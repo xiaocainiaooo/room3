@@ -17,6 +17,7 @@
 package androidx.appsearch.util;
 
 import androidx.appsearch.app.GenericDocument;
+import androidx.appsearch.app.JoinSpec;
 import androidx.core.util.Preconditions;
 
 import org.jspecify.annotations.NonNull;
@@ -69,15 +70,17 @@ public class DocumentIdUtil {
      *
      * <p> A qualified id is a String referring to the combined package name, database name,
      * namespace, and id of the document. It is useful for linking one document to another in order
-     * to perform a join operation.
+     * to perform a join operation with {@link JoinSpec}.
      *
      * @param packageName The package the document belongs to.
      * @param databaseName The database containing the document.
      * @param namespace The namespace of the document.
      * @param id The id of the document.
      * @return the qualified id of a document
+     *
+     * @see JoinSpec
+     * @see JoinSpec#QUALIFIED_ID
      */
-    // TODO(b/256022027): Add @link to QUALIFIED_ID and JoinSpec
     public static @NonNull String createQualifiedId(@NonNull String packageName,
             @NonNull String databaseName, @NonNull String namespace, @NonNull String id) {
         Preconditions.checkNotNull(packageName);
