@@ -455,7 +455,9 @@ package androidx.compose.ui.graphics {
 
   public interface GraphicsContext {
     method public androidx.compose.ui.graphics.layer.GraphicsLayer createGraphicsLayer();
+    method public default androidx.compose.ui.graphics.shadow.ShadowContext getShadowContext();
     method public void releaseGraphicsLayer(androidx.compose.ui.graphics.layer.GraphicsLayer layer);
+    property public default androidx.compose.ui.graphics.shadow.ShadowContext shadowContext;
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface ImageBitmap {
@@ -1587,6 +1589,10 @@ package androidx.compose.ui.graphics.painter {
 
 package androidx.compose.ui.graphics.shadow {
 
+  public final class AndroidShadowContext_androidKt {
+    method public static androidx.compose.ui.graphics.shadow.ShadowContext ShadowContext();
+  }
+
   @androidx.compose.runtime.Stable public final class DropShadow {
     ctor public DropShadow(float radius, androidx.compose.ui.graphics.Brush brush, optional float spread, optional float alpha, optional int blendMode);
     ctor public DropShadow(float radius, optional long color, optional float spread, optional float alpha, optional int blendMode);
@@ -1635,6 +1641,12 @@ package androidx.compose.ui.graphics.shadow {
     method public long getIntrinsicSize();
     method protected void onDraw(androidx.compose.ui.graphics.drawscope.DrawScope);
     property public long intrinsicSize;
+  }
+
+  public interface ShadowContext {
+    method public default void clearCache();
+    method public default androidx.compose.ui.graphics.shadow.DropShadowPainter createDropShadowPainter(androidx.compose.ui.graphics.Shape shape, androidx.compose.ui.graphics.shadow.DropShadow dropShadow);
+    method public default androidx.compose.ui.graphics.shadow.InnerShadowPainter createInnerShadowPainter(androidx.compose.ui.graphics.Shape shape, androidx.compose.ui.graphics.shadow.InnerShadow innerShadow);
   }
 
 }
