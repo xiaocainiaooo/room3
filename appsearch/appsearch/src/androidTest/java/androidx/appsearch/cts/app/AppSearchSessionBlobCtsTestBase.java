@@ -37,8 +37,10 @@ import androidx.appsearch.app.AppSearchCommitBlobResponse;
 import androidx.appsearch.app.AppSearchOpenBlobForReadResponse;
 import androidx.appsearch.app.AppSearchOpenBlobForWriteResponse;
 import androidx.appsearch.app.AppSearchResult;
+import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.AppSearchSession;
 import androidx.appsearch.app.Features;
+import androidx.appsearch.app.GetSchemaResponse;
 import androidx.appsearch.app.SetSchemaRequest;
 import androidx.appsearch.flags.CheckFlagsRule;
 import androidx.appsearch.flags.DeviceFlagsValueProvider;
@@ -447,6 +449,21 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     }
 
     @Test
+    public void testSetBlobSchema() throws Exception {
+        assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
+        AppSearchSchema schema = new AppSearchSchema.Builder("Type")
+                .addProperty(new AppSearchSchema.BlobHandlePropertyConfig.Builder("blob")
+                        .setCardinality(AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setDescription("this is a blob.")
+                        .build())
+                .build();
+        mDb1.setSchemaAsync(new SetSchemaRequest.Builder().addSchemas(schema).build()).get();
+
+        GetSchemaResponse getSchemaResponse = mDb1.getSchemaAsync().get();
+        assertThat(getSchemaResponse.getSchemas()).containsExactly(schema);
+    }
+
+    @Test
     public void testWriteAndReadBlob_notSupported() throws Exception {
         assumeFalse(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
         byte[] data = generateRandomBytes(10); // 10 Bytes
@@ -464,6 +481,22 @@ public abstract class AppSearchSessionBlobCtsTestBase {
                 Features.BLOB_STORAGE + " is not available on this AppSearch implementation.");
         exception = assertThrows(UnsupportedOperationException.class,
                 () -> mDb1.openBlobForReadAsync(ImmutableSet.of(handle)));
+        assertThat(exception).hasMessageThat().contains(
+                Features.BLOB_STORAGE + " is not available on this AppSearch implementation.");
+    }
+
+    @Test
+    public void testSetBlobSchema_notSupported() throws Exception {
+        assumeFalse(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
+        AppSearchSchema schema = new AppSearchSchema.Builder("Type")
+                .addProperty(new AppSearchSchema.BlobHandlePropertyConfig.Builder("blob")
+                        .setCardinality(AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL)
+                        .build())
+                .build();
+
+        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class,
+                () -> mDb1.setSchemaAsync(new SetSchemaRequest.Builder().addSchemas(schema).build())
+                        .get());
         assertThat(exception).hasMessageThat().contains(
                 Features.BLOB_STORAGE + " is not available on this AppSearch implementation.");
     }

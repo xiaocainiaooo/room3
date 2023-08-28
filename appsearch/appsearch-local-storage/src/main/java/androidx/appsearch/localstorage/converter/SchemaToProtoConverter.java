@@ -213,6 +213,11 @@ public final class SchemaToProtoConverter {
                 return toDocumentPropertyConfig(proto);
             case VECTOR:
                 return toEmbeddingPropertyConfig(proto);
+            case BLOB_HANDLE:
+                return new AppSearchSchema.BlobHandlePropertyConfig.Builder(proto.getPropertyName())
+                        .setDescription(proto.getDescription())
+                        .setCardinality(proto.getCardinality().getNumber())
+                        .build();
             default:
                 throw new IllegalArgumentException(
                         "Invalid dataType code: " + proto.getDataType().getNumber());
