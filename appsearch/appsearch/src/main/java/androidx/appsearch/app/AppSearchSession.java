@@ -114,11 +114,11 @@ public interface AppSearchSession extends Closeable {
     /**
      * Opens a batch of AppSearch Blobs for writing.
      *
-     * <p>A "blob" is a large binary object, typically represented as a long byte array. It is
-     * used to store a significant amount of data that is not searchable, such as images, videos,
-     * audio files, or other binary data. Unlike other fields in AppSearch, blobs are stored as
-     * blob files on disk rather than in memory, and use {@link android.os.ParcelFileDescriptor} to
-     * read and write. This allows for efficient handling of large, non-searchable content.
+     * <p>A "blob" is a large binary object. It is used to store a significant amount of data that
+     * is not searchable, such as images, videos, audio files, or other binary data. Unlike other
+     * fields in AppSearch, blobs are stored as blob files on disk rather than in memory, and use
+     * {@link android.os.ParcelFileDescriptor} to read and write. This allows for efficient handling
+     * of large, non-searchable content.
      *
      * <p> Once done writing, call {@link #commitBlobAsync} to commit blob files.
      *
@@ -152,13 +152,14 @@ public interface AppSearchSession extends Closeable {
      *
      * @param handles The {@link AppSearchBlobHandle}s that identifies the blobs.
      * @return a response containing the writeable file descriptors.
+     *
+     * @see GenericDocument.Builder#setPropertyBlobHandle
      */
     @RequiresFeature(
             enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
             name = Features.BLOB_STORAGE)
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     @ExperimentalAppSearchApi
-    // TODO(b/273591938) improve the java doc when we support set blob property in GenericDocument
     // TODO(b/273591938) improve the java doc when we support abandon pending blobs.
     @NonNull
     ListenableFuture<AppSearchOpenBlobForWriteResponse> openBlobForWriteAsync(
@@ -184,13 +185,14 @@ public interface AppSearchSession extends Closeable {
      *
      * @param handles The {@link AppSearchBlobHandle}s that identifies the blobs.
      * @return a response containing the commit results.
+     *
+     * @see GenericDocument.Builder#setPropertyBlobHandle
      */
     @RequiresFeature(
             enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
             name = Features.BLOB_STORAGE)
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     @ExperimentalAppSearchApi
-    // TODO(b/273591938) improve the java doc when we support set blob property in GenericDocument
     @NonNull
     ListenableFuture<AppSearchCommitBlobResponse> commitBlobAsync(
             @NonNull Set<AppSearchBlobHandle> handles);
@@ -207,8 +209,9 @@ public interface AppSearchSession extends Closeable {
      *
      * @param handles The {@link AppSearchBlobHandle}s that identifies the blobs.
      * @return a response containing the readable file descriptors.
+     *
+     * @see GenericDocument.Builder#setPropertyBlobHandle
      */
-    // TODO(b/273591938) improve the java doc when we support set blob property in GenericDocument
     @RequiresFeature(
             enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
             name = Features.BLOB_STORAGE)

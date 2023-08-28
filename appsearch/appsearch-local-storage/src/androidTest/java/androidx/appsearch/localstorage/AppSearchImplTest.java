@@ -2341,6 +2341,128 @@ public class AppSearchImplTest {
     }
 
     @Test
+    public void testOptimizeBlob() throws Exception {
+        // Create a new AppSearchImpl with lower orphan blob time to live.
+        mAppSearchImpl.close();
+        File tempFolder = mTemporaryFolder.newFolder();
+        mAppSearchImpl = AppSearchImpl.create(
+                tempFolder, new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new LocalStorageIcingOptionsConfig() {
+                            @Override
+                            public long getOrphanBlobTimeToLiveMs() {
+                                // 0 will make it non-expire
+                                return 1L;
+                            }
+                        }),
+                /*initStatsBuilder=*/ null,
+                /*visibilityChecker=*/ null,
+                new JetpackRevocableFileDescriptorStore(mUnlimitedConfig),
+                ALWAYS_OPTIMIZE);
+
+        // Write the blob and commit it.
+        byte[] data = generateRandomBytes(20); // 20 Bytes
+        byte[] digest = calculateDigest(data);
+        AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
+                digest, "package", "db1", "namespace");
+        ParcelFileDescriptor writePfd = mAppSearchImpl.openWriteBlob("package", "db1", handle);
+        try (OutputStream outputStream = new ParcelFileDescriptor.AutoCloseOutputStream(writePfd)) {
+            outputStream.write(data);
+            outputStream.flush();
+        }
+        writePfd.close();
+        mAppSearchImpl.commitBlob("package", "db1", handle);
+
+        mAppSearchImpl.persistToDisk(PersistType.Code.FULL);
+
+        // Optimize remove the expired orphan blob.
+        mAppSearchImpl.optimize(/*builder=*/null);
+        AppSearchException e = assertThrows(AppSearchException.class, () -> {
+            mAppSearchImpl.openReadBlob("package", "db1", handle);
+        });
+        assertThat(e.getResultCode()).isEqualTo(AppSearchResult.RESULT_NOT_FOUND);
+        assertThat(e.getMessage()).contains("Cannot find the blob for handle");
+    }
+
+    @Test
+    public void testOptimizeBlobWithDocument() throws Exception {
+        // Create a new AppSearchImpl with lower orphan blob time to live.
+        mAppSearchImpl.close();
+        File tempFolder = mTemporaryFolder.newFolder();
+        mAppSearchImpl = AppSearchImpl.create(
+                tempFolder, new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new LocalStorageIcingOptionsConfig() {
+                            @Override
+                            public long getOrphanBlobTimeToLiveMs() {
+                                // 0 will make it non-expire
+                                return 1L;
+                            }
+                        }),
+                /*initStatsBuilder=*/ null,
+                /*visibilityChecker=*/ null,
+                new JetpackRevocableFileDescriptorStore(mUnlimitedConfig),
+                ALWAYS_OPTIMIZE);
+
+        // Write the blob and commit it.
+        byte[] data = generateRandomBytes(20); // 20 Bytes
+        byte[] digest = calculateDigest(data);
+        AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
+                digest, "package", "db1", "namespace");
+        ParcelFileDescriptor writePfd = mAppSearchImpl.openWriteBlob("package", "db1", handle);
+        try (OutputStream outputStream = new ParcelFileDescriptor.AutoCloseOutputStream(writePfd)) {
+            outputStream.write(data);
+            outputStream.flush();
+        }
+        writePfd.close();
+        mAppSearchImpl.commitBlob("package", "db1", handle);
+
+        // Put a document link that blob handle.
+        AppSearchSchema schema = new AppSearchSchema.Builder("Type")
+                .addProperty(new AppSearchSchema.BlobHandlePropertyConfig.Builder("blob")
+                        .setCardinality(AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL)
+                        .build())
+                .build();
+        InternalSetSchemaResponse internalSetSchemaResponse = mAppSearchImpl.setSchema(
+                "package",
+                "db1",
+                ImmutableList.of(schema),
+                /*visibilityConfigs=*/ Collections.emptyList(),
+                /*forceOverride=*/ true,
+                /*version=*/ 0,
+                /* setSchemaStatsBuilder= */ null);
+        assertThat(internalSetSchemaResponse.isSuccess()).isTrue();
+        GenericDocument document = new GenericDocument.Builder<>("namespace", "id", "Type")
+                .setPropertyBlobHandle("blob", handle)
+                .build();
+        mAppSearchImpl.putDocument(
+                "package",
+                "db1",
+                document,
+                /*sendChangeNotifications=*/ false,
+                /*logger=*/ null);
+
+        mAppSearchImpl.persistToDisk(PersistType.Code.FULL);
+
+        // Optimize won't remove the blob since it has reference document.
+        mAppSearchImpl.optimize(/*builder=*/null);
+        byte[] readBytes = new byte[20];
+        try (ParcelFileDescriptor readPfd =  mAppSearchImpl.openReadBlob("package", "db1", handle);
+                InputStream inputStream = new ParcelFileDescriptor.AutoCloseInputStream(readPfd)) {
+            inputStream.read(readBytes);
+        }
+        assertThat(readBytes).isEqualTo(data);
+
+        mAppSearchImpl.remove("package", "db1",  "namespace", "id", /*statsBuilder=*/ null);
+
+        // The blob is orphan now and optimize will remove it.
+        mAppSearchImpl.optimize(/*builder=*/null);
+        AppSearchException e = assertThrows(AppSearchException.class, () -> {
+            mAppSearchImpl.openReadBlob("package", "db1", handle);
+        });
+        assertThat(e.getResultCode()).isEqualTo(AppSearchResult.RESULT_NOT_FOUND);
+        assertThat(e.getMessage()).contains("Cannot find the blob for handle");
+    }
+
+    @Test
     public void testRevokeFileDescriptor() throws Exception {
         mAppSearchImpl = AppSearchImpl.create(
                 mAppSearchDir,
