@@ -31,27 +31,78 @@ import android.view.SurfaceControlViewHost
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
+import androidx.privacysandbox.ui.core.DelegatingSandboxedUiAdapter
+import androidx.privacysandbox.ui.core.IDelegateChangeListener
+import androidx.privacysandbox.ui.core.IDelegatingSandboxedUiAdapter
+import androidx.privacysandbox.ui.core.IDelegatorCallback
 import androidx.privacysandbox.ui.core.IRemoteSessionClient
 import androidx.privacysandbox.ui.core.IRemoteSessionController
 import androidx.privacysandbox.ui.core.ISandboxedUiAdapter
+import androidx.privacysandbox.ui.core.ProtocolConstants
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.core.SessionObserver
 import androidx.privacysandbox.ui.core.SessionObserverContext
 import androidx.privacysandbox.ui.core.SessionObserverFactory
 import androidx.privacysandbox.ui.provider.impl.DeferredSessionClient
 import java.util.concurrent.Executor
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * Provides a [Bundle] containing a Binder which represents a [SandboxedUiAdapter]. The Bundle is
  * shuttled to the host app in order for the [SandboxedUiAdapter] to be used to retrieve content.
  */
 fun SandboxedUiAdapter.toCoreLibInfo(@Suppress("ContextFirst") context: Context): Bundle {
-    val binderAdapter = BinderAdapterDelegate(context, this)
     // TODO: Add version info
     val bundle = Bundle()
+    val binderAdapter =
+        if (this is DelegatingSandboxedUiAdapter) {
+            bundle.putBundle(ProtocolConstants.delegateKey, this.getDelegate())
+            BinderDelegatingAdapter(this)
+        } else {
+            BinderAdapterDelegate(context, this)
+        }
     // Bundle key is a binary compatibility requirement
+    // TODO(b/375389719): Move key to ProtocolConstants
     bundle.putBinder("uiAdapterBinder", binderAdapter)
     return bundle
+}
+
+private class BinderDelegatingAdapter(private var adapter: DelegatingSandboxedUiAdapter) :
+    IDelegatingSandboxedUiAdapter.Stub() {
+    private class RemoteDelegateChangeListener(val binder: IDelegateChangeListener) :
+        DelegatingSandboxedUiAdapter.DelegateChangeListener {
+
+        override suspend fun onDelegateChanged(delegate: Bundle) {
+            suspendCancellableCoroutine { continuation ->
+                binder.onDelegateChanged(
+                    delegate,
+                    object : IDelegatorCallback.Stub() {
+                        override fun onDelegateChangeResult(success: Boolean) {
+                            if (success) {
+                                continuation.resume(Unit)
+                            } else {
+                                continuation.resumeWithException(
+                                    IllegalStateException("Client failed to switch")
+                                )
+                            }
+                        }
+                    }
+                )
+            }
+        }
+    }
+
+    override fun addDelegateChangeListener(binder: IDelegateChangeListener) {
+        val listener = RemoteDelegateChangeListener(binder)
+        adapter.addDelegateChangeListener(listener)
+        binder.asBinder().linkToDeath({ adapter.removeDelegateChangeListener(listener) }, 0)
+    }
+
+    override fun removeDelegateChangeListener(listener: IDelegateChangeListener) {
+        adapter.removeDelegateChangeListener(RemoteDelegateChangeListener(listener))
+    }
 }
 
 private class BinderAdapterDelegate(

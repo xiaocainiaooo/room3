@@ -18,8 +18,11 @@ package androidx.privacysandbox.ui.integration.testsdkprovider
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.Process
 import androidx.privacysandbox.sdkruntime.core.controller.SdkSandboxControllerCompat
+import androidx.privacysandbox.ui.core.DelegatingSandboxedUiAdapter
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.integration.sdkproviderutils.PlayerViewProvider
 import androidx.privacysandbox.ui.integration.sdkproviderutils.PlayerViewabilityHandler
@@ -30,9 +33,12 @@ import androidx.privacysandbox.ui.integration.sdkproviderutils.ViewabilityHandle
 import androidx.privacysandbox.ui.integration.testaidl.IMediateeSdkApi
 import androidx.privacysandbox.ui.integration.testaidl.ISdkApi
 import androidx.privacysandbox.ui.provider.toCoreLibInfo
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 class SdkApi(private val sdkContext: Context) : ISdkApi.Stub() {
     private val testAdapters = TestAdapters(sdkContext)
+    private val handler = Handler(Looper.getMainLooper())
 
     override fun loadBannerAd(
         @AdType adType: Int,
@@ -43,16 +49,13 @@ class SdkApi(private val sdkContext: Context) : ISdkApi.Stub() {
         val isMediation = mediationOption != MediationOption.NON_MEDIATED
         val isAppOwnedMediation = (mediationOption == MediationOption.IN_APP_MEDIATEE)
         if (isMediation) {
-            val mediateeBundle =
-                maybeGetMediateeBannerAdBundle(
+            return loadMediatedTestAd(
                     isAppOwnedMediation,
                     adType,
                     waitInsideOnDraw,
                     drawViewability
                 )
-            return if (mediationOption == MediationOption.SDK_RUNTIME_MEDIATEE_WITH_OVERLAY) {
-                testAdapters.OverlaidAd(mediateeBundle).toCoreLibInfo(sdkContext)
-            } else mediateeBundle
+                .toCoreLibInfo(sdkContext)
         }
         val adapter: SandboxedUiAdapter =
             when (adType) {
@@ -71,6 +74,47 @@ class SdkApi(private val sdkContext: Context) : ISdkApi.Stub() {
                 }
             }.also { ViewabilityHandler.addObserverFactoryToAdapter(it, drawViewability) }
         return adapter.toCoreLibInfo(sdkContext)
+    }
+
+    private fun startDelegatingAdUpdateHandler(
+        adapter: DelegatingSandboxedUiAdapter,
+        drawViewability: Boolean
+    ) {
+        val updateInterval = UPDATE_DELEGATE_INTERVAL
+
+        val displayAdFromRuntimeMediatee = Runnable {
+            val coroutineScope = MainScope()
+            coroutineScope.launch {
+                val runtimeAdapterBundle =
+                    maybeGetMediateeBannerAdBundle(
+                        false,
+                        AdType.BASIC_NON_WEBVIEW,
+                        false,
+                        drawViewability
+                    )
+                adapter.updateDelegate(runtimeAdapterBundle)
+            }
+        }
+        val displayAdFromAppOwnedMediatee = Runnable {
+            val coroutineScope = MainScope()
+            coroutineScope.launch {
+                val inAppAdapterBundle =
+                    maybeGetMediateeBannerAdBundle(
+                        true,
+                        AdType.BASIC_NON_WEBVIEW,
+                        false,
+                        drawViewability
+                    )
+                adapter.updateDelegate(inAppAdapterBundle)
+            }
+        }
+        // Post events to update the delegate after certain intervals
+        handler.postDelayed(displayAdFromRuntimeMediatee, updateInterval)
+        // race condition
+        handler.postDelayed(displayAdFromRuntimeMediatee, 2 * updateInterval)
+        handler.postDelayed(displayAdFromAppOwnedMediatee, 2 * updateInterval)
+
+        handler.postDelayed(displayAdFromRuntimeMediatee, 4 * updateInterval)
     }
 
     /** Kill sandbox process */
@@ -98,6 +142,22 @@ class SdkApi(private val sdkContext: Context) : ISdkApi.Stub() {
         val adapter = testAdapters.VideoBannerAd(playerViewProvider)
         PlayerViewabilityHandler.addObserverFactoryToAdapter(adapter, playerViewProvider)
         return adapter
+    }
+
+    private fun loadMediatedTestAd(
+        isAppMediatee: Boolean,
+        @AdType adType: Int,
+        waitInsideOnDraw: Boolean,
+        drawViewability: Boolean
+    ): SandboxedUiAdapter {
+        // TODO(b/350473804): Clean up mediatee flag - redundant after introducing Delegating
+        // adapters
+        val mediateeBannerAdBundle =
+            maybeGetMediateeBannerAdBundle(isAppMediatee, adType, waitInsideOnDraw, drawViewability)
+        val bannerAd = DelegatingSandboxedUiAdapter(mediateeBannerAdBundle)
+        // The ad will keep refreshing between different mediatees
+        startDelegatingAdUpdateHandler(bannerAd, drawViewability)
+        return bannerAd
     }
 
     override fun requestResize(width: Int, height: Int) {}
@@ -144,6 +204,6 @@ class SdkApi(private val sdkContext: Context) : ISdkApi.Stub() {
     companion object {
         private const val MEDIATEE_SDK =
             "androidx.privacysandbox.ui.integration.mediateesdkprovider"
-        private const val TAG = "SdkApi"
+        private const val UPDATE_DELEGATE_INTERVAL: Long = 5000L
     }
 }
