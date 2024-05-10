@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The Android Open Source Project
+ * Copyright (C) 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,18 +33,6 @@
 
 package androidx.core.uwb.backend;
 @JavaPassthrough(annotation="@androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY)")
-interface IUwbClient {
-  boolean isAvailable();
-  androidx.core.uwb.backend.RangingCapabilities getRangingCapabilities();
-  androidx.core.uwb.backend.UwbAddress getLocalAddress();
-  androidx.core.uwb.backend.UwbComplexChannel getComplexChannel();
-  void startRanging(in androidx.core.uwb.backend.RangingParameters parameters, in androidx.core.uwb.backend.IRangingSessionCallback callback);
-  void stopRanging(in androidx.core.uwb.backend.IRangingSessionCallback callback);
-  void addControlee(in androidx.core.uwb.backend.UwbAddress address);
-  void addControleeWithSessionParams(in androidx.core.uwb.backend.RangingControleeParameters params);
-  void removeControlee(in androidx.core.uwb.backend.UwbAddress address);
-  void reconfigureRangingInterval(in int intervalSkipCount);
-  void reconfigureRangeDataNtf(in int configType, in int proximityNearCm, in int proximityFarCm);
-  void subscribeToAvailability(in androidx.core.uwb.backend.IUwbAvailabilityObserver observer);
-  void unsubscribeFromAvailability();
+interface IUwbAvailabilityObserver {
+  void onUwbStateChanged(boolean isAvailable, int reason);
 }
