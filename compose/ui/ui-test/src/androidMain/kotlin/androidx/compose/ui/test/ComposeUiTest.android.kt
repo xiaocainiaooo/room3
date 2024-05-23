@@ -26,7 +26,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.InfiniteAnimationPolicy
+import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.WindowRecomposerPolicy
 import androidx.compose.ui.unit.Density
 import androidx.test.core.app.ActivityScenario
@@ -112,7 +115,22 @@ fun <A : ComponentActivity> runAndroidComposeUiTest(
     try {
         environment.runTest {
             scenario = ActivityScenario.launch(activityClass)
-            block()
+            var blockException: Throwable? = null
+            try {
+                // Run the test
+                block()
+            } catch (t: Throwable) {
+                blockException = t
+            } finally {
+                // Remove all compose content in a controlled environment. Content may or may not
+                // dispose cleanly. The Activity teardown is going to dispose all of the
+                // compositions anyway, so we need to preemptively try now where we can catch any
+                // exceptions.
+                runOnUiThread { environment.tryDiscardAllCompositions() }
+            }
+
+            // Throw the aggregate exception. May be from the test body or from the cleanup.
+            blockException?.let { throw it }
         }
     } finally {
         // Close the scenario outside runTest to avoid getting stuck.
@@ -124,6 +142,45 @@ fun <A : ComponentActivity> runAndroidComposeUiTest(
         // call close() outside the runTest lambda. This will not help if the content is not set
         // through the test's setContent method though, in which case we'll still time out here.
         scenario?.close()
+    }
+}
+
+/**
+ * Attempts to permanently dispose a composition. This works by both immediately calling
+ * [Composition.dispose()][androidx.compose.runtime.Composition.dispose] to synchronously remove all
+ * content, and setting the content lambda of the composition to `{ }` to prevent the removed
+ * content from being immediately recreated again (which could notably happen if the underlying
+ * ComposeView is remeasured during or just before the destruction process of the Activity).
+ *
+ * This function is best-effort in that it is not always possible to clear the content lambda.
+ * Usually, this means that the content is in a dialog. If this is the case, this function
+ * immediately returns without attempting any disposal.
+ *
+ * Any errors thrown by composition teardown are immediately propagated. This function does not
+ * perform any error handling.
+ *
+ * This function is intended for internal test runner usage only. Tests should never need to call
+ * this function directly. It is invoked automatically at the end of all compose tests executed with
+ * `ComposeContentTestRule` (and by extension, `AndroidComposeTestRule`) as well as tests run with
+ * [runComposeUiTest].
+ *
+ * Must be called on the main thread.
+ */
+private fun ViewRootForTest.tryDiscardComposition() {
+    var composeView = view
+    if (!composeView.isAttachedToWindow) return
+
+    while (composeView !is AbstractComposeView) {
+        composeView = (composeView.parent as View?) ?: return
+    }
+    when {
+        composeView is ComposeView -> {
+            composeView.setContent {}
+            composeView.disposeComposition()
+        }
+        composeView.parent == composeView.rootView -> {
+            // Not supported. We're probably in a dialog or some other popup.
+        }
     }
 }
 
@@ -365,14 +422,13 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
         // activity might still be launching. If it is going to set compose content, we want that
         // to happen before we install our hooks to avoid a race.
         idlingStrategy.runUntilIdle()
+
         return composeRootRegistry.withRegistry {
             idlingResourceRegistry.withRegistry {
                 idlingStrategy.withStrategy {
                     withTestCoroutines {
                         withWindowRecomposer {
-                            withComposeIdlingResource {
-                                testReceiverScope.withDisposableContent(block)
-                            }
+                            withComposeIdlingResource { testReceiverScope.block() }
                         }
                     }
                 }
@@ -425,6 +481,29 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
         }
     }
 
+    /**
+     * Attempts to permanently dispose all compositions known to the test environment. Disposing a
+     * composition is done by clearing both the composed content and the content lambda to prevent
+     * accidental recreations of the removed composition hierarchy that could be caused by the
+     * underlying activity's destruction.
+     *
+     * This function is intended to be called by the Compose test runner. Tests should never need to
+     * call this function directly; the out-of-box testing infrastructure calls this method at the
+     * end of each test.
+     *
+     * Must be called on the main thread.
+     */
+    fun tryDiscardAllCompositions() {
+        var exception: Exception? = null
+        composeRootRegistry.getCreatedComposeRoots().forEach { viewRootForTest ->
+            try {
+                viewRootForTest.tryDiscardComposition()
+            } catch (e: Exception) {
+                exception = exception?.apply { addSuppressed(e) } ?: e
+            }
+        }
+    }
+
     private fun <R> withTestCoroutines(block: () -> R): R {
         try {
             return block()
@@ -447,7 +526,6 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
     }
 
     internal inner class AndroidComposeUiTestImpl : AndroidComposeUiTest<A> {
-        private var disposeContentHook: (() -> Unit)? = null
 
         override val activity: A?
             get() = this@AndroidComposeUiTestEnvironment.activity
@@ -553,8 +631,6 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
         }
 
         override fun setContent(composable: @Composable () -> Unit) {
-            check(disposeContentHook == null) { "Cannot call setContent twice per test!" }
-
             // We always make sure we have the latest activity when setting a content
             val currentActivity =
                 checkNotNull(activity) { "Cannot set content, host activity not found" }
@@ -567,48 +643,11 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
                     "`setContent {}` is done after the ComposeTestRule has run"
             }
 
-            runOnUiThread {
-                currentActivity.setContent(recomposer, composable)
-                disposeContentHook = {
-                    // Removing a default ComposeView from the view hierarchy will
-                    // dispose its composition.
-                    activity?.let { it.setContentView(View(it)) }
-                }
-            }
+            runOnUiThread { currentActivity.setContent(recomposer, composable) }
 
             // Synchronizing from the UI thread when we can't leads to a dead lock
             if (idlingStrategy.canSynchronizeOnUiThread || !isOnUiThread()) {
                 waitForIdle()
-            }
-        }
-
-        fun <R> withDisposableContent(block: AndroidComposeUiTest<A>.() -> R): R {
-            try {
-                return block.invoke(this)
-            } finally {
-                // Dispose the content. The content is disposed by replacing the activity's content
-                // with an empty View, breaking potential infinite loops. Just cancelling the
-                // Recomposer is not enough, as the infinite loop might not involve recomposition.
-                // For example, when there is a layout or draw lambda that keeps invalidating
-                // itself. Note that this won't have any effect if the content is not set with
-                // ComposeUiTest.setContent, but directly with ComponentActivity.setContent, which
-                // would be the typical case when testing an Activity that sets Compose content.
-                disposeContentHook?.let {
-                    disposeContentHook = null
-                    runOnUiThread {
-                        // NOTE: currently, calling dispose after an exception that happened during
-                        // composition is not a safe call. Compose runtime should fix this, and then
-                        // this call will be okay. At the moment, however, calling this could
-                        // itself produce an exception which will then obscure the original
-                        // exception. To fix this, we will just wrap this call in a try/catch of
-                        // its own
-                        try {
-                            it.invoke()
-                        } catch (e: Exception) {
-                            // ignore
-                        }
-                    }
-                }
             }
         }
     }
