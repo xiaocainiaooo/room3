@@ -63,13 +63,13 @@ class UiErrorTraceTests(private val lookahead: Boolean) {
         fun init() = listOf(false, true)
     }
 
-    private var exceptionHandler: ((Throwable) -> Unit)? = null
+    private lateinit var exceptionHandler: (Throwable) -> Unit
 
     @OptIn(ExperimentalTestApi::class)
     @get:Rule
     val rule =
         createAndroidComposeRule<ComponentActivity>(
-            CoroutineExceptionHandler { _, e -> exceptionHandler?.invoke(e) }
+            CoroutineExceptionHandler { _, e -> exceptionHandler.invoke(e) }
         )
 
     @Before
@@ -423,13 +423,8 @@ class UiErrorTraceTests(private val lookahead: Boolean) {
             }
         }
 
-        findViewRootForTest(view)!!.setExceptionHandler { e ->
-            try {
-                exceptionHandler?.invoke(e)
-                true
-            } catch (_: Throwable) {
-                false
-            }
+        findViewRootForTest(view)!!.setUncaughtExceptionHandler { e, _ ->
+            exceptionHandler.invoke(e)
         }
         view.setContent {
             if (!lookahead) {
