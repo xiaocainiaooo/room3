@@ -16,29 +16,32 @@
 
 package androidx.benchmark.benchmark
 
-import androidx.benchmark.BenchmarkState
+import androidx.benchmark.ExperimentalBenchmarkConfigApi
+import androidx.benchmark.ExperimentalBlackHoleApi
 import androidx.benchmark.TestDefinition
+import androidx.benchmark.measureRepeated
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@OptIn(ExperimentalBenchmarkConfigApi::class, ExperimentalBlackHoleApi::class)
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class BenchmarkStateBenchmark {
-    /** Proof of concept benchmark using BenchmarkState without a JUnit Rule */
+class MeasureRepeatedSampleBenchmark {
+    /** Proof of concept of top-level benchmark function, without a JUnit Rule */
     @Test
-    fun nothing() {
-        val state =
-            BenchmarkState(
-                TestDefinition(
-                    "androidx.benchmark.benchmark.BenchmarkState2Benchmark",
-                    "BenchmarkState2Benchmark",
-                    "increment"
-                ),
+    fun increment() {
+        println("increment")
+        var i: Int = 0
+        measureRepeated(
+            TestDefinition(
+                "androidx.benchmark.benchmark.MeasureRepeatedSampleBenchmark",
+                "MeasureRepeatedSampleBenchmark",
+                "increment"
             )
-        while (state.keepRunning()) {
-            //
+        ) {
+            i++
         }
     }
 }
