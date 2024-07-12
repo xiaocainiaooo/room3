@@ -16,9 +16,9 @@
 
 package androidx.privacysandbox.ui.tests.endtoend
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.os.Bundle
 import androidx.privacysandbox.ui.client.SharedUiAdapterFactory
+import androidx.privacysandbox.ui.core.BackwardCompatUtil
 import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.core.SharedUiAdapter
 import androidx.privacysandbox.ui.provider.toCoreLibInfo
@@ -29,22 +29,43 @@ import com.google.common.truth.Truth.assertWithMessage
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
+import org.junit.Assume.assumeTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 // TODO(b/263460954): in the following CLs with AppOwnedUiContainer implementation:
 //  1) Add tests for cases when the adapter is set on an app-owned container;
 //  2) Add state change listener checks to the tests;
 @OptIn(ExperimentalFeatures.SharedUiPresentationApi::class)
+@RunWith(Parameterized::class)
 @MediumTest
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-class SharedSessionIntegrationTests() {
+class SharedSessionIntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
 
     companion object {
         const val TIMEOUT = 1000L
+        const val TEST_ONLY_USE_REMOTE_ADAPTER = "testOnlyUseRemoteAdapter"
+
+        @JvmStatic
+        @Parameterized.Parameters(name = "invokeBackwardsCompatFlow={0}")
+        fun data(): Array<Any> =
+            arrayOf(
+                arrayOf(true),
+                arrayOf(false),
+            )
     }
 
     @get:Rule var activityScenarioRule = ActivityScenarioRule(MainActivity::class.java)
+
+    @Before
+    fun setup() {
+        if (!invokeBackwardsCompatFlow) {
+            // Device needs to support remote provider to invoke non-backward-compat flow.
+            assumeTrue(BackwardCompatUtil.canProviderBeRemote())
+        }
+    }
 
     @Test
     fun testOpenSession_fromAdapter() {
@@ -76,6 +97,24 @@ class SharedSessionIntegrationTests() {
         assertWithMessage("close is called on Session").that(adapter.isCloseSessionCalled).isTrue()
     }
 
+    @Test
+    fun testSessionClientProxy_methodsOnObjectClass() {
+        // Only makes sense when a dynamic proxy is involved in the flow
+        assumeTrue(invokeBackwardsCompatFlow)
+        val testSessionClient = TestSessionClient()
+
+        val sdkAdapter =
+            createAdapterAndEstablishSession(testSharedSessionClient = testSessionClient)
+        // Verify toString, hashCode and equals have been implemented for dynamic proxy
+        val testSession = sdkAdapter.session as TestSharedUiAdapter.TestSession
+        val client = testSession.sessionClient
+
+        assertThat(client.toString()).isEqualTo(testSessionClient.toString())
+        assertThat(client.equals(client)).isTrue()
+        assertThat(client).isNotEqualTo(testSessionClient)
+        assertThat(client.hashCode()).isEqualTo(client.hashCode())
+    }
+
     // TODO (b/263460954): add app-owned container as a parameter once it's implemented
     private fun createAdapterAndEstablishSession(
         testSharedSessionClient: TestSessionClient = TestSessionClient(),
@@ -83,13 +122,19 @@ class SharedSessionIntegrationTests() {
     ): TestSharedUiAdapter {
         val adapter = TestSharedUiAdapter(isFailingSession)
         val adapterFromCoreLibInfo =
-            SharedUiAdapterFactory.createFromCoreLibInfo(adapter.toCoreLibInfo())
+            SharedUiAdapterFactory.createFromCoreLibInfo(getCoreLibInfoFromAdapter(adapter))
         adapterFromCoreLibInfo.openSession(Runnable::run, testSharedSessionClient)
 
         assertWithMessage("openSession is called on adapter")
             .that(adapter.isOpenSessionCalled)
             .isTrue()
         return adapter
+    }
+
+    private fun getCoreLibInfoFromAdapter(sdkAdapter: SharedUiAdapter): Bundle {
+        val bundle = sdkAdapter.toCoreLibInfo()
+        bundle.putBoolean(TEST_ONLY_USE_REMOTE_ADAPTER, !invokeBackwardsCompatFlow)
+        return bundle
     }
 
     inner class TestSharedUiAdapter(private val isFailingSession: Boolean = false) :
@@ -107,12 +152,14 @@ class SharedSessionIntegrationTests() {
 
         override fun openSession(clientExecutor: Executor, client: SharedUiAdapter.SessionClient) {
             session =
-                if (isFailingSession) FailingTestSession(client, clientExecutor) else TestSession()
+                if (isFailingSession) FailingTestSession(client, clientExecutor)
+                else TestSession(client)
             client.onSessionOpened(session)
             openSessionLatch.countDown()
         }
 
-        inner class TestSession() : SharedUiAdapter.Session {
+        inner class TestSession(val sessionClient: SharedUiAdapter.SessionClient) :
+            SharedUiAdapter.Session {
             override fun close() {
                 closeSessionLatch.countDown()
             }

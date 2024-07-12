@@ -35,7 +35,6 @@ import java.util.concurrent.Executor
  */
 @SuppressLint("NullAnnotationGroup")
 @ExperimentalFeatures.SharedUiPresentationApi
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 fun SharedUiAdapter.toCoreLibInfo(): Bundle {
     val binderAdapter = BinderSharedUiAdapterDelegate(this)
     // TODO(b/350445624): Add version info
@@ -48,7 +47,6 @@ fun SharedUiAdapter.toCoreLibInfo(): Bundle {
 
 @SuppressLint("NullAnnotationGroup")
 @OptIn(ExperimentalFeatures.SharedUiPresentationApi::class)
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 private class BinderSharedUiAdapterDelegate(private val adapter: SharedUiAdapter) :
     ISharedUiAdapter.Stub(), SharedUiAdapter {
 
@@ -57,6 +55,7 @@ private class BinderSharedUiAdapterDelegate(private val adapter: SharedUiAdapter
     }
 
     // TODO(b/365614954): try to improve method's performance.
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun openRemoteSession(remoteSessionClient: IRemoteSharedUiSessionClient) {
         try {
             val sessionClient = SessionClientProxy(remoteSessionClient)
@@ -66,6 +65,7 @@ private class BinderSharedUiAdapterDelegate(private val adapter: SharedUiAdapter
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     private class SessionClientProxy(
         private val remoteSessionClient: IRemoteSharedUiSessionClient
     ) : SharedUiAdapter.SessionClient {
