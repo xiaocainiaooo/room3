@@ -59,6 +59,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.platform.AccessibilityManager
+import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.PlatformTextInputSessionScope
 import androidx.compose.ui.platform.SoftwareKeyboardController
@@ -2335,6 +2336,9 @@ internal class MockOwner(
         get() = TODO("Not yet implemented")
 
     override val clipboardManager: ClipboardManager
+        get() = TODO("Not yet implemented")
+
+    override val clipboard: Clipboard
         get() = TODO("Not yet implemented")
 
     override val accessibilityManager: AccessibilityManager

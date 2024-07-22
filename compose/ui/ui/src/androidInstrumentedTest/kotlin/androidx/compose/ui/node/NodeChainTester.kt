@@ -40,6 +40,7 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerIconService
 import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.platform.AccessibilityManager
+import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.PlatformTextInputSessionScope
@@ -404,6 +405,9 @@ private class MockOwner(
         get() = TODO("Not yet implemented")
 
     override val clipboardManager: ClipboardManager
+        get() = TODO("Not yet implemented")
+
+    override val clipboard: Clipboard
         get() = TODO("Not yet implemented")
 
     override val accessibilityManager: AccessibilityManager

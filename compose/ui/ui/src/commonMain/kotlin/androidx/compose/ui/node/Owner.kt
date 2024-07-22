@@ -40,6 +40,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.PlacementScope
 import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.platform.AccessibilityManager
+import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.PlatformTextInputModifierNode
 import androidx.compose.ui.platform.PlatformTextInputSessionScope
@@ -87,6 +88,12 @@ internal interface Owner : PositionCalculator {
 
     /** Provide clipboard manager to the user. Use the Android version of clipboard manager. */
     val clipboardManager: ClipboardManager
+
+    /**
+     * Provide clipboard manager with suspend function to the user. Use the Android version of
+     * clipboard manager.
+     */
+    val clipboard: Clipboard
 
     /**
      * Provide accessibility manager to the user. Use the Android version of accessibility manager.
