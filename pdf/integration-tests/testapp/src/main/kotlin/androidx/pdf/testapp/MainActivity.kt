@@ -49,7 +49,9 @@ class MainActivity : AppCompatActivity() {
         val getContentButton: MaterialButton = findViewById(R.id.launch_button)
 
         getContentButton.setOnClickListener { filePicker.launch(MIME_TYPE_PDF) }
-        setPdfView()
+        if (savedInstanceState == null) {
+            setPdfView()
+        }
     }
 
     private fun setPdfView() {
