@@ -16,14 +16,17 @@
 
 package androidx.compose.material3
 
+import androidx.annotation.FloatRange
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -78,11 +81,17 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -97,9 +106,11 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
@@ -125,6 +136,7 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sign
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * <a href="https://m3.material.io/components/search/overview" class="external"
@@ -328,6 +340,135 @@ fun DockedSearchBar(
     BackHandler(enabled = expanded) { onExpandedChange(false) }
 }
 
+/**
+ * The state of a search bar.
+ *
+ * @property focusRequester The [FocusRequester] to request focus on the search bar.
+ *   [SearchBarDefaults.InputField] applies this automatically. Custom input fields must attach this
+ *   focus requester using [Modifier.focusRequester].
+ */
+@ExperimentalMaterial3Api
+@Stable
+internal class SearchBarState
+private constructor(
+    private val animatable: Animatable<Float, AnimationVector1D>,
+    private val animationSpecForExpand: AnimationSpec<Float>,
+    private val animationSpecForCollapse: AnimationSpec<Float>,
+    val focusRequester: FocusRequester,
+) {
+    /**
+     * Construct a [SearchBarState].
+     *
+     * @param initialExpanded the initial value of whether the search bar is expanded.
+     * @param animationSpecForExpand the animation spec used when the search bar expands.
+     * @param animationSpecForCollapse the animation spec used when the search bar collapses.
+     * @param focusRequester the focus requester to be applied to the search bar's input field.
+     */
+    constructor(
+        initialExpanded: Boolean,
+        animationSpecForExpand: AnimationSpec<Float>,
+        animationSpecForCollapse: AnimationSpec<Float>,
+        focusRequester: FocusRequester = FocusRequester(),
+    ) : this(
+        animatable = Animatable(if (initialExpanded) 1f else 0f),
+        animationSpecForExpand = animationSpecForExpand,
+        animationSpecForCollapse = animationSpecForCollapse,
+        focusRequester = focusRequester,
+    )
+
+    /** The layout coordinates, if available, of the search bar when it is collapsed. */
+    var collapsedCoords: LayoutCoordinates? by mutableStateOf(null)
+
+    /**
+     * The animation progress of the search bar, where 0 represents the collapsed state and 1
+     * represents the expanded state.
+     */
+    @get:FloatRange(from = 0.0, to = 1.0)
+    val progress: Float
+        get() = animatable.value.coerceIn(0f, 1f)
+
+    /**
+     * Whether this search bar is expanded (showing search results), or in the process of expanding.
+     */
+    val isExpanded: Boolean by derivedStateOf { progress > 0f }
+
+    internal var softwareKeyboardController: SoftwareKeyboardController? = null
+
+    /** Animate the search bar to its expanded state. */
+    suspend fun animateToExpanded() {
+        animatable.animateTo(targetValue = 1f, animationSpec = animationSpecForExpand)
+        focusRequester.requestFocus()
+    }
+
+    /** Animate the search bar to its collapsed state. */
+    suspend fun animateToCollapsed() {
+        softwareKeyboardController?.hide()
+        animatable.animateTo(targetValue = 0f, animationSpec = animationSpecForCollapse)
+    }
+
+    /** Snap the search bar progress to the given [fraction]. */
+    suspend fun snapTo(fraction: Float) {
+        animatable.snapTo(fraction)
+    }
+
+    companion object {
+        fun Saver(
+            animationSpecForExpand: AnimationSpec<Float>,
+            animationSpecForCollapse: AnimationSpec<Float>,
+            focusRequester: FocusRequester,
+        ): Saver<SearchBarState, *> =
+            listSaver(
+                save = { listOf(it.progress) },
+                restore = {
+                    SearchBarState(
+                        animatable = Animatable(it[0], Float.VectorConverter),
+                        animationSpecForExpand = animationSpecForExpand,
+                        animationSpecForCollapse = animationSpecForCollapse,
+                        focusRequester = focusRequester,
+                    )
+                },
+            )
+    }
+}
+
+/**
+ * Create and remember a [SearchBarState].
+ *
+ * @param initialExpanded the initial value of whether the search bar is expanded.
+ * @param animationSpecForExpand the animation spec used when the search bar expands.
+ * @param animationSpecForCollapse the animation spec used when the search bar collapses.
+ * @param focusRequester the focus requester to be applied to the search bar's input field.
+ */
+@ExperimentalMaterial3Api
+@Composable
+internal fun rememberSearchBarState(
+    initialExpanded: Boolean = false,
+    animationSpecForExpand: AnimationSpec<Float> = MotionSchemeKeyTokens.SlowSpatial.value(),
+    animationSpecForCollapse: AnimationSpec<Float> = MotionSchemeKeyTokens.DefaultSpatial.value(),
+    focusRequester: FocusRequester? = null,
+): SearchBarState {
+    @Suppress("NAME_SHADOWING") val focusRequester = focusRequester ?: remember { FocusRequester() }
+    return rememberSaveable(
+        initialExpanded,
+        animationSpecForExpand,
+        animationSpecForCollapse,
+        focusRequester,
+        saver =
+            SearchBarState.Saver(
+                animationSpecForExpand = animationSpecForExpand,
+                animationSpecForCollapse = animationSpecForCollapse,
+                focusRequester = focusRequester,
+            )
+    ) {
+        SearchBarState(
+            initialExpanded = initialExpanded,
+            animationSpecForExpand = animationSpecForExpand,
+            animationSpecForCollapse = animationSpecForCollapse,
+            focusRequester = focusRequester,
+        )
+    }
+}
+
 /** Defaults used in [SearchBar] and [DockedSearchBar]. */
 @ExperimentalMaterial3Api
 object SearchBarDefaults {
@@ -497,8 +638,170 @@ object SearchBarDefaults {
      * A text field to input a query in a search bar.
      *
      * This overload of [InputField] uses [TextFieldState] to keep track of the text content and
-     * position of the cursor or selection. It is the recommended overload to use with [SearchBar]
-     * and [DockedSearchBar].
+     * position of the cursor or selection, and [SearchBarState] to keep track of the state of the
+     * search bar.
+     *
+     * @param textFieldState [TextFieldState] that holds the internal editing state of the input
+     *   field.
+     * @param searchBarState the state of the search bar as a whole.
+     * @param onSearch the callback to be invoked when the input service triggers the
+     *   [ImeAction.Search] action. The current query in the [textFieldState] comes as a parameter
+     *   of the callback.
+     * @param modifier the [Modifier] to be applied to this input field.
+     * @param enabled the enabled state of this input field. When `false`, this component will not
+     *   respond to user input, and it will appear visually disabled and disabled to accessibility
+     *   services.
+     * @param readOnly controls the editable state of the input field. When `true`, the field cannot
+     *   be modified. However, a user can focus it and copy text from it.
+     * @param textStyle the style to be applied to the input text. Defaults to [LocalTextStyle].
+     * @param placeholder the placeholder to be displayed when the input text is empty.
+     * @param leadingIcon the leading icon to be displayed at the start of the input field.
+     * @param trailingIcon the trailing icon to be displayed at the end of the input field.
+     * @param prefix the optional prefix to be displayed before the input text.
+     * @param suffix the optional suffix to be displayed after the input text.
+     * @param inputTransformation optional [InputTransformation] that will be used to transform
+     *   changes to the [TextFieldState] made by the user. The transformation will be applied to
+     *   changes made by hardware and software keyboard events, pasting or dropping text,
+     *   accessibility services, and tests. The transformation will _not_ be applied when changing
+     *   the [textFieldState] programmatically, or when the transformation is changed. If the
+     *   transformation is changed on an existing text field, it will be applied to the next user
+     *   edit. The transformation will not immediately affect the current [textFieldState].
+     * @param outputTransformation optional [OutputTransformation] that transforms how the contents
+     *   of the text field are presented.
+     * @param scrollState scroll state that manages the horizontal scroll of the input field.
+     * @param shape the shape of the input field.
+     * @param colors [TextFieldColors] that will be used to resolve the colors used for this input
+     *   field in different states. See [SearchBarDefaults.inputFieldColors].
+     * @param interactionSource an optional hoisted [MutableInteractionSource] for observing and
+     *   emitting [Interaction]s for this input field. You can use this to change the search bar's
+     *   appearance or preview the search bar in different states. Note that if `null` is provided,
+     *   interactions will still happen internally.
+     */
+    @ExperimentalMaterial3Api
+    @Composable
+    internal fun InputField(
+        textFieldState: TextFieldState,
+        searchBarState: SearchBarState,
+        onSearch: (String) -> Unit,
+        modifier: Modifier = Modifier,
+        enabled: Boolean = true,
+        readOnly: Boolean = false,
+        textStyle: TextStyle = LocalTextStyle.current,
+        placeholder: @Composable (() -> Unit)? = null,
+        leadingIcon: @Composable (() -> Unit)? = null,
+        trailingIcon: @Composable (() -> Unit)? = null,
+        prefix: @Composable (() -> Unit)? = null,
+        suffix: @Composable (() -> Unit)? = null,
+        inputTransformation: InputTransformation? = null,
+        outputTransformation: OutputTransformation? = null,
+        scrollState: ScrollState = rememberScrollState(),
+        shape: Shape = inputFieldShape,
+        colors: TextFieldColors = inputFieldColors(),
+        interactionSource: MutableInteractionSource? = null,
+    ) {
+        @Suppress("NAME_SHADOWING")
+        val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
+
+        val focused = interactionSource.collectIsFocusedAsState().value
+        val focusManager = LocalFocusManager.current
+
+        val searchSemantics = getString(Strings.SearchBarSearch)
+        val suggestionsAvailableSemantics = getString(Strings.SuggestionsAvailable)
+
+        val textColor =
+            textStyle.color.takeOrElse {
+                colors.textColor(enabled, isError = false, focused = focused)
+            }
+        val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
+
+        val coroutineScope = rememberCoroutineScope()
+
+        BasicTextField(
+            state = textFieldState,
+            modifier =
+                modifier
+                    .sizeIn(
+                        minWidth = SearchBarMinWidth,
+                        maxWidth = SearchBarMaxWidth,
+                        minHeight = InputFieldHeight,
+                    )
+                    .focusRequester(searchBarState.focusRequester)
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            coroutineScope.launch { searchBarState.animateToExpanded() }
+                        }
+                    }
+                    .semantics {
+                        contentDescription = searchSemantics
+                        if (searchBarState.isExpanded) {
+                            stateDescription = suggestionsAvailableSemantics
+                        }
+                        onClick {
+                            searchBarState.focusRequester.requestFocus()
+                            true
+                        }
+                    },
+            enabled = enabled,
+            readOnly = readOnly,
+            lineLimits = TextFieldLineLimits.SingleLine,
+            textStyle = mergedTextStyle,
+            cursorBrush = SolidColor(colors.cursorColor(isError = false)),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            onKeyboardAction = { onSearch(textFieldState.text.toString()) },
+            interactionSource = interactionSource,
+            inputTransformation = inputTransformation,
+            outputTransformation = outputTransformation,
+            scrollState = scrollState,
+            decorator =
+                TextFieldDefaults.decorator(
+                    state = textFieldState,
+                    enabled = enabled,
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                    outputTransformation = outputTransformation,
+                    interactionSource = interactionSource,
+                    placeholder = placeholder,
+                    leadingIcon =
+                        leadingIcon?.let { leading ->
+                            { Box(Modifier.offset(x = SearchBarIconOffsetX)) { leading() } }
+                        },
+                    trailingIcon =
+                        trailingIcon?.let { trailing ->
+                            { Box(Modifier.offset(x = -SearchBarIconOffsetX)) { trailing() } }
+                        },
+                    prefix = prefix,
+                    suffix = suffix,
+                    colors = colors,
+                    contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(),
+                    container = {
+                        val containerColor =
+                            animateColorAsState(
+                                targetValue =
+                                    colors.containerColor(
+                                        enabled = enabled,
+                                        isError = false,
+                                        focused = focused
+                                    ),
+                                animationSpec = MotionSchemeKeyTokens.FastEffects.value(),
+                            )
+                        Box(Modifier.textFieldBackground(containerColor::value, shape))
+                    },
+                )
+        )
+
+        val shouldClearFocus = !searchBarState.isExpanded && focused
+        LaunchedEffect(searchBarState.isExpanded) {
+            if (shouldClearFocus) {
+                focusManager.clearFocus()
+            }
+        }
+    }
+
+    /**
+     * A text field to input a query in a search bar.
+     *
+     * This overload of [InputField] uses [TextFieldState] to keep track of the text content and
+     * position of the cursor or selection, and [expanded] and [onExpandedChange] to keep track of
+     * the state of the search bar.
      *
      * @param state [TextFieldState] that holds the internal editing state of the input field.
      * @param onSearch the callback to be invoked when the input service triggers the
