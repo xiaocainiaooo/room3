@@ -279,7 +279,7 @@ fun ListDetailPaneScaffoldWithNavigationSample() {
         }
         composable(listDetailRoute) {
             val listScrollState = rememberScrollState()
-            val selectedItem = scaffoldNavigator.currentDestination?.content
+            val selectedItem = scaffoldNavigator.currentDestination?.contentKey
 
             // Back behavior can be customized based on the scaffold's layout.
             // In this example, back navigation goes item-by-item when both
@@ -317,7 +317,7 @@ fun ListDetailPaneScaffoldWithNavigationSample() {
                                                 if (item != selectedItem) {
                                                     scaffoldNavigator.navigateTo(
                                                         pane = ListDetailPaneScaffoldRole.Detail,
-                                                        content = item,
+                                                        contentKey = item,
                                                     )
                                                 }
                                             }
