@@ -20,16 +20,14 @@ import android.app.Activity
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.privacysandbox.sdkruntime.client.SdkSandboxManagerCompat
 import androidx.privacysandbox.ui.client.SandboxedUiAdapterFactory
-import androidx.privacysandbox.ui.client.view.SandboxedSdkUiSessionState
-import androidx.privacysandbox.ui.client.view.SandboxedSdkUiSessionStateChangedListener
 import androidx.privacysandbox.ui.client.view.SandboxedSdkView
+import androidx.privacysandbox.ui.client.view.SandboxedSdkViewEventListener
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdType
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.MediationOption
 import androidx.privacysandbox.ui.integration.testaidl.ISdkApi
@@ -64,7 +62,7 @@ abstract class BaseFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        getSandboxedSdkViews().forEach { it.addStateChangedListener() }
+        getSandboxedSdkViews().forEach { it.setEventListener() }
     }
 
     /** Returns a handle to the already loaded SDK. */
@@ -72,8 +70,8 @@ abstract class BaseFragment : Fragment() {
         return sdkApi
     }
 
-    fun SandboxedSdkView.addStateChangedListener() {
-        addStateChangedListener(StateChangeListener(this))
+    fun SandboxedSdkView.setEventListener() {
+        setEventListener(TestEventListener(this))
     }
 
     /**
@@ -118,25 +116,24 @@ abstract class BaseFragment : Fragment() {
         }
     }
 
-    private inner class StateChangeListener(val view: SandboxedSdkView) :
-        SandboxedSdkUiSessionStateChangedListener {
-        override fun onStateChanged(state: SandboxedSdkUiSessionState) {
-            Log.i(TAG, "UI session state changed to: $state")
-            if (state is SandboxedSdkUiSessionState.Error) {
-                // If the session fails to open, display the error.
-                val parent = view.parent as ViewGroup
-                val index = parent.indexOfChild(view)
-                val textView = TextView(requireActivity())
-                textView.setTypeface(null, Typeface.BOLD_ITALIC)
-                textView.setTextColor(Color.RED)
-                textView.text = state.throwable.message
+    private inner class TestEventListener(val view: SandboxedSdkView) :
+        SandboxedSdkViewEventListener {
+        override fun onUiDisplayed() {}
 
-                requireActivity().runOnUiThread {
-                    parent.removeView(view)
-                    parent.addView(textView, index)
-                }
+        override fun onUiError(error: Throwable) {
+            val parent = view.parent as ViewGroup
+            val index = parent.indexOfChild(view)
+            val textView = TextView(requireActivity())
+            textView.setTypeface(null, Typeface.BOLD_ITALIC)
+            textView.setTextColor(Color.RED)
+            textView.text = error.message
+            requireActivity().runOnUiThread {
+                parent.removeView(view)
+                parent.addView(textView, index)
             }
         }
+
+        override fun onUiClosed() {}
     }
 
     companion object {
