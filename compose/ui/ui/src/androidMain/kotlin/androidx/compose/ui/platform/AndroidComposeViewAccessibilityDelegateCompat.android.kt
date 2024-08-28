@@ -107,6 +107,8 @@ import androidx.core.view.ViewCompat.ACCESSIBILITY_LIVE_REGION_POLITE
 import androidx.core.view.accessibility.AccessibilityEventCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_ACCESSIBILITY
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
 import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 import androidx.lifecycle.Lifecycle
 import kotlin.math.abs
@@ -342,7 +344,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private val handler = Handler(Looper.getMainLooper())
     private var nodeProvider = ComposeAccessibilityNodeProvider()
 
+    private var accessibilityFocusedVirtualViewId = InvalidId
     private var focusedVirtualViewId = InvalidId
+    private var currentlyAccessibilityFocusedANI: AccessibilityNodeInfoCompat? = null
     private var currentlyFocusedANI: AccessibilityNodeInfoCompat? = null
     private var sendingFocusAffectingEvent = false
     private val pendingHorizontalScrollEvents = MutableIntObjectMap<ScrollAxisRange>()
@@ -624,7 +628,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
 
         // Manage internal accessibility focus state.
-        if (virtualViewId == focusedVirtualViewId) {
+        if (virtualViewId == accessibilityFocusedVirtualViewId) {
             info.isAccessibilityFocused = true
             info.addAction(AccessibilityActionCompat.ACTION_CLEAR_ACCESSIBILITY_FOCUS)
         } else {
@@ -703,6 +707,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             info.isFocused = semanticsNode.unmergedConfig[SemanticsProperties.Focused]
             if (info.isFocused) {
                 info.addAction(AccessibilityNodeInfoCompat.ACTION_CLEAR_FOCUS)
+                focusedVirtualViewId = virtualViewId
             } else {
                 info.addAction(AccessibilityNodeInfoCompat.ACTION_FOCUS)
             }
@@ -1104,7 +1109,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
      * @return True if the view is accessibility focused.
      */
     private fun isAccessibilityFocused(virtualViewId: Int): Boolean {
-        return (focusedVirtualViewId == virtualViewId)
+        return (accessibilityFocusedVirtualViewId == virtualViewId)
     }
 
     /**
@@ -1125,15 +1130,15 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         // TODO: Check virtual view visibility.
         if (!isAccessibilityFocused(virtualViewId)) {
             // Clear focus from the previously focused view, if applicable.
-            if (focusedVirtualViewId != InvalidId) {
+            if (accessibilityFocusedVirtualViewId != InvalidId) {
                 sendEventForVirtualView(
-                    focusedVirtualViewId,
+                    accessibilityFocusedVirtualViewId,
                     AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED
                 )
             }
 
             // Set focus on the new view.
-            focusedVirtualViewId = virtualViewId
+            accessibilityFocusedVirtualViewId = virtualViewId
             // TODO(b/272068594): Do we have to set currentlyFocusedANI object too?
 
             view.invalidate()
@@ -1265,8 +1270,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
      */
     private fun clearAccessibilityFocus(virtualViewId: Int): Boolean {
         if (isAccessibilityFocused(virtualViewId)) {
-            focusedVirtualViewId = InvalidId
-            currentlyFocusedANI = null
+            accessibilityFocusedVirtualViewId = InvalidId
+            currentlyAccessibilityFocusedANI = null
             view.invalidate()
             sendEventForVirtualView(
                 virtualViewId,
@@ -2496,6 +2501,20 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
                 // Refresh the current "green box" bounds and invalidate the View to tell
                 // ViewRootImpl to redraw it at its latest position.
+                currentSemanticsNodes[accessibilityFocusedVirtualViewId]?.let {
+                    try {
+                        currentlyAccessibilityFocusedANI?.setBoundsInScreen(boundsInScreen(it))
+                    } catch (e: IllegalStateException) {
+                        // setBoundsInScreen could in theory throw an IllegalStateException if the
+                        // system has previously sealed the AccessibilityNodeInfo.  This cannot
+                        // happen on stock AOSP, because ViewRootImpl only uses it for bounds
+                        // checking, and never forwards it to an accessibility service. But that is
+                        // a non-CTS-enforced implementation detail, so we should avoid crashing if
+                        // this happens.
+                    }
+                }
+                // Refresh the current "blue box" bounds and invalidate the View to tell
+                // ViewRootImpl to redraw it at its latest position.
                 currentSemanticsNodes[focusedVirtualViewId]?.let {
                     try {
                         currentlyFocusedANI?.setBoundsInScreen(boundsInScreen(it))
@@ -2820,8 +2839,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private inner class ComposeAccessibilityNodeProvider : AccessibilityNodeProviderCompat() {
         override fun createAccessibilityNodeInfo(virtualViewId: Int): AccessibilityNodeInfoCompat? {
             return createNodeInfo(virtualViewId).also {
-                if (sendingFocusAffectingEvent && virtualViewId == focusedVirtualViewId) {
-                    currentlyFocusedANI = it
+                if (sendingFocusAffectingEvent) {
+                    if (virtualViewId == accessibilityFocusedVirtualViewId) {
+                        currentlyAccessibilityFocusedANI = it
+                    }
+                    if (virtualViewId == focusedVirtualViewId) {
+                        currentlyFocusedANI = it
+                    }
                 }
             }
         }
@@ -2840,7 +2864,15 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
 
         override fun findFocus(focus: Int): AccessibilityNodeInfoCompat? {
-            return createAccessibilityNodeInfo(focusedVirtualViewId)
+            return when (focus) {
+                // TODO(b/364744967): add test for  FOCUS_ACCESSIBILITY
+                FOCUS_ACCESSIBILITY ->
+                    createAccessibilityNodeInfo(accessibilityFocusedVirtualViewId)
+                FOCUS_INPUT ->
+                    if (focusedVirtualViewId == InvalidId) null
+                    else createAccessibilityNodeInfo(focusedVirtualViewId)
+                else -> throw IllegalArgumentException("Unknown focus type: $focus")
+            }
         }
     }
 
