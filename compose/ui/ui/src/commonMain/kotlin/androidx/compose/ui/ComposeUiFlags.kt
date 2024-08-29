@@ -86,4 +86,12 @@ object ComposeUiFlags {
      * disabling them.
      */
     @Suppress("MutableBareField") @JvmField var isViewFocusFixEnabled: Boolean = true
+
+    /**
+     * With this flag on, the new focus state management implementation is enabled. The new
+     * implementation removes the focus state previously stored in each FocusTargetNode and instead
+     * keeps track of the current active focus node centrally in FocusOwnerImpl. This change reduces
+     * the cost of initializing the focus system.
+     */
+    @Suppress("MutableBareField") @JvmField var isTrackFocusEnabled: Boolean = true
 }
