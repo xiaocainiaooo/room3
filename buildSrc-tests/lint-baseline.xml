@@ -103,8 +103,8 @@
     <issue
         id="EagerGradleConfiguration"
         message="Avoid using method findByName"
-        errorLine1="        .findByName(FINALIZE_TEST_CONFIGS_WITH_APKS_TASK)!!"
-        errorLine2="         ~~~~~~~~~~">
+        errorLine1="            .findByName(FINALIZE_TEST_CONFIGS_WITH_APKS_TASK)!!"
+        errorLine2="             ~~~~~~~~~~">
         <location
             file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/testConfiguration/TestSuiteConfiguration.kt"/>
     </issue>
@@ -240,6 +240,15 @@
         message="Avoid using method getRootProject"
         errorLine1="    rootProject.extensions.findByType(YarnRootExtension::class.java)?.let {"
         errorLine2="    ~~~~~~~~~~~">
+        <location
+            file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/AndroidXMultiplatformExtension.kt"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Avoid using method getRootProject"
+        errorLine1="    val unzipChromeTask = rootProject.tasks.named(&quot;unzipChrome&quot;)"
+        errorLine2="                          ~~~~~~~~~~~">
         <location
             file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/AndroidXMultiplatformExtension.kt"/>
     </issue>
@@ -436,8 +445,8 @@
     <issue
         id="GradleProjectIsolation"
         message="Avoid using method getRootProject"
-        errorLine1="    rootProject.tasks.named(CREATE_MODULE_INFO).configure {"
-        errorLine2="    ~~~~~~~~~~~">
+        errorLine1="        rootProject.tasks.named(CREATE_MODULE_INFO).configure {"
+        errorLine2="        ~~~~~~~~~~~">
         <location
             file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/testConfiguration/OwnersService.kt"/>
     </issue>
@@ -526,8 +535,8 @@
     <issue
         id="GradleProjectIsolation"
         message="Avoid using method getRootProject"
-        errorLine1="    rootProject.tasks"
-        errorLine2="    ~~~~~~~~~~~">
+        errorLine1="        rootProject.tasks"
+        errorLine2="        ~~~~~~~~~~~">
         <location
             file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/testConfiguration/TestSuiteConfiguration.kt"/>
     </issue>
