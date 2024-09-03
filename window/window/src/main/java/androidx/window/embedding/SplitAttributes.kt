@@ -411,11 +411,19 @@ constructor(
      *   transitions.
      * - The default divider attributes is not to use divider.
      */
-    class Builder {
+    class Builder() {
         private var splitType = SPLIT_TYPE_EQUAL
         private var layoutDirection = LOCALE
         private var animationParams = EmbeddingAnimationParams.Builder().build()
         private var dividerAttributes: DividerAttributes = DividerAttributes.NO_DIVIDER
+
+        /** Creates a Builder with values initialized from the original [SplitAttributes] */
+        internal constructor(original: SplitAttributes) : this() {
+            this.setSplitType(original.splitType)
+                .setLayoutDirection(original.layoutDirection)
+                .setAnimationParams(original.animationParams)
+                .setDividerAttributes(original.dividerAttributes)
+        }
 
         /**
          * Sets the split type attribute.
