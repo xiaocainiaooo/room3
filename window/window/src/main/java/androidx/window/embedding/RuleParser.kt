@@ -437,7 +437,7 @@ internal object RuleParser {
         parser: XmlResourceParser
     ): DividerAttributes {
         context.theme.obtainStyledAttributes(parser, R.styleable.DividerAttributes, 0, 0).apply {
-            val type = getInt(R.styleable.DividerAttributes_dividerType, TYPE_VALUE_FIXED)
+            val type = getInt(R.styleable.DividerAttributes_embeddingDividerType, TYPE_VALUE_FIXED)
             validateXmlDividerAttributes(
                 type,
                 hasValue(R.styleable.DividerAttributes_dragRangeMinRatio),
@@ -445,8 +445,10 @@ internal object RuleParser {
                 hasValue(R.styleable.DividerAttributes_isDraggingToFullscreenAllowed),
             )
 
-            val widthDp = getInt(R.styleable.DividerAttributes_dividerWidthDp, WIDTH_SYSTEM_DEFAULT)
-            val color = getColor(R.styleable.DividerAttributes_dividerColor, COLOR_SYSTEM_DEFAULT)
+            val widthDp =
+                getInt(R.styleable.DividerAttributes_embeddingDividerWidthDp, WIDTH_SYSTEM_DEFAULT)
+            val color =
+                getColor(R.styleable.DividerAttributes_embeddingDividerColor, COLOR_SYSTEM_DEFAULT)
             val dragRangeMinRatio =
                 getFloat(
                     R.styleable.DividerAttributes_dragRangeMinRatio,
