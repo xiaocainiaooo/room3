@@ -46,9 +46,8 @@ internal class SplitPlaceHolderRuleTest {
     @Test
     fun equalsImpliesHashCode() {
         val filter = ActivityFilter(ActivityComponentInfo("a", "b"), "ACTION")
-        val placeholderIntent = Intent()
-        val firstRule = SplitPlaceholderRule.Builder(setOf(filter), placeholderIntent).build()
-        val secondRule = SplitPlaceholderRule.Builder(setOf(filter), placeholderIntent).build()
+        val firstRule = SplitPlaceholderRule.Builder(setOf(filter), Intent()).build()
+        val secondRule = SplitPlaceholderRule.Builder(setOf(filter), Intent()).build()
         assertEquals(firstRule, secondRule)
         assertEquals(firstRule.hashCode(), secondRule.hashCode())
     }
