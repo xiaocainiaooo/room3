@@ -133,10 +133,10 @@ private constructor(
      * @property dragRange the range that a divider is allowed to be dragged. When the user drags
      *   the divider beyond this range, the system will choose to either fully expand the container
      *   or move the divider back into the range.
-     * @property isDraggingToFullscreenAllowed if {@code true}, the user is allowed to drag beyond
-     *   the specified range temporarily, and when dragging is finished, the system will choose to
+     * @property isDraggingToFullscreenAllowed if `true`, the user is allowed to drag beyond the
+     *   specified range temporarily, and when dragging is finished, the system will choose to
      *   either fully expand the larger container or move the divider back to the range limit.
-     *   Default to {@code false}.
+     *   Default to `false`.
      * @see SplitAttributes.Builder.setDividerAttributes
      */
     class DraggableDividerAttributes
