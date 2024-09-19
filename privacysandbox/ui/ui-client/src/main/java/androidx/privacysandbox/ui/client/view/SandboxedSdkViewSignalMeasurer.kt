@@ -93,20 +93,23 @@ internal class SandboxedSdkViewSignalMeasurer(
 
     /** Updates the [SandboxedSdkViewUiInfo] that represents the state of the view. */
     private fun updateUiContainerInfo() {
-        if (view.windowVisibility == View.VISIBLE) {
-            val isVisible = view.getGlobalVisibleRect(onScreenGeometry)
+        val childView = view.getChildAt(0)
+        if (childView == null) {
+            return
+        } else if (childView.windowVisibility == View.VISIBLE) {
+            val isVisible = childView.getGlobalVisibleRect(onScreenGeometry)
             if (!isVisible) {
                 onScreenGeometry.set(-1, -1, -1, -1)
             } else {
-                view.getLocationOnScreen(windowLocation)
+                childView.getLocationOnScreen(windowLocation)
                 onScreenGeometry.offset(-windowLocation[0], -windowLocation[1])
-                onScreenGeometry.intersect(0, 0, view.width, view.height)
+                onScreenGeometry.intersect(0, 0, childView.width, childView.height)
             }
         } else {
             onScreenGeometry.set(-1, -1, -1, -1)
         }
-        containerHeightPx = view.height
-        containerWidthPx = view.width
+        containerHeightPx = childView.height
+        containerWidthPx = childView.width
         opacityHint = view.alpha
     }
 }

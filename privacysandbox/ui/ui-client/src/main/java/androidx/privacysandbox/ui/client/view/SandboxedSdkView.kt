@@ -141,8 +141,8 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
     private var requestedHeight = -1
     private var isTransitionGroupSet = false
     private var windowInputToken: IBinder? = null
-    private var previousWidth = -1
-    private var previousHeight = -1
+    private var previousChildWidth = -1
+    private var previousChildHeight = -1
     private var currentClippingBounds = Rect()
     internal val stateListenerManager: StateListenerManager = StateListenerManager()
     private var viewContainingPoolingContainerListener: View? = null
@@ -370,25 +370,30 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
         if (this.isWithinPoolingContainer) {
             attachPoolingContainerListener()
         }
-        // We will not call client?.notifyResized for the first onLayout call
-        // and the case in which the width and the height remain unchanged.
-        if (
-            (previousWidth != (right - left) || previousHeight != (bottom - top)) &&
-                (previousWidth != -1 && previousHeight != -1)
-        ) {
-            client?.notifyResized(right - left, bottom - top)
-        } else {
-            // Child needs to receive coordinates that are relative to the parent.
-            getChildAt(0)
-                ?.layout(
-                    /* left = */ 0,
-                    /* top = */ 0,
-                    /* right = */ right - left,
-                    /* bottom = */ bottom - top
+        val childView = getChildAt(0)
+        if (childView != null) {
+            val childWidth = Math.max(0, width - paddingLeft - paddingRight)
+            val childHeight = Math.max(0, height - paddingTop - paddingBottom)
+            // We will not call client?.notifyResized for the first onLayout call
+            // and the case in which the width and the height remain unchanged.
+            if (
+                previousChildHeight != -1 &&
+                    previousChildWidth != -1 &&
+                    (childWidth != previousChildWidth || childHeight != previousChildHeight)
+            ) {
+                client?.notifyResized(childWidth, childHeight)
+            } else {
+                // Child needs to receive coordinates that are relative to the parent.
+                childView.layout(
+                    /* left = */ paddingLeft,
+                    /* top = */ paddingTop,
+                    /* right = */ paddingLeft + childWidth,
+                    /* bottom = */ paddingTop + childHeight
                 )
+            }
+            previousChildHeight = childHeight
+            previousChildWidth = childWidth
         }
-        previousHeight = height
-        previousWidth = width
         checkClientOpenSession()
         signalMeasurer?.maybeSendSignals()
     }

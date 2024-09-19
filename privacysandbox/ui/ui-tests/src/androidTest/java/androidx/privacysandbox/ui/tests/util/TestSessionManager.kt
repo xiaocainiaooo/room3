@@ -406,6 +406,7 @@ class TestSessionManager(
 
     class SessionObserverImpl : SessionObserver {
         var sessionObserverContext: SessionObserverContext? = null
+        var latestUiChange: Bundle = Bundle()
         private val sessionOpenedLatch = CountDownLatch(1)
         private val sessionClosedLatch = CountDownLatch(1)
         private val uiContainerChangedLatch = CountDownLatch(1)
@@ -416,6 +417,7 @@ class TestSessionManager(
         }
 
         override fun onUiContainerChanged(uiContainerInfo: Bundle) {
+            latestUiChange = uiContainerInfo
             uiContainerChangedLatch.countDown()
         }
 
