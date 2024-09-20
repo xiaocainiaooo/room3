@@ -293,9 +293,7 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
                     )
                     .setShouldClearTop(rule.clearTop)
 
-            if (tag != null) {
-                builder.setTag(tag)
-            }
+            builder.setTag(tag ?: Integer.toHexString(rule.hashCode()))
             return builder.build()
         }
     }
@@ -314,9 +312,7 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
             )
         builder.setSticky(splitPinRule.isSticky)
         val tag = splitPinRule.tag
-        if (tag != null) {
-            builder.setTag(tag)
-        }
+        builder.setTag(tag ?: Integer.toHexString(splitPinRule.hashCode()))
         return builder.build()
     }
 
@@ -448,9 +444,7 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
                     .setFinishPrimaryWithPlaceholder(
                         translateFinishBehavior(rule.finishPrimaryWithPlaceholder)
                     )
-            if (tag != null) {
-                builder.setTag(tag)
-            }
+            builder.setTag(tag ?: Integer.toHexString(rule.hashCode()))
             return builder.build()
         }
     }
@@ -482,9 +476,7 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
                 ActivityRuleBuilder(activityPredicate, intentPredicate)
                     .setShouldAlwaysExpand(rule.alwaysExpand)
             val tag = rule.tag
-            if (tag != null) {
-                builder.setTag(tag)
-            }
+            builder.setTag(tag ?: Integer.toHexString(rule.hashCode()))
             return builder.build()
         }
     }
