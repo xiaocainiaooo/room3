@@ -23,6 +23,7 @@ import androidx.annotation.RequiresApi
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdType
 import androidx.privacysandbox.ui.integration.testaidl.IMediateeSdkApi
+import androidx.privacysandbox.ui.provider.AbstractSandboxedUiAdapter
 import androidx.privacysandbox.ui.provider.toCoreLibInfo
 
 class MediateeSdkApiImpl(private val sdkContext: Context) : IMediateeSdkApi.Stub() {
@@ -38,13 +39,14 @@ class MediateeSdkApiImpl(private val sdkContext: Context) : IMediateeSdkApi.Stub
         waitInsideOnDraw: Boolean,
         drawViewability: Boolean
     ): Bundle {
-        val adapter: SandboxedUiAdapter =
+        val adapter: AbstractSandboxedUiAdapter =
             when (adType) {
                 AdType.BASIC_WEBVIEW -> loadWebViewBannerAd()
                 AdType.WEBVIEW_FROM_LOCAL_ASSETS -> loadWebViewBannerAdFromLocalAssets()
                 AdType.NON_WEBVIEW_VIDEO -> loadVideoAd()
                 else -> loadNonWebViewBannerAd(mediationDescription, waitInsideOnDraw)
             }
+                as AbstractSandboxedUiAdapter
         ViewabilityHandler.addObserverFactoryToAdapter(adapter, drawViewability)
         return adapter.toCoreLibInfo(sdkContext)
     }
