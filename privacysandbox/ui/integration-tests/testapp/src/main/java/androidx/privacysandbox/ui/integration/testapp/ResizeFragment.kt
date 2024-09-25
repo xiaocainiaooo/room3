@@ -30,6 +30,7 @@ class ResizeFragment : BaseFragment() {
     private lateinit var resizableBannerView: SandboxedSdkView
     private lateinit var resizeButton: Button
     private lateinit var resizeFromSdkButton: Button
+    private lateinit var setPaddingButton: Button
     private lateinit var inflatedView: View
 
     override fun getSandboxedSdkViews(): List<SandboxedSdkView> {
@@ -62,6 +63,7 @@ class ResizeFragment : BaseFragment() {
         resizableBannerView = inflatedView.findViewById(R.id.resizable_ad_view)
         resizeButton = inflatedView.findViewById(R.id.resize_button)
         resizeFromSdkButton = inflatedView.findViewById(R.id.resize_sdk_button)
+        setPaddingButton = inflatedView.findViewById(R.id.set_padding_button)
         loadResizableBannerAd()
         return inflatedView
     }
@@ -90,6 +92,17 @@ class ResizeFragment : BaseFragment() {
                     width = newWidth
                     height = newHeight
                 }
+        }
+
+        setPaddingButton.setOnClickListener {
+            val halfWidth = (resizableBannerView.width / 2) - 10
+            val halfHeight = (resizableBannerView.height / 2) - 10
+            resizableBannerView.setPadding(
+                (10..halfWidth).random(),
+                (10..halfHeight).random(),
+                (10..halfWidth).random(),
+                (10..halfHeight).random(),
+            )
         }
     }
 }
