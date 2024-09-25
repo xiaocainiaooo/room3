@@ -22,6 +22,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
+import androidx.annotation.VisibleForTesting
 import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.core.SharedUiAdapter
@@ -60,7 +61,7 @@ import kotlin.math.max
 class SharedUiContainer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     ViewGroup(context, attrs) {
 
-    private val registeredAssets: MutableMap<View, SharedUiAsset> = HashMap()
+    @VisibleForTesting internal val registeredAssets: MutableMap<View, SharedUiAsset> = HashMap()
     private val onAttachStateChangeListener =
         object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {}
