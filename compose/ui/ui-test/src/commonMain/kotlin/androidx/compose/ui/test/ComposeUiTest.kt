@@ -22,6 +22,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.TestResult
 
 /**
  * Sets up the test environment, runs the given [test][block] and then tears down the test
@@ -43,13 +44,17 @@ import kotlinx.coroutines.test.TestDispatcher
  *   `LaunchedEffect`s and `rememberCoroutineScope` will be derived from this context. If this
  *   context contains a [TestDispatcher] or [TestCoroutineScheduler] (in that order), it will be
  *   used for composition and the [MainTestClock].
+ * @param runTestContext The [CoroutineContext] used to create the context to run the test [block].
+ *   By default [block] will run using [kotlinx.coroutines.test.StandardTestDispatcher].
+ *   [runTestContext] and [effectContext] must not share [TestCoroutineScheduler].
  * @param block The test function.
  */
 @ExperimentalTestApi
 expect fun runComposeUiTest(
     effectContext: CoroutineContext = EmptyCoroutineContext,
-    block: ComposeUiTest.() -> Unit
-)
+    runTestContext: CoroutineContext = EmptyCoroutineContext,
+    block: suspend ComposeUiTest.() -> Unit
+): TestResult
 
 /**
  * A test environment that allows you to test and control composables, either in isolation or in
