@@ -16,9 +16,9 @@
 
 package androidx.navigation.runtime.lint
 
-import androidx.navigation.lint.common.NAVIGATION_STUBS
-import androidx.navigation.lint.common.TEST_CLASS
-import androidx.navigation.lint.common.bytecodeStub
+import androidx.navigation.lint.NAVIGATION_STUBS
+import androidx.navigation.lint.TEST_CLASS
+import androidx.navigation.lint.bytecodeStub
 
 internal val ACTIVITY_NAVIGATION_DESTINATION_BUILDER =
     bytecodeStub(

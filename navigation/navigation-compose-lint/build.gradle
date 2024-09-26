@@ -37,7 +37,7 @@ dependencies {
     compileOnly(libs.intellijCore)
     compileOnly(libs.uast)
     bundleInside(project(":compose:lint:common"))
-    bundleInside(project(":navigation:navigation-lint-common"))
+    bundleInside(project(":navigation:lint:common"))
 
     testRuntimeOnly(libs.kotlinReflect)
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.navigation.lint.common
+package androidx.navigation.lint
 
 import com.intellij.psi.PsiClass
 import com.intellij.psi.impl.source.PsiClassReferenceType

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.navigation.lint.common
+package androidx.navigation.lint
 
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
