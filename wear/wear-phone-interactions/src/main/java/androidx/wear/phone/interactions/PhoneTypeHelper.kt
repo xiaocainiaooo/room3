@@ -34,11 +34,6 @@ public class PhoneTypeHelper private constructor() {
                 .path(BLUETOOTH_MODE)
                 .build()
 
-        internal const val UNKNOWN_MODE = 0
-        internal const val ANDROID_MODE = 1
-        internal const val IOS_MODE = 2
-        internal const val NONE_PAIRED_MODE = 4
-
         /** Indicates an error returned retrieving the type of phone we are paired to. */
         public const val DEVICE_TYPE_ERROR: Int = 0
 
@@ -66,7 +61,7 @@ public class PhoneTypeHelper private constructor() {
         @DeviceFamily
         @JvmStatic
         public fun getPhoneDeviceType(context: Context): Int {
-            var bluetoothMode = UNKNOWN_MODE
+            var pairedPhoneDeviceType = DEVICE_TYPE_UNKNOWN
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
                 val cursor =
                     context.contentResolver.query(BLUETOOTH_MODE_URI, null, null, null, null)
@@ -74,25 +69,20 @@ public class PhoneTypeHelper private constructor() {
                 cursor.use {
                     while (it.moveToNext()) {
                         if (BLUETOOTH_MODE == it.getString(0)) {
-                            bluetoothMode = it.getInt(1)
+                            pairedPhoneDeviceType = it.getInt(1)
                             break
                         }
                     }
                 }
             } else {
-                bluetoothMode =
+                pairedPhoneDeviceType =
                     Settings.Global.getInt(
                         context.getContentResolver(),
                         PAIRED_DEVICE_OS_TYPE,
-                        UNKNOWN_MODE
+                        DEVICE_TYPE_UNKNOWN
                     )
             }
-            return when (bluetoothMode) {
-                ANDROID_MODE -> DEVICE_TYPE_ANDROID
-                IOS_MODE -> DEVICE_TYPE_IOS
-                NONE_PAIRED_MODE -> DEVICE_TYPE_NONE
-                else -> DEVICE_TYPE_UNKNOWN
-            }
+            return pairedPhoneDeviceType
         }
 
         /** Annotates a value of DeviceType. */
