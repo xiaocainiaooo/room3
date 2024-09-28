@@ -39,6 +39,7 @@ import androidx.appsearch.ast.operators.AndNode;
 import androidx.appsearch.ast.operators.ComparatorNode;
 import androidx.appsearch.ast.operators.OrNode;
 import androidx.appsearch.ast.operators.PropertyRestrictNode;
+import androidx.appsearch.ast.query.HasPropertyNode;
 import androidx.appsearch.flags.CheckFlagsRule;
 import androidx.appsearch.flags.DeviceFlagsValueProvider;
 import androidx.appsearch.flags.Flags;
@@ -543,5 +544,48 @@ public abstract class AbstractSyntaxTreeSearchCtsTestBase {
                 .build());
         List<GenericDocument> documents = convertSearchResultsToDocuments(searchResults);
         assertThat(documents).containsExactly(fooBodyEmail);
+    }
+
+    @Test
+    public void testHasProperty_toString_returnsDocumentsWithProperty() throws Exception {
+        // Schema Registration
+        AppSearchSchema noBodySchema = new AppSearchSchema.Builder("NoBodySchema")
+                .addProperty(new StringPropertyConfig.Builder("subject")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setTokenizerType(StringPropertyConfig.TOKENIZER_TYPE_PLAIN)
+                        .setIndexingType(StringPropertyConfig.INDEXING_TYPE_PREFIXES)
+                        .build())
+                .build();
+        mDb1.setSchemaAsync(
+                new SetSchemaRequest.Builder()
+                        .addSchemas(AppSearchEmail.SCHEMA, noBodySchema).build()).get();
+
+        GenericDocument noBodyPropertyDoc =
+                new GenericDocument.Builder<>("namespace",
+                        "genericId1",
+                        "NoBodySchema")
+                        .build();
+        AppSearchEmail emptyBodyEmail = new AppSearchEmail.Builder("namespace", "emailId1")
+                .build();
+        AppSearchEmail nonEmptyBodyEmail =
+                new AppSearchEmail.Builder("namespace", "emailId2")
+                        .setBody("bar")
+                        .build();
+
+        checkIsBatchResultSuccess(mDb1.putAsync(
+                new PutDocumentsRequest.Builder()
+                        .addGenericDocuments(noBodyPropertyDoc, emptyBodyEmail, nonEmptyBodyEmail)
+                        .build()));
+
+        HasPropertyNode hasPropertyNode = new HasPropertyNode(new PropertyPath("body"));
+        SearchResults searchResults = mDb1.search(hasPropertyNode.toString(),
+                new SearchSpec.Builder()
+                        .setTermMatch(SearchSpec.TERM_MATCH_EXACT_ONLY)
+                        .setListFilterHasPropertyFunctionEnabled(true)
+                        .setListFilterQueryLanguageEnabled(true)
+                        .build());
+        List<GenericDocument> documents = convertSearchResultsToDocuments(searchResults);
+
+        assertThat(documents).containsExactly(nonEmptyBodyEmail);
     }
 }

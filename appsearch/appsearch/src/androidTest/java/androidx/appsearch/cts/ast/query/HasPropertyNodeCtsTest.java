@@ -110,4 +110,16 @@ public class HasPropertyNodeCtsTest {
 
         assertThat(hasPropertyNode.getProperty()).isEqualTo(newPropertyPath);
     }
+
+    @Test
+    public void testToString_correctString() {
+        List<PropertyPath.PathSegment> pathSegmentList = List.of(
+                PropertyPath.PathSegment.create("property"),
+                PropertyPath.PathSegment.create("path"));
+        PropertyPath propertyPath = new PropertyPath(pathSegmentList);
+        HasPropertyNode hasPropertyNode =
+                new HasPropertyNode(propertyPath);
+
+        assertThat(hasPropertyNode.toString()).isEqualTo("hasProperty(\"property.path\")");
+    }
 }
