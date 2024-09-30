@@ -66,6 +66,7 @@ package androidx.window.extensions.embedding {
     method public default boolean pinTopActivityStack(int, androidx.window.extensions.embedding.SplitPinRule);
     method public default void registerActivityStackCallback(java.util.concurrent.Executor, androidx.window.extensions.core.util.function.Consumer<java.util.List<androidx.window.extensions.embedding.ActivityStack!>!>);
     method public default void setActivityStackAttributesCalculator(androidx.window.extensions.core.util.function.Function<androidx.window.extensions.embedding.ActivityStackAttributesCalculatorParams!,androidx.window.extensions.embedding.ActivityStackAttributes!>);
+    method public default void setAutoSaveEmbeddingState(boolean);
     method public default void setEmbeddedActivityWindowInfoCallback(java.util.concurrent.Executor, androidx.window.extensions.core.util.function.Consumer<androidx.window.extensions.embedding.EmbeddedActivityWindowInfo!>);
     method public void setEmbeddingRules(java.util.Set<androidx.window.extensions.embedding.EmbeddingRule!>);
     method @Deprecated public default android.app.ActivityOptions setLaunchingActivityStack(android.app.ActivityOptions, android.os.IBinder);
