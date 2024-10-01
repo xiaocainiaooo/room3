@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,9 @@
 package androidx.compose.material3
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 
 @Composable
-internal actual fun getWindowContainerHeight(): Dp =
-    // TODO(b/372046254): [LocalConfiguration] shouldn't be used for layout calculation.
-    //  Replace to `WindowInfo.containerSize` once available
-    LocalConfiguration.current.screenHeightDp.dp
+internal actual fun getWindowContainerHeight(): Dp {
+    implementedInJetBrainsFork()
+}
