@@ -19,6 +19,13 @@ package androidx.privacysandbox.ui.integration.sdkproviderutils
 // TODO(b/346965982) : Move to SdkApi file
 class SdkApiConstants {
     companion object {
+        annotation class AdFormat {
+            companion object {
+                const val BANNER_AD = 0
+                const val NATIVE_AD = 1
+            }
+        }
+
         annotation class AdType {
             companion object {
                 const val BASIC_NON_WEBVIEW = 0
@@ -80,6 +87,28 @@ class SdkApiConstants {
             companion object {
                 const val VIEW = 0
                 const val COMPOSE = 1
+            }
+        }
+
+        annotation class NativeAdAssetName {
+            companion object {
+                const val ASSET_BUNDLE_NAME = "assets"
+                const val HEADLINE = "headline"
+                const val BODY = "body"
+                const val ICON = "icon"
+                const val MEDIA_VIEW_1 = "media-view-1"
+                const val MEDIA_VIEW_2 = "media-view-2"
+                const val AD_CHOICES = "ad-choices"
+                const val CALL_TO_ACTION = "call-to-action"
+            }
+        }
+
+        annotation class NativeAdAssetProperties {
+            companion object {
+                const val TEXT = "text"
+                const val COLOR = "color"
+                const val BITMAP = "bitmap"
+                const val URL = "url"
             }
         }
     }

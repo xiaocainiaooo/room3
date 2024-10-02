@@ -31,6 +31,7 @@ import androidx.privacysandbox.sdkruntime.client.SdkSandboxManagerCompat
 import androidx.privacysandbox.ui.client.SandboxedUiAdapterFactory
 import androidx.privacysandbox.ui.client.view.SandboxedSdkView
 import androidx.privacysandbox.ui.client.view.SandboxedSdkViewEventListener
+import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdFormat
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdType
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.MediationOption
 import androidx.privacysandbox.ui.integration.testsdkprovider.ISdkApi
@@ -125,7 +126,13 @@ abstract class BaseFragment : Fragment() {
     ) {
         CoroutineScope(Dispatchers.Main).launch {
             val sdkBundle =
-                sdkApi.loadBannerAd(adType, mediationOption, waitInsideOnDraw, drawViewabilityLayer)
+                sdkApi.loadAd(
+                    AdFormat.BANNER_AD,
+                    adType,
+                    mediationOption,
+                    waitInsideOnDraw,
+                    drawViewabilityLayer
+                )
             sandboxedSdkView.setAdapter(SandboxedUiAdapterFactory.createFromCoreLibInfo(sdkBundle))
             sandboxedSdkView.orderProviderUiAboveClientUi(providerUiOnTop)
         }

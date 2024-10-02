@@ -46,6 +46,7 @@ import androidx.privacysandbox.ui.client.SandboxedUiAdapterFactory
 import androidx.privacysandbox.ui.client.view.SandboxedSdkUi
 import androidx.privacysandbox.ui.client.view.SandboxedSdkViewEventListener
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
+import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdFormat
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -182,7 +183,8 @@ class ResizeComposeFragment : BaseFragment() {
             adapter =
                 SandboxedUiAdapterFactory.createFromCoreLibInfo(
                     getSdkApi()
-                        .loadBannerAd(
+                        .loadAd(
+                            AdFormat.BANNER_AD,
                             currentAdType,
                             currentMediationOption,
                             false,
