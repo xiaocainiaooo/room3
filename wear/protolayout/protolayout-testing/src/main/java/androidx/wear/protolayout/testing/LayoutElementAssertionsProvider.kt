@@ -40,4 +40,10 @@ public class LayoutElementAssertionsProvider(layoutRoot: LayoutElement) {
     public fun onRoot(): LayoutElementAssertion = LayoutElementAssertion("root", root)
 
     // TODO - b/374944199: add onAllElement which returns a LayoutElementAssertionCollection
+
+    private fun searchElement(root: LayoutElement?, matcher: LayoutElementMatcher): LayoutElement? {
+        if (root == null) return null
+        if (matcher.matches(root)) return root
+        return root.children.firstNotNullOfOrNull { searchElement(it, matcher) }
+    }
 }
