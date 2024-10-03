@@ -158,6 +158,8 @@ internal class TransformingLazyColumnCenterBoundsMeasurementStrategy :
             coroutineScope = coroutineScope,
             density = density,
             itemSpacing = itemSpacing,
+            beforeContentPadding = 0,
+            afterContentPadding = 0,
             measureResult =
                 layout(containerConstraints.maxWidth, containerConstraints.maxHeight) {
                     visibleItems.fastForEach { it.place(this) }
