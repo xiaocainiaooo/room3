@@ -330,11 +330,17 @@ package androidx.appsearch.app {
   }
 
   public interface DocumentClassFactory<T> {
-    method public T fromGenericDocument(androidx.appsearch.app.GenericDocument, java.util.Map<java.lang.String!,java.util.List<java.lang.String!>!>?) throws androidx.appsearch.exceptions.AppSearchException;
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public T fromGenericDocument(androidx.appsearch.app.GenericDocument, androidx.appsearch.app.DocumentClassMappingContext) throws androidx.appsearch.exceptions.AppSearchException;
     method public java.util.List<java.lang.Class<? extends java.lang.Object!>!> getDependencyDocumentClasses() throws androidx.appsearch.exceptions.AppSearchException;
     method public androidx.appsearch.app.AppSearchSchema getSchema() throws androidx.appsearch.exceptions.AppSearchException;
     method public String getSchemaName();
     method public androidx.appsearch.app.GenericDocument toGenericDocument(T) throws androidx.appsearch.exceptions.AppSearchException;
+  }
+
+  public class DocumentClassMappingContext {
+    ctor @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public DocumentClassMappingContext(java.util.Map<java.lang.String!,java.util.List<java.lang.String!>!>?, java.util.Map<java.lang.String!,java.util.List<java.lang.String!>!>?);
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public java.util.Map<java.lang.String!,java.util.List<java.lang.String!>!> getDocumentClassMap();
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public java.util.Map<java.lang.String!,java.util.List<java.lang.String!>!> getParentTypeMap();
   }
 
   @RequiresFeature(enforcement="androidx.appsearch.app.Features#isFeatureSupported", name=androidx.appsearch.app.Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG) public final class EmbeddingVector {
@@ -373,6 +379,7 @@ package androidx.appsearch.app {
     field @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public static final String SCHEMA_SCORABLE_PROPERTY_CONFIG = "SCHEMA_SCORABLE_PROPERTY_CONFIG";
     field @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public static final String SCHEMA_SET_DESCRIPTION = "SCHEMA_SET_DESCRIPTION";
     field public static final String SEARCH_RESULT_MATCH_INFO_SUBMATCH = "SEARCH_RESULT_MATCH_INFO_SUBMATCH";
+    field @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public static final String SEARCH_RESULT_PARENT_TYPES = "SEARCH_RESULT_PARENT_TYPES";
     field @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public static final String SEARCH_SPEC_ADD_FILTER_DOCUMENT_IDS = "SEARCH_SPEC_ADD_FILTER_DOCUMENT_IDS";
     field public static final String SEARCH_SPEC_ADD_FILTER_PROPERTIES = "SEARCH_SPEC_ADD_FILTER_PROPERTIES";
     field public static final String SEARCH_SPEC_ADD_INFORMATIONAL_RANKING_EXPRESSIONS = "SEARCH_SPEC_ADD_INFORMATIONAL_RANKING_EXPRESSIONS";
@@ -417,7 +424,7 @@ package androidx.appsearch.app {
     method public int getScore();
     method public long getTtlMillis();
     method public <T> T toDocumentClass(Class<T!>) throws androidx.appsearch.exceptions.AppSearchException;
-    method public <T> T toDocumentClass(Class<T!>, java.util.Map<java.lang.String!,java.util.List<java.lang.String!>!>?) throws androidx.appsearch.exceptions.AppSearchException;
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public <T> T toDocumentClass(Class<T!>, androidx.appsearch.app.DocumentClassMappingContext) throws androidx.appsearch.exceptions.AppSearchException;
   }
 
   public static class GenericDocument.Builder<BuilderType extends androidx.appsearch.app.GenericDocument.Builder> {
@@ -633,6 +640,7 @@ package androidx.appsearch.app {
     method public java.util.List<androidx.appsearch.app.SearchResult!> getJoinedResults();
     method public java.util.List<androidx.appsearch.app.SearchResult.MatchInfo!> getMatchInfos();
     method public String getPackageName();
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public java.util.Map<java.lang.String!,java.util.List<java.lang.String!>!> getParentTypeMap();
     method public double getRankingSignal();
   }
 
@@ -644,6 +652,7 @@ package androidx.appsearch.app {
     method public androidx.appsearch.app.SearchResult build();
     method public androidx.appsearch.app.SearchResult.Builder setDocument(Object) throws androidx.appsearch.exceptions.AppSearchException;
     method public androidx.appsearch.app.SearchResult.Builder setGenericDocument(androidx.appsearch.app.GenericDocument);
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public androidx.appsearch.app.SearchResult.Builder setParentTypeMap(java.util.Map<java.lang.String!,java.util.List<java.lang.String!>!>);
     method public androidx.appsearch.app.SearchResult.Builder setRankingSignal(double);
   }
 

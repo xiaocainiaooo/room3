@@ -257,9 +257,13 @@ public class GenericDocument {
      * Returns the list of parent types of the {@link GenericDocument}'s type.
      *
      * <p>It is guaranteed that child types appear before parent types in the list.
+     *
+     * @deprecated Parent types should no longer be set in {@link GenericDocument}. Use
+     * {@link SearchResult.Builder#getParentTypeMap()} instead.
      * <!--@exportToFramework:hide-->
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @Deprecated
     @Nullable
     public List<String> getParentTypes() {
         List<String> result = mDocumentParcel.getParentTypes();
@@ -1089,8 +1093,9 @@ public class GenericDocument {
      * @see GenericDocument#fromDocumentClass
      */
     @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public <T> T toDocumentClass(@NonNull Class<T> documentClass) throws AppSearchException {
-        return toDocumentClass(documentClass, /* documentClassMap= */null);
+        return toDocumentClass(documentClass, DocumentClassMappingContext.EMPTY);
     }
 
     /**
@@ -1106,11 +1111,12 @@ public class GenericDocument {
      *
      * <p>If this GenericDocument's type is recorded as a subtype of the provided
      * {@code documentClass}, the method will find an AppSearch document class, using the provided
-     * {@code documentClassMap}, that is the most concrete and assignable to {@code documentClass},
-     * and then deserialize to that class instead. This allows for more specific and accurate
-     * deserialization of GenericDocuments. If {@code documentClassMap} is null or we are not
-     * able to find a candidate assignable to {@code documentClass}, the method will deserialize
-     * to {@code documentClass} directly.
+     * {@code documentClassMappingContext}, that is the most concrete and assignable to
+     * {@code documentClass}, and then deserialize to that class instead. This allows for more
+     * specific and accurate deserialization of GenericDocuments. If
+     * {@code documentClassMappingContext} has information missing or we are not able to find a
+     * candidate assignable to {@code documentClass}, the method will deserialize to
+     * {@code documentClass} directly.
      *
      * <p>Assignability is determined by the programing language's type system, and which type is
      * more concrete is determined by AppSearch's type system specified via
@@ -1118,13 +1124,15 @@ public class GenericDocument {
      * {@link Document#parent()}.
      *
      * <p>For nested document properties, this method will be called recursively, and
-     * {@code documentClassMap} will be passed down to the recursive calls of this method.
+     * {@code documentClassMappingContext} will be passed down to the recursive
+     * calls of this method.
      *
-     * @param documentClass    a class annotated with {@link Document}
-     * @param documentClassMap a map from AppSearch's type name specified by {@link Document#name()}
-     *                         to the list of the fully qualified names of the corresponding
-     *                         document classes. In most cases, passing the value returned by
-     *                         {@link AppSearchDocumentClassMap#getGlobalMap()} will be sufficient.
+     * <p>For most use cases, it is recommended to utilize
+     * {@link SearchResult#getDocument(Class, Map)} instead of calling this method directly. This
+     * avoids the need to manually create a {@link DocumentClassMappingContext}.
+     *
+     * @param documentClass               a class annotated with {@link Document}
+     * @param documentClassMappingContext a {@link DocumentClassMappingContext} instance
      * @return an instance of the document class after being converted from a
      * {@link GenericDocument}
      * @throws AppSearchException if no factory for this document class could be found on the
@@ -1132,20 +1140,26 @@ public class GenericDocument {
      * @see GenericDocument#fromDocumentClass
      */
     @NonNull
+    @ExperimentalAppSearchApi
     public <T> T toDocumentClass(@NonNull Class<T> documentClass,
-            @Nullable Map<String, List<String>> documentClassMap) throws AppSearchException {
+            @NonNull DocumentClassMappingContext documentClassMappingContext)
+            throws AppSearchException {
         Preconditions.checkNotNull(documentClass);
+        Preconditions.checkNotNull(documentClassMappingContext);
         DocumentClassFactoryRegistry registry = DocumentClassFactoryRegistry.getInstance();
         Class<? extends T> targetClass = findTargetClassToDeserialize(documentClass,
-                documentClassMap);
+                documentClassMappingContext.getDocumentClassMap(),
+                documentClassMappingContext.getParentTypeMap());
         DocumentClassFactory<? extends T> factory = registry.getOrCreateFactory(targetClass);
-        return factory.fromGenericDocument(this, documentClassMap);
+        return factory.fromGenericDocument(this, documentClassMappingContext);
     }
 
     /**
      * Find a target class that is assignable to {@code documentClass} to deserialize this
-     * document, based on the provided document class map. If the provided map is null, return
-     * {@code documentClass} directly.
+     * document, based on the provided {@code documentClassMap} and {@code parentTypeMap}. If
+     * {@code documentClassMap} is empty, return {@code documentClass} directly.
+     * If {@code parentTypeMap} does not contain the required parent type information, this
+     * method will try the deprecated {@link #getParentTypes()}.
      *
      * <p>This method first tries to find a target class corresponding to the document's own type.
      * If that fails, it then tries to find a class corresponding to the document's parent type.
@@ -1153,8 +1167,9 @@ public class GenericDocument {
      */
     @NonNull
     private <T> Class<? extends T> findTargetClassToDeserialize(@NonNull Class<T> documentClass,
-            @Nullable Map<String, List<String>> documentClassMap) {
-        if (documentClassMap == null) {
+            @NonNull Map<String, List<String>> documentClassMap,
+            @NonNull Map<String, List<String>> parentTypeMap) {
+        if (documentClassMap.isEmpty()) {
             return documentClass;
         }
 
@@ -1166,7 +1181,12 @@ public class GenericDocument {
         }
 
         // Find the target class by parent types.
-        List<String> parentTypes = getParentTypes();
+        List<String> parentTypes;
+        if (parentTypeMap.containsKey(getSchemaType())) {
+            parentTypes = parentTypeMap.get(getSchemaType());
+        } else {
+            parentTypes = getParentTypes();
+        }
         if (parentTypes != null) {
             for (int i = 0; i < parentTypes.size(); ++i) {
                 targetClass = AppSearchDocumentClassMap.getAssignableClassBySchemaName(
@@ -1422,13 +1442,16 @@ public class GenericDocument {
          * Sets the list of parent types of the {@link GenericDocument}'s type.
          *
          * <p>Child types must appear before parent types in the list.
+         *
+         * @deprecated Parent types should no longer be set in {@link GenericDocument}. Use
+         * {@link SearchResult.Builder#setParentTypeMap(Map)} instead.
          * <!--@exportToFramework:hide-->
          */
         @CanIgnoreReturnValue
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+        @Deprecated
         @NonNull
-        public BuilderType setParentTypes(@NonNull List<String> parentTypes) {
-            Preconditions.checkNotNull(parentTypes);
+        public BuilderType setParentTypes(@Nullable List<String> parentTypes) {
             mDocumentParcelBuilder.setParentTypes(parentTypes);
             return mBuilderTypeInstance;
         }

@@ -2335,7 +2335,7 @@ public class AppSearchCompilerTest {
         checkResultContains("Thing.java",
                 "Thing document = Thing.create(getIdConv, getNamespaceConv)");
         checkResultContains("Gift.java",
-                "thingConv = thingCopy.toDocumentClass(Thing.class, documentClassMap)");
+                "thingConv = thingCopy.toDocumentClass(Thing.class, documentClassMappingContext)");
         checkEqualsGolden("Gift.java");
     }
 

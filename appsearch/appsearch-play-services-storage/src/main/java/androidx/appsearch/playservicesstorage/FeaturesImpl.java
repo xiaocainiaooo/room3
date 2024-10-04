@@ -93,6 +93,8 @@ final class FeaturesImpl implements Features {
                 // fall through
             case Features.SCHEMA_SCORABLE_PROPERTY_CONFIG:
                 // fall through
+            case Features.SEARCH_RESULT_PARENT_TYPES:
+                // fall through
             default:
                 return false; // AppSearch features absent in GMSCore AppSearch.
         }

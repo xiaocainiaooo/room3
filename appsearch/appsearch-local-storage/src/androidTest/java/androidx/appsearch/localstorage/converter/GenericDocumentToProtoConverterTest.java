@@ -20,9 +20,13 @@ import static androidx.appsearch.testutil.AppSearchTestUtils.calculateDigest;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
+
 import androidx.appsearch.app.AppSearchBlobHandle;
 import androidx.appsearch.app.EmbeddingVector;
 import androidx.appsearch.app.GenericDocument;
+import androidx.appsearch.flags.Flags;
 import androidx.appsearch.localstorage.AppSearchConfigImpl;
 import androidx.appsearch.localstorage.LocalStorageIcingOptionsConfig;
 import androidx.appsearch.localstorage.SchemaCache;
@@ -372,7 +376,9 @@ public class GenericDocumentToProtoConverterTest {
     // @exportToFramework:startStrip()
     // TODO(b/274157614): setParentTypes is hidden
     @Test
+    @SuppressWarnings("deprecation")
     public void testConvertDocument_withParentTypes() throws Exception {
+        assumeFalse(Flags.enableSearchResultParentTypes());
         // Create a type with a parent type.
         SchemaTypeConfigProto schemaProto1 = SchemaTypeConfigProto.newBuilder()
                 .setSchemaType(PREFIX + SCHEMA_TYPE_1)
@@ -449,6 +455,67 @@ public class GenericDocumentToProtoConverterTest {
                 expectedDocWithParentAsMetaField);
     }
     // @exportToFramework:endStrip()
+
+    @Test
+    public void testConvertDocument_withoutParentTypes() throws Exception {
+        assumeTrue(Flags.enableSearchResultParentTypes());
+        // Create a type with a parent type.
+        SchemaTypeConfigProto schemaProto1 = SchemaTypeConfigProto.newBuilder()
+                .setSchemaType(PREFIX + SCHEMA_TYPE_1)
+                .addParentTypes(PREFIX + SCHEMA_TYPE_2)
+                .build();
+        Map<String, Map<String, SchemaTypeConfigProto>> schemaMap =
+                ImmutableMap.of(PREFIX, ImmutableMap.of(
+                        PREFIX + SCHEMA_TYPE_1, schemaProto1,
+                        PREFIX + SCHEMA_TYPE_2, SCHEMA_PROTO_2));
+
+        // Create a document proto for the above type.
+        DocumentProto.Builder documentProtoBuilder = DocumentProto.newBuilder()
+                .setUri("id1")
+                .setSchema(SCHEMA_TYPE_1)
+                .setCreationTimestampMs(5L)
+                .setScore(1)
+                .setTtlMs(1L)
+                .setNamespace("namespace");
+        HashMap<String, PropertyProto.Builder> propertyProtoMap = new HashMap<>();
+        propertyProtoMap.put("longKey1",
+                PropertyProto.newBuilder().setName("longKey1").addInt64Values(1L));
+        propertyProtoMap.put("doubleKey1",
+                PropertyProto.newBuilder().setName("doubleKey1").addDoubleValues(1.0));
+        for (Map.Entry<String, PropertyProto.Builder> entry : propertyProtoMap.entrySet()) {
+            documentProtoBuilder.addProperties(entry.getValue());
+        }
+        DocumentProto documentProto = documentProtoBuilder.build();
+
+        // Check that the parent types list is not wrapped anywhere in GenericDocument, neither
+        // as a synthetic property nor as a meta field, since Flags.enableSearchResultParentTypes()
+        // is true.
+        GenericDocument expectedDoc =
+                new GenericDocument.Builder<GenericDocument.Builder<?>>("namespace", "id1",
+                        SCHEMA_TYPE_1)
+                        .setCreationTimestampMillis(5L)
+                        .setScore(1)
+                        .setTtlMillis(1L)
+                        .setPropertyLong("longKey1", 1L)
+                        .setPropertyDouble("doubleKey1", 1.0)
+                        .build();
+        GenericDocument actualDoc1 =
+                GenericDocumentToProtoConverter.toGenericDocument(documentProto, PREFIX,
+                        new SchemaCache(schemaMap),
+                        new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                                new LocalStorageIcingOptionsConfig(),
+                                /* storeParentInfoAsSyntheticProperty= */ false,
+                                /* shouldRetrieveParentInfo= */ true));
+        GenericDocument actualDoc2 =
+                GenericDocumentToProtoConverter.toGenericDocument(documentProto, PREFIX,
+                        new SchemaCache(schemaMap),
+                        new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                                new LocalStorageIcingOptionsConfig(),
+                                /* storeParentInfoAsSyntheticProperty= */ true,
+                                /* shouldRetrieveParentInfo= */ true));
+        assertThat(actualDoc1).isEqualTo(expectedDoc);
+        assertThat(actualDoc2).isEqualTo(expectedDoc);
+    }
 
     @Test
     public void testDocumentProtoConvert_EmbeddingProperty() throws Exception {

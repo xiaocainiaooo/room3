@@ -25,6 +25,7 @@ import androidx.appsearch.app.EmbeddingVector;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.GenericDocument;
 import androidx.appsearch.exceptions.AppSearchException;
+import androidx.appsearch.flags.Flags;
 import androidx.appsearch.localstorage.AppSearchConfig;
 import androidx.appsearch.localstorage.SchemaCache;
 import androidx.core.util.Preconditions;
@@ -151,6 +152,7 @@ public final class GenericDocumentToProtoConverter {
      * @param schemaCache   The SchemaCache instance held in AppSearch.
      */
     @NonNull
+    @SuppressWarnings("deprecation")
     @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public static GenericDocument toGenericDocument(@NonNull DocumentProtoOrBuilder proto,
             @NonNull String prefix,
@@ -170,7 +172,7 @@ public final class GenericDocumentToProtoConverter {
                         .setTtlMillis(proto.getTtlMs())
                         .setCreationTimestampMillis(proto.getCreationTimestampMs());
         String prefixedSchemaType = prefix + proto.getSchema();
-        if (config.shouldRetrieveParentInfo()) {
+        if (config.shouldRetrieveParentInfo() && !Flags.enableSearchResultParentTypes()) {
             List<String> parentSchemaTypes =
                     schemaCache.getTransitiveUnprefixedParentSchemaTypes(
                             prefix, prefixedSchemaType);
