@@ -25,6 +25,7 @@ import androidx.appsearch.app.EmbeddingVector;
 import androidx.appsearch.app.GenericDocument;
 import androidx.appsearch.localstorage.AppSearchConfigImpl;
 import androidx.appsearch.localstorage.LocalStorageIcingOptionsConfig;
+import androidx.appsearch.localstorage.SchemaCache;
 import androidx.appsearch.localstorage.UnlimitedLimitConfig;
 import androidx.appsearch.localstorage.util.PrefixUtil;
 
@@ -64,16 +65,17 @@ public class GenericDocumentToProtoConverterTest {
                     "namespace", "sDocumentProperties2", SCHEMA_TYPE_2)
                     .setCreationTimestampMillis(6789L)
                     .build();
+    private static final String PREFIX = "package$databaseName/";
     private static final SchemaTypeConfigProto SCHEMA_PROTO_1 = SchemaTypeConfigProto.newBuilder()
-            .setSchemaType(SCHEMA_TYPE_1)
+            .setSchemaType(PREFIX + SCHEMA_TYPE_1)
             .build();
     private static final SchemaTypeConfigProto SCHEMA_PROTO_2 = SchemaTypeConfigProto.newBuilder()
-            .setSchemaType(SCHEMA_TYPE_2)
+            .setSchemaType(PREFIX + SCHEMA_TYPE_2)
             .build();
-    private static final String PREFIX = "package$databaseName/";
-    private static final Map<String, SchemaTypeConfigProto> SCHEMA_MAP =
-            ImmutableMap.of(PREFIX + SCHEMA_TYPE_1, SCHEMA_PROTO_1, PREFIX + SCHEMA_TYPE_2,
-                    SCHEMA_PROTO_2);
+    private static final Map<String, Map<String, SchemaTypeConfigProto>> SCHEMA_MAP =
+            ImmutableMap.of(PREFIX, ImmutableMap.of(
+                    PREFIX + SCHEMA_TYPE_1, SCHEMA_PROTO_1,
+                    PREFIX + SCHEMA_TYPE_2, SCHEMA_PROTO_2));
 
     @Test
     public void testDocumentProtoConvert() throws Exception {
@@ -128,7 +130,8 @@ public class GenericDocumentToProtoConverterTest {
 
         GenericDocument convertedGenericDocument =
                 GenericDocumentToProtoConverter.toGenericDocument(documentProto, PREFIX,
-                        SCHEMA_MAP, new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new SchemaCache(SCHEMA_MAP),
+                        new AppSearchConfigImpl(new UnlimitedLimitConfig(),
                                 new LocalStorageIcingOptionsConfig()));
         DocumentProto convertedDocumentProto =
                 GenericDocumentToProtoConverter.toDocumentProto(document);
@@ -220,13 +223,15 @@ public class GenericDocumentToProtoConverterTest {
                 .addProperties(emptyDocumentListProperty)
                 .setSchemaType(PREFIX + SCHEMA_TYPE_1)
                 .build();
-        Map<String, SchemaTypeConfigProto> schemaMap =
-                ImmutableMap.of(PREFIX + SCHEMA_TYPE_1, schemaTypeConfigProto);
+        Map<String, Map<String, SchemaTypeConfigProto>> schemaMap =
+                ImmutableMap.of(PREFIX,
+                        ImmutableMap.of(PREFIX + SCHEMA_TYPE_1, schemaTypeConfigProto));
 
         // Convert to the other type and check if they are matched.
         GenericDocument convertedGenericDocument =
                 GenericDocumentToProtoConverter.toGenericDocument(documentProto, PREFIX,
-                        schemaMap, new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new SchemaCache(schemaMap),
+                        new AppSearchConfigImpl(new UnlimitedLimitConfig(),
                                 new LocalStorageIcingOptionsConfig()));
         DocumentProto convertedDocumentProto =
                 GenericDocumentToProtoConverter.toDocumentProto(document);
@@ -348,14 +353,16 @@ public class GenericDocumentToProtoConverterTest {
                 .addProperties(nestedDocumentProperty)
                 .setSchemaType(PREFIX + SCHEMA_TYPE_2)
                 .build();
-        Map<String, SchemaTypeConfigProto> schemaMap =
-                ImmutableMap.of(PREFIX + SCHEMA_TYPE_1, nestedSchemaTypeConfigProto,
-                        PREFIX + SCHEMA_TYPE_2, outerSchemaTypeConfigProto);
+        Map<String, Map<String, SchemaTypeConfigProto>> schemaMap =
+                ImmutableMap.of(PREFIX,
+                        ImmutableMap.of(PREFIX + SCHEMA_TYPE_1, nestedSchemaTypeConfigProto,
+                                PREFIX + SCHEMA_TYPE_2, outerSchemaTypeConfigProto));
 
         // Convert to the other type and check if they are matched.
         GenericDocument convertedGenericDocument =
                 GenericDocumentToProtoConverter.toGenericDocument(outerDocumentProto, PREFIX,
-                        schemaMap, new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new SchemaCache(schemaMap),
+                        new AppSearchConfigImpl(new UnlimitedLimitConfig(),
                                 new LocalStorageIcingOptionsConfig()));
         DocumentProto convertedDocumentProto =
                 GenericDocumentToProtoConverter.toDocumentProto(outerDocument);
@@ -371,9 +378,10 @@ public class GenericDocumentToProtoConverterTest {
                 .setSchemaType(PREFIX + SCHEMA_TYPE_1)
                 .addParentTypes(PREFIX + SCHEMA_TYPE_2)
                 .build();
-        Map<String, SchemaTypeConfigProto> schemaMap =
-                ImmutableMap.of(PREFIX + SCHEMA_TYPE_1, schemaProto1, PREFIX + SCHEMA_TYPE_2,
-                        SCHEMA_PROTO_2);
+        Map<String, Map<String, SchemaTypeConfigProto>> schemaMap =
+                ImmutableMap.of(PREFIX, ImmutableMap.of(
+                        PREFIX + SCHEMA_TYPE_1, schemaProto1,
+                        PREFIX + SCHEMA_TYPE_2, SCHEMA_PROTO_2));
 
         // Create a document proto for the above type.
         DocumentProto.Builder documentProtoBuilder = DocumentProto.newBuilder()
@@ -418,13 +426,15 @@ public class GenericDocumentToProtoConverterTest {
 
         GenericDocument actualDocWithParentAsMetaField =
                 GenericDocumentToProtoConverter.toGenericDocument(documentProto, PREFIX,
-                        schemaMap, new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new SchemaCache(schemaMap),
+                        new AppSearchConfigImpl(new UnlimitedLimitConfig(),
                                 new LocalStorageIcingOptionsConfig(),
                                 /* storeParentInfoAsSyntheticProperty= */ false,
                                 /* shouldRetrieveParentInfo= */ true));
         GenericDocument actualDocWithParentAsSyntheticProperty =
                 GenericDocumentToProtoConverter.toGenericDocument(documentProto, PREFIX,
-                        schemaMap, new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new SchemaCache(schemaMap),
+                        new AppSearchConfigImpl(new UnlimitedLimitConfig(),
                                 new LocalStorageIcingOptionsConfig(),
                                 /* storeParentInfoAsSyntheticProperty= */ true,
                                 /* shouldRetrieveParentInfo= */ true));
@@ -486,7 +496,8 @@ public class GenericDocumentToProtoConverterTest {
 
         GenericDocument convertedGenericDocument =
                 GenericDocumentToProtoConverter.toGenericDocument(documentProto, PREFIX,
-                        SCHEMA_MAP, new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new SchemaCache(SCHEMA_MAP),
+                        new AppSearchConfigImpl(new UnlimitedLimitConfig(),
                                 new LocalStorageIcingOptionsConfig()));
         DocumentProto convertedDocumentProto =
                 GenericDocumentToProtoConverter.toDocumentProto(document);
@@ -554,7 +565,8 @@ public class GenericDocumentToProtoConverterTest {
 
         GenericDocument convertedGenericDocument =
                 GenericDocumentToProtoConverter.toGenericDocument(documentProto, PREFIX,
-                        SCHEMA_MAP, new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new SchemaCache(SCHEMA_MAP),
+                        new AppSearchConfigImpl(new UnlimitedLimitConfig(),
                                 new LocalStorageIcingOptionsConfig()));
         DocumentProto convertedDocumentProto =
                 GenericDocumentToProtoConverter.toDocumentProto(document);

@@ -81,25 +81,24 @@ public class SearchResultToProtoConverterTest {
                         .build();
         Map<String, Map<String, SchemaTypeConfigProto>> schemaMap = ImmutableMap.of(prefix,
                 ImmutableMap.of(schemaType, schemaTypeConfigProto));
+        SchemaCache schemaCache = new SchemaCache(schemaMap);
 
         removePrefixesFromDocument(documentProtoBuilder);
         removePrefixesFromDocument(joinedDocProtoBuilder);
         SearchResultPage searchResultPage = SearchResultToProtoConverter.toSearchResultPage(
-                searchResultProto, new SchemaCache(schemaMap), config);
+                searchResultProto, schemaCache, config);
         assertThat(searchResultPage.getResults()).hasSize(1);
         SearchResult result = searchResultPage.getResults().get(0);
         assertThat(result.getPackageName()).isEqualTo("com.package.foo");
         assertThat(result.getDatabaseName()).isEqualTo("databaseName");
         assertThat(result.getGenericDocument()).isEqualTo(
                 GenericDocumentToProtoConverter.toGenericDocument(
-                        documentProtoBuilder.build(), prefix, schemaMap.get(prefix),
-                        config));
+                        documentProtoBuilder.build(), prefix, schemaCache, config));
 
         assertThat(result.getJoinedResults()).hasSize(1);
         assertThat(result.getJoinedResults().get(0).getGenericDocument()).isEqualTo(
                 GenericDocumentToProtoConverter.toGenericDocument(
-                        joinedDocProtoBuilder.build(), prefix, schemaMap.get(prefix),
-                        config));
+                        joinedDocProtoBuilder.build(), prefix, schemaCache, config));
     }
 
     @Test
