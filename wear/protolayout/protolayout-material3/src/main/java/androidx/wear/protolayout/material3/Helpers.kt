@@ -21,6 +21,7 @@ import android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE
 import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
 import androidx.annotation.Dimension.Companion.SP
+import androidx.annotation.RestrictTo
 import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders.Spacer
@@ -70,3 +71,6 @@ internal fun String.toElementMetadata() = ElementMetadata.Builder().setTagData(t
 internal fun horizontalSpacer(@Dimension(unit = DP) heightDp: Int): Spacer {
     return Spacer.Builder().setWidth(expand()).setHeight(dp(heightDp.toFloat())).build()
 }
+
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+public fun String.prop(): StringProp = StringProp.Builder(this).build()
