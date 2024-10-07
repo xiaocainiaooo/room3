@@ -237,7 +237,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initializeZOrderToggleButton() {
         zOrderToggleButton.setOnCheckedChangeListener { _, isChecked ->
-            BaseFragment.isZOrderOnTop = !isChecked
+            BaseFragment.isZOrderBelowToggleChecked = isChecked
         }
     }
 
@@ -290,7 +290,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun selectCuj(menuItem: MenuItem) {
         when (menuItem.itemId) {
-            R.id.item_resize -> switchContentFragment(ResizeFragment(), menuItem.title)
+            R.id.item_resize ->
+                if (useCompose) {
+                    switchContentFragment(
+                        ResizeComposeFragment(),
+                        "${menuItem.title} ${getString(R.string.compose)}"
+                    )
+                } else {
+                    switchContentFragment(ResizeFragment(), menuItem.title)
+                }
             R.id.item_scroll -> switchContentFragment(ScrollFragment(), menuItem.title)
             R.id.item_pooling_container ->
                 switchContentFragment(PoolingContainerFragment(), menuItem.title)

@@ -23,6 +23,9 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.fragment.app.Fragment
 import androidx.privacysandbox.sdkruntime.client.SdkSandboxManagerCompat
 import androidx.privacysandbox.ui.client.SandboxedUiAdapterFactory
@@ -46,6 +49,7 @@ abstract class BaseFragment : Fragment() {
 
     private lateinit var sdkSandboxManager: SdkSandboxManagerCompat
     private lateinit var activity: Activity
+    protected var providerUiOnTop by mutableStateOf(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,9 +121,8 @@ abstract class BaseFragment : Fragment() {
     }
 
     open fun handleDrawerStateChange(isDrawerOpen: Boolean) {
-        getSandboxedSdkViews().forEach {
-            it.orderProviderUiAboveClientUi(!isDrawerOpen && isZOrderOnTop)
-        }
+        providerUiOnTop = !isDrawerOpen && !isZOrderBelowToggleChecked
+        getSandboxedSdkViews().forEach { it.orderProviderUiAboveClientUi(providerUiOnTop) }
     }
 
     private inner class TestEventListener(val view: SandboxedSdkView) :
@@ -147,7 +150,7 @@ abstract class BaseFragment : Fragment() {
         private const val MEDIATEE_SDK_NAME =
             "androidx.privacysandbox.ui.integration.mediateesdkproviderwrapper"
         const val TAG = "TestSandboxClient"
-        var isZOrderOnTop = true
+        var isZOrderBelowToggleChecked = false
         @AdType var currentAdType = AdType.BASIC_NON_WEBVIEW
         @MediationOption var currentMediationOption = MediationOption.NON_MEDIATED
         var shouldDrawViewabilityLayer = false
