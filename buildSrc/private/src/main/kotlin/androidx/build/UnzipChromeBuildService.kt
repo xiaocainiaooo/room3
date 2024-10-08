@@ -41,8 +41,10 @@ constructor(
         val unzipToDir: DirectoryProperty
     }
 
+    val chromePath: String by lazy { unzipChrome() }
+
     /** Unzips the Chrome prebuilt for the current OS and returns the path of the executable. */
-    fun getChromePath(): String {
+    private fun unzipChrome(): String {
         val osName = chromeBinOsSuffix()
         val chromeZip =
             File(parameters.browserDir.get().asFile, "chrome-headless-shell-$osName.zip")
