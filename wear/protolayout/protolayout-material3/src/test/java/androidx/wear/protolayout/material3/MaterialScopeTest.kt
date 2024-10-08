@@ -15,16 +15,13 @@
  */
 package androidx.wear.protolayout.material3
 
-import android.content.Context
 import android.graphics.Color
 import android.os.Build.VERSION_CODES
-import android.provider.Settings
-import androidx.test.core.app.ApplicationProvider
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.wear.protolayout.ColorBuilders
+import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.DeviceParametersBuilders
-import androidx.wear.protolayout.LayoutElementBuilders
-import androidx.wear.protolayout.material3.DynamicMaterialTheme.getColorProp
+import androidx.wear.protolayout.material3.tokens.ColorTokens
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,39 +35,33 @@ class MaterialScopeTest {
     fun testDynamicThemeEnabled_returnsTrue() {
         enableDynamicTheme()
 
-        assertThat(isDynamicThemeEnabled(ApplicationProvider.getApplicationContext())).isTrue()
+        assertThat(isDynamicColorSchemeEnabled(getApplicationContext())).isTrue()
     }
 
     @Test
     @Config(minSdk = VERSION_CODES.UPSIDE_DOWN_CAKE)
     fun scopeWithDefaultTheme_defaultOptInDynamicColor_dynamicThemeEnabled_api34() {
-        val scopeWithDefaultTheme =
-            MaterialScope(ApplicationProvider.getApplicationContext(), DEVICE_PARAMETERS)
         enableDynamicTheme()
+
+        val scopeWithDefaultTheme =
+            MaterialScope(
+                context = getApplicationContext(),
+                deviceConfiguration = DEVICE_PARAMETERS,
+                allowDynamicTheme = true,
+                theme =
+                    MaterialTheme(
+                        colorScheme = dynamicColorScheme(context = getApplicationContext())
+                    ),
+                defaultTextElementStyle = TextElementStyle(),
+                defaultIconStyle = IconStyle()
+            )
 
         assertThat(scopeWithDefaultTheme.deviceConfiguration).isEqualTo(DEVICE_PARAMETERS)
         assertThat(scopeWithDefaultTheme.allowDynamicTheme).isTrue()
-        assertThat(isDynamicThemeEnabled(scopeWithDefaultTheme.context)).isTrue()
-
-        for (i in 0 until ColorTokens.TOKEN_COUNT) {
-            assertThat(scopeWithDefaultTheme.getColorProp(i).argb)
-                .isEqualTo(getColorProp(ApplicationProvider.getApplicationContext(), i)!!.argb)
-        }
-
-        for (i in 0 until Shape.TOKEN_COUNT) {
-            assertThat(scopeWithDefaultTheme.getCorner(i).radius!!.value)
-                .isEqualTo(DEFAULT_MATERIAL_THEME.getCornerShape(i).getRadius()!!.getValue())
-        }
-
-        for (i in 0 until Typography.TOKEN_COUNT) {
-            val fontStyle1: LayoutElementBuilders.FontStyle =
-                DEFAULT_MATERIAL_THEME.getFontStyleBuilder(i).build()
-            val fontStyle2 = scopeWithDefaultTheme.theme.getFontStyleBuilder(i).build()
-            assertThat(fontStyle1.preferredFontFamilies).isEmpty()
-            assertThat(fontStyle1.variant!!.toProto())
-                .isEqualTo(TypographyFontSelection.getFontVariant(i).toProto())
-            assertThat(fontStyle1.size!!.value).isEqualTo(fontStyle2.size!!.value)
-        }
+        assertThat(isDynamicColorSchemeEnabled(scopeWithDefaultTheme.context)).isTrue()
+        // It doesn't use default static theme
+        assertThat(scopeWithDefaultTheme.theme.colorScheme.primary.argb)
+            .isNotEqualTo(ColorTokens.PRIMARY)
     }
 
     @Test
@@ -80,35 +71,29 @@ class MaterialScopeTest {
 
         val materialScope =
             MaterialScope(
-                context = ApplicationProvider.getApplicationContext(),
+                context = getApplicationContext(),
                 deviceConfiguration = DEVICE_PARAMETERS,
                 theme =
                     MaterialTheme(
-                        customColorScheme =
-                            mapOf(
-                                ColorTokens.ERROR to ColorBuilders.argb(customErrorColor),
-                                ColorTokens.TERTIARY to ColorBuilders.argb(customTertiaryColor)
+                        colorScheme =
+                            ColorScheme(
+                                error = argb(customErrorColor),
+                                tertiary = argb(customTertiaryColor)
                             )
                     ),
-                allowDynamicTheme = false
+                allowDynamicTheme = false,
+                defaultTextElementStyle = TextElementStyle(),
+                defaultIconStyle = IconStyle()
             )
 
         assertThat(materialScope.deviceConfiguration).isEqualTo(DEVICE_PARAMETERS)
         assertThat(materialScope.allowDynamicTheme).isFalse()
 
-        for (i in 0 until ColorTokens.TOKEN_COUNT) {
-            when (i) {
-                ColorTokens.ERROR ->
-                    assertThat(materialScope.getColorProp(i).argb).isEqualTo(customErrorColor)
-                ColorTokens.TERTIARY ->
-                    assertThat(materialScope.getColorProp(i).argb).isEqualTo(customTertiaryColor)
-                else ->
-                    assertThat(materialScope.getColorProp(i).argb)
-                        .isEqualTo(DEFAULT_MATERIAL_THEME.getColor(i).argb)
-            }
-        }
-
-        assertThat(materialScope.deviceConfiguration).isEqualTo(DEVICE_PARAMETERS)
+        // Overridden
+        assertThat(materialScope.theme.colorScheme.error.argb).isEqualTo(customErrorColor)
+        assertThat(materialScope.theme.colorScheme.tertiary.argb).isEqualTo(customTertiaryColor)
+        // Not overridden
+        assertThat(materialScope.theme.colorScheme.primary.argb).isEqualTo(ColorTokens.PRIMARY)
     }
 
     @Test
@@ -118,35 +103,29 @@ class MaterialScopeTest {
 
         val materialScope =
             MaterialScope(
-                context = ApplicationProvider.getApplicationContext(),
+                context = getApplicationContext(),
                 deviceConfiguration = DEVICE_PARAMETERS,
+                allowDynamicTheme = true,
                 theme =
                     MaterialTheme(
-                        customColorScheme =
-                            mapOf(
-                                ColorTokens.ERROR to ColorBuilders.argb(customErrorColor),
-                                ColorTokens.TERTIARY to ColorBuilders.argb(customTertiaryColor)
+                        colorScheme =
+                            ColorScheme(
+                                error = argb(customErrorColor),
+                                tertiary = argb(customTertiaryColor)
                             )
-                    )
+                    ),
+                defaultTextElementStyle = TextElementStyle(),
+                defaultIconStyle = IconStyle()
             )
 
-        assertThat(isDynamicThemeEnabled(materialScope.context)).isFalse()
+        assertThat(isDynamicColorSchemeEnabled(materialScope.context)).isFalse()
         assertThat(materialScope.deviceConfiguration).isEqualTo(DEVICE_PARAMETERS)
         assertThat(materialScope.allowDynamicTheme).isTrue()
-
-        for (i in 0 until ColorTokens.TOKEN_COUNT) {
-            when (i) {
-                ColorTokens.ERROR ->
-                    assertThat(materialScope.getColorProp(i).argb).isEqualTo(customErrorColor)
-                ColorTokens.TERTIARY ->
-                    assertThat(materialScope.getColorProp(i).argb).isEqualTo(customTertiaryColor)
-                else ->
-                    assertThat(materialScope.getColorProp(i).argb)
-                        .isEqualTo(DEFAULT_MATERIAL_THEME.getColor(i).argb)
-            }
-        }
-
-        assertThat(materialScope.deviceConfiguration).isEqualTo(DEVICE_PARAMETERS)
+        // Overridden
+        assertThat(materialScope.theme.colorScheme.error.argb).isEqualTo(customErrorColor)
+        assertThat(materialScope.theme.colorScheme.tertiary.argb).isEqualTo(customTertiaryColor)
+        // Not overridden
+        assertThat(materialScope.theme.colorScheme.primary.argb).isEqualTo(ColorTokens.PRIMARY)
     }
 
     companion object {
@@ -155,13 +134,5 @@ class MaterialScopeTest {
                 .setScreenWidthDp(192)
                 .setScreenHeightDp(192)
                 .build()
-
-        private fun enableDynamicTheme() {
-            Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                THEME_CUSTOMIZATION_OVERLAY_PACKAGES,
-                "Placeholder text that enables theming"
-            )
-        }
     }
 }

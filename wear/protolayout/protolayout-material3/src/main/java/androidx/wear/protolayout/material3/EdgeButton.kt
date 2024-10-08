@@ -244,35 +244,29 @@ public object EdgeButtonDefaults {
      * [EdgeButtonColors] for the high-emphasis button representing the primary, most important or
      * most common action on a screen.
      *
-     * These colors are using [ColorTokens.PRIMARY] for background color and
-     * [ColorTokens.ON_PRIMARY] for content color.
+     * These colors are using [ColorScheme.primary] for background color and [ColorScheme.onPrimary]
+     * for content color.
      */
     public fun MaterialScope.filled(): EdgeButtonColors =
-        EdgeButtonColors(getColorProp(ColorTokens.PRIMARY), getColorProp(ColorTokens.ON_PRIMARY))
+        EdgeButtonColors(theme.colorScheme.primary, theme.colorScheme.onPrimary)
 
     /**
      * [EdgeButtonColors] for the medium-emphasis button.
      *
-     * These colors are using [ColorTokens.SURFACE_CONTAINER] for background color and
-     * [ColorTokens.ON_SURFACE] for content color.
+     * These colors are using [ColorScheme.surfaceContainer] for background color and
+     * [ColorScheme.onSurface] for content color.
      */
     public fun MaterialScope.filledTonal(): EdgeButtonColors =
-        EdgeButtonColors(
-            getColorProp(ColorTokens.SURFACE_CONTAINER),
-            getColorProp(ColorTokens.ON_SURFACE)
-        )
+        EdgeButtonColors(theme.colorScheme.surfaceContainer, theme.colorScheme.onSurface)
 
     /**
      * Alternative [EdgeButtonColors] for the high-emphasis button.
      *
-     * These colors are using [ColorTokens.PRIMARY_CONTAINER] for background color and
-     * [ColorTokens.ON_PRIMARY_CONTAINER] for content color.
+     * These colors are using [ColorScheme.primaryContainer] for background color and
+     * [ColorScheme.primaryContainer] for content color.
      */
     public fun MaterialScope.filledVariant(): EdgeButtonColors =
-        EdgeButtonColors(
-            getColorProp(ColorTokens.PRIMARY_CONTAINER),
-            getColorProp(ColorTokens.ON_PRIMARY_CONTAINER)
-        )
+        EdgeButtonColors(theme.colorScheme.primaryContainer, theme.colorScheme.onPrimaryContainer)
 
     @JvmField internal val TOP_CORNER_RADIUS: DpProp = dp(17f)
     internal const val HORIZONTAL_MARGIN_PERCENT: Float = 24f
