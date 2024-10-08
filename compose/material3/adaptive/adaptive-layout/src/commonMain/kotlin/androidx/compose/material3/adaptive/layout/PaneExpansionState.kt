@@ -34,6 +34,7 @@ import androidx.compose.material3.adaptive.layout.PaneExpansionState.Companion.D
 import androidx.compose.material3.adaptive.layout.PaneExpansionState.Companion.Unspecified
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -169,8 +170,8 @@ fun rememberPaneExpansionState(
                 ?: PaneExpansionStateData(currentAnchor = initialAnchor)
         )
     }
-    return expansionState.apply {
-        restore(
+    LaunchedEffect(key, anchors, anchoringAnimationSpec, flingBehavior) {
+        expansionState.restore(
             dataMap[key]
                 ?: PaneExpansionStateData(currentAnchor = initialAnchor).also { dataMap[key] = it },
             anchors,
@@ -178,6 +179,7 @@ fun rememberPaneExpansionState(
             flingBehavior
         )
     }
+    return expansionState
 }
 
 /**
@@ -332,19 +334,21 @@ internal constructor(
         data.currentDraggingOffsetState = Unspecified
     }
 
-    internal fun restore(
+    internal suspend fun restore(
         data: PaneExpansionStateData,
         anchors: List<PaneExpansionAnchor>,
         anchoringAnimationSpec: FiniteAnimationSpec<Float>,
         flingBehavior: FlingBehavior
     ) {
-        this.data = data
-        this.anchors = anchors
-        if (!anchors.contains(Snapshot.withoutReadObservation { currentAnchor })) {
-            currentAnchor = null
+        dragMutex.mutate(MutatePriority.PreventUserInput) {
+            this.data = data
+            this.anchors = anchors
+            if (!anchors.contains(Snapshot.withoutReadObservation { currentAnchor })) {
+                currentAnchor = null
+            }
+            this.anchoringAnimationSpec = anchoringAnimationSpec
+            this.flingBehavior = flingBehavior
         }
-        this.anchoringAnimationSpec = anchoringAnimationSpec
-        this.flingBehavior = flingBehavior
     }
 
     internal fun onMeasured(measuredWidth: Int, density: Density) {
@@ -383,16 +387,20 @@ internal constructor(
                     currentMeasuredDraggingOffset,
                     leftVelocity
                 )
-            currentAnchor = anchors[anchorPosition.index]
-            animate(
-                currentMeasuredDraggingOffset.toFloat(),
-                anchorPosition.position.toFloat(),
-                leftVelocity,
-                anchoringAnimationSpec,
-            ) { value, _ ->
-                currentDraggingOffset = value.toInt()
+            try {
+                currentAnchor = anchors[anchorPosition.index]
+                animate(
+                    currentMeasuredDraggingOffset.toFloat(),
+                    anchorPosition.position.toFloat(),
+                    leftVelocity,
+                    anchoringAnimationSpec,
+                ) { value, _ ->
+                    currentDraggingOffset = value.toInt()
+                }
+            } finally {
+                currentDraggingOffset = anchorPosition.position
+                isSettling = false
             }
-            isSettling = false
         }
     }
 
