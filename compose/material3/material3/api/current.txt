@@ -651,6 +651,11 @@ package androidx.compose.material3 {
     property public abstract kotlin.ranges.IntRange yearRange;
   }
 
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3Api public final class DefaultNavigationRailAdaptiveStrategy implements androidx.compose.material3.NavigationRailAdaptiveStrategy {
+    method @androidx.compose.runtime.Composable public void NavigationRail(androidx.compose.material3.NavigationRailAdaptiveStrategyContext);
+    field public static final androidx.compose.material3.DefaultNavigationRailAdaptiveStrategy INSTANCE;
+  }
+
   @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Immutable public final class DismissibleModalWideNavigationRailDefaults {
     method public androidx.compose.material3.ModalWideNavigationRailProperties getProperties();
     property public final androidx.compose.material3.ModalWideNavigationRailProperties Properties;
@@ -1531,6 +1536,25 @@ package androidx.compose.material3 {
     property public final int Top;
   }
 
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3Api public interface NavigationRailAdaptiveStrategy {
+    method @androidx.compose.runtime.Composable public void NavigationRail(androidx.compose.material3.NavigationRailAdaptiveStrategyContext);
+  }
+
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3Api public final class NavigationRailAdaptiveStrategyContext {
+    method public long getContainerColor();
+    method public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> getContent();
+    method public long getContentColor();
+    method public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? getHeader();
+    method public androidx.compose.ui.Modifier getModifier();
+    method public androidx.compose.foundation.layout.WindowInsets getWindowInsets();
+    property public final long containerColor;
+    property public final kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content;
+    property public final long contentColor;
+    property public final kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? header;
+    property public final androidx.compose.ui.Modifier modifier;
+    property public final androidx.compose.foundation.layout.WindowInsets windowInsets;
+  }
+
   public final class NavigationRailDefaults {
     method @androidx.compose.runtime.Composable public long getContainerColor();
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.layout.WindowInsets getWindowInsets();
@@ -1568,6 +1592,8 @@ package androidx.compose.material3 {
   public final class NavigationRailKt {
     method @androidx.compose.runtime.Composable public static void NavigationRail(optional androidx.compose.ui.Modifier modifier, optional long containerColor, optional long contentColor, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? header, optional androidx.compose.foundation.layout.WindowInsets windowInsets, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static void NavigationRailItem(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> icon, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional boolean alwaysShowLabel, optional androidx.compose.material3.NavigationRailItemColors colors, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
+    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3Api public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.NavigationRailAdaptiveStrategy> getLocalNavigationRailAdaptiveStrategy();
+    property @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3Api public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.NavigationRailAdaptiveStrategy> LocalNavigationRailAdaptiveStrategy;
   }
 
   public final class OpticalCenteringKt {
