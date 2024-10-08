@@ -22,10 +22,12 @@ import android.graphics.Rect
 import android.graphics.pdf.models.PageMatchBounds
 import android.graphics.pdf.models.selection.PageSelection
 import android.graphics.pdf.models.selection.SelectionBoundary
+import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.RemoteException
 import android.util.Size
 import android.util.SparseArray
+import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
 import androidx.pdf.loader.PdfDocument.BitmapSource
 import androidx.pdf.loader.PdfDocument.PageInfo
@@ -128,6 +130,7 @@ internal class RemotePdfDocument(
      * @return A SparseArray mapping page numbers to [PageSelection] objects representing the
      *   selection bounds on each page.
      */
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
     override suspend fun getSelectionBounds(
         pageNumber: Int,
         start: PointF,

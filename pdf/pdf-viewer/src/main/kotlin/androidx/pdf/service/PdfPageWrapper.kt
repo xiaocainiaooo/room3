@@ -26,6 +26,8 @@ import android.graphics.pdf.content.PdfPageTextContent
 import android.graphics.pdf.models.PageMatchBounds
 import android.graphics.pdf.models.selection.PageSelection
 import android.graphics.pdf.models.selection.SelectionBoundary
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -64,6 +66,7 @@ internal interface PdfPageWrapper : AutoCloseable {
         }
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
     fun getRenderParams(): RenderParams {
         return RenderParams.Builder(RenderParams.RENDER_MODE_FOR_DISPLAY)
             .setRenderFlags(

@@ -19,10 +19,15 @@ package androidx.pdf.service
 
 import android.graphics.pdf.LoadParams
 import android.graphics.pdf.PdfRenderer
+import android.os.Build
 import android.os.ParcelFileDescriptor
+import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
 import java.util.concurrent.ConcurrentHashMap
 
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 internal class PdfRendererWrapperPostV(
     parcelFileDescriptor: ParcelFileDescriptor,

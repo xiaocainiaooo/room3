@@ -37,6 +37,7 @@ import android.widget.TextView.OnEditorActionListener;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
+import androidx.core.os.BundleCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.pdf.R;
@@ -291,15 +292,13 @@ public class FindInFileView extends LinearLayout {
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
         Bundle bundle = (Bundle) state;
-        super.onRestoreInstanceState(bundle.getParcelable(KEY_SUPER, Parcelable.class));
-        // TextView Focus State
-        mFocus = bundle.getBoolean(KEY_FOCUS);
-        // SearchModel State
+        super.onRestoreInstanceState(
+                BundleCompat.getParcelable(bundle, KEY_SUPER, Parcelable.class));
         if (bundle.getBoolean(KEY_IS_SAVED)) {
             mIsRestoring = true;
             mSelectedMatch = bundle.getInt(KEY_SELECTED_INDEX);
             mViewingPage = bundle.getInt(KEY_SELECTED_PAGE);
-            mMatches = bundle.getParcelable(KEY_MATCH_RECTS, MatchRects.class);
+            mMatches = BundleCompat.getParcelable(bundle, KEY_MATCH_RECTS, MatchRects.class);
         }
     }
 
