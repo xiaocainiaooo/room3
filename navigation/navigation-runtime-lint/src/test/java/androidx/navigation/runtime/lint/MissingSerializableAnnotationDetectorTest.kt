@@ -16,10 +16,10 @@
 
 package androidx.navigation.runtime.lint
 
-import androidx.navigation.lint.NAVIGATION_STUBS
-import androidx.navigation.lint.SERIALIZABLE_ANNOTATION
-import androidx.navigation.lint.SERIALIZABLE_TEST_CLASS
-import androidx.navigation.lint.TEST_CLASS
+import androidx.navigation.lint.test.NAVIGATION_STUBS
+import androidx.navigation.lint.test.SERIALIZABLE_ANNOTATION
+import androidx.navigation.lint.test.SERIALIZABLE_TEST_CLASS
+import androidx.navigation.lint.test.TEST_CLASS
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -280,6 +280,6 @@ src/androidx/test/Test.kt:37: Error: To use this class or object as a type-safe 
             .map { it.toTestBytecodeStub() }
             .toTypedArray()
     val SERIALIZABLE_TEST_CLASS =
-        androidx.navigation.lint.SERIALIZABLE_TEST_CLASS.toTestKotlinAndBytecodeStub().kotlin
-    val TEST_CLASS = androidx.navigation.lint.TEST_CLASS.toTestKotlinAndBytecodeStub().kotlin
+        androidx.navigation.lint.test.SERIALIZABLE_TEST_CLASS.toTestKotlinAndBytecodeStub().kotlin
+    val TEST_CLASS = androidx.navigation.lint.test.TEST_CLASS.toTestKotlinAndBytecodeStub().kotlin
 }
