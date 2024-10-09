@@ -36,6 +36,8 @@ internal interface WindowBackend {
      * called only after the it is attached to the window. The supplied [UiContext] should
      * correspond to a window or an area on the screen. It must be either an [Activity] or a
      * [UiContext] created with [Context#createWindowContext].
+     *
+     * @throws IllegalArgumentException when [context] is not an [UiContext].
      */
     fun registerLayoutChangeCallback(
         @UiContext context: Context,
