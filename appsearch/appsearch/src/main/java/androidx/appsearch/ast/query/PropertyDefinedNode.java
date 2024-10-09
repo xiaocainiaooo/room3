@@ -73,4 +73,16 @@ public final class PropertyDefinedNode implements FunctionNode {
     public void setProperty(@NonNull PropertyPath property) {
         mProperty = Preconditions.checkNotNull(property);
     }
+
+    /**
+     * Get the string representation of {@link PropertyDefinedNode}.
+     *
+     * <p>The string representation of {@link PropertyDefinedNode} is the function name followed by
+     * the property path in quotes surrounded by parentheses.
+     */
+    @NonNull
+    @Override
+    public String toString() {
+        return FUNCTION_NAME_PROPERTY_DEFINED + "(\"" + mProperty + "\")";
+    }
 }
