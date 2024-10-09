@@ -25,18 +25,26 @@ Typical usage example:
   python validateRefactorHelper.py agpKmp
 """
 import itertools
+import logging
+import queue
 import re
 import shutil
 import subprocess
 import sys
+import threading
 from typing import Dict
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 # noto-emoji-compat `bundleinside`s an externally-built with-timestamps jar.
 # classes.jar is compared using `diffuse` instead of unzipping and diffing class files.
 bannedJars = ["-x", "noto-emoji-compat-java.jar", "-x", "classes.jar"]
-# java and json aren"t for unzipping, but the poor exclude-everything-but-jars regex doesn't
+# java and json aren't for unzipping, but the poor exclude-everything-but-jars regex doesn't
 # exclude them. Same for exclude-non-klib and .kt/.knm
-areNotZips = ["-x", r"**\.java", "-x", r"**\.json", "-x", r"**\.kt", "-x", r"**\.knm"]
+areNotZips = ["-x", r"**\.java", "-x", r"**\.json", "-x", r"**\.kt", "-x", r"**\.knm", "-x", r"**\.xml",
+              "-x", r"**\.sha1", "-x", r"**\.sha256", "-x", r"**\.sha512", "-x", r"**\.md5",
+              "-x", r"**\.module", "-x", r"**\.pom"]
 # keeps making my regexes fall over :(
 hasNoExtension = ["-x", "manifest", "-x", "module"]
 doNotUnzip = bannedJars + areNotZips + hasNoExtension
@@ -45,36 +53,62 @@ def diff(excludes):
     return popenAndReturn(["diff", "-r", "../../out-old/dist/", "../../out-new/dist/"] + excludes)
 
 def popenAndReturn(args):
+    logger.debug(" ".join(args))
     return subprocess.Popen(args, stdout=subprocess.PIPE).stdout.read().decode("utf-8").split("\n")
 
-# Finds and unzips all files with old/new diff that _do not_ match the argument regex.
-def findFilesMatchingWithDiffAndUnzip(regexThatMatchesEverythingElse):
+# Finds and unzips all files with old/new diff that _do not_ match the argument regexes.
+# Because the `diff` command doesn't have an --include, only --exclude.
+def findFilesNotMatchingWithDiffAndUnzip(*regexesToExclude):
+    excludeArgs = list(itertools.chain.from_iterable(zip(["-x"]*9, regexesToExclude)))
     # Exclude all things that are *not* the desired zip type
-    # (because diff doesn"t have an --include, only --exclude).
-    zipsWithDiffs = diff(["-q", "-x", regexThatMatchesEverythingElse] + doNotUnzip)
+    zipsWithDiffs = diff(["-q"] + excludeArgs + doNotUnzip)
     # Take only changed files, not new/deleted ones (the diff there is obvious)
     zipsWithDiffs = filter(lambda s: s.startswith("Files"), zipsWithDiffs)
     zipsWithDiffs = map(lambda s: s.split()[1:4:2], zipsWithDiffs)
-    zipsWithDiffs = list(itertools.chain.from_iterable(zipsWithDiffs))  # flatten
+    zipsWithDiffs = itertools.chain.from_iterable(zipsWithDiffs)  # flatten
+    workQueueOfZips = queue.LifoQueue()
+    for it in zipsWithDiffs: workQueueOfZips.put(it)
     # And unzip them
-    for filename in zipsWithDiffs:
-        print("unzipping " + filename)
-        shutil.rmtree(filename+".unzipped/")
-        subprocess.Popen(["unzip", "-qq", "-o", filename, "-d", filename+".unzipped/"])
+    # If we spam unzip commands without a break, the unzips start failing.
+    # if we wait after every Popen, the script runs very slowly
+    # So create a pool of 10 unzip workers to consume from zipsWithDiffs
+    numWorkers = 10
+    workers = []
+    for i in range(min(numWorkers, workQueueOfZips.qsize())):
+        w = threading.Thread(target=unzipWorker, args=(workQueueOfZips,))
+        w.start()
+        workers.append(w)
+    for w in workers: w.join()
 
-diffusePath = "../../prebuilts/build-tools/diffuse-0.3.0/bin/diffuse"
+def unzipWorker(workQueueOfZips):
+    while not workQueueOfZips.empty():
+        zipFilePath = workQueueOfZips.get(0)
+        try: shutil.rmtree(zipFilePath+".unzipped/")
+        except FileNotFoundError: pass
+        logger.debug("unzipping " + zipFilePath)
+        subprocess.Popen(["unzip", "-qq", "-o", zipFilePath, "-d", zipFilePath+".unzipped/"]).wait()
 
+diffusePath = "../../prebuilts/build-tools/diffuse/diffuse-0.3.0/bin/diffuser"
+
+diffuseIsPresent = True
 def compareWithDiffuse(listOfJars):
+    global diffuseIsPresent
+    if not diffuseIsPresent: return
     for jarPath in list(filter(None, listOfJars)):
-        print("jarpath: " + jarPath)
+        logger.info("jarpath: " + jarPath)
         newJarPath = jarPath.replace("out-old", "out-new")
-        print(popenAndReturn([diffusePath, "diff", "--jar", jarPath, newJarPath]))
+        try: logger.info("\n".join(popenAndReturn([diffusePath, "diff", "--jar", jarPath, newJarPath])))
+        except FileNotFoundError:
+            logger.warning(f"https://github.com/JakeWharton/diffuse is not present on disk in expected location"
+                  f" ${diffusePath}. You can install it.")
+            diffuseIsPresent = False
+            return
 
 # We might care to know whether .sha1 or .md5 files have changed, but changes in those files will
 # always be accompanied by more meaningful changes in other files, so we don"t need to show changes
 # in .sha1 or .md5 files, or in .module files showing the hashes of other files, or config names.
-excludedHashes = ["-x", "*.md5*", "-x", "*.sha**", "-I", "        \"md5\".*", \
-  "-I", "        \"sha.*", "-I", "        \"size\".*", "-I", "      \"name\".*"]
+excludedHashes = ["-x", "*.md5*", "-x", "*.sha**", "-I", "        \"md5\".*",
+"-I", "        \"sha.*", "-I", "        \"size\".*", "-I", "      \"name\".*"]
 # Don"t care about maven-metadata files because they have timestamps in them.
 # temporarily ignore knm files
 # If changes to the dackka args json are meaningful, they will affect the generated docs and show diff there
@@ -168,7 +202,17 @@ re.compile(r"""
 re.compile(r"""[0-9]+c[0-9]+
 <       <artifactId>kotlinx-coroutines-core-jvm</artifactId>
 ---
->       <artifactId>kotlinx-coroutines-core</artifactId>""")
+>       <artifactId>kotlinx-coroutines-core</artifactId>"""),
+# AGP-KMP adds a new default sourceSet, which in itself doesn't do anything
+re.compile(r"""(11,17d10|12,18d11)
+<       "name": "androidRelease",
+<       "dependencies": \[
+<         "commonMain"
+<       \],
+<       "analysisPlatform": "jvm"
+<     \},
+<     \{
+"""),
 ]
 
 baselines = []
@@ -177,12 +221,13 @@ unskippableBaselinedChanges = []
 arguments = sys.argv[1:]
 if "agpKmp" in arguments:
     arguments.remove("agpKmp"); baselines += ["agpKmp"]
-    print("IGNORING DIFF FOR agpKmp")
+    logger.info("IGNORING DIFF FOR agpKmp")
     baselinedChanges += baselinedChangesForAgpKmp
     unskippableBaselinedChanges += unskippableBaselinedChangesForAgpKmp
+    excludedFiles += ["-x", r"**\.aar.unzipped/res"]  # agp-kmp may add this empty
 if arguments:
-    print("invalid argument(s) for validateRefactorHelper: " + ", ".join(arguments))
-    print("currently recognized arguments: agpKmp")
+    logger.error("invalid argument(s) for validateRefactorHelper: " + ", ".join(arguments))
+    logger.error("currently recognized arguments: agpKmp")
     exit()
 
 # interleave "-I" to tell diffutils to 'I'gnore the baselined lines
@@ -217,7 +262,7 @@ def processDiffSegment(segment, fileExtension):
     if len(keptContentLines) == 0: return ""
     # return value is based on `lines` because we want to retain ordering we may have lost during processing
     # We want to keep keptContentLines, and formatting lines like "---" and the header (which don't start with <>).
-    return "\n".join([line for line in lines if line != "" and ((not line[0] in "<>") or line in keptContentLines)])
+    return "\n".join([line for line in lines if (line != "") and ((not line[0] in "<>") or line in keptContentLines)])
 
 # The output of diff entails multiple files, and multiple segments per file
 # This function removes baselined changes from the entire diff output
@@ -245,18 +290,24 @@ def processMegaDiff(inputString):
         if len(result) != 0: processedPerFileDiffs += [newFilePath + "\n" + "\n".join(result)]
     return "\ndiff ".join(processedPerFileDiffs)
 
+# We unzip multiple times in this order because e.g. zips can contain apks.
 # Find all zip files with a diff, e.g. the tip-of-tree-repository file, and maybe the docs zip
-# findFilesMatchingWithDiffAndUnzip(r"**\.[^z][a-z]*")
+logger.info("UNZIPPING ZIP FILES");
+findFilesNotMatchingWithDiffAndUnzip(r"**\.[^z][a-z]*")
 # Find all aar and apk files with a diff. The proper regex would be `.*\..*[^akpr]+.*`, but it
 # doesn"t work in difftools exclude's very limited regex syntax.
-findFilesMatchingWithDiffAndUnzip(r"**\.[^a][a-z]*")
+logger.info("UNZIPPING AAR/APK FILES");
+findFilesNotMatchingWithDiffAndUnzip(r"**\.zip", r"**\.jar", r"**\.klib")
 # Find all jars and klibs and unzip them (comes after because they could be inside aars/apks).
-findFilesMatchingWithDiffAndUnzip(r"**\.[^j][a-z]*")
-findFilesMatchingWithDiffAndUnzip(r"**\.[^k][a-z]*")
+logger.info("UNZIPPING JAR/KLIB FILES");
+findFilesNotMatchingWithDiffAndUnzip(r"**\.zip", r"**\.aar", r"**\.apk")
+
 # now find all diffs in classes.jars
-classesJarsWithDiffs = popenAndReturn(["find", "../../out-old/dist/", "-name", "classes.jar"])
-print("classes.jar s: " + str(classesJarsWithDiffs))
-compareWithDiffuse(classesJarsWithDiffs)
+# TODO(375636734) Disabled because this tracks internal methods' diffs
+# classesJarsWithDiffs = popenAndReturn(["find", "../../out-old/dist/", "-name", "classes.jar"])
+logger.info("classes.jar s: " + str(classesJarsWithDiffs))
+# compareWithDiffuse(classesJarsWithDiffs)
+
 # Now find all diffs in non-zipped files
 finalExcludes = excludedHashes + excludedFiles + excludedZips + baselinedChangesArgs
 finalDiff = "\n".join(diff(finalExcludes))
