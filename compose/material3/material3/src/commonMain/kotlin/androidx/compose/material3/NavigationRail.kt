@@ -125,7 +125,7 @@ fun NavigationRail(
     content: @Composable ColumnScope.() -> Unit
 ) {
     val context =
-        NavigationRailAdaptiveStrategyContext(
+        NavigationRailComponentOverrideContext(
             modifier = modifier,
             containerColor = containerColor,
             contentColor = contentColor,
@@ -133,7 +133,7 @@ fun NavigationRail(
             windowInsets = windowInsets,
             content = content,
         )
-    with(LocalNavigationRailAdaptiveStrategy.current) { context.NavigationRail() }
+    with(LocalNavigationRailComponentOverride.current) { context.NavigationRail() }
 }
 
 /**
@@ -764,15 +764,15 @@ private val IndicatorVerticalPaddingNoLabel: Dp =
     (NavigationRailVerticalItemTokens.ActiveIndicatorWidth -
         NavigationRailBaselineItemTokens.IconSize) / 2
 
-/** Adaptive strategy that allows libraries to override NavigationRail's behavior. */
+/** Interface that allows libraries to override the behavior of the [NavigationRail] component. */
 @ExperimentalMaterial3Api
-interface NavigationRailAdaptiveStrategy {
-    /** Adaptive function that is called by the NavigationRail component. */
-    @Composable fun NavigationRailAdaptiveStrategyContext.NavigationRail()
+interface NavigationRailComponentOverride {
+    /** Behavior function that is called by the [NavigationRail] component. */
+    @Composable fun NavigationRailComponentOverrideContext.NavigationRail()
 }
 
 /**
- * Parameters available to an adaptive NavigationRail.
+ * Parameters available to NavigationRail.
  *
  * @param modifier the [Modifier] to be applied to this navigation rail
  * @param containerColor the color used for the background of this navigation rail. Use
@@ -785,7 +785,7 @@ interface NavigationRailAdaptiveStrategy {
  * @param content the content of this navigation rail, typically 3-7 [NavigationRailItem]s
  */
 @ExperimentalMaterial3Api
-class NavigationRailAdaptiveStrategyContext
+class NavigationRailComponentOverrideContext
 internal constructor(
     val modifier: Modifier = Modifier,
     val containerColor: Color,
@@ -795,11 +795,11 @@ internal constructor(
     val content: @Composable ColumnScope.() -> Unit,
 )
 
-/** [NavigationRailAdaptiveStrategy] used when no other strategy is specified. */
+/** [NavigationRailComponentOverride] used when no override is specified. */
 @ExperimentalMaterial3Api
-object DefaultNavigationRailAdaptiveStrategy : NavigationRailAdaptiveStrategy {
+object DefaultNavigationRailComponentOverride : NavigationRailComponentOverride {
     @Composable
-    override fun NavigationRailAdaptiveStrategyContext.NavigationRail() {
+    override fun NavigationRailComponentOverrideContext.NavigationRail() {
         Surface(
             color = containerColor,
             contentColor = contentColor,
@@ -825,12 +825,12 @@ object DefaultNavigationRailAdaptiveStrategy : NavigationRailAdaptiveStrategy {
     }
 }
 
-/** CompositionLocal containing the currently-selected [NavigationRailAdaptiveStrategy]. */
+/** CompositionLocal containing the currently-selected [NavigationRailComponentOverride]. */
 @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @get:ExperimentalMaterial3Api
 @ExperimentalMaterial3Api
-val LocalNavigationRailAdaptiveStrategy:
-    ProvidableCompositionLocal<NavigationRailAdaptiveStrategy> =
+val LocalNavigationRailComponentOverride:
+    ProvidableCompositionLocal<NavigationRailComponentOverride> =
     compositionLocalOf {
-        DefaultNavigationRailAdaptiveStrategy
+        DefaultNavigationRailComponentOverride
     }
