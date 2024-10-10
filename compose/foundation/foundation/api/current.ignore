@@ -1,4 +1,6 @@
 // Baseline format: 1.0
+AddedAbstractMethod: androidx.compose.foundation.OverscrollEffect#getNode():
+    Added method androidx.compose.foundation.OverscrollEffect.getNode()
 AddedAbstractMethod: androidx.compose.foundation.gestures.DraggableAnchors#anchorAt(int):
     Added method androidx.compose.foundation.gestures.DraggableAnchors.anchorAt(int)
 AddedAbstractMethod: androidx.compose.foundation.gestures.DraggableAnchors#hasPositionFor(T):

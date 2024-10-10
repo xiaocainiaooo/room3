@@ -60,7 +60,8 @@ import androidx.compose.ui.unit.dp
  *   still possible to scroll programmatically through state when [userScrollEnabled] is set to
  *   false
  * @param overscrollEffect the [OverscrollEffect] that will be used to render overscroll for this
- *   layout. Note that the [OverscrollEffect.effectModifier] will be applied internally as well.
+ *   layout. Note that the [OverscrollEffect.node] will be applied internally as well - you do not
+ *   need to use Modifier.overscroll separately.
  * @param content a lambda describing the staggered grid content. Inside this block you can use
  *   [LazyStaggeredGridScope.items] to present list of items or [LazyStaggeredGridScope.item] for a
  *   single one.
@@ -184,7 +185,8 @@ private fun rememberColumnSlots(
  *   still possible to scroll programmatically through state when [userScrollEnabled] is set to
  *   false
  * @param overscrollEffect the [OverscrollEffect] that will be used to render overscroll for this
- *   layout. Note that the [OverscrollEffect.effectModifier] will be applied internally as well.
+ *   layout. Note that the [OverscrollEffect.node] will be applied internally as well - you do not
+ *   need to use Modifier.overscroll separately.
  * @param content a lambda describing the staggered grid content. Inside this block you can use
  *   [LazyStaggeredGridScope.items] to present list of items or [LazyStaggeredGridScope.item] for a
  *   single one.

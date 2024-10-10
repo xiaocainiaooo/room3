@@ -99,7 +99,8 @@ import kotlinx.coroutines.launch
  *   in the layout (e.g. if the snap position is the start of the layout, then currentPage will be
  *   the page closest to that).
  * @param overscrollEffect the [OverscrollEffect] that will be used to render overscroll for this
- *   Pager. Note that the [OverscrollEffect.effectModifier] will be applied internally as well.
+ *   Pager. Note that the [OverscrollEffect.node] will be applied internally as well - you do not
+ *   need to use Modifier.overscroll separately.
  * @param pageContent This Pager's page Composable.
  * @sample androidx.compose.foundation.samples.SimpleHorizontalPagerSample
  * @sample androidx.compose.foundation.samples.HorizontalPagerWithScrollableContent
@@ -229,7 +230,8 @@ fun HorizontalPager(
  *   in the layout (e.g. if the snap position is the start of the layout, then currentPage will be
  *   the page closest to that).
  * @param overscrollEffect the [OverscrollEffect] that will be used to render overscroll for this
- *   Pager. Note that the [OverscrollEffect.effectModifier] will be applied internally as well.
+ *   Pager. Note that the [OverscrollEffect.node] will be applied internally as well - you do not
+ *   need to use Modifier.overscroll separately.
  * @param pageContent This Pager's page Composable.
  * @sample androidx.compose.foundation.samples.SimpleVerticalPagerSample
  * @see androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider for the implementation
