@@ -36,6 +36,7 @@ import androidx.benchmark.checkAndGetSuppressionState
 import androidx.benchmark.conditionalError
 import androidx.benchmark.inMemoryTrace
 import androidx.benchmark.json.BenchmarkData
+import androidx.benchmark.macro.MacrobenchmarkScope.KillFlushMode
 import androidx.benchmark.perfetto.PerfettoCapture.PerfettoSdkConfig
 import androidx.benchmark.perfetto.PerfettoCapture.PerfettoSdkConfig.InitialProcessState
 import androidx.benchmark.perfetto.PerfettoTraceProcessor
@@ -263,41 +264,49 @@ private fun macrobenchmark(
     val outputs = mutableListOf<PhaseResult>()
 
     PerfettoTraceProcessor.runServer {
-        // Measurement Phase
-        outputs +=
-            runPhase(
-                uniqueName = uniqueName,
-                packageName = packageName,
-                macrobenchmarkPackageName = macrobenchPackageName,
-                iterations = if (Arguments.dryRunMode) 1 else iterations,
-                startupMode = startupModeMetricHint,
-                scope = scope,
-                profiler = null, // Don't profile when measuring
-                metrics = metrics,
-                experimentalConfig = experimentalConfig,
-                perfettoSdkConfig = perfettoSdkConfig,
-                setupBlock = setupBlock,
-                measureBlock = measureBlock
-            )
-        // Profiling Phase
-        if (requestMethodTracing) {
+        scope.withKillFlushMode(
+            current = KillFlushMode.None,
+            override =
+                if (compilationMode.requiresClearArtRuntimeImage())
+                    KillFlushMode.ClearArtRuntimeImage
+                else KillFlushMode.None
+        ) {
+            // Measurement Phase
             outputs +=
                 runPhase(
                     uniqueName = uniqueName,
                     packageName = packageName,
                     macrobenchmarkPackageName = macrobenchPackageName,
-                    // We should open up an API to control the number of iterations here.
-                    // Run profiling for 1 additional iteration.
-                    iterations = 1,
+                    iterations = if (Arguments.dryRunMode) 1 else iterations,
                     startupMode = startupModeMetricHint,
                     scope = scope,
-                    profiler = MethodTracingProfiler(scope),
-                    metrics = emptyList(), // Nothing to measure
+                    profiler = null, // Don't profile when measuring
+                    metrics = metrics,
                     experimentalConfig = experimentalConfig,
                     perfettoSdkConfig = perfettoSdkConfig,
                     setupBlock = setupBlock,
                     measureBlock = measureBlock
                 )
+            // Profiling Phase
+            if (requestMethodTracing) {
+                outputs +=
+                    runPhase(
+                        uniqueName = uniqueName,
+                        packageName = packageName,
+                        macrobenchmarkPackageName = macrobenchPackageName,
+                        // We should open up an API to control the number of iterations here.
+                        // Run profiling for 1 additional iteration.
+                        iterations = 1,
+                        startupMode = startupModeMetricHint,
+                        scope = scope,
+                        profiler = MethodTracingProfiler(scope),
+                        metrics = emptyList(), // Nothing to measure
+                        experimentalConfig = experimentalConfig,
+                        perfettoSdkConfig = perfettoSdkConfig,
+                        setupBlock = setupBlock,
+                        measureBlock = measureBlock
+                    )
+            }
         }
     }
 

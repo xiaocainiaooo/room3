@@ -665,15 +665,16 @@ constructor(
  * adb shell cmd package list packages --show-versioncode --apex-only art
  * ```
  *
- * Classes must be initialized by ART in order to be used at runtime. In [CompilationMode.None] and
- * [CompilationMode.Full], this is deferred until runtime, and the cost of this can significantly
- * slow down scenarios where code is run for the first time, such as startup. In
- * [CompilationMode.Partial], this is done at compile time if the class is `trivial` (that is, has
- * no static initializers).
+ * Classes must be initialized by ART in order to be used at runtime. In [CompilationMode.None]
+ * (with `warmupRuntimeImageEnabled=false`) and [CompilationMode.Full], this is deferred until
+ * runtime, and the cost of this can significantly slow down scenarios where code is run for the
+ * first time, such as startup. In [CompilationMode.Partial], this is done at compile time if the
+ * class is `trivial` (that is, has no static initializers).
  *
  * The number of traces and total duration (reported as `artClassInitCount` and `artClassInitSumMs`)
  * indicate how many classes were initialized during measurement, at runtime, without
- * preinitialization at compile time.
+ * pre-initialization at compile time (or in the case of `CompilationMode.None(true), a previous app
+ * launch)`.
  *
  * These tracepoints are slices of the form `Lcom/example/MyClassName;` for a class named
  * `com.example.MyClassName`.
