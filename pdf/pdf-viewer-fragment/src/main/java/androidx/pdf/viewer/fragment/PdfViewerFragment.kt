@@ -192,7 +192,8 @@ public open class PdfViewerFragment : Fragment() {
                     savedUri?.equals(value) ?: false
                 } ?: false
 
-            if (value != null && !isFileRestoring) {
+            // Load file if it's a new URI or it's not loaded
+            if (value != null && (!isFileRestoring || !documentLoaded)) {
                 loadFile(value)
             }
         }
@@ -317,6 +318,10 @@ public open class PdfViewerFragment : Fragment() {
             loadingView?.showLoadingView()
         }
 
+        //  Restore documentLoaded state to determine if the document was successfully loaded
+        //  before a potential configuration change or fragment replacement.
+        documentLoaded = savedInstanceState?.getBoolean(KEY_DOCUMENT_LOADED) ?: false
+
         arguments?.let { args ->
             documentUri = BundleCompat.getParcelable(args, KEY_DOCUMENT_URI, Uri::class.java)
             isTextSearchActive = args.getBoolean(KEY_TEXT_SEARCH_ACTIVE)
@@ -358,6 +363,8 @@ public open class PdfViewerFragment : Fragment() {
                     }
                 },
                 onDocumentLoadFailure = { exception, showErrorView ->
+                    // Update state to reflect document load failure.
+                    documentLoaded = false
                     handleError(exception, showErrorView)
                 },
                 eventCallback = mEventCallback
@@ -810,6 +817,7 @@ public open class PdfViewerFragment : Fragment() {
                 (annotationButton?.visibility == View.VISIBLE)
             )
             putBoolean(KEY_PENDING_DOCUMENT_LOAD, pendingDocumentLoad)
+            putBoolean(KEY_DOCUMENT_LOADED, documentLoaded)
         }
     }
 
@@ -956,6 +964,7 @@ public open class PdfViewerFragment : Fragment() {
         private const val KEY_ANNOTATION_BUTTON_VISIBILITY = "isAnnotationVisible"
         private const val KEY_PENDING_DOCUMENT_LOAD = "pendingDocumentLoad"
         private const val KEY_TOOLBOX_VISIBILITY = "isToolboxVisible"
+        private const val KEY_DOCUMENT_LOADED = "isDocumentLoaded"
         private const val EXTRA_PDF_FILE_NAME = "androidx.pdf.viewer.fragment.extra.PDF_FILE_NAME"
         private const val EXTRA_STARTING_PAGE: String =
             "androidx.pdf.viewer.fragment.extra.STARTING_PAGE"
