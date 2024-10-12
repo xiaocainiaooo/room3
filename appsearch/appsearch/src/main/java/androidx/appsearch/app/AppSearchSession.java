@@ -19,6 +19,9 @@ package androidx.appsearch.app;
 import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresFeature;
+import androidx.appsearch.flags.FlaggedApi;
+import androidx.appsearch.flags.Flags;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -107,6 +110,113 @@ public interface AppSearchSession extends Closeable {
     @NonNull
     ListenableFuture<AppSearchBatchResult<String, GenericDocument>> getByDocumentIdAsync(
             @NonNull GetByDocumentIdRequest request);
+
+    /**
+     * Opens a batch of AppSearch Blobs for writing.
+     *
+     * <p>A "blob" is a large binary object, typically represented as a long byte array. It is
+     * used to store a significant amount of data that is not searchable, such as images, videos,
+     * audio files, or other binary data. Unlike other fields in AppSearch, blobs are stored as
+     * blob files on disk rather than in memory, and use {@link android.os.ParcelFileDescriptor} to
+     * read and write. This allows for efficient handling of large, non-searchable content.
+     *
+     * <p> Once done writing, call {@link #commitBlobAsync} to commit blob files.
+     *
+     * <p> This call will create a empty blob file for each given {@link AppSearchBlobHandle}, and
+     * a {@link android.os.ParcelFileDescriptor} of that blob file will be returned in the
+     * {@link AppSearchOpenBlobForWriteResponse}.
+     *
+     * <p> If the blob file is already stored in AppSearch and committed. A failed
+     * {@link AppSearchResult} with error code {@link AppSearchResult#RESULT_ALREADY_EXISTS} will be
+     * associated with the {@link AppSearchBlobHandle}.
+     *
+     * <p> If the blob file is already stored in AppSearch but not committed. A
+     * {@link android.os.ParcelFileDescriptor} of that blob file will be returned for continue
+     * writing.
+     *
+     * <p> For given duplicate {@link AppSearchBlobHandle}, the same
+     * {@link android.os.ParcelFileDescriptor} pointing to the same blob file will be returned.
+     *
+     * <p> Pending blob files won't be lost or auto-commit if {@link AppSearchSession} closed.
+     * Pending blob files will be stored in disk rather than memory. You can re-open
+     * {@link AppSearchSession} and re-write the pending blob files.
+     *
+     * <p> A committed blob file will be considered as an orphan if no {@link GenericDocument}
+     * references it. Uncommitted pending blob files and orphan blobs files will be cleaned up if
+     * they has been created for an extended period (default is 1 week).
+     *
+     * <p class="caution">
+     * The returned {@link AppSearchOpenBlobForWriteResponse} must be closed after use to avoid
+     * resource leaks. Failing to close it will result in system file descriptor exhaustion.
+     * </p>
+     *
+     * @param handles The {@link AppSearchBlobHandle}s that identifies the blobs.
+     * @return a response containing the writeable file descriptors.
+     */
+    @RequiresFeature(
+            enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
+            name = Features.BLOB_STORAGE)
+    @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
+    @ExperimentalAppSearchApi
+    // TODO(b/273591938) improve the java doc when we support set blob property in GenericDocument
+    // TODO(b/273591938) improve the java doc when we support abandon pending blobs.
+    @NonNull
+    ListenableFuture<AppSearchOpenBlobForWriteResponse> openBlobForWriteAsync(
+            @NonNull Set<AppSearchBlobHandle> handles);
+
+
+    /**
+     * Commits the blobs to make it retrievable and immutable.
+     *
+     * <p>After this call, the blob is readable via {@link #openBlobForReadAsync}. Any change to
+     * the content or rewrite via {@link #openBlobForWriteAsync} of this blob won't be allowed.
+     *
+     * <p> If the blob is already stored in AppSearch and committed. A failed
+     * {@link AppSearchResult} with error code {@link AppSearchResult#RESULT_ALREADY_EXISTS} will be
+     * associated with the {@link AppSearchBlobHandle}.
+     *
+     * <p> Pending blobs won't be lost or auto-commit if {@link AppSearchSession} closed.
+     * Pending blobs will store in disk rather than memory. You can re-open {@link AppSearchSession}
+     * and re-write the pending blobs.
+     *
+     * <p> The default time to recycle pending and orphan blobs is 1 week. A blob will be considered
+     * as an orphan if no {@link GenericDocument} references it.
+     *
+     * @param handles The {@link AppSearchBlobHandle}s that identifies the blobs.
+     * @return a response containing the commit results.
+     */
+    @RequiresFeature(
+            enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
+            name = Features.BLOB_STORAGE)
+    @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
+    @ExperimentalAppSearchApi
+    // TODO(b/273591938) improve the java doc when we support set blob property in GenericDocument
+    @NonNull
+    ListenableFuture<AppSearchCommitBlobResponse> commitBlobAsync(
+            @NonNull Set<AppSearchBlobHandle> handles);
+
+    /**
+     * Opens a batch of AppSearch Blobs for reading.
+     *
+     * <p> Only blobs committed via {@link #commitBlobAsync} are available for reading.
+     *
+     * <p class="caution">
+     * The returned {@link AppSearchOpenBlobForReadResponse} must be closed after use to avoid
+     * resource leaks. Failing to close it will result in system file descriptor exhaustion.
+     * </p>
+     *
+     * @param handles The {@link AppSearchBlobHandle}s that identifies the blobs.
+     * @return a response containing the readable file descriptors.
+     */
+    // TODO(b/273591938) improve the java doc when we support set blob property in GenericDocument
+    @RequiresFeature(
+            enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
+            name = Features.BLOB_STORAGE)
+    @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
+    @ExperimentalAppSearchApi
+    @NonNull
+    ListenableFuture<AppSearchOpenBlobForReadResponse> openBlobForReadAsync(
+            @NonNull Set<AppSearchBlobHandle> handles);
 
     /**
      * Retrieves documents from the open {@link AppSearchSession} that match a given query string
