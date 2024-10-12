@@ -109,10 +109,33 @@ package androidx.appsearch.app {
     method public byte[] getSha256Digest();
   }
 
+  @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public final class AppSearchCommitBlobResponse {
+    ctor public AppSearchCommitBlobResponse(androidx.appsearch.app.AppSearchBatchResult<androidx.appsearch.app.AppSearchBlobHandle!,java.lang.Void!>);
+    method public androidx.appsearch.app.AppSearchBatchResult<androidx.appsearch.app.AppSearchBlobHandle!,java.lang.Void!> getResult();
+    method public void writeToParcel(android.os.Parcel, int);
+    field public static final android.os.Parcelable.Creator<androidx.appsearch.app.AppSearchCommitBlobResponse!> CREATOR;
+  }
+
   @AnyThread public abstract class AppSearchDocumentClassMap {
     ctor public AppSearchDocumentClassMap();
     method @WorkerThread public static java.util.Map<java.lang.String!,java.util.List<java.lang.String!>!> getGlobalMap();
     method protected abstract java.util.Map<java.lang.String!,java.util.List<java.lang.String!>!> getMap();
+  }
+
+  @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public final class AppSearchOpenBlobForReadResponse implements java.io.Closeable {
+    ctor public AppSearchOpenBlobForReadResponse(androidx.appsearch.app.AppSearchBatchResult<androidx.appsearch.app.AppSearchBlobHandle!,android.os.ParcelFileDescriptor!>);
+    method public void close();
+    method public androidx.appsearch.app.AppSearchBatchResult<androidx.appsearch.app.AppSearchBlobHandle!,android.os.ParcelFileDescriptor!> getResult();
+    method public void writeToParcel(android.os.Parcel, int);
+    field public static final android.os.Parcelable.Creator<androidx.appsearch.app.AppSearchOpenBlobForReadResponse!> CREATOR;
+  }
+
+  @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public final class AppSearchOpenBlobForWriteResponse implements java.io.Closeable {
+    ctor public AppSearchOpenBlobForWriteResponse(androidx.appsearch.app.AppSearchBatchResult<androidx.appsearch.app.AppSearchBlobHandle!,android.os.ParcelFileDescriptor!>);
+    method public void close();
+    method public androidx.appsearch.app.AppSearchBatchResult<androidx.appsearch.app.AppSearchBlobHandle!,android.os.ParcelFileDescriptor!> getResult();
+    method public void writeToParcel(android.os.Parcel, int);
+    field public static final android.os.Parcelable.Creator<androidx.appsearch.app.AppSearchOpenBlobForWriteResponse!> CREATOR;
   }
 
   public final class AppSearchResult<ValueType> {
