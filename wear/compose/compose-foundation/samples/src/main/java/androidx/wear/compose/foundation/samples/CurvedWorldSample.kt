@@ -20,6 +20,7 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,9 +31,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -55,8 +59,10 @@ import androidx.wear.compose.foundation.curvedRow
 import androidx.wear.compose.foundation.padding
 import androidx.wear.compose.foundation.radialGradientBackground
 import androidx.wear.compose.foundation.radialSize
+import androidx.wear.compose.foundation.semantics
 import androidx.wear.compose.foundation.size
 import androidx.wear.compose.foundation.weight
+import androidx.wear.compose.material.Text
 
 @Sampled
 @Composable
@@ -273,6 +279,43 @@ fun CurvedLetterSpacingSample() {
                 "Counter Clockwise",
                 style = style,
             )
+        }
+    }
+}
+
+@Sampled
+@Composable
+fun CurvedSemanticsSample() {
+    val style =
+        CurvedTextStyle(
+            letterSpacing = 0.6.sp,
+            letterSpacingCounterClockwise = 1.4.sp,
+            color = Color.White
+        )
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CurvedLayout(modifier = Modifier.fillMaxSize()) {
+            basicCurvedText(
+                "2 - Left",
+                style,
+                CurvedModifier.semantics {
+                    contentDescription = "Left"
+                    traversalIndex = 2f
+                },
+            )
+            curvedComposable { Box(Modifier.padding(5.dp).background(Color.Red).size(5.dp)) }
+            basicCurvedText(
+                "3 - Right",
+                style,
+                CurvedModifier.semantics {
+                    contentDescription = "Right"
+                    traversalIndex = 3f
+                },
+            )
+        }
+        Row {
+            Text("Text 1", Modifier.semantics { traversalIndex = 1f })
+            Spacer(Modifier.size(10.dp))
+            Text("Text 4", Modifier.semantics { traversalIndex = 4f })
         }
     }
 }
