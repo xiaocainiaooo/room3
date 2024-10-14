@@ -1054,7 +1054,8 @@ import java.util.Set;
             MediaRouteProvider.DynamicGroupRouteController dynamicGroupRouteController =
                     route.getProviderInstance()
                             .onCreateDynamicGroupRouteController(
-                                    route.mDescriptorId, /* controlHints= */ null);
+                                    route.mDescriptorId,
+                                    MediaRouteProvider.RouteControllerOptions.EMPTY);
             // Select route asynchronously.
             if (dynamicGroupRouteController != null) {
                 dynamicGroupRouteController.setOnDynamicRoutesChangedListener(

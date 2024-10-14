@@ -317,27 +317,25 @@ public abstract class MediaRouteProvider {
      * static group is selected.
      *
      * @param initialMemberRouteId initially selected route's id.
-     * @param controlHints the hints passed by the client application for creating the route
-     *     controller, or {@code null} if the client has not provided control hints. The
-     *     controlHints may be provided by {@link
-     *     android.media.MediaRouter2.OnGetControllerHintsListener}.
+     * @param routeControllerOptions the parameters to be used to create the route controller.
      * @return {@link DynamicGroupRouteController}. Returns null if there is no such route or if the
      *     route cannot be controlled using the {@link DynamicGroupRouteController} interface.
      */
     @Nullable
     public DynamicGroupRouteController onCreateDynamicGroupRouteController(
-            @NonNull String initialMemberRouteId, @Nullable Bundle controlHints) {
+            @NonNull String initialMemberRouteId,
+            @NonNull RouteControllerOptions routeControllerOptions) {
         return onCreateDynamicGroupRouteController(initialMemberRouteId);
     }
 
     /**
      * Creates a {@link DynamicGroupRouteController}.
      *
-     * <p>It is equivalent to {@link #onCreateDynamicGroupRouteController(String, Bundle)}, except
-     * it doesn't take {@code controlHints}.
+     * <p>It is equivalent to {@link #onCreateDynamicGroupRouteController(String,
+     * RouteControllerOptions)}, except it doesn't take {@code RouteControllerOptions}.
      *
      * <p>This method is only called when the subclass doesn't implement {@link
-     * #onCreateDynamicGroupRouteController(String, Bundle)}.
+     * #onCreateDynamicGroupRouteController(String, RouteControllerOptions)}.
      *
      * @param initialMemberRouteId initially selected route's id.
      * @return {@link DynamicGroupRouteController}. Returns null if there is no such route or if the
@@ -906,19 +904,54 @@ public abstract class MediaRouteProvider {
         }
     }
 
-    /**
-     * Callback which is invoked when route information becomes available or changes.
-     */
-    public static abstract class Callback {
+    /** Holds parameters for creating {@link RouteController}. */
+    public static final class RouteControllerOptions {
+        static final RouteControllerOptions EMPTY = new RouteControllerOptions.Builder().build();
+
+        // The controlHints is passed by the client application for creating the route controller,
+        // or {@code null} if the client has not provided control hints. The controlHints may be
+        // provided by {@link android.media.MediaRouter2.OnGetControllerHintsListener}.
+        private final Bundle mControlHints;
+
+        private RouteControllerOptions(Builder builder) {
+            mControlHints = (builder.mControlHints != null) ? builder.mControlHints : Bundle.EMPTY;
+        }
+
+        @NonNull
+        public Bundle getControlHints() {
+            return mControlHints;
+        }
+
+        /** Builder for {@link RouteControllerOptions}. */
+        public static final class Builder {
+            @Nullable private Bundle mControlHints;
+
+            /** Sets controlHints passed by the client application. */
+            @NonNull
+            public Builder setControlHints(@Nullable Bundle controlHints) {
+                mControlHints = controlHints;
+                return this;
+            }
+
+            /** Builds the {@link RouteControllerOptions}. */
+            @NonNull
+            public RouteControllerOptions build() {
+                return new RouteControllerOptions(this);
+            }
+        }
+    }
+
+    /** Callback which is invoked when route information becomes available or changes. */
+    public abstract static class Callback {
         /**
          * Called when information about a route provider and its routes change.
          *
          * @param provider The media route provider that changed, never null.
          * @param descriptor The new media route provider descriptor, or null if none.
          */
-        public void onDescriptorChanged(@NonNull MediaRouteProvider provider,
-                @Nullable MediaRouteProviderDescriptor descriptor) {
-        }
+        public void onDescriptorChanged(
+                @NonNull MediaRouteProvider provider,
+                @Nullable MediaRouteProviderDescriptor descriptor) {}
     }
 
     private final class ProviderHandler extends Handler {
