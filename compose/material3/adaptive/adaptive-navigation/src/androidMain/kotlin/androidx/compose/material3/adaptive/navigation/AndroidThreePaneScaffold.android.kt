@@ -20,7 +20,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
-import androidx.compose.material3.adaptive.layout.PaneExpansionDragHandle
 import androidx.compose.material3.adaptive.layout.PaneExpansionState
 import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
 import androidx.compose.material3.adaptive.layout.SupportingPaneScaffoldRole
@@ -50,12 +49,8 @@ import androidx.compose.ui.graphics.graphicsLayer
  *   mail app. See [ListDetailPaneScaffoldRole.Extra].
  * @param defaultBackBehavior the default back navigation behavior when the system back event
  *   happens. See [BackNavigationBehavior] for the use cases of each behavior.
- * @param paneExpansionDragHandle the pane expansion drag handle to let users be able to drag to
- *   change pane expansion state. Note that by default this argument will be `null`, and there won't
- *   be a drag handle rendered and users won't be able to drag to change the pane split. You can
- *   provide a [PaneExpansionDragHandle] here as our sample suggests. On the other hand, even if
- *   there's no drag handle, you can still modify [paneExpansionState] directly to apply pane
- *   expansion.
+ * @param paneExpansionDragHandle the pane expansion drag handle to allow users to drag to change
+ *   pane expansion state, `null` by default.
  * @param paneExpansionState the state object of pane expansion.
  */
 @ExperimentalMaterial3AdaptiveApi
@@ -107,12 +102,8 @@ fun <T> NavigableListDetailPaneScaffold(
  *   [SupportingPaneScaffoldRole.Extra].
  * @param defaultBackBehavior the default back navigation behavior when the system back event
  *   happens. See [BackNavigationBehavior] for the use cases of each behavior.
- * @param paneExpansionDragHandle the pane expansion drag handle to let users be able to drag to
- *   change pane expansion state. Note that by default this argument will be `null`, and there won't
- *   be a drag handle rendered and users won't be able to drag to change the pane split. You can
- *   provide a [PaneExpansionDragHandle] here as our sample suggests. On the other hand, even if
- *   there's no drag handle, you can still modify [paneExpansionState] directly to apply pane
- *   expansion.
+ * @param paneExpansionDragHandle the pane expansion drag handle to allow users to drag to change
+ *   pane expansion state, `null` by default.
  * @param paneExpansionState the state object of pane expansion.
  */
 @ExperimentalMaterial3AdaptiveApi
