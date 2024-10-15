@@ -26,8 +26,6 @@ import androidx.wear.protolayout.LayoutElementBuilders.TEXT_ALIGN_CENTER
 import androidx.wear.protolayout.LayoutElementBuilders.TEXT_OVERFLOW_ELLIPSIZE
 import androidx.wear.protolayout.LayoutElementBuilders.TextAlignment
 import androidx.wear.protolayout.LayoutElementBuilders.TextOverflow
-import androidx.wear.protolayout.ModifiersBuilders.Corner
-import androidx.wear.protolayout.material3.Shape.ShapeToken
 import androidx.wear.protolayout.material3.Typography.TypographyToken
 import androidx.wear.protolayout.material3.tokens.ColorTokens
 
@@ -70,6 +68,9 @@ internal constructor(
     /** Color Scheme used within this scope and its components. */
     public val colorScheme: ColorScheme = theme.colorScheme
 
+    /** Shapes theme used within this scope and its components. */
+    public val shapes: Shapes = theme.shapes
+
     internal fun withStyle(
         defaultTextElementStyle: TextElementStyle = this.defaultTextElementStyle,
         defaultIconStyle: IconStyle = this.defaultIconStyle
@@ -83,15 +84,6 @@ internal constructor(
             defaultIconStyle = defaultIconStyle
         )
 }
-
-/**
- * Retrieves the [Corner] shape from the default Material theme with shape token name.
- *
- * @throws IllegalArgumentException if the token name is not recognized as one of the constants in
- *   [Shape]
- */
-public fun MaterialScope.getCorner(@ShapeToken shapeToken: Int): Corner =
-    theme.getCornerShape(shapeToken)
 
 /**
  * Creates a top-level receiver scope [MaterialScope] that calls the given [layout] to support for

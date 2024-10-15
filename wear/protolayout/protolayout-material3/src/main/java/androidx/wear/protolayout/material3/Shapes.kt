@@ -15,61 +15,60 @@
  */
 package androidx.wear.protolayout.material3
 
-import androidx.annotation.IntDef
-import androidx.annotation.RestrictTo
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.material3.tokens.ShapeTokens
 
-/** Class holding corner shapes as defined by the Wear Material3 shape specification. */
-public object Shape {
-    /** Returns the [Corner] from the shape tokens for the given token name. */
-    internal fun fromToken(@ShapeToken shapeToken: Int): Corner {
-        return when (shapeToken) {
-            CORNER_EXTRA_LARGE -> ShapeTokens.CORNER_EXTRA_LARGE
-            CORNER_EXTRA_SMALL -> ShapeTokens.CORNER_EXTRA_SMALL
-            CORNER_FULL -> ShapeTokens.CORNER_FULL
-            CORNER_LARGE -> ShapeTokens.CORNER_LARGE
-            CORNER_MEDIUM -> ShapeTokens.CORNER_MEDIUM
-            CORNER_NONE -> ShapeTokens.CORNER_NONE
-            CORNER_SMALL -> ShapeTokens.CORNER_SMALL
-            else -> throw IllegalArgumentException("Shape $shapeToken does not exit.")
-        }
-    }
+/**
+ * Material surfaces can be displayed in different shapes. Shapes direct attention, identify
+ * components, communicate state, and express brand.
+ *
+ * The shape scale defines the style of container, offering a range of curved shapes. The default
+ * [Shapes] theme for Material3 is rounded rectangles, with various degrees of corner roundness:
+ * - None
+ * - Extra Small
+ * - Small
+ * - Medium
+ * - Large
+ * - Extra Large
+ * - Full
+ *
+ * You can customize the shape of any component by overriding the shape parameter for that
+ * component. For example, by default, buttons use the shape style "large". If your product requires
+ * a smaller amount of roundness, you can override the shape parameter with a different shape value
+ * like [Shapes.small].
+ */
+public class Shapes
+private constructor(
+    /** No corner radius, i.e. square shape. */
+    public val none: Corner,
 
-    /** An extra large rounded corner shape. */
-    public const val CORNER_EXTRA_LARGE: Int = 0
+    /** The extra small, mostly square corner with `4dp` corner radius. */
+    public val extraSmall: Corner,
 
-    /** An extra small rounded corner shape. */
-    public const val CORNER_EXTRA_SMALL: Int = 1
+    /** The small, almost square corner with `8dp` corner radius. */
+    public val small: Corner,
 
-    /** A fully rounded corner shape. */
-    public const val CORNER_FULL: Int = 2
+    /** The medium corner with `18dp` corner radius. */
+    public val medium: Corner,
 
-    /** A large rounded corner shape. */
-    public const val CORNER_LARGE: Int = 3
+    /** The large, mostly round corner with `26dp` corner radius. */
+    public val large: Corner,
 
-    /** A medium rounded corner shape. */
-    public const val CORNER_MEDIUM: Int = 4
+    /** The extra large, almost round corner with `32dp` corner radius. */
+    public val extraLarge: Corner,
 
-    /** A non-rounded corner shape */
-    public const val CORNER_NONE: Int = 5
-
-    /** A small rounded corner shape. */
-    public const val CORNER_SMALL: Int = 6
-
-    internal const val TOKEN_COUNT = 7
-
-    /** The referencing token names for a range of corner shapes in Material3. */
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    @Retention(AnnotationRetention.SOURCE)
-    @IntDef(
-        CORNER_EXTRA_LARGE,
-        CORNER_EXTRA_SMALL,
-        CORNER_FULL,
-        CORNER_LARGE,
-        CORNER_MEDIUM,
-        CORNER_NONE,
-        CORNER_SMALL
-    )
-    public annotation class ShapeToken
+    /** Full corner radius, i.e. round shape. */
+    public val full: Corner
+) {
+    /** Default Shape theme. */
+    public constructor() :
+        this(
+            none = ShapeTokens.CORNER_NONE,
+            small = ShapeTokens.CORNER_SMALL,
+            extraSmall = ShapeTokens.CORNER_EXTRA_SMALL,
+            medium = ShapeTokens.CORNER_MEDIUM,
+            large = ShapeTokens.CORNER_LARGE,
+            extraLarge = ShapeTokens.CORNER_EXTRA_LARGE,
+            full = ShapeTokens.CORNER_FULL,
+        )
 }

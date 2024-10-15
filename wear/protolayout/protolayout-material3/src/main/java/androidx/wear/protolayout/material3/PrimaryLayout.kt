@@ -209,7 +209,7 @@ private fun MaterialScope.getIconPlaceholder(overrideIcon: Boolean): LayoutEleme
             Modifiers.Builder()
                 .setBackground(
                     ModifiersBuilders.Background.Builder()
-                        .setCorner(getCorner(Shape.CORNER_FULL))
+                        .setCorner(shapes.full)
                         .setColor(theme.colorScheme.onBackground)
                         .build()
                 )

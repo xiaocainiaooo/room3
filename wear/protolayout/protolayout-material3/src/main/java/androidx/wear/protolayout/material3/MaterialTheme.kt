@@ -22,9 +22,7 @@ import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
 import androidx.wear.protolayout.DimensionBuilders.SpProp
 import androidx.wear.protolayout.DimensionBuilders.sp
 import androidx.wear.protolayout.LayoutElementBuilders.FontStyle
-import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.expression.ProtoLayoutExperimental
-import androidx.wear.protolayout.material3.Shape.ShapeToken
 import androidx.wear.protolayout.material3.Typography.TypographyToken
 import androidx.wear.protolayout.material3.tokens.TextStyle
 
@@ -49,7 +47,10 @@ import androidx.wear.protolayout.material3.tokens.TextStyle
  *
  * @param colorScheme The customized colors for each color role.
  */
-internal class MaterialTheme(internal val colorScheme: ColorScheme = ColorScheme()) {
+internal class MaterialTheme(
+    internal val colorScheme: ColorScheme = ColorScheme(),
+    internal val shapes: Shapes = Shapes()
+) {
     /** Retrieves the [FontStyle.Builder] with the typography name. */
     internal fun getFontStyleBuilder(@TypographyToken typographyToken: Int) =
         createFontStyleBuilder(typographyToken)
@@ -57,9 +58,6 @@ internal class MaterialTheme(internal val colorScheme: ColorScheme = ColorScheme
     /** Retrieves the line height with the typography name. */
     internal fun getLineHeight(@TypographyToken typographyToken: Int) =
         Typography.fromToken(typographyToken).lineHeight
-
-    /** Retrieves the [Corner] with the shape name. */
-    internal fun getCornerShape(@ShapeToken shapeToken: Int): Corner = Shape.fromToken(shapeToken)
 }
 
 @SuppressLint("ResourceType")

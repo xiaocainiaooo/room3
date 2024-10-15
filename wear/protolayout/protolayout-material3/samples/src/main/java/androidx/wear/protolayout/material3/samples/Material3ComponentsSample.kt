@@ -19,7 +19,9 @@ package androidx.wear.protolayout.material3.samples
 import android.content.Context
 import androidx.annotation.Sampled
 import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
+import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
+import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint
 import androidx.wear.protolayout.TypeBuilders.StringProp
@@ -95,7 +97,20 @@ fun topLeveLayout(
             titleSlot = { text("App title".prop()) },
             mainSlot = {
                 buttonGroup {
-                    // To be populated
+                    // To be populated with proper components
+                    buttonGroupItem {
+                        LayoutElementBuilders.Box.Builder()
+                            .setModifiers(
+                                ModifiersBuilders.Modifiers.Builder()
+                                    .setBackground(
+                                        ModifiersBuilders.Background.Builder()
+                                            .setCorner(shapes.full)
+                                            .build()
+                                    )
+                                    .build()
+                            )
+                            .build()
+                    }
                 }
             },
             bottomSlot = { iconEdgeButton(clickable, "Description".prop()) { icon("id") } }
