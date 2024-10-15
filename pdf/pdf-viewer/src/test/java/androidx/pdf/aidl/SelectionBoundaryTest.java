@@ -21,7 +21,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import android.graphics.Point;
-import android.os.Build;
 
 import androidx.pdf.models.SelectionBoundary;
 import androidx.test.filters.SmallTest;
@@ -29,7 +28,6 @@ import androidx.test.filters.SmallTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -37,14 +35,13 @@ import java.util.List;
 
 @SmallTest
 @RunWith(RobolectricTestRunner.class)
-//TODO: Remove minsdk check after sdk extension 13 release
-@Config(minSdk = Build.VERSION_CODES.VANILLA_ICE_CREAM)
 public class SelectionBoundaryTest {
 
     @Test
     public void testAtIndex_selectionBoundaryCreatedWithCorrectValues() {
         assertThat(SelectionBoundary.atIndex(4)).isEqualTo(new SelectionBoundary(4, -1, -1, false));
     }
+
     @Test
     public void testAtPoint_selectionBoundaryCreatedWithCorrectValues() {
         assertThat(SelectionBoundary.atPoint(new Point(3, 4))).isEqualTo(
@@ -56,6 +53,7 @@ public class SelectionBoundaryTest {
         assertThat(SelectionBoundary.atPoint(1, 2)).isEqualTo(
                 new SelectionBoundary(-1, 1, 2, false));
     }
+
     @Test
     public void testClassFields() {
         List<String> fields = new ArrayList<>();
