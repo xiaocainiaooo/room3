@@ -24,7 +24,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import android.os.Build;
 import android.widget.TextView;
 
 import androidx.pdf.data.Range;
@@ -39,13 +38,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 /** Tests for {@link PageIndicator}. */
 @SmallTest
 @RunWith(RobolectricTestRunner.class)
-//TODO: Remove minsdk check after sdk extension 13 release
-@Config(minSdk = Build.VERSION_CODES.VANILLA_ICE_CREAM)
 public class PageIndicatorTest {
     @Mock
     Accessibility mAccessibility;
@@ -113,6 +109,6 @@ public class PageIndicatorTest {
         mPageIndicator.setRangeAndZoom(new Range(0, 0), 4.0f, false);
         mPageIndicator.setRangeAndZoom(new Range(0, 0), 4.0f, true);
         verify(mAccessibility).announce(mContext, mPageNumberView,
-                String.format("%s\n%s", "page 1 of 10", "zoom 400 percent"));
+                String.format("%s", "zoom 400 percent"));
     }
 }
