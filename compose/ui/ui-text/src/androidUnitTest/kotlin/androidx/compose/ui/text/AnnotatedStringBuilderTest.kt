@@ -1209,6 +1209,29 @@ class AnnotatedStringBuilderTest {
         assertThat(buildResult.getStringAnnotations("another tag", 4, 6)).isEmpty()
     }
 
+    @Test
+    fun pushBullet() {
+        val buildResult = buildAnnotatedString {
+            pushBullet(DefaultBullet)
+            append("text")
+            pop()
+        }
+
+        assertThat(buildResult.text).isEqualTo("text")
+        assertThat(buildResult.annotations).containsExactly(Range(DefaultBullet, 0, 4))
+    }
+
+    @Test
+    fun addBullet() {
+        val buildResult = buildAnnotatedString {
+            append("text text")
+            addBullet(DefaultBullet, 0, 4)
+        }
+
+        assertThat(buildResult.text).isEqualTo("text text")
+        assertThat(buildResult.annotations).containsExactly(Range(DefaultBullet, 0, 4))
+    }
+
     private fun createAnnotatedString(
         text: String,
         color: Color = Color.Red,
