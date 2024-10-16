@@ -1735,7 +1735,7 @@ package androidx.compose.material3 {
     property public final float activeRangeEnd;
     property public final float activeRangeStart;
     property public final kotlin.jvm.functions.Function0<kotlin.Unit>? onValueChangeFinished;
-    property public final int steps;
+    property @IntRange(from=0L) public final int steps;
     property public final kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange;
   }
 
@@ -2102,7 +2102,7 @@ package androidx.compose.material3 {
     method public void setOnValueChangeFinished(kotlin.jvm.functions.Function0<kotlin.Unit>?);
     method public void setValue(float);
     property public final kotlin.jvm.functions.Function0<kotlin.Unit>? onValueChangeFinished;
-    property public final int steps;
+    property @IntRange(from=0L) public final int steps;
     property public final float value;
     property public final kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange;
   }

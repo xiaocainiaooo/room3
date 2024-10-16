@@ -10,14 +10,14 @@ package androidx.compose.ui {
     method public androidx.compose.ui.Alignment.Horizontal getRight();
     method public androidx.compose.ui.Alignment getTopLeft();
     method public androidx.compose.ui.Alignment getTopRight();
-    property public final androidx.compose.ui.Alignment BottomLeft;
-    property public final androidx.compose.ui.Alignment BottomRight;
-    property public final androidx.compose.ui.Alignment CenterLeft;
-    property public final androidx.compose.ui.Alignment CenterRight;
-    property public final androidx.compose.ui.Alignment.Horizontal Left;
-    property public final androidx.compose.ui.Alignment.Horizontal Right;
-    property public final androidx.compose.ui.Alignment TopLeft;
-    property public final androidx.compose.ui.Alignment TopRight;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment BottomLeft;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment BottomRight;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment CenterLeft;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment CenterRight;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment.Horizontal Left;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment.Horizontal Right;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment TopLeft;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment TopRight;
     field public static final androidx.compose.ui.AbsoluteAlignment INSTANCE;
   }
 
@@ -42,21 +42,21 @@ package androidx.compose.ui {
     method public androidx.compose.ui.Alignment getTopCenter();
     method public androidx.compose.ui.Alignment getTopEnd();
     method public androidx.compose.ui.Alignment getTopStart();
-    property public final androidx.compose.ui.Alignment.Vertical Bottom;
-    property public final androidx.compose.ui.Alignment BottomCenter;
-    property public final androidx.compose.ui.Alignment BottomEnd;
-    property public final androidx.compose.ui.Alignment BottomStart;
-    property public final androidx.compose.ui.Alignment Center;
-    property public final androidx.compose.ui.Alignment CenterEnd;
-    property public final androidx.compose.ui.Alignment.Horizontal CenterHorizontally;
-    property public final androidx.compose.ui.Alignment CenterStart;
-    property public final androidx.compose.ui.Alignment.Vertical CenterVertically;
-    property public final androidx.compose.ui.Alignment.Horizontal End;
-    property public final androidx.compose.ui.Alignment.Horizontal Start;
-    property public final androidx.compose.ui.Alignment.Vertical Top;
-    property public final androidx.compose.ui.Alignment TopCenter;
-    property public final androidx.compose.ui.Alignment TopEnd;
-    property public final androidx.compose.ui.Alignment TopStart;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment.Vertical Bottom;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment BottomCenter;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment BottomEnd;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment BottomStart;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment Center;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment CenterEnd;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment.Horizontal CenterHorizontally;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment CenterStart;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment.Vertical CenterVertically;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment.Horizontal End;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment.Horizontal Start;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment.Vertical Top;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment TopCenter;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment TopEnd;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.Alignment TopStart;
   }
 
   @androidx.compose.runtime.Stable public static fun interface Alignment.Horizontal {
@@ -890,6 +890,7 @@ package androidx.compose.ui.graphics {
     method public long copy(optional float pivotFractionX, optional float pivotFractionY);
     method public float getPivotFractionX();
     method public float getPivotFractionY();
+    property @kotlin.PublishedApi internal final long packedValue;
     property public final float pivotFractionX;
     property public final float pivotFractionY;
     field public static final androidx.compose.ui.graphics.TransformOrigin.Companion Companion;
@@ -2326,13 +2327,13 @@ package androidx.compose.ui.layout {
     method public androidx.compose.ui.layout.ContentScale getFit();
     method public androidx.compose.ui.layout.ContentScale getInside();
     method public androidx.compose.ui.layout.FixedScale getNone();
-    property public final androidx.compose.ui.layout.ContentScale Crop;
-    property public final androidx.compose.ui.layout.ContentScale FillBounds;
-    property public final androidx.compose.ui.layout.ContentScale FillHeight;
-    property public final androidx.compose.ui.layout.ContentScale FillWidth;
-    property public final androidx.compose.ui.layout.ContentScale Fit;
-    property public final androidx.compose.ui.layout.ContentScale Inside;
-    property public final androidx.compose.ui.layout.FixedScale None;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.layout.ContentScale Crop;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.layout.ContentScale FillBounds;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.layout.ContentScale FillHeight;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.layout.ContentScale FillWidth;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.layout.ContentScale Fit;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.layout.ContentScale Inside;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.layout.FixedScale None;
   }
 
   @androidx.compose.runtime.Immutable public final class FixedScale implements androidx.compose.ui.layout.ContentScale {
@@ -2676,7 +2677,7 @@ package androidx.compose.ui.layout {
 
   public static final class ScaleFactor.Companion {
     method public long getUnspecified();
-    property public final long Unspecified;
+    property @androidx.compose.runtime.Stable public final long Unspecified;
   }
 
   public final class ScaleFactorKt {
@@ -3069,7 +3070,7 @@ package androidx.compose.ui.platform {
     method public final void setViewCompositionStrategy(androidx.compose.ui.platform.ViewCompositionStrategy strategy);
     property public final boolean hasComposition;
     property protected boolean shouldCreateCompositionOnAttachedToWindow;
-    property public final boolean showLayoutBounds;
+    property @SuppressCompatibility @androidx.compose.ui.InternalComposeUiApi public final boolean showLayoutBounds;
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface AccessibilityManager {
@@ -3433,7 +3434,7 @@ package androidx.compose.ui.platform {
   public static final class ViewRootForTest.Companion {
     method public kotlin.jvm.functions.Function1<androidx.compose.ui.platform.ViewRootForTest,kotlin.Unit>? getOnViewCreatedCallback();
     method public void setOnViewCreatedCallback(kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.ViewRootForTest,kotlin.Unit>?);
-    property public final kotlin.jvm.functions.Function1<androidx.compose.ui.platform.ViewRootForTest,kotlin.Unit>? onViewCreatedCallback;
+    property @VisibleForTesting public final kotlin.jvm.functions.Function1<androidx.compose.ui.platform.ViewRootForTest,kotlin.Unit>? onViewCreatedCallback;
   }
 
   @androidx.compose.runtime.Stable public interface WindowInfo {

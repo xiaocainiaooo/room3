@@ -12,7 +12,7 @@ package androidx.wear.watchface {
     method public float getTotalAngle();
     method public boolean hitTest(android.graphics.Rect rect, @Px float x, @Px float y);
     property public final float startAngle;
-    property public final float thickness;
+    property @Px public final float thickness;
     property public final float totalAngle;
   }
 
@@ -232,9 +232,9 @@ package androidx.wear.watchface {
     method @SuppressCompatibility @androidx.wear.watchface.WatchFaceExperimental public final void setWatchfaceColors(androidx.wear.watchface.WatchFaceColors?);
     method @UiThread public boolean shouldAnimate();
     property public final java.util.Collection<kotlin.Pair<java.lang.Integer,androidx.wear.watchface.ContentDescriptionLabel>> additionalContentDescriptionLabels;
-    property public final float centerX;
-    property public final float centerY;
-    property public final long interactiveDrawModeUpdateDelayMillis;
+    property @Px public final float centerX;
+    property @Px public final float centerY;
+    property @IntRange(from=0L, to=60000L) public final long interactiveDrawModeUpdateDelayMillis;
     property public final androidx.wear.watchface.RenderParameters renderParameters;
     property public final android.graphics.Rect screenBounds;
     property public final android.view.SurfaceHolder surfaceHolder;
@@ -346,8 +346,8 @@ package androidx.wear.watchface {
     method public int getXPos();
     method public int getYPos();
     property public final java.time.Instant tapTime;
-    property public final int xPos;
-    property public final int yPos;
+    property @Px public final int xPos;
+    property @Px public final int yPos;
   }
 
   public final class TapType {
@@ -391,7 +391,7 @@ package androidx.wear.watchface {
     method public int getStatusBarGravity();
     method public int getViewProtectionMode();
     method public boolean isTapEventsAccepted();
-    property public final int accentColor;
+    property @ColorInt public final int accentColor;
     property public final int statusBarGravity;
     property public final boolean tapEventsAccepted;
     property public final int viewProtectionMode;

@@ -1615,7 +1615,7 @@ package androidx.compose.foundation.shape {
     method @androidx.compose.runtime.Stable public static androidx.compose.foundation.shape.CornerSize CornerSize(float size);
     method @androidx.compose.runtime.Stable public static androidx.compose.foundation.shape.CornerSize CornerSize(@IntRange(from=0L, to=100L) int percent);
     method public static androidx.compose.foundation.shape.CornerSize getZeroCornerSize();
-    property public static final androidx.compose.foundation.shape.CornerSize ZeroCornerSize;
+    property @androidx.compose.runtime.Stable public static final androidx.compose.foundation.shape.CornerSize ZeroCornerSize;
   }
 
   public final class CutCornerShape extends androidx.compose.foundation.shape.CornerBasedShape {
@@ -1761,7 +1761,7 @@ package androidx.compose.foundation.text {
 
   public static final class KeyboardActions.Companion {
     method public androidx.compose.foundation.text.KeyboardActions getDefault();
-    property public final androidx.compose.foundation.text.KeyboardActions Default;
+    property @androidx.compose.runtime.Stable public final androidx.compose.foundation.text.KeyboardActions Default;
   }
 
   public final class KeyboardActionsKt {
@@ -1802,7 +1802,7 @@ package androidx.compose.foundation.text {
 
   public static final class KeyboardOptions.Companion {
     method public androidx.compose.foundation.text.KeyboardOptions getDefault();
-    property public final androidx.compose.foundation.text.KeyboardOptions Default;
+    property @androidx.compose.runtime.Stable public final androidx.compose.foundation.text.KeyboardOptions Default;
   }
 
 }

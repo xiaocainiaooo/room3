@@ -62,7 +62,7 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public default androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.unit.DpRect);
     method @androidx.compose.runtime.Stable public default long toSize(long);
     method @androidx.compose.runtime.Stable public default long toSp(int);
-    property public abstract float density;
+    property @androidx.compose.runtime.Stable public abstract float density;
   }
 
   public final class DensityKt {
@@ -89,9 +89,9 @@ package androidx.compose.ui.unit {
     method public float getHairline();
     method public float getInfinity();
     method public float getUnspecified();
-    property public final float Hairline;
-    property public final float Infinity;
-    property public final float Unspecified;
+    property @androidx.compose.runtime.Stable public final float Hairline;
+    property @androidx.compose.runtime.Stable public final float Infinity;
+    property @androidx.compose.runtime.Stable public final float Unspecified;
   }
 
   public final class DpKt {
@@ -162,10 +162,10 @@ package androidx.compose.ui.unit {
     method public float getLeft();
     method public float getRight();
     method public float getTop();
-    property public final float bottom;
-    property public final float left;
-    property public final float right;
-    property public final float top;
+    property @androidx.compose.runtime.Stable public final float bottom;
+    property @androidx.compose.runtime.Stable public final float left;
+    property @androidx.compose.runtime.Stable public final float right;
+    property @androidx.compose.runtime.Stable public final float top;
     field public static final androidx.compose.ui.unit.DpRect.Companion Companion;
   }
 
@@ -203,7 +203,7 @@ package androidx.compose.ui.unit {
     method public float getFontScale();
     method @androidx.compose.runtime.Stable public default float toDp(long);
     method @androidx.compose.runtime.Stable public default long toSp(float);
-    property public abstract float fontScale;
+    property @androidx.compose.runtime.Stable public abstract float fontScale;
   }
 
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class IntOffset {
@@ -277,7 +277,7 @@ package androidx.compose.ui.unit {
     method public boolean overlaps(androidx.compose.ui.unit.IntRect other);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.unit.IntRect translate(int translateX, int translateY);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.unit.IntRect translate(long offset);
-    property public final int bottom;
+    property @androidx.compose.runtime.Stable public final int bottom;
     property public final long bottomCenter;
     property public final long bottomLeft;
     property public final long bottomRight;
@@ -286,12 +286,12 @@ package androidx.compose.ui.unit {
     property public final long centerRight;
     property @androidx.compose.runtime.Stable public final int height;
     property @androidx.compose.runtime.Stable public final boolean isEmpty;
-    property public final int left;
+    property @androidx.compose.runtime.Stable public final int left;
     property public final int maxDimension;
     property public final int minDimension;
-    property public final int right;
+    property @androidx.compose.runtime.Stable public final int right;
     property @androidx.compose.runtime.Stable public final long size;
-    property public final int top;
+    property @androidx.compose.runtime.Stable public final int top;
     property public final long topCenter;
     property public final long topLeft;
     property public final long topRight;
@@ -301,7 +301,7 @@ package androidx.compose.ui.unit {
 
   public static final class IntRect.Companion {
     method public androidx.compose.ui.unit.IntRect getZero();
-    property public final androidx.compose.ui.unit.IntRect Zero;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.unit.IntRect Zero;
   }
 
   public final class IntRectKt {
@@ -369,7 +369,7 @@ package androidx.compose.ui.unit {
 
   public static final class TextUnit.Companion {
     method public long getUnspecified();
-    property public final long Unspecified;
+    property @androidx.compose.runtime.Stable public final long Unspecified;
   }
 
   public final class TextUnitKt {
@@ -422,7 +422,7 @@ package androidx.compose.ui.unit {
 
   public static final class Velocity.Companion {
     method public long getZero();
-    property public final long Zero;
+    property @androidx.compose.runtime.Stable public final long Zero;
   }
 
   public final class VelocityKt {

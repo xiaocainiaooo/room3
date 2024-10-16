@@ -24,7 +24,7 @@ package androidx.compose.ui.geometry {
 
   public static final class CornerRadius.Companion {
     method public long getZero();
-    property public final long Zero;
+    property @androidx.compose.runtime.Stable public final long Zero;
   }
 
   public final class CornerRadiusKt {
@@ -33,6 +33,15 @@ package androidx.compose.ui.geometry {
   }
 
   public final class InlineClassHelperKt {
+    property @kotlin.PublishedApi internal static final long DualFirstNaN;
+    property @kotlin.PublishedApi internal static final long DualFloatInfinityBase;
+    property @kotlin.PublishedApi internal static final long DualFloatSignBit;
+    property @kotlin.PublishedApi internal static final long DualLoadedSignificand;
+    property @kotlin.PublishedApi internal static final long DualUnsignedFloatMask;
+    property @kotlin.PublishedApi internal static final int FloatInfinityBase;
+    property @kotlin.PublishedApi internal static final long Uint64High32;
+    property @kotlin.PublishedApi internal static final long Uint64Low32;
+    property @kotlin.PublishedApi internal static final long UnspecifiedPackedFloats;
     field @kotlin.PublishedApi internal static final long DualFirstNaN = 9187343246269874177L; // 0x7f8000017f800001L
     field @kotlin.PublishedApi internal static final long DualFloatInfinityBase = 9187343241974906880L; // 0x7f8000007f800000L
     field @kotlin.PublishedApi internal static final long DualFloatSignBit = -9223372034707292160L; // 0x8000000080000000L
@@ -137,9 +146,9 @@ package androidx.compose.ui.geometry {
     method public long getInfinite();
     method public long getUnspecified();
     method public long getZero();
-    property public final long Infinite;
-    property public final long Unspecified;
-    property public final long Zero;
+    property @androidx.compose.runtime.Stable public final long Infinite;
+    property @androidx.compose.runtime.Stable public final long Unspecified;
+    property @androidx.compose.runtime.Stable public final long Zero;
   }
 
   public final class OffsetKt {
@@ -187,7 +196,7 @@ package androidx.compose.ui.geometry {
     method public boolean overlaps(androidx.compose.ui.geometry.Rect other);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect translate(float translateX, float translateY);
     method @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect translate(long offset);
-    property public final float bottom;
+    property @androidx.compose.runtime.Stable public final float bottom;
     property public final long bottomCenter;
     property public final long bottomLeft;
     property public final long bottomRight;
@@ -198,12 +207,12 @@ package androidx.compose.ui.geometry {
     property @androidx.compose.runtime.Stable public final boolean isEmpty;
     property @androidx.compose.runtime.Stable public final boolean isFinite;
     property @androidx.compose.runtime.Stable public final boolean isInfinite;
-    property public final float left;
+    property @androidx.compose.runtime.Stable public final float left;
     property public final float maxDimension;
     property public final float minDimension;
-    property public final float right;
+    property @androidx.compose.runtime.Stable public final float right;
     property @androidx.compose.runtime.Stable public final long size;
-    property public final float top;
+    property @androidx.compose.runtime.Stable public final float top;
     property public final long topCenter;
     property public final long topLeft;
     property public final long topRight;
@@ -213,7 +222,7 @@ package androidx.compose.ui.geometry {
 
   public static final class Rect.Companion {
     method public androidx.compose.ui.geometry.Rect getZero();
-    property public final androidx.compose.ui.geometry.Rect Zero;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.geometry.Rect Zero;
   }
 
   public final class RectKt {
@@ -246,7 +255,6 @@ package androidx.compose.ui.geometry {
     method public long getTopRightCornerRadius();
     method public float getWidth();
     method public static androidx.compose.ui.geometry.RoundRect getZero();
-    property public static final androidx.compose.ui.geometry.RoundRect Zero;
     property public final float bottom;
     property public final long bottomLeftCornerRadius;
     property public final long bottomRightCornerRadius;
@@ -310,8 +318,8 @@ package androidx.compose.ui.geometry {
   public static final class Size.Companion {
     method public long getUnspecified();
     method public long getZero();
-    property public final long Unspecified;
-    property public final long Zero;
+    property @androidx.compose.runtime.Stable public final long Unspecified;
+    property @androidx.compose.runtime.Stable public final long Zero;
   }
 
   public final class SizeKt {

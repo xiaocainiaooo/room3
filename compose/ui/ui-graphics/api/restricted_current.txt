@@ -32,6 +32,7 @@ package androidx.compose.ui.graphics {
     method public void skew(float sx, float sy);
     method public android.graphics.Region.Op toRegionOp(int);
     method public void translate(float dx, float dy);
+    property @kotlin.PublishedApi internal final android.graphics.Canvas internalCanvas;
     field @kotlin.PublishedApi internal android.graphics.Canvas internalCanvas;
   }
 
@@ -340,6 +341,7 @@ package androidx.compose.ui.graphics {
   public final class CanvasHolder {
     ctor public CanvasHolder();
     method public inline void drawInto(android.graphics.Canvas targetCanvas, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Canvas,kotlin.Unit> block);
+    property @kotlin.PublishedApi internal final androidx.compose.ui.graphics.AndroidCanvas androidCanvas;
     field @kotlin.PublishedApi internal final androidx.compose.ui.graphics.AndroidCanvas androidCanvas;
   }
 
@@ -403,19 +405,19 @@ package androidx.compose.ui.graphics {
     method public long getYellow();
     method public long hsl(float hue, float saturation, float lightness, optional float alpha, optional androidx.compose.ui.graphics.colorspace.Rgb colorSpace);
     method public long hsv(float hue, float saturation, float value, optional float alpha, optional androidx.compose.ui.graphics.colorspace.Rgb colorSpace);
-    property public final long Black;
-    property public final long Blue;
-    property public final long Cyan;
-    property public final long DarkGray;
-    property public final long Gray;
-    property public final long Green;
-    property public final long LightGray;
-    property public final long Magenta;
-    property public final long Red;
-    property public final long Transparent;
-    property public final long Unspecified;
-    property public final long White;
-    property public final long Yellow;
+    property @androidx.compose.runtime.Stable public final long Black;
+    property @androidx.compose.runtime.Stable public final long Blue;
+    property @androidx.compose.runtime.Stable public final long Cyan;
+    property @androidx.compose.runtime.Stable public final long DarkGray;
+    property @androidx.compose.runtime.Stable public final long Gray;
+    property @androidx.compose.runtime.Stable public final long Green;
+    property @androidx.compose.runtime.Stable public final long LightGray;
+    property @androidx.compose.runtime.Stable public final long Magenta;
+    property @androidx.compose.runtime.Stable public final long Red;
+    property @androidx.compose.runtime.Stable public final long Transparent;
+    property @androidx.compose.runtime.Stable public final long Unspecified;
+    property @androidx.compose.runtime.Stable public final long White;
+    property @androidx.compose.runtime.Stable public final long Yellow;
   }
 
   @androidx.compose.runtime.Immutable public class ColorFilter {
@@ -440,6 +442,7 @@ package androidx.compose.ui.graphics {
     method @androidx.compose.runtime.Stable public static float luminance(long);
     method public static inline long takeOrElse(long, kotlin.jvm.functions.Function0<androidx.compose.ui.graphics.Color> block);
     method @ColorInt @androidx.compose.runtime.Stable public static int toArgb(long);
+    property @kotlin.PublishedApi internal static final long UnspecifiedColor;
     field @kotlin.PublishedApi internal static final long UnspecifiedColor = 16L; // 0x10L
   }
 
@@ -945,7 +948,7 @@ package androidx.compose.ui.graphics {
 
   public final class RectangleShapeKt {
     method public static androidx.compose.ui.graphics.Shape getRectangleShape();
-    property public static final androidx.compose.ui.graphics.Shape RectangleShape;
+    property @androidx.compose.runtime.Stable public static final androidx.compose.ui.graphics.Shape RectangleShape;
   }
 
   @androidx.compose.runtime.Immutable public abstract sealed class RenderEffect {
@@ -979,15 +982,15 @@ package androidx.compose.ui.graphics {
     method public float getBlurRadius();
     method public long getColor();
     method public long getOffset();
-    property public final float blurRadius;
-    property public final long color;
-    property public final long offset;
+    property @androidx.compose.runtime.Stable public final float blurRadius;
+    property @androidx.compose.runtime.Stable public final long color;
+    property @androidx.compose.runtime.Stable public final long offset;
     field public static final androidx.compose.ui.graphics.Shadow.Companion Companion;
   }
 
   public static final class Shadow.Companion {
     method public androidx.compose.ui.graphics.Shadow getNone();
-    property public final androidx.compose.ui.graphics.Shadow None;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.graphics.Shadow None;
   }
 
   public final class ShadowKt {
@@ -1344,6 +1347,7 @@ package androidx.compose.ui.graphics.drawscope {
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     property public float density;
     property public androidx.compose.ui.graphics.drawscope.DrawContext drawContext;
+    property @kotlin.PublishedApi internal final androidx.compose.ui.graphics.drawscope.CanvasDrawScope.DrawParams drawParams;
     property public float fontScale;
     property public androidx.compose.ui.unit.LayoutDirection layoutDirection;
     field @kotlin.PublishedApi internal final androidx.compose.ui.graphics.drawscope.CanvasDrawScope.DrawParams drawParams;

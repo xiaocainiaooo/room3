@@ -14,7 +14,7 @@ package androidx.activity {
     method public float getTouchX();
     method public float getTouchY();
     method @RequiresApi(34) public android.window.BackEvent toBackEvent();
-    property public final float progress;
+    property @FloatRange(from=0.0, to=1.0) public final float progress;
     property public final int swipeEdge;
     property public final float touchX;
     property public final float touchY;

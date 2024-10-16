@@ -26,7 +26,7 @@ package androidx.bluetooth {
     method public boolean isDiscoverable();
     method public boolean shouldIncludeDeviceAddress();
     method public boolean shouldIncludeDeviceName();
-    property public final long durationMillis;
+    property @IntRange(from=0L, to=180000L) public final long durationMillis;
     property public final boolean isConnectable;
     property public final boolean isDiscoverable;
     property public final java.util.Map<java.lang.Integer,byte[]> manufacturerData;
