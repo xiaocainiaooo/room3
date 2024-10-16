@@ -800,7 +800,7 @@ class DaoKotlinCodeGenTest : BaseDaoKotlinCodeGenTest() {
             @Entity
             data class MyEntity(
                 @PrimaryKey
-                val pk: Int,
+                val pk: String,
             )
             """
                     .trimIndent()
@@ -1938,6 +1938,9 @@ class DaoKotlinCodeGenTest : BaseDaoKotlinCodeGenTest() {
             abstract class MyDao {
                 @Query("SELECT * from MyEntity")
                 abstract fun getDataSourceFactory(): DataSource.Factory<Int, MyEntity>
+
+                @Query("SELECT * FROM MyEntity WHERE pk > :gt ORDER BY pk ASC")
+                abstract fun getDataSourceFactoryWithArgs(gt: Long): DataSource.Factory<Int, MyEntity>
             }
 
             @Entity

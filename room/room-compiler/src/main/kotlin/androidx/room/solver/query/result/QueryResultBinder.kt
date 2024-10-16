@@ -44,6 +44,8 @@ abstract class QueryResultBinder(val adapter: QueryResultAdapter?) {
     // TODO(b/319660042): Remove once migration to driver API is done.
     open fun isMigratedToDriver(): Boolean = false
 
+    open val usesCompatQueryWriter: Boolean = false
+
     /**
      * Receives the SQL and a function to bind args into a statement, it must then generate the code
      * that steps on the query, reads its columns and returns the result.
@@ -56,6 +58,6 @@ abstract class QueryResultBinder(val adapter: QueryResultAdapter?) {
         inTransaction: Boolean,
         scope: CodeGenScope
     ) {
-        error("Result binder has not been migrated to use driver API.")
+        error("Result binder has not been migrated to use driver API. ")
     }
 }
