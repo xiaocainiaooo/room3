@@ -17,13 +17,17 @@
 package androidx.pdf.testapp.ui
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.ext.SdkExtensions
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
+import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
@@ -43,11 +47,19 @@ class BasicPdfFragment : Fragment(), OpCancellationHandler {
     var filePicker: ActivityResultLauncher<String> =
         registerForActivityResult(GetContent()) { uri: Uri? ->
             uri?.let {
-                if (!isPdfViewInitialized) {
-                    setPdfView()
-                    isPdfViewInitialized = true
+                if (SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 13) {
+                    if (!isPdfViewInitialized) {
+                        setPdfView()
+                        isPdfViewInitialized = true
+                    }
+                    pdfViewerFragment?.documentUri = uri
+                } else {
+                    /**
+                     * Send an intent to other apps who support opening PDFs in case PdfViewer
+                     * library is not supported due to SdkExtension limitations.
+                     */
+                    sendIntentToOpenPdf(uri)
                 }
-                pdfViewerFragment?.documentUri = uri
             }
         }
 
@@ -72,11 +84,23 @@ class BasicPdfFragment : Fragment(), OpCancellationHandler {
         val searchButton: MaterialButton = pdfInteraction.searchButton
 
         getContentButton.setOnClickListener { filePicker.launch(MIME_TYPE_PDF) }
-        searchButton.setOnClickListener { setFindInFileViewVisible() }
-
+        if (SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 13) {
+            searchButton.setOnClickListener { setFindInFileViewVisible() }
+        }
         return pdfInteraction.root
     }
 
+    private fun sendIntentToOpenPdf(uri: Uri) {
+        val intent =
+            Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "application/pdf")
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NO_HISTORY
+            }
+        val chooser = Intent.createChooser(intent, "Open PDF")
+        startActivity(chooser)
+    }
+
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
     private fun setPdfView() {
         val fragmentManager: FragmentManager = childFragmentManager
 
@@ -92,6 +116,7 @@ class BasicPdfFragment : Fragment(), OpCancellationHandler {
         fragmentManager.executePendingTransactions()
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
     private fun setFindInFileViewVisible() {
         if (pdfViewerFragment != null) {
             pdfViewerFragment!!.isTextSearchActive = true
