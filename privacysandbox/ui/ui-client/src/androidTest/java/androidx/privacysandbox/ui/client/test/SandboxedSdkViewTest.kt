@@ -31,6 +31,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.privacysandbox.ui.client.view.SandboxedSdkView
 import androidx.privacysandbox.ui.core.BackwardCompatUtil
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
+import androidx.privacysandbox.ui.core.SessionConstants
 import androidx.privacysandbox.ui.integration.testingutils.TestEventListener
 import androidx.privacysandbox.ui.provider.AbstractSandboxedUiAdapter
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -270,7 +271,7 @@ class SandboxedSdkViewTest {
         class CustomUiAdapter : AbstractSandboxedUiAdapter() {
             override fun openSession(
                 context: Context,
-                windowInputToken: IBinder,
+                sessionConstants: SessionConstants,
                 initialWidth: Int,
                 initialHeight: Int,
                 isZOrderOnTop: Boolean,
@@ -307,7 +308,7 @@ class SandboxedSdkViewTest {
         class CustomUiAdapter : AbstractSandboxedUiAdapter() {
             override fun openSession(
                 context: Context,
-                windowInputToken: IBinder,
+                sessionConstants: SessionConstants,
                 initialWidth: Int,
                 initialHeight: Int,
                 isZOrderOnTop: Boolean,

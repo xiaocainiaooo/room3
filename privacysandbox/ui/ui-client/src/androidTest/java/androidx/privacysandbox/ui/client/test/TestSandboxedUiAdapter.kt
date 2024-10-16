@@ -23,6 +23,7 @@ import android.os.SystemClock
 import android.view.View
 import androidx.privacysandbox.ui.core.SandboxedSdkViewUiInfo
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
+import androidx.privacysandbox.ui.core.SessionConstants
 import androidx.privacysandbox.ui.provider.AbstractSandboxedUiAdapter
 import com.google.common.truth.Truth
 import java.util.concurrent.CountDownLatch
@@ -46,7 +47,7 @@ class TestSandboxedUiAdapter(private val signalOptions: Set<String> = setOf("opt
 
     override fun openSession(
         context: Context,
-        windowInputToken: IBinder,
+        sessionConstants: SessionConstants,
         initialWidth: Int,
         initialHeight: Int,
         isZOrderOnTop: Boolean,
@@ -61,7 +62,7 @@ class TestSandboxedUiAdapter(private val signalOptions: Set<String> = setOf("opt
             }
             isSessionOpened = true
             this.isZOrderOnTop = isZOrderOnTop
-            this.inputToken = windowInputToken
+            this.inputToken = sessionConstants.windowInputToken
             openSessionLatch.countDown()
         }
     }
