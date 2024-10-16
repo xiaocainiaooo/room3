@@ -97,7 +97,7 @@ package androidx.privacysandbox.ads.adservices.adselection {
     ctor public GetAdSelectionDataRequest(androidx.privacysandbox.ads.adservices.common.AdTechIdentifier seller, optional android.net.Uri? coordinatorOriginUri);
     method public android.net.Uri? getCoordinatorOriginUri();
     method public androidx.privacysandbox.ads.adservices.common.AdTechIdentifier getSeller();
-    property public final android.net.Uri? coordinatorOriginUri;
+    property @SuppressCompatibility @androidx.privacysandbox.ads.adservices.common.ExperimentalFeatures.Ext12OptIn public final android.net.Uri? coordinatorOriginUri;
     property public final androidx.privacysandbox.ads.adservices.common.AdTechIdentifier seller;
   }
 
@@ -124,7 +124,7 @@ package androidx.privacysandbox.ads.adservices.adselection {
     property public final long adSelectionId;
     property public final String eventData;
     property public final String eventKey;
-    property public final android.view.InputEvent? inputEvent;
+    property @SuppressCompatibility @androidx.privacysandbox.ads.adservices.common.ExperimentalFeatures.Ext10OptIn public final android.view.InputEvent? inputEvent;
     property public final int reportingDestinations;
     field public static final androidx.privacysandbox.ads.adservices.adselection.ReportEventRequest.Companion Companion;
     field public static final int FLAG_REPORTING_DESTINATION_BUYER = 2; // 0x2

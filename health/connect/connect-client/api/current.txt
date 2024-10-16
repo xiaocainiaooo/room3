@@ -22,7 +22,6 @@ package androidx.health.connect.client {
     method public suspend <T extends androidx.health.connect.client.records.Record> Object? readRecord(kotlin.reflect.KClass<T> recordType, String recordId, kotlin.coroutines.Continuation<? super androidx.health.connect.client.response.ReadRecordResponse<T>>);
     method public suspend <T extends androidx.health.connect.client.records.Record> Object? readRecords(androidx.health.connect.client.request.ReadRecordsRequest<T> request, kotlin.coroutines.Continuation<? super androidx.health.connect.client.response.ReadRecordsResponse<T>>);
     method public suspend Object? updateRecords(java.util.List<? extends androidx.health.connect.client.records.Record> records, kotlin.coroutines.Continuation<? super kotlin.Unit>);
-    property public static String ACTION_HEALTH_CONNECT_SETTINGS;
     property @SuppressCompatibility @androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi public default androidx.health.connect.client.HealthConnectFeatures features;
     property public abstract androidx.health.connect.client.PermissionController permissionController;
     field public static final androidx.health.connect.client.HealthConnectClient.Companion Companion;
@@ -426,7 +425,7 @@ package androidx.health.connect.client.records {
     ctor public CyclingPedalingCadenceRecord.Sample(java.time.Instant time, @FloatRange(from=0.0, to=10000.0) double revolutionsPerMinute);
     method public double getRevolutionsPerMinute();
     method public java.time.Instant getTime();
-    property public final double revolutionsPerMinute;
+    property @FloatRange(from=0.0, to=10000.0) public final double revolutionsPerMinute;
     property public final java.time.Instant time;
   }
 
@@ -869,7 +868,7 @@ package androidx.health.connect.client.records {
     ctor public HeartRateRecord.Sample(java.time.Instant time, @IntRange(from=1L, to=300L) long beatsPerMinute);
     method public long getBeatsPerMinute();
     method public java.time.Instant getTime();
-    property public final long beatsPerMinute;
+    property @IntRange(from=1L, to=300L) public final long beatsPerMinute;
     property public final java.time.Instant time;
   }
 
@@ -1467,7 +1466,7 @@ package androidx.health.connect.client.records {
     ctor public StepsCadenceRecord.Sample(java.time.Instant time, @FloatRange(from=0.0, to=10000.0) double rate);
     method public double getRate();
     method public java.time.Instant getTime();
-    property public final double rate;
+    property @FloatRange(from=0.0, to=10000.0) public final double rate;
     property public final java.time.Instant time;
   }
 
@@ -1479,7 +1478,7 @@ package androidx.health.connect.client.records {
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public java.time.Instant getStartTime();
     method public java.time.ZoneOffset? getStartZoneOffset();
-    property public final long count;
+    property @IntRange(from=1L, to=1000000L) public final long count;
     property public java.time.Instant endTime;
     property public java.time.ZoneOffset? endZoneOffset;
     property public androidx.health.connect.client.records.metadata.Metadata metadata;

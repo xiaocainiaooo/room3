@@ -2350,6 +2350,9 @@ package androidx.collection {
     method public static <K, V> androidx.collection.MutableScatterMap<K,V> mutableScatterMapOf();
     method public static <K, V> androidx.collection.MutableScatterMap<K,V> mutableScatterMapOf(kotlin.Pair<? extends K,? extends V>... pairs);
     method @kotlin.PublishedApi internal static inline long readRawMetadata(long[] data, int offset);
+    property @kotlin.PublishedApi internal static final long BitmaskLsb;
+    property @kotlin.PublishedApi internal static final long BitmaskMsb;
+    property @kotlin.PublishedApi internal static final long Sentinel;
     field @kotlin.PublishedApi internal static final long BitmaskLsb = 72340172838076673L; // 0x101010101010101L
     field @kotlin.PublishedApi internal static final long BitmaskMsb = -9187201950435737472L; // 0x8080808080808080L
     field @kotlin.PublishedApi internal static final long Sentinel = 255L; // 0xffL
@@ -2459,6 +2462,8 @@ package androidx.collection {
   }
 
   public final class SieveCacheKt {
+    property @kotlin.PublishedApi internal static final int NodeInvalidLink;
+    property @kotlin.PublishedApi internal static final long NodeLinkMask;
     field @kotlin.PublishedApi internal static final int NodeInvalidLink = 2147483647; // 0x7fffffff
     field @kotlin.PublishedApi internal static final long NodeLinkMask = 2147483647L; // 0x7fffffffL
   }

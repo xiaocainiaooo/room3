@@ -96,11 +96,11 @@ package androidx.work {
     method public boolean requiresCharging();
     method @RequiresApi(23) public boolean requiresDeviceIdle();
     method public boolean requiresStorageNotLow();
-    property @RequiresApi(24) public final long contentTriggerMaxDelayMillis;
-    property @RequiresApi(24) public final long contentTriggerUpdateDelayMillis;
-    property @RequiresApi(24) public final java.util.Set<androidx.work.Constraints.ContentUriTrigger> contentUriTriggers;
+    property @RequiresApi(24) @androidx.room.ColumnInfo(name="trigger_max_content_delay") public final long contentTriggerMaxDelayMillis;
+    property @RequiresApi(24) @androidx.room.ColumnInfo(name="trigger_content_update_delay") public final long contentTriggerUpdateDelayMillis;
+    property @RequiresApi(24) @androidx.room.ColumnInfo(name="content_uri_triggers") public final java.util.Set<androidx.work.Constraints.ContentUriTrigger> contentUriTriggers;
     property @RequiresApi(21) public final android.net.NetworkRequest? requiredNetworkRequest;
-    property public final androidx.work.NetworkType requiredNetworkType;
+    property @androidx.room.ColumnInfo(name="required_network_type") public final androidx.work.NetworkType requiredNetworkType;
     field public static final androidx.work.Constraints.Companion Companion;
     field public static final androidx.work.Constraints NONE;
   }

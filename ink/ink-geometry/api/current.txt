@@ -126,7 +126,7 @@ package androidx.ink.geometry {
     method public float getWidth();
     property public androidx.ink.geometry.ImmutableVec center;
     property public float height;
-    property public float rotation;
+    property @androidx.ink.geometry.AngleRadiansFloat public float rotation;
     property public float shearFactor;
     property public float width;
     field public static final androidx.ink.geometry.ImmutableParallelogram.Companion Companion;

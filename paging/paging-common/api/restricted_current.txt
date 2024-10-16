@@ -106,8 +106,8 @@ package androidx.paging {
     method public int getPlaceholdersBefore();
     method public int getSize();
     property public final java.util.List<T> items;
-    property public final int placeholdersAfter;
-    property public final int placeholdersBefore;
+    property @IntRange(from=0L) public final int placeholdersAfter;
+    property @IntRange(from=0L) public final int placeholdersBefore;
     property public int size;
   }
 
@@ -490,8 +490,8 @@ package androidx.paging {
     method public Key? getPrevKey();
     method public java.util.Iterator<Value> iterator();
     property public final java.util.List<Value> data;
-    property public final int itemsAfter;
-    property public final int itemsBefore;
+    property @IntRange(from=androidx.paging.PagingSource.LoadResult.Page.COUNT_UNDEFINED.toLong()) public final int itemsAfter;
+    property @IntRange(from=androidx.paging.PagingSource.LoadResult.Page.COUNT_UNDEFINED.toLong()) public final int itemsBefore;
     property public final Key? nextKey;
     property public final Key? prevKey;
     field public static final int COUNT_UNDEFINED = -2147483648; // 0x80000000

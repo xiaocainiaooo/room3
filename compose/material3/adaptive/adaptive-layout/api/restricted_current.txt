@@ -101,7 +101,7 @@ package androidx.compose.material3.adaptive.layout {
   public static final class PaneExpansionAnchor.Proportion extends androidx.compose.material3.adaptive.layout.PaneExpansionAnchor {
     ctor public PaneExpansionAnchor.Proportion(@FloatRange(from=0.0, to=1.0) float proportion);
     method public float getProportion();
-    property public final float proportion;
+    property @FloatRange(from=0.0, to=1.0) public final float proportion;
   }
 
   public final class PaneExpansionDragHandleKt {

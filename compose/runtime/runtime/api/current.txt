@@ -171,18 +171,18 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public void startReusableNode();
     method @androidx.compose.runtime.ComposeCompilerApi public void updateRememberedValue(Object? value);
     method @androidx.compose.runtime.ComposeCompilerApi public void useNode();
-    property public abstract androidx.compose.runtime.Applier<? extends java.lang.Object?> applier;
+    property @androidx.compose.runtime.ComposeCompilerApi public abstract androidx.compose.runtime.Applier<? extends java.lang.Object?> applier;
     property @SuppressCompatibility @androidx.compose.runtime.InternalComposeApi @org.jetbrains.annotations.TestOnly public abstract kotlin.coroutines.CoroutineContext applyCoroutineContext;
     property @org.jetbrains.annotations.TestOnly public abstract androidx.compose.runtime.ControlledComposition composition;
     property public abstract androidx.compose.runtime.tooling.CompositionData compositionData;
-    property public abstract int compoundKeyHash;
+    property @SuppressCompatibility @androidx.compose.runtime.InternalComposeApi public abstract int compoundKeyHash;
     property public abstract androidx.compose.runtime.CompositionLocalMap currentCompositionLocalMap;
-    property public abstract int currentMarker;
-    property public abstract boolean defaultsInvalid;
-    property public abstract boolean inserting;
-    property public abstract androidx.compose.runtime.RecomposeScope? recomposeScope;
-    property public abstract Object? recomposeScopeIdentity;
-    property public abstract boolean skipping;
+    property @androidx.compose.runtime.ComposeCompilerApi public abstract int currentMarker;
+    property @androidx.compose.runtime.ComposeCompilerApi public abstract boolean defaultsInvalid;
+    property @androidx.compose.runtime.ComposeCompilerApi public abstract boolean inserting;
+    property @SuppressCompatibility @androidx.compose.runtime.InternalComposeApi public abstract androidx.compose.runtime.RecomposeScope? recomposeScope;
+    property @androidx.compose.runtime.ComposeCompilerApi public abstract Object? recomposeScopeIdentity;
+    property @androidx.compose.runtime.ComposeCompilerApi public abstract boolean skipping;
     field public static final androidx.compose.runtime.Composer.Companion Companion;
   }
 
@@ -824,7 +824,7 @@ package androidx.compose.runtime.internal {
     method public static boolean isLiveLiteralsEnabled();
     method @SuppressCompatibility @androidx.compose.runtime.ComposeCompilerApi @androidx.compose.runtime.InternalComposeApi public static <T> androidx.compose.runtime.State<T> liveLiteral(String key, T value);
     method @SuppressCompatibility @androidx.compose.runtime.InternalComposeApi public static void updateLiveLiteralValue(String key, Object? value);
-    property public static final boolean isLiveLiteralsEnabled;
+    property @SuppressCompatibility @androidx.compose.runtime.ComposeCompilerApi @androidx.compose.runtime.InternalComposeApi public static final boolean isLiveLiteralsEnabled;
   }
 
   @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface StabilityInferred {

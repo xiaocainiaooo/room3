@@ -534,14 +534,14 @@ package androidx.tv.material3 {
     method public float getPressedSelectedScale();
     method public float getScale();
     method public float getSelectedScale();
-    property public final float disabledScale;
-    property public final float focusedDisabledScale;
-    property public final float focusedScale;
-    property public final float focusedSelectedScale;
-    property public final float pressedScale;
-    property public final float pressedSelectedScale;
-    property public final float scale;
-    property public final float selectedScale;
+    property @FloatRange(from=0.0) public final float disabledScale;
+    property @FloatRange(from=0.0) public final float focusedDisabledScale;
+    property @FloatRange(from=0.0) public final float focusedScale;
+    property @FloatRange(from=0.0) public final float focusedSelectedScale;
+    property @FloatRange(from=0.0) public final float pressedScale;
+    property @FloatRange(from=0.0) public final float pressedSelectedScale;
+    property @FloatRange(from=0.0) public final float scale;
+    property @FloatRange(from=0.0) public final float selectedScale;
     field public static final androidx.tv.material3.ListItemScale.Companion Companion;
   }
 
@@ -704,14 +704,14 @@ package androidx.tv.material3 {
     method public float getPressedSelectedScale();
     method public float getScale();
     method public float getSelectedScale();
-    property public final float disabledScale;
-    property public final float focusedDisabledScale;
-    property public final float focusedScale;
-    property public final float focusedSelectedScale;
-    property public final float pressedScale;
-    property public final float pressedSelectedScale;
-    property public final float scale;
-    property public final float selectedScale;
+    property @FloatRange(from=0.0) public final float disabledScale;
+    property @FloatRange(from=0.0) public final float focusedDisabledScale;
+    property @FloatRange(from=0.0) public final float focusedScale;
+    property @FloatRange(from=0.0) public final float focusedSelectedScale;
+    property @FloatRange(from=0.0) public final float pressedScale;
+    property @FloatRange(from=0.0) public final float pressedSelectedScale;
+    property @FloatRange(from=0.0) public final float scale;
+    property @FloatRange(from=0.0) public final float selectedScale;
     field public static final androidx.tv.material3.NavigationDrawerItemScale.Companion Companion;
   }
 
