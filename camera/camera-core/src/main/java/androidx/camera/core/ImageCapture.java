@@ -112,6 +112,7 @@ import androidx.camera.core.impl.ImageReaderProxy;
 import androidx.camera.core.impl.MutableConfig;
 import androidx.camera.core.impl.MutableOptionsBundle;
 import androidx.camera.core.impl.OptionsBundle;
+import androidx.camera.core.impl.RestrictedCameraInfo;
 import androidx.camera.core.impl.SessionConfig;
 import androidx.camera.core.impl.SessionProcessor;
 import androidx.camera.core.impl.StreamSpec;
@@ -1050,6 +1051,13 @@ public final class ImageCapture extends UseCase {
         @NonNull
         @Override
         public Set<@OutputFormat Integer> getSupportedOutputFormats() {
+            Set<Integer> outputFormatsFromRestrictedCameraInfo =
+                    getSupportedOutputFormatsFromRestrictedCameraInfo();
+
+            if (outputFormatsFromRestrictedCameraInfo != null) {
+                return outputFormatsFromRestrictedCameraInfo;
+            }
+
             Set<Integer> formats = new HashSet<>();
             formats.add(OUTPUT_FORMAT_JPEG);
             if (isUltraHdrSupported()) {
@@ -1080,6 +1088,42 @@ public final class ImageCapture extends UseCase {
             }
 
             return false;
+        }
+
+        @OptIn(markerClass = ExperimentalImageCaptureOutputFormat.class)
+        @Nullable
+        private Set<Integer> getSupportedOutputFormatsFromRestrictedCameraInfo() {
+            if (!(mCameraInfo instanceof RestrictedCameraInfo)) {
+                return null;
+            }
+
+            // If RestrictedCameraInfo is used to query the capabilities, retrieves the supported
+            // output formats from the CameraConfig associated with it.
+            CameraConfig cameraConfig = ((RestrictedCameraInfo) mCameraInfo).getCameraConfig();
+            UseCaseConfigFactory useCaseConfigFactory = cameraConfig.getUseCaseConfigFactory();
+            Config useCaseConfig = useCaseConfigFactory.getConfig(
+                    UseCaseConfigFactory.CaptureType.IMAGE_CAPTURE, DEFAULT_CAPTURE_MODE);
+
+            if (useCaseConfig == null || !useCaseConfig.containsOption(
+                    OPTION_SUPPORTED_RESOLUTIONS)) {
+                return null;
+            }
+
+            Set<Integer> formats = new HashSet<>();
+            // JPEG output format should always be supported for ImageCapture.
+            formats.add(OUTPUT_FORMAT_JPEG);
+            for (Pair<Integer, Size[]> formatSizesPair : useCaseConfig.retrieveOption(
+                    OPTION_SUPPORTED_RESOLUTIONS)) {
+                if (formatSizesPair.first == ImageFormat.JPEG_R) {
+                    formats.add(OUTPUT_FORMAT_JPEG_ULTRA_HDR);
+                    // Besides JPEG, only JPEG_ULTRA_HDR can be supported for now from the
+                    // restricted camera info. Breaks the for-loop when it has been confirmed that
+                    // JPEG_ULTRA_HDR can be supported.
+                    break;
+                }
+            }
+
+            return formats;
         }
     }
 
@@ -1333,7 +1377,8 @@ public final class ImageCapture extends UseCase {
     /**
      * Creates the pipeline for both capture request configuration and image post-processing.
      */
-    @OptIn(markerClass = ExperimentalZeroShutterLag.class)
+    @OptIn(markerClass = {ExperimentalZeroShutterLag.class,
+            ExperimentalImageCaptureOutputFormat.class})
     @MainThread
     private SessionConfig.Builder createPipeline(@NonNull String cameraId,
             @NonNull ImageCaptureConfig config, @NonNull StreamSpec streamSpec) {
@@ -1348,6 +1393,13 @@ public final class ImageCapture extends UseCase {
             // SessionConfig error callback and recreate children pipeline.
             mImagePipeline.close();
         }
+
+        Set<Integer> supportedOutputFormats = getImageCaptureCapabilities(
+                getCamera().getCameraInfo()).getSupportedOutputFormats();
+        Preconditions.checkArgument(supportedOutputFormats.contains(getOutputFormat()),
+                "The specified output format (" + getOutputFormat()
+                        + ") is not supported by current configuration. Supported output formats: "
+                        + supportedOutputFormats);
 
         PostviewSettings postviewSettings = isPostviewEnabled() ? calculatePostviewSettings(
                 resolution) : null;
@@ -2983,6 +3035,10 @@ public final class ImageCapture extends UseCase {
          * {@link ImageCaptureCapabilities#getSupportedOutputFormats()}.
          *
          * <p>If not set, the output format will default to {@link #OUTPUT_FORMAT_JPEG}.
+         *
+         * <p>An {@link IllegalArgumentException} will be thrown when binding the UseCase if the
+         * specified output format is not supported. Please note that the supported output formats
+         * might be changed when Extensions is enabled.
          *
          * @param outputFormat The output image format. Value is {@link #OUTPUT_FORMAT_JPEG} or
          *                     {@link #OUTPUT_FORMAT_JPEG_ULTRA_HDR} or {@link #OUTPUT_FORMAT_RAW}.

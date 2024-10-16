@@ -1035,11 +1035,6 @@ public final class CameraUseCaseAdapter implements Camera {
                         + "standard dynamic range.");
             }
 
-            if (hasUltraHdrImageCapture(useCases)) {
-                throw new IllegalArgumentException("Extensions are not supported for use with "
-                        + "Ultra HDR image capture.");
-            }
-
             if (hasRawImageCapture(useCases)) {
                 throw new IllegalArgumentException("Extensions are not supported for use with "
                         + "Raw image capture.");
