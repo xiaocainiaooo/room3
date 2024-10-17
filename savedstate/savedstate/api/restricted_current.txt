@@ -154,3 +154,17 @@ package androidx.savedstate {
 
 }
 
+package androidx.savedstate.serialization {
+
+  public final class SavedStateDecoderKt {
+    method public static inline <reified T> T decodeFromSavedState(androidx.savedstate.SavedState savedState);
+    method public static <T> T decodeFromSavedState(DeserializationStrategy<T!> deserializer, androidx.savedstate.SavedState savedState);
+  }
+
+  public final class SavedStateEncoderKt {
+    method public static <T> androidx.savedstate.SavedState encodeToSavedState(SerializationStrategy<T!> serializer, T value);
+    method public static inline <reified T> androidx.savedstate.SavedState encodeToSavedState(T serializable);
+  }
+
+}
+

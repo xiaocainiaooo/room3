@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
+    alias(libs.plugins.kotlinSerialization)
 }
 
 androidXMultiplatform {
@@ -36,6 +37,7 @@ androidXMultiplatform {
                 api(libs.kotlinStdlib)
                 api("androidx.annotation:annotation:1.8.0")
                 api(projectOrArtifact(":lifecycle:lifecycle-common"))
+                api(libs.kotlinSerializationCore)
             }
         }
 
