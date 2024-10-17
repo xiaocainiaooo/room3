@@ -389,6 +389,7 @@ package androidx.window.extensions.layout {
   public interface WindowLayoutComponent {
     method @Deprecated public void addWindowLayoutInfoListener(android.app.Activity, java.util.function.Consumer<androidx.window.extensions.layout.WindowLayoutInfo!>);
     method public default void addWindowLayoutInfoListener(@UiContext android.content.Context, androidx.window.extensions.core.util.function.Consumer<androidx.window.extensions.layout.WindowLayoutInfo!>);
+    method public default androidx.window.extensions.layout.WindowLayoutInfo getCurrentWindowLayoutInfo(@UiContext android.content.Context);
     method public default androidx.window.extensions.layout.SupportedWindowFeatures getSupportedWindowFeatures();
     method public default void removeWindowLayoutInfoListener(androidx.window.extensions.core.util.function.Consumer<androidx.window.extensions.layout.WindowLayoutInfo!>);
     method @Deprecated public void removeWindowLayoutInfoListener(java.util.function.Consumer<androidx.window.extensions.layout.WindowLayoutInfo!>);
