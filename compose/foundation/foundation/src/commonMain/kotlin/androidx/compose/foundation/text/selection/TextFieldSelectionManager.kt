@@ -34,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.AutofillManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -91,6 +92,9 @@ internal class TextFieldSelectionManager(val undoManager: UndoManager? = null) {
      * permitted. For example, 'cut' will not be available is it is password transformation.
      */
     internal var visualTransformation: VisualTransformation = VisualTransformation.None
+
+    /** [AutofillManager] to perform clipboard features. */
+    internal var autofillManager: AutofillManager? = null
 
     /** [ClipboardManager] to perform clipboard features. */
     internal var clipboardManager: ClipboardManager? = null
@@ -688,6 +692,11 @@ internal class TextFieldSelectionManager(val undoManager: UndoManager? = null) {
         enterSelectionMode(showFloatingToolbar = true)
     }
 
+    @Suppress("NewApi")
+    internal fun autofill() {
+        autofillManager?.let { requestAutofill(it) }
+    }
+
     internal fun getHandlePosition(isStartHandle: Boolean): Offset {
         val textLayoutResult = state?.layoutResult?.value ?: return Offset.Unspecified
 
@@ -765,12 +774,18 @@ internal class TextFieldSelectionManager(val undoManager: UndoManager? = null) {
                 { selectAll() }
             } else null
 
+        val autofill: (() -> Unit)? =
+            if (editable && value.selection.collapsed) {
+                { autofill() }
+            } else null
+
         textToolbar?.showMenu(
             rect = getContentRect(),
             onCopyRequested = copy,
             onPasteRequested = paste,
             onCutRequested = cut,
-            onSelectAllRequested = selectAll
+            onSelectAllRequested = selectAll,
+            onAutofillRequested = autofill
         )
     }
 
@@ -1088,3 +1103,5 @@ internal fun calculateSelectionMagnifierCenterAndroid(
 
     return Offset(centerX, centerY)
 }
+
+internal expect fun requestAutofill(autofillManager: AutofillManager)

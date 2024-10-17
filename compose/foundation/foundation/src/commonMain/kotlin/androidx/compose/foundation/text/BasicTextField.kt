@@ -63,6 +63,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalAutofillManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -291,6 +292,7 @@ internal fun BasicTextField(
     val currentHapticFeedback = LocalHapticFeedback.current
     val currentClipboardManager = LocalClipboardManager.current
     val currentTextToolbar = LocalTextToolbar.current
+    val autofillManager = LocalAutofillManager.current
     SideEffect {
         // These properties are not backed by snapshot state, so they can't be updated directly in
         // composition.
@@ -304,6 +306,7 @@ internal fun BasicTextField(
             enabled = enabled,
             readOnly = readOnly,
             isPassword = isPassword,
+            autofillManager = autofillManager
         )
     }
 

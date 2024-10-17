@@ -16,6 +16,8 @@
 
 package androidx.compose.foundation.text.selection
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.PlatformMagnifierFactory
 import androidx.compose.foundation.contextmenu.ContextMenuScope
 import androidx.compose.foundation.contextmenu.ContextMenuState
@@ -28,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.AutofillManager
 import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.platform.LocalDensity
@@ -100,4 +103,9 @@ internal fun TextFieldSelectionManager.contextMenuBuilder(
     ) {
         selectAll()
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+internal actual fun requestAutofill(autofillManager: AutofillManager) {
+    autofillManager.requestAutofill()
 }
