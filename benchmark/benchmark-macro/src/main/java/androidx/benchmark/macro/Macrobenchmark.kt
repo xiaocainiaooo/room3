@@ -42,7 +42,6 @@ import androidx.benchmark.perfetto.PerfettoCapture.PerfettoSdkConfig.InitialProc
 import androidx.benchmark.perfetto.PerfettoTraceProcessor
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assume.assumeFalse
-import perfetto.protos.AndroidStartupMetric
 
 /** Get package ApplicationInfo, throw if not found. */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
@@ -261,7 +260,7 @@ private fun macrobenchmark(
 
     // package name for macrobench process, so it's captured as well
     val macrobenchPackageName = InstrumentationRegistry.getInstrumentation().context.packageName
-    val outputs = mutableListOf<PhaseResult>()
+    val iterationResults = mutableListOf<IterationResult>()
 
     PerfettoTraceProcessor.runServer {
         scope.withKillFlushMode(
@@ -272,7 +271,7 @@ private fun macrobenchmark(
                 else KillFlushMode.None
         ) {
             // Measurement Phase
-            outputs +=
+            iterationResults +=
                 runPhase(
                     uniqueName = uniqueName,
                     packageName = packageName,
@@ -289,7 +288,7 @@ private fun macrobenchmark(
                 )
             // Profiling Phase
             if (requestMethodTracing) {
-                outputs +=
+                iterationResults +=
                     runPhase(
                         uniqueName = uniqueName,
                         packageName = packageName,
@@ -309,21 +308,23 @@ private fun macrobenchmark(
             }
         }
     }
-
+    /*
     val tracePaths = mutableListOf<String>()
     val profilerResults = mutableListOf<Profiler.ResultFile>()
     val measurementsList = mutableListOf<List<Metric.Measurement>>()
     val insightsList = mutableListOf<List<AndroidStartupMetric.SlowStartReason>>()
 
-    outputs.forEach {
+    iterationResults.forEach {
         tracePaths += it.tracePaths
         profilerResults += it.profilerResults
         measurementsList += it.measurements
         insightsList += it.insights
     }
 
+     */
+
     // Merge measurements
-    val measurements = measurementsList.mergeMultiIterResults()
+    val measurements = iterationResults.map { it.measurements }.mergeMultiIterResults()
     require(measurements.isNotEmpty()) {
         """
             Unable to read any metrics during benchmark (metric list: $metrics).
@@ -334,6 +335,8 @@ private fun macrobenchmark(
             .trimIndent()
     }
 
+    val iterationTracePaths = iterationResults.map { it.tracePath }
+    val profilerResults = iterationResults.flatMap { it.profilerResultFiles }
     InstrumentationResults.instrumentationReport {
         reportSummaryToIde(
             warningMessage = warningMessage,
@@ -341,11 +344,10 @@ private fun macrobenchmark(
             measurements = measurements,
             insights =
                 createInsightsIdeSummary(
-                    insightsList,
                     experimentalConfig?.startupInsightsConfig,
-                    tracePaths
+                    iterationResults
                 ),
-            iterationTracePaths = tracePaths,
+            iterationTracePaths = iterationTracePaths,
             profilerResults = profilerResults,
             useTreeDisplayFormat = experimentalConfig?.startupInsightsConfig?.isEnabled == true
         )
@@ -366,7 +368,7 @@ private fun macrobenchmark(
         }
 
     val mergedProfilerOutputs =
-        (tracePaths.mapIndexed { index, it ->
+        (iterationTracePaths.mapIndexed { index, it ->
                 Profiler.ResultFile.ofPerfettoTrace(
                     label = "Trace Iteration $index",
                     absolutePath = it

@@ -26,8 +26,18 @@ import androidx.annotation.RestrictTo
  *
  * @param criterion A description of the performance issue, including the expected behavior and any
  *   relevant thresholds.
- * @param observed Specific details about when and how the violation occurred, such as the
- *   iterations where it was observed and any associated values.
+ * @param observedV2 Specific details about when and how the violation occurred, such as the
+ *   iterations where it was observed and any associated values. Uses [LinkFormat.V2].
+ * @param observedV3 Specific details about when and how the violation occurred, such as the
+ *   iterations where it was observed and any associated values. Uses [LinkFormat.V3] to link more
+ *   precisely into traces.
+ *
+ * TODO(364598145): generalize
+ * TODO: Defer string construction until InstrumentationResults output step
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) // TODO(364598145): generalise
-data class Insight(val criterion: String, val observed: String)
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+data class Insight(
+    val criterion: String,
+    val observedV2: String,
+    val observedV3: String,
+)

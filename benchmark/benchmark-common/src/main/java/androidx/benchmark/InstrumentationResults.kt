@@ -27,8 +27,14 @@ import org.jetbrains.annotations.TestOnly
 
 /** Wrapper for multi studio version link format */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-data class IdeSummaryPair(val summaryV2: String) {
-    constructor(v2lines: List<String>) : this(summaryV2 = v2lines.joinToString("\n"))
+data class IdeSummaryPair(val summaryV2: String, val summaryV3: String = summaryV2) {
+    constructor(
+        v2lines: List<String>,
+        v3lines: List<String> = v2lines,
+    ) : this(
+        summaryV2 = v2lines.joinToString("\n"),
+        summaryV3 = v3lines.joinToString("\n"),
+    )
 
     /** Fallback for very old versions of Studio */
     val summaryV1: String
@@ -43,14 +49,27 @@ class InstrumentationResultScope(val bundle: Bundle = Bundle()) {
         /**
          * V2 output string, supports linking to files in the output dir via links of the format
          * `[link](file://<relative-path-to-trace>`).
+         *
+         * @see LinkFormat.V2
          */
-        summaryV2: String
+        summaryV2: String,
+        /**
+         * V3 output string, supports linking to files with query parameters of the format
+         * `[link](uri://<relative-path-to-trace>?<queryParam>=<queryParamValue>`).
+         *
+         * @see TraceDeepLink
+         * @see LinkFormat.V3
+         */
+        summaryV3: String,
     ) {
         bundle.putString(IDE_V1_SUMMARY_KEY, summaryV2) // deprecating v1 with a "graceful" fallback
+
         // Outputs.outputDirectory is safe to use in the context of Studio currently.
         // This is because AGP does not populate the `additionalTestOutputDir` argument.
         bundle.putString(IDE_V2_OUTPUT_DIR_PATH_KEY, Outputs.outputDirectory.absolutePath)
         bundle.putString(IDE_V2_SUMMARY_KEY, summaryV2)
+        bundle.putString(IDE_V3_OUTPUT_DIR_PATH_KEY, Outputs.outputDirectory.absolutePath)
+        bundle.putString(IDE_V3_SUMMARY_KEY, summaryV3)
     }
 
     fun reportSummaryToIde(
@@ -76,7 +95,7 @@ class InstrumentationResultScope(val bundle: Bundle = Bundle()) {
                 insights = insights,
                 useTreeDisplayFormat = useTreeDisplayFormat
             )
-        reportIdeSummary(summaryV2 = summaryPair.summaryV2)
+        reportIdeSummary(summaryV2 = summaryPair.summaryV2, summaryV3 = summaryPair.summaryV3)
     }
 
     public fun fileRecord(key: String, path: String) {
@@ -89,6 +108,10 @@ class InstrumentationResultScope(val bundle: Bundle = Bundle()) {
         private const val IDE_V2_OUTPUT_DIR_PATH_KEY =
             "android.studio.v2display.benchmark.outputDirPath"
         private const val IDE_V2_SUMMARY_KEY = "android.studio.v2display.benchmark"
+
+        private const val IDE_V3_OUTPUT_DIR_PATH_KEY =
+            "android.studio.v3display.benchmark.outputDirPath"
+        private const val IDE_V3_SUMMARY_KEY = "android.studio.v3display.benchmark"
     }
 }
 
@@ -263,63 +286,72 @@ object InstrumentationResults {
             v2metricLines = emptyList()
         }
 
-        val v2lines =
-            if (!useTreeDisplayFormat) { // use the regular output format
-                val v2traceLinks =
-                    if (linkableIterTraces.isNotEmpty()) {
-                        listOf(
-                            "    Traces: Iteration " +
-                                linkableIterTraces
-                                    .mapIndexed { index, path -> createFileLink("$index", path) }
-                                    .joinToString(" ")
-                        )
-                    } else {
-                        emptyList()
-                    } +
-                        profilerResults.map {
-                            "    ${createFileLink(it.label, it.outputRelativePath)}"
+        if (!useTreeDisplayFormat) { // use the regular output format
+            val v2traceLinks =
+                if (linkableIterTraces.isNotEmpty()) {
+                    listOf(
+                        "    Traces: Iteration " +
+                            linkableIterTraces
+                                .mapIndexed { index, path -> createFileLink("$index", path) }
+                                .joinToString(" ")
+                    )
+                } else {
+                    emptyList()
+                } + profilerResults.map { "    ${createFileLink(it.label, it.outputRelativePath)}" }
+            return IdeSummaryPair(
+                v2lines =
+                    listOfNotNull(warningMessage, testName, message) +
+                        v2metricLines +
+                        v2traceLinks +
+                        "" /* adds \n */
+            )
+        } else { // use the experimental tree-like output format
+            val formatLines =
+                LinkFormat.entries.associateWith { linkFormat ->
+                    buildList {
+                        if (warningMessage != null) add(warningMessage)
+                        if (testName != null) add(testName)
+                        if (message != null) add(message)
+                        val tree = TreeBuilder()
+                        if (v2metricLines.isNotEmpty()) {
+                            tree.append("Metrics", 0)
+                            for (metric in v2metricLines) tree.append(metric, 1)
                         }
-                listOfNotNull(warningMessage, testName, message) +
-                    v2metricLines +
-                    v2traceLinks +
-                    "" /* adds \n */
-            } else { // use the experimental tree-like output format
-                buildList {
-                    if (warningMessage != null) add(warningMessage)
-                    if (testName != null) add(testName)
-                    if (message != null) add(message)
-                    val tree = TreeBuilder()
-                    if (v2metricLines.isNotEmpty()) {
-                        tree.append("Metrics", 0)
-                        for (metric in v2metricLines) tree.append(metric, 1)
-                    }
-                    if (insights.isNotEmpty()) {
-                        tree.append("App Startup Insights", 0)
-                        for ((criterion, observed) in insights) {
-                            tree.append(criterion, 1)
-                            tree.append(observed, 2)
+                        if (insights.isNotEmpty()) {
+                            tree.append("App Startup Insights", 0)
+                            for (insight in insights) {
+                                tree.append(insight.criterion, 1)
+                                val observed =
+                                    when (linkFormat) {
+                                        LinkFormat.V2 -> insight.observedV2
+                                        LinkFormat.V3 -> insight.observedV3
+                                    }
+                                tree.append(observed, 2)
+                            }
                         }
-                    }
-                    if (linkableIterTraces.isNotEmpty() || profilerResults.isNotEmpty()) {
-                        tree.append("Traces", 0)
-                        if (linkableIterTraces.isNotEmpty())
-                            tree.append(
-                                linkableIterTraces
-                                    .mapIndexed { ix, trace -> createFileLink("$ix", trace) }
-                                    .joinToString(prefix = "Iteration ", separator = " "),
+                        if (linkableIterTraces.isNotEmpty() || profilerResults.isNotEmpty()) {
+                            tree.append("Traces", 0)
+                            if (linkableIterTraces.isNotEmpty())
+                                tree.append(
+                                    linkableIterTraces
+                                        .mapIndexed { ix, trace -> createFileLink("$ix", trace) }
+                                        .joinToString(prefix = "Iteration ", separator = " "),
+                                    1
+                                )
+                            for (line in profilerResults) tree.append(
+                                createFileLink(line.label, line.outputRelativePath),
                                 1
                             )
-                        for (line in profilerResults) tree.append(
-                            createFileLink(line.label, line.outputRelativePath),
-                            1
-                        )
+                        }
+                        addAll(tree.build())
+                        add("")
                     }
-                    addAll(tree.build())
-                    add("")
                 }
-            }
-
-        return IdeSummaryPair(v2lines = v2lines)
+            return IdeSummaryPair(
+                v2lines = formatLines[LinkFormat.V2]!!,
+                v3lines = formatLines[LinkFormat.V3]!!
+            )
+        }
     }
 
     /**

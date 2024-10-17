@@ -21,6 +21,7 @@ import android.util.Log
 import androidx.benchmark.ExperimentalBenchmarkConfigApi
 import androidx.benchmark.ExperimentalConfig
 import androidx.benchmark.Profiler
+import androidx.benchmark.TraceDeepLink
 import androidx.benchmark.inMemoryTrace
 import androidx.benchmark.perfetto.PerfettoCapture
 import androidx.benchmark.perfetto.PerfettoCaptureWrapper
@@ -54,21 +55,15 @@ internal class MethodTracingProfiler(private val scope: MacrobenchmarkScope) : P
     }
 }
 
-/** Results obtained from running a Macrobenchmark Phase. */
-internal data class PhaseResult(
-    /**
-     * A list of Perfetto trace paths obtained. Typically a single trace in this list represents one
-     * iteration of a Macrobenchmark Phase.
-     */
-    val tracePaths: List<String> = emptyList(),
-    /** A list of profiler results obtained during a Macrobenchmark Phase. */
-    val profilerResults: List<Profiler.ResultFile> = emptyList(),
-    /** The list of measurements obtained per-iteration from the Macrobenchmark Phase. */
-    val measurements: List<List<Metric.Measurement>> = emptyList(),
-    val insights: List<List<AndroidStartupMetric.SlowStartReason>> = emptyList()
+internal data class IterationResult(
+    val tracePath: String,
+    val profilerResultFiles: List<Profiler.ResultFile>,
+    val measurements: List<Metric.Measurement>,
+    val insights: List<AndroidStartupMetric.SlowStartReason>,
+    val defaultStartupInsightSelectionParams: TraceDeepLink.SelectionParams?,
 )
 
-/** Run a Macrobenchmark Phase and collect the [PhaseResult]. */
+/** Run a Macrobenchmark Phase and collect a list of [IterationResult]. */
 @ExperimentalBenchmarkConfigApi
 internal fun PerfettoTraceProcessor.runPhase(
     uniqueName: String,
@@ -83,14 +78,10 @@ internal fun PerfettoTraceProcessor.runPhase(
     perfettoSdkConfig: PerfettoCapture.PerfettoSdkConfig?,
     setupBlock: MacrobenchmarkScope.() -> Unit,
     measureBlock: MacrobenchmarkScope.() -> Unit
-): PhaseResult {
+): List<IterationResult> {
     // Perfetto collector is separate from metrics, so we can control file
     // output, and give it different (test-wide) lifecycle
     val perfettoCollector = PerfettoCaptureWrapper()
-    val tracePaths = mutableListOf<String>()
-    val measurements = mutableListOf<List<Metric.Measurement>>()
-    val insights = mutableListOf<List<AndroidStartupMetric.SlowStartReason>>()
-    val profilerResultFiles = mutableListOf<Profiler.ResultFile>()
     val captureInfo =
         Metric.CaptureInfo.forLocalCapture(
             targetPackageName = packageName,
@@ -99,7 +90,7 @@ internal fun PerfettoTraceProcessor.runPhase(
     try {
         // Configure metrics in the Phase.
         metrics.forEach { it.configure(captureInfo) }
-        List(iterations) { iteration ->
+        return List<IterationResult>(iterations) { iteration ->
             // Wake the device to ensure it stays awake with large iteration count
             inMemoryTrace("wake device") { scope.device.wakeUp() }
 
@@ -110,6 +101,8 @@ internal fun PerfettoTraceProcessor.runPhase(
             // Setup file labels.
             val iterString = iteration.toString().padStart(3, '0')
             scope.fileLabel = "${uniqueName}_iter$iterString"
+
+            var profilerResultFiles: List<Profiler.ResultFile> = emptyList()
 
             val tracePath =
                 perfettoCollector.record(
@@ -151,55 +144,57 @@ internal fun PerfettoTraceProcessor.runPhase(
                         profiler?.let {
                             trace("stop profiler") {
                                 // Keep track of Profiler Results.
-                                profilerResultFiles += it.stop()
+                                profilerResultFiles = it.stop()
                             }
                         }
                         trace("stop metrics") { metrics.forEach { it.stop() } }
                     }
                 }!!
 
-            // Accumulate Trace Paths
-            tracePaths.add(tracePath)
-
             // Append UI state to trace, so tools opening trace will highlight relevant
             // parts in UI.
             val uiState = UiState(highlightPackage = packageName)
-
             Log.d(TAG, "Iteration $iteration captured $uiState")
             File(tracePath).apply { appendUiState(uiState) }
 
             // Accumulate measurements
             loadTrace(PerfettoTrace(tracePath)) {
-                // Extracts the insights using the perfetto trace processor
-                if (experimentalConfig?.startupInsightsConfig?.isEnabled == true) {
-                    inMemoryTrace("extract insights") {
-                        insights +=
-                            TraceMetrics.ADAPTER.decode(
-                                    queryMetricsProtoBinary(listOf("android_startup"))
-                                )
-                                .android_startup
-                                ?.startup
-                                ?.flatMap { it.slow_start_reason_with_details } ?: emptyList()
-                    }
-                }
-                // Extracts the metrics using the perfetto trace processor
-                inMemoryTrace("extract metrics") {
-                    measurements +=
-                        metrics
-                            // capture list of Measurements
-                            .map { it.getMeasurements(captureInfo, this) }
-                            // merge together
-                            .reduceOrNull() { sum, element -> sum.merge(element) } ?: emptyList()
-                }
+                IterationResult(
+                    tracePath = tracePath,
+                    profilerResultFiles = profilerResultFiles,
+
+                    // Extracts the metrics using the perfetto trace processor
+                    measurements =
+                        inMemoryTrace("extract metrics") {
+                            metrics
+                                // capture list of Measurements
+                                .map { it.getMeasurements(captureInfo, this) }
+                                // merge together
+                                .reduceOrNull() { sum, element -> sum.merge(element) }
+                                ?: emptyList()
+                        },
+
+                    // Extracts the insights using the perfetto trace processor
+                    insights =
+                        if (experimentalConfig?.startupInsightsConfig?.isEnabled == true) {
+                            inMemoryTrace("extract insights") {
+                                TraceMetrics.ADAPTER.decode(
+                                        queryMetricsProtoBinary(listOf("android_startup"))
+                                    )
+                                    .android_startup
+                                    ?.startup
+                                    ?.flatMap { it.slow_start_reason_with_details } ?: emptyList()
+                            }
+                        } else emptyList(),
+
+                    // Extracts a default startup selection param for deep link construction
+                    // Eventually, this should be removed in favor of extracting info from insights
+                    defaultStartupInsightSelectionParams =
+                        extractStartupSliceSelectionParams(packageName = packageName)
+                )
             }
         }
     } finally {
         scope.killProcess()
     }
-    return PhaseResult(
-        tracePaths = tracePaths,
-        profilerResults = profilerResultFiles,
-        measurements = measurements,
-        insights = insights
-    )
 }
