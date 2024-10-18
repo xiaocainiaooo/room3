@@ -221,8 +221,6 @@ package androidx.collection {
     ctor public FloatFloatPair(float first, float second);
     method public inline operator float component1();
     method public inline operator float component2();
-    method public inline float getFirst();
-    method public inline float getSecond();
     property public final inline float first;
     property public final long packedValue;
     property public final inline float second;
@@ -619,8 +617,6 @@ package androidx.collection {
     ctor public IntIntPair(int first, int second);
     method public inline operator int component1();
     method public inline operator int component2();
-    method public int getFirst();
-    method public int getSecond();
     property public final int first;
     property public final long packedValue;
     property public final int second;

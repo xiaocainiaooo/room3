@@ -623,13 +623,6 @@ package androidx.compose.ui.text {
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class TextRange {
     method public operator boolean contains(int offset);
     method public operator boolean contains(long other);
-    method public boolean getCollapsed();
-    method public int getEnd();
-    method public int getLength();
-    method public int getMax();
-    method public int getMin();
-    method public boolean getReversed();
-    method public int getStart();
     method public boolean intersects(long other);
     property public final boolean collapsed;
     property public final int end;
@@ -1454,9 +1447,6 @@ package androidx.compose.ui.text.style {
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class LineBreak {
     ctor public LineBreak(int strategy, int strictness, int wordBreak);
     method public int copy(optional int strategy, optional int strictness, optional int wordBreak);
-    method public int getStrategy();
-    method public int getStrictness();
-    method public int getWordBreak();
     property public final int strategy;
     property public final int strictness;
     property public final int wordBreak;
