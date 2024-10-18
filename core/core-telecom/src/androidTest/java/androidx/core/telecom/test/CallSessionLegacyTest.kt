@@ -132,6 +132,7 @@ class CallSessionLegacyTest : BaseTelecomTest() {
     ): CallSessionLegacy {
         return CallSessionLegacy(
             getRandomParcelUuid(),
+            mContext,
             TestUtils.INCOMING_CALL_ATTRIBUTES,
             CallChannels(),
             coroutineContext,

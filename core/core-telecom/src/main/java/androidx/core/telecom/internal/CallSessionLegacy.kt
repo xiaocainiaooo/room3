@@ -17,7 +17,10 @@
 package androidx.core.telecom.internal
 
 import android.bluetooth.BluetoothDevice
-import android.os.Build
+import android.content.Context
+import android.content.IntentFilter
+import android.media.AudioManager
+import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.os.ParcelUuid
@@ -40,6 +43,7 @@ import androidx.core.telecom.internal.utils.EndpointUtils.Companion.isEarpieceEn
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.isWiredHeadsetOrBtEndpoint
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.toCallEndpointCompat
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.toCallEndpointsCompat
+import androidx.core.telecom.internal.utils.Utils.Companion.isBuildAtLeastP
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -52,6 +56,7 @@ import kotlinx.coroutines.launch
 @RequiresApi(VERSION_CODES.O)
 internal class CallSessionLegacy(
     private val id: ParcelUuid,
+    private val mContext: Context,
     private val attributes: CallAttributesCompat,
     private val callChannels: CallChannels,
     private val coroutineContext: CoroutineContext,
@@ -74,8 +79,16 @@ internal class CallSessionLegacy(
     private var mAvailableCallEndpoints: List<CallEndpointCompat>? = null
     private var mLastClientRequestedEndpoint: CallEndpointCompat? = null
     private val mCallSessionLegacyId: Int = CallEndpointUuidTracker.startSession()
+    private var mGlobalMuteStateReceiver: MuteStateReceiver? = null
 
     init {
+        if (isBuildAtLeastP()) {
+            mGlobalMuteStateReceiver = MuteStateReceiver(::onGlobalMuteStateChanged)
+            mContext.registerReceiver(
+                mGlobalMuteStateReceiver,
+                IntentFilter(AudioManager.ACTION_MICROPHONE_MUTE_CHANGED)
+            )
+        }
         CoroutineScope(coroutineContext).launch {
             val state =
                 if (attributes.isOutgoingCall()) CallStateEvent.DIALING else CallStateEvent.RINGING
@@ -129,6 +142,17 @@ internal class CallSessionLegacy(
      * Audio Updates
      * =========================================================================================
      */
+    fun onGlobalMuteStateChanged(isMuted: Boolean) {
+        callChannels.isMutedChannel.trySend(isMuted).getOrThrow()
+        CoroutineScope(coroutineContext).launch {
+            if (isMuted) {
+                onStateChangedCallback.emit(CallStateEvent.GLOBAL_MUTED)
+            } else {
+                onStateChangedCallback.emit(CallStateEvent.GLOBAL_UNMUTE)
+            }
+        }
+    }
+
     @VisibleForTesting
     internal fun toRemappedCallEndpointCompat(endpoint: CallEndpointCompat): CallEndpointCompat {
         val jetpackUuid =
@@ -159,20 +183,14 @@ internal class CallSessionLegacy(
     }
 
     override fun onCallAudioStateChanged(state: CallAudioState) {
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.P) {
+        if (VERSION.SDK_INT >= VERSION_CODES.P) {
             Api28PlusImpl.refreshBluetoothDeviceCache(mCachedBluetoothDevices, state)
         }
         try {
             setCurrentCallEndpoint(state)
             setAvailableCallEndpoints(state)
-            callChannels.isMutedChannel.trySend(state.isMuted).getOrThrow()
-            CoroutineScope(coroutineContext).launch {
-                if (state.isMuted) {
-                    onStateChangedCallback.emit(CallStateEvent.GLOBAL_MUTED)
-                } else {
-                    onStateChangedCallback.emit(CallStateEvent.GLOBAL_UNMUTE)
-                }
-            }
+            onGlobalMuteStateChanged(state.isMuted)
+
             // On the first call audio state change, determine if the platform started on the
             // correct audio route.  Otherwise, request an endpoint switch.
             if (mAvailableCallEndpoints != null) {
@@ -369,7 +387,7 @@ internal class CallSessionLegacy(
         // cache the last CallEndpoint the user requested to reference in audio callbacks
         mLastClientRequestedEndpoint = callEndpoint
         return if (
-            Build.VERSION.SDK_INT <
+            VERSION.SDK_INT <
                 VERSION_CODES.P || /* In the event the client hasn't accepted BLUETOOTH_CONNECT,
                   let the platform decide */
                 (callEndpoint.name == EndpointUtils.BLUETOOTH_DEVICE_DEFAULT_NAME)
@@ -605,5 +623,8 @@ internal class CallSessionLegacy(
     override fun close() {
         Log.i(TAG, "close: CallSessionLegacyId=[$mCallSessionLegacyId]")
         CallEndpointUuidTracker.endSession(mCallSessionLegacyId)
+        if (isBuildAtLeastP() && mGlobalMuteStateReceiver != null) {
+            mContext.unregisterReceiver(mGlobalMuteStateReceiver)
+        }
     }
 }

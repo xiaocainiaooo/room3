@@ -66,7 +66,7 @@ class ExtensionProvider : PreviewParameterProvider<ExtensionUiState> {
     override val values =
         sequenceOf(
             ExtensionUiState(
-                LocalCallSilenceExtensionUiState(true, null),
+                LocalCallSilenceExtensionUiState(true, {}, null),
                 ParticipantExtensionUiState(
                     isRaiseHandSupported = true,
                     isKickParticipantSupported = true,
@@ -114,10 +114,13 @@ fun ExtensionsContent(
                 OutlinedIconButton(
                     onClick = {
                         scope.launch {
-                            extensionUiState.localCallSilenceUiState.extension
-                                ?.requestLocalCallSilenceUpdate(
-                                    !extensionUiState.localCallSilenceUiState.isLocallySilenced
-                                )
+                            val lcsData = extensionUiState.localCallSilenceUiState
+                            val isSilenced = !lcsData.isLocallySilenced
+                            val res = lcsData.extension?.requestLocalCallSilenceUpdate(isSilenced)
+                            if (res == CallControlResult.Success()) {
+                                // update the InCallService UI
+                                lcsData.onInCallServiceUiUpdate(isSilenced)
+                            }
                         }
                     }
                 ) {

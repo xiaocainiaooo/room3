@@ -16,7 +16,9 @@
 
 package androidx.core.telecom.test.utils
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
@@ -474,5 +476,29 @@ class TestCallCallbackListener(private val scope: CoroutineScope) : ITestAppCont
                     .first()
             }
         assertEquals("kick participant action never received", expectedParticipant, result?.second)
+    }
+}
+
+class TestMuteStateReceiver(private val scope: CoroutineScope) : BroadcastReceiver() {
+    private val isMutedFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
+
+    suspend fun waitForGlobalMuteState(isMuted: Boolean, id: String = "") {
+        val result =
+            withTimeoutOrNull(5000) {
+                isMutedFlow
+                    .filter {
+                        Log.i("TestMuteStateReceiver", "received $isMuted")
+                        it == isMuted
+                    }
+                    .first()
+            }
+        assertEquals("Global Mute State {$id} never reached the expected state", isMuted, result)
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        if (AudioManager.ACTION_MICROPHONE_MUTE_CHANGED == intent.action) {
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            scope.launch { isMutedFlow.emit(audioManager.isMicrophoneMute) }
+        }
     }
 }

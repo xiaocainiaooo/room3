@@ -241,6 +241,7 @@ class JetpackConnectionServiceTest : BaseTelecomTest() {
             mConnectionService.maybeReplaceAddress(
                 JetpackConnectionService.PendingConnectionRequest(
                     "1",
+                    mContext,
                     attributes,
                     callChannels,
                     mWorkerContext,
@@ -291,6 +292,7 @@ class JetpackConnectionServiceTest : BaseTelecomTest() {
         val pr =
             JetpackConnectionService.PendingConnectionRequest(
                 pendingRequestId,
+                mContext,
                 callAttributesCompat,
                 callChannels,
                 mWorkerContext,

@@ -145,10 +145,11 @@ class OngoingCallsViewModel(private val callProvider: RemoteCallProvider = Remot
         localCallSilenceExtensionData: LocalCallSilenceData?
     ): LocalCallSilenceExtensionUiState {
         if (localCallSilenceExtensionData == null) {
-            return LocalCallSilenceExtensionUiState(false, null)
+            return LocalCallSilenceExtensionUiState(false, {}, null)
         }
         return LocalCallSilenceExtensionUiState(
             localCallSilenceExtensionData.isLocallySilenced,
+            localCallSilenceExtensionData.onInCallServiceUiUpdate,
             localCallSilenceExtensionData.extension
         )
     }
