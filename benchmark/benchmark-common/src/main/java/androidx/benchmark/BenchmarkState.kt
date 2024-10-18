@@ -319,6 +319,11 @@ class BenchmarkState internal constructor(phaseConfig: MicrobenchmarkPhase.Confi
             profilerResult = phaseProfilerResult
         }
 
+        // Warm up the metrics data structure to reduce the impact on the first measurement.
+        currentMetrics.captureStart()
+        currentMetrics.captureStop()
+        currentMetrics.captureInit()
+
         currentMetrics.captureStart()
         return true
     }
