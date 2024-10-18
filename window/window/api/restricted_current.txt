@@ -7,6 +7,13 @@ package androidx.window {
   }
 
   public final class WindowProperties {
+    property public static final String PROPERTY_ACTIVITY_EMBEDDING_ALLOW_SYSTEM_OVERRIDE;
+    property public static final String PROPERTY_ACTIVITY_EMBEDDING_SPLITS_ENABLED;
+    property public static final String PROPERTY_COMPAT_ALLOW_IGNORING_ORIENTATION_REQUEST_WHEN_LOOP_DETECTED;
+    property public static final String PROPERTY_COMPAT_ALLOW_MIN_ASPECT_RATIO_OVERRIDE;
+    property public static final String PROPERTY_COMPAT_ALLOW_RESIZEABLE_ACTIVITY_OVERRIDES;
+    property public static final String PROPERTY_COMPAT_ALLOW_USER_ASPECT_RATIO_FULLSCREEN_OVERRIDE;
+    property public static final String PROPERTY_COMPAT_ALLOW_USER_ASPECT_RATIO_OVERRIDE;
     field public static final androidx.window.WindowProperties INSTANCE;
     field public static final String PROPERTY_ACTIVITY_EMBEDDING_ALLOW_SYSTEM_OVERRIDE = "android.window.PROPERTY_ACTIVITY_EMBEDDING_ALLOW_SYSTEM_OVERRIDE";
     field public static final String PROPERTY_ACTIVITY_EMBEDDING_SPLITS_ENABLED = "android.window.PROPERTY_ACTIVITY_EMBEDDING_SPLITS_ENABLED";
@@ -46,6 +53,8 @@ package androidx.window.area {
   }
 
   public static final class WindowAreaCapability.Operation.Companion {
+    property public final androidx.window.area.WindowAreaCapability.Operation OPERATION_PRESENT_ON_AREA;
+    property public final androidx.window.area.WindowAreaCapability.Operation OPERATION_TRANSFER_ACTIVITY_TO_AREA;
   }
 
   @SuppressCompatibility @androidx.window.core.ExperimentalWindowApi public static final class WindowAreaCapability.Status {
@@ -57,6 +66,10 @@ package androidx.window.area {
   }
 
   public static final class WindowAreaCapability.Status.Companion {
+    property public final androidx.window.area.WindowAreaCapability.Status WINDOW_AREA_STATUS_ACTIVE;
+    property public final androidx.window.area.WindowAreaCapability.Status WINDOW_AREA_STATUS_AVAILABLE;
+    property public final androidx.window.area.WindowAreaCapability.Status WINDOW_AREA_STATUS_UNAVAILABLE;
+    property public final androidx.window.area.WindowAreaCapability.Status WINDOW_AREA_STATUS_UNSUPPORTED;
   }
 
   @SuppressCompatibility @androidx.window.core.ExperimentalWindowApi public abstract class WindowAreaController {
@@ -90,6 +103,7 @@ package androidx.window.area {
   }
 
   public static final class WindowAreaInfo.Type.Companion {
+    property public final androidx.window.area.WindowAreaInfo.Type TYPE_REAR_FACING;
   }
 
   @SuppressCompatibility @androidx.window.core.ExperimentalWindowApi public interface WindowAreaPresentationSessionCallback {
@@ -187,6 +201,8 @@ package androidx.window.embedding {
   }
 
   public static final class DividerAttributes.Companion {
+    property public final androidx.window.embedding.DividerAttributes NO_DIVIDER;
+    property public static final int WIDTH_SYSTEM_DEFAULT;
   }
 
   public abstract static class DividerAttributes.DragRange {
@@ -195,6 +211,7 @@ package androidx.window.embedding {
   }
 
   public static final class DividerAttributes.DragRange.Companion {
+    property public final androidx.window.embedding.DividerAttributes.DragRange DRAG_RANGE_SYSTEM_DEFAULT;
   }
 
   public static final class DividerAttributes.DragRange.SplitRatioDragRange extends androidx.window.embedding.DividerAttributes.DragRange {
@@ -255,6 +272,7 @@ package androidx.window.embedding {
 
   public static final class EmbeddingAnimationBackground.Companion {
     method public androidx.window.embedding.EmbeddingAnimationBackground.ColorBackground createColorBackground(@ColorInt @IntRange(from=android.graphics.Color.BLACK.toLong(), to=android.graphics.Color.WHITE.toLong()) int color);
+    property public final androidx.window.embedding.EmbeddingAnimationBackground DEFAULT;
   }
 
   public final class EmbeddingAnimationParams {
@@ -280,6 +298,8 @@ package androidx.window.embedding {
   }
 
   public static final class EmbeddingAnimationParams.AnimationSpec.Companion {
+    property public final androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec DEFAULT;
+    property public final androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec JUMP_CUT;
   }
 
   public static final class EmbeddingAnimationParams.Builder {
@@ -300,6 +320,8 @@ package androidx.window.embedding {
 
   public static final class EmbeddingAspectRatio.Companion {
     method public androidx.window.embedding.EmbeddingAspectRatio ratio(@FloatRange(from=1.0, fromInclusive=false) float ratio);
+    property public final androidx.window.embedding.EmbeddingAspectRatio ALWAYS_ALLOW;
+    property public final androidx.window.embedding.EmbeddingAspectRatio ALWAYS_DISALLOW;
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class EmbeddingBounds {
@@ -327,9 +349,18 @@ package androidx.window.embedding {
   }
 
   public static final class EmbeddingBounds.Alignment.Companion {
+    property public final androidx.window.embedding.EmbeddingBounds.Alignment ALIGN_BOTTOM;
+    property public final androidx.window.embedding.EmbeddingBounds.Alignment ALIGN_LEFT;
+    property public final androidx.window.embedding.EmbeddingBounds.Alignment ALIGN_RIGHT;
+    property public final androidx.window.embedding.EmbeddingBounds.Alignment ALIGN_TOP;
   }
 
   public static final class EmbeddingBounds.Companion {
+    property public final androidx.window.embedding.EmbeddingBounds BOUNDS_EXPANDED;
+    property public final androidx.window.embedding.EmbeddingBounds BOUNDS_HINGE_BOTTOM;
+    property public final androidx.window.embedding.EmbeddingBounds BOUNDS_HINGE_LEFT;
+    property public final androidx.window.embedding.EmbeddingBounds BOUNDS_HINGE_RIGHT;
+    property public final androidx.window.embedding.EmbeddingBounds BOUNDS_HINGE_TOP;
   }
 
   public abstract static class EmbeddingBounds.Dimension {
@@ -343,6 +374,8 @@ package androidx.window.embedding {
   public static final class EmbeddingBounds.Dimension.Companion {
     method public androidx.window.embedding.EmbeddingBounds.Dimension pixel(@IntRange(from=1L) @Px int value);
     method public androidx.window.embedding.EmbeddingBounds.Dimension ratio(@FloatRange(from=0.0, fromInclusive=false, to=1.0, toInclusive=false) float ratio);
+    property public final androidx.window.embedding.EmbeddingBounds.Dimension DIMENSION_EXPANDED;
+    property public final androidx.window.embedding.EmbeddingBounds.Dimension DIMENSION_HINGE;
   }
 
   public final class EmbeddingConfiguration {
@@ -370,6 +403,9 @@ package androidx.window.embedding {
   }
 
   public static final class EmbeddingConfiguration.DimAreaBehavior.Companion {
+    property public final androidx.window.embedding.EmbeddingConfiguration.DimAreaBehavior ON_ACTIVITY_STACK;
+    property public final androidx.window.embedding.EmbeddingConfiguration.DimAreaBehavior ON_TASK;
+    property public final androidx.window.embedding.EmbeddingConfiguration.DimAreaBehavior UNDEFINED;
   }
 
   public abstract class EmbeddingRule {
@@ -509,6 +545,11 @@ package androidx.window.embedding {
   }
 
   public static final class SplitAttributes.LayoutDirection.Companion {
+    property public final androidx.window.embedding.SplitAttributes.LayoutDirection BOTTOM_TO_TOP;
+    property public final androidx.window.embedding.SplitAttributes.LayoutDirection LEFT_TO_RIGHT;
+    property public final androidx.window.embedding.SplitAttributes.LayoutDirection LOCALE;
+    property public final androidx.window.embedding.SplitAttributes.LayoutDirection RIGHT_TO_LEFT;
+    property public final androidx.window.embedding.SplitAttributes.LayoutDirection TOP_TO_BOTTOM;
   }
 
   public static final class SplitAttributes.SplitType {
@@ -521,6 +562,9 @@ package androidx.window.embedding {
 
   public static final class SplitAttributes.SplitType.Companion {
     method public androidx.window.embedding.SplitAttributes.SplitType ratio(@FloatRange(from=0.0, to=1.0, fromInclusive=false, toInclusive=false) float ratio);
+    property public final androidx.window.embedding.SplitAttributes.SplitType SPLIT_TYPE_EQUAL;
+    property public final androidx.window.embedding.SplitAttributes.SplitType SPLIT_TYPE_EXPAND;
+    property public final androidx.window.embedding.SplitAttributes.SplitType SPLIT_TYPE_HINGE;
   }
 
   public final class SplitAttributesCalculatorParams {
@@ -563,6 +607,9 @@ package androidx.window.embedding {
   }
 
   public static final class SplitController.SplitSupportStatus.Companion {
+    property public final androidx.window.embedding.SplitController.SplitSupportStatus SPLIT_AVAILABLE;
+    property public final androidx.window.embedding.SplitController.SplitSupportStatus SPLIT_ERROR_PROPERTY_NOT_DECLARED;
+    property public final androidx.window.embedding.SplitController.SplitSupportStatus SPLIT_UNAVAILABLE;
   }
 
   public final class SplitInfo {
@@ -677,6 +724,10 @@ package androidx.window.embedding {
   }
 
   public static final class SplitRule.Companion {
+    property public final androidx.window.embedding.EmbeddingAspectRatio SPLIT_MAX_ASPECT_RATIO_LANDSCAPE_DEFAULT;
+    property public final androidx.window.embedding.EmbeddingAspectRatio SPLIT_MAX_ASPECT_RATIO_PORTRAIT_DEFAULT;
+    property public static final int SPLIT_MIN_DIMENSION_ALWAYS_ALLOW;
+    property public static final int SPLIT_MIN_DIMENSION_DP_DEFAULT;
   }
 
   public static final class SplitRule.FinishBehavior {
@@ -687,6 +738,9 @@ package androidx.window.embedding {
   }
 
   public static final class SplitRule.FinishBehavior.Companion {
+    property public final androidx.window.embedding.SplitRule.FinishBehavior ADJACENT;
+    property public final androidx.window.embedding.SplitRule.FinishBehavior ALWAYS;
+    property public final androidx.window.embedding.SplitRule.FinishBehavior NEVER;
   }
 
 }
@@ -716,6 +770,8 @@ package androidx.window.layout {
   }
 
   public static final class FoldingFeature.OcclusionType.Companion {
+    property public final androidx.window.layout.FoldingFeature.OcclusionType FULL;
+    property public final androidx.window.layout.FoldingFeature.OcclusionType NONE;
   }
 
   public static final class FoldingFeature.Orientation {
@@ -725,6 +781,8 @@ package androidx.window.layout {
   }
 
   public static final class FoldingFeature.Orientation.Companion {
+    property public final androidx.window.layout.FoldingFeature.Orientation HORIZONTAL;
+    property public final androidx.window.layout.FoldingFeature.Orientation VERTICAL;
   }
 
   public static final class FoldingFeature.State {
@@ -734,6 +792,8 @@ package androidx.window.layout {
   }
 
   public static final class FoldingFeature.State.Companion {
+    property public final androidx.window.layout.FoldingFeature.State FLAT;
+    property public final androidx.window.layout.FoldingFeature.State HALF_OPENED;
   }
 
   public final class SupportedPosture {
@@ -742,6 +802,7 @@ package androidx.window.layout {
   }
 
   public static final class SupportedPosture.Companion {
+    property public final androidx.window.layout.SupportedPosture TABLETOP;
   }
 
   public interface WindowInfoTracker {

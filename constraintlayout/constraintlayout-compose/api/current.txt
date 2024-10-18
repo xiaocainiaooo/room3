@@ -722,6 +722,7 @@ package androidx.constraintlayout.compose {
     method public float getStaggeredWeight(androidx.constraintlayout.compose.ConstrainScope);
     method public void setStaggeredWeight(androidx.constraintlayout.compose.ConstrainScope, float);
     method public void transition(androidx.constraintlayout.compose.ConstraintSetRef from, androidx.constraintlayout.compose.ConstraintSetRef to, optional String? name, kotlin.jvm.functions.Function1<? super androidx.constraintlayout.compose.TransitionScope,kotlin.Unit> transitionContent);
+    property public final float staggeredWeight;
   }
 
   public final class MotionSceneScope.ConstrainedLayoutReferences {

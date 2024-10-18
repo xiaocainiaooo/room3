@@ -545,6 +545,17 @@ package androidx.compose.ui.graphics {
   }
 
   public static final class Matrix.Companion {
+    property public static final int Perspective0;
+    property public static final int Perspective1;
+    property public static final int Perspective2;
+    property public static final int ScaleX;
+    property public static final int ScaleY;
+    property public static final int ScaleZ;
+    property public static final int SkewX;
+    property public static final int SkewY;
+    property public static final int TranslateX;
+    property public static final int TranslateY;
+    property public static final int TranslateZ;
   }
 
   public final class MatrixKt {
@@ -636,6 +647,7 @@ package androidx.compose.ui.graphics {
   }
 
   public final class PaintKt {
+    property public static final float DefaultAlpha;
     field public static final float DefaultAlpha = 1.0f;
   }
 
@@ -1410,6 +1422,8 @@ package androidx.compose.ui.graphics.drawscope {
     method public int getDefaultJoin();
     property public final int DefaultCap;
     property public final int DefaultJoin;
+    property public static final float DefaultMiter;
+    property public static final float HairlineWidth;
   }
 
 }
@@ -1511,6 +1525,7 @@ package androidx.compose.ui.graphics.layer {
   public final class GraphicsLayerKt {
     method public static void drawLayer(androidx.compose.ui.graphics.drawscope.DrawScope, androidx.compose.ui.graphics.layer.GraphicsLayer graphicsLayer);
     method public static void setOutline(androidx.compose.ui.graphics.layer.GraphicsLayer, androidx.compose.ui.graphics.Outline outline);
+    property public static final float DefaultCameraDistance;
     field public static final float DefaultCameraDistance = 8.0f;
   }
 

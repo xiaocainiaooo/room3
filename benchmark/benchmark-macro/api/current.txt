@@ -17,6 +17,7 @@ package androidx.benchmark.macro {
   }
 
   public static final class CompilationMode.Companion {
+    property public final androidx.benchmark.macro.CompilationMode DEFAULT;
   }
 
   public static final class CompilationMode.Full extends androidx.benchmark.macro.CompilationMode {

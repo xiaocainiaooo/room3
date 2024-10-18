@@ -26,6 +26,13 @@ package androidx.core.telecom {
   }
 
   public static final class CallAttributesCompat.Companion {
+    property public static final int CALL_TYPE_AUDIO_CALL;
+    property public static final int CALL_TYPE_VIDEO_CALL;
+    property public static final int DIRECTION_INCOMING;
+    property public static final int DIRECTION_OUTGOING;
+    property public static final int SUPPORTS_SET_INACTIVE;
+    property public static final int SUPPORTS_STREAM;
+    property public static final int SUPPORTS_TRANSFER;
   }
 
   public abstract sealed class CallControlResult {
@@ -75,6 +82,12 @@ package androidx.core.telecom {
   }
 
   public static final class CallEndpointCompat.Companion {
+    property public static final int TYPE_BLUETOOTH;
+    property public static final int TYPE_EARPIECE;
+    property public static final int TYPE_SPEAKER;
+    property public static final int TYPE_STREAMING;
+    property public static final int TYPE_UNKNOWN;
+    property public static final int TYPE_WIRED_HEADSET;
   }
 
   public final class CallException extends java.lang.RuntimeException {
@@ -94,6 +107,14 @@ package androidx.core.telecom {
   }
 
   public static final class CallException.Companion {
+    property public static final int ERROR_BLUETOOTH_DEVICE_IS_NULL;
+    property public static final int ERROR_CALL_CANNOT_BE_SET_TO_ACTIVE;
+    property public static final int ERROR_CALL_DOES_NOT_SUPPORT_HOLD;
+    property public static final int ERROR_CALL_IS_NOT_BEING_TRACKED;
+    property public static final int ERROR_CALL_NOT_PERMITTED_AT_PRESENT_TIME;
+    property public static final int ERROR_CANNOT_HOLD_CURRENT_ACTIVE_CALL;
+    property public static final int ERROR_OPERATION_TIMED_OUT;
+    property public static final int ERROR_UNKNOWN;
   }
 
   @RequiresApi(android.os.Build.VERSION_CODES.O) public final class CallsManager implements androidx.core.telecom.extensions.CallsManagerExtensions {
@@ -109,6 +130,9 @@ package androidx.core.telecom {
   }
 
   public static final class CallsManager.Companion {
+    property public static final int CAPABILITY_BASELINE;
+    property public static final int CAPABILITY_SUPPORTS_CALL_STREAMING;
+    property public static final int CAPABILITY_SUPPORTS_VIDEO_CALLING;
   }
 
   @RequiresApi(android.os.Build.VERSION_CODES.O) public class InCallServiceCompat extends android.telecom.InCallService implements androidx.core.telecom.extensions.CallExtensions androidx.lifecycle.LifecycleOwner {

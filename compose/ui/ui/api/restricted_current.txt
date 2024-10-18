@@ -132,6 +132,9 @@ package androidx.compose.ui {
   }
 
   @SuppressCompatibility @androidx.compose.ui.ExperimentalComposeUiApi public final class ComposeUiFlags {
+    property public final boolean NewNestedScrollFlingDispatchingEnabled;
+    property public final boolean isRectTrackingEnabled;
+    property public final boolean isSemanticAutofillEnabled;
     field public static final androidx.compose.ui.ComposeUiFlags INSTANCE;
     field public static boolean NewNestedScrollFlingDispatchingEnabled;
     field public static boolean isRectTrackingEnabled;
@@ -880,6 +883,7 @@ package androidx.compose.ui.graphics {
     method public static androidx.compose.ui.graphics.GraphicsLayerScope GraphicsLayerScope();
     method public static long getDefaultShadowColor();
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableOpenTarget(index=0xffffffff) public static androidx.compose.ui.graphics.layer.GraphicsLayer rememberGraphicsLayer();
+    property public static final float DefaultCameraDistance;
     property public static final long DefaultShadowColor;
     field public static final float DefaultCameraDistance = 8.0f;
   }
@@ -1009,10 +1013,24 @@ package androidx.compose.ui.graphics.vector {
     method public static long getDefaultTintColor();
     method public static java.util.List<androidx.compose.ui.graphics.vector.PathNode> getEmptyPath();
     property public static final int DefaultFillType;
+    property public static final String DefaultGroupName;
+    property public static final String DefaultPathName;
+    property public static final float DefaultPivotX;
+    property public static final float DefaultPivotY;
+    property public static final float DefaultRotation;
+    property public static final float DefaultScaleX;
+    property public static final float DefaultScaleY;
     property public static final int DefaultStrokeLineCap;
     property public static final int DefaultStrokeLineJoin;
+    property public static final float DefaultStrokeLineMiter;
+    property public static final float DefaultStrokeLineWidth;
     property public static final int DefaultTintBlendMode;
     property public static final long DefaultTintColor;
+    property public static final float DefaultTranslationX;
+    property public static final float DefaultTranslationY;
+    property public static final float DefaultTrimPathEnd;
+    property public static final float DefaultTrimPathOffset;
+    property public static final float DefaultTrimPathStart;
     property public static final java.util.List<androidx.compose.ui.graphics.vector.PathNode> EmptyPath;
     field public static final String DefaultGroupName = "";
     field public static final String DefaultPathName = "";
@@ -1044,6 +1062,7 @@ package androidx.compose.ui.graphics.vector {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableOpenTarget(index=0xffffffff) public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional int tintBlendMode, optional boolean autoMirror, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
     method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableOpenTarget(index=0xffffffff) public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional int tintBlendMode, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
+    property public static final String RootGroupName;
     field public static final String RootGroupName = "VectorRootGroup";
   }
 
@@ -2251,6 +2270,7 @@ package androidx.compose.ui.layout {
   }
 
   public static final class AlignmentLine.Companion {
+    property public static final int Unspecified;
   }
 
   public final class AlignmentLineKt {
@@ -2475,6 +2495,7 @@ package androidx.compose.ui.layout {
     method public androidx.compose.ui.layout.LayoutCoordinates getLookaheadScopeCoordinates(androidx.compose.ui.layout.Placeable.PlacementScope);
     method public default long localLookaheadPositionOf(androidx.compose.ui.layout.LayoutCoordinates, androidx.compose.ui.layout.LayoutCoordinates sourceCoordinates, optional long relativeToSource, optional boolean includeMotionFrameOfReference);
     method public androidx.compose.ui.layout.LayoutCoordinates toLookaheadCoordinates(androidx.compose.ui.layout.LayoutCoordinates);
+    property public androidx.compose.ui.layout.LayoutCoordinates lookaheadScopeCoordinates;
   }
 
   public final class LookaheadScopeKt {
@@ -2772,6 +2793,7 @@ package androidx.compose.ui.modifier {
     method public default <T> T getCurrent(androidx.compose.ui.modifier.ModifierLocal<T>);
     method public default androidx.compose.ui.modifier.ModifierLocalMap getProvidedValues();
     method public default <T> void provide(androidx.compose.ui.modifier.ModifierLocal<T> key, T value);
+    property public T current;
     property public default androidx.compose.ui.modifier.ModifierLocalMap providedValues;
   }
 
@@ -2798,6 +2820,7 @@ package androidx.compose.ui.modifier {
 
   public interface ModifierLocalReadScope {
     method public <T> T getCurrent(androidx.compose.ui.modifier.ModifierLocal<T>);
+    property public T current;
   }
 
   @androidx.compose.runtime.Stable public final class ProvidableModifierLocal<T> extends androidx.compose.ui.modifier.ModifierLocal<T> {
@@ -3940,11 +3963,38 @@ package androidx.compose.ui.semantics {
     method public static void setTraversalIndex(androidx.compose.ui.semantics.SemanticsPropertyReceiver, float);
     method public static void setVerticalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange);
     method public static void showTextSubstitution(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function1<? super java.lang.Boolean,java.lang.Boolean>? action);
+    property public final androidx.compose.ui.semantics.CollectionInfo collectionInfo;
+    property public final androidx.compose.ui.semantics.CollectionItemInfo collectionItemInfo;
+    property public final int contentDataType;
+    property public final androidx.compose.ui.autofill.ContentType contentType;
+    property public final java.util.List<? extends androidx.compose.ui.semantics.CustomAccessibilityAction> customActions;
+    property public final androidx.compose.ui.text.AnnotatedString editableText;
+    property public final boolean focused;
+    property public final androidx.compose.ui.semantics.ScrollAxisRange horizontalScrollAxisRange;
+    property @Deprecated public final int imeAction;
+    property @Deprecated public final boolean isContainer;
+    property public final boolean isEditable;
+    property public final boolean isShowingTextSubstitution;
+    property public final boolean isTraversalGroup;
+    property public final int liveRegion;
+    property public final int maxTextLength;
+    property public final String paneTitle;
+    property public final androidx.compose.ui.semantics.ProgressBarRangeInfo progressBarRangeInfo;
+    property public final int role;
+    property public final boolean selected;
+    property public final String stateDescription;
+    property public final String testTag;
+    property public final long textSelectionRange;
+    property public final androidx.compose.ui.text.AnnotatedString textSubstitution;
+    property public final androidx.compose.ui.state.ToggleableState toggleableState;
+    property public final float traversalIndex;
+    property public final androidx.compose.ui.semantics.ScrollAxisRange verticalScrollAxisRange;
   }
 
   public final class SemanticsProperties_androidKt {
     method public static boolean getTestTagsAsResourceId(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void setTestTagsAsResourceId(androidx.compose.ui.semantics.SemanticsPropertyReceiver, boolean);
+    property public final boolean testTagsAsResourceId;
   }
 
   public final class SemanticsPropertyKey<T> {

@@ -81,6 +81,16 @@ package androidx.core.uwb {
   }
 
   public static final class RangingParameters.Companion {
+    property public static final int CONFIG_MULTICAST_DS_TWR;
+    property public static final int CONFIG_PROVISIONED_INDIVIDUAL_MULTICAST_DS_TWR;
+    property public static final int CONFIG_PROVISIONED_MULTICAST_DS_TWR;
+    property public static final int CONFIG_PROVISIONED_UNICAST_DS_TWR;
+    property public static final int CONFIG_UNICAST_DS_TWR;
+    property public static final long RANGING_SLOT_DURATION_1_MILLIS;
+    property public static final long RANGING_SLOT_DURATION_2_MILLIS;
+    property public static final int RANGING_UPDATE_RATE_AUTOMATIC;
+    property public static final int RANGING_UPDATE_RATE_FREQUENT;
+    property public static final int RANGING_UPDATE_RATE_INFREQUENT;
   }
 
   public final class RangingPosition {

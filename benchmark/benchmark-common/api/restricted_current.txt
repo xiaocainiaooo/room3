@@ -9,6 +9,7 @@ package androidx.benchmark {
     method public void pauseTiming();
     method @SuppressCompatibility @androidx.benchmark.BenchmarkState.Companion.ExperimentalExternalReport public static void reportData(String className, String testName, @IntRange(from=0L) long totalRunTimeNs, java.util.List<java.lang.Long> dataNs, @IntRange(from=0L) int warmupIterations, @IntRange(from=0L) long thermalThrottleSleepSeconds, @IntRange(from=1L) int repeatIterations);
     method public void resumeTiming();
+    property @kotlin.PublishedApi internal final int iterationsRemaining;
     field public static final androidx.benchmark.BenchmarkState.Companion Companion;
     field @kotlin.PublishedApi internal int iterationsRemaining;
   }
@@ -84,6 +85,7 @@ package androidx.benchmark {
   }
 
   public static final class ProfilerConfig.MethodTracing.Companion {
+    property public final boolean AFFECTS_MEASUREMENTS_ON_THIS_DEVICE;
   }
 
   public static final class ProfilerConfig.StackSampling extends androidx.benchmark.ProfilerConfig {

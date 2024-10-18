@@ -25,6 +25,11 @@ package androidx.security.state {
   }
 
   public static final class SecurityPatchState.Companion {
+    property public static final String COMPONENT_KERNEL;
+    property public static final String COMPONENT_SYSTEM;
+    property public static final String COMPONENT_SYSTEM_MODULES;
+    property public final java.util.List<? extends java.lang.String> DEFAULT_SYSTEM_MODULES;
+    property public static final String DEFAULT_VULNERABILITY_REPORTS_URL;
   }
 
   public static final class SecurityPatchState.DateBasedSecurityPatchLevel extends androidx.security.state.SecurityPatchState.SecurityPatchLevel {
@@ -83,6 +88,9 @@ package androidx.security.state {
   }
 
   public static final class SecurityStateManager.Companion {
+    property public static final String KEY_KERNEL_VERSION;
+    property public static final String KEY_SYSTEM_SPL;
+    property public static final String KEY_VENDOR_SPL;
   }
 
   public final class UpdateInfo {
