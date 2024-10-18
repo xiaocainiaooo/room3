@@ -795,9 +795,9 @@ class CarouselTest {
             Row {
                 Column(
                     Modifier.focusProperties {
-                            enter = {
+                            onEnter = {
                                 focusRequester.requestFocus()
-                                FocusRequester.Cancel
+                                cancelFocus()
                             }
                         }
                         .focusGroup()
