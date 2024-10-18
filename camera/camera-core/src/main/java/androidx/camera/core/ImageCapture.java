@@ -1349,54 +1349,8 @@ public final class ImageCapture extends UseCase {
             mImagePipeline.close();
         }
 
-        boolean isPostviewEnabled =
-                getCurrentConfig().retrieveOption(OPTION_POSTVIEW_ENABLED, false);
-        Size postViewSize = null;
-        int postviewFormat = ImageFormat.YUV_420_888;
-
-        if (isPostviewEnabled) {
-            SessionProcessor sessionProcessor = getSessionProcessor();
-            if (sessionProcessor != null) {
-                ResolutionSelector postviewSizeSelector =
-                        getCurrentConfig().retrieveOption(OPTION_POSTVIEW_RESOLUTION_SELECTOR,
-                                null);
-                Map<Integer, List<Size>> map =
-                        sessionProcessor.getSupportedPostviewSize(resolution);
-                // Prefer YUV because it takes less time to decode to bitmap.
-                List<Size> sizes = map.get(ImageFormat.YUV_420_888);
-                if (sizes == null || sizes.isEmpty()) {
-                    sizes = map.get(JPEG);
-                    postviewFormat = JPEG;
-                }
-
-                if (sizes != null && !sizes.isEmpty()) {
-                    if (postviewSizeSelector != null) {
-                        Collections.sort(sizes, new CompareSizesByArea(true));
-                        CameraInternal camera = getCamera();
-                        Rect sensorRect = camera.getCameraControlInternal().getSensorRect();
-                        CameraInfoInternal cameraInfo = camera.getCameraInfoInternal();
-                        Rational fullFov = new Rational(sensorRect.width(), sensorRect.height());
-                        List<Size> result =
-                                SupportedOutputSizesSorter
-                                        .sortSupportedOutputSizesByResolutionSelector(
-                                                postviewSizeSelector,
-                                                sizes,
-                                                null,
-                                                getTargetRotation(),
-                                                fullFov,
-                                                cameraInfo.getSensorRotationDegrees(),
-                                                cameraInfo.getLensFacing());
-                        if (result.isEmpty()) {
-                            throw new IllegalArgumentException("The postview ResolutionSelector "
-                                    + "cannot select a valid size for the postview.");
-                        }
-                        postViewSize = result.get(0);
-                    } else {
-                        postViewSize = Collections.max(sizes, new CompareSizesByArea());
-                    }
-                }
-            }
-        }
+        PostviewSettings postviewSettings = isPostviewEnabled() ? calculatePostviewSettings(
+                resolution) : null;
 
         CameraCharacteristics cameraCharacteristics = null;
         if (getCamera() != null) {
@@ -1409,9 +1363,6 @@ public final class ImageCapture extends UseCase {
                 Log.e(TAG, "getCameraCharacteristics failed", e);
             }
         }
-
-        PostviewSettings postviewSettings = postViewSize == null ? null : PostviewSettings.create(
-                postViewSize, postviewFormat);
 
         mImagePipeline = new ImagePipeline(config, resolution, cameraCharacteristics, getEffect(),
                 isVirtualCamera, postviewSettings);
@@ -1455,6 +1406,73 @@ public final class ImageCapture extends UseCase {
                 });
         sessionConfigBuilder.setErrorListener(mCloseableErrorListener);
         return sessionConfigBuilder;
+    }
+
+    /**
+     * Calculates the best format and size to generate the postview output bitmap according to the
+     * info retrieved from the use case config.
+     *
+     * @param targetResolution the target resolution of the still image
+     * @return the settings for the postview, or <code>null</code> if no supported format or
+     * output size can be found.
+     */
+    @Nullable
+    private PostviewSettings calculatePostviewSettings(@NonNull Size targetResolution) {
+        SessionProcessor sessionProcessor = getSessionProcessor();
+
+        // No session processor can be found which is necessary for supporting postview
+        if (sessionProcessor == null) {
+            return null;
+        }
+
+        Map<Integer, List<Size>> formatSizesMap = sessionProcessor.getSupportedPostviewSize(
+                targetResolution);
+
+        int format = ImageFormat.UNKNOWN;
+        // Prefer YUV because it takes less time to decode to bitmap.
+        if (isPostviewImageFormatSupported(formatSizesMap, ImageFormat.YUV_420_888)) {
+            format = ImageFormat.YUV_420_888;
+        } else if (isPostviewImageFormatSupported(formatSizesMap, ImageFormat.JPEG)) {
+            format = ImageFormat.JPEG;
+        } else if (isPostviewImageFormatSupported(formatSizesMap, ImageFormat.JPEG_R)) {
+            format = ImageFormat.JPEG_R;
+        }
+
+        // No supported postview image format can be found
+        if (format == ImageFormat.UNKNOWN) {
+            return null;
+        }
+
+        List<Size> sizes = formatSizesMap.get(format);
+        ResolutionSelector postviewSizeSelector = getCurrentConfig().retrieveOption(
+                OPTION_POSTVIEW_RESOLUTION_SELECTOR, null);
+
+        if (postviewSizeSelector != null) {
+            Collections.sort(sizes, new CompareSizesByArea(true));
+            CameraInternal camera = getCamera();
+            Rect sensorRect = camera.getCameraControlInternal().getSensorRect();
+            CameraInfoInternal cameraInfo = camera.getCameraInfoInternal();
+            Rational fullFov = new Rational(sensorRect.width(), sensorRect.height());
+            List<Size> result =
+                    SupportedOutputSizesSorter.sortSupportedOutputSizesByResolutionSelector(
+                            postviewSizeSelector, sizes, null, getTargetRotation(), fullFov,
+                            cameraInfo.getSensorRotationDegrees(), cameraInfo.getLensFacing());
+
+            if (result.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "The postview ResolutionSelector cannot select a valid size for the "
+                                + "postview.");
+            }
+            return PostviewSettings.create(result.get(0), format);
+        } else {
+            return PostviewSettings.create(Collections.max(sizes, new CompareSizesByArea()),
+                    format);
+        }
+    }
+
+    private boolean isPostviewImageFormatSupported(@NonNull Map<Integer, List<Size>> formatSizesMap,
+            int format) {
+        return formatSizesMap.containsKey(format) && !formatSizesMap.get(format).isEmpty();
     }
 
     /**
