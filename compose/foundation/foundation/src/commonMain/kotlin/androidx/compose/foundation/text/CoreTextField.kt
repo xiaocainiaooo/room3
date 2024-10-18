@@ -82,6 +82,7 @@ import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalAutofillManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -311,6 +312,7 @@ internal fun CoreTextField(
     manager.clipboardManager = LocalClipboardManager.current
     manager.textToolbar = LocalTextToolbar.current
     manager.hapticFeedBack = LocalHapticFeedback.current
+    manager.autofillManager = LocalAutofillManager.current
     manager.focusRequester = focusRequester
     manager.editable = !readOnly
     manager.enabled = enabled

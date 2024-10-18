@@ -30,4 +30,5 @@ internal fun TextFieldSelectionState.contextMenuBuilder(
     }
     TextItem(state, TextContextMenuItems.Paste, enabled = canPaste()) { paste() }
     TextItem(state, TextContextMenuItems.SelectAll, enabled = canSelectAll()) { selectAll() }
+    TextItem(state, TextContextMenuItems.Autofill, enabled = canAutofill()) { autofill() }
 }
