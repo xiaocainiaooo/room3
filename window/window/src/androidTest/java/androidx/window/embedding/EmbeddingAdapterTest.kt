@@ -655,8 +655,14 @@ class EmbeddingAdapterTest {
                 .setDividerColor(Color.GRAY)
                 .build()
 
-        assertEquals(oemDividerAttributes, adapter.translateDividerAttributes(dividerAttributes))
-        assertEquals(dividerAttributes, adapter.translateDividerAttributes(oemDividerAttributes))
+        assertEquals(
+            oemDividerAttributes,
+            adapter.translateToOemDividerAttributes(dividerAttributes),
+        )
+        assertEquals(
+            dividerAttributes,
+            adapter.translateToJetpackDividerAttributes(oemDividerAttributes),
+        )
     }
 
     @Test
@@ -673,7 +679,10 @@ class EmbeddingAdapterTest {
                 .setDividerColor(Color.GRAY)
                 .build()
 
-        assertEquals(oemDividerAttributes, adapter.translateDividerAttributes(dividerAttributes))
+        assertEquals(
+            oemDividerAttributes,
+            adapter.translateToOemDividerAttributes(dividerAttributes),
+        )
     }
 
     @Test
