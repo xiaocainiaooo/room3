@@ -21,7 +21,6 @@ dependencies {
     samples("androidx.window:window-samples:1.3.0")
 
     docsForOptionalProject(":xr:xr")
-    docsForOptionalProject(":xr:xr-material3-adaptive")
     docsForOptionalProject(":xr:runtime:runtime")
     docs(project(":activity:activity"))
     docs(project(":activity:activity-compose"))
@@ -414,6 +413,7 @@ dependencies {
     docs(project(":work:work-rxjava2"))
     docs(project(":work:work-rxjava3"))
     docs(project(":work:work-testing"))
+    docs(project(":xr:compose:material3:material3"))
 }
 afterEvaluate {
   tasks["docs"].doFirst {
