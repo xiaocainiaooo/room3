@@ -624,8 +624,6 @@ package androidx.compose.animation.core {
 
   @kotlin.jvm.JvmInline public final value class StartOffset {
     ctor public StartOffset(int offsetMillis, optional int offsetType);
-    method public int getOffsetMillis();
-    method public int getOffsetType();
     property public final int offsetMillis;
     property public final int offsetType;
   }

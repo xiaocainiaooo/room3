@@ -331,9 +331,6 @@ package androidx.constraintlayout.compose {
 
   @kotlin.jvm.JvmInline public final value class DebugFlags {
     ctor public DebugFlags(optional boolean showBounds, optional boolean showPaths, optional boolean showKeyPositions);
-    method public boolean getShowBounds();
-    method public boolean getShowKeyPositions();
-    method public boolean getShowPaths();
     property public final boolean showBounds;
     property public final boolean showKeyPositions;
     property public final boolean showPaths;
@@ -426,7 +423,6 @@ package androidx.constraintlayout.compose {
   }
 
   @kotlin.jvm.JvmInline public final value class GridFlag {
-    method public boolean isPlaceLayoutsOnSpansFirst();
     method public infix int or(int other);
     property public final boolean isPlaceLayoutsOnSpansFirst;
     field public static final androidx.constraintlayout.compose.GridFlag.Companion Companion;

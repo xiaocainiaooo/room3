@@ -892,8 +892,6 @@ package androidx.compose.ui.graphics {
     method @androidx.compose.runtime.Stable public inline operator float component1();
     method @androidx.compose.runtime.Stable public inline operator float component2();
     method public long copy(optional float pivotFractionX, optional float pivotFractionY);
-    method public float getPivotFractionX();
-    method public float getPivotFractionY();
     property @kotlin.PublishedApi internal final long packedValue;
     property public final float pivotFractionX;
     property public final float pivotFractionY;
@@ -2687,8 +2685,6 @@ package androidx.compose.ui.layout {
     method public long copy(optional float scaleX, optional float scaleY);
     method @androidx.compose.runtime.Stable public operator long div(float operand);
     method public long getPackedValue();
-    method public inline float getScaleX();
-    method public inline float getScaleY();
     method @androidx.compose.runtime.Stable public operator long times(float operand);
     property public final long packedValue;
     property @androidx.compose.runtime.Stable public final inline float scaleX;
@@ -3027,11 +3023,6 @@ package androidx.compose.ui.node {
   }
 
   @kotlin.jvm.JvmInline public final value class TouchBoundsExpansion {
-    method public int getBottom();
-    method public int getEnd();
-    method public int getStart();
-    method public int getTop();
-    method public boolean isLayoutDirectionAware();
     property public final int bottom;
     property public final int end;
     property public final boolean isLayoutDirectionAware;

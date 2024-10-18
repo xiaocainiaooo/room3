@@ -8,8 +8,6 @@ package androidx.compose.ui.geometry {
     method public long copy(optional float x, optional float y);
     method @androidx.compose.runtime.Stable public operator long div(float operand);
     method public long getPackedValue();
-    method public inline float getX();
-    method public inline float getY();
     method @androidx.compose.runtime.Stable public inline boolean isCircular();
     method @androidx.compose.runtime.Stable public inline boolean isZero();
     method @androidx.compose.runtime.Stable public operator long minus(long other);
@@ -128,8 +126,6 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public float getDistance();
     method @androidx.compose.runtime.Stable public float getDistanceSquared();
     method public long getPackedValue();
-    method public inline float getX();
-    method public inline float getY();
     method @androidx.compose.runtime.Stable public inline boolean isValid();
     method @androidx.compose.runtime.Stable public operator long minus(long other);
     method @androidx.compose.runtime.Stable public operator long plus(long other);
@@ -300,11 +296,7 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public inline operator float component2();
     method public long copy(optional float width, optional float height);
     method @androidx.compose.runtime.Stable public operator long div(float operand);
-    method public inline float getHeight();
-    method public float getMaxDimension();
-    method public float getMinDimension();
     method public long getPackedValue();
-    method public inline float getWidth();
     method @androidx.compose.runtime.Stable public boolean isEmpty();
     method @androidx.compose.runtime.Stable public operator long times(float operand);
     property @androidx.compose.runtime.Stable public final inline float height;
