@@ -35,6 +35,7 @@ package androidx.health.connect.client.testing {
   }
 
   public static final class FakeHealthConnectClient.Companion {
+    property public static final String DEFAULT_PACKAGE_NAME;
   }
 
   public final class FakeHealthConnectClientOverrides {

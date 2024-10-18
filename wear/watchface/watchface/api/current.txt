@@ -34,6 +34,8 @@ package androidx.wear.watchface {
   }
 
   public final class CanvasType {
+    property public static final int HARDWARE;
+    property public static final int SOFTWARE;
     field public static final int HARDWARE = 1; // 0x1
     field public static final androidx.wear.watchface.CanvasType INSTANCE;
     field public static final int SOFTWARE = 0; // 0x0
@@ -108,6 +110,9 @@ package androidx.wear.watchface {
   }
 
   public final class ComplicationSlotBoundsType {
+    property public static final int BACKGROUND;
+    property public static final int EDGE;
+    property public static final int ROUND_RECT;
     field public static final int BACKGROUND = 1; // 0x1
     field public static final int EDGE = 2; // 0x2
     field public static final androidx.wear.watchface.ComplicationSlotBoundsType INSTANCE;
@@ -179,6 +184,7 @@ package androidx.wear.watchface {
   }
 
   public static final class RenderParameters.Companion {
+    property public final androidx.wear.watchface.RenderParameters DEFAULT_INTERACTIVE;
   }
 
   public static final class RenderParameters.HighlightLayer {
@@ -351,6 +357,9 @@ package androidx.wear.watchface {
   }
 
   public final class TapType {
+    property public static final int CANCEL;
+    property public static final int DOWN;
+    property public static final int UP;
     field public static final int CANCEL = 1; // 0x1
     field public static final int DOWN = 0; // 0x0
     field public static final androidx.wear.watchface.TapType INSTANCE;
@@ -451,9 +460,12 @@ package androidx.wear.watchface {
   }
 
   public static final class WatchFaceService.Companion {
+    property public static final int MAX_CREATE_WATCHFACE_TIME_MILLIS;
   }
 
   public final class WatchFaceType {
+    property public static final int ANALOG;
+    property public static final int DIGITAL;
     field public static final int ANALOG = 0; // 0x0
     field public static final int DIGITAL = 1; // 0x1
     field public static final androidx.wear.watchface.WatchFaceType INSTANCE;

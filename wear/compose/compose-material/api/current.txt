@@ -793,6 +793,8 @@ package androidx.wear.compose.material {
     method public float getVelocityThreshold();
     method public androidx.wear.compose.material.ResistanceConfig? resistanceConfig(java.util.Set<java.lang.Float> anchors, optional float factorAtMin, optional float factorAtMax);
     property public final androidx.compose.animation.core.SpringSpec<java.lang.Float> AnimationSpec;
+    property public static final float StandardResistanceFactor;
+    property public static final float StiffResistanceFactor;
     property public final float VelocityThreshold;
     field public static final androidx.wear.compose.material.SwipeableDefaults INSTANCE;
     field public static final float StandardResistanceFactor = 10.0f;
@@ -867,6 +869,8 @@ package androidx.wear.compose.material {
     method public androidx.wear.compose.material.TimeSource timeSource(String timeFormat);
     method @androidx.compose.runtime.Composable public androidx.compose.ui.text.TextStyle timeTextStyle(optional long background, optional long color, optional long fontSize);
     property public final androidx.compose.foundation.layout.PaddingValues ContentPadding;
+    property public static final String TimeFormat12Hours;
+    property public static final String TimeFormat24Hours;
     field public static final androidx.wear.compose.material.TimeTextDefaults INSTANCE;
     field public static final String TimeFormat12Hours = "h:mm";
     field public static final String TimeFormat24Hours = "HH:mm";

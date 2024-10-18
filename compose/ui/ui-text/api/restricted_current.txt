@@ -842,6 +842,7 @@ package androidx.compose.ui.text.font {
   }
 
   public static final class Font.Companion {
+    property public static final long MaximumAsyncTimeoutMillis;
     field public static final long MaximumAsyncTimeoutMillis = 15000L; // 0x3a98L
   }
 

@@ -131,6 +131,7 @@ package androidx.glance.action {
     method @androidx.compose.runtime.Composable public static androidx.glance.GlanceModifier clickable(androidx.glance.GlanceModifier, optional @DrawableRes int rippleOverride, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method @androidx.compose.runtime.Composable public static androidx.glance.GlanceModifier clickable(androidx.glance.GlanceModifier, optional String? key, optional @DrawableRes int rippleOverride, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method @androidx.compose.runtime.Composable public static androidx.glance.GlanceModifier clickable(androidx.glance.GlanceModifier, kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    property @DrawableRes public static final int NoRippleOverride;
     field @DrawableRes public static final int NoRippleOverride = 0; // 0x0
   }
 

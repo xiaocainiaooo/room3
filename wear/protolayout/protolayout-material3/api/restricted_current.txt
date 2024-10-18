@@ -2,6 +2,8 @@
 package androidx.wear.protolayout.material3 {
 
   public final class ButtonGroupDefaults {
+    property public final androidx.wear.protolayout.LayoutElementBuilders.Spacer DEFAULT_SPACER_BETWEEN_BUTTON_GROUPS;
+    property @Dimension(unit=androidx.annotation.Dimension.Companion.DP) public static final float DEFAULT_SPACER_WIDTH_DP;
     field public static final androidx.wear.protolayout.LayoutElementBuilders.Spacer DEFAULT_SPACER_BETWEEN_BUTTON_GROUPS;
     field @Dimension(unit=androidx.annotation.Dimension.Companion.DP) public static final float DEFAULT_SPACER_WIDTH_DP = 4.0f;
     field public static final androidx.wear.protolayout.material3.ButtonGroupDefaults INSTANCE;
@@ -16,6 +18,34 @@ package androidx.wear.protolayout.material3 {
   }
 
   public final class ColorTokens {
+    property public static final int BACKGROUND;
+    property public static final int ERROR;
+    property public static final int ERROR_CONTAINER;
+    property public static final int ON_BACKGROUND;
+    property public static final int ON_ERROR;
+    property public static final int ON_ERROR_CONTAINER;
+    property public static final int ON_PRIMARY;
+    property public static final int ON_PRIMARY_CONTAINER;
+    property public static final int ON_SECONDARY;
+    property public static final int ON_SECONDARY_CONTAINER;
+    property public static final int ON_SURFACE;
+    property public static final int ON_SURFACE_VARIANT;
+    property public static final int ON_TERTIARY;
+    property public static final int ON_TERTIARY_CONTAINER;
+    property public static final int OUTLINE;
+    property public static final int OUTLINE_VARIANT;
+    property public static final int PRIMARY;
+    property public static final int PRIMARY_CONTAINER;
+    property public static final int PRIMARY_DIM;
+    property public static final int SECONDARY;
+    property public static final int SECONDARY_CONTAINER;
+    property public static final int SECONDARY_DIM;
+    property public static final int SURFACE_CONTAINER;
+    property public static final int SURFACE_CONTAINER_HIGH;
+    property public static final int SURFACE_CONTAINER_LOW;
+    property public static final int TERTIARY;
+    property public static final int TERTIARY_CONTAINER;
+    property public static final int TERTIARY_DIM;
     field public static final int BACKGROUND = 0; // 0x0
     field public static final int ERROR = 1; // 0x1
     field public static final int ERROR_CONTAINER = 2; // 0x2
@@ -74,6 +104,8 @@ package androidx.wear.protolayout.material3 {
   }
 
   public static final class EdgeButtonStyle.Companion {
+    property public final androidx.wear.protolayout.material3.EdgeButtonStyle DEFAULT;
+    property public final androidx.wear.protolayout.material3.EdgeButtonStyle TOP_ALIGN;
   }
 
   public final class IconKt {
@@ -100,6 +132,13 @@ package androidx.wear.protolayout.material3 {
   }
 
   public final class Shape {
+    property public static final int CORNER_EXTRA_LARGE;
+    property public static final int CORNER_EXTRA_SMALL;
+    property public static final int CORNER_FULL;
+    property public static final int CORNER_LARGE;
+    property public static final int CORNER_MEDIUM;
+    property public static final int CORNER_NONE;
+    property public static final int CORNER_SMALL;
     field public static final int CORNER_EXTRA_LARGE = 0; // 0x0
     field public static final int CORNER_EXTRA_SMALL = 1; // 0x1
     field public static final int CORNER_FULL = 2; // 0x2
@@ -115,6 +154,26 @@ package androidx.wear.protolayout.material3 {
   }
 
   public final class Typography {
+    property public static final int ARC_MEDIUM;
+    property public static final int ARC_SMALL;
+    property public static final int BODY_EXTRA_SMALL;
+    property public static final int BODY_LARGE;
+    property public static final int BODY_MEDIUM;
+    property public static final int BODY_SMALL;
+    property public static final int DISPLAY_LARGE;
+    property public static final int DISPLAY_MEDIUM;
+    property public static final int DISPLAY_SMALL;
+    property public static final int LABEL_LARGE;
+    property public static final int LABEL_MEDIUM;
+    property public static final int LABEL_SMALL;
+    property public static final int NUMERAL_EXTRA_LARGE;
+    property public static final int NUMERAL_EXTRA_SMALL;
+    property public static final int NUMERAL_LARGE;
+    property public static final int NUMERAL_MEDIUM;
+    property public static final int NUMERAL_SMALL;
+    property public static final int TITLE_LARGE;
+    property public static final int TITLE_MEDIUM;
+    property public static final int TITLE_SMALL;
     field public static final int ARC_MEDIUM = 0; // 0x0
     field public static final int ARC_SMALL = 1; // 0x1
     field public static final int BODY_EXTRA_SMALL = 2; // 0x2

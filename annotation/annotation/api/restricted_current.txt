@@ -78,6 +78,9 @@ package androidx.annotation {
   }
 
   public static final class Dimension.Companion {
+    property public static final int DP;
+    property public static final int PX;
+    property public static final int SP;
     field public static final int DP = 0; // 0x0
     field public static final int PX = 1; // 0x1
     field public static final int SP = 2; // 0x2
@@ -262,6 +265,8 @@ package androidx.annotation {
 
   @java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE, java.lang.annotation.ElementType.METHOD, java.lang.annotation.ElementType.CONSTRUCTOR, java.lang.annotation.ElementType.FIELD, java.lang.annotation.ElementType.PACKAGE}) @kotlin.annotation.MustBeDocumented @kotlin.annotation.Repeatable @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.ANNOTATION_CLASS, kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER, kotlin.annotation.AnnotationTarget.PROPERTY_SETTER, kotlin.annotation.AnnotationTarget.CONSTRUCTOR, kotlin.annotation.AnnotationTarget.FIELD, kotlin.annotation.AnnotationTarget.FILE}) public static @interface RequiresExtension.Container {
     method public abstract androidx.annotation.RequiresExtension[] value();
+    property @IntRange(from=1L) public abstract int extension;
+    property @IntRange(from=1L) public abstract int version;
   }
 
   @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.SOURCE) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.ANNOTATION_CLASS, kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FIELD, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER, kotlin.annotation.AnnotationTarget.PROPERTY_SETTER, kotlin.annotation.AnnotationTarget.CONSTRUCTOR}) public @interface RequiresFeature {
@@ -356,6 +361,10 @@ package androidx.annotation {
   }
 
   public static final class VisibleForTesting.Companion {
+    property public static final int NONE;
+    property public static final int PACKAGE_PRIVATE;
+    property public static final int PRIVATE;
+    property public static final int PROTECTED;
     field public static final int NONE = 5; // 0x5
     field public static final int PACKAGE_PRIVATE = 3; // 0x3
     field public static final int PRIVATE = 2; // 0x2

@@ -13,6 +13,7 @@ package androidx.graphics.shapes {
   }
 
   public static final class CornerRounding.Companion {
+    property public final androidx.graphics.shapes.CornerRounding Unrounded;
   }
 
   public class Cubic {

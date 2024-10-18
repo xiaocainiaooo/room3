@@ -126,6 +126,8 @@ package androidx.wear.watchface.style {
 
   public static final class UserStyleSetting.BooleanUserStyleSetting.BooleanOption.Companion {
     method public androidx.wear.watchface.style.UserStyleSetting.BooleanUserStyleSetting.BooleanOption from(boolean value);
+    property public final androidx.wear.watchface.style.UserStyleSetting.BooleanUserStyleSetting.BooleanOption FALSE;
+    property public final androidx.wear.watchface.style.UserStyleSetting.BooleanUserStyleSetting.BooleanOption TRUE;
   }
 
   public static final class UserStyleSetting.BooleanUserStyleSetting.Builder {
@@ -249,6 +251,7 @@ package androidx.wear.watchface.style {
   }
 
   public static final class UserStyleSetting.Id.Companion {
+    property public static final int MAX_LENGTH;
   }
 
   @RequiresApi(android.os.Build.VERSION_CODES.TIRAMISU) public static final class UserStyleSetting.LargeCustomValueUserStyleSetting extends androidx.wear.watchface.style.UserStyleSetting {
@@ -264,6 +267,7 @@ package androidx.wear.watchface.style {
   }
 
   public static final class UserStyleSetting.LargeCustomValueUserStyleSetting.CustomValueOption.Companion {
+    property public static final int MAX_SIZE;
   }
 
   public static class UserStyleSetting.ListUserStyleSetting extends androidx.wear.watchface.style.UserStyleSetting {
@@ -354,6 +358,7 @@ package androidx.wear.watchface.style {
   }
 
   public static final class UserStyleSetting.Option.Id.Companion {
+    property public static final int MAX_LENGTH;
   }
 
   public static final class UserStyleSetting.WatchFaceEditorData {
@@ -371,6 +376,7 @@ package androidx.wear.watchface.style {
   }
 
   public static final class WatchFaceLayer.Companion {
+    property public final java.util.Set<? extends androidx.wear.watchface.style.WatchFaceLayer> ALL_WATCH_FACE_LAYERS;
   }
 
 }

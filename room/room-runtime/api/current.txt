@@ -4,6 +4,28 @@ package androidx.room {
   public class DatabaseConfiguration {
     method public boolean isMigrationRequired(int fromVersion, int toVersion);
     method @Deprecated public boolean isMigrationRequiredFrom(int version);
+    property public final boolean allowDestructiveMigrationForAllTables;
+    property public final boolean allowDestructiveMigrationOnDowngrade;
+    property public final boolean allowMainThreadQueries;
+    property public final java.util.List<? extends androidx.room.migration.AutoMigrationSpec> autoMigrationSpecs;
+    property public final java.util.List<? extends androidx.room.RoomDatabase.Callback>? callbacks;
+    property public final android.content.Context context;
+    property public final String? copyFromAssetPath;
+    property public final java.io.File? copyFromFile;
+    property public final java.util.concurrent.Callable<java.io.InputStream>? copyFromInputStream;
+    property public final androidx.room.RoomDatabase.JournalMode journalMode;
+    property public final androidx.room.RoomDatabase.MigrationContainer migrationContainer;
+    property public final boolean multiInstanceInvalidation;
+    property public final android.content.Intent? multiInstanceInvalidationServiceIntent;
+    property public final String? name;
+    property public final androidx.room.RoomDatabase.PrepackagedDatabaseCallback? prepackagedDatabaseCallback;
+    property public final kotlin.coroutines.CoroutineContext? queryCoroutineContext;
+    property public final java.util.concurrent.Executor queryExecutor;
+    property public final boolean requireMigration;
+    property public final androidx.sqlite.SQLiteDriver? sqliteDriver;
+    property public final androidx.sqlite.db.SupportSQLiteOpenHelper.Factory? sqliteOpenHelperFactory;
+    property public final java.util.concurrent.Executor transactionExecutor;
+    property public final java.util.List<?> typeConverters;
     field public final boolean allowDestructiveMigrationForAllTables;
     field public final boolean allowDestructiveMigrationOnDowngrade;
     field public final boolean allowMainThreadQueries;
@@ -62,6 +84,7 @@ package androidx.room {
     method public inline <reified T extends androidx.room.RoomDatabase> androidx.room.RoomDatabase.Builder<T> databaseBuilder(android.content.Context context, String name, optional kotlin.jvm.functions.Function0<? extends T> factory);
     method public static <T extends androidx.room.RoomDatabase> androidx.room.RoomDatabase.Builder<T> inMemoryDatabaseBuilder(android.content.Context context, Class<T> klass);
     method public inline <reified T extends androidx.room.RoomDatabase> androidx.room.RoomDatabase.Builder<T> inMemoryDatabaseBuilder(android.content.Context context, optional kotlin.jvm.functions.Function0<? extends T> factory);
+    property public static final String MASTER_TABLE_NAME;
     field public static final androidx.room.Room INSTANCE;
     field public static final String MASTER_TABLE_NAME = "room_master_table";
   }
@@ -229,6 +252,8 @@ package androidx.room.migration {
     ctor public Migration(int startVersion, int endVersion);
     method public void migrate(androidx.sqlite.db.SupportSQLiteDatabase db);
     method public void migrate(androidx.sqlite.SQLiteConnection connection);
+    property public final int endVersion;
+    property public final int startVersion;
     field public final int endVersion;
     field public final int startVersion;
   }
