@@ -39,6 +39,7 @@ import java.lang.annotation.RetentionPolicy;
 public interface FunctionNode extends Node {
     /**
      * Enums representing functions available to use in the query language.
+     * @exportToFramework:hide
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     @Retention(RetentionPolicy.SOURCE)
