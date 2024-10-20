@@ -90,6 +90,8 @@ public class FindInFileView extends LinearLayout {
     private int mSelectedMatch;
     private MatchRects mMatches;
 
+    private OnVisibilityChangedListener mOnVisibilityChangedListener;
+
     private final OnClickListener mOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -177,6 +179,20 @@ public class FindInFileView extends LinearLayout {
         }
     };
 
+    /**
+     *  Listener interface for receiving FindInFile visibility change events.
+     */
+    public interface OnVisibilityChangedListener {
+        /**
+         * Called when the visibility state changes.
+         */
+        void onVisibilityChanged(boolean isVisible);
+    }
+
+    public void setOnVisibilityChangedListener(@Nullable OnVisibilityChangedListener listener) {
+        this.mOnVisibilityChangedListener = listener;
+    }
+
     public FindInFileView(@NonNull Context context) {
         this(context, null);
     }
@@ -196,6 +212,16 @@ public class FindInFileView extends LinearLayout {
         mNextButton.setOnClickListener(mOnClickListener);
         mCloseButton.setOnClickListener(mOnClickListener);
         this.setFocusableInTouchMode(true);
+    }
+
+    @Override
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+
+
+        if (changedView == this && mOnVisibilityChangedListener != null) {
+            mOnVisibilityChangedListener.onVisibilityChanged(visibility == View.VISIBLE);
+        }
     }
 
     @NonNull
