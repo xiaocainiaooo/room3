@@ -3123,6 +3123,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    @FlakyTest(bugId = 364709885)
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun selectionEventBeforeTraverseEvent_whenTraverseTextField() {
         val text = "h"
