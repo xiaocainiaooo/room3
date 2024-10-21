@@ -95,6 +95,7 @@ import androidx.annotation.UiThread;
 import androidx.annotation.VisibleForTesting;
 import androidx.camera.core.imagecapture.ImageCaptureControl;
 import androidx.camera.core.imagecapture.ImagePipeline;
+import androidx.camera.core.imagecapture.PostviewSettings;
 import androidx.camera.core.imagecapture.TakePictureManager;
 import androidx.camera.core.imagecapture.TakePictureRequest;
 import androidx.camera.core.impl.CameraConfig;
@@ -1409,10 +1410,11 @@ public final class ImageCapture extends UseCase {
             }
         }
 
-        mImagePipeline = new ImagePipeline(config, resolution,
-                cameraCharacteristics,
-                getEffect(), isVirtualCamera,
+        PostviewSettings postviewSettings = postViewSize == null ? null : PostviewSettings.create(
                 postViewSize, postviewFormat);
+
+        mImagePipeline = new ImagePipeline(config, resolution, cameraCharacteristics, getEffect(),
+                isVirtualCamera, postviewSettings);
 
         if (mTakePictureManager == null) {
             // mTakePictureManager is reused when the Surface is reset.

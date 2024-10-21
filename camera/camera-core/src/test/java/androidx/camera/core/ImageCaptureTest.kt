@@ -851,7 +851,8 @@ class ImageCaptureTest {
                 )
             )
         cameraUseCaseAdapter.addUseCases(listOf(imageCapture))
-        assertThat(imageCapture.imagePipeline!!.postviewSize).isEqualTo(Size(1920, 1080))
+        assertThat(imageCapture.imagePipeline!!.postviewSettings!!.resolution)
+            .isEqualTo(Size(1920, 1080))
     }
 
     @RequiresApi(23)
@@ -884,7 +885,8 @@ class ImageCaptureTest {
             )
 
         cameraUseCaseAdapter.addUseCases(listOf(imageCapture))
-        assertThat(imageCapture.imagePipeline!!.postviewSize).isEqualTo(Size(1920, 1080))
+        assertThat(imageCapture.imagePipeline!!.postviewSettings!!.resolution)
+            .isEqualTo(Size(1920, 1080))
     }
 
     @RequiresApi(23)
