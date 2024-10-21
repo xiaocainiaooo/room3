@@ -444,7 +444,6 @@ package androidx.compose.ui.graphics {
   }
 
   @kotlin.jvm.JvmInline public final value class ColorMatrix {
-    ctor public ColorMatrix();
     ctor public ColorMatrix(optional float[] values);
     method public void convertRgbToYuv();
     method public void convertYuvToRgb();
@@ -585,7 +584,6 @@ package androidx.compose.ui.graphics {
   }
 
   @kotlin.jvm.JvmInline public final value class Matrix {
-    ctor public Matrix();
     ctor public Matrix(optional float[] values);
     method public inline operator float get(int row, int column);
     method public float[] getValues();
