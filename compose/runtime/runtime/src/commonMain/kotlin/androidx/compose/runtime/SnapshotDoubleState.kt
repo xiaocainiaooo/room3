@@ -24,6 +24,7 @@ import androidx.compose.runtime.internal.equalsWithNanFix
 import androidx.compose.runtime.snapshots.AutoboxingStateValueProperty
 import androidx.compose.runtime.snapshots.GlobalSnapshot
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.snapshots.SnapshotId
 import androidx.compose.runtime.snapshots.SnapshotMutableState
 import androidx.compose.runtime.snapshots.StateFactoryMarker
 import androidx.compose.runtime.snapshots.StateObjectImpl
@@ -31,6 +32,7 @@ import androidx.compose.runtime.snapshots.StateRecord
 import androidx.compose.runtime.snapshots.currentSnapshot
 import androidx.compose.runtime.snapshots.overwritable
 import androidx.compose.runtime.snapshots.readable
+import androidx.compose.runtime.snapshots.toSnapshotId
 import androidx.compose.runtime.snapshots.withCurrent
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
@@ -127,9 +129,10 @@ internal open class SnapshotMutableDoubleStateImpl(value: Double) :
 
     private var next =
         currentSnapshot().let { snapshot ->
-            DoubleStateStateRecord(snapshot.id, value).also {
+            DoubleStateStateRecord(snapshot.snapshotId, value).also {
                 if (snapshot !is GlobalSnapshot) {
-                    it.next = DoubleStateStateRecord(Snapshot.PreexistingSnapshotId, value)
+                    it.next =
+                        DoubleStateStateRecord(Snapshot.PreexistingSnapshotId.toSnapshotId(), value)
                 }
             }
         }
@@ -176,7 +179,7 @@ internal open class SnapshotMutableDoubleStateImpl(value: Double) :
     override fun toString(): String =
         next.withCurrent { "MutableDoubleState(value=${it.value})@${hashCode()}" }
 
-    private class DoubleStateStateRecord(snapshotId: Int, var value: Double) :
+    private class DoubleStateStateRecord(snapshotId: SnapshotId, var value: Double) :
         StateRecord(snapshotId) {
         override fun assign(value: StateRecord) {
             this.value = (value as DoubleStateStateRecord).value
@@ -184,7 +187,7 @@ internal open class SnapshotMutableDoubleStateImpl(value: Double) :
 
         override fun create(): StateRecord = create(snapshotId)
 
-        override fun create(snapshotId: Int): StateRecord =
+        override fun create(snapshotId: SnapshotId): StateRecord =
             DoubleStateStateRecord(snapshotId, value)
     }
 }

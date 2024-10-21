@@ -66,7 +66,7 @@ class SnapshotStateSet<T> : StateObject, MutableSet<T>, RandomAccess {
 
     /** This is an internal implementation class of [SnapshotStateSet]. Do not use. */
     internal class StateSetStateRecord<T>
-    internal constructor(snapshotId: Int, internal var set: PersistentSet<T>) :
+    internal constructor(snapshotId: SnapshotId, internal var set: PersistentSet<T>) :
         StateRecord(snapshotId) {
         internal var modification = 0
 
@@ -78,9 +78,10 @@ class SnapshotStateSet<T> : StateObject, MutableSet<T>, RandomAccess {
             }
         }
 
-        override fun create(): StateRecord = StateSetStateRecord(currentSnapshot().id, set)
+        override fun create(): StateRecord = StateSetStateRecord(currentSnapshot().snapshotId, set)
 
-        override fun create(snapshotId: Int): StateRecord = StateSetStateRecord(snapshotId, set)
+        override fun create(snapshotId: SnapshotId): StateRecord =
+            StateSetStateRecord(snapshotId, set)
     }
 
     override val size: Int
@@ -193,9 +194,9 @@ class SnapshotStateSet<T> : StateObject, MutableSet<T>, RandomAccess {
         }
 
     private fun stateRecordWith(set: PersistentSet<T>): StateRecord {
-        return StateSetStateRecord(currentSnapshot().id, set).also {
+        return StateSetStateRecord(currentSnapshot().snapshotId, set).also {
             if (Snapshot.isInSnapshot) {
-                it.next = StateSetStateRecord(Snapshot.PreexistingSnapshotId, set)
+                it.next = StateSetStateRecord(Snapshot.PreexistingSnapshotId.toSnapshotId(), set)
             }
         }
     }
