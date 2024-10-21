@@ -276,9 +276,11 @@ public class BiometricFragment extends Fragment {
 
         // Some device credential implementations in API 29 cause the prompt to receive a cancel
         // signal immediately after it's shown (b/162022588).
+        // TODO(b/162022588): mViewModel.info hasn't been set. So isDeviceCredentialAllowed()
+        //  check will always be false. Reproduce the bug and fix it.
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q
                 && AuthenticatorUtils.isDeviceCredentialAllowed(
-                    mViewModel.getAllowedAuthenticators())) {
+                mViewModel.getAllowedAuthenticators())) {
             mViewModel.setIgnoringCancel(true);
             mHandler.postDelayed(new StopIgnoringCancelRunnable(mViewModel), 250L);
         }
@@ -383,19 +385,13 @@ public class BiometricFragment extends Fragment {
     void authenticate(
             BiometricPrompt.@NonNull PromptInfo info,
             BiometricPrompt.@Nullable CryptoObject crypto) {
+        // PromptInfo has to be set prior to others.
         mViewModel.setPromptInfo(info);
 
-        // Use a fake crypto object to force Strong biometric auth prior to Android 11 (API 30).
-        @BiometricManager.AuthenticatorTypes final int authenticators =
-                AuthenticatorUtils.getConsolidatedAuthenticators(info, crypto);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                && Build.VERSION.SDK_INT < Build.VERSION_CODES.R
-                && authenticators == Authenticators.BIOMETRIC_STRONG
-                && crypto == null) {
-            mViewModel.setCryptoObject(CryptoObjectUtils.createFakeCryptoObject());
-        } else {
-            mViewModel.setCryptoObject(crypto);
-        }
+        mViewModel.setIsIdentityCheckAvailable(
+                BiometricManager.from(requireContext()).isIdentityCheckAvailable());
+
+        mViewModel.setCryptoObject(crypto);
 
         if (isManagingDeviceCredentialButton()) {
             mViewModel.setNegativeButtonTextOverride(
