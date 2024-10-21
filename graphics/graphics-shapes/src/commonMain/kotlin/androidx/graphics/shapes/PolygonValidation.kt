@@ -79,7 +79,7 @@ internal class PolygonValidator() {
                 }
             }
 
-            return RoundedPolygon(reversedFeatures, polygon.centerX, polygon.centerY)
+            return RoundedPolygon(reversedFeatures, polygon.center)
         }
     }
 }
