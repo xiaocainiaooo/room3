@@ -56,12 +56,14 @@ import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Preview
 @Sampled
 @Composable
-fun ExpandableHorizontalFloatingAppBar() {
+fun ExpandableHorizontalFloatingAppBarSample() {
     val context = LocalContext.current
     val isTouchExplorationEnabled = remember {
         val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
@@ -78,7 +80,7 @@ fun ExpandableHorizontalFloatingAppBar() {
     }
     Scaffold(
         content = { innerPadding ->
-            Box {
+            Box(Modifier.padding(innerPadding)) {
                 LazyColumn(
                     state = listState,
                     contentPadding = innerPadding,
@@ -113,9 +115,10 @@ fun ExpandableHorizontalFloatingAppBar() {
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Preview
 @Sampled
 @Composable
-fun ScrollableHorizontalFloatingAppBar() {
+fun ScrollableHorizontalFloatingAppBarSample() {
     val context = LocalContext.current
     val isTouchExplorationEnabled = remember {
         val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
@@ -127,7 +130,7 @@ fun ScrollableHorizontalFloatingAppBar() {
     Scaffold(
         modifier = Modifier.nestedScroll(exitAlwaysScrollBehavior),
         content = { innerPadding ->
-            Box {
+            Box(Modifier.padding(innerPadding)) {
                 LazyColumn(
                     state = listState,
                     contentPadding = innerPadding,
@@ -164,9 +167,10 @@ fun ScrollableHorizontalFloatingAppBar() {
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Preview
 @Sampled
 @Composable
-fun ExpandableVerticalFloatingAppBar() {
+fun ExpandableVerticalFloatingAppBarSample() {
     val context = LocalContext.current
     val isTouchExplorationEnabled = remember {
         val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
@@ -183,7 +187,7 @@ fun ExpandableVerticalFloatingAppBar() {
     }
     Scaffold(
         content = { innerPadding ->
-            Box {
+            Box(Modifier.padding(innerPadding)) {
                 LazyColumn(
                     state = listState,
                     contentPadding = innerPadding,
@@ -218,9 +222,10 @@ fun ExpandableVerticalFloatingAppBar() {
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Preview
 @Sampled
 @Composable
-fun ScrollableVerticalFloatingAppBar() {
+fun ScrollableVerticalFloatingAppBarSample() {
     val context = LocalContext.current
     val isTouchExplorationEnabled = remember {
         val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
@@ -232,7 +237,7 @@ fun ScrollableVerticalFloatingAppBar() {
     Scaffold(
         modifier = Modifier.nestedScroll(exitAlwaysScrollBehavior),
         content = { innerPadding ->
-            Box {
+            Box(Modifier.padding(innerPadding)) {
                 LazyColumn(
                     state = listState,
                     contentPadding = innerPadding,
