@@ -1130,6 +1130,7 @@ File repoRoot = new File(rootDir, "../..").canonicalFile
 includeOptionalProject(":xr:xr", new File(repoRoot, "xr/xr"), [BuildType.XR])
 includeOptionalProject(":xr:compose:compose", new File(repoRoot, "xr/compose/compose"), [BuildType.XR])
 includeOptionalProject(":xr:runtime:runtime", new File(repoRoot, "xr/runtime/runtime"), [BuildType.XR])
+includeOptionalProject(":xr:runtime:runtime-testing", new File(repoRoot, "xr/runtime/runtime-testing"), [BuildType.XR])
 includeOptionalProject(":xr:scenecore:scenecore", new File(repoRoot, "xr/scenecore/scenecore"), [BuildType.XR])
 
 /////////////////////////////
