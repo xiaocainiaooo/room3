@@ -1457,7 +1457,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
 }
 
 private fun Project.validateLintVersionTestExists(androidXExtension: AndroidXExtension) {
-    if (androidXExtension.type != LibraryType.LINT) {
+    if (!androidXExtension.type.isLint()) {
         return
     }
     kotlinExtensionOrNull?.let { extension ->
