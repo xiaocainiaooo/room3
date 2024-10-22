@@ -18,8 +18,8 @@ package androidx.camera.viewfinder.compose
 
 import androidx.annotation.RequiresApi
 import androidx.camera.testing.impl.SurfaceUtil
-import androidx.camera.viewfinder.surface.ImplementationMode
-import androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest
+import androidx.camera.viewfinder.core.ImplementationMode
+import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons

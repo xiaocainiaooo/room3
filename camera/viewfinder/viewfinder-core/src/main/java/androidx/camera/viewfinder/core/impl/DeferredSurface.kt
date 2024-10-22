@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.camera.viewfinder.impl.surface
+package androidx.camera.viewfinder.core.impl
 
 import android.view.Surface
 import androidx.annotation.GuardedBy
-import androidx.camera.impl.utils.Logger
-import androidx.camera.impl.utils.futures.Futures.nonCancellationPropagating
+import androidx.camera.viewfinder.core.impl.utils.Logger
+import androidx.camera.viewfinder.core.impl.utils.futures.Futures.nonCancellationPropagating
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import com.google.common.util.concurrent.ListenableFuture
 
@@ -52,8 +52,8 @@ abstract class DeferredSurface : AutoCloseable {
     /**
      * Close the surface.
      *
-     * After closing, the underlying surface resources can be safely released by [SurfaceView] or
-     * [TextureView] implementation.
+     * After closing, the underlying surface resources can be safely released by
+     * [android.view.SurfaceView] or [android.view.TextureView] implementation.
      */
     override fun close() {
         var terminationCompleter: CallbackToFutureAdapter.Completer<Void?>? = null

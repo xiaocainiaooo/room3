@@ -21,11 +21,11 @@ import android.graphics.Bitmap
 import android.hardware.camera2.CameraManager
 import android.util.Size
 import android.view.Surface
-import androidx.camera.impl.utils.futures.FutureCallback
-import androidx.camera.impl.utils.futures.Futures
 import androidx.camera.viewfinder.CameraViewfinder.ScaleType.FILL_CENTER
-import androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest
-import androidx.camera.viewfinder.surface.populateFromCharacteristics
+import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
+import androidx.camera.viewfinder.core.impl.utils.futures.FutureCallback
+import androidx.camera.viewfinder.core.impl.utils.futures.Futures
+import androidx.camera.viewfinder.core.populateFromCharacteristics
 import androidx.camera.viewfinder.utils.CoreAppTestUtil
 import androidx.camera.viewfinder.utils.FakeActivity
 import androidx.core.content.ContextCompat

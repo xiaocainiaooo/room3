@@ -20,8 +20,8 @@ import static android.hardware.camera2.CameraMetadata.LENS_FACING_BACK;
 import static android.hardware.camera2.CameraMetadata.LENS_FACING_EXTERNAL;
 import static android.hardware.camera2.CameraMetadata.LENS_FACING_FRONT;
 
-import static androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest.MIRROR_MODE_HORIZONTAL;
-import static androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest.MIRROR_MODE_NONE;
+import static androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.MIRROR_MODE_HORIZONTAL;
+import static androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.MIRROR_MODE_NONE;
 
 import android.annotation.SuppressLint;
 import android.graphics.SurfaceTexture;
@@ -35,6 +35,7 @@ import android.view.TextureView;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.camera.viewfinder.core.ImplementationMode;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -55,24 +56,24 @@ import java.util.concurrent.Executor;
  * <p> Calling {@link ViewfinderSurfaceRequest#markSurfaceSafeToRelease()} will notify the
  * surface provider that the surface is not needed and related resources can be released.
  *
- * @deprecated Use {@link androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest} instead.
+ * @deprecated Use {@link androidx.camera.viewfinder.core.ViewfinderSurfaceRequest} instead.
  */
 @Deprecated
 public class ViewfinderSurfaceRequest {
 
     private static final String TAG = "ViewfinderSurfaceRequest";
 
-    @NonNull private androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest
+    @NonNull private androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
             mViewfinderSurfaceRequest;
 
     /**
      * Creates a new surface request with surface resolution, camera device, lens facing and
      * sensor orientation information.
      *
-     * surfaceRequest The {@link androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest}.
+     * surfaceRequest The {@link androidx.camera.viewfinder.core.ViewfinderSurfaceRequest}.
      */
     ViewfinderSurfaceRequest(
-            @NonNull androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest surfaceRequest) {
+            @NonNull androidx.camera.viewfinder.core.ViewfinderSurfaceRequest surfaceRequest) {
         mViewfinderSurfaceRequest = surfaceRequest;
     }
 
@@ -146,7 +147,7 @@ public class ViewfinderSurfaceRequest {
     }
 
     @NonNull
-    androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest getViewfinderSurfaceRequest() {
+    androidx.camera.viewfinder.core.ViewfinderSurfaceRequest getViewfinderSurfaceRequest() {
         return mViewfinderSurfaceRequest;
     }
 
@@ -169,13 +170,13 @@ public class ViewfinderSurfaceRequest {
     /**
      * Builder for {@link ViewfinderSurfaceRequest}.
      *
-     * @deprecated Use {@link androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest.Builder}
+     * @deprecated Use {@link androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.Builder}
      * instead.
      */
     @Deprecated
     public static final class Builder {
         @NonNull
-        private androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest.Builder mBuilder;
+        private androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.Builder mBuilder;
 
         /**
          * Constructor for {@link Builder}.
@@ -185,7 +186,7 @@ public class ViewfinderSurfaceRequest {
          * @param resolution viewfinder resolution.
          */
         public Builder(@NonNull Size resolution) {
-            mBuilder = new androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest.Builder(
+            mBuilder = new androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.Builder(
                     resolution);
         }
 
@@ -211,13 +212,13 @@ public class ViewfinderSurfaceRequest {
          * @param surfaceRequest {@link ViewfinderSurfaceRequest} instance.
          */
         public Builder(@NonNull ViewfinderSurfaceRequest surfaceRequest) {
-            mBuilder = new androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest.Builder(
+            mBuilder = new androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.Builder(
                     surfaceRequest.getResolution());
             mBuilder.setSourceOrientation(surfaceRequest.getSensorOrientation());
             mBuilder.setOutputMirrorMode(surfaceRequest.getLensFacing() == LENS_FACING_FRONT
                     ? MIRROR_MODE_HORIZONTAL : MIRROR_MODE_NONE);
             mBuilder.setImplementationMode(
-                    androidx.camera.viewfinder.surface.ImplementationMode.fromId(
+                    ImplementationMode.fromId(
                             surfaceRequest.getImplementationMode().getId()));
         }
 
@@ -250,7 +251,7 @@ public class ViewfinderSurfaceRequest {
                 @Nullable
                 androidx.camera.viewfinder.CameraViewfinder.ImplementationMode implementationMode) {
             mBuilder.setImplementationMode(
-                    androidx.camera.viewfinder.surface.ImplementationMode.fromId(
+                    ImplementationMode.fromId(
                             implementationMode.getId()));
             return this;
         }

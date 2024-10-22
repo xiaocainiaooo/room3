@@ -17,8 +17,8 @@
 package androidx.camera.viewfinder.compose
 
 import android.util.Size
-import androidx.camera.viewfinder.surface.ImplementationMode
-import androidx.camera.viewfinder.surface.TransformationInfo
+import androidx.camera.viewfinder.core.ImplementationMode
+import androidx.camera.viewfinder.core.TransformationInfo
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 

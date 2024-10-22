@@ -23,7 +23,7 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest;
+import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest;
 
 /**
  * Wraps the underlying handling of the {@link android.view.Surface} used for viewfinder, which is

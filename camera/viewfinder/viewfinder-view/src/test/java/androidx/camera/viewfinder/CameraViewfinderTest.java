@@ -17,8 +17,8 @@
 package androidx.camera.viewfinder;
 
 import static androidx.camera.viewfinder.CameraViewfinder.shouldUseTextureView;
-import static androidx.camera.viewfinder.surface.ImplementationMode.EMBEDDED;
-import static androidx.camera.viewfinder.surface.ImplementationMode.EXTERNAL;
+import static androidx.camera.viewfinder.core.ImplementationMode.EMBEDDED;
+import static androidx.camera.viewfinder.core.ImplementationMode.EXTERNAL;
 
 import static com.google.common.truth.Truth.assertThat;
 

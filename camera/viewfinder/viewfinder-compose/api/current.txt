@@ -22,7 +22,7 @@ package androidx.camera.viewfinder.compose {
   }
 
   public final class ViewfinderKt {
-    method @androidx.compose.runtime.Composable public static void Viewfinder(androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest surfaceRequest, androidx.camera.viewfinder.surface.ImplementationMode implementationMode, androidx.camera.viewfinder.surface.TransformationInfo transformationInfo, optional androidx.compose.ui.Modifier modifier, optional androidx.camera.viewfinder.compose.MutableCoordinateTransformer? coordinateTransformer);
+    method @androidx.compose.runtime.Composable public static void Viewfinder(androidx.camera.viewfinder.core.ViewfinderSurfaceRequest surfaceRequest, androidx.camera.viewfinder.core.ImplementationMode implementationMode, androidx.camera.viewfinder.core.TransformationInfo transformationInfo, optional androidx.compose.ui.Modifier modifier, optional androidx.camera.viewfinder.compose.MutableCoordinateTransformer? coordinateTransformer);
   }
 
 }

@@ -31,11 +31,11 @@ import androidx.camera.viewfinder.CameraViewfinder.ImplementationMode
  * will be set to [ImplementationMode.COMPATIBLE].
  */
 @Deprecated(
-    message = "Use androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest as argument",
+    message = "Use androidx.camera.viewfinder.core.ViewfinderSurfaceRequest as argument",
     replaceWith =
         ReplaceWith(
             "populateFromCharacteristics returning " +
-                "androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest.Builder"
+                "androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.Builder"
         )
 )
 @SuppressLint("ClassVerificationFailure")
