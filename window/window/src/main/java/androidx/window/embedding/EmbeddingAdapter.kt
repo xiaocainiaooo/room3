@@ -232,7 +232,9 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
         val windowLayoutInfo = params.parentWindowLayoutInfo
         val defaultSplitAttributes = params.defaultSplitAttributes
         val areDefaultConstraintsSatisfied = params.areDefaultConstraintsSatisfied()
-        val splitRuleTag = params.splitRuleTag
+        val splitRuleTag =
+            if (params.splitRuleTag == null || isTagGenerated(params.splitRuleTag!!)) null
+            else params.splitRuleTag
         val density =
             DensityCompatHelper.getInstance().density(taskConfiguration, taskWindowMetrics)
         val windowMetrics =
@@ -292,7 +294,7 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
                     )
                     .setShouldClearTop(rule.clearTop)
 
-            builder.setTag(tag ?: Integer.toHexString(rule.hashCode()))
+            builder.setTag(tag ?: generateTag(rule))
             return builder.build()
         }
     }
@@ -311,7 +313,7 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
             )
         builder.setSticky(splitPinRule.isSticky)
         val tag = splitPinRule.tag
-        builder.setTag(tag ?: Integer.toHexString(splitPinRule.hashCode()))
+        builder.setTag(tag ?: generateTag(splitPinRule))
         return builder.build()
     }
 
@@ -443,7 +445,7 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
                     .setFinishPrimaryWithPlaceholder(
                         translateFinishBehavior(rule.finishPrimaryWithPlaceholder)
                     )
-            builder.setTag(tag ?: Integer.toHexString(rule.hashCode()))
+            builder.setTag(tag ?: generateTag(rule))
             return builder.build()
         }
     }
@@ -475,7 +477,7 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
                 ActivityRuleBuilder(activityPredicate, intentPredicate)
                     .setShouldAlwaysExpand(rule.alwaysExpand)
             val tag = rule.tag
-            builder.setTag(tag ?: Integer.toHexString(rule.hashCode()))
+            builder.setTag(tag ?: generateTag(rule))
             return builder.build()
         }
     }
@@ -834,10 +836,20 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
     internal companion object {
         private val TAG = EmbeddingAdapter::class.simpleName
 
+        val RULE_TAG_PREFIX = "ae-gen:"
+
         /**
          * The default token of [SplitInfo], which provides compatibility for device prior to vendor
          * API level 3
          */
         val INVALID_SPLIT_INFO_TOKEN = Binder()
+
+        fun generateTag(rule: EmbeddingRule): String =
+            RULE_TAG_PREFIX + Integer.toHexString(rule.hashCode())
+
+        fun isTagGenerated(tag: String): Boolean {
+            val subTag = tag.removePrefix(RULE_TAG_PREFIX)
+            return subTag != tag && subTag.toIntOrNull(16) != null
+        }
     }
 }
