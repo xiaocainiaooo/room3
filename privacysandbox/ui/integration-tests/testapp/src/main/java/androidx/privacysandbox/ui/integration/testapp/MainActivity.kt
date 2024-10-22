@@ -25,7 +25,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import android.widget.TextView
@@ -34,6 +33,7 @@ import androidx.annotation.RequiresExtension
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.forEach
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.privacysandbox.sdkruntime.client.SdkSandboxManagerCompat
@@ -41,8 +41,10 @@ import androidx.privacysandbox.sdkruntime.client.SdkSandboxProcessDeathCallbackC
 import androidx.privacysandbox.sdkruntime.core.AppOwnedSdkSandboxInterfaceCompat
 import androidx.privacysandbox.sdkruntime.core.LoadSdkCompatException
 import androidx.privacysandbox.ui.integration.sdkproviderutils.MediateeSdkApiImpl
+import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdFormat
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdType
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.MediationOption
+import androidx.privacysandbox.ui.integration.testapp.util.DisabledItemsArrayAdapter
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.CoroutineScope
@@ -60,7 +62,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var composeToggleButton: SwitchMaterial
     private lateinit var mediationDropDownMenu: Spinner
     private lateinit var adTypeDropDownMenu: Spinner
+    private lateinit var adFormatDropDownMenu: Spinner
     private lateinit var titleBar: TextView
+
+    @AdFormat
+    private val adFormat
+        get() =
+            if (::adFormatDropDownMenu.isInitialized) adFormatDropDownMenu.selectedItemPosition
+            else AdFormat.BANNER_AD
 
     @AdType
     private val adType
@@ -94,6 +103,7 @@ class MainActivity : AppCompatActivity() {
         triggerSandboxDeathButton = findViewById(R.id.trigger_sandbox_death)
         mediationDropDownMenu = findViewById(R.id.mediation_dropdown_menu)
         adTypeDropDownMenu = findViewById(R.id.ad_type_dropdown_menu)
+        adFormatDropDownMenu = findViewById(R.id.ad_format_dropdown_menu)
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             // there is no sandbox to kill on T-
@@ -101,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             triggerSandboxDeathButton.setOnClickListener {
                 triggerSandboxDeath()
-                disableAllControls()
+                setAllControlsEnabled(false)
             }
         }
 
@@ -188,59 +198,55 @@ class MainActivity : AppCompatActivity() {
 
     private fun initializeToggles() {
         initializeViewabilityToggleButton()
+        initializeAdFormatDropDown()
         initializeMediationDropDown()
         initializeAdTypeDropDown()
         initializeZOrderToggleButton()
         initializeComposeToggleButton()
     }
 
-    private fun disableAllControls() {
-        mediationDropDownMenu.isEnabled = false
-        adTypeDropDownMenu.isEnabled = false
-        viewabilityToggleButton.isEnabled = false
-        zOrderToggleButton.isEnabled = false
-        composeToggleButton.isEnabled = false
-    }
-
-    private fun enableAllControls() {
-        mediationDropDownMenu.isEnabled = true
-        adTypeDropDownMenu.isEnabled = true
-        viewabilityToggleButton.isEnabled = true
-        zOrderToggleButton.isEnabled = true
-        composeToggleButton.isEnabled = true
-    }
-
     private fun initializeViewabilityToggleButton() {
         viewabilityToggleButton.setOnCheckedChangeListener { _, _ -> loadAllAds() }
     }
 
-    private fun initializeMediationDropDown() {
-        // Supply the mediation_option array to the mediationDropDownMenu spinner.
-        ArrayAdapter.createFromResource(
-                applicationContext,
-                R.array.mediation_dropdown_menu_array,
-                android.R.layout.simple_spinner_item
-            )
-            .also { adapter ->
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                mediationDropDownMenu.adapter = adapter
-            }
+    private fun initializeAdFormatDropDown() {
+        adFormatDropDownMenu.apply {
+            adapter =
+                DisabledItemsArrayAdapter(
+                    applicationContext,
+                    resources.getStringArray(R.array.ad_format_menu_array)
+                ) { position: Int ->
+                    isSupportedOptionsCombination(position)
+                }
+            onItemSelectedListener = OnItemSelectedListener()
+        }
+    }
 
-        mediationDropDownMenu.onItemSelectedListener = OnItemSelectedListener()
+    private fun initializeMediationDropDown() {
+        mediationDropDownMenu.apply {
+            // Supply the mediation_option array to the mediationDropDownMenu spinner.
+            adapter =
+                DisabledItemsArrayAdapter(
+                    applicationContext,
+                    resources.getStringArray(R.array.mediation_dropdown_menu_array)
+                ) { _: Int ->
+                    isSupportedOptionsCombination(adFormat)
+                }
+            onItemSelectedListener = OnItemSelectedListener()
+        }
     }
 
     private fun initializeAdTypeDropDown() {
-        ArrayAdapter.createFromResource(
-                applicationContext,
-                R.array.ad_type_dropdown_menu_array,
-                android.R.layout.simple_spinner_item
-            )
-            .also { adapter ->
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                adTypeDropDownMenu.adapter = adapter
-            }
-
-        adTypeDropDownMenu.onItemSelectedListener = OnItemSelectedListener()
+        adTypeDropDownMenu.apply {
+            adapter =
+                DisabledItemsArrayAdapter(
+                    applicationContext,
+                    resources.getStringArray(R.array.ad_type_dropdown_menu_array)
+                ) { _: Int ->
+                    isSupportedOptionsCombination(adFormat)
+                }
+            onItemSelectedListener = OnItemSelectedListener()
+        }
     }
 
     private fun initializeZOrderToggleButton() {
@@ -340,8 +346,38 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun isSupportedOptionsCombination(
+        @AdFormat adFormat: Int,
+    ): Boolean {
+        when (adFormat) {
+            AdFormat.BANNER_AD -> return true
+            AdFormat.NATIVE_AD -> return false
+        }
+        return false
+    }
+
+    private fun updateDrawerOptions() {
+        setAllControlsEnabled(true)
+        if (adFormat == AdFormat.NATIVE_AD) {
+            runOnUiThread { navigationView.menu.forEach { it.isEnabled = false } }
+            viewabilityToggleButton.isEnabled = false
+            zOrderToggleButton.isEnabled = false
+            composeToggleButton.isEnabled = false
+        }
+    }
+
+    private fun setAllControlsEnabled(isEnabled: Boolean) {
+        runOnUiThread { navigationView.menu.forEach { it.isEnabled = isEnabled } }
+        adFormatDropDownMenu.isEnabled = isEnabled
+        mediationDropDownMenu.isEnabled = isEnabled
+        adTypeDropDownMenu.isEnabled = isEnabled
+        viewabilityToggleButton.isEnabled = isEnabled
+        zOrderToggleButton.isEnabled = isEnabled
+        composeToggleButton.isEnabled = isEnabled
+    }
+
     private fun switchContentFragment(fragment: BaseFragment, title: CharSequence?): Boolean {
-        enableAllControls()
+        setAllControlsEnabled(true)
         drawerLayout.closeDrawers()
         supportFragmentManager
             .beginTransaction()
@@ -354,7 +390,12 @@ class MainActivity : AppCompatActivity() {
 
     /** Loads all ads in the current fragment. */
     private fun loadAllAds() {
-        currentFragment.handleLoadAdFromDrawer(adType, mediationOption, drawViewabilityLayer)
+        currentFragment.handleLoadAdFromDrawer(
+            adFormat,
+            adType,
+            mediationOption,
+            drawViewabilityLayer
+        )
     }
 
     private inner class OnItemSelectedListener : AdapterView.OnItemSelectedListener {
@@ -365,6 +406,7 @@ class MainActivity : AppCompatActivity() {
                 isCalledOnStartingApp = false
                 return
             }
+            updateDrawerOptions()
             loadAllAds()
         }
 
