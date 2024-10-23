@@ -364,6 +364,9 @@ private constructor(
         val NO_DIVIDER =
             object : DividerAttributes() {
                 override fun toString(): String = "NO_DIVIDER"
+
+                // Override #hashCode to return consistent value every time.
+                @Suppress("EqualsAndHashCode") override fun hashCode(): Int = toString().hashCode()
             }
 
         /** Specifies a fixed divider. Used by the XML rule parser and must match attrs.xml. */

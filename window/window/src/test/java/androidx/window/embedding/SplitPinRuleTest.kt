@@ -33,10 +33,14 @@ class SplitPinRuleTest {
     /** Test hashcode and equals are properly calculated for 2 equal [SplitPinRule] */
     @Test
     fun equalsImpliesHashCode() {
-        val firstRule = SplitPinRule.Builder().build()
-        val secondRule = SplitPinRule.Builder().build()
+        val firstRule = SplitPinRule.Builder().setSticky(true).build()
+        val secondRule = SplitPinRule.Builder().setSticky(true).build()
         assertEquals(firstRule, secondRule)
         assertEquals(firstRule.hashCode(), secondRule.hashCode())
+
+        // The hashCode should be consistent to the predetermined value.
+        // Note that the value should be updated whenever hashCode calculation is changed.
+        assertEquals(1678620995, firstRule.hashCode())
     }
 
     /*------------------------------Builder Test------------------------------*/

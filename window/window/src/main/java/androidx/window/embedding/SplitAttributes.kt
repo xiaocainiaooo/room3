@@ -273,6 +273,17 @@ constructor(
          */
         override fun toString(): String = description
 
+        override fun equals(other: Any?): Boolean {
+            if (other === this) return true
+            if (other !is LayoutDirection) return false
+            return description == other.description && value == other.value
+        }
+
+        override fun hashCode(): Int {
+            var result = description.hashCode()
+            return 31 * result + value
+        }
+
         /** Non-public properties and methods. */
         companion object {
             /**

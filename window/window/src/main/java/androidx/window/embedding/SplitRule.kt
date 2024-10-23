@@ -196,7 +196,7 @@ internal constructor(
     ) {
         override fun toString(): String = description
 
-        /** Override #hashCode to return consistent value every time (even after device reboot). */
+        // Override #hashCode to return consistent value every time.
         @Suppress("EqualsAndHashCode")
         override fun hashCode(): Int {
             var result = description.hashCode()

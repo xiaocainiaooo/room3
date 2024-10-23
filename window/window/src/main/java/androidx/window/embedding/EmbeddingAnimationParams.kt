@@ -67,6 +67,14 @@ constructor(
                 else -> "Unknown value: $value"
             }
 
+        override fun equals(other: Any?): Boolean {
+            if (other === this) return true
+            if (other !is AnimationSpec) return false
+            return value == other.value
+        }
+
+        override fun hashCode(): Int = value * 31
+
         /** Properties and methods. */
         companion object {
             /** Specifies the default animation defined by the system. */

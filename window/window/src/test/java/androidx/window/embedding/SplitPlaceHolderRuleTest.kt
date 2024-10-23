@@ -50,6 +50,10 @@ internal class SplitPlaceHolderRuleTest {
         val secondRule = SplitPlaceholderRule.Builder(setOf(filter), Intent()).build()
         assertEquals(firstRule, secondRule)
         assertEquals(firstRule.hashCode(), secondRule.hashCode())
+
+        // The hashCode should be consistent to the predetermined value.
+        // Note that the value should be updated whenever hashCode calculation is changed.
+        assertEquals(1986646852, firstRule.hashCode())
     }
 
     /*------------------------------Builder Test------------------------------*/
