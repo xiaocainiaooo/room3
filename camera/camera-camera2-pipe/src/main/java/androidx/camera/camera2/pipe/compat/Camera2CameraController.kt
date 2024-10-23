@@ -64,7 +64,7 @@ constructor(
     private val cameraStatusMonitor: CameraStatusMonitor,
     private val captureSessionFactory: CaptureSessionFactory,
     private val captureSequenceProcessorFactory: Camera2CaptureSequenceProcessorFactory,
-    private val virtualCameraManager: VirtualCameraManager,
+    private val camera2DeviceManager: Camera2DeviceManager,
     private val cameraSurfaceManager: CameraSurfaceManager,
     private val timeSource: TimeSource,
     override val cameraGraphId: CameraGraphId
@@ -162,10 +162,11 @@ constructor(
         }
         lastCameraError = null
         val camera =
-            virtualCameraManager.open(
-                graphConfig.camera,
-                graphConfig.sharedCameraIds,
-                graphListener,
+            camera2DeviceManager.open(
+                cameraId = graphConfig.camera,
+                sharedCameraIds = graphConfig.sharedCameraIds,
+                graphListener = graphListener,
+                isPrewarm = false,
             ) { _ ->
                 isForeground
             }
@@ -292,7 +293,7 @@ constructor(
             disconnectSessionAndCamera(session, camera)
             if (graphConfig.flags.closeCameraDeviceOnClose) {
                 Log.debug { "Quirk: Closing all camera devices" }
-                virtualCameraManager.closeAll()
+                camera2DeviceManager.closeAll()
             }
         }
 

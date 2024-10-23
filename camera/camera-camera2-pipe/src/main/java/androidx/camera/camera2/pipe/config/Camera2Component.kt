@@ -33,6 +33,8 @@ import androidx.camera.camera2.pipe.compat.Camera2CaptureSequenceProcessorFactor
 import androidx.camera.camera2.pipe.compat.Camera2CaptureSessionsModule
 import androidx.camera.camera2.pipe.compat.Camera2DeviceCloser
 import androidx.camera.camera2.pipe.compat.Camera2DeviceCloserImpl
+import androidx.camera.camera2.pipe.compat.Camera2DeviceManager
+import androidx.camera.camera2.pipe.compat.Camera2DeviceManagerImpl
 import androidx.camera.camera2.pipe.compat.Camera2ErrorProcessor
 import androidx.camera.camera2.pipe.compat.Camera2MetadataCache
 import androidx.camera.camera2.pipe.compat.Camera2MetadataProvider
@@ -58,6 +60,11 @@ internal abstract class Camera2Module {
     @Binds
     @DefaultCameraBackend
     abstract fun bindCameraPipeCameraBackend(camera2Backend: Camera2Backend): CameraBackend
+
+    @Binds
+    abstract fun bindCamera2DeviceManager(
+        camera2DeviceManager: Camera2DeviceManagerImpl
+    ): Camera2DeviceManager
 
     @Binds abstract fun bindCameraOpener(camera2CameraOpener: Camera2CameraOpener): CameraOpener
 

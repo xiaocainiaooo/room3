@@ -39,7 +39,7 @@ internal class Camera2Backend
 constructor(
     private val camera2DeviceCache: Camera2DeviceCache,
     private val camera2MetadataCache: Camera2MetadataCache,
-    private val virtualCameraManager: VirtualCameraManager,
+    private val camera2DeviceManager: Camera2DeviceManager,
     private val camera2CameraControllerComponent: Camera2ControllerComponent.Builder,
 ) : CameraBackend {
     override val id: CameraBackendId
@@ -59,31 +59,31 @@ constructor(
         camera2MetadataCache.awaitCameraMetadata(cameraId)
 
     override fun disconnect(cameraId: CameraId) {
-        virtualCameraManager.close(cameraId)
+        camera2DeviceManager.close(cameraId)
     }
 
     override fun disconnectAsync(cameraId: CameraId): Deferred<Unit> {
         TODO(
-            "b/324142928 - Add support in VirtualCameraManager for closing a camera " +
+            "b/324142928 - Add support in Camera2DeviceManager for closing a camera " +
                 "with a deferred result."
         )
     }
 
     override fun disconnectAll() {
-        return virtualCameraManager.closeAll()
+        return camera2DeviceManager.closeAll()
     }
 
     override fun disconnectAllAsync(): Deferred<Unit> {
         TODO(
-            "b/324142928 - Add support in VirtualCameraManager for closing a camera " +
+            "b/324142928 - Add support in Camera2DeviceManager for closing a camera " +
                 "with a deferred result."
         )
     }
 
     override fun shutdownAsync(): Deferred<Unit> {
-        // TODO: VirtualCameraManager needs to be extended to support a suspendable future that can
+        // TODO: Camera2DeviceManager needs to be extended to support a suspendable future that can
         //   be used to wait until close has been called on all camera devices.
-        virtualCameraManager.closeAll()
+        camera2DeviceManager.closeAll()
         return CompletableDeferred(Unit)
     }
 
@@ -113,6 +113,6 @@ constructor(
     }
 
     override fun prewarm(cameraId: CameraId) {
-        virtualCameraManager.prewarm(cameraId)
+        camera2DeviceManager.prewarm(cameraId)
     }
 }
