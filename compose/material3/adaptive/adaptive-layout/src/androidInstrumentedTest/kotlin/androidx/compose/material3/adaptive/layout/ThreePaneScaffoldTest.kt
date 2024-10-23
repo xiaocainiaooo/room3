@@ -352,3 +352,38 @@ internal fun SampleThreePaneScaffold(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+internal fun SampleThreePaneScaffold(
+    scaffoldDirective: PaneScaffoldDirective,
+    scaffoldState: ThreePaneScaffoldState,
+    paneOrder: ThreePaneScaffoldHorizontalOrder,
+) {
+    ThreePaneScaffold(
+        modifier = Modifier.fillMaxSize().testTag(ThreePaneScaffoldTestTag),
+        scaffoldDirective = scaffoldDirective,
+        scaffoldState = scaffoldState,
+        paneOrder = paneOrder,
+        secondaryPane = {
+            AnimatedPane(modifier = Modifier.testTag(tag = "SecondaryPane")) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.secondary
+                ) {}
+            }
+        },
+        tertiaryPane = {
+            AnimatedPane(modifier = Modifier.testTag(tag = "TertiaryPane")) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.tertiary
+                ) {}
+            }
+        }
+    ) {
+        AnimatedPane(modifier = Modifier.testTag(tag = "PrimaryPane")) {
+            Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {}
+        }
+    }
+}
