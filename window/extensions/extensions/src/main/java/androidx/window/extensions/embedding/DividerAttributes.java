@@ -69,6 +69,15 @@ public final class DividerAttributes {
      */
     public static final int WIDTH_SYSTEM_DEFAULT = -1;
 
+    /**
+     * The default value for the veil color. When used, the activity window background color will be
+     * used.
+     *
+     * @see #getPrimaryVeilColor()
+     * @see #getSecondaryVeilColor()
+     */
+    public static final int DIVIDER_VEIL_COLOR_DEFAULT = Color.TRANSPARENT;
+
     /** The {@link DividerType}. */
     private final @DividerType int mDividerType;
 
@@ -116,6 +125,12 @@ public final class DividerAttributes {
     /** Whether it is allowed to expand a container to full screen by dragging the divider. */
     private final boolean mIsDraggingToFullscreenAllowed;
 
+    /** The veil color of the primary container while dragging. */
+    private final @ColorInt int mPrimaryVeilColor;
+
+    /** The veil color of the secondary container while dragging. */
+    private final @ColorInt int mSecondaryVeilColor;
+
     /**
      * Constructor of {@link DividerAttributes}.
      *
@@ -126,6 +141,12 @@ public final class DividerAttributes {
      * @param dividerColor                  the color of the divider.
      * @param isDraggingToFullscreenAllowed whether it is allowed to expand a container to full
      *                                      screen by dragging the divider.
+     * @param primaryVeilColor              the veil color of the primary container while dragging.
+     *                                      If {@link #DIVIDER_VEIL_COLOR_DEFAULT}, activity window
+     *                                      background color is used.
+     * @param secondaryVeilColor            the veil color of the secondary container while
+     *                                      dragging. If {@link #DIVIDER_VEIL_COLOR_DEFAULT},
+     *                                      activity window background color is used.
      * @throws IllegalStateException if the provided values are invalid.
      */
     private DividerAttributes(
@@ -134,12 +155,21 @@ public final class DividerAttributes {
             float primaryMinRatio,
             float primaryMaxRatio,
             @ColorInt int dividerColor,
-            boolean isDraggingToFullscreenAllowed) {
+            boolean isDraggingToFullscreenAllowed,
+            @ColorInt int primaryVeilColor,
+            @ColorInt int secondaryVeilColor) {
         if (dividerType == DIVIDER_TYPE_FIXED
                 && (primaryMinRatio != RATIO_SYSTEM_DEFAULT
                 || primaryMaxRatio != RATIO_SYSTEM_DEFAULT)) {
             throw new IllegalStateException(
                     "primaryMinRatio and primaryMaxRatio must be RATIO_SYSTEM_DEFAULT for "
+                            + "DIVIDER_TYPE_FIXED.");
+        }
+        if (dividerType == DIVIDER_TYPE_FIXED
+                && (primaryVeilColor != DIVIDER_VEIL_COLOR_DEFAULT
+                || secondaryVeilColor != DIVIDER_VEIL_COLOR_DEFAULT)) {
+            throw new IllegalStateException(
+                    "primaryVeilColor and secondaryVeilColor must be unset for"
                             + "DIVIDER_TYPE_FIXED.");
         }
         if (primaryMinRatio != RATIO_SYSTEM_DEFAULT && primaryMaxRatio != RATIO_SYSTEM_DEFAULT
@@ -153,6 +183,8 @@ public final class DividerAttributes {
         mPrimaryMaxRatio = primaryMaxRatio;
         mDividerColor = dividerColor;
         mIsDraggingToFullscreenAllowed = isDraggingToFullscreenAllowed;
+        mPrimaryVeilColor = primaryVeilColor;
+        mSecondaryVeilColor = secondaryVeilColor;
     }
 
     /**
@@ -230,6 +262,24 @@ public final class DividerAttributes {
         return mIsDraggingToFullscreenAllowed;
     }
 
+    /**
+     * Returns the veil color of the primary container. {@link #DIVIDER_VEIL_COLOR_DEFAULT}
+     * indicates that activity window background color should be used.
+     */
+    @RequiresVendorApiLevel(level = 8)
+    public @ColorInt int getPrimaryVeilColor() {
+        return mPrimaryVeilColor;
+    }
+
+    /**
+     * Returns the veil color of the secondary container. {@link #DIVIDER_VEIL_COLOR_DEFAULT}
+     * indicates that activity window background color should be used.
+     */
+    @RequiresVendorApiLevel(level = 8)
+    public @ColorInt int getSecondaryVeilColor() {
+        return mSecondaryVeilColor;
+    }
+
     @Override
     public boolean equals(@Nullable Object obj) {
         if (this == obj) return true;
@@ -240,13 +290,15 @@ public final class DividerAttributes {
                 && mPrimaryMinRatio == other.mPrimaryMinRatio
                 && mPrimaryMaxRatio == other.mPrimaryMaxRatio
                 && mDividerColor == other.mDividerColor
-                && mIsDraggingToFullscreenAllowed == other.mIsDraggingToFullscreenAllowed;
+                && mIsDraggingToFullscreenAllowed == other.mIsDraggingToFullscreenAllowed
+                && mPrimaryVeilColor == other.mPrimaryVeilColor
+                && mSecondaryVeilColor == other.mSecondaryVeilColor;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(mDividerType, mWidthDp, mPrimaryMinRatio, mPrimaryMaxRatio,
-                mIsDraggingToFullscreenAllowed);
+                mIsDraggingToFullscreenAllowed, mPrimaryVeilColor, mSecondaryVeilColor);
     }
 
     @NonNull
@@ -259,6 +311,8 @@ public final class DividerAttributes {
                 + ", maxPrimaryRatio=" + mPrimaryMaxRatio
                 + ", dividerColor=" + mDividerColor
                 + ", isDraggingToFullscreenAllowed=" + mIsDraggingToFullscreenAllowed
+                + ", mPrimaryVeilColor=" + mPrimaryVeilColor
+                + ", mSecondaryVeilColor=" + mSecondaryVeilColor
                 + "}";
     }
 
@@ -276,6 +330,10 @@ public final class DividerAttributes {
         private @ColorInt int mDividerColor = Color.BLACK;
 
         private boolean mIsDraggingToFullscreenAllowed = false;
+
+        private @ColorInt int mPrimaryVeilColor = DIVIDER_VEIL_COLOR_DEFAULT;
+
+        private @ColorInt int  mSecondaryVeilColor = DIVIDER_VEIL_COLOR_DEFAULT;
 
         /**
          * The {@link DividerAttributes} builder constructor.
@@ -303,6 +361,8 @@ public final class DividerAttributes {
             mPrimaryMaxRatio = original.mPrimaryMaxRatio;
             mDividerColor = original.mDividerColor;
             mIsDraggingToFullscreenAllowed = original.mIsDraggingToFullscreenAllowed;
+            mPrimaryVeilColor = original.mPrimaryVeilColor;
+            mSecondaryVeilColor = original.mSecondaryVeilColor;
         }
 
         /**
@@ -384,7 +444,8 @@ public final class DividerAttributes {
 
         /**
          * Sets the color of the divider. If not set, the default color {@link Color#BLACK} is
-         * used.
+         * used. Only the RGB components are used and the alpha value is ignored and always
+         * considered as fully opaque.
          */
         @RequiresVendorApiLevel(level = 6)
         @NonNull
@@ -405,6 +466,44 @@ public final class DividerAttributes {
         }
 
         /**
+         * Sets the veil color of the primary container. Solid color veils are used to cover
+         * activity content while dragging.
+         *
+         * The default value is {@link #DIVIDER_VEIL_COLOR_DEFAULT}.
+         *
+         * @param color the veil color for the primary container. If the value equals to
+         *              {@link #DIVIDER_VEIL_COLOR_DEFAULT}, activity window
+         *              background color is used. If {@link Color#TRANSPARENT} is used, it is
+         *              treated as {@link #DIVIDER_VEIL_COLOR_DEFAULT}. Only the RGB components are
+         *              used and the alpha value is ignored and always considered as fully opaque.
+         */
+        @RequiresVendorApiLevel(level = 8)
+        @NonNull
+        public Builder setPrimaryVeilColor(@ColorInt int color) {
+            mPrimaryVeilColor = color;
+            return this;
+        }
+
+        /**
+         * Sets the veil color of the secondary container. Solid color veils are used to cover
+         * activity content while dragging.
+         *
+         * The default value is {@link #DIVIDER_VEIL_COLOR_DEFAULT}.
+         *
+         * @param color the veil color for the secondary container. If the value equals to
+         *              {@link #DIVIDER_VEIL_COLOR_DEFAULT}, activity window
+         *              background color is used. If {@link Color#TRANSPARENT} is used, it is
+         *              treated as {@link #DIVIDER_VEIL_COLOR_DEFAULT}. Only the RGB components are
+         *              used and the alpha value is ignored and always considered as fully opaque.
+         */
+        @RequiresVendorApiLevel(level = 8)
+        @NonNull
+        public Builder setSecondaryVeilColor(@ColorInt int color) {
+            mSecondaryVeilColor = color;
+            return this;
+        }
+
+        /**
          * Builds a {@link DividerAttributes} instance.
          *
          * @return a {@link DividerAttributes} instance.
@@ -414,7 +513,8 @@ public final class DividerAttributes {
         @NonNull
         public DividerAttributes build() {
             return new DividerAttributes(mDividerType, mWidthDp, mPrimaryMinRatio,
-                    mPrimaryMaxRatio, mDividerColor, mIsDraggingToFullscreenAllowed);
+                    mPrimaryMaxRatio, mDividerColor, mIsDraggingToFullscreenAllowed,
+                    mPrimaryVeilColor, mSecondaryVeilColor);
         }
     }
 }
