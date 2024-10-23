@@ -45,6 +45,7 @@ import androidx.camera.core.TorchState
 import androidx.camera.core.UseCase
 import androidx.camera.core.ViewPort
 import androidx.camera.core.concurrent.CameraCoordinator
+import androidx.camera.core.impl.AdapterCameraInternal
 import androidx.camera.core.impl.CameraConfig
 import androidx.camera.core.impl.CameraConfigs
 import androidx.camera.core.impl.CameraInfoInternal
@@ -90,7 +91,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.eq
 import org.mockito.ArgumentMatchers.isNull
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.verify
@@ -660,7 +660,8 @@ class CameraUseCaseAdapterTest {
         val fakeUseCase = FakeUseCase()
         adapter.addUseCases(listOf(fakeUseCase))
         adapter.detachUseCases()
-        assertThat(fakeUseCase.camera).isEqualTo(fakeCamera)
+        assertThat((fakeUseCase.camera as AdapterCameraInternal).implementation)
+            .isEqualTo(fakeCamera)
         assertThat(fakeCamera.attachedUseCases).isEmpty()
     }
 
@@ -682,15 +683,24 @@ class CameraUseCaseAdapterTest {
         val fakeUseCase = spy(FakeUseCase())
         adapter.addUseCases(listOf(fakeUseCase))
         verify(fakeUseCase)
-            .bindToCamera(eq(fakeCamera), isNull(), isNull(), any(FakeUseCaseConfig::class.java))
+            .bindToCamera(
+                any(AdapterCameraInternal::class.java),
+                isNull(),
+                isNull(),
+                any(FakeUseCaseConfig::class.java)
+            )
+        assertThat((fakeUseCase.camera as AdapterCameraInternal).implementation)
+            .isSameInstanceAs(fakeCamera)
     }
 
     @Test
     fun useCase_onDetach() {
         val fakeUseCase = spy(FakeUseCase())
         adapter.addUseCases(listOf(fakeUseCase))
+        val adapterCameraInternal = fakeUseCase.camera as AdapterCameraInternal
+        assertThat(adapterCameraInternal.implementation).isSameInstanceAs(fakeCamera)
         adapter.removeUseCases(listOf(fakeUseCase))
-        verify(fakeUseCase).unbindFromCamera(fakeCamera)
+        verify(fakeUseCase).unbindFromCamera(adapterCameraInternal)
     }
 
     @Test
