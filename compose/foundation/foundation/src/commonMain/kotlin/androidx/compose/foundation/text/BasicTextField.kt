@@ -489,6 +489,7 @@ internal fun TextFieldSelectionHandles(selectionState: TextFieldSelectionState) 
                 Modifier.pointerInput(selectionState) {
                     with(selectionState) { selectionHandleGestures(true) }
                 },
+            lineHeight = startHandleState.lineHeight,
             minTouchTargetSize = MinTouchTargetSizeForHandles,
         )
     }
@@ -513,6 +514,7 @@ internal fun TextFieldSelectionHandles(selectionState: TextFieldSelectionState) 
                 Modifier.pointerInput(selectionState) {
                     with(selectionState) { selectionHandleGestures(false) }
                 },
+            lineHeight = endHandleState.lineHeight,
             minTouchTargetSize = MinTouchTargetSizeForHandles,
         )
     }
