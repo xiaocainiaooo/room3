@@ -177,12 +177,6 @@ actual class AutofillManager internal constructor(view: AndroidComposeView) {
     }
 
     private fun notifyViewEntered(semanticsId: Int) {
-        // When a field is entered for the first time, a pop-up dialog should appear. Compose does
-        // not need to keep track of whether or not this is the first time a field is entered;
-        // the Autofill framework takes care of that. Compose simply calls `showAutofillDialog`
-        // each time a field is entered and the dialog appears if the appropriate conditions are
-        // met.
-        autofillManager.showAutofillDialog(semanticsId)
         currentSemanticsNodes[semanticsId]?.adjustedBounds?.let {
             autofillManager.notifyViewEntered(semanticsId, it)
         }
@@ -481,8 +475,6 @@ internal interface AutofillManagerWrapper {
 
     fun notifyViewVisibilityChanged(semanticsId: Int, isVisible: Boolean)
 
-    fun showAutofillDialog(semanticsId: Int)
-
     fun commit()
 
     fun cancel()
@@ -516,12 +508,6 @@ private class AutofillManagerWrapperImpl(val view: AndroidComposeView) : Autofil
                 semanticsId,
                 isVisible
             )
-        }
-    }
-
-    override fun showAutofillDialog(semanticsId: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            AutofillApi33Helper.showAutofillDialog(view, autofillManager, semanticsId)
         }
     }
 
