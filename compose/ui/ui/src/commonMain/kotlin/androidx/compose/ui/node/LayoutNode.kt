@@ -1336,6 +1336,8 @@ internal class LayoutNode(
         if (isAttached) {
             invalidateSemantics()
         }
+        _semanticsConfiguration = null
+        isSemanticsInvalidated = false
         owner?.onLayoutNodeDeactivated(this)
     }
 

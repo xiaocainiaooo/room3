@@ -19,14 +19,20 @@ package androidx.compose.ui.semantics
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties.TestTag
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Correspondence
@@ -207,6 +213,32 @@ class SemanticsInfoTest {
             )
             .inOrder()
         assertThat(testTarget.semanticsConfiguration?.getOrNull(TestTag)).isEqualTo("testTarget")
+    }
+
+    @Test
+    fun readingSemanticsConfigurationOfDeactivatedNode() {
+        // Arrange.
+        lateinit var lazyListState: LazyListState
+        lateinit var rootForTest: RootForTest
+        rule.setContent {
+            rootForTest = LocalView.current as RootForTest
+            lazyListState = rememberLazyListState()
+            LazyRow(state = lazyListState, modifier = Modifier.size(10.dp)) {
+                items(2) { index -> Box(Modifier.size(10.dp).testTag("$index")) }
+            }
+        }
+        val semanticsId = rule.onNodeWithTag("0").semanticsId()
+        val semanticsInfo = checkNotNull(rootForTest.semanticsOwner[semanticsId])
+
+        // Act.
+        rule.runOnIdle { lazyListState.requestScrollToItem(1) }
+        val semanticsConfiguration = rule.runOnIdle { semanticsInfo.semanticsConfiguration }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(semanticsInfo.isDeactivated).isTrue()
+            assertThat(semanticsConfiguration).isNull()
+        }
     }
 
     private fun ComposeContentTestRule.setTestContent(composable: @Composable () -> Unit) {
