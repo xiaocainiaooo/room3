@@ -167,6 +167,11 @@ constructor(
         @FlashType flashType: Int,
         mainCaptureParams: MainCaptureParams?,
     ): List<Deferred<Void?>> {
+        debug {
+            "CapturePipeline#invokeCaptureTasks: tasks = $pipelineTasks" +
+                ", captureMode = $captureMode, flashMode = $flashMode, flashType = $flashType"
+        }
+
         if (pipelineTasks.contains(MAIN_CAPTURE)) {
             checkNotNull(mainCaptureParams) { "Must not be null for PipelineType.MAIN_CAPTURE" }
         }
@@ -270,7 +275,7 @@ constructor(
                     checkNotNull(mainCaptureParams),
                 )
             } else {
-                listOf(CompletableDeferred(null))
+                listOf(CompletableDeferred(value = null))
             }
             .also { captureSignal ->
                 if (contains(POST_CAPTURE)) {

@@ -95,6 +95,7 @@ constructor(
         @ImageCapture.FlashMode flashMode: Int,
         cancelPreviousTask: Boolean = true
     ): Deferred<Unit> {
+        debug { "setFlashAsync: flashMode = $flashMode, requestControl = $requestControl" }
         val signal = CompletableDeferred<Unit>()
 
         requestControl?.let {
@@ -268,6 +269,7 @@ constructor(
         // the initial flash mode value (for which waiting started) is returned afterwards.
         val initialFlashMode = flashMode
         updateSignal.join()
+        debug { "awaitFlashModeUpdate: initialFlashMode = $initialFlashMode" }
         return initialFlashMode
     }
 
