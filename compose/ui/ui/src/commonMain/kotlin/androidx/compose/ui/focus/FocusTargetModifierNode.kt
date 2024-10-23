@@ -19,6 +19,7 @@ package androidx.compose.ui.focus
 import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.node.invalidateSemantics
+import kotlin.js.JsName
 
 /**
  * This modifier node can be delegated to in order to create a modifier that makes a component
@@ -72,6 +73,7 @@ private object InvalidateSemantics {
     "Use the other overload with added parameters for focusability and onFocusChange",
     level = DeprecationLevel.HIDDEN
 )
+@JsName("funFocusTargetModifierNode")
 fun FocusTargetModifierNode(): FocusTargetModifierNode =
     FocusTargetNode(onDispatchEventsCompleted = InvalidateSemantics::onDispatchEventsCompleted)
 
@@ -86,6 +88,7 @@ fun FocusTargetModifierNode(): FocusTargetModifierNode =
  *   will be invoked if the node is losing focus due to being detached from the hierarchy, but
  *   before the node is marked as detached (node.isAttached will still be true).
  */
+@JsName("funFocusTargetModifierNode2")
 fun FocusTargetModifierNode(
     focusability: Focusability = Focusability.Always,
     onFocusChange: ((previous: FocusState, current: FocusState) -> Unit)? = null
