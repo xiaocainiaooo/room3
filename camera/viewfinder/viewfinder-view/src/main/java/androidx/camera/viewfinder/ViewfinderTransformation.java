@@ -91,8 +91,7 @@ final class ViewfinderTransformation {
 
     private static final String TAG = "ViewfinderTransformation";
 
-    private static final ScaleType DEFAULT_SCALE_TYPE =
-            ScaleType.FILL_CENTER;
+    private static final ScaleType DEFAULT_SCALE_TYPE = ScaleType.FILL_CENTER;
 
     @Nullable
     private Size mResolution;
@@ -112,8 +111,6 @@ final class ViewfinderTransformation {
 
     /**
      * Sets the {@link TransformationInfo}.
-     *
-     * <p> All the values originally come from a {@link ViewfinderSurfaceRequest}.
      */
     void setTransformationInfo(@NonNull TransformationInfo transformationInfo,
             Size resolution, boolean isFrontCamera) {
