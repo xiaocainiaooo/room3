@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,6 @@ import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -55,7 +54,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class PointerIconTest {
+class StylusHoverIconTest {
     @get:Rule val rule = createComposeRule()
     private val parentIconTag = "myParentIcon"
     private val childIconTag = "myChildIcon"
@@ -63,7 +62,6 @@ class PointerIconTest {
     private val desiredParentIcon = PointerIcon.Crosshair // AndroidPointerIcon(type=1007)
     private val desiredChildIcon = PointerIcon.Text // AndroidPointerIcon(type=1008)
     private val desiredGrandchildIcon = PointerIcon.Hand // AndroidPointerIcon(type=1002)
-    private val desiredDefaultIcon = PointerIcon.Default // AndroidPointerIcon(type=1000)
     private lateinit var iconService: PointerIconService
 
     @Before
@@ -71,6 +69,7 @@ class PointerIconTest {
         iconService =
             object : PointerIconService {
                 private var currentIcon: PointerIcon = PointerIcon.Default
+                private var currentStylusHoverIcon: PointerIcon? = null
 
                 override fun getIcon(): PointerIcon {
                     return currentIcon
@@ -81,10 +80,12 @@ class PointerIconTest {
                 }
 
                 override fun getStylusHoverIcon(): PointerIcon? {
-                    return null
+                    return currentStylusHoverIcon
                 }
 
-                override fun setStylusHoverIcon(value: PointerIcon?) {}
+                override fun setStylusHoverIcon(value: PointerIcon?) {
+                    currentStylusHoverIcon = value
+                }
             }
     }
 
@@ -93,14 +94,15 @@ class PointerIconTest {
         isDebugInspectorInfoEnabled = true
         rule.setContent {
             val modifier =
-                Modifier.pointerHoverIcon(PointerIcon.Hand, overrideDescendants = false)
+                Modifier.stylusHoverIcon(PointerIcon.Hand, overrideDescendants = false)
                     as InspectableValue
-            assertThat(modifier.nameFallback).isEqualTo("pointerHoverIcon")
+            assertThat(modifier.nameFallback).isEqualTo("stylusHoverIcon")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable())
                 .containsExactly(
                     "icon",
                     "overrideDescendants",
+                    "touchBoundsExpansion",
                 )
         }
         isDebugInspectorInfoEnabled = false
@@ -111,9 +113,9 @@ class PointerIconTest {
      * [PointerIcon.Crosshair], overrideDescendants = FALSE) ⤷ Child Box (custom icon =
      * [PointerIcon.Text], overrideDescendants = FALSE)
      *
-     * Expected Output: Because we don't move the cursor, the icon will be the default
-     * [PointerIcon.Default]. We also want to check that when using a .pointerHoverIcon modifier
-     * with a composable, composition only happens once (per composable).
+     * Expected Output: Because we don't move the cursor, the icon will be null. We also want to
+     * check that when using a .stylusHoverIcon modifier with a composable, composition only happens
+     * once (per composable).
      */
     @Test
     fun parentChildFullOverlap_noOverrideDescendants_checkNumberOfCompositions() {
@@ -127,7 +129,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     numberOfCompositions++
 
@@ -135,7 +137,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     ) {
                         numberOfCompositions++
                     }
@@ -144,7 +146,7 @@ class PointerIconTest {
         }
         // Verify initial state of pointer icon
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon)
+            assertThat(iconService.getStylusHoverIcon()).isNull()
             assertThat(numberOfCompositions).isEqualTo(2)
         }
     }
@@ -167,19 +169,19 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     Box(
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     )
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Child Box's icon is the desired child icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify Parent Box is respecting Child Box's icon
@@ -205,19 +207,19 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = true)
                 ) {
                     Box(
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     )
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Parent Box's icon is the desired parent icon
         verifyIconOnHover(parentIconTag, desiredParentIcon)
         // Verify Child Box is respecting Parent Box's icon
@@ -242,19 +244,19 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     Box(
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                     )
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Child Box's icon is the desired child icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify Parent Box is respecting Child Box's icon
@@ -279,19 +281,19 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = true)
                 ) {
                     Box(
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                     )
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Parent Box's icon is the desired parent icon
         verifyIconOnHover(parentIconTag, desiredParentIcon)
         // Verify Child Box is respecting Parent Box's icon
@@ -317,20 +319,20 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(100.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     )
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Child Box's icon is the desired child icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify remaining Parent Box's area is the desired parent icon
@@ -355,20 +357,20 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = true)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(100.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     )
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Parent Box's icon is the desired parent icon
         verifyIconOnHover(parentIconTag, desiredParentIcon)
         // Verify Child Box is respecting Parent Box's icon
@@ -393,20 +395,20 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(100.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                     )
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Child Box's icon is the desired child icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify remaining Parent Box's area is the desired parent icon
@@ -432,20 +434,20 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = true)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(100.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                     )
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Parent Box's icon is the desired parent icon
         verifyIconOnHover(parentIconTag, desiredParentIcon)
         // Verify Child Box is respecting Parent Box's icon
@@ -462,7 +464,7 @@ class PointerIconTest {
      *
      * Expected Output: Initially, the Child Box's [PointerIcon.Text] should win for its entire
      * surface area because it has no competition in the hierarchy for any other custom icons. After
-     * the Parent Box dynamically has the pointerHoverIcon Modifier added to it, the Parent Box's
+     * the Parent Box dynamically has the stylusHoverIcon Modifier added to it, the Parent Box's
      * [PointerIcon.Crosshair] should win for the entire surface area of the Parent Box and Child
      * Box because the Parent Box has overrideDescendants = true.
      *
@@ -481,7 +483,7 @@ class PointerIconTest {
                             .testTag(parentIconTag)
                             .then(
                                 if (isVisible.value)
-                                    Modifier.pointerHoverIcon(
+                                    Modifier.stylusHoverIcon(
                                         desiredParentIcon,
                                         overrideDescendants = true
                                     )
@@ -493,18 +495,18 @@ class PointerIconTest {
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     )
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Child Box is the desired child icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify Parent Box's icon is the desired default icon
-        verifyIconOnHover(parentIconTag, desiredDefaultIcon)
-        // Dynamically add the pointerHoverIcon Modifier to the Parent Box
+        verifyIconOnHover(parentIconTag, null)
+        // Dynamically add the stylusHoverIcon Modifier to the Parent Box
         rule.runOnIdle { isVisible.value = true }
         // Verify Parent Box's icon is the desired parent icon
         verifyIconOnHover(parentIconTag, desiredParentIcon)
@@ -522,7 +524,7 @@ class PointerIconTest {
      *
      * Expected Output: Initially, the Child Box's [PointerIcon.Text] should win for its entire
      * surface area because it has no competition in the hierarchy for any other custom icons. After
-     * the Parent Box dynamically has the pointerHoverIcon Modifier added to it, the Parent Box's
+     * the Parent Box dynamically has the stylusHoverIcon Modifier added to it, the Parent Box's
      * [PointerIcon.Crosshair] should win for the entire surface area of the Parent Box and Child
      * Box because the Parent Box has overrideDescendants = true.
      *
@@ -542,7 +544,7 @@ class PointerIconTest {
                             .testTag(parentIconTag)
                             .then(
                                 if (isVisible.value)
-                                    Modifier.pointerHoverIcon(
+                                    Modifier.stylusHoverIcon(
                                         desiredParentIcon,
                                         overrideDescendants = true
                                     )
@@ -554,32 +556,32 @@ class PointerIconTest {
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     )
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over Child Box and verify it has the desired child icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { enter(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverEnter(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move to Parent Box and verify its icon is the desired default icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Move back to the Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(center) }
-        // Dynamically add the pointerHoverIcon Modifier to the Parent Box
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(center) }
+        // Dynamically add the stylusHoverIcon Modifier to the Parent Box
         rule.runOnIdle { isVisible.value = true }
         // Verify the Child Box has updated to respect the desired parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move within the Child Box and verify it is still respecting the desired parent icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomRight) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomRight) }
         // Move to the Parent Box and verify it also has the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Exit hovering over Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -615,7 +617,7 @@ class PointerIconTest {
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
                             .then(
-                                Modifier.pointerHoverIcon(
+                                Modifier.stylusHoverIcon(
                                     desiredParentIcon,
                                     overrideDescendants = parentOverrideDescendants
                                 )
@@ -626,63 +628,63 @@ class PointerIconTest {
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     )
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over Child Box and verify it has the desired child icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { enter(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverEnter(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move to Parent Box and verify its icon is the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move back to the Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(center) }
 
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
 
-        // Dynamically change the pointerHoverIcon Modifier to the Parent Box to
+        // Dynamically change the stylusHoverIcon Modifier to the Parent Box to
         // override descendants.
         rule.runOnIdle { parentOverrideDescendants = true }
 
         // Verify the Child Box has updated to respect the desired parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
 
         // Move within the Child Box and verify it is still respecting the desired parent icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomRight) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomRight) }
 
         // Verify the Child Box has updated to respect the desired parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
 
         // Move to the Parent Box and verify it also has the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
 
         // Move within the Child Box and verify it is still respecting the desired parent icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomRight) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomRight) }
 
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
 
-        // Dynamically change the pointerHoverIcon Modifier to the Parent Box to NOT
+        // Dynamically change the stylusHoverIcon Modifier to the Parent Box to NOT
         // override descendants.
         rule.runOnIdle { parentOverrideDescendants = false }
 
         // Verify it's changed to child icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
 
         // Move to Parent Box and verify its icon is the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move back to the Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(center) }
 
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
 
         // Exit hovering over Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -711,7 +713,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(
+                            .stylusHoverIcon(
                                 desiredParentIcon,
                                 overrideDescendants = parentOverrideState.value
                             )
@@ -721,13 +723,13 @@ class PointerIconTest {
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     )
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Child Box's icon is the desired child icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify remaining Parent Box's area is the desired parent icon
@@ -779,7 +781,7 @@ class PointerIconTest {
                                 .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                                 .testTag(parentIconTag)
                                 .then(
-                                    Modifier.pointerHoverIcon(
+                                    Modifier.stylusHoverIcon(
                                         desiredParentIcon,
                                         overrideDescendants = parentOverrideDescendants
                                     )
@@ -792,69 +794,69 @@ class PointerIconTest {
                                 .height(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                 .testTag(childIconTag)
-                                .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                                .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over Child Box and verify it has the desired child icon (outside parent)
-        rule.onNodeWithTag(childIconTag).performMouseInput { enter(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverEnter(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
 
         // Hover over Child Box and verify it has the desired child icon (inside parent)
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomLeft) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomLeft) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
 
         // Move to Parent Box and verify its icon is the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move back to the Child Box (portion inside parent)
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomLeft) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomLeft) }
 
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
 
-        // Dynamically change the pointerHoverIcon Modifier of the Parent Box to
+        // Dynamically change the stylusHoverIcon Modifier of the Parent Box to
         // override descendants.
         rule.runOnIdle { parentOverrideDescendants = true }
 
         // Verify the Child Box has updated to respect the desired parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
 
         // Hover over Child Box and verify it has the desired child icon (outside parent)
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomRight) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomRight) }
 
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
 
         // Move to the Parent Box and verify it also has the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
 
         // Move within the Child Box (portion inside parent) and verify it is still
         // respecting the desired parent icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomLeft) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomLeft) }
 
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
 
-        // Dynamically change the pointerHoverIcon Modifier of the Parent Box to NOT
+        // Dynamically change the stylusHoverIcon Modifier of the Parent Box to NOT
         // override descendants.
         rule.runOnIdle { parentOverrideDescendants = false }
 
         // Verify it's changed to child icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
 
         // Move to Parent Box and verify its icon is the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move back to the Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomLeft) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomLeft) }
 
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
 
         // Exit hovering over Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -863,13 +865,13 @@ class PointerIconTest {
      * [PointerIcon.Hand], overrideDescendants = FALSE)
      *
      * Expected Output: ChildA Box’s [PointerIcon.Text] wins for the entire surface area of ChildA's
-     * Box. ChildB Box's [PointerIcon.Hand] wins for the entire surface area of ChildB's Box.
-     * [PointerIcon.Default] wins for the remainder of the surface area of Parent Box that's not
-     * covered by ChildA Box or ChildB Box. In this example, there's no competition for pointer
-     * icons because the parent has no icon set and neither ChildA or ChildB Boxes overlap.
+     * Box. ChildB Box's [PointerIcon.Hand] wins for the entire surface area of ChildB's Box. No
+     * icon wins for the remainder of the surface area of Parent Box that's not covered by ChildA
+     * Box or ChildB Box. In this example, there's no competition for pointer icons because the
+     * parent has no icon set and neither ChildA or ChildB Boxes overlap.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ Child Box (output icon =
-     * [PointerIcon.Text]) ⤷ Child Box (output icon = [PointerIcon.Hand])
+     * Parent Box (output icon = null) ⤷ Child Box (output icon = [PointerIcon.Text]) ⤷ Child Box
+     * (output icon = [PointerIcon.Hand])
      */
     @Test
     fun NonOverlappingSiblings_noOverrideDescendants() {
@@ -887,7 +889,7 @@ class PointerIconTest {
                                 .requiredSize(50.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                 .testTag(childIconTag)
-                                .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                                .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                         )
                         // Referencing grandchild tag/icon for ChildB in this test
                         Box(
@@ -895,23 +897,20 @@ class PointerIconTest {
                                 .requiredSize(50.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(
-                                    desiredGrandchildIcon,
-                                    overrideDescendants = false
-                                )
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify ChildA Box's icon is the desired ChildA icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify ChildB Box's icon is the desired ChildB icon
         verifyIconOnHover(grandchildIconTag, desiredGrandchildIcon)
         // Verify remaining Parent Box's icon is the default icon
-        verifyIconOnHover(parentIconTag, desiredDefaultIcon)
+        verifyIconOnHover(parentIconTag, null)
     }
 
     /**
@@ -920,14 +919,14 @@ class PointerIconTest {
      * [PointerIcon.Hand], overrideDescendants = FALSE)
      *
      * Expected Output: ChildA Box’s [PointerIcon.Text] wins for the entire surface area of ChildA's
-     * Box. ChildB Box's [PointerIcon.Hand] wins for the entire surface area of ChildB's Box.
-     * [PointerIcon.Default] wins for the remainder of the surface area of Parent Box that's not
-     * covered by ChildA Box or ChildB Box. In this example, it doesn't matter whether ChildA Box's
+     * Box. ChildB Box's [PointerIcon.Hand] wins for the entire surface area of ChildB's Box. No
+     * icon wins for the remainder of the surface area of Parent Box that's not covered by ChildA
+     * Box or ChildB Box. In this example, it doesn't matter whether ChildA Box's
      * overrideDescendants = true or false because there's no competition for pointer icons in this
      * example.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ Child Box (output icon =
-     * [PointerIcon.Text]) ⤷ Child Box (output icon = [PointerIcon.Hand])
+     * Parent Box (output icon = null) ⤷ Child Box (output icon = [PointerIcon.Text]) ⤷ Child Box
+     * (output icon = [PointerIcon.Hand])
      */
     @Test
     fun NonOverlappingSiblings_firstChildOverridesDescendants() {
@@ -945,7 +944,7 @@ class PointerIconTest {
                                 .requiredSize(50.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                 .testTag(childIconTag)
-                                .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                                .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                         )
                         // Referencing grandchild tag/icon for ChildB in this test
                         Box(
@@ -953,23 +952,20 @@ class PointerIconTest {
                                 .requiredSize(50.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(
-                                    desiredGrandchildIcon,
-                                    overrideDescendants = false
-                                )
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify ChildA Box's icon is the desired ChildA icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify ChildB Box's icon is the desired ChildB icon
         verifyIconOnHover(grandchildIconTag, desiredGrandchildIcon)
         // Verify remaining Parent Box's icon is the default icon
-        verifyIconOnHover(parentIconTag, desiredDefaultIcon)
+        verifyIconOnHover(parentIconTag, null)
     }
 
     /**
@@ -978,14 +974,14 @@ class PointerIconTest {
      * [PointerIcon.Hand], overrideDescendants = TRUE)
      *
      * Expected Output: ChildA Box’s [PointerIcon.Text] wins for the entire surface area of ChildA's
-     * Box. ChildB Box's [PointerIcon.Hand] wins for the entire surface area of ChildB's Box.
-     * [PointerIcon.Default] wins for the remainder of the surface area of Parent Box that's not
-     * covered by ChildA Box or ChildB Box. In this example, it doesn't matter whether ChildB Box's
+     * Box. ChildB Box's [PointerIcon.Hand] wins for the entire surface area of ChildB's Box. No
+     * icon wins for the remainder of the surface area of Parent Box that's not covered by ChildA
+     * Box or ChildB Box. In this example, it doesn't matter whether ChildB Box's
      * overrideDescendants = true or false because there's no competition for pointer icons in this
      * example.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ Child Box (output icon =
-     * [PointerIcon.Text]) ⤷ Child Box (output icon = [PointerIcon.Hand])
+     * Parent Box (output icon = null) ⤷ Child Box (output icon = [PointerIcon.Text]) ⤷ Child Box
+     * (output icon = [PointerIcon.Hand])
      */
     @Test
     fun NonOverlappingSiblings_secondChildOverridesDescendants() {
@@ -1003,7 +999,7 @@ class PointerIconTest {
                                 .requiredSize(50.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                 .testTag(childIconTag)
-                                .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                                .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                         )
                         // Referencing grandchild tag/icon for ChildB in this test
                         Box(
@@ -1011,20 +1007,20 @@ class PointerIconTest {
                                 .requiredSize(50.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify ChildA Box's icon is the desired ChildA icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify ChildB Box's icon is the desired ChildB icon
         verifyIconOnHover(grandchildIconTag, desiredGrandchildIcon)
         // Verify remaining Parent Box's icon is the default icon
-        verifyIconOnHover(parentIconTag, desiredDefaultIcon)
+        verifyIconOnHover(parentIconTag, null)
     }
 
     /**
@@ -1033,14 +1029,14 @@ class PointerIconTest {
      * [PointerIcon.Hand], overrideDescendants = TRUE)
      *
      * Expected Output: ChildA Box’s [PointerIcon.Text] wins for the entire surface area of ChildA's
-     * Box. ChildB Box's [PointerIcon.Hand] wins for the entire surface area of ChildB's Box.
-     * [PointerIcon.Default] wins for the remainder of the surface area of Parent Box that's not
-     * covered by ChildA Box or ChildB Box. In this example, it doesn't matter whether ChildA Box
-     * and ChildB Box's overrideDescendants = true or false because there's no competition for
-     * pointer icons in this example.
+     * Box. ChildB Box's [PointerIcon.Hand] wins for the entire surface area of ChildB's Box. No
+     * icon wins for the remainder of the surface area of Parent Box that's not covered by ChildA
+     * Box or ChildB Box. In this example, it doesn't matter whether ChildA Box and ChildB Box's
+     * overrideDescendants = true or false because there's no competition for pointer icons in this
+     * example.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ ChildA Box (output icon =
-     * [PointerIcon.Text]) ⤷ ChildB Box (output icon = [PointerIcon.Hand])
+     * Parent Box (output icon = null) ⤷ ChildA Box (output icon = [PointerIcon.Text]) ⤷ ChildB Box
+     * (output icon = [PointerIcon.Hand])
      */
     @Test
     fun NonOverlappingSiblings_bothOverrideDescendants() {
@@ -1058,7 +1054,7 @@ class PointerIconTest {
                                 .requiredSize(50.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                 .testTag(childIconTag)
-                                .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                                .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                         )
                         // Referencing grandchild tag/icon for ChildB in this test
                         Box(
@@ -1066,20 +1062,20 @@ class PointerIconTest {
                                 .requiredSize(50.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify ChildA Box's icon is the desired ChildA icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify ChildB Box's icon is the desired ChildB icon
         verifyIconOnHover(grandchildIconTag, desiredGrandchildIcon)
         // Verify remaining Parent Box's icon is the default icon
-        verifyIconOnHover(parentIconTag, desiredDefaultIcon)
+        verifyIconOnHover(parentIconTag, null)
     }
 
     /**
@@ -1090,11 +1086,11 @@ class PointerIconTest {
      *
      * Expected Output: ChildB Box's [PointerIcon.Hand] wins for the entire surface area of ChildB's
      * Box. ChildA Box's [PointerIcon.Text] wins for the remaining surface area of ChildA Box not
-     * covered by ChildB Box. [PointerIcon.Default] wins for the remainder of the surface area of
-     * Parent Box that's not covered by ChildA Box or ChildB Box.
+     * covered by ChildB Box. No icon wins for the remainder of the surface area of Parent Box
+     * that's not covered by ChildA Box or ChildB Box.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ ChildA Box (output icon =
-     * [PointerIcon.Text]) ⤷ ChildB Box (output icon = [PointerIcon.Hand])
+     * Parent Box (output icon = null) ⤷ ChildA Box (output icon = [PointerIcon.Text]) ⤷ ChildB Box
+     * (output icon = [PointerIcon.Hand])
      */
     @Test
     fun OverlappingSiblings_noOverrideDescendants() {
@@ -1111,7 +1107,7 @@ class PointerIconTest {
                             .requiredSize(120.dp, 60.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     )
                     // Referencing grandchild tag/icon for ChildB in this test
                     Box(
@@ -1119,7 +1115,7 @@ class PointerIconTest {
                             .requiredSize(120.dp, 20.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                             .testTag(grandchildIconTag)
-                            .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
                     )
                 }
             }
@@ -1136,14 +1132,14 @@ class PointerIconTest {
      *
      * Expected Output: ChildB Box's [PointerIcon.Hand] wins for the entire surface area of ChildB's
      * Box. ChildA Box's [PointerIcon.Text] wins for the remaining surface area of ChildA Box not
-     * covered by ChildB Box. [PointerIcon.Default] wins for the remainder of the surface area of
-     * Parent Box that's not covered by ChildA Box or ChildB Box. The overrideDescendants param only
-     * affects that element's children. So in this example, it doesn't matter whether ChildA Box's
+     * covered by ChildB Box. No icon wins for the remainder of the surface area of Parent Box
+     * that's not covered by ChildA Box or ChildB Box. The overrideDescendants param only affects
+     * that element's children. So in this example, it doesn't matter whether ChildA Box's
      * overrideDescendants = true because ChildB is its sibling and is therefore unaffected by this
      * param.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ ChildA Box (output icon =
-     * [PointerIcon.Text]) ⤷ ChildB Box (output icon = [PointerIcon.Hand])
+     * Parent Box (output icon = null) ⤷ ChildA Box (output icon = [PointerIcon.Text]) ⤷ ChildB Box
+     * (output icon = [PointerIcon.Hand])
      */
     @Test
     fun OverlappingSiblings_childAOverridesDescendants() {
@@ -1160,7 +1156,7 @@ class PointerIconTest {
                             .requiredSize(120.dp, 60.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                     )
                     // Referencing grandchild tag/icon for ChildB in this test
                     Box(
@@ -1168,7 +1164,7 @@ class PointerIconTest {
                             .requiredSize(120.dp, 20.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                             .testTag(grandchildIconTag)
-                            .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
                     )
                 }
             }
@@ -1185,14 +1181,14 @@ class PointerIconTest {
      *
      * Expected Output: ChildB Box's [PointerIcon.Hand] wins for the entire surface area of ChildB's
      * Box. ChildA Box's [PointerIcon.Text] wins for the remaining surface area of ChildA Box not
-     * covered by ChildB Box. [PointerIcon.Default] wins for the remainder of the surface area of
-     * Parent Box that's not covered by ChildA Box or ChildB Box. The overrideDescendants param only
-     * affects that element's children. So in this example, it doesn't matter whether ChildB Box's
+     * covered by ChildB Box. No icon wins for the remainder of the surface area of Parent Box
+     * that's not covered by ChildA Box or ChildB Box. The overrideDescendants param only affects
+     * that element's children. So in this example, it doesn't matter whether ChildB Box's
      * overrideDescendants = true because ChildA is its sibling and is therefore unaffected by this
      * param.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ ChildA Box (output icon =
-     * [PointerIcon.Text]) ⤷ ChildB Box (output icon = [PointerIcon.Hand])
+     * Parent Box (output icon = null) ⤷ ChildA Box (output icon = [PointerIcon.Text]) ⤷ ChildB Box
+     * (output icon = [PointerIcon.Hand])
      */
     @Test
     fun OverlappingSiblings_childBOverridesDescendants() {
@@ -1209,7 +1205,7 @@ class PointerIconTest {
                             .requiredSize(120.dp, 60.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     )
                     // Referencing grandchild tag/icon for ChildB in this test
                     Box(
@@ -1217,7 +1213,7 @@ class PointerIconTest {
                             .requiredSize(120.dp, 20.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                             .testTag(grandchildIconTag)
-                            .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                     )
                 }
             }
@@ -1234,14 +1230,14 @@ class PointerIconTest {
      *
      * Expected Output: ChildB Box's [PointerIcon.Hand] wins for the entire surface area of ChildB's
      * Box. ChildA Box's [PointerIcon.Text] wins for the remaining surface area of ChildA Box not
-     * covered by ChildB Box. [PointerIcon.Default] wins for the remainder of the surface area of
-     * Parent Box that's not covered by ChildA Box or ChildB Box. The overrideDescendants param only
-     * affects that element's children. So in this example, it doesn't matter whether ChildA Box or
-     * ChildB Box's overrideDescendants = true because ChildA and ChildB Boxes are siblings and are
+     * covered by ChildB Box. No icon wins for the remainder of the surface area of Parent Box
+     * that's not covered by ChildA Box or ChildB Box. The overrideDescendants param only affects
+     * that element's children. So in this example, it doesn't matter whether ChildA Box or ChildB
+     * Box's overrideDescendants = true because ChildA and ChildB Boxes are siblings and are
      * unaffected by each other's overrideDescendants param.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ ChildA Box (output icon =
-     * [PointerIcon.Text]) ⤷ ChildB Box (output icon = [PointerIcon.Hand])
+     * Parent Box (output icon = null) ⤷ ChildA Box (output icon = [PointerIcon.Text]) ⤷ ChildB Box
+     * (output icon = [PointerIcon.Hand])
      */
     @Test
     fun OverlappingSiblings_bothOverrideDescendants() {
@@ -1258,7 +1254,7 @@ class PointerIconTest {
                             .requiredSize(120.dp, 60.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                     )
                     // Referencing grandchild tag/icon for ChildB in this test
                     Box(
@@ -1266,7 +1262,7 @@ class PointerIconTest {
                             .requiredSize(120.dp, 20.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                             .testTag(grandchildIconTag)
-                            .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                     )
                 }
             }
@@ -1298,14 +1294,14 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = true)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(120.dp, 60.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                     )
                     // Referencing grandchild tag/icon for ChildB in this test
                     Box(
@@ -1313,25 +1309,25 @@ class PointerIconTest {
                             .requiredSize(120.dp, 20.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                             .testTag(grandchildIconTag)
-                            .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                     )
                 }
             }
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over ChildB (bottom right corner) and verify desired Parent icon
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { enter(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverEnter(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Then hover to parent (bottom right corner) and icon hasn't changed
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Then hover to ChildA (bottom left corner) and verify icon hasn't changed
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomLeft) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomLeft) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Exit hovering
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -1340,11 +1336,11 @@ class PointerIconTest {
      * = FALSE)
      *
      * Expected Output: Grandchild Box’s [PointerIcon.Hand] wins for the entire surface area of
-     * Grandchild's Box. [PointerIcon.Default] wins for the remainder of the surface area of Parent
-     * Box that isn't covered by Grandchild Box.
+     * Grandchild's Box. No icon wins for the remainder of the surface area of Parent Box that isn't
+     * covered by Grandchild Box.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ Child Box (output icon =
-     * [PointerIcon.Default]) ⤷ Grandchild Box (output icon = [PointerIcon.Hand])
+     * Parent Box (output icon = null) ⤷ Child Box (output icon = null) ⤷ Grandchild Box (output
+     * icon = [PointerIcon.Hand])
      */
     @Test
     fun multiLayeredNesting_grandchildCustomIconNoOverride() {
@@ -1367,23 +1363,20 @@ class PointerIconTest {
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(
-                                    desiredGrandchildIcon,
-                                    overrideDescendants = false
-                                )
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Grandchild Box's icon is the desired grandchild icon
         verifyIconOnHover(grandchildIconTag, desiredGrandchildIcon)
         // Verify remaining Child Box's area is the default arrow icon
-        verifyIconOnHover(childIconTag, desiredDefaultIcon)
+        verifyIconOnHover(childIconTag, null)
         // Verify remaining Parent Box's area is the default arrow icon
-        verifyIconOnHover(parentIconTag, desiredDefaultIcon)
+        verifyIconOnHover(parentIconTag, null)
     }
 
     /**
@@ -1392,11 +1385,11 @@ class PointerIconTest {
      * = TRUE)
      *
      * Expected Output: Grandchild Box’s [PointerIcon.Hand] wins for the entire surface area of
-     * Grandchild's Box. [PointerIcon.Default] wins for the remainder of the surface area of Parent
-     * Box that isn't covered by Grandchild Box.
+     * Grandchild's Box. No icon wins for the remainder of the surface area of Parent Box that isn't
+     * covered by Grandchild Box.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ Child Box (output icon =
-     * [PointerIcon.Default]) ⤷ Grandchild Box (output icon = [PointerIcon.Hand])
+     * Parent Box (output icon = null) ⤷ Child Box (output icon = null) ⤷ Grandchild Box (output
+     * icon = [PointerIcon.Hand])
      */
     @Test
     fun multiLayeredNesting_grandchildCustomIconHasOverride() {
@@ -1419,20 +1412,20 @@ class PointerIconTest {
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Grandchild Box's icon is the desired grandchild icon
         verifyIconOnHover(grandchildIconTag, desiredGrandchildIcon)
         // Verify remaining Child Box's area is the default arrow icon
-        verifyIconOnHover(childIconTag, desiredDefaultIcon)
+        verifyIconOnHover(childIconTag, null)
         // Verify remaining Parent Box's area is the default arrow icon
-        verifyIconOnHover(parentIconTag, desiredDefaultIcon)
+        verifyIconOnHover(parentIconTag, null)
     }
 
     /**
@@ -1442,11 +1435,11 @@ class PointerIconTest {
      *
      * Expected Output: Grandchild Box's [PointerIcon.Hand] wins for the entire surface area of the
      * Grandchild Box. Child Box’s [PointerIcon.Text] wins for remaining surface area of its Box not
-     * covered by the Grandchild Box. [PointerIcon.Default] wins for the remainder of the surface
-     * area of Parent Box that isn't covered by Child Box.
+     * covered by the Grandchild Box. No icon wins for the remainder of the surface area of Parent
+     * Box that isn't covered by Child Box.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ Child Box (output icon =
-     * [PointerIcon.Text]) ⤷ Grandchild Box (output icon = [PointerIcon.Hand])
+     * Parent Box (output icon = null) ⤷ Child Box (output icon = [PointerIcon.Text]) ⤷ Grandchild
+     * Box (output icon = [PointerIcon.Hand])
      */
     @Test
     fun multiLayeredNesting_childAndGrandchildCustomIconsNoOverrides() {
@@ -1463,30 +1456,27 @@ class PointerIconTest {
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     ) {
                         Box(
                             Modifier.padding(40.dp)
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(
-                                    desiredGrandchildIcon,
-                                    overrideDescendants = false
-                                )
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Grandchild Box's icon is the desired grandchild icon
         verifyIconOnHover(grandchildIconTag, desiredGrandchildIcon)
         // Verify remaining Child Box's icon is the desired child icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify remaining Parent Box's area is the default arrow icon
-        verifyIconOnHover(parentIconTag, desiredDefaultIcon)
+        verifyIconOnHover(parentIconTag, null)
     }
 
     /**
@@ -1496,11 +1486,11 @@ class PointerIconTest {
      *
      * Expected Output: Grandchild Box's [PointerIcon.Hand] wins for the entire surface area of the
      * Grandchild Box. Child Box’s [PointerIcon.Text] wins for the remainder of the Child Box's
-     * surface area that's not covered by the Grandchild box. [PointerIcon.Default] wins for the
-     * remainder of the surface area of Parent Box that isn't covered by Child Box.
+     * surface area that's not covered by the Grandchild box. No icon wins for the remainder of the
+     * surface area of Parent Box that isn't covered by Child Box.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ Child Box (output icon =
-     * [PointerIcon.Text]) ⤷ Grandchild Box (output icon = [PointerIcon.Hand])
+     * Parent Box (output icon = null) ⤷ Child Box (output icon = [PointerIcon.Text]) ⤷ Grandchild
+     * Box (output icon = [PointerIcon.Hand])
      */
     @Test
     fun multiLayeredNesting_childCustomIconGrandchildHasOverride() {
@@ -1517,27 +1507,27 @@ class PointerIconTest {
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     ) {
                         Box(
                             Modifier.padding(40.dp)
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Grandchild Box's icon is the desired grandchild icon
         verifyIconOnHover(grandchildIconTag, desiredGrandchildIcon)
         // Verify remaining Child Box's icon is the desired child icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify remaining Parent Box's area is the default arrow icon
-        verifyIconOnHover(parentIconTag, desiredDefaultIcon)
+        verifyIconOnHover(parentIconTag, null)
     }
 
     /**
@@ -1547,11 +1537,11 @@ class PointerIconTest {
      *
      * Expected Output: Child Box’s [PointerIcon.Text] wins for the entire surface area of its Box
      * (including all of the Grandchild Box since it is contained within Child Box's surface area).
-     * [PointerIcon.Default] wins for the remainder of the surface area of Parent Box that isn't
-     * covered by Child Box.
+     * No icon wins for the remainder of the surface area of Parent Box that isn't covered by Child
+     * Box.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ Child Box (output icon =
-     * [PointerIcon.Text]) ⤷ Grandchild Box (output icon = [PointerIcon.Text])
+     * Parent Box (output icon = null) ⤷ Child Box (output icon = [PointerIcon.Text]) ⤷ Grandchild
+     * Box (output icon = [PointerIcon.Text])
      */
     @Test
     fun multiLayeredNesting_grandchildCustomIconChildHasOverride() {
@@ -1568,30 +1558,27 @@ class PointerIconTest {
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                     ) {
                         Box(
                             Modifier.padding(40.dp)
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(
-                                    desiredGrandchildIcon,
-                                    overrideDescendants = false
-                                )
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Child Box's icon is the desired child icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify Grandchild Box is respecting Child Box's icon
         verifyIconOnHover(grandchildIconTag, desiredChildIcon)
         // Verify remaining Parent Box's area is the default arrow icon
-        verifyIconOnHover(parentIconTag, desiredDefaultIcon)
+        verifyIconOnHover(parentIconTag, null)
     }
 
     /**
@@ -1601,11 +1588,11 @@ class PointerIconTest {
      *
      * Expected Output: Child Box’s [PointerIcon.Text] wins for the entire surface area of its Box
      * (including all of the Grandchild Box since it is contained within Child Box's surface area).
-     * [PointerIcon.Default] wins for the remainder of the surface area of Parent Box that isn't
-     * covered by Child Box.
+     * No icon wins for the remainder of the surface area of Parent Box that isn't covered by Child
+     * Box.
      *
-     * Parent Box (output icon = [PointerIcon.Default]) ⤷ Child Box (output icon =
-     * [PointerIcon.Text]) ⤷ Grandchild Box (output icon = [PointerIcon.Text])
+     * Parent Box (output icon = null) ⤷ Child Box (output icon = [PointerIcon.Text]) ⤷ Grandchild
+     * Box (output icon = [PointerIcon.Text])
      */
     @Test
     fun multiLayeredNesting_childAndGrandchildOverrideDescendants() {
@@ -1622,27 +1609,27 @@ class PointerIconTest {
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                     ) {
                         Box(
                             Modifier.padding(40.dp)
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Child Box's icon is the desired child icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify Grandchild Box is respecting Child Box's icon
         verifyIconOnHover(grandchildIconTag, desiredChildIcon)
         // Verify remaining Parent Box's area is the default arrow icon
-        verifyIconOnHover(parentIconTag, desiredDefaultIcon)
+        verifyIconOnHover(parentIconTag, null)
     }
 
     /**
@@ -1666,7 +1653,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
@@ -1679,17 +1666,14 @@ class PointerIconTest {
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(
-                                    desiredGrandchildIcon,
-                                    overrideDescendants = false
-                                )
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Grandchild Box's icon is the desired grandchild icon
         verifyIconOnHover(grandchildIconTag, desiredGrandchildIcon)
         // Verify remaining Child Box is respecting Parent Box's icon
@@ -1719,7 +1703,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
@@ -1732,14 +1716,14 @@ class PointerIconTest {
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Grandchild Box's icon is the desired grandchild icon
         verifyIconOnHover(grandchildIconTag, desiredGrandchildIcon)
         // Verify remaining Child Box is respecting Parent Box's icon
@@ -1771,31 +1755,28 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     ) {
                         Box(
                             Modifier.padding(40.dp)
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(
-                                    desiredGrandchildIcon,
-                                    overrideDescendants = false
-                                )
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Grandchild Box's icon is the desired grandchild icon
         verifyIconOnHover(grandchildIconTag, desiredGrandchildIcon)
         // Verify remaining Child Box's icon is the desired child icon
@@ -1827,28 +1808,28 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     ) {
                         Box(
                             Modifier.padding(40.dp)
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Grandchild Box's icon is the desired grandchild icon
         verifyIconOnHover(grandchildIconTag, desiredGrandchildIcon)
         // Verify remaining Child Box's icon is the desired child icon
@@ -1878,31 +1859,28 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                     ) {
                         Box(
                             Modifier.padding(40.dp)
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(
-                                    desiredGrandchildIcon,
-                                    overrideDescendants = false
-                                )
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Child Box's icon is the desired child icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify Grandchild Box is respecting Child Box's icon
@@ -1935,28 +1913,28 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                     ) {
                         Box(
                             Modifier.padding(40.dp)
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Child Box's icon is the desired child icon
         verifyIconOnHover(childIconTag, desiredChildIcon)
         // Verify Grandchild Box is respecting Child Box's icon
@@ -1986,7 +1964,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = true)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
@@ -1999,17 +1977,14 @@ class PointerIconTest {
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(
-                                    desiredGrandchildIcon,
-                                    overrideDescendants = false
-                                )
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Parent Box's icon is the desired parent icon
         verifyIconOnHover(parentIconTag, desiredParentIcon)
         // Verify Child Box is respecting Parent Box's icon
@@ -2039,28 +2014,28 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = true)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     ) {
                         Box(
                             Modifier.padding(40.dp)
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Parent Box's icon is the desired parent icon
         verifyIconOnHover(parentIconTag, desiredParentIcon)
         // Verify Child Box is respecting Parent Box's icon
@@ -2092,31 +2067,28 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = true)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     ) {
                         Box(
                             Modifier.padding(40.dp)
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(
-                                    desiredGrandchildIcon,
-                                    overrideDescendants = false
-                                )
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Parent Box's icon is the desired parent icon
         verifyIconOnHover(parentIconTag, desiredParentIcon)
         // Verify Child Box is respecting Parent Box's icon
@@ -2148,28 +2120,28 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = true)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                     ) {
                         Box(
                             Modifier.padding(40.dp)
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Parent Box's icon is the desired parent icon
         verifyIconOnHover(parentIconTag, desiredParentIcon)
         // Verify Child Box is respecting Parent Box's icon
@@ -2201,31 +2173,28 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = true)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                     ) {
                         Box(
                             Modifier.padding(40.dp)
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(
-                                    desiredGrandchildIcon,
-                                    overrideDescendants = false
-                                )
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Parent Box's icon is the desired parent icon
         verifyIconOnHover(parentIconTag, desiredParentIcon)
         // Verify Child Box is respecting Parent Box's icon
@@ -2257,28 +2226,28 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = true)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(desiredChildIcon, overrideDescendants = true)
+                            .stylusHoverIcon(desiredChildIcon, overrideDescendants = true)
                     ) {
                         Box(
                             Modifier.padding(40.dp)
                                 .requiredSize(100.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(grandchildIconTag)
-                                .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
+                                .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = true)
                         )
                     }
                 }
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Verify Parent Box's icon is the desired parent icon
         verifyIconOnHover(parentIconTag, desiredParentIcon)
         // Verify Child Box is respecting Parent Box's icon
@@ -2302,36 +2271,40 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     Box(
                         Modifier.padding(20.dp)
                             .requiredSize(100.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                             .testTag(childIconTag)
-                            .pointerHoverIcon(icon.value, overrideDescendants = false)
+                            .stylusHoverIcon(icon.value, overrideDescendants = false)
                     )
                 }
             }
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { enter(bottomRight) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverEnter(bottomRight) }
         // Verify Child Box has the desired child icon and dynamically update the icon assigned to
         // the Child Box while hovering over Child Box
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon)
             icon.value = desiredGrandchildIcon
         }
         // Verify the icon has been updated to the desired grandchild icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move cursor within Child Box and verify it still has the updated icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Exit hovering over Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -2363,7 +2336,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false),
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false),
                     contentAlignment = Alignment.Center
                 ) {
                     if (isChildVisible.value) {
@@ -2373,7 +2346,7 @@ class PointerIconTest {
                                     .requiredSize(100.dp)
                                     .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                     .testTag(childIconTag)
-                                    .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                                    .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                         )
                     }
                 }
@@ -2381,31 +2354,31 @@ class PointerIconTest {
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over center of Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { enter(center) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverEnter(center) }
         // Verify Parent Box has the desired parent icon and dynamically add the Child Box under the
         // cursor
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon)
             isChildVisible.value = true
         }
         // Verify the icon has been updated to the desired child icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor within Child Box and verify it still has the updated icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor outside Child Box and verify the icon is updated to the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomCenter) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomCenter) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor back to the center of the Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(center) }
         // Dynamically remove the Child Box
         rule.runOnIdle { isChildVisible.value = false }
         // Verify the icon has been updated to the desired parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Exit hovering over Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -2434,7 +2407,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = true),
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = true),
                     contentAlignment = Alignment.Center
                 ) {
                     if (isChildVisible.value) {
@@ -2444,7 +2417,7 @@ class PointerIconTest {
                                     .requiredSize(100.dp)
                                     .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                     .testTag(childIconTag)
-                                    .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                                    .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                         )
                     }
                 }
@@ -2452,31 +2425,31 @@ class PointerIconTest {
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over center of Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { enter(center) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverEnter(center) }
         // Verify Parent Box has the desired parent icon and dynamically add the Child Box under the
         // cursor
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon)
             isChildVisible.value = true
         }
         // Verify the icon stays as the parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor within Child Box and verify it still is the parent icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor outside Child Box and verify the icon is updated to the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomCenter) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomCenter) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor back to the center of the Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(center) }
         // Dynamically remove the Child Box
         rule.runOnIdle { isChildVisible.value = false }
         // Verify the icon still the desired parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Exit hovering over Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -2510,7 +2483,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false),
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false),
                     contentAlignment = Alignment.Center
                 ) {
                     if (areDescendantsVisible.value) {
@@ -2520,10 +2493,7 @@ class PointerIconTest {
                                     .requiredSize(150.dp)
                                     .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                     .testTag(childIconTag)
-                                    .pointerHoverIcon(
-                                        desiredChildIcon,
-                                        overrideDescendants = false
-                                    ),
+                                    .stylusHoverIcon(desiredChildIcon, overrideDescendants = false),
                             contentAlignment = Alignment.Center
                         ) {
                             Box(
@@ -2532,7 +2502,7 @@ class PointerIconTest {
                                         .requiredSize(100.dp)
                                         .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                         .testTag(grandchildIconTag)
-                                        .pointerHoverIcon(
+                                        .stylusHoverIcon(
                                             desiredGrandchildIcon,
                                             overrideDescendants = false
                                         )
@@ -2544,34 +2514,38 @@ class PointerIconTest {
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over center of Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { enter(center) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverEnter(center) }
         // Verify Parent Box has the desired parent icon and dynamically add the Child Box and
         // Grandchild Box under the cursor
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon)
             areDescendantsVisible.value = true
         }
         // Verify the icon has been updated to the desired grandchild icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move cursor within Grandchild Box and verify it still has the grandchild icon
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move cursor outside Grandchild Box within Child Box and verify it has the child icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor outside Child Box and verify the icon is updated to the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomCenter) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomCenter) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor back to the center of the Grandchild Box
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(center) }
         // Dynamically remove the Child Box and Grandchild Box
         rule.runOnIdle { areDescendantsVisible.value = false }
         // Verify the icon has been updated to the desired parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Exit hovering over Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -2607,7 +2581,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false),
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false),
                     contentAlignment = Alignment.Center
                 ) {
                     if (areDescendantsVisible.value) {
@@ -2617,10 +2591,7 @@ class PointerIconTest {
                                     .requiredSize(150.dp)
                                     .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                     .testTag(childIconTag)
-                                    .pointerHoverIcon(
-                                        desiredChildIcon,
-                                        overrideDescendants = false
-                                    ),
+                                    .stylusHoverIcon(desiredChildIcon, overrideDescendants = false),
                             contentAlignment = Alignment.Center
                         ) {
                             Box(
@@ -2629,7 +2600,7 @@ class PointerIconTest {
                                         .requiredSize(100.dp)
                                         .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                         .testTag(grandchildIconTag)
-                                        .pointerHoverIcon(
+                                        .stylusHoverIcon(
                                             desiredGrandchildIcon,
                                             overrideDescendants = true
                                         )
@@ -2641,34 +2612,38 @@ class PointerIconTest {
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over center of Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { enter(center) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverEnter(center) }
         // Verify Parent Box has the desired parent icon and dynamically add the Child Box and
         // Grandchild Box under the cursor
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon)
             areDescendantsVisible.value = true
         }
         // Verify the icon has been updated to the desired grandchild icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move cursor within Grandchild Box and verify it still has the grandchild icon
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move cursor outside Grandchild Box within Child Box and verify it has the child icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor outside Child Box and verify the icon is updated to the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomCenter) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomCenter) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor back to the center of the Grandchild Box
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(center) }
         // Dynamically remove the Child Box and Grandchild Box
         rule.runOnIdle { areDescendantsVisible.value = false }
         // Verify the icon has been updated to the desired parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Exit hovering over Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -2702,7 +2677,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false),
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false),
                     contentAlignment = Alignment.Center
                 ) {
                     if (areDescendantsVisible.value) {
@@ -2712,7 +2687,7 @@ class PointerIconTest {
                                     .requiredSize(150.dp)
                                     .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                     .testTag(childIconTag)
-                                    .pointerHoverIcon(desiredChildIcon, overrideDescendants = true),
+                                    .stylusHoverIcon(desiredChildIcon, overrideDescendants = true),
                             contentAlignment = Alignment.Center
                         ) {
                             Box(
@@ -2721,7 +2696,7 @@ class PointerIconTest {
                                         .requiredSize(100.dp)
                                         .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                         .testTag(grandchildIconTag)
-                                        .pointerHoverIcon(
+                                        .stylusHoverIcon(
                                             desiredGrandchildIcon,
                                             overrideDescendants = false
                                         )
@@ -2733,34 +2708,34 @@ class PointerIconTest {
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over center of Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { enter(center) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverEnter(center) }
         // Verify Parent Box has the desired parent icon, then dynamically add the Child Box and
         // Grandchild Box under the cursor
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon)
             areDescendantsVisible.value = true
         }
         // Verify the icon has been updated to the desired child icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor within Grandchild Box and verify it still has the child icon
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor outside Grandchild Box within Child Box to verify it still has the child icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor outside Child Box and verify the icon is updated to the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomCenter) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomCenter) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor back to the center of the Grandchild Box
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(center) }
         // Dynamically remove the Child Box and Grandchild Box
         rule.runOnIdle { areDescendantsVisible.value = false }
         // Verify the icon has been updated to the desired parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Exit hovering over Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -2789,7 +2764,7 @@ class PointerIconTest {
                     Modifier.requiredSize(150.dp)
                         .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                         .testTag(childIconTag)
-                        .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                        .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
             )
         }
 
@@ -2801,7 +2776,7 @@ class PointerIconTest {
                             Modifier.requiredSize(200.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                                 .testTag(parentIconTag)
-                                .pointerHoverIcon(desiredParentIcon, overrideDescendants = false),
+                                .stylusHoverIcon(desiredParentIcon, overrideDescendants = false),
                         contentAlignment = Alignment.Center
                     ) {
                         child()
@@ -2813,31 +2788,31 @@ class PointerIconTest {
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over center of Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { enter(center) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverEnter(center) }
         // Verify Child Box has the desired child icon and dynamically add the Parent Box under the
         // cursor
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon)
             isParentVisible.value = true
         }
         // Verify the icon stays as the desired child icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor within Child Box and verify it still has the child icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor outside Child Box and verify the icon is updated to the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomCenter) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomCenter) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor back to the center of the Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(center) }
         // Dynamically remove the Parent Box
         rule.runOnIdle { isParentVisible.value = false }
         // Verify the icon stays as the desired child icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Exit hovering over Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -2867,7 +2842,7 @@ class PointerIconTest {
                     Modifier.requiredSize(150.dp)
                         .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                         .testTag(childIconTag)
-                        .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                        .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
             )
         }
 
@@ -2879,7 +2854,7 @@ class PointerIconTest {
                             Modifier.requiredSize(200.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                                 .testTag(parentIconTag)
-                                .pointerHoverIcon(desiredParentIcon, overrideDescendants = true),
+                                .stylusHoverIcon(desiredParentIcon, overrideDescendants = true),
                         contentAlignment = Alignment.Center
                     ) {
                         child()
@@ -2891,31 +2866,31 @@ class PointerIconTest {
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over center of Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { enter(center) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverEnter(center) }
         // Verify Child Box has the desired child icon and dynamically add the Parent Box under the
         // cursor
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon)
             isParentVisible.value = true
         }
         // Verify the icon has been updated to the desired parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor within Child Box and verify it still has the parent icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor outside Child Box and verify the icon is still the parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomCenter) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomCenter) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor back to the center of the Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(center) }
         // Dynamically remove the Parent Box
         rule.runOnIdle { isParentVisible.value = false }
         // Verify the icon has been updated to the desired child icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Exit hovering over Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -2948,7 +2923,7 @@ class PointerIconTest {
                     Modifier.requiredSize(100.dp)
                         .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                         .testTag(grandchildIconTag)
-                        .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
+                        .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
             )
         }
 
@@ -2959,7 +2934,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false),
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false),
                     contentAlignment = Alignment.Center
                 ) {
                     if (isChildVisible.value) {
@@ -2968,10 +2943,7 @@ class PointerIconTest {
                                 Modifier.requiredSize(150.dp)
                                     .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                     .testTag(childIconTag)
-                                    .pointerHoverIcon(
-                                        desiredChildIcon,
-                                        overrideDescendants = false
-                                    ),
+                                    .stylusHoverIcon(desiredChildIcon, overrideDescendants = false),
                             contentAlignment = Alignment.Center
                         ) {
                             grandchild()
@@ -2984,34 +2956,40 @@ class PointerIconTest {
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over center of Grandchild Box
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { enter(center) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverEnter(center) }
         // Verify Grandchild Box has the desired grandchild icon and dynamically add the Child Box
         // under the cursor
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
             isChildVisible.value = true
         }
         // Verify the icon stays as the desired grandchild icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move cursor within Grandchild Box and verify it still has the grandchild icon
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move cursor outside Grandchild Box within Child Box to verify icon is now the child icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor outside Child Box and verify the icon is updated to the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor back to the center of the Grandchild Box
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(center) }
         // Dynamically remove the Child Box
         rule.runOnIdle { isChildVisible.value = false }
         // Verify the icon has been updated to the desired grandchild icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Exit hovering over Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -3050,7 +3028,7 @@ class PointerIconTest {
                     Modifier.requiredSize(100.dp)
                         .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                         .testTag(grandchildIconTag)
-                        .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
+                        .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
             )
         }
 
@@ -3061,7 +3039,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false),
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false),
                     contentAlignment = Alignment.Center
                 ) {
                     if (isChildVisible.value) {
@@ -3070,7 +3048,7 @@ class PointerIconTest {
                                 Modifier.requiredSize(150.dp)
                                     .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                                     .testTag(childIconTag)
-                                    .pointerHoverIcon(desiredChildIcon, overrideDescendants = true),
+                                    .stylusHoverIcon(desiredChildIcon, overrideDescendants = true),
                             contentAlignment = Alignment.Center
                         ) {
                             grandchild()
@@ -3083,34 +3061,36 @@ class PointerIconTest {
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over center of Grandchild Box
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { enter(center) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverEnter(center) }
         // Verify Grandchild Box has the desired grandchild icon and dynamically add the Child Box
         // under the cursor
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
             isChildVisible.value = true
         }
         // Verify the icon has been updated to the desired child icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor within Grandchild Box and verify it still has the child icon
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor outside Grandchild Box within Child Box to verify it still has the child icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor outside Child Box and verify the icon is updated to the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomCenter) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomCenter) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor back to center of the Grandchild Box
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(center) }
         // Dynamically remove the Child Box
         rule.runOnIdle { isChildVisible.value = false }
         // Verify the icon has been updated to the desired grandchild icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Exit hovering over Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -3150,7 +3130,7 @@ class PointerIconTest {
                     Modifier.requiredSize(100.dp)
                         .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                         .testTag(grandchildIconTag)
-                        .pointerHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
+                        .stylusHoverIcon(desiredGrandchildIcon, overrideDescendants = false)
             )
         }
 
@@ -3161,7 +3141,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(grandparentIconTag)
-                            .pointerHoverIcon(desiredGrandparentIcon, overrideDescendants = false),
+                            .stylusHoverIcon(desiredGrandparentIcon, overrideDescendants = false),
                     contentAlignment = Alignment.Center
                 ) {
                     Box(
@@ -3169,7 +3149,7 @@ class PointerIconTest {
                             Modifier.requiredSize(175.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                                 .testTag(parentIconTag)
-                                .pointerHoverIcon(desiredParentIcon, overrideDescendants = false),
+                                .stylusHoverIcon(desiredParentIcon, overrideDescendants = false),
                         contentAlignment = Alignment.Center
                     ) {
                         if (isChildVisible.value) {
@@ -3178,7 +3158,7 @@ class PointerIconTest {
                                     Modifier.requiredSize(150.dp)
                                         .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                         .testTag(childIconTag)
-                                        .pointerHoverIcon(
+                                        .stylusHoverIcon(
                                             desiredChildIcon,
                                             overrideDescendants = false
                                         ),
@@ -3195,34 +3175,42 @@ class PointerIconTest {
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over center of Grandchild Box
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { enter(center) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverEnter(center) }
         // Verify Grandchild Box has the desired grandchild icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move to corner of Grandparent Box where no descendants are under the cursor
-        rule.onNodeWithTag(grandparentIconTag).performMouseInput { moveTo(bottomRight) }
+        rule.onNodeWithTag(grandparentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
         // Verify the icon is the desired grandparent icon and dynamically add the Child Box
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredGrandparentIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandparentIcon)
             isChildVisible.value = true
         }
         // Verify the icon stays as the desired grandparent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandparentIcon) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandparentIcon)
+        }
         // Move cursor within Grandparent Box and verify it still has the grandparent icon
-        rule.onNodeWithTag(grandparentIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandparentIcon) }
+        rule.onNodeWithTag(grandparentIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandparentIcon)
+        }
         // Move cursor outside Grandparent Box to Parent Box to verify icon is now the parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor back to corner of Grandparent Box where no descendants are under the cursor
-        rule.onNodeWithTag(grandparentIconTag).performMouseInput { moveTo(bottomRight) }
+        rule.onNodeWithTag(grandparentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
         // Dynamically remove the Child Box
         rule.runOnIdle { isChildVisible.value = false }
         // Verify the icon stays as the grandparent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandparentIcon) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandparentIcon)
+        }
         // Exit hovering over Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -3258,7 +3246,7 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false),
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false),
                     contentAlignment = Alignment.Center
                 ) {
                     Box(
@@ -3266,7 +3254,7 @@ class PointerIconTest {
                             Modifier.requiredSize(150.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                 .testTag(childIconTag)
-                                .pointerHoverIcon(desiredChildIcon, overrideDescendants = false),
+                                .stylusHoverIcon(desiredChildIcon, overrideDescendants = false),
                         contentAlignment = Alignment.Center
                     ) {
                         if (isGrandchildVisible.value) {
@@ -3275,7 +3263,7 @@ class PointerIconTest {
                                     Modifier.requiredSize(100.dp)
                                         .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                         .testTag(grandchildIconTag)
-                                        .pointerHoverIcon(
+                                        .stylusHoverIcon(
                                             desiredGrandchildIcon,
                                             overrideDescendants = false
                                         )
@@ -3287,34 +3275,34 @@ class PointerIconTest {
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over center of Child Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { enter(center) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverEnter(center) }
         // Verify Child Box has the desired child icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move to corner of Parent Box where no descendants are under the cursor
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
         // Verify the icon is the desired parent icon and dynamically add the Grandchild Box
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon)
             isGrandchildVisible.value = true
         }
         // Verify the icon stays as the desired parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor within Parent Box and verify it still has the grandparent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move cursor outside Parent Box to Child Box to verify icon is now the child icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor back to corner of Parent Box where no descendants are under the cursor
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
         // Dynamically remove the Grandchild Box
         rule.runOnIdle { isGrandchildVisible.value = false }
         // Verify the icon stays as the parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Exit hovering over Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -3349,14 +3337,14 @@ class PointerIconTest {
                         Modifier.requiredSize(150.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     Column {
                         Box(
                             Modifier.requiredSize(50.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(childIconTag)
-                                .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                                .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                         )
                         if (isChildBVisible.value) {
                             // Referencing grandchild tag/icon for ChildB in this test
@@ -3365,7 +3353,7 @@ class PointerIconTest {
                                     .offset(y = 100.dp)
                                     .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                     .testTag(grandchildIconTag)
-                                    .pointerHoverIcon(
+                                    .stylusHoverIcon(
                                         desiredGrandchildIcon,
                                         overrideDescendants = false
                                     )
@@ -3376,43 +3364,47 @@ class PointerIconTest {
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over corner of Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { enter(bottomRight) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverEnter(bottomRight) }
         // Verify Parent Box has the desired parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move to center of ChildA Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(center) }
         // Verify ChildA Box has the desired child icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move to left corner of Parent Box where ChildB will be added
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomLeft) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomLeft) }
         // Dynamically add the ChildB Box
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon)
             isChildBVisible.value = true
         }
         // Verify the icon is updated to the desired ChildB icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move to corner of ChildB Box
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(bottomRight) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(bottomRight) }
         // Verify ChildB Box has the desired grandchild icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move cursor back to the center of ChildA Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(center) }
         // Verify that icon is updated to the desired ChildA icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor back to the location of ChildB
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(center) }
         // Dynamically remove the ChildB Box
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
             isChildBVisible.value = false
         }
         // Verify the icon updates to the parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Exit hovering over ChildA Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -3446,14 +3438,14 @@ class PointerIconTest {
                         Modifier.requiredSize(200.dp)
                             .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                             .testTag(parentIconTag)
-                            .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                            .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                 ) {
                     Column {
                         Box(
                             Modifier.requiredSize(50.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                 .testTag(childIconTag)
-                                .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                                .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                         )
                         if (isChildBVisible.value) {
                             // Referencing grandchild tag/icon for ChildB in this test
@@ -3462,7 +3454,7 @@ class PointerIconTest {
                                     .offset(y = 100.dp)
                                     .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                     .testTag(grandchildIconTag)
-                                    .pointerHoverIcon(
+                                    .stylusHoverIcon(
                                         desiredGrandchildIcon,
                                         overrideDescendants = false
                                     )
@@ -3473,35 +3465,37 @@ class PointerIconTest {
             }
         }
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over corner of Parent Box
-        rule.onNodeWithTag(parentIconTag).performMouseInput { enter(bottomRight) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverEnter(bottomRight) }
         // Verify Parent Box has the desired parent icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
         // Move to center of ChildA Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(center) }
         // Verify ChildA Box has the desired child icon and dynamically add the ChildB Box
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon)
             isChildBVisible.value = true
         }
         // Verify the icon stays as the desired child icon since the cursor hasn't moved
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move to corner of ChildB Box
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(bottomRight) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(bottomRight) }
         // Verify ChildB Box has the desired grandchild icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move cursor back to the center of ChildA Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(center) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(center) }
         // Dynamically remove the ChildB Box
         rule.runOnIdle {
-            assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon)
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon)
             isChildBVisible.value = false
         }
         // Verify the icon stays as the desired child icon since the cursor hasn't moved
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Exit hovering over ChildA Box
-        rule.onNodeWithTag(childIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverExit() }
     }
 
     /**
@@ -3513,12 +3507,11 @@ class PointerIconTest {
      * Expected Output: Grandchild Box's [PointerIcon.Hand] wins for the entire surface area of the
      * Grandchild Box. Child Box's [PointerIcon.Text] wins for the remaining surface area of the
      * Child Box not covered by the Grandchild Box. Parent Box’s [PointerIcon.Crosshair] wins for
-     * the remaining surface area not covered by the Child Box. [PointerIcon.Default] wins for the
-     * remaining surface area of
+     * the remaining surface area not covered by the Child Box. No icon wins for the remaining
+     * surface area of
      *
-     * Default Box (output icon = [PointerIcon.Default] ⤷ Parent Box (output icon =
-     * [PointerIcon.Crosshair]) ⤷ Child Box (output icon = [PointerIcon.Text]) ⤷ Grandchild Box
-     * (output icon = [PointerIcon.Hand])
+     * Default Box (output icon = null) ⤷ Parent Box (output icon = [PointerIcon.Crosshair]) ⤷ Child
+     * Box (output icon = [PointerIcon.Text]) ⤷ Grandchild Box (output icon = [PointerIcon.Hand])
      */
     @Test
     fun childNotFullyContainedInParent_noOverrideDescendants() {
@@ -3536,20 +3529,20 @@ class PointerIconTest {
                             Modifier.requiredSize(width = 200.dp, height = 150.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Red)))
                                 .testTag(parentIconTag)
-                                .pointerHoverIcon(desiredParentIcon, overrideDescendants = false)
+                                .stylusHoverIcon(desiredParentIcon, overrideDescendants = false)
                     ) {
                         Box(
                             Modifier.requiredSize(width = 150.dp, height = 125.dp)
                                 .border(BorderStroke(2.dp, SolidColor(Color.Black)))
                                 .testTag(childIconTag)
-                                .pointerHoverIcon(desiredChildIcon, overrideDescendants = false)
+                                .stylusHoverIcon(desiredChildIcon, overrideDescendants = false)
                         ) {
                             Box(
                                 Modifier.requiredSize(width = 300.dp, height = 100.dp)
                                     .offset(x = 100.dp)
                                     .border(BorderStroke(2.dp, SolidColor(Color.Blue)))
                                     .testTag(grandchildIconTag)
-                                    .pointerHoverIcon(
+                                    .stylusHoverIcon(
                                         desiredGrandchildIcon,
                                         overrideDescendants = false
                                     )
@@ -3561,29 +3554,35 @@ class PointerIconTest {
         }
 
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over the default wrapping box and verify the cursor is still the default icon
-        rule.onNodeWithTag(defaultIconTag).performMouseInput { enter(center) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.onNodeWithTag(defaultIconTag).performStylusInput { hoverEnter(center) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Move cursor to the corner of the Grandchild Box and verify it has the desired grandchild
         // icon
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move cursor to the center right of the Child Box and verify it still has the desired
         // grandchild icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move cursor to the corner of the Child Box and verify it has updated to the desired child
         // icon
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
         // Move cursor to the center right of the Parent Box and verify it has the desired
         // grandchild icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(centerRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(centerRight) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
         // Move cursor to the corner of the Parent Box and verify it has the desired parent icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredParentIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredParentIcon) }
     }
 
     @Test
@@ -3595,13 +3594,12 @@ class PointerIconTest {
                 Box(
                     modifier =
                         Modifier.fillMaxSize()
-                            .pointerHoverIcon(PointerIcon.Hand)
+                            .stylusHoverIcon(PointerIcon.Hand)
                             .testTag(defaultIconTag)
                 ) {
                     if (show) {
                         Box(
-                            modifier =
-                                Modifier.pointerHoverIcon(PointerIcon.Text).size(10.dp, 10.dp)
+                            modifier = Modifier.stylusHoverIcon(PointerIcon.Text).size(10.dp, 10.dp)
                         )
                     }
                 }
@@ -3609,19 +3607,23 @@ class PointerIconTest {
         }
 
         rule.runOnIdle {
-            // No mouse movement yet, should be default
-            assertThat(iconService.getIcon()).isEqualTo(PointerIcon.Default)
+            // No stylus movement yet, should be default
+            assertThat(iconService.getStylusHoverIcon()).isNull()
         }
 
-        rule.onNodeWithTag(defaultIconTag).performMouseInput { moveTo(Offset(x = 5f, y = 5f)) }
+        rule.onNodeWithTag(defaultIconTag).performStylusInput {
+            hoverMoveTo(Offset(x = 5f, y = 5f))
+        }
 
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(PointerIcon.Text) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(PointerIcon.Text) }
 
         show = false
 
-        rule.onNodeWithTag(defaultIconTag).performMouseInput { moveTo(Offset(x = 6f, y = 6f)) }
+        rule.onNodeWithTag(defaultIconTag).performStylusInput {
+            hoverMoveTo(Offset(x = 6f, y = 6f))
+        }
 
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(PointerIcon.Hand) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(PointerIcon.Hand) }
     }
 
     @Test
@@ -3633,8 +3635,7 @@ class PointerIconTest {
                 Box(modifier = Modifier.fillMaxSize().testTag(defaultIconTag)) {
                     if (show) {
                         Box(
-                            modifier =
-                                Modifier.pointerHoverIcon(PointerIcon.Text).size(10.dp, 10.dp)
+                            modifier = Modifier.stylusHoverIcon(PointerIcon.Text).size(10.dp, 10.dp)
                         )
                     }
                 }
@@ -3642,55 +3643,63 @@ class PointerIconTest {
         }
 
         rule.runOnIdle {
-            // No mouse movement yet, should be default
-            assertThat(iconService.getIcon()).isEqualTo(PointerIcon.Default)
+            // No stylus movement yet, should be default
+            assertThat(iconService.getStylusHoverIcon()).isNull()
         }
 
-        rule.onNodeWithTag(defaultIconTag).performMouseInput { moveTo(Offset(x = 5f, y = 5f)) }
+        rule.onNodeWithTag(defaultIconTag).performStylusInput {
+            hoverMoveTo(Offset(x = 5f, y = 5f))
+        }
 
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(PointerIcon.Text) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(PointerIcon.Text) }
 
         show = false
 
-        rule.onNodeWithTag(defaultIconTag).performMouseInput { moveTo(Offset(x = 6f, y = 6f)) }
+        rule.onNodeWithTag(defaultIconTag).performStylusInput {
+            hoverMoveTo(Offset(x = 6f, y = 6f))
+        }
 
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(PointerIcon.Default) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
     }
 
-    private fun verifyIconOnHover(tag: String, expectedIcon: PointerIcon) {
+    private fun verifyIconOnHover(tag: String, expectedIcon: PointerIcon?) {
         // Hover over element with specified tag
-        rule.onNodeWithTag(tag).performMouseInput { enter(bottomRight) }
+        rule.onNodeWithTag(tag).performStylusInput { hoverEnter(bottomRight) }
         // Verify the current icon is the expected icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(expectedIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(expectedIcon) }
         // Exit hovering over element
-        rule.onNodeWithTag(tag).performMouseInput { exit() }
+        rule.onNodeWithTag(tag).performStylusInput { hoverExit() }
     }
 
     private fun verifyOverlappingSiblings() {
         // Verify initial state of pointer icon
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
         // Hover over ChildB (bottom right corner) and verify desired ChildB icon
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { enter(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverEnter(bottomRight) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
 
         // Then hover to parent (bottom right corner) and verify default arrow icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomRight) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomRight) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
 
         // Then hover back over ChildB in area that overlaps with sibling (bottom left corner) and
         // verify desired ChildB icon
-        rule.onNodeWithTag(grandchildIconTag).performMouseInput { moveTo(bottomLeft) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredGrandchildIcon) }
+        rule.onNodeWithTag(grandchildIconTag).performStylusInput { hoverMoveTo(bottomLeft) }
+        rule.runOnIdle {
+            assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredGrandchildIcon)
+        }
 
         // Then hover to ChildA (bottom left corner) and verify desired ChildA icon (hand)
-        rule.onNodeWithTag(childIconTag).performMouseInput { moveTo(bottomLeft) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredChildIcon) }
+        rule.onNodeWithTag(childIconTag).performStylusInput { hoverMoveTo(bottomLeft) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isEqualTo(desiredChildIcon) }
 
         // Then hover over parent (bottom left corner) and verify default arrow icon
-        rule.onNodeWithTag(parentIconTag).performMouseInput { moveTo(bottomLeft) }
-        rule.runOnIdle { assertThat(iconService.getIcon()).isEqualTo(desiredDefaultIcon) }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverMoveTo(bottomLeft) }
+        rule.runOnIdle { assertThat(iconService.getStylusHoverIcon()).isNull() }
 
         // Exit hovering
-        rule.onNodeWithTag(parentIconTag).performMouseInput { exit() }
+        rule.onNodeWithTag(parentIconTag).performStylusInput { hoverExit() }
     }
 }

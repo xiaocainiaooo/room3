@@ -34,6 +34,7 @@ import android.os.SystemClock
 import android.util.LongSparseArray
 import android.util.SparseArray
 import android.view.FocusFinder
+import android.view.InputDevice
 import android.view.KeyEvent as AndroidKeyEvent
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_CANCEL
@@ -2444,22 +2445,54 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         return null
     }
 
+    @RequiresApi(N)
+    override fun onResolvePointerIcon(
+        event: MotionEvent,
+        pointerIndex: Int
+    ): android.view.PointerIcon {
+        val toolType = event.getToolType(pointerIndex)
+        if (
+            !event.isFromSource(InputDevice.SOURCE_MOUSE) &&
+                event.isFromSource(InputDevice.SOURCE_STYLUS) &&
+                (toolType == MotionEvent.TOOL_TYPE_STYLUS ||
+                    toolType == MotionEvent.TOOL_TYPE_ERASER)
+        ) {
+            val icon = pointerIconService.getStylusHoverIcon()
+            if (icon != null) {
+                return AndroidComposeViewVerificationHelperMethodsN.toAndroidPointerIcon(
+                    context,
+                    icon
+                )
+            }
+        }
+        return super.onResolvePointerIcon(event, pointerIndex)
+    }
+
     override val pointerIconService: PointerIconService =
         object : PointerIconService {
-            private var currentIcon: PointerIcon = PointerIcon.Default
+            private var currentMouseCursorIcon: PointerIcon = PointerIcon.Default
+            private var currentStylusHoverIcon: PointerIcon? = null
 
             override fun getIcon(): PointerIcon {
-                return currentIcon
+                return currentMouseCursorIcon
             }
 
             override fun setIcon(value: PointerIcon?) {
-                currentIcon = value ?: PointerIcon.Default
+                currentMouseCursorIcon = value ?: PointerIcon.Default
                 if (SDK_INT >= N) {
                     AndroidComposeViewVerificationHelperMethodsN.setPointerIcon(
                         this@AndroidComposeView,
-                        currentIcon
+                        currentMouseCursorIcon
                     )
                 }
+            }
+
+            override fun getStylusHoverIcon(): PointerIcon? {
+                return currentStylusHoverIcon
+            }
+
+            override fun setStylusHoverIcon(value: PointerIcon?) {
+                currentStylusHoverIcon = value
             }
         }
 
@@ -2601,20 +2634,22 @@ private object AndroidComposeViewAssistHelperMethodsO {
 
 @RequiresApi(N)
 private object AndroidComposeViewVerificationHelperMethodsN {
+    @RequiresApi(N)
+    fun toAndroidPointerIcon(context: Context, icon: PointerIcon?): android.view.PointerIcon =
+        when (icon) {
+            is AndroidPointerIcon -> icon.pointerIcon
+            is AndroidPointerIconType -> android.view.PointerIcon.getSystemIcon(context, icon.type)
+            else ->
+                android.view.PointerIcon.getSystemIcon(
+                    context,
+                    android.view.PointerIcon.TYPE_DEFAULT
+                )
+        }
+
     @DoNotInline
     @RequiresApi(N)
     fun setPointerIcon(view: View, icon: PointerIcon?) {
-        val iconToSet =
-            when (icon) {
-                is AndroidPointerIcon -> icon.pointerIcon
-                is AndroidPointerIconType ->
-                    android.view.PointerIcon.getSystemIcon(view.context, icon.type)
-                else ->
-                    android.view.PointerIcon.getSystemIcon(
-                        view.context,
-                        android.view.PointerIcon.TYPE_DEFAULT
-                    )
-            }
+        val iconToSet = toAndroidPointerIcon(view.context, icon)
 
         if (view.pointerIcon != iconToSet) {
             view.pointerIcon = iconToSet

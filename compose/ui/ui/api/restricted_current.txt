@@ -2068,6 +2068,7 @@ package androidx.compose.ui.input.pointer {
 
   public final class PointerIconKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier pointerHoverIcon(androidx.compose.ui.Modifier, androidx.compose.ui.input.pointer.PointerIcon icon, optional boolean overrideDescendants);
+    method public static androidx.compose.ui.Modifier stylusHoverIcon(androidx.compose.ui.Modifier, androidx.compose.ui.input.pointer.PointerIcon icon, optional boolean overrideDescendants, optional androidx.compose.ui.node.DpTouchBoundsExpansion? touchBoundsExpansion);
   }
 
   public final class PointerIcon_androidKt {
