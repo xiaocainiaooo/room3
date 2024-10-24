@@ -56,6 +56,7 @@ import androidx.camera.integration.extensions.CameraExtensionsActivity
 import androidx.camera.integration.extensions.CameraExtensionsActivity.CAMERA2_IMPLEMENTATION_OPTION
 import androidx.camera.integration.extensions.CameraExtensionsActivity.CAMERA_PIPE_IMPLEMENTATION_OPTION
 import androidx.camera.integration.extensions.IntentExtraKey
+import androidx.camera.integration.extensions.IntentExtraKey.INTENT_EXTRA_KEY_VIDEO_CAPTURE_ENABLED
 import androidx.camera.integration.extensions.utils.CameraSelectorUtil.createCameraSelectorById
 import androidx.camera.integration.extensions.utils.ExtensionModeUtil.AVAILABLE_EXTENSION_MODES
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -290,6 +291,7 @@ object CameraXExtensionsTestUtil {
     fun launchCameraExtensionsActivity(
         cameraId: String,
         extensionMode: Int,
+        videoCaptureEnabled: Boolean? = null,
         deleteCapturedImages: Boolean = true,
     ): ActivityScenario<CameraExtensionsActivity> {
         val intent =
@@ -303,6 +305,9 @@ object CameraXExtensionsTestUtil {
                         IntentExtraKey.INTENT_EXTRA_KEY_DELETE_CAPTURED_IMAGE,
                         deleteCapturedImages
                     )
+                    videoCaptureEnabled?.let {
+                        putExtra(INTENT_EXTRA_KEY_VIDEO_CAPTURE_ENABLED, it)
+                    }
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 }
 

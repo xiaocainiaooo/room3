@@ -143,6 +143,22 @@ class ImageCaptureTest(private val config: CameraXExtensionTestParams) {
     }
 
     /**
+     * Checks that ImageCapture can successfully take a picture when an extension mode is enabled
+     * and VideoCapture is bound together.
+     */
+    @Test
+    fun takePictureWithExtensionModeAndVideoCaptureOn() {
+        val activityScenario =
+            launchCameraExtensionsActivity(
+                config.cameraId,
+                config.extensionMode,
+                videoCaptureEnabled = true
+            )
+
+        with(activityScenario) { use { takePictureAndWaitForImageSavedIdle() } }
+    }
+
+    /**
      * The following 1.4 interface methods are validated by this test.
      * <ol>
      * <li>ImageCaptureExtenderImpl#getRealtimeCaptureLatency()
