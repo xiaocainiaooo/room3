@@ -48,6 +48,12 @@ class HealthPermissionTest {
     }
 
     @Test
+    fun createReadPermission_reified() {
+        val permission = HealthPermission.getReadPermission<StepsRecord>()
+        assertThat(permission).isEqualTo(HealthPermission.READ_STEPS)
+    }
+
+    @Test
     fun createReadPermission_everyRecord() {
         RECORD_CLASSES.forEach {
             val permission = HealthPermission.getReadPermission(it)
@@ -56,15 +62,28 @@ class HealthPermissionTest {
     }
 
     @Test
-    fun createReadPermission_invalidRecord_isNull() {
+    fun createReadPermission_invalidRecord_throwsIAE() {
         assertThrows(IllegalArgumentException::class.java) {
             HealthPermission.getReadPermission(Record::class)
         }
     }
 
     @Test
+    fun createReadPermission_reified_invalidRecord_throwsIAE() {
+        assertThrows(IllegalArgumentException::class.java) {
+            HealthPermission.getReadPermission<Record>()
+        }
+    }
+
+    @Test
     fun createWritePermission() {
         val permission = HealthPermission.getWritePermission(StepsRecord::class)
+        assertThat(permission).isEqualTo(HealthPermission.WRITE_STEPS)
+    }
+
+    @Test
+    fun createWritePermission_reified() {
+        val permission = HealthPermission.getWritePermission<StepsRecord>()
         assertThat(permission).isEqualTo(HealthPermission.WRITE_STEPS)
     }
 
@@ -77,9 +96,16 @@ class HealthPermissionTest {
     }
 
     @Test
-    fun createWritePermission_invalidRecord_isNull() {
+    fun createWritePermission_invalidRecord_throwsIAE() {
         assertThrows(IllegalArgumentException::class.java) {
             HealthPermission.getWritePermission(Record::class)
+        }
+    }
+
+    @Test
+    fun createWritePermission_reified_invalidRecord_throwsIAE() {
+        assertThrows(IllegalArgumentException::class.java) {
+            HealthPermission.getWritePermission<Record>()
         }
     }
 }

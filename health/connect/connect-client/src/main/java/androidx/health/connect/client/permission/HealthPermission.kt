@@ -88,6 +88,18 @@ internal constructor(
 
         /**
          * Returns a permission defined in [HealthPermission] to read provided [recordType], such as
+         * `StepsRecord`.
+         *
+         * @return Permission to use with [androidx.health.connect.client.PermissionController].
+         * @throws IllegalArgumentException if the given record type is invalid.
+         */
+        @JvmStatic
+        inline fun <reified T : Record> getReadPermission(): String {
+            return getReadPermission(T::class)
+        }
+
+        /**
+         * Returns a permission defined in [HealthPermission] to read provided [recordType], such as
          * `StepsRecord::class`.
          *
          * @return Permission to use with [androidx.health.connect.client.PermissionController].
@@ -115,8 +127,21 @@ internal constructor(
         }
 
         /**
-         * Returns a permission defined in [HealthPermission] to read provided [recordType], such as
-         * `StepsRecord::class`.
+         * Returns a permission defined in [HealthPermission] to write provided [recordType], such
+         * as `StepsRecord:`.
+         *
+         * @return Permission object to use with
+         *   [androidx.health.connect.client.PermissionController].
+         * @throws IllegalArgumentException if the given record type is invalid.
+         */
+        @JvmStatic
+        inline fun <reified T : Record> getWritePermission(): String {
+            return getWritePermission(T::class)
+        }
+
+        /**
+         * Returns a permission defined in [HealthPermission] to write provided [recordType], such
+         * as `StepsRecord::class`.
          *
          * @return Permission object to use with
          *   [androidx.health.connect.client.PermissionController].
