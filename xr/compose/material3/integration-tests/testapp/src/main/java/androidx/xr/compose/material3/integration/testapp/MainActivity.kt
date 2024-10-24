@@ -26,17 +26,11 @@ package androidx.xr.compose.material3.integration.testapp
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
@@ -45,13 +39,12 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldDestinationItem
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldLayout
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.xr.compose.material3.EnableXrComponentOverrides
 import androidx.xr.compose.material3.ExperimentalMaterial3XrApi
 
@@ -66,32 +59,15 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun Content() {
     var navSuiteSelectedItem by remember { mutableStateOf(NavSuiteItem.HOME) }
-    val context = LocalContext.current
-    NavigationSuiteScaffoldLayout(
-        navigationSuite = {
-            NavigationRail(
-                header = {
-                    FloatingActionButton(
-                        onClick = {
-                            Toast.makeText(
-                                    context,
-                                    "Search navigation rail item clicked",
-                                    Toast.LENGTH_SHORT
-                                )
-                                .show()
-                        },
-                        content = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                    )
-                }
-            ) {
-                NavSuiteItem.values().forEach { item ->
-                    NavigationRailItem(
-                        selected = navSuiteSelectedItem == item,
-                        onClick = { navSuiteSelectedItem = item },
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) },
-                    )
-                }
+    NavigationSuiteScaffold(
+        navigationSuiteItems = {
+            NavSuiteItem.values().forEach { item ->
+                item(
+                    selected = navSuiteSelectedItem == item,
+                    onClick = { navSuiteSelectedItem = item },
+                    icon = { Icon(item.icon, contentDescription = item.label) },
+                    label = { Text(item.label) },
+                )
             }
         }
     ) {
