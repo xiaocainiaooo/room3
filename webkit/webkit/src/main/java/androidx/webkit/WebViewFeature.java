@@ -122,6 +122,7 @@ public class WebViewFeature {
     @StringDef(value = {
             STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX,
             STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS,
+            STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES,
     })
     @Retention(RetentionPolicy.SOURCE)
     @Target({ElementType.PARAMETER, ElementType.METHOD})
@@ -529,6 +530,15 @@ public class WebViewFeature {
      */
     public static final String STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS =
             "STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS";
+
+    /**
+     * Feature for {@link #isStartupFeatureSupported(Context, String)}.
+     * This feature covers
+     * {@link androidx.webkit.ProcessGlobalConfig#setDirectoryBasePaths(Context, File, File)}
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public static final String STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES =
+            "STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES";
 
     /**
      * Feature for {@link #isFeatureSupported(String)}.
