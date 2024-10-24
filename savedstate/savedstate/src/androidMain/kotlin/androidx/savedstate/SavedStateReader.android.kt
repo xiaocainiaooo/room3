@@ -165,6 +165,56 @@ actual value class SavedStateReader actual constructor(actual val source: SavedS
         }
     }
 
+    actual inline fun getBooleanArray(key: String): BooleanArray =
+        getSingleResultOrThrow(key) { source.getBooleanArray(key) }
+
+    actual inline fun getBooleanArrayOrElse(
+        key: String,
+        defaultValue: () -> BooleanArray
+    ): BooleanArray = getSingleResultOrElse(key, defaultValue) { source.getBooleanArray(key) }
+
+    actual inline fun getCharArray(key: String): CharArray {
+        return getSingleResultOrThrow(key) { source.getCharArray(key) }
+    }
+
+    actual inline fun getCharArrayOrElse(key: String, defaultValue: () -> CharArray): CharArray {
+        return getSingleResultOrElse(key, defaultValue) { source.getCharArray(key) }
+    }
+
+    actual inline fun getDoubleArray(key: String): DoubleArray =
+        getSingleResultOrThrow(key) { source.getDoubleArray(key) }
+
+    actual inline fun getDoubleArrayOrElse(
+        key: String,
+        defaultValue: () -> DoubleArray
+    ): DoubleArray = getSingleResultOrElse(key, defaultValue) { source.getDoubleArray(key) }
+
+    actual inline fun getFloatArray(key: String): FloatArray =
+        getSingleResultOrThrow(key) { source.getFloatArray(key) }
+
+    actual inline fun getFloatArrayOrElse(key: String, defaultValue: () -> FloatArray): FloatArray =
+        getSingleResultOrElse(key, defaultValue) { source.getFloatArray(key) }
+
+    actual inline fun getIntArray(key: String): IntArray =
+        getSingleResultOrThrow(key) { source.getIntArray(key) }
+
+    actual inline fun getIntArrayOrElse(key: String, defaultValue: () -> IntArray): IntArray =
+        getSingleResultOrElse(key, defaultValue) { source.getIntArray(key) }
+
+    actual inline fun getLongArray(key: String) =
+        getSingleResultOrThrow(key) { source.getLongArray(key) }
+
+    actual inline fun getLongArrayOrElse(key: String, defaultValue: () -> LongArray): LongArray =
+        getSingleResultOrElse(key, defaultValue) { source.getLongArray(key) }
+
+    actual inline fun getStringArray(key: String): Array<String> =
+        getSingleResultOrThrow(key) { source.getStringArray(key) }
+
+    actual inline fun getStringArrayOrElse(
+        key: String,
+        defaultValue: () -> Array<String>
+    ): Array<String> = getSingleResultOrElse(key, defaultValue) { source.getStringArray(key) }
+
     actual inline fun getSavedState(key: String): SavedState {
         return getSingleResultOrThrow(key) { source.getBundle(key) }
     }

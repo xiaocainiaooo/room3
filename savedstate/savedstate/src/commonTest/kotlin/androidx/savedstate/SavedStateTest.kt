@@ -612,6 +612,377 @@ internal class SavedStateTest : RobolectricTest() {
     }
 
     @Test
+    fun getBooleanArray_whenSet_returns() {
+        val expected = BooleanArray(size = 5) { idx -> idx % 2 == 0 }
+
+        val underTest = savedState { putBooleanArray(KEY_1, expected) }
+        val actual = underTest.read { getBooleanArray(KEY_1) }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getBooleanArray_whenNotSet_throws() {
+        assertThrows<IllegalStateException> { savedState().read { getBooleanArray(KEY_1) } }
+    }
+
+    @Test
+    fun getBooleanArray_whenSet_differentType_throws() {
+        val expected = Int.MAX_VALUE
+
+        val underTest = savedState { putInt(KEY_1, expected) }
+
+        assertThrows<IllegalStateException> { underTest.read { getBooleanArray(KEY_1) } }
+    }
+
+    @Test
+    fun getBooleanArrayOrElse_whenSet_returns() {
+        val expected = BooleanArray(size = 5) { idx -> idx % 2 == 0 }
+
+        val underTest = savedState { putBooleanArray(KEY_1, expected) }
+        val actual = underTest.read { getBooleanArrayOrElse(KEY_1) { BooleanArray(size = 0) } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getBooleanArrayOrElse_whenNotSet_returnsElse() {
+        val expected = BooleanArray(size = 0)
+
+        val actual = savedState().read { getBooleanArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getBooleanArrayOrElse_whenSet_differentType_returnsElse() {
+        val expected = booleanArrayOf()
+
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+        val actual = underTest.read { getBooleanArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getCharArray_whenSet_returns() {
+        val expected = CharArray(size = 5) { idx -> idx.toChar() }
+
+        val underTest = savedState { putCharArray(KEY_1, expected) }
+        val actual = underTest.read { getCharArray(KEY_1) }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getCharArray_whenNotSet_throws() {
+        assertThrows<IllegalStateException> { savedState().read { getCharArray(KEY_1) } }
+    }
+
+    @Test
+    fun getCharArray_whenSet_differentType_throws() {
+        val expected = Int.MAX_VALUE
+
+        val underTest = savedState { putInt(KEY_1, expected) }
+
+        assertThrows<IllegalStateException> { underTest.read { getCharArray(KEY_1) } }
+    }
+
+    @Test
+    fun getCharArrayOrElse_whenSet_returns() {
+        val expected = CharArray(size = 5) { idx -> idx.toChar() }
+
+        val underTest = savedState { putCharArray(KEY_1, expected) }
+        val actual = underTest.read { getCharArrayOrElse(KEY_1) { CharArray(size = 0) } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getCharArrayOrElse_whenNotSet_returnsElse() {
+        val expected = CharArray(size = 0)
+
+        val actual = savedState().read { getCharArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getCharArrayOrElse_whenSet_differentType_returnsElse() {
+        val expected = charArrayOf()
+
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+        val actual = underTest.read { getCharArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getDoubleArray_whenSet_returns() {
+        val expected = DoubleArray(size = 5) { idx -> idx.toDouble() }
+
+        val underTest = savedState { putDoubleArray(KEY_1, expected) }
+        val actual = underTest.read { getDoubleArray(KEY_1) }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getDoubleArray_whenNotSet_throws() {
+        assertThrows<IllegalStateException> { savedState().read { getDoubleArray(KEY_1) } }
+    }
+
+    @Test
+    fun getDoubleArray_whenSet_differentType_throws() {
+        val expected = Int.MAX_VALUE
+
+        val underTest = savedState { putInt(KEY_1, expected) }
+
+        assertThrows<IllegalStateException> { underTest.read { getDoubleArray(KEY_1) } }
+    }
+
+    @Test
+    fun getDoubleArrayOrElse_whenSet_returns() {
+        val expected = DoubleArray(size = 5) { idx -> idx.toDouble() }
+
+        val underTest = savedState { putDoubleArray(KEY_1, expected) }
+        val actual = underTest.read { getDoubleArrayOrElse(KEY_1) { DoubleArray(size = 0) } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getDoubleArrayOrElse_whenNotSet_returnsElse() {
+        val expected = DoubleArray(size = 0)
+
+        val actual = savedState().read { getDoubleArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getDoubleArrayOrElse_whenSet_differentType_returnsElse() {
+        val expected = doubleArrayOf()
+
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+        val actual = underTest.read { getDoubleArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getFloatArray_whenSet_returns() {
+        val expected = FloatArray(size = 5) { idx -> idx.toFloat() }
+
+        val underTest = savedState { putFloatArray(KEY_1, expected) }
+        val actual = underTest.read { getFloatArray(KEY_1) }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getFloatArray_whenNotSet_throws() {
+        assertThrows<IllegalStateException> { savedState().read { getFloatArray(KEY_1) } }
+    }
+
+    @Test
+    fun getFloatArray_whenSet_differentType_throws() {
+        val expected = Int.MAX_VALUE
+
+        val underTest = savedState { putInt(KEY_1, expected) }
+
+        assertThrows<IllegalStateException> { underTest.read { getFloatArray(KEY_1) } }
+    }
+
+    @Test
+    fun getFloatArrayOrElse_whenSet_returns() {
+        val expected = FloatArray(size = 5) { idx -> idx.toFloat() }
+
+        val underTest = savedState { putFloatArray(KEY_1, expected) }
+        val actual = underTest.read { getFloatArrayOrElse(KEY_1) { FloatArray(size = 0) } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getFloatArrayOrElse_whenNotSet_returnsElse() {
+        val expected = FloatArray(size = 0)
+
+        val actual = savedState().read { getFloatArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getFloatArrayOrElse_whenSet_differentType_returnsElse() {
+        val expected = floatArrayOf()
+
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+        val actual = underTest.read { getFloatArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getIntArray_whenSet_returns() {
+        val expected = IntArray(size = 5) { idx -> idx }
+
+        val underTest = savedState { putIntArray(KEY_1, expected) }
+        val actual = underTest.read { getIntArray(KEY_1) }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getIntArray_whenNotSet_throws() {
+        assertThrows<IllegalStateException> { savedState().read { getIntArray(KEY_1) } }
+    }
+
+    @Test
+    fun getIntArray_whenSet_differentType_throws() {
+        val expected = Int.MAX_VALUE
+
+        val underTest = savedState { putInt(KEY_1, expected) }
+
+        assertThrows<IllegalStateException> { underTest.read { getIntArray(KEY_1) } }
+    }
+
+    @Test
+    fun getIntArrayOrElse_whenSet_returns() {
+        val expected = IntArray(size = 5) { idx -> idx }
+
+        val underTest = savedState { putIntArray(KEY_1, expected) }
+        val actual = underTest.read { getIntArrayOrElse(KEY_1) { IntArray(size = 0) } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getIntArrayOrElse_whenNotSet_returnsElse() {
+        val expected = IntArray(size = 0)
+
+        val actual = savedState().read { getIntArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getIntArrayOrElse_whenSet_differentType_returnsElse() {
+        val expected = intArrayOf()
+
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+        val actual = underTest.read { getIntArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getLongArray_whenSet_returns() {
+        val expected = LongArray(size = 5) { idx -> idx.toLong() }
+
+        val underTest = savedState { putLongArray(KEY_1, expected) }
+        val actual = underTest.read { getLongArray(KEY_1) }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getLongArray_whenNotSet_throws() {
+        assertThrows<IllegalStateException> { savedState().read { getLongArray(KEY_1) } }
+    }
+
+    @Test
+    fun getLongArray_whenSet_differentType_throws() {
+        val expected = Int.MAX_VALUE
+
+        val underTest = savedState { putInt(KEY_1, expected) }
+
+        assertThrows<IllegalStateException> { underTest.read { getLongArray(KEY_1) } }
+    }
+
+    @Test
+    fun getLongArrayOrElse_whenSet_returns() {
+        val expected = LongArray(size = 5) { idx -> idx.toLong() }
+
+        val underTest = savedState { putLongArray(KEY_1, expected) }
+        val actual = underTest.read { getLongArrayOrElse(KEY_1) { LongArray(size = 0) } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getLongArrayOrElse_whenNotSet_returnsElse() {
+        val expected = LongArray(size = 0)
+
+        val actual = savedState().read { getLongArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getLongArrayOrElse_whenSet_differentType_returnsElse() {
+        val expected = longArrayOf()
+
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+        val actual = underTest.read { getLongArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getStringArray_whenSet_returns() {
+        val expected = Array(size = 5) { idx -> idx.toString() }
+
+        val underTest = savedState { putStringArray(KEY_1, expected) }
+        val actual = underTest.read { getStringArray(KEY_1) }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getStringArray_whenNotSet_throws() {
+        assertThrows<IllegalStateException> { savedState().read { getStringArray(KEY_1) } }
+    }
+
+    @Test
+    fun getStringArray_whenSet_differentType_throws() {
+        val expected = Int.MAX_VALUE
+
+        val underTest = savedState { putInt(KEY_1, expected) }
+
+        assertThrows<IllegalStateException> { underTest.read { getStringArray(KEY_1) } }
+    }
+
+    @Test
+    fun getStringArrayOrElse_whenSet_returns() {
+        val expected = Array(size = 5) { idx -> idx.toString() }
+
+        val underTest = savedState { putStringArray(KEY_1, expected) }
+        val actual = underTest.read { getStringArrayOrElse(KEY_1) { arrayOf() } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getStringArrayOrElse_whenNotSet_returnsElse() {
+        val expected = arrayOf<String>()
+
+        val actual = savedState().read { getStringArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun getStringArrayOrElse_whenSet_differentType_returnsElse() {
+        val expected = arrayOf<String>()
+
+        val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
+        val actual = underTest.read { getStringArrayOrElse(KEY_1) { expected } }
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
     fun getSavedState_whenSet_returns() {
         val underTest = savedState { putSavedState(KEY_1, SAVED_STATE_VALUE) }
         val actual = underTest.read { getSavedState(KEY_1) }

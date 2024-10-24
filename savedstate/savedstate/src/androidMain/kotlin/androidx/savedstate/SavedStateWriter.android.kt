@@ -21,7 +21,6 @@ import android.os.Parcelable
 @Suppress("NOTHING_TO_INLINE")
 @JvmInline
 actual value class SavedStateWriter actual constructor(actual val source: SavedState) {
-
     actual inline fun putBoolean(key: String, value: Boolean) {
         source.putBoolean(key, value)
     }
@@ -81,6 +80,34 @@ actual value class SavedStateWriter actual constructor(actual val source: SavedS
      */
     inline fun <reified T : Parcelable> putParcelableList(key: String, values: List<T>) {
         source.putParcelableArrayList(key, values.toArrayListUnsafe())
+    }
+
+    actual inline fun putBooleanArray(key: String, values: BooleanArray) {
+        source.putBooleanArray(key, values)
+    }
+
+    actual inline fun putCharArray(key: String, values: CharArray) {
+        source.putCharArray(key, values)
+    }
+
+    actual inline fun putDoubleArray(key: String, values: DoubleArray) {
+        source.putDoubleArray(key, values)
+    }
+
+    actual inline fun putFloatArray(key: String, values: FloatArray) {
+        source.putFloatArray(key, values)
+    }
+
+    actual inline fun putIntArray(key: String, values: IntArray) {
+        source.putIntArray(key, values)
+    }
+
+    actual inline fun putLongArray(key: String, values: LongArray) {
+        source.putLongArray(key, values)
+    }
+
+    actual inline fun putStringArray(key: String, values: Array<String>) {
+        source.putStringArray(key, values)
     }
 
     actual inline fun putSavedState(key: String, value: SavedState) {

@@ -92,6 +92,72 @@ actual value class SavedStateReader actual constructor(actual val source: SavedS
         return getListResultOrElse(key, defaultValue) { source.map[key] as? List<String> }
     }
 
+    actual inline fun getCharArray(key: String): CharArray {
+        return getSingleResultOrThrow(key) { source.map[key] as? CharArray }
+    }
+
+    actual inline fun getCharArrayOrElse(key: String, defaultValue: () -> CharArray): CharArray {
+        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? CharArray }
+    }
+
+    actual inline fun getBooleanArray(key: String): BooleanArray =
+        getSingleResultOrThrow(key) { source.map[key] as? BooleanArray }
+
+    actual inline fun getBooleanArrayOrElse(
+        key: String,
+        defaultValue: () -> BooleanArray
+    ): BooleanArray {
+        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? BooleanArray }
+    }
+
+    actual inline fun getDoubleArray(key: String): DoubleArray {
+        return getSingleResultOrThrow(key) { source.map[key] as? DoubleArray }
+    }
+
+    actual inline fun getDoubleArrayOrElse(
+        key: String,
+        defaultValue: () -> DoubleArray
+    ): DoubleArray {
+        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? DoubleArray }
+    }
+
+    actual inline fun getFloatArray(key: String): FloatArray {
+        return getSingleResultOrThrow(key) { source.map[key] as? FloatArray }
+    }
+
+    actual inline fun getFloatArrayOrElse(key: String, defaultValue: () -> FloatArray): FloatArray {
+        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? FloatArray }
+    }
+
+    actual inline fun getIntArray(key: String): IntArray {
+        return getSingleResultOrThrow(key) { source.map[key] as? IntArray }
+    }
+
+    actual inline fun getIntArrayOrElse(key: String, defaultValue: () -> IntArray): IntArray {
+        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? IntArray }
+    }
+
+    actual inline fun getLongArray(key: String): LongArray {
+        return getSingleResultOrThrow(key) { source.map[key] as? LongArray }
+    }
+
+    actual inline fun getLongArrayOrElse(key: String, defaultValue: () -> LongArray): LongArray {
+        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? LongArray }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    actual inline fun getStringArray(key: String): Array<String> {
+        return getSingleResultOrThrow(key) { source.map[key] as? Array<String> }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    actual inline fun getStringArrayOrElse(
+        key: String,
+        defaultValue: () -> Array<String>
+    ): Array<String> {
+        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? Array<String> }
+    }
+
     actual inline fun getSavedState(key: String): SavedState =
         getSingleResultOrThrow(key) { source.map[key] as? SavedState }
 

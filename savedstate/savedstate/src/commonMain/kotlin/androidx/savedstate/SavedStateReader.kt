@@ -226,6 +226,162 @@ internal constructor(
     ): List<String>
 
     /**
+     * Retrieves a [BooleanArray] value associated with the specified [key]. Throws an
+     * [IllegalStateException] if the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @return The [BooleanArray] value associated with the [key].
+     * @throws IllegalStateException If the [key] is not found.
+     */
+    public inline fun getBooleanArray(key: String): BooleanArray
+
+    /**
+     * Retrieves a [BooleanArray] value associated with the specified [key], or a default value if
+     * the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value if the [key] is not found.
+     * @return The [BooleanArray] value associated with the [key], or the default value if the [key]
+     *   is not found.
+     */
+    public inline fun getBooleanArrayOrElse(
+        key: String,
+        defaultValue: () -> BooleanArray
+    ): BooleanArray
+
+    /**
+     * Retrieves a [CharArray] value associated with the specified [key]. Throws an
+     * [IllegalStateException] if the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @return The [CharArray] value associated with the [key].
+     * @throws IllegalStateException If the [key] is not found.
+     */
+    public inline fun getCharArray(key: String): CharArray
+
+    /**
+     * Retrieves a [CharArray] value associated with the specified [key], or a default value if the
+     * [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value if the [key] is not found.
+     * @return The [CharArray] value associated with the [key], or the default value if the [key] is
+     *   not found.
+     */
+    public inline fun getCharArrayOrElse(key: String, defaultValue: () -> CharArray): CharArray
+
+    /**
+     * Retrieves a [DoubleArray] value associated with the specified [key]. Throws an
+     * [IllegalStateException] if the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @return The [DoubleArray] value associated with the [key].
+     * @throws IllegalStateException If the [key] is not found.
+     */
+    public inline fun getDoubleArray(key: String): DoubleArray
+
+    /**
+     * Retrieves a [DoubleArray] value associated with the specified [key], or a default value if
+     * the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value if the [key] is not found.
+     * @return The [DoubleArray] value associated with the [key], or the default value if the [key]
+     *   is not found.
+     */
+    public inline fun getDoubleArrayOrElse(
+        key: String,
+        defaultValue: () -> DoubleArray
+    ): DoubleArray
+
+    /**
+     * Retrieves a [FloatArray] value associated with the specified [key]. Throws an
+     * [IllegalStateException] if the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @return The [FloatArray] value associated with the [key].
+     * @throws IllegalStateException If the [key] is not found.
+     */
+    public inline fun getFloatArray(key: String): FloatArray
+
+    /**
+     * Retrieves a [FloatArray] value associated with the specified [key], or a default value if the
+     * [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value if the [key] is not found.
+     * @return The [FloatArray] value associated with the [key], or the default value if the [key]
+     *   is not found.
+     */
+    public inline fun getFloatArrayOrElse(key: String, defaultValue: () -> FloatArray): FloatArray
+
+    /**
+     * Retrieves a [IntArray] value associated with the specified [key]. Throws an
+     * [IllegalStateException] if the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @return The [IntArray] value associated with the [key].
+     * @throws IllegalStateException If the [key] is not found.
+     */
+    public inline fun getIntArray(key: String): IntArray
+
+    /**
+     * Retrieves a [IntArray] value associated with the specified [key], or a default value if the
+     * [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value if the [key] is not found.
+     * @return The [IntArray] value associated with the [key], or the default value if the [key] is
+     *   not found.
+     */
+    public inline fun getIntArrayOrElse(key: String, defaultValue: () -> IntArray): IntArray
+
+    /**
+     * Retrieves a [LongArray] value associated with the specified [key]. Throws an
+     * [IllegalStateException] if the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @return The [LongArray] value associated with the [key].
+     * @throws IllegalStateException If the [key] is not found.
+     */
+    public inline fun getLongArray(key: String): LongArray
+
+    /**
+     * Retrieves a [LongArray] value associated with the specified [key], or a default value if the
+     * [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value if the [key] is not found.
+     * @return The [LongArray] value associated with the [key], or the default value if the [key] is
+     *   not found.
+     */
+    public inline fun getLongArrayOrElse(key: String, defaultValue: () -> LongArray): LongArray
+
+    /**
+     * Retrieves a [Array] of [String] value associated with the specified [key]. Throws an
+     * [IllegalStateException] if the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @return The [Array] of [String] value associated with the [key].
+     * @throws IllegalStateException If the [key] is not found.
+     */
+    public inline fun getStringArray(key: String): Array<String>
+
+    /**
+     * Retrieves a [Array] of [String] value associated with the specified [key], or a default value
+     * if the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value if the [key] is not found.
+     * @return The [Array] of [String] value associated with the [key], or the default value if the
+     *   [key] is not found.
+     */
+    public inline fun getStringArrayOrElse(
+        key: String,
+        defaultValue: () -> Array<String>
+    ): Array<String>
+
+    /**
      * Retrieves a [SavedState] object associated with the specified [key]. Throws an
      * [IllegalStateException] if the [key] doesn't exist.
      *

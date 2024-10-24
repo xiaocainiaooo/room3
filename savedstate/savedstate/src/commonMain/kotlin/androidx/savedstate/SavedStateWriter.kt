@@ -105,6 +105,68 @@ internal constructor(
     public inline fun putStringList(key: String, values: List<String>)
 
     /**
+     * Stores an [Array] of elements of [Boolean] associated with the specified key in the
+     * [SavedState].
+     *
+     * @param key The key to associate the value with.
+     * @param values The array of elements to store.
+     */
+    public inline fun putBooleanArray(key: String, values: BooleanArray)
+
+    /**
+     * Stores an [Array] of elements of [Boolean] associated with the specified key in the
+     * [SavedState].
+     *
+     * @param key The key to associate the value with.
+     * @param values The array of elements to store.
+     */
+    public inline fun putCharArray(key: String, values: CharArray)
+
+    /**
+     * Stores an [Array] of elements of [Double] associated with the specified key in the
+     * [SavedState].
+     *
+     * @param key The key to associate the value with.
+     * @param values The array of elements to store.
+     */
+    public inline fun putDoubleArray(key: String, values: DoubleArray)
+
+    /**
+     * Stores an [Array] of elements of [Float] associated with the specified key in the
+     * [SavedState].
+     *
+     * @param key The key to associate the value with.
+     * @param values The array of elements to store.
+     */
+    public inline fun putFloatArray(key: String, values: FloatArray)
+
+    /**
+     * Stores an [Array] of elements of [Int] associated with the specified key in the [SavedState].
+     *
+     * @param key The key to associate the value with.
+     * @param values The array of elements to store.
+     */
+    public inline fun putIntArray(key: String, values: IntArray)
+
+    /**
+     * Stores an [Array] of elements of [Long] associated with the specified key in the
+     * [SavedState].
+     *
+     * @param key The key to associate the value with.
+     * @param values The array of elements to store.
+     */
+    public inline fun putLongArray(key: String, values: LongArray)
+
+    /**
+     * Stores an [Array] of elements of [String] associated with the specified key in the
+     * [SavedState].
+     *
+     * @param key The key to associate the value with.
+     * @param values The array of elements to store.
+     */
+    public inline fun putStringArray(key: String, values: Array<String>)
+
+    /**
      * Stores a [SavedState] object associated with the specified key in the [SavedState].
      *
      * @param key The key to associate the value with.
