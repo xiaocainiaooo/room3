@@ -17,7 +17,6 @@
 package androidx.compose.runtime.changelist
 
 import androidx.compose.runtime.EnableDebugRuntimeChecks
-import androidx.compose.runtime.changelist.Operation.IntParameter
 import androidx.compose.runtime.changelist.Operation.ObjectParameter
 import androidx.compose.runtime.changelist.TestOperations.MixedOperation
 import androidx.compose.runtime.changelist.TestOperations.NoArgsOperation
@@ -471,7 +470,7 @@ class OperationsTest {
         val capturedObjects = mutableListOf<Any?>()
         stack.drain {
             capturedOperations += operation
-            repeat(operation.ints) { offset -> capturedInts += getInt(IntParameter(offset)) }
+            repeat(operation.ints) { offset -> capturedInts += getInt(offset) }
             repeat(operation.objects) { offset ->
                 capturedObjects += getObject(ObjectParameter<Any?>(offset))
             }
@@ -514,7 +513,7 @@ class OperationsTest {
         val capturedObjects = mutableListOf<Any?>()
         stack.forEach {
             capturedOperations += operation
-            repeat(operation.ints) { offset -> capturedInts += getInt(IntParameter(offset)) }
+            repeat(operation.ints) { offset -> capturedInts += getInt(offset) }
             repeat(operation.objects) { offset ->
                 capturedObjects += getObject(ObjectParameter<Any?>(offset))
             }
