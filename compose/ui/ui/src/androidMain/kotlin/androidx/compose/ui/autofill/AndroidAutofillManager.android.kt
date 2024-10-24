@@ -194,7 +194,8 @@ actual class AutofillManager internal constructor(view: AndroidComposeView) {
 
     private fun notifyAutofillValueChanged(semanticsId: Int, newAutofillValue: Any) {
         val currSemanticsNode = currentSemanticsNodes[semanticsId]?.semanticsNode
-        val currDataType = currSemanticsNode?.unmergedConfig?.getOrNull(SemanticsContentDataType)
+        val currDataType =
+            currSemanticsNode?.unmergedConfig?.getOrNull(SemanticsContentDataType) ?: return
 
         when (currDataType) {
             ContentDataType.Text ->

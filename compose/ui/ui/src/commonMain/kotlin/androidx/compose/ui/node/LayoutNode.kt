@@ -486,7 +486,11 @@ internal class LayoutNode(
         pendingModifier?.let { applyModifier(it) }
         pendingModifier = null
 
-        if (nodes.has(Nodes.Semantics)) invalidateSemantics()
+        @OptIn(ExperimentalComposeUiApi::class)
+        if (!ComposeUiFlags.isSemanticAutofillEnabled && nodes.has(Nodes.Semantics)) {
+            invalidateSemantics()
+        }
+
         owner.onAttach(this)
 
         // Update lookahead root when attached. For nested cases, we'll always use the
@@ -505,6 +509,12 @@ internal class LayoutNode(
         if (!isDeactivated) {
             nodes.markAsAttached()
         }
+
+        @OptIn(ExperimentalComposeUiApi::class)
+        if (ComposeUiFlags.isSemanticAutofillEnabled && nodes.has(Nodes.Semantics)) {
+            invalidateSemantics()
+        }
+
         _foldedChildren.forEach { child -> child.attach(owner) }
         if (!isDeactivated) {
             nodes.runAttachLifecycle()
@@ -540,6 +550,7 @@ internal class LayoutNode(
         onDetach?.invoke(owner)
         if (nodes.has(Nodes.Semantics)) {
             _semanticsConfiguration = null
+            isSemanticsInvalidated = false
             requireOwner().onSemanticsChange()
         }
         nodes.runDetachLifecycle()
@@ -1315,7 +1326,6 @@ internal class LayoutNode(
         subcompositionsState?.onReuse()
         if (isDeactivated) {
             isDeactivated = false
-            invalidateSemantics()
             // we don't need to reset state as it was done when deactivated
         } else {
             resetModifierState()
@@ -1324,6 +1334,7 @@ internal class LayoutNode(
         semanticsId = generateSemanticsId()
         nodes.markAsAttached()
         nodes.runAttachLifecycle()
+        if (nodes.has(Nodes.Semantics)) invalidateSemantics()
         rescheduleRemeasureOrRelayout(this)
     }
 
@@ -1332,10 +1343,6 @@ internal class LayoutNode(
         subcompositionsState?.onDeactivate()
         isDeactivated = true
         resetModifierState()
-        // if the node is detached the semantics were already updated without this node.
-        if (isAttached) {
-            invalidateSemantics()
-        }
         _semanticsConfiguration = null
         isSemanticsInvalidated = false
         owner?.onLayoutNodeDeactivated(this)
