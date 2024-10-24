@@ -17,11 +17,11 @@
 package androidx.wear.compose.material3.macrobenchmark
 
 import android.content.Intent
+import android.os.SystemClock
 import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.filters.LargeTest
 import androidx.wear.compose.material3.macrobenchmark.common.baselineprofile.BaselineProfileScreens
-import java.lang.Thread.sleep
 import org.junit.Rule
 import org.junit.Test
 
@@ -70,10 +70,10 @@ class BaselineProfile {
         for (i in 0 until pageCount) {
             BaselineProfileScreens[i].exercise.invoke(this)
             device.waitForIdle()
-            sleep(1_000L)
+            SystemClock.sleep(1_000L)
             device.swipe(startX, y, endX, y, 10)
             device.waitForIdle()
-            sleep(1_000L)
+            SystemClock.sleep(1_000L)
         }
     }
 

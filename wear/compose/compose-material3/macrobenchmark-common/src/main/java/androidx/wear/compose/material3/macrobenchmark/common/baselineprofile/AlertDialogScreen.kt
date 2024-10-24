@@ -67,9 +67,19 @@ val AlertDialogScreen =
 
         override val exercise: MacrobenchmarkScope.() -> Unit
             get() = {
-                device.findObject(By.desc(OpenAlertDialogWithConfirmAndDismiss)).click()
+                device
+                    .wait(
+                        Until.findObject(By.desc(OpenAlertDialogWithConfirmAndDismiss)),
+                        FIND_OBJECT_TIMEOUT_MS
+                    )
+                    .click()
                 device.waitForIdle()
-                device.pressBack()
+                device
+                    .wait(
+                        Until.findObject(By.desc(DismissAlertDialogWithConfirmAndDismiss)),
+                        FIND_OBJECT_TIMEOUT_MS
+                    )
+                    .click()
                 device.waitForIdle()
 
                 device
@@ -79,7 +89,12 @@ val AlertDialogScreen =
                     )
                     .click()
                 device.waitForIdle()
-                device.pressBack()
+                device
+                    .wait(
+                        Until.findObject(By.desc(DismissAlertDialogWithEdgeButton)),
+                        FIND_OBJECT_TIMEOUT_MS
+                    )
+                    .click()
                 device.waitForIdle()
 
                 device
@@ -89,7 +104,12 @@ val AlertDialogScreen =
                     )
                     .click()
                 device.waitForIdle()
-                device.pressBack()
+                device
+                    .wait(
+                        Until.findObject(By.desc(DismissAlertDialogWithContentGroups)),
+                        FIND_OBJECT_TIMEOUT_MS
+                    )
+                    .click()
                 device.waitForIdle()
 
                 device.wait(
@@ -110,7 +130,7 @@ private fun AlertDialogWithConfirmAndDismiss() {
                     contentDescription = OpenAlertDialogWithConfirmAndDismiss
                 },
             onClick = { showDialog = true },
-            label = { Text("Show Dialog") }
+            label = { Text("Confirm and Dismiss") }
         )
     }
     AlertDialog(
@@ -136,6 +156,10 @@ private fun AlertDialogWithConfirmAndDismiss() {
         },
         dismissButton = {
             AlertDialogDefaults.DismissButton(
+                modifier =
+                    Modifier.semantics {
+                        contentDescription = DismissAlertDialogWithConfirmAndDismiss
+                    },
                 onClick = {
                     // Perform dismiss action here
                     showDialog = false
@@ -156,7 +180,7 @@ private fun AlertDialogWithEdgeButton() {
                     contentDescription = OpenAlertDialogWithEdgeButton
                 },
             onClick = { showDialog = true },
-            label = { Text("Show Dialog") }
+            label = { Text("Dialog with EdgeButton") }
         )
     }
 
@@ -174,6 +198,8 @@ private fun AlertDialogWithEdgeButton() {
         title = { Text("Mobile network is not currently available") },
         edgeButton = {
             AlertDialogDefaults.EdgeButton(
+                modifier =
+                    Modifier.semantics { contentDescription = DismissAlertDialogWithEdgeButton },
                 onClick = {
                     // Perform confirm action here
                     showDialog = false
@@ -194,7 +220,7 @@ private fun AlertDialogWithContentGroups() {
                     contentDescription = OpenAlertDialogWithContentGroups
                 },
             onClick = { showDialog = true },
-            label = { Text("Show Dialog") }
+            label = { Text("Content Groups") }
         )
     }
     AlertDialog(
@@ -205,8 +231,11 @@ private fun AlertDialogWithContentGroups() {
     ) {
         item {
             FilledTonalButton(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {},
+                modifier =
+                    Modifier.fillMaxWidth().semantics {
+                        contentDescription = DismissAlertDialogWithContentGroups
+                    },
+                onClick = { showDialog = false },
                 label = { Text("Weather") }
             )
         }
@@ -236,5 +265,9 @@ private fun AlertDialogWithContentGroups() {
 }
 
 private const val OpenAlertDialogWithConfirmAndDismiss = "OpenAlertDialogWithConfirmAndDismiss"
+private const val DismissAlertDialogWithConfirmAndDismiss =
+    "DismissAlertDialogWithConfirmAndDismiss"
 private const val OpenAlertDialogWithEdgeButton = "OpenAlertDialogWithEdgeButton"
+private const val DismissAlertDialogWithEdgeButton = "DismissAlertDialogWithEdgeButton"
 private const val OpenAlertDialogWithContentGroups = "OpenAlertDialogWithContentGroups"
+private const val DismissAlertDialogWithContentGroups = "DismissAlertDialogWithContentGroups"
