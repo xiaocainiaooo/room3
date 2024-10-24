@@ -22,7 +22,7 @@ import android.util.LayoutDirection
 import android.util.Size
 import android.view.Surface
 import android.view.View
-import androidx.camera.viewfinder.CameraViewfinder.ScaleType
+import androidx.camera.viewfinder.core.ScaleType
 import androidx.camera.viewfinder.internal.transform.Rotation.RotationValue
 import androidx.camera.viewfinder.internal.transform.TransformationInfo
 import androidx.camera.viewfinder.internal.utils.TransformUtils.sizeToVertices

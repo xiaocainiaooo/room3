@@ -42,6 +42,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 import androidx.annotation.VisibleForTesting;
+import androidx.camera.viewfinder.core.ScaleType;
 import androidx.camera.viewfinder.internal.quirk.DeviceQuirks;
 import androidx.camera.viewfinder.internal.quirk.SurfaceViewNotCroppedByParentQuirk;
 import androidx.camera.viewfinder.internal.quirk.SurfaceViewStretchedQuirk;
@@ -556,89 +557,6 @@ public final class CameraViewfinder extends FrameLayout {
                 }
             }
             throw new IllegalArgumentException("Unknown implementation mode id " + id);
-        }
-    }
-
-    /** Options for scaling the viewfinder vis-à-vis its container {@link CameraViewfinder}. */
-    public enum ScaleType {
-        /**
-         * Scale the viewfinder, maintaining the source aspect ratio, so it fills the entire
-         * {@link CameraViewfinder}, and align it to the start of the view, which is the top left
-         * corner in a left-to-right (LTR) layout, or the top right corner in a right-to-left
-         * (RTL) layout.
-         * <p>
-         * This may cause the viewfinder to be cropped if the camera viewfinder aspect ratio does
-         * not match that of its container {@link CameraViewfinder}.
-         */
-        FILL_START(0),
-        /**
-         * Scale the viewfinder, maintaining the source aspect ratio, so it fills the entire
-         * {@link CameraViewfinder}, and center it in the view.
-         * <p>
-         * This may cause the viewfinder to be cropped if the camera viewfinder aspect ratio does
-         * not match that of its container {@link CameraViewfinder}.
-         */
-        FILL_CENTER(1),
-        /**
-         * Scale the viewfinder, maintaining the source aspect ratio, so it fills the entire
-         * {@link CameraViewfinder}, and align it to the end of the view, which is the bottom right
-         * corner in a left-to-right (LTR) layout, or the bottom left corner in a right-to-left
-         * (RTL) layout.
-         * <p>
-         * This may cause the viewfinder to be cropped if the camera viewfinder aspect ratio does
-         * not match that of its container {@link CameraViewfinder}.
-         */
-        FILL_END(2),
-        /**
-         * Scale the viewfinder, maintaining the source aspect ratio, so it is entirely contained
-         * within the {@link CameraViewfinder}, and align it to the start of the view, which is the
-         * top left corner in a left-to-right (LTR) layout, or the top right corner in a
-         * right-to-left (RTL) layout. The background area not covered by the viewfinder stream
-         * will be black or the background of the {@link CameraViewfinder}
-         * <p>
-         * Both dimensions of the viewfinder will be equal or less than the corresponding dimensions
-         * of its container {@link CameraViewfinder}.
-         */
-        FIT_START(3),
-        /**
-         * Scale the viewfinder, maintaining the source aspect ratio, so it is entirely contained
-         * within the {@link CameraViewfinder}, and center it inside the view. The background
-         * area not covered by the viewfinder stream will be black or the background of the
-         * {@link CameraViewfinder}.
-         * <p>
-         * Both dimensions of the viewfinder will be equal or less than the corresponding dimensions
-         * of its container {@link CameraViewfinder}.
-         */
-        FIT_CENTER(4),
-        /**
-         * Scale the viewfinder, maintaining the source aspect ratio, so it is entirely contained
-         * within the {@link CameraViewfinder}, and align it to the end of the view, which is the
-         * bottom right corner in a left-to-right (LTR) layout, or the bottom left corner in a
-         * right-to-left (RTL) layout. The background area not covered by the viewfinder stream
-         * will be black or the background of the {@link CameraViewfinder}.
-         * <p>
-         * Both dimensions of the viewfinder will be equal or less than the corresponding dimensions
-         * of its container {@link CameraViewfinder}.
-         */
-        FIT_END(5);
-
-        private final int mId;
-
-        ScaleType(int id) {
-            mId = id;
-        }
-
-        int getId() {
-            return mId;
-        }
-
-        static ScaleType fromId(int id) {
-            for (ScaleType scaleType : values()) {
-                if (scaleType.mId == id) {
-                    return scaleType;
-                }
-            }
-            throw new IllegalArgumentException("Unknown scale type id " + id);
         }
     }
 

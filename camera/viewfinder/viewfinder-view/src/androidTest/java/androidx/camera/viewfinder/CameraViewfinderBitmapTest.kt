@@ -21,7 +21,8 @@ import android.graphics.Bitmap
 import android.hardware.camera2.CameraManager
 import android.util.Size
 import android.view.Surface
-import androidx.camera.viewfinder.CameraViewfinder.ScaleType.FILL_CENTER
+import androidx.camera.viewfinder.core.ScaleType
+import androidx.camera.viewfinder.core.ScaleType.FILL_CENTER
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
 import androidx.camera.viewfinder.core.impl.utils.futures.FutureCallback
 import androidx.camera.viewfinder.core.impl.utils.futures.Futures
@@ -145,7 +146,7 @@ class CameraViewfinderBitmapTest {
         )
     }
 
-    private fun setUpViewfinder(scaleType: CameraViewfinder.ScaleType): CameraViewfinder {
+    private fun setUpViewfinder(scaleType: ScaleType): CameraViewfinder {
         val viewfinderAtomicReference: AtomicReference<CameraViewfinder> =
             AtomicReference<CameraViewfinder>()
         runOnMainThread {

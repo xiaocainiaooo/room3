@@ -8,25 +8,16 @@ package androidx.camera.viewfinder {
     ctor @UiThread public CameraViewfinder(android.content.Context, android.util.AttributeSet?, int, int);
     method @UiThread public android.graphics.Bitmap? getBitmap();
     method @Deprecated @UiThread public androidx.camera.viewfinder.CameraViewfinder.ImplementationMode getImplementationMode();
-    method @UiThread public androidx.camera.viewfinder.CameraViewfinder.ScaleType getScaleType();
+    method @UiThread public androidx.camera.viewfinder.core.ScaleType getScaleType();
     method @UiThread public androidx.camera.viewfinder.core.ImplementationMode getSurfaceImplementationMode();
     method @UiThread public com.google.common.util.concurrent.ListenableFuture<android.view.Surface!> requestSurfaceAsync(androidx.camera.viewfinder.core.ViewfinderSurfaceRequest);
     method @Deprecated @UiThread public com.google.common.util.concurrent.ListenableFuture<android.view.Surface!> requestSurfaceAsync(androidx.camera.viewfinder.ViewfinderSurfaceRequest);
-    method @UiThread public void setScaleType(androidx.camera.viewfinder.CameraViewfinder.ScaleType);
+    method @UiThread public void setScaleType(androidx.camera.viewfinder.core.ScaleType);
   }
 
   @Deprecated public enum CameraViewfinder.ImplementationMode {
     enum_constant @Deprecated public static final androidx.camera.viewfinder.CameraViewfinder.ImplementationMode COMPATIBLE;
     enum_constant @Deprecated public static final androidx.camera.viewfinder.CameraViewfinder.ImplementationMode PERFORMANCE;
-  }
-
-  public enum CameraViewfinder.ScaleType {
-    enum_constant public static final androidx.camera.viewfinder.CameraViewfinder.ScaleType FILL_CENTER;
-    enum_constant public static final androidx.camera.viewfinder.CameraViewfinder.ScaleType FILL_END;
-    enum_constant public static final androidx.camera.viewfinder.CameraViewfinder.ScaleType FILL_START;
-    enum_constant public static final androidx.camera.viewfinder.CameraViewfinder.ScaleType FIT_CENTER;
-    enum_constant public static final androidx.camera.viewfinder.CameraViewfinder.ScaleType FIT_END;
-    enum_constant public static final androidx.camera.viewfinder.CameraViewfinder.ScaleType FIT_START;
   }
 
   public final class CameraViewfinderExt {

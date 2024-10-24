@@ -10,6 +10,19 @@ package androidx.camera.viewfinder.core {
   public static final class ImplementationMode.Companion {
   }
 
+  public enum ScaleType {
+    enum_constant public static final androidx.camera.viewfinder.core.ScaleType FILL_CENTER;
+    enum_constant public static final androidx.camera.viewfinder.core.ScaleType FILL_END;
+    enum_constant public static final androidx.camera.viewfinder.core.ScaleType FILL_START;
+    enum_constant public static final androidx.camera.viewfinder.core.ScaleType FIT_CENTER;
+    enum_constant public static final androidx.camera.viewfinder.core.ScaleType FIT_END;
+    enum_constant public static final androidx.camera.viewfinder.core.ScaleType FIT_START;
+    field public static final androidx.camera.viewfinder.core.ScaleType.Companion Companion;
+  }
+
+  public static final class ScaleType.Companion {
+  }
+
   public final class TransformationInfo {
     ctor public TransformationInfo(int sourceRotation, boolean isSourceMirroredHorizontally, boolean isSourceMirroredVertically, int cropRectLeft, int cropRectTop, int cropRectRight, int cropRectBottom);
     method public int getCropRectBottom();
