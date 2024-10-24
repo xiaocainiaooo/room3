@@ -1627,7 +1627,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         contentCaptureManager.onLayoutChange(layoutNode)
     }
 
-    override val rectManager = RectManager()
+    override val rectManager = RectManager(layoutNodes)
 
     override fun onLayoutNodeDeactivated(layoutNode: LayoutNode) {
         @OptIn(ExperimentalComposeUiApi::class)

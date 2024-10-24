@@ -2573,6 +2573,10 @@ package androidx.compose.ui.layout {
     method public default int minIntrinsicWidth(androidx.compose.ui.layout.IntrinsicMeasureScope, java.util.List<? extends java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>> measurables, int height);
   }
 
+  public final class OnGlobalLayoutListenerKt {
+    method public static kotlinx.coroutines.DisposableHandle registerOnGlobalLayoutListener(androidx.compose.ui.node.DelegatableNode, int throttleMs, int debounceMs, kotlin.jvm.functions.Function1<? super androidx.compose.ui.spatial.RectInfo,kotlin.Unit> callback);
+  }
+
   @kotlin.jvm.JvmDefaultWithCompatibility public interface OnGloballyPositionedModifier extends androidx.compose.ui.Modifier.Element {
     method public void onGloballyPositioned(androidx.compose.ui.layout.LayoutCoordinates coordinates);
   }
@@ -4001,6 +4005,7 @@ package androidx.compose.ui.semantics {
 package androidx.compose.ui.spatial {
 
   public final class RectInfo {
+    method public java.util.List<androidx.compose.ui.unit.IntRect> calculateOcclusions();
     method public int getHeight();
     method public long getPositionInRoot();
     method public long getPositionInScreen();

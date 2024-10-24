@@ -18,6 +18,9 @@ package androidx.compose.ui.spatial
 
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.requireLayoutNode
+import androidx.compose.ui.node.requireOwner
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.roundToIntRect
@@ -35,6 +38,7 @@ internal constructor(
     private val windowOffset: IntOffset,
     private val screenOffset: IntOffset,
     private val viewToWindowMatrix: Matrix?,
+    private val node: DelegatableNode,
 ) {
     /**
      * The top left position of the Rect in the coordinates of the root node of the compose
@@ -132,4 +136,42 @@ internal constructor(
             val y = screenOffset.y
             return IntRect(l + x, t + y, r + x, b + y)
         }
+
+    /**
+     * At the current state of the layout, calculates which other Composable Layouts are occluding
+     * the Composable associated with this [RectInfo]. **Note**: Calling this method during measure
+     * or layout may result on calculations with stale (or partially stale) layout information.
+     *
+     * An occlusion is defined by an intersecting Composable that may draw on top of the target
+     * Composable.
+     *
+     * There's no guarantee that something was actually drawn to occlude, so a transparent
+     * Composable that could otherwise draw on top of the target is considered to be occluding.
+     *
+     * There's no differentiation between partial and complete occlusions, they are all included as
+     * part of this calculation.
+     *
+     * Ancestors, child and grandchild Layouts are never considered to be occluding.
+     *
+     * @return A [List] of the rectangles that occlude the associated Composable Layout.
+     */
+    fun calculateOcclusions(): List<IntRect> {
+        val rectManager = node.requireOwner().rectManager
+        val id = node.requireLayoutNode().semanticsId
+        val rectList = rectManager.rects
+        val idIndex = rectList.indexOf(id)
+        if (idIndex < 0) {
+            return emptyList()
+        }
+        // For the given `id`, finds intersections and determines occlusions by the result of
+        // the 'RectManager.isTargetDrawnFirst', if the node for 'id' is drawn first, then it's
+        // being occluded and the intersecting rect is added to the list result.
+        return buildList {
+            rectList.forEachIntersectingRectWithValueAt(idIndex) { l, t, r, b, intersectingId ->
+                if (rectManager.isTargetDrawnFirst(id, intersectingId)) {
+                    this@buildList.add(IntRect(l, t, r, b))
+                }
+            }
+        }
+    }
 }
