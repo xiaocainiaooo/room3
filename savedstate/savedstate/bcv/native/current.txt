@@ -54,6 +54,7 @@ final value class androidx.savedstate/SavedStateReader { // androidx.savedstate/
     final fun contentDeepEquals(androidx.savedstate/SavedState): kotlin/Boolean // androidx.savedstate/SavedStateReader.contentDeepEquals|contentDeepEquals(androidx.savedstate.SavedState){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // androidx.savedstate/SavedStateReader.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // androidx.savedstate/SavedStateReader.hashCode|hashCode(){}[0]
+    final fun toMap(): kotlin.collections/Map<kotlin/String, kotlin/Any?> // androidx.savedstate/SavedStateReader.toMap|toMap(){}[0]
     final fun toString(): kotlin/String // androidx.savedstate/SavedStateReader.toString|toString(){}[0]
     final inline fun <#A1: reified kotlin/Any?> getListResultOrElse(kotlin/String, kotlin/Function0<kotlin.collections/List<#A1>>, kotlin/Function0<kotlin.collections/List<#A1>?>): kotlin.collections/List<#A1> // androidx.savedstate/SavedStateReader.getListResultOrElse|getListResultOrElse(kotlin.String;kotlin.Function0<kotlin.collections.List<0:0>>;kotlin.Function0<kotlin.collections.List<0:0>?>){0§<kotlin.Any?>}[0]
     final inline fun <#A1: reified kotlin/Any?> getListResultOrThrow(kotlin/String, kotlin/Function0<kotlin.collections/List<#A1>?>): kotlin.collections/List<#A1> // androidx.savedstate/SavedStateReader.getListResultOrThrow|getListResultOrThrow(kotlin.String;kotlin.Function0<kotlin.collections.List<0:0>?>){0§<kotlin.Any?>}[0]
@@ -128,6 +129,7 @@ final object androidx.savedstate.internal/SavedStateUtils { // androidx.savedsta
     final inline fun keyNotFoundError(kotlin/String): kotlin/Nothing // androidx.savedstate.internal/SavedStateUtils.keyNotFoundError|keyNotFoundError(kotlin.String){}[0]
 }
 
+final fun (androidx.savedstate/SavedState).androidx.savedstate/toMap(): kotlin.collections/Map<kotlin/String, kotlin/Any?> // androidx.savedstate/toMap|toMap@androidx.savedstate.SavedState(){}[0]
 final inline fun <#A: kotlin/Any?> (androidx.savedstate/SavedState).androidx.savedstate/read(kotlin/Function1<androidx.savedstate/SavedStateReader, #A>): #A // androidx.savedstate/read|read@androidx.savedstate.SavedState(kotlin.Function1<androidx.savedstate.SavedStateReader,0:0>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (androidx.savedstate/SavedState).androidx.savedstate/write(kotlin/Function1<androidx.savedstate/SavedStateWriter, #A>): #A // androidx.savedstate/write|write@androidx.savedstate.SavedState(kotlin.Function1<androidx.savedstate.SavedStateWriter,0:0>){0§<kotlin.Any?>}[0]
 final inline fun androidx.savedstate/savedState(kotlin.collections/Map<kotlin/String, kotlin/Any?> = ..., kotlin/Function1<androidx.savedstate/SavedStateWriter, kotlin/Unit> = ...): androidx.savedstate/SavedState // androidx.savedstate/savedState|savedState(kotlin.collections.Map<kotlin.String,kotlin.Any?>;kotlin.Function1<androidx.savedstate.SavedStateWriter,kotlin.Unit>){}[0]

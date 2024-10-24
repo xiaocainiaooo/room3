@@ -178,6 +178,35 @@ internal class SavedStateTest : RobolectricTest() {
         assertThat(contentDeepEquals).isFalse()
     }
 
+    @Test
+    fun toMap() {
+        val parentState = savedState {
+            putInt(KEY_1, Int.MAX_VALUE)
+            putNull(KEY_2)
+            putSavedState(
+                KEY_3,
+                savedState {
+                    putInt(KEY_1, Int.MIN_VALUE)
+                    putNull(KEY_2)
+                }
+            )
+        }
+
+        val actual = parentState.read { toMap() }
+
+        val expected =
+            mapOf(
+                KEY_1 to Int.MAX_VALUE,
+                KEY_2 to null,
+                KEY_3 to
+                    mapOf(
+                        KEY_1 to Int.MIN_VALUE,
+                        KEY_2 to null,
+                    )
+            )
+        assertThat(actual).containsExactlyEntriesIn(expected)
+    }
+
     // region getters and setters
     @Test
     fun getBoolean_whenSet_returns() {
