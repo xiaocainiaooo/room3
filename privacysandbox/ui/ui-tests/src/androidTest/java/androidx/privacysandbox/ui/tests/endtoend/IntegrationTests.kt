@@ -16,11 +16,9 @@
 
 package androidx.privacysandbox.ui.tests.endtoend
 
-import android.app.Activity
-import android.app.Instrumentation
+import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
-import android.graphics.Color
 import android.os.SystemClock
 import android.view.MotionEvent
 import android.view.View
@@ -30,16 +28,16 @@ import android.widget.LinearLayout
 import androidx.privacysandbox.ui.client.view.SandboxedSdkUiSessionState
 import androidx.privacysandbox.ui.client.view.SandboxedSdkUiSessionStateChangedListener
 import androidx.privacysandbox.ui.client.view.SandboxedSdkView
-import androidx.privacysandbox.ui.core.BackwardCompatUtil
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
+import androidx.privacysandbox.ui.tests.endtoend.IntegrationTestSetupRule.Companion.INITIAL_HEIGHT
+import androidx.privacysandbox.ui.tests.endtoend.IntegrationTestSetupRule.Companion.INITIAL_WIDTH
 import androidx.privacysandbox.ui.tests.util.TestSessionManager
 import androidx.privacysandbox.ui.tests.util.TestSessionManager.Companion.TIMEOUT
 import androidx.privacysandbox.ui.tests.util.TestSessionManager.TestSandboxedUiAdapter
 import androidx.privacysandbox.ui.tests.util.TestSessionManager.TestSessionClient
-import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.core.app.ActivityScenario
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.testutils.withActivity
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import java.util.concurrent.CountDownLatch
@@ -57,11 +55,9 @@ import org.junit.runners.Parameterized
 @MediumTest
 class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
 
-    @get:Rule var activityScenarioRule = ActivityScenarioRule(MainActivity::class.java)
+    @get:Rule val rule = IntegrationTestSetupRule(invokeBackwardsCompatFlow)
 
     companion object {
-        const val INITIAL_HEIGHT = 100
-        const val INITIAL_WIDTH = 100
 
         @JvmStatic
         @Parameterized.Parameters(name = "invokeBackwardsCompatFlow={0}")
@@ -72,43 +68,23 @@ class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
             )
     }
 
-    private val context = InstrumentationRegistry.getInstrumentation().context
-
+    private lateinit var context: Context
     private lateinit var view: SandboxedSdkView
     private lateinit var stateChangeListener: TestStateChangeListener
-    private lateinit var activity: Activity
     private lateinit var errorLatch: CountDownLatch
     private lateinit var linearLayout: LinearLayout
-    private lateinit var mInstrumentation: Instrumentation
     private lateinit var sessionManager: TestSessionManager
+    private lateinit var activityScenario: ActivityScenario<MainActivity>
 
     @Before
     fun setup() {
-        if (!invokeBackwardsCompatFlow) {
-            // Device needs to support remote provider to invoke non-backward-compat flow.
-            assumeTrue(BackwardCompatUtil.canProviderBeRemote())
-        }
-
-        mInstrumentation = InstrumentationRegistry.getInstrumentation()
-        sessionManager = TestSessionManager(context, invokeBackwardsCompatFlow)
-
-        activity = activityScenarioRule.withActivity { this }
-        activityScenarioRule.withActivity {
-            view = SandboxedSdkView(context)
-            errorLatch = CountDownLatch(1)
-            stateChangeListener = TestStateChangeListener(errorLatch)
-            view.addStateChangedListener(stateChangeListener)
-            linearLayout = LinearLayout(context)
-            linearLayout.layoutParams =
-                LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT
-                )
-            linearLayout.setBackgroundColor(Color.RED)
-            setContentView(linearLayout)
-            view.layoutParams = LinearLayout.LayoutParams(INITIAL_WIDTH, INITIAL_HEIGHT)
-            linearLayout.addView(view)
-        }
+        context = rule.context
+        view = rule.view
+        stateChangeListener = rule.stateChangeListener
+        errorLatch = rule.errorLatch
+        linearLayout = rule.linearLayout
+        sessionManager = rule.sessionManager
+        activityScenario = rule.activityScenario
     }
 
     @Ignore // b/271299184
@@ -172,8 +148,8 @@ class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
     fun testConfigurationChanged() {
         val sdkAdapter = sessionManager.createAdapterAndEstablishSession(viewForSession = view)
 
-        activityScenarioRule.withActivity {
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        activityScenario.onActivity { activity ->
+            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         }
 
         val testSession = sdkAdapter.session as TestSandboxedUiAdapter.TestSession
@@ -238,7 +214,7 @@ class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
     fun testSessionError() {
         sessionManager.createAdapterAndEstablishSession(
             viewForSession = view,
-            hasFailingTestSession = true
+            failToProvideUi = true
         )
 
         assertThat(errorLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)).isTrue()
@@ -262,7 +238,7 @@ class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
         val newWidth = INITIAL_WIDTH - 10
         val newHeight = INITIAL_HEIGHT - 10
 
-        activityScenarioRule.withActivity {
+        activityScenario.onActivity {
             testSession.sessionClient.onResizeRequested(newWidth, newHeight)
         }
         assertWithMessage("Resized width").that(testSession.resizedWidth).isEqualTo(newWidth)
@@ -283,7 +259,7 @@ class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
         val sdkAdapter = sessionManager.createAdapterAndWaitToBeActive(viewForSession = view)
         val testSession = sdkAdapter.session as TestSandboxedUiAdapter.TestSession
 
-        activityScenarioRule.withActivity {
+        activityScenario.onActivity {
             testSession.sessionClient.onResizeRequested(INITIAL_WIDTH - 10, INITIAL_HEIGHT - 10)
         }
         testSession.assertResizeDidNotOccur()
@@ -294,7 +270,7 @@ class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
         val sdkAdapter = sessionManager.createAdapterAndWaitToBeActive(viewForSession = view)
         val newWidth = INITIAL_WIDTH - 10
         val newHeight = INITIAL_HEIGHT - 10
-        activityScenarioRule.withActivity {
+        activityScenario.onActivity {
             view.layoutParams = LinearLayout.LayoutParams(newWidth, newHeight)
         }
 
@@ -345,7 +321,7 @@ class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
         val session = adapter.session as TestSandboxedUiAdapter.TestSession
 
         // Force a layout pass by changing the size of the view
-        activityScenarioRule.withActivity {
+        activityScenario.onActivity {
             session.sessionClient.onResizeRequested(INITIAL_WIDTH - 10, INITIAL_HEIGHT - 10)
         }
         session.assertViewWasLaidOut()
@@ -405,7 +381,7 @@ class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
         val sessionObserver = factory.sessionObservers[0]
         sessionObserver.assertSessionOpened()
         assertThat(sessionObserver.sessionObserverContext).isNotNull()
-        assertThat(sessionObserver.sessionObserverContext?.view).isEqualTo(adapter.session.view)
+        assertThat(sessionObserver.sessionObserverContext?.view).isEqualTo(adapter.session?.view)
     }
 
     @Test
@@ -432,7 +408,7 @@ class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
         adapter.removeObserverFactory(factory)
         val sessionObserver = factory.sessionObservers[0]
         // Setting a new adapter on the SandboxedSdKView will cause the current session to close.
-        activityScenarioRule.withActivity { view.setAdapter(TestSandboxedUiAdapter()) }
+        activityScenario.onActivity { view.setAdapter(TestSandboxedUiAdapter()) }
         // onSessionClosed is still sent for the observer
         sessionObserver.assertSessionClosed()
     }
@@ -448,7 +424,7 @@ class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
         assertThat(factory.sessionObservers.size).isEqualTo(1)
         adapter.removeObserverFactory(factory)
         val sandboxedSdkView2 = SandboxedSdkView(context)
-        activityScenarioRule.withActivity { linearLayout.addView(sandboxedSdkView2) }
+        activityScenario.onActivity { linearLayout.addView(sandboxedSdkView2) }
         // create a new session and wait to be active
         sandboxedSdkView2.setAdapter(adapter)
 
@@ -474,12 +450,12 @@ class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
         assertThat(factory.sessionObservers.size).isEqualTo(1)
         val sessionObserver = factory.sessionObservers[0]
         // Setting a new adapter on the SandboxedSdKView will cause the current session to close.
-        activityScenarioRule.withActivity { view.setAdapter(TestSandboxedUiAdapter()) }
+        activityScenario.onActivity { view.setAdapter(TestSandboxedUiAdapter()) }
         sessionObserver.assertSessionClosed()
     }
 
     private fun injectInputEventOnView() {
-        activityScenarioRule.withActivity {
+        activityScenario.onActivity {
             val location = IntArray(2)
             view.getLocationOnScreen(location)
             InstrumentationRegistry.getInstrumentation()
