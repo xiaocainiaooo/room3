@@ -77,6 +77,7 @@ sealed class LibraryType(
         @JvmStatic val INTERNAL_TEST_LIBRARY = InternalTestLibrary()
         @JvmStatic val INTERNAL_HOST_TEST_LIBRARY = InternalHostTestLibrary()
         @JvmStatic val LINT = Lint()
+        @JvmStatic val STANDALONE_PUBLISHED_LINT = StandalonePublishedLint()
         @JvmStatic val PUBLISHED_LIBRARY = PublishedLibrary()
         @JvmStatic
         val PUBLISHED_PROTO_LIBRARY =
@@ -107,6 +108,7 @@ sealed class LibraryType(
                 "INTERNAL_HOST_TEST_LIBRARY" to INTERNAL_HOST_TEST_LIBRARY,
                 "SAMPLES" to SAMPLES,
                 "LINT" to LINT,
+                "STANDALONE_PUBLISHED_LINT" to STANDALONE_PUBLISHED_LINT,
                 "GRADLE_PLUGIN" to GRADLE_PLUGIN,
                 "ANNOTATION_PROCESSOR" to ANNOTATION_PROCESSOR,
                 "ANNOTATION_PROCESSOR_UTILS" to ANNOTATION_PROCESSOR_UTILS,
@@ -166,6 +168,14 @@ sealed class LibraryType(
         LibraryType(
             publish = Publish.NONE,
             sourceJars = false,
+            checkApi = RunApiTasks.No("Lint Library"),
+            compilationTarget = CompilationTarget.HOST
+        )
+
+    class StandalonePublishedLint :
+        LibraryType(
+            publish = Publish.SNAPSHOT_AND_RELEASE,
+            sourceJars = true,
             checkApi = RunApiTasks.No("Lint Library"),
             compilationTarget = CompilationTarget.HOST
         )
@@ -280,3 +290,5 @@ sealed class RunApiTasks {
     /** Do not run any API tasks. */
     data class No(val reason: String) : RunApiTasks()
 }
+
+fun LibraryType.isLint() = this == LibraryType.LINT || this == LibraryType.STANDALONE_PUBLISHED_LINT
