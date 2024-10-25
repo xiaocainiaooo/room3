@@ -159,4 +159,108 @@ class Camera2CameraControllerTest {
 
             cameraController.close()
         }
+
+    @Test
+    fun testControllerRestartsWhenCameraAvailableAfterCameraError() =
+        testScope.runTest(20.seconds) {
+            val cameraController = createCamera2CameraController()
+            cameraController.updateSurfaceMap(mapOf(streamId1 to fakeSurface))
+            cameraController.start()
+            fakeCamera2DeviceManager.simulateCameraOpen(cameraId)
+            testScope.advanceUntilIdle()
+
+            fakeCameraStatusMonitor.simulateCameraUnavailable()
+            fakeCamera2DeviceManager.simulateCameraError(cameraId, CameraError.ERROR_CAMERA_SERVICE)
+            testScope.advanceUntilIdle()
+
+            fakeCameraStatusMonitor.simulateCameraAvailable()
+            testScope.advanceUntilIdle()
+            assertEquals(cameraController.controllerState, ControllerState.STARTED)
+            verify(fakeCaptureSessionFactory, times(1)).create(any(), any(), any())
+
+            cameraController.close()
+        }
+
+    @Test
+    fun testControllerRestartsWhenCameraAvailableAfterCameraDisconnected() =
+        testScope.runTest(20.seconds) {
+            val cameraController = createCamera2CameraController()
+            cameraController.updateSurfaceMap(mapOf(streamId1 to fakeSurface))
+            cameraController.start()
+            fakeCamera2DeviceManager.simulateCameraOpen(cameraId)
+            testScope.advanceUntilIdle()
+
+            fakeCameraStatusMonitor.simulateCameraUnavailable()
+            fakeCamera2DeviceManager.simulateCameraError(cameraId, CameraError.ERROR_CAMERA_IN_USE)
+            testScope.advanceUntilIdle()
+
+            fakeCameraStatusMonitor.simulateCameraAvailable()
+            testScope.advanceUntilIdle()
+            assertEquals(cameraController.controllerState, ControllerState.STARTED)
+            verify(fakeCaptureSessionFactory, times(1)).create(any(), any(), any())
+
+            cameraController.close()
+        }
+
+    @Test
+    fun testControllerDoesNotRestartWhenCameraAvailableAfterGraphConfigError() =
+        testScope.runTest(20.seconds) {
+            val cameraController = createCamera2CameraController()
+            cameraController.updateSurfaceMap(mapOf(streamId1 to fakeSurface))
+            cameraController.start()
+            fakeCamera2DeviceManager.simulateCameraOpen(cameraId)
+            testScope.advanceUntilIdle()
+
+            fakeCameraStatusMonitor.simulateCameraUnavailable()
+            fakeCamera2DeviceManager.simulateCameraError(cameraId, CameraError.ERROR_GRAPH_CONFIG)
+            testScope.advanceUntilIdle()
+
+            fakeCameraStatusMonitor.simulateCameraAvailable()
+            testScope.advanceUntilIdle()
+            assertEquals(cameraController.controllerState, ControllerState.ERROR)
+
+            cameraController.close()
+        }
+
+    @Test
+    fun testControllerDoesNotRestartWhenCameraPrioritiesChangedAfterCameraError() =
+        testScope.runTest(20.seconds) {
+            val cameraController = createCamera2CameraController()
+            cameraController.updateSurfaceMap(mapOf(streamId1 to fakeSurface))
+            cameraController.start()
+            fakeCamera2DeviceManager.simulateCameraOpen(cameraId)
+            testScope.advanceUntilIdle()
+
+            fakeCameraStatusMonitor.simulateCameraUnavailable()
+            fakeCamera2DeviceManager.simulateCameraError(cameraId, CameraError.ERROR_CAMERA_DEVICE)
+            testScope.advanceUntilIdle()
+
+            fakeCameraStatusMonitor.simulateCameraPrioritiesChanged()
+            testScope.advanceUntilIdle()
+            assertEquals(cameraController.controllerState, ControllerState.ERROR)
+
+            cameraController.close()
+        }
+
+    @Test
+    fun testControllerRestartsWhenCameraPrioritiesChangedAfterCameraDisconnected() =
+        testScope.runTest(20.seconds) {
+            val cameraController = createCamera2CameraController()
+            cameraController.updateSurfaceMap(mapOf(streamId1 to fakeSurface))
+            cameraController.start()
+            fakeCamera2DeviceManager.simulateCameraOpen(cameraId)
+            testScope.advanceUntilIdle()
+
+            fakeCameraStatusMonitor.simulateCameraUnavailable()
+            fakeCamera2DeviceManager.simulateCameraError(cameraId, CameraError.ERROR_CAMERA_IN_USE)
+            testScope.advanceUntilIdle()
+
+            fakeCameraStatusMonitor.simulateCameraPrioritiesChanged()
+            fakeCameraStatusMonitor.simulateCameraAvailable()
+            testScope.advanceUntilIdle()
+            assertEquals(cameraController.controllerState, ControllerState.STARTED)
+            verify(fakeCaptureSessionFactory, times(1)).create(any(), any(), any())
+
+            cameraController.close()
+        }
 }
