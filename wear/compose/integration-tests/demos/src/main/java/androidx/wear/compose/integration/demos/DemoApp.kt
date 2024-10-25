@@ -49,7 +49,6 @@ import androidx.wear.compose.material.LocalTextStyle
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.SwipeToDismissBox
 import androidx.wear.compose.material.Text
-import androidx.wear.compose.material3.demos.RobotoFlexTypography
 
 @Composable
 fun DemoApp(
@@ -110,15 +109,12 @@ internal fun BoxScope.DisplayDemoList(category: DemoCategory, onNavigateTo: (Dem
         @Composable { it: @Composable () -> Unit ->
             // Only material3 demos benefit from the Material3 ScreenScaffold
             if (category.materialVersion == 3) {
-                androidx.wear.compose.material3.MaterialTheme(typography = RobotoFlexTypography) {
-                    val timeText =
-                        @Composable { androidx.wear.compose.material3.TimeText { time() } }
-                    androidx.wear.compose.material3.ScreenScaffold(
-                        scrollState = state,
-                        timeText = remember { timeText },
-                    ) {
-                        it()
-                    }
+                val timeText = @Composable { androidx.wear.compose.material3.TimeText { time() } }
+                androidx.wear.compose.material3.ScreenScaffold(
+                    scrollState = state,
+                    timeText = remember { timeText },
+                ) {
+                    it()
                 }
             } else {
                 it()

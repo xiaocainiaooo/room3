@@ -26,60 +26,119 @@ import androidx.wear.compose.material3.Typography
 import androidx.wear.compose.material3.tokens.TypographyVariableFontsTokens
 
 @OptIn(ExperimentalTextApi::class)
-fun createRobotoFlexTextStyle(variationSettings: FontVariation.Settings) =
-    TextStyle(
+fun createRobotoFlexTextStyle(style: TextStyle, variationSettings: FontVariation.Settings) =
+    style.copy(
         fontFamily =
             Font(R.font.robotoflex_variable, variationSettings = variationSettings).toFontFamily()
     )
 
+val DefaultTypography = Typography()
+
 val RobotoFlexTypography =
     Typography(
         arcLarge =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.ArcLargeVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.arcLarge,
+                TypographyVariableFontsTokens.ArcLargeVariationSettings
+            ),
         arcMedium =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.ArcMediumVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.arcMedium,
+                TypographyVariableFontsTokens.ArcMediumVariationSettings
+            ),
         arcSmall =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.ArcSmallVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.arcSmall,
+                TypographyVariableFontsTokens.ArcSmallVariationSettings
+            ),
         bodyExtraSmall =
             createRobotoFlexTextStyle(
+                DefaultTypography.bodyExtraSmall,
                 TypographyVariableFontsTokens.BodyExtraSmallVariationSettings
             ),
         bodySmall =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.BodySmallVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.bodySmall,
+                TypographyVariableFontsTokens.BodySmallVariationSettings
+            ),
         bodyMedium =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.BodyMediumVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.bodyMedium,
+                TypographyVariableFontsTokens.BodyMediumVariationSettings
+            ),
         bodyLarge =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.BodyLargeVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.bodyLarge,
+                TypographyVariableFontsTokens.BodyLargeVariationSettings
+            ),
         displaySmall =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.DisplaySmallVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.displaySmall,
+                TypographyVariableFontsTokens.DisplaySmallVariationSettings
+            ),
         displayMedium =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.DisplayMediumVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.displayMedium,
+                TypographyVariableFontsTokens.DisplayMediumVariationSettings
+            ),
         displayLarge =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.DisplayLargeVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.displayLarge,
+                TypographyVariableFontsTokens.DisplayLargeVariationSettings
+            ),
         labelSmall =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.LabelSmallVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.labelSmall,
+                TypographyVariableFontsTokens.LabelSmallVariationSettings
+            ),
         labelMedium =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.LabelMediumVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.labelMedium,
+                TypographyVariableFontsTokens.LabelMediumVariationSettings
+            ),
         labelLarge =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.LabelLargeVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.labelLarge,
+                TypographyVariableFontsTokens.LabelLargeVariationSettings
+            ),
         titleSmall =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.TitleSmallVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.titleSmall,
+                TypographyVariableFontsTokens.TitleSmallVariationSettings
+            ),
         titleMedium =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.TitleMediumVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.titleMedium,
+                TypographyVariableFontsTokens.TitleMediumVariationSettings
+            ),
         titleLarge =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.TitleLargeVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.titleLarge,
+                TypographyVariableFontsTokens.TitleLargeVariationSettings
+            ),
         numeralExtraSmall =
             createRobotoFlexTextStyle(
+                DefaultTypography.numeralExtraSmall,
                 TypographyVariableFontsTokens.NumeralExtraSmallVariationSettings
             ),
         numeralSmall =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.NumeralSmallVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.numeralSmall,
+                TypographyVariableFontsTokens.NumeralSmallVariationSettings
+            ),
         numeralMedium =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.NumeralMediumVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.numeralMedium,
+                TypographyVariableFontsTokens.NumeralMediumVariationSettings
+            ),
         numeralLarge =
-            createRobotoFlexTextStyle(TypographyVariableFontsTokens.NumeralLargeVariationSettings),
+            createRobotoFlexTextStyle(
+                DefaultTypography.numeralLarge,
+                TypographyVariableFontsTokens.NumeralLargeVariationSettings
+            ),
         numeralExtraLarge =
             createRobotoFlexTextStyle(
+                DefaultTypography.numeralExtraLarge,
                 TypographyVariableFontsTokens.NumeralExtraLargeVariationSettings
             ),
     )
