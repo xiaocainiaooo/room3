@@ -17,13 +17,12 @@
 package androidx.camera.viewfinder;
 
 import static androidx.camera.viewfinder.internal.utils.TransformUtils.createTransformInfo;
-import static androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest.MIRROR_MODE_HORIZONTAL;
+import static androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.MIRROR_MODE_HORIZONTAL;
 
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Handler;
@@ -42,12 +41,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 import androidx.annotation.VisibleForTesting;
+import androidx.camera.viewfinder.core.ImplementationMode;
+import androidx.camera.viewfinder.core.ScaleType;
+import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest;
 import androidx.camera.viewfinder.internal.quirk.DeviceQuirks;
 import androidx.camera.viewfinder.internal.quirk.SurfaceViewNotCroppedByParentQuirk;
 import androidx.camera.viewfinder.internal.quirk.SurfaceViewStretchedQuirk;
 import androidx.camera.viewfinder.internal.utils.Logger;
 import androidx.camera.viewfinder.internal.utils.Threads;
-import androidx.camera.viewfinder.surface.ViewfinderSurfaceProvider;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 
@@ -65,8 +66,7 @@ public final class CameraViewfinder extends FrameLayout {
     private static final String TAG = "CameraViewFinder";
 
     @ColorRes private static final int DEFAULT_BACKGROUND_COLOR = android.R.color.black;
-    private static final androidx.camera.viewfinder.surface.ImplementationMode DEFAULT_IMPL_MODE =
-            androidx.camera.viewfinder.surface.ImplementationMode.EXTERNAL;
+    private static final ImplementationMode DEFAULT_IMPL_MODE = ImplementationMode.EXTERNAL;
 
     // Synthetic access
     @SuppressWarnings("WeakerAccess")
@@ -80,7 +80,8 @@ public final class CameraViewfinder extends FrameLayout {
     @NonNull
     private final Looper mRequiredLooper = Looper.myLooper();
 
-    @NonNull androidx.camera.viewfinder.surface.ImplementationMode mImplementationMode;
+    @NonNull
+    ImplementationMode mImplementationMode;
 
     // Synthetic access
     @SuppressWarnings("WeakerAccess")
@@ -90,7 +91,7 @@ public final class CameraViewfinder extends FrameLayout {
     // Synthetic access
     @SuppressWarnings("WeakerAccess")
     @Nullable
-    androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest mCurrentSurfaceRequest;
+    ViewfinderSurfaceRequest mCurrentSurfaceRequest;
 
     private final OnLayoutChangeListener mOnLayoutChangeListener =
             (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
@@ -108,7 +109,7 @@ public final class CameraViewfinder extends FrameLayout {
         @Override
         @AnyThread
         public void onSurfaceRequested(
-                @NonNull androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest surfaceRequest
+                @NonNull ViewfinderSurfaceRequest surfaceRequest
         ) {
             if (!Threads.isMainThread()) {
                 // In short term, throwing exception to guarantee onSurfaceRequest is
@@ -184,7 +185,7 @@ public final class CameraViewfinder extends FrameLayout {
             int implementationModeId =
                     attributes.getInteger(R.styleable.Viewfinder_implementationMode,
                             DEFAULT_IMPL_MODE.getId());
-            mImplementationMode = androidx.camera.viewfinder.surface.ImplementationMode.fromId(
+            mImplementationMode = ImplementationMode.fromId(
                     implementationModeId);
         } finally {
             attributes.recycle();
@@ -200,48 +201,24 @@ public final class CameraViewfinder extends FrameLayout {
     /**
      * Returns the {@link ImplementationMode}.
      *
-     * <p>For each {@link ViewfinderSurfaceRequest} sent to {@link CameraViewfinder}, the
-     * {@link ImplementationMode} set in the {@link ViewfinderSurfaceRequest} will be used first.
-     * If it's not set, the {@code app:implementationMode} in the layout xml will be used. If
-     * it's not set in the layout xml, the default value {@link ImplementationMode#PERFORMANCE}
-     * will be used. Each {@link ViewfinderSurfaceRequest} sent to {@link CameraViewfinder} can
-     * override the {@link ImplementationMode} once it has set the {@link ImplementationMode}.
-     *
-     * @return The {@link ImplementationMode} for the viewfinder.
-     *
-     * @deprecated Use {@link #getSurfaceImplementationMode()} instead. The
-     * {@link ImplementationMode} in viewfinder-view will be made obsolete with the
-     * introduction of viewfinder-core.
-     */
-    @Deprecated
-    @UiThread
-    @NonNull
-    public ImplementationMode getImplementationMode() {
-        checkUiThread();
-        return ImplementationMode.fromId(mImplementationMode.getId());
-    }
-
-    /**
-     * Returns the {@link androidx.camera.viewfinder.surface.ImplementationMode}.
-     *
-     * <p> For each {@link androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest} sent to
+     * <p> For each {@link ViewfinderSurfaceRequest} sent to
      * {@link CameraViewfinder}, the
-     * {@link androidx.camera.viewfinder.surface.ImplementationMode} set in the
-     * {@link androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest} will be used first.
+     * {@link ImplementationMode} set in the
+     * {@link ViewfinderSurfaceRequest} will be used first.
      * If it's not set, the {@code app:implementationMode} in the layout xml will be used. If
      * it's not set in the layout xml, the default value
-     * {@link androidx.camera.viewfinder.surface.ImplementationMode#EXTERNAL}
-     * will be used. Each {@link androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest} sent
+     * {@link ImplementationMode#EXTERNAL}
+     * will be used. Each {@link ViewfinderSurfaceRequest} sent
      * to {@link CameraViewfinder} can override the
-     * {@link androidx.camera.viewfinder.surface.ImplementationMode} once it has set the
-     * {@link androidx.camera.viewfinder.surface.ImplementationMode}.
+     * {@link ImplementationMode} once it has set the
+     * {@link ImplementationMode}.
      *
-     * @return The {@link androidx.camera.viewfinder.surface.ImplementationMode} for
+     * @return The {@link ImplementationMode} for
      * {@link CameraViewfinder}.
      */
     @UiThread
     @NonNull
-    public androidx.camera.viewfinder.surface.ImplementationMode getSurfaceImplementationMode() {
+    public ImplementationMode getSurfaceImplementationMode() {
         checkUiThread();
         return mImplementationMode;
     }
@@ -284,11 +261,13 @@ public final class CameraViewfinder extends FrameLayout {
     }
 
     /**
-     * Requests surface by sending a {@link ViewfinderSurfaceRequest}.
+     * Requests surface by sending a
+     * {@link ViewfinderSurfaceRequest}.
      *
      * <p> Only one request can be handled at the same time. If requesting a surface with
-     * the same {@link ViewfinderSurfaceRequest}, the previous requested surface will be returned.
-     * If requesting a surface with a new {@link ViewfinderSurfaceRequest}, the previous
+     * the same {@link ViewfinderSurfaceRequest}, the previous
+     * requested surface will be returned. If requesting a surface with a new
+     * {@link ViewfinderSurfaceRequest}, the previous
      * requested surface will be released and a new surface will be requested.
      *
      * <p> The result is a {@link ListenableFuture} of {@link Surface}, which provides the
@@ -314,66 +293,16 @@ public final class CameraViewfinder extends FrameLayout {
      * }, ContextCompat.getMainExecutor(getContext()));
      * }</pre>
      *
-     * @param surfaceRequest The {@link ViewfinderSurfaceRequest} to get a surface.
+     * @param surfaceRequest The {@link ViewfinderSurfaceRequest}
+     *                       to get a surface.
      * @return The requested surface.
      *
      * @see ViewfinderSurfaceRequest
-     * @deprecated Use
-     * {@link #requestSurfaceAsync(androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest)}
-     * instead. The {@link ViewfinderSurfaceRequest} in viewfinder-view will be made obsolete
-     * with the introduction of viewfinder-core.
      */
-    @Deprecated
     @UiThread
     @NonNull
     public ListenableFuture<Surface> requestSurfaceAsync(
             @NonNull ViewfinderSurfaceRequest surfaceRequest) {
-        return requestSurfaceAsync(surfaceRequest.getViewfinderSurfaceRequest());
-    }
-
-    /**
-     * Requests surface by sending a
-     * {@link androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest}.
-     *
-     * <p> Only one request can be handled at the same time. If requesting a surface with
-     * the same {@link androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest}, the previous
-     * requested surface will be returned. If requesting a surface with a new
-     * {@link androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest}, the previous
-     * requested surface will be released and a new surface will be requested.
-     *
-     * <p> The result is a {@link ListenableFuture} of {@link Surface}, which provides the
-     * functionality to attach listeners and propagate exceptions.
-     *
-     * <pre>{@code
-     * ViewfinderSurfaceRequest request = new ViewfinderSurfaceRequest(
-     *     new Size(width, height), cameraManager.getCameraCharacteristics(cameraId));
-     *
-     * ListenableFuture<Surface> surfaceListenableFuture =
-     *     mCameraViewFinder.requestSurfaceAsync(request);
-     *
-     * Futures.addCallback(surfaceListenableFuture, new FutureCallback<Surface>() {
-     *     {@literal @}Override
-     *     public void onSuccess({@literal @}Nullable Surface surface) {
-     *         if (surface != null) {
-     *             createCaptureSession(surface);
-     *         }
-     *     }
-     *
-     *     {@literal @}Override
-     *     public void onFailure(Throwable t) {}
-     * }, ContextCompat.getMainExecutor(getContext()));
-     * }</pre>
-     *
-     * @param surfaceRequest The {@link androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest}
-     *                       to get a surface.
-     * @return The requested surface.
-     *
-     * @see androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest
-     */
-    @UiThread
-    @NonNull
-    public ListenableFuture<Surface> requestSurfaceAsync(
-            @NonNull androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest surfaceRequest) {
         checkUiThread();
 
         if (mCurrentSurfaceRequest != null
@@ -446,7 +375,7 @@ public final class CameraViewfinder extends FrameLayout {
 
     @VisibleForTesting
     static boolean shouldUseTextureView(
-            @NonNull final androidx.camera.viewfinder.surface.ImplementationMode implementationMode
+            @NonNull final ImplementationMode implementationMode
     ) {
         boolean hasSurfaceViewQuirk = DeviceQuirks.get(SurfaceViewStretchedQuirk.class) != null
                 ||  DeviceQuirks.get(SurfaceViewNotCroppedByParentQuirk.class) != null;
@@ -477,7 +406,7 @@ public final class CameraViewfinder extends FrameLayout {
     }
 
     private boolean provideSurfaceIfReady() {
-        final androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest surfaceRequest =
+        final ViewfinderSurfaceRequest surfaceRequest =
                 mCurrentSurfaceRequest;
         final ViewfinderSurfaceProvider surfaceProvider = mSurfaceProvider;
         if (surfaceProvider != null && surfaceRequest != null) {
@@ -501,144 +430,6 @@ public final class CameraViewfinder extends FrameLayout {
                             + "'. All methods must be called on the same thread. (Expected Looper "
                             + mRequiredLooper + ", but called on " + Looper.myLooper() + ".");
             throw new RuntimeException(throwable);
-        }
-    }
-
-    /**
-     * The implementation mode of a {@link CameraViewfinder}.
-     *
-     * <p> User preference on how the {@link CameraViewfinder} should render the viewfinder.
-     * {@link CameraViewfinder} displays the viewfinder with either a {@link SurfaceView} or a
-     * {@link TextureView}. A {@link SurfaceView} is generally better than a {@link TextureView}
-     * when it comes to certain key metrics, including power and latency. On the other hand,
-     * {@link TextureView} is better supported by a wider range of devices. The option is used by
-     * {@link CameraViewfinder} to decide what is the best internal implementation given the device
-     * capabilities and user configurations.
-     *
-     * @deprecated Use {@link androidx.camera.viewfinder.surface.ImplementationMode} instead.
-     */
-    @Deprecated
-    public enum ImplementationMode {
-
-        /**
-         * Use a {@link SurfaceView} for the viewfinder when possible. A SurfaceView has somewhat
-         * lower latency and less performance and power overhead than a TextureView. Use this
-         *
-         * If the device doesn't support {@link SurfaceView}, {@link CameraViewfinder} will fall
-         * back to use a {@link TextureView} instead.
-         *
-         * <p>{@link CameraViewfinder} falls back to {@link TextureView} when the API level is 24 or
-         * lower, the camera hardware support level is
-         * {@link CameraCharacteristics#INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY}.
-         *
-         */
-        PERFORMANCE(0),
-
-        /**
-         * Use a {@link TextureView} for the viewfinder.
-         */
-        COMPATIBLE(1);
-
-        private final int mId;
-
-        ImplementationMode(int id) {
-            mId = id;
-        }
-
-        int getId() {
-            return mId;
-        }
-
-        static ImplementationMode fromId(int id) {
-            for (ImplementationMode implementationMode : values()) {
-                if (implementationMode.mId == id) {
-                    return implementationMode;
-                }
-            }
-            throw new IllegalArgumentException("Unknown implementation mode id " + id);
-        }
-    }
-
-    /** Options for scaling the viewfinder vis-à-vis its container {@link CameraViewfinder}. */
-    public enum ScaleType {
-        /**
-         * Scale the viewfinder, maintaining the source aspect ratio, so it fills the entire
-         * {@link CameraViewfinder}, and align it to the start of the view, which is the top left
-         * corner in a left-to-right (LTR) layout, or the top right corner in a right-to-left
-         * (RTL) layout.
-         * <p>
-         * This may cause the viewfinder to be cropped if the camera viewfinder aspect ratio does
-         * not match that of its container {@link CameraViewfinder}.
-         */
-        FILL_START(0),
-        /**
-         * Scale the viewfinder, maintaining the source aspect ratio, so it fills the entire
-         * {@link CameraViewfinder}, and center it in the view.
-         * <p>
-         * This may cause the viewfinder to be cropped if the camera viewfinder aspect ratio does
-         * not match that of its container {@link CameraViewfinder}.
-         */
-        FILL_CENTER(1),
-        /**
-         * Scale the viewfinder, maintaining the source aspect ratio, so it fills the entire
-         * {@link CameraViewfinder}, and align it to the end of the view, which is the bottom right
-         * corner in a left-to-right (LTR) layout, or the bottom left corner in a right-to-left
-         * (RTL) layout.
-         * <p>
-         * This may cause the viewfinder to be cropped if the camera viewfinder aspect ratio does
-         * not match that of its container {@link CameraViewfinder}.
-         */
-        FILL_END(2),
-        /**
-         * Scale the viewfinder, maintaining the source aspect ratio, so it is entirely contained
-         * within the {@link CameraViewfinder}, and align it to the start of the view, which is the
-         * top left corner in a left-to-right (LTR) layout, or the top right corner in a
-         * right-to-left (RTL) layout. The background area not covered by the viewfinder stream
-         * will be black or the background of the {@link CameraViewfinder}
-         * <p>
-         * Both dimensions of the viewfinder will be equal or less than the corresponding dimensions
-         * of its container {@link CameraViewfinder}.
-         */
-        FIT_START(3),
-        /**
-         * Scale the viewfinder, maintaining the source aspect ratio, so it is entirely contained
-         * within the {@link CameraViewfinder}, and center it inside the view. The background
-         * area not covered by the viewfinder stream will be black or the background of the
-         * {@link CameraViewfinder}.
-         * <p>
-         * Both dimensions of the viewfinder will be equal or less than the corresponding dimensions
-         * of its container {@link CameraViewfinder}.
-         */
-        FIT_CENTER(4),
-        /**
-         * Scale the viewfinder, maintaining the source aspect ratio, so it is entirely contained
-         * within the {@link CameraViewfinder}, and align it to the end of the view, which is the
-         * bottom right corner in a left-to-right (LTR) layout, or the bottom left corner in a
-         * right-to-left (RTL) layout. The background area not covered by the viewfinder stream
-         * will be black or the background of the {@link CameraViewfinder}.
-         * <p>
-         * Both dimensions of the viewfinder will be equal or less than the corresponding dimensions
-         * of its container {@link CameraViewfinder}.
-         */
-        FIT_END(5);
-
-        private final int mId;
-
-        ScaleType(int id) {
-            mId = id;
-        }
-
-        int getId() {
-            return mId;
-        }
-
-        static ScaleType fromId(int id) {
-            for (ScaleType scaleType : values()) {
-                if (scaleType.mId == id) {
-                    return scaleType;
-                }
-            }
-            throw new IllegalArgumentException("Unknown scale type id " + id);
         }
     }
 
@@ -690,7 +481,7 @@ public final class CameraViewfinder extends FrameLayout {
         public void onDisplayChanged(int displayId) {
             Display display = getDisplay();
             if (display != null && display.getDisplayId() == displayId) {
-                androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest surfaceRequest =
+                ViewfinderSurfaceRequest surfaceRequest =
                         mCurrentSurfaceRequest;
                 if (surfaceRequest != null) {
                     mViewfinderTransformation.updateTransformInfo(

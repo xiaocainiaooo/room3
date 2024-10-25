@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package androidx.camera.viewfinder.surface
+package androidx.camera.viewfinder.core
 
 import android.annotation.SuppressLint
 import android.util.Size
 import android.view.Surface
 import androidx.annotation.IntDef
 import androidx.annotation.RestrictTo
-import androidx.camera.impl.utils.Logger
-import androidx.camera.impl.utils.executor.ViewfinderExecutors
-import androidx.camera.impl.utils.futures.FutureCallback
-import androidx.camera.impl.utils.futures.Futures
-import androidx.camera.viewfinder.impl.surface.DeferredSurface
+import androidx.camera.viewfinder.core.impl.DeferredSurface
+import androidx.camera.viewfinder.core.impl.utils.Logger
+import androidx.camera.viewfinder.core.impl.utils.executor.ViewfinderExecutors
+import androidx.camera.viewfinder.core.impl.utils.futures.FutureCallback
+import androidx.camera.viewfinder.core.impl.utils.futures.Futures
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.concurrent.futures.await
 import androidx.core.util.Consumer

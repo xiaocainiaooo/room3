@@ -30,8 +30,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.UiThread;
+import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest;
 import androidx.camera.viewfinder.internal.utils.Logger;
-import androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Preconditions;
 
@@ -74,7 +74,8 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
         mResolution = surfaceRequest.getResolution();
         initializeViewfinder();
         surfaceRequest.addRequestCancellationListener(
-                ContextCompat.getMainExecutor(mSurfaceView.getContext()), () -> {});
+                ContextCompat.getMainExecutor(mSurfaceView.getContext()), () -> {
+                });
         mSurfaceView.post(() -> mSurfaceRequestCallback.setSurfaceRequest(surfaceRequest));
     }
 
@@ -113,7 +114,7 @@ final class SurfaceViewImplementation extends ViewfinderImplementation {
             } else {
                 Logger.e(TAG,
                         "CameraViewfinder.SurfaceViewImplementation.getBitmap() failed with error "
-                        + copyResult);
+                                + copyResult);
             }
         }, mSurfaceView.getHandler());
 

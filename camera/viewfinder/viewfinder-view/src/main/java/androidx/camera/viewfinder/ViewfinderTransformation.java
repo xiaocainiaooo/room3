@@ -20,9 +20,9 @@ import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 import static android.graphics.Paint.DITHER_FLAG;
 import static android.graphics.Paint.FILTER_BITMAP_FLAG;
 
-import static androidx.camera.viewfinder.CameraViewfinder.ScaleType.FIT_CENTER;
-import static androidx.camera.viewfinder.CameraViewfinder.ScaleType.FIT_END;
-import static androidx.camera.viewfinder.CameraViewfinder.ScaleType.FIT_START;
+import static androidx.camera.viewfinder.core.ScaleType.FIT_CENTER;
+import static androidx.camera.viewfinder.core.ScaleType.FIT_END;
+import static androidx.camera.viewfinder.core.ScaleType.FIT_START;
 import static androidx.camera.viewfinder.internal.utils.TransformUtils.getRectToRect;
 import static androidx.camera.viewfinder.internal.utils.TransformUtils.is90or270;
 import static androidx.camera.viewfinder.internal.utils.TransformUtils.isAspectRatioMatchingWithRoundingError;
@@ -44,7 +44,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import androidx.camera.viewfinder.CameraViewfinder.ScaleType;
+import androidx.camera.viewfinder.core.ScaleType;
 import androidx.camera.viewfinder.internal.transform.TransformationInfo;
 import androidx.camera.viewfinder.internal.utils.Logger;
 import androidx.core.util.Preconditions;
@@ -91,8 +91,7 @@ final class ViewfinderTransformation {
 
     private static final String TAG = "ViewfinderTransformation";
 
-    private static final ScaleType DEFAULT_SCALE_TYPE =
-            ScaleType.FILL_CENTER;
+    private static final ScaleType DEFAULT_SCALE_TYPE = ScaleType.FILL_CENTER;
 
     @Nullable
     private Size mResolution;
@@ -112,8 +111,6 @@ final class ViewfinderTransformation {
 
     /**
      * Sets the {@link TransformationInfo}.
-     *
-     * <p> All the values originally come from a {@link ViewfinderSurfaceRequest}.
      */
     void setTransformationInfo(@NonNull TransformationInfo transformationInfo,
             Size resolution, boolean isFrontCamera) {

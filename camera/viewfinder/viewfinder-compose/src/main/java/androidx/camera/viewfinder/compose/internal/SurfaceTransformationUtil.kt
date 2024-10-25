@@ -19,7 +19,7 @@ package androidx.camera.viewfinder.compose.internal
 import android.graphics.Matrix
 import android.graphics.RectF
 import android.util.Size
-import androidx.camera.viewfinder.surface.TransformationInfo
+import androidx.camera.viewfinder.core.TransformationInfo
 
 /**
  * A util class with methods that transform the input viewfinder surface so that its preview fits

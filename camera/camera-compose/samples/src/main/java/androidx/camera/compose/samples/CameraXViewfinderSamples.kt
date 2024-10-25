@@ -22,7 +22,7 @@ import androidx.camera.compose.CameraXViewfinder
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceRequest
 import androidx.camera.viewfinder.compose.MutableCoordinateTransformer
-import androidx.camera.viewfinder.surface.ImplementationMode
+import androidx.camera.viewfinder.core.ImplementationMode
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
