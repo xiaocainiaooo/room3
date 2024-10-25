@@ -16,6 +16,7 @@
 
 package androidx.camera.camera2.pipe.testing
 
+import androidx.camera.camera2.pipe.CameraError
 import androidx.camera.camera2.pipe.CameraId
 import androidx.camera.camera2.pipe.compat.Camera2DeviceManager
 import androidx.camera.camera2.pipe.compat.VirtualCamera
@@ -50,5 +51,10 @@ internal class FakeCamera2DeviceManager : Camera2DeviceManager {
     suspend fun simulateCameraOpen(cameraId: CameraId) {
         val fakeVirtualCamera = checkNotNull(fakeVirtualCameraMap[cameraId])
         fakeVirtualCamera.simulateCameraStateOpen()
+    }
+
+    suspend fun simulateCameraError(cameraId: CameraId, cameraError: CameraError) {
+        val fakeVirtualCamera = checkNotNull(fakeVirtualCameraMap[cameraId])
+        fakeVirtualCamera.simulateCameraStateError(cameraError)
     }
 }

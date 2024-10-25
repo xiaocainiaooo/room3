@@ -20,8 +20,10 @@ import androidx.camera.camera2.pipe.CameraError
 import androidx.camera.camera2.pipe.CameraId
 import androidx.camera.camera2.pipe.compat.CameraDeviceWrapper
 import androidx.camera.camera2.pipe.compat.CameraState
+import androidx.camera.camera2.pipe.compat.CameraStateClosed
 import androidx.camera.camera2.pipe.compat.CameraStateOpen
 import androidx.camera.camera2.pipe.compat.CameraStateUnopened
+import androidx.camera.camera2.pipe.compat.ClosedReason
 import androidx.camera.camera2.pipe.compat.VirtualCamera
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +50,16 @@ internal class FakeVirtualCamera(val cameraId: CameraId) : VirtualCamera {
     suspend fun simulateCameraStateOpen() {
         whenever(fakeCameraDevice.cameraId).thenReturn(cameraId)
         val state = CameraStateOpen(fakeCameraDevice)
+        _state.value = state
+    }
+
+    suspend fun simulateCameraStateError(cameraError: CameraError) {
+        val state =
+            CameraStateClosed(
+                cameraId = cameraId,
+                cameraClosedReason = ClosedReason.CAMERA2_ERROR,
+                cameraErrorCode = cameraError,
+            )
         _state.value = state
     }
 }

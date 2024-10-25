@@ -20,6 +20,8 @@ import android.graphics.SurfaceTexture
 import android.os.Build
 import android.util.Size
 import android.view.Surface
+import androidx.camera.camera2.pipe.CameraController.ControllerState
+import androidx.camera.camera2.pipe.CameraError
 import androidx.camera.camera2.pipe.CameraGraph
 import androidx.camera.camera2.pipe.CameraGraphId
 import androidx.camera.camera2.pipe.CameraId
@@ -29,17 +31,14 @@ import androidx.camera.camera2.pipe.StreamFormat
 import androidx.camera.camera2.pipe.StreamId
 import androidx.camera.camera2.pipe.core.TimeSource
 import androidx.camera.camera2.pipe.graph.GraphListener
-import androidx.camera.camera2.pipe.internal.CameraStatusMonitor
 import androidx.camera.camera2.pipe.testing.FakeCamera2DeviceManager
+import androidx.camera.camera2.pipe.testing.FakeCameraStatusMonitor
 import androidx.camera.camera2.pipe.testing.FakeThreads
 import androidx.camera.camera2.pipe.testing.RobolectricCameraPipeTestRunner
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -65,18 +64,7 @@ class Camera2CameraControllerTest {
     private val fakeGraphListener: GraphListener = mock()
 
     // TODO: b/372258646 - Implement a proper fake implementation to simulate status changes.
-    private val fakeCameraStatusMonitor: CameraStatusMonitor =
-        object : CameraStatusMonitor {
-            private val _cameraAvailability =
-                MutableStateFlow(CameraStatusMonitor.CameraStatus.CameraAvailable(cameraId))
-            override val cameraAvailability: StateFlow<CameraStatusMonitor.CameraStatus>
-                get() = _cameraAvailability.asStateFlow()
-
-            override val cameraPriorities: SharedFlow<Unit>
-                get() = MutableSharedFlow()
-
-            override fun close() {}
-        }
+    private val fakeCameraStatusMonitor = FakeCameraStatusMonitor(cameraId)
 
     private val fakeCaptureSessionFactory: CaptureSessionFactory = mock()
     private val fakeCaptureSequenceProcessorFactory: Camera2CaptureSequenceProcessorFactory = mock()
@@ -127,6 +115,48 @@ class Camera2CameraControllerTest {
             fakeCamera2DeviceManager.simulateCameraOpen(cameraId)
             testScope.advanceUntilIdle()
             verify(fakeCaptureSessionFactory, times(1)).create(any(), any(), any())
+            cameraController.close()
+        }
+
+    @Test
+    fun testControllerStateErrorWhenNonrecoverableCameraError() =
+        testScope.runTest {
+            val cameraController = createCamera2CameraController()
+            cameraController.updateSurfaceMap(mapOf(streamId1 to fakeSurface))
+            cameraController.start()
+            fakeCamera2DeviceManager.simulateCameraOpen(cameraId)
+            testScope.advanceUntilIdle()
+
+            fakeCameraStatusMonitor.simulateCameraUnavailable()
+            fakeCamera2DeviceManager.simulateCameraError(cameraId, CameraError.ERROR_CAMERA_DEVICE)
+            testScope.advanceUntilIdle()
+
+            assertEquals(cameraController.controllerState, ControllerState.ERROR)
+
+            cameraController.close()
+        }
+
+    @Test
+    fun testControllerStateDisconnectedWhenRecoverableCameraError() =
+        testScope.runTest(20.seconds) {
+            val cameraController = createCamera2CameraController()
+            cameraController.updateSurfaceMap(mapOf(streamId1 to fakeSurface))
+            cameraController.start()
+            fakeCamera2DeviceManager.simulateCameraOpen(cameraId)
+            testScope.advanceUntilIdle()
+
+            fakeCameraStatusMonitor.simulateCameraUnavailable()
+            fakeCamera2DeviceManager.simulateCameraError(cameraId, CameraError.ERROR_CAMERA_IN_USE)
+            testScope.advanceUntilIdle()
+
+            if (Build.VERSION.SDK_INT in (Build.VERSION_CODES.Q..Build.VERSION_CODES.S_V2)) {
+                // Between Android Q and S_V2, we have a quirk that institutes an immediate restart,
+                // since we're unable to get reliable onCameraAccessPrioritiesChanged signals.
+                assertEquals(cameraController.controllerState, ControllerState.STARTED)
+            } else {
+                assertEquals(cameraController.controllerState, ControllerState.DISCONNECTED)
+            }
+
             cameraController.close()
         }
 }
