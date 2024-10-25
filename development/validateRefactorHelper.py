@@ -25,10 +25,11 @@ Typical usage example:
   python validateRefactorHelper.py agpKmp
 """
 import itertools
-import os
+import re
 import shutil
 import subprocess
 import sys
+from typing import Dict
 
 # noto-emoji-compat `bundleinside`s an externally-built with-timestamps jar.
 # classes.jar is compared using `diffuse` instead of unzipping and diffing class files.
@@ -58,7 +59,6 @@ def findFilesMatchingWithDiffAndUnzip(regexThatMatchesEverythingElse):
     # And unzip them
     for filename in zipsWithDiffs:
         print("unzipping " + filename)
-        # if os.path.exists(filename+".unzipped/"): os.rmdir(filename+".unzipped/")
         shutil.rmtree(filename+".unzipped/")
         subprocess.Popen(["unzip", "-qq", "-o", filename, "-d", filename+".unzipped/"])
 
@@ -76,7 +76,9 @@ def compareWithDiffuse(listOfJars):
 excludedHashes = ["-x", "*.md5*", "-x", "*.sha**", "-I", "        \"md5\".*", \
   "-I", "        \"sha.*", "-I", "        \"size\".*", "-I", "      \"name\".*"]
 # Don"t care about maven-metadata files because they have timestamps in them.
-excludedFiles = ["-x", "*maven-metadata.xml**", "-x", r"**\.knm"]  # temporarily ignore knms
+# temporarily ignore knm files
+# If changes to the dackka args json are meaningful, they will affect the generated docs and show diff there
+excludedFiles = ["-x", "*maven-metadata.xml**", "-x", r"**\.knm", "-x", "dackkaArgs-docs-tip-of-tree.json"]
 # Also, ignore files that we already unzipped
 excludedZips = ["-x", "*.zip", "-x", "*.jar", "-x", "*.aar", "-x", "*.apk", "-x", "*.klib"]
 
@@ -84,43 +86,46 @@ excludedZips = ["-x", "*.zip", "-x", "*.jar", "-x", "*.aar", "-x", "*.apk", "-x"
 # "Unskippable" changes are multi-line and can't be skipped in `diff`, so post-process
 baselinedChangesForAgpKmp = [
     # these are new attributes being added
-    """        "org.gradle.libraryelements": "aar",""",
-    """        "org.gradle.jvm.environment": "android",""",
-    """        "org.gradle.jvm.environment": "non-jvm",""",
-    """        "org.gradle.jvm.environment": "standard-jvm",""",
+    """>         "org.gradle.libraryelements": "aar",""",
+    """>         "org.gradle.jvm.environment": "android",""",
+    """>         "org.gradle.jvm.environment": "non-jvm",""",
+    """>         "org.gradle.jvm.environment": "standard-jvm",""",
+    """>       <type>aar</type>""",
     # this attribute swap occurs alongside the above new attributes added.
     # https://chat.google.com/room/AAAAW8qmCIs/4phaNn_gsrc
-    """        "org.jetbrains.kotlin.platform.type": "androidJvm\"""",
-    """        "org.jetbrains.kotlin.platform.type": "jvm\"""",
+    """<         "org.jetbrains.kotlin.platform.type": "androidJvm\"""",
+    """>         "org.jetbrains.kotlin.platform.type": "jvm\"""",
     # name-only change; nothing resolves based on names
-    """      "name": "releaseApiElements-published",""",
-    """      "name": "androidApiElements-published",""",
-    """            <pre>actual typealias""",  # open bug in dackka b/339221337
+    """<      "name": "releaseApiElements-published",""",
+    """>      "name": "androidApiElements-published",""",
+    """             <pre>actual typealias""",  # open bug in dackka b/339221337
     # we are switching from our KMP sourcejars solution to the upstream one
-    """        "org.gradle.docstype": "fake-sources",""",
-    """        "org.gradle.docstype": "sources",""",
+    """<         "org.gradle.docstype": "fake-sources",""",
+    """>         "org.gradle.docstype": "sources",""",
 ]
 unskippableBaselinedChangesForAgpKmp = [
-    """
-<           },
-<           "excludes": [
-<             {
+# This was an AGP workaround for a dependency resolution issue for kotlin stdlib
+# https://chat.google.com/room/AAAAW8qmCIs/4phaNn_gsrc
+re.compile(r"""
+[0-9]+,[0-9]+c[0-9]+
+<           \},
+<           "excludes": \[
+<             \{
 <               "group": "org.jetbrains.kotlin",
 <               "module": "kotlin-stdlib-common"
-<             },
-<             {
+<             \},
+<             \{
 <               "group": "org.jetbrains.kotlin",
 <               "module": "kotlin-test-common"
-<             },
-<             {
+<             \},
+<             \{
 <               "group": "org.jetbrains.kotlin",
 <               "module": "kotlin-test-annotations-common"
-<             }
-<           ]
+<             \}
+<           \]
 ---
->           }
-""",
-"""
+>           \}"""),
+re.compile(r"""
 <       <exclusions>
 <         <exclusion>
 <           <groupId>org.jetbrains.kotlin</groupId>
@@ -134,15 +139,44 @@ unskippableBaselinedChangesForAgpKmp = [
 <           <groupId>org.jetbrains.kotlin</groupId>
 <           <artifactId>kotlin-test-annotations-common</artifactId>
 <         </exclusion>
-<       </exclusions>
-"""
+<       </exclusions>"""),
+# .module files[] blocks aren't ordered; baseline reordering of samples-sources b/374956513
+re.compile(r"""
+[0-9]+,[0-9]+d[0-9]+
+<           "name": "[a-z3\-]+-[0-9].[0-9].[0-9](-[a-z0-9]+)?-samples-sources.jar",
+<           "url": "[a-z3\-]+-[0-9].[0-9].[0-9](-[a-z0-9]+)?-samples-sources.jar",
+<           "size": [0-9]+,
+<           "sha512": "[0-9a-z]+",
+<           "sha256": "[0-9a-z]+",
+<           "sha1": "[0-9a-z]+",
+<           "md5": "[0-9a-z]+"
+<         \},
+<         \{
+[0-9]+a[0-9]+,[0-9]+
+>         \},
+>         \{
+>           "name": "[a-z3\-]+-[0-9].[0-9].[0-9](-[a-z0-9]+)?-samples-sources.jar",
+>           "url": "[a-z3\-]+-[0-9].[0-9].[0-9](-[a-z0-9]+)?-samples-sources.jar",
+>           "size": [0-9]+,
+>           "sha512": "[0-9a-z]+",
+>           "sha256": "[0-9a-z]+",
+>           "sha1": "[0-9a-z]+",
+>           "md5": "[0-9a-z]+"
+"""),
+# This one is okay because the common pom expresses a dependency on the jvm pom
+# https://repo1.maven.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core/1.7.3/kotlinx-coroutines-core-1.7.3.pom
+re.compile(r"""[0-9]+c[0-9]+
+<       <artifactId>kotlinx-coroutines-core-jvm</artifactId>
+---
+>       <artifactId>kotlinx-coroutines-core</artifactId>""")
 ]
 
+baselines = []
 baselinedChanges = []
 unskippableBaselinedChanges = []
 arguments = sys.argv[1:]
 if "agpKmp" in arguments:
-    arguments.remove("agpKmp")
+    arguments.remove("agpKmp"); baselines += ["agpKmp"]
     print("IGNORING DIFF FOR agpKmp")
     baselinedChanges += baselinedChangesForAgpKmp
     unskippableBaselinedChanges += unskippableBaselinedChangesForAgpKmp
@@ -152,30 +186,64 @@ if arguments:
     exit()
 
 # interleave "-I" to tell diffutils to 'I'gnore the baselined lines
-baselinedChanges = list(itertools.chain.from_iterable(zip(["-I"]*99, baselinedChanges)))
+baselinedChangesArgs = list(itertools.chain.from_iterable(zip(["-I"]*99, [it.removeprefix(">").removeprefix("<") for it in baselinedChanges])))
 
-# post-process the diff output to remove multi-line changes that can't be excluded in `diff` itself
-def filterOutUnskippableBaselinedChanges(inputString):
-    result = inputString
-    for toRemove in unskippableBaselinedChanges:
-        i = result.find(toRemove)
-        while (i != -1):
-            j = result.rfind("\n", 0, i-2)  # also find and remove previous line e.g. 82,96c70
-            result = result[:j+1] + result[i+len(toRemove):]
-            i = result.find(toRemove)
-    #remove all "diff -r ..." header lines that no longer have content due to baselining
-    result = result.split("\n")
-    nRemoved = 0
-    for i in range(len(result)):  # check for consecutive `diff -r` lines: the first has no content
-        if not result[i-nRemoved].startswith("diff -r "): continue
-        if not result[i+1-nRemoved].startswith("diff -r "): continue
-        del result[i-nRemoved]
-        nRemoved+=1
-    if not result[-1]: del result[-1]  # remove possible ending blank line
-    if result[-1].startswith("diff -r "): del result[-1]  # terminal `diff -r` line: has no content
-    return "\n".join(result)
+def removeLinesStartingWith(listOfStrings, listOfStringsToMatchAgainst):
+    return [line for line in listOfStrings if not any(line.startswith(it) for it in listOfStringsToMatchAgainst)]
 
-# print(baselinedChanges)
+# removeLinesWithChangedSuffixes(["foo"], ["foo-bar"], "-bar") returns [], []
+def removeLinesWithChangedSuffixes(newStrings, oldStrings, newSuffix, oldSuffix=""):
+    possibleIndices = [i for i, string in enumerate(newStrings) if string.endswith(newSuffix)]
+    convertedMap: Dict[int, str] = {i: newStrings[i].replace(newSuffix, oldSuffix) for i in possibleIndices}
+    confirmedIndicesNew = [i for i, converted in convertedMap.items() if converted in oldStrings]
+    confirmedIndicesOld = [oldStrings.index(convertedMap[i]) for i in confirmedIndicesNew]
+    resultNew = [string for i, string in enumerate(newStrings) if i not in confirmedIndicesNew]
+    resultOld = [string for i, string in enumerate(oldStrings) if i not in confirmedIndicesOld]
+    return resultNew, resultOld
+
+# remove baselined elements from a single diff segment, starting with a location-in-file element like 223c220
+def processDiffSegment(segment, fileExtension):
+    if segment == "": return ""
+    lines = segment.split("\n")
+    lines = removeLinesStartingWith(lines, baselinedChanges)
+    removed = [line[1:] for line in lines if line.startswith("<")]
+    added = [line[1:] for line in lines if line.startswith(">")]
+    if (fileExtension == "pom") and "agpKmp" in baselines:
+        # Ignore artifactIds' new -jvm and -android suffixes in poms b/356612738
+        added, removed = removeLinesWithChangedSuffixes(added, removed, "-jvm</artifactId>", "</artifactId>")
+        added, removed = removeLinesWithChangedSuffixes(added, removed, "-android</artifactId>", "</artifactId>")
+    keptContentLines = set(">" + it for it in added).union(set("<" + it for it in removed))
+    # Do not keep any formatting lines or the header if there is no content
+    if len(keptContentLines) == 0: return ""
+    # return value is based on `lines` because we want to retain ordering we may have lost during processing
+    # We want to keep keptContentLines, and formatting lines like "---" and the header (which don't start with <>).
+    return "\n".join([line for line in lines if line != "" and ((not line[0] in "<>") or line in keptContentLines)])
+
+# The output of diff entails multiple files, and multiple segments per file
+# This function removes baselined changes from the entire diff output
+def processMegaDiff(inputString):
+    perFileDiffs = inputString.split("diff -r")
+    processedPerFileDiffs = []
+    for i in range(1, len(perFileDiffs)):
+        diffStatement, _, diffContent = perFileDiffs[i].partition("\n")
+        newFilePath = diffStatement.rpartition(" ")[2]
+        fileExtension = newFilePath.rpartition(".")[2]
+        for multilineBaselinedElement in unskippableBaselinedChanges:
+            diffContent = multilineBaselinedElement.sub("", diffContent)
+        diffSegments = re.split(r'(^[0-9]+[0-9acd,]*\n)', diffContent, flags=re.MULTILINE)
+        result = []
+        # every other segment is a segment header like 99,112d87; 0th is ""
+        for j in range(1, len(diffSegments)-1, 2):
+            # a complete segment is a location-in-file header and everything until the next header. E.g.
+            # 83c70
+            # <       <artifactId>kotlinx-coroutines-core-jvm</artifactId>
+            # ---
+            # >       <artifactId>kotlinx-coroutines-core</artifactId>
+            segment = diffSegments[j] + diffSegments[j+1]
+            processedSegment = processDiffSegment(segment, fileExtension)
+            if processedSegment != "": result.append(processedSegment)
+        if len(result) != 0: processedPerFileDiffs += [newFilePath + "\n" + "\n".join(result)]
+    return "\ndiff ".join(processedPerFileDiffs)
 
 # Find all zip files with a diff, e.g. the tip-of-tree-repository file, and maybe the docs zip
 # findFilesMatchingWithDiffAndUnzip(r"**\.[^z][a-z]*")
@@ -190,8 +258,7 @@ classesJarsWithDiffs = popenAndReturn(["find", "../../out-old/dist/", "-name", "
 print("classes.jar s: " + str(classesJarsWithDiffs))
 compareWithDiffuse(classesJarsWithDiffs)
 # Now find all diffs in non-zipped files
-finalExcludes = excludedHashes + excludedFiles + excludedZips + baselinedChanges
+finalExcludes = excludedHashes + excludedFiles + excludedZips + baselinedChangesArgs
 finalDiff = "\n".join(diff(finalExcludes))
-finalDiff = filterOutUnskippableBaselinedChanges(finalDiff)
+finalDiff = processMegaDiff(finalDiff)
 print(finalDiff)
-
