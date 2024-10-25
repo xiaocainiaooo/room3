@@ -54,16 +54,44 @@ actual value class SavedStateWriter actual constructor(actual val source: SavedS
         source.map[key] = value
     }
 
-    actual inline fun putSavedState(key: String, value: SavedState) {
-        source.map[key] = value
-    }
-
     actual inline fun putIntList(key: String, values: List<Int>) {
         source.map[key] = values
     }
 
     actual inline fun putStringList(key: String, values: List<String>) {
         source.map[key] = values
+    }
+
+    actual inline fun putBooleanArray(key: String, values: BooleanArray) {
+        source.map[key] = values
+    }
+
+    actual inline fun putCharArray(key: String, values: CharArray) {
+        source.map[key] = values
+    }
+
+    actual inline fun putDoubleArray(key: String, values: DoubleArray) {
+        source.map[key] = values
+    }
+
+    actual inline fun putFloatArray(key: String, values: FloatArray) {
+        source.map[key] = values
+    }
+
+    actual inline fun putIntArray(key: String, values: IntArray) {
+        source.map[key] = values
+    }
+
+    actual inline fun putLongArray(key: String, values: LongArray) {
+        source.map[key] = values
+    }
+
+    actual inline fun putStringArray(key: String, values: Array<String>) {
+        source.map[key] = values
+    }
+
+    actual inline fun putSavedState(key: String, value: SavedState) {
+        source.map[key] = value
     }
 
     actual inline fun putAll(values: SavedState) {
