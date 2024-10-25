@@ -19,6 +19,7 @@ package androidx.camera.camera2.pipe.compat
 import android.os.Build
 import android.view.Surface
 import androidx.annotation.GuardedBy
+import androidx.annotation.VisibleForTesting
 import androidx.camera.camera2.pipe.CameraController
 import androidx.camera.camera2.pipe.CameraController.ControllerState
 import androidx.camera.camera2.pipe.CameraError
@@ -41,6 +42,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -80,7 +82,9 @@ constructor(
 
     @GuardedBy("lock") private var _isForeground: Boolean = true
 
-    @GuardedBy("lock") private var controllerState: ControllerState = ControllerState.STOPPED
+    @VisibleForTesting
+    @GuardedBy("lock")
+    internal var controllerState: ControllerState = ControllerState.STOPPED
 
     @GuardedBy("lock")
     private var cameraStatus: CameraStatus = CameraStatus.CameraUnavailable(cameraId)
@@ -282,6 +286,7 @@ constructor(
             currentCamera = null
             currentSession = null
 
+            restartJob?.cancel()
             currentCameraStateJob?.cancel()
             currentCameraStateJob = null
             cameraAvailabilityJob?.cancel()
