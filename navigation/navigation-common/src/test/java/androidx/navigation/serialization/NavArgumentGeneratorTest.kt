@@ -983,6 +983,39 @@ class NavArgumentGeneratorTest {
     }
 
     @Test
+    fun convertValueClass() {
+        // test value class as destination route
+        val converted = serializer<TestValueClass>().generateNavArguments()
+        val expected =
+            navArgument("arg") {
+                type = NavType.IntType
+                nullable = false
+                unknownDefaultValuePresent = false
+            }
+        assertThat(converted).containsExactlyInOrder(expected)
+
+        // test value class as route arg
+        @Serializable class TestClass(val arg: TestValueClass)
+        val navType =
+            object : NavType<TestValueClass>(false) {
+                override fun put(bundle: Bundle, key: String, value: TestValueClass) {}
+
+                override fun get(bundle: Bundle, key: String): TestValueClass? = null
+
+                override fun parseValue(value: String): TestValueClass = TestValueClass(0)
+            }
+        val converted2 =
+            serializer<TestClass>().generateNavArguments(mapOf(typeOf<TestValueClass>() to navType))
+        val expected2 =
+            navArgument("arg") {
+                type = navType
+                nullable = false
+                unknownDefaultValuePresent = false
+            }
+        assertThat(converted2).containsExactlyInOrder(expected2)
+    }
+
+    @Test
     fun convertWithDefaultValue() {
         @Serializable class TestClass(val arg: String = "test")
         val converted = serializer<TestClass>().generateNavArguments()
@@ -1430,6 +1463,8 @@ class NavArgumentGeneratorTest {
             }
         assertThat(converted).containsExactlyInOrder(expected)
     }
+
+    @Serializable @JvmInline value class TestValueClass(val arg: Int)
 
     // writing our own assert so we don't need to override NamedNavArgument's equals
     // and hashcode which will need to be public api.

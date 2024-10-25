@@ -5252,6 +5252,43 @@ class NavControllerRouteTest {
 
     @UiThreadTest
     @Test
+    fun testNavigateWithObjectValueClass() {
+        @Serializable @SerialName("test") class TestClass(val arg: TestValueClass)
+        val navType =
+            object : NavType<TestValueClass>(false) {
+                override fun put(bundle: Bundle, key: String, value: TestValueClass) {
+                    bundle.putInt(key, value.id)
+                }
+
+                override fun get(bundle: Bundle, key: String): TestValueClass? =
+                    TestValueClass(bundle.getInt(key))
+
+                override fun parseValue(value: String): TestValueClass =
+                    TestValueClass(value.toInt())
+
+                override fun serializeAsValue(value: TestValueClass): String = value.id.toString()
+            }
+        val navController = createNavController()
+        navController.graph =
+            navController.createGraph(startDestination = TestClass(TestValueClass(12))) {
+                test<TestClass>(mapOf(typeOf<TestValueClass>() to navType))
+                test<TestValueClass>()
+            }
+        // test value class as arg type
+        assertThat(navController.currentDestination?.route).isEqualTo("test/{arg}")
+        val route = navController.currentBackStackEntry?.toRoute<TestClass>()
+        assertThat(route!!.arg).isEqualTo(TestValueClass(12))
+
+        // test value class as destination route
+        navController.navigate(TestValueClass(22))
+        assertThat(navController.currentDestination?.route)
+            .isEqualTo("androidx.navigation.NavControllerRouteTest.TestValueClass/{id}")
+        val route2 = navController.currentBackStackEntry?.toRoute<TestValueClass>()
+        assertThat(route2!!.id).isEqualTo(22)
+    }
+
+    @UiThreadTest
+    @Test
     fun testDeepLinkFromNavGraph() {
         val navController = createNavController()
         navController.graph = nav_simple_route_graph
@@ -5630,6 +5667,8 @@ class NavControllerRouteTest {
         navController.graph = navRepeatedGraph
         navController.graph = navRepeatedGraph
     }
+
+    @Serializable @JvmInline value class TestValueClass(val id: Int)
 
     private fun createNavController(): NavController {
         val navController = NavController(ApplicationProvider.getApplicationContext())
