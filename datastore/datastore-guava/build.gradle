@@ -61,6 +61,5 @@ androidx {
     type = LibraryType.PUBLISHED_LIBRARY
     inceptionYear = "2024"
     description = "Android DataStore Guava - contains wrappers for using DataStore using ListenableFuture"
-    metalavaK2UastEnabled = true
     kotlinTarget = KotlinTarget.KOTLIN_1_9
 }
