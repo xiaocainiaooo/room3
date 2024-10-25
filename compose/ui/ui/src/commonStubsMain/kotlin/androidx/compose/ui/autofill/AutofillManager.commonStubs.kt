@@ -16,15 +16,12 @@
 
 package androidx.compose.ui.autofill
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-
 /**
  * Autofill API.
  *
  * This interface is available to all composables via a CompositionLocal. The composable can then
  * notify the Autofill framework that user values have been committed as required.
  */
-@ExperimentalComposeUiApi
 actual class AutofillManager {
     /**
      * Indicate the autofill context should be committed.
