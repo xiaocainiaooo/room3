@@ -23,13 +23,13 @@ import androidx.compose.runtime.EnableDebugRuntimeChecks
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.RememberManager
 import androidx.compose.runtime.SlotWriter
-import androidx.compose.runtime.changelist.Operation.IntParameter
 import androidx.compose.runtime.changelist.Operation.ObjectParameter
 import androidx.compose.runtime.debugRuntimeCheck
 import androidx.compose.runtime.requirePrecondition
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
+import kotlin.jvm.JvmField
 import kotlin.jvm.JvmInline
 
 private const val OperationsMaxResizeAmount = 1024
@@ -47,14 +47,24 @@ internal const val OperationsInitialCapacity = 16
  * `Operations` is not a thread safe data structure.
  */
 internal class Operations : OperationsDebugStringFormattable() {
-    private var opCodes = arrayOfNulls<Operation>(OperationsInitialCapacity)
-    private var opCodesSize = 0
+    // To create an array of non-nullable references, Kotlin would normally force us to pass an
+    // initializer lambda to the array constructor, which could be expensive for larger arrays.
+    // Using an array of Operation? allows us to bypass the initialization of every entry, but it
+    // means that accessing an entry known to be non-null requires a null-check (via !! for
+    // instance), which produces unwanted code bloat in hot paths. The cast used here allows us to
+    // allocate the array as an array of Operation? but to use it as an array of Operation.
+    // When we want to remove an item from the array, we can cast it back to an array of Operation?
+    // to set the corresponding entry to null (see pop() for instance).
+    @Suppress("UNCHECKED_CAST")
+    @JvmField
+    internal var opCodes = arrayOfNulls<Operation>(OperationsInitialCapacity) as Array<Operation>
+    @JvmField internal var opCodesSize = 0
 
-    private var intArgs = IntArray(OperationsInitialCapacity)
-    private var intArgsSize = 0
+    @JvmField internal var intArgs = IntArray(OperationsInitialCapacity)
+    @JvmField internal var intArgsSize = 0
 
-    private var objectArgs = arrayOfNulls<Any>(OperationsInitialCapacity)
-    private var objectArgsSize = 0
+    @JvmField internal var objectArgs = arrayOfNulls<Any>(OperationsInitialCapacity)
+    @JvmField internal var objectArgsSize = 0
 
     /*
        The two masks below are used to track which arguments have been assigned for the most
@@ -125,7 +135,8 @@ internal class Operations : OperationsDebugStringFormattable() {
 
     private fun resizeOpCodes() {
         val resizeAmount = opCodesSize.coerceAtMost(OperationsMaxResizeAmount)
-        val newOpCodes = arrayOfNulls<Operation>(opCodesSize + resizeAmount)
+        @Suppress("UNCHECKED_CAST")
+        val newOpCodes = arrayOfNulls<Operation>(opCodesSize + resizeAmount) as Array<Operation>
         opCodes = opCodes.copyInto(newOpCodes, 0, 0, opCodesSize)
     }
 
@@ -210,7 +221,7 @@ internal class Operations : OperationsDebugStringFormattable() {
             repeat(operation.ints) { arg ->
                 if ((0b1 shl arg) and pushedIntMask == 0b0) {
                     if (missingIntCount > 0) append(", ")
-                    append(operation.intParamName(IntParameter(arg)))
+                    append(operation.intParamName(arg))
                     missingIntCount++
                 }
             }
@@ -250,8 +261,11 @@ internal class Operations : OperationsDebugStringFormattable() {
     fun pop() {
         // We could check for isEmpty(), instead we'll just let the array access throw an index out
         // of bounds exception
-        val op = opCodes[--opCodesSize]!!
-        opCodes[opCodesSize] = null
+        val opCodes = opCodes
+        val op = opCodes[--opCodesSize]
+        // See comment where opCodes is defined
+        @Suppress("UNCHECKED_CAST")
+        (opCodes as Array<Operation?>)[opCodesSize] = null
 
         repeat(op.objects) { objectArgs[--objectArgsSize] = null }
 
@@ -269,8 +283,10 @@ internal class Operations : OperationsDebugStringFormattable() {
         // We could check for isEmpty(), instead we'll just let the array access throw an index out
         // of bounds exception
         val opCodes = opCodes
-        val op = opCodes[--opCodesSize]!!
-        opCodes[opCodesSize] = null
+        val op = opCodes[--opCodesSize]
+        // See comment where opCodes is defined
+        @Suppress("UNCHECKED_CAST")
+        (opCodes as Array<Operation?>)[opCodesSize] = null
 
         other.pushOp(op)
 
@@ -336,12 +352,12 @@ internal class Operations : OperationsDebugStringFormattable() {
 
     private fun String.indent() = "$this    "
 
-    private fun peekOperation() = opCodes[opCodesSize - 1]!!
+    private inline fun peekOperation() = opCodes[opCodesSize - 1]
 
-    private fun topIntIndexOf(parameter: IntParameter) =
-        intArgsSize - peekOperation().ints + parameter.offset
+    private inline fun topIntIndexOf(parameter: IntParameter) =
+        intArgsSize - peekOperation().ints + parameter
 
-    private fun topObjectIndexOf(parameter: ObjectParameter<*>) =
+    private inline fun topObjectIndexOf(parameter: ObjectParameter<*>) =
         objectArgsSize - peekOperation().objects + parameter.offset
 
     @JvmInline
@@ -349,16 +365,62 @@ internal class Operations : OperationsDebugStringFormattable() {
         val operation: Operation
             get() = stack.peekOperation()
 
-        fun setInt(parameter: IntParameter, value: Int) =
+        inline fun setInt(parameter: IntParameter, value: Int) =
             with(stack) {
                 if (EnableDebugRuntimeChecks) {
-                    val mask = 0b1 shl parameter.offset
+                    val mask = 0b1 shl parameter
                     debugRuntimeCheck(pushedIntMask and mask == 0) {
                         "Already pushed argument ${operation.intParamName(parameter)}"
                     }
                     pushedIntMask = pushedIntMask or mask
                 }
                 intArgs[topIntIndexOf(parameter)] = value
+            }
+
+        inline fun setInts(
+            parameter1: IntParameter,
+            value1: Int,
+            parameter2: IntParameter,
+            value2: Int
+        ) =
+            with(stack) {
+                if (EnableDebugRuntimeChecks) {
+                    val mask = (0b1 shl parameter1) or (0b1 shl parameter2)
+                    debugRuntimeCheck(pushedIntMask and mask == 0) {
+                        "Already pushed argument(s) ${operation.intParamName(parameter1)}" +
+                            ", ${operation.intParamName(parameter2)}"
+                    }
+                    pushedIntMask = pushedIntMask or mask
+                }
+                val base = intArgsSize - peekOperation().ints
+                val intArgs = intArgs
+                intArgs[base + parameter1] = value1
+                intArgs[base + parameter2] = value2
+            }
+
+        inline fun setInts(
+            parameter1: IntParameter,
+            value1: Int,
+            parameter2: IntParameter,
+            value2: Int,
+            parameter3: IntParameter,
+            value3: Int
+        ) =
+            with(stack) {
+                if (EnableDebugRuntimeChecks) {
+                    val mask = (0b1 shl parameter1) or (0b1 shl parameter2) or (0b1 shl parameter3)
+                    debugRuntimeCheck(pushedIntMask and mask == 0) {
+                        "Already pushed argument(s) ${operation.intParamName(parameter1)}" +
+                            ", ${operation.intParamName(parameter2)}" +
+                            ", ${operation.intParamName(parameter3)}"
+                    }
+                    pushedIntMask = pushedIntMask or mask
+                }
+                val base = intArgsSize - peekOperation().ints
+                val intArgs = intArgs
+                intArgs[base + parameter1] = value1
+                intArgs[base + parameter2] = value2
+                intArgs[base + parameter3] = value3
             }
 
         fun <T> setObject(parameter: ObjectParameter<T>, value: T) =
@@ -371,6 +433,88 @@ internal class Operations : OperationsDebugStringFormattable() {
                     pushedObjectMask = pushedObjectMask or mask
                 }
                 objectArgs[topObjectIndexOf(parameter)] = value
+            }
+
+        fun <T, U> setObjects(
+            parameter1: ObjectParameter<T>,
+            value1: T,
+            parameter2: ObjectParameter<U>,
+            value2: U
+        ) =
+            with(stack) {
+                if (EnableDebugRuntimeChecks) {
+                    val mask = (0b1 shl parameter1.offset) or (0b1 shl parameter2.offset)
+                    debugRuntimeCheck(pushedIntMask and mask == 0) {
+                        "Already pushed argument(s) ${operation.objectParamName(parameter1)}" +
+                            ", ${operation.objectParamName(parameter2)}"
+                    }
+                    pushedIntMask = pushedIntMask or mask
+                }
+                val base = objectArgsSize - peekOperation().objects
+                val objectArgs = objectArgs
+                objectArgs[base + parameter1.offset] = value1
+                objectArgs[base + parameter2.offset] = value2
+            }
+
+        fun <T, U, V> setObjects(
+            parameter1: ObjectParameter<T>,
+            value1: T,
+            parameter2: ObjectParameter<U>,
+            value2: U,
+            parameter3: ObjectParameter<V>,
+            value3: V
+        ) =
+            with(stack) {
+                if (EnableDebugRuntimeChecks) {
+                    val mask =
+                        (0b1 shl parameter1.offset) or
+                            (0b1 shl parameter2.offset) or
+                            (0b1 shl parameter3.offset)
+                    debugRuntimeCheck(pushedIntMask and mask == 0) {
+                        "Already pushed argument(s) ${operation.objectParamName(parameter1)}" +
+                            ", ${operation.objectParamName(parameter2)}" +
+                            ", ${operation.objectParamName(parameter3)}"
+                    }
+                    pushedIntMask = pushedIntMask or mask
+                }
+                val base = objectArgsSize - peekOperation().objects
+                val objectArgs = objectArgs
+                objectArgs[base + parameter1.offset] = value1
+                objectArgs[base + parameter2.offset] = value2
+                objectArgs[base + parameter3.offset] = value3
+            }
+
+        fun <T, U, V, W> setObjects(
+            parameter1: ObjectParameter<T>,
+            value1: T,
+            parameter2: ObjectParameter<U>,
+            value2: U,
+            parameter3: ObjectParameter<V>,
+            value3: V,
+            parameter4: ObjectParameter<W>,
+            value4: W
+        ) =
+            with(stack) {
+                if (EnableDebugRuntimeChecks) {
+                    val mask =
+                        (0b1 shl parameter1.offset) or
+                            (0b1 shl parameter2.offset) or
+                            (0b1 shl parameter3.offset) or
+                            (0b1 shl parameter4.offset)
+                    debugRuntimeCheck(pushedIntMask and mask == 0) {
+                        "Already pushed argument(s) ${operation.objectParamName(parameter1)}" +
+                            ", ${operation.objectParamName(parameter2)}" +
+                            ", ${operation.objectParamName(parameter3)}" +
+                            ", ${operation.objectParamName(parameter4)}"
+                    }
+                    pushedIntMask = pushedIntMask or mask
+                }
+                val base = objectArgsSize - peekOperation().objects
+                val objectArgs = objectArgs
+                objectArgs[base + parameter1.offset] = value1
+                objectArgs[base + parameter2.offset] = value2
+                objectArgs[base + parameter3.offset] = value3
+                objectArgs[base + parameter4.offset] = value4
             }
     }
 
@@ -391,13 +535,13 @@ internal class Operations : OperationsDebugStringFormattable() {
 
         /** Returns the [Operation] at the current position of the iterator in the [Operations]. */
         val operation: Operation
-            get() = opCodes[opIdx]!!
+            get() = opCodes[opIdx]
 
         /**
          * Returns the value of [parameter] for the operation at the current position of the
          * iterator.
          */
-        override fun getInt(parameter: IntParameter): Int = intArgs[intIdx + parameter.offset]
+        override fun getInt(parameter: IntParameter): Int = intArgs[intIdx + parameter]
 
         /**
          * Returns the value of [parameter] for the operation at the current position of the
@@ -448,14 +592,13 @@ internal class Operations : OperationsDebugStringFormattable() {
                 var isFirstParam = true
                 val argLinePrefix = linePrefix.indent()
                 repeat(operation.ints) { offset ->
-                    val param = IntParameter(offset)
-                    val name = operation.intParamName(param)
+                    val name = operation.intParamName(offset)
                     if (!isFirstParam) append(", ") else isFirstParam = false
                     appendLine()
                     append(argLinePrefix)
                     append(name)
                     append(" = ")
-                    append(getInt(param))
+                    append(getInt(offset))
                 }
                 repeat(operation.objects) { offset ->
                     val param = ObjectParameter<Any?>(offset)

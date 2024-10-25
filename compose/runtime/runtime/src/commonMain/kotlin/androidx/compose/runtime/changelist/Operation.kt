@@ -45,8 +45,9 @@ import androidx.compose.runtime.snapshots.fastForEachIndexed
 import androidx.compose.runtime.withAfterAnchorInfo
 import kotlin.jvm.JvmInline
 
-internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
+internal typealias IntParameter = Int
 
+internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
     val name: String
         get() = this::class.simpleName.orEmpty()
 
@@ -56,21 +57,19 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
         rememberManager: RememberManager
     )
 
-    open fun intParamName(parameter: IntParameter): String = "IntParameter(${parameter.offset})"
+    open fun intParamName(parameter: IntParameter): String = "IntParameter(${parameter})"
 
     open fun objectParamName(parameter: ObjectParameter<*>): String =
         "ObjectParameter(${parameter.offset})"
 
     override fun toString() = name
 
-    @JvmInline value class IntParameter(val offset: Int)
-
     @JvmInline value class ObjectParameter<T>(val offset: Int)
 
     // region traversal operations
     object Ups : Operation(ints = 1) {
         inline val Count
-            get() = IntParameter(0)
+            get() = 0
 
         override fun intParamName(parameter: IntParameter) =
             when (parameter) {
@@ -112,7 +111,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
 
     object AdvanceSlotsBy : Operation(ints = 1) {
         inline val Distance
-            get() = IntParameter(0)
+            get() = 0
 
         override fun intParamName(parameter: IntParameter) =
             when (parameter) {
@@ -260,7 +259,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
 
     object TrimParentValues : Operation(ints = 1) {
         inline val Count
-            get() = IntParameter(0)
+            get() = 0
 
         override fun intParamName(parameter: IntParameter): String =
             when (parameter) {
@@ -302,7 +301,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
             get() = ObjectParameter<Any?>(0)
 
         inline val GroupSlotIndex
-            get() = IntParameter(0)
+            get() = 0
 
         override fun intParamName(parameter: IntParameter) =
             when (parameter) {
@@ -348,7 +347,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
             get() = ObjectParameter<Anchor>(1)
 
         inline val GroupSlotIndex
-            get() = IntParameter(0)
+            get() = 0
 
         override fun intParamName(parameter: IntParameter) =
             when (parameter) {
@@ -457,7 +456,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
 
     object MoveCurrentGroup : Operation(ints = 1) {
         inline val Offset
-            get() = IntParameter(0)
+            get() = 0
 
         override fun intParamName(parameter: IntParameter) =
             when (parameter) {
@@ -557,10 +556,10 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
 
     object RemoveNode : Operation(ints = 2) {
         inline val RemoveIndex
-            get() = IntParameter(0)
+            get() = 0
 
         inline val Count
-            get() = IntParameter(1)
+            get() = 1
 
         override fun intParamName(parameter: IntParameter) =
             when (parameter) {
@@ -580,13 +579,13 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
 
     object MoveNode : Operation(ints = 3) {
         inline val From
-            get() = IntParameter(0)
+            get() = 0
 
         inline val To
-            get() = IntParameter(1)
+            get() = 1
 
         inline val Count
-            get() = IntParameter(2)
+            get() = 2
 
         override fun intParamName(parameter: IntParameter) =
             when (parameter) {
@@ -682,7 +681,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
             get() = ObjectParameter<() -> Any?>(0)
 
         inline val InsertIndex
-            get() = IntParameter(0)
+            get() = 0
 
         inline val GroupAnchor
             get() = ObjectParameter<Anchor>(1)
@@ -718,7 +717,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
 
     object PostInsertNodeFixup : Operation(ints = 1, objects = 1) {
         inline val InsertIndex
-            get() = IntParameter(0)
+            get() = 0
 
         inline val GroupAnchor
             get() = ObjectParameter<Anchor>(0)
@@ -986,7 +985,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
         objects: Int = 0,
         val block: (Applier<*>, SlotWriter, RememberManager) -> Unit = { _, _, _ -> }
     ) : Operation(ints, objects) {
-        val intParams = List(ints) { index -> IntParameter(index) }
+        @Suppress("PrimitiveInCollection") val intParams = List(ints) { it }
         val objParams = List(objects) { index -> ObjectParameter<Any?>(index) }
 
         override fun OperationArgContainer.execute(
