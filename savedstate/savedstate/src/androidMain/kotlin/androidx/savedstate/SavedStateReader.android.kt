@@ -238,7 +238,13 @@ actual value class SavedStateReader actual constructor(actual val source: SavedS
 
     actual fun contentDeepEquals(other: SavedState): Boolean = source.contentDeepEquals(other)
 
-    actual fun toMap(): Map<String, Any?> = source.toMap()
+    actual fun toMap(): Map<String, Any?> {
+        return buildMap(capacity = source.size()) {
+            for (key in source.keySet()) {
+                @Suppress("DEPRECATION") put(key, source[key])
+            }
+        }
+    }
 
     @PublishedApi
     internal inline fun <reified T> getSingleResultOrThrow(
@@ -309,18 +315,4 @@ internal fun SavedState.contentDeepEquals(other: SavedState): Boolean {
         }
     }
     return true
-}
-
-@PublishedApi
-internal fun SavedState.toMap(): Map<String, Any?> {
-    return buildMap(capacity = this.size()) {
-        for (key in this@toMap.keySet()) {
-            @Suppress("DEPRECATION") val value = this@toMap[key]
-            if (value is SavedState) {
-                put(key, value.toMap())
-            } else {
-                put(key, value)
-            }
-        }
-    }
 }
