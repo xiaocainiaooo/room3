@@ -34,7 +34,7 @@ import androidx.compose.ui.graphics.setFrom
 internal class LayerMatrixCache<T>(
     private val getMatrix: (target: T, matrix: AndroidMatrix) -> Unit
 ) {
-    private var androidMatrixCache: AndroidMatrix = AndroidMatrix()
+    private var androidMatrixCache: AndroidMatrix? = null
     private var matrixCache: Matrix = Matrix()
     private var inverseMatrixCache: Matrix = Matrix()
 
@@ -72,7 +72,7 @@ internal class LayerMatrixCache<T>(
             return matrix
         }
 
-        val cachedMatrix = androidMatrixCache
+        val cachedMatrix = androidMatrixCache ?: AndroidMatrix().also { androidMatrixCache = it }
         getMatrix(target, cachedMatrix)
         matrix.setFrom(cachedMatrix)
         isDirty = false
