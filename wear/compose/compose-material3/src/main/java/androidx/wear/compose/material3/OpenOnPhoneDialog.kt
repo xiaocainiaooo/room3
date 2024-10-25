@@ -16,8 +16,10 @@
 
 package androidx.wear.compose.material3
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
@@ -33,6 +35,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +49,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.wear.compose.foundation.CurvedDirection
@@ -55,9 +59,12 @@ import androidx.wear.compose.foundation.CurvedScope
 import androidx.wear.compose.foundation.CurvedTextStyle
 import androidx.wear.compose.foundation.padding
 import androidx.wear.compose.material3.tokens.ColorSchemeKeyTokens
+import androidx.wear.compose.material3.tokens.MotionTokens.DurationLong2
+import androidx.wear.compose.material3.tokens.MotionTokens.DurationShort3
 import androidx.wear.compose.materialcore.screenHeightDp
 import androidx.wear.compose.materialcore.screenWidthDp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * A full-screen dialog that displays an animated icon with a curved text at the bottom.
@@ -98,10 +105,7 @@ fun OpenOnPhoneDialog(
     durationMillis: Long = OpenOnPhoneDialogDefaults.DurationMillis,
     content: @Composable BoxScope.() -> Unit = OpenOnPhoneDialogDefaults.OpenOnPhoneIcon,
 ) {
-    var progress by remember(show) { mutableFloatStateOf(0f) }
-    val animatable = remember { Animatable(0f) }
-
-    val a11yDurationMillis =
+    val a11yFullDurationMillis =
         LocalAccessibilityManager.current?.calculateRecommendedTimeoutMillis(
             originalTimeoutMillis = durationMillis,
             containsIcons = true,
@@ -109,26 +113,66 @@ fun OpenOnPhoneDialog(
             containsControls = false,
         ) ?: durationMillis
 
-    LaunchedEffect(show, a11yDurationMillis) {
+    LaunchedEffect(show, a11yFullDurationMillis) {
         if (show) {
-            animatable.snapTo(0f)
-            animatable.animateTo(
-                targetValue = 1f,
-                animationSpec =
-                    tween(durationMillis = a11yDurationMillis.toInt(), easing = LinearEasing),
-            ) {
-                progress = value
-            }
+            delay(a11yFullDurationMillis)
             onDismissRequest()
         }
     }
-
     Dialog(
         show = show,
         modifier = modifier,
         onDismissRequest = onDismissRequest,
         properties = properties,
     ) {
+        var progress by remember { mutableFloatStateOf(0f) }
+        val progressAnimatable = remember { Animatable(0f) }
+        val alphaAnimatable = remember { Animatable(0f) }
+
+        var endAnimation by remember { mutableStateOf(false) }
+
+        val finalAnimationDuration = DurationLong2
+        val progressDuration = a11yFullDurationMillis - finalAnimationDuration
+
+        val alphaAnimationSpec = MaterialTheme.motionScheme.fastEffectsSpec<Float>()
+
+        LaunchedEffect(a11yFullDurationMillis) {
+            launch {
+                delay(DurationShort3.toLong())
+                alphaAnimatable.animateTo(1f, alphaAnimationSpec)
+            }
+            launch {
+                progressAnimatable.snapTo(0f)
+                progressAnimatable.animateTo(
+                    targetValue = 1f,
+                    animationSpec =
+                        tween(durationMillis = progressDuration.toInt(), easing = LinearEasing),
+                ) {
+                    progress = value
+                }
+                endAnimation = true
+            }
+        }
+
+        val colorReversalAnimationSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Color>()
+        val sizeAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec<Float>()
+        val progressAlphaAnimationSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
+
+        val sizeAnimationFraction =
+            animateFloatAsState(if (endAnimation) 0f else 1f, sizeAnimationSpec)
+        val progressAlphaAnimationFraction =
+            animateFloatAsState(if (endAnimation) 0f else 1f, progressAlphaAnimationSpec)
+        val iconColor =
+            animateColorAsState(
+                if (endAnimation) colors.iconContainerColor else colors.iconColor,
+                colorReversalAnimationSpec
+            )
+        val iconContainerColor =
+            animateColorAsState(
+                if (endAnimation) colors.iconColor else colors.iconContainerColor,
+                colorReversalAnimationSpec
+            )
+
         Box(modifier = Modifier.fillMaxSize()) {
             val topPadding = screenHeightDp() * HeightPaddingFraction
             val size = screenWidthDp() * SizeFraction
@@ -136,18 +180,26 @@ fun OpenOnPhoneDialog(
                 Modifier.padding(top = topPadding.dp).size(size.dp).align(Alignment.TopCenter),
             ) {
                 iconContainer(
-                    iconContainerColor = colors.iconContainerColor,
+                    iconContainerColor = iconContainerColor.value,
                     progressIndicatorColors =
                         ProgressIndicatorDefaults.colors(
                             SolidColor(colors.progressIndicatorColor),
                             SolidColor(colors.progressTrackColor)
                         ),
+                    sizeAnimationFraction = sizeAnimationFraction,
+                    progressAlphaAnimationFraction = progressAlphaAnimationFraction,
                     progress = { progress }
                 )()
-                CompositionLocalProvider(LocalContentColor provides colors.iconColor) { content() }
+                CompositionLocalProvider(LocalContentColor provides iconColor.value) { content() }
             }
             CompositionLocalProvider(LocalContentColor provides colors.textColor) {
-                curvedText?.let { CurvedLayout(anchor = 90f, contentBuilder = curvedText) }
+                curvedText?.let {
+                    CurvedLayout(
+                        modifier = Modifier.graphicsLayer { alpha = alphaAnimatable.value },
+                        anchor = 90f,
+                        contentBuilder = curvedText
+                    )
+                }
             }
         }
     }
@@ -315,11 +367,20 @@ class OpenOnPhoneDialogColors(
 private fun iconContainer(
     iconContainerColor: Color,
     progressIndicatorColors: ProgressIndicatorColors,
+    sizeAnimationFraction: State<Float>,
+    progressAlphaAnimationFraction: State<Float>,
     progress: () -> Float
 ): @Composable BoxScope.() -> Unit = {
+    // Some animations might overshoot outside 0..1 range, that's why we need to coerce values above
+    // 0 to eliminate negative padding and strokeWidth.
+    val padding =
+        ((progressIndicatorStrokeWidth + progressIndicatorPadding) * sizeAnimationFraction.value)
+            .coerceAtLeast(0.dp)
+    val strokeWidth =
+        (progressIndicatorStrokeWidth * sizeAnimationFraction.value).coerceAtLeast(0.dp)
     Box(
         Modifier.fillMaxSize()
-            .padding(progressIndicatorStrokeWidth + progressIndicatorPadding)
+            .padding(padding)
             .graphicsLayer {
                 shape = CircleShape
                 clip = true
@@ -328,8 +389,9 @@ private fun iconContainer(
     )
 
     CircularProgressIndicator(
+        modifier = Modifier.graphicsLayer { alpha = progressAlphaAnimationFraction.value },
         progress = progress,
-        strokeWidth = progressIndicatorStrokeWidth,
+        strokeWidth = strokeWidth,
         colors = progressIndicatorColors
     )
 }
