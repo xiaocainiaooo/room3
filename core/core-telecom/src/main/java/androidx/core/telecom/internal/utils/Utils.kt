@@ -77,6 +77,10 @@ internal class Utils {
             }
         }
 
+        fun isBuildAtLeastP(): Boolean {
+            return VERSION.SDK_INT >= VERSION_CODES.P
+        }
+
         @RequiresApi(VERSION_CODES.O)
         fun remapJetpackCapsToPlatformCaps(
             @CallsManager.Companion.Capability clientBitmapSelection: Int

@@ -22,4 +22,8 @@ import androidx.core.telecom.util.ExperimentalAppActions
 /* Local Call Silence Ui state for the InCallService */
 data class LocalCallSilenceExtensionUiState
 @OptIn(ExperimentalAppActions::class)
-constructor(val isLocallySilenced: Boolean, val extension: LocalCallSilenceExtensionRemote?)
+constructor(
+    val isLocallySilenced: Boolean,
+    val onInCallServiceUiUpdate: (Boolean) -> Unit,
+    val extension: LocalCallSilenceExtensionRemote?
+)

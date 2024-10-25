@@ -518,6 +518,7 @@ public class CallsManager(context: Context) : CallsManagerExtensions {
             val request =
                 JetpackConnectionService.PendingConnectionRequest(
                     UUID.randomUUID().toString(),
+                    mContext,
                     callAttributes,
                     callChannels,
                     coroutineContext,

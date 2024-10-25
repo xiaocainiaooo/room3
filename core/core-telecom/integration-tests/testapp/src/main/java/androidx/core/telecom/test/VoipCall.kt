@@ -77,19 +77,15 @@ class VoipCall {
             mIsLocallySilence = !mIsLocallySilence
 
             mAdapter?.updateLocalCallSilenceIcon(mTelecomCallId, mIsLocallySilence)
-
             // send update to the ICS
             mLocalCallSilenceExtension?.updateIsLocallySilenced(mIsLocallySilence)
         }
     }
 
-    @OptIn(ExperimentalAppActions::class)
     suspend fun onLocalCallSilenceUpdate(isSilenced: Boolean) {
         // change the value for the app to match the ics
         mIsLocallySilence = isSilenced
         CoroutineScope(coroutineContext).launch {
-            // TODO:: b/372766291 should not have to update the ICS to keep internal state
-            mLocalCallSilenceExtension?.updateIsLocallySilenced(mIsLocallySilence)
             mAdapter?.updateLocalCallSilenceIcon(mTelecomCallId, isSilenced)
         }
     }
