@@ -379,6 +379,34 @@ internal fun DrawScope.drawCircularIndicator(
     )
 }
 
+internal fun DrawScope.drawIndicatorArc(
+    startAngle: Float,
+    sweep: Float,
+    brush: Brush,
+    stroke: Stroke,
+    gapSweep: Float
+) {
+    if (sweep.absoluteValue < gapSweep) {
+        // Draw a small circle indicator.
+        val angle = (startAngle + sweep / 2f).toRadians()
+        val radius = size.width / 2 - stroke.width / 2
+        val circleRadius = (stroke.width / 2) * sweep.absoluteValue / gapSweep
+        drawCircle(
+            brush = brush,
+            radius = circleRadius,
+            center =
+                Offset(radius * cos(angle) + size.width / 2, radius * sin(angle) + size.width / 2)
+        )
+    } else {
+        drawCircularIndicator(
+            startAngle = if (sweep > 0) startAngle + gapSweep / 2 else startAngle - gapSweep / 2,
+            sweep = if (sweep > 0) sweep - gapSweep else sweep + gapSweep,
+            brush = brush,
+            stroke = stroke
+        )
+    }
+}
+
 internal fun Float.isFullInt(): Boolean = (round(this) == this)
 
 internal fun Float.equalsWithTolerance(number: Float, tolerance: Float = 0.1f) =

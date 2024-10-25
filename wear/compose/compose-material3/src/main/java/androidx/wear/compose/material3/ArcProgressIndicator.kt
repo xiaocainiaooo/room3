@@ -92,19 +92,18 @@ fun ArcProgressIndicator(
         val gapSizeSweep = asin(adjustedGapSize.toPx() / size.width) * 360f / PI.toFloat()
 
         // Track before arc
-        val beforeTrackSweep =
-            if (tail.value >= 0.999f) (1 - head.value) * fullSweep
-            else (1 - head.value) * fullSweep - gapSizeSweep
+        val beforeTrackSweep = (1 - head.value) * fullSweep
         if (beforeTrackSweep > 0) {
-            drawCircularIndicator(
+            drawIndicatorArc(
                 startAngle =
                     if (angularDirection == AngularDirection.CounterClockwise) startAngle
                     else endAngle,
                 sweep =
                     if (angularDirection == AngularDirection.CounterClockwise) beforeTrackSweep
                     else -beforeTrackSweep,
-                colors.trackBrush,
-                stroke = stroke
+                brush = colors.trackBrush,
+                stroke = stroke,
+                gapSweep = gapSizeSweep
             )
         }
 
@@ -117,27 +116,27 @@ fun ArcProgressIndicator(
             if (angularDirection == AngularDirection.CounterClockwise)
                 (tail.value - head.value) * fullSweep
             else (head.value - tail.value) * fullSweep
-        drawCircularIndicator(
+        drawIndicatorArc(
             startAngle = arcStart,
             sweep = arcSweep,
-            colors.indicatorBrush,
-            stroke = stroke
+            brush = colors.indicatorBrush,
+            stroke = stroke,
+            gapSweep = gapSizeSweep,
         )
 
         // Track after arc
-        val afterTrackSweep =
-            if (tail.value >= 0.999f) tail.value * fullSweep
-            else tail.value * fullSweep - gapSizeSweep
+        val afterTrackSweep = tail.value * fullSweep
         if (afterTrackSweep > 0) {
-            drawCircularIndicator(
+            drawIndicatorArc(
                 startAngle =
                     if (angularDirection == AngularDirection.CounterClockwise) endAngle
                     else startAngle,
                 sweep =
                     if (angularDirection == AngularDirection.CounterClockwise) -afterTrackSweep
                     else afterTrackSweep,
-                colors.trackBrush,
-                stroke = stroke
+                brush = colors.trackBrush,
+                stroke = stroke,
+                gapSweep = gapSizeSweep,
             )
         }
     }
