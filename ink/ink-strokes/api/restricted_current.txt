@@ -7,6 +7,7 @@ package androidx.ink.strokes {
   }
 
   public static final class ImmutableStrokeInputBatch.Companion {
+    property public final androidx.ink.strokes.ImmutableStrokeInputBatch EMPTY;
   }
 
   public final class InProgressStroke {
@@ -131,6 +132,10 @@ package androidx.ink.strokes {
     method @VisibleForTesting public androidx.ink.strokes.StrokeInput create(float x, float y, @IntRange(from=0L) long elapsedTimeMillis, optional androidx.ink.brush.InputToolType toolType, optional float strokeUnitLengthCm, optional float pressure);
     method @VisibleForTesting public androidx.ink.strokes.StrokeInput create(float x, float y, @IntRange(from=0L) long elapsedTimeMillis, optional androidx.ink.brush.InputToolType toolType, optional float strokeUnitLengthCm, optional float pressure, optional float tiltRadians);
     method @VisibleForTesting public androidx.ink.strokes.StrokeInput create(float x, float y, @IntRange(from=0L) long elapsedTimeMillis, optional androidx.ink.brush.InputToolType toolType, optional float strokeUnitLengthCm, optional float pressure, optional float tiltRadians, optional float orientationRadians);
+    property public static final float NO_ORIENTATION;
+    property public static final float NO_PRESSURE;
+    property public static final float NO_STROKE_UNIT_LENGTH;
+    property public static final float NO_TILT;
   }
 
   public abstract class StrokeInputBatch {

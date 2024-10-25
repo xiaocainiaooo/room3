@@ -26,6 +26,7 @@ package androidx.compose.animation {
     method public androidx.compose.animation.EnterTransition slideIntoContainer(int towards, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> initialOffset);
     method public androidx.compose.animation.ExitTransition slideOutOfContainer(int towards, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec, optional kotlin.jvm.functions.Function1<? super java.lang.Integer,java.lang.Integer> targetOffset);
     method public infix androidx.compose.animation.ContentTransform using(androidx.compose.animation.ContentTransform, androidx.compose.animation.SizeTransform? sizeTransform);
+    property public androidx.compose.animation.ExitTransition KeepUntilTransitionsFinished;
     property public abstract androidx.compose.ui.Alignment contentAlignment;
   }
 

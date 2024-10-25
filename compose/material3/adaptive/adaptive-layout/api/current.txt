@@ -101,7 +101,7 @@ package androidx.compose.material3.adaptive.layout {
   public static final class PaneExpansionAnchor.Proportion extends androidx.compose.material3.adaptive.layout.PaneExpansionAnchor {
     ctor public PaneExpansionAnchor.Proportion(@FloatRange(from=0.0, to=1.0) float proportion);
     method public float getProportion();
-    property public final float proportion;
+    property @FloatRange(from=0.0, to=1.0) public final float proportion;
   }
 
   public final class PaneExpansionDragHandleKt {
@@ -120,6 +120,7 @@ package androidx.compose.material3.adaptive.layout {
   }
 
   public static final class PaneExpansionState.Companion {
+    property public static final int Unspecified;
   }
 
   @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi @androidx.compose.runtime.Immutable public sealed interface PaneExpansionStateKey {
@@ -149,6 +150,8 @@ package androidx.compose.material3.adaptive.layout {
     method public androidx.compose.animation.EnterTransition getEnterTransition(androidx.compose.material3.adaptive.layout.PaneScaffoldMotionScope);
     method public androidx.compose.animation.ExitTransition getExitTransition(androidx.compose.material3.adaptive.layout.PaneScaffoldMotionScope);
     method public int getType();
+    property public androidx.compose.animation.EnterTransition enterTransition;
+    property public androidx.compose.animation.ExitTransition exitTransition;
     property public abstract int type;
     field public static final androidx.compose.material3.adaptive.layout.PaneMotion.Companion Companion;
   }

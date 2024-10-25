@@ -39,6 +39,7 @@ package androidx.wear.compose.material3 {
   }
 
   @RequiresApi(31) public final class AnimatedTextDefaults {
+    property public static final int CacheSize;
     field public static final int CacheSize = 5; // 0x5
     field public static final androidx.wear.compose.material3.AnimatedTextDefaults INSTANCE;
   }
@@ -60,6 +61,8 @@ package androidx.wear.compose.material3 {
     method public float calculateRecommendedGapSize(float strokeWidth);
     method public float getIndeterminateStrokeWidth();
     method @androidx.compose.runtime.Composable public float getRecommendedIndeterminateDiameter();
+    property public static final float IndeterminateEndAngle;
+    property public static final float IndeterminateStartAngle;
     property public final float IndeterminateStrokeWidth;
     property @androidx.compose.runtime.Composable public final float recommendedIndeterminateDiameter;
     field public static final androidx.wear.compose.material3.ArcProgressIndicatorDefaults INSTANCE;
@@ -404,6 +407,7 @@ package androidx.wear.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.ConfirmationColors successColors();
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.ConfirmationColors successColors(optional long iconColor, optional long iconContainerColor, optional long textColor);
     method @androidx.compose.runtime.Composable public kotlin.jvm.functions.Function1<androidx.wear.compose.foundation.CurvedScope,kotlin.Unit> successText();
+    property public static final long ConfirmationDurationMillis;
     property public final kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.BoxScope,kotlin.Unit> FailureIcon;
     property public final float IconSize;
     property public final float SmallIconSize;
@@ -426,6 +430,8 @@ package androidx.wear.compose.material3 {
 
   public final class CurvedTextDefaults {
     method @androidx.compose.runtime.Composable public long backgroundColor();
+    property public static final float ScrollableContentMaxSweepAngle;
+    property public static final float StaticContentMaxSweepAngle;
     field public static final androidx.wear.compose.material3.CurvedTextDefaults INSTANCE;
     field public static final float ScrollableContentMaxSweepAngle = 70.0f;
     field public static final float StaticContentMaxSweepAngle = 120.0f;
@@ -674,6 +680,7 @@ package androidx.wear.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.LevelIndicatorColors colors(optional long indicatorColor, optional long trackColor, optional long disabledIndicatorColor, optional long disabledTrackColor);
     method public float getStrokeWidth();
     property public final float StrokeWidth;
+    property public static final float SweepAngle;
     field public static final androidx.wear.compose.material3.LevelIndicatorDefaults INSTANCE;
     field public static final float SweepAngle = 72.0f;
   }
@@ -763,6 +770,7 @@ package androidx.wear.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.OpenOnPhoneDialogColors colors(optional long iconColor, optional long iconContainerColor, optional long progressIndicatorColor, optional long progressTrackColor, optional long textColor);
     method @androidx.compose.runtime.Composable public kotlin.jvm.functions.Function1<androidx.wear.compose.foundation.CurvedScope,kotlin.Unit> curvedText(optional String text, optional androidx.wear.compose.foundation.CurvedTextStyle style);
     method public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.BoxScope,kotlin.Unit> getOpenOnPhoneIcon();
+    property public static final long DurationMillis;
     property public final kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.BoxScope,kotlin.Unit> OpenOnPhoneIcon;
     field public static final long DurationMillis = 4000L; // 0xfa0L
     field public static final androidx.wear.compose.material3.OpenOnPhoneDialogDefaults INSTANCE;
@@ -1474,6 +1482,7 @@ package androidx.wear.compose.material3 {
   public final class TextConfigurationDefaults {
     method public int getOverflow();
     method public androidx.compose.ui.text.style.TextAlign? getTextAlign();
+    property public static final int MaxLines;
     property public final int Overflow;
     property public final androidx.compose.ui.text.style.TextAlign? TextAlign;
     field public static final androidx.wear.compose.material3.TextConfigurationDefaults INSTANCE;
@@ -1607,6 +1616,9 @@ package androidx.wear.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.compose.ui.text.TextStyle timeTextStyle(optional long background, optional long color, optional long fontSize);
     property public final float AutoTextWeight;
     property public final androidx.compose.foundation.layout.PaddingValues ContentPadding;
+    property public static final float MaxSweepAngle;
+    property public static final String TimeFormat12Hours;
+    property public static final String TimeFormat24Hours;
     field public static final androidx.wear.compose.material3.TimeTextDefaults INSTANCE;
     field public static final float MaxSweepAngle = 70.0f;
     field public static final String TimeFormat12Hours = "h:mm";

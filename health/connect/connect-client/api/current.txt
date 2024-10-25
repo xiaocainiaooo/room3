@@ -22,7 +22,6 @@ package androidx.health.connect.client {
     method public suspend <T extends androidx.health.connect.client.records.Record> Object? readRecord(kotlin.reflect.KClass<T> recordType, String recordId, kotlin.coroutines.Continuation<? super androidx.health.connect.client.response.ReadRecordResponse<T>>);
     method public suspend <T extends androidx.health.connect.client.records.Record> Object? readRecords(androidx.health.connect.client.request.ReadRecordsRequest<T> request, kotlin.coroutines.Continuation<? super androidx.health.connect.client.response.ReadRecordsResponse<T>>);
     method public suspend Object? updateRecords(java.util.List<? extends androidx.health.connect.client.records.Record> records, kotlin.coroutines.Continuation<? super kotlin.Unit>);
-    property public static String ACTION_HEALTH_CONNECT_SETTINGS;
     property @SuppressCompatibility @androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi public default androidx.health.connect.client.HealthConnectFeatures features;
     property public abstract androidx.health.connect.client.PermissionController permissionController;
     field public static final androidx.health.connect.client.HealthConnectClient.Companion Companion;
@@ -40,6 +39,9 @@ package androidx.health.connect.client {
     method public int getSdkStatus(android.content.Context context);
     method public int getSdkStatus(android.content.Context context, optional String providerPackageName);
     property public final String ACTION_HEALTH_CONNECT_SETTINGS;
+    property public static final int SDK_AVAILABLE;
+    property public static final int SDK_UNAVAILABLE;
+    property public static final int SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED;
     field public static final int SDK_AVAILABLE = 3; // 0x3
     field public static final int SDK_UNAVAILABLE = 1; // 0x1
     field public static final int SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED = 2; // 0x2
@@ -63,6 +65,12 @@ package androidx.health.connect.client {
   }
 
   public static final class HealthConnectFeatures.Companion {
+    property public static final int FEATURE_PLANNED_EXERCISE;
+    property public static final int FEATURE_READ_HEALTH_DATA_HISTORY;
+    property public static final int FEATURE_READ_HEALTH_DATA_IN_BACKGROUND;
+    property public static final int FEATURE_SKIN_TEMPERATURE;
+    property public static final int FEATURE_STATUS_AVAILABLE;
+    property public static final int FEATURE_STATUS_UNAVAILABLE;
     field public static final int FEATURE_PLANNED_EXERCISE = 3; // 0x3
     field public static final int FEATURE_READ_HEALTH_DATA_HISTORY = 4; // 0x4
     field public static final int FEATURE_READ_HEALTH_DATA_IN_BACKGROUND = 1; // 0x1
@@ -175,6 +183,9 @@ package androidx.health.connect.client.permission {
   public static final class HealthPermission.Companion {
     method public String getReadPermission(kotlin.reflect.KClass<? extends androidx.health.connect.client.records.Record> recordType);
     method public String getWritePermission(kotlin.reflect.KClass<? extends androidx.health.connect.client.records.Record> recordType);
+    property public static final String PERMISSION_READ_HEALTH_DATA_HISTORY;
+    property public static final String PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND;
+    property public static final String PERMISSION_WRITE_EXERCISE_ROUTE;
   }
 
 }
@@ -200,6 +211,7 @@ package androidx.health.connect.client.records {
   }
 
   public static final class ActiveCaloriesBurnedRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Energy> ACTIVE_CALORIES_TOTAL;
   }
 
   public final class BasalBodyTemperatureRecord implements androidx.health.connect.client.records.Record {
@@ -231,6 +243,7 @@ package androidx.health.connect.client.records {
   }
 
   public static final class BasalMetabolicRateRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Energy> BASAL_CALORIES_TOTAL;
   }
 
   public final class BloodGlucoseRecord implements androidx.health.connect.client.records.Record {
@@ -265,6 +278,18 @@ package androidx.health.connect.client.records {
   }
 
   public static final class BloodGlucoseRecord.Companion {
+    property public static final int RELATION_TO_MEAL_AFTER_MEAL;
+    property public static final int RELATION_TO_MEAL_BEFORE_MEAL;
+    property public static final int RELATION_TO_MEAL_FASTING;
+    property public static final int RELATION_TO_MEAL_GENERAL;
+    property public static final int RELATION_TO_MEAL_UNKNOWN;
+    property public static final int SPECIMEN_SOURCE_CAPILLARY_BLOOD;
+    property public static final int SPECIMEN_SOURCE_INTERSTITIAL_FLUID;
+    property public static final int SPECIMEN_SOURCE_PLASMA;
+    property public static final int SPECIMEN_SOURCE_SERUM;
+    property public static final int SPECIMEN_SOURCE_TEARS;
+    property public static final int SPECIMEN_SOURCE_UNKNOWN;
+    property public static final int SPECIMEN_SOURCE_WHOLE_BLOOD;
   }
 
   public final class BloodPressureRecord implements androidx.health.connect.client.records.Record {
@@ -303,6 +328,22 @@ package androidx.health.connect.client.records {
   }
 
   public static final class BloodPressureRecord.Companion {
+    property public static final int BODY_POSITION_LYING_DOWN;
+    property public static final int BODY_POSITION_RECLINING;
+    property public static final int BODY_POSITION_SITTING_DOWN;
+    property public static final int BODY_POSITION_STANDING_UP;
+    property public static final int BODY_POSITION_UNKNOWN;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Pressure> DIASTOLIC_AVG;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Pressure> DIASTOLIC_MAX;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Pressure> DIASTOLIC_MIN;
+    property public static final int MEASUREMENT_LOCATION_LEFT_UPPER_ARM;
+    property public static final int MEASUREMENT_LOCATION_LEFT_WRIST;
+    property public static final int MEASUREMENT_LOCATION_RIGHT_UPPER_ARM;
+    property public static final int MEASUREMENT_LOCATION_RIGHT_WRIST;
+    property public static final int MEASUREMENT_LOCATION_UNKNOWN;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Pressure> SYSTOLIC_AVG;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Pressure> SYSTOLIC_MAX;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Pressure> SYSTOLIC_MIN;
   }
 
   public final class BodyFatRecord implements androidx.health.connect.client.records.Record {
@@ -318,6 +359,17 @@ package androidx.health.connect.client.records {
   }
 
   public final class BodyTemperatureMeasurementLocation {
+    property public static final int MEASUREMENT_LOCATION_ARMPIT;
+    property public static final int MEASUREMENT_LOCATION_EAR;
+    property public static final int MEASUREMENT_LOCATION_FINGER;
+    property public static final int MEASUREMENT_LOCATION_FOREHEAD;
+    property public static final int MEASUREMENT_LOCATION_MOUTH;
+    property public static final int MEASUREMENT_LOCATION_RECTUM;
+    property public static final int MEASUREMENT_LOCATION_TEMPORAL_ARTERY;
+    property public static final int MEASUREMENT_LOCATION_TOE;
+    property public static final int MEASUREMENT_LOCATION_UNKNOWN;
+    property public static final int MEASUREMENT_LOCATION_VAGINA;
+    property public static final int MEASUREMENT_LOCATION_WRIST;
     field public static final androidx.health.connect.client.records.BodyTemperatureMeasurementLocation INSTANCE;
     field public static final int MEASUREMENT_LOCATION_ARMPIT = 1; // 0x1
     field public static final int MEASUREMENT_LOCATION_EAR = 8; // 0x8
@@ -397,6 +449,17 @@ package androidx.health.connect.client.records {
   }
 
   public static final class CervicalMucusRecord.Companion {
+    property public static final int APPEARANCE_CREAMY;
+    property public static final int APPEARANCE_DRY;
+    property public static final int APPEARANCE_EGG_WHITE;
+    property public static final int APPEARANCE_STICKY;
+    property public static final int APPEARANCE_UNKNOWN;
+    property public static final int APPEARANCE_UNUSUAL;
+    property public static final int APPEARANCE_WATERY;
+    property public static final int SENSATION_HEAVY;
+    property public static final int SENSATION_LIGHT;
+    property public static final int SENSATION_MEDIUM;
+    property public static final int SENSATION_UNKNOWN;
   }
 
   public final class CyclingPedalingCadenceRecord implements androidx.health.connect.client.records.Record {
@@ -420,13 +483,16 @@ package androidx.health.connect.client.records {
   }
 
   public static final class CyclingPedalingCadenceRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Double> RPM_AVG;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Double> RPM_MAX;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Double> RPM_MIN;
   }
 
   public static final class CyclingPedalingCadenceRecord.Sample {
     ctor public CyclingPedalingCadenceRecord.Sample(java.time.Instant time, @FloatRange(from=0.0, to=10000.0) double revolutionsPerMinute);
     method public double getRevolutionsPerMinute();
     method public java.time.Instant getTime();
-    property public final double revolutionsPerMinute;
+    property @FloatRange(from=0.0, to=10000.0) public final double revolutionsPerMinute;
     property public final java.time.Instant time;
   }
 
@@ -449,6 +515,7 @@ package androidx.health.connect.client.records {
   }
 
   public static final class DistanceRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Length> DISTANCE_TOTAL;
   }
 
   public final class ElevationGainedRecord implements androidx.health.connect.client.records.Record {
@@ -470,6 +537,7 @@ package androidx.health.connect.client.records {
   }
 
   public static final class ElevationGainedRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Length> ELEVATION_GAINED_TOTAL;
   }
 
   public abstract class ExerciseCompletionGoal {
@@ -717,6 +785,74 @@ package androidx.health.connect.client.records {
   }
 
   public static final class ExerciseSegment.Companion {
+    property public static final int EXERCISE_SEGMENT_TYPE_ARM_CURL;
+    property public static final int EXERCISE_SEGMENT_TYPE_BACK_EXTENSION;
+    property public static final int EXERCISE_SEGMENT_TYPE_BALL_SLAM;
+    property public static final int EXERCISE_SEGMENT_TYPE_BARBELL_SHOULDER_PRESS;
+    property public static final int EXERCISE_SEGMENT_TYPE_BENCH_PRESS;
+    property public static final int EXERCISE_SEGMENT_TYPE_BENCH_SIT_UP;
+    property public static final int EXERCISE_SEGMENT_TYPE_BIKING;
+    property public static final int EXERCISE_SEGMENT_TYPE_BIKING_STATIONARY;
+    property public static final int EXERCISE_SEGMENT_TYPE_BURPEE;
+    property public static final int EXERCISE_SEGMENT_TYPE_CRUNCH;
+    property public static final int EXERCISE_SEGMENT_TYPE_DEADLIFT;
+    property public static final int EXERCISE_SEGMENT_TYPE_DOUBLE_ARM_TRICEPS_EXTENSION;
+    property public static final int EXERCISE_SEGMENT_TYPE_DUMBBELL_CURL_LEFT_ARM;
+    property public static final int EXERCISE_SEGMENT_TYPE_DUMBBELL_CURL_RIGHT_ARM;
+    property public static final int EXERCISE_SEGMENT_TYPE_DUMBBELL_FRONT_RAISE;
+    property public static final int EXERCISE_SEGMENT_TYPE_DUMBBELL_LATERAL_RAISE;
+    property public static final int EXERCISE_SEGMENT_TYPE_DUMBBELL_ROW;
+    property public static final int EXERCISE_SEGMENT_TYPE_DUMBBELL_TRICEPS_EXTENSION_LEFT_ARM;
+    property public static final int EXERCISE_SEGMENT_TYPE_DUMBBELL_TRICEPS_EXTENSION_RIGHT_ARM;
+    property public static final int EXERCISE_SEGMENT_TYPE_DUMBBELL_TRICEPS_EXTENSION_TWO_ARM;
+    property public static final int EXERCISE_SEGMENT_TYPE_ELLIPTICAL;
+    property public static final int EXERCISE_SEGMENT_TYPE_FORWARD_TWIST;
+    property public static final int EXERCISE_SEGMENT_TYPE_FRONT_RAISE;
+    property public static final int EXERCISE_SEGMENT_TYPE_HIGH_INTENSITY_INTERVAL_TRAINING;
+    property public static final int EXERCISE_SEGMENT_TYPE_HIP_THRUST;
+    property public static final int EXERCISE_SEGMENT_TYPE_HULA_HOOP;
+    property public static final int EXERCISE_SEGMENT_TYPE_JUMPING_JACK;
+    property public static final int EXERCISE_SEGMENT_TYPE_JUMP_ROPE;
+    property public static final int EXERCISE_SEGMENT_TYPE_KETTLEBELL_SWING;
+    property public static final int EXERCISE_SEGMENT_TYPE_LATERAL_RAISE;
+    property public static final int EXERCISE_SEGMENT_TYPE_LAT_PULL_DOWN;
+    property public static final int EXERCISE_SEGMENT_TYPE_LEG_CURL;
+    property public static final int EXERCISE_SEGMENT_TYPE_LEG_EXTENSION;
+    property public static final int EXERCISE_SEGMENT_TYPE_LEG_PRESS;
+    property public static final int EXERCISE_SEGMENT_TYPE_LEG_RAISE;
+    property public static final int EXERCISE_SEGMENT_TYPE_LUNGE;
+    property public static final int EXERCISE_SEGMENT_TYPE_MOUNTAIN_CLIMBER;
+    property public static final int EXERCISE_SEGMENT_TYPE_OTHER_WORKOUT;
+    property public static final int EXERCISE_SEGMENT_TYPE_PAUSE;
+    property public static final int EXERCISE_SEGMENT_TYPE_PILATES;
+    property public static final int EXERCISE_SEGMENT_TYPE_PLANK;
+    property public static final int EXERCISE_SEGMENT_TYPE_PULL_UP;
+    property public static final int EXERCISE_SEGMENT_TYPE_PUNCH;
+    property public static final int EXERCISE_SEGMENT_TYPE_REST;
+    property public static final int EXERCISE_SEGMENT_TYPE_ROWING_MACHINE;
+    property public static final int EXERCISE_SEGMENT_TYPE_RUNNING;
+    property public static final int EXERCISE_SEGMENT_TYPE_RUNNING_TREADMILL;
+    property public static final int EXERCISE_SEGMENT_TYPE_SHOULDER_PRESS;
+    property public static final int EXERCISE_SEGMENT_TYPE_SINGLE_ARM_TRICEPS_EXTENSION;
+    property public static final int EXERCISE_SEGMENT_TYPE_SIT_UP;
+    property public static final int EXERCISE_SEGMENT_TYPE_SQUAT;
+    property public static final int EXERCISE_SEGMENT_TYPE_STAIR_CLIMBING;
+    property public static final int EXERCISE_SEGMENT_TYPE_STAIR_CLIMBING_MACHINE;
+    property public static final int EXERCISE_SEGMENT_TYPE_STRETCHING;
+    property public static final int EXERCISE_SEGMENT_TYPE_SWIMMING_BACKSTROKE;
+    property public static final int EXERCISE_SEGMENT_TYPE_SWIMMING_BREASTSTROKE;
+    property public static final int EXERCISE_SEGMENT_TYPE_SWIMMING_BUTTERFLY;
+    property public static final int EXERCISE_SEGMENT_TYPE_SWIMMING_FREESTYLE;
+    property public static final int EXERCISE_SEGMENT_TYPE_SWIMMING_MIXED;
+    property public static final int EXERCISE_SEGMENT_TYPE_SWIMMING_OPEN_WATER;
+    property public static final int EXERCISE_SEGMENT_TYPE_SWIMMING_OTHER;
+    property public static final int EXERCISE_SEGMENT_TYPE_SWIMMING_POOL;
+    property public static final int EXERCISE_SEGMENT_TYPE_UNKNOWN;
+    property public static final int EXERCISE_SEGMENT_TYPE_UPPER_TWIST;
+    property public static final int EXERCISE_SEGMENT_TYPE_WALKING;
+    property public static final int EXERCISE_SEGMENT_TYPE_WEIGHTLIFTING;
+    property public static final int EXERCISE_SEGMENT_TYPE_WHEELCHAIR;
+    property public static final int EXERCISE_SEGMENT_TYPE_YOGA;
   }
 
   public final class ExerciseSessionRecord implements androidx.health.connect.client.records.Record {
@@ -818,6 +954,68 @@ package androidx.health.connect.client.records {
   }
 
   public static final class ExerciseSessionRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.time.Duration> EXERCISE_DURATION_TOTAL;
+    property public static final int EXERCISE_TYPE_BADMINTON;
+    property public static final int EXERCISE_TYPE_BASEBALL;
+    property public static final int EXERCISE_TYPE_BASKETBALL;
+    property public static final int EXERCISE_TYPE_BIKING;
+    property public static final int EXERCISE_TYPE_BIKING_STATIONARY;
+    property public static final int EXERCISE_TYPE_BOOT_CAMP;
+    property public static final int EXERCISE_TYPE_BOXING;
+    property public static final int EXERCISE_TYPE_CALISTHENICS;
+    property public static final int EXERCISE_TYPE_CRICKET;
+    property public static final int EXERCISE_TYPE_DANCING;
+    property public static final int EXERCISE_TYPE_ELLIPTICAL;
+    property public static final int EXERCISE_TYPE_EXERCISE_CLASS;
+    property public static final int EXERCISE_TYPE_FENCING;
+    property public static final int EXERCISE_TYPE_FOOTBALL_AMERICAN;
+    property public static final int EXERCISE_TYPE_FOOTBALL_AUSTRALIAN;
+    property public static final int EXERCISE_TYPE_FRISBEE_DISC;
+    property public static final int EXERCISE_TYPE_GOLF;
+    property public static final int EXERCISE_TYPE_GUIDED_BREATHING;
+    property public static final int EXERCISE_TYPE_GYMNASTICS;
+    property public static final int EXERCISE_TYPE_HANDBALL;
+    property public static final int EXERCISE_TYPE_HIGH_INTENSITY_INTERVAL_TRAINING;
+    property public static final int EXERCISE_TYPE_HIKING;
+    property public static final int EXERCISE_TYPE_ICE_HOCKEY;
+    property public static final int EXERCISE_TYPE_ICE_SKATING;
+    property public static final int EXERCISE_TYPE_MARTIAL_ARTS;
+    property public static final int EXERCISE_TYPE_OTHER_WORKOUT;
+    property public static final int EXERCISE_TYPE_PADDLING;
+    property public static final int EXERCISE_TYPE_PARAGLIDING;
+    property public static final int EXERCISE_TYPE_PILATES;
+    property public static final int EXERCISE_TYPE_RACQUETBALL;
+    property public static final int EXERCISE_TYPE_ROCK_CLIMBING;
+    property public static final int EXERCISE_TYPE_ROLLER_HOCKEY;
+    property public static final int EXERCISE_TYPE_ROWING;
+    property public static final int EXERCISE_TYPE_ROWING_MACHINE;
+    property public static final int EXERCISE_TYPE_RUGBY;
+    property public static final int EXERCISE_TYPE_RUNNING;
+    property public static final int EXERCISE_TYPE_RUNNING_TREADMILL;
+    property public static final int EXERCISE_TYPE_SAILING;
+    property public static final int EXERCISE_TYPE_SCUBA_DIVING;
+    property public static final int EXERCISE_TYPE_SKATING;
+    property public static final int EXERCISE_TYPE_SKIING;
+    property public static final int EXERCISE_TYPE_SNOWBOARDING;
+    property public static final int EXERCISE_TYPE_SNOWSHOEING;
+    property public static final int EXERCISE_TYPE_SOCCER;
+    property public static final int EXERCISE_TYPE_SOFTBALL;
+    property public static final int EXERCISE_TYPE_SQUASH;
+    property public static final int EXERCISE_TYPE_STAIR_CLIMBING;
+    property public static final int EXERCISE_TYPE_STAIR_CLIMBING_MACHINE;
+    property public static final int EXERCISE_TYPE_STRENGTH_TRAINING;
+    property public static final int EXERCISE_TYPE_STRETCHING;
+    property public static final int EXERCISE_TYPE_SURFING;
+    property public static final int EXERCISE_TYPE_SWIMMING_OPEN_WATER;
+    property public static final int EXERCISE_TYPE_SWIMMING_POOL;
+    property public static final int EXERCISE_TYPE_TABLE_TENNIS;
+    property public static final int EXERCISE_TYPE_TENNIS;
+    property public static final int EXERCISE_TYPE_VOLLEYBALL;
+    property public static final int EXERCISE_TYPE_WALKING;
+    property public static final int EXERCISE_TYPE_WATER_POLO;
+    property public static final int EXERCISE_TYPE_WEIGHTLIFTING;
+    property public static final int EXERCISE_TYPE_WHEELCHAIR;
+    property public static final int EXERCISE_TYPE_YOGA;
   }
 
   public final class FloorsClimbedRecord implements androidx.health.connect.client.records.Record {
@@ -839,6 +1037,7 @@ package androidx.health.connect.client.records {
   }
 
   public static final class FloorsClimbedRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Double> FLOORS_CLIMBED_TOTAL;
   }
 
   public final class HeartRateRecord implements androidx.health.connect.client.records.Record {
@@ -863,13 +1062,17 @@ package androidx.health.connect.client.records {
   }
 
   public static final class HeartRateRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Long> BPM_AVG;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Long> BPM_MAX;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Long> BPM_MIN;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Long> MEASUREMENTS_COUNT;
   }
 
   public static final class HeartRateRecord.Sample {
     ctor public HeartRateRecord.Sample(java.time.Instant time, @IntRange(from=1L, to=300L) long beatsPerMinute);
     method public long getBeatsPerMinute();
     method public java.time.Instant getTime();
-    property public final long beatsPerMinute;
+    property @IntRange(from=1L, to=300L) public final long beatsPerMinute;
     property public final java.time.Instant time;
   }
 
@@ -902,6 +1105,9 @@ package androidx.health.connect.client.records {
   }
 
   public static final class HeightRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Length> HEIGHT_AVG;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Length> HEIGHT_MAX;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Length> HEIGHT_MIN;
   }
 
   public final class HydrationRecord implements androidx.health.connect.client.records.Record {
@@ -923,6 +1129,7 @@ package androidx.health.connect.client.records {
   }
 
   public static final class HydrationRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Volume> VOLUME_TOTAL;
   }
 
   public final class IntermenstrualBleedingRecord implements androidx.health.connect.client.records.Record {
@@ -948,6 +1155,11 @@ package androidx.health.connect.client.records {
   }
 
   public final class MealType {
+    property public static final int MEAL_TYPE_BREAKFAST;
+    property public static final int MEAL_TYPE_DINNER;
+    property public static final int MEAL_TYPE_LUNCH;
+    property public static final int MEAL_TYPE_SNACK;
+    property public static final int MEAL_TYPE_UNKNOWN;
     field public static final androidx.health.connect.client.records.MealType INSTANCE;
     field public static final int MEAL_TYPE_BREAKFAST = 1; // 0x1
     field public static final int MEAL_TYPE_DINNER = 3; // 0x3
@@ -974,6 +1186,10 @@ package androidx.health.connect.client.records {
   }
 
   public static final class MenstruationFlowRecord.Companion {
+    property public static final int FLOW_HEAVY;
+    property public static final int FLOW_LIGHT;
+    property public static final int FLOW_MEDIUM;
+    property public static final int FLOW_UNKNOWN;
   }
 
   public final class MenstruationPeriodRecord implements androidx.health.connect.client.records.Record {
@@ -1136,6 +1352,48 @@ package androidx.health.connect.client.records {
   }
 
   public static final class NutritionRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> BIOTIN_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> CAFFEINE_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> CALCIUM_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> CHLORIDE_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> CHOLESTEROL_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> CHROMIUM_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> COPPER_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> DIETARY_FIBER_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Energy> ENERGY_FROM_FAT_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Energy> ENERGY_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> FOLATE_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> FOLIC_ACID_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> IODINE_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> IRON_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> MAGNESIUM_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> MANGANESE_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> MOLYBDENUM_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> MONOUNSATURATED_FAT_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> NIACIN_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> PANTOTHENIC_ACID_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> PHOSPHORUS_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> POLYUNSATURATED_FAT_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> POTASSIUM_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> PROTEIN_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> RIBOFLAVIN_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> SATURATED_FAT_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> SELENIUM_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> SODIUM_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> SUGAR_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> THIAMIN_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> TOTAL_CARBOHYDRATE_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> TOTAL_FAT_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> TRANS_FAT_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> UNSATURATED_FAT_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> VITAMIN_A_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> VITAMIN_B12_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> VITAMIN_B6_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> VITAMIN_C_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> VITAMIN_D_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> VITAMIN_E_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> VITAMIN_K_TOTAL;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> ZINC_TOTAL;
   }
 
   public final class OvulationTestRecord implements androidx.health.connect.client.records.Record {
@@ -1156,6 +1414,10 @@ package androidx.health.connect.client.records {
   }
 
   public static final class OvulationTestRecord.Companion {
+    property public static final int RESULT_HIGH;
+    property public static final int RESULT_INCONCLUSIVE;
+    property public static final int RESULT_NEGATIVE;
+    property public static final int RESULT_POSITIVE;
   }
 
   public final class OxygenSaturationRecord implements androidx.health.connect.client.records.Record {
@@ -1239,6 +1501,12 @@ package androidx.health.connect.client.records {
   }
 
   public static final class PlannedExerciseStep.Companion {
+    property public static final int EXERCISE_PHASE_ACTIVE;
+    property public static final int EXERCISE_PHASE_COOLDOWN;
+    property public static final int EXERCISE_PHASE_RECOVERY;
+    property public static final int EXERCISE_PHASE_REST;
+    property public static final int EXERCISE_PHASE_UNKNOWN;
+    property public static final int EXERCISE_PHASE_WARMUP;
   }
 
   public final class PowerRecord implements androidx.health.connect.client.records.Record {
@@ -1262,6 +1530,9 @@ package androidx.health.connect.client.records {
   }
 
   public static final class PowerRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Power> POWER_AVG;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Power> POWER_MAX;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Power> POWER_MIN;
   }
 
   public static final class PowerRecord.Sample {
@@ -1306,6 +1577,9 @@ package androidx.health.connect.client.records {
   }
 
   public static final class RestingHeartRateRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Long> BPM_AVG;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Long> BPM_MAX;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Long> BPM_MIN;
   }
 
   public final class SexualActivityRecord implements androidx.health.connect.client.records.Record {
@@ -1325,6 +1599,9 @@ package androidx.health.connect.client.records {
   }
 
   public static final class SexualActivityRecord.Companion {
+    property public static final int PROTECTION_USED_PROTECTED;
+    property public static final int PROTECTION_USED_UNKNOWN;
+    property public static final int PROTECTION_USED_UNPROTECTED;
   }
 
   public final class SkinTemperatureRecord implements androidx.health.connect.client.records.Record {
@@ -1356,6 +1633,13 @@ package androidx.health.connect.client.records {
   }
 
   public static final class SkinTemperatureRecord.Companion {
+    property public static final int MEASUREMENT_LOCATION_FINGER;
+    property public static final int MEASUREMENT_LOCATION_TOE;
+    property public static final int MEASUREMENT_LOCATION_UNKNOWN;
+    property public static final int MEASUREMENT_LOCATION_WRIST;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.TemperatureDelta> TEMPERATURE_DELTA_AVG;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.TemperatureDelta> TEMPERATURE_DELTA_MAX;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.TemperatureDelta> TEMPERATURE_DELTA_MIN;
   }
 
   public static final class SkinTemperatureRecord.Delta {
@@ -1397,6 +1681,15 @@ package androidx.health.connect.client.records {
   }
 
   public static final class SleepSessionRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.time.Duration> SLEEP_DURATION_TOTAL;
+    property public static final int STAGE_TYPE_AWAKE;
+    property public static final int STAGE_TYPE_AWAKE_IN_BED;
+    property public static final int STAGE_TYPE_DEEP;
+    property public static final int STAGE_TYPE_LIGHT;
+    property public static final int STAGE_TYPE_OUT_OF_BED;
+    property public static final int STAGE_TYPE_REM;
+    property public static final int STAGE_TYPE_SLEEPING;
+    property public static final int STAGE_TYPE_UNKNOWN;
   }
 
   public static final class SleepSessionRecord.Stage {
@@ -1430,6 +1723,9 @@ package androidx.health.connect.client.records {
   }
 
   public static final class SpeedRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Velocity> SPEED_AVG;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Velocity> SPEED_MAX;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Velocity> SPEED_MIN;
   }
 
   public static final class SpeedRecord.Sample {
@@ -1461,13 +1757,16 @@ package androidx.health.connect.client.records {
   }
 
   public static final class StepsCadenceRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Double> RATE_AVG;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Double> RATE_MAX;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Double> RATE_MIN;
   }
 
   public static final class StepsCadenceRecord.Sample {
     ctor public StepsCadenceRecord.Sample(java.time.Instant time, @FloatRange(from=0.0, to=10000.0) double rate);
     method public double getRate();
     method public java.time.Instant getTime();
-    property public final double rate;
+    property @FloatRange(from=0.0, to=10000.0) public final double rate;
     property public final java.time.Instant time;
   }
 
@@ -1479,7 +1778,7 @@ package androidx.health.connect.client.records {
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public java.time.Instant getStartTime();
     method public java.time.ZoneOffset? getStartZoneOffset();
-    property public final long count;
+    property @IntRange(from=1L, to=1000000L) public final long count;
     property public java.time.Instant endTime;
     property public java.time.ZoneOffset? endZoneOffset;
     property public androidx.health.connect.client.records.metadata.Metadata metadata;
@@ -1490,6 +1789,7 @@ package androidx.health.connect.client.records {
   }
 
   public static final class StepsRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Long> COUNT_TOTAL;
   }
 
   public final class TotalCaloriesBurnedRecord implements androidx.health.connect.client.records.Record {
@@ -1511,6 +1811,7 @@ package androidx.health.connect.client.records {
   }
 
   public static final class TotalCaloriesBurnedRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Energy> ENERGY_TOTAL;
   }
 
   public final class Vo2MaxRecord implements androidx.health.connect.client.records.Record {
@@ -1535,6 +1836,12 @@ package androidx.health.connect.client.records {
   }
 
   public static final class Vo2MaxRecord.Companion {
+    property public static final int MEASUREMENT_METHOD_COOPER_TEST;
+    property public static final int MEASUREMENT_METHOD_HEART_RATE_RATIO;
+    property public static final int MEASUREMENT_METHOD_METABOLIC_CART;
+    property public static final int MEASUREMENT_METHOD_MULTISTAGE_FITNESS_TEST;
+    property public static final int MEASUREMENT_METHOD_OTHER;
+    property public static final int MEASUREMENT_METHOD_ROCKPORT_FITNESS_TEST;
   }
 
   public final class WeightRecord implements androidx.health.connect.client.records.Record {
@@ -1554,6 +1861,9 @@ package androidx.health.connect.client.records {
   }
 
   public static final class WeightRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> WEIGHT_AVG;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> WEIGHT_MAX;
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends androidx.health.connect.client.units.Mass> WEIGHT_MIN;
   }
 
   public final class WheelchairPushesRecord implements androidx.health.connect.client.records.Record {
@@ -1575,6 +1885,7 @@ package androidx.health.connect.client.records {
   }
 
   public static final class WheelchairPushesRecord.Companion {
+    property public final androidx.health.connect.client.aggregate.AggregateMetric<? extends java.lang.Long> COUNT_TOTAL;
   }
 
 }
@@ -1609,6 +1920,15 @@ package androidx.health.connect.client.records.metadata {
   }
 
   public static final class Device.Companion {
+    property public static final int TYPE_CHEST_STRAP;
+    property public static final int TYPE_FITNESS_BAND;
+    property public static final int TYPE_HEAD_MOUNTED;
+    property public static final int TYPE_PHONE;
+    property public static final int TYPE_RING;
+    property public static final int TYPE_SCALE;
+    property public static final int TYPE_SMART_DISPLAY;
+    property public static final int TYPE_UNKNOWN;
+    property public static final int TYPE_WATCH;
   }
 
   public final class Metadata {
@@ -1636,6 +1956,10 @@ package androidx.health.connect.client.records.metadata {
   }
 
   public static final class Metadata.Companion {
+    property public static final int RECORDING_METHOD_ACTIVELY_RECORDED;
+    property public static final int RECORDING_METHOD_AUTOMATICALLY_RECORDED;
+    property public static final int RECORDING_METHOD_MANUAL_ENTRY;
+    property public static final int RECORDING_METHOD_UNKNOWN;
   }
 
 }

@@ -112,7 +112,7 @@ package androidx.glance.template {
     method public int getSize();
     property public final int aspectRatio;
     property public final java.util.List<androidx.glance.template.TemplateImageWithDescription> images;
-    property public final int priority;
+    property @IntRange(from=0L) public final int priority;
     property public final int size;
   }
 
@@ -231,7 +231,7 @@ package androidx.glance.template {
     method public androidx.glance.template.TemplateText getText1();
     method public androidx.glance.template.TemplateText? getText2();
     method public androidx.glance.template.TemplateText? getText3();
-    property public final int priority;
+    property @IntRange(from=0L) public final int priority;
     property public final androidx.glance.template.TemplateText text1;
     property public final androidx.glance.template.TemplateText? text2;
     property public final androidx.glance.template.TemplateText? text3;
