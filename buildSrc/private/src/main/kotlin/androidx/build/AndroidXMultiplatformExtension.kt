@@ -51,6 +51,7 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinWasmTargetDsl
 import org.jetbrains.kotlin.gradle.targets.js.ir.DefaultIncrementalSyncTask
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
+import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
@@ -663,8 +664,9 @@ open class AndroidXMultiplatformExtension(val project: Project) {
             kotlinExtension.js() {
                 block?.execute(this)
                 binaries.library()
-                browser {}
+                browser { testTask { it.useKarma { useChromeHeadless() } } }
                 project.configureJs()
+                project.configureKotlinJsTests()
             }
         } else {
             null
@@ -679,14 +681,9 @@ open class AndroidXMultiplatformExtension(val project: Project) {
             kotlinExtension.wasmJs("wasmJs") {
                 block?.execute(this)
                 binaries.library()
-                browser {
-                    testTask {
-                        it.useKarma { useChromeHeadless() }
-                        // TODO(b/367673246) Enable when ChromeHeadless is in AndroidX
-                        it.enabled = false
-                    }
-                }
+                browser { testTask { it.useKarma { useChromeHeadless() } } }
                 project.configureWasm()
+                project.configureKotlinJsTests()
             }
         } else {
             null
@@ -751,6 +748,22 @@ private fun Project.configureNode() {
         it.version = getVersionByName("yarn")
         it.lockFileDirectory = File(project.getPrebuiltsRoot(), "androidx/javascript-for-kotlin")
         it.yarnLockMismatchReport = YarnLockMismatchReport.FAIL
+    }
+}
+
+private fun Project.configureKotlinJsTests() {
+    val unzipChromeBuildServiceProvider =
+        gradle.sharedServices.registrations.getByName("unzipChrome").service
+    tasks.withType(KotlinJsTest::class.java).configureEach { task ->
+        task.usesService(unzipChromeBuildServiceProvider)
+        // Remove doFirst and switch to FileProperty property to set browser path when issue
+        // https://youtrack.jetbrains.com/issue/KT-72514 is resolved
+        task.doFirst {
+            task.environment(
+                "CHROME_BIN",
+                (unzipChromeBuildServiceProvider.get() as UnzipChromeBuildService).getChromePath()
+            )
+        }
     }
 }
 

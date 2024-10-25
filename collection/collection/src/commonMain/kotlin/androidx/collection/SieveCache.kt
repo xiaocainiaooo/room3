@@ -21,6 +21,7 @@ package androidx.collection
 import androidx.annotation.IntRange
 import androidx.collection.internal.EMPTY_OBJECTS
 import androidx.collection.internal.requirePrecondition
+import kotlin.js.JsName
 import kotlin.jvm.JvmField
 import kotlin.math.max
 
@@ -156,6 +157,7 @@ public constructor(
      *
      * @see capacity
      */
+    @JsName("jsCount")
     public val count: Int
         get() = _count
 

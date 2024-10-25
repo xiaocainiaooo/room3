@@ -225,12 +225,14 @@ private inline fun <E, T : E?> SparseArrayCompat<E>.internalGet(key: Int, defaul
 
 @Suppress("NOTHING_TO_INLINE")
 internal fun <E> SparseArrayCompat<E>.commonGet(key: Int): E? {
-    return internalGet(key, null)
+    // TODO(b/375562182) revert the change done here in aosp/375562182 after lib targets K2
+    return internalGet<E, E?>(key, null)
 }
 
 @Suppress("NOTHING_TO_INLINE")
 internal fun <E> SparseArrayCompat<E>.commonGet(key: Int, defaultValue: E): E {
-    return internalGet(key, defaultValue)
+    // TODO(b/375562182) revert the change done here in aosp/375562182 after lib targets K2
+    return internalGet<E, E>(key, defaultValue)
 }
 
 @Suppress("NOTHING_TO_INLINE")
