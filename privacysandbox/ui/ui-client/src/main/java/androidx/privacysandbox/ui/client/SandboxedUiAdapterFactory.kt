@@ -33,9 +33,11 @@ import androidx.annotation.RequiresApi
 import androidx.privacysandbox.ui.client.RemoteCallManager.addBinderDeathListener
 import androidx.privacysandbox.ui.client.RemoteCallManager.closeRemoteSession
 import androidx.privacysandbox.ui.client.RemoteCallManager.tryToCallRemoteObject
+import androidx.privacysandbox.ui.core.IDelegatingSandboxedUiAdapter
 import androidx.privacysandbox.ui.core.IRemoteSessionClient
 import androidx.privacysandbox.ui.core.IRemoteSessionController
 import androidx.privacysandbox.ui.core.ISandboxedUiAdapter
+import androidx.privacysandbox.ui.core.ProtocolConstants
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.core.SessionObserverFactory
 import java.lang.reflect.InvocationHandler
@@ -64,7 +66,24 @@ object SandboxedUiAdapterFactory {
                 "Invalid bundle, missing $UI_ADAPTER_BINDER."
             }
         val adapterInterface = ISandboxedUiAdapter.Stub.asInterface(uiAdapterBinder)
-
+        // the following check for DelegatingAdapter check must happen before the checks for
+        // remote/local binder as the checks below have fallback to a RemoteAdapter if it's not
+        // local.
+        if (
+            uiAdapterBinder.interfaceDescriptor?.equals(
+                "androidx.privacysandbox.ui.core.IDelegatingSandboxedUiAdapter"
+            ) == true
+        ) {
+            val delegate =
+                coreLibInfo.getBundle(ProtocolConstants.delegateKey)
+                    ?: throw UnsupportedOperationException(
+                        "DelegatingAdapter must have a non null delegate"
+                    )
+            return ClientDelegatingAdapter(
+                IDelegatingSandboxedUiAdapter.Stub.asInterface(uiAdapterBinder),
+                createFromCoreLibInfo(delegate)
+            )
+        }
         val forceUseRemoteAdapter = coreLibInfo.getBoolean(TEST_ONLY_USE_REMOTE_ADAPTER)
         val isLocalBinder =
             uiAdapterBinder.queryLocalInterface(ISandboxedUiAdapter.DESCRIPTOR) != null

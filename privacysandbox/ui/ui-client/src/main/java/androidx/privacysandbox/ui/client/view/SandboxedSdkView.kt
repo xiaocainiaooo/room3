@@ -32,6 +32,7 @@ import android.view.ViewParent
 import android.view.ViewTreeObserver
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
+import androidx.core.util.Consumer
 import androidx.customview.poolingcontainer.PoolingContainerListener
 import androidx.customview.poolingcontainer.addPoolingContainerListener
 import androidx.customview.poolingcontainer.isPoolingContainer
@@ -41,6 +42,7 @@ import androidx.privacysandbox.ui.client.view.SandboxedSdkUiSessionState.Active
 import androidx.privacysandbox.ui.client.view.SandboxedSdkUiSessionState.Idle
 import androidx.privacysandbox.ui.client.view.SandboxedSdkUiSessionState.Loading
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
+import androidx.privacysandbox.ui.core.SandboxedUiAdapter.SessionClient
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.min
 
@@ -96,6 +98,16 @@ sealed class SandboxedSdkUiSessionState private constructor() {
     class Error(val throwable: Throwable) : SandboxedSdkUiSessionState()
 }
 
+/** A type of client that may get refresh requests (to re-establish a session) */
+internal interface RefreshableSessionClient : SessionClient {
+    /**
+     * Called when the provider of content wants to refresh the ui session it holds.
+     *
+     * @param callback delivers success/failure of the refresh
+     */
+    fun onSessionRefreshRequested(callback: Consumer<Boolean>)
+}
+
 class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     ViewGroup(context, attrs) {
 
@@ -121,8 +133,10 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
 
     private var adapter: SandboxedUiAdapter? = null
     private var client: Client? = null
+    private var clientSecondary: Client? = null
     private var isZOrderOnTop = true
     private var contentView: View? = null
+    private var refreshCallback: Consumer<Boolean>? = null
     private var requestedWidth = -1
     private var requestedHeight = -1
     private var isTransitionGroupSet = false
@@ -205,27 +219,43 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
         return false
     }
 
-    private fun checkClientOpenSession() {
+    private fun checkClientOpenSession(
+        isSecondary: Boolean = false,
+        callback: Consumer<Boolean>? = null
+    ) {
         val adapter = adapter
         if (
-            client == null &&
-                adapter != null &&
+            adapter != null &&
                 windowInputToken != null &&
                 width > 0 &&
                 height > 0 &&
                 windowVisibility == View.VISIBLE
         ) {
-            stateListenerManager.currentUiSessionState = SandboxedSdkUiSessionState.Loading
-            client = Client(this)
-            adapter.openSession(
-                context,
-                windowInputToken!!,
-                width,
-                height,
-                isZOrderOnTop,
-                handler::post,
-                client!!
-            )
+            if (client == null && !isSecondary) {
+                stateListenerManager.currentUiSessionState = SandboxedSdkUiSessionState.Loading
+                client = Client(this)
+                adapter.openSession(
+                    context,
+                    windowInputToken!!,
+                    width,
+                    height,
+                    isZOrderOnTop,
+                    handler::post,
+                    client!!
+                )
+            } else if (client != null && isSecondary) {
+                clientSecondary = Client(this)
+                this.refreshCallback = callback
+                adapter.openSession(
+                    context,
+                    windowInputToken!!,
+                    width,
+                    height,
+                    isZOrderOnTop,
+                    handler::post,
+                    clientSecondary!!
+                )
+            }
         }
     }
 
@@ -491,8 +521,13 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
         super.removeView(surfaceView)
     }
 
+    /**
+     * A SandboxedSdkView may have one active primary client and a secondary client with which a
+     * session is being formed. Once [Client.onSessionOpened] is received on the secondaryClient we
+     * close the session with the primary client and promote the secondary to the primary client.
+     */
     internal class Client(private var sandboxedSdkView: SandboxedSdkView?) :
-        SandboxedUiAdapter.SessionClient {
+        RefreshableSessionClient {
 
         private var session: SandboxedUiAdapter.Session? = null
         private var pendingWidth: Int? = null
@@ -543,6 +578,10 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
                 return
             }
             val view = checkNotNull(sandboxedSdkView) { "SandboxedSdkView should not be null" }
+            if (this === view.clientSecondary) {
+                view.switchClient()
+                view.refreshCallback?.accept(true)
+            }
             view.setContentView(session.view)
             this.session = session
             val width = pendingWidth
@@ -561,14 +600,33 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
 
         override fun onSessionError(throwable: Throwable) {
             if (sandboxedSdkView == null) return
-
-            sandboxedSdkView?.onClientClosedSession(throwable)
+            sandboxedSdkView?.let { view ->
+                if (this == view.clientSecondary) {
+                    view.clientSecondary = null
+                    view.refreshCallback?.accept(false)
+                } else {
+                    view.onClientClosedSession(throwable)
+                }
+            }
         }
 
         override fun onResizeRequested(width: Int, height: Int) {
             if (sandboxedSdkView == null) return
             sandboxedSdkView?.requestResize(width, height)
         }
+
+        override fun onSessionRefreshRequested(callback: Consumer<Boolean>) {
+            sandboxedSdkView?.checkClientOpenSession(true, callback)
+        }
+    }
+
+    private fun switchClient() {
+        if (this.clientSecondary == null) {
+            throw java.lang.IllegalStateException("secondary client must be non null for switch")
+        }
+        // close session with primary client
+        this.client?.close()
+        this.client = this.clientSecondary
     }
 
     internal class StateListenerManager {

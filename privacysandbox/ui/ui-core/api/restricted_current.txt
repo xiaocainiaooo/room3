@@ -1,6 +1,21 @@
 // Signature format: 4.0
 package androidx.privacysandbox.ui.core {
 
+  public final class DelegatingSandboxedUiAdapter implements androidx.privacysandbox.ui.core.SandboxedUiAdapter {
+    ctor public DelegatingSandboxedUiAdapter(android.os.Bundle delegate);
+    method public void addDelegateChangeListener(androidx.privacysandbox.ui.core.DelegatingSandboxedUiAdapter.DelegateChangeListener listener);
+    method public void addObserverFactory(androidx.privacysandbox.ui.core.SessionObserverFactory sessionObserverFactory);
+    method public android.os.Bundle getDelegate();
+    method public void openSession(android.content.Context context, android.os.IBinder windowInputToken, int initialWidth, int initialHeight, boolean isZOrderOnTop, java.util.concurrent.Executor clientExecutor, androidx.privacysandbox.ui.core.SandboxedUiAdapter.SessionClient client);
+    method public void removeDelegateChangeListener(androidx.privacysandbox.ui.core.DelegatingSandboxedUiAdapter.DelegateChangeListener listener);
+    method public void removeObserverFactory(androidx.privacysandbox.ui.core.SessionObserverFactory sessionObserverFactory);
+    method public suspend Object? updateDelegate(android.os.Bundle delegate, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+  }
+
+  public static interface DelegatingSandboxedUiAdapter.DelegateChangeListener {
+    method public default suspend Object? onDelegateChanged(android.os.Bundle delegate, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+  }
+
   public final class SandboxedSdkViewUiInfo {
     ctor public SandboxedSdkViewUiInfo(int uiContainerWidth, int uiContainerHeight, android.graphics.Rect onScreenGeometry, float uiContainerOpacityHint);
     method public static androidx.privacysandbox.ui.core.SandboxedSdkViewUiInfo fromBundle(android.os.Bundle bundle);
