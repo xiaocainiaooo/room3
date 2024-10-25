@@ -152,6 +152,12 @@ package androidx.savedstate.internal {
   @kotlin.PublishedApi internal final class SavedStateUtils {
     method public inline <reified T> T getValueFromSavedState(String key, kotlin.jvm.functions.Function0<? extends T?> currentValue, kotlin.jvm.functions.Function1<? super java.lang.String,java.lang.Boolean> contains, kotlin.jvm.functions.Function0<? extends T> defaultValue);
     method public inline Void keyNotFoundError(String key);
+    property public static final boolean DEFAULT_BOOLEAN;
+    property public static final char DEFAULT_CHAR;
+    property public static final double DEFAULT_DOUBLE;
+    property public static final float DEFAULT_FLOAT;
+    property public static final int DEFAULT_INT;
+    property public static final long DEFAULT_LONG;
     field public static final boolean DEFAULT_BOOLEAN = false;
     field public static final char DEFAULT_CHAR = 0; // 0x0000 '\u0000'
     field public static final double DEFAULT_DOUBLE = 0.0;

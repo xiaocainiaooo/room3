@@ -102,6 +102,7 @@ package androidx.glance.appwidget {
   }
 
   public static final class GlanceAppWidgetReceiver.Companion {
+    property public static final String ACTION_DEBUG_UPDATE;
   }
 
   @SuppressCompatibility @androidx.glance.appwidget.ExperimentalGlanceRemoteViewsApi public final class GlanceRemoteViews {
@@ -302,6 +303,7 @@ package androidx.glance.appwidget.lazy {
   }
 
   public static final class LazyListScope.Companion {
+    property public static final long UnspecifiedItemId;
     field public static final long UnspecifiedItemId = -9223372036854775808L; // 0x8000000000000000L
   }
 
@@ -325,6 +327,7 @@ package androidx.glance.appwidget.lazy {
   }
 
   public static final class LazyVerticalGridScope.Companion {
+    property public static final long UnspecifiedItemId;
     field public static final long UnspecifiedItemId = -9223372036854775808L; // 0x8000000000000000L
   }
 

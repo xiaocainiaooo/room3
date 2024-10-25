@@ -82,6 +82,7 @@ package androidx.benchmark {
   }
 
   public static final class ProfilerConfig.MethodTracing.Companion {
+    property public final boolean AFFECTS_MEASUREMENTS_ON_THIS_DEVICE;
   }
 
   public static final class ProfilerConfig.StackSampling extends androidx.benchmark.ProfilerConfig {

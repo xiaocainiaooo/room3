@@ -529,12 +529,12 @@ package androidx.wear.compose.foundation.lazy {
     method public androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress? getScrollProgress(androidx.compose.ui.graphics.drawscope.DrawScope);
     method public androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress? getScrollProgress(androidx.compose.ui.graphics.GraphicsLayerScope);
     method public androidx.compose.ui.Modifier transformedHeight(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function2<? super java.lang.Integer,? super androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress,java.lang.Integer> heightProvider);
+    property public androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress? scrollProgress;
+    property public androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress? scrollProgress;
   }
 
   @kotlin.jvm.JvmInline public final value class TransformingLazyColumnItemScrollProgress {
     ctor public TransformingLazyColumnItemScrollProgress(float topOffsetFraction, float bottomOffsetFraction);
-    method public float getBottomOffsetFraction();
-    method public float getTopOffsetFraction();
     property public final float bottomOffsetFraction;
     property public final float topOffsetFraction;
   }
@@ -607,6 +607,8 @@ package androidx.wear.compose.foundation.pager {
 
   public final class PagerDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.gestures.TargetedFlingBehavior snapFlingBehavior(androidx.wear.compose.foundation.pager.PagerState state, optional androidx.compose.foundation.pager.PagerSnapDistance pagerSnapDistance, optional androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> decayAnimationSpec, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> snapAnimationSpec, optional @FloatRange(from=0.0, to=1.0) float snapPositionalThreshold);
+    property public static final int BeyondViewportPageCount;
+    property public static final float SwipeToDismissEdgeZoneFraction;
     field public static final int BeyondViewportPageCount = 0; // 0x0
     field public static final androidx.wear.compose.foundation.pager.PagerDefaults INSTANCE;
     field public static final float SwipeToDismissEdgeZoneFraction = 0.15f;

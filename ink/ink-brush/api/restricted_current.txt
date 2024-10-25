@@ -27,9 +27,9 @@ package androidx.ink.brush {
     method public androidx.ink.brush.Brush.Builder toBuilder();
     property @ColorInt public final int colorIntArgb;
     property @ColorLong public final long colorLong;
-    property public final float epsilon;
+    property @FloatRange(from=0.0, fromInclusive=false, to=kotlin.jvm.internal.DoubleCompanionObject.POSITIVE_INFINITY, toInclusive=false) public final float epsilon;
     property public final androidx.ink.brush.BrushFamily family;
-    property public final float size;
+    property @FloatRange(from=0.0, fromInclusive=false, to=kotlin.jvm.internal.DoubleCompanionObject.POSITIVE_INFINITY, toInclusive=false) public final float size;
     field public static final androidx.ink.brush.Brush.Companion Companion;
   }
 
@@ -71,6 +71,7 @@ package androidx.ink.brush {
   }
 
   public final class InputToolType {
+    property public final int value;
     field public static final androidx.ink.brush.InputToolType.Companion Companion;
     field public static final androidx.ink.brush.InputToolType MOUSE;
     field public static final androidx.ink.brush.InputToolType STYLUS;
@@ -79,6 +80,10 @@ package androidx.ink.brush {
   }
 
   public static final class InputToolType.Companion {
+    property public final androidx.ink.brush.InputToolType MOUSE;
+    property public final androidx.ink.brush.InputToolType STYLUS;
+    property public final androidx.ink.brush.InputToolType TOUCH;
+    property public final androidx.ink.brush.InputToolType UNKNOWN;
   }
 
   public final class StockBrushes {

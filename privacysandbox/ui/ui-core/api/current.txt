@@ -66,6 +66,7 @@ package androidx.privacysandbox.ui.core {
 
   public final class SdkRuntimeUiLibVersions {
     method public int getClientVersion();
+    property public static final int apiVersion;
     property public final int clientVersion;
     field public static final androidx.privacysandbox.ui.core.SdkRuntimeUiLibVersions INSTANCE;
     field public static final int apiVersion = 1; // 0x1

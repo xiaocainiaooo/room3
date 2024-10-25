@@ -38,6 +38,7 @@ package androidx.compose.foundation {
   @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi public final class BasicTooltipDefaults {
     method public androidx.compose.foundation.MutatorMutex getGlobalMutatorMutex();
     property public final androidx.compose.foundation.MutatorMutex GlobalMutatorMutex;
+    property public static final long TooltipDuration;
     field public static final androidx.compose.foundation.BasicTooltipDefaults INSTANCE;
     field public static final long TooltipDuration = 1500L; // 0x5dcL
   }
@@ -103,6 +104,9 @@ package androidx.compose.foundation {
   }
 
   @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi public final class ComposeFoundationFlags {
+    property public final boolean DragGesturePickUpEnabled;
+    property public final boolean NewNestedFlingPropagationEnabled;
+    property public final boolean RemoveBasicTextGraphicsLayerEnabled;
     field public static boolean DragGesturePickUpEnabled;
     field public static final androidx.compose.foundation.ComposeFoundationFlags INSTANCE;
     field public static boolean NewNestedFlingPropagationEnabled;
@@ -981,7 +985,6 @@ package androidx.compose.foundation.lazy.grid {
   }
 
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class GridItemSpan {
-    method public int getCurrentLineSpan();
     property public final int currentLineSpan;
   }
 
@@ -1019,6 +1022,8 @@ package androidx.compose.foundation.lazy.grid {
   }
 
   public static final class LazyGridItemInfo.Companion {
+    property public static final int UnknownColumn;
+    property public static final int UnknownRow;
     field public static final int UnknownColumn = -1; // 0xffffffff
     field public static final int UnknownRow = -1; // 0xffffffff
   }
@@ -1420,6 +1425,7 @@ package androidx.compose.foundation.pager {
   public final class PagerDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.gestures.TargetedFlingBehavior flingBehavior(androidx.compose.foundation.pager.PagerState state, optional androidx.compose.foundation.pager.PagerSnapDistance pagerSnapDistance, optional androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> decayAnimationSpec, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> snapAnimationSpec, optional @FloatRange(from=0.0, to=1.0) float snapPositionalThreshold);
     method @androidx.compose.runtime.Composable public androidx.compose.ui.input.nestedscroll.NestedScrollConnection pageNestedScrollConnection(androidx.compose.foundation.pager.PagerState state, androidx.compose.foundation.gestures.Orientation orientation);
+    property public static final int BeyondViewportPageCount;
     field public static final int BeyondViewportPageCount = 0; // 0x0
     field public static final androidx.compose.foundation.pager.PagerDefaults INSTANCE;
   }
@@ -1617,7 +1623,7 @@ package androidx.compose.foundation.shape {
     method @androidx.compose.runtime.Stable public static androidx.compose.foundation.shape.CornerSize CornerSize(float size);
     method @androidx.compose.runtime.Stable public static androidx.compose.foundation.shape.CornerSize CornerSize(@IntRange(from=0L, to=100L) int percent);
     method public static androidx.compose.foundation.shape.CornerSize getZeroCornerSize();
-    property public static final androidx.compose.foundation.shape.CornerSize ZeroCornerSize;
+    property @androidx.compose.runtime.Stable public static final androidx.compose.foundation.shape.CornerSize ZeroCornerSize;
   }
 
   public final class CutCornerShape extends androidx.compose.foundation.shape.CornerBasedShape {
@@ -1763,7 +1769,7 @@ package androidx.compose.foundation.text {
 
   public static final class KeyboardActions.Companion {
     method public androidx.compose.foundation.text.KeyboardActions getDefault();
-    property public final androidx.compose.foundation.text.KeyboardActions Default;
+    property @androidx.compose.runtime.Stable public final androidx.compose.foundation.text.KeyboardActions Default;
   }
 
   public final class KeyboardActionsKt {
@@ -1797,14 +1803,14 @@ package androidx.compose.foundation.text {
     property public final int imeAction;
     property public final int keyboardType;
     property public final androidx.compose.ui.text.input.PlatformImeOptions? platformImeOptions;
-    property public boolean shouldShowKeyboardOnFocus;
+    property @Deprecated public boolean shouldShowKeyboardOnFocus;
     property public final Boolean? showKeyboardOnFocus;
     field public static final androidx.compose.foundation.text.KeyboardOptions.Companion Companion;
   }
 
   public static final class KeyboardOptions.Companion {
     method public androidx.compose.foundation.text.KeyboardOptions getDefault();
-    property public final androidx.compose.foundation.text.KeyboardOptions Default;
+    property @androidx.compose.runtime.Stable public final androidx.compose.foundation.text.KeyboardOptions Default;
   }
 
 }

@@ -617,6 +617,9 @@ package androidx.compose.material3 {
     method public kotlin.ranges.IntRange getYearRange();
     property public final androidx.compose.material3.SelectableDates AllDates;
     property public final float TonalElevation;
+    property public static final String YearAbbrMonthDaySkeleton;
+    property public static final String YearMonthSkeleton;
+    property public static final String YearMonthWeekdayDaySkeleton;
     property public final kotlin.ranges.IntRange YearRange;
     property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape shape;
     field public static final androidx.compose.material3.DatePickerDefaults INSTANCE;
@@ -1787,7 +1790,7 @@ package androidx.compose.material3 {
     property public final float activeRangeEnd;
     property public final float activeRangeStart;
     property public final kotlin.jvm.functions.Function0<kotlin.Unit>? onValueChangeFinished;
-    property public final int steps;
+    property @IntRange(from=0L) public final int steps;
     property public final kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange;
   }
 
@@ -2154,7 +2157,7 @@ package androidx.compose.material3 {
     method public void setOnValueChangeFinished(kotlin.jvm.functions.Function0<kotlin.Unit>?);
     method public void setValue(float);
     property public final kotlin.jvm.functions.Function0<kotlin.Unit>? onValueChangeFinished;
-    property public final int steps;
+    property @IntRange(from=0L) public final int steps;
     property public final float value;
     property public final kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> valueRange;
   }
