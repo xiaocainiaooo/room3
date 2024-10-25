@@ -56,11 +56,13 @@ package androidx.savedstate {
     method public inline boolean isEmpty();
     method public inline boolean isNull(String key);
     method public inline int size();
+    method public java.util.Map<java.lang.String,java.lang.Object?> toMap();
     property public final android.os.Bundle source;
   }
 
   public final class SavedStateReader_androidKt {
     method @kotlin.PublishedApi internal static boolean contentDeepEquals(android.os.Bundle, android.os.Bundle other);
+    method @kotlin.PublishedApi internal static java.util.Map<java.lang.String,java.lang.Object?> toMap(android.os.Bundle);
   }
 
   public final class SavedStateRegistry {

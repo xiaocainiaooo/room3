@@ -444,4 +444,16 @@ internal constructor(
      * @return `true` if the two are deeply equal, `false` otherwise.
      */
     public fun contentDeepEquals(other: SavedState): Boolean
+
+    /**
+     * Returns a new [Map] containing all key-value pairs from the [SavedState].
+     *
+     * If a value within the [SavedState] is another [SavedState], it will also be recursively
+     * converted to a [Map]. Other values, including [List] and [Array], are copied by reference.
+     *
+     * The returned [Map] does not preserve the entry iteration order of the [SavedState].
+     *
+     * @return A [Map] containing all key-value pairs from the [SavedState].
+     */
+    public fun toMap(): Map<String, Any?>
 }

@@ -234,4 +234,20 @@ actual value class SavedStateReader actual constructor(actual val source: SavedS
         // Map implements `equals` as a content deep, there is no need to do anything else.
         return source.map == other.map
     }
+
+    actual fun toMap(): Map<String, Any?> = source.toMap()
+}
+
+@PublishedApi
+internal fun SavedState.toMap(): Map<String, Any?> {
+    return buildMap(capacity = this.map.size) {
+        for (key in this@toMap.map.keys) {
+            val value = this@toMap.map[key]
+            if (value is SavedState) {
+                put(key, value.toMap())
+            } else {
+                put(key, value)
+            }
+        }
+    }
 }
