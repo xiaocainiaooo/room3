@@ -17,7 +17,6 @@ package androidx.mediarouter.media;
 
 import android.content.Context;
 import android.content.IntentFilter;
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -104,7 +103,8 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
         @Nullable
         @Override
         public DynamicGroupRouteController onCreateDynamicGroupRouteController(
-                @NonNull String initialMemberRouteId, @Nullable Bundle controlHints) {
+                @NonNull String initialMemberRouteId,
+                @NonNull RouteControllerOptions routeControllerOptions) {
             mGroupController = new StubDynamicRouteController();
             return mGroupController;
         }
