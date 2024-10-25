@@ -239,6 +239,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
         project.workaroundPrebuiltTakingPrecedenceOverProject()
         project.configureSamplesProject()
         project.configureMaxDepVersions(androidXExtension)
+        project.configureUnzipChromeBuildService()
     }
 
     private fun initializeAndroidXExtension(project: Project): AndroidXExtension {
@@ -1653,6 +1654,13 @@ fun AndroidXExtension.validateMavenVersion() {
 fun Project.workaroundPrebuiltTakingPrecedenceOverProject() {
     project.configurations.configureEach { configuration ->
         configuration.resolutionStrategy.preferProjectModules()
+    }
+}
+
+private fun Project.configureUnzipChromeBuildService() {
+    gradle.sharedServices.registerIfAbsent("unzipChrome", UnzipChromeBuildService::class.java) {
+        it.parameters.browserDir.set(File(getPrebuiltsRoot(), "androidx/chrome-for-testing/"))
+        it.parameters.unzipToDir.set(getOutDirectory().resolve("chrome-bin"))
     }
 }
 

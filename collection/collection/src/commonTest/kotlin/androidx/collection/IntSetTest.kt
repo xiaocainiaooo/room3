@@ -15,6 +15,7 @@
  */
 package androidx.collection
 
+import kotlin.js.JsName
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -367,6 +368,7 @@ class IntSetTest {
     }
 
     @Test
+    @JsName("jsEquals")
     fun equals() {
         val set = MutableIntSet()
         set += 1

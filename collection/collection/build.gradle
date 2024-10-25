@@ -34,16 +34,17 @@ plugins {
 }
 
 androidXMultiplatform {
+    ios()
     jvm {
         withJava()
     }
-    mac()
     linux()
-    ios()
+    mac()
+    mingwX64()
+    tvos()
+    wasmJs()
     watchosDeviceArm64()
     watchos()
-    tvos()
-    mingwX64()
 
     defaultPlatform(PlatformIdentifier.JVM)
 
@@ -56,20 +57,26 @@ androidXMultiplatform {
         commonMain {
             dependencies {
                 api(libs.kotlinStdlib)
-                api("androidx.annotation:annotation:1.9.0")
+                api(project(":annotation:annotation"))
             }
         }
 
         commonTest {
             dependencies {
-                implementation(libs.kotlinTest)
                 implementation(libs.kotlinTestAnnotationsCommon)
-                implementation(libs.kotlinCoroutinesCore)
-                implementation(libs.kotlinCoroutinesTest)
+                // For KotlinWasm, versions of toolchain and stdlib need to be the same for tests:
+                // https://youtrack.jetbrains.com/issue/KT-71032
+                // So we force kotlin-test to be on Kotlin 2.
+                // Published artifacts are unaffected by this, they continue to target Kotlin 1.9
+                // TODO(b/375358921) Set to libs.kotlinTest when collection targets Kotlin 2
+                implementation("org.jetbrains.kotlin:kotlin-test:2.0.10")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
             }
         }
 
         jvmTest {
+            dependsOn(commonTest)
             dependencies {
                 implementation(libs.kotlinTestJunit)
                 implementation(libs.truth)
@@ -77,8 +84,12 @@ androidXMultiplatform {
             }
         }
 
-        nativeMain {
+        nonJvmMain {
             dependsOn(commonMain)
+        }
+
+        nativeMain {
+            dependsOn(nonJvmMain)
         }
 
         nativeTest {
@@ -101,6 +112,13 @@ androidXMultiplatform {
             dependsOn(nativeMain)
         }
 
+        webMain {
+            dependsOn(nonJvmMain)
+        }
+
+        wasmJsMain {
+            dependsOn(webMain)
+        }
 
         targets.configureEach { target ->
             if (target.platformType == KotlinPlatformType.native) {

@@ -66,10 +66,6 @@ fun Project.getDistributionDirectory(): File {
         .also { distDir -> distDir.mkdirs() }
 }
 
-private fun Project.getOutDirectory(): File {
-    return extensions.extraProperties.get("outDir") as File
-}
-
 /** Directory to put build info files for release service dependency files. */
 fun Project.getBuildInfoDirectory(): File = File(getDistributionDirectory(), "build-info")
 
