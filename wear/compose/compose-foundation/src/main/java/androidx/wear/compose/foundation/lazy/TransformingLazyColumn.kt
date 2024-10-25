@@ -47,39 +47,6 @@ import androidx.wear.compose.foundation.rotary.RotaryScrollableBehavior
 import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
 
-@Deprecated(
-    "Use TransformingLazyColumn instead.",
-    ReplaceWith(
-        "TransformingLazyColumn(modifier = modifier, state = state, verticalArrangement = verticalArrangement, horizontalAlignment = horizontalAlignment, flingBehavior = flingBehavior, userScrollEnabled = userScrollEnabled, rotaryScrollableBehavior = rotaryScrollableBehavior, content = content)"
-    )
-)
-@Composable
-fun LazyColumn(
-    modifier: Modifier = Modifier,
-    state: TransformingLazyColumnState = rememberTransformingLazyColumnState(),
-    verticalArrangement: Arrangement.Vertical =
-        Arrangement.spacedBy(
-            space = 4.dp,
-            // TODO: b/352513793 - Add support for reverseLayout.
-            alignment = Alignment.Top
-        ),
-    horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
-    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
-    userScrollEnabled: Boolean = true,
-    rotaryScrollableBehavior: RotaryScrollableBehavior? = RotaryScrollableDefaults.behavior(state),
-    content: TransformingLazyColumnScope.() -> Unit
-) =
-    TransformingLazyColumn(
-        modifier = modifier,
-        state = state,
-        verticalArrangement = verticalArrangement,
-        horizontalAlignment = horizontalAlignment,
-        flingBehavior = flingBehavior,
-        userScrollEnabled = userScrollEnabled,
-        rotaryScrollableBehavior = rotaryScrollableBehavior,
-        content = content
-    )
-
 /**
  * The vertically scrolling list that only composes and lays out the currently visible items. This
  * is a wear specific version of LazyColumn that adds support for scaling and morphing animations.

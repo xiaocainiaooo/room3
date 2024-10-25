@@ -27,12 +27,6 @@ import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastFirstOrNull
 
-@Deprecated(
-    "Use TransformingLazyColumnItemScope instead",
-    ReplaceWith("TransformingLazyColumnItemScope")
-)
-typealias LazyColumnItemScope = TransformingLazyColumnItemScope
-
 /** Receiver scope being used by the item content parameter of [TransformingLazyColumn]. */
 @TransformingLazyColumnScopeMarker
 sealed interface TransformingLazyColumnItemScope {
@@ -60,9 +54,6 @@ sealed interface TransformingLazyColumnItemScope {
             (measuredHeight: Int, scrollProgress: TransformingLazyColumnItemScrollProgress) -> Int
     ): Modifier
 }
-
-@Deprecated("Use TransformingLazyColumnScope instead", ReplaceWith("TransformingLazyColumnScope"))
-typealias LazyColumnScope = TransformingLazyColumnScope
 
 /** Receiver scope which is used by [TransformingLazyColumn]. */
 @TransformingLazyColumnScopeMarker

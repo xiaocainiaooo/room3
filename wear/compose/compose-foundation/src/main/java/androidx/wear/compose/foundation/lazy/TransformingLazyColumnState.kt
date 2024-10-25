@@ -39,20 +39,10 @@ import kotlin.math.abs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Deprecated(
-    "Use rememberTransformingLazyColumnState instead",
-    ReplaceWith("rememberTransformingLazyColumnState()")
-)
-@Composable
-fun rememberLazyColumnState() = rememberTransformingLazyColumnState()
-
 /** Creates a [TransformingLazyColumnState] that is remembered across compositions. */
 @Composable
 fun rememberTransformingLazyColumnState() =
     rememberSaveable(saver = TransformingLazyColumnState.Saver) { TransformingLazyColumnState() }
-
-@Deprecated("Use TransformingLazyColumnState instead", ReplaceWith("TransformingLazyColumnState"))
-typealias LazyColumnState = TransformingLazyColumnState
 
 /**
  * A state object that can be hoisted to control and observe scrolling.

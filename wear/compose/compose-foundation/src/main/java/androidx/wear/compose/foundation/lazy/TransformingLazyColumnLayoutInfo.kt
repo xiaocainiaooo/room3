@@ -21,12 +21,6 @@ import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
 
-@Deprecated(
-    "Use TransformingLazyColumnItemScrollProgress instead.",
-    ReplaceWith("TransformingLazyColumnItemScrollProgress")
-)
-typealias LazyColumnItemScrollProgress = TransformingLazyColumnItemScrollProgress
-
 /**
  * Scroll progress of an item in a [TransformingLazyColumn] before any modifications to the item's
  * height are applied (using [TransformingLazyColumnItemScope.transformedHeight] modifier).
@@ -93,12 +87,6 @@ internal constructor(private val packedValue: Long) {
     }
 }
 
-@Deprecated(
-    "Use TransformingLazyColumnVisibleItemInfo instead.",
-    ReplaceWith("TransformingLazyColumnVisibleItemInfo")
-)
-typealias LazyColumnVisibleItemInfo = TransformingLazyColumnVisibleItemInfo
-
 /** Represents an item that is visible in the [TransformingLazyColumn] component. */
 sealed interface TransformingLazyColumnVisibleItemInfo {
     /** The index of the item in the underlying data source. */
@@ -109,11 +97,6 @@ sealed interface TransformingLazyColumnVisibleItemInfo {
 
     /** The height of the item after applying height transformation. */
     val transformedHeight: Int
-
-    /** The height of the item after applying height transformation. */
-    @Deprecated("Use transformedHeight instead.", ReplaceWith("transformedHeight"))
-    val height: Int
-        get() = transformedHeight
 
     /**
      * The height of the item returned during the measurement phase and before height transformation
@@ -130,12 +113,6 @@ sealed interface TransformingLazyColumnVisibleItemInfo {
     /** The content type of the item which was passed to the item() or items() function. */
     val contentType: Any?
 }
-
-@Deprecated(
-    "Use TransformingLazyColumnLayoutInfo instead.",
-    ReplaceWith("TransformingLazyColumnLayoutInfo")
-)
-typealias LazyColumnLayoutInfo = TransformingLazyColumnLayoutInfo
 
 /** Holds the layout information for a [TransformingLazyColumn]. */
 sealed interface TransformingLazyColumnLayoutInfo {
