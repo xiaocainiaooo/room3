@@ -47,6 +47,7 @@ import androidx.wear.compose.integration.demos.common.ActivityDemo
 import androidx.wear.compose.integration.demos.common.Demo
 import androidx.wear.compose.integration.demos.common.DemoCategory
 import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material3.demos.RobotoFlexTypography
 import java.io.FileNotFoundException
 
 /** Main [Activity] for Wear Compose related demos. */
@@ -80,19 +81,23 @@ class DemoActivity : ComponentActivity() {
                         Navigator(allDemos, onBackPressedDispatcher, activityStarter)
                     }
                 MaterialTheme {
-                    DemoApp(
-                        currentDemo = navigator.currentDemo,
-                        parentDemo = navigator.parentDemo,
-                        onNavigateTo = { demo ->
-                            recents.addDemoToRecents(demo)
-                            navigator.navigateTo(demo)
-                        },
-                        onNavigateBack = {
-                            if (!navigator.navigateBack()) {
-                                ActivityCompat.finishAffinity(this)
+                    androidx.wear.compose.material3.MaterialTheme(
+                        typography = RobotoFlexTypography
+                    ) {
+                        DemoApp(
+                            currentDemo = navigator.currentDemo,
+                            parentDemo = navigator.parentDemo,
+                            onNavigateTo = { demo ->
+                                recents.addDemoToRecents(demo)
+                                navigator.navigateTo(demo)
+                            },
+                            onNavigateBack = {
+                                if (!navigator.navigateBack()) {
+                                    ActivityCompat.finishAffinity(this)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
     }
