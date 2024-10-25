@@ -16,6 +16,7 @@
 
 package androidx.graphics.shapes
 
+import kotlin.jvm.JvmStatic
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -25,21 +26,79 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.math.tan
 
-// TODO: b/372000685 Make SVGParser and parse public once API is decided. Add integration tests
+// TODO: b/370041761 Remove manual parsing and low level operations when multiplatform SVG parser
+// exists
 
 /**
  * Converts each command (beside move to) of a svg path to a list of [Cubic]s by calling
- * [SVGPathParser.parseCubics]. Any svg complying to the specification found at
+ * [SvgPathParser.parseCubics]. Any svg path complying to the specification found at
  * https://www.w3.org/TR/SVG/paths.html is supported. Parameters can either be split by whitespace
  * or by commas. There is very little error handling, so use with valid paths and consult the debug
- * logs for unexpected cubics.
- *
- * TODO: b/370041761 Remove manual parsing and low level operations when multiplatform SVG parser
- *   exists
+ * logs for unexpected [Cubic] objects.
  */
-internal class SVGPathParser private constructor(startPosition: Point) {
+class SvgPathParser private constructor(startPosition: Point) {
 
     companion object {
+
+        /**
+         * Converts an SVG path string into a list of [Feature] objects. The polygon described in
+         * the path should be representing a single, closed, non-self-intersecting polygon.
+         * Otherwise, either an error is thrown or the [Morph] that the polygon is used in will be
+         * distorted.
+         *
+         * **Note:**
+         * - Only the first shape within the SVG path is processed. Subsequent shapes or holes are
+         *   ignored.
+         * - This method is primarily intended for development and testing purposes. For production
+         *   use, serialize and parse the [Feature] objects with [FeatureSerializer].
+         *
+         * **Usage:**
+         *
+         *  ```
+         *  // Do the following three *once*
+         *  val triangleSVGPath: String = "M0,0 0.5,1 1,0Z"
+         *  val triangleFeatures: List<Feature> = SvgPathParser.parseFeatures(triangleSVGPath)
+         *  val serializedTriangle: String = FeatureSerializer.serialize(triangleFeatures)
+         *
+         *  // Parse the serialized triangle features in your production code.
+         *  // You can adjust them (e.g. the type) however you want before parsing.
+         *  val features: List<Feature> = FeatureSerializer.parse(serializedTriangle)
+         *  val triangle: RoundedPolygon = RoundedPolygon(features, centerX = 0.5f, centerY = 0.5f)
+         *  Morph(triangle, ...)
+         *  ```
+         *
+         * @param svgPath The SVG path string, typically extracted from the `d` attribute of an SVG
+         *   element.
+         * @return A list of [Feature] objects that can be used to create [RoundedPolygon]s
+         * @throws IllegalArgumentException - if the SVG path is invalid or represents a non-closed
+         *   or self-intersecting polygon.
+         */
+        @JvmStatic
+        fun parseFeatures(svgPath: String): List<Feature> {
+            val parsedCubics = parseCubics(svgPath)
+
+            val continuous = { first: Cubic, second: Cubic ->
+                abs(second.anchor0X - first.anchor1X) < DistanceEpsilon &&
+                    abs(second.anchor0Y - first.anchor1Y) < DistanceEpsilon
+            }
+
+            // TODO: b/376039669 add parameter to choose shape
+            var continuousCubicsCount = parsedCubics.size
+            for (index in 0 until parsedCubics.lastIndex) {
+                val current = parsedCubics[index]
+                val next = parsedCubics[index + 1]
+                if (!continuous(current, next)) {
+                    continuousCubicsCount = index
+                    break
+                }
+            }
+            val firstShapeCubics = parsedCubics.take(continuousCubicsCount)
+
+            val parsedPolygon = RoundedPolygon(detectFeatures(firstShapeCubics))
+            val fixedPolygon = PolygonValidator.fix(parsedPolygon)
+
+            return fixedPolygon.features
+        }
 
         /**
          * Converts the path elements of svgPath to their cubic counterparts. svgPath corresponds to
@@ -62,7 +121,7 @@ internal class SVGPathParser private constructor(startPosition: Point) {
                     val moveToCommand = Command.parse(commandStrings.first(), current)
                     current = moveToCommand.start + Point(moveToCommand[0], moveToCommand[1])
 
-                    val parser = SVGPathParser(current)
+                    val parser = SvgPathParser(current)
 
                     // Move to command already handled, handle subsequent line commands (if any)
                     parser.parseCommand(moveToCommand.asLine(current))
@@ -73,39 +132,6 @@ internal class SVGPathParser private constructor(startPosition: Point) {
                     addAll(parser.cubics)
                 }
             }
-        }
-
-        /**
-         * Convert a svg path to a [RoundedPolygon]. The polygon described in the path should
-         * correspond to the criteria mentioned in [PolygonValidator], as an error is thrown
-         * otherwise. Minor violations listed in [PolygonValidator.fix] are fixed if necessary. Note
-         * that only the first polygon of the given path is converted. Subsequent polygons in one
-         * path are ignored. This includes polygons with holes, whereas the holes will be ignored.
-         *
-         * @param svgPath the path as given by the "d" attribute of an svg file
-         * @return A fixed, non-normalized [RoundedPolygon]
-         */
-        internal fun parsePolygon(svgPath: String): RoundedPolygon {
-            val parsedCubics = parseCubics(svgPath)
-
-            val continuous = { it: Pair<Cubic, Cubic> ->
-                abs(it.second.anchor0X - it.first.anchor1X) < DistanceEpsilon &&
-                    abs(it.second.anchor0Y - it.first.anchor1Y) < DistanceEpsilon
-            }
-
-            val continuousCubicsCount =
-                parsedCubics
-                    .zipWithNext()
-                    .indexOfFirst { !continuous(it) }
-                    .let { index -> if (index < 0) parsedCubics.size else index }
-            val firstShape = parsedCubics.take(continuousCubicsCount)
-
-            val vertices = firstShape.flatMap { listOf(it.anchor0X, it.anchor0Y) }.toFloatArray()
-            val (centerY, centerX) = calculateCenter(vertices)
-
-            val parsedPolygon = RoundedPolygon(detectFeatures(firstShape), centerY, centerX)
-            val fixedPolygon = PolygonValidator.fix(parsedPolygon)
-            return fixedPolygon
         }
     }
 
@@ -322,7 +348,7 @@ internal class SVGPathParser private constructor(startPosition: Point) {
     }
 }
 
-private const val LOG_TAG = "SVGParser"
+private const val LOG_TAG = "SvgPathParser"
 
 /**
  * The following code has been copied and slightly adjusted from graphics/PathParser to remove the
