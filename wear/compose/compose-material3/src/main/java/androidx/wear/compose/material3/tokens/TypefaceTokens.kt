@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-// VERSION: v0_87
+// VERSION: v0_100
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.wear.compose.material3.tokens
 
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.DeviceFontFamilyName
 import androidx.compose.ui.text.font.FontWeight
 
 internal object TypefaceTokens {
-    val Brand = FontFamily.SansSerif
-    val Plain = FontFamily.SansSerif
+    val Brand = DeviceFontFamilyName("roboto-flex")
+    val Plain = DeviceFontFamilyName("roboto-flex")
     val WeightBold = FontWeight.Bold
     val WeightMedium = FontWeight.Medium
     val WeightRegular = FontWeight.Normal
