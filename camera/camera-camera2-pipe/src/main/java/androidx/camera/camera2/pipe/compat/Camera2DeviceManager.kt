@@ -51,8 +51,7 @@ internal data class RequestOpen(
  * executed sequentially, as the camera may take a while to be fully opened, and RequestClose()
  * might execute in parallel.
  */
-internal data class RequestClose(val activeCamera: VirtualCameraManager.ActiveCamera) :
-    CameraRequest()
+internal data class RequestClose(val activeCamera: ActiveCamera) : CameraRequest()
 
 internal data class RequestCloseById(val activeCameraId: CameraId) : CameraRequest()
 
@@ -68,35 +67,120 @@ internal object NoOpGraphListener : GraphListener {
     override fun onGraphError(graphStateError: GraphState.GraphStateError) {}
 }
 
-// A queue depth of 32 was deemed necessary in b/276051078 where a flood of requests can cause the
-// queue depth to go over 8. In the long run, we can perhaps look into refactoring and
-// reimplementing the request queue in a more robust way.
+internal interface Camera2DeviceManager {
+    /**
+     * Issue a request to open the specified camera. The camera will be delivered through
+     * [VirtualCamera.state] when opened, and the state will continue to provide updates to the
+     * state of the camera. If shared camera IDs are specified, the cameras won't be provided until
+     * all cameras are opened.
+     */
+    fun open(
+        cameraId: CameraId,
+        sharedCameraIds: List<CameraId>,
+        graphListener: GraphListener,
+        isPrewarm: Boolean,
+        isForegroundObserver: (Unit) -> Boolean,
+    ): VirtualCamera?
+
+    /**
+     * Connects and starts the underlying camera. Once the active camera timeout elapses and it
+     * hasn't been utilized, the camera is closed.
+     */
+    fun prewarm(cameraId: CameraId)
+
+    /** Submits a request to close the underlying camera. */
+    fun close(cameraId: CameraId)
+
+    /** Instructs Camera2DeviceManager to close all cameras. */
+    fun closeAll()
+}
+
+internal class ActiveCamera(
+    private val androidCameraState: AndroidCameraState,
+    internal val allCameraIds: Set<CameraId>,
+    scope: CoroutineScope,
+    channel: SendChannel<CameraRequest>
+) {
+    val cameraId: CameraId
+        get() = androidCameraState.cameraId
+
+    private val listenerJob: Job
+    private var current: VirtualCameraState? = null
+
+    private val wakelock =
+        WakeLock(
+            scope,
+            timeout = 1000,
+            callback = { channel.trySend(RequestClose(this)).isSuccess },
+            // Every ActiveCamera is associated with an opened camera. We should ensure that we
+            // issue a RequestClose eventually for every ActiveCamera created.
+            //
+            // A notable bug is b/264396089 where, because camera opens took too long, we didn't
+            // acquire a WakeLockToken, and thereby not issuing the request to close camera
+            // eventually.
+            startTimeoutOnCreation = true
+        )
+
+    init {
+        listenerJob =
+            scope.launch {
+                androidCameraState.state.collect {
+                    if (it is CameraStateClosing || it is CameraStateClosed) {
+                        wakelock.release()
+                        this.cancel()
+                    }
+                }
+            }
+    }
+
+    suspend fun connectTo(virtualCameraState: VirtualCameraState) {
+        val token = wakelock.acquire()
+        val previous = current
+        current = virtualCameraState
+
+        previous?.disconnect()
+        virtualCameraState.connect(androidCameraState.state, token)
+    }
+
+    fun close() {
+        wakelock.release()
+        androidCameraState.close()
+    }
+
+    suspend fun awaitClosed() {
+        androidCameraState.awaitClosed()
+    }
+}
+
+// TODO: b/307396261 - A queue depth of 64 was deemed necessary in b/276051078 and b/307396261 where
+//  a flood of requests can cause the queue depth to grow larger than anticipated. Rewrite the
+//  camera manager such that it handles these abnormal scenarios more robustly.
 private const val requestQueueDepth = 64
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 @Singleton
-internal class VirtualCameraManager
+internal class Camera2DeviceManagerImpl
 @Inject
 constructor(
     private val permissions: Permissions,
     private val retryingCameraStateOpener: RetryingCameraStateOpener,
     private val camera2ErrorProcessor: Camera2ErrorProcessor,
     private val threads: Threads
-) {
+) : Camera2DeviceManager {
     // TODO: Consider rewriting this as a MutableSharedFlow
     private val requestQueue: Channel<CameraRequest> = Channel(requestQueueDepth)
     private val activeCameras: MutableSet<ActiveCamera> = mutableSetOf()
     private val pendingRequestOpens = mutableListOf<RequestOpen>()
 
     init {
-        threads.globalScope.launch(CoroutineName("CXCP-VirtualCameraManager")) { requestLoop() }
+        threads.globalScope.launch(CoroutineName("CXCP-Camera2DeviceManager")) { requestLoop() }
     }
 
-    internal fun open(
+    override fun open(
         cameraId: CameraId,
         sharedCameraIds: List<CameraId>,
         graphListener: GraphListener,
-        isPrewarm: Boolean = false,
+        isPrewarm: Boolean,
         isForegroundObserver: (Unit) -> Boolean,
     ): VirtualCamera? {
         val result = VirtualCameraState(cameraId, graphListener, threads.globalScope)
@@ -105,7 +189,7 @@ constructor(
                 RequestOpen(result, sharedCameraIds, graphListener, isPrewarm, isForegroundObserver)
             )
         ) {
-            Log.error { "Camera open request failed: VirtualCameraManager queue size exceeded" }
+            Log.error { "Camera open request failed: Camera2DeviceManagerImpl queue size exceeded" }
             graphListener.onGraphError(
                 GraphState.GraphStateError(
                     CameraError.ERROR_CAMERA_OPENER,
@@ -117,20 +201,22 @@ constructor(
         return result
     }
 
-    /**
-     * Connects and starts the underlying camera. Once the, ActiveCamera, timeout elapses and it
-     * hasn't been utilized, the camera is closed.
-     */
-    internal fun prewarm(cameraId: CameraId) {
-        open(cameraId, emptyList(), NoOpGraphListener, isPrewarm = true) { _ -> false }
+    override fun prewarm(cameraId: CameraId) {
+        open(
+            cameraId = cameraId,
+            sharedCameraIds = emptyList(),
+            graphListener = NoOpGraphListener,
+            isPrewarm = true,
+        ) { _ ->
+            false
+        }
     }
 
-    /** Submits a request to close the underlying camera */
-    internal fun close(cameraId: CameraId) {
+    override fun close(cameraId: CameraId) {
         offerChecked(RequestCloseById(cameraId))
     }
 
-    internal fun closeAll() {
+    override fun closeAll() {
         if (!offerChecked(RequestCloseAll)) {
             Log.warn { "Failed to close all cameras: Close request submission failed" }
             return
@@ -364,63 +450,6 @@ constructor(
         // were doing other things (like opening a camera).
         while (!requestQueue.isEmpty) {
             requests.add(requestQueue.receive())
-        }
-    }
-
-    internal class ActiveCamera(
-        private val androidCameraState: AndroidCameraState,
-        internal val allCameraIds: Set<CameraId>,
-        scope: CoroutineScope,
-        channel: SendChannel<CameraRequest>
-    ) {
-        val cameraId: CameraId
-            get() = androidCameraState.cameraId
-
-        private val listenerJob: Job
-        private var current: VirtualCameraState? = null
-
-        private val wakelock =
-            WakeLock(
-                scope,
-                timeout = 1000,
-                callback = { channel.trySend(RequestClose(this)).isSuccess },
-                // Every ActiveCamera is associated with an opened camera. We should ensure that we
-                // issue a RequestClose eventually for every ActiveCamera created.
-                //
-                // A notable bug is b/264396089 where, because camera opens took too long, we didn't
-                // acquire a WakeLockToken, and thereby not issuing the request to close camera
-                // eventually.
-                startTimeoutOnCreation = true
-            )
-
-        init {
-            listenerJob =
-                scope.launch {
-                    androidCameraState.state.collect {
-                        if (it is CameraStateClosing || it is CameraStateClosed) {
-                            wakelock.release()
-                            this.cancel()
-                        }
-                    }
-                }
-        }
-
-        suspend fun connectTo(virtualCameraState: VirtualCameraState) {
-            val token = wakelock.acquire()
-            val previous = current
-            current = virtualCameraState
-
-            previous?.disconnect()
-            virtualCameraState.connect(androidCameraState.state, token)
-        }
-
-        fun close() {
-            wakelock.release()
-            androidCameraState.close()
-        }
-
-        suspend fun awaitClosed() {
-            androidCameraState.awaitClosed()
         }
     }
 
