@@ -48,6 +48,7 @@ androidx.compose.ui.spatial
 androidx.compose.ui.text
 androidx.compose.ui.viewinterop
 androidx.compose.ui.window
+androidx.lifecycle.compose
 androidx.navigation.compose
 androidx.wear.compose.foundation
 androidx.wear.compose.foundation.lazy

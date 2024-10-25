@@ -63,6 +63,7 @@ val systemPackages =
         packageNameHash("androidx.compose.ui.text"),
         packageNameHash("androidx.compose.ui.viewinterop"),
         packageNameHash("androidx.compose.ui.window"),
+        packageNameHash("androidx.lifecycle.compose"),
         packageNameHash("androidx.navigation.compose"),
         packageNameHash("androidx.wear.compose.foundation"),
         packageNameHash("androidx.wear.compose.foundation.lazy"),
