@@ -64,6 +64,7 @@ import java.util.Objects;
 public class FindInFileView extends LinearLayout {
     private static final char MATCH_STATUS_COUNTING = '\u2026';
     private static final String KEY_SUPER = "super";
+    private static final String KEY_FOCUS = "focus";
     private static final String KEY_IS_SAVED = "is_saved";
     private static final String KEY_MATCH_RECTS = "match_rects";
     private static final String KEY_SELECTED_PAGE = "selected_page";
@@ -86,6 +87,7 @@ public class FindInFileView extends LinearLayout {
 
     private boolean mIsAnnotationIntentResolvable;
     private boolean mIsRestoring;
+    private boolean mFocus;
     private int mViewingPage;
     private int mSelectedMatch;
     private MatchRects mMatches;
@@ -99,7 +101,45 @@ public class FindInFileView extends LinearLayout {
                     boolean mBackwards = (v == mPrevButton);
                     mFindInFileListener.onFindNextMatch(mQueryBox.getText().toString(), mBackwards);
                 }
+            } else if (v == mCloseButton) {
+                resetFindInFile();
+                if (mIsAnnotationIntentResolvable) {
+                    mImmersiveModeRequester.requestImmersiveModeChange(false);
+                }
             }
+        }
+    };
+
+    private final FindInFileListener mFindInFileListenerSetter = new FindInFileListener() {
+        @Override
+        public boolean onQueryTextChange(@androidx.annotation.Nullable String query) {
+            if (mSearchModel != null && mPaginatedView != null) {
+                mSearchModel.setQuery(query, getViewingPage());
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean onFindNextMatch(String query, boolean backwards) {
+            if (mSearchModel != null) {
+                CycleRange.Direction direction;
+                if (backwards) {
+                    direction = CycleRange.Direction.BACKWARDS;
+                } else {
+                    direction = CycleRange.Direction.FORWARDS;
+                }
+                mSearchModel.selectNextMatch(direction,
+                        mPaginatedView.getPageRangeHandler().getVisiblePage());
+                return true;
+            }
+            return false;
+        }
+
+        @androidx.annotation.Nullable
+        @Override
+        public ObservableValue<MatchCount> matchCount() {
+            return mSearchModel != null ? mSearchModel.matchCount() : null;
         }
     };
 
@@ -185,17 +225,22 @@ public class FindInFileView extends LinearLayout {
         super(context, attrs);
         LayoutInflater.from(context).inflate(R.layout.find_in_file, this, true);
 
+        // Init UI Elements
         mQueryBox = (TextView) findViewById(R.id.find_query_box);
         mPrevButton = findViewById(R.id.find_prev_btn);
         mNextButton = findViewById(R.id.find_next_btn);
         mMatchStatus = (TextView) findViewById(R.id.match_status_textview);
         mCloseButton = findViewById(R.id.close_btn);
+
+        // Set Listeners
         mQueryBox.addTextChangedListener(mOnQueryTextListener);
         mQueryBox.setOnEditorActionListener(mOnActionListener);
         mPrevButton.setOnClickListener(mOnClickListener);
         mNextButton.setOnClickListener(mOnClickListener);
         mCloseButton.setOnClickListener(mOnClickListener);
-        this.setFocusableInTouchMode(true);
+
+        // Set Focus In Touch Mode
+        setFocusInTouchMode();
     }
 
     @NonNull
@@ -203,6 +248,9 @@ public class FindInFileView extends LinearLayout {
     protected Parcelable onSaveInstanceState() {
         Bundle bundle = new Bundle();
         bundle.putParcelable(KEY_SUPER, super.onSaveInstanceState());
+        // Save TextView Focus State
+        bundle.putBoolean(KEY_FOCUS, mQueryBox.hasFocus());
+        // Save SearchModel State
         if (mSearchModel != null && mSearchModel.selectedMatch().get() != null) {
             bundle.putBoolean(KEY_IS_SAVED, true);
             bundle.putParcelable(KEY_MATCH_RECTS, Objects.requireNonNull(
@@ -218,6 +266,9 @@ public class FindInFileView extends LinearLayout {
     protected void onRestoreInstanceState(Parcelable state) {
         Bundle bundle = (Bundle) state;
         super.onRestoreInstanceState(bundle.getParcelable(KEY_SUPER, Parcelable.class));
+        // TextView Focus State
+        mFocus = bundle.getBoolean(KEY_FOCUS);
+        // SearchModel State
         if (bundle.getBoolean(KEY_IS_SAVED)) {
             mIsRestoring = true;
             mSelectedMatch = bundle.getInt(KEY_SELECTED_INDEX);
@@ -280,9 +331,15 @@ public class FindInFileView extends LinearLayout {
             if (mAnnotationButton != null && mAnnotationButton.getVisibility() == VISIBLE) {
                 mImmersiveModeRequester.requestImmersiveModeChange(true);
             }
-            setupFindInFileBtn();
-            WindowCompat.getInsetsController(((Activity) getContext()).getWindow(), this)
-                    .show(WindowInsetsCompat.Type.ime());
+            // We set the FIF listener after the document loads
+            // to prevent incomplete search results.
+            setFindInFileListener();
+            setMatchStatus();
+            // Requests the keyboard based on the focus flag
+            if (mFocus) {
+                queryBoxRequestFocus();
+            }
+            // Restores search model select state
             if (mIsRestoring) {
                 restoreSelectedMatch();
             }
@@ -291,12 +348,15 @@ public class FindInFileView extends LinearLayout {
         }
     }
 
-    /** Resets the visibility of the FindInFileView and resets the search query */
+    /**
+     * Resets the visibility of the FindInFileView and resets the search query
+     */
     public void resetFindInFile() {
         mOnClosedButtonCallback.run();
         this.setVisibility(GONE);
         mQueryBox.clearFocus();
         mQueryBox.setText("");
+        mFocus = true;
         mIsRestoring = false;
     }
 
@@ -310,60 +370,21 @@ public class FindInFileView extends LinearLayout {
         }
     }
 
-    private void setupFindInFileBtn() {
-        setFindInFileListener(this.makeFindInFileListener());
-        queryBoxRequestFocus();
-
-        mCloseButton.setOnClickListener(view -> {
-            resetFindInFile();
-            if (mIsAnnotationIntentResolvable) {
-                mImmersiveModeRequester.requestImmersiveModeChange(false);
-            }
-        });
-    }
-
-    private FindInFileListener makeFindInFileListener() {
-        return new FindInFileListener() {
-            @Override
-            public boolean onQueryTextChange(@androidx.annotation.Nullable String query) {
-                if (mSearchModel != null && mPaginatedView != null) {
-                    mSearchModel.setQuery(query, getViewingPage());
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public boolean onFindNextMatch(String query, boolean backwards) {
-                if (mSearchModel != null) {
-                    CycleRange.Direction direction;
-                    if (backwards) {
-                        direction = CycleRange.Direction.BACKWARDS;
-                    } else {
-                        direction = CycleRange.Direction.FORWARDS;
-                    }
-                    mSearchModel.selectNextMatch(direction,
-                            mPaginatedView.getPageRangeHandler().getVisiblePage());
-                    return true;
-                }
-                return false;
-            }
-
-            @androidx.annotation.Nullable
-            @Override
-            public ObservableValue<MatchCount> matchCount() {
-                return mSearchModel != null ? mSearchModel.matchCount() : null;
-            }
-        };
-    }
-
     /**
      * registers the {@link FindInFileListener}
      */
-    private void setFindInFileListener(@Nullable FindInFileListener findInFileListener) {
-        this.mFindInFileListener = findInFileListener;
+    private void setFindInFileListener() {
+        this.mFindInFileListener = mFindInFileListenerSetter;
+    }
+
+    /**
+     *  Sets match count observer and search for any existing string in QueryBox
+     */
+    private void setMatchStatus() {
+        // Set MatchCount Observer for Search
         setObservableMatchCount(
-                (findInFileListener != null) ? findInFileListener.matchCount() : null);
+                (mFindInFileListener != null) ? mFindInFileListener.matchCount() : null);
+        // Check for any existing string in QueryBox
         if (!mQueryBox.getText().toString().isEmpty()) {
             if (mFindInFileListener != null) {
                 mFindInFileListener.onQueryTextChange(mQueryBox.getText().toString());
@@ -383,10 +404,20 @@ public class FindInFileView extends LinearLayout {
     }
 
     /**
-     * Shows the keyboard when find in file view is inflated.
+     * Requests focus and shows the keyboard when find in file view is inflated.
      */
     private void queryBoxRequestFocus() {
         mQueryBox.requestFocus();
+        WindowCompat.getInsetsController(((Activity) getContext()).getWindow(), this)
+                .show(WindowInsetsCompat.Type.ime());
+    }
+
+    /**
+     * Enables touch mode focus for the view and sets the focus flag.
+     */
+    private void setFocusInTouchMode() {
+        this.setFocusableInTouchMode(true);
+        mFocus = true;
     }
 
     private int getViewingPage() {
