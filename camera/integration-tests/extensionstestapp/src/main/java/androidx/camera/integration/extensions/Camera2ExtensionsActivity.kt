@@ -310,6 +310,9 @@ class Camera2ExtensionsActivity : AppCompatActivity() {
      */
     private var measureStreamConfigurationLatency: Boolean = true
 
+    /** Used to wait for the camera is closed. */
+    private val cameraClosedIdlingResource = CountingIdlingResource("cameraClosed")
+
     /** Used to wait for the capture session is configured. */
     private val captureSessionConfiguredIdlingResource =
         CountingIdlingResource("captureSessionConfigured").apply { increment() }
@@ -951,6 +954,7 @@ class Camera2ExtensionsActivity : AppCompatActivity() {
                 return@async
             }
             setCurrentState(STATE_CAMERA_OPENING)
+            resetCameraClosedIdlingResource()
             manager.openCamera(
                 cameraId,
                 cameraTaskDispatcher.asExecutor(),
@@ -973,6 +977,9 @@ class Camera2ExtensionsActivity : AppCompatActivity() {
                         Log.d(TAG, "Camera ${device.id} - onClosed")
                         cameraDevice = null
                         setCurrentState(STATE_CAMERA_CLOSED)
+                        if (!cameraClosedIdlingResource.isIdleNow) {
+                            cameraClosedIdlingResource.decrement()
+                        }
                         determineNextStepOnUiThread(STATE_CAMERA_CLOSED, device.id)
                     }
 
@@ -1410,6 +1417,9 @@ class Camera2ExtensionsActivity : AppCompatActivity() {
     }
 
     @VisibleForTesting
+    fun getCameraClosedIdlingResource(): CountingIdlingResource = cameraClosedIdlingResource
+
+    @VisibleForTesting
     fun getCaptureSessionConfiguredIdlingResource(): CountingIdlingResource =
         captureSessionConfiguredIdlingResource
 
@@ -1418,6 +1428,12 @@ class Camera2ExtensionsActivity : AppCompatActivity() {
 
     @VisibleForTesting
     fun getImageSavedIdlingResource(): CountingIdlingResource = imageSavedIdlingResource
+
+    private fun resetCameraClosedIdlingResource() {
+        if (cameraClosedIdlingResource.isIdleNow) {
+            cameraClosedIdlingResource.increment()
+        }
+    }
 
     private fun resetCaptureSessionConfiguredIdlingResource() {
         if (captureSessionConfiguredIdlingResource.isIdleNow) {
