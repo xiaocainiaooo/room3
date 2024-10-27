@@ -31,6 +31,7 @@ import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.C
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.MediationOption
 import androidx.privacysandbox.ui.integration.sdkproviderutils.TestAdapters
 import androidx.privacysandbox.ui.integration.sdkproviderutils.ViewabilityHandler
+import androidx.privacysandbox.ui.integration.sdkproviderutils.fullscreen.FullscreenAd
 import androidx.privacysandbox.ui.integration.testaidl.IMediateeSdkApi
 import androidx.privacysandbox.ui.integration.testaidl.ISdkApi
 import androidx.privacysandbox.ui.provider.toCoreLibInfo
@@ -110,6 +111,11 @@ class SdkApi(private val sdkContext: Context) : ISdkApi.Stub() {
                 }
             }
         }
+    }
+
+    override fun launchFullscreenAd(launcherInfo: Bundle) {
+        val coroutineScope = MainScope()
+        coroutineScope.launch { FullscreenAd(sdkContext).show(launcherInfo) }
     }
 
     @OptIn(ExperimentalFeatures.DelegatingAdapterApi::class)
