@@ -204,6 +204,7 @@ private const val PETTYL = "pettyl,version=27"
 private const val HWCOR = "HWCOR,version=27"
 private const val Q2Q = "q2q,version=31"
 
+private const val PHYSICAL_PIXEL9 = "tokay,version=34"
 private const val MEDIUM_PHONE_34 = "MediumPhone.arm,version=34"
 private const val PIXEL2_33 = "Pixel2.arm,version=33"
 private const val PIXEL2_30 = "Pixel2.arm,version=30"
@@ -225,6 +226,7 @@ private const val FTL_ON_APIS_NAME = "ftlOnApis"
 private val devicesToRunOn =
     listOf(
         FTL_ON_APIS_NAME to listOf(), // instead read devices via repeatable --api
+        "ftlphysicalpixel9api34" to listOf(PHYSICAL_PIXEL9),
         "ftlmediumphoneapi34" to listOf(MEDIUM_PHONE_34),
         "ftlpixel2api33" to listOf(PIXEL2_33),
         "ftlpixel2api30" to listOf(PIXEL2_30),
