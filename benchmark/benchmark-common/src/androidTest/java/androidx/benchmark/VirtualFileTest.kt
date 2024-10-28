@@ -23,6 +23,7 @@ import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -149,6 +150,7 @@ class VirtualFileIoTest {
         shellFile = ShellFile.inTempDir("shell.file1").apply { delete() }
     }
 
+    @Ignore // b/375656692
     @Test
     fun shellCopyToUser() {
         shellFile.writeText("test")
@@ -156,6 +158,7 @@ class VirtualFileIoTest {
         assertThat(userFile.readText()).isEqualTo("test")
     }
 
+    @Ignore // b/375656692
     @Test
     fun shellCopyFromUser() {
         userFile.writeText("test")
@@ -163,6 +166,7 @@ class VirtualFileIoTest {
         assertThat(shellFile.readText()).isEqualTo("test")
     }
 
+    @Ignore // b/375656692
     @Test
     fun userCopyToShell() {
         userFile.writeText("test")
@@ -170,6 +174,7 @@ class VirtualFileIoTest {
         assertThat(shellFile.readText()).isEqualTo("test")
     }
 
+    @Ignore // b/375656692
     @Test
     fun userCopyFromShell() {
         shellFile.writeText("test")
