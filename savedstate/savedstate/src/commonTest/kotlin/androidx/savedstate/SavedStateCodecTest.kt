@@ -27,9 +27,13 @@ import kotlin.test.assertEquals
 import kotlin.time.Duration
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.builtins.IntArraySerializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
 
 @ExperimentalSerializationApi
@@ -191,14 +195,76 @@ internal class SavedStateCodecTest : RobolectricTest() {
     }
 
     @Test
+    fun arrays() {
+        intArrayOf(Int.MIN_VALUE, Int.MAX_VALUE).encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getIntArray("")).isEqualTo(intArrayOf(Int.MIN_VALUE, Int.MAX_VALUE))
+        }
+        longArrayOf(Long.MIN_VALUE, Long.MAX_VALUE).encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getLongArray("")).isEqualTo(longArrayOf(Long.MIN_VALUE, Long.MAX_VALUE))
+        }
+        booleanArrayOf(false, true).encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getBooleanArray("")).isEqualTo(booleanArrayOf(false, true))
+        }
+        charArrayOf(Char.MIN_VALUE, Char.MAX_VALUE).encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getCharArray("")).isEqualTo(charArrayOf(Char.MIN_VALUE, Char.MAX_VALUE))
+        }
+        floatArrayOf(Float.MIN_VALUE, Float.MAX_VALUE).encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getFloatArray("")).isEqualTo(floatArrayOf(Float.MIN_VALUE, Float.MAX_VALUE))
+        }
+        doubleArrayOf(Double.MIN_VALUE, Double.MAX_VALUE).encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getDoubleArray(""))
+                .isEqualTo(doubleArrayOf(Double.MIN_VALUE, Double.MAX_VALUE))
+        }
+        arrayOf("a", "b").encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getStringArray("")).isEqualTo(arrayOf("a", "b"))
+        }
+        // We still decompose nullable String arrays.
+        arrayOf("a", null).encodeDecode {
+            assertThat(size()).isEqualTo(2)
+            assertThat(getString("0")).isEqualTo("a")
+            assertThat(isNull("1")).isTrue()
+        }
+
+        MyColor(0, 128, 255).encodeDecode(MyColorIntArraySerializer) {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getIntArray("")).isEqualTo(intArrayOf(0, 128, 255))
+        }
+    }
+
+    @Test
     fun list() {
-        emptyList<Int>().encodeDecode()
+        emptyList<Int>().encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getIntList("")).isEqualTo(emptyList<Int>())
+        }
 
         listOf(1, 2, 3).encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getIntList("")).isEqualTo(listOf(1, 2, 3))
+        }
+
+        listOf("a", "b", "c").encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getStringList("")).isEqualTo(listOf("a", "b", "c"))
+        }
+
+        listOf("a", null, "c").encodeDecode {
             assertThat(size()).isEqualTo(3)
-            assertThat(getInt("0")).isEqualTo(1)
-            assertThat(getInt("1")).isEqualTo(2)
-            assertThat(getInt("2")).isEqualTo(3)
+            assertThat(getString("0")).isEqualTo("a")
+            assertThat(isNull("1")).isTrue()
+            assertThrows(IllegalStateException::class) { getString("1") }
+                .hasMessageThat()
+                .contains(
+                    "The saved state value associated with the key '1' is either null or not of the expected type. This might happen if the value was saved with a different type or if the saved state has been modified unexpectedly."
+                )
+            assertThat(getString("2")).isEqualTo("c")
         }
 
         listOf(1, 2, null, 4, 5, null).encodeDecode {
@@ -214,16 +280,8 @@ internal class SavedStateCodecTest : RobolectricTest() {
         // List of list.
         listOf(listOf(1, 2), listOf(3, 4)).encodeDecode {
             assertThat(size()).isEqualTo(2)
-            getSavedState("0").read {
-                assertThat(size()).isEqualTo(2)
-                assertThat(getInt("0")).isEqualTo(1)
-                assertThat(getInt("1")).isEqualTo(2)
-            }
-            getSavedState("1").read {
-                assertThat(size()).isEqualTo(2)
-                assertThat(getInt("0")).isEqualTo(3)
-                assertThat(getInt("1")).isEqualTo(4)
-            }
+            assertThat(getIntList("0")).isEqualTo(listOf(1, 2))
+            assertThat(getIntList("1")).isEqualTo(listOf(3, 4))
         }
 
         // List of list of list.
@@ -231,20 +289,12 @@ internal class SavedStateCodecTest : RobolectricTest() {
             assertThat(size()).isEqualTo(2)
             getSavedState("0").read {
                 assertThat(size()).isEqualTo(2)
-                getSavedState("0").read { assertThat(size()).isEqualTo(0) }
-                getSavedState("1").read {
-                    assertThat(size()).isEqualTo(2)
-                    assertThat(getInt("0")).isEqualTo(1)
-                    assertThat(getInt("1")).isEqualTo(2)
-                }
+                assertThat(getIntList("0")).isEqualTo(emptyList<Int>())
+                assertThat(getIntList("1")).isEqualTo(listOf(1, 2))
             }
             getSavedState("1").read {
                 assertThat(size()).isEqualTo(1)
-                getSavedState("0").read {
-                    assertThat(size()).isEqualTo(2)
-                    assertThat(getInt("0")).isEqualTo(3)
-                    assertThat(getInt("1")).isEqualTo(4)
-                }
+                assertThat(getIntList("0")).isEqualTo(listOf(3, 4))
             }
         }
 
@@ -255,11 +305,7 @@ internal class SavedStateCodecTest : RobolectricTest() {
             assertThat(size()).isEqualTo(1)
             getSavedState("myComponent").read {
                 assertThat(size()).isEqualTo(1)
-                getSavedState("list").read {
-                    assertThat(size()).isEqualTo(2)
-                    assertThat(getString("0")).isEqualTo("foo")
-                    assertThat(getString("1")).isEqualTo("bar")
-                }
+                assertThat(getStringList("list")).isEqualTo(listOf("foo", "bar"))
             }
         }
 
@@ -267,18 +313,11 @@ internal class SavedStateCodecTest : RobolectricTest() {
         val myDelegatedList = MyDelegatedList(arrayListOf(1, 3, 5))
         myDelegatedList.encodeDecode(serializer<MyDelegatedList<Int>>()) {
             assertThat(size()).isEqualTo(1)
-            getSavedState("values").read {
-                assertThat(size()).isEqualTo(3)
-                assertThat(getInt("0")).isEqualTo(1)
-                assertThat(getInt("1")).isEqualTo(3)
-                assertThat(getInt("2")).isEqualTo(5)
-            }
+            assertThat(getIntList("values")).isEqualTo(listOf(1, 3, 5))
         }
         myDelegatedList.encodeDecode(serializer<List<Int>>()) {
-            assertThat(size()).isEqualTo(3)
-            assertThat(getInt("0")).isEqualTo(1)
-            assertThat(getInt("1")).isEqualTo(3)
-            assertThat(getInt("2")).isEqualTo(5)
+            assertThat(size()).isEqualTo(1)
+            assertThat(getIntList("")).isEqualTo(listOf(1, 3, 5))
         }
     }
 
@@ -500,4 +539,22 @@ private class MyDelegatedList<E>(val values: ArrayList<E>) : MutableList<E> by v
 @Serializable
 object MyObject {
     val foo = "bar"
+}
+
+@Serializable private data class MyColor(val r: Int, val g: Int, val b: Int)
+
+@OptIn(ExperimentalSerializationApi::class)
+private object MyColorIntArraySerializer : KSerializer<MyColor> {
+    private val delegateSerializer = IntArraySerializer()
+    override val descriptor = SerialDescriptor("MyColor", delegateSerializer.descriptor)
+
+    override fun serialize(encoder: Encoder, value: MyColor) {
+        val data = value.run { intArrayOf(r, g, b) }
+        encoder.encodeSerializableValue(delegateSerializer, data)
+    }
+
+    override fun deserialize(decoder: Decoder): MyColor {
+        val array = decoder.decodeSerializableValue(delegateSerializer)
+        return MyColor(array[0], array[1], array[2])
+    }
 }
