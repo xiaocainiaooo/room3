@@ -52,6 +52,7 @@ import androidx.appsearch.app.SearchSuggestionSpec;
 import androidx.appsearch.app.SetSchemaResponse;
 import androidx.appsearch.app.StorageInfo;
 import androidx.appsearch.exceptions.AppSearchException;
+import androidx.appsearch.flags.Flags;
 import androidx.appsearch.localstorage.converter.GenericDocumentToProtoConverter;
 import androidx.appsearch.localstorage.converter.ResultCodeToProtoConverter;
 import androidx.appsearch.localstorage.converter.SchemaToProtoConverter;
@@ -1073,13 +1074,14 @@ public final class AppSearchImpl implements Closeable {
 
             // Only update caches if the document is successfully put to Icing.
             addToMap(mNamespaceMapLocked, prefix, finalDocument.getNamespace());
-            if (!putResultProto.getWasReplacement()) {
+            if (!Flags.enableDocumentLimiterReplaceTracking()
+                    || !putResultProto.getWasReplacement()) {
                 // If the document was a replacement, then there is no need to report it because the
                 // number of documents has not changed. We only need to report "true" additions to
                 // the DocumentLimiter.
-                // Even replacement document will consume a document id, but the limit is only
-                // intended to apply to "living" documents. It is the responsibility of AppSearch
-                // it's optimization task to reclaim space when needed.
+                // Although a replacement document will consume a document id, the limit is only
+                // intended to apply to "living" documents. It is the responsibility of AppSearch's
+                // optimization task to reclaim space when needed.
                 mDocumentLimiterLocked.reportDocumentAdded(packageName);
             }
 
@@ -1125,7 +1127,10 @@ public final class AppSearchImpl implements Closeable {
                             + "limit of " + mConfig.getMaxDocumentSizeBytes() + " bytes");
         }
 
-        mDocumentLimiterLocked.enforceDocumentCountLimit(packageName);
+        mDocumentLimiterLocked.enforceDocumentCountLimit(
+                packageName,
+                () -> getRawStorageInfoProto().getDocumentStorageInfo()
+                        .getNamespaceStorageInfoList());
     }
 
     /**

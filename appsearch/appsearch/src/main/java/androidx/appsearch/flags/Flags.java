@@ -306,4 +306,11 @@ public final class Flags {
     public static boolean enableAdditionalBuilderCopyConstructors() {
         return true;
     }
+
+    /**
+     * Whether or not the AppSearch should keep track of replaces when calculating the document
+     * limit or should call into Icing to get the current active document count when the limit is
+     * reached.
+     */
+    public static boolean enableDocumentLimiterReplaceTracking() { return true; }
 }
