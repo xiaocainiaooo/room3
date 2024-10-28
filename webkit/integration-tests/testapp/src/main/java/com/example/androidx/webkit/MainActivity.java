@@ -99,6 +99,9 @@ public class MainActivity extends AppCompatActivity {
                 new MenuListView.MenuItem(
                         getResources().getString(R.string.restricted_content_activity_title),
                         new Intent(activityContext, RestrictedContentActivity.class)),
+                new MenuListView.MenuItem(
+                        getResources().getString(R.string.async_startup_activity_title),
+                        new Intent(activityContext, AsyncStartUpActivity.class)),
         };
         listView.setItems(menuItems);
     }

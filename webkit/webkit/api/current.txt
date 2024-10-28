@@ -381,6 +381,10 @@ package androidx.webkit {
     method @RequiresFeature(name=androidx.webkit.WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") @UiThread public static void setWebViewRenderProcessClient(android.webkit.WebView, androidx.webkit.WebViewRenderProcessClient?);
     method @RequiresFeature(name=androidx.webkit.WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") @UiThread public static void setWebViewRenderProcessClient(android.webkit.WebView, java.util.concurrent.Executor, androidx.webkit.WebViewRenderProcessClient);
     method @Deprecated @AnyThread @RequiresFeature(name=androidx.webkit.WebViewFeature.START_SAFE_BROWSING, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") public static void startSafeBrowsing(android.content.Context, android.webkit.ValueCallback<java.lang.Boolean!>?);
+    method @SuppressCompatibility @AnyThread @androidx.webkit.WebViewCompat.ExperimentalAsyncStartUp public static void startUpWebView(androidx.webkit.WebViewStartUpConfig, androidx.webkit.WebViewCompat.WebViewStartUpCallback);
+  }
+
+  @SuppressCompatibility @RequiresOptIn(level=androidx.annotation.RequiresOptIn.Level.ERROR) @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.CLASS) @java.lang.annotation.Target({java.lang.annotation.ElementType.METHOD, java.lang.annotation.ElementType.TYPE, java.lang.annotation.ElementType.FIELD}) public static @interface WebViewCompat.ExperimentalAsyncStartUp {
   }
 
   public static interface WebViewCompat.VisualStateCallback {
@@ -389,6 +393,10 @@ package androidx.webkit {
 
   public static interface WebViewCompat.WebMessageListener {
     method @UiThread public void onPostMessage(android.webkit.WebView, androidx.webkit.WebMessageCompat, android.net.Uri, boolean, androidx.webkit.JavaScriptReplyProxy);
+  }
+
+  @SuppressCompatibility @androidx.webkit.WebViewCompat.ExperimentalAsyncStartUp public static interface WebViewCompat.WebViewStartUpCallback {
+    method public void onSuccess(androidx.webkit.WebViewStartUpResult);
   }
 
   public class WebViewFeature {
@@ -479,6 +487,18 @@ package androidx.webkit {
     ctor public WebViewRenderProcessClient();
     method public abstract void onRenderProcessResponsive(android.webkit.WebView, androidx.webkit.WebViewRenderProcess?);
     method public abstract void onRenderProcessUnresponsive(android.webkit.WebView, androidx.webkit.WebViewRenderProcess?);
+  }
+
+  @SuppressCompatibility @androidx.webkit.WebViewCompat.ExperimentalAsyncStartUp public final class WebViewStartUpConfig {
+    method public java.util.concurrent.Executor getBackgroundExecutor();
+  }
+
+  @SuppressCompatibility @androidx.webkit.WebViewCompat.ExperimentalAsyncStartUp public static final class WebViewStartUpConfig.Builder {
+    ctor public WebViewStartUpConfig.Builder(java.util.concurrent.Executor);
+    method public androidx.webkit.WebViewStartUpConfig build();
+  }
+
+  @SuppressCompatibility @androidx.webkit.WebViewCompat.ExperimentalAsyncStartUp public interface WebViewStartUpResult {
   }
 
 }

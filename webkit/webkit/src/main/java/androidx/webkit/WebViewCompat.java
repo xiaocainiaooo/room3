@@ -22,9 +22,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.Looper;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -32,6 +34,7 @@ import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresFeature;
+import androidx.annotation.RequiresOptIn;
 import androidx.annotation.RestrictTo;
 import androidx.annotation.UiThread;
 import androidx.webkit.internal.ApiFeature;
@@ -51,6 +54,10 @@ import androidx.webkit.internal.WebViewRenderProcessImpl;
 
 import org.chromium.support_lib_boundary.WebViewProviderBoundaryInterface;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -1182,6 +1189,75 @@ public class WebViewCompat {
         }
     }
 
+    /**
+     * Denotes that the startUpWebView API surface is experimental.
+     * <p>
+     * It may change without warning and should not be relied upon for non-experimental purposes.
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target({ElementType.METHOD, ElementType.TYPE, ElementType.FIELD})
+    @RequiresOptIn(level = RequiresOptIn.Level.ERROR)
+    public @interface ExperimentalAsyncStartUp {
+    }
+
+    /**
+     * Callback interface for
+     * {@link WebViewCompat#startUpWebView(WebViewStartUpConfig, WebViewStartUpCallback)}.
+     */
+    @ExperimentalAsyncStartUp
+    public interface WebViewStartUpCallback {
+        /**
+         * Called when WebView startup completes successfully.
+         *
+         * @param result The async startup result.
+         */
+        void onSuccess(@NonNull WebViewStartUpResult result);
+    }
+
+    /**
+     * Asynchronously trigger WebView startup.
+     * <p>
+     * WebView startup is a time-consuming process that is  normally triggered during the first
+     * usage of WebView related APIs. WebView startup happens once per process.
+     * For example, the first call to `new WebView()` can take longer to
+     * complete than future calls due to WebView startup being triggered. The Android
+     * UI thread remains blocked till the startup completes.
+     * <p>
+     * This method allows callers to trigger WebView startup at a time of their choosing.
+     * <p>
+     * There are performance improvements this API provides.
+     * This method ensures that the portions of WebView startup which are able to run in the
+     * background will do so. Other portions of startup will still run on the UI thread.
+     * <p>
+     * Any APIs in `android.webkit` and `androidx.webkit` (including
+     * {@link WebViewFeature} MUST only be called after the callback is invoked in order to
+     * ensure the maximum benefit.
+     * There is no feature check or call to {@link WebViewFeature} required for using this method.
+     * <p>
+     * This API can be called multiple times. The callback will be called promptly if startup
+     * has already completed.
+     * <p>
+     * This is an experimental API and unsuitable for non-experimental use.
+     * This method can be removed in future versions of the library.
+     *
+     * @param config configuration for startup.
+     * @param callback the callback triggered when WebView startup is complete. This will be called
+     *                 on the main looper (Looper.getMainLooper()).
+     */
+    @ExperimentalAsyncStartUp
+    @AnyThread
+    public static void startUpWebView(
+            @NonNull WebViewStartUpConfig config, @NonNull WebViewStartUpCallback callback) {
+        config.getBackgroundExecutor().execute(() -> {
+            // We never access the context in Chromium-based WebView and `startUpWebView` will
+            // only be called on Android API versions where the WebView is Chromium-based, so
+            // passing `null`.
+            WebSettings.getDefaultUserAgent(null);
+            // Trigger the callback from the main looper.
+            new Handler(Looper.getMainLooper()).post(() -> callback.onSuccess(
+                    new WebViewStartUpResult() {}));
+        });
+    }
 
     private static WebViewProviderFactory getFactory() {
         return WebViewGlueCommunicator.getFactory();
