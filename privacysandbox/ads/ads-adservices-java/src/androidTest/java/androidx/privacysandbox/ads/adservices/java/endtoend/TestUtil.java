@@ -89,6 +89,12 @@ public class TestUtil {
         runShellCommand("setprop debug.adservices.consent_manager_debug_mode " + overrideStr);
     }
 
+    public void overrideConsentNotificationDebugMode(boolean override) {
+        String overrideStr = override ? "true" : "null";
+        // This flag is only read through system property and not DeviceConfig
+        runShellCommand("setprop debug.adservices.consent_notification_debug_mode " + overrideStr);
+    }
+
     public void overrideAllowlists(boolean override) {
         String overrideStr = override ? "*" : "null";
         runShellCommand("device_config put adservices ppapi_app_allow_list " + overrideStr);
