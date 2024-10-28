@@ -513,6 +513,65 @@ class AsyncPagingDataDifferTest {
             job2.cancelAndJoin()
         }
 
+    @Test
+    fun submitData_cancelsLastItemCount() = runTest {
+        val workerDispatcher = TestDispatcher()
+        val pager =
+            Pager(
+                config =
+                    PagingConfig(
+                        pageSize = 1,
+                        prefetchDistance = 1,
+                        enablePlaceholders = false,
+                    ),
+            ) {
+                TestPagingSource(loadDelay = 500)
+            }
+        val differ =
+            AsyncPagingDataDiffer(
+                diffCallback =
+                    object : DiffUtil.ItemCallback<Int>() {
+                        override fun areContentsTheSame(oldItem: Int, newItem: Int): Boolean {
+                            return oldItem == newItem
+                        }
+
+                        override fun areItemsTheSame(oldItem: Int, newItem: Int): Boolean {
+                            return oldItem == newItem
+                        }
+                    },
+                updateCallback = listUpdateCapture,
+                workerDispatcher = workerDispatcher
+            )
+        val job = launch { pager.flow.collect { differ.submitData(it) } }
+
+        advanceUntilIdle()
+        assertThat(differ.itemCount).isEqualTo(3)
+
+        // trigger first submit data and let it run until it hits computeDiff in presenter
+        differ.refresh()
+        advanceUntilIdle()
+
+        // let diffing run but not what follows to simulate real-life scenario of the
+        // presenter getting interrupted
+        workerDispatcher.executeAll()
+        job.cancel()
+
+        // submit second data - the one that cancels the previous one
+        differ.submitData(
+            PagingData.empty(
+                sourceLoadStates =
+                    loadStates(
+                        refresh = NotLoading(endOfPaginationReached = false),
+                        prepend = NotLoading(endOfPaginationReached = true),
+                        append = NotLoading(endOfPaginationReached = true),
+                    )
+            )
+        )
+
+        advanceUntilIdle()
+        assertThat(differ.itemCount).isEqualTo(0)
+    }
+
     /**
      * This test makes sure we don't inject unnecessary IDLE events when pages are cached. Caching
      * tests already validate that but it is still good to have an integration test to clarify end
