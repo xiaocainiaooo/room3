@@ -18,8 +18,11 @@ package androidx.biometric;
 
 import static android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED;
 
+import android.os.Build;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 
 /**
@@ -50,6 +53,7 @@ import androidx.annotation.RequiresPermission;
  *     .build();
  * </pre>
  */
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 public final class PromptContentViewWithMoreOptionsButton implements PromptContentView {
     private final String mDescription;
 

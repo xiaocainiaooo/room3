@@ -30,6 +30,7 @@ import java.util.concurrent.Executor;
  * Utility class for creating and converting between different types of prompt content view that may
  * be used internally by {@link BiometricPrompt}
  */
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 class PromptContentViewUtils {
     // Prevent instantiation.
     private PromptContentViewUtils() {
