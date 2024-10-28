@@ -24,6 +24,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.benchmark.Arguments
 import androidx.benchmark.DeviceInfo
+import androidx.benchmark.InstrumentationResults
 import androidx.benchmark.Outputs
 import androidx.benchmark.Profiler
 import androidx.benchmark.Shell
@@ -68,24 +69,67 @@ public class MacrobenchmarkScope(
     /** This is `true` iff method tracing is currently active for this benchmarking session. */
     private var isMethodTracingSessionActive: Boolean = false
 
-    /**
-     * When `true`, the app will be forced to flush its ART profiles to disk before being killed.
-     * This allows them to be later collected e.g. by a `BaselineProfile` capture, or immediate
-     * compilation by `CompilationMode.Partial` with warmupIterations.
-     */
-    internal var flushArtProfiles: Boolean = false
-        set(value) {
+    internal enum class KillFlushMode {
+        /** Just kill the process, nothing fancy. */
+        None,
+
+        /**
+         * When used, the app will be forced to flush its ART profiles to disk before being killed.
+         * This allows them to be later collected e.g. by a `BaselineProfile` capture, or immediate
+         * compilation by [CompilationMode.Partial] with warmupIterations.
+         */
+        FlushArtProfiles,
+
+        /**
+         * After killing the process, clear any potential runtime image.
+         *
+         * Starting in API 34 (and below with mainline), `verify` complied apps will attempt to
+         * store initialized classes to disk directly. To consistently capture worst case `verify`
+         * performance, this means macrobenchmark must recompile the target app with `verify`.
+         *
+         * @See DeviceInfo.supportsRuntimeImages
+         */
+        ClearArtRuntimeImage,
+    }
+
+    internal inline fun withKillFlushMode(
+        current: KillFlushMode,
+        override: KillFlushMode,
+        block: MacrobenchmarkScope.() -> Unit
+    ) {
+        check(killFlushMode == current) { "Expected KFM = $current, was $killFlushMode" }
+        killFlushMode = override
+        try {
+            block(this)
+        } finally {
+            check(killFlushMode == override) {
+                "Expected KFM at end to be = $override, was $killFlushMode"
+            }
+            killFlushMode = current
+        }
+    }
+
+    internal var killFlushMode: KillFlushMode = KillFlushMode.None
+        private set(value) {
             hasFlushedArtProfiles = false
             field = value
         }
 
     /**
-     * When `true`, the app has successfully flushed art profiles for at least one process.
+     * When `true`, the app has successfully flushed art profiles at least once.
      *
      * This will only be set by [killProcessAndFlushArtProfiles] when called directly, or
-     * [killProcess] when [flushArtProfiles] is `true`
+     * [killProcess] when [KillFlushMode.FlushArtProfiles] is used.
      */
     internal var hasFlushedArtProfiles: Boolean = false
+        private set
+
+    /**
+     * When `true`, the app has attempted to flush the runtime image during [killProcess].
+     *
+     * This will only be set by [killProcess] when [KillFlushMode.ClearArtRuntimeImage] is used.
+     */
+    internal var hasClearedRuntimeImage: Boolean = false
         private set
 
     /** `true` if the app is a system app. */
@@ -297,19 +341,38 @@ public class MacrobenchmarkScope(
         replaceWith = ReplaceWith("killProcess()")
     )
     @Suppress("UNUSED_PARAMETER")
-    public fun killProcess(useKillAll: Boolean = false) {
+    fun killProcess(useKillAll: Boolean = false) {
         killProcess()
     }
 
     /** Force-stop the process being measured. */
-    public fun killProcess() {
+    fun killProcess() {
         // Method traces are only flushed is a method tracing session is active.
         flushMethodTraces()
-        if (flushArtProfiles && Build.VERSION.SDK_INT >= 24) {
+
+        if (killFlushMode == KillFlushMode.FlushArtProfiles && Build.VERSION.SDK_INT >= 24) {
             // Flushing ART profiles will also kill the process at the end.
             killProcessAndFlushArtProfiles()
         } else {
             killProcessImpl()
+            if (
+                killFlushMode == KillFlushMode.ClearArtRuntimeImage && Build.VERSION.SDK_INT >= 24
+            ) {
+                if (DeviceInfo.verifyClearsRuntimeImage) {
+                    // clear the runtime image
+                    CompilationMode.cmdPackageCompile(packageName, "verify")
+                } else if (Shell.isSessionRooted()) {
+                    CompilationMode.cmdPackageCompileReset(packageName)
+                } else {
+                    // TODO - follow up!
+                    // b/368404173
+                    InstrumentationResults.scheduleIdeWarningOnNextReport(
+                        "Unable to clear Runtime Image, subsequent launches/iterations may" +
+                            " exhibit faster startup than production due to accelerated class" +
+                            " loading."
+                    )
+                }
+            }
         }
     }
 
@@ -324,7 +387,7 @@ public class MacrobenchmarkScope(
      * @throws IllegalStateException if the device is not rooted, and the target app cannot be
      *   signalled to drop its shader cache.
      */
-    public fun dropShaderCache() {
+    fun dropShaderCache() {
         if (Arguments.dropShadersEnable) {
             Log.d(TAG, "Dropping shader cache for $packageName")
             val dropError = ProfileInstallBroadcast.dropShaderCache(packageName)
@@ -398,7 +461,7 @@ public class MacrobenchmarkScope(
         @Suppress("BanThreadSleep") Thread.sleep(5000)
         val saveResult = ProfileInstallBroadcast.saveProfilesForAllProcesses(packageName)
         if (saveResult.processCount > 0) {
-            println("Flushed profiles in ${saveResult.processCount} processes")
+            Log.d(TAG, "Flushed profiles in ${saveResult.processCount} processes")
             hasFlushedArtProfiles = true
         }
         if (saveResult.error == null) {
@@ -420,7 +483,7 @@ public class MacrobenchmarkScope(
     }
 
     /** Force-stop the process being measured. */
-    private fun killProcessImpl() {
+    internal fun killProcessImpl() {
         Shell.killProcessesAndWait(packageName) {
             val isRooted = Shell.isSessionRooted()
             Log.d(TAG, "Killing process $packageName")

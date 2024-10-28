@@ -108,9 +108,9 @@ class MacrobenchmarkScopeTest {
                 baselineProfileMode = BaselineProfileMode.Disable,
                 warmupIterations = warmupIterations
             )
-        assertFalse(scope.flushArtProfiles)
+        assertEquals(MacrobenchmarkScope.KillFlushMode.None, scope.killFlushMode)
         compilation.resetAndCompile(scope) {
-            assertTrue(scope.flushArtProfiles)
+            assertEquals(MacrobenchmarkScope.KillFlushMode.FlushArtProfiles, scope.killFlushMode)
             executions += 1
 
             // on first iter, kill doesn't kill anything, so profiles are not yet flushed
@@ -120,7 +120,7 @@ class MacrobenchmarkScopeTest {
             scope.pressHome()
             scope.startActivityAndWait()
         }
-        assertFalse(scope.flushArtProfiles)
+        assertEquals(MacrobenchmarkScope.KillFlushMode.None, scope.killFlushMode)
         assertEquals(warmupIterations, executions)
     }
 
@@ -137,11 +137,14 @@ class MacrobenchmarkScopeTest {
                 baselineProfileMode = BaselineProfileMode.Disable,
                 warmupIterations = 2
             )
-        assertFalse(scope.flushArtProfiles)
+        assertEquals(MacrobenchmarkScope.KillFlushMode.None, scope.killFlushMode)
         assertContains(
             assertFailsWith<IllegalStateException> {
                     compilation.resetAndCompile(scope) {
-                        assertTrue(scope.flushArtProfiles)
+                        assertEquals(
+                            MacrobenchmarkScope.KillFlushMode.FlushArtProfiles,
+                            scope.killFlushMode
+                        )
                         assertFalse(scope.hasFlushedArtProfiles)
                         // not launching process so profiles can't flush, should fail after this
                         executions++
@@ -150,7 +153,7 @@ class MacrobenchmarkScopeTest {
                 .message!!,
             "never flushed profiles in any process"
         )
-        assertFalse(scope.flushArtProfiles)
+        assertEquals(MacrobenchmarkScope.KillFlushMode.None, scope.killFlushMode)
         assertEquals(2, executions)
     }
 
