@@ -47,6 +47,7 @@ public class ComparatorNode implements Node {
     /**
      * Enums representing different comparators for numeric search expressions in the query
      * language.
+     * @exportToFramework:hide
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     @Retention(RetentionPolicy.SOURCE)

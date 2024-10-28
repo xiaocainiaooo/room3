@@ -192,9 +192,11 @@ class ExportToFramework:
             .replace('<!--@exportToFramework:hide-->', '@hide')
             .replace('@exportToFramework:hide', '@hide')
             .replace('// @exportToFramework:skipFile()', '')
+            .replace('@ExperimentalAppSearchApi', '')
         )
         contents = re.sub(r'\/\/ @exportToFramework:copyToPath\([^)]+\)', '', contents)
         contents = re.sub(r'@RequiresFeature\([^)]*\)', '', contents, flags=re.DOTALL)
+        contents = re.sub(r'@RequiresOptIn\([^)]+\)', '', contents)
 
         # Jetpack methods have the Async suffix, but framework doesn't. Strip the Async suffix
         # to allow the same documentation to compile for both.
