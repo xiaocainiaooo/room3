@@ -540,7 +540,6 @@ package androidx.wear.compose.foundation.lazy {
   }
 
   public final class TransformingLazyColumnKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static void LazyColumn(optional androidx.compose.ui.Modifier modifier, optional androidx.wear.compose.foundation.lazy.TransformingLazyColumnState state, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, optional androidx.compose.foundation.gestures.FlingBehavior flingBehavior, optional boolean userScrollEnabled, optional androidx.wear.compose.foundation.rotary.RotaryScrollableBehavior? rotaryScrollableBehavior, kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.lazy.TransformingLazyColumnScope,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static void TransformingLazyColumn(androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Modifier modifier, optional androidx.wear.compose.foundation.lazy.TransformingLazyColumnState state, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, optional androidx.compose.foundation.gestures.FlingBehavior flingBehavior, optional boolean userScrollEnabled, optional androidx.wear.compose.foundation.rotary.RotaryScrollableBehavior? rotaryScrollableBehavior, kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.lazy.TransformingLazyColumnScope,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static void TransformingLazyColumn(optional androidx.compose.ui.Modifier modifier, optional androidx.wear.compose.foundation.lazy.TransformingLazyColumnState state, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, optional androidx.compose.foundation.gestures.FlingBehavior flingBehavior, optional boolean userScrollEnabled, optional androidx.wear.compose.foundation.rotary.RotaryScrollableBehavior? rotaryScrollableBehavior, kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.lazy.TransformingLazyColumnScope,kotlin.Unit> content);
   }
@@ -578,13 +577,11 @@ package androidx.wear.compose.foundation.lazy {
   }
 
   public final class TransformingLazyColumnStateKt {
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.wear.compose.foundation.lazy.TransformingLazyColumnState rememberLazyColumnState();
     method @androidx.compose.runtime.Composable public static androidx.wear.compose.foundation.lazy.TransformingLazyColumnState rememberTransformingLazyColumnState();
   }
 
   public sealed interface TransformingLazyColumnVisibleItemInfo {
     method public Object? getContentType();
-    method @Deprecated public default int getHeight();
     method public int getIndex();
     method public Object getKey();
     method public int getMeasuredHeight();
@@ -592,7 +589,6 @@ package androidx.wear.compose.foundation.lazy {
     method public long getScrollProgress();
     method public int getTransformedHeight();
     property public abstract Object? contentType;
-    property @Deprecated public default int height;
     property public abstract int index;
     property public abstract Object key;
     property public abstract int measuredHeight;
