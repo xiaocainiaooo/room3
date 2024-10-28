@@ -145,6 +145,19 @@ class TextFieldBufferUseFromImeTest {
     }
 
     @Test
+    fun replace_notChangingContent_stillClearsComposition() {
+        val eb = TextFieldBuffer(TextFieldCharSequence("ABC", TextRange.Zero, TextRange(0, 3)))
+
+        eb.imeReplace(0, 3, "ABC")
+
+        assertThat(eb).hasChars("ABC")
+        assertThat(eb.selection.start).isEqualTo(3)
+        assertThat(eb.selection.end).isEqualTo(3)
+        assertThat(eb.hasComposition()).isFalse()
+        assertThat(eb.composition).isNull()
+    }
+
+    @Test
     fun setSelection_coerces_whenNegativeStart() {
         val eb = TextFieldBuffer("ABCDE", TextRange.Zero)
 

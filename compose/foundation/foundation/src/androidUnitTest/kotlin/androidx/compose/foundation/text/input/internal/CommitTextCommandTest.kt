@@ -194,4 +194,17 @@ internal class CommitTextCommandTest : ImeEditCommandTest() {
         assertThat(state.selection.end).isEqualTo(6)
         assertThat(state.composition).isNull()
     }
+
+    @Test
+    fun committed_text_same_as_current_composition() {
+        initialize("ABCDE", TextRange(5))
+
+        imeScope.setComposingRegion(0, 5)
+        imeScope.commitText("ABCDE", 1)
+
+        assertThat(state.text.toString()).isEqualTo("ABCDE")
+        assertThat(state.selection.start).isEqualTo(5)
+        assertThat(state.selection.end).isEqualTo(5)
+        assertThat(state.composition).isNull()
+    }
 }
