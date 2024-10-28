@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.camera.impl.utils
+package androidx.camera.viewfinder.core.impl.utils
 
 import android.os.Build
 import android.util.Log

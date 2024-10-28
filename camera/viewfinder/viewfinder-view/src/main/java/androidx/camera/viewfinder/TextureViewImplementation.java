@@ -25,12 +25,12 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.camera.impl.utils.executor.ViewfinderExecutors;
-import androidx.camera.impl.utils.futures.FutureCallback;
-import androidx.camera.impl.utils.futures.Futures;
+import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest;
+import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.Result;
+import androidx.camera.viewfinder.core.impl.utils.executor.ViewfinderExecutors;
+import androidx.camera.viewfinder.core.impl.utils.futures.FutureCallback;
+import androidx.camera.viewfinder.core.impl.utils.futures.Futures;
 import androidx.camera.viewfinder.internal.utils.Logger;
-import androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest;
-import androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest.Result;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Consumer;
@@ -133,7 +133,7 @@ final class TextureViewImplementation extends ViewfinderImplementation {
                                 }
 
                                 @Override
-                                public void onFailure(Throwable t) {
+                                public void onFailure(@NonNull Throwable t) {
                                     throw new IllegalStateException("SurfaceReleaseFuture did not "
                                             + "complete nicely.", t);
                                 }
@@ -147,7 +147,8 @@ final class TextureViewImplementation extends ViewfinderImplementation {
             }
 
             @Override
-            public void onSurfaceTextureUpdated(@NonNull final SurfaceTexture surfaceTexture) {}
+            public void onSurfaceTextureUpdated(@NonNull final SurfaceTexture surfaceTexture) {
+            }
         });
 
         mParent.removeAllViews();
@@ -204,9 +205,8 @@ final class TextureViewImplementation extends ViewfinderImplementation {
 
     /**
      * Provides a {@link Surface} for viewfinder to the camera only if the {@link TextureView}'s
-     * {@link SurfaceTexture} is available, and the {@link ViewfinderSurfaceRequest} was received from
-     * the
-     * camera.
+     * {@link SurfaceTexture} is available, and the {@link ViewfinderSurfaceRequest} was received
+     * from the camera.
      */
     @SuppressWarnings({"WeakerAccess", "ObjectToString"})
     void tryToProvideViewfinderSurface() {

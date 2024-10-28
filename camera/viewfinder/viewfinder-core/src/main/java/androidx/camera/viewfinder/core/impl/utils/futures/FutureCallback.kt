@@ -14,29 +14,33 @@
  * limitations under the License.
  */
 
-package androidx.camera.impl.utils.futures
+package androidx.camera.viewfinder.core.impl.utils.futures
 
 import com.google.common.util.concurrent.ListenableFuture
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.Future
 
 /**
  * Cloned from concurrent-futures package in Guava to AndroidX namespace since we would need
  * ListenableFuture related implementation but not want to include whole Guava library.
  *
- * Transforms a value, possibly asynchronously. For an example usage and more information, see
- * [Futures.transformAsync].
+ * A callback for accepting the results of a [Future] computation asynchronously.
  *
- * @param <I>
- * @param <O> </O></I>
- * @author Chris Povirk
- * @since 11.0
+ * To attach to a [ListenableFuture] use [Futures.addCallback].
+ *
+ * @param <V> </V>
+ * @author Anthony Zana
+ * @since 10.0
  */
-fun interface AsyncFunction<I, O> {
+interface FutureCallback<V> {
+    /** Invoked with the result of the `Future` computation when it is successful. */
+    fun onSuccess(result: V?)
+
     /**
-     * Returns an output `Future` to use in place of the given `input`. The output `Future` need not
-     * be [done][Future.isDone], making `AsyncFunction` suitable for asynchronous derivations.
+     * Invoked when a `Future` computation fails or is canceled.
      *
-     * Throwing an exception from this method is equivalent to returning a failing `Future`.
+     * If the future's [get][Future.get] method throws an [ExecutionException], then the cause is
+     * passed to this method. Any other thrown object is passed unaltered.
      */
-    @Throws(Exception::class) fun apply(input: I?): ListenableFuture<O>
+    fun onFailure(t: Throwable)
 }
