@@ -657,15 +657,9 @@ internal fun ConfirmationImpl(
             containsControls = false,
         ) ?: durationMillis
 
-    val alphaAnimatable = remember(show) { Animatable(0f) }
-
     LaunchedEffect(show, a11yDurationMillis) {
         if (show) {
             performHapticFeedback?.invoke()
-            launch {
-                delay(DurationShort3.toLong())
-                alphaAnimatable.animateTo(1f, AlphaAnimationSpec)
-            }
             delay(a11yDurationMillis)
             onDismissRequest()
         }
@@ -677,6 +671,12 @@ internal fun ConfirmationImpl(
         onDismissRequest = onDismissRequest,
         properties = properties,
     ) {
+        val alphaAnimatable = remember { Animatable(0f) }
+
+        LaunchedEffect(Unit) {
+            delay(DurationShort3.toLong())
+            alphaAnimatable.animateTo(1f, AlphaAnimationSpec)
+        }
         Box(modifier = Modifier.fillMaxSize()) {
             content()
             CompositionLocalProvider(LocalContentColor provides colors.textColor) {
@@ -798,7 +798,7 @@ private const val HorizontalLinearContentPaddingFraction = 0.12f
 private const val ConfirmationTextTransitionFraction = 0.015f
 private const val ConfirmationIconInitialAngle = -45f
 
-private val FailureContentTransition = arrayOf(-15f, -20f, 0f)
+private val FailureContentTransition = arrayOf(-8f, -15f, 0f)
 private val FailureContentAnimationSpecs =
     arrayOf(
         spring(
