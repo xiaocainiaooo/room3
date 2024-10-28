@@ -16,16 +16,20 @@
 
 package androidx.window.layout.adapter.extensions
 
+import android.content.Context
 import androidx.window.RequiresWindowSdkExtension
 import androidx.window.core.ConsumerAdapter
 import androidx.window.extensions.layout.WindowLayoutComponent
-import androidx.window.layout.SupportedPosture
+import androidx.window.layout.WindowLayoutInfo
 
-@RequiresWindowSdkExtension(version = 6)
-internal open class ExtensionWindowBackendApi6(
+@RequiresWindowSdkExtension(version = 9)
+internal open class ExtensionWindowBackendApi9(
     component: WindowLayoutComponent,
-    adapter: ConsumerAdapter
-) : ExtensionWindowBackendApi2(component, adapter) {
-    override val supportedPostures: List<SupportedPosture>
-        get() = ExtensionsWindowLayoutInfoAdapter.translate(component.supportedWindowFeatures)
+    adapter: ConsumerAdapter,
+) : ExtensionWindowBackendApi6(component, adapter) {
+    override fun getCurrentWindowLayoutInfo(context: Context): WindowLayoutInfo =
+        ExtensionsWindowLayoutInfoAdapter.translate(
+            context,
+            info = component.getCurrentWindowLayoutInfo(context),
+        )
 }
