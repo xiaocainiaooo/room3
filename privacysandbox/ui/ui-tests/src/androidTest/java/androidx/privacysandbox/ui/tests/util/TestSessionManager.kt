@@ -29,6 +29,7 @@ import androidx.privacysandbox.ui.client.SandboxedUiAdapterFactory
 import androidx.privacysandbox.ui.client.view.SandboxedSdkUiSessionState
 import androidx.privacysandbox.ui.client.view.SandboxedSdkView
 import androidx.privacysandbox.ui.core.DelegatingSandboxedUiAdapter
+import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.core.SessionObserver
 import androidx.privacysandbox.ui.core.SessionObserverContext
@@ -104,6 +105,7 @@ class TestSessionManager(
      * A [DelegatingSandboxedUiAdapter] is set to the [viewForSession], to open a session with the
      * delegate adapter.
      */
+    @OptIn(ExperimentalFeatures.DelegatingAdapterApi::class)
     fun createDelegatingAdapterAndEstablishSession(
         failToProvideUi: Boolean = false,
         placeViewInsideFrameLayout: Boolean = false,
@@ -152,7 +154,9 @@ class TestSessionManager(
         return adapter
     }
 
-    class TestDelegatingAdapterWithDelegate(
+    class TestDelegatingAdapterWithDelegate
+    @OptIn(ExperimentalFeatures.DelegatingAdapterApi::class)
+    constructor(
         var delegatingAdapter: DelegatingSandboxedUiAdapter,
         var delegate: TestSandboxedUiAdapter
     )
