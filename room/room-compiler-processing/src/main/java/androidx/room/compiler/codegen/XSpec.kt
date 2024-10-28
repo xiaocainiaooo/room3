@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,18 @@
 
 package androidx.room.compiler.codegen
 
-enum class CodeLanguage {
-    JAVA,
-    KOTLIN
+internal abstract class XSpec {
+    override fun toString(): String =
+        error(
+            "Calling toString() on ${this.javaClass} is not supported. " +
+                "Did you mean to pass this into a builder method?"
+        )
+
+    internal abstract class Builder {
+        override fun toString(): String =
+            error(
+                "Calling toString() on ${this.javaClass} is not supported. " +
+                    "Did you mean to call .build()?"
+            )
+    }
 }
