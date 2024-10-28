@@ -113,6 +113,7 @@ public class WebViewFeature {
             WEB_AUTHENTICATION,
             SPECULATIVE_LOADING,
             BACK_FORWARD_CACHE,
+            DEFAULT_TRAFFICSTATS_TAGGING,
     })
     @Retention(RetentionPolicy.SOURCE)
     @Target({ElementType.PARAMETER, ElementType.METHOD})
@@ -638,6 +639,14 @@ public class WebViewFeature {
      */
     @Profile.ExperimentalUrlPrefetch
     public static final String PROFILE_URL_PREFETCH = "PREFETCH_URL_V2";
+
+    /**
+     * Feature for {@link #isFeatureSupported(String)}.
+     * This feature covers
+     * {@link androidx.webkit.WebViewCompat#setDefaultTrafficStatsTag(int)}}
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public static final String DEFAULT_TRAFFICSTATS_TAGGING = "DEFAULT_TRAFFICSTATS_TAGGING";
 
     /**
      * Return whether a feature is supported at run-time. This will check whether a feature is

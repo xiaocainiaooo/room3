@@ -672,6 +672,14 @@ public class WebViewFeatureInternal {
             new ApiFeature.NoFramework("IMPLEMENTATION_ONLY_FEATURE",
                     Features.ASYNC_WEBVIEW_STARTUP);
 
+    /**
+     * Feature for {@link WebViewFeature#isFeatureSupported(String)}.
+     * This feature covers {@link androidx.webkit.WebViewCompat#setDefaultTrafficStatsTag(int)}}
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public static final ApiFeature.NoFramework DEFAULT_TRAFFICSTATS_TAGGING =
+            new ApiFeature.NoFramework(WebViewFeature.DEFAULT_TRAFFICSTATS_TAGGING,
+                    Features.DEFAULT_TRAFFICSTATS_TAGGING);
 
     // --- Add new feature constants above this line ---
 
