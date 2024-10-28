@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
+@file:JvmName("SavedStateKt")
+@file:JvmMultifileClass
 @file:Suppress("NOTHING_TO_INLINE")
 
 package androidx.savedstate
+
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
 
 public actual class SavedState
 @PublishedApi

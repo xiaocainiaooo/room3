@@ -14,9 +14,22 @@
  * limitations under the License.
  */
 
+@file:JvmName("SavedStateReaderKt")
+@file:JvmMultifileClass
+@file:Suppress("NOTHING_TO_INLINE")
+
 package androidx.savedstate
 
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
+
+@PublishedApi internal const val DEFAULT_BOOLEAN: Boolean = false
+@PublishedApi internal const val DEFAULT_CHAR: Char = 0.toChar()
+@PublishedApi internal const val DEFAULT_FLOAT: Float = 0F
+@PublishedApi internal const val DEFAULT_DOUBLE: Double = 0.0
+@PublishedApi internal const val DEFAULT_INT: Int = 0
+@PublishedApi internal const val DEFAULT_LONG: Long = 0L
 
 /**
  * An inline class that encapsulates an opaque [SavedState], and provides an API for reading the
@@ -456,4 +469,18 @@ internal constructor(
      * @return A [Map] containing all key-value pairs from the [SavedState].
      */
     public fun toMap(): Map<String, Any?>
+}
+
+@PublishedApi
+internal inline fun keyNotFoundError(key: String): Nothing {
+    throw IllegalArgumentException("No saved state was found associated with the key '$key'.")
+}
+
+@PublishedApi
+internal inline fun valueNotFoundError(key: String): Nothing {
+    throw IllegalStateException(
+        "The saved state value associated with the key '$key' is " +
+            "either null or not of the expected type. This might happen if the value was saved " +
+            "with a different type or if the saved state has been modified unexpectedly."
+    )
 }

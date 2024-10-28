@@ -2,12 +2,12 @@
 package androidx.savedstate {
 
   public final class SavedStateKt {
-    method public static inline <T> T read(androidx.savedstate.SavedState, kotlin.jvm.functions.Function1<? super androidx.savedstate.SavedStateReader,? extends T> block);
-    method public static inline <T> T write(androidx.savedstate.SavedState, kotlin.jvm.functions.Function1<? super androidx.savedstate.SavedStateWriter,? extends T> block);
+    method public static inline <T> T read(android.os.Bundle, kotlin.jvm.functions.Function1<? super androidx.savedstate.SavedStateReader,? extends T> block);
+    method public static inline android.os.Bundle savedState(optional java.util.Map<java.lang.String,? extends java.lang.Object?> initialState, optional kotlin.jvm.functions.Function1<? super androidx.savedstate.SavedStateWriter,kotlin.Unit> builderAction);
+    method public static inline <T> T write(android.os.Bundle, kotlin.jvm.functions.Function1<? super androidx.savedstate.SavedStateWriter,? extends T> block);
   }
 
   @kotlin.jvm.JvmInline public final value class SavedStateReader {
-    ctor public SavedStateReader(android.os.Bundle source);
     method public inline operator boolean contains(String key);
     method public boolean contentDeepEquals(android.os.Bundle other);
     method public inline boolean getBoolean(String key);
@@ -42,7 +42,6 @@ package androidx.savedstate {
     method public inline <reified T extends android.os.Parcelable> T getParcelableOrElse(String key, kotlin.jvm.functions.Function0<? extends T> defaultValue);
     method public inline android.os.Bundle getSavedState(String key);
     method public inline android.os.Bundle getSavedStateOrElse(String key, kotlin.jvm.functions.Function0<android.os.Bundle> defaultValue);
-    method public android.os.Bundle getSource();
     method public inline String getString(String key);
     method public inline String[] getStringArray(String key);
     method public inline String[] getStringArrayOrElse(String key, kotlin.jvm.functions.Function0<java.lang.String[]> defaultValue);
@@ -53,7 +52,6 @@ package androidx.savedstate {
     method public inline boolean isNull(String key);
     method public inline int size();
     method public java.util.Map<java.lang.String,java.lang.Object?> toMap();
-    property public final android.os.Bundle source;
   }
 
   public final class SavedStateRegistry {
@@ -94,9 +92,7 @@ package androidx.savedstate {
   }
 
   @kotlin.jvm.JvmInline public final value class SavedStateWriter {
-    ctor public SavedStateWriter(android.os.Bundle source);
     method public inline void clear();
-    method public android.os.Bundle getSource();
     method public inline void putAll(android.os.Bundle values);
     method public inline void putBoolean(String key, boolean value);
     method public inline void putBooleanArray(String key, boolean[] values);
@@ -119,11 +115,6 @@ package androidx.savedstate {
     method public inline void putStringArray(String key, String[] values);
     method public inline void putStringList(String key, java.util.List<java.lang.String> values);
     method public inline void remove(String key);
-    property public final android.os.Bundle source;
-  }
-
-  public final class SavedState_androidKt {
-    method public static inline android.os.Bundle savedState(optional java.util.Map<java.lang.String,? extends java.lang.Object?> initialState, optional kotlin.jvm.functions.Function1<? super androidx.savedstate.SavedStateWriter,kotlin.Unit> builderAction);
   }
 
   public final class ViewKt {

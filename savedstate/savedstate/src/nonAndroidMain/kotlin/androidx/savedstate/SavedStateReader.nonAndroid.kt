@@ -14,74 +14,109 @@
  * limitations under the License.
  */
 
+@file:JvmName("SavedStateReaderKt")
+@file:JvmMultifileClass
+@file:Suppress("NOTHING_TO_INLINE")
+
 package androidx.savedstate
 
-import androidx.savedstate.internal.SavedStateUtils
-import androidx.savedstate.internal.SavedStateUtils.getValueFromSavedState
-import androidx.savedstate.internal.SavedStateUtils.keyNotFoundError
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
 
-@Suppress("NOTHING_TO_INLINE")
 @JvmInline
-actual value class SavedStateReader actual constructor(actual val source: SavedState) {
+public actual value class SavedStateReader
+@PublishedApi
+internal actual constructor(
+    @PublishedApi internal actual val source: SavedState,
+) {
 
-    actual inline fun getBoolean(key: String): Boolean =
-        getSingleResultOrThrow(key) {
-            source.map[key] as? Boolean ?: SavedStateUtils.DEFAULT_BOOLEAN
-        }
+    actual inline fun getBoolean(key: String): Boolean {
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? Boolean ?: DEFAULT_BOOLEAN
+    }
 
-    actual inline fun getBooleanOrElse(key: String, defaultValue: () -> Boolean): Boolean =
-        getSingleResultOrElse(key, defaultValue) { source.map[key] as? Boolean }
+    actual inline fun getBooleanOrElse(key: String, defaultValue: () -> Boolean): Boolean {
+        if (key !in this) defaultValue()
+        return source.map[key] as? Boolean ?: defaultValue()
+    }
 
-    actual inline fun getChar(key: String): Char =
-        getSingleResultOrThrow(key) { source.map[key] as? Char ?: SavedStateUtils.DEFAULT_CHAR }
+    actual inline fun getChar(key: String): Char {
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? Char ?: DEFAULT_CHAR
+    }
 
-    actual inline fun getCharOrElse(key: String, defaultValue: () -> Char): Char =
-        getSingleResultOrElse(key, defaultValue) { source.map[key] as? Char }
+    actual inline fun getCharOrElse(key: String, defaultValue: () -> Char): Char {
+        if (key !in this) defaultValue()
+        return source.map[key] as? Char ?: defaultValue()
+    }
 
-    actual inline fun getDouble(key: String): Double =
-        getSingleResultOrThrow(key) { source.map[key] as? Double ?: SavedStateUtils.DEFAULT_DOUBLE }
+    actual inline fun getDouble(key: String): Double {
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? Double ?: DEFAULT_DOUBLE
+    }
 
-    actual inline fun getDoubleOrElse(key: String, defaultValue: () -> Double): Double =
-        getSingleResultOrElse(key, defaultValue) { source.map[key] as? Double }
+    actual inline fun getDoubleOrElse(key: String, defaultValue: () -> Double): Double {
+        if (key !in this) defaultValue()
+        return source.map[key] as? Double ?: defaultValue()
+    }
 
-    actual inline fun getFloat(key: String): Float =
-        getSingleResultOrThrow(key) { source.map[key] as? Float ?: SavedStateUtils.DEFAULT_FLOAT }
+    actual inline fun getFloat(key: String): Float {
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? Float ?: DEFAULT_FLOAT
+    }
 
-    actual inline fun getFloatOrElse(key: String, defaultValue: () -> Float): Float =
-        getSingleResultOrElse(key, defaultValue) { source.map[key] as? Float }
+    actual inline fun getFloatOrElse(key: String, defaultValue: () -> Float): Float {
+        if (key !in this) defaultValue()
+        return source.map[key] as? Float ?: defaultValue()
+    }
 
-    actual inline fun getInt(key: String): Int =
-        getSingleResultOrThrow(key) { source.map[key] as? Int ?: SavedStateUtils.DEFAULT_INT }
+    actual inline fun getInt(key: String): Int {
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? Int ?: DEFAULT_INT
+    }
 
-    actual inline fun getIntOrElse(key: String, defaultValue: () -> Int): Int =
-        getSingleResultOrElse(key, defaultValue) { source.map[key] as? Int }
+    actual inline fun getIntOrElse(key: String, defaultValue: () -> Int): Int {
+        if (key !in this) defaultValue()
+        return source.map[key] as? Int ?: defaultValue()
+    }
 
-    actual inline fun getLong(key: String): Long =
-        getSingleResultOrThrow(key) { source.map[key] as? Long ?: SavedStateUtils.DEFAULT_LONG }
+    actual inline fun getLong(key: String): Long {
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? Long ?: DEFAULT_LONG
+    }
 
-    actual inline fun getLongOrElse(key: String, defaultValue: () -> Long): Long =
-        getSingleResultOrElse(key, defaultValue) { source.map[key] as? Long }
+    actual inline fun getLongOrElse(key: String, defaultValue: () -> Long): Long {
+        if (key !in this) defaultValue()
+        return source.map[key] as? Long ?: defaultValue()
+    }
 
-    actual inline fun getString(key: String): String =
-        getSingleResultOrThrow(key) { source.map[key] as? String }
+    actual inline fun getString(key: String): String {
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? String ?: valueNotFoundError(key)
+    }
 
-    actual inline fun getStringOrElse(key: String, defaultValue: () -> String): String =
-        getSingleResultOrElse(key, defaultValue) { source.map[key] as? String }
+    actual inline fun getStringOrElse(key: String, defaultValue: () -> String): String {
+        if (key !in this) defaultValue()
+        return source.map[key] as? String ?: defaultValue()
+    }
 
     @Suppress("UNCHECKED_CAST")
     actual inline fun getIntList(key: String): List<Int> {
-        return getListResultOrThrow(key) { source.map[key] as? List<Int> }
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? List<Int> ?: valueNotFoundError(key)
     }
 
     @Suppress("UNCHECKED_CAST")
     actual inline fun getIntListOrElse(key: String, defaultValue: () -> List<Int>): List<Int> {
-        return getListResultOrElse(key, defaultValue) { source.map[key] as? List<Int> }
+        if (key !in this) defaultValue()
+        return source.map[key] as? List<Int> ?: defaultValue()
     }
 
     @Suppress("UNCHECKED_CAST")
     actual inline fun getStringList(key: String): List<String> {
-        return getListResultOrThrow(key) { source.map[key] as? List<String> }
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? List<String> ?: valueNotFoundError(key)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -89,65 +124,80 @@ actual value class SavedStateReader actual constructor(actual val source: SavedS
         key: String,
         defaultValue: () -> List<String>
     ): List<String> {
-        return getListResultOrElse(key, defaultValue) { source.map[key] as? List<String> }
+        if (key !in this) defaultValue()
+        return source.map[key] as? List<String> ?: defaultValue()
     }
 
     actual inline fun getCharArray(key: String): CharArray {
-        return getSingleResultOrThrow(key) { source.map[key] as? CharArray }
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? CharArray ?: valueNotFoundError(key)
     }
 
     actual inline fun getCharArrayOrElse(key: String, defaultValue: () -> CharArray): CharArray {
-        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? CharArray }
+        if (key !in this) defaultValue()
+        return source.map[key] as? CharArray ?: defaultValue()
     }
 
-    actual inline fun getBooleanArray(key: String): BooleanArray =
-        getSingleResultOrThrow(key) { source.map[key] as? BooleanArray }
+    actual inline fun getBooleanArray(key: String): BooleanArray {
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? BooleanArray ?: valueNotFoundError(key)
+    }
 
     actual inline fun getBooleanArrayOrElse(
         key: String,
         defaultValue: () -> BooleanArray
     ): BooleanArray {
-        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? BooleanArray }
+        if (key !in this) defaultValue()
+        return source.map[key] as? BooleanArray ?: defaultValue()
     }
 
     actual inline fun getDoubleArray(key: String): DoubleArray {
-        return getSingleResultOrThrow(key) { source.map[key] as? DoubleArray }
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? DoubleArray ?: valueNotFoundError(key)
     }
 
     actual inline fun getDoubleArrayOrElse(
         key: String,
-        defaultValue: () -> DoubleArray
+        defaultValue: () -> DoubleArray,
     ): DoubleArray {
-        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? DoubleArray }
+        if (key !in this) defaultValue()
+        return source.map[key] as? DoubleArray ?: defaultValue()
     }
 
     actual inline fun getFloatArray(key: String): FloatArray {
-        return getSingleResultOrThrow(key) { source.map[key] as? FloatArray }
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? FloatArray ?: valueNotFoundError(key)
     }
 
     actual inline fun getFloatArrayOrElse(key: String, defaultValue: () -> FloatArray): FloatArray {
-        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? FloatArray }
+        if (key !in this) defaultValue()
+        return source.map[key] as? FloatArray ?: defaultValue()
     }
 
     actual inline fun getIntArray(key: String): IntArray {
-        return getSingleResultOrThrow(key) { source.map[key] as? IntArray }
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? IntArray ?: valueNotFoundError(key)
     }
 
     actual inline fun getIntArrayOrElse(key: String, defaultValue: () -> IntArray): IntArray {
-        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? IntArray }
+        if (key !in this) defaultValue()
+        return source.map[key] as? IntArray ?: defaultValue()
     }
 
     actual inline fun getLongArray(key: String): LongArray {
-        return getSingleResultOrThrow(key) { source.map[key] as? LongArray }
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? LongArray ?: valueNotFoundError(key)
     }
 
     actual inline fun getLongArrayOrElse(key: String, defaultValue: () -> LongArray): LongArray {
-        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? LongArray }
+        if (key !in this) defaultValue()
+        return source.map[key] as? LongArray ?: defaultValue()
     }
 
     @Suppress("UNCHECKED_CAST")
     actual inline fun getStringArray(key: String): Array<String> {
-        return getSingleResultOrThrow(key) { source.map[key] as? Array<String> }
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? Array<String> ?: valueNotFoundError(key)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -155,80 +205,27 @@ actual value class SavedStateReader actual constructor(actual val source: SavedS
         key: String,
         defaultValue: () -> Array<String>
     ): Array<String> {
-        return getSingleResultOrElse(key, defaultValue) { source.map[key] as? Array<String> }
+        if (key !in this) defaultValue()
+        return source.map[key] as? Array<String> ?: defaultValue()
     }
 
-    actual inline fun getSavedState(key: String): SavedState =
-        getSingleResultOrThrow(key) { source.map[key] as? SavedState }
-
-    actual inline fun getSavedStateOrElse(key: String, defaultValue: () -> SavedState): SavedState =
-        getSingleResultOrElse(key, defaultValue) { source.map[key] as? SavedState }
-
-    actual inline fun size(): Int {
-        return source.map.size
+    actual inline fun getSavedState(key: String): SavedState {
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? SavedState ?: valueNotFoundError(key)
     }
 
-    actual inline fun isEmpty(): Boolean {
-        return source.map.isEmpty()
+    actual inline fun getSavedStateOrElse(key: String, defaultValue: () -> SavedState): SavedState {
+        if (key !in this) defaultValue()
+        return source.map[key] as? SavedState ?: defaultValue()
     }
 
-    actual inline fun isNull(key: String): Boolean {
-        return contains(key) && source.map[key] == null
-    }
+    actual inline fun size(): Int = source.map.size
 
-    actual inline operator fun contains(key: String): Boolean {
-        return source.map.containsKey(key)
-    }
+    actual inline fun isEmpty(): Boolean = source.map.isEmpty()
 
-    @PublishedApi
-    internal inline fun <reified T> getSingleResultOrThrow(
-        key: String,
-        currentValue: () -> T?,
-    ): T =
-        getValueFromSavedState(
-            key = key,
-            contains = { source.map.containsKey(key) },
-            currentValue = { currentValue() },
-            defaultValue = { keyNotFoundError(key) },
-        )
+    actual inline fun isNull(key: String): Boolean = contains(key) && source.map[key] == null
 
-    @PublishedApi
-    internal inline fun <reified T> getSingleResultOrElse(
-        key: String,
-        defaultValue: () -> T,
-        currentValue: () -> T?,
-    ): T =
-        getValueFromSavedState(
-            key = key,
-            contains = { source.map.containsKey(key) },
-            currentValue = { currentValue() },
-            defaultValue = { defaultValue() },
-        )
-
-    @PublishedApi
-    internal inline fun <reified T> getListResultOrThrow(
-        key: String,
-        currentValue: () -> List<T>?,
-    ): List<T> =
-        getValueFromSavedState(
-            key = key,
-            contains = { source.map.containsKey(key) },
-            currentValue = { currentValue() },
-            defaultValue = { keyNotFoundError(key) },
-        )
-
-    @PublishedApi
-    internal inline fun <reified T> getListResultOrElse(
-        key: String,
-        defaultValue: () -> List<T>,
-        currentValue: () -> List<T>?,
-    ): List<T> =
-        getValueFromSavedState(
-            key = key,
-            contains = { source.map.containsKey(key) },
-            currentValue = { currentValue() },
-            defaultValue = { defaultValue() },
-        )
+    actual inline operator fun contains(key: String): Boolean = source.map.containsKey(key)
 
     actual fun contentDeepEquals(other: SavedState): Boolean {
         // Map implements `equals` as a content deep, there is no need to do anything else.
