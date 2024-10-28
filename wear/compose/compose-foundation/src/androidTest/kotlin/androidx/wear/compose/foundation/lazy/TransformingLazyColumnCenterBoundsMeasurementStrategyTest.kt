@@ -280,18 +280,17 @@ class TransformingLazyColumnCenterBoundsMeasurementStrategyTest {
             scrollToBeConsumed = scrollToBeConsumed,
             coroutineScope = CoroutineScope(EmptyCoroutineContext),
             density = Density(density),
-            layout = { width, height, _ -> EmptyMeasureResult(width, height) },
+            layout = { width, height, _ ->
+                object : MeasureResult {
+                    override val width = width
+                    override val height = height
+                    override val alignmentLines
+                        get() = TODO("Not yet implemented")
+
+                    override fun placeChildren() {}
+                }
+            },
         )
-
-    private class EmptyMeasureResult(override val width: Int, override val height: Int) :
-        MeasureResult {
-        override val alignmentLines: Map<out AlignmentLine, Int>
-            get() = TODO("Not yet implemented")
-
-        override fun placeChildren() {
-            TODO("Not yet implemented")
-        }
-    }
 
     private class EmptyPlaceable(
         width: Int,

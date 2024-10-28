@@ -78,6 +78,9 @@ class TransformingLazyColumnState() : ScrollableState {
     internal val layoutInfoState =
         mutableStateOf(EmptyTransformingLazyColumnMeasureResult, neverEqualPolicy())
 
+    internal val itemsCount: Int
+        get() = layoutInfoState.value.totalItemsCount
+
     /**
      * The object of LazyColumnLayoutInfo calculated during the last layout pass. For example, you
      * can use it to calculate what items are currently visible. Note that this property is
@@ -291,6 +294,8 @@ private val EmptyTransformingLazyColumnMeasureResult =
         coroutineScope = CoroutineScope(EmptyCoroutineContext),
         density = Density(1f),
         itemSpacing = 0,
+        beforeContentPadding = 0,
+        afterContentPadding = 0,
         measureResult =
             object : MeasureResult {
                 override val width: Int = 0
