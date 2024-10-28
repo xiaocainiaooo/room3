@@ -18,11 +18,13 @@ package androidx.wear.compose.material3.macrobenchmark
 
 import android.content.Intent
 import androidx.benchmark.macro.CompilationMode
-import androidx.benchmark.macro.FrameTimingMetric
+import androidx.benchmark.macro.ExperimentalMetricApi
+import androidx.benchmark.macro.FrameTimingGfxInfoMetric
+import androidx.benchmark.macro.MemoryUsageMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.filters.LargeTest
 import androidx.testutils.createCompilationParams
-import androidx.wear.compose.material3.macrobenchmark.common.TransformingLazyColumnBenchmark
+import androidx.wear.compose.material3.macrobenchmark.common.IconButtonBenchmark
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -32,7 +34,7 @@ import org.junit.runners.Parameterized
 
 @LargeTest
 @RunWith(Parameterized::class)
-class TransformingLazyColumnBenchmark(private val compilationMode: CompilationMode) {
+class IconButtonBenchmarkTest(private val compilationMode: CompilationMode) {
     @get:Rule val benchmarkRule = MacrobenchmarkRule()
 
     @Before
@@ -45,27 +47,30 @@ class TransformingLazyColumnBenchmark(private val compilationMode: CompilationMo
         enableChargingExperience()
     }
 
+    @OptIn(ExperimentalMetricApi::class)
     @Test
     fun start() {
         benchmarkRule.measureRepeated(
             packageName = PACKAGE_NAME,
-            metrics = listOf(FrameTimingMetric()),
+            metrics =
+                listOf(
+                    FrameTimingGfxInfoMetric(),
+                    MemoryUsageMetric(MemoryUsageMetric.Mode.Last),
+                ),
             compilationMode = compilationMode,
             iterations = 10,
             setupBlock = {
                 val intent = Intent()
-                intent.action = TRANSFORMING_LAZY_COLUMN_ACTIVITY
+                intent.action = ICON_BUTTON_ACTIVITY
                 startActivityAndWait(intent)
             }
         ) {
-            TransformingLazyColumnBenchmark.exercise.invoke(this)
+            IconButtonBenchmark.exercise.invoke(this)
         }
     }
 
     companion object {
-
-        private const val TRANSFORMING_LAZY_COLUMN_ACTIVITY =
-            "$PACKAGE_NAME.TRANSFORMING_LAZY_COLUMN_ACTIVITY"
+        private const val ICON_BUTTON_ACTIVITY = "$PACKAGE_NAME.ICON_BUTTON_ACTIVITY"
 
         @Parameterized.Parameters(name = "compilation={0}")
         @JvmStatic

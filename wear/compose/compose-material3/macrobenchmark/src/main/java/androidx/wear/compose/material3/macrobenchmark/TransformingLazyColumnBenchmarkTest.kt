@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.wear.compose.integration.macrobenchmark.material3
+package androidx.wear.compose.material3.macrobenchmark
 
 import android.content.Intent
 import androidx.benchmark.macro.CompilationMode
@@ -23,11 +23,8 @@ import androidx.benchmark.macro.FrameTimingGfxInfoMetric
 import androidx.benchmark.macro.MemoryUsageMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.filters.LargeTest
-import androidx.test.uiautomator.By
 import androidx.testutils.createCompilationParams
-import androidx.wear.compose.integration.macrobenchmark.disableChargingExperience
-import androidx.wear.compose.integration.macrobenchmark.enableChargingExperience
-import java.lang.Thread.sleep
+import androidx.wear.compose.material3.macrobenchmark.common.TransformingLazyColumnBenchmark
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -38,7 +35,7 @@ import org.junit.runners.Parameterized
 @OptIn(ExperimentalMetricApi::class)
 @LargeTest
 @RunWith(Parameterized::class)
-class DialogBenchmark(private val compilationMode: CompilationMode) {
+class TransformingLazyColumnBenchmarkTest(private val compilationMode: CompilationMode) {
     @get:Rule val benchmarkRule = MacrobenchmarkRule()
 
     @Before
@@ -58,43 +55,20 @@ class DialogBenchmark(private val compilationMode: CompilationMode) {
             metrics =
                 listOf(FrameTimingGfxInfoMetric(), MemoryUsageMetric(MemoryUsageMetric.Mode.Last)),
             compilationMode = compilationMode,
-            iterations = 5,
+            iterations = 10,
             setupBlock = {
                 val intent = Intent()
-                intent.action = DIALOG_ACTIVITY
+                intent.action = TRANSFORMING_LAZY_COLUMN_ACTIVITY
                 startActivityAndWait(intent)
             }
         ) {
-            val buttonOpenAlertDialog = device.findObject(By.desc(OPEN_ALERT_DIALOG))
-            val buttonOpenConfirmDialog = device.findObject(By.desc(OPEN_CONFIRM_DIALOG))
-            val buttonOpenSuccessDialog = device.findObject(By.desc(OPEN_SUCCESS_DIALOG))
-            val buttonOpenFailureDialog = device.findObject(By.desc(OPEN_FAILURE_DIALOG))
-
-            requireNotNull(buttonOpenAlertDialog).click()
-            sleep(1000)
-            requireNotNull(device.findObject(By.desc(DIALOG_CONFIRM))).click()
-
-            requireNotNull(buttonOpenConfirmDialog).click()
-            sleep(3000)
-
-            requireNotNull(buttonOpenSuccessDialog).click()
-            sleep(3000)
-
-            requireNotNull(buttonOpenFailureDialog).click()
-            sleep(3000)
+            TransformingLazyColumnBenchmark.exercise.invoke(this)
         }
     }
 
     companion object {
-        private const val PACKAGE_NAME = "androidx.wear.compose.integration.macrobenchmark.target"
-        private const val DIALOG_ACTIVITY = "${PACKAGE_NAME}.material3.DIALOG_ACTIVITY"
-
-        private const val OPEN_ALERT_DIALOG = "OPEN_ALERT_DIALOG"
-        private const val OPEN_CONFIRM_DIALOG = "OPEN_CONFIRM_DIALOG"
-        private const val OPEN_SUCCESS_DIALOG = "OPEN_SUCCESS_DIALOG"
-        private const val OPEN_FAILURE_DIALOG = "OPEN_FAILURE_DIALOG"
-
-        private const val DIALOG_CONFIRM = "DIALOG_CONFIRM"
+        private const val TRANSFORMING_LAZY_COLUMN_ACTIVITY =
+            "$PACKAGE_NAME.TRANSFORMING_LAZY_COLUMN_ACTIVITY"
 
         @Parameterized.Parameters(name = "compilation={0}")
         @JvmStatic
