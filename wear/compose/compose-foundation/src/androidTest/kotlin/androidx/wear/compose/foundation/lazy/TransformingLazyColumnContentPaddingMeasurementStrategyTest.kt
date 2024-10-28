@@ -360,7 +360,11 @@ class TransformingLazyColumnContentPaddingMeasurementStrategyTest {
 
     @Test
     fun dynamicHeightItems_measuredWithCorrectOffsets() {
-        val strategy = TransformingLazyColumnCenterBoundsMeasurementStrategy()
+        val strategy =
+            TransformingLazyColumnContentPaddingMeasurementStrategy(
+                PaddingValues(0.dp),
+                measureScope
+            )
         val result =
             strategy.measure(
                 listOf(
@@ -379,6 +383,69 @@ class TransformingLazyColumnContentPaddingMeasurementStrategyTest {
 
         assertThat(result.visibleItems.size).isEqualTo(2)
         assertThat(result.visibleItems.map { it.offset }).isEqualTo(listOf(0, screenHeight / 4))
+    }
+
+    @Test
+    fun flingBackwards_restoresLayoutCorrectly() {
+        val strategy =
+            TransformingLazyColumnContentPaddingMeasurementStrategy(
+                PaddingValues(0.dp),
+                measureScope
+            )
+
+        val itemSize = screenHeight / 4
+
+        val result =
+            strategy.measure(
+                listOf(
+                    // Items visible before the fling.
+                    itemSize,
+                    itemSize,
+                    itemSize,
+                    itemSize,
+                    // Items visible after the fling.
+                    itemSize,
+                    itemSize,
+                    itemSize,
+                    itemSize,
+                ),
+                scrollToBeConsumed = -10 * screenHeight.toFloat()
+            )
+        assertThat(result.visibleItems.map { it.index }).isEqualTo(listOf(4, 5, 6, 7))
+        assertThat(result.visibleItems.map { it.offset })
+            .isEqualTo(listOf(0, screenHeight / 4, screenHeight / 2, screenHeight * 3 / 4))
+    }
+
+    @Test
+    fun flingForward_restoresLayoutCorrectly() {
+        val strategy =
+            TransformingLazyColumnContentPaddingMeasurementStrategy(
+                PaddingValues(0.dp),
+                measureScope
+            )
+
+        val itemSize = screenHeight / 4
+
+        val result =
+            strategy.measure(
+                listOf(
+                    // Items visible after the fling.
+                    itemSize,
+                    itemSize,
+                    itemSize,
+                    itemSize,
+                    // Items visible before the fling.
+                    itemSize,
+                    itemSize,
+                    itemSize,
+                    itemSize,
+                ),
+                anchorItemIndex = 4,
+                scrollToBeConsumed = 10 * screenHeight.toFloat()
+            )
+        assertThat(result.visibleItems.map { it.index }).isEqualTo(listOf(0, 1, 2, 3))
+        assertThat(result.visibleItems.map { it.offset })
+            .isEqualTo(listOf(0, screenHeight / 4, screenHeight / 2, screenHeight * 3 / 4))
     }
 
     private val measureScope: IntrinsicMeasureScope =

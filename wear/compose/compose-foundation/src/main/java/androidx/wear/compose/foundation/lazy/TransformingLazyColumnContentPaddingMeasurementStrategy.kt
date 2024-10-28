@@ -86,34 +86,22 @@ internal class TransformingLazyColumnContentPaddingMeasurementStrategy(
 
         visibleItems.add(centerItem)
 
-        var bottomOffset = centerItem.offset + centerItem.transformedHeight + itemSpacing
-        var bottomPassIndex = anchorItemIndex + 1
+        addVisibleItemsAfterItem(
+            centerItem,
+            itemSpacing = itemSpacing,
+            containerConstraints = containerConstraints,
+            itemsCount = itemsCount,
+            measuredItemProvider = measuredItemProvider,
+            visibleItems = visibleItems
+        )
 
-        while (bottomOffset < containerConstraints.maxHeight && bottomPassIndex < itemsCount) {
-            val item =
-                measuredItemProvider.downwardMeasuredItem(
-                    bottomPassIndex,
-                    bottomOffset,
-                    maxHeight = containerConstraints.maxHeight
-                )
-            bottomOffset += item.transformedHeight + itemSpacing
-            visibleItems.add(item)
-            bottomPassIndex += 1
-        }
-        var topOffset = centerItem.offset - itemSpacing
-        var topPassIndex = anchorItemIndex - 1
-
-        while (topOffset >= 0 && topPassIndex >= 0) {
-            val additionalItem =
-                measuredItemProvider.upwardMeasuredItem(
-                    topPassIndex,
-                    topOffset,
-                    maxHeight = containerConstraints.maxHeight
-                )
-            visibleItems.addFirst(additionalItem)
-            topOffset -= additionalItem.transformedHeight + itemSpacing
-            topPassIndex -= 1
-        }
+        addVisibleItemsBeforeItem(
+            centerItem,
+            itemSpacing = itemSpacing,
+            measuredItemProvider = measuredItemProvider,
+            containerConstraints = containerConstraints,
+            visibleItems = visibleItems
+        )
 
         if (visibleItems.isEmpty()) {
             return emptyMeasureResult(containerConstraints, layout)
@@ -133,14 +121,39 @@ internal class TransformingLazyColumnContentPaddingMeasurementStrategy(
             restoreLayoutTopToBottom(visibleItems, itemSpacing, containerConstraints)
             canScrollBackward = false
             canScrollForward = false
-        } else if (overscrolledBackwards(visibleItems.first(), 0)) {
+        } else if (overscrolledBackwards(visibleItems.first())) {
             restoreLayoutTopToBottom(visibleItems, itemSpacing, containerConstraints)
+            addVisibleItemsAfterItem(
+                visibleItems.last(),
+                itemSpacing = itemSpacing,
+                itemsCount = itemsCount,
+                measuredItemProvider = measuredItemProvider,
+                containerConstraints = containerConstraints,
+                visibleItems = visibleItems
+            )
             canScrollBackward = false
         } else if (
             overscrolledForward(visibleItems.last(), itemsCount - 1, containerConstraints.maxHeight)
         ) {
             restoreLayoutBottomToTop(visibleItems, itemSpacing, containerConstraints)
+            addVisibleItemsBeforeItem(
+                visibleItems.first(),
+                itemSpacing = itemSpacing,
+                measuredItemProvider = measuredItemProvider,
+                containerConstraints = containerConstraints,
+                visibleItems = visibleItems
+            )
             canScrollForward = false
+        }
+
+        // Clean up items that are no longer visible.
+        fun TransformingLazyColumnMeasuredItem.isVisible(): Boolean =
+            offset + transformedHeight > 0 && offset < containerConstraints.maxHeight
+
+        for (index in visibleItems.indices.reversed()) {
+            if (!visibleItems[index].isVisible()) {
+                visibleItems.removeAt(index)
+            }
         }
 
         val anchorItem =
@@ -167,6 +180,53 @@ internal class TransformingLazyColumnContentPaddingMeasurementStrategy(
                     visibleItems.fastForEach { it.place(this) }
                 }
         )
+    }
+
+    private fun addVisibleItemsBeforeItem(
+        item: TransformingLazyColumnMeasuredItem,
+        itemSpacing: Int,
+        measuredItemProvider: MeasuredItemProvider,
+        containerConstraints: Constraints,
+        visibleItems: ArrayDeque<TransformingLazyColumnMeasuredItem>
+    ) {
+        var topOffset = item.offset - itemSpacing
+        var topPassIndex = item.index - 1
+
+        while (topOffset >= 0 && topPassIndex >= 0) {
+            val additionalItem =
+                measuredItemProvider.upwardMeasuredItem(
+                    topPassIndex,
+                    topOffset,
+                    maxHeight = containerConstraints.maxHeight
+                )
+            visibleItems.addFirst(additionalItem)
+            topOffset -= additionalItem.transformedHeight + itemSpacing
+            topPassIndex -= 1
+        }
+    }
+
+    private fun addVisibleItemsAfterItem(
+        item: TransformingLazyColumnMeasuredItem,
+        itemSpacing: Int,
+        containerConstraints: Constraints,
+        itemsCount: Int,
+        measuredItemProvider: MeasuredItemProvider,
+        visibleItems: ArrayDeque<TransformingLazyColumnMeasuredItem>
+    ) {
+        var bottomOffset = item.offset + item.transformedHeight + itemSpacing
+        var bottomPassIndex = item.index + 1
+
+        while (bottomOffset < containerConstraints.maxHeight && bottomPassIndex < itemsCount) {
+            val additionalItem =
+                measuredItemProvider.downwardMeasuredItem(
+                    bottomPassIndex,
+                    bottomOffset,
+                    maxHeight = containerConstraints.maxHeight
+                )
+            bottomOffset += additionalItem.transformedHeight + itemSpacing
+            visibleItems.add(additionalItem)
+            bottomPassIndex += 1
+        }
     }
 
     private val beforeContentPadding: Int =
@@ -215,8 +275,7 @@ internal class TransformingLazyColumnContentPaddingMeasurementStrategy(
 
     private fun overscrolledBackwards(
         visibleItem: TransformingLazyColumnMeasuredItem,
-        index: Int
-    ): Boolean = visibleItem.let { it.index == index && it.offset >= beforeContentPadding }
+    ): Boolean = visibleItem.let { it.index == 0 && it.offset >= beforeContentPadding }
 
     private fun overscrolledForward(
         visibleItem: TransformingLazyColumnMeasuredItem,
