@@ -34,6 +34,8 @@ import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.node.InteroperableComposeUiNode
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewRootForInspector
 import androidx.compose.ui.semantics.getAllSemanticsNodes
 import androidx.compose.ui.tooling.data.ContextCache
@@ -773,6 +775,12 @@ class LayoutInspectorTree {
         private fun findSingleRootInGroupData(group: CompositionGroup): ViewRootForInspector? {
             group.data.filterIsInstance<ViewRootForInspector>().singleOrNull()?.let {
                 return it
+            }
+            group.data.filterIsInstance<ComposeView>().singleOrNull()?.let {
+                return object : ViewRootForInspector {
+                    override val subCompositionView: AbstractComposeView
+                        get() = it
+                }
             }
             val refs = group.data.filterIsInstance<Ref<*>>().map { it.value }
             return refs.filterIsInstance<ViewRootForInspector>().singleOrNull()
