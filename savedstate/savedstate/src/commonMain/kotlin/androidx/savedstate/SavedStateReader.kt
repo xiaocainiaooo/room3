@@ -448,10 +448,10 @@ internal constructor(
     /**
      * Returns a new [Map] containing all key-value pairs from the [SavedState].
      *
-     * If a value within the [SavedState] is another [SavedState], it will also be recursively
-     * converted to a [Map]. Other values, including [List] and [Array], are copied by reference.
-     *
      * The returned [Map] does not preserve the entry iteration order of the [SavedState].
+     *
+     * **IMPORTANT:** All values will be copied by reference, and values within the [SavedState]
+     * that are also a [SavedState] will **NOT** be converted to a [Map].
      *
      * @return A [Map] containing all key-value pairs from the [SavedState].
      */
