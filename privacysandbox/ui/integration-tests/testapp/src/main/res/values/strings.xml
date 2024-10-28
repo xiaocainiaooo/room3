@@ -31,4 +31,12 @@
     <string name="display_viewability_switch">Display Viewability Geometry</string>
     <string name="video_switch">Video</string>
     <string name="basic_non_webview_switch">Basic Non-Webview</string>
+    <string name="cta_launch_fullscreen_ad">Launch Fullscreen Ad</string>
+    <string name="option_enable_back_navigation_after_5_sec">Enable after 5 seconds</string>
+    <string name="option_enable_back_navigation">Enable</string>
+    <string name="label_back_navigation">Back navigation</string>
+    <string name="option_non_blocking">Non blocking</string>
+    <string name="option_landscape">Landscape</string>
+    <string name="option_portrait">Portrait</string>
+    <string name="label_screen_orientation">Screen Orientation</string>
 </resources>

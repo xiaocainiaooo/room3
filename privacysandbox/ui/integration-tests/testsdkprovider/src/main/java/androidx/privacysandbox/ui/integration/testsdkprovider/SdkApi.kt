@@ -113,9 +113,15 @@ class SdkApi(private val sdkContext: Context) : ISdkApi.Stub() {
         }
     }
 
-    override fun launchFullscreenAd(launcherInfo: Bundle) {
+    override fun launchFullscreenAd(
+        launcherInfo: Bundle,
+        screenOrientation: Int,
+        backButtonNavigation: Int
+    ) {
         val coroutineScope = MainScope()
-        coroutineScope.launch { FullscreenAd(sdkContext).show(launcherInfo) }
+        coroutineScope.launch {
+            FullscreenAd(sdkContext).show(launcherInfo, screenOrientation, backButtonNavigation)
+        }
     }
 
     @OptIn(ExperimentalFeatures.DelegatingAdapterApi::class)

@@ -16,13 +16,16 @@
 
 package androidx.privacysandbox.ui.integration.testapp
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.RadioButton
 import androidx.privacysandbox.activity.client.createSdkActivityLauncher
 import androidx.privacysandbox.activity.client.toLauncherInfo
+import androidx.privacysandbox.ui.integration.sdkproviderutils.fullscreen.BackNavigation
 
 class FullscreenSetupFragment : BaseFragment() {
 
@@ -32,10 +35,39 @@ class FullscreenSetupFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         val setUpView = inflater.inflate(R.layout.fragment_fullscreen_setup, container, false)
+        val radioNonBlocking = setUpView.findViewById<RadioButton>(R.id.radio_non_blocking)
+        val radioLandscape = setUpView.findViewById<RadioButton>(R.id.radio_landscape)
+        val radioPortrait = setUpView.findViewById<RadioButton>(R.id.radio_portrait)
+        val radioEnableBackNav =
+            setUpView.findViewById<RadioButton>(R.id.radio_enable_back_navigation_immediately)
+        val radioEnableBackNavAfter5Seconds =
+            setUpView.findViewById<RadioButton>(R.id.radio_enable_back_navigation_after_5s)
+
         val launchButton: Button = setUpView.findViewById(R.id.btn_launch_fullscreen_ad)
         launchButton.setOnClickListener {
+            val screenOrientation =
+                when {
+                    radioLandscape.isChecked -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    radioPortrait.isChecked -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    radioNonBlocking.isChecked -> ActivityInfo.SCREEN_ORIENTATION_USER
+                    else -> ActivityInfo.SCREEN_ORIENTATION_USER
+                }
+
+            val backNavigation =
+                when {
+                    radioEnableBackNav.isChecked -> BackNavigation.ENABLED
+                    radioEnableBackNavAfter5Seconds.isChecked ->
+                        BackNavigation.ENABLED_AFTER_5_SECONDS
+                    else -> BackNavigation.ENABLED
+                }
+
             val activityLauncher = requireActivity().createSdkActivityLauncher({ true })
-            getSdkApi().launchFullscreenAd(activityLauncher.toLauncherInfo())
+            getSdkApi()
+                .launchFullscreenAd(
+                    activityLauncher.toLauncherInfo(),
+                    screenOrientation,
+                    backNavigation
+                )
         }
         return setUpView
     }

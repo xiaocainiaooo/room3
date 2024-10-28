@@ -18,10 +18,6 @@ package androidx.privacysandbox.ui.integration.sdkproviderutils.fullscreen
 
 import android.content.Context
 import android.os.Bundle
-import android.webkit.WebResourceRequest
-import android.webkit.WebSettings
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -30,33 +26,18 @@ import androidx.privacysandbox.sdkruntime.core.activity.ActivityHolder
 import androidx.privacysandbox.sdkruntime.core.activity.SdkSandboxActivityHandlerCompat
 import androidx.privacysandbox.sdkruntime.core.controller.SdkSandboxControllerCompat
 
-class FullscreenAd(sdkContext: Context) {
+class FullscreenAd(private val sdkContext: Context) {
 
-    private val webView = WebView(sdkContext)
     private val controller = SdkSandboxControllerCompat.from(sdkContext)
 
-    init {
-        initializeSettings(webView.settings)
-        webView.webViewClient =
-            object : WebViewClient() {
-                override fun shouldOverrideUrlLoading(
-                    view: WebView,
-                    request: WebResourceRequest
-                ): Boolean {
-                    return false
-                }
-            }
-        webView.loadUrl(WEB_VIEW_LINK)
-    }
-
-    suspend fun show(launcherInfo: Bundle) {
+    suspend fun show(launcherInfo: Bundle, screenOrientation: Int, backNavigation: Int) {
         val sdkActivityLauncher = SdkActivityLauncherFactory.fromLauncherInfo(launcherInfo)
         val handler =
             object : SdkSandboxActivityHandlerCompat {
 
                 override fun onActivityCreated(activityHolder: ActivityHolder) {
-                    val activityHandler = FullscreenActivityHandler(activityHolder, webView)
-                    activityHandler.buildLayout()
+                    val activityHandler = FullscreenActivityHandler(sdkContext, activityHolder)
+                    activityHandler.buildLayout(screenOrientation, backNavigation)
 
                     ViewCompat.setOnApplyWindowInsetsListener(
                         activityHolder.getActivity().window.decorView
@@ -71,22 +52,5 @@ class FullscreenAd(sdkContext: Context) {
         val token = controller.registerSdkSandboxActivityHandler(handler)
         val launched = sdkActivityLauncher.launchSdkActivity(token)
         if (!launched) controller.unregisterSdkSandboxActivityHandler(handler)
-    }
-
-    private fun initializeSettings(settings: WebSettings) {
-        settings.javaScriptEnabled = true
-        settings.setGeolocationEnabled(true)
-        settings.setSupportZoom(true)
-        settings.databaseEnabled = true
-        settings.domStorageEnabled = true
-        settings.allowFileAccess = true
-        settings.allowContentAccess = true
-        settings.useWideViewPort = true
-        settings.loadWithOverviewMode = true
-        settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
-    }
-
-    private companion object {
-        private const val WEB_VIEW_LINK = "https://developer.android.com/"
     }
 }

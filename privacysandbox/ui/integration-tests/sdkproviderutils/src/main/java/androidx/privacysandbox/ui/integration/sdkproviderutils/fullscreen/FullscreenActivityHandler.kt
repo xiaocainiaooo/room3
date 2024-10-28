@@ -16,67 +16,89 @@
 
 package androidx.privacysandbox.ui.integration.sdkproviderutils.fullscreen
 
+import android.content.Context
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.net.Uri
-import android.view.View
-import android.view.ViewGroup
+import android.os.Handler
+import android.os.Looper
+import android.view.LayoutInflater
+import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.privacysandbox.sdkruntime.core.activity.ActivityHolder
+import androidx.privacysandbox.ui.integration.sdkproviderutils.R
 
 class FullscreenActivityHandler(
-    private val activityHolder: ActivityHolder,
-    private val adView: View,
+    private val sdkContext: Context,
+    private val activityHolder: ActivityHolder
 ) {
+
     private val activity = activityHolder.getActivity()
+    private val handler = Handler(Looper.getMainLooper())
+    private val handlerCallback: () -> Unit = {
+        destroyActivityButton.isEnabled = true
+        destroyActivityButton.setOnClickListener { activity.finish() }
+        backPressDispatcherCallback.remove()
+    }
+    private val backPressDispatcherCallback =
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                makeToast("Can not go back!")
+            }
+        }
     private lateinit var destroyActivityButton: Button
     private lateinit var openLandingPage: Button
 
-    fun buildLayout() {
-        buildLayoutProgrammatically()
-        registerDestroyActivityButton()
+    fun buildLayout(screenOrientation: Int, @BackNavigation backNavigation: Int) {
+        initUI(screenOrientation)
+        registerDestroyActivityButton(backNavigation)
         registerOpenLandingPageButton()
         registerLifecycleListener()
     }
 
-    /** Builds the activity layout programmatically. */
-    private fun buildLayoutProgrammatically(): ViewGroup {
-        val mainLayout = LinearLayout(activity)
-        mainLayout.orientation = LinearLayout.VERTICAL
-        mainLayout.layoutParams =
-            ViewGroup.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-            )
+    private fun initUI(screenOrientation: Int) {
+        val mainLayout =
+            LayoutInflater.from(sdkContext).inflate(R.layout.layout_fullscreen_ad, null)
 
-        destroyActivityButton = Button(activity).apply { text = DESTROY_ACTIVITY }
-        mainLayout.addView(destroyActivityButton)
+        destroyActivityButton = mainLayout.findViewById(R.id.btn_destroy)
+        openLandingPage = mainLayout.findViewById(R.id.btn_open_landing_page)
 
-        openLandingPage = Button(activity).apply { text = OPEN_LANDING_PAGE }
-        mainLayout.addView(openLandingPage)
+        val webView = mainLayout.findViewById<WebView>(R.id.webview)
+        initializeSettings(webView.settings)
+        webView.webViewClient =
+            object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(
+                    view: WebView,
+                    request: WebResourceRequest
+                ): Boolean {
+                    return false
+                }
+            }
+        webView.loadUrl(WEB_VIEW_LINK)
 
-        if (adView.parent != null) {
-            (adView.parent as ViewGroup).removeView(adView)
-        }
-        adView.layoutParams =
-            ViewGroup.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-            )
-        mainLayout.addView(adView)
-
+        activity.requestedOrientation = screenOrientation
         activity.setContentView(mainLayout)
-        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        return mainLayout
     }
 
-    private fun registerDestroyActivityButton() {
-        destroyActivityButton.setOnClickListener { activity.finish() }
+    private fun registerDestroyActivityButton(@BackNavigation backNavigation: Int) {
+        when (backNavigation) {
+            BackNavigation.ENABLED -> {
+                destroyActivityButton.isEnabled = true
+                destroyActivityButton.setOnClickListener { activity.finish() }
+            }
+            BackNavigation.ENABLED_AFTER_5_SECONDS -> {
+                destroyActivityButton.isEnabled = false
+                activityHolder.getOnBackPressedDispatcher().addCallback(backPressDispatcherCallback)
+                handler.postDelayed(handlerCallback, BACK_CONTROL_DISABLE_TIME)
+            }
+        }
     }
 
     private fun registerOpenLandingPageButton() {
@@ -99,12 +121,34 @@ class FullscreenActivityHandler(
     private inner class LocalLifecycleObserver : LifecycleEventObserver {
         override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
             makeToast("Current activity state is: $event")
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                handler.removeCallbacks(handlerCallback)
+            }
         }
     }
 
+    private fun initializeSettings(settings: WebSettings) {
+        settings.javaScriptEnabled = true
+        settings.setGeolocationEnabled(true)
+        settings.setSupportZoom(true)
+        settings.domStorageEnabled = true
+        settings.allowFileAccess = true
+        settings.allowContentAccess = true
+        settings.useWideViewPort = true
+        settings.loadWithOverviewMode = true
+        settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
+    }
+
     private companion object {
-        private const val DESTROY_ACTIVITY = "Destroy Activity"
-        private const val OPEN_LANDING_PAGE = "Open Landing Page"
+        private const val BACK_CONTROL_DISABLE_TIME = 5000L
         private const val LANDING_PAGE_URL = "https://www.google.com"
+        private const val WEB_VIEW_LINK = "https://developer.android.com/"
+    }
+}
+
+annotation class BackNavigation {
+    companion object {
+        const val ENABLED = 0
+        const val ENABLED_AFTER_5_SECONDS = 1
     }
 }
