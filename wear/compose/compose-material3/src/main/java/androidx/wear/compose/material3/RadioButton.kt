@@ -50,8 +50,6 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -124,8 +122,6 @@ fun RadioButton(
     secondaryLabel: @Composable (RowScope.() -> Unit)? = null,
     label: @Composable RowScope.() -> Unit
 ) {
-    val hapticFeedback = LocalHapticFeedback.current
-
     // Stadium/Pill shaped toggle button
     Row(
         modifier =
@@ -138,10 +134,7 @@ fun RadioButton(
                 .selectable(
                     enabled = enabled,
                     selected = selected,
-                    onClick = {
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
-                        onSelect()
-                    },
+                    onClick = onSelect,
                     indication = ripple(),
                     interactionSource = interactionSource
                 )
@@ -345,7 +338,6 @@ fun SplitRadioButton(
         val splitBackground = if (enabled) containerColor else Color.Black
         val splitBackgroundOverlay =
             colors.splitContainerColor(enabled = enabled, selected = selected).value
-        val hapticFeedback = LocalHapticFeedback.current
 
         Box(
             contentAlignment = Alignment.Center,
@@ -353,10 +345,7 @@ fun SplitRadioButton(
                 Modifier.selectable(
                         enabled = enabled,
                         selected = selected,
-                        onClick = {
-                            hapticFeedback.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            onSelectionClick()
-                        },
+                        onClick = onSelectionClick,
                         indication = ripple(),
                         interactionSource = selectionInteractionSource
                     )
