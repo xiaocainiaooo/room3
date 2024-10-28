@@ -598,6 +598,7 @@ class DatePickerTest {
         rule.onNodeWithText("July 2020").assertExists()
     }
 
+    @Test
     fun setSelection_outOfYearsBound() {
         lateinit var datePickerState: DatePickerState
         rule.setMaterialContent(lightColorScheme()) {
@@ -612,6 +613,7 @@ class DatePickerTest {
         assertThat(datePickerState.selectedDateMillis).isNull()
     }
 
+    @Test
     fun initialDateOutOfBounds() {
         lateinit var datePickerState: DatePickerState
         rule.setMaterialContent(lightColorScheme()) {
@@ -627,6 +629,7 @@ class DatePickerTest {
         assertThat(datePickerState.selectedDateMillis).isNull()
     }
 
+    @Test
     fun initialDisplayedMonthOutObBounds() {
         lateinit var datePickerState: DatePickerState
         rule.setMaterialContent(lightColorScheme()) {

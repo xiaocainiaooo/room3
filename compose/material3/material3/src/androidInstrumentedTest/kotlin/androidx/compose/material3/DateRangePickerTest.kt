@@ -141,6 +141,7 @@ class DateRangePickerTest {
         }
     }
 
+    @Test
     fun state_initWithEndDateOnly() {
         lateinit var dateRangePickerState: DateRangePickerState
         rule.setMaterialContent(lightColorScheme()) {
@@ -156,6 +157,7 @@ class DateRangePickerTest {
         assertThat(dateRangePickerState.selectedEndDateMillis).isNull()
     }
 
+    @Test
     fun state_initWithEndDateBeforeStartDate() {
         lateinit var dateRangePickerState: DateRangePickerState
         rule.setMaterialContent(lightColorScheme()) {
@@ -174,6 +176,7 @@ class DateRangePickerTest {
         assertThat(dateRangePickerState.selectedEndDateMillis).isNull()
     }
 
+    @Test
     fun state_initWithEqualStartAndEndDates() {
         lateinit var dateRangePickerState: DateRangePickerState
         rule.setMaterialContent(lightColorScheme()) {
@@ -193,6 +196,7 @@ class DateRangePickerTest {
         }
     }
 
+    @Test
     fun initialStartDateOutOfBounds() {
         lateinit var dateRangePickerState: DateRangePickerState
         rule.setMaterialContent(lightColorScheme()) {
@@ -212,12 +216,12 @@ class DateRangePickerTest {
         assertThat(dateRangePickerState.selectedEndDateMillis).isNull()
     }
 
+    @Test
     fun initialEndDateOutOfBounds() {
         lateinit var dateRangePickerState: DateRangePickerState
+        val initialStartDateMillis = dayInUtcMilliseconds(year = 2020, month = 1, dayOfMonth = 10)
+        val initialEndDateMillis = dayInUtcMilliseconds(year = 2051, month = 5, dayOfMonth = 12)
         rule.setMaterialContent(lightColorScheme()) {
-            val initialStartDateMillis =
-                dayInUtcMilliseconds(year = 2020, month = 1, dayOfMonth = 10)
-            val initialEndDateMillis = dayInUtcMilliseconds(year = 2051, month = 5, dayOfMonth = 12)
             dateRangePickerState =
                 rememberDateRangePickerState(
                     initialSelectedStartDateMillis = initialStartDateMillis,
@@ -226,8 +230,8 @@ class DateRangePickerTest {
                 )
         }
 
-        // Expecting nulls since the dates are out of range.
-        assertThat(dateRangePickerState.selectedStartDateMillis).isNull()
+        assertThat(dateRangePickerState.selectedStartDateMillis).isEqualTo(initialStartDateMillis)
+        // Expecting nulls end date as it's out of range.
         assertThat(dateRangePickerState.selectedEndDateMillis).isNull()
     }
 
@@ -413,6 +417,7 @@ class DateRangePickerTest {
         }
     }
 
+    @Test
     fun setSelection_outOfYearsBound() {
         lateinit var dateRangePickerState: DateRangePickerState
         rule.setMaterialContent(lightColorScheme()) {
@@ -430,6 +435,7 @@ class DateRangePickerTest {
         assertThat(dateRangePickerState.selectedEndDateMillis).isNull()
     }
 
+    @Test
     fun setSelection_endBeforeStart() {
         lateinit var dateRangePickerState: DateRangePickerState
         rule.setMaterialContent(lightColorScheme()) {
