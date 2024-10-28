@@ -299,11 +299,12 @@ private fun Message() {
 
 @Composable
 private fun SecondaryButton() {
+    var checked by remember { mutableStateOf(false) }
     SwitchButton(
         modifier = Modifier.fillMaxWidth(),
-        checked = false,
+        checked = checked,
         enabled = true,
-        onCheckedChange = {},
+        onCheckedChange = { checked = it },
         label = { Text("Don't show again") },
     )
 }
