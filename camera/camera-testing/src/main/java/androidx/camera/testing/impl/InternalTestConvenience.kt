@@ -76,7 +76,7 @@ public object InternalTestConvenience {
      */
     public fun String.ignoreTestForCameraPipe(message: String, evenInLab: Boolean = false) {
         if (!LabTestRule.isInLabTest() || evenInLab) {
-            assumeTrue(message, this != CameraPipeConfig::class.simpleName)
+            assumeTrue(message, !this.contains(CameraPipeConfig::class.simpleName.toString()))
         }
     }
 }
