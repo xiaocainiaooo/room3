@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.wear.compose.integration.macrobenchmark
+package androidx.wear.compose.material3.macrobenchmark
 
 import android.content.Intent
 import androidx.benchmark.macro.CompilationMode
@@ -22,17 +22,20 @@ import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.FrameTimingGfxInfoMetric
 import androidx.benchmark.macro.MemoryUsageMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
-import androidx.test.uiautomator.By
+import androidx.test.filters.LargeTest
+import androidx.testutils.createCompilationParams
+import androidx.wear.compose.material3.macrobenchmark.common.ButtonBenchmark
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 @OptIn(ExperimentalMetricApi::class)
-abstract class ButtonBenchmarkBase(
-    private val compilationMode: CompilationMode,
-    private val activityAction: String
-) {
+@LargeTest
+@RunWith(Parameterized::class)
+class ButtonBenchmarkTest(private val compilationMode: CompilationMode) {
     @get:Rule val benchmarkRule = MacrobenchmarkRule()
 
     @Before
@@ -55,24 +58,19 @@ abstract class ButtonBenchmarkBase(
             iterations = 10,
             setupBlock = {
                 val intent = Intent()
-                intent.action = activityAction
+                intent.action = BUTTON_ACTIVITY
                 startActivityAndWait(intent)
             }
         ) {
-            val buttons = buildList {
-                repeat(4) { add(device.findObject(By.desc(numberedContentDescription(it)))) }
-            }
-            repeat(3) {
-                for (button in buttons) {
-                    button.click(50)
-                    device.waitForIdle()
-                }
-                Thread.sleep(500)
-            }
+            ButtonBenchmark.exercise.invoke(this)
         }
     }
 
     companion object {
-        private const val PACKAGE_NAME = "androidx.wear.compose.integration.macrobenchmark.target"
+        private const val BUTTON_ACTIVITY = "$PACKAGE_NAME.BUTTON_ACTIVITY"
+
+        @Parameterized.Parameters(name = "compilation={0}")
+        @JvmStatic
+        fun parameters() = createCompilationParams()
     }
 }

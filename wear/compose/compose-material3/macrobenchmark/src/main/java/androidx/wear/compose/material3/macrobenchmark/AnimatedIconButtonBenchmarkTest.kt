@@ -14,31 +14,28 @@
  * limitations under the License.
  */
 
-package androidx.wear.compose.integration.macrobenchmark
+package androidx.wear.compose.material3.macrobenchmark
 
 import android.content.Intent
-import android.os.Build
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.FrameTimingGfxInfoMetric
 import androidx.benchmark.macro.MemoryUsageMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.filters.SdkSuppress
-import androidx.test.uiautomator.By
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import androidx.testutils.createCompilationParams
+import androidx.wear.compose.material3.macrobenchmark.common.AnimatedIconButtonBenchmark
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
+@OptIn(ExperimentalMetricApi::class)
 @LargeTest
-@RunWith(AndroidJUnit4::class)
-@SdkSuppress(minSdkVersion = Build.VERSION_CODES.S)
-class AnimatedTextBenchmark {
+@RunWith(Parameterized::class)
+class AnimatedIconButtonBenchmarkTest(private val compilationMode: CompilationMode) {
     @get:Rule val benchmarkRule = MacrobenchmarkRule()
 
     @Before
@@ -51,41 +48,30 @@ class AnimatedTextBenchmark {
         enableChargingExperience()
     }
 
-    @OptIn(ExperimentalMetricApi::class)
     @Test
     fun start() {
         benchmarkRule.measureRepeated(
             packageName = PACKAGE_NAME,
             metrics =
-                listOf(
-                    FrameTimingGfxInfoMetric(),
-                    MemoryUsageMetric(MemoryUsageMetric.Mode.Last),
-                ),
-            compilationMode = CompilationMode.DEFAULT,
+                listOf(FrameTimingGfxInfoMetric(), MemoryUsageMetric(MemoryUsageMetric.Mode.Last)),
+            compilationMode = compilationMode,
             iterations = 10,
             setupBlock = {
                 val intent = Intent()
-                intent.action = ANIMATED_TEXT_ACTIVITY
+                intent.action = ANIMATED_ICON_BUTTON_ACTIVITY
                 startActivityAndWait(intent)
             }
         ) {
-            runBlocking {
-                val plusButton = device.findObject(By.desc("plusContentDescription"))
-                val minusButton = device.findObject(By.desc("minusContentDescription"))
-                repeat(3) {
-                    plusButton.click()
-                    delay(250L)
-                }
-                repeat(3) {
-                    minusButton.click()
-                    delay(250L)
-                }
-            }
+            AnimatedIconButtonBenchmark.exercise.invoke(this)
         }
     }
 
     companion object {
-        private const val PACKAGE_NAME = "androidx.wear.compose.integration.macrobenchmark.target"
-        private const val ANIMATED_TEXT_ACTIVITY = "$PACKAGE_NAME.ANIMATED_TEXT_ACTIVITY"
+        private const val ANIMATED_ICON_BUTTON_ACTIVITY =
+            "$PACKAGE_NAME.ANIMATED_ICON_BUTTON_ACTIVITY"
+
+        @Parameterized.Parameters(name = "compilation={0}")
+        @JvmStatic
+        fun parameters() = createCompilationParams()
     }
 }
