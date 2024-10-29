@@ -252,6 +252,12 @@ public class StreamSharing extends UseCase {
         mVirtualCameraAdapter.notifyStateDetached();
     }
 
+    @Override
+    public void onCameraControlReady() {
+        super.onCameraControlReady();
+        mVirtualCameraAdapter.notifyCameraControlReady();
+    }
+
     @NonNull
     public Set<UseCase> getChildren() {
         return mVirtualCameraAdapter.getChildren();

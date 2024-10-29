@@ -41,6 +41,7 @@ import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.camera.camera2.pipe.integration.CameraPipeConfig
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.Camera
+import androidx.camera.core.CameraEffect.IMAGE_CAPTURE
 import androidx.camera.core.CameraFilter
 import androidx.camera.core.CameraInfo
 import androidx.camera.core.CameraSelector
@@ -82,6 +83,7 @@ import androidx.camera.testing.impl.CameraPipeConfigTestRule
 import androidx.camera.testing.impl.CameraUtil
 import androidx.camera.testing.impl.CoreAppTestUtil
 import androidx.camera.testing.impl.InternalTestConvenience.ignoreTestForCameraPipe
+import androidx.camera.testing.impl.StreamSharingForceEnabledEffect
 import androidx.camera.testing.impl.SurfaceTextureProvider
 import androidx.camera.testing.impl.WakelockEmptyActivityRule
 import androidx.camera.testing.impl.fakes.FakeLifecycleOwner
@@ -392,19 +394,31 @@ class ImageCaptureTest(private val implName: String, private val cameraXConfig: 
         builder: ImageCapture.Builder,
         cameraSelector: CameraSelector = BACK_SELECTOR,
         numImages: Int = 1,
+        addSharedEffect: Boolean = false,
         runAtStart: suspend () -> Unit = {},
     ): Unit = runBlocking {
         runAtStart()
 
         // Arrange.
-        val useCase = builder.build()
+        val imageCapture = builder.build()
+        val useCaseGroup =
+            UseCaseGroup.Builder()
+                .addUseCase(imageCapture)
+                .apply {
+                    if (addSharedEffect) {
+                        addUseCase(VideoCapture.withOutput(Recorder.Builder().build()))
+                        addEffect(StreamSharingForceEnabledEffect(IMAGE_CAPTURE))
+                    }
+                }
+                .build()
+
         withContext(Dispatchers.Main) {
-            cameraProvider.bindToLifecycle(fakeLifecycleOwner, cameraSelector, useCase)
+            cameraProvider.bindToLifecycle(fakeLifecycleOwner, cameraSelector, useCaseGroup)
         }
 
         // Act.
         val callback = FakeOnImageCapturedCallback(captureCount = numImages)
-        repeat(numImages) { useCase.takePicture(mainExecutor, callback) }
+        repeat(numImages) { imageCapture.takePicture(mainExecutor, callback) }
 
         // Assert.
         callback.awaitCapturesAndAssert(
@@ -2120,6 +2134,11 @@ class ImageCaptureTest(private val implName: String, private val cameraXConfig: 
         // The set allowedResolutionMode is kept
         assertThat(resolutionSelector.allowedResolutionMode)
             .isEqualTo(PREFER_HIGHER_RESOLUTION_OVER_CAPTURE_RATE)
+    }
+
+    @Test
+    fun canCaptureImageWithCameraEffect() {
+        canTakeImages(defaultBuilder, addSharedEffect = true)
     }
 
     private fun capturedImage_withHighResolutionEnabled(
