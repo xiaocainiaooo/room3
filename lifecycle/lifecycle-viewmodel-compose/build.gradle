@@ -21,6 +21,8 @@
  * Please use that script when creating a new project, rather than copying an existing project and
  * modifying its settings.
  */
+
+import androidx.build.KotlinTarget
 import androidx.build.LibraryType
 import androidx.build.PlatformIdentifier
 
@@ -101,6 +103,7 @@ androidx {
     legacyDisableKotlinStrictApiMode = true
     metalavaK2UastEnabled = false
     samples(project(":lifecycle:lifecycle-viewmodel-compose:lifecycle-viewmodel-compose-samples"))
+    kotlinTarget = KotlinTarget.KOTLIN_1_9
 }
 
 android {

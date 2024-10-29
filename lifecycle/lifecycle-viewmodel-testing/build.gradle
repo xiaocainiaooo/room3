@@ -22,6 +22,8 @@
  * modifying its settings.
  */
 
+
+import androidx.build.KotlinTarget
 import androidx.build.LibraryType
 import androidx.build.PlatformIdentifier
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
@@ -115,5 +117,6 @@ androidx {
     description = "Testing utilities for 'lifecycle-viewmodel' artifact"
     // TODO(b/337268135): Temporarily disabled until issue fixed.
     metalavaK2UastEnabled = false
+    kotlinTarget = KotlinTarget.KOTLIN_1_9
 }
 

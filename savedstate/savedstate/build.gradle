@@ -6,6 +6,8 @@
  * modifying its settings.
  */
 
+
+import androidx.build.KotlinTarget
 import androidx.build.LibraryType
 import androidx.build.PlatformIdentifier
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
@@ -168,4 +170,5 @@ androidx {
     inceptionYear = "2018"
     description = "Android Lifecycle Saved State"
     legacyDisableKotlinStrictApiMode = true
+    kotlinTarget = KotlinTarget.KOTLIN_1_9
 }
