@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package androidx.camera.impl.utils.executor
+package androidx.camera.viewfinder.core.impl.utils.executor
 
+import android.os.Handler
+import android.os.Looper
 import java.util.concurrent.Executor
 import java.util.concurrent.ScheduledExecutorService
 
-/** Utility class for generating specific implementations of [Executor]. */
-object ViewfinderExecutors {
-    /** Returns a cached [ScheduledExecutorService] which posts to the main thread. */
-    @JvmStatic
-    fun mainThreadExecutor(): ScheduledExecutorService {
-        return MainThreadExecutor.instance
-    }
-
-    /** Returns a cached executor that runs tasks directly from the calling thread. */
-    @JvmStatic
-    fun directExecutor(): Executor {
-        return DirectExecutor.instance
+/**
+ * Helper class for retrieving an [ScheduledExecutorService] which will post to the main thread.
+ *
+ * Since [ScheduledExecutorService] implements [Executor], this can also be used as a simple
+ * Executor.
+ */
+internal class MainThreadExecutor {
+    companion object {
+        val instance: ScheduledExecutorService by lazy {
+            HandlerScheduledExecutorService(Handler(Looper.getMainLooper()))
+        }
     }
 }

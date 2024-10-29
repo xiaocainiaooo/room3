@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package androidx.camera.viewfinder.surface
+package androidx.camera.viewfinder
 
 import android.view.Surface
+import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
 
 /**
  * A interface implemented by the application to provide a [Surface] for viewfinder.
@@ -25,7 +26,7 @@ import android.view.Surface
  * application when it needs a Surface for viewfinder. It also signals when the Surface is no longer
  * in use.
  */
-interface ViewfinderSurfaceProvider {
+internal interface ViewfinderSurfaceProvider {
     /**
      * Called when a new [Surface] has been requested by the frame producer.
      *

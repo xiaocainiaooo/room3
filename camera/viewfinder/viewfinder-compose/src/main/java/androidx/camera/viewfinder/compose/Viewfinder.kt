@@ -23,9 +23,9 @@ import android.view.Surface
 import androidx.camera.viewfinder.compose.internal.RefCounted
 import androidx.camera.viewfinder.compose.internal.SurfaceTransformationUtil
 import androidx.camera.viewfinder.compose.internal.TransformUtil.surfaceRotationToRotationDegrees
-import androidx.camera.viewfinder.surface.ImplementationMode
-import androidx.camera.viewfinder.surface.TransformationInfo
-import androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest
+import androidx.camera.viewfinder.core.ImplementationMode
+import androidx.camera.viewfinder.core.TransformationInfo
+import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
 import androidx.compose.foundation.AndroidEmbeddedExternalSurface
 import androidx.compose.foundation.AndroidExternalSurface
 import androidx.compose.foundation.AndroidExternalSurfaceScope

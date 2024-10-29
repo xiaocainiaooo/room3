@@ -23,7 +23,7 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.camera.viewfinder.surface.ViewfinderSurfaceRequest;
+import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest;
 
 /**
  * Wraps the underlying handling of the {@link android.view.Surface} used for viewfinder, which is
@@ -65,10 +65,11 @@ abstract class ViewfinderImplementation {
     /**
      * Invoked when the viewfinder needs to be adjusted, either because the layout bounds of the
      * viewfinder's container {@link CameraViewfinder} have changed, or the
-     * {@link CameraViewfinder.ScaleType} has changed.
+     * {@link androidx.camera.viewfinder.core.ScaleType} has changed.
      * <p>
-     * Corrects and adjusts the viewfinder using the latest {@link CameraViewfinder.ScaleType} and
-     * display properties such as the display orientation and size.
+     * Corrects and adjusts the viewfinder using the latest
+     * {@link androidx.camera.viewfinder.core.ScaleType} and display properties such as the display
+     * orientation and size.
      */
     void redrawViewfinder() {
         View viewfinder = getViewfinder();
