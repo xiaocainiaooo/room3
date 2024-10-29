@@ -311,7 +311,7 @@ internal constructor(
         buffer.replace(start, end, text, textStart, textEnd)
 
         commitComposition()
-        highlight = null
+        clearHighlight()
     }
 
     /**
