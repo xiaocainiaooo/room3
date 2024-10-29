@@ -87,13 +87,13 @@ public interface AppSearchEnvironment {
     }
 
     /** This code is being built in the Jetpack Environment */
-    static final int JETPACK_ENVIRONMENT = 1;
+    int JETPACK_ENVIRONMENT = 1;
 
     /** This code is being built in the Android Framework Environment */
-    static final int FRAMEWORK_ENVIRONMENT = 2;
+    int FRAMEWORK_ENVIRONMENT = 2;
 
     /** This code is being built in the internal environment for Play Services code. */
-    static final int PLAY_SERVICES_ENVIRONMENT = 3;
+    int PLAY_SERVICES_ENVIRONMENT = 3;
 
     /** Returns the {@code EnvironmentType} for this environment. */
     @EnvironmentType int getEnvironment();
