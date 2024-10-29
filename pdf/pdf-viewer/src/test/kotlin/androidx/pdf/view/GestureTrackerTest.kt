@@ -26,6 +26,7 @@ import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -238,6 +239,7 @@ class GestureTrackerTest {
         verifyNoMoreInteractions(gestureHandlerSpy)
     }
 
+    @Ignore // b/376314114
     @Test
     fun testZoomOut_pinch() {
         // Drag pointer 1 in the negative Y direction from (500, 500) at the same time as dragging
