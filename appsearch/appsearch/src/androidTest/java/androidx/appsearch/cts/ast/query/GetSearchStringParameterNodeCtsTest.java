@@ -82,4 +82,13 @@ public class GetSearchStringParameterNodeCtsTest {
 
         assertThat(getSearchStringParameterNode.getSearchStringIndex()).isEqualTo(1);
     }
+
+    @Test
+    public void testToString_returnsCorrectString() {
+        GetSearchStringParameterNode getSearchStringParameterNode =
+                new GetSearchStringParameterNode(0);
+
+        assertThat(getSearchStringParameterNode.toString())
+                .isEqualTo("getSearchStringParameter(0)");
+    }
 }

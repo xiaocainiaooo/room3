@@ -39,6 +39,7 @@ import androidx.appsearch.ast.operators.AndNode;
 import androidx.appsearch.ast.operators.ComparatorNode;
 import androidx.appsearch.ast.operators.OrNode;
 import androidx.appsearch.ast.operators.PropertyRestrictNode;
+import androidx.appsearch.ast.query.GetSearchStringParameterNode;
 import androidx.appsearch.ast.query.HasPropertyNode;
 import androidx.appsearch.flags.CheckFlagsRule;
 import androidx.appsearch.flags.DeviceFlagsValueProvider;
@@ -544,6 +545,37 @@ public abstract class AbstractSyntaxTreeSearchCtsTestBase {
                 .build());
         List<GenericDocument> documents = convertSearchResultsToDocuments(searchResults);
         assertThat(documents).containsExactly(fooBodyEmail);
+    }
+
+    @Test
+    public void testGetSearchStringParameterNode_toString_retrievesSearchString() throws Exception {
+        mDb1.setSchemaAsync(
+                new SetSchemaRequest.Builder().addSchemas(AppSearchEmail.SCHEMA).build()).get();
+
+        AppSearchEmail fooEmail = new AppSearchEmail.Builder("namespace", "id1")
+                .setBody("foo")
+                .build();
+
+        AppSearchEmail barEmail = new AppSearchEmail.Builder("namespace", "id2")
+                .setBody("bar")
+                .build();
+
+        checkIsBatchResultSuccess(mDb1.putAsync(
+                new PutDocumentsRequest.Builder()
+                        .addGenericDocuments(fooEmail, barEmail).build()));
+
+        // Query for the document.
+        GetSearchStringParameterNode getSearchStringParameterNode =
+                new GetSearchStringParameterNode(0);
+        SearchResults searchResults = mDb1.search(getSearchStringParameterNode.toString(),
+                new SearchSpec.Builder()
+                        .addSearchStringParameters("foo")
+                        .setTermMatch(SearchSpec.TERM_MATCH_EXACT_ONLY)
+                        .setListFilterQueryLanguageEnabled(true)
+                        .build());
+        List<GenericDocument> documents = convertSearchResultsToDocuments(searchResults);
+
+        assertThat(documents).containsExactly(fooEmail);
     }
 
     @Test
