@@ -453,7 +453,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
             currentScope = scope
             currentScopeReads = scopeToValues[scope]
             if (currentToken == -1) {
-                currentToken = currentSnapshot().id
+                currentToken = currentSnapshot().snapshotId.hashCode()
             }
 
             observeDerivedStateRecalculations(derivedStateObserver) {
@@ -572,7 +572,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
 
         fun rereadDerivedState(derivedState: DerivedState<*>) {
             val scopeToValues = scopeToValues
-            val token = currentSnapshot().id
+            val token = currentSnapshot().snapshotId.hashCode()
 
             valueToScopes.forEachScopeOf(derivedState) { scope ->
                 recordRead(
