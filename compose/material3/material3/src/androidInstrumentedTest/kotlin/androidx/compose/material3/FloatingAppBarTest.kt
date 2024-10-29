@@ -19,14 +19,21 @@ package androidx.compose.material3
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.FloatingAppBarDefaults.floatingToolbarVerticalNestedScroll
 import androidx.compose.material3.FloatingAppBarExitDirection.Companion.Bottom
 import androidx.compose.material3.FloatingAppBarExitDirection.Companion.End
 import androidx.compose.runtime.Composable
@@ -54,6 +61,9 @@ import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -748,6 +758,191 @@ class FloatingAppBarTest {
                 /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
                 FloatingAppBarDefaults.ToolbarToFabGap
         rule.onNodeWithTag(FloatingAppBarTestTag).assertHeightIsEqualTo(componentHeight)
+    }
+
+    private val mainLayoutTag = "mainLayout"
+
+    @Test
+    fun floatingToolbarVerticalNestedScroll_verticalSwipesUpdateValue() {
+        var expanded = true
+        rule.setContent {
+            VerticalNestedScrollTestContent(
+                onExpanded = { expanded = true },
+                onCollapsed = { expanded = false },
+                initialValue = expanded,
+            )
+        }
+
+        assertThat(expanded).isEqualTo(true)
+
+        // Toggle the value by scrolling up and down.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeDown(top, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+    }
+
+    @Test
+    fun floatingToolbarVerticalNestedScroll_verticalSwipesUpdateValue_reverseLayout() {
+        var expanded = true
+        rule.setContent {
+            VerticalNestedScrollTestContent(
+                onExpanded = { expanded = true },
+                onCollapsed = { expanded = false },
+                initialValue = expanded,
+                reverseLayout = true,
+            )
+        }
+
+        assertThat(expanded).isEqualTo(true)
+
+        // Toggle the value by scrolling down and up in this reverse layout..
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeDown(top, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+    }
+
+    @Test
+    fun floatingToolbarVerticalNestedScroll_disableScrollInterception() {
+        var expanded = true
+        rule.setContent {
+            VerticalNestedScrollTestContent(
+                onExpanded = { expanded = true },
+                onCollapsed = { expanded = false },
+                toolbarNestedScrollEnabled = false,
+                initialValue = expanded,
+                reverseLayout = true
+            )
+        }
+
+        assertThat(expanded).isEqualTo(true)
+
+        // Scrolling up or down should not change the value.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeDown(top, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+    }
+
+    @Test
+    fun floatingToolbarVerticalNestedScroll_falseInitialValue() {
+        var expanded = false
+        rule.setContent {
+            VerticalNestedScrollTestContent(
+                onExpanded = { expanded = true },
+                onCollapsed = { expanded = false },
+                initialValue = expanded
+            )
+        }
+
+        assertThat(expanded).isEqualTo(false)
+
+        // Simulate a scroll up and ensure that the value is still false.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
+        // Simulate a scroll down to toggle the value to true.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeDown(top, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+    }
+
+    @Test
+    fun floatingToolbarVerticalNestedScroll_threshold() {
+        var expanded = true
+        var thresholdPx = 0f
+
+        rule.setContent {
+            VerticalNestedScrollTestContent(
+                onExpanded = { expanded = true },
+                onCollapsed = { expanded = false },
+                initialValue = expanded
+            )
+            thresholdPx =
+                with(LocalDensity.current) { FloatingAppBarDefaults.ScrollDistanceThreshold.toPx() }
+        }
+
+        assertThat(expanded).isEqualTo(true)
+
+        // Simulate a short scroll below the threshold and ensure that the value is still true.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput {
+            swipeUp(bottom, bottom - thresholdPx / 4f)
+        }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+
+        // Simulate an additional scroll to cross the threshold and ensure that the value is now
+        // false.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput {
+            swipeUp(bottom, bottom - thresholdPx * 2)
+        }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
+    }
+
+    @Test
+    fun floatingToolbarVerticalNestedScroll_customThreshold() {
+        val customThreshold = 100.dp
+        var expanded = true
+        var thresholdPx = 0f
+
+        rule.setContent {
+            VerticalNestedScrollTestContent(
+                onExpanded = { expanded = true },
+                onCollapsed = { expanded = false },
+                initialValue = expanded
+            )
+            thresholdPx = with(LocalDensity.current) { customThreshold.toPx() }
+        }
+
+        assertThat(expanded).isEqualTo(true)
+
+        // Simulate a short scroll below the threshold and ensure that the value is still true.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput {
+            swipeUp(bottom, bottom - thresholdPx / 4f)
+        }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+
+        // Simulate an additional scroll to cross the threshold and ensure that the value is now
+        // false.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput {
+            swipeUp(bottom, bottom - thresholdPx)
+        }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
+    }
+
+    @Composable
+    private fun VerticalNestedScrollTestContent(
+        onExpanded: () -> Unit,
+        onCollapsed: () -> Unit,
+        toolbarNestedScrollEnabled: Boolean = true,
+        initialValue: Boolean = true,
+        reverseLayout: Boolean = false
+    ) {
+        Column(
+            modifier =
+                Modifier.fillMaxSize() then
+                    (if (toolbarNestedScrollEnabled) {
+                        Modifier.floatingToolbarVerticalNestedScroll(
+                            expanded = initialValue,
+                            reverseLayout = reverseLayout,
+                            onExpand = onExpanded,
+                            onCollapse = onCollapsed
+                        )
+                    } else {
+                        Modifier
+                    })
+        ) {
+            Box(modifier = Modifier.fillMaxWidth().height(80.dp))
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth().testTag(mainLayoutTag).weight(1f),
+                reverseLayout = reverseLayout
+            ) {
+                items(100) {
+                    Box(modifier = Modifier.fillMaxWidth().height(60.dp).background(Color.Gray)) {
+                        Text(text = it.toString())
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
     }
 
     @Composable
