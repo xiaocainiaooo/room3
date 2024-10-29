@@ -110,4 +110,17 @@ public class PropertyDefinedNodeCtsTest {
 
         assertThat(propertyDefinedNode.getProperty()).isEqualTo(anotherProperty);
     }
+
+    @Test
+    public void testToString_returnsCorrectString() {
+        List<PropertyPath.PathSegment> pathSegmentList = List.of(
+                PropertyPath.PathSegment.create("property"),
+                PropertyPath.PathSegment.create("path"));
+        PropertyPath propertyPath = new PropertyPath(pathSegmentList);
+        PropertyDefinedNode propertyDefinedNode =
+                new PropertyDefinedNode(propertyPath);
+
+        assertThat(propertyDefinedNode.toString())
+                .isEqualTo("propertyDefined(\"property.path\")");
+    }
 }
