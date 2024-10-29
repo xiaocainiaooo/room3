@@ -84,11 +84,11 @@ package androidx.biometric {
 
   public static class BiometricPrompt.PromptInfo {
     method public int getAllowedAuthenticators();
-    method public androidx.biometric.PromptContentView? getContentView();
+    method @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) public androidx.biometric.PromptContentView? getContentView();
     method public CharSequence? getDescription();
-    method @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public android.graphics.Bitmap? getLogoBitmap();
-    method @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public String? getLogoDescription();
-    method @DrawableRes @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public int getLogoRes();
+    method @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public android.graphics.Bitmap? getLogoBitmap();
+    method @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public String? getLogoDescription();
+    method @DrawableRes @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public int getLogoRes();
     method public CharSequence getNegativeButtonText();
     method public CharSequence? getSubtitle();
     method public CharSequence getTitle();
@@ -101,32 +101,32 @@ package androidx.biometric {
     method public androidx.biometric.BiometricPrompt.PromptInfo build();
     method public androidx.biometric.BiometricPrompt.PromptInfo.Builder setAllowedAuthenticators(int);
     method public androidx.biometric.BiometricPrompt.PromptInfo.Builder setConfirmationRequired(boolean);
-    method public androidx.biometric.BiometricPrompt.PromptInfo.Builder setContentView(androidx.biometric.PromptContentView);
+    method @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) public androidx.biometric.BiometricPrompt.PromptInfo.Builder setContentView(androidx.biometric.PromptContentView);
     method public androidx.biometric.BiometricPrompt.PromptInfo.Builder setDescription(CharSequence?);
     method @Deprecated public androidx.biometric.BiometricPrompt.PromptInfo.Builder setDeviceCredentialAllowed(boolean);
-    method @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public androidx.biometric.BiometricPrompt.PromptInfo.Builder setLogoBitmap(android.graphics.Bitmap);
-    method @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public androidx.biometric.BiometricPrompt.PromptInfo.Builder setLogoDescription(String);
-    method @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public androidx.biometric.BiometricPrompt.PromptInfo.Builder setLogoRes(@DrawableRes int);
+    method @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public androidx.biometric.BiometricPrompt.PromptInfo.Builder setLogoBitmap(android.graphics.Bitmap);
+    method @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public androidx.biometric.BiometricPrompt.PromptInfo.Builder setLogoDescription(String);
+    method @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public androidx.biometric.BiometricPrompt.PromptInfo.Builder setLogoRes(@DrawableRes int);
     method public androidx.biometric.BiometricPrompt.PromptInfo.Builder setNegativeButtonText(CharSequence);
     method public androidx.biometric.BiometricPrompt.PromptInfo.Builder setSubtitle(CharSequence?);
     method public androidx.biometric.BiometricPrompt.PromptInfo.Builder setTitle(CharSequence);
   }
 
-  public interface PromptContentItem {
+  @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) public interface PromptContentItem {
   }
 
-  public final class PromptContentItemBulletedText implements androidx.biometric.PromptContentItem {
+  @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) public final class PromptContentItemBulletedText implements androidx.biometric.PromptContentItem {
     ctor public PromptContentItemBulletedText(String);
   }
 
-  public final class PromptContentItemPlainText implements androidx.biometric.PromptContentItem {
+  @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) public final class PromptContentItemPlainText implements androidx.biometric.PromptContentItem {
     ctor public PromptContentItemPlainText(String);
   }
 
-  public interface PromptContentView {
+  @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) public interface PromptContentView {
   }
 
-  public final class PromptContentViewWithMoreOptionsButton implements androidx.biometric.PromptContentView {
+  @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) public final class PromptContentViewWithMoreOptionsButton implements androidx.biometric.PromptContentView {
     method @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public String? getDescription();
   }
 
@@ -136,7 +136,7 @@ package androidx.biometric {
     method @RequiresPermission(android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED) public androidx.biometric.PromptContentViewWithMoreOptionsButton.Builder setDescription(String);
   }
 
-  public final class PromptVerticalListContentView implements androidx.biometric.PromptContentView {
+  @RequiresApi(android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) public final class PromptVerticalListContentView implements androidx.biometric.PromptContentView {
     method public String? getDescription();
     method public java.util.List<androidx.biometric.PromptContentItem!> getListItems();
   }

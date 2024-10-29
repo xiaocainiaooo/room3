@@ -16,8 +16,11 @@
 
 package androidx.biometric;
 
+import android.os.Build;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +44,7 @@ import java.util.List;
  *     .build();
  * </pre>
  */
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 public final class PromptVerticalListContentView implements PromptContentView {
     private final List<PromptContentItem> mContentList;
     private final String mDescription;
