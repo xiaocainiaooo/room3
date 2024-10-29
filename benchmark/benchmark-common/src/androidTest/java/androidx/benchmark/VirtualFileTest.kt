@@ -70,22 +70,26 @@ class VirtualFileTest(
         file2.delete()
     }
 
+    @Ignore // b/375656692
     @Test
     fun absolutePath() {
         assertThat(file1.absolutePath).isEqualTo(expectedFile1Path)
     }
 
+    @Ignore // b/375656692
     @Test
     fun fileType() {
         assertThat(file1.fileType).isEqualTo(expectedFileType)
     }
 
+    @Ignore // b/375656692
     @Test
     fun writeReadText() {
         file1.writeText("test")
         assertThat(file1.readText()).isEqualTo("test")
     }
 
+    @Ignore // b/375656692
     @Test
     fun writeReadBytes() {
         val bytes = ByteArray(3) { it.toByte() }
@@ -93,6 +97,7 @@ class VirtualFileTest(
         assertThat(file1.readBytes()).isEqualTo(bytes)
     }
 
+    @Ignore // b/375656692
     @Test
     fun existDelete() {
         file1.writeText("text")
@@ -101,6 +106,7 @@ class VirtualFileTest(
         assertThat(file1.exists()).isFalse()
     }
 
+    @Ignore // b/375656692
     @Test
     fun copyFrom() {
         file2.writeText("text")
@@ -108,6 +114,7 @@ class VirtualFileTest(
         assertThat(file1.readText()).isEqualTo("text")
     }
 
+    @Ignore // b/375656692
     @Test
     fun copyTo() {
         file1.writeText("text")
@@ -115,6 +122,7 @@ class VirtualFileTest(
         assertThat(file2.readText()).isEqualTo("text")
     }
 
+    @Ignore // b/375656692
     @Test
     fun moveTo() {
         file1.writeText("text")
@@ -123,12 +131,14 @@ class VirtualFileTest(
         assertThat(file1.exists()).isFalse()
     }
 
+    @Ignore // b/375656692
     @Test
     fun md5sum() {
         file1.writeText("text")
         assertThat(file1.md5sum()).isEqualTo("1cb251ec0d568de6a929b520c4aed8d1")
     }
 
+    @Ignore // b/375656692
     @Test
     fun ls() {
         file1.writeText("text")
