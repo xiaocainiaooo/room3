@@ -19,7 +19,6 @@ package androidx.compose.ui.node
 
 import androidx.annotation.RestrictTo
 import androidx.compose.runtime.Applier
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillManager
@@ -119,7 +118,7 @@ internal interface Owner : PositionCalculator {
      * The [AutofillManager] class can be used to perform autofill operations. It is used as a
      * CompositionLocal.
      */
-    @OptIn(ExperimentalComposeUiApi::class) val autofillManager: AutofillManager?
+    val autofillManager: AutofillManager?
 
     val density: Density
 
