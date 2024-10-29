@@ -3577,7 +3577,7 @@ internal class ComposerImpl(
     ) {
         runtimeCheck(!isComposing) { "Reentrant composition is not supported" }
         trace("Compose:recompose") {
-            compositionToken = currentSnapshot().id
+            compositionToken = currentSnapshot().snapshotId.hashCode()
             providerUpdates = null
             updateComposerInvalidations(invalidationsRequested)
             nodeIndex = 0
