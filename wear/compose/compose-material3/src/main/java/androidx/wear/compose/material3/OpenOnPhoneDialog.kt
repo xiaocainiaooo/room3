@@ -129,7 +129,7 @@ fun OpenOnPhoneDialog(
         val progressAnimatable = remember { Animatable(0f) }
         val alphaAnimatable = remember { Animatable(0f) }
 
-        var endAnimation by remember { mutableStateOf(false) }
+        var finalAnimation by remember { mutableStateOf(false) }
 
         val finalAnimationDuration = DurationLong2
         val progressDuration = a11yFullDurationMillis - finalAnimationDuration
@@ -150,7 +150,7 @@ fun OpenOnPhoneDialog(
                 ) {
                     progress = value
                 }
-                endAnimation = true
+                finalAnimation = true
             }
         }
 
@@ -159,17 +159,17 @@ fun OpenOnPhoneDialog(
         val progressAlphaAnimationSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
 
         val sizeAnimationFraction =
-            animateFloatAsState(if (endAnimation) 0f else 1f, sizeAnimationSpec)
+            animateFloatAsState(if (finalAnimation) 0f else 1f, sizeAnimationSpec)
         val progressAlphaAnimationFraction =
-            animateFloatAsState(if (endAnimation) 0f else 1f, progressAlphaAnimationSpec)
+            animateFloatAsState(if (finalAnimation) 0f else 1f, progressAlphaAnimationSpec)
         val iconColor =
             animateColorAsState(
-                if (endAnimation) colors.iconContainerColor else colors.iconColor,
+                if (finalAnimation) colors.iconContainerColor else colors.iconColor,
                 colorReversalAnimationSpec
             )
         val iconContainerColor =
             animateColorAsState(
-                if (endAnimation) colors.iconColor else colors.iconContainerColor,
+                if (finalAnimation) colors.iconColor else colors.iconContainerColor,
                 colorReversalAnimationSpec
             )
 
