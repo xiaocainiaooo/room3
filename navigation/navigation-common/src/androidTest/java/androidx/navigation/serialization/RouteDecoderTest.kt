@@ -222,6 +222,39 @@ abstract class RouteDecoderTest(val source: ArgumentSource) {
     }
 
     @Test
+    fun decodeValueClass() {
+        val values = mapOf("arg" to 13)
+        val result = decode<TestValueClass>(values, listOf(intArgument("arg")))
+        assertThat(result).isEqualTo(TestValueClass(13))
+
+        @Serializable class TestClass(val arg: TestValueClass)
+        val navType =
+            object : NavType<TestValueClass>(false) {
+                override fun put(bundle: Bundle, key: String, value: TestValueClass) {
+                    bundle.putInt(key, value.arg)
+                }
+
+                override fun get(bundle: Bundle, key: String): TestValueClass =
+                    TestValueClass(bundle.getInt(key))
+
+                override fun parseValue(value: String): TestValueClass =
+                    TestValueClass(value.toInt())
+
+                override fun serializeAsValue(value: TestValueClass): String = value.arg.toString()
+            }
+        val values2 = mapOf("arg" to TestValueClass(12))
+        val navArg =
+            navArgument("arg") {
+                type = navType
+                nullable = false
+                unknownDefaultValuePresent = false
+            }
+        val result2 = decode<TestClass>(values2, listOf(navArg))
+        assertThat(result2).isInstanceOf(TestClass::class.java)
+        assertThat(result2.arg).isEqualTo(TestValueClass(12))
+    }
+
+    @Test
     fun decodeCustomType() {
         @Serializable class TestClass(val arg: CustomType)
 

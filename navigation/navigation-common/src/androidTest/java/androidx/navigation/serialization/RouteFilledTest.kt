@@ -632,6 +632,13 @@ class RouteFilledTest {
     }
 
     @Test
+    fun valueClass() {
+        val clazz = TestValueClass(12)
+        assertThatRouteFilledFrom(clazz, listOf(intArgument("arg")))
+            .isEqualTo("$PATH_SERIAL_NAME/12")
+    }
+
+    @Test
     fun routeFromObject() {
         assertThatRouteFilledFrom(TestObject).isEqualTo(PATH_SERIAL_NAME)
     }
@@ -883,6 +890,8 @@ private sealed class SealedClass {
             get() = arg2
     }
 }
+
+@JvmInline @Serializable @SerialName(PATH_SERIAL_NAME) value class TestValueClass(val arg: Int)
 
 private class CustomSerializerClass(val longArg: Long)
 

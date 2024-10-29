@@ -27,6 +27,7 @@ import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.descriptors.capturedKClass
 import kotlinx.serialization.serializer
 
@@ -218,3 +219,6 @@ private fun unknownNavTypeErrorMessage(
 ) =
     "Route $className could not find any NavType for argument $fieldName " +
         "of type $fieldType - typeMap received was $typeMap"
+
+internal fun SerialDescriptor.isValueClass(): Boolean =
+    kind == StructureKind.CLASS && isInline && elementsCount == 1

@@ -98,6 +98,17 @@ internal class RouteDecoder : AbstractDecoder {
     // we want to know if it is not null, so its !isNull
     override fun decodeNotNullMark(): Boolean = store.get(elementName) != null
 
+    /** To handle value class */
+    override fun decodeInline(
+        descriptor: SerialDescriptor
+    ): kotlinx.serialization.encoding.Decoder {
+        if (descriptor.isValueClass()) {
+            elementName = descriptor.getElementName(0)
+            elementIndex = 0
+        }
+        return super.decodeInline(descriptor)
+    }
+
     /**
      * Entry point to decoding the route
      *
@@ -118,9 +129,8 @@ internal class RouteDecoder : AbstractDecoder {
      * 3. non-nullable non-primitive values
      */
     @Suppress("UNCHECKED_CAST")
-    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
-        return internalDecodeValue() as T
-    }
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T =
+        internalDecodeValue() as T
 
     /**
      * [internalDecodeValue] should only be called for arguments with values stored within [store].
