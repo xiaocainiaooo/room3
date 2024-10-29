@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.text.font
 
-import androidx.collection.SieveCache
+import androidx.collection.LruCache
 import androidx.collection.mutableScatterMapOf
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -362,7 +362,7 @@ internal class AsyncTypefaceCache {
     // After loading, fonts are put into the resultCache to allow reading from a kotlin function
     // context, reducing async fonts overhead cache lookup overhead only while cached
     // @GuardedBy("cacheLock")
-    private val resultCache = SieveCache<Key, AsyncTypefaceResult>(16, 16)
+    private val resultCache = LruCache<Key, AsyncTypefaceResult>(16)
     // failures and preloads are permanent, so they are stored separately
     // @GuardedBy("cacheLock")
     private val permanentCache = mutableScatterMapOf<Key, AsyncTypefaceResult>()
@@ -385,7 +385,7 @@ internal class AsyncTypefaceCache {
                     permanentCache[key] = AsyncTypefaceResult(result)
                 }
                 else -> {
-                    resultCache[key] = AsyncTypefaceResult(result)
+                    resultCache.put(key, AsyncTypefaceResult(result))
                 }
             }
         }
@@ -419,7 +419,7 @@ internal class AsyncTypefaceCache {
                         permanentCache[key] = AsyncTypefaceResult(it)
                     }
                     else -> {
-                        resultCache[key] = AsyncTypefaceResult(it)
+                        resultCache.put(key, AsyncTypefaceResult(it))
                     }
                 }
             }
