@@ -46,6 +46,10 @@ public abstract class MultiProcessGlanceAppWidget(
      *
      * If null, then this widget will be run with normal WorkManager, i.e. the same behavior as
      * GlanceAppWidget.
+     *
+     * If running in a non-default process, you should also declare a subclass of
+     * [androidx.glance.appwidget.MyPackageReplacedReceiver] in AndroidManifest.xml for that
+     * process, in order to handle [android.content.Intent.ACTION_MY_PACKAGE_REPLACED] broadcasts.
      */
     public open fun getMultiProcessConfig(context: Context): MultiProcessConfig? = null
 
