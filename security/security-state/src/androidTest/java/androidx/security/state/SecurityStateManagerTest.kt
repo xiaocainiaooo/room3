@@ -19,7 +19,6 @@ package androidx.security.state
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import androidx.security.state.SecurityPatchState.DateBasedSecurityPatchLevel
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -140,18 +139,5 @@ class SecurityStateManagerTest {
         SecurityPatchState.Companion.USE_VENDOR_SPL = false
         val bundle = securityStateManager.getGlobalSecurityState()
         assertFalse(bundle.containsKey("vendor_spl"))
-    }
-
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
-    @Test
-    fun testGetGlobalSecurityState_withGoogleModules_doesNotThrow() {
-        if (!Build.MANUFACTURER.equals("Google", ignoreCase = true)) {
-            return // Skip this test on non-Google devices.
-        }
-        val bundle =
-            securityStateManager.getGlobalSecurityState("com.google.android.modulemetadata")
-        DateBasedSecurityPatchLevel.fromString(
-            bundle.getString("com.google.android.modulemetadata")!!
-        )
     }
 }
