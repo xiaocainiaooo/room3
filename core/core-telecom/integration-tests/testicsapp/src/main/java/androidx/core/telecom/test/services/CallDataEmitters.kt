@@ -109,12 +109,16 @@ class RaiseHandDataEmitter {
 class LocalCallSilenceExtensionDataEmitter {
     private val mLcsDataFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    fun onLocalCallSilenceStateChanged(isSilenced: Boolean) {
+    fun onVoipAppUpdate(isSilenced: Boolean) {
+        mLcsDataFlow.value = isSilenced
+    }
+
+    fun onInCallServiceUpdate(isSilenced: Boolean) {
         mLcsDataFlow.value = isSilenced
     }
 
     fun collect(e: LocalCallSilenceExtensionRemote): Flow<LocalCallSilenceData> {
-        return mLcsDataFlow.map { LocalCallSilenceData(it, e) }
+        return mLcsDataFlow.map { LocalCallSilenceData(it, ::onInCallServiceUpdate, e) }
     }
 }
 

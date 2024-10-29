@@ -131,7 +131,7 @@ class InCallServiceImpl : LocalIcsBinder, InCallServiceCompat() {
                     val localCallSilenceExtension =
                         addLocalCallSilenceExtension(
                             onIsLocallySilencedUpdated =
-                                localCallSilenceDataEmitter::onLocalCallSilenceStateChanged
+                                localCallSilenceDataEmitter::onVoipAppUpdate
                         )
 
                     onConnected {

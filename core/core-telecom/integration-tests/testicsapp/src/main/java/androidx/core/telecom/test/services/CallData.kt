@@ -94,6 +94,7 @@ data class ParticipantExtensionData(
 @OptIn(ExperimentalAppActions::class)
 data class LocalCallSilenceData(
     val isLocallySilenced: Boolean,
+    val onInCallServiceUiUpdate: (Boolean) -> Unit,
     val extension: LocalCallSilenceExtensionRemote?
 )
 

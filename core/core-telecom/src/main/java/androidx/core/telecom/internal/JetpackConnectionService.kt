@@ -15,6 +15,7 @@
  */
 package androidx.core.telecom.internal
 
+import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION_CODES
@@ -56,6 +57,7 @@ internal class JetpackConnectionService : ConnectionService() {
          * gets from the platform.
          */
         val requestIdMatcher: String,
+        val context: Context,
         var callAttributes: CallAttributesCompat,
         val callChannel: CallChannels,
         val coroutineContext: CoroutineContext,
@@ -248,6 +250,7 @@ internal class JetpackConnectionService : ConnectionService() {
         val jetpackConnection =
             CallSessionLegacy(
                 ParcelUuid.fromString(UUID.randomUUID().toString()),
+                targetRequest.context,
                 targetRequest.callAttributes,
                 targetRequest.callChannel,
                 targetRequest.coroutineContext,
