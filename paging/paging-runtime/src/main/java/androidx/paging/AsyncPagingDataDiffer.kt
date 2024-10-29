@@ -180,9 +180,14 @@ constructor(
                                     previousPresenter.set(previousList)
                                     val diffResult =
                                         withContext(workerDispatcher) {
-                                            previousList.computeDiff(newList, diffCallback)
+                                            val diff =
+                                                previousList.computeDiff(newList, diffCallback)
+                                            // set to null right after computeDiff in case another
+                                            // refresh comes in and interrupts the work following
+                                            // this withContext block
+                                            previousPresenter.set(null)
+                                            diff
                                         }
-                                    previousPresenter.set(null)
                                     previousList.dispatchDiff(updateCallback, newList, diffResult)
                                     val transformedIndex =
                                         previousList.transformAnchorIndex(
