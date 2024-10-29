@@ -19,13 +19,14 @@ package androidx.biometric;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -174,11 +175,6 @@ public class BiometricViewModel extends ViewModel {
      * The callback object that will receive authentication events.
      */
     @Nullable private BiometricPrompt.AuthenticationCallback mClientCallback;
-
-    /**
-     * Reference to latest {@link androidx.fragment.app.FragmentActivity} hosting BiometricPrompt
-     */
-    @Nullable private WeakReference<FragmentActivity> mClientActivity;
 
     /**
      * Info about the appearance and behavior of the prompt provided by the client application.
@@ -339,24 +335,6 @@ public class BiometricViewModel extends ViewModel {
         mClientCallback = null;
     }
 
-    /**
-     * Returns reference to latest activity hosting BiometricPrompt or null if activity has
-     * already been destroyed
-     * @return Reference to latest activity hosting BiometricPrompt
-     */
-    @Nullable
-    public FragmentActivity getClientActivity() {
-        return mClientActivity != null ? mClientActivity.get() : null;
-    }
-
-    /**
-     * Updates reference to latest activity hosting BiometricPrompt
-     * @param clientActivity Reference to latest activity hosting BiometricPrompt
-     */
-    void setClientActivity(@NonNull FragmentActivity clientActivity) {
-        mClientActivity = new WeakReference<>(clientActivity);
-    }
-
     void setPromptInfo(@Nullable BiometricPrompt.PromptInfo promptInfo) {
         mPromptInfo = promptInfo;
     }
@@ -369,6 +347,7 @@ public class BiometricViewModel extends ViewModel {
      *
      * @return The logo res for the prompt, or -1 if not set.
      */
+    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     @SuppressLint("MissingPermission")
     int getLogoRes() {
         return mPromptInfo != null ? mPromptInfo.getLogoRes() : -1;
@@ -382,6 +361,7 @@ public class BiometricViewModel extends ViewModel {
      *
      * @return The logo bitmap for the prompt, or null if not set.
      */
+    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     @SuppressLint("MissingPermission")
     @Nullable
     Bitmap getLogoBitmap() {
@@ -396,6 +376,7 @@ public class BiometricViewModel extends ViewModel {
      *
      * @return The logo description for the prompt, or null if not set.
      */
+    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     @SuppressLint("MissingPermission")
     @Nullable
     String getLogoDescription() {
@@ -449,6 +430,7 @@ public class BiometricViewModel extends ViewModel {
      *
      * @return The prompt content view for the prompt, or {@code null} if not set.
      */
+    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     @Nullable
     PromptContentView getContentView() {
         return mPromptInfo != null ? mPromptInfo.getContentView() : null;
