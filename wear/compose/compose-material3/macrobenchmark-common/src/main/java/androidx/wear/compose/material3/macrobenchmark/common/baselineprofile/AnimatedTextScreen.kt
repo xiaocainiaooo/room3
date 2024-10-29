@@ -17,6 +17,7 @@
 package androidx.wear.compose.material3.macrobenchmark.common.baselineprofile
 
 import android.os.Build
+import android.os.SystemClock
 import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.clickable
@@ -140,8 +141,14 @@ val AnimatedTextScreen =
                     Until.findObject(By.desc(MinusContentDescription)),
                     FIND_OBJECT_TIMEOUT_MS
                 )
-                repeat(3) { device.findObject(By.desc(MinusContentDescription)).click() }
-                repeat(3) { device.findObject(By.desc(PlusContentDescription)).click() }
+                repeat(3) {
+                    device.findObject(By.desc(MinusContentDescription)).click()
+                    SystemClock.sleep(250L)
+                }
+                repeat(3) {
+                    device.findObject(By.desc(PlusContentDescription)).click()
+                    SystemClock.sleep(250L)
+                }
                 device.waitForIdle()
             }
     }
