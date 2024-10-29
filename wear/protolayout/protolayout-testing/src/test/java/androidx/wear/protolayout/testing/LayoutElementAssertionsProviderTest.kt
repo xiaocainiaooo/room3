@@ -46,7 +46,7 @@ class LayoutElementAssertionsProviderTest {
     }
 
     @Test
-    fun onRoot_description() {
+    fun onRoot_errorMessageComposition() {
         val assertionError =
             assertThrows(AssertionError::class.java) {
                 LayoutElementAssertionsProvider(TEST_LAYOUT).onRoot().assertDoesNotExist()
@@ -74,7 +74,7 @@ class LayoutElementAssertionsProviderTest {
     }
 
     @Test
-    fun onElement_description() {
+    fun onElement_errorMessageComposition() {
         val assertionError =
             assertThrows(AssertionError::class.java) {
                 LayoutElementAssertionsProvider(TEST_LAYOUT).onElement(isText).assertDoesNotExist()
@@ -88,7 +88,6 @@ class LayoutElementAssertionsProviderTest {
     }
 
     companion object {
-        val isBox = LayoutElementMatcher("Element type is Box") { it is Box }
         val isImage = LayoutElementMatcher("Element type is Image") { it is Image }
         val isText = LayoutElementMatcher("Element type is Text") { it is Text }
         val TEST_LAYOUT =

@@ -16,20 +16,7 @@
 
 package androidx.wear.protolayout.testing
 
-import androidx.wear.protolayout.LayoutElementBuilders.Box
-import androidx.wear.protolayout.LayoutElementBuilders.Column
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
-import androidx.wear.protolayout.LayoutElementBuilders.Row
-
-internal val LayoutElement.children: List<LayoutElement>
-    get() =
-        when (this) {
-            is Box -> this.contents
-            is Row -> this.contents
-            is Column -> this.contents
-            // TODO b/372916396 - Dealing with Arc container and ArcLayoutElements
-            else -> emptyList<LayoutElement>()
-        }
 
 internal fun searchElement(root: LayoutElement?, matcher: LayoutElementMatcher): LayoutElement? {
     if (root == null) return null
