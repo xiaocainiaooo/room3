@@ -24,16 +24,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.wear.compose.material3.MaterialTheme
-import androidx.wear.compose.material3.macrobenchmark.common.DialogBenchmark
+import androidx.wear.compose.material3.macrobenchmark.common.ConfirmationBenchmark
 
-class DialogActivity : ComponentActivity() {
+class ConfirmationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             MaterialTheme {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    DialogBenchmark.content.invoke(this)
+                    ConfirmationBenchmark.content.invoke(this)
                 }
             }
         }

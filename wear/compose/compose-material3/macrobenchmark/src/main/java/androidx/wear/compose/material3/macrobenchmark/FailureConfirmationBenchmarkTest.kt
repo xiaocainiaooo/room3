@@ -24,7 +24,7 @@ import androidx.benchmark.macro.MemoryUsageMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.filters.LargeTest
 import androidx.testutils.createCompilationParams
-import androidx.wear.compose.material3.macrobenchmark.common.DialogBenchmark
+import androidx.wear.compose.material3.macrobenchmark.common.FailureConfirmationBenchmark
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -35,7 +35,7 @@ import org.junit.runners.Parameterized
 @OptIn(ExperimentalMetricApi::class)
 @LargeTest
 @RunWith(Parameterized::class)
-class DialogBenchmarkTest(private val compilationMode: CompilationMode) {
+class FailureConfirmationBenchmarkTest(private val compilationMode: CompilationMode) {
     @get:Rule val benchmarkRule = MacrobenchmarkRule()
 
     @Before
@@ -58,16 +58,16 @@ class DialogBenchmarkTest(private val compilationMode: CompilationMode) {
             iterations = 5,
             setupBlock = {
                 val intent = Intent()
-                intent.action = DIALOG_ACTIVITY
+                intent.action = ACTIVITY
                 startActivityAndWait(intent)
             }
         ) {
-            DialogBenchmark.exercise.invoke(this)
+            FailureConfirmationBenchmark.exercise.invoke(this)
         }
     }
 
     companion object {
-        private const val DIALOG_ACTIVITY = "${PACKAGE_NAME}.DIALOG_ACTIVITY"
+        private const val ACTIVITY = "${PACKAGE_NAME}.FAILURE_CONFIRMATION_ACTIVITY"
 
         @Parameterized.Parameters(name = "compilation={0}")
         @JvmStatic

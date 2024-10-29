@@ -75,12 +75,35 @@
         </activity>
 
         <activity
-            android:name=".DialogActivity"
+            android:name=".ConfirmationActivity"
             android:theme="@style/AppTheme"
             android:exported="true">
             <intent-filter>
                 <action android:name=
-                    "androidx.wear.compose.material3.macrobenchmark.target.DIALOG_ACTIVITY" />
+                    "androidx.wear.compose.material3.macrobenchmark.target.CONFIRMATION_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+
+        <activity
+            android:name=".AlertDialogActivity"
+            android:theme="@style/AppTheme"
+            android:exported="true">
+            <intent-filter>
+                <action android:name=
+                    "androidx.wear.compose.material3.macrobenchmark.target.ALERT_DIALOG_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".FailureConfirmationActivity"
+            android:theme="@style/AppTheme"
+            android:exported="true">
+            <intent-filter>
+                <action android:name=
+                    "androidx.wear.compose.material3.macrobenchmark.target.FAILURE_CONFIRMATION_ACTIVITY" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -91,6 +114,27 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="androidx.wear.compose.material3.macrobenchmark.target.ICON_BUTTON_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".OpenOnPhoneDialogActivity"
+            android:theme="@style/AppTheme"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.wear.compose.material3.macrobenchmark.target.OPEN_ON_PHONE_DIALOG_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".SuccessConfirmationActivity"
+            android:theme="@style/AppTheme"
+            android:exported="true">
+            <intent-filter>
+                <action android:name=
+                    "androidx.wear.compose.material3.macrobenchmark.target.SUCCESS_CONFIRMATION_ACTIVITY" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
