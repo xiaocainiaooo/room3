@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.DeviceConfigurationOverride
 import androidx.compose.ui.test.LayoutDirection
-import androidx.compose.ui.test.RoundScreen
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -61,7 +60,7 @@ class PageIndicatorScreenshotTest {
         @TestParameter screenSize: ScreenSize,
         @TestParameter shape: ScreenShape
     ) {
-        verifyPageIndicator(shape.isRound, true, LayoutDirection.Ltr, screenSize)
+        verifyPageIndicator(isRound = shape.isRound, isHorizontal = true, screenSize = screenSize)
     }
 
     @Test
@@ -69,7 +68,7 @@ class PageIndicatorScreenshotTest {
         @TestParameter screenSize: ScreenSize,
         @TestParameter shape: ScreenShape
     ) {
-        verifyPageIndicator(shape.isRound, false, LayoutDirection.Ltr, screenSize)
+        verifyPageIndicator(isRound = shape.isRound, isHorizontal = false, screenSize = screenSize)
     }
 
     @Test
@@ -77,7 +76,12 @@ class PageIndicatorScreenshotTest {
         @TestParameter screenSize: ScreenSize,
         @TestParameter shape: ScreenShape
     ) {
-        verifyPageIndicator(shape.isRound, true, LayoutDirection.Rtl, screenSize)
+        verifyPageIndicator(
+            isRound = shape.isRound,
+            isHorizontal = true,
+            layoutDirection = LayoutDirection.Rtl,
+            screenSize = screenSize
+        )
     }
 
     @Test
@@ -85,44 +89,100 @@ class PageIndicatorScreenshotTest {
         @TestParameter screenSize: ScreenSize,
         @TestParameter shape: ScreenShape
     ) {
-        verifyPageIndicator(shape.isRound, false, LayoutDirection.Rtl, screenSize)
+        verifyPageIndicator(
+            isRound = shape.isRound,
+            isHorizontal = false,
+            layoutDirection = LayoutDirection.Rtl,
+            screenSize = screenSize
+        )
     }
 
     @Test
-    fun horizontalPageIndicator_between_pages(
+    fun horizontalPageIndicator_offset_0_2(
         @TestParameter screenSize: ScreenSize,
         @TestParameter shape: ScreenShape
     ) {
         verifyPageIndicator(
-            shape.isRound,
-            true,
-            LayoutDirection.Ltr,
-            screenSize,
+            isRound = shape.isRound,
+            isHorizontal = true,
+            screenSize = screenSize,
+            offsetFraction = 0.2f,
+        )
+    }
+
+    @Test
+    fun verticalPageIndicator_offset_0_2(
+        @TestParameter screenSize: ScreenSize,
+        @TestParameter shape: ScreenShape
+    ) {
+        verifyPageIndicator(
+            isRound = shape.isRound,
+            isHorizontal = false,
+            screenSize = screenSize,
+            offsetFraction = 0.2f
+        )
+    }
+
+    @Test
+    fun horizontalPageIndicator_offset_0_5(
+        @TestParameter screenSize: ScreenSize,
+        @TestParameter shape: ScreenShape
+    ) {
+        verifyPageIndicator(
+            isRound = shape.isRound,
+            isHorizontal = true,
+            screenSize = screenSize,
             offsetFraction = 0.5f,
         )
     }
 
     @Test
-    fun verticalPageIndicator_between_pages(
+    fun verticalPageIndicator_offset_0_5(
         @TestParameter screenSize: ScreenSize,
         @TestParameter shape: ScreenShape
     ) {
         verifyPageIndicator(
-            shape.isRound,
-            false,
-            LayoutDirection.Ltr,
-            screenSize,
+            isRound = shape.isRound,
+            isHorizontal = false,
+            screenSize = screenSize,
             offsetFraction = 0.5f
+        )
+    }
+
+    @Test
+    fun horizontalPageIndicator_offset_minus_0_3(
+        @TestParameter screenSize: ScreenSize,
+        @TestParameter shape: ScreenShape
+    ) {
+        verifyPageIndicator(
+            isRound = shape.isRound,
+            isHorizontal = true,
+            screenSize = screenSize,
+            offsetFraction = -0.3f,
+            selectedPageIndex = SELECTED_PAGE_INDEX + 1
+        )
+    }
+
+    @Test
+    fun verticalPageIndicator_offset_minus_0_3(
+        @TestParameter screenSize: ScreenSize,
+        @TestParameter shape: ScreenShape
+    ) {
+        verifyPageIndicator(
+            isRound = shape.isRound,
+            isHorizontal = false,
+            screenSize = screenSize,
+            offsetFraction = -0.3f,
+            selectedPageIndex = SELECTED_PAGE_INDEX + 1
         )
     }
 
     @Test
     fun horizontalPageIndicator_circular_9_pages(@TestParameter screenSize: ScreenSize) {
         verifyPageIndicator(
-            true,
-            true,
-            LayoutDirection.Ltr,
-            screenSize,
+            isRound = true,
+            isHorizontal = true,
+            screenSize = screenSize,
             pageCount = 9,
             selectedPageIndex = 6
         )
@@ -131,12 +191,33 @@ class PageIndicatorScreenshotTest {
     @Test
     fun verticalPageIndicator_circular_9_pages(@TestParameter screenSize: ScreenSize) {
         verifyPageIndicator(
-            true,
-            false,
-            LayoutDirection.Ltr,
-            screenSize,
+            isRound = true,
+            isHorizontal = false,
+            screenSize = screenSize,
             pageCount = 9,
             selectedPageIndex = 6
+        )
+    }
+
+    @Test
+    fun horizontalPageIndicator_circular_1_page(@TestParameter screenSize: ScreenSize) {
+        verifyPageIndicator(
+            isRound = true,
+            isHorizontal = true,
+            screenSize = screenSize,
+            pageCount = 1,
+            selectedPageIndex = 0
+        )
+    }
+
+    @Test
+    fun verticalPageIndicator_circular_1_page(@TestParameter screenSize: ScreenSize) {
+        verifyPageIndicator(
+            isRound = true,
+            isHorizontal = false,
+            screenSize = screenSize,
+            pageCount = 1,
+            selectedPageIndex = 0
         )
     }
 
@@ -145,7 +226,7 @@ class PageIndicatorScreenshotTest {
     private fun verifyPageIndicator(
         isRound: Boolean,
         isHorizontal: Boolean,
-        layoutDirection: LayoutDirection,
+        layoutDirection: LayoutDirection = LayoutDirection.Ltr,
         screenSize: ScreenSize = ScreenSize.SMALL,
         offsetFraction: Float = 0.0f,
         pageCount: Int = PAGE_COUNT,
@@ -182,20 +263,18 @@ class PageIndicatorScreenshotTest {
         pageCount: Int,
         selectedPageIndex: Int
     ) {
-        DeviceConfigurationOverride(DeviceConfigurationOverride.RoundScreen(isRound)) {
-            ScreenConfiguration(screenSize.size) {
-                Box(modifier = Modifier.testTag(TEST_TAG).fillMaxSize().background(Color.White)) {
-                    val pagerState =
-                        PagerState(
-                            currentPage = selectedPageIndex,
-                            currentPageOffsetFraction = offsetFraction,
-                            pageCount = { pageCount }
-                        )
-                    if (isHorizontal) {
-                        HorizontalPageIndicator(pagerState = pagerState)
-                    } else {
-                        VerticalPageIndicator(pagerState = pagerState)
-                    }
+        ScreenConfiguration(screenSize.size, isRound) {
+            Box(modifier = Modifier.testTag(TEST_TAG).fillMaxSize().background(Color.White)) {
+                val pagerState =
+                    PagerState(
+                        currentPage = selectedPageIndex,
+                        currentPageOffsetFraction = offsetFraction,
+                        pageCount = { pageCount }
+                    )
+                if (isHorizontal) {
+                    HorizontalPageIndicator(pagerState = pagerState)
+                } else {
+                    VerticalPageIndicator(pagerState = pagerState)
                 }
             }
         }

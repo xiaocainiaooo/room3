@@ -57,6 +57,7 @@ import androidx.wear.compose.foundation.angularSizeDp
 import androidx.wear.compose.foundation.background
 import androidx.wear.compose.foundation.curvedBox
 import androidx.wear.compose.foundation.curvedRow
+import androidx.wear.compose.foundation.lazy.inverseLerp
 import androidx.wear.compose.foundation.padding
 import androidx.wear.compose.foundation.pager.HorizontalPager
 import androidx.wear.compose.foundation.pager.PagerState
@@ -68,7 +69,6 @@ import androidx.wear.compose.material3.tokens.ColorSchemeKeyTokens
 import androidx.wear.compose.materialcore.BoundsLimiter
 import androidx.wear.compose.materialcore.isLayoutDirectionRtl
 import androidx.wear.compose.materialcore.isRoundDevice
-import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
@@ -210,7 +210,17 @@ internal fun PageIndicatorImpl(
     // Converting offsetFraction into range 0..1f
     val currentPageOffsetWithFraction =
         pagerState.currentPage + pagerState.currentPageOffsetFraction
-    val selectedPage: Int = currentPageOffsetWithFraction.toInt()
+
+    val isLastPage =
+        currentPageOffsetWithFraction.equalsWithTolerance(
+            number = pagerState.pageCount - 1f,
+            tolerance = 0.001f
+        )
+
+    // If it's the last page, then we decrease its index by 1 and put a 1f to the offset
+    val selectedPage: Int =
+        if (isLastPage) currentPageOffsetWithFraction.toInt() - 1
+        else currentPageOffsetWithFraction.toInt()
     val offset = currentPageOffsetWithFraction - selectedPage
 
     val pagesOnScreen = Integer.min(MaxNumberOfIndicators, pagerState.pageCount)
@@ -219,19 +229,23 @@ internal fun PageIndicatorImpl(
             PagesState(
                 totalPages = pagerState.pageCount,
                 pagesOnScreen = pagesOnScreen,
-                smallIndicatorSize = smallIndicatorSize
+                smallIndicatorSizeFraction = smallIndicatorSizeFraction,
+                shrinkThresholdStart = calculateShrinkThresholdStart(spacing, indicatorSize),
+                shrinkThresholdEnd = calculateShrinkThresholdEnd(spacing, indicatorSize)
             )
         }
-    pagesState.recalculateState(selectedPage, offset)
 
-    val leftSpacerSize = (indicatorSize + spacing) * pagesState.leftSpacerSizeRatio
-    val rightSpacerSize = (indicatorSize + spacing) * pagesState.rightSpacerSizeRatio
+    if (pagesState.totalPages > 1) {
+        pagesState.recalculateState(selectedPage, offset)
+    }
+
+    val spacerSize = indicatorSize + spacing
 
     if (isScreenRound) {
         var containerSize by remember { mutableStateOf(IntSize.Zero) }
 
         val boundsSize: Density.() -> IntSize = {
-            val width = ((indicatorSize + spacing).toPx() * pagesOnScreen).roundToInt()
+            val width = (spacerSize.toPx() * pagesOnScreen).roundToInt()
             val height = (indicatorSize * 2).roundToPx().coerceAtLeast(0)
             val size =
                 IntSize(
@@ -273,33 +287,43 @@ internal fun PageIndicatorImpl(
             modifier = modifier.padding(edgePadding),
             onSizeChanged = { containerSize = it }
         ) {
-            CurvedPageIndicator(
-                visibleDotIndex = pagesState.visibleDotIndex,
-                pagesOnScreen = pagesOnScreen,
-                indicator = { page ->
-                    curvedIndicator(
-                        page = page,
-                        size = indicatorSize,
-                        unselectedColor = unselectedColor,
-                        pagesState = pagesState
-                    )
-                },
-                itemsSpacer = { curvedSpacer(indicatorSize + spacing) },
-                selectedIndicator = {
-                    curvedSelectedIndicator(
-                        indicatorSize = indicatorSize,
-                        spacing = spacing,
-                        selectedColor = selectedColor,
-                        progress = offset
-                    )
-                },
-                spacerLeft = { curvedSpacer(leftSpacerSize) },
-                spacerRight = { curvedSpacer(rightSpacerSize) },
-                angularPadding = angularPadding,
-                isHorizontal = isHorizontal,
-                layoutDirection = layoutDirection,
-                backgroundColor = backgroundColor
-            )
+            if (pagesState.totalPages == 1) {
+                SingleDotCurvedPageIndicator(
+                    isHorizontal = isHorizontal,
+                    indicatorSize = indicatorSize,
+                    layoutDirection = layoutDirection,
+                    selectedColor = selectedColor,
+                    backgroundColor = backgroundColor,
+                )
+            } else {
+                CurvedPageIndicator(
+                    visibleDotIndex = pagesState.visibleDotIndex,
+                    pagesOnScreen = pagesOnScreen,
+                    indicator = { page ->
+                        curvedIndicator(
+                            page = page,
+                            size = indicatorSize,
+                            unselectedColor = unselectedColor,
+                            pagesState = pagesState
+                        )
+                    },
+                    spacer = { spacerIndex ->
+                        curvedSpacer(spacerSize * pagesState.spacersSizeRatio[spacerIndex])
+                    },
+                    selectedIndicator = {
+                        curvedSelectedIndicator(
+                            indicatorSize = indicatorSize,
+                            spacing = spacing,
+                            selectedColor = selectedColor,
+                            progress = offset
+                        )
+                    },
+                    angularPadding = angularPadding,
+                    isHorizontal = isHorizontal,
+                    layoutDirection = layoutDirection,
+                    backgroundColor = backgroundColor
+                )
+            }
         }
     } else {
         LinearPageIndicator(
@@ -323,8 +347,8 @@ internal fun PageIndicatorImpl(
                     progress = offset
                 )
             },
-            spacerStart = { LinearSpacer(leftSpacerSize) },
-            spacerEnd = { LinearSpacer(rightSpacerSize) },
+            spacerStart = { LinearSpacer(spacerSize * pagesState.spacersSizeRatio.first()) },
+            spacerEnd = { LinearSpacer(spacerSize * pagesState.spacersSizeRatio.last()) },
             isHorizontal = isHorizontal,
             layoutDirection = layoutDirection,
             background = {
@@ -468,7 +492,7 @@ private fun LinearIndicator(
     Spacer(
         modifier =
             Modifier.padding(horizontal = spacing / 2).size(indicatorSize).drawWithCache {
-                val strokeWidth = indicatorSize.toPx() * pagesState.sizeRatio(page)
+                val strokeWidth = indicatorSize.toPx() * pagesState.indicatorsSizeRatio[page]
                 val start = Offset(strokeWidth / 2 + 1, this.size.height / 2)
                 val end = Offset(strokeWidth / 2, this.size.height / 2)
                 onDrawBehind {
@@ -477,7 +501,7 @@ private fun LinearIndicator(
                         start = start,
                         end = end,
                         cap = StrokeCap.Round,
-                        alpha = pagesState.alpha(page),
+                        alpha = pagesState.indicatorsAlpha[page],
                         strokeWidth = strokeWidth
                     )
                 }
@@ -495,10 +519,8 @@ private fun CurvedPageIndicator(
     visibleDotIndex: Int,
     pagesOnScreen: Int,
     indicator: CurvedScope.(Int) -> Unit,
-    itemsSpacer: CurvedScope.() -> Unit,
+    spacer: CurvedScope.(Int) -> Unit,
     selectedIndicator: CurvedScope.() -> Unit,
-    spacerLeft: CurvedScope.() -> Unit,
-    spacerRight: CurvedScope.() -> Unit,
     isHorizontal: Boolean,
     layoutDirection: LayoutDirection,
     angularPadding: Dp,
@@ -514,32 +536,72 @@ private fun CurvedPageIndicator(
         if (isHorizontal) CurvedDirection.Angular.Reversed else CurvedDirection.Angular.Normal
 
     CurvedLayout(modifier = Modifier, anchor = anchor, angularDirection = angularDirection) {
-        // drawing 1 extra spacer for transition
         curvedRow(
             modifier =
                 CurvedModifier.background(backgroundColor, cap = StrokeCap.Round)
                     .padding(radial = BackgroundRadius, angular = angularPadding)
         ) {
-            spacerLeft()
             curvedRow(radialAlignment = CurvedAlignment.Radial.Center) {
                 for (page in 0 until visibleDotIndex) {
+                    spacer(page)
                     indicator(page)
-                    itemsSpacer()
                 }
-                curvedBox(radialAlignment = CurvedAlignment.Radial.Center) {
+                curvedBox(
+                    radialAlignment = CurvedAlignment.Radial.Center,
+                    angularAlignment = CurvedAlignment.Angular.Center,
+                ) {
                     curvedRow(radialAlignment = CurvedAlignment.Radial.Center) {
+                        spacer(visibleDotIndex)
                         indicator(visibleDotIndex)
-                        itemsSpacer()
+                        spacer(visibleDotIndex + 1)
                         indicator(visibleDotIndex + 1)
+                        spacer(visibleDotIndex + 2)
                     }
                     selectedIndicator()
                 }
                 for (page in visibleDotIndex + 2..pagesOnScreen) {
-                    itemsSpacer()
                     indicator(page)
+                    spacer(page + 1)
                 }
             }
-            spacerRight()
+        }
+    }
+}
+
+@Composable
+private fun SingleDotCurvedPageIndicator(
+    isHorizontal: Boolean,
+    indicatorSize: Dp,
+    layoutDirection: LayoutDirection,
+    selectedColor: Color,
+    backgroundColor: Color,
+) {
+    val anchor =
+        if (isHorizontal) HorizontalPagerAnchor
+        else {
+            if (layoutDirection == LayoutDirection.Ltr) VerticalPagerAnchor
+            else VerticalPagerRtlAnchor
+        }
+    val angularDirection =
+        if (isHorizontal) CurvedDirection.Angular.Reversed else CurvedDirection.Angular.Normal
+
+    CurvedLayout(modifier = Modifier, anchor = anchor, angularDirection = angularDirection) {
+        curvedRow(
+            modifier =
+                CurvedModifier.background(backgroundColor, cap = StrokeCap.Round)
+                    .padding(radial = BackgroundRadius)
+        ) {
+            curvedBox(
+                modifier =
+                    CurvedModifier
+                        // Ideally we want sweepDegrees to be = 0f, because the circular shape is
+                        // drawn
+                        // by the Round StrokeCap.
+                        // But it can't have 0f value due to limitations of underlying Canvas.
+                        // Values below 0.2f also give some artifacts b/291753164
+                        .size(0.2f, indicatorSize)
+                        .background(color = selectedColor, cap = StrokeCap.Round)
+            ) {}
         }
     }
 }
@@ -584,10 +646,12 @@ private fun CurvedScope.curvedIndicator(
             // by the Round StrokeCap.
             // But it can't have 0f value due to limitations of underlying Canvas.
             // Values below 0.2f also give some artifacts b/291753164
-            .size(0.2f, size * pagesState.sizeRatio(page))
+            .size(0.2f, size * pagesState.indicatorsSizeRatio[page])
             .background(
                 color =
-                    unselectedColor.copy(alpha = unselectedColor.alpha * pagesState.alpha(page)),
+                    unselectedColor.copy(
+                        alpha = unselectedColor.alpha * pagesState.indicatorsAlpha[page]
+                    ),
                 cap = StrokeCap.Round
             )
     ) {}
@@ -599,79 +663,37 @@ private fun CurvedScope.curvedSpacer(size: Dp) {
 
 /**
  * Represents an internal state of pageIndicator. This state is responsible for keeping and
- * recalculating alpha and size parameters of each indicator, and selected indicators as well.
+ * recalculating alpha and size parameters of each indicator, spacers between them, and selected
+ * indicators.
  */
 private class PagesState(
     val totalPages: Int,
     val pagesOnScreen: Int,
-    val smallIndicatorSize: Float
+    val smallIndicatorSizeFraction: Float,
+    val shrinkThresholdStart: Float,
+    val shrinkThresholdEnd: Float
 ) {
-    // Sizes and alphas of first and last indicators on the screen. Used to show that there're more
-    // pages on the left or on the right, and also for smooth transitions
-    private var firstAlpha = 1f
-    private var lastAlpha = 0f
-    private var firstSize = 1f
-    private var secondSize = 1f
-    private var lastSize = 1f
-    private var lastButOneSize = 1f
+    private val dotsCount = pagesOnScreen + 1
+    private val spacersCount = pagesOnScreen + 2
 
     private var smoothProgress = 0f
-
     // An offset in pages, basically meaning how many pages are hidden to the left.
     private var hiddenPagesToTheLeft = 0
-
-    // A default size of spacers - invisible items to the left and to the right of
-    // visible indicators, used for smooth transitions
 
     // Current visible position on the screen.
     var visibleDotIndex = 0
         private set
 
-    // A size of a left spacer used for smooth transitions
-    val leftSpacerSizeRatio
-        get() = 1 - smoothProgress
+    // Sizes and alphas of all indicators on the screen. These parameters depend on the currently
+    // selected page, and how many pages are at the front and at the back of the selected page.
+    val indicatorsAlpha = FloatArray(dotsCount)
+    val indicatorsSizeRatio = FloatArray(dotsCount)
 
-    // A size of a right spacer used for smooth transitions
-    val rightSpacerSizeRatio
-        get() = smoothProgress
+    // Sizes of the spacers between dots
+    val spacersSizeRatio = FloatArray(spacersCount)
 
-    /**
-     * Depending on the page index, return an alpha for this indicator
-     *
-     * @param page Page index
-     * @return An alpha of page index- in range 0..1
-     */
-    fun alpha(page: Int): Float =
-        when (page) {
-            0 -> firstAlpha
-            pagesOnScreen -> lastAlpha
-            else -> 1f
-        }
-
-    /**
-     * Depending on the page index, return a size ratio for this indicator
-     *
-     * @param page Page index
-     * @return An size ratio for page index - in range 0..1
-     */
-    fun sizeRatio(page: Int): Float =
-        when (page) {
-            0 -> firstSize
-            1 -> secondSize
-            pagesOnScreen - 1 -> lastButOneSize
-            pagesOnScreen -> lastSize
-            else -> 1f
-        }
-
-    /**
-     * Returns a value in the range 0..1 where 0 is unselected state, and 1 is selected. Used to
-     * show a smooth transition between page indicator items.
-     */
-    fun calculateSelectedRatio(targetPage: Int, offset: Float): Float =
-        (1 - abs(visibleDotIndex + offset - targetPage)).coerceAtLeast(0f)
-
-    // Main function responsible for recalculation of all parameters regarding
-    // to the [selectedPage] and [offset]
+    // Main function responsible for recalculation of all parameters based on [selectedPage] and
+    // [offset] parameters
     fun recalculateState(selectedPage: Int, offset: Float) {
         val pageWithOffset = selectedPage + offset
         // Calculating offsetInPages relating to the [selectedPage].
@@ -703,45 +725,121 @@ private class PagesState(
 
         smoothProgress = if (scrolledToTheLeft || scrolledToTheRight) offset else 0f
 
-        // Calculating exact parameters for border indicators like [firstAlpha], [lastSize], etc.
-        firstAlpha = 1 - smoothProgress
-        lastAlpha = smoothProgress
-        secondSize = 1 - (1 - smallIndicatorSize) * smoothProgress
+        // Calculating alphas of indicators
+        for (i in indicatorsAlpha.indices) {
+            indicatorsAlpha[i] =
+                when (i) {
+                    0 -> 1 - smoothProgress
+                    dotsCount - 1 -> smoothProgress
+                    else -> 1f
+                }
+        }
 
-        // Depending on offsetInPages we'll either show a shrinked first indicator, or full-size
-        firstSize =
-            if (hiddenPagesToTheLeft == 0 || hiddenPagesToTheLeft == 1 && scrolledToTheLeft) {
-                1 - smoothProgress
-            } else {
-                smallIndicatorSize * (1 - smoothProgress)
-            }
+        // Calculating spacer sizes between indicators
+        for (i in spacersSizeRatio.indices) {
+            spacersSizeRatio[i] =
+                when (i) {
+                    0 -> 1 - smoothProgress
+                    spacersCount - 1 -> smoothProgress
+                    else -> 1f
+                }
+        }
 
-        // Depending on offsetInPages and other parameters, we'll either show a shrinked
-        // last indicator, or full-size
-        lastSize =
-            if (
-                hiddenPagesToTheLeft == totalPages - pagesOnScreen - 1 && scrolledToTheRight ||
-                    hiddenPagesToTheLeft == totalPages - pagesOnScreen && scrolledToTheLeft
-            ) {
-                smoothProgress
-            } else {
-                smallIndicatorSize * smoothProgress
-            }
-
-        lastButOneSize =
-            if (scrolledToTheRight || scrolledToTheLeft) {
-                lerp(smallIndicatorSize, 1f, smoothProgress)
-            } else if (hiddenPagesToTheLeft < totalPages - pagesOnScreen) smallIndicatorSize else 1f
+        // Calculating indicator sizes
+        for (i in indicatorsSizeRatio.indices) {
+            indicatorsSizeRatio[i] =
+                when (i) {
+                    // Depending on offsetInPages we'll either show a shrinked first indicator, or
+                    // full-size indicator
+                    0 -> {
+                        if (
+                            hiddenPagesToTheLeft == 0 ||
+                                hiddenPagesToTheLeft == 1 && scrolledToTheLeft
+                        ) {
+                            1 - smoothProgress
+                        } else {
+                            smallIndicatorSizeFraction * (1 - smoothProgress)
+                        }
+                    }
+                    1 -> 1 - (1 - smallIndicatorSizeFraction) * smoothProgress
+                    dotsCount - 2 -> {
+                        if (scrolledToTheRight || scrolledToTheLeft) {
+                            lerp(smallIndicatorSizeFraction, 1f, smoothProgress)
+                        } else if (hiddenPagesToTheLeft < totalPages - pagesOnScreen)
+                            smallIndicatorSizeFraction
+                        else 1f
+                    }
+                    // Depending on offsetInPages and other parameters,the last indicator will be
+                    // a fraction of a shrinked or full-size indicator.
+                    dotsCount - 1 -> {
+                        if (
+                            hiddenPagesToTheLeft == totalPages - pagesOnScreen - 1 &&
+                                scrolledToTheRight ||
+                                hiddenPagesToTheLeft == totalPages - pagesOnScreen &&
+                                    scrolledToTheLeft
+                        ) {
+                            smoothProgress
+                        } else {
+                            smallIndicatorSizeFraction * smoothProgress
+                        }
+                    }
+                    else -> 1f
+                }
+        }
 
         // A visibleDot represents a currently selected page on the screen
         // As we scroll to the left, we add an invisible indicator to the left, shifting all other
         // indicators to the right. The shift is only possible when a visibleDot = 1,
         // thus we have to leave it at 1 as we always add a positive offset
-        visibleDotIndex = if (scrolledToTheLeft) 1 else selectedPage - hiddenPagesToTheLeft
+        visibleDotIndex =
+            (if (scrolledToTheLeft) 1 else selectedPage - hiddenPagesToTheLeft).coerceAtLeast(0)
+
+        calculateAdjacentDotParameters(
+            shrinkThresholdStart,
+            shrinkThresholdEnd,
+            visibleDotIndex,
+            offset
+        )
+    }
+
+    /**
+     * This function calculates a size and alpha parameters of adjacent indicators to selected
+     * indicator. It also modifies spacer sizes for properly placing adjacent indicators.
+     */
+    private fun calculateAdjacentDotParameters(
+        shrinkThresholdStart: Float,
+        shrinkThresholdEnd: Float,
+        visibleDotIndex: Int,
+        offset: Float
+    ) {
+        val shrinkFractionPrev =
+            inverseLerp(1 - shrinkThresholdStart, 1 - shrinkThresholdEnd, offset)
+        val shrinkFractionNext = inverseLerp(shrinkThresholdStart, shrinkThresholdEnd, offset)
+
+        // We change the size of the current and next visible indicator.
+        indicatorsSizeRatio[visibleDotIndex] *= (1 - shrinkFractionPrev)
+        indicatorsSizeRatio[visibleDotIndex + 1] *= (1 - shrinkFractionNext)
+
+        // We have one more spacer than indicators, so spacers[visibleDotIndex] represents a spacer
+        // before selected indicator, and spacers[visibleDotIndex + 2] after selected indicator
+        spacersSizeRatio[visibleDotIndex] = 1 - shrinkFractionPrev / 3
+        spacersSizeRatio[visibleDotIndex + 1] = 1 + shrinkFractionNext / 3 + shrinkFractionPrev / 3
+        spacersSizeRatio[visibleDotIndex + 2] = 1 - shrinkFractionNext / 3
+
+        indicatorsAlpha[visibleDotIndex] *=
+            inverseLerp(0f, 0.5f, indicatorsSizeRatio[visibleDotIndex])
+        indicatorsAlpha[visibleDotIndex + 1] *=
+            inverseLerp(0f, 0.5f, indicatorsSizeRatio[visibleDotIndex + 1])
     }
 }
 
-private const val smallIndicatorSize = 0.66f
+private fun calculateShrinkThresholdStart(spacing: Dp, indicatorSize: Dp): Float =
+    spacing / (spacing + indicatorSize) / 4
+
+private fun calculateShrinkThresholdEnd(spacing: Dp, indicatorSize: Dp): Float =
+    (spacing / 2 + indicatorSize) / (spacing + indicatorSize) / 2
+
+private const val smallIndicatorSizeFraction = 0.66f
 private const val MaxNumberOfIndicators = 6
 
 // 0 degrees equals to 3 o'clock position, at the right of the screen

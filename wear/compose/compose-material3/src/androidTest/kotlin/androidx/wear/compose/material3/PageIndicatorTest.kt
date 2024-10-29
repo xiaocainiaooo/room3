@@ -18,23 +18,19 @@ package androidx.wear.compose.material3
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 import androidx.compose.testutils.assertContainsColor
+import androidx.compose.testutils.assertDoesNotContainColor
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.DeviceConfigurationOverride
 import androidx.compose.ui.test.LayoutDirection
-import androidx.compose.ui.test.RoundScreen
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.then
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.pager.PagerState
 import org.junit.Rule
 import org.junit.Test
@@ -46,9 +42,7 @@ class PageIndicatorTest {
     @Test
     public fun horizontalPageIndicator_supports_testtag_circular() {
         rule.setContentWithTheme {
-            DeviceConfigurationOverride(
-                DeviceConfigurationOverride.RoundScreen(isScreenRound = true)
-            ) {
+            ScreenConfiguration(screenSizeDp = 150, isRound = true) {
                 HorizontalPageIndicator(
                     modifier = Modifier.testTag(TEST_TAG),
                     pagerState = pagerState_start,
@@ -61,9 +55,7 @@ class PageIndicatorTest {
     @Test
     public fun horizontalPageIndicator_supports_testtag_linear() {
         rule.setContentWithTheme {
-            DeviceConfigurationOverride(
-                DeviceConfigurationOverride.RoundScreen(isScreenRound = false)
-            ) {
+            ScreenConfiguration(screenSizeDp = 150, isRound = false) {
                 HorizontalPageIndicator(
                     modifier = Modifier.testTag(TEST_TAG),
                     pagerState = pagerState_start
@@ -76,9 +68,7 @@ class PageIndicatorTest {
     @Test
     public fun verticalPageIndicator_supports_testtag_circular() {
         rule.setContentWithTheme {
-            DeviceConfigurationOverride(
-                DeviceConfigurationOverride.RoundScreen(isScreenRound = true)
-            ) {
+            ScreenConfiguration(screenSizeDp = 150, isRound = true) {
                 VerticalPageIndicator(
                     modifier = Modifier.testTag(TEST_TAG),
                     pagerState = pagerState_start,
@@ -91,9 +81,7 @@ class PageIndicatorTest {
     @Test
     public fun verticalPageIndicator_supports_testtag_linear() {
         rule.setContentWithTheme {
-            DeviceConfigurationOverride(
-                DeviceConfigurationOverride.RoundScreen(isScreenRound = false)
-            ) {
+            ScreenConfiguration(screenSizeDp = 150, isRound = false) {
                 VerticalPageIndicator(
                     modifier = Modifier.testTag(TEST_TAG),
                     pagerState = pagerState_start
@@ -111,16 +99,14 @@ class PageIndicatorTest {
     @Test
     public fun horizontalPageIndicator_in_between_positions_circular() {
         rule.setContentWithTheme {
-            DeviceConfigurationOverride(DeviceConfigurationOverride.RoundScreen(true)) {
-                Box(modifier = Modifier.size(150.dp)) {
-                    HorizontalPageIndicator(
-                        modifier = Modifier.testTag(TEST_TAG),
-                        pagerState = pagerState_middle,
-                        selectedColor = selectedColor,
-                        unselectedColor = unselectedColor,
-                        backgroundColor = backgroundColor
-                    )
-                }
+            ScreenConfiguration(screenSizeDp = 150, isRound = true) {
+                HorizontalPageIndicator(
+                    modifier = Modifier.testTag(TEST_TAG),
+                    pagerState = pagerState_middle,
+                    selectedColor = selectedColor,
+                    unselectedColor = unselectedColor,
+                    backgroundColor = backgroundColor
+                )
             }
         }
         rule.waitForIdle()
@@ -150,16 +136,14 @@ class PageIndicatorTest {
     @Test
     public fun verticalPageIndicator_in_between_positions_circular() {
         rule.setContentWithTheme {
-            DeviceConfigurationOverride(DeviceConfigurationOverride.RoundScreen(true)) {
-                Box(modifier = Modifier.size(150.dp)) {
-                    VerticalPageIndicator(
-                        modifier = Modifier.testTag(TEST_TAG),
-                        pagerState = pagerState_middle,
-                        selectedColor = selectedColor,
-                        unselectedColor = unselectedColor,
-                        backgroundColor = backgroundColor
-                    )
-                }
+            ScreenConfiguration(screenSizeDp = 150, isRound = true) {
+                VerticalPageIndicator(
+                    modifier = Modifier.testTag(TEST_TAG),
+                    pagerState = pagerState_middle,
+                    selectedColor = selectedColor,
+                    unselectedColor = unselectedColor,
+                    backgroundColor = backgroundColor
+                )
             }
         }
         rule.waitForIdle()
@@ -188,18 +172,16 @@ class PageIndicatorTest {
         val spacing = PageIndicatorSpacing
         val padding = PaddingDefaults.edgePadding
         rule.setContent {
-            DeviceConfigurationOverride(DeviceConfigurationOverride.RoundScreen(true)) {
-                Box(modifier = Modifier.size(150.dp)) {
-                    HorizontalPageIndicator(
-                        modifier = Modifier.testTag(TEST_TAG),
-                        pagerState =
-                            PagerState(
-                                currentPage = 1,
-                                currentPageOffsetFraction = 0.0f,
-                                pageCount = { 9 }
-                            ),
-                    )
-                }
+            ScreenConfiguration(screenSizeDp = 150, isRound = true) {
+                HorizontalPageIndicator(
+                    modifier = Modifier.testTag(TEST_TAG),
+                    pagerState =
+                        PagerState(
+                            currentPage = 1,
+                            currentPageOffsetFraction = 0.0f,
+                            pageCount = { 9 }
+                        ),
+                )
             }
         }
 
@@ -217,18 +199,16 @@ class PageIndicatorTest {
         val padding = PaddingDefaults.edgePadding
 
         rule.setContent {
-            DeviceConfigurationOverride(DeviceConfigurationOverride.RoundScreen(true)) {
-                Box(modifier = Modifier.size(150.dp)) {
-                    HorizontalPageIndicator(
-                        modifier = Modifier.testTag(TEST_TAG),
-                        pagerState =
-                            PagerState(
-                                currentPage = 1,
-                                currentPageOffsetFraction = 0.0f,
-                                pageCount = { pagesCount }
-                            ),
-                    )
-                }
+            ScreenConfiguration(screenSizeDp = 150, isRound = true) {
+                HorizontalPageIndicator(
+                    modifier = Modifier.testTag(TEST_TAG),
+                    pagerState =
+                        PagerState(
+                            currentPage = 1,
+                            currentPageOffsetFraction = 0.0f,
+                            pageCount = { pagesCount }
+                        ),
+                )
             }
         }
 
@@ -248,15 +228,47 @@ class PageIndicatorTest {
         verticalPageIndicator_position_is_selected_circular(LayoutDirection.Rtl)
     }
 
+    @Test
+    public fun horizontalPageIndicator_single_page_circular() {
+        rule.setContentWithTheme {
+            ScreenConfiguration(screenSizeDp = 150, isRound = true) {
+                HorizontalPageIndicator(
+                    modifier = Modifier.testTag(TEST_TAG),
+                    pagerState =
+                        PagerState(
+                            currentPage = 0,
+                            currentPageOffsetFraction = 0f,
+                            pageCount = { 1 }
+                        ),
+                    selectedColor = selectedColor,
+                    unselectedColor = unselectedColor,
+                    backgroundColor = backgroundColor
+                )
+            }
+        }
+        rule.waitForIdle()
+
+        // Selected color should occupy 1 dot, which
+        // approximately equals to 12%
+        rule
+            .onNodeWithTag(TEST_TAG)
+            .captureToImage()
+            .assertColorInPercentageRange(selectedColor, 11f..13f)
+        // Unselected dots shouldn't be visible on the screen because we only have one page
+        rule.onNodeWithTag(TEST_TAG).captureToImage().assertDoesNotContainColor(unselectedColor)
+
+        // Check that background color exists
+        rule.onNodeWithTag(TEST_TAG).captureToImage().assertContainsColor(backgroundColor)
+    }
+
     private fun horizontalPageIndicator_position_is_selected_circular(
         layoutDirection: LayoutDirection
     ) {
         rule.setContentWithTheme {
-            DeviceConfigurationOverride(
-                DeviceConfigurationOverride.RoundScreen(true)
-                    .then(DeviceConfigurationOverride.LayoutDirection(layoutDirection))
-            ) {
-                Box(modifier = Modifier.size(150.dp)) {
+            ScreenConfiguration(screenSizeDp = 150, isRound = true) {
+                DeviceConfigurationOverride(
+                    DeviceConfigurationOverride.LayoutDirection(layoutDirection)
+                ) {
                     HorizontalPageIndicator(
                         modifier = Modifier.testTag(TEST_TAG),
                         pagerState = pagerState_start,
@@ -290,11 +302,10 @@ class PageIndicatorTest {
         layoutDirection: LayoutDirection
     ) {
         rule.setContentWithTheme {
-            DeviceConfigurationOverride(
-                DeviceConfigurationOverride.RoundScreen(true)
-                    .then(DeviceConfigurationOverride.LayoutDirection(layoutDirection))
-            ) {
-                Box(modifier = Modifier.size(150.dp)) {
+            ScreenConfiguration(screenSizeDp = 150, isRound = true) {
+                DeviceConfigurationOverride(
+                    DeviceConfigurationOverride.LayoutDirection(layoutDirection)
+                ) {
                     VerticalPageIndicator(
                         modifier = Modifier.testTag(TEST_TAG),
                         pagerState = pagerState_start,
