@@ -2206,9 +2206,13 @@ internal class ComposerImpl(
         } else {
             val oldScope = reader.groupAux(reader.currentGroup) as PersistentCompositionLocalMap
             providers =
-                if ((!skipping || change) && (value.canOverride || !parentScope.contains(local)))
-                    parentScope.putValue(local, state)
-                else oldScope
+                when {
+                    (!skipping || change) && (value.canOverride || !parentScope.contains(local)) ->
+                        parentScope.putValue(local, state)
+                    !change && !providersInvalid -> oldScope
+                    providersInvalid -> parentScope
+                    else -> oldScope
+                }
             invalid = reusing || oldScope !== providers
         }
         if (invalid && !inserting) {
