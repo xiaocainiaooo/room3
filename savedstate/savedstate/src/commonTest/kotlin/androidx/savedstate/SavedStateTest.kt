@@ -18,7 +18,6 @@ package androidx.savedstate
 
 import androidx.kruth.assertThat
 import androidx.kruth.assertThrows
-import androidx.savedstate.internal.SavedStateUtils
 import kotlin.test.Test
 
 internal class SavedStateTest : RobolectricTest() {
@@ -209,7 +208,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getBoolean_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getBoolean(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getBoolean(KEY_1) } }
     }
 
     @Test
@@ -217,7 +216,7 @@ internal class SavedStateTest : RobolectricTest() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
         val actual = underTest.read { getBoolean(KEY_1) }
 
-        assertThat(actual).isEqualTo(SavedStateUtils.DEFAULT_BOOLEAN)
+        assertThat(actual).isEqualTo(DEFAULT_BOOLEAN)
     }
 
     @Test
@@ -255,7 +254,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getChar_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getChar(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getChar(KEY_1) } }
     }
 
     @Test
@@ -263,7 +262,7 @@ internal class SavedStateTest : RobolectricTest() {
         val underTest = savedState { putInt(KEY_1, Int.MIN_VALUE) }
         val actual = underTest.read { getChar(KEY_1) }
 
-        assertThat(actual).isEqualTo(SavedStateUtils.DEFAULT_CHAR)
+        assertThat(actual).isEqualTo(DEFAULT_CHAR)
     }
 
     @Test
@@ -299,7 +298,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getDouble_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getDouble(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getDouble(KEY_1) } }
     }
 
     @Test
@@ -307,7 +306,7 @@ internal class SavedStateTest : RobolectricTest() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
         val actual = underTest.read { getDouble(KEY_1) }
 
-        assertThat(actual).isEqualTo(SavedStateUtils.DEFAULT_DOUBLE)
+        assertThat(actual).isEqualTo(DEFAULT_DOUBLE)
     }
 
     @Test
@@ -343,7 +342,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getFloat_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getFloat(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getFloat(KEY_1) } }
     }
 
     @Test
@@ -351,7 +350,7 @@ internal class SavedStateTest : RobolectricTest() {
         val underTest = savedState { putInt(KEY_1, Int.MAX_VALUE) }
         val actual = underTest.read { getFloat(KEY_1) }
 
-        assertThat(actual).isEqualTo(SavedStateUtils.DEFAULT_FLOAT)
+        assertThat(actual).isEqualTo(DEFAULT_FLOAT)
     }
 
     @Test
@@ -387,7 +386,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getInt_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getInt(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getInt(KEY_1) } }
     }
 
     @Test
@@ -395,7 +394,7 @@ internal class SavedStateTest : RobolectricTest() {
         val underTest = savedState { putBoolean(KEY_1, false) }
         val actual = underTest.read { getInt(KEY_1) }
 
-        assertThat(actual).isEqualTo(SavedStateUtils.DEFAULT_INT)
+        assertThat(actual).isEqualTo(DEFAULT_INT)
     }
 
     @Test
@@ -431,7 +430,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getLong_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getLong(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getLong(KEY_1) } }
     }
 
     @Test
@@ -439,7 +438,7 @@ internal class SavedStateTest : RobolectricTest() {
         val underTest = savedState { putBoolean(KEY_1, false) }
         val actual = underTest.read { getLong(KEY_1) }
 
-        assertThat(actual).isEqualTo(SavedStateUtils.DEFAULT_LONG)
+        assertThat(actual).isEqualTo(DEFAULT_LONG)
     }
 
     @Test
@@ -499,7 +498,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getString_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getString(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getString(KEY_1) } }
     }
 
     @Test
@@ -545,7 +544,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getIntList_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getIntList(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getIntList(KEY_1) } }
     }
 
     @Test
@@ -592,7 +591,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getStringList_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getStringList(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getStringList(KEY_1) } }
     }
 
     @Test
@@ -641,7 +640,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getBooleanArray_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getBooleanArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getBooleanArray(KEY_1) } }
     }
 
     @Test
@@ -694,7 +693,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getCharArray_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getCharArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getCharArray(KEY_1) } }
     }
 
     @Test
@@ -747,7 +746,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getDoubleArray_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getDoubleArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getDoubleArray(KEY_1) } }
     }
 
     @Test
@@ -800,7 +799,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getFloatArray_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getFloatArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getFloatArray(KEY_1) } }
     }
 
     @Test
@@ -853,7 +852,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getIntArray_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getIntArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getIntArray(KEY_1) } }
     }
 
     @Test
@@ -906,7 +905,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getLongArray_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getLongArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getLongArray(KEY_1) } }
     }
 
     @Test
@@ -959,7 +958,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getStringArray_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getStringArray(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getStringArray(KEY_1) } }
     }
 
     @Test
@@ -1010,7 +1009,7 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun getSavedState_whenNotSet_throws() {
-        assertThrows<IllegalStateException> { savedState().read { getSavedState(KEY_1) } }
+        assertThrows<IllegalArgumentException> { savedState().read { getSavedState(KEY_1) } }
     }
 
     @Test

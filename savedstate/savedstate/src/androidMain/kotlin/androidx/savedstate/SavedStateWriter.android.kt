@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
+@file:JvmName("SavedStateWriterKt")
+@file:JvmMultifileClass
+@file:Suppress("NOTHING_TO_INLINE")
+
 package androidx.savedstate
 
 import android.os.Parcelable
 
-@Suppress("NOTHING_TO_INLINE")
 @JvmInline
-actual value class SavedStateWriter actual constructor(actual val source: SavedState) {
+actual value class SavedStateWriter
+@PublishedApi
+internal actual constructor(
+    @PublishedApi internal actual val source: SavedState,
+) {
+
     actual inline fun putBoolean(key: String, value: Boolean) {
         source.putBoolean(key, value)
     }
@@ -125,10 +133,10 @@ actual value class SavedStateWriter actual constructor(actual val source: SavedS
     actual inline fun clear() {
         source.clear()
     }
+}
 
-    @Suppress("UNCHECKED_CAST", "ConcreteCollection")
-    @PublishedApi
-    internal inline fun <reified T : Any> Collection<*>.toArrayListUnsafe(): ArrayList<T> {
-        return if (this is ArrayList<*>) this as ArrayList<T> else ArrayList(this as Collection<T>)
-    }
+@Suppress("UNCHECKED_CAST", "ConcreteCollection")
+@PublishedApi
+internal inline fun <reified T : Any> Collection<*>.toArrayListUnsafe(): ArrayList<T> {
+    return if (this is ArrayList<*>) this as ArrayList<T> else ArrayList(this as Collection<T>)
 }

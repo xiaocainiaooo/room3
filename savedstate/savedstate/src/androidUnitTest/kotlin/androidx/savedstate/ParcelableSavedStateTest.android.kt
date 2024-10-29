@@ -34,7 +34,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
 
     @Test
     fun getParcelable_whenNotSet_throws() {
-        assertThrows<IllegalStateException> {
+        assertThrows<IllegalArgumentException> {
             savedState().read { getParcelable<TestParcelable>(KEY_1) }
         }
     }
@@ -83,7 +83,7 @@ internal class ParcelableSavedStateTest : RobolectricTest() {
 
     @Test
     fun getList_ofParcelable_whenNotSet_throws() {
-        assertThrows<IllegalStateException> {
+        assertThrows<IllegalArgumentException> {
             savedState().read { getParcelableList<TestParcelable>(KEY_1) }
         }
     }
