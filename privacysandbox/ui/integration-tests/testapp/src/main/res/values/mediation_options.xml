@@ -21,5 +21,6 @@
         <item>Runtime-Runtime Mediation without Overlay</item>
         <item>Runtime-Runtime Mediation with Overlay</item>
         <item>Runtime-App Mediation</item>
+        <item>Refreshable Mediation</item>
     </string-array>
 </resources>
