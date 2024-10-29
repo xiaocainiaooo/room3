@@ -60,7 +60,6 @@ import androidx.camera.testing.impl.AndroidUtil.skipVideoRecordingTestIfNotSuppo
 import androidx.camera.testing.impl.CameraPipeConfigTestRule
 import androidx.camera.testing.impl.CameraTaskTrackingExecutor
 import androidx.camera.testing.impl.CameraUtil
-import androidx.camera.testing.impl.InternalTestConvenience.ignoreTestForCameraPipe
 import androidx.camera.testing.impl.StreamSharingForceEnabledEffect
 import androidx.camera.testing.impl.SurfaceTextureProvider
 import androidx.camera.testing.impl.WakelockEmptyActivityRule
@@ -800,11 +799,6 @@ class VideoRecordingTest(
 
     @Test
     fun updateVideoUsage_whenRecordingStartedPausedResumedStopped(): Unit = runBlocking {
-        implName.ignoreTestForCameraPipe(
-            "TODO: b/339615736 - Enable when implemented at camera-pipe",
-            evenInLab = true,
-        )
-
         checkAndBindUseCases(videoCapture, preview)
         // Act 1 - isRecording is true after start.
         val recording = recordingSession.createRecording().startAndVerify()
@@ -840,11 +834,6 @@ class VideoRecordingTest(
         runBlocking {
             assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
 
-            implName.ignoreTestForCameraPipe(
-                "TODO: b/339615736 - Enable when implemented at camera-pipe",
-                evenInLab = true,
-            )
-
             checkAndBindUseCases(preview, videoCapture)
             val recording1 = recordingSession.createRecording().startAndVerify()
 
@@ -873,11 +862,6 @@ class VideoRecordingTest(
     fun updateVideoUsage_whenLifecycleStoppedBeforeCompletingRecording(): Unit = runBlocking {
         assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
 
-        implName.ignoreTestForCameraPipe(
-            "TODO: b/339615736 - Enable when implemented at camera-pipe",
-            evenInLab = true,
-        )
-
         checkAndBindUseCases(preview, videoCapture)
         recordingSession.createRecording().startAndVerify()
 
@@ -896,11 +880,6 @@ class VideoRecordingTest(
         assumeFalse(
             "TODO: b/340406044 - Temporarily ignored when stream sharing is enabled.",
             forceEnableStreamSharing
-        )
-
-        implName.ignoreTestForCameraPipe(
-            "TODO: b/339615736 - Enable when implemented at camera-pipe",
-            evenInLab = true,
         )
 
         checkAndBindUseCases(preview, videoCapture)
@@ -933,11 +912,6 @@ class VideoRecordingTest(
             forceEnableStreamSharing
         )
 
-        implName.ignoreTestForCameraPipe(
-            "TODO: b/339615736 - Enable when implemented at camera-pipe",
-            evenInLab = true,
-        )
-
         checkAndBindUseCases(preview, videoCapture)
         recordingSession.createRecording(asPersistentRecording = true).startAndVerify()
 
@@ -966,11 +940,6 @@ class VideoRecordingTest(
         assumeFalse(
             "TODO: b/340406044 - Temporarily ignored when stream sharing is enabled.",
             forceEnableStreamSharing
-        )
-
-        implName.ignoreTestForCameraPipe(
-            "TODO: b/339615736 - Enable when implemented at camera-pipe",
-            evenInLab = true,
         )
 
         checkAndBindUseCases(preview, videoCapture)

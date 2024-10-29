@@ -446,6 +446,7 @@ class StillCaptureRequestTest {
                                 torchControl = torchControl,
                                 useFlashModeTorchFor3aUpdate = NotUseFlashModeTorchFor3aUpdate,
                             ),
+                        videoUsageControl = VideoUsageControl(),
                     ),
                 state = fakeUseCaseCameraState,
                 useCaseGraphConfig = fakeUseCaseGraphConfig,

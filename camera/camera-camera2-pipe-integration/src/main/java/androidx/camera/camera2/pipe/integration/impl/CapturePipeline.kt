@@ -121,6 +121,7 @@ constructor(
     private val configAdapter: CaptureConfigAdapter,
     private val flashControl: FlashControl,
     private val torchControl: TorchControl,
+    private val videoUsageControl: VideoUsageControl,
     private val threads: UseCaseThreads,
     private val requestListener: ComboRequestListener,
     private val useTorchAsFlash: UseTorchAsFlash,
@@ -301,6 +302,9 @@ constructor(
                 captureMode,
                 CHECK_3A_WITH_FLASH_TIMEOUT_IN_NS,
                 pipelineTasks,
+                // TODO: b/339846763 - Disable AE precap only for the quirks where AE precapture
+                //  is problematic, instead of all TorchAsFlash quirks.
+                !useTorchAsFlash.shouldUseTorchAsFlash() && !videoUsageControl.isInVideoUsage(),
             )
         } else {
             defaultNoFlashCapture(mainCaptureParams, captureMode, pipelineTasks)
@@ -372,6 +376,7 @@ constructor(
         @CaptureMode captureMode: Int,
         timeLimitNs: Long,
         pipelineTasks: List<PipelineTask>,
+        triggerAePreCapture: Boolean,
     ): List<Deferred<Void?>> {
         debug { "CapturePipeline#torchApplyCapture" }
         val torchOnRequired = torchControl.torchStateLiveData.value == TorchState.OFF
@@ -386,10 +391,32 @@ constructor(
                     debug { "CapturePipeline#torchApplyCapture: Setting torch done" }
                 }
 
-                if (lock3ARequired) {
-                    debug { "CapturePipeline#torchApplyCapture: Locking 3A" }
-                    lock3A(timeLimitNs)
-                    debug { "CapturePipeline#torchApplyCapture: Locking 3A done" }
+                if (triggerAePreCapture) {
+                    debug { "CapturePipeline#torchApplyCapture: Locking 3A for capture" }
+                    val result3A =
+                        graph.acquireSession().use {
+                            it.lock3AForCapture(
+                                    timeLimitNs = timeLimitNs,
+                                    triggerAf = captureMode == CAPTURE_MODE_MAXIMIZE_QUALITY,
+                                    waitForAwb = true,
+                                )
+                                .await()
+                        }
+                    debug {
+                        "CapturePipeline#torchApplyCapture: Locking 3A for capture done" +
+                            ", result3A = $result3A"
+                    }
+                } else {
+                    // TODO: b/339846763 - When triggerAePreCapture is false, AE pre-capture may
+                    //  cause issues in some devices and thus should not be used here. When capture
+                    //  mode is not max quality, we should only wait for 3A convergence without any
+                    //  additional locking. In case of max quality, only AF should be locked, not
+                    //  AE/AWB too.
+                    if (lock3ARequired) {
+                        debug { "CapturePipeline#torchApplyCapture: Locking 3A" }
+                        lock3A(timeLimitNs)
+                        debug { "CapturePipeline#torchApplyCapture: Locking 3A done" }
+                    }
                 }
             },
             postCapture = {
@@ -398,10 +425,20 @@ constructor(
                     @Suppress("DeferredResultUnused") torchControl.setTorchAsync(false)
                     debug { "CapturePipeline#torchApplyCapture: Unsetting torch done" }
                 }
-                if (lock3ARequired) {
-                    debug { "CapturePipeline#torchApplyCapture: Unlocking 3A" }
-                    unlock3A(CHECK_3A_TIMEOUT_IN_NS)
-                    debug { "CapturePipeline#torchApplyCapture: Unlocking 3A done" }
+                if (triggerAePreCapture) {
+                    debug { "CapturePipeline#torchApplyCapture: Unlocking 3A for capture" }
+                    @Suppress("DeferredResultUnused")
+                    graph.acquireSession().use {
+                        it.unlock3APostCapture(
+                            cancelAf = captureMode == CAPTURE_MODE_MAXIMIZE_QUALITY,
+                        )
+                    }
+                } else {
+                    if (lock3ARequired) {
+                        debug { "CapturePipeline#torchApplyCapture: Unlocking 3A" }
+                        unlock3A(CHECK_3A_TIMEOUT_IN_NS)
+                        debug { "CapturePipeline#torchApplyCapture: Unlocking 3A done" }
+                    }
                 }
             }
         )

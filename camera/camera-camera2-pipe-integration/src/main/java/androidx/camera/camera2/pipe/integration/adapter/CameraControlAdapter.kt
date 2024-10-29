@@ -33,6 +33,7 @@ import androidx.camera.camera2.pipe.integration.impl.TorchControl
 import androidx.camera.camera2.pipe.integration.impl.UseCaseCamera
 import androidx.camera.camera2.pipe.integration.impl.UseCaseManager
 import androidx.camera.camera2.pipe.integration.impl.UseCaseThreads
+import androidx.camera.camera2.pipe.integration.impl.VideoUsageControl
 import androidx.camera.camera2.pipe.integration.impl.ZoomControl
 import androidx.camera.camera2.pipe.integration.interop.Camera2CameraControl
 import androidx.camera.camera2.pipe.integration.interop.CaptureRequestOptions
@@ -80,6 +81,7 @@ constructor(
     public val camera2cameraControl: Camera2CameraControl,
     private val useCaseManager: UseCaseManager,
     private val threads: UseCaseThreads,
+    private val videoUsageControl: VideoUsageControl,
 ) : CameraControlInternal {
     override fun getSensorRect(): Rect {
         val sensorRect =
@@ -196,4 +198,14 @@ constructor(
         warn { "TODO: getSessionConfig is not yet supported" }
         return SessionConfig.defaultEmptySessionConfig()
     }
+
+    override fun incrementVideoUsage() {
+        videoUsageControl.incrementUsage()
+    }
+
+    override fun decrementVideoUsage() {
+        videoUsageControl.decrementUsage()
+    }
+
+    override fun isInVideoUsage(): Boolean = videoUsageControl.isInVideoUsage()
 }
