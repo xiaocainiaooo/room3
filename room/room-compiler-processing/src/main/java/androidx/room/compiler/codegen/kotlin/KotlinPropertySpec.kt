@@ -43,8 +43,6 @@ internal class KotlinPropertySpec(override val name: String, internal val actual
             actual.getter(FunSpec.getterBuilder().addCode(code.actual).build())
         }
 
-        override fun build(): XPropertySpec {
-            return KotlinPropertySpec(name, actual.build())
-        }
+        override fun build() = KotlinPropertySpec(name, actual.build())
     }
 }

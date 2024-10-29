@@ -21,7 +21,6 @@ import androidx.room.compiler.codegen.java.JavaTypeSpec
 import androidx.room.compiler.codegen.kotlin.KotlinCodeBlock
 import androidx.room.compiler.codegen.kotlin.KotlinTypeSpec
 import androidx.room.compiler.processing.XElement
-import androidx.room.compiler.processing.addOriginatingElement
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.javapoet.JTypeSpec
 import com.squareup.kotlinpoet.javapoet.KTypeSpec
@@ -36,7 +35,7 @@ interface XTypeSpec : TargetLanguage {
 
         fun addSuperinterface(typeName: XTypeName): Builder
 
-        fun addAnnotation(annotation: XAnnotationSpec)
+        fun addAnnotation(annotation: XAnnotationSpec): Builder
 
         fun addProperty(propertySpec: XPropertySpec): Builder
 
@@ -46,41 +45,29 @@ interface XTypeSpec : TargetLanguage {
 
         fun setPrimaryConstructor(functionSpec: XFunSpec): Builder
 
-        fun setVisibility(visibility: VisibilityModifier)
+        fun setVisibility(visibility: VisibilityModifier): Builder
 
         fun addAbstractModifier(): Builder
 
+        fun addOriginatingElement(element: XElement): Builder
+
         fun build(): XTypeSpec
 
+        fun addProperty(
+            name: String,
+            typeName: XTypeName,
+            visibility: VisibilityModifier,
+            isMutable: Boolean = false,
+            initExpr: XCodeBlock? = null,
+        ) = apply {
+            val builder = XPropertySpec.builder(language, name, typeName, visibility, isMutable)
+            if (initExpr != null) {
+                builder.initializer(initExpr)
+            }
+            addProperty(builder.build())
+        }
+
         companion object {
-
-            fun Builder.addOriginatingElement(element: XElement) = apply {
-                when (language) {
-                    CodeLanguage.JAVA -> {
-                        check(this is JavaTypeSpec.Builder)
-                        actual.addOriginatingElement(element)
-                    }
-                    CodeLanguage.KOTLIN -> {
-                        check(this is KotlinTypeSpec.Builder)
-                        actual.addOriginatingElement(element)
-                    }
-                }
-            }
-
-            fun Builder.addProperty(
-                name: String,
-                typeName: XTypeName,
-                visibility: VisibilityModifier,
-                isMutable: Boolean = false,
-                initExpr: XCodeBlock? = null,
-            ) = apply {
-                val builder = XPropertySpec.builder(language, name, typeName, visibility, isMutable)
-                if (initExpr != null) {
-                    builder.initializer(initExpr)
-                }
-                addProperty(builder.build())
-            }
-
             fun Builder.apply(
                 javaTypeBuilder: com.squareup.javapoet.TypeSpec.Builder.() -> Unit,
                 kotlinTypeBuilder: com.squareup.kotlinpoet.TypeSpec.Builder.() -> Unit,
@@ -100,6 +87,7 @@ interface XTypeSpec : TargetLanguage {
     }
 
     companion object {
+        @JvmStatic
         fun classBuilder(
             language: CodeLanguage,
             className: XClassName,
@@ -129,6 +117,7 @@ interface XTypeSpec : TargetLanguage {
             }
         }
 
+        @JvmStatic
         fun anonymousClassBuilder(
             language: CodeLanguage,
             argsFormat: String = "",
@@ -164,6 +153,7 @@ interface XTypeSpec : TargetLanguage {
             }
         }
 
+        @JvmStatic
         fun companionObjectBuilder(language: CodeLanguage): Builder {
             return when (language) {
                 CodeLanguage.JAVA ->

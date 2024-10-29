@@ -45,8 +45,8 @@ interface XPropertySpec : TargetLanguage {
 
         companion object {
             fun Builder.apply(
-                javaFieldBuilder: com.squareup.javapoet.FieldSpec.Builder.() -> Unit,
-                kotlinPropertyBuilder: com.squareup.kotlinpoet.PropertySpec.Builder.() -> Unit,
+                javaFieldBuilder: FieldSpec.Builder.() -> Unit,
+                kotlinPropertyBuilder: PropertySpec.Builder.() -> Unit,
             ): Builder = apply {
                 when (language) {
                     CodeLanguage.JAVA -> {
@@ -63,6 +63,7 @@ interface XPropertySpec : TargetLanguage {
     }
 
     companion object {
+        @JvmStatic
         fun builder(
             language: CodeLanguage,
             name: String,
@@ -101,6 +102,7 @@ interface XPropertySpec : TargetLanguage {
             }
         }
 
+        @JvmStatic
         fun overridingBuilder(
             language: CodeLanguage,
             element: XMethodElement,

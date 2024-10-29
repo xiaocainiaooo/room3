@@ -20,6 +20,7 @@ import androidx.room.compiler.codegen.CodeLanguage
 import androidx.room.compiler.codegen.KCodeBlock
 import androidx.room.compiler.codegen.KCodeBlockBuilder
 import androidx.room.compiler.codegen.TargetLanguage
+import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XMemberName
@@ -31,9 +32,8 @@ internal class KotlinCodeBlock(internal val actual: KCodeBlock) : KotlinLang(), 
 
     override fun toString() = actual.toString()
 
-    internal class Builder : KotlinLang(), XCodeBlock.Builder {
-
-        internal val actual = KCodeBlockBuilder()
+    internal class Builder(internal val actual: KCodeBlockBuilder) :
+        KotlinLang(), XCodeBlock.Builder {
 
         override fun add(code: XCodeBlock) = apply {
             require(code is KotlinCodeBlock)
@@ -94,9 +94,7 @@ internal class KotlinCodeBlock(internal val actual: KCodeBlock) : KotlinLang(), 
 
         override fun unindent() = apply { actual.unindent() }
 
-        override fun build(): XCodeBlock {
-            return KotlinCodeBlock(actual.build())
-        }
+        override fun build() = KotlinCodeBlock(actual.build())
 
         // No need to really process 'format' since we use '%' as placeholders, but check for
         // JavaPoet placeholders to hunt down bad migrations to XPoet.
@@ -122,6 +120,13 @@ internal class KotlinCodeBlock(internal val actual: KCodeBlock) : KotlinLang(), 
                     is XPropertySpec -> (arg as KotlinPropertySpec).actual
                     is XFunSpec -> (arg as KotlinFunSpec).actual
                     is XCodeBlock -> (arg as KotlinCodeBlock).actual
+                    is XAnnotationSpec -> (arg as KotlinAnnotationSpec).actual
+                    is XTypeSpec.Builder,
+                    is XPropertySpec.Builder,
+                    is XFunSpec.Builder,
+                    is XCodeBlock.Builder,
+                    is XAnnotationSpec.Builder ->
+                        error("Found builder, ${arg.javaClass}. Did you forget to call .build()?")
                     else -> arg
                 }
             }
