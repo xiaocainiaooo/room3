@@ -703,41 +703,6 @@ package androidx.compose.material3 {
     field public static final androidx.compose.material3.DismissibleModalWideNavigationRailDefaults INSTANCE;
   }
 
-  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public final class DismissibleModalWideNavigationRailState {
-    ctor public DismissibleModalWideNavigationRailState(androidx.compose.material3.DismissibleModalWideNavigationRailValue initialValue, androidx.compose.ui.unit.Density density, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.material3.DismissibleModalWideNavigationRailValue,java.lang.Boolean> confirmValueChange);
-    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit>);
-    method public androidx.compose.animation.core.AnimationSpec<java.lang.Float> getAnimationSpec();
-    method public kotlin.jvm.functions.Function1<androidx.compose.material3.DismissibleModalWideNavigationRailValue,java.lang.Boolean> getConfirmValueChange();
-    method public float getCurrentOffset();
-    method public androidx.compose.material3.DismissibleModalWideNavigationRailValue getCurrentValue();
-    method public androidx.compose.material3.DismissibleModalWideNavigationRailValue getInitialValue();
-    method public androidx.compose.material3.DismissibleModalWideNavigationRailValue getTargetValue();
-    method public boolean isAnimationRunning();
-    method public boolean isOpen();
-    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit>);
-    method public void setConfirmValueChange(kotlin.jvm.functions.Function1<? super androidx.compose.material3.DismissibleModalWideNavigationRailValue,java.lang.Boolean>);
-    method public void setInitialValue(androidx.compose.material3.DismissibleModalWideNavigationRailValue);
-    method public suspend Object? snapTo(androidx.compose.material3.DismissibleModalWideNavigationRailValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
-    property public final androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec;
-    property public final kotlin.jvm.functions.Function1<androidx.compose.material3.DismissibleModalWideNavigationRailValue,java.lang.Boolean> confirmValueChange;
-    property public final float currentOffset;
-    property public final androidx.compose.material3.DismissibleModalWideNavigationRailValue currentValue;
-    property public final androidx.compose.material3.DismissibleModalWideNavigationRailValue initialValue;
-    property public final boolean isAnimationRunning;
-    property public final boolean isOpen;
-    property public final androidx.compose.material3.DismissibleModalWideNavigationRailValue targetValue;
-    field public static final androidx.compose.material3.DismissibleModalWideNavigationRailState.Companion Companion;
-  }
-
-  public static final class DismissibleModalWideNavigationRailState.Companion {
-    method public androidx.compose.runtime.saveable.Saver<androidx.compose.material3.DismissibleModalWideNavigationRailState,androidx.compose.material3.DismissibleModalWideNavigationRailValue> Saver(androidx.compose.ui.unit.Density density, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material3.DismissibleModalWideNavigationRailValue,java.lang.Boolean> confirmStateChange);
-  }
-
-  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public enum DismissibleModalWideNavigationRailValue {
-    enum_constant public static final androidx.compose.material3.DismissibleModalWideNavigationRailValue Closed;
-    enum_constant public static final androidx.compose.material3.DismissibleModalWideNavigationRailValue Open;
-  }
-
   @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class DisplayMode {
     field public static final androidx.compose.material3.DisplayMode.Companion Companion;
   }
@@ -3057,14 +3022,29 @@ package androidx.compose.material3 {
   }
 
   public final class WideNavigationRailKt {
-    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static void DismissibleModalWideNavigationRail(kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.material3.DismissibleModalWideNavigationRailState railState, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.WideNavigationRailColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? header, optional androidx.compose.foundation.layout.WindowInsets windowInsets, optional int arrangement, optional boolean gesturesEnabled, optional androidx.compose.material3.ModalWideNavigationRailProperties properties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static void ModalWideNavigationRail(kotlin.jvm.functions.Function0<kotlin.Unit> scrimOnClick, optional androidx.compose.ui.Modifier modifier, optional boolean expanded, optional androidx.compose.ui.graphics.Shape collapsedShape, optional androidx.compose.ui.graphics.Shape expandedShape, optional androidx.compose.material3.WideNavigationRailColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? header, optional float expandedHeaderTopPadding, optional androidx.compose.foundation.layout.WindowInsets windowInsets, optional int arrangement, optional androidx.compose.material3.ModalWideNavigationRailProperties expandedProperties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static void WideNavigationRail(optional androidx.compose.ui.Modifier modifier, optional boolean expanded, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.WideNavigationRailColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? header, optional androidx.compose.foundation.layout.WindowInsets windowInsets, optional int arrangement, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static void ModalWideNavigationRail(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.material3.WideNavigationRailState state, optional boolean hideOnCollapse, optional androidx.compose.ui.graphics.Shape collapsedShape, optional androidx.compose.ui.graphics.Shape expandedShape, optional androidx.compose.material3.WideNavigationRailColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? header, optional float expandedHeaderTopPadding, optional androidx.compose.foundation.layout.WindowInsets windowInsets, optional int arrangement, optional androidx.compose.material3.ModalWideNavigationRailProperties expandedProperties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static void WideNavigationRail(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.material3.WideNavigationRailState state, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.WideNavigationRailColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? header, optional androidx.compose.foundation.layout.WindowInsets windowInsets, optional int arrangement, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static void WideNavigationRailItem(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> icon, kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional boolean railExpanded, optional int iconPosition, optional androidx.compose.material3.NavigationItemColors colors, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
   }
 
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public interface WideNavigationRailState {
+    method public suspend Object? collapse(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? expand(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public boolean isAnimating();
+    method public boolean isExpanded();
+    method public suspend Object? snapTo(androidx.compose.material3.WideNavigationRailValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? toggle(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public abstract boolean isAnimating;
+    property public abstract boolean isExpanded;
+  }
+
   public final class WideNavigationRailStateKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.material3.DismissibleModalWideNavigationRailState rememberDismissibleModalWideNavigationRailState(optional kotlin.jvm.functions.Function1<? super androidx.compose.material3.DismissibleModalWideNavigationRailValue,java.lang.Boolean> confirmValueChange);
+    method @androidx.compose.runtime.Composable public static androidx.compose.material3.WideNavigationRailState rememberWideNavigationRailState(optional androidx.compose.material3.WideNavigationRailValue initialValue);
+  }
+
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public enum WideNavigationRailValue {
+    enum_constant public static final androidx.compose.material3.WideNavigationRailValue Collapsed;
+    enum_constant public static final androidx.compose.material3.WideNavigationRailValue Expanded;
   }
 
 }
