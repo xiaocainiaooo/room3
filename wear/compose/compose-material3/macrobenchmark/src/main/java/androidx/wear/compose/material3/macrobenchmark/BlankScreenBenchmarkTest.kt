@@ -17,16 +17,20 @@
 package androidx.wear.compose.material3.macrobenchmark
 
 import androidx.benchmark.macro.CompilationMode
+import androidx.benchmark.macro.ExperimentalMetricApi
+import androidx.benchmark.macro.MemoryUsageMetric
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.wear.compose.material3.macrobenchmark.common.TransformingLazyColumnBenchmark
+import androidx.wear.compose.material3.macrobenchmark.common.BlankScreenBenchmark
 import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 
+@OptIn(ExperimentalMetricApi::class)
 @LargeTest
-@RunWith(Parameterized::class)
-class TransformingLazyColumnBenchmarkTest(compilationMode: CompilationMode) :
+@RunWith(AndroidJUnit4::class)
+class BlankScreenBenchmarkTest :
     BenchmarkTestBase(
-        compilationMode = compilationMode,
-        macrobenchmarkScreen = TransformingLazyColumnBenchmark,
-        actionSuffix = "TRANSFORMING_LAZY_COLUMN_ACTIVITY"
+        compilationMode = CompilationMode.DEFAULT,
+        macrobenchmarkScreen = BlankScreenBenchmark,
+        actionSuffix = "BLANK_SCREEN_ACTIVITY",
+        metrics = listOf(MemoryUsageMetric(MemoryUsageMetric.Mode.Last)),
     )

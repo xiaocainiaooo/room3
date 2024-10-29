@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-package androidx.wear.compose.material3.macrobenchmark.target
+package androidx.wear.compose.material3.macrobenchmark.common
 
-import androidx.wear.compose.material3.macrobenchmark.common.ButtonBenchmark
+import android.os.SystemClock
+import androidx.benchmark.macro.MacrobenchmarkScope
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.runtime.Composable
 
-class ButtonActivity : BenchmarkBaseActivity(ButtonBenchmark)
+object BlankScreenBenchmark : MacrobenchmarkScreen {
+    override val content: @Composable (BoxScope.() -> Unit)
+        get() = {}
+
+    override val exercise: MacrobenchmarkScope.() -> Unit
+        get() = { SystemClock.sleep(500L) }
+}

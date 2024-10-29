@@ -16,6 +16,6 @@
 
 package androidx.wear.compose.material3.macrobenchmark.target
 
-import androidx.wear.compose.material3.macrobenchmark.common.ButtonBenchmark
+import androidx.wear.compose.material3.macrobenchmark.common.BlankScreenBenchmark
 
-class ButtonActivity : BenchmarkBaseActivity(ButtonBenchmark)
+class BlankScreenActivity : BenchmarkBaseActivity(BlankScreenBenchmark)
