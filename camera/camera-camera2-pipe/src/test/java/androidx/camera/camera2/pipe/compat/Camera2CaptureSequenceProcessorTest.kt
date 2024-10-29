@@ -200,13 +200,14 @@ internal class Camera2CaptureSequenceProcessorTest {
                         CaptureRequest.CONTROL_AF_MODE to
                             CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
                     ),
+                graphParameters = mapOf<Any, Any?>(),
                 requiredParameters =
                     mapOf<Any, Any?>(
                         CaptureRequest.CONTROL_AF_MODE to
                             CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO
                     ),
-                listeners = listOf(),
-                sequenceListener = FakeCaptureSequenceListener()
+                sequenceListener = FakeCaptureSequenceListener(),
+                listeners = listOf()
             )
 
         val result = captureSequenceProcessor.submit(sequence!!)
@@ -234,9 +235,10 @@ internal class Camera2CaptureSequenceProcessorTest {
                 isRepeating = false,
                 requests = listOf(Request(listOf(stream1.id, stream2.id))),
                 defaultParameters = mapOf<Any, Any?>(),
+                graphParameters = mapOf<Any, Any?>(),
                 requiredParameters = mapOf<Any, Any?>(),
-                listeners = emptyList(),
-                sequenceListener = FakeCaptureSequenceListener()
+                sequenceListener = FakeCaptureSequenceListener(),
+                listeners = emptyList()
             )
         assertThat(captureSequence).isNotNull()
 
@@ -262,9 +264,10 @@ internal class Camera2CaptureSequenceProcessorTest {
                 isRepeating = false,
                 requests = listOf(Request(listOf(stream2.id))),
                 defaultParameters = mapOf<Any, Any?>(),
+                graphParameters = mapOf<Any, Any?>(),
                 requiredParameters = mapOf<Any, Any?>(),
-                listeners = emptyList(),
-                sequenceListener = FakeCaptureSequenceListener()
+                sequenceListener = FakeCaptureSequenceListener(),
+                listeners = emptyList()
             )
 
         assertThat(captureSequence).isNull()
@@ -285,9 +288,10 @@ internal class Camera2CaptureSequenceProcessorTest {
                 isRepeating = false,
                 requests = listOf(Request(listOf(stream1.id, stream2.id))),
                 defaultParameters = mapOf<Any, Any?>(),
+                graphParameters = mapOf<Any, Any?>(),
                 requiredParameters = mapOf<Any, Any?>(),
-                listeners = emptyList(),
-                sequenceListener = FakeCaptureSequenceListener()
+                sequenceListener = FakeCaptureSequenceListener(),
+                listeners = emptyList()
             )
 
         assertThat(captureSequence).isNotNull()
@@ -321,13 +325,14 @@ internal class Camera2CaptureSequenceProcessorTest {
                         CaptureRequest.CONTROL_AF_MODE to
                             CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
                     ),
+                graphParameters = mapOf<Any, Any?>(),
                 requiredParameters =
                     mapOf<Any, Any?>(
                         CaptureRequest.CONTROL_AF_MODE to
                             CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO
                     ),
-                listeners = listOf(),
-                sequenceListener = FakeCaptureSequenceListener()
+                sequenceListener = FakeCaptureSequenceListener(),
+                listeners = listOf()
             )
 
         val result = captureSequenceProcessor.submit(sequence!!)

@@ -143,7 +143,7 @@ internal class CameraGraphImplTest {
             frameCaptureQueue,
             audioRestriction,
             graphId,
-            CameraGraphParametersImpl(sessionLock),
+            CameraGraphParametersImpl(sessionLock, fakeGraphProcessor, testScope),
             sessionLock
         )
     private val stream1: CameraStream =

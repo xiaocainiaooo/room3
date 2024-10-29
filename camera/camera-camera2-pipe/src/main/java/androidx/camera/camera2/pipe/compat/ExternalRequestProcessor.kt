@@ -105,9 +105,10 @@ internal class ExternalCaptureSequenceProcessor(
         isRepeating: Boolean,
         requests: List<Request>,
         defaultParameters: Map<*, Any?>,
+        graphParameters: Map<*, Any?>,
         requiredParameters: Map<*, Any?>,
-        listeners: List<Request.Listener>,
-        sequenceListener: CaptureSequence.CaptureSequenceListener
+        sequenceListener: CaptureSequence.CaptureSequenceListener,
+        listeners: List<Request.Listener>
     ): ExternalCaptureSequence? {
         if (closed.value) {
             return null
@@ -119,7 +120,8 @@ internal class ExternalCaptureSequenceProcessor(
         }
         val metadata =
             requests.map { request ->
-                val parameters = defaultParameters + request.parameters + requiredParameters
+                val parameters =
+                    defaultParameters + graphParameters + request.parameters + requiredParameters
 
                 ExternalRequestMetadata(
                     graphConfig.defaultTemplate,

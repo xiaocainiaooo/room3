@@ -21,18 +21,24 @@ import androidx.annotation.GuardedBy
 import androidx.camera.camera2.pipe.CameraGraph
 import androidx.camera.camera2.pipe.Metadata
 import androidx.camera.camera2.pipe.config.CameraGraphScope
+import androidx.camera.camera2.pipe.config.ForCameraGraph
 import androidx.camera.camera2.pipe.core.Log.warn
+import androidx.camera.camera2.pipe.graph.GraphProcessor
 import androidx.camera.camera2.pipe.graph.SessionLock
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 
 @CameraGraphScope
 public class CameraGraphParametersImpl
 @Inject
-internal constructor(private val sessionLock: SessionLock) : CameraGraph.Parameters {
+internal constructor(
+    private val sessionLock: SessionLock,
+    private val graphProcessor: GraphProcessor,
+    @ForCameraGraph private val graphScope: CoroutineScope
+) : CameraGraph.Parameters {
     private val lock = Any()
 
     @GuardedBy("lock") private val parameters = mutableMapOf<Any, Any?>()
-    @GuardedBy("lock") private var listener: (() -> Unit)? = null
 
     /**
      * Set to true when [parameters] is modified. Set to false when the modified [parameters] is
@@ -57,18 +63,18 @@ internal constructor(private val sessionLock: SessionLock) : CameraGraph.Paramet
     }
 
     public override fun setAll(newParameters: Map<Any, Any?>) {
-        var invokeListener = false
+        var invokeUpdate = false
         synchronized(lock) {
             var modified = false
             for ((key, value) in newParameters.entries) {
-                modified = modified || modify(parameters, key, value)
+                modified = modify(parameters, key, value) || modified
             }
             if (modified && !dirty) {
                 dirty = true
-                invokeListener = true
+                invokeUpdate = true
             }
         }
-        if (invokeListener) listener?.invoke()
+        applyUpdate(invokeUpdate)
     }
 
     private fun modify(map: MutableMap<Any, Any?>, key: Any, value: Any?): Boolean {
@@ -90,7 +96,7 @@ internal constructor(private val sessionLock: SessionLock) : CameraGraph.Paramet
     }
 
     public override fun clear() {
-        var invokeListener = false
+        var invokeUpdate = false
         synchronized(lock) {
             var modified = false
             if (parameters.isNotEmpty()) {
@@ -99,10 +105,10 @@ internal constructor(private val sessionLock: SessionLock) : CameraGraph.Paramet
             }
             if (modified && !dirty) {
                 dirty = true
-                invokeListener = true
+                invokeUpdate = true
             }
         }
-        if (invokeListener) listener?.invoke()
+        applyUpdate(invokeUpdate)
     }
 
     public override fun <T> remove(key: CaptureRequest.Key<T>): Boolean {
@@ -114,7 +120,7 @@ internal constructor(private val sessionLock: SessionLock) : CameraGraph.Paramet
     }
 
     public override fun removeAll(keys: Set<*>): Boolean {
-        var invokeListener = false
+        var invokeUpdate = false
         var modified = false
         synchronized(lock) {
             for (key in keys) {
@@ -130,10 +136,10 @@ internal constructor(private val sessionLock: SessionLock) : CameraGraph.Paramet
             }
             if (modified && !dirty) {
                 dirty = true
-                invokeListener = true
+                invokeUpdate = true
             }
         }
-        if (invokeListener) listener?.invoke()
+        applyUpdate(invokeUpdate)
         return modified
     }
 
@@ -150,12 +156,10 @@ internal constructor(private val sessionLock: SessionLock) : CameraGraph.Paramet
         }
     }
 
-    public fun setListener(listener: () -> Unit) {
-        synchronized(lock) {
-            if (this.listener != null) {
-                warn { "Listener already set in $this." }
-            } else {
-                this.listener = listener
+    private fun applyUpdate(update: Boolean) {
+        if (update) {
+            sessionLock.withTokenIn(graphScope) {
+                // TODO(amycao): b/354899273 Wire CameraGraphParameters to CameraGraph
             }
         }
     }

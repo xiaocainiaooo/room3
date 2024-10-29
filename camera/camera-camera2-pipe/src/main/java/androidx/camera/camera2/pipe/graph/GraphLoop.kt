@@ -69,6 +69,8 @@ internal class GraphLoop(
 
     @GuardedBy("lock") private var _repeatingRequest: Request? = null
 
+    @GuardedBy("lock") private var _graphParameters: Map<Any, Any?> = emptyMap()
+
     var requestProcessor: GraphRequestProcessor?
         get() = synchronized(lock) { _requestProcessor }
         set(value) {
@@ -142,13 +144,20 @@ internal class GraphLoop(
                     processingQueue.tryEmit(StopRepeating(_requestProcessor))
                 }
             }
-
             if (value == null) {
                 for (i in listeners.indices) {
                     listeners[i].onStopRepeating()
                 }
             }
         }
+
+    var graphParameters: Map<Any, Any?>
+        get() = synchronized(lock) { _graphParameters }
+        set(value) =
+            synchronized(lock) {
+                _graphParameters = value
+                updateParameters(value)
+            }
 
     private val _captureProcessingEnabled = atomic(true)
     var captureProcessingEnabled: Boolean
@@ -177,6 +186,19 @@ internal class GraphLoop(
                 "Cannot submit parameters without an active repeating request!"
             }
             return processingQueue.tryEmit(SubmitParameters(currentRepeatingRequest, parameters))
+        }
+    }
+
+    private fun updateParameters(parameters: Map<Any, Any?>): Boolean {
+        synchronized(lock) {
+            val currentRepeatingRequest = _repeatingRequest
+            if (currentRepeatingRequest != null) {
+                return processingQueue.tryEmit(
+                    UpdateParameters(currentRepeatingRequest, parameters)
+                )
+            } else {
+                return false
+            }
         }
     }
 
@@ -276,7 +298,8 @@ internal class GraphLoop(
                     }
                     is StartRepeating,
                     is SubmitCapture,
-                    is SubmitParameters -> continue
+                    is SubmitParameters,
+                    is UpdateParameters -> continue
                 }
             }
 
@@ -348,6 +371,10 @@ internal class GraphLoop(
                             // fire.
                             true
                         }
+                        is UpdateParameters -> {
+                            // Same as above
+                            true
+                        }
                         else -> false
                     }
                 }
@@ -368,7 +395,8 @@ internal class GraphLoop(
                 val success =
                     requestProcessor?.buildAndSubmit(
                         isRepeating = true,
-                        requests = listOf(command.request)
+                        requests = listOf(command.request),
+                        graphParameters = graphParameters
                     ) == true
                 if (success) {
                     lastRepeatingRequest = command.request
@@ -387,7 +415,8 @@ internal class GraphLoop(
                 val success =
                     requestProcessor?.buildAndSubmit(
                         isRepeating = false,
-                        requests = command.requests
+                        requests = command.requests,
+                        graphParameters = graphParameters
                     ) == true
                 if (success) {
                     commands.removeAt(idx)
@@ -411,7 +440,8 @@ internal class GraphLoop(
                     requestProcessor?.buildAndSubmit(
                         isRepeating = false,
                         requests = listOf(command.request),
-                        parameters = command.parameters
+                        parameters = command.parameters,
+                        graphParameters = graphParameters
                     ) == true
                 if (success) {
                     commands.removeAt(idx)
@@ -419,6 +449,22 @@ internal class GraphLoop(
                     Log.warn {
                         "SubmitParameters failed to submit to $requestProcessor: " +
                             Debug.formatParameterMap(command.parameters)
+                    }
+                }
+            }
+            is UpdateParameters -> {
+                val success =
+                    requestProcessor?.buildAndSubmit(
+                        isRepeating = true,
+                        requests = listOf(command.request),
+                        graphParameters = graphParameters
+                    ) == true
+                if (success) {
+                    commands.removeAt(idx)
+                } else {
+                    Log.warn {
+                        "UpdateParameters failed to submit to $requestProcessor: " +
+                            Debug.formatParameterMap(command.graphParameters)
                     }
                 }
             }
@@ -445,7 +491,8 @@ internal class GraphLoop(
     private fun GraphRequestProcessor.buildAndSubmit(
         isRepeating: Boolean,
         requests: List<Request>,
-        parameters: Map<*, Any?> = emptyMap<Any, Any?>()
+        parameters: Map<*, Any?> = emptyMap<Any, Any?>(),
+        graphParameters: Map<Any, Any?> = emptyMap()
     ): Boolean {
         val graphRequiredParameters = buildMap {
             // Build the required parameter map:
@@ -456,13 +503,16 @@ internal class GraphLoop(
             this.putAllMetadata(requiredParameters)
         }
 
-        return this.submit(
-            isRepeating = isRepeating,
-            requests = requests,
-            defaultParameters = defaultParameters,
-            requiredParameters = graphRequiredParameters,
-            listeners = graphListeners
-        )
+        val result =
+            this.submit(
+                isRepeating = isRepeating,
+                requests = requests,
+                defaultParameters = defaultParameters,
+                graphParameters = graphParameters,
+                requiredParameters = graphRequiredParameters,
+                listeners = graphListeners
+            )
+        return result
     }
 
     override fun toString(): String = "GraphLoop($cameraGraphId)"
@@ -485,5 +535,8 @@ internal class GraphLoop(
     private class SubmitCapture(val requests: List<Request>) : GraphCommand()
 
     private class SubmitParameters(val request: Request, val parameters: Map<*, Any?>) :
+        GraphCommand()
+
+    private class UpdateParameters(val request: Request, val graphParameters: Map<Any, Any?>) :
         GraphCommand()
 }
