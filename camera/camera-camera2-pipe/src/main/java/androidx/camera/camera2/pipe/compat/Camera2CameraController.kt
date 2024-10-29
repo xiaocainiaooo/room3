@@ -31,10 +31,12 @@ import androidx.camera.camera2.pipe.GraphState
 import androidx.camera.camera2.pipe.StreamGraph
 import androidx.camera.camera2.pipe.StreamId
 import androidx.camera.camera2.pipe.config.Camera2ControllerScope
+import androidx.camera.camera2.pipe.core.DurationNs
 import androidx.camera.camera2.pipe.core.Log
 import androidx.camera.camera2.pipe.core.Threading.runBlockingCheckedOrNull
 import androidx.camera.camera2.pipe.core.Threads
 import androidx.camera.camera2.pipe.core.TimeSource
+import androidx.camera.camera2.pipe.core.TimestampNs
 import androidx.camera.camera2.pipe.graph.GraphListener
 import androidx.camera.camera2.pipe.internal.CameraStatusMonitor
 import androidx.camera.camera2.pipe.internal.CameraStatusMonitor.CameraStatus
@@ -42,7 +44,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -87,9 +88,10 @@ constructor(
     internal var controllerState: ControllerState = ControllerState.STOPPED
 
     @GuardedBy("lock")
-    private var cameraStatus: CameraStatus = CameraStatus.CameraUnavailable(cameraId)
+    private var cameraAvailability: CameraStatus = CameraStatus.CameraUnavailable(cameraId)
 
     @GuardedBy("lock") private var lastCameraError: CameraError? = null
+    @GuardedBy("lock") private var lastCameraPrioritiesChangedTs: TimestampNs? = null
 
     @GuardedBy("lock") private var restartJob: Job? = null
 
@@ -134,25 +136,46 @@ constructor(
         synchronized(lock) { stopLocked() }
     }
 
-    private fun restart(delayMs: Long) {
-        synchronized(lock) {
-            restartJob?.cancel()
-            restartJob =
-                scope.launch {
-                    delay(delayMs)
-                    synchronized(lock) {
-                        if (
-                            controllerState != ControllerState.CLOSED &&
-                                controllerState != ControllerState.STOPPING &&
-                                controllerState != ControllerState.STOPPED
-                        ) {
-                            controllerState
-                            stopLocked()
-                            startLocked()
-                        }
+    @GuardedBy("lock")
+    private fun tryRestart() {
+        val currentTimestampTs = timeSource.now()
+        if (
+            !shouldRestart(
+                controllerState,
+                lastCameraError,
+                cameraAvailability,
+                lastCameraPrioritiesChangedTs,
+                currentTimestampTs,
+            )
+        ) {
+            Log.debug {
+                "$this: Not restarting. " +
+                    "Controller state = $controllerState, last camera error = $lastCameraError, " +
+                    "camera availability = $cameraAvailability, " +
+                    "last camera priorities changed = $lastCameraPrioritiesChangedTs, " +
+                    "current timestamp = $currentTimestampTs."
+            }
+            return
+        }
+
+        val delayMs =
+            if (graphConfig.flags.enableRestartDelays) RESTART_TIMEOUT_WHEN_ENABLED_MS else 0L
+        restartJob?.cancel()
+        restartJob =
+            scope.launch {
+                delay(delayMs)
+                synchronized(lock) {
+                    if (
+                        controllerState != ControllerState.CLOSED &&
+                            controllerState != ControllerState.STOPPING &&
+                            controllerState != ControllerState.STOPPED
+                    ) {
+                        Log.debug { "$this: Restarting Camera2CameraController..." }
+                        stopLocked()
+                        startLocked()
                     }
                 }
-        }
+            }
     }
 
     @GuardedBy("lock")
@@ -231,45 +254,16 @@ constructor(
     }
 
     private fun onCameraStatusChanged(cameraStatus: CameraStatus) {
-        val shouldRestart =
-            synchronized(lock) {
-                Log.debug { "$this ($cameraId) camera status changed to $cameraStatus" }
-                if (
-                    cameraStatus is CameraStatus.CameraAvailable ||
-                        cameraStatus is CameraStatus.CameraUnavailable
-                ) {
-                    this@Camera2CameraController.cameraStatus = cameraStatus
-                }
-
-                var shouldRestart = false
-                when (controllerState) {
-                    ControllerState.DISCONNECTED ->
-                        if (
-                            cameraStatus is CameraStatus.CameraAvailable ||
-                                cameraStatus is CameraStatus.CameraPrioritiesChanged
-                        ) {
-                            shouldRestart = true
-                        }
-                    ControllerState.ERROR ->
-                        if (
-                            cameraStatus is CameraStatus.CameraAvailable &&
-                                lastCameraError != CameraError.ERROR_GRAPH_CONFIG
-                        ) {
-                            shouldRestart = true
-                        }
-                }
-                shouldRestart
+        Log.debug { "$this ($cameraId) camera status changed: $cameraStatus" }
+        synchronized(lock) {
+            when (cameraStatus) {
+                is CameraStatus.CameraAvailable -> cameraAvailability = cameraStatus
+                is CameraStatus.CameraUnavailable -> cameraAvailability = cameraStatus
+                is CameraStatus.CameraPrioritiesChanged ->
+                    lastCameraPrioritiesChangedTs = timeSource.now()
             }
-        if (!shouldRestart) {
-            Log.debug {
-                "Camera status changed but not restarting: " +
-                    "Controller state = $controllerState, camera status = $cameraStatus."
-            }
-            return
+            tryRestart()
         }
-        Log.debug { "Restarting Camera2CameraController" }
-        val delayMs = if (graphConfig.flags.enableRestartDelays) 700L else 0L
-        restart(delayMs)
     }
 
     override fun close(): Unit =
@@ -356,49 +350,27 @@ constructor(
         }
     }
 
-    private fun onStateClosed(cameraState: CameraStateClosed) =
+    private fun onStateClosed(cameraState: CameraStateClosed) {
         synchronized(lock) {
             if (cameraState.cameraErrorCode != null) {
+                lastCameraError = cameraState.cameraErrorCode
                 if (
                     cameraState.cameraErrorCode == CameraError.ERROR_CAMERA_DISCONNECTED ||
                         cameraState.cameraErrorCode == CameraError.ERROR_CAMERA_IN_USE ||
                         cameraState.cameraErrorCode == CameraError.ERROR_CAMERA_LIMIT_EXCEEDED
                 ) {
                     controllerState = ControllerState.DISCONNECTED
-                    Log.debug { "Camera2CameraController is disconnected" }
-                    if (
-                        Build.VERSION.SDK_INT in
-                            (Build.VERSION_CODES.Q..Build.VERSION_CODES.S_V2) && _isForeground
-                    ) {
-                        Log.debug {
-                            "Quirk for multi-resume activated: " +
-                                "Emulating camera priorities changed to kickoff potential restart."
-                        }
-                        onCameraStatusChanged(CameraStatus.CameraPrioritiesChanged)
-                    }
+                    Log.debug { "$this is disconnected" }
                 } else {
                     controllerState = ControllerState.ERROR
-                    Log.debug {
-                        "Camera2CameraController encountered error: ${cameraState.cameraErrorCode}"
-                    }
-
-                    // When camera is closed under error, it is possible for the camera availability
-                    // callback to indicate camera as available, before we finish processing
-                    // (receiving) the camera error. Therefore, if we have an error, but we think
-                    // the camera is available, we should attempt a retry.
-                    // Please refer to b/362902859 for details.
-                    if (
-                        cameraStatus is CameraStatus.CameraAvailable &&
-                            cameraState.cameraErrorCode != CameraError.ERROR_GRAPH_CONFIG
-                    ) {
-                        onCameraStatusChanged(cameraStatus)
-                    }
+                    Log.debug { "$this encountered error: ${cameraState.cameraErrorCode}" }
                 }
-                lastCameraError = cameraState.cameraErrorCode
             } else {
                 controllerState = ControllerState.STOPPED
             }
+            tryRestart()
         }
+    }
 
     private fun disconnectSessionAndCamera(session: CaptureSessionState?, camera: VirtualCamera?) {
         val deferred =
@@ -434,6 +406,52 @@ constructor(
 
     companion object {
         private const val DISCONNECT_TIMEOUT_MS = 5000L // 5s
+        private const val RESTART_TIMEOUT_WHEN_ENABLED_MS = 700L // 0.7s
         private const val MS_TO_NS = 1_000_000
+        private val PRIORITIES_CHANGED_THRESHOLD_NS = DurationNs(200_000_000L) // 200ms
+
+        @VisibleForTesting
+        internal fun shouldRestart(
+            controllerState: ControllerState,
+            lastCameraError: CameraError?,
+            cameraAvailability: CameraStatus,
+            lastCameraPrioritiesChangedTs: TimestampNs?,
+            currentTs: TimestampNs,
+        ): Boolean {
+            val cameraAvailable = cameraAvailability is CameraStatus.CameraAvailable
+
+            // Camera priorities changed is a on-the-spot signal that doesn't actually indicate
+            // whether we do have camera priority. The signal may come in early or late, and other
+            // associated signals (e.g., camera disconnect) may also be processed slightly later in
+            // CameraPipe. To address the racey nature of these camera signals, here we consider
+            // camera priorities changed if we've received such a signal within the last 200ms.
+            val prioritiesChanged =
+                if (lastCameraPrioritiesChangedTs == null) false
+                else (currentTs - lastCameraPrioritiesChangedTs) <= PRIORITIES_CHANGED_THRESHOLD_NS
+
+            when (controllerState) {
+                ControllerState.DISCONNECTED ->
+                    if (cameraAvailable || prioritiesChanged) {
+                        return true
+                    } else if (
+                        Build.VERSION.SDK_INT in (Build.VERSION_CODES.Q..Build.VERSION_CODES.S_V2)
+                    ) {
+                        // The camera priorities changed signal experiences issues during [Q, S_V2]
+                        // where it might not be invoked as expected. Hence we restart whenever
+                        // an opportunity arises.
+                        Log.debug { "Quirk for multi-resume activated: Kicking off restart." }
+                        return true
+                    }
+                ControllerState.ERROR ->
+                    // If the camera is available, we should restart, provided that we didn't get
+                    // an error during graph (session) configuration, since restarting here would
+                    // likely not help if it's a problem with graph configuration settings.
+                    if (cameraAvailable && lastCameraError != CameraError.ERROR_GRAPH_CONFIG) {
+                        return true
+                    }
+            }
+
+            return false
+        }
     }
 }
