@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
+@file:JvmName("SavedStateWriterKt")
+@file:JvmMultifileClass
+@file:Suppress("NOTHING_TO_INLINE")
+
 package androidx.savedstate
 
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
 
-@Suppress("NOTHING_TO_INLINE")
 @JvmInline
-actual value class SavedStateWriter actual constructor(actual val source: SavedState) {
+actual value class SavedStateWriter
+@PublishedApi
+internal actual constructor(
+    @PublishedApi internal actual val source: SavedState,
+) {
 
     actual inline fun putBoolean(key: String, value: Boolean) {
         source.map[key] = value

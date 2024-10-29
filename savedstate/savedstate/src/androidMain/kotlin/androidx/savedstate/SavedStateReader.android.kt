@@ -14,66 +14,81 @@
  * limitations under the License.
  */
 
+@file:JvmName("SavedStateReaderKt")
+@file:JvmMultifileClass
+@file:Suppress("NOTHING_TO_INLINE")
+
 package androidx.savedstate
 
 import android.os.Parcelable
-import androidx.core.os.BundleCompat
-import androidx.savedstate.internal.SavedStateUtils
-import androidx.savedstate.internal.SavedStateUtils.getValueFromSavedState
-import androidx.savedstate.internal.SavedStateUtils.keyNotFoundError
+import androidx.core.os.BundleCompat.getParcelable
+import androidx.core.os.BundleCompat.getParcelableArrayList
 
-@Suppress("NOTHING_TO_INLINE")
 @JvmInline
-actual value class SavedStateReader actual constructor(actual val source: SavedState) {
+actual value class SavedStateReader
+@PublishedApi
+internal actual constructor(
+    @PublishedApi internal actual val source: SavedState,
+) {
 
     actual inline fun getBoolean(key: String): Boolean {
-        return getSingleResultOrThrow(key) {
-            source.getBoolean(key, SavedStateUtils.DEFAULT_BOOLEAN)
-        }
+        if (key !in this) keyNotFoundError(key)
+        return source.getBoolean(key, DEFAULT_BOOLEAN)
     }
 
     actual inline fun getBooleanOrElse(key: String, defaultValue: () -> Boolean): Boolean {
-        return getSingleResultOrElse(key, defaultValue) { source.getBoolean(key, defaultValue()) }
+        if (key !in this) defaultValue()
+        return source.getBoolean(key, defaultValue())
     }
 
     actual inline fun getChar(key: String): Char {
-        return getSingleResultOrThrow(key) { source.getChar(key, SavedStateUtils.DEFAULT_CHAR) }
+        if (key !in this) keyNotFoundError(key)
+        return source.getChar(key, DEFAULT_CHAR)
     }
 
     actual inline fun getCharOrElse(key: String, defaultValue: () -> Char): Char {
-        return getSingleResultOrElse(key, defaultValue) { source.getChar(key, defaultValue()) }
+        if (key !in this) defaultValue()
+        return source.getChar(key, defaultValue())
     }
 
     actual inline fun getDouble(key: String): Double {
-        return getSingleResultOrThrow(key) { source.getDouble(key, SavedStateUtils.DEFAULT_DOUBLE) }
+        if (key !in this) keyNotFoundError(key)
+        return source.getDouble(key, DEFAULT_DOUBLE)
     }
 
     actual inline fun getDoubleOrElse(key: String, defaultValue: () -> Double): Double {
-        return getSingleResultOrElse(key, defaultValue) { source.getDouble(key, defaultValue()) }
+        if (key !in this) defaultValue()
+        return source.getDouble(key, defaultValue())
     }
 
     actual inline fun getFloat(key: String): Float {
-        return getSingleResultOrThrow(key) { source.getFloat(key, SavedStateUtils.DEFAULT_FLOAT) }
+        if (key !in this) keyNotFoundError(key)
+        return source.getFloat(key, DEFAULT_FLOAT)
     }
 
     actual inline fun getFloatOrElse(key: String, defaultValue: () -> Float): Float {
-        return getSingleResultOrElse(key, defaultValue) { source.getFloat(key, defaultValue()) }
+        if (key !in this) defaultValue()
+        return source.getFloat(key, defaultValue())
     }
 
     actual inline fun getInt(key: String): Int {
-        return getSingleResultOrThrow(key) { source.getInt(key, SavedStateUtils.DEFAULT_INT) }
+        if (key !in this) keyNotFoundError(key)
+        return source.getInt(key, DEFAULT_INT)
     }
 
     actual inline fun getIntOrElse(key: String, defaultValue: () -> Int): Int {
-        return getSingleResultOrElse(key, defaultValue) { source.getInt(key, defaultValue()) }
+        if (key !in this) defaultValue()
+        return source.getInt(key, defaultValue())
     }
 
     actual inline fun getLong(key: String): Long {
-        return getSingleResultOrThrow(key) { source.getLong(key, SavedStateUtils.DEFAULT_LONG) }
+        if (key !in this) keyNotFoundError(key)
+        return source.getLong(key, DEFAULT_LONG)
     }
 
     actual inline fun getLongOrElse(key: String, defaultValue: () -> Long): Long {
-        return getSingleResultOrElse(key, defaultValue) { source.getLong(key, defaultValue()) }
+        if (key !in this) defaultValue()
+        return source.getLong(key, defaultValue())
     }
 
     /**
@@ -85,9 +100,8 @@ actual value class SavedStateReader actual constructor(actual val source: SavedS
      * @throws IllegalStateException If the key is not found.
      */
     inline fun <reified T : Parcelable> getParcelable(key: String): T {
-        return getSingleResultOrThrow(key) {
-            BundleCompat.getParcelable(source, key, T::class.java)
-        }
+        if (key !in this) keyNotFoundError(key)
+        return getParcelable(source, key, T::class.java) ?: valueNotFoundError(key)
     }
 
     /**
@@ -100,36 +114,41 @@ actual value class SavedStateReader actual constructor(actual val source: SavedS
      *   not found.
      */
     inline fun <reified T : Parcelable> getParcelableOrElse(key: String, defaultValue: () -> T): T {
-        return getSingleResultOrElse(key, defaultValue) {
-            BundleCompat.getParcelable(source, key, T::class.java)
-        }
+        if (key !in this) defaultValue()
+        return getParcelable(source, key, T::class.java) ?: defaultValue()
     }
 
     actual inline fun getString(key: String): String {
-        return getSingleResultOrThrow(key) { source.getString(key) }
+        if (key !in this) keyNotFoundError(key)
+        return source.getString(key) ?: valueNotFoundError(key)
     }
 
     actual inline fun getStringOrElse(key: String, defaultValue: () -> String): String {
-        return getSingleResultOrElse(key, defaultValue) { source.getString(key, defaultValue()) }
+        if (key !in this) defaultValue()
+        return source.getString(key, defaultValue())
     }
 
     actual inline fun getIntList(key: String): List<Int> {
-        return getListResultOrThrow(key) { source.getIntegerArrayList(key) }
+        if (key !in this) keyNotFoundError(key)
+        return source.getIntegerArrayList(key) ?: valueNotFoundError(key)
     }
 
     actual inline fun getIntListOrElse(key: String, defaultValue: () -> List<Int>): List<Int> {
-        return getListResultOrElse(key, defaultValue) { source.getIntegerArrayList(key) }
+        if (key !in this) defaultValue()
+        return source.getIntegerArrayList(key) ?: defaultValue()
     }
 
     actual inline fun getStringList(key: String): List<String> {
-        return getListResultOrThrow(key) { source.getStringArrayList(key) }
+        if (key !in this) keyNotFoundError(key)
+        return source.getStringArrayList(key) ?: valueNotFoundError(key)
     }
 
     actual inline fun getStringListOrElse(
         key: String,
         defaultValue: () -> List<String>
     ): List<String> {
-        return getListResultOrElse(key, defaultValue) { source.getStringArrayList(key) }
+        if (key !in this) defaultValue()
+        return source.getStringArrayList(key) ?: defaultValue()
     }
 
     /**
@@ -141,9 +160,8 @@ actual value class SavedStateReader actual constructor(actual val source: SavedS
      * @throws IllegalStateException If the [key] is not found.
      */
     inline fun <reified T : Parcelable> getParcelableList(key: String): List<T> {
-        return getListResultOrThrow(key) {
-            BundleCompat.getParcelableArrayList(source, key, T::class.java)
-        }
+        if (key !in this) keyNotFoundError(key)
+        return getParcelableArrayList(source, key, T::class.java) ?: valueNotFoundError(key)
     }
 
     /**
@@ -160,67 +178,97 @@ actual value class SavedStateReader actual constructor(actual val source: SavedS
         key: String,
         defaultValue: () -> List<T>
     ): List<T> {
-        return getListResultOrElse(key, defaultValue) {
-            BundleCompat.getParcelableArrayList(source, key, T::class.java)
-        }
+        if (key !in this) defaultValue()
+        return getParcelableArrayList(source, key, T::class.java) ?: defaultValue()
     }
 
-    actual inline fun getBooleanArray(key: String): BooleanArray =
-        getSingleResultOrThrow(key) { source.getBooleanArray(key) }
+    actual inline fun getBooleanArray(key: String): BooleanArray {
+        if (key !in this) keyNotFoundError(key)
+        return source.getBooleanArray(key) ?: valueNotFoundError(key)
+    }
 
     actual inline fun getBooleanArrayOrElse(
         key: String,
         defaultValue: () -> BooleanArray
-    ): BooleanArray = getSingleResultOrElse(key, defaultValue) { source.getBooleanArray(key) }
+    ): BooleanArray {
+        if (key !in this) defaultValue()
+        return source.getBooleanArray(key) ?: defaultValue()
+    }
 
     actual inline fun getCharArray(key: String): CharArray {
-        return getSingleResultOrThrow(key) { source.getCharArray(key) }
+        if (key !in this) keyNotFoundError(key)
+        return source.getCharArray(key) ?: valueNotFoundError(key)
     }
 
     actual inline fun getCharArrayOrElse(key: String, defaultValue: () -> CharArray): CharArray {
-        return getSingleResultOrElse(key, defaultValue) { source.getCharArray(key) }
+        if (key !in this) defaultValue()
+        return source.getCharArray(key) ?: defaultValue()
     }
 
-    actual inline fun getDoubleArray(key: String): DoubleArray =
-        getSingleResultOrThrow(key) { source.getDoubleArray(key) }
+    actual inline fun getDoubleArray(key: String): DoubleArray {
+        if (key !in this) keyNotFoundError(key)
+        return source.getDoubleArray(key) ?: valueNotFoundError(key)
+    }
 
     actual inline fun getDoubleArrayOrElse(
         key: String,
         defaultValue: () -> DoubleArray
-    ): DoubleArray = getSingleResultOrElse(key, defaultValue) { source.getDoubleArray(key) }
+    ): DoubleArray {
+        if (key !in this) defaultValue()
+        return source.getDoubleArray(key) ?: defaultValue()
+    }
 
-    actual inline fun getFloatArray(key: String): FloatArray =
-        getSingleResultOrThrow(key) { source.getFloatArray(key) }
+    actual inline fun getFloatArray(key: String): FloatArray {
+        if (key !in this) keyNotFoundError(key)
+        return source.getFloatArray(key) ?: valueNotFoundError(key)
+    }
 
-    actual inline fun getFloatArrayOrElse(key: String, defaultValue: () -> FloatArray): FloatArray =
-        getSingleResultOrElse(key, defaultValue) { source.getFloatArray(key) }
+    actual inline fun getFloatArrayOrElse(key: String, defaultValue: () -> FloatArray): FloatArray {
+        if (key !in this) defaultValue()
+        return source.getFloatArray(key) ?: defaultValue()
+    }
 
-    actual inline fun getIntArray(key: String): IntArray =
-        getSingleResultOrThrow(key) { source.getIntArray(key) }
+    actual inline fun getIntArray(key: String): IntArray {
+        if (key !in this) keyNotFoundError(key)
+        return source.getIntArray(key) ?: valueNotFoundError(key)
+    }
 
-    actual inline fun getIntArrayOrElse(key: String, defaultValue: () -> IntArray): IntArray =
-        getSingleResultOrElse(key, defaultValue) { source.getIntArray(key) }
+    actual inline fun getIntArrayOrElse(key: String, defaultValue: () -> IntArray): IntArray {
+        if (key !in this) defaultValue()
+        return source.getIntArray(key) ?: defaultValue()
+    }
 
-    actual inline fun getLongArray(key: String) =
-        getSingleResultOrThrow(key) { source.getLongArray(key) }
+    actual inline fun getLongArray(key: String): LongArray {
+        if (key !in this) keyNotFoundError(key)
+        return source.getLongArray(key) ?: valueNotFoundError(key)
+    }
 
-    actual inline fun getLongArrayOrElse(key: String, defaultValue: () -> LongArray): LongArray =
-        getSingleResultOrElse(key, defaultValue) { source.getLongArray(key) }
+    actual inline fun getLongArrayOrElse(key: String, defaultValue: () -> LongArray): LongArray {
+        if (key !in this) defaultValue()
+        return source.getLongArray(key) ?: defaultValue()
+    }
 
-    actual inline fun getStringArray(key: String): Array<String> =
-        getSingleResultOrThrow(key) { source.getStringArray(key) }
+    actual inline fun getStringArray(key: String): Array<String> {
+        if (key !in this) keyNotFoundError(key)
+        return source.getStringArray(key) ?: valueNotFoundError(key)
+    }
 
     actual inline fun getStringArrayOrElse(
         key: String,
         defaultValue: () -> Array<String>
-    ): Array<String> = getSingleResultOrElse(key, defaultValue) { source.getStringArray(key) }
+    ): Array<String> {
+        if (key !in this) defaultValue()
+        return source.getStringArray(key) ?: defaultValue()
+    }
 
     actual inline fun getSavedState(key: String): SavedState {
-        return getSingleResultOrThrow(key) { source.getBundle(key) }
+        if (key !in this) keyNotFoundError(key)
+        return source.getBundle(key) ?: valueNotFoundError(key)
     }
 
     actual inline fun getSavedStateOrElse(key: String, defaultValue: () -> SavedState): SavedState {
-        return getSingleResultOrElse(key, defaultValue) { source.getBundle(key) }
+        if (key !in this) defaultValue()
+        return source.getBundle(key) ?: defaultValue()
     }
 
     actual inline fun size(): Int = source.size()
@@ -245,56 +293,6 @@ actual value class SavedStateReader actual constructor(actual val source: SavedS
             }
         }
     }
-
-    @PublishedApi
-    internal inline fun <reified T> getSingleResultOrThrow(
-        key: String,
-        currentValue: () -> T?,
-    ): T =
-        getValueFromSavedState(
-            key = key,
-            contains = { source.containsKey(key) },
-            currentValue = { currentValue() },
-            defaultValue = { keyNotFoundError(key) },
-        )
-
-    @PublishedApi
-    internal inline fun <reified T> getSingleResultOrElse(
-        key: String,
-        defaultValue: () -> T,
-        currentValue: () -> T?,
-    ): T =
-        getValueFromSavedState(
-            key = key,
-            contains = { source.containsKey(key) },
-            currentValue = { currentValue() },
-            defaultValue = { defaultValue() },
-        )
-
-    @PublishedApi
-    internal inline fun <reified T> getListResultOrThrow(
-        key: String,
-        currentValue: () -> List<T>?,
-    ): List<T> =
-        getValueFromSavedState(
-            key = key,
-            contains = { source.containsKey(key) },
-            currentValue = { currentValue() },
-            defaultValue = { keyNotFoundError(key) },
-        )
-
-    @PublishedApi
-    internal inline fun <reified T> getListResultOrElse(
-        key: String,
-        defaultValue: () -> List<T>,
-        currentValue: () -> List<T>?,
-    ): List<T> =
-        getValueFromSavedState(
-            key = key,
-            contains = { source.containsKey(key) },
-            currentValue = { currentValue() },
-            defaultValue = { defaultValue() },
-        )
 }
 
 @PublishedApi
