@@ -23,9 +23,9 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DragHandleDefaults.dragHandleColors
+import androidx.compose.material3.DragHandleDefaults.dragHandleShapes
+import androidx.compose.material3.tokens.DragHandleTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
@@ -43,15 +43,14 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastRoundToInt
 
 @Composable
 internal fun VerticalDragHandle(
     modifier: Modifier = Modifier,
     sizes: DragHandleSizes = DragHandleDefaults.DefaultDragHandleSizes,
-    colors: DragHandleColors = MaterialTheme.colorScheme.dragHandleColors(),
-    shapes: DragHandleShapes = DragHandleDefaults.DefaultDragHandleShapes,
+    colors: DragHandleColors = dragHandleColors(),
+    shapes: DragHandleShapes = dragHandleShapes(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val isDragged by interactionSource.collectIsDraggedAsState()
@@ -156,26 +155,34 @@ internal object DragHandleDefaults {
         pressedColor: Color = Color.Unspecified
     ): DragHandleColors = MaterialTheme.colorScheme.dragHandleColors(defaultColor, pressedColor)
 
+    @Composable
     fun dragHandleShapes(
-        defaultShape: Shape = CircleShape,
-        pressedShape: Shape = RoundedCornerShape(12.dp)
-    ): DragHandleShapes = DragHandleShapes(defaultShape, pressedShape)
+        defaultShape: Shape? = null,
+        pressedShape: Shape? = null
+    ): DragHandleShapes = MaterialTheme.shapes.dragHandleShapes(defaultShape, pressedShape)
 
     fun dragHandleSizes(
-        defaultSize: DpSize = DpSize(4.dp, 48.dp),
-        pressedSize: DpSize = DpSize(12.dp, 52.dp)
+        defaultSize: DpSize = DpSize(DragHandleTokens.Width, DragHandleTokens.Height),
+        pressedSize: DpSize = DpSize(DragHandleTokens.PressedWidth, DragHandleTokens.PressedHeight)
     ): DragHandleSizes = DragHandleSizes(defaultSize, pressedSize)
 
-    internal fun ColorScheme.dragHandleColors(
+    private fun ColorScheme.dragHandleColors(
         defaultColor: Color = Color.Unspecified,
         pressedColor: Color = Color.Unspecified
     ): DragHandleColors =
         DragHandleColors(
-            if (defaultColor.isSpecified) defaultColor else outline,
-            if (pressedColor.isSpecified) pressedColor else onSurface
+            if (defaultColor.isSpecified) defaultColor else fromToken(DragHandleTokens.Color),
+            if (pressedColor.isSpecified) pressedColor else fromToken(DragHandleTokens.PressedColor)
         )
 
-    internal val DefaultDragHandleShapes = dragHandleShapes()
+    private fun Shapes.dragHandleShapes(
+        defaultShape: Shape? = null,
+        pressedShape: Shape? = null
+    ): DragHandleShapes =
+        DragHandleShapes(
+            defaultShape ?: fromToken(DragHandleTokens.Shape),
+            pressedShape ?: fromToken(DragHandleTokens.PressedShape)
+        )
 
     internal val DefaultDragHandleSizes = dragHandleSizes()
 }
