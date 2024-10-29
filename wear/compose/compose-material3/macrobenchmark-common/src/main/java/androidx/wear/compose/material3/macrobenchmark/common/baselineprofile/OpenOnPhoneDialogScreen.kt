@@ -16,6 +16,7 @@
 
 package androidx.wear.compose.material3.macrobenchmark.common.baselineprofile
 
+import android.os.SystemClock
 import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -34,7 +35,9 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Until
 import androidx.wear.compose.material3.FilledTonalButton
 import androidx.wear.compose.material3.OpenOnPhoneDialog
+import androidx.wear.compose.material3.OpenOnPhoneDialogDefaults
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.macrobenchmark.common.FIND_OBJECT_TIMEOUT_MS
 import androidx.wear.compose.material3.macrobenchmark.common.MacrobenchmarkScreen
 
 val OpenOnPhoneDialogScreen =
@@ -67,9 +70,13 @@ val OpenOnPhoneDialogScreen =
 
         override val exercise: MacrobenchmarkScope.() -> Unit
             get() = {
-                device.wait(Until.findObject(By.desc(OpenOnPhoneDialog)), 10_000L).click()
+                device
+                    .wait(Until.findObject(By.desc(OpenOnPhoneDialog)), FIND_OBJECT_TIMEOUT_MS)
+                    .click()
                 device.waitForIdle()
-                device.wait(Until.findObject(By.desc(OpenOnPhoneDialog)), 10_000L)
+                // Make sure the dialog is dismissed.
+                SystemClock.sleep(OpenOnPhoneDialogDefaults.DurationMillis)
+                device.wait(Until.findObject(By.desc(OpenOnPhoneDialog)), FIND_OBJECT_TIMEOUT_MS)
             }
     }
 

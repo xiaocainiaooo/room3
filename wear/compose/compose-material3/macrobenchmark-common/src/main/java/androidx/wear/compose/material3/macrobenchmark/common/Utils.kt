@@ -18,7 +18,7 @@ package androidx.wear.compose.material3.macrobenchmark.common
 
 import androidx.test.uiautomator.UiDevice
 
-internal val CONTENT_DESCRIPTION = "find-me"
+internal const val CONTENT_DESCRIPTION = "find-me"
 
 internal fun numberedContentDescription(n: Int) = "$CONTENT_DESCRIPTION-$n"
 

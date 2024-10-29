@@ -34,6 +34,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.test.uiautomator.By
+import androidx.test.uiautomator.StaleObjectException
+import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
 import androidx.wear.compose.material3.Confirmation
 import androidx.wear.compose.material3.ConfirmationDefaults
@@ -66,11 +68,12 @@ val ConfirmationScreen =
         override val exercise: MacrobenchmarkScope.() -> Unit
             get() = {
                 for (i in 0..3) {
-                    device
-                        .wait(
-                            Until.findObject(By.desc(numberedContentDescription(i))),
-                            FIND_OBJECT_TIMEOUT_MS
-                        )
+                    retryIfStale {
+                            device.wait(
+                                Until.findObject(By.desc(numberedContentDescription(i))),
+                                FIND_OBJECT_TIMEOUT_MS
+                            )
+                        }
                         .click()
                     device.waitForIdle()
                 }
@@ -79,6 +82,15 @@ val ConfirmationScreen =
                     FIND_OBJECT_TIMEOUT_MS
                 )
             }
+    }
+
+private fun retryIfStale(block: () -> UiObject2): UiObject2 =
+    block().let {
+        try {
+            it.also { it.toString() }
+        } catch (e: StaleObjectException) {
+            block()
+        }
     }
 
 @Composable
