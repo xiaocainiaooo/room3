@@ -16,6 +16,7 @@
 
 package androidx.compose.runtime
 
+import androidx.collection.MutableObjectList
 import androidx.collection.MutableScatterSet
 import androidx.collection.ScatterSet
 import androidx.collection.emptyScatterSet
@@ -41,6 +42,8 @@ import androidx.compose.runtime.snapshots.fastGroupBy
 import androidx.compose.runtime.snapshots.fastMap
 import androidx.compose.runtime.snapshots.fastMapNotNull
 import androidx.compose.runtime.tooling.CompositionData
+import androidx.compose.runtime.tooling.CompositionObserverHandle
+import androidx.compose.runtime.tooling.CompositionRegistrationObserver
 import kotlin.collections.removeFirst as removeFirstKt
 import kotlin.collections.removeLast as removeLastKt
 import kotlin.coroutines.Continuation
@@ -301,6 +304,9 @@ class Recomposer(effectCoroutineContext: CoroutineContext) : CompositionContext(
 
     private val hasBroadcastFrameClockAwaiters: Boolean
         get() = synchronized(stateLock) { hasBroadcastFrameClockAwaitersLocked }
+
+    @ExperimentalComposeRuntimeApi
+    private var registrationObservers: MutableObjectList<CompositionRegistrationObserver>? = null
 
     /**
      * Determine the new value of [_state]. Call only while locked on [stateLock]. If it returns a
@@ -767,19 +773,54 @@ class Recomposer(effectCoroutineContext: CoroutineContext) : CompositionContext(
         }
     }
 
+    @OptIn(ExperimentalComposeRuntimeApi::class)
     private fun clearKnownCompositionsLocked() {
+        registrationObservers?.forEach { observer ->
+            knownCompositions.forEach { composition ->
+                observer.onCompositionUnregistered(this, composition)
+            }
+        }
         _knownCompositions.clear()
         _knownCompositionsCache = emptyList()
     }
 
+    @OptIn(ExperimentalComposeRuntimeApi::class)
     private fun removeKnownCompositionLocked(composition: ControlledComposition) {
-        _knownCompositions -= composition
-        _knownCompositionsCache = null
+        if (_knownCompositions.remove(composition)) {
+            _knownCompositionsCache = null
+            registrationObservers?.forEach { it.onCompositionUnregistered(this, composition) }
+        }
     }
 
+    @OptIn(ExperimentalComposeRuntimeApi::class)
     private fun addKnownCompositionLocked(composition: ControlledComposition) {
         _knownCompositions += composition
         _knownCompositionsCache = null
+        registrationObservers?.forEach { it.onCompositionRegistered(this, composition) }
+    }
+
+    @ExperimentalComposeRuntimeApi
+    internal fun addCompositionRegistrationObserver(
+        observer: CompositionRegistrationObserver
+    ): CompositionObserverHandle {
+        synchronized(stateLock) {
+            val observers =
+                registrationObservers
+                    ?: MutableObjectList<CompositionRegistrationObserver>().also {
+                        registrationObservers = it
+                    }
+
+            observers += observer
+            _knownCompositions.fastForEach { composition ->
+                observer.onCompositionRegistered(this@Recomposer, composition)
+            }
+        }
+
+        return object : CompositionObserverHandle {
+            override fun dispose() {
+                synchronized(stateLock) { registrationObservers?.remove(observer) }
+            }
+        }
     }
 
     private fun resetErrorState(): RecomposerErrorState? {
