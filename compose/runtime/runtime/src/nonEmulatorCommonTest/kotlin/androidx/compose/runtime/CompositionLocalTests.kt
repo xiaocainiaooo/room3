@@ -755,6 +755,51 @@ class CompositionLocalTests {
 
         compose { App() }
     }
+
+    @Test // 374263387
+    fun staticLocalUpdateInvalidatesCorrectly_startProvide() = compositionTest {
+        val LocalValue = staticCompositionLocalOf<Boolean> { error("Not provided") }
+        val LocalOtherValue = staticCompositionLocalOf<Int> { error("Not provided") }
+        var value by mutableStateOf(false)
+        var valueSeen = false
+        compose {
+            CompositionLocalProvider(LocalValue provides value) {
+                CompositionLocalProvider(LocalOtherValue providesDefault 1) {
+                    CompositionLocalProvider(LocalOtherValue providesDefault 2) {
+                        valueSeen = LocalValue.current
+                    }
+                }
+            }
+        }
+        assertFalse(valueSeen)
+        value = true
+        advance()
+        assertTrue(valueSeen)
+    }
+
+    fun staticLocalUpdateInvalidatesCorrectly_startProvides() = compositionTest {
+        val SomeValue = staticCompositionLocalOf { 0 }
+        val LocalValue = staticCompositionLocalOf<Boolean> { error("Not provided") }
+        val LocalOtherValue = staticCompositionLocalOf<Int> { error("Not provided") }
+        var value by mutableStateOf(false)
+        var valueSeen = false
+        compose {
+            CompositionLocalProvider(SomeValue provides 0, LocalValue provides value) {
+                CompositionLocalProvider(SomeValue provides 1, LocalOtherValue providesDefault 1) {
+                    CompositionLocalProvider(
+                        SomeValue provides 2,
+                        LocalOtherValue providesDefault 2
+                    ) {
+                        valueSeen = LocalValue.current
+                    }
+                }
+            }
+        }
+        assertFalse(valueSeen)
+        value = true
+        advance()
+        assertTrue(valueSeen)
+    }
 }
 
 val cacheLocal = staticCompositionLocalOf { "Unset" }
