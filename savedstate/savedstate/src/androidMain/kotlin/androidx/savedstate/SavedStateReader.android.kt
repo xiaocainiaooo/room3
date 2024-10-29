@@ -32,6 +32,7 @@ import androidx.core.os.BundleCompat.getSerializable
 import androidx.core.os.BundleCompat.getSparseParcelableArray
 import java.io.Serializable
 
+@Suppress("ValueClassDefinition")
 @JvmInline
 actual value class SavedStateReader
 @PublishedApi
