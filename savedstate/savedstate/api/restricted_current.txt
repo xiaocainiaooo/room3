@@ -62,7 +62,6 @@ package androidx.savedstate {
 
   public final class SavedStateReader_androidKt {
     method @kotlin.PublishedApi internal static boolean contentDeepEquals(android.os.Bundle, android.os.Bundle other);
-    method @kotlin.PublishedApi internal static java.util.Map<java.lang.String,java.lang.Object?> toMap(android.os.Bundle);
   }
 
   public final class SavedStateRegistry {
