@@ -194,7 +194,8 @@ actual class AutofillManager internal constructor(view: AndroidComposeView) {
 
     private fun notifyAutofillValueChanged(semanticsId: Int, newAutofillValue: Any) {
         val currSemanticsNode = currentSemanticsNodes[semanticsId]?.semanticsNode
-        val currDataType = currSemanticsNode?.unmergedConfig?.getOrNull(SemanticsContentDataType)
+        val currDataType =
+            currSemanticsNode?.unmergedConfig?.getOrNull(SemanticsContentDataType) ?: return
 
         when (currDataType) {
             ContentDataType.Text ->
@@ -310,6 +311,8 @@ internal fun AutofillManager.populateViewStructure(root: ViewStructure) {
                     SemanticsContentDataType
                 )
         }
+    // TODO(b/138549623): Instead of creating a flattened tree by using the nodes from the map, we
+    //  can use SemanticsOwner to get the root SemanticsInfo and create a more representative tree.
     var index = AutofillApi26Helper.addChildCount(root, count)
 
     // Iterate through currentSemanticsNodes, finding autofill-related nodes
@@ -491,7 +494,7 @@ internal interface AutofillManagerWrapper {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-private class AutofillManagerWrapperImpl(val view: AndroidComposeView) : AutofillManagerWrapper {
+private class AutofillManagerWrapperImpl(val view: View) : AutofillManagerWrapper {
     override val autofillManager =
         view.context.getSystemService(PlatformAndroidManager::class.java)
             ?: error("Autofill service could not be located.")
