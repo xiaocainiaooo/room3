@@ -77,7 +77,7 @@ fun MacrobenchmarkRule.measureStartup(
     iterations: Int = 10,
     metrics: List<Metric> = getStartupMetrics(),
     setupIntent: Intent.() -> Unit = {}
-) =
+) {
     measureRepeated(
         packageName = packageName,
         metrics = metrics,
@@ -91,6 +91,7 @@ fun MacrobenchmarkRule.measureStartup(
         setupIntent(intent)
         startActivityAndWait(intent)
     }
+}
 
 /** Baseline Profile compilation mode is considered primary, and always worth measuring */
 private fun CompilationMode.isPrimary(): Boolean {

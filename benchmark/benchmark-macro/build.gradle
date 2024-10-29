@@ -37,6 +37,11 @@ plugins {
 android {
     defaultConfig {
         minSdkVersion 23
+
+        // We don't care about perf from these correctness tests, so suppress
+        // anything that may otherwise block these tests
+        testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] =
+                "CODE-COVERAGE,DEBUGGABLE,EMULATOR,LOW-BATTERY,UNLOCKED"
     }
     sourceSets {
         main.assets.srcDirs += new File(
