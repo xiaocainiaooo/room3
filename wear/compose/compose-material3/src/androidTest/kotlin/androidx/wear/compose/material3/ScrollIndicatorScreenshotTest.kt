@@ -54,7 +54,7 @@ class ScrollIndicatorScreenshotTest {
     @Test
     fun position_indicator_round_size_small_position_top() =
         position_indicator_position_test(
-            size = 0.1f,
+            size = 0.2f,
             position = 0.1f,
             ltr = true,
             roundScreen = true,
@@ -64,7 +64,7 @@ class ScrollIndicatorScreenshotTest {
     @Test
     fun position_indicator_round_size_small_position_bottom() =
         position_indicator_position_test(
-            size = 0.1f,
+            size = 0.2f,
             position = 1f,
             ltr = true,
             roundScreen = true,
