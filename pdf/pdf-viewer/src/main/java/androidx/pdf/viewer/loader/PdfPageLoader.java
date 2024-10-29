@@ -310,7 +310,16 @@ public class PdfPageLoader {
 
         @Override
         protected void doCallback(PdfLoaderCallbacks callbacks, Dimensions result) {
-            callbacks.setPageDimensions(mPageNum, result);
+            // If invalid dimensions are returned, treat it as page broken and report error
+            if (!arePageDimensionsValid(result)) {
+                reportError(callbacks);
+            } else {
+                callbacks.setPageDimensions(mPageNum, result);
+            }
+        }
+
+        private boolean arePageDimensionsValid(Dimensions dimensions) {
+            return dimensions.getWidth() > 0 && dimensions.getHeight() > 0;
         }
 
         @Override
