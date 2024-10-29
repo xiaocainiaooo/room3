@@ -237,6 +237,7 @@ internal fun TransformingLazyColumnImpl(
             Orientation.Vertical,
             reverseScrolling = false
         )
+    val semanticState = remember(state) { TransformingLazyColumnSemanticState(state = state) }
 
     LazyLayout(
         itemProvider = itemProviderLambda,
@@ -251,6 +252,13 @@ internal fun TransformingLazyColumnImpl(
                     else Modifier
                 )
                 .then(state.remeasurementModifier)
+                .lazyLayoutSemantics(
+                    itemProviderLambda = itemProviderLambda,
+                    state = semanticState,
+                    orientation = Orientation.Vertical,
+                    userScrollEnabled = userScrollEnabled,
+                    reverseScrolling = false,
+                )
                 .scrollable(
                     state = state,
                     reverseDirection = reverseDirection,

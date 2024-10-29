@@ -86,6 +86,8 @@ internal fun emptyMeasureResult(
         canScrollBackward = false,
         coroutineScope = CoroutineScope(EmptyCoroutineContext),
         density = Density(1f),
+        beforeContentPadding = 0,
+        afterContentPadding = 0,
         itemSpacing = 0,
         measureResult = layout(containerConstraints.maxWidth, containerConstraints.maxHeight) {}
     )

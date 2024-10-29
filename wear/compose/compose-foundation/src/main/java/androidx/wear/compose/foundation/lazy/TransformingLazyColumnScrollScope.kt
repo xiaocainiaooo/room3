@@ -58,8 +58,7 @@ internal class TransformingLazyColumnScrollScope(
         val layoutInfo = state.layoutInfoState.value
         if (layoutInfo.visibleItems.isEmpty()) return 0
         return if (!isItemVisible(targetIndex)) {
-            val averageSize =
-                calculateVisibleItemsAverageHeight(layoutInfo) + layoutInfo.itemSpacing
+            val averageSize = layoutInfo.visibleItemsAverageHeight + layoutInfo.itemSpacing
             val indexesDiff = targetIndex - layoutInfo.anchorItemIndex
             (averageSize * indexesDiff) - layoutInfo.anchorItemScrollOffset
         } else {
@@ -68,17 +67,13 @@ internal class TransformingLazyColumnScrollScope(
         } + targetOffset
     }
 
-    private fun calculateVisibleItemsAverageHeight(
-        measureResult: TransformingLazyColumnMeasureResult
-    ): Int {
-        val visibleItems = measureResult.visibleItems
-        return visibleItems.fastSumBy { it.measuredHeight } / visibleItems.size
-    }
-
     internal fun TransformingLazyColumnScrollScope.isItemVisible(index: Int): Boolean {
         return index in firstVisibleItemIndex..lastVisibleItemIndex
     }
 }
+
+internal val TransformingLazyColumnMeasureResult.visibleItemsAverageHeight: Int
+    get() = visibleItems.fastSumBy { it.measuredHeight } / visibleItems.size
 
 private class ItemFoundInScroll(
     val itemOffset: Int,
