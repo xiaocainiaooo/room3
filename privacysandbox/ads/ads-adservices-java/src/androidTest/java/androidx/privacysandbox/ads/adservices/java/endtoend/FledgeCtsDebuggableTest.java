@@ -162,6 +162,7 @@ public class FledgeCtsDebuggableTest {
         testUtil.overrideKillSwitches(true);
         testUtil.overrideAllowlists(true);
         testUtil.overrideConsentManagerDebugMode(true);
+        testUtil.overrideConsentNotificationDebugMode(true);
         testUtil.overrideMeasurementKillSwitches(true);
         testUtil.overrideDisableMeasurementEnrollmentCheck(DISABLE_MEASUREMENT_ENROLLMENT_CHECK);
         testUtil.enableEnrollmentCheck(true);
@@ -187,6 +188,7 @@ public class FledgeCtsDebuggableTest {
         testUtil.overrideKillSwitches(false);
         testUtil.overrideAllowlists(false);
         testUtil.overrideConsentManagerDebugMode(false);
+        testUtil.overrideConsentNotificationDebugMode(false);
         testUtil.overrideMeasurementKillSwitches(false);
         testUtil.resetOverrideDisableMeasurementEnrollmentCheck();
         testUtil.enableEnrollmentCheck(false);
