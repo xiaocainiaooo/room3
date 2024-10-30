@@ -50,7 +50,11 @@ import kotlin.math.roundToInt
  * [ScreenScaffold] is one of the Wear Material3 scaffold components.
  *
  * The scaffold components [AppScaffold] and [ScreenScaffold] lay out the structure of a screen and
- * coordinate transitions of the [ScrollIndicator] and [TimeText] components.
+ * coordinate transitions of the [ScrollIndicator] and [TimeText] components. [AppScaffold] should
+ * be at the top of the composition (because it provides [ScaffoldState] and layers [TimeText] on
+ * top of all other content) and [ScreenScaffold] should be part of [AppScaffold]'s content. When
+ * used in conjunction with SwipeDismissableNavHost, [AppScaffold] remains at the top of the
+ * composition, whilst [ScreenScaffold] will be placed for each individual composable route.
  *
  * [ScreenScaffold] displays the [ScrollIndicator] at the center-end of the screen by default and
  * coordinates showing/hiding [TimeText] and [ScrollIndicator] according to [scrollState].
@@ -109,7 +113,11 @@ fun ScreenScaffold(
  * [ScreenScaffold] is one of the Wear Material3 scaffold components.
  *
  * The scaffold components [AppScaffold] and [ScreenScaffold] lay out the structure of a screen and
- * coordinate transitions of the [ScrollIndicator] and [TimeText] components.
+ * coordinate transitions of the [ScrollIndicator] and [TimeText] components. [AppScaffold] should
+ * be at the top of the composition (because it provides [ScaffoldState] and layers [TimeText] on
+ * top of all other content) and [ScreenScaffold] should be part of [AppScaffold]'s content. When
+ * used in conjunction with SwipeDismissableNavHost, [AppScaffold] remains at the top of the
+ * composition, whilst [ScreenScaffold] will be placed for each individual composable route.
  *
  * [ScreenScaffold] displays the [ScrollIndicator] at the center-end of the screen by default and
  * coordinates showing/hiding [TimeText] and [ScrollIndicator] according to [scrollState].
@@ -172,7 +180,11 @@ fun ScreenScaffold(
  * [ScreenScaffold] is one of the Wear Material3 scaffold components.
  *
  * The scaffold components [AppScaffold] and [ScreenScaffold] lay out the structure of a screen and
- * coordinate transitions of the [ScrollIndicator] and [TimeText] components.
+ * coordinate transitions of the [ScrollIndicator] and [TimeText] components. [AppScaffold] should
+ * be at the top of the composition (because it provides [ScaffoldState] and layers [TimeText] on
+ * top of all other content) and [ScreenScaffold] should be part of [AppScaffold]'s content. When
+ * used in conjunction with SwipeDismissableNavHost, [AppScaffold] remains at the top of the
+ * composition, whilst [ScreenScaffold] will be placed for each individual composable route.
  *
  * [ScreenScaffold] displays the [ScrollIndicator] at the center-end of the screen by default and
  * coordinates showing/hiding [TimeText] and [ScrollIndicator] according to [scrollState].
@@ -231,7 +243,11 @@ fun ScreenScaffold(
  * [ScreenScaffold] is one of the Wear Material3 scaffold components.
  *
  * The scaffold components [AppScaffold] and [ScreenScaffold] lay out the structure of a screen and
- * coordinate transitions of the [ScrollIndicator] and [TimeText] components.
+ * coordinate transitions of the [ScrollIndicator] and [TimeText] components. [AppScaffold] should
+ * be at the top of the composition (because it provides [ScaffoldState] and layers [TimeText] on
+ * top of all other content) and [ScreenScaffold] should be part of [AppScaffold]'s content. When
+ * used in conjunction with SwipeDismissableNavHost, [AppScaffold] remains at the top of the
+ * composition, whilst [ScreenScaffold] will be placed for each individual composable route.
  *
  * [ScreenScaffold] displays the [ScrollIndicator] at the center-end of the screen by default and
  * coordinates showing/hiding [TimeText] and [ScrollIndicator] according to [scrollState]. Note that
@@ -267,7 +283,11 @@ fun ScreenScaffold(
  * [ScreenScaffold] is one of the Wear Material3 scaffold components.
  *
  * The scaffold components [AppScaffold] and [ScreenScaffold] lay out the structure of a screen and
- * coordinate transitions of the [ScrollIndicator] and [TimeText] components.
+ * coordinate transitions of the [ScrollIndicator] and [TimeText] components. [AppScaffold] should
+ * be at the top of the composition (because it provides [ScaffoldState] and layers [TimeText] on
+ * top of all other content) and [ScreenScaffold] should be part of [AppScaffold]'s content. When
+ * used in conjunction with SwipeDismissableNavHost, [AppScaffold] remains at the top of the
+ * composition, whilst [ScreenScaffold] will be placed for each individual composable route.
  *
  * [ScreenScaffold] displays the [ScrollIndicator] at the center-end of the screen by default and
  * coordinates showing/hiding [TimeText], [ScrollIndicator] and the bottom button according to a
@@ -325,7 +345,11 @@ fun ScreenScaffold(
  * [ScreenScaffold] is one of the Wear Material3 scaffold components.
  *
  * The scaffold components [AppScaffold] and [ScreenScaffold] lay out the structure of a screen and
- * coordinate transitions of the [ScrollIndicator] and [TimeText] components.
+ * coordinate transitions of the [ScrollIndicator] and [TimeText] components. [AppScaffold] should
+ * be at the top of the composition (because it provides [ScaffoldState] and layers [TimeText] on
+ * top of all other content) and [ScreenScaffold] should be part of [AppScaffold]'s content. When
+ * used in conjunction with SwipeDismissableNavHost, [AppScaffold] remains at the top of the
+ * composition, whilst [ScreenScaffold] will be placed for each individual composable route.
  *
  * [ScreenScaffold] displays the [ScrollIndicator] at the center-end of the screen by default and
  * coordinates showing/hiding [TimeText] and [ScrollIndicator] according to [scrollInfoProvider].
