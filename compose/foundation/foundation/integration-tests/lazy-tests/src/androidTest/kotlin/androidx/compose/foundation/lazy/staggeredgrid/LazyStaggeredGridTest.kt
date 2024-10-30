@@ -27,11 +27,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.list.assertIsNotPlaced
 import androidx.compose.foundation.lazy.list.assertIsPlaced
 import androidx.compose.foundation.lazy.list.setContentWithTestViewConfiguration
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,11 +41,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
@@ -69,19 +71,22 @@ import org.junit.runners.Parameterized
 
 @MediumTest
 @RunWith(Parameterized::class)
-class LazyStaggeredGridTest(private val orientation: Orientation) :
-    BaseLazyStaggeredGridWithOrientation(orientation) {
+class LazyStaggeredGridTest(
+    private val orientation: Orientation,
+    private val useLookahead: Boolean
+) : BaseLazyStaggeredGridWithOrientation(orientation) {
     private val LazyStaggeredGridTag = "LazyStaggeredGridTag"
 
     internal lateinit var state: LazyStaggeredGridState
 
     companion object {
         @JvmStatic
-        @Parameterized.Parameters(name = "{0}")
+        @Parameterized.Parameters(name = "orientation: {0}, useLookahead: {1}")
         fun initParameters(): Array<Any> =
             arrayOf(
-                Orientation.Vertical,
-                Orientation.Horizontal,
+                arrayOf(Orientation.Vertical, true),
+                arrayOf(Orientation.Vertical, false),
+                arrayOf(Orientation.Horizontal, false)
             )
     }
 
@@ -114,9 +119,31 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
         }
     }
 
+    private fun ComposeContentTestRule.setContentWithConfigurableLookahead(
+        content: @Composable () -> Unit
+    ) {
+        setContent { ConfigurableLookaheadScope(useLookahead, content) }
+    }
+
+    @Composable
+    private fun ConfigurableLookaheadScope(useLookahead: Boolean, content: @Composable () -> Unit) {
+        if (useLookahead) {
+            LookaheadScope { content() }
+        } else {
+            content()
+        }
+    }
+
+    private fun ComposeContentTestRule.setContentWithTestViewConfiguration(
+        useLookahead: Boolean,
+        content: @Composable () -> Unit
+    ) {
+        setContentWithTestViewConfiguration { ConfigurableLookaheadScope(useLookahead, content) }
+    }
+
     @Test
     fun showsZeroItems() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
 
             LazyStaggeredGrid(
@@ -136,7 +163,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun showsOneItem() {
         val itemTestTag = "itemTestTag"
 
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
 
             LazyStaggeredGrid(
@@ -155,7 +182,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun distributesSingleLine() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             LazyStaggeredGrid(
                 lanes = 3,
                 modifier = Modifier.crossAxisSize(itemSizeDp * 3),
@@ -185,7 +212,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun distributesTwoLines() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             LazyStaggeredGrid(
                 lanes = 3,
                 modifier = Modifier.crossAxisSize(itemSizeDp * 3),
@@ -245,7 +272,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun moreItemsDisplayedOnScroll() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 3,
@@ -291,7 +318,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun itemSizeInLayoutInfo() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 3,
@@ -334,7 +361,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun itemCanEmitZeroNodes() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 3,
@@ -355,7 +382,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun itemsAreHiddenOnScroll() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 3,
@@ -384,7 +411,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun itemsArePresentedWhenScrollingBack() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 3,
@@ -416,7 +443,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     @Test
     fun itemsAreCorrectedWhenSizeIncreased() {
         var expanded by mutableStateOf(false)
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 2,
@@ -478,7 +505,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     @Test
     fun itemsAreCorrectedWhenSizeDecreased() {
         var expanded by mutableStateOf(true)
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 2,
@@ -540,7 +567,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     @Test
     fun itemsAreCorrectedWhenItemCountIsIncreasedFromZero() {
         var itemCount by mutableStateOf(0)
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 2,
@@ -562,7 +589,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun itemsAreCorrectedWithWrongColumns() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             // intentionally wrong values, normally items should be [0, 1][2, 3][4, 5]
             state =
                 rememberLazyStaggeredGridState(
@@ -608,7 +635,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     @Test
     fun itemsAreCorrectedWithAlignedOffsets() {
         var expanded by mutableStateOf(false)
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state =
                 rememberLazyStaggeredGridState(
                     initialFirstVisibleItemIndex = 0,
@@ -652,7 +679,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     @Test
     fun itemsAreCorrectedWhenItemIncreased() {
         var expanded by mutableStateOf(false)
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state =
                 rememberLazyStaggeredGridState(
                     initialFirstVisibleItemIndex = 0,
@@ -697,7 +724,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun addItems() {
         val state = LazyStaggeredGridState()
         var itemsCount by mutableStateOf(1)
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             LazyStaggeredGrid(
                 lanes = 2,
                 state = state,
@@ -740,7 +767,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     @Test
     fun removeItems() {
         var itemsCount by mutableStateOf(20)
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 2,
@@ -782,7 +809,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun resizingItems_maintainsScrollingRange() {
         val state = LazyStaggeredGridState()
         var itemSizes by mutableStateOf(List(10) { itemSizeDp * (it % 4 + 1) })
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             LazyStaggeredGrid(
                 lanes = 2,
                 state = state,
@@ -822,7 +849,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     @Test
     fun removingItems_maintainsCorrectOffsets() {
         var itemCount by mutableStateOf(20)
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state =
                 rememberLazyStaggeredGridState(
                     initialFirstVisibleItemIndex = 10,
@@ -862,7 +889,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun staggeredGrid_supportsLargeIndices() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state =
                 rememberLazyStaggeredGridState(
                     initialFirstVisibleItemIndex = Int.MAX_VALUE / 2,
@@ -912,13 +939,15 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
         var state: LazyStaggeredGridState?
 
         restorationTester.setContent {
-            state = rememberLazyStaggeredGridState()
-            LazyStaggeredGrid(
-                lanes = 3,
-                state = state!!,
-                modifier = Modifier.mainAxisSize(itemSizeDp * 10).testTag(LazyStaggeredGridTag)
-            ) {
-                items(1000) { Spacer(Modifier.mainAxisSize(itemSizeDp).testTag("$it")) }
+            ConfigurableLookaheadScope(useLookahead) {
+                state = rememberLazyStaggeredGridState()
+                LazyStaggeredGrid(
+                    lanes = 3,
+                    state = state!!,
+                    modifier = Modifier.mainAxisSize(itemSizeDp * 10).testTag(LazyStaggeredGridTag)
+                ) {
+                    items(1000) { Spacer(Modifier.mainAxisSize(itemSizeDp).testTag("$it")) }
+                }
             }
         }
 
@@ -940,15 +969,17 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
         val recomposeCounter = mutableStateOf(0)
 
         restorationTester.setContent {
-            state = rememberLazyStaggeredGridState()
-            LazyStaggeredGrid(
-                lanes = 3,
-                state = state,
-                modifier = Modifier.mainAxisSize(itemSizeDp * 10).testTag(LazyStaggeredGridTag)
-            ) {
-                recomposeCounter.value // read state to force recomposition
+            ConfigurableLookaheadScope(useLookahead) {
+                state = rememberLazyStaggeredGridState()
+                LazyStaggeredGrid(
+                    lanes = 3,
+                    state = state,
+                    modifier = Modifier.mainAxisSize(itemSizeDp * 10).testTag(LazyStaggeredGridTag)
+                ) {
+                    recomposeCounter.value // read state to force recomposition
 
-                items(itemsCount) { Spacer(Modifier.mainAxisSize(itemSizeDp).testTag("$it")) }
+                    items(itemsCount) { Spacer(Modifier.mainAxisSize(itemSizeDp).testTag("$it")) }
+                }
             }
         }
 
@@ -974,7 +1005,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun screenRotate_oneItem_withAdaptiveCells_fillsContentCorrectly() {
         var rotated by mutableStateOf(false)
 
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
 
             val crossAxis = if (!rotated) itemSizeDp * 6 else itemSizeDp * 9
@@ -1014,7 +1045,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun screenRotate_twoItems_withAdaptiveCells_fillsContentCorrectly() {
         var rotated by mutableStateOf(false)
 
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
 
             val crossAxis = if (!rotated) itemSizeDp * 6 else itemSizeDp * 9
@@ -1057,7 +1088,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     @Test
     fun scrollingALot_layoutIsNotRecomposed() {
         var recomposed = 0
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 3,
@@ -1083,7 +1114,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun onlyOneInitialMeasurePass() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 3,
@@ -1104,7 +1135,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
         state.prefetchingEnabled = false
         val itemSizePx = 5f
         val itemSize = with(rule.density) { itemSizePx.toDp() }
-        rule.setContentWithTestViewConfiguration {
+        rule.setContentWithConfigurableLookahead {
             LazyStaggeredGrid(
                 1,
                 Modifier.testTag(LazyStaggeredGridTag).mainAxisSize(itemSize),
@@ -1125,7 +1156,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun fullSpan_fillsAllCrossAxisSpace() {
         val state = LazyStaggeredGridState()
         state.prefetchingEnabled = false
-        rule.setContentWithTestViewConfiguration {
+        rule.setContentWithConfigurableLookahead {
             LazyStaggeredGrid(
                 3,
                 Modifier.testTag(LazyStaggeredGridTag)
@@ -1150,7 +1181,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun fullSpan_leavesEmptyGapsWithOtherItems() {
         val state = LazyStaggeredGridState()
         state.prefetchingEnabled = false
-        rule.setContentWithTestViewConfiguration {
+        rule.setContentWithConfigurableLookahead {
             LazyStaggeredGrid(
                 3,
                 Modifier.testTag(LazyStaggeredGridTag)
@@ -1188,7 +1219,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun fullSpan_leavesGapsBetweenItems() {
         val state = LazyStaggeredGridState()
         state.prefetchingEnabled = false
-        rule.setContentWithTestViewConfiguration {
+        rule.setContentWithConfigurableLookahead {
             LazyStaggeredGrid(
                 3,
                 Modifier.testTag(LazyStaggeredGridTag)
@@ -1234,7 +1265,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun fullSpan_scrollsCorrectly() {
         val state = LazyStaggeredGridState()
         state.prefetchingEnabled = false
-        rule.setContentWithTestViewConfiguration {
+        rule.setContentWithTestViewConfiguration(useLookahead) {
             LazyStaggeredGrid(
                 3,
                 Modifier.testTag(LazyStaggeredGridTag)
@@ -1289,7 +1320,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun fullSpan_scrollsCorrectly_pastFullSpan() {
         val state = LazyStaggeredGridState()
         state.prefetchingEnabled = false
-        rule.setContentWithTestViewConfiguration {
+        rule.setContentWithTestViewConfiguration(useLookahead) {
             LazyStaggeredGrid(
                 3,
                 Modifier.testTag(LazyStaggeredGridTag)
@@ -1347,7 +1378,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun fullSpan_scrollsCorrectly_pastFullSpan_andBack() {
         val state = LazyStaggeredGridState()
         state.prefetchingEnabled = false
-        rule.setContentWithTestViewConfiguration {
+        rule.setContentWithTestViewConfiguration(useLookahead) {
             LazyStaggeredGrid(
                 3,
                 Modifier.testTag(LazyStaggeredGridTag)
@@ -1408,7 +1439,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun fullSpan_scrollsCorrectly_multipleFullSpans() {
         val state = LazyStaggeredGridState()
         state.prefetchingEnabled = false
-        rule.setContentWithTestViewConfiguration {
+        rule.setContentWithTestViewConfiguration(useLookahead = useLookahead) {
             LazyStaggeredGrid(
                 3,
                 Modifier.testTag(LazyStaggeredGridTag)
@@ -1451,7 +1482,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun initialIndex_largerThanItemCount_ordersItemsCorrectly_withFullSpan() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState(20)
             Box(Modifier.mainAxisSize(itemSizeDp * 4)) {
                 LazyStaggeredGrid(
@@ -1531,7 +1562,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun initialIndex_largerThanItemCount_ordersItemsCorrectly() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState(20)
             Box(Modifier.mainAxisSize(itemSizeDp * 4)) {
                 LazyStaggeredGrid(
@@ -1600,7 +1631,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     @Test
     fun changeItemsAndScrollImmediately() {
         val keys = mutableStateListOf<Int>().also { list -> repeat(10) { list.add(it) } }
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(lanes = 2, Modifier.mainAxisSize(itemSizeDp), state) {
                 items(keys, key = { it }) { Box(Modifier.size(itemSizeDp * 2)) }
@@ -1628,7 +1659,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     @Test
     fun fixedSizeCell_forcesFixedSize() {
         val state = LazyStaggeredGridState()
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             LazyStaggeredGrid(
                 cells = StaggeredGridCells.FixedSize(itemSizeDp * 2),
                 modifier = Modifier.axisSize(crossAxis = itemSizeDp * 5, mainAxis = itemSizeDp * 5),
@@ -1651,7 +1682,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     @Test
     fun manyPlaceablesInItem_itemSizeIsMaxOfPlaceables() {
         val state = LazyStaggeredGridState()
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             LazyStaggeredGrid(
                 lanes = 2,
                 modifier = Modifier.axisSize(crossAxis = itemSizeDp * 2, mainAxis = itemSizeDp * 5),
@@ -1676,7 +1707,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun scrollDuringMeasure() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             BoxWithConstraints {
                 val state = rememberLazyStaggeredGridState()
                 LazyStaggeredGrid(
@@ -1698,7 +1729,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
 
     @Test
     fun scrollInLaunchedEffect() {
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             val state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 1,
@@ -1718,7 +1749,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     @Test
     fun scrollToPreviouslyFullSpanItem() {
         var firstItemVisible by mutableStateOf(false)
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 2,
@@ -1760,7 +1791,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun itemsRemovedAfterLargeThenSmallScrollForward() {
         lateinit var state: LazyStaggeredGridState
         val composedItems = mutableSetOf<Int>()
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 2,
@@ -1795,7 +1826,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun itemsRemovedAfterLargeThenSmallScrollBackward() {
         lateinit var state: LazyStaggeredGridState
         val composedItems = mutableSetOf<Int>()
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState(initialFirstVisibleItemIndex = 6)
             LazyStaggeredGrid(
                 lanes = 2,
@@ -1830,7 +1861,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun zeroSizeItemIsPlacedWhenItIsAtTheTop() {
         lateinit var state: LazyStaggeredGridState
 
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState(initialFirstVisibleItemIndex = 0)
             LazyStaggeredGrid(
                 lanes = 2,
@@ -1875,7 +1906,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun itemsAreDistributedCorrectlyOnOverscrollPassWithSameOffset() {
         val gridHeight = itemSizeDp * 11 // two big items + two small items
         state = LazyStaggeredGridState()
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             LazyStaggeredGrid(
                 modifier = Modifier.mainAxisSize(gridHeight).crossAxisSize(itemSizeDp * 2),
                 state = state,
@@ -1926,7 +1957,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     @Test
     fun fixedCells_withSpacing_notEnoughSpace() {
         state = LazyStaggeredGridState()
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             Box(Modifier.size(itemSizeDp)) {
                 LazyStaggeredGrid(
                     modifier = Modifier.mainAxisSize(itemSizeDp * 5),
@@ -1952,7 +1983,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
         // ├───┴───┤
         // │   2   │
         // └───────┘
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             state = rememberLazyStaggeredGridState().apply { prefetchingEnabled = false }
             LazyStaggeredGrid(
                 lanes = 2,
@@ -2034,7 +2065,7 @@ class LazyStaggeredGridTest(private val orientation: Orientation) :
     fun customOverscroll() {
         val overscroll = TestOverscrollEffect()
 
-        rule.setContent {
+        rule.setContentWithConfigurableLookahead {
             val state = rememberLazyStaggeredGridState()
             LazyStaggeredGrid(
                 lanes = 2,

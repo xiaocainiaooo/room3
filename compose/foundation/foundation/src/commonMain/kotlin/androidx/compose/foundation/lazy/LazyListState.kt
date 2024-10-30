@@ -17,13 +17,6 @@
 package androidx.compose.foundation.lazy
 
 import androidx.annotation.IntRange as AndroidXIntRange
-import androidx.compose.animation.core.AnimationState
-import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.animateTo
-import androidx.compose.animation.core.copy
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.Orientation
@@ -38,6 +31,7 @@ import androidx.compose.foundation.lazy.layout.LazyLayoutBeyondBoundsInfo
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemAnimator
 import androidx.compose.foundation.lazy.layout.LazyLayoutPinnedItemList
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
+import androidx.compose.foundation.lazy.layout.LazyLayoutScrollDeltaBetweenPasses
 import androidx.compose.foundation.lazy.layout.ObservableScopeInvalidator
 import androidx.compose.foundation.lazy.layout.animateScrollToItem
 import androidx.compose.runtime.Composable
@@ -57,7 +51,6 @@ import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastRoundToInt
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.abs
@@ -518,7 +511,7 @@ constructor(
             }
 
             if (isLookingAhead) {
-                updateScrollDeltaForApproach(
+                _lazyLayoutScrollDeltaBetweenPasses.updateScrollDeltaForApproach(
                     result.scrollBackAmount,
                     result.density,
                     result.coroutineScope
@@ -529,48 +522,9 @@ constructor(
     }
 
     internal val scrollDeltaBetweenPasses: Float
-        get() = _scrollDeltaBetweenPasses.value
+        get() = _lazyLayoutScrollDeltaBetweenPasses.scrollDeltaBetweenPasses
 
-    private var _scrollDeltaBetweenPasses: AnimationState<Float, AnimationVector1D> =
-        AnimationState(Float.VectorConverter, 0f, 0f)
-
-    // Updates the scroll delta between lookahead & post-lookahead pass
-    private fun updateScrollDeltaForApproach(
-        delta: Float,
-        density: Density,
-        coroutineScope: CoroutineScope
-    ) {
-        if (delta <= with(density) { DeltaThresholdForScrollAnimation.toPx() }) {
-            // If the delta is within the threshold, scroll by the delta amount instead of animating
-            return
-        }
-
-        // Scroll delta is updated during lookahead, we don't need to trigger lookahead when
-        // the delta changes.
-        Snapshot.withoutReadObservation {
-            val currentDelta = _scrollDeltaBetweenPasses.value
-
-            if (_scrollDeltaBetweenPasses.isRunning) {
-                _scrollDeltaBetweenPasses = _scrollDeltaBetweenPasses.copy(currentDelta - delta)
-                coroutineScope.launch {
-                    _scrollDeltaBetweenPasses.animateTo(
-                        0f,
-                        spring(stiffness = Spring.StiffnessMediumLow, visibilityThreshold = 0.5f),
-                        true
-                    )
-                }
-            } else {
-                _scrollDeltaBetweenPasses = AnimationState(Float.VectorConverter, -delta)
-                coroutineScope.launch {
-                    _scrollDeltaBetweenPasses.animateTo(
-                        0f,
-                        spring(stiffness = Spring.StiffnessMediumLow, visibilityThreshold = 0.5f),
-                        true
-                    )
-                }
-            }
-        }
-    }
+    private val _lazyLayoutScrollDeltaBetweenPasses = LazyLayoutScrollDeltaBetweenPasses()
 
     /**
      * When the user provided custom keys for the items we can try to detect when there were items
@@ -613,8 +567,6 @@ constructor(
             )
     }
 }
-
-private val DeltaThresholdForScrollAnimation = 1.dp
 
 private val EmptyLazyListMeasureResult =
     LazyListMeasureResult(
