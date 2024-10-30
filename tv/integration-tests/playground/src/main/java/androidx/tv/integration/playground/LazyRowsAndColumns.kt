@@ -53,7 +53,7 @@ fun SampleLazyRow(modifier: Modifier = Modifier) {
     val focusRequester = remember { FocusRequester() }
 
     LazyRow(
-        modifier = modifier.lazyListSemantics(1, columnsCount).focusRestorer { focusRequester },
+        modifier = modifier.lazyListSemantics(1, columnsCount).focusRestorer(focusRequester),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         itemsIndexed(backgroundColors) { index, item ->
