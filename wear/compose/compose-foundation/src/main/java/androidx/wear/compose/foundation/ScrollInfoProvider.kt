@@ -17,7 +17,6 @@
 package androidx.wear.compose.foundation
 
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -31,7 +30,6 @@ import androidx.wear.compose.foundation.lazy.startOffset
 import androidx.wear.compose.foundation.pager.HorizontalPager
 import androidx.wear.compose.foundation.pager.PagerState
 import androidx.wear.compose.foundation.pager.VerticalPager
-import kotlin.math.absoluteValue
 
 /**
  * An interface for providing scroll information for different scrollable containers, such lists.
@@ -113,19 +111,11 @@ fun ScrollInfoProvider(state: ScrollState): ScrollInfoProvider =
  * Function for creating a [ScrollInfoProvider] from a [PagerState], for use with [HorizontalPager]
  * and [VerticalPager]
  * - used to coordinate when to fade out the PageIndicator and [TimeText]. The PageIndicator fades
- *   out when when scrolling is finished and the screen is in an idle state. For [VerticalPager] the
- *   [TimeText] is scrolled away as you page, for [HorizontalPager] the [TimeText] remains present
- *   as you page.
+ *   out when when scrolling is finished and the screen is in an idle state.
  *
  * @param state the [PagerState] to use as the base for creating the [ScrollInfoProvider]
- * @param orientation a parameter used to specify whether the Pager is Horizontal or Vertical
  */
-fun ScrollInfoProvider(state: PagerState, orientation: Orientation): ScrollInfoProvider =
-    if (orientation == Orientation.Horizontal) {
-        HorizontalPagerStateScrollInfoProvider(state)
-    } else {
-        VerticalPagerStateScrollInfoProvider(state)
-    }
+fun ScrollInfoProvider(state: PagerState): ScrollInfoProvider = PagerStateScrollInfoProvider(state)
 
 // Implementation of [ScrollInfoProvider] for [ScalingLazyColumn].
 // Being in Foundation, this implementation has access to the ScalingLazyListState
@@ -308,8 +298,8 @@ private class TransformingLazyColumnStateScrollInfoProvider(
     }
 }
 
-// Implementation of [ScrollInfoProvider] for [HorizontalPager].
-private class HorizontalPagerStateScrollInfoProvider(val state: PagerState) : ScrollInfoProvider {
+// Implementation of [ScrollInfoProvider] for [Pager].
+private class PagerStateScrollInfoProvider(val state: PagerState) : ScrollInfoProvider {
     override val isScrollAwayValid: Boolean
         get() = false
 
@@ -321,32 +311,6 @@ private class HorizontalPagerStateScrollInfoProvider(val state: PagerState) : Sc
 
     override val anchorItemOffset: Float
         get() = Float.NaN
-
-    override val lastItemOffset: Float
-        get() = 0f
-}
-
-// Implementation of [ScrollInfoProvider] for [VerticalPager].
-private class VerticalPagerStateScrollInfoProvider(val state: PagerState) : ScrollInfoProvider {
-    override val isScrollAwayValid: Boolean
-        get() = state.pageCount > 1
-
-    override val isScrollable: Boolean
-        get() = state.canScrollBackward || state.canScrollForward
-
-    override val isScrollInProgress: Boolean
-        get() = state.isScrollInProgress
-
-    override val anchorItemOffset: Float
-        get() {
-            val offset =
-                when (state.currentPage) {
-                    0 -> state.currentPageOffsetFraction.absoluteValue
-                    1 -> 1 - state.currentPageOffsetFraction.absoluteValue
-                    else -> Float.NaN
-                }
-            return offset * state.layoutInfo.pageSize
-        }
 
     override val lastItemOffset: Float
         get() = 0f

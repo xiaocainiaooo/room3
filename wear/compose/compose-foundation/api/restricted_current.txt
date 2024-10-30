@@ -326,7 +326,7 @@ package androidx.wear.compose.foundation {
     method public static androidx.wear.compose.foundation.ScrollInfoProvider ScrollInfoProvider(androidx.compose.foundation.ScrollState state);
     method public static androidx.wear.compose.foundation.ScrollInfoProvider ScrollInfoProvider(androidx.wear.compose.foundation.lazy.ScalingLazyListState state);
     method public static androidx.wear.compose.foundation.ScrollInfoProvider ScrollInfoProvider(androidx.wear.compose.foundation.lazy.TransformingLazyColumnState state);
-    method public static androidx.wear.compose.foundation.ScrollInfoProvider ScrollInfoProvider(androidx.wear.compose.foundation.pager.PagerState state, androidx.compose.foundation.gestures.Orientation orientation);
+    method public static androidx.wear.compose.foundation.ScrollInfoProvider ScrollInfoProvider(androidx.wear.compose.foundation.pager.PagerState state);
   }
 
   @kotlin.jvm.JvmInline public final value class SwipeDirection {

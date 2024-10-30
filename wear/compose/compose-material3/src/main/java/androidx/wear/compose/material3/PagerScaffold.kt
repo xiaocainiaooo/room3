@@ -94,7 +94,7 @@ fun HorizontalPagerScaffold(
     content: @Composable PagerScope.(page: Int) -> Unit,
 ) =
     PagerScaffoldImpl(
-        scrollInfoProvider = ScrollInfoProvider(pagerState, orientation = Orientation.Horizontal),
+        scrollInfoProvider = ScrollInfoProvider(pagerState),
         pagerContent = {
             AnimatedHorizontalPager(
                 state = pagerState,
@@ -151,7 +151,7 @@ fun VerticalPagerScaffold(
     content: @Composable PagerScope.(page: Int) -> Unit,
 ) =
     PagerScaffoldImpl(
-        scrollInfoProvider = ScrollInfoProvider(pagerState, orientation = Orientation.Vertical),
+        scrollInfoProvider = ScrollInfoProvider(pagerState),
         pagerContent = {
             AnimatedVerticalPager(
                 state = pagerState,
