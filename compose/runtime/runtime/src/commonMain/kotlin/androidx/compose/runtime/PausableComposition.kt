@@ -48,7 +48,7 @@ import androidx.compose.runtime.internal.RememberEventDispatcher
  * @see Composition
  * @see ReusableComposition
  */
-interface PausableComposition : ReusableComposition {
+sealed interface PausableComposition : ReusableComposition {
     /**
      * Set the content of the composition. A [PausedComposition] that is currently paused. No
      * composition is performed until [PausedComposition.resume] is called.
@@ -74,6 +74,17 @@ interface PausableComposition : ReusableComposition {
     fun setPausableContentWithReuse(content: @Composable () -> Unit): PausedComposition
 }
 
+/** The callback type used in [PausedComposition.resume]. */
+fun interface ShouldPauseCallback {
+    /**
+     * Called to determine if a resumed [PausedComposition] should pause.
+     *
+     * @return Return `true` to indicate that the composition should pause. Otherwise the
+     *   composition will continue normally.
+     */
+    @Suppress("CallbackMethodName") fun shouldPause(): Boolean
+}
+
 /**
  * [PausedComposition] is the result of calling [PausableComposition.setContent] or
  * [PausableComposition.setContentWithReuse]. It is used to drive the paused composition to
@@ -83,7 +94,7 @@ interface PausableComposition : ReusableComposition {
  * A [PausedComposition] is created paused and will only compose the `content` parameter when
  * [resume] is called the first time.
  */
-interface PausedComposition {
+sealed interface PausedComposition {
     /**
      * Returns `true` when the [PausedComposition] is complete. [isComplete] matches the last value
      * returned from [resume]. Once a [PausedComposition] is [isComplete] the [apply] method should
@@ -109,7 +120,7 @@ interface PausedComposition {
      * @return `true` if the composition is complete and `false` if one or more calls to `resume`
      *   are required to complete composition.
      */
-    fun resume(shouldPause: () -> Boolean): Boolean
+    @Suppress("ExecutorRegistration") fun resume(shouldPause: ShouldPauseCallback): Boolean
 
     /**
      * Apply the composition. This is the last step of a paused composition and is required to be
@@ -164,7 +175,7 @@ internal class PausedCompositionImpl(
     override val isComplete: Boolean
         get() = state >= PausedCompositionState.ApplyPending
 
-    override fun resume(shouldPause: () -> Boolean): Boolean {
+    override fun resume(shouldPause: ShouldPauseCallback): Boolean {
         try {
             when (state) {
                 PausedCompositionState.InitialPending -> {
