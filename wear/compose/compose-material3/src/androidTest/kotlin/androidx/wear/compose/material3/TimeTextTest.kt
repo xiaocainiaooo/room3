@@ -53,6 +53,23 @@ class TimeTextTest {
     }
 
     @Test
+    fun shows_time_by_default() {
+        val timeText = "test"
+
+        rule.setContent {
+            MaterialTheme() {
+                TimeText(
+                    timeSource =
+                        object : TimeSource {
+                            @Composable override fun currentTime(): String = timeText
+                        },
+                )
+            }
+        }
+        rule.onNodeWithText(timeText).assertExists()
+    }
+
+    @Test
     fun updates_clock_when_source_changes_on_non_round_device() {
         val timeState = mutableStateOf("Unchanged")
 
