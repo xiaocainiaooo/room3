@@ -21,6 +21,7 @@ import androidx.compose.runtime.external.kotlinx.collections.immutable.Persisten
 import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentSetOf
 import androidx.compose.runtime.makeSynchronizedObject
 import androidx.compose.runtime.synchronized
+import kotlin.js.JsName
 import kotlin.jvm.JvmName
 
 /**
@@ -220,7 +221,7 @@ private val sync = makeSynchronizedObject()
 private class StateSetIterator<T>(val set: SnapshotStateSet<T>, val iterator: Iterator<T>) :
     MutableIterator<T> {
     var current: T? = null
-    var next: T? = null
+    @JsName("var_next") var next: T? = null
     var modification = set.modification
 
     init {

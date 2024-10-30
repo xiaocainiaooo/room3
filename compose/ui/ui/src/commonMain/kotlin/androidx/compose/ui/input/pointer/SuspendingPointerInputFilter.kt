@@ -39,6 +39,7 @@ import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.createCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.js.JsName
 import kotlin.math.max
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
@@ -149,6 +150,7 @@ interface PointerInputScope : Density {
      */
     @Suppress("GetterSetterNames")
     @get:Suppress("GetterSetterNames")
+    @JsName("varinterceptOutOfBoundsChildEvents")
     var interceptOutOfBoundsChildEvents: Boolean
         get() = false
         set(_) {}
