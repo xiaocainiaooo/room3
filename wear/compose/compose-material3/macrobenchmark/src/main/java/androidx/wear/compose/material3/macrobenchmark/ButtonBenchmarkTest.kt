@@ -16,61 +16,17 @@
 
 package androidx.wear.compose.material3.macrobenchmark
 
-import android.content.Intent
 import androidx.benchmark.macro.CompilationMode
-import androidx.benchmark.macro.ExperimentalMetricApi
-import androidx.benchmark.macro.FrameTimingGfxInfoMetric
-import androidx.benchmark.macro.MemoryUsageMetric
-import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.filters.LargeTest
-import androidx.testutils.createCompilationParams
 import androidx.wear.compose.material3.macrobenchmark.common.ButtonBenchmark
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-@OptIn(ExperimentalMetricApi::class)
 @LargeTest
 @RunWith(Parameterized::class)
-class ButtonBenchmarkTest(private val compilationMode: CompilationMode) {
-    @get:Rule val benchmarkRule = MacrobenchmarkRule()
-
-    @Before
-    fun setUp() {
-        disableChargingExperience()
-    }
-
-    @After
-    fun destroy() {
-        enableChargingExperience()
-    }
-
-    @Test
-    fun start() {
-        benchmarkRule.measureRepeated(
-            packageName = PACKAGE_NAME,
-            metrics =
-                listOf(FrameTimingGfxInfoMetric(), MemoryUsageMetric(MemoryUsageMetric.Mode.Last)),
-            compilationMode = compilationMode,
-            iterations = 10,
-            setupBlock = {
-                val intent = Intent()
-                intent.action = BUTTON_ACTIVITY
-                startActivityAndWait(intent)
-            }
-        ) {
-            ButtonBenchmark.exercise.invoke(this)
-        }
-    }
-
-    companion object {
-        private const val BUTTON_ACTIVITY = "$PACKAGE_NAME.BUTTON_ACTIVITY"
-
-        @Parameterized.Parameters(name = "compilation={0}")
-        @JvmStatic
-        fun parameters() = createCompilationParams()
-    }
-}
+class ButtonBenchmarkTest(compilationMode: CompilationMode) :
+    BenchmarkTestBase(
+        compilationMode = compilationMode,
+        macrobenchmarkScreen = ButtonBenchmark,
+        actionSuffix = "BUTTON_ACTIVITY"
+    )

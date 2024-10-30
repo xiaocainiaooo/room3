@@ -16,6 +16,6 @@
 
 package androidx.wear.compose.material3.macrobenchmark.target
 
-import androidx.wear.compose.material3.macrobenchmark.common.ButtonBenchmark
+import androidx.wear.compose.material3.macrobenchmark.common.SwipeToRevealBenchmark
 
-class ButtonActivity : BenchmarkBaseActivity(ButtonBenchmark)
+class SwipeToRevealActivity : BenchmarkBaseActivity(SwipeToRevealBenchmark)

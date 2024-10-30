@@ -14,8 +14,19 @@
  * limitations under the License.
  */
 
-package androidx.wear.compose.material3.macrobenchmark.target
+package androidx.wear.compose.material3.macrobenchmark
 
-import androidx.wear.compose.material3.macrobenchmark.common.ButtonBenchmark
+import androidx.benchmark.macro.CompilationMode
+import androidx.test.filters.LargeTest
+import androidx.wear.compose.material3.macrobenchmark.common.SwipeToRevealBenchmark
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
-class ButtonActivity : BenchmarkBaseActivity(ButtonBenchmark)
+@LargeTest
+@RunWith(Parameterized::class)
+class SwipeToRevealBenchmarkTest(compilationMode: CompilationMode) :
+    BenchmarkTestBase(
+        compilationMode = compilationMode,
+        macrobenchmarkScreen = SwipeToRevealBenchmark,
+        actionSuffix = "SWIPE_TO_REVEAL_ACTIVITY"
+    )
