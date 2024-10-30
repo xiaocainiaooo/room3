@@ -29,11 +29,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 internal sealed class CameraRequest
@@ -104,7 +103,6 @@ internal class ActiveCamera(
     val cameraId: CameraId
         get() = androidCameraState.cameraId
 
-    private val listenerJob: Job
     private var current: VirtualCameraState? = null
 
     private val wakelock =
@@ -122,15 +120,10 @@ internal class ActiveCamera(
         )
 
     init {
-        listenerJob =
-            scope.launch {
-                androidCameraState.state.collect {
-                    if (it is CameraStateClosing || it is CameraStateClosed) {
-                        wakelock.release()
-                        this.cancel()
-                    }
-                }
-            }
+        scope.launch {
+            androidCameraState.state.first { it is CameraStateClosing || it is CameraStateClosed }
+            wakelock.release()
+        }
     }
 
     suspend fun connectTo(virtualCameraState: VirtualCameraState) {
