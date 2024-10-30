@@ -21,7 +21,7 @@
 package androidx.wear.compose.foundation.rotary
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.LocalOverscrollConfiguration
+import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -307,7 +307,7 @@ internal fun MockRotaryResolution(lowRes: Boolean = false, content: @Composable 
 
     CompositionLocalProvider(
         LocalContext provides mockContext,
-        LocalOverscrollConfiguration provides null
+        LocalOverscrollFactory provides null
     ) {
         content()
     }
