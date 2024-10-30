@@ -638,14 +638,14 @@ private fun LayoutWithLinksAndInlineContent(
 
     val textScope =
         if (text.hasLinks()) {
-            remember(text.text) { TextLinkScope(text) }
+            remember(text) { TextLinkScope(text) }
         } else null
 
     // only adds additional span styles to the existing link annotations, doesn't semantically
     // change the text
     val styledText: () -> AnnotatedString =
         if (text.hasLinks()) {
-            remember(textScope) { { textScope?.applyAnnotators() ?: text } }
+            remember(text, textScope) { { textScope?.applyAnnotators() ?: text } }
         } else {
             { text }
         }
