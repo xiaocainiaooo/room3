@@ -1024,14 +1024,20 @@ public class SupportedSurfaceCombination(
     /**
      * Finds a frame rate range supported by the device that is closest to the target frame rate
      *
-     * @param targetFrameRate the Target Frame Rate resolved from all current existing surfaces and
-     *   incoming new use cases
-     * @return a frame rate range supported by the device that is closest to targetFrameRate
+     * @param targetFrameRate The Target Frame Rate resolved from all current existing surfaces and
+     *   incoming new use cases.
+     * @return A frame rate range supported by the device that is closest to targetFrameRate when it
+     *   is specified. [StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED] is returned if targetFrameRate is
+     *   [StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED].
      */
     private fun getClosestSupportedDeviceFrameRate(
         targetFrameRate: Range<Int>,
         maxFps: Int
     ): Range<Int> {
+        if (targetFrameRate == StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED) {
+            return StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED
+        }
+
         var newTargetFrameRate = targetFrameRate
         // get all fps ranges supported by device
         val availableFpsRanges =

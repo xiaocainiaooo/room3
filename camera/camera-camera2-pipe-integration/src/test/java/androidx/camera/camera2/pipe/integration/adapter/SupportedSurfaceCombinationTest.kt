@@ -2915,6 +2915,28 @@ class SupportedSurfaceCombinationTest {
         // unspecified: (0,0)
     }
 
+    @Test
+    fun getSuggestedStreamSpec_whenTargetFrameRateRangeIsUnspecified_unspecifiedRangeSuggested() {
+        // a valid target means the device is capable of that fps
+
+        // use case with no target fps
+        val useCase1 =
+            createUseCase(
+                UseCaseConfigFactory.CaptureType.PREVIEW,
+                targetFrameRate = StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED
+            )
+
+        val useCaseExpectedResultMap =
+            mutableMapOf<UseCase, Size>().apply { put(useCase1, Size(4032, 3024)) }
+        getSuggestedSpecsAndVerify(
+            useCaseExpectedResultMap,
+            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL,
+            compareExpectedFps = StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED
+        )
+        // since target fps is unspecified, no specific device fps will be selected, and is set to
+        // unspecified: (0,0)
+    }
+
     // //////////////////////////////////////////////////////////////////////////////////////////
     //
     // Other tests

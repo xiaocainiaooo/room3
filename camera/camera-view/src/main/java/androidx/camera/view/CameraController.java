@@ -494,7 +494,14 @@ public abstract class CameraController {
         if (!isVideoCaptureEnabled() && isRecording()) {
             stopRecording();
         }
-        startCameraAndTrackStates(() -> mEnabledUseCases = oldEnabledUseCases);
+        startCameraAndTrackStates(() -> {
+            mEnabledUseCases = oldEnabledUseCases;
+            Logger.w(TAG,
+                    "setEnabledUseCases: failed to enable use cases properly for enabledUseCases = "
+                            + Integer.toBinaryString(enabledUseCases)
+                            + ", restoring back previous values " + Integer.toBinaryString(
+                            oldEnabledUseCases));
+        });
     }
 
     /**
