@@ -28,7 +28,7 @@ actual constructor(
 
 @Immutable
 @ExperimentalMaterial3ExpressiveApi
-actual object DismissibleModalWideNavigationRailDefaults {
+actual object ModalWideNavigationRailDefaults {
     actual val Properties: ModalWideNavigationRailProperties = implementedInJetBrainsFork()
 }
 

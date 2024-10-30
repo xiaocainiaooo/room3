@@ -435,7 +435,7 @@ fun ModalWideNavigationRail(
     windowInsets: WindowInsets = WideNavigationRailDefaults.windowInsets,
     arrangement: WideNavigationRailArrangement = WideNavigationRailDefaults.Arrangement,
     expandedProperties: ModalWideNavigationRailProperties =
-        DismissibleModalWideNavigationRailDefaults.Properties,
+        ModalWideNavigationRailDefaults.Properties,
     content: @Composable () -> Unit
 ) {
     val rememberContent = remember(content) { movableContentOf(content) }
@@ -879,15 +879,12 @@ object WideNavigationRailItemDefaults {
         }
 }
 
-/** Default values for [DismissibleModalWideNavigationRail] */
+/** Default values for [ModalWideNavigationRail]. */
 @Immutable
 @ExperimentalMaterial3ExpressiveApi
-expect object DismissibleModalWideNavigationRailDefaults {
+expect object ModalWideNavigationRailDefaults {
 
-    /**
-     * Properties used to customize the behavior of a [ModalWideNavigationRail] or of a
-     * [DismissibleModalWideNavigationRail].
-     */
+    /** Properties used to customize the window behavior of a [ModalWideNavigationRail]. */
     val Properties: ModalWideNavigationRailProperties
 }
 
