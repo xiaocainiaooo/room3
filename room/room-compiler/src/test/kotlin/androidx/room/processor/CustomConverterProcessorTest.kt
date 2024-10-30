@@ -24,7 +24,8 @@ import androidx.room.compiler.codegen.XClassName
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.XTypeSpec
-import androidx.room.compiler.codegen.XTypeSpec.Builder.Companion.apply
+import androidx.room.compiler.codegen.compat.XConverters.applyToJavaPoet
+import androidx.room.compiler.codegen.compat.XConverters.applyToKotlinPoet
 import androidx.room.compiler.processing.util.Source
 import androidx.room.compiler.processing.util.XTestInvocation
 import androidx.room.ext.CommonTypeNames
@@ -391,10 +392,8 @@ class CustomConverterProcessorTest {
                         addFunction(buildMethod("convertF2"))
                     }
                 }
-                .apply(
-                    javaTypeBuilder = { addTypeVariables(typeVariables) },
-                    kotlinTypeBuilder = { error("Test converter shouldn't be generated in Kotlin") }
-                )
+                .applyToJavaPoet { addTypeVariables(typeVariables) }
+                .applyToKotlinPoet { error("Test converter shouldn't be generated in Kotlin") }
                 .build()
                 .toString()
         return Source.java(CONVERTER.canonicalName, "package ${CONVERTER.packageName};\n$code")

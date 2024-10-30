@@ -16,15 +16,16 @@
 
 package androidx.room.compiler.codegen.java
 
+import androidx.room.compiler.codegen.JPropertySpec
+import androidx.room.compiler.codegen.JPropertySpecBuilder
 import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XPropertySpec
-import com.squareup.javapoet.FieldSpec
 
-internal class JavaPropertySpec(override val name: String, internal val actual: FieldSpec) :
+internal class JavaPropertySpec(override val name: String, internal val actual: JPropertySpec) :
     JavaLang(), XPropertySpec {
 
-    internal class Builder(private val name: String, internal val actual: FieldSpec.Builder) :
+    internal class Builder(private val name: String, internal val actual: JPropertySpecBuilder) :
         JavaLang(), XPropertySpec.Builder {
 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {

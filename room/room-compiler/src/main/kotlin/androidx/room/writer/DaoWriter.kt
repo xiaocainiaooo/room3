@@ -21,10 +21,11 @@ import androidx.room.compiler.codegen.VisibilityModifier
 import androidx.room.compiler.codegen.XClassName
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
-import androidx.room.compiler.codegen.XFunSpec.Builder.Companion.apply
 import androidx.room.compiler.codegen.XPropertySpec
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.XTypeSpec
+import androidx.room.compiler.codegen.compat.XConverters.applyToJavaPoet
+import androidx.room.compiler.codegen.compat.XConverters.applyToKotlinPoet
 import androidx.room.compiler.processing.XElement
 import androidx.room.compiler.processing.XMethodElement
 import androidx.room.compiler.processing.XProcessingEnv
@@ -215,10 +216,7 @@ class DaoWriter(
                 GET_LIST_OF_TYPE_CONVERTERS_METHOD,
                 VisibilityModifier.PUBLIC
             )
-            .apply(
-                javaMethodBuilder = { addModifiers(javax.lang.model.element.Modifier.STATIC) },
-                kotlinFunctionBuilder = {},
-            )
+            .applyToJavaPoet { addModifiers(javax.lang.model.element.Modifier.STATIC) }
             .apply {
                 returns(
                     CommonTypeNames.LIST.parametrizedBy(
@@ -286,31 +284,28 @@ class DaoWriter(
 
     private fun createSelectMethod(method: ReadQueryMethod): XFunSpec {
         return overrideWithoutAnnotations(method.element, declaredDao)
-            .apply(
-                javaMethodBuilder = {},
-                kotlinFunctionBuilder = {
-                    // TODO: Update XPoet to better handle this case.
-                    if (method.isProperty) {
-                        // When the DAO function is from a Kotlin property, we'll still generate
-                        // a DAO function, but it won't be an override and it'll be private, to be
-                        // called from the overridden property's getter.
-                        modifiers.remove(KModifier.OVERRIDE)
-                        modifiers.removeAll(
-                            listOf(KModifier.PUBLIC, KModifier.INTERNAL, KModifier.PROTECTED)
-                        )
-                        addModifiers(KModifier.PRIVATE)
+            .applyToKotlinPoet {
+                // TODO: Update XPoet to better handle this case.
+                if (method.isProperty) {
+                    // When the DAO function is from a Kotlin property, we'll still generate
+                    // a DAO function, but it won't be an override and it'll be private, to be
+                    // called from the overridden property's getter.
+                    modifiers.remove(KModifier.OVERRIDE)
+                    modifiers.removeAll(
+                        listOf(KModifier.PUBLIC, KModifier.INTERNAL, KModifier.PROTECTED)
+                    )
+                    addModifiers(KModifier.PRIVATE)
 
-                        // For JVM emit a @JvmName to avoid same-signature conflict with
-                        // actual property.
-                        if (
-                            context.targetPlatforms.size == 1 &&
-                                context.targetPlatforms.contains(XProcessingEnv.Platform.JVM)
-                        ) {
-                            jvmName("_private${method.element.name.capitalize(Locale.US)}")
-                        }
+                    // For JVM emit a @JvmName to avoid same-signature conflict with
+                    // actual property.
+                    if (
+                        context.targetPlatforms.size == 1 &&
+                            context.targetPlatforms.contains(XProcessingEnv.Platform.JVM)
+                    ) {
+                        jvmName("_private${method.element.name.capitalize(Locale.US)}")
                     }
                 }
-            )
+            }
             .addCode(createQueryMethodBody(method))
             .build()
     }

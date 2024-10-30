@@ -50,7 +50,7 @@ internal class KotlinTypeSpec(private val _className: XClassName?, internal val 
         }
 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
-            check(annotation is KotlinAnnotationSpec)
+            require(annotation is KotlinAnnotationSpec)
             actual.addAnnotation(annotation.actual)
         }
 

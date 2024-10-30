@@ -16,6 +16,10 @@
 
 package androidx.room.compiler.codegen.java
 
+import androidx.room.compiler.codegen.JCodeBlock
+import androidx.room.compiler.codegen.JFunSpec
+import androidx.room.compiler.codegen.JFunSpecBuilder
+import androidx.room.compiler.codegen.JParameterSpec
 import androidx.room.compiler.codegen.L
 import androidx.room.compiler.codegen.VisibilityModifier
 import androidx.room.compiler.codegen.XAnnotationSpec
@@ -23,17 +27,14 @@ import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.processing.XNullability
-import com.squareup.javapoet.CodeBlock
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.ParameterSpec
 import com.squareup.kotlinpoet.javapoet.JTypeName
 import javax.lang.model.element.Modifier
 
-internal class JavaFunSpec(override val name: String, internal val actual: MethodSpec) :
+internal class JavaFunSpec(override val name: String, internal val actual: JFunSpec) :
     JavaLang(), XFunSpec {
     override fun toString() = actual.toString()
 
-    internal class Builder(override val name: String, internal val actual: MethodSpec.Builder) :
+    internal class Builder(override val name: String, internal val actual: JFunSpecBuilder) :
         JavaLang(), XFunSpec.Builder {
 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
@@ -53,7 +54,7 @@ internal class JavaFunSpec(override val name: String, internal val actual: Metho
             name: String,
             annotations: List<XAnnotationSpec>
         ) = apply {
-            val paramSpec = ParameterSpec.builder(typeName.java, name, Modifier.FINAL)
+            val paramSpec = JParameterSpec.builder(typeName.java, name, Modifier.FINAL)
             actual.addParameter(
                 // Adding nullability annotation to primitive parameters is redundant as
                 // primitives can never be null.
@@ -73,7 +74,7 @@ internal class JavaFunSpec(override val name: String, internal val actual: Metho
         override fun callSuperConstructor(vararg args: XCodeBlock) = apply {
             actual.addStatement(
                 "super($L)",
-                CodeBlock.join(
+                JCodeBlock.join(
                     args.map {
                         check(it is JavaCodeBlock)
                         it.actual

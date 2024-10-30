@@ -21,7 +21,6 @@ import androidx.room.compiler.codegen.VisibilityModifier
 import androidx.room.compiler.codegen.XClassName
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
-import androidx.room.compiler.codegen.XFunSpec.Builder.Companion.apply
 import androidx.room.compiler.codegen.XMemberName
 import androidx.room.compiler.codegen.XMemberName.Companion.companionMember
 import androidx.room.compiler.codegen.XMemberName.Companion.packageMember
@@ -29,6 +28,7 @@ import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.XTypeSpec
 import androidx.room.compiler.codegen.asClassName
 import androidx.room.compiler.codegen.asMutableClassName
+import androidx.room.compiler.codegen.compat.XConverters.applyToJavaPoet
 import androidx.room.ext.RoomGuavaTypeNames.GUAVA_ROOM
 import androidx.room.solver.CodeGenScope
 import com.squareup.kotlinpoet.javapoet.JTypeName
@@ -374,10 +374,7 @@ fun CallableTypeSpecBuilder(
                     returns(parameterTypeName)
                     callBody()
                 }
-                .apply(
-                    javaMethodBuilder = { addException(JTypeName.get(Exception::class.java)) },
-                    kotlinFunctionBuilder = {}
-                )
+                .applyToJavaPoet { addException(JTypeName.get(Exception::class.java)) }
                 .build()
         )
     }

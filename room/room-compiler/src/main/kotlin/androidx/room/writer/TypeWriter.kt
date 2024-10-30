@@ -23,7 +23,8 @@ import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XPropertySpec
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.XTypeSpec
-import androidx.room.compiler.codegen.XTypeSpec.Builder.Companion.apply
+import androidx.room.compiler.codegen.compat.XConverters.applyToJavaPoet
+import androidx.room.compiler.codegen.compat.XConverters.applyToKotlinPoet
 import androidx.room.compiler.processing.XProcessingEnv
 import androidx.room.compiler.processing.writeTo
 import androidx.room.processor.Context
@@ -77,8 +78,8 @@ abstract class TypeWriter(val context: WriterContext) {
     }
 
     private fun addSuppressWarnings(builder: XTypeSpec.Builder) {
-        builder.apply(
-            javaTypeBuilder = {
+        builder
+            .applyToJavaPoet {
                 addAnnotation(
                     com.squareup.javapoet.AnnotationSpec.builder(SuppressWarnings::class.java)
                         .addMember(
@@ -90,8 +91,8 @@ abstract class TypeWriter(val context: WriterContext) {
                         )
                         .build()
                 )
-            },
-            kotlinTypeBuilder = {
+            }
+            .applyToKotlinPoet {
                 addAnnotation(
                     com.squareup.kotlinpoet.AnnotationSpec.builder(Suppress::class)
                         .addMember(
@@ -104,7 +105,6 @@ abstract class TypeWriter(val context: WriterContext) {
                         .build()
                 )
             }
-        )
     }
 
     private fun addGeneratedAnnotationIfAvailable(
@@ -114,22 +114,21 @@ abstract class TypeWriter(val context: WriterContext) {
         processingEnv.findGeneratedAnnotation()?.let {
             val annotationName = it.asClassName().canonicalName
             val memberValue = RoomProcessor::class.java.canonicalName
-            adapterTypeSpecBuilder.apply(
-                javaTypeBuilder = {
+            adapterTypeSpecBuilder
+                .applyToJavaPoet {
                     addAnnotation(
                         JAnnotationSpec.builder(JClassName.bestGuess(annotationName))
                             .addMember("value", "\$S", memberValue)
                             .build()
                     )
-                },
-                kotlinTypeBuilder = {
+                }
+                .applyToKotlinPoet {
                     addAnnotation(
                         KAnnotationSpec.builder(KClassName.bestGuess(annotationName))
                             .addMember("value = [%S]", memberValue)
                             .build()
                     )
                 }
-            )
         }
     }
 

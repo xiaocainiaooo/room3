@@ -26,9 +26,6 @@ import androidx.room.compiler.processing.PropertySpecHelper
 import androidx.room.compiler.processing.XMethodElement
 import androidx.room.compiler.processing.XNullability
 import androidx.room.compiler.processing.XType
-import com.squareup.javapoet.FieldSpec
-import com.squareup.kotlinpoet.PropertySpec
-import javax.lang.model.element.Modifier
 
 interface XPropertySpec : TargetLanguage {
 
@@ -42,24 +39,6 @@ interface XPropertySpec : TargetLanguage {
         fun getter(code: XCodeBlock): Builder
 
         fun build(): XPropertySpec
-
-        companion object {
-            fun Builder.apply(
-                javaFieldBuilder: FieldSpec.Builder.() -> Unit,
-                kotlinPropertyBuilder: PropertySpec.Builder.() -> Unit,
-            ): Builder = apply {
-                when (language) {
-                    CodeLanguage.JAVA -> {
-                        check(this is JavaPropertySpec.Builder)
-                        this.actual.javaFieldBuilder()
-                    }
-                    CodeLanguage.KOTLIN -> {
-                        check(this is KotlinPropertySpec.Builder)
-                        this.actual.kotlinPropertyBuilder()
-                    }
-                }
-            }
-        }
     }
 
     companion object {
@@ -75,10 +54,10 @@ interface XPropertySpec : TargetLanguage {
                 CodeLanguage.JAVA ->
                     JavaPropertySpec.Builder(
                         name,
-                        FieldSpec.builder(typeName.java, name).apply {
+                        JPropertySpec.builder(typeName.java, name).apply {
                             val visibilityModifier = visibility.toJavaVisibilityModifier()
                             // TODO(b/247242374) Add nullability annotations for non-private fields
-                            if (visibilityModifier != Modifier.PRIVATE) {
+                            if (visibilityModifier != JModifier.PRIVATE) {
                                 if (typeName.nullability == XNullability.NULLABLE) {
                                     addAnnotation(NULLABLE_ANNOTATION)
                                 } else if (typeName.nullability == XNullability.NONNULL) {
@@ -87,14 +66,14 @@ interface XPropertySpec : TargetLanguage {
                             }
                             addModifiers(visibilityModifier)
                             if (!isMutable) {
-                                addModifiers(Modifier.FINAL)
+                                addModifiers(JModifier.FINAL)
                             }
                         }
                     )
                 CodeLanguage.KOTLIN ->
                     KotlinPropertySpec.Builder(
                         name,
-                        PropertySpec.builder(name, typeName.kotlin).apply {
+                        KPropertySpec.builder(name, typeName.kotlin).apply {
                             mutable(isMutable)
                             addModifiers(visibility.toKotlinVisibilityModifier())
                         }
