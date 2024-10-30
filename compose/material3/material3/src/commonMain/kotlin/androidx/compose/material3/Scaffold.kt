@@ -146,26 +146,17 @@ private fun ScaffoldLayout(
     // change
     val contentPadding = remember {
         object : PaddingValues {
-            var topContentPadding by mutableStateOf(0.dp)
-            var startContentPadding by mutableStateOf(0.dp)
-            var endContentPadding by mutableStateOf(0.dp)
-            var bottomContentPadding by mutableStateOf(0.dp)
+            var paddingHolder by mutableStateOf(PaddingValues(0.dp))
 
             override fun calculateLeftPadding(layoutDirection: LayoutDirection): Dp =
-                when (layoutDirection) {
-                    LayoutDirection.Ltr -> startContentPadding
-                    LayoutDirection.Rtl -> endContentPadding
-                }
+                paddingHolder.calculateLeftPadding(layoutDirection)
 
-            override fun calculateTopPadding(): Dp = topContentPadding
+            override fun calculateTopPadding(): Dp = paddingHolder.calculateTopPadding()
 
             override fun calculateRightPadding(layoutDirection: LayoutDirection): Dp =
-                when (layoutDirection) {
-                    LayoutDirection.Ltr -> endContentPadding
-                    LayoutDirection.Rtl -> startContentPadding
-                }
+                paddingHolder.calculateRightPadding(layoutDirection)
 
-            override fun calculateBottomPadding(): Dp = bottomContentPadding
+            override fun calculateBottomPadding(): Dp = paddingHolder.calculateBottomPadding()
         }
     }
 
@@ -299,20 +290,23 @@ private fun ScaffoldLayout(
 
         // Update the backing state for the content padding before subcomposing the body
         val insets = contentWindowInsets.asPaddingValues(this)
-        contentPadding.topContentPadding =
-            if (topBarPlaceable.width == 0 && topBarPlaceable.height == 0) {
-                insets.calculateTopPadding()
-            } else {
-                topBarPlaceable.height.toDp()
-            }
-        contentPadding.bottomContentPadding =
-            if (isBottomBarEmpty) {
-                insets.calculateBottomPadding()
-            } else {
-                bottomBarPlaceable.height.toDp()
-            }
-        contentPadding.startContentPadding = insets.calculateStartPadding(layoutDirection)
-        contentPadding.endContentPadding = insets.calculateEndPadding(layoutDirection)
+        contentPadding.paddingHolder =
+            PaddingValues(
+                top =
+                    if (topBarPlaceable.width == 0 && topBarPlaceable.height == 0) {
+                        insets.calculateTopPadding()
+                    } else {
+                        topBarPlaceable.height.toDp()
+                    },
+                bottom =
+                    if (isBottomBarEmpty) {
+                        insets.calculateBottomPadding()
+                    } else {
+                        bottomBarPlaceable.height.toDp()
+                    },
+                start = insets.calculateStartPadding(layoutDirection),
+                end = insets.calculateEndPadding(layoutDirection)
+            )
 
         val bodyContentPlaceable =
             subcompose(ScaffoldLayoutContent.MainContent) {
