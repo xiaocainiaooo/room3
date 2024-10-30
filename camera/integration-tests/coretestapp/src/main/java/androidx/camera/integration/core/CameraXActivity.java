@@ -71,6 +71,7 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
 import android.util.Range;
 import android.util.Rational;
 import android.view.Display;
@@ -193,6 +194,7 @@ public class CameraXActivity extends AppCompatActivity {
     private static final String TAG = "CameraXActivity";
     private static final String[] REQUIRED_PERMISSIONS;
     private static final List<DynamicRangeUiData> DYNAMIC_RANGE_UI_DATA = new ArrayList<>();
+    private static final List<Pair<Range<Integer>, String>> FPS_OPTIONS = new ArrayList<>();
 
     static {
         // From Android T, skips the permission check of WRITE_EXTERNAL_STORAGE since it won't be
@@ -238,6 +240,15 @@ public class CameraXActivity extends AppCompatActivity {
                 DynamicRange.DOLBY_VISION_10_BIT,
                 "HDR (Dolby Vision, 10-bit)",
                 R.string.toggle_video_dyn_rng_hdr_dolby_vision_10));
+
+        // TODO - Indicate whether the FPS ranges are supported with
+        //  `CameraInfo.getSupportedFrameRateRanges()`, but we may want to try unsupported cases too
+        //  sometimes for testing, so the unsupported ones still should be options (perhaps greyed
+        //  out or struck-through).
+        FPS_OPTIONS.add(new Pair<>(new Range<>(0, 0), "Unspecified"));
+        FPS_OPTIONS.add(new Pair<>(new Range<>(15, 15), "15"));
+        FPS_OPTIONS.add(new Pair<>(new Range<>(30, 30), "30"));
+        FPS_OPTIONS.add(new Pair<>(new Range<>(60, 60), "60"));
     }
 
     //Use this activity title when Camera Pipe configuration is used by core test app
@@ -355,6 +366,7 @@ public class CameraXActivity extends AppCompatActivity {
     private Button mZoomIn2XToggle;
     private Button mZoomResetToggle;
     private Button mButtonImageOutputFormat;
+    private Button mButtonFps;
     private Toast mEvToast = null;
     private Toast mPSToast = null;
     private ToggleButton mPreviewStabilizationToggle;
@@ -371,6 +383,7 @@ public class CameraXActivity extends AppCompatActivity {
     private final Set<DynamicRange> mSelectableDynamicRanges = new HashSet<>();
     private int mVideoMirrorMode = MIRROR_MODE_ON_FRONT_ONLY;
     private boolean mIsPreviewStabilizationOn = false;
+    private int mFpsMenuId = 0;
 
     SessionMediaUriSet mSessionImagesUriSet = new SessionMediaUriSet();
     SessionMediaUriSet mSessionVideosUriSet = new SessionMediaUriSet();
@@ -1277,6 +1290,7 @@ public class CameraXActivity extends AppCompatActivity {
         mZoomSeekBar.setVisibility(View.GONE);
         mZoomRatioLabel.setVisibility(View.GONE);
         mTextView.setVisibility(View.GONE);
+        mButtonFps.setVisibility(View.GONE);
 
         if (testCase.equals(PREVIEW_TEST_CASE) || testCase.equals(SWITCH_TEST_CASE)) {
             mTorchButton.setVisibility(View.GONE);
@@ -1389,6 +1403,7 @@ public class CameraXActivity extends AppCompatActivity {
         mPlusEV.setEnabled(isExposureCompensationSupported());
         mDecEV.setEnabled(isExposureCompensationSupported());
         mZoomIn2XToggle.setEnabled(is2XZoomSupported());
+        mButtonFps.setEnabled(mPreviewToggle.isChecked() || mVideoToggle.isChecked());
 
         // this function may make some view visible again, so need to update for E2E tests again
         updateAppUIForE2ETest();
@@ -1592,6 +1607,42 @@ public class CameraXActivity extends AppCompatActivity {
                 findViewById(R.id.video_mute),
                 (newState) -> updateDynamicRangeUiState()
         );
+        mButtonFps = findViewById(R.id.fps);
+        if (mFpsMenuId == 0) {
+            mButtonFps.setText("FPS\nUnsp.");
+        } else {
+            mButtonFps.setText("FPS\n" + FPS_OPTIONS.get(mFpsMenuId).second);
+        }
+        mButtonFps.setOnClickListener(view -> {
+            PopupMenu popup = new PopupMenu(this, view);
+            Menu menu = popup.getMenu();
+
+            for (int i = 0; i < FPS_OPTIONS.size(); i++) {
+                menu.add(0, i, Menu.NONE, FPS_OPTIONS.get(i).second);
+            }
+
+            menu.findItem(mFpsMenuId).setChecked(true);
+
+            // Make menu single checkable
+            menu.setGroupCheckable(0, true, true);
+
+            popup.setOnMenuItemClickListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId != mFpsMenuId) {
+                    mFpsMenuId = itemId;
+                    if (mFpsMenuId == 0) {
+                        mButtonFps.setText("FPS\nUnsp.");
+                    } else {
+                        mButtonFps.setText("FPS\n" + FPS_OPTIONS.get(mFpsMenuId).second);
+                    }
+                    // FPS changed, rebind UseCases
+                    tryBindUseCases();
+                }
+                return true;
+            });
+
+            popup.show();
+        });
 
         setUpButtonEvents();
         setupViewFinderGestureControls();
@@ -1911,6 +1962,7 @@ public class CameraXActivity extends AppCompatActivity {
                     .setPreviewStabilizationEnabled(mIsPreviewStabilizationOn)
                     .setDynamicRange(
                             mVideoToggle.isChecked() ? DynamicRange.UNSPECIFIED : mDynamicRange)
+                    .setTargetFrameRate(FPS_OPTIONS.get(mFpsMenuId).first)
                     .build();
             resetViewIdlingResource();
             // Use the listener of the future to make sure the Preview setup the new surface.
@@ -1959,6 +2011,7 @@ public class CameraXActivity extends AppCompatActivity {
                 mVideoCapture = new VideoCapture.Builder<>(mRecorder)
                         .setMirrorMode(mVideoMirrorMode)
                         .setDynamicRange(mDynamicRange)
+                        .setTargetFrameRate(FPS_OPTIONS.get(mFpsMenuId).first)
                         .build();
             }
             useCases.add(mVideoCapture);
