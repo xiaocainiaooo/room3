@@ -24,10 +24,12 @@ import androidx.compose.foundation.lazy.grid.scrollBy
 import androidx.compose.runtime.Stable
 import androidx.compose.testutils.assertIsEqualTo
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
@@ -199,7 +201,13 @@ open class BaseLazyLayoutTestWithOrientation(private val orientation: Orientatio
         }
 
         override val isInProgress: Boolean = false
-        override val effectModifier: Modifier = Modifier.drawBehind { drawCalled = true }
+        override val node: DelegatableNode =
+            object : Modifier.Node(), DrawModifierNode {
+                override fun ContentDrawScope.draw() {
+                    drawContent()
+                    drawCalled = true
+                }
+            }
     }
 
     companion object {

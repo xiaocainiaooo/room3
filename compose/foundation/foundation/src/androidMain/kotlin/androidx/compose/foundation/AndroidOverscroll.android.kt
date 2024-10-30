@@ -34,8 +34,6 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.runtime.CompositionLocalAccessorScope
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
@@ -50,12 +48,12 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.pointer.PointerId
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.InspectorInfo
-import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.input.pointer.SuspendingPointerInputModifierNode
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.DelegatingNode
+import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Velocity
@@ -105,11 +103,14 @@ private class AndroidEdgeEffectOverscrollFactory(
 }
 
 @RequiresApi(Build.VERSION_CODES.S)
-private class DrawStretchOverscrollModifier(
+private class StretchOverscrollNode(
+    pointerInputNode: DelegatableNode,
     private val overscrollEffect: AndroidEdgeEffectOverscrollEffect,
     private val edgeEffectWrapper: EdgeEffectWrapper,
-    inspectorInfo: InspectorInfo.() -> Unit
-) : DrawModifier, InspectorValueInfo(inspectorInfo) {
+) : DelegatingNode(), DrawModifierNode {
+    init {
+        delegate(pointerInputNode)
+    }
 
     /**
      * There is an unwanted behavior in the stretch overscroll effect we have to workaround: when
@@ -351,12 +352,15 @@ private class DrawStretchOverscrollModifier(
     }
 }
 
-private class DrawGlowOverscrollModifier(
+private class GlowOverscrollNode(
+    pointerInputNode: DelegatableNode,
     private val overscrollEffect: AndroidEdgeEffectOverscrollEffect,
     private val edgeEffectWrapper: EdgeEffectWrapper,
     private val overscrollConfig: OverscrollConfiguration,
-    inspectorInfo: InspectorInfo.() -> Unit
-) : DrawModifier, InspectorValueInfo(inspectorInfo) {
+) : DelegatingNode(), DrawModifierNode {
+    init {
+        delegate(pointerInputNode)
+    }
 
     @Suppress("KotlinConstantConditions")
     override fun ContentDrawScope.draw() {
@@ -716,55 +720,49 @@ internal class AndroidEdgeEffectOverscrollEffect(
         return Offset(x, y)
     }
 
-    override val effectModifier: Modifier =
-        Modifier.pointerInput(Unit) {
-                awaitEachGesture {
-                    val down = awaitFirstDown(requireUnconsumed = false)
-                    pointerId = down.id
-                    pointerPosition = down.position
-                    do {
-                        val pressedChanges = awaitPointerEvent().changes.fastFilter { it.pressed }
-                        // If the same ID we are already tracking is down, use that. Otherwise, use
-                        // the next down, to move the overscroll to the next pointer.
-                        val change =
-                            pressedChanges.fastFirstOrNull { it.id == pointerId }
-                                ?: pressedChanges.firstOrNull()
-                        if (change != null) {
-                            // Update the id if we are now tracking a new down
-                            pointerId = change.id
-                            pointerPosition = change.position
-                        }
-                    } while (pressedChanges.isNotEmpty())
-                    pointerId = PointerId(-1L)
-                    // Explicitly not resetting the pointer position until the next down, so we
-                    // don't change any existing effects
+    private val pointerInputNode = SuspendingPointerInputModifierNode {
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false)
+            pointerId = down.id
+            pointerPosition = down.position
+            do {
+                val pressedChanges = awaitPointerEvent().changes.fastFilter { it.pressed }
+                // If the same ID we are already tracking is down, use that. Otherwise, use
+                // the next down, to move the overscroll to the next pointer.
+                val change =
+                    pressedChanges.fastFirstOrNull { it.id == pointerId }
+                        ?: pressedChanges.firstOrNull()
+                if (change != null) {
+                    // Update the id if we are now tracking a new down
+                    pointerId = change.id
+                    pointerPosition = change.position
                 }
-            }
-            .then(
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    DrawStretchOverscrollModifier(
-                        this@AndroidEdgeEffectOverscrollEffect,
-                        edgeEffectWrapper,
-                        debugInspectorInfo {
-                            name = "overscroll"
-                            value = this@AndroidEdgeEffectOverscrollEffect
-                        }
-                    )
-                } else {
-                    DrawGlowOverscrollModifier(
-                        this@AndroidEdgeEffectOverscrollEffect,
-                        edgeEffectWrapper,
-                        overscrollConfig,
-                        debugInspectorInfo {
-                            name = "overscroll"
-                            value = this@AndroidEdgeEffectOverscrollEffect
-                        }
-                    )
-                }
+            } while (pressedChanges.isNotEmpty())
+            pointerId = PointerId(-1L)
+            // Explicitly not resetting the pointer position until the next down, so we
+            // don't change any existing effects
+        }
+    }
+
+    override val node =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            StretchOverscrollNode(
+                pointerInputNode,
+                this@AndroidEdgeEffectOverscrollEffect,
+                edgeEffectWrapper,
             )
+        } else {
+            GlowOverscrollNode(
+                pointerInputNode,
+                this@AndroidEdgeEffectOverscrollEffect,
+                edgeEffectWrapper,
+                overscrollConfig
+            )
+        }
 
     internal fun invalidateOverscroll() {
         if (invalidationEnabled) {
+            // TODO: b/367437728 replace with invalidateDraw()
             redrawSignal.value = Unit
         }
     }

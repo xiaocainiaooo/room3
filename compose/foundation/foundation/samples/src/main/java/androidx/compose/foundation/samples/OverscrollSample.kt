@@ -27,7 +27,6 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.overscroll
 import androidx.compose.foundation.rememberOverscrollEffect
@@ -43,7 +42,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
@@ -116,9 +121,20 @@ fun OverscrollSample() {
         override val isInProgress: Boolean
             get() = overscrollOffset.value != 0f
 
-        // as we're building an offset modifiers, let's offset of our value we calculated
-        override val effectModifier: Modifier =
-            Modifier.offset { IntOffset(x = 0, y = overscrollOffset.value.roundToInt()) }
+        // Create a LayoutModifierNode that offsets by overscrollOffset.value
+        override val node: DelegatableNode =
+            object : Modifier.Node(), LayoutModifierNode {
+                override fun MeasureScope.measure(
+                    measurable: Measurable,
+                    constraints: Constraints
+                ): MeasureResult {
+                    val placeable = measurable.measure(constraints)
+                    return layout(placeable.width, placeable.height) {
+                        val offsetValue = IntOffset(x = 0, y = overscrollOffset.value.roundToInt())
+                        placeable.placeRelativeWithLayer(offsetValue.x, offsetValue.y)
+                    }
+                }
+            }
     }
 
     val offset = remember { mutableStateOf(0f) }

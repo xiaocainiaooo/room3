@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -420,7 +421,7 @@ private class TestOverscrollEffect : OverscrollEffect {
     }
 
     override val isInProgress: Boolean = false
-    override val effectModifier: Modifier = Modifier
+    override val node: DelegatableNode = object : Modifier.Node() {}
 }
 
 private val NoOpDensity =

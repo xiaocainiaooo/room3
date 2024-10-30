@@ -55,6 +55,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
@@ -66,6 +67,8 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.OnRemeasuredModifier
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -1584,6 +1587,12 @@ class ScrollTest(private val config: Config) {
         }
 
         override val isInProgress: Boolean = false
-        override val effectModifier: Modifier = Modifier.drawBehind { drawCalled = true }
+        override val node: DelegatableNode =
+            object : Modifier.Node(), DrawModifierNode {
+                override fun ContentDrawScope.draw() {
+                    drawContent()
+                    drawCalled = true
+                }
+            }
     }
 }

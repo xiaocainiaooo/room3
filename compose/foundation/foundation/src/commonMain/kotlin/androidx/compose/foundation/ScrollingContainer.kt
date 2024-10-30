@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.DelegatingNode
 import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
@@ -50,18 +51,17 @@ internal fun Modifier.scrollingContainer(
     bringIntoViewSpec: BringIntoViewSpec? = null
 ): Modifier {
     return this.then(
-            ScrollingContainerElement(
-                state = state,
-                orientation = orientation,
-                enabled = enabled,
-                reverseScrolling = reverseScrolling,
-                flingBehavior = flingBehavior,
-                interactionSource = interactionSource,
-                bringIntoViewSpec = bringIntoViewSpec,
-                overscrollEffect = overscrollEffect
-            )
+        ScrollingContainerElement(
+            state = state,
+            orientation = orientation,
+            enabled = enabled,
+            reverseScrolling = reverseScrolling,
+            flingBehavior = flingBehavior,
+            interactionSource = interactionSource,
+            bringIntoViewSpec = bringIntoViewSpec,
+            overscrollEffect = overscrollEffect
         )
-        .then(if (overscrollEffect == null) Modifier else Modifier.overscroll(overscrollEffect))
+    )
 }
 
 /**
@@ -160,6 +160,7 @@ private class ScrollingContainerNode(
 ) : DelegatingNode(), LayoutModifierNode {
     override val shouldAutoInvalidate = false
     private var scrollableNode: ScrollableNode? = null
+    private var overscrollNode: DelegatableNode? = null
     private var shouldReverseDirection = false
 
     // Needs to be mutated to properly update the underlying layer, which relies on instance
@@ -188,6 +189,7 @@ private class ScrollingContainerNode(
                     )
                 )
         }
+        attachOverscrollNodeIfNeeded()
     }
 
     override fun MeasureScope.measure(
@@ -239,7 +241,12 @@ private class ScrollingContainerNode(
             }
             invalidatePlacement()
         }
-        this.overscrollEffect = overscrollEffect
+        if (this.overscrollEffect != overscrollEffect) {
+            this.overscrollEffect = overscrollEffect
+            overscrollNode?.let { undelegate(it) }
+            overscrollNode = null
+            attachOverscrollNodeIfNeeded()
+        }
         this.enabled = enabled
         this.reverseScrolling = reverseScrolling
         this.flingBehavior = flingBehavior
@@ -265,5 +272,14 @@ private class ScrollingContainerNode(
             layoutDirection = requireLayoutDirection()
         }
         return ScrollableDefaults.reverseDirection(layoutDirection, orientation, reverseScrolling)
+    }
+
+    private fun attachOverscrollNodeIfNeeded() {
+        if (overscrollNode == null && overscrollEffect != null) {
+            val node = overscrollEffect!!.node
+            if (!node.node.isAttached) {
+                overscrollNode = delegate(node)
+            }
+        }
     }
 }

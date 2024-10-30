@@ -31,10 +31,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isNotDisplayed
@@ -545,6 +547,12 @@ class PagerTest(val config: ParamConfig) : BasePagerTest(config) {
         }
 
         override val isInProgress: Boolean = false
-        override val effectModifier: Modifier = Modifier.drawBehind { drawCalled = true }
+        override val node: DelegatableNode =
+            object : Modifier.Node(), DrawModifierNode {
+                override fun ContentDrawScope.draw() {
+                    drawContent()
+                    drawCalled = true
+                }
+            }
     }
 }

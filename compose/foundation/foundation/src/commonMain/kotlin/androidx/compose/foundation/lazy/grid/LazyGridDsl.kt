@@ -61,7 +61,8 @@ import androidx.compose.ui.unit.dp
  * @param userScrollEnabled whether the scrolling via the user gestures or accessibility actions is
  *   allowed. You can still scroll programmatically using the state even when it is disabled.
  * @param overscrollEffect the [OverscrollEffect] that will be used to render overscroll for this
- *   layout. Note that the [OverscrollEffect.effectModifier] will be applied internally as well.
+ *   layout. Note that the [OverscrollEffect.node] will be applied internally as well - you do not
+ *   need to use Modifier.overscroll separately.
  * @param content the [LazyGridScope] which describes the content
  */
 @Composable
@@ -149,7 +150,8 @@ fun LazyVerticalGrid(
  * @param userScrollEnabled whether the scrolling via the user gestures or accessibility actions is
  *   allowed. You can still scroll programmatically using the state even when it is disabled.
  * @param overscrollEffect the [OverscrollEffect] that will be used to render overscroll for this
- *   layout. Note that the [OverscrollEffect.effectModifier] will be applied internally as well.
+ *   layout. Note that the [OverscrollEffect.node] will be applied internally as well - you do not
+ *   need to use Modifier.overscroll separately.
  * @param content the [LazyGridScope] which describes the content
  */
 @Composable

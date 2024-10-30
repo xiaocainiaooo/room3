@@ -15,6 +15,7 @@
  */
 package androidx.compose.foundation
 
+import androidx.compose.foundation.OverscrollTest.TestOverscrollEffect
 import androidx.compose.foundation.gestures.Orientation.Horizontal
 import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.gestures.ScrollableState
@@ -33,6 +34,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.node.DelegatingNode
+import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -189,6 +192,113 @@ class ScrollingContainerTest {
 
         // Now that layout direction changed, we should go back to 0
         rule.runOnIdle { assertThat(scrollAmount).isEqualTo(0f) }
+    }
+
+    @Test
+    fun attachesOverscrollEffectNode() {
+        val overscrollEffect = TestOverscrollEffect()
+
+        rule.setContent {
+            Box(
+                Modifier.scrollingContainer(
+                    rememberScrollState(),
+                    orientation = Horizontal,
+                    enabled = true,
+                    reverseScrolling = false,
+                    flingBehavior = null,
+                    interactionSource = null,
+                    overscrollEffect = overscrollEffect,
+                    bringIntoViewSpec = null
+                )
+            )
+        }
+
+        rule.runOnIdle { assertThat(overscrollEffect.node.node.isAttached).isTrue() }
+    }
+
+    @Test
+    fun updatesToNewOverscrollEffectNode() {
+        val overscrollEffect1 = TestOverscrollEffect()
+        val overscrollEffect2 = TestOverscrollEffect()
+        var effect by mutableStateOf(overscrollEffect1)
+
+        rule.setContent {
+            Box(
+                Modifier.scrollingContainer(
+                    rememberScrollState(),
+                    orientation = Horizontal,
+                    enabled = true,
+                    reverseScrolling = false,
+                    flingBehavior = null,
+                    interactionSource = null,
+                    overscrollEffect = effect,
+                    bringIntoViewSpec = null
+                )
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(overscrollEffect1.node.node.isAttached).isTrue()
+            assertThat(overscrollEffect2.node.node.isAttached).isFalse()
+            effect = overscrollEffect2
+        }
+
+        // The old node should be detached, and the new one should be attached
+        rule.runOnIdle {
+            assertThat(overscrollEffect1.node.node.isAttached).isFalse()
+            assertThat(overscrollEffect2.node.node.isAttached).isTrue()
+            effect = overscrollEffect2
+        }
+    }
+
+    @Test
+    fun doesNotAddAlreadyAttachedOverscrollEffectNode() {
+        val overscrollEffect = TestOverscrollEffect()
+        class CustomDelegatingNode : DelegatingNode() {
+            init {
+                delegate(overscrollEffect.node)
+            }
+        }
+
+        val element =
+            object : ModifierNodeElement<CustomDelegatingNode>() {
+                override fun create() = CustomDelegatingNode()
+
+                override fun update(node: CustomDelegatingNode) {}
+
+                override fun equals(other: Any?) = other === this
+
+                override fun hashCode() = -1
+            }
+
+        var addScrollingContainer by mutableStateOf(false)
+
+        rule.setContent {
+            Box(
+                element.then(
+                    if (addScrollingContainer)
+                        Modifier.scrollingContainer(
+                            rememberScrollState(),
+                            orientation = Horizontal,
+                            enabled = true,
+                            reverseScrolling = false,
+                            flingBehavior = null,
+                            interactionSource = null,
+                            overscrollEffect = overscrollEffect,
+                            bringIntoViewSpec = null
+                        )
+                    else Modifier
+                )
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(overscrollEffect.node.node.isAttached).isTrue()
+            addScrollingContainer = true
+        }
+
+        // Should not crash - the node should not be added by Modifier.scrollingContainer
+        rule.waitForIdle()
     }
 
     private fun Modifier.drawOutsideOfBounds() = drawBehind {

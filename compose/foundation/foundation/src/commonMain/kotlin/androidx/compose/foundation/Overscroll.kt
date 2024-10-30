@@ -25,6 +25,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.DelegatingNode
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Velocity
 
 /**
@@ -115,24 +119,90 @@ interface OverscrollEffect {
      */
     val isInProgress: Boolean
 
-    /** A [Modifier] that will draw this OverscrollEffect */
-    val effectModifier: Modifier
+    /**
+     * The [DelegatableNode] that will render this OverscrollEffect and provide any required size or
+     * other information to this effect.
+     *
+     * In most cases you should use [Modifier.overscroll] to render this OverscrollEffect, which
+     * will internally attach this node to the hierarchy. The node should be attached before
+     * [applyToScroll] or [applyToFling] is called to ensure correctness.
+     *
+     * This property should return a single instance, and can only be attached once, as with other
+     * [DelegatableNode]s.
+     */
+    val node: DelegatableNode
 }
 
 /**
  * Renders overscroll from the provided [overscrollEffect].
  *
- * This modifier is a convenience method to call [OverscrollEffect.effectModifier], which renders
- * the actual effect. Note that this modifier is only responsible for the visual part of
- * overscroll - on its own it will not handle input events. In addition to using this modifier you
- * also need to propagate events to the [overscrollEffect], most commonly by using a
+ * This modifier attaches the provided [overscrollEffect]'s [OverscrollEffect.node] to the
+ * hierarchy, which renders the actual effect. Note that this modifier is only responsible for the
+ * visual part of overscroll - on its own it will not handle input events. In addition to using this
+ * modifier you also need to propagate events to the [overscrollEffect], most commonly by using a
  * [androidx.compose.foundation.gestures.scrollable].
+ *
+ * Alternatively, you can use a higher level API such as [verticalScroll] or
+ * [androidx.compose.foundation.lazy.LazyColumn] and provide a custom [OverscrollEffect] - these
+ * components will both render and provide events to the [OverscrollEffect], so you do not need to
+ * manually render the effect with this modifier.
  *
  * @sample androidx.compose.foundation.samples.OverscrollSample
  * @param overscrollEffect the [OverscrollEffect] to render
  */
 fun Modifier.overscroll(overscrollEffect: OverscrollEffect?): Modifier =
-    this.then(overscrollEffect?.effectModifier ?: Modifier)
+    this.then(OverscrollModifierElement(overscrollEffect))
+
+private class OverscrollModifierElement(
+    private val overscrollEffect: OverscrollEffect?,
+) : ModifierNodeElement<OverscrollModifierNode>() {
+    override fun create(): OverscrollModifierNode {
+        return OverscrollModifierNode(overscrollEffect?.node)
+    }
+
+    override fun update(node: OverscrollModifierNode) {
+        node.update(overscrollEffect?.node)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is OverscrollModifierElement) return false
+
+        if (overscrollEffect != other.overscrollEffect) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return overscrollEffect.hashCode()
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "overscroll"
+        properties["overscrollEffect"] = overscrollEffect
+    }
+}
+
+private class OverscrollModifierNode(private var overscrollNode: DelegatableNode?) :
+    DelegatingNode() {
+    init {
+        attachIfNeeded()
+    }
+
+    fun update(overscrollNode: DelegatableNode?) {
+        this.overscrollNode?.let { undelegate(it) }
+        this.overscrollNode = overscrollNode
+        attachIfNeeded()
+    }
+
+    private fun attachIfNeeded() {
+        overscrollNode =
+            if (overscrollNode?.node?.isAttached == false) {
+                delegate(overscrollNode!!)
+            } else {
+                null
+            }
+    }
+}
 
 /**
  * Returns a remembered [OverscrollEffect] created from the current value of
