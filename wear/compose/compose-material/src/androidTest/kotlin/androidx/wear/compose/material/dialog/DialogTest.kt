@@ -424,11 +424,10 @@ class DialogBehaviourTest {
                         dismissCounter++
                         show.value = false
                     },
-                    durationMillis = 300
+                    durationMillis = 100
                 )
             }
         }
-        rule.waitForIdle()
         rule.waitUntilDoesNotExist(hasTestTag(TEST_TAG))
         assertEquals(1, dismissCounter)
     }
@@ -1182,11 +1181,6 @@ internal fun DialogWithTimeout(
     }
 
     Dialog(showDialog = showDialog, onDismissRequest = currentOnTimeout, modifier = modifier) {
-        Alert(
-            icon = {},
-            title = {},
-            message = { Text("Text") },
-            content = {},
-        )
+        Box(Modifier.fillMaxSize()) { Text("Text") }
     }
 }
