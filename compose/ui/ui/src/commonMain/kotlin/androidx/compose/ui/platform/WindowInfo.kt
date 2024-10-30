@@ -45,9 +45,14 @@ interface WindowInfo {
     val keyboardModifiers: PointerKeyboardModifiers
         get() = WindowInfoImpl.GlobalKeyboardModifiers.value
 
-    /** Size of the window's content container in pixels. */
+    /**
+     * Size of the window. This size excludes insets, such as any system bars, so it is not safe to
+     * assume that this size matches the available space of the compose hierarchy hosted inside this
+     * window. Instead this size should be used as a breakpoint when changing between UI
+     * configurations, or similar window-dependent configuration.
+     */
     val containerSize: IntSize
-        get() = IntSize.Zero
+        get() = IntSize(Int.MIN_VALUE, Int.MIN_VALUE)
 }
 
 @Composable
