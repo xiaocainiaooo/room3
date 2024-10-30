@@ -137,7 +137,7 @@ fun FocusRestorerCustomFallbackSample() {
     val focusRequester = remember { FocusRequester() }
     LazyRow(
         // If restoration fails, focus would fallback to the item associated with focusRequester.
-        Modifier.focusRestorer { focusRequester }
+        Modifier.focusRestorer(focusRequester)
     ) {
         item {
             Button(modifier = Modifier.focusRequester(focusRequester), onClick = {}) { Text("1") }

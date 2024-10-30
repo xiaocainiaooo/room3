@@ -758,7 +758,8 @@ package androidx.compose.ui.focus {
   }
 
   public final class FocusRestorerKt {
-    method public static androidx.compose.ui.Modifier focusRestorer(androidx.compose.ui.Modifier, optional kotlin.jvm.functions.Function0<androidx.compose.ui.focus.FocusRequester>? onRestoreFailed);
+    method public static androidx.compose.ui.Modifier focusRestorer(androidx.compose.ui.Modifier, optional androidx.compose.ui.focus.FocusRequester fallback);
+    method @Deprecated @SuppressCompatibility @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.Modifier focusRestorer(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function0<androidx.compose.ui.focus.FocusRequester>? onRestoreFailed);
   }
 
   public interface FocusState {
