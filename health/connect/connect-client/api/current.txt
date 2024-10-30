@@ -181,7 +181,9 @@ package androidx.health.connect.client.permission {
   }
 
   public static final class HealthPermission.Companion {
+    method public inline <reified T extends androidx.health.connect.client.records.Record> String getReadPermission();
     method public String getReadPermission(kotlin.reflect.KClass<? extends androidx.health.connect.client.records.Record> recordType);
+    method public inline <reified T extends androidx.health.connect.client.records.Record> String getWritePermission();
     method public String getWritePermission(kotlin.reflect.KClass<? extends androidx.health.connect.client.records.Record> recordType);
     property public static final String PERMISSION_READ_HEALTH_DATA_HISTORY;
     property public static final String PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND;
