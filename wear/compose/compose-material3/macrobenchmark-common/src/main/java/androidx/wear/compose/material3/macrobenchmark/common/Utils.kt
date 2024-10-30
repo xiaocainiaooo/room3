@@ -16,7 +16,9 @@
 
 package androidx.wear.compose.material3.macrobenchmark.common
 
+import androidx.test.uiautomator.StaleObjectException
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiObject2
 
 internal const val CONTENT_DESCRIPTION = "find-me"
 
@@ -31,5 +33,14 @@ internal fun UiDevice.scrollDown() {
         10
     )
 }
+
+internal fun retryIfStale(block: () -> UiObject2): UiObject2 =
+    block().let {
+        try {
+            it.also { it.toString() }
+        } catch (e: StaleObjectException) {
+            block()
+        }
+    }
 
 internal const val FIND_OBJECT_TIMEOUT_MS = 10_000L

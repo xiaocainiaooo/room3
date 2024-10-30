@@ -16,62 +16,17 @@
 
 package androidx.wear.compose.material3.macrobenchmark
 
-import android.content.Intent
-import android.os.Build
 import androidx.benchmark.macro.CompilationMode
-import androidx.benchmark.macro.ExperimentalMetricApi
-import androidx.benchmark.macro.FrameTimingGfxInfoMetric
-import androidx.benchmark.macro.MemoryUsageMetric
-import androidx.benchmark.macro.junit4.MacrobenchmarkRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.filters.SdkSuppress
 import androidx.wear.compose.material3.macrobenchmark.common.AnimatedTextBenchmark
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 @LargeTest
-@RunWith(AndroidJUnit4::class)
-@SdkSuppress(minSdkVersion = Build.VERSION_CODES.S)
-class AnimatedTextBenchmarkTest {
-    @get:Rule val benchmarkRule = MacrobenchmarkRule()
-
-    @Before
-    fun setUp() {
-        disableChargingExperience()
-    }
-
-    @After
-    fun destroy() {
-        enableChargingExperience()
-    }
-
-    @OptIn(ExperimentalMetricApi::class)
-    @Test
-    fun start() {
-        benchmarkRule.measureRepeated(
-            packageName = PACKAGE_NAME,
-            metrics =
-                listOf(
-                    FrameTimingGfxInfoMetric(),
-                    MemoryUsageMetric(MemoryUsageMetric.Mode.Last),
-                ),
-            compilationMode = CompilationMode.DEFAULT,
-            iterations = 10,
-            setupBlock = {
-                val intent = Intent()
-                intent.action = ANIMATED_TEXT_ACTIVITY
-                startActivityAndWait(intent)
-            }
-        ) {
-            AnimatedTextBenchmark.exercise.invoke(this)
-        }
-    }
-
-    companion object {
-        private const val ANIMATED_TEXT_ACTIVITY = "$PACKAGE_NAME.ANIMATED_TEXT_ACTIVITY"
-    }
-}
+@RunWith(Parameterized::class)
+class AnimatedTextBenchmarkTest(compilationMode: CompilationMode) :
+    BenchmarkTestBase(
+        compilationMode = compilationMode,
+        macrobenchmarkScreen = AnimatedTextBenchmark,
+        actionSuffix = "ANIMATED_TEXT_ACTIVITY"
+    )
