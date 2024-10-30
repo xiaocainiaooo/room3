@@ -36,7 +36,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.kotlinStdlib)
     implementation(project(":compose:foundation:foundation-layout"))
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:foundation:foundation"))

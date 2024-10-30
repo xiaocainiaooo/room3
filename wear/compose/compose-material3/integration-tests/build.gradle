@@ -31,8 +31,6 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.kotlinStdlib)
-
     implementation(project(":compose:animation:animation"))
     implementation(project(":compose:foundation:foundation"))
     implementation(project(":compose:foundation:foundation-layout"))
