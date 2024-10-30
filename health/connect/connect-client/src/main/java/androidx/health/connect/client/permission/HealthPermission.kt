@@ -66,26 +66,8 @@ import kotlin.reflect.KClass
  *
  * @see androidx.health.connect.client.PermissionController
  */
-public class HealthPermission
-internal constructor(
-    /** type of [Record] the permission gives access for. */
-    internal val recordType: KClass<out Record>,
-    /** whether read or write access. */
-    @property:AccessType internal val accessType: Int,
-) {
+public class HealthPermission internal constructor() {
     companion object {
-        /**
-         * Creates [HealthPermission] to read provided [recordType], such as `StepsRecord::class`.
-         *
-         * @return Permission object to use with
-         *   [androidx.health.connect.client.PermissionController].
-         */
-        @RestrictTo(RestrictTo.Scope.LIBRARY) // To be deleted.
-        @JvmStatic
-        public fun createReadPermissionLegacy(recordType: KClass<out Record>): HealthPermission {
-            return HealthPermission(recordType, AccessTypes.READ)
-        }
-
         /**
          * Returns a permission defined in [HealthPermission] to read provided [recordType], such as
          * `StepsRecord`.
@@ -113,17 +95,6 @@ internal constructor(
                 )
             }
             return READ_PERMISSION_PREFIX + RECORD_TYPE_TO_PERMISSION[recordType]
-        }
-
-        /**
-         * Creates [HealthPermission] to write provided [recordType], such as `StepsRecord::class`.
-         *
-         * @return Permission to use with [androidx.health.connect.client.PermissionController].
-         */
-        @RestrictTo(RestrictTo.Scope.LIBRARY) // To be deleted.
-        @JvmStatic
-        public fun createWritePermissionLegacy(recordType: KClass<out Record>): HealthPermission {
-            return HealthPermission(recordType, AccessTypes.WRITE)
         }
 
         /**
@@ -416,21 +387,5 @@ internal constructor(
             add(PERMISSION_WRITE_EXERCISE_ROUTE)
             add(PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND)
         }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is HealthPermission) return false
-
-        if (recordType != other.recordType) return false
-        if (accessType != other.accessType) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = recordType.hashCode()
-        result = 31 * result + accessType
-        return result
     }
 }
