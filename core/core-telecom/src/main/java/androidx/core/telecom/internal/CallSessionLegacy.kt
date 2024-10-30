@@ -41,6 +41,7 @@ import androidx.core.telecom.internal.utils.EndpointUtils.Companion.getSpeakerEn
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.isBluetoothAvailable
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.isEarpieceEndpoint
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.isWiredHeadsetOrBtEndpoint
+import androidx.core.telecom.internal.utils.EndpointUtils.Companion.maybeRemoveEarpieceIfWiredEndpointPresent
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.toCallEndpointCompat
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.toCallEndpointsCompat
 import androidx.core.telecom.internal.utils.Utils.Companion.isBuildAtLeastP
@@ -76,7 +77,7 @@ internal class CallSessionLegacy(
     private var mAlreadyRequestedSpeaker: Boolean = false
     private var mPreviousCallEndpoint: CallEndpointCompat? = null
     private var mCurrentCallEndpoint: CallEndpointCompat? = null
-    private var mAvailableCallEndpoints: List<CallEndpointCompat>? = null
+    private var mAvailableCallEndpoints: MutableList<CallEndpointCompat> = mutableListOf()
     private var mLastClientRequestedEndpoint: CallEndpointCompat? = null
     private val mCallSessionLegacyId: Int = CallEndpointUuidTracker.startSession()
     private var mGlobalMuteStateReceiver: MuteStateReceiver? = null
@@ -98,6 +99,11 @@ internal class CallSessionLegacy(
 
     fun getCurrentCallEndpointForSession(): CallEndpointCompat? {
         return mCurrentCallEndpoint
+    }
+
+    @VisibleForTesting
+    internal fun getAvailableCallEndpointsForSession(): MutableList<CallEndpointCompat> {
+        return mAvailableCallEndpoints
     }
 
     companion object {
@@ -173,12 +179,14 @@ internal class CallSessionLegacy(
         callChannels.currentEndpointChannel.trySend(mCurrentCallEndpoint!!).getOrThrow()
     }
 
-    private fun setAvailableCallEndpoints(state: CallAudioState) {
+    @VisibleForTesting
+    internal fun setAvailableCallEndpoints(state: CallAudioState) {
         val availableEndpoints =
             toCallEndpointsCompat(state, mCallSessionLegacyId)
                 .map { toRemappedCallEndpointCompat(it) }
                 .sorted()
-        mAvailableCallEndpoints = availableEndpoints
+        mAvailableCallEndpoints = availableEndpoints.toMutableList()
+        maybeRemoveEarpieceIfWiredEndpointPresent(mAvailableCallEndpoints)
         callChannels.availableEndpointChannel.trySend(availableEndpoints).getOrThrow()
     }
 
@@ -193,16 +201,14 @@ internal class CallSessionLegacy(
 
             // On the first call audio state change, determine if the platform started on the
             // correct audio route.  Otherwise, request an endpoint switch.
-            if (mAvailableCallEndpoints != null) {
-                switchStartingCallEndpointOnCallStart(mAvailableCallEndpoints!!)
-            }
+            switchStartingCallEndpointOnCallStart(mAvailableCallEndpoints)
             // In the event the users headset disconnects, they will likely want to continue the
             // call via the speakerphone
-            if (mCurrentCallEndpoint != null && mAvailableCallEndpoints != null) {
+            if (mCurrentCallEndpoint != null) {
                 maybeSwitchToSpeakerOnHeadsetDisconnect(
                     mCurrentCallEndpoint!!,
                     mPreviousCallEndpoint,
-                    mAvailableCallEndpoints!!,
+                    mAvailableCallEndpoints,
                 )
             }
         } catch (e: Exception) {

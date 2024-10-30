@@ -32,6 +32,7 @@ import androidx.core.telecom.CallEndpointCompat
 import androidx.core.telecom.CallEndpointCompat.Companion.TYPE_BLUETOOTH
 import androidx.core.telecom.CallEndpointCompat.Companion.TYPE_EARPIECE
 import androidx.core.telecom.CallEndpointCompat.Companion.TYPE_SPEAKER
+import androidx.core.telecom.CallEndpointCompat.Companion.TYPE_WIRED_HEADSET
 import androidx.core.telecom.CallsManager
 import androidx.core.telecom.internal.CallEndpointUuidTracker
 import androidx.core.telecom.internal.JetpackConnectionService
@@ -75,6 +76,7 @@ abstract class BaseTelecomTest {
     val mEarpieceEndpoint = CallEndpointCompat("EARPIECE", TYPE_EARPIECE, mBaseSessionId)
     val mSpeakerEndpoint = CallEndpointCompat("SPEAKER", TYPE_SPEAKER, mBaseSessionId)
     val mBluetoothEndpoint = CallEndpointCompat("BLUETOOTH", TYPE_BLUETOOTH, mBaseSessionId)
+    val mWiredEndpoint = CallEndpointCompat("WIRED", TYPE_WIRED_HEADSET, mBaseSessionId)
 
     @Before
     fun setUpBase() {
