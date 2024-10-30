@@ -26,7 +26,6 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -44,15 +43,20 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.DelegatingNode
+import androidx.compose.ui.node.DrawModifierNode
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
@@ -62,7 +66,6 @@ import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -73,6 +76,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlin.math.abs
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -90,9 +94,106 @@ class OverscrollTest {
     fun before() {
         // if we don't do it the overscroll effect will not even start.
         animationScaleRule.setAnimationDurationScale(1f)
+        isDebugInspectorInfoEnabled = true
+    }
+
+    @After
+    fun after() {
+        isDebugInspectorInfoEnabled = false
     }
 
     private val boxTag = "box"
+
+    @Test
+    fun modifierInspectorInfo() {
+        rule.setContent {
+            val modifier = Modifier.overscroll(rememberOverscrollEffect()) as InspectableValue
+            assertThat(modifier.nameFallback).isEqualTo("overscroll")
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable())
+                .containsExactly("overscrollEffect")
+        }
+    }
+
+    @Test
+    fun modifierIsProducingEqualsModifiersForTheSameInput() {
+        var overscrollEffect: OverscrollEffect? = null
+        rule.setContent { overscrollEffect = rememberOverscrollEffect() }
+
+        val first = Modifier.overscroll(overscrollEffect!!)
+        val second = Modifier.overscroll(overscrollEffect!!)
+        assertThat(first).isEqualTo(second)
+    }
+
+    @Test
+    fun modifierAttachesNode() {
+        val overscrollEffect = TestOverscrollEffect()
+
+        rule.setContent { Box(Modifier.overscroll(overscrollEffect)) }
+
+        rule.runOnIdle { assertThat(overscrollEffect.node.node.isAttached).isTrue() }
+    }
+
+    @Test
+    fun modifierUpdatesToNewNode() {
+        val overscrollEffect1 = TestOverscrollEffect()
+        val overscrollEffect2 = TestOverscrollEffect()
+        var effect by mutableStateOf(overscrollEffect1)
+
+        rule.setContent { Box(Modifier.overscroll(effect)) }
+
+        rule.runOnIdle {
+            assertThat(overscrollEffect1.node.node.isAttached).isTrue()
+            assertThat(overscrollEffect2.node.node.isAttached).isFalse()
+            effect = overscrollEffect2
+        }
+
+        // The old node should be detached, and the new one should be attached
+        rule.runOnIdle {
+            assertThat(overscrollEffect1.node.node.isAttached).isFalse()
+            assertThat(overscrollEffect2.node.node.isAttached).isTrue()
+            effect = overscrollEffect2
+        }
+    }
+
+    @Test
+    fun modifierDoesNotAddAlreadyAttachedNode() {
+        val overscrollEffect = TestOverscrollEffect()
+        class CustomDelegatingNode : DelegatingNode() {
+            init {
+                delegate(overscrollEffect.node)
+            }
+        }
+
+        val element =
+            object : ModifierNodeElement<CustomDelegatingNode>() {
+                override fun create() = CustomDelegatingNode()
+
+                override fun update(node: CustomDelegatingNode) {}
+
+                override fun equals(other: Any?) = other === this
+
+                override fun hashCode() = -1
+            }
+
+        var addOverscrollModifier by mutableStateOf(false)
+
+        rule.setContent {
+            Box(
+                element.then(
+                    if (addOverscrollModifier) Modifier.overscroll(overscrollEffect) else Modifier
+                )
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(overscrollEffect.node.node.isAttached).isTrue()
+            addOverscrollModifier = true
+        }
+
+        // Should not crash - the node should not be added by Modifier.overscroll
+        rule.waitForIdle()
+    }
 
     @Test
     fun rememberOverscrollEffect_defaultValue() {
@@ -121,7 +222,7 @@ class OverscrollTest {
         var setCustomFactory by mutableStateOf(false)
         class CustomEffect : OverscrollEffect {
             override val isInProgress = false
-            override val effectModifier = Modifier
+            override val node = object : Modifier.Node() {}
 
             override fun applyToScroll(
                 delta: Offset,
@@ -372,23 +473,6 @@ class OverscrollTest {
         assertThat(acummulatedScroll - lastAccScroll).isEqualTo(500f)
 
         rule.runOnIdle { assertThat(controller.isInProgressCallCount).isEqualTo(2) }
-    }
-
-    @Test
-    fun modifierIsProducingEqualsModifiersForTheSameInput() {
-        var overscrollEffect: OverscrollEffect? = null
-        rule.setContent {
-            overscrollEffect =
-                AndroidEdgeEffectOverscrollEffect(
-                    LocalView.current.context,
-                    LocalDensity.current,
-                    OverscrollConfiguration(Color.Gray)
-                )
-        }
-
-        val first = Modifier.overscroll(overscrollEffect!!)
-        val second = Modifier.overscroll(overscrollEffect!!)
-        assertThat(first).isEqualTo(second)
     }
 
     @Test
@@ -1144,7 +1228,13 @@ class OverscrollTest {
                 return animationRunning
             }
 
-        override val effectModifier: Modifier = Modifier.drawBehind { drawCallsCount += 1 }
+        override val node: DelegatableNode =
+            object : Modifier.Node(), DrawModifierNode {
+                override fun ContentDrawScope.draw() {
+                    drawCallsCount += 1
+                    drawContent()
+                }
+            }
     }
 
     fun testDrag(reverseDirection: Boolean) {
@@ -1370,5 +1460,5 @@ private class OffsetOverscrollEffectCounter : OverscrollEffect {
     }
 
     override val isInProgress: Boolean = false
-    override val effectModifier: Modifier = Modifier.offset { IntOffset(x = 0, y = 0) }
+    override val node: DelegatableNode = object : Modifier.Node() {}
 }

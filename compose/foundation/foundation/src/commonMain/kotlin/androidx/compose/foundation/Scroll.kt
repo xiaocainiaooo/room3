@@ -247,7 +247,8 @@ fun Modifier.verticalScroll(
  *
  * @param state state of the scroll
  * @param overscrollEffect the [OverscrollEffect] that will be used to render overscroll for this
- *   modifier. Note that the [OverscrollEffect.effectModifier] will be applied internally as well.
+ *   modifier. Note that the [OverscrollEffect.node] will be applied internally as well - you do not
+ *   need to use Modifier.overscroll separately.
  * @param enabled whether or not scrolling via touch input is enabled
  * @param flingBehavior logic describing fling behavior when drag has finished with velocity. If
  *   `null`, default from [ScrollableDefaults.flingBehavior] will be used.
@@ -325,7 +326,8 @@ fun Modifier.horizontalScroll(
  *
  * @param state state of the scroll
  * @param overscrollEffect the [OverscrollEffect] that will be used to render overscroll for this
- *   modifier. Note that the [OverscrollEffect.effectModifier] will be applied internally as well.
+ *   modifier. Note that the [OverscrollEffect.node] will be applied internally as well - you do not
+ *   need to use Modifier.overscroll separately.
  * @param enabled whether or not scrolling via touch input is enabled
  * @param flingBehavior logic describing fling behavior when drag has finished with velocity. If
  *   `null`, default from [ScrollableDefaults.flingBehavior] will be used.
