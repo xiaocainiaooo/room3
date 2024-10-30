@@ -28,20 +28,6 @@ import org.junit.runner.RunWith
 class HealthPermissionTest {
 
     @Test
-    fun createReadPermissionLegacy() {
-        val permission = HealthPermission.createReadPermissionLegacy(StepsRecord::class)
-        assertThat(permission.accessType).isEqualTo(AccessTypes.READ)
-        assertThat(permission.recordType).isEqualTo(StepsRecord::class)
-    }
-
-    @Test
-    fun createWritePermissionLegacy() {
-        val permission = HealthPermission.createWritePermissionLegacy(StepsRecord::class)
-        assertThat(permission.accessType).isEqualTo(AccessTypes.WRITE)
-        assertThat(permission.recordType).isEqualTo(StepsRecord::class)
-    }
-
-    @Test
     fun createReadPermission() {
         val permission = HealthPermission.getReadPermission(StepsRecord::class)
         assertThat(permission).isEqualTo(HealthPermission.READ_STEPS)
