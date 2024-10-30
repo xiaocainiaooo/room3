@@ -27,11 +27,13 @@ import android.util.AttributeSet
 import android.util.Range
 import android.util.Size
 import android.util.SparseArray
+import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.RestrictTo
 import androidx.core.util.keyIterator
 import androidx.pdf.PdfDocument
 import java.util.concurrent.Executors
+import kotlin.math.max
 import kotlin.math.round
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -72,6 +74,17 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private val coroutineScope: CoroutineScope =
         CoroutineScope(Executors.newFixedThreadPool(5).asCoroutineDispatcher())
 
+    /** The maximum scaling factor that can be applied to this View using the [zoom] property */
+    // TODO(b/376299551) - Make maxZoom configurable via XML attribute
+    public var maxZoom: Float = DEFAULT_MAX_ZOOM
+    /** The minimum scaling factor that can be applied to this View using the [zoom] property */
+    // TODO(b/376299551) - Make minZoom configurable via XML attribute
+    public var minZoom: Float = DEFAULT_MIN_ZOOM
+
+    /**
+     * The zoom level of this view, as a factor of the content's natural size with when 1 pixel is
+     * equal to 1 PDF point. Will always be clamped within ([minZoom], [maxZoom])
+     */
     public var zoom: Float = DEFAULT_INIT_ZOOM
         set(value) {
             checkMainThread()
@@ -87,12 +100,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     // TODO(b/376299551) - Make page prefetch radius configurable via XML attribute
     public var pagePrefetchRadius: Int = 1
 
-    /**
-     * [PdfDocument] is backed by a single-threaded PDF parser, so only allow one thread to access
-     * at a time
-     */
-    private var pdfDocumentMutex = Mutex()
-    private var paginationModel: PaginationModel? = null
     private var visiblePages: Range<Int> = Range(0, 1)
         set(value) {
             // Debounce setting the range to the same value
@@ -101,7 +108,25 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             onVisiblePagesChanged()
         }
 
+    /** The first page in the viewport, including partially-visible pages. 0-indexed. */
+    public val firstVisiblePage: Int
+        get() = visiblePages.lower
+
+    /** The number of pages visible in the viewport, including partially visible pages */
+    public val visiblePagesCount: Int
+        get() = visiblePages.upper - visiblePages.lower + 1
+
+    /**
+     * [PdfDocument] is backed by a single-threaded PDF parser, so only allow one thread to access
+     * at a time
+     */
+    private var pdfDocumentMutex = Mutex()
+    private var paginationModel: PaginationModel? = null
+
     private val pages = SparseArray<Page>()
+
+    private val gestureTracker =
+        GestureTracker(context).apply { delegate = ZoomScrollGestureHandler(this@PdfView) }
 
     // To avoid allocations during drawing
     private val visibleAreaRect = Rect()
@@ -118,8 +143,18 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
     }
 
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        val handled = event?.let { gestureTracker.feed(it) } ?: false
+        return handled || super.onTouchEvent(event)
+    }
+
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+        updateVisibleContent()
+    }
+
+    override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
+        super.onScrollChanged(l, t, oldl, oldt)
         updateVisibleContent()
     }
 
@@ -135,7 +170,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      * Compute what content is visible from the current position of this View. Generally invoked on
      * position or size changes.
      */
-    private fun updateVisibleContent() {
+    internal fun updateVisibleContent() {
         val localPaginationModel = paginationModel ?: return
 
         val contentTop = round(scrollY / zoom).toInt()
@@ -153,7 +188,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             )
 
         // Fetch dimensions for near pages
-        for (i in nearPages.lower..nearPages.upper) {
+        for (i in max(localPaginationModel.reach - 1, nearPages.lower)..nearPages.upper) {
             loadPageDimensions(i)
         }
 
@@ -199,6 +234,31 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
     }
 
+    /** Set the zoom, using the given point as a pivot point to zoom in or out of */
+    internal fun zoomTo(zoom: Float, pivotX: Float, pivotY: Float) {
+        // TODO(b/376299551) - Restore to developer-configured initial zoom value once that API is
+        // implemented
+        val newZoom = if (Float.NaN.equals(zoom)) DEFAULT_INIT_ZOOM else zoom
+        val deltaX = scrollDeltaNeededForZoomChange(this.zoom, newZoom, pivotX, scrollX)
+        val deltaY = scrollDeltaNeededForZoomChange(this.zoom, newZoom, pivotY, scrollY)
+
+        this.zoom = newZoom
+        scrollBy(deltaX, deltaY)
+    }
+
+    private fun scrollDeltaNeededForZoomChange(
+        oldZoom: Float,
+        newZoom: Float,
+        pivot: Float,
+        scroll: Int,
+    ): Int {
+        // Find where the given pivot point would move to when we change the zoom, and return the
+        // delta.
+        val contentPivot = toContentCoord(pivot, oldZoom, scroll)
+        val movedZoomViewPivot: Float = toViewCoord(contentPivot, newZoom, scroll)
+        return (movedZoomViewPivot - pivot).toInt()
+    }
+
     /**
      * Computes the part of the content visible within the outer part of this view (including this
      * view's padding) in co-ordinates of the content.
@@ -231,6 +291,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         return toContentCoord(viewY, zoom, scrollY)
     }
 
+    private fun toViewCoord(contentCoord: Float, zoom: Float, scroll: Int): Float {
+        return (contentCoord * zoom) - scroll
+    }
+
     /**
      * Converts a one-dimensional coordinate in View space to a one-dimensional coordinate in
      * content space
@@ -249,6 +313,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     /** A single PDF page that knows how to render and draw itself */
     private inner class Page(val pageNum: Int, val size: Size) : AutoCloseable {
+
+        init {
+            require(pageNum >= 0) { "Invalid negative page" }
+        }
+
         var isVisible: Boolean = false
             set(value) {
                 field = value
@@ -274,7 +343,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     public companion object {
         public const val DEFAULT_PAGE_SPACING_PX: Int = 20
-        public const val DEFAULT_INIT_ZOOM: Float = 1.5f
+        public const val DEFAULT_INIT_ZOOM: Float = 1.0f
+        public const val DEFAULT_MAX_ZOOM: Float = 25.0f
+        public const val DEFAULT_MIN_ZOOM: Float = 0.1f
 
         private val DEBUG_PAINT =
             Paint().apply {
