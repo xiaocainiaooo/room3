@@ -549,10 +549,15 @@ def update_docs_tip_of_tree_build_grade(group_id, artifact_id):
     # Open file for reading and get all lines
     with open(DOCS_TOT_BUILD_GRADLE_FP, 'r') as f:
         docs_tot_bg_lines = f.readlines()
+    index_of_real_dependencies_block = next(
+        idx for idx, line in enumerate(docs_tot_bg_lines) if line.startswith("dependencies {")
+    )
+    if (index_of_real_dependencies_block == None):
+        raise RuntimeError("Couldn't find dependencies block")
     num_lines = len(docs_tot_bg_lines)
 
     new_docs_tot_bq_line = get_new_docs_tip_of_tree_build_grade_line(group_id, artifact_id)
-    for i in range(num_lines):
+    for i in range(index_of_real_dependencies_block, num_lines):
         cur_line = docs_tot_bg_lines[i]
         if "project" not in cur_line:
             continue
