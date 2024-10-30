@@ -73,7 +73,7 @@ internal class LazyColumnScrollTransformBehavior(private val morphingMinHeight: 
     private val stickyBottomFlippedOffsetPercentage = 0.09f
 
     /** Final value of the width morphing as percentage of the width. */
-    private val morphWidthTargetPercentage = 0.87f
+    private val morphWidthTargetPercentage = 1f
 
     private val widthMorphEasing: CubicBezierEasing
         get() = bottomScaleEasing
