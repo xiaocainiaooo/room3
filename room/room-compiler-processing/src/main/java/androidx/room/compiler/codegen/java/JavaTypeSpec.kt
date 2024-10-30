@@ -19,7 +19,6 @@ package androidx.room.compiler.codegen.java
 import androidx.room.compiler.codegen.JTypeSpecBuilder
 import androidx.room.compiler.codegen.VisibilityModifier
 import androidx.room.compiler.codegen.XAnnotationSpec
-import androidx.room.compiler.codegen.XClassName
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XPropertySpec
 import androidx.room.compiler.codegen.XTypeName
@@ -29,20 +28,13 @@ import androidx.room.compiler.processing.addOriginatingElement
 import com.squareup.kotlinpoet.javapoet.JTypeSpec
 import javax.lang.model.element.Modifier
 
-internal class JavaTypeSpec(private val _className: XClassName?, internal val actual: JTypeSpec) :
-    JavaLang(), XTypeSpec {
+internal class JavaTypeSpec(internal val actual: JTypeSpec) : JavaLang(), XTypeSpec {
+
+    override val name: String? = actual.name
+
     override fun toString() = actual.toString()
 
-    override val className: XClassName
-        get() {
-            checkNotNull(_className) { "Anonymous classes have no name." }
-            return _className
-        }
-
-    internal class Builder(
-        private val className: XClassName?,
-        internal val actual: JTypeSpecBuilder
-    ) : JavaLang(), XTypeSpec.Builder {
+    internal class Builder(internal val actual: JTypeSpecBuilder) : JavaLang(), XTypeSpec.Builder {
         override fun superclass(typeName: XTypeName) = apply { actual.superclass(typeName.java) }
 
         override fun addSuperinterface(typeName: XTypeName) = apply {
@@ -83,6 +75,6 @@ internal class JavaTypeSpec(private val _className: XClassName?, internal val ac
             actual.addOriginatingElement(element)
         }
 
-        override fun build() = JavaTypeSpec(className, actual.build())
+        override fun build() = JavaTypeSpec(actual.build())
     }
 }

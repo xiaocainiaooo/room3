@@ -31,6 +31,7 @@ import androidx.room.compiler.codegen.XClassName
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XMemberName
+import androidx.room.compiler.codegen.XName
 import androidx.room.compiler.codegen.XPropertySpec
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.XTypeSpec
@@ -53,6 +54,7 @@ import com.squareup.kotlinpoet.javapoet.toJTypeName
 import com.squareup.kotlinpoet.javapoet.toKTypeName
 
 object XConverters {
+    @JvmStatic fun XName.toJavaPoet() = java
 
     @JvmStatic fun XMemberName.toJavaPoet() = java
 
@@ -129,6 +131,8 @@ object XConverters {
             is JavaTypeSpec.Builder -> actual
             else -> error("Unsupported type: $this")
         }
+
+    @JvmStatic fun XName.toKotlinPoet() = kotlin
 
     @JvmStatic fun XMemberName.toKotlinPoet() = kotlin
 

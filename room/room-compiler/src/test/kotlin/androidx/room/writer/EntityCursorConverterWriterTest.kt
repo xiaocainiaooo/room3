@@ -123,6 +123,8 @@ class EntityCursorConverterWriterTest : BaseEntityParserTest() {
             val className = XClassName.get("foo.bar", "MyContainerClass")
             val writer =
                 object : TypeWriter(WriterContext(CodeLanguage.JAVA, setOf(Platform.JVM), true)) {
+                    override val packageName = className.packageName
+
                     override fun createTypeSpecBuilder(): XTypeSpec.Builder {
                         getOrCreateFunction(EntityCursorConverterWriter(entity, false))
                         return XTypeSpec.classBuilder(codeLanguage, className).applyToJavaPoet {

@@ -145,7 +145,8 @@ class OpenDelegateWriter(val database: Database) {
                             isMutable = true
                         )
                         methodBuilders.drop(1).forEach {
-                            addStatement("%L = %L(%L)", resultVar, it.name, connectionParamName)
+                            val methodName = it.build().name
+                            addStatement("%L = %L(%L)", resultVar, methodName, connectionParamName)
                             beginControlFlow("if (!%L.isValid)", resultVar).apply {
                                 addStatement("return %L", resultVar)
                             }

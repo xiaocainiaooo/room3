@@ -29,6 +29,7 @@ import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XPropertySpec
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.XTypeSpec
+import androidx.room.compiler.codegen.compat.XConverters.toJavaPoet
 import androidx.room.compiler.processing.util.CompilationResultSubject
 import androidx.room.compiler.processing.util.Source
 import androidx.room.ext.CommonTypeNames
@@ -42,9 +43,8 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class CustomTypeConverterResolutionTest {
-    fun XTypeSpec.toSource(): Source {
-        return Source.java(this.className.canonicalName, "package foo.bar;\n" + toString())
-    }
+    fun XTypeSpec.toSource() =
+        Source.java("foo.bar.$name", "package foo.bar;\n" + toJavaPoet().toString())
 
     companion object {
         val ENTITY = XClassName.get("foo.bar", "MyEntity")

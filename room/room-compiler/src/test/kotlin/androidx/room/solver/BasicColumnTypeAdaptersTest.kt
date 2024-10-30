@@ -197,10 +197,8 @@ class BasicColumnTypeAdaptersTest(
             // guard against multi round
             return
         }
-        XTypeSpec.classBuilder(
-                language = CodeLanguage.JAVA,
-                className = XClassName.get("foo.bar", "OuterClass")
-            )
+        val className = XClassName.get("foo.bar", "OuterClass")
+        XTypeSpec.classBuilder(language = CodeLanguage.JAVA, className = className)
             .apply {
                 addProperty(
                     XPropertySpec.builder(
@@ -249,7 +247,7 @@ class BasicColumnTypeAdaptersTest(
                 )
             }
             .build()
-            .writeTo(invocation.processingEnv.filer)
+            .writeTo(CodeLanguage.JAVA, className.packageName, invocation.processingEnv.filer)
     }
 
     @Test
