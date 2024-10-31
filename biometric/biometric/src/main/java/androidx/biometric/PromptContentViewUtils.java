@@ -55,15 +55,13 @@ class PromptContentViewUtils {
         }
 
         // Prompt content view is only supported on API 35 and above.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-            if (contentView instanceof PromptVerticalListContentView) {
-                return Api35Impl.createPromptVerticalListContentView(
-                        (PromptVerticalListContentView) contentView);
-            } else if (contentView instanceof PromptContentViewWithMoreOptionsButton) {
-                return Api35Impl.createPromptContentViewWithMoreOptionsButton(
-                        (PromptContentViewWithMoreOptionsButton) contentView, executor,
-                        moreOptionsButtonListener);
-            }
+        if (contentView instanceof PromptVerticalListContentView) {
+            return Api35Impl.createPromptVerticalListContentView(
+                    (PromptVerticalListContentView) contentView);
+        } else if (contentView instanceof PromptContentViewWithMoreOptionsButton) {
+            return Api35Impl.createPromptContentViewWithMoreOptionsButton(
+                    (PromptContentViewWithMoreOptionsButton) contentView, executor,
+                    moreOptionsButtonListener);
         }
 
         return null;
