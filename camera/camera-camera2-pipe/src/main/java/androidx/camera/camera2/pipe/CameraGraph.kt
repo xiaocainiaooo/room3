@@ -392,16 +392,6 @@ public interface CameraGraph : AutoCloseable {
         val closeCameraDeviceOnClose: Boolean = false,
 
         /**
-         * Flag to disable CameraGraph level Surface usage tracking. On legacy hardware levels, we
-         * need to explicitly relinquish current Surface usages on camera closure (or disconnection)
-         * such that CameraX can refresh the Surfaces used in the CameraGraph.
-         * - Bug(s): b/344749041
-         * - Device(s): LEGACY camera hardware level
-         * - API levels: 23 or LEGACY hardware level.
-         */
-        val disableGraphLevelSurfaceTracking: Boolean = false,
-
-        /**
          * Flag to enable CameraGraph to restart its internal camera controller(s) with a delay. The
          * delay might be needed during Activity switching, to allow time for the preceding Activity
          * to close its CameraGraphs to allow for the succeeding Activity to acquire the same
