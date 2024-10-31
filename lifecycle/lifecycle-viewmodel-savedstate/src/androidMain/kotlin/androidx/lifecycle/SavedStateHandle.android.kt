@@ -23,7 +23,9 @@ import androidx.lifecycle.internal.isAcceptableType
 import androidx.savedstate.SavedState
 import androidx.savedstate.SavedStateRegistry.SavedStateProvider
 import androidx.savedstate.read
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 actual class SavedStateHandle {
 
@@ -107,6 +109,8 @@ actual class SavedStateHandle {
         hasInitialValue: Boolean,
         initialValue: T
     ): MutableLiveData<T> {
+        require(key !in impl.mutableFlows) { createMutuallyExclusiveErrorMessage(key) }
+
         val liveData =
             liveDatas.getOrPut(key) {
                 when {
@@ -123,8 +127,20 @@ actual class SavedStateHandle {
     }
 
     @MainThread
-    actual fun <T> getStateFlow(key: String, initialValue: T): StateFlow<T> =
-        impl.getStateFlow(key, initialValue)
+    actual fun <T> getStateFlow(key: String, initialValue: T): StateFlow<T> {
+        return if (key in impl.mutableFlows) {
+            // Return existing 'MutableStateFlow' as 'StateFlow' to keep values synchronized.
+            impl.getMutableStateFlow(key, initialValue).asStateFlow()
+        } else {
+            impl.getStateFlow(key, initialValue)
+        }
+    }
+
+    @MainThread
+    actual fun <T> getMutableStateFlow(key: String, initialValue: T): MutableStateFlow<T> {
+        require(key !in liveDatas) { createMutuallyExclusiveErrorMessage(key) }
+        return impl.getMutableStateFlow(key, initialValue)
+    }
 
     @MainThread actual fun keys(): Set<String> = impl.keys() + liveDatas.keys
 
@@ -204,4 +220,9 @@ actual class SavedStateHandle {
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
         actual fun validateValue(value: Any?): Boolean = isAcceptableType(value)
     }
+}
+
+private fun createMutuallyExclusiveErrorMessage(key: String): String {
+    return "StateFlow and LiveData are mutually exclusive for the same key. Please use either " +
+        "'getMutableStateFlow' or 'getLiveData' for key '$key', but not both."
 }
