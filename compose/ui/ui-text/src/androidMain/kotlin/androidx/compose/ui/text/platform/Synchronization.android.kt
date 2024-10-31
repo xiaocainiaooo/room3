@@ -14,12 +14,23 @@
  * limitations under the License.
  */
 
+@file:JvmName("Synchronization_jvmKt")
+
 package androidx.compose.ui.text.platform
 
-internal actual class SynchronizedObject
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+
+@PublishedApi internal actual class SynchronizedObject
 
 @Suppress("NOTHING_TO_INLINE")
 internal actual inline fun makeSynchronizedObject(ref: Any?) = SynchronizedObject()
 
+@Suppress("BanInlineOptIn")
+@OptIn(ExperimentalContracts::class)
 @PublishedApi
-internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R = block()
+internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R {
+    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+    return kotlin.synchronized(lock, block)
+}
