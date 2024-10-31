@@ -141,13 +141,13 @@ internal class ZoomScrollGestureHandler(private val pdfView: PdfView) :
         when (gesture) {
             GestureTracker.Gesture.ZOOM -> {
                 scaleInProgress = false
-                pdfView.updateVisibleContent()
+                pdfView.onZoomChanged()
             }
             GestureTracker.Gesture.DRAG,
             GestureTracker.Gesture.DRAG_Y,
             GestureTracker.Gesture.DRAG_X -> {
                 scrollInProgress = false
-                pdfView.updateVisibleContent()
+                pdfView.onZoomChanged()
             }
             else -> {
                 /* no-op */

@@ -16,37 +16,26 @@
 
 package androidx.pdf.view
 
-import android.content.Context
 import android.graphics.Point
-import android.os.Looper
-import android.view.View
-import android.view.View.MeasureSpec
-import androidx.test.core.app.ApplicationProvider
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.test.core.app.ActivityScenario
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
-import org.junit.BeforeClass
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class PdfViewRenderingTest {
-    private val context = ApplicationProvider.getApplicationContext<Context>()
-
-    companion object {
-        @BeforeClass
-        @JvmStatic
-        fun setup() {
-            // PdfView creates a ScaleGestureDetector internally, which can only be done from Looper
-            // threads, so let's make sure we're executing on one
-            if (Looper.myLooper() == null) {
-                Looper.prepare()
-            }
-        }
+    @After
+    fun tearDown() {
+        PdfViewTestActivity.onCreateCallback = {}
     }
 
     @Test
@@ -55,13 +44,19 @@ class PdfViewRenderingTest {
         val pdfDocument = FakePdfDocument(List(10) { Point(100, 200) })
         setupPdfView(500, 1000, pdfDocument)
 
-        pdfDocument.waitForRender(untilPage = 4)
+        with(ActivityScenario.launch(PdfViewTestActivity::class.java)) {
+            pdfDocument.waitForRender(untilPage = 4)
 
-        val requestedBitmaps = pdfDocument.bitmapRequests
-        for (i in 0..4) {
-            assertThat((requestedBitmaps[i] as? FullBitmap)?.scaledPageSizePx?.width).isEqualTo(100)
-            assertThat((requestedBitmaps[i] as? FullBitmap)?.scaledPageSizePx?.height)
-                .isEqualTo(200)
+            val requestedBitmaps = pdfDocument.bitmapRequests
+            assertThat(requestedBitmaps.size).isEqualTo(5)
+            for (i in 0..4) {
+                assertThat((requestedBitmaps[i] as? FullBitmap)?.scaledPageSizePx?.width)
+                    .isEqualTo(100)
+                assertThat((requestedBitmaps[i] as? FullBitmap)?.scaledPageSizePx?.height)
+                    .isEqualTo(200)
+            }
+
+            close()
         }
     }
 
@@ -69,18 +64,26 @@ class PdfViewRenderingTest {
     fun testPageRendering_renderNewPagesOnScroll() = runTest {
         // Layout at 500x1000, and expect to render pages [0, 4] at 100x200
         val pdfDocument = FakePdfDocument(List(10) { Point(100, 200) })
-        val pdfView = setupPdfView(500, 1000, pdfDocument)
-        pdfDocument.waitForRender(untilPage = 4)
+        setupPdfView(500, 1000, pdfDocument)
 
-        // Scroll until the viewport spans [1000, 2000] vertically and expect to render pages
-        // [5, 9] at 200x400
-        pdfView.scrollTo(0, 1000)
-        pdfDocument.waitForRender(untilPage = 9)
-        val requestedBitmaps = pdfDocument.bitmapRequests
-        for (i in 0..4) {
-            assertThat((requestedBitmaps[i] as? FullBitmap)?.scaledPageSizePx?.width).isEqualTo(100)
-            assertThat((requestedBitmaps[i] as? FullBitmap)?.scaledPageSizePx?.height)
-                .isEqualTo(200)
+        with(ActivityScenario.launch(PdfViewTestActivity::class.java)) {
+            pdfDocument.waitForRender(untilPage = 4)
+            assertThat(pdfDocument.bitmapRequests.size).isEqualTo(5)
+
+            // Scroll until the viewport spans [1000, 2000] vertically and expect to render pages
+            // [5, 9]
+            Espresso.onView(withId(PDF_VIEW_ID)).scrollByY(1000)
+            pdfDocument.waitForRender(untilPage = 9)
+            val requestedBitmaps = pdfDocument.bitmapRequests
+            assertThat(requestedBitmaps.size).isEqualTo(10)
+            for (i in 0..9) {
+                assertThat((requestedBitmaps[i] as? FullBitmap)?.scaledPageSizePx?.width)
+                    .isEqualTo(100)
+                assertThat((requestedBitmaps[i] as? FullBitmap)?.scaledPageSizePx?.height)
+                    .isEqualTo(200)
+            }
+
+            close()
         }
     }
 
@@ -88,50 +91,46 @@ class PdfViewRenderingTest {
     fun testPageRendering_renderNewBitmapsOnZoom() = runTest {
         // Layout at 500x1000, and expect to render pages [0, 4] at 100x200
         val pdfDocument = FakePdfDocument(List(10) { Point(100, 200) })
-        val pdfView = setupPdfView(500, 1000, pdfDocument)
-        pdfDocument.waitForRender(untilPage = 4)
+        setupPdfView(500, 1000, pdfDocument)
 
-        // Set zoom to 2f, and expect to render pages [0, 2] at 200x400
-        // Reset render reach, as we expect to start rendering new Bitmaps for already-rendered
-        // pages
-        pdfDocument.renderReach = 0
-        withContext(Dispatchers.Main) { pdfView.zoom = 2f }
-        pdfDocument.waitForRender(2)
-        val requestedBitmaps = pdfDocument.bitmapRequests
-        for (i in 0..2) {
-            assertThat((requestedBitmaps[i] as? FullBitmap)?.scaledPageSizePx?.width).isEqualTo(200)
-            assertThat((requestedBitmaps[i] as? FullBitmap)?.scaledPageSizePx?.height)
-                .isEqualTo(400)
+        with(ActivityScenario.launch(PdfViewTestActivity::class.java)) {
+            pdfDocument.waitForRender(untilPage = 4)
+            assertThat(pdfDocument.bitmapRequests.size).isEqualTo(5)
+
+            // Set zoom to 2f, and expect to render pages [0, 2] at 200x400
+            // Reset render reach, as we expect to start rendering new Bitmaps for already-rendered
+            // pages
+            pdfDocument.clearBitmapRequests()
+            Espresso.onView(withId(PDF_VIEW_ID)).zoomTo(2f)
+            pdfDocument.waitForRender(untilPage = 2)
+            val requestedBitmaps = pdfDocument.bitmapRequests
+            assertThat(requestedBitmaps.size).isEqualTo(3)
+            for (i in 0..2) {
+                assertThat((requestedBitmaps[i] as? FullBitmap)?.scaledPageSizePx?.width)
+                    .isEqualTo(200)
+                assertThat((requestedBitmaps[i] as? FullBitmap)?.scaledPageSizePx?.height)
+                    .isEqualTo(400)
+            }
+
+            close()
         }
-    }
-
-    /** Create, measure, and layout a [PdfView] at the specified [width] and [height] */
-    private suspend fun setupPdfView(
-        width: Int,
-        height: Int,
-        pdfDocument: FakePdfDocument?
-    ): PdfView {
-        return withContext(Dispatchers.Main) {
-            setupPdfViewOnMainThread(width, height, pdfDocument)
-        }
-    }
-
-    private fun setupPdfViewOnMainThread(
-        width: Int,
-        height: Int,
-        pdfDocument: FakePdfDocument?
-    ): PdfView {
-        val pdfView = PdfView(context)
-        pdfView.layoutAndMeasure(width, height)
-        pdfDocument?.let { pdfView.pdfDocument = it }
-        return pdfView
     }
 }
 
-private fun View.layoutAndMeasure(width: Int, height: Int) {
-    measure(
-        MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-        MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
-    )
-    layout(0, 0, measuredWidth, measuredHeight)
+/** Create, measure, and layout a [PdfView] at the specified [width] and [height] */
+private fun setupPdfView(width: Int, height: Int, fakePdfDocument: FakePdfDocument?) {
+    PdfViewTestActivity.onCreateCallback = { activity ->
+        val container = FrameLayout(activity)
+        container.addView(
+            PdfView(activity).apply {
+                pdfDocument = fakePdfDocument
+                id = PDF_VIEW_ID
+            },
+            ViewGroup.LayoutParams(width, height)
+        )
+        activity.setContentView(container)
+    }
 }
+
+/** Arbitrary fixed ID for PdfView */
+private const val PDF_VIEW_ID = 123456789

@@ -20,6 +20,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Point
 import android.graphics.Rect
 import android.util.Size
 import androidx.annotation.RestrictTo
@@ -34,7 +35,7 @@ import kotlinx.coroutines.withContext
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 internal class Page(
     val pageNum: Int,
-    val size: Size,
+    val size: Point,
     private val pdfView: PdfView,
 ) {
 
@@ -79,11 +80,11 @@ internal class Page(
             pdfView.pdfDocument?.getPageBitmapSource(pageNum)
                 ?: throw IllegalStateException("No PDF document to render")
         renderBitmapJob =
-            pdfView.coroutineScope.launch {
+            pdfView.backgroundScope.launch {
                 ensureActive()
                 val zoom = pdfView.zoom
-                val width = (size.width * zoom).toInt()
-                val height = (size.height * zoom).toInt()
+                val width = (size.x * zoom).toInt()
+                val height = (size.y * zoom).toInt()
                 renderedZoom = zoom
                 bitmap = bitmapSource.getBitmap(Size(width, height))
                 withContext(Dispatchers.Main) { pdfView.invalidate() }

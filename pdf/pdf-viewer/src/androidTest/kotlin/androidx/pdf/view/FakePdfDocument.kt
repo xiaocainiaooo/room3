@@ -48,7 +48,6 @@ import kotlinx.coroutines.withTimeout
  *
  * Requests made against an instance can be tracked:
  * - Using [layoutReach] to detect the maximum page whose dimensions have been requested
- * - Using [renderReach] to detect the maximum page for which any bitmap has been requested from the
  *   corresponding [PdfDocument.BitmapSource]
  * - Using [bitmapRequests] to examine the type of bitmaps that have been requested for any page
  *
@@ -73,12 +72,14 @@ internal open class FakePdfDocument(
 
     @get:Synchronized @set:Synchronized internal var layoutReach: Int = 0
 
-    @get:Synchronized @set:Synchronized internal var renderReach: Int = 0
-
     private val bitmapRequestsLock = Object()
     private val _bitmapRequests = mutableMapOf<Int, SizeParams>()
     internal val bitmapRequests
         get() = _bitmapRequests
+
+    internal fun clearBitmapRequests() {
+        _bitmapRequests.clear()
+    }
 
     override fun getPageBitmapSource(pageNumber: Int): PdfDocument.BitmapSource {
         return FakeBitmapSource(pageNumber)
@@ -132,7 +133,6 @@ internal open class FakePdfDocument(
     private inner class FakeBitmapSource(override val pageNumber: Int) : PdfDocument.BitmapSource {
 
         override suspend fun getBitmap(scaledPageSizePx: Size, tileRegion: Rect?): Bitmap {
-            renderReach = maxOf(renderReach, pageNumber)
             logRequest(scaledPageSizePx, tileRegion)
             // Generate a solid random RGB bitmap at the requested size
             val size =
@@ -235,9 +235,18 @@ internal suspend fun FakePdfDocument.waitForRender(untilPage: Int, timeoutMillis
     // Jump to Dispatchers.Default, as TestDispatcher will skip delays and timeouts
     withContext(Dispatchers.Default.limitedParallelism(1)) {
         withTimeout(timeoutMillis) {
-            while (renderReach < untilPage) {
+            while (!bitmapRequests.containsKeys(0..untilPage)) {
                 delay(100)
             }
         }
     }
+}
+
+/** Returns true if every value in [keys] is a key in this [Map] */
+private fun <V> Map<Int, V>.containsKeys(keys: IntRange): Boolean {
+    for (key in keys) {
+        if (key in this) continue
+        return false
+    }
+    return true
 }
