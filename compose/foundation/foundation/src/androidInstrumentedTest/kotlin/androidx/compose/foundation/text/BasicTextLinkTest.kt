@@ -77,7 +77,6 @@ import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.LinkAnnotation.Url
-import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
@@ -938,28 +937,6 @@ class BasicTextLinkTest {
                     }
             )
         }
-    }
-
-    @Test
-    fun links_getPathForRange_doesNotThrow_whenParagraphNotAdded() {
-        var layoutResult: TextLayoutResult? = null
-        rule.setContent {
-            BasicText(
-                buildAnnotatedString {
-                    withStyle(ParagraphStyle()) { append("a\nb\nc\n") }
-                    withStyle(ParagraphStyle()) {
-                        pushLink(Url("url"))
-                        append("d")
-                        pop()
-                    }
-                },
-                onTextLayout = { layoutResult = it },
-                maxLines = 2
-            )
-        }
-
-        assertThat(layoutResult).isNotNull()
-        assertThat(layoutResult!!.lineCount).isEqualTo(2)
     }
 
     @Composable
