@@ -52,6 +52,7 @@ dependencies {
     testImplementation(libs.kotlinCoroutinesTest)
     testImplementation(libs.robolectric)
 
+    androidTestImplementation(project(":compose:foundation:foundation"))
     androidTestImplementation(project(":compose:ui:ui-test"))
     androidTestImplementation(project(":compose:ui:ui-test-junit4"))
     androidTestImplementation(project(":compose:test-utils"))

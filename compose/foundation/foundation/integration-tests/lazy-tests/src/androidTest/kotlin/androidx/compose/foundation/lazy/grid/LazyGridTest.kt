@@ -24,7 +24,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.AutoTestFrameClock
-import androidx.compose.foundation.LocalOverscrollConfiguration
+import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollBy
@@ -2340,7 +2340,7 @@ class LazyGridTest(private val orientation: Orientation) :
         rule.setContent {
             LookaheadScope {
                 CompositionLocalProvider(LocalDensity provides Density(1f)) {
-                    CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
+                    CompositionLocalProvider(LocalOverscrollFactory provides null) {
                         Box(Modifier.testTag("grid")) {
                             LazyVerticalGrid(
                                 columns = GridCells.Fixed(2),
