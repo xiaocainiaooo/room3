@@ -16,61 +16,17 @@
 
 package androidx.wear.compose.material3.macrobenchmark
 
-import android.content.Intent
 import androidx.benchmark.macro.CompilationMode
-import androidx.benchmark.macro.ExperimentalMetricApi
-import androidx.benchmark.macro.FrameTimingGfxInfoMetric
-import androidx.benchmark.macro.MemoryUsageMetric
-import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.filters.LargeTest
-import androidx.testutils.createCompilationParams
 import androidx.wear.compose.material3.macrobenchmark.common.AlertDialogBenchmark
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-@OptIn(ExperimentalMetricApi::class)
 @LargeTest
 @RunWith(Parameterized::class)
-class AlertDialogBenchmarkTest(private val compilationMode: CompilationMode) {
-    @get:Rule val benchmarkRule = MacrobenchmarkRule()
-
-    @Before
-    fun setUp() {
-        disableChargingExperience()
-    }
-
-    @After
-    fun destroy() {
-        enableChargingExperience()
-    }
-
-    @Test
-    fun start() {
-        benchmarkRule.measureRepeated(
-            packageName = PACKAGE_NAME,
-            metrics =
-                listOf(FrameTimingGfxInfoMetric(), MemoryUsageMetric(MemoryUsageMetric.Mode.Last)),
-            compilationMode = compilationMode,
-            iterations = 5,
-            setupBlock = {
-                val intent = Intent()
-                intent.action = ALERT_DIALOG_ACTIVITY
-                startActivityAndWait(intent)
-            }
-        ) {
-            AlertDialogBenchmark.exercise.invoke(this)
-        }
-    }
-
-    companion object {
-        private const val ALERT_DIALOG_ACTIVITY = "${PACKAGE_NAME}.ALERT_DIALOG_ACTIVITY"
-
-        @Parameterized.Parameters(name = "compilation={0}")
-        @JvmStatic
-        fun parameters() = createCompilationParams()
-    }
-}
+class AlertDialogBenchmarkTest(compilationMode: CompilationMode) :
+    BenchmarkTestBase(
+        compilationMode = compilationMode,
+        macrobenchmarkScreen = AlertDialogBenchmark,
+        actionSuffix = "ALERT_DIALOG_ACTIVITY"
+    )
