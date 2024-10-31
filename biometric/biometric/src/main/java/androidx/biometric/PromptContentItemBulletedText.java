@@ -16,15 +16,11 @@
 
 package androidx.biometric;
 
-import android.os.Build;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 
 /**
  * A list item with bulleted text shown on {@link PromptVerticalListContentView}.
  */
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 public final class PromptContentItemBulletedText implements PromptContentItem {
     private final String mText;
 
