@@ -41,7 +41,6 @@ import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.Nodes
 import androidx.compose.ui.node.requireLayoutNode
 import androidx.compose.ui.node.requireOwner
-import androidx.compose.ui.node.requireView
 import androidx.compose.ui.node.visitLocalDescendants
 import androidx.compose.ui.platform.InspectorInfo
 
@@ -56,17 +55,16 @@ internal fun Modifier.focusInteropModifier(): Modifier =
 
 private class FocusTargetPropertiesNode : Modifier.Node(), FocusPropertiesModifierNode {
     override fun applyFocusProperties(focusProperties: FocusProperties) {
-        focusProperties.canFocus = node.isAttached && getEmbeddedView().hasFocusable()
+        focusProperties.canFocus = node.isAttached && getView().hasFocusable()
     }
 }
 
 private class FocusGroupPropertiesNode :
-    Modifier.Node(), FocusPropertiesModifierNode, ViewTreeObserver.OnGlobalFocusChangeListener {
+    Modifier.Node(),
+    FocusPropertiesModifierNode,
+    ViewTreeObserver.OnGlobalFocusChangeListener,
+    View.OnAttachStateChangeListener {
     var focusedChild: View? = null
-    // ViewTreeObserver used during onAttach() -- used to make sure to remove the listener
-    // from the global ViewTreeObserver even if the ComposeView has already been removed from
-    // the hierarchy before onDetach() is called.
-    var attachedViewTreeObserver: ViewTreeObserver? = null
 
     override fun applyFocusProperties(focusProperties: FocusProperties) {
         focusProperties.canFocus = false
@@ -77,11 +75,12 @@ private class FocusGroupPropertiesNode :
     fun onEnter(focusDirection: FocusDirection): FocusRequester {
         // If this requestFocus is triggered by the embedded view getting focus,
         // then we don't perform this onEnter logic.
-        val embeddedView = getEmbeddedView()
+        val embeddedView = getView()
+
         if (embeddedView.isFocused || embeddedView.hasFocus()) return Default
 
         val focusOwner = requireOwner().focusOwner
-        val hostView = requireView()
+        val hostView = requireOwner() as View
 
         val targetViewFocused =
             embeddedView.requestInteropFocus(
@@ -92,11 +91,11 @@ private class FocusGroupPropertiesNode :
     }
 
     fun onExit(focusDirection: FocusDirection): FocusRequester {
-        val embeddedView = getEmbeddedView()
+        val embeddedView = getView()
         if (!embeddedView.hasFocus()) return Default
 
         val focusOwner = requireOwner().focusOwner
-        val hostView = requireView()
+        val hostView = requireOwner() as View
 
         // If the embedded view is not a view group, then we can safely exit this focus group.
         if (embeddedView !is ViewGroup) {
@@ -135,7 +134,7 @@ private class FocusGroupPropertiesNode :
 
     override fun onGlobalFocusChanged(oldFocus: View?, newFocus: View?) {
         if (requireLayoutNode().owner == null) return
-        val embeddedView = getEmbeddedView()
+        val embeddedView = getView()
         val focusOwner = requireOwner().focusOwner
         val hostView = requireOwner()
         val subViewLostFocus =
@@ -177,20 +176,21 @@ private class FocusGroupPropertiesNode :
 
     override fun onAttach() {
         super.onAttach()
-        val viewTreeObserver = requireView().viewTreeObserver
-        attachedViewTreeObserver = viewTreeObserver
-        viewTreeObserver.addOnGlobalFocusChangeListener(this)
+        getView().addOnAttachStateChangeListener(this)
     }
 
     override fun onDetach() {
-        val viewTreeObserver = attachedViewTreeObserver
-        if (viewTreeObserver != null && viewTreeObserver.isAlive) {
-            viewTreeObserver.removeOnGlobalFocusChangeListener(this)
-        }
-        attachedViewTreeObserver = null
-        requireView().viewTreeObserver.removeOnGlobalFocusChangeListener(this)
+        getView().removeOnAttachStateChangeListener(this)
         focusedChild = null
         super.onDetach()
+    }
+
+    override fun onViewAttachedToWindow(v: View) {
+        v.viewTreeObserver.addOnGlobalFocusChangeListener(this)
+    }
+
+    override fun onViewDetachedFromWindow(v: View) {
+        v.viewTreeObserver.removeOnGlobalFocusChangeListener(this)
     }
 }
 
@@ -222,7 +222,7 @@ private object FocusTargetPropertiesElement : ModifierNodeElement<FocusTargetPro
     override fun equals(other: Any?) = other === this
 }
 
-private fun Modifier.Node.getEmbeddedView(): View {
+private fun Modifier.Node.getView(): View {
     @OptIn(InternalComposeUiApi::class)
     return checkNotNull(node.requireLayoutNode().getInteropView()) {
         "Could not fetch interop view"
