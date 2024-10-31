@@ -105,7 +105,7 @@ import java.util.Locale
  * @param contentColor [Color] of content of displayed through [TimeTextScope.text] and
  *   [TimeTextScope.composable].
  * @param contentPadding The spacing values between the container and the content.
- * @param content The content of the [TimeText].
+ * @param content The content of the [TimeText] - displays the current time by default.
  */
 @Composable
 fun TimeText(
@@ -116,7 +116,7 @@ fun TimeText(
     timeTextStyle: TextStyle = TimeTextDefaults.timeTextStyle(),
     contentColor: Color = MaterialTheme.colorScheme.primary,
     contentPadding: PaddingValues = TimeTextDefaults.ContentPadding,
-    content: TimeTextScope.() -> Unit
+    content: TimeTextScope.() -> Unit = { time() }
 ) {
     val timeText = timeSource.currentTime()
     val backgroundColor = CurvedTextDefaults.backgroundColor()
