@@ -69,7 +69,7 @@ import kotlin.reflect.KClass
 public class HealthPermission internal constructor() {
     companion object {
         /**
-         * Returns a permission defined in [HealthPermission] to read provided [recordType], such as
+         * Returns a permission defined in [HealthPermission] to read records of type [T], such as
          * `StepsRecord`.
          *
          * @return Permission to use with [androidx.health.connect.client.PermissionController].
@@ -81,8 +81,8 @@ public class HealthPermission internal constructor() {
         }
 
         /**
-         * Returns a permission defined in [HealthPermission] to read provided [recordType], such as
-         * `StepsRecord::class`.
+         * Returns a permission defined in [HealthPermission] to read records of type [recordType],
+         * such as `StepsRecord::class`.
          *
          * @return Permission to use with [androidx.health.connect.client.PermissionController].
          * @throws IllegalArgumentException if the given record type is invalid.
@@ -98,8 +98,8 @@ public class HealthPermission internal constructor() {
         }
 
         /**
-         * Returns a permission defined in [HealthPermission] to write provided [recordType], such
-         * as `StepsRecord:`.
+         * Returns a permission defined in [HealthPermission] to write records of type [T], such as
+         * `StepsRecord:`.
          *
          * @return Permission object to use with
          *   [androidx.health.connect.client.PermissionController].
@@ -111,8 +111,8 @@ public class HealthPermission internal constructor() {
         }
 
         /**
-         * Returns a permission defined in [HealthPermission] to write provided [recordType], such
-         * as `StepsRecord::class`.
+         * Returns a permission defined in [HealthPermission] to write records of type [recordType],
+         * such as `StepsRecord::class`.
          *
          * @return Permission object to use with
          *   [androidx.health.connect.client.PermissionController].
