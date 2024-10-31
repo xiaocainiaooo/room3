@@ -260,6 +260,7 @@ constructor(
 
     /** Cached shapes used in components */
     internal var defaultToggleButtonShapesCached: ButtonShapes? = null
+    internal var defaultVerticalDragHandleShapesCached: DragHandleShapes? = null
 }
 
 /** Contains the default values used by [Shapes] */

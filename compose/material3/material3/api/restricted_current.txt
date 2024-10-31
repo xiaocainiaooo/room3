@@ -732,6 +732,34 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public static void VerticalDivider(optional androidx.compose.ui.Modifier modifier, optional float thickness, optional long color);
   }
 
+  @androidx.compose.runtime.Immutable public final class DragHandleColors {
+    ctor public DragHandleColors(long defaultColor, long pressedColor);
+    method public long getDefaultColor();
+    method public long getPressedColor();
+    property public final long defaultColor;
+    property public final long pressedColor;
+  }
+
+  public final class DragHandleKt {
+    method @androidx.compose.runtime.Composable public static void VerticalDragHandle(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.material3.DragHandleSizes sizes, optional androidx.compose.material3.DragHandleColors colors, optional androidx.compose.material3.DragHandleShapes shapes, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
+  }
+
+  @androidx.compose.runtime.Immutable public final class DragHandleShapes {
+    ctor public DragHandleShapes(androidx.compose.ui.graphics.Shape defaultShape, androidx.compose.ui.graphics.Shape pressedShape);
+    method public androidx.compose.ui.graphics.Shape getDefaultShape();
+    method public androidx.compose.ui.graphics.Shape getPressedShape();
+    property public final androidx.compose.ui.graphics.Shape defaultShape;
+    property public final androidx.compose.ui.graphics.Shape pressedShape;
+  }
+
+  @androidx.compose.runtime.Immutable public final class DragHandleSizes {
+    ctor public DragHandleSizes(long defaultSize, long pressedSize);
+    method public long getDefaultSize();
+    method public long getPressedSize();
+    property public final long defaultSize;
+    property public final long pressedSize;
+  }
+
   public final class DrawerDefaults {
     method @Deprecated @androidx.compose.runtime.Composable public long getContainerColor();
     method public float getDismissibleDrawerElevation();
@@ -2979,6 +3007,15 @@ package androidx.compose.material3 {
     property @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public final androidx.compose.ui.text.TextStyle titleMediumEmphasized;
     property public final androidx.compose.ui.text.TextStyle titleSmall;
     property @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public final androidx.compose.ui.text.TextStyle titleSmallEmphasized;
+  }
+
+  public final class VerticalDragHandleDefaults {
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.DragHandleColors colors();
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.DragHandleColors colors(optional long defaultColor, optional long pressedColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.DragHandleShapes shapes();
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.DragHandleShapes shapes(optional androidx.compose.ui.graphics.Shape? defaultShape, optional androidx.compose.ui.graphics.Shape? pressedShape);
+    method public androidx.compose.material3.DragHandleSizes sizes(optional long defaultSize, optional long pressedSize);
+    field public static final androidx.compose.material3.VerticalDragHandleDefaults INSTANCE;
   }
 
   @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public final class WavyProgressIndicatorDefaults {
