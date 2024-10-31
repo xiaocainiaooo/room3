@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.roundToIntRect
 import androidx.compose.ui.util.fastForEach
-import kotlin.math.min
 
 internal typealias LinkRange = AnnotatedString.Range<LinkAnnotation>
 
@@ -172,17 +171,9 @@ internal class TextLinkScope(internal val initialText: AnnotatedString) {
     fun LinksComposables() {
         val uriHandler = LocalUriHandler.current
 
-        // The paragraph with a link might not be added to the paragraphs list if it exceeds the
-        // maxline. We should only add links up to the last line's end offset.
-        val lineCount = textLayoutResult?.lineCount ?: return
-        val lastOffset = textLayoutResult?.getLineEnd(lineCount - 1) ?: return
         val links = text.getLinkAnnotations(0, text.length)
-
-        links.fastForEach { it ->
-            if (it.start != it.end && it.start < lastOffset) {
-                // The link might be clipped if we reach the maxLines so we adjust its end in that
-                // case to be the last visible offset
-                val range = it.copy(end = min(it.end, lastOffset))
+        links.fastForEach { range ->
+            if (range.start != range.end) {
                 val shape = shapeForRange(range)
                 val clipModifier = shape?.let { Modifier.clip(it) } ?: Modifier
                 val interactionSource = remember { MutableInteractionSource() }
@@ -240,7 +231,7 @@ internal class TextLinkScope(internal val initialText: AnnotatedString) {
                                     if (linkStateObserver.isPressed) range.item.styles?.pressedStyle
                                     else null
                                 )
-                        replaceStyle(it, mergedStyle)
+                        replaceStyle(range, mergedStyle)
                     }
                 }
             }
