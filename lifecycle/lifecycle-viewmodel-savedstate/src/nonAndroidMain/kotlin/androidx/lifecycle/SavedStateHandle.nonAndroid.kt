@@ -24,7 +24,9 @@ import androidx.savedstate.SavedState
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.read
 import kotlin.jvm.JvmStatic
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 actual class SavedStateHandle {
 
@@ -45,8 +47,17 @@ actual class SavedStateHandle {
     @MainThread actual operator fun contains(key: String): Boolean = key in impl
 
     @MainThread
-    actual fun <T> getStateFlow(key: String, initialValue: T): StateFlow<T> =
-        impl.getStateFlow(key, initialValue)
+    actual fun <T> getStateFlow(key: String, initialValue: T): StateFlow<T> {
+        // On platforms other than Android, LiveData is not available.
+        // Therefore, there's no need to check for mutual exclusivity with LiveData.
+        // We can directly use getMutableStateFlow and convert it to a StateFlow.
+        return impl.getMutableStateFlow(key, initialValue).asStateFlow()
+    }
+
+    @MainThread
+    actual fun <T> getMutableStateFlow(key: String, initialValue: T): MutableStateFlow<T> {
+        return impl.getMutableStateFlow(key, initialValue)
+    }
 
     @MainThread actual fun keys(): Set<String> = impl.keys()
 

@@ -29,8 +29,15 @@ internal class SavedStateHandleImpl(initialState: Map<String, Any?> = emptyMap()
     val regular = initialState.toMutableMap()
     private val providers = mutableMapOf<String, SavedStateProvider>()
     private val flows = mutableMapOf<String, MutableStateFlow<Any?>>()
+    val mutableFlows = mutableMapOf<String, MutableStateFlow<Any?>>()
 
     val savedStateProvider = SavedStateProvider {
+        // Synchronize the current value of a MutableStateFlow with the regular values.
+        // It copies the original map to avoid re-entrance.
+        for ((key, mutableFlow) in mutableFlows.toMap()) {
+            set(key, mutableFlow.value)
+        }
+
         // Get the saved state from each SavedStateProvider registered with this
         // SavedStateHandle, iterating through a copy to avoid re-entrance
         for ((key, provider) in providers.toMap()) {
@@ -61,13 +68,29 @@ internal class SavedStateHandleImpl(initialState: Map<String, Any?> = emptyMap()
         @Suppress("UNCHECKED_CAST") return flow.asStateFlow() as StateFlow<T>
     }
 
+    @MainThread
+    fun <T> getMutableStateFlow(key: String, initialValue: T): MutableStateFlow<T> {
+        // If a flow exists we should just return it, and since it is a StateFlow and a value must
+        // always be set, we know a value must already be available
+        val flow =
+            mutableFlows.getOrPut(key) {
+                // If there is not a value associated with the key, add the initial value,
+                // otherwise, use the one we already have.
+                if (key !in regular) {
+                    regular[key] = initialValue
+                }
+                MutableStateFlow(regular[key])
+            }
+        @Suppress("UNCHECKED_CAST") return flow as MutableStateFlow<T>
+    }
+
     @MainThread fun keys(): Set<String> = regular.keys + providers.keys
 
     @MainThread
     operator fun <T> get(key: String): T? {
         return try {
             @Suppress("UNCHECKED_CAST")
-            regular[key] as T?
+            (mutableFlows[key]?.value ?: regular[key]) as T?
         } catch (e: ClassCastException) {
             // Instead of failing on ClassCastException, we remove the value from the
             // SavedStateHandle and return null.
@@ -80,6 +103,7 @@ internal class SavedStateHandleImpl(initialState: Map<String, Any?> = emptyMap()
     operator fun <T> set(key: String, value: T?) {
         regular[key] = value
         flows[key]?.value = value
+        mutableFlows[key]?.value = value
     }
 
     @MainThread

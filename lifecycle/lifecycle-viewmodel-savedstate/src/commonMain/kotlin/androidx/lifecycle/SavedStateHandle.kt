@@ -20,6 +20,7 @@ import androidx.annotation.RestrictTo
 import androidx.savedstate.SavedState
 import androidx.savedstate.SavedStateRegistry.SavedStateProvider
 import kotlin.jvm.JvmStatic
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -90,6 +91,46 @@ expect class SavedStateHandle {
      *   given `initialValue`.
      */
     @MainThread fun <T> getStateFlow(key: String, initialValue: T): StateFlow<T>
+
+    /**
+     * Returns a [MutableStateFlow] that will emit the currently active value associated with the
+     * given key.
+     *
+     * ```
+     * val flow = savedStateHandle.getMutableStateFlow(KEY, "defaultValue")
+     * ```
+     *
+     * Since this is a [MutableStateFlow] there will always be a value available which, is why an
+     * initial value must be provided. The value of this flow is changed by making a call to [set],
+     * passing in the key that references this flow or by updating the value of the returned
+     * [MutableStateFlow]
+     *
+     * If there is already a value associated with the given key, the initial value will be ignored.
+     *
+     * **Note 1:** If [T] is an [Array] of `Parcelable` classes, note that you should always use
+     * `Array<Parcelable>` and create a typed array from the result as going through process death
+     * and recreation (or using the `Don't keep activities` developer option) will result in the
+     * type information being lost, thus resulting in a `ClassCastException` if you directly try to
+     * collect the result as an `Array<CustomParcelable>`.
+     *
+     * ```
+     * val typedArrayFlow = savedStateHandle.getMutableStateFlow<Array<Parcelable>>(
+     *   "KEY"
+     * ).map { array ->
+     *   // Convert the Array<Parcelable> to an Array<CustomParcelable>
+     *   array.map { it as CustomParcelable }.toTypedArray()
+     * }
+     * ```
+     *
+     * **Note 2:** On Android, this method is mutually exclusive with `getLiveData` for the same
+     * key. You should use either `getMutableStateFlow` or `getLiveData` to access the stored value,
+     * but not both. Using both methods with the same key will result in an `IllegalStateException`.
+     *
+     * @param key The identifier for the flow
+     * @param initialValue If no value exists with the given `key`, a new one is created with the
+     *   given `initialValue`.
+     */
+    @MainThread fun <T> getMutableStateFlow(key: String, initialValue: T): MutableStateFlow<T>
 
     /**
      * Returns all keys contained in this [SavedStateHandle]
