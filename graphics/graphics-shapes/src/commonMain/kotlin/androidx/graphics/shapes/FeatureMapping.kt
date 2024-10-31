@@ -85,8 +85,8 @@ internal fun doMapping(
     features1: List<ProgressableFeature>,
     features2: List<ProgressableFeature>
 ): List<Pair<Float, Float>> {
-    debugLog("LOG_TAG") { "Shape1 progresses: " + features1.map { it.progress }.joinToString() }
-    debugLog("LOG_TAG") { "Shape2 progresses: " + features2.map { it.progress }.joinToString() }
+    debugLog(LOG_TAG) { "Shape1 progresses: " + features1.map { it.progress }.joinToString() }
+    debugLog(LOG_TAG) { "Shape2 progresses: " + features2.map { it.progress }.joinToString() }
     val distanceVertexList =
         buildList {
                 for (f1 in features1) {

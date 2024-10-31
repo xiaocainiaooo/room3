@@ -279,7 +279,7 @@ internal class MeasuredPolygon : AbstractList<MeasuredPolygon.MeasuredCubic> {
                     val ix = featureToCubic[i].second
                     add(
                         ProgressableFeature(
-                            (outlineProgress[ix] + outlineProgress[ix + 1]) / 2,
+                            positiveModulo((outlineProgress[ix] + outlineProgress[ix + 1]) / 2, 1f),
                             featureToCubic[i].first
                         )
                     )
