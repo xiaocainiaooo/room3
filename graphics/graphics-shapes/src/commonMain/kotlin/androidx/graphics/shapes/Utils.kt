@@ -72,6 +72,10 @@ internal fun interpolate(start: Float, stop: Float, fraction: Float): Float {
     return (1 - fraction) * start + fraction * stop
 }
 
+/**
+ * Similar to num % mod, but ensures the result is always positive. For example: 4 % 3 =
+ * positiveModulo(4, 3) = 1, but: -4 % 3 = -1 positiveModulo(-4, 3) = 2
+ */
 internal fun positiveModulo(num: Float, mod: Float) = (num % mod + mod) % mod
 
 /** Returns whether C is on the line defined by the two points AB */
