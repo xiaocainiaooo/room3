@@ -138,27 +138,56 @@ class PolygonMeasureTest {
         )
     }
 
+    @Test
+    fun handlesEmptyFeatureLast() {
+        val triangle =
+            RoundedPolygon(
+                listOf(
+                    Feature.buildConvexCorner(listOf(Cubic.straightLine(0f, 0f, 1f, 1f))),
+                    Feature.buildConvexCorner(listOf(Cubic.straightLine(1f, 1f, 1f, 0f))),
+                    Feature.buildConvexCorner(listOf(Cubic.straightLine(1f, 0f, 0f, 0f))),
+                    // Empty feature at the end.
+                    Feature.buildConvexCorner(listOf(Cubic.straightLine(0f, 0f, 0f, 0f))),
+                )
+            )
+
+        irregularPolygonMeasure(triangle)
+    }
+
     private fun regularPolygonMeasure(
         sides: Int,
         rounding: CornerRounding = CornerRounding.Unrounded
     ) {
-        val polygon = RoundedPolygon(sides, rounding = rounding)
-        val measuredPolygon = MeasuredPolygon.measurePolygon(measurer, polygon)
+        irregularPolygonMeasure(RoundedPolygon(sides, rounding = rounding)) { measuredPolygon ->
+            assertEquals(sides, measuredPolygon.size)
 
-        assertEquals(sides, measuredPolygon.size)
-
-        assertEquals(0f, measuredPolygon.first().startOutlineProgress)
-        assertEquals(1f, measuredPolygon.last().endOutlineProgress)
-        measuredPolygon.forEachIndexed { index, measuredCubic ->
-            assertEqualish(index.toFloat() / sides, measuredCubic.startOutlineProgress)
+            measuredPolygon.forEachIndexed { index, measuredCubic ->
+                assertEqualish(index.toFloat() / sides, measuredCubic.startOutlineProgress)
+            }
         }
     }
 
-    private fun irregularPolygonMeasure(polygon: RoundedPolygon) {
+    private fun customPolygonMeasure(polygon: RoundedPolygon, progresses: FloatArray) =
+        irregularPolygonMeasure(polygon) { measuredPolygon ->
+            require(measuredPolygon.size == progresses.size)
+
+            measuredPolygon.forEachIndexed { index, measuredCubic ->
+                assertEqualish(
+                    progresses[index],
+                    measuredCubic.endOutlineProgress - measuredCubic.startOutlineProgress
+                )
+            }
+        }
+
+    private fun irregularPolygonMeasure(
+        polygon: RoundedPolygon,
+        extraChecks: (MeasuredPolygon) -> Unit = {}
+    ) {
         val measuredPolygon = MeasuredPolygon.measurePolygon(measurer, polygon)
 
         assertEquals(0f, measuredPolygon.first().startOutlineProgress)
         assertEquals(1f, measuredPolygon.last().endOutlineProgress)
+
         measuredPolygon.forEachIndexed { index, measuredCubic ->
             if (index > 0) {
                 assertEquals(
@@ -168,19 +197,13 @@ class PolygonMeasureTest {
             }
             assertTrue(measuredCubic.endOutlineProgress >= measuredCubic.startOutlineProgress)
         }
-    }
 
-    private fun customPolygonMeasure(polygon: RoundedPolygon, progresses: FloatArray) {
-        irregularPolygonMeasure(polygon)
-
-        val measuredPolygon = MeasuredPolygon.measurePolygon(measurer, polygon)
-        require(measuredPolygon.size == progresses.size)
-
-        measuredPolygon.forEachIndexed { index, measuredCubic ->
-            assertEqualish(
-                progresses[index],
-                measuredCubic.endOutlineProgress - measuredCubic.startOutlineProgress
-            )
+        measuredPolygon.features.forEachIndexed { index, progressableFeature ->
+            assert(progressableFeature.progress >= 0f && progressableFeature.progress < 1f) {
+                "Feature #$index has invalid progress: ${progressableFeature.progress}"
+            }
         }
+
+        extraChecks(measuredPolygon)
     }
 }
