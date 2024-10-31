@@ -32,6 +32,7 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import androidx.privacysandbox.ui.core.DelegatingSandboxedUiAdapter
+import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.core.IDelegateChangeListener
 import androidx.privacysandbox.ui.core.IDelegatingSandboxedUiAdapter
 import androidx.privacysandbox.ui.core.IDelegatorCallback
@@ -53,6 +54,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * Provides a [Bundle] containing a Binder which represents a [SandboxedUiAdapter]. The Bundle is
  * shuttled to the host app in order for the [SandboxedUiAdapter] to be used to retrieve content.
  */
+@OptIn(ExperimentalFeatures.DelegatingAdapterApi::class)
 fun SandboxedUiAdapter.toCoreLibInfo(@Suppress("ContextFirst") context: Context): Bundle {
     // TODO: Add version info
     val bundle = Bundle()
@@ -69,6 +71,7 @@ fun SandboxedUiAdapter.toCoreLibInfo(@Suppress("ContextFirst") context: Context)
     return bundle
 }
 
+@OptIn(ExperimentalFeatures.DelegatingAdapterApi::class)
 private class BinderDelegatingAdapter(private var adapter: DelegatingSandboxedUiAdapter) :
     IDelegatingSandboxedUiAdapter.Stub() {
     private class RemoteDelegateChangeListener(val binder: IDelegateChangeListener) :

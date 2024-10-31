@@ -1,7 +1,7 @@
 // Signature format: 4.0
 package androidx.privacysandbox.ui.core {
 
-  public final class DelegatingSandboxedUiAdapter implements androidx.privacysandbox.ui.core.SandboxedUiAdapter {
+  @SuppressCompatibility @androidx.privacysandbox.ui.core.ExperimentalFeatures.DelegatingAdapterApi public final class DelegatingSandboxedUiAdapter implements androidx.privacysandbox.ui.core.SandboxedUiAdapter {
     ctor public DelegatingSandboxedUiAdapter(android.os.Bundle delegate);
     method public void addDelegateChangeListener(androidx.privacysandbox.ui.core.DelegatingSandboxedUiAdapter.DelegateChangeListener listener);
     method public void addObserverFactory(androidx.privacysandbox.ui.core.SessionObserverFactory sessionObserverFactory);
@@ -14,6 +14,12 @@ package androidx.privacysandbox.ui.core {
 
   public static interface DelegatingSandboxedUiAdapter.DelegateChangeListener {
     method public default suspend Object? onDelegateChanged(android.os.Bundle delegate, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+  }
+
+  public sealed interface ExperimentalFeatures {
+  }
+
+  @SuppressCompatibility @kotlin.RequiresOptIn(message="This API is experimental. It may be changed in the future without notice.", level=kotlin.RequiresOptIn.Level.WARNING) @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public static @interface ExperimentalFeatures.DelegatingAdapterApi {
   }
 
   public final class SandboxedSdkViewUiInfo {
