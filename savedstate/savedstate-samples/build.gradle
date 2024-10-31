@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright (C) 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,32 +24,29 @@
 
 import androidx.build.KotlinTarget
 import androidx.build.LibraryType
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("AndroidXComposePlugin")
     id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.kotlinSerialization)
 }
 
 dependencies {
+    api(libs.kotlinStdlib)
+    implementation(project(":savedstate:savedstate"))
     compileOnly(project(":annotation:annotation-sampled"))
-    implementation(libs.kotlinStdlib)
-    implementation project(":lifecycle:lifecycle-common-java8")
-    implementation project(":lifecycle:lifecycle-viewmodel-compose")
-    implementation project(":lifecycle:lifecycle-viewmodel-savedstate")
-}
-
-androidx {
-    name = "Lifecycle ViewModel Compose Integration Samples"
-    type = LibraryType.SAMPLES
-    inceptionYear = "2021"
-    description = "Samples for Compose integration with Lifecycle ViewModel"
-    kotlinTarget = KotlinTarget.KOTLIN_1_9
+    implementation(libs.kotlinSerializationCore)
 }
 
 android {
-    compileSdk 35
-    namespace "androidx.lifecycle.viewmodel.compose.samples"
+    namespace "androidx.savedstate.samples"
+}
+
+androidx {
+    name = "androidx.savedstate:savedstate-samples"
+    type = LibraryType.SAMPLES
+    inceptionYear = "2024"
+    description = "Sample code for SavedState"
+    kotlinTarget = KotlinTarget.KOTLIN_1_9
 }

@@ -313,6 +313,7 @@ dependencies {
     docs(project(":safeparcel:safeparcel"))
     kmpDocs(project(":savedstate:savedstate"))
     docs(project(":savedstate:savedstate-ktx"))
+    samples(project(":savedstate:savedstate-samples"))
     docs(project(":security:security-app-authenticator"))
     docs(project(":security:security-app-authenticator-testing"))
     docs(project(":security:security-biometric"))
