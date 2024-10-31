@@ -60,6 +60,10 @@ class LevelIndicatorScreenshotTest {
         verifyScreenshot(value = 0f, shape = shape, testName = testName)
 
     @Test
+    fun level_indicator_5_percent(@TestParameter shape: ScreenShape) =
+        verifyScreenshot(value = 5f, shape = shape, testName = testName)
+
+    @Test
     fun level_indicator_25_percent(@TestParameter shape: ScreenShape) =
         verifyScreenshot(value = 25f, shape = shape, testName = testName)
 
@@ -133,14 +137,13 @@ class LevelIndicatorScreenshotTest {
             ) {
                 Box(
                     modifier =
-                        Modifier.testTag(TEST_TAG)
-                            .size(screenSizeDp.dp)
+                        Modifier.size(screenSizeDp.dp)
                             .background(MaterialTheme.colorScheme.background)
                 ) {
                     LevelIndicator(
                         value = { value },
                         valueRange = valueRange,
-                        modifier = Modifier.align(Alignment.CenterStart),
+                        modifier = Modifier.align(Alignment.CenterStart).testTag(TEST_TAG),
                         enabled = enabled,
                         strokeWidth = strokeWidth,
                         sweepAngle = sweepAngle,
