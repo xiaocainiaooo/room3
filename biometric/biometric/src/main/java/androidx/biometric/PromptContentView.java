@@ -16,13 +16,8 @@
 
 package androidx.biometric;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
 /**
  * Contains the information of the template of content view for Biometric Prompt.
  */
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 public interface PromptContentView {
 }
