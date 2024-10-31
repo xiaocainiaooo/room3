@@ -37,6 +37,7 @@ import kotlinx.coroutines.sync.withLock
  * One example use-case of these kind of UIAdapters is to support updating the provider of the UI
  * without the client's involvement.
  */
+@ExperimentalFeatures.DelegatingAdapterApi
 class DelegatingSandboxedUiAdapter(private var delegate: Bundle) : SandboxedUiAdapter {
 
     /** Listener that consumes events to process the delegate change for a client */

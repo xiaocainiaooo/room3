@@ -23,6 +23,7 @@ import android.os.Looper
 import android.os.Process
 import androidx.privacysandbox.sdkruntime.core.controller.SdkSandboxControllerCompat
 import androidx.privacysandbox.ui.core.DelegatingSandboxedUiAdapter
+import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.integration.sdkproviderutils.PlayerViewProvider
 import androidx.privacysandbox.ui.integration.sdkproviderutils.PlayerViewabilityHandler
@@ -76,6 +77,7 @@ class SdkApi(private val sdkContext: Context) : ISdkApi.Stub() {
         return adapter.toCoreLibInfo(sdkContext)
     }
 
+    @OptIn(ExperimentalFeatures.DelegatingAdapterApi::class)
     private fun startDelegatingAdUpdateHandler(
         adapter: DelegatingSandboxedUiAdapter,
         drawViewability: Boolean
@@ -144,6 +146,7 @@ class SdkApi(private val sdkContext: Context) : ISdkApi.Stub() {
         return adapter
     }
 
+    @OptIn(ExperimentalFeatures.DelegatingAdapterApi::class)
     private fun loadMediatedTestAd(
         isAppMediatee: Boolean,
         @AdType adType: Int,

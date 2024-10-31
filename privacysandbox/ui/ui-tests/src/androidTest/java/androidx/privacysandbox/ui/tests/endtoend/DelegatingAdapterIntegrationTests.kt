@@ -20,6 +20,7 @@ import android.content.Context
 import android.widget.LinearLayout
 import androidx.privacysandbox.ui.client.view.SandboxedSdkView
 import androidx.privacysandbox.ui.core.DelegatingSandboxedUiAdapter
+import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.tests.endtoend.IntegrationTests.TestStateChangeListener
 import androidx.privacysandbox.ui.tests.util.TestSessionManager
 import androidx.privacysandbox.ui.tests.util.TestSessionManager.TestDelegatingAdapterWithDelegate
@@ -38,6 +39,7 @@ import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
 @MediumTest
+@OptIn(ExperimentalFeatures.DelegatingAdapterApi::class)
 class DelegatingAdapterIntegrationTests(invokeBackwardsCompatFlow: Boolean) {
 
     @get:Rule val rule = IntegrationTestSetupRule(invokeBackwardsCompatFlow)
