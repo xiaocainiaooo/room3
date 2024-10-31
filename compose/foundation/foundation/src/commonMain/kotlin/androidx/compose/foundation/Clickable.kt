@@ -31,9 +31,13 @@ import androidx.compose.ui.focus.Focusability
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType.Companion.KeyDown
+import androidx.compose.ui.input.key.KeyEventType.Companion.KeyUp
 import androidx.compose.ui.input.key.KeyInputModifierNode
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -494,11 +498,29 @@ internal expect val TapIndicationDelay: Long
  */
 internal expect fun DelegatableNode.isComposeRootInScrollableContainer(): Boolean
 
-/** Whether the specified [KeyEvent] should trigger a press for a clickable component. */
-internal expect val KeyEvent.isPress: Boolean
+/**
+ * Whether the specified [KeyEvent] should trigger a press for a clickable component, i.e. whether
+ * it is associated with a press of an enter key or dpad centre.
+ */
+private val KeyEvent.isPress: Boolean
+    get() = type == KeyDown && isEnter
 
-/** Whether the specified [KeyEvent] should trigger a click for a clickable component. */
-internal expect val KeyEvent.isClick: Boolean
+/**
+ * Whether the specified [KeyEvent] should trigger a click for a clickable component, i.e. whether
+ * it is associated with a release of an enter key or dpad centre.
+ */
+private val KeyEvent.isClick: Boolean
+    get() = type == KeyUp && isEnter
+
+private val KeyEvent.isEnter: Boolean
+    get() =
+        when (key) {
+            Key.DirectionCenter,
+            Key.Enter,
+            Key.NumPadEnter,
+            Key.Spacebar -> true
+            else -> false
+        }
 
 private class ClickableElement(
     private val interactionSource: MutableInteractionSource?,
