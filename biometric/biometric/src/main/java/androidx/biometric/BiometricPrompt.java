@@ -595,10 +595,11 @@ public class BiometricPrompt {
             /**
              * Optional: Sets a description that will be shown on the prompt.
              *
-             * <p> Note that the description set by {@link Builder#setDescription(CharSequence)}
-             * will be overridden by {@link Builder#setContentView(PromptContentView)}. The view
-             * provided to {@link Builder#setContentView(PromptContentView)} will be used if both
-             * methods are called.
+             * <p> Note that from API 35, the description set by
+             * {@link Builder#setDescription(CharSequence)} will be overridden by
+             * {@link Builder#setContentView(PromptContentView)}. The view provided to
+             * {@link Builder#setContentView(PromptContentView)} will be used if both methods are
+             * called.
              *
              * @param description The description to display.
              * @return This builder.
@@ -612,10 +613,11 @@ public class BiometricPrompt {
             /**
              * Optional: Sets application customized content view that will be shown on the prompt.
              *
-             * <p> Note that the description set by {@link Builder#setDescription(CharSequence)}
-             * will be overridden by {@link Builder#setContentView(PromptContentView)}. The view
-             * provided to {@link Builder#setContentView(PromptContentView)} will be used if both
-             * methods are called.
+             * <p> Note that from API 35, the description set by
+             * {@link Builder#setDescription(CharSequence)} will be overridden by
+             * {@link Builder#setContentView(PromptContentView)}. The view provided to
+             * {@link Builder#setContentView(PromptContentView)} will be used if both methods are
+             * called.
              *
              * @param view The customized view information.
              * @return This builder.

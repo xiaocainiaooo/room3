@@ -260,12 +260,6 @@ public class BiometricFragment extends Fragment {
                 PackageUtils.hasSystemFeatureIris(getContext()));
     }
 
-    @Nullable
-    @VisibleForTesting
-    BiometricViewModel getViewModel() {
-        return mViewModel;
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -313,8 +307,6 @@ public class BiometricFragment extends Fragment {
      * fragment.
      */
     private void connectViewModel() {
-        mViewModel.setClientActivity(getActivity());
-
         mViewModel.getAuthenticationResult().observe(this,
                 authenticationResult -> {
                     if (authenticationResult != null) {
@@ -412,8 +404,7 @@ public class BiometricFragment extends Fragment {
         }
 
         // Fall back to device credential immediately if no known biometrics are available.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                && isKeyguardManagerNeededForCredential()) {
+        if (isKeyguardManagerNeededForNoBiometric()) {
             mViewModel.setAwaitingResult(true);
             launchConfirmCredentialActivity();
             return;
@@ -442,8 +433,7 @@ public class BiometricFragment extends Fragment {
 
             mViewModel.setPromptShowing(true);
             mViewModel.setAwaitingResult(true);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                    && isKeyguardManagerNeededForBiometricAndCredential()) {
+            if (isKeyguardManagerNeededForBiometricAndCredential()) {
                 launchConfirmCredentialActivity();
             } else if (isUsingFingerprintDialog()) {
                 showFingerprintDialogForAuthentication();
@@ -718,13 +708,10 @@ public class BiometricFragment extends Fragment {
                 : BiometricPrompt.ERROR_VENDOR;
 
         final Context context = getContext();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
-                && ErrorUtils.isLockoutError(knownErrorCode)
-                && context != null
-                && KeyguardUtils.isDeviceSecuredWithCredential(context)
-                && AuthenticatorUtils.isDeviceCredentialAllowed(
-                    mViewModel.getAllowedAuthenticators())) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ErrorUtils.isLockoutError(
+                knownErrorCode) && context != null && KeyguardUtils.isDeviceSecuredWithCredential(
+                context) && AuthenticatorUtils.isDeviceCredentialAllowed(
+                mViewModel.getAllowedAuthenticators())) {
             launchConfirmCredentialActivity();
             return;
         }
@@ -795,10 +782,6 @@ public class BiometricFragment extends Fragment {
      */
     @SuppressWarnings("WeakerAccess") /* synthetic access */
     void onDeviceCredentialButtonPressed() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            Log.e(TAG, "Failed to check device credential. Not supported prior to API 21.");
-            return;
-        }
         launchConfirmCredentialActivity();
     }
 
@@ -833,7 +816,6 @@ public class BiometricFragment extends Fragment {
      * Launches the confirm device credential Settings activity, where the user can authenticate
      * using their PIN, pattern, or password.
      */
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private void launchConfirmCredentialActivity() {
         final Context context = getContext();
 
@@ -1074,7 +1056,7 @@ public class BiometricFragment extends Fragment {
         return Build.VERSION.SDK_INT == Build.VERSION_CODES.P && !hasFingerprint();
     }
 
-    private boolean isKeyguardManagerNeededForCredential() {
+    private boolean isKeyguardManagerNeededForNoBiometric() {
         final Context context = getContext();
 
         // On API 29, BiometricPrompt fails to launch the confirm device credential Settings
@@ -1086,10 +1068,11 @@ public class BiometricFragment extends Fragment {
             return true;
         }
 
-        // Launch CDC activity if managing the credential button and if no biometrics are available.
+        // Launch CDC activity if managing the credential button and if no biometrics are
+        // available on the device.
         return isManagingDeviceCredentialButton()
                 && BiometricManager.from(context).canAuthenticate(Authenticators.BIOMETRIC_WEAK)
-                        != BiometricManager.BIOMETRIC_SUCCESS;
+                != BiometricManager.BIOMETRIC_SUCCESS;
     }
 
     /**
@@ -1103,8 +1086,7 @@ public class BiometricFragment extends Fragment {
         // Devices from some vendors should use KeyguardManager for authentication if both biometric
         // and credential authenticator types are allowed (on API 29).
         final Context context = getContext();
-        if (context != null && DeviceUtils.shouldUseKeyguardManagerForBiometricAndCredential(
-                context, Build.MANUFACTURER)) {
+        if (context != null && Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
 
             @BiometricManager.AuthenticatorTypes int allowedAuthenticators =
                     mViewModel.getAllowedAuthenticators();
@@ -1414,7 +1396,6 @@ public class BiometricFragment extends Fragment {
     /**
      * Nested class to avoid verification errors for methods introduced in Android 5.0 (API 21).
      */
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private static class Api21Impl {
         // Prevent instantiation.
         private Api21Impl() {}
