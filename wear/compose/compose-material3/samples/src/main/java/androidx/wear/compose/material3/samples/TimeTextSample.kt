@@ -25,7 +25,8 @@ import androidx.wear.compose.material3.TimeTextDefaults
 @Sampled
 @Composable
 fun TimeTextClockOnly() {
-    TimeText { time() }
+    // TimeText displays the current time by default.
+    TimeText()
 }
 
 @Sampled
