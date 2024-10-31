@@ -64,54 +64,49 @@ interface XCodeBlock : TargetLanguage {
 
         fun unindent(): Builder
 
+        /**
+         * Convenience local immutable variable emitter.
+         *
+         * Shouldn't contain declaration, only right hand assignment expression.
+         */
+        fun addLocalVal(
+            name: String,
+            typeName: XTypeName,
+            assignExprFormat: String,
+            vararg assignExprArgs: Any?
+        ) = apply {
+            addLocalVariable(
+                name = name,
+                typeName = typeName,
+                isMutable = false,
+                assignExpr = of(language, assignExprFormat, *assignExprArgs)
+            )
+        }
+
+        /**
+         * Convenience for-each control flow emitter taking into account the receiver's
+         * [CodeLanguage].
+         *
+         * For Java this will emit: `for (<typeName> <itemVarName> : <iteratorVarName>)`
+         *
+         * For Kotlin this will emit: `for (<itemVarName>: <typeName> in <iteratorVarName>)`
+         */
+        fun beginForEachControlFlow(
+            itemVarName: String,
+            typeName: XTypeName,
+            iteratorVarName: String
+        ) = apply {
+            when (language) {
+                CodeLanguage.JAVA ->
+                    beginControlFlow("for (%T %L : %L)", typeName, itemVarName, iteratorVarName)
+                CodeLanguage.KOTLIN ->
+                    beginControlFlow("for (%L: %T in %L)", itemVarName, typeName, iteratorVarName)
+            }
+        }
+
         fun build(): XCodeBlock
 
         companion object {
-            /**
-             * Convenience local immutable variable emitter.
-             *
-             * Shouldn't contain declaration, only right hand assignment expression.
-             */
-            fun Builder.addLocalVal(
-                name: String,
-                typeName: XTypeName,
-                assignExprFormat: String,
-                vararg assignExprArgs: Any?
-            ) = apply {
-                addLocalVariable(
-                    name = name,
-                    typeName = typeName,
-                    isMutable = false,
-                    assignExpr = of(language, assignExprFormat, *assignExprArgs)
-                )
-            }
-
-            /**
-             * Convenience for-each control flow emitter taking into account the receiver's
-             * [CodeLanguage].
-             *
-             * For Java this will emit: `for (<typeName> <itemVarName> : <iteratorVarName>)`
-             *
-             * For Kotlin this will emit: `for (<itemVarName>: <typeName> in <iteratorVarName>)`
-             */
-            fun Builder.beginForEachControlFlow(
-                itemVarName: String,
-                typeName: XTypeName,
-                iteratorVarName: String
-            ) = apply {
-                when (language) {
-                    CodeLanguage.JAVA ->
-                        beginControlFlow("for (%T %L : %L)", typeName, itemVarName, iteratorVarName)
-                    CodeLanguage.KOTLIN ->
-                        beginControlFlow(
-                            "for (%L: %T in %L)",
-                            itemVarName,
-                            typeName,
-                            iteratorVarName
-                        )
-                }
-            }
-
             fun Builder.apply(
                 javaCodeBuilder: com.squareup.javapoet.CodeBlock.Builder.() -> Unit,
                 kotlinCodeBuilder: com.squareup.kotlinpoet.CodeBlock.Builder.() -> Unit,
@@ -131,22 +126,24 @@ interface XCodeBlock : TargetLanguage {
     }
 
     companion object {
+        @JvmStatic
         fun builder(language: CodeLanguage): Builder {
             return when (language) {
-                CodeLanguage.JAVA -> JavaCodeBlock.Builder()
-                CodeLanguage.KOTLIN -> KotlinCodeBlock.Builder()
+                CodeLanguage.JAVA -> JavaCodeBlock.Builder(JCodeBlock.builder())
+                CodeLanguage.KOTLIN -> KotlinCodeBlock.Builder(KCodeBlock.builder())
             }
         }
 
-        fun of(language: CodeLanguage, format: String, vararg args: Any?): XCodeBlock {
-            return builder(language).add(format, *args).build()
-        }
+        @JvmStatic
+        fun of(language: CodeLanguage, format: String, vararg args: Any?) =
+            builder(language).add(format, *args).build()
 
         /**
          * Convenience code block of a new instantiation expression.
          *
          * Shouldn't contain parenthesis.
          */
+        @JvmStatic
         fun ofNewInstance(
             language: CodeLanguage,
             typeName: XTypeName,
@@ -155,17 +152,18 @@ interface XCodeBlock : TargetLanguage {
         ): XCodeBlock {
             return builder(language)
                 .apply {
-                    val newKeyword =
-                        when (language) {
-                            CodeLanguage.JAVA -> "new "
-                            CodeLanguage.KOTLIN -> ""
-                        }
-                    add("$newKeyword%T($argsFormat)", typeName.copy(nullable = false), *args)
+                    when (language) {
+                        CodeLanguage.JAVA ->
+                            add("new %T($argsFormat)", typeName.copy(nullable = false), *args)
+                        CodeLanguage.KOTLIN ->
+                            add("%T($argsFormat)", typeName.copy(nullable = false), *args)
+                    }
                 }
                 .build()
         }
 
         /** Convenience code block of an unsafe cast expression. */
+        @JvmStatic
         fun ofCast(
             language: CodeLanguage,
             typeName: XTypeName,
@@ -186,6 +184,7 @@ interface XCodeBlock : TargetLanguage {
         }
 
         /** Convenience code block of a Java class literal. */
+        @JvmStatic
         fun ofJavaClassLiteral(
             language: CodeLanguage,
             typeName: XClassName,
@@ -197,6 +196,7 @@ interface XCodeBlock : TargetLanguage {
         }
 
         /** Convenience code block of a Kotlin class literal. */
+        @JvmStatic
         fun ofKotlinClassLiteral(
             language: CodeLanguage,
             typeName: XClassName,
@@ -220,6 +220,7 @@ interface XCodeBlock : TargetLanguage {
          *
          * For Kotlin this will emit: `if (<condition>) <leftExpr> else <rightExpr>)`
          */
+        @JvmStatic
         fun ofTernaryIf(
             language: CodeLanguage,
             condition: XCodeBlock,
@@ -240,6 +241,7 @@ interface XCodeBlock : TargetLanguage {
          *
          * For Kotlin this will emit: `<receiverVarName>.<memberName>(<args>)`
          */
+        @JvmStatic
         fun ofExtensionCall(
             language: CodeLanguage,
             memberName: XMemberName,

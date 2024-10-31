@@ -32,8 +32,6 @@ internal class KotlinAnnotationSpec(internal val actual: KAnnotationSpec) :
             actual.addMember(CodeBlock.of("$name = %L", code.actual))
         }
 
-        override fun build(): XAnnotationSpec {
-            return KotlinAnnotationSpec(actual.build())
-        }
+        override fun build() = KotlinAnnotationSpec(actual.build())
     }
 }

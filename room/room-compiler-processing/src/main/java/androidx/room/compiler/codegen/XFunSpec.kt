@@ -49,6 +49,9 @@ interface XFunSpec : TargetLanguage {
 
         fun addCode(code: XCodeBlock): Builder
 
+        fun addStatement(format: String, vararg args: Any?) =
+            addCode(XCodeBlock.builder(language).addStatement(format, *args).build())
+
         fun callSuperConstructor(vararg args: XCodeBlock): Builder
 
         fun returns(typeName: XTypeName): Builder
@@ -56,9 +59,6 @@ interface XFunSpec : TargetLanguage {
         fun build(): XFunSpec
 
         companion object {
-            fun Builder.addStatement(format: String, vararg args: Any?) =
-                addCode(XCodeBlock.builder(language).addStatement(format, *args).build())
-
             fun Builder.apply(
                 javaMethodBuilder: MethodSpec.Builder.() -> Unit,
                 kotlinFunctionBuilder: FunSpec.Builder.() -> Unit,
@@ -78,6 +78,7 @@ interface XFunSpec : TargetLanguage {
     }
 
     companion object {
+        @JvmStatic
         fun builder(
             language: CodeLanguage,
             name: String,
@@ -118,6 +119,7 @@ interface XFunSpec : TargetLanguage {
             }
         }
 
+        @JvmStatic
         fun constructorBuilder(language: CodeLanguage, visibility: VisibilityModifier): Builder {
             val name = "<init>"
             return when (language) {
@@ -144,6 +146,7 @@ interface XFunSpec : TargetLanguage {
             }
         }
 
+        @JvmStatic
         fun overridingBuilder(
             language: CodeLanguage,
             element: XMethodElement,

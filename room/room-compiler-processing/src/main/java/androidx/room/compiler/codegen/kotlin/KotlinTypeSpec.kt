@@ -24,6 +24,8 @@ import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XPropertySpec
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.XTypeSpec
+import androidx.room.compiler.processing.XElement
+import androidx.room.compiler.processing.addOriginatingElement
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.javapoet.KTypeSpec
 
@@ -47,7 +49,7 @@ internal class KotlinTypeSpec(private val _className: XClassName?, internal val 
             actual.addSuperinterface(typeName.kotlin)
         }
 
-        override fun addAnnotation(annotation: XAnnotationSpec) {
+        override fun addAnnotation(annotation: XAnnotationSpec) = apply {
             check(annotation is KotlinAnnotationSpec)
             actual.addAnnotation(annotation.actual)
         }
@@ -75,7 +77,7 @@ internal class KotlinTypeSpec(private val _className: XClassName?, internal val 
             }
         }
 
-        override fun setVisibility(visibility: VisibilityModifier) {
+        override fun setVisibility(visibility: VisibilityModifier) = apply {
             actual.addModifiers(visibility.toKotlinVisibilityModifier())
         }
 
@@ -83,8 +85,10 @@ internal class KotlinTypeSpec(private val _className: XClassName?, internal val 
             actual.addModifiers(KModifier.ABSTRACT)
         }
 
-        override fun build(): XTypeSpec {
-            return KotlinTypeSpec(className, actual.build())
+        override fun addOriginatingElement(element: XElement) = apply {
+            actual.addOriginatingElement(element)
         }
+
+        override fun build() = KotlinTypeSpec(className, actual.build())
     }
 }

@@ -18,7 +18,9 @@ package androidx.room.compiler.codegen.java
 
 import androidx.room.compiler.codegen.CodeLanguage
 import androidx.room.compiler.codegen.JCodeBlock
+import androidx.room.compiler.codegen.JCodeBlockBuilder
 import androidx.room.compiler.codegen.TargetLanguage
+import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XMemberName
@@ -30,8 +32,8 @@ internal class JavaCodeBlock(internal val actual: JCodeBlock) : JavaLang(), XCod
 
     override fun toString() = actual.toString()
 
-    internal class Builder : JavaLang(), XCodeBlock.Builder {
-        internal val actual = JCodeBlock.builder()
+    internal class Builder(internal val actual: JCodeBlockBuilder) :
+        JavaLang(), XCodeBlock.Builder {
 
         override fun add(code: XCodeBlock) = apply {
             require(code is JavaCodeBlock)
@@ -58,15 +60,9 @@ internal class JavaCodeBlock(internal val actual: JCodeBlock) : JavaLang(), XCod
         ) = apply {
             val finalKeyword = if (isMutable) "" else "final "
             if (assignExpr != null) {
-                require(assignExpr is JavaCodeBlock)
-                actual.addStatement(
-                    "$finalKeyword\$T \$L = \$L",
-                    typeName.java,
-                    name,
-                    assignExpr.actual
-                )
+                addStatement("$finalKeyword%T %L = %L", typeName, name, assignExpr)
             } else {
-                actual.addStatement("$finalKeyword\$T \$L", typeName.java, name)
+                addStatement("$finalKeyword%T %L", typeName, name)
             }
         }
 
@@ -88,9 +84,7 @@ internal class JavaCodeBlock(internal val actual: JCodeBlock) : JavaLang(), XCod
 
         override fun unindent() = apply { actual.unindent() }
 
-        override fun build(): XCodeBlock {
-            return JavaCodeBlock(actual.build())
-        }
+        override fun build() = JavaCodeBlock(actual.build())
 
         // Converts '%' place holders to '$' for JavaPoet
         private fun processFormatString(format: String): String {
@@ -117,6 +111,13 @@ internal class JavaCodeBlock(internal val actual: JCodeBlock) : JavaLang(), XCod
                     is XPropertySpec -> (arg as JavaPropertySpec).actual
                     is XFunSpec -> (arg as JavaFunSpec).actual
                     is XCodeBlock -> (arg as JavaCodeBlock).actual
+                    is XAnnotationSpec -> (arg as JavaAnnotationSpec).actual
+                    is XTypeSpec.Builder,
+                    is XPropertySpec.Builder,
+                    is XFunSpec.Builder,
+                    is XCodeBlock.Builder,
+                    is XAnnotationSpec.Builder ->
+                        error("Found builder, ${arg.javaClass}. Did you forget to call .build()?")
                     else -> arg
                 }
             }
