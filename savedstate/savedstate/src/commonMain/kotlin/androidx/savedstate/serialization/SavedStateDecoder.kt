@@ -99,6 +99,42 @@ private class SavedStateDecoder(
 
     override fun decodeEnum(enumDescriptor: SerialDescriptor): Int = savedState.read { getInt(key) }
 
+    private fun decodeIntList(): List<Int> {
+        return savedState.read { getIntList(key) }
+    }
+
+    private fun decodeStringList(): List<String> {
+        return savedState.read { getStringList(key) }
+    }
+
+    private fun decodeBooleanArray(): BooleanArray {
+        return savedState.read { getBooleanArray(key) }
+    }
+
+    private fun decodeCharArray(): CharArray {
+        return savedState.read { getCharArray(key) }
+    }
+
+    private fun decodeDoubleArray(): DoubleArray {
+        return savedState.read { getDoubleArray(key) }
+    }
+
+    private fun decodeFloatArray(): FloatArray {
+        return savedState.read { getFloatArray(key) }
+    }
+
+    private fun decodeIntArray(): IntArray {
+        return savedState.read { getIntArray(key) }
+    }
+
+    private fun decodeLongArray(): LongArray {
+        return savedState.read { getLongArray(key) }
+    }
+
+    private fun decodeStringArray(): Array<String> {
+        return savedState.read { getStringArray(key) }
+    }
+
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder =
         if (key == "") {
             this
@@ -109,4 +145,21 @@ private class SavedStateDecoder(
     // We don't encode NotNullMark so this will actually read either a `null` from
     // `encodeNull()` or a value from other encode functions.
     override fun decodeNotNullMark(): Boolean = savedState.read { !isNull(key) }
+
+    @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
+        return when (deserializer.descriptor) {
+            intListDescriptor -> decodeIntList()
+            stringListDescriptor -> decodeStringList()
+            booleanArrayDescriptor -> decodeBooleanArray()
+            charArrayDescriptor -> decodeCharArray()
+            doubleArrayDescriptor -> decodeDoubleArray()
+            floatArrayDescriptor -> decodeFloatArray()
+            intArrayDescriptor -> decodeIntArray()
+            longArrayDescriptor -> decodeLongArray()
+            stringArrayDescriptor -> decodeStringArray()
+            else -> super.decodeSerializableValue(deserializer)
+        }
+            as T
+    }
 }
