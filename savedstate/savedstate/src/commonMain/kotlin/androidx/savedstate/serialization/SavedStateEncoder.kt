@@ -121,6 +121,42 @@ private class SavedStateEncoder(private val savedState: SavedState) : AbstractEn
         savedState.write { putNull(key) }
     }
 
+    private fun encodeIntList(value: List<Int>) {
+        savedState.write { putIntList(key, value) }
+    }
+
+    private fun encodeStringList(value: List<String>) {
+        savedState.write { putStringList(key, value) }
+    }
+
+    private fun encodeBooleanArray(value: BooleanArray) {
+        savedState.write { putBooleanArray(key, value) }
+    }
+
+    private fun encodeCharArray(value: CharArray) {
+        savedState.write { putCharArray(key, value) }
+    }
+
+    private fun encodeDoubleArray(value: DoubleArray) {
+        savedState.write { putDoubleArray(key, value) }
+    }
+
+    private fun encodeFloatArray(value: FloatArray) {
+        savedState.write { putFloatArray(key, value) }
+    }
+
+    private fun encodeIntArray(value: IntArray) {
+        savedState.write { putIntArray(key, value) }
+    }
+
+    private fun encodeLongArray(value: LongArray) {
+        savedState.write { putLongArray(key, value) }
+    }
+
+    private fun encodeStringArray(value: Array<String>) {
+        savedState.write { putStringArray(key, value) }
+    }
+
     override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
         // We flatten single structured object at root to prevent encoding to a
         // SavedState containing only one SavedState inside. For example, a
@@ -133,6 +169,22 @@ private class SavedStateEncoder(private val savedState: SavedState) : AbstractEn
             SavedStateEncoder(
                 savedState().also { child -> savedState.write { putSavedState(key, child) } }
             )
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
+        return when (serializer.descriptor) {
+            intListDescriptor -> encodeIntList(value as List<Int>)
+            stringListDescriptor -> encodeStringList(value as List<String>)
+            booleanArrayDescriptor -> encodeBooleanArray(value as BooleanArray)
+            charArrayDescriptor -> encodeCharArray(value as CharArray)
+            doubleArrayDescriptor -> encodeDoubleArray(value as DoubleArray)
+            floatArrayDescriptor -> encodeFloatArray(value as FloatArray)
+            intArrayDescriptor -> encodeIntArray(value as IntArray)
+            longArrayDescriptor -> encodeLongArray(value as LongArray)
+            stringArrayDescriptor -> encodeStringArray(value as Array<String>)
+            else -> super.encodeSerializableValue(serializer, value)
         }
     }
 }
