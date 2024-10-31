@@ -344,6 +344,7 @@ final class Camera2CameraImpl implements CameraInternal {
         switch (mState) {
             case INITIALIZED:
             case PENDING_OPEN:
+            case OPENING_WITH_ERROR:
                 tryForceOpenCameraDevice(/*fromScheduledCameraReopen*/false);
                 break;
             case CLOSING:
@@ -402,6 +403,7 @@ final class Camera2CameraImpl implements CameraInternal {
                 }
                 break;
             case PENDING_OPEN:
+            case OPENING_WITH_ERROR:
                 // We should be able to transition directly to an initialized state since the
                 // camera is not yet opening.
                 Preconditions.checkState(mCameraDevice == null);
@@ -541,7 +543,7 @@ final class Camera2CameraImpl implements CameraInternal {
                 });
                 mCameraManager.openCamera(mCameraInfoInternal.getCameraId(), mExecutor,
                         CameraDeviceStateCallbacks.createComboCallback(allStateCallbacks));
-            } catch (CameraAccessExceptionCompat | SecurityException e) {
+            } catch (CameraAccessExceptionCompat | RuntimeException e) {
                 debugLog("Unable to open camera for configAndClose: " + e.getMessage(), e);
                 completer.setException(e);
             }
@@ -654,6 +656,7 @@ final class Camera2CameraImpl implements CameraInternal {
         switch (mState) {
             case INITIALIZED:
             case PENDING_OPEN:
+            case OPENING_WITH_ERROR:
                 Preconditions.checkState(mCameraDevice == null);
                 setState(InternalState.RELEASING);
                 Preconditions.checkState(isSessionCloseComplete());
@@ -1383,7 +1386,8 @@ final class Camera2CameraImpl implements CameraInternal {
 
             // If camera is interrupted currently, force open the camera right now regardless of the
             // camera availability.
-            if (enabled && mState == InternalState.PENDING_OPEN) {
+            if (enabled && (mState == InternalState.PENDING_OPEN
+                    || mState == InternalState.OPENING_WITH_ERROR)) {
                 tryForceOpenCameraDevice(/*fromScheduledCameraReopen*/false);
             }
         });
@@ -1439,6 +1443,14 @@ final class Camera2CameraImpl implements CameraInternal {
             // callback's onError() method, which is why we manually attempt to reopen the camera.
             setState(InternalState.REOPENING);
             mStateCallback.scheduleCameraReopen();
+        } catch (RuntimeException e) {
+            debugLog("Unexpected error occurred when opening camera.", e);
+            // RuntimeExceptions like IllegalArgumentException could be due to:
+            // 1. The external camera being unplugged.
+            // 2. CameraService being temporarily unavailable.
+            // Transition to the OPENING_WITH_ERROR state to handle this situation.
+            setState(InternalState.OPENING_WITH_ERROR,
+                    CameraState.StateError.create(CameraState.ERROR_CAMERA_FATAL_ERROR));
         }
     }
 
@@ -1869,6 +1881,18 @@ final class Camera2CameraImpl implements CameraInternal {
          */
         PENDING_OPEN,
         /**
+         * A transitional state where the camera device is opening, but encountered an
+         * unexpected RuntimeException.
+         *
+         * <p>This state is used to handle unexpected errors during camera opening, such as when
+         * an external camera is unplugged or the CameraService is temporarily unavailable.
+         *
+         * <p>At the end of this state, the camera should move into either the PENDING_OPEN
+         * state to wait for a signal to retry opening, or the OPENING state to attempt
+         * reopening immediately.
+         */
+        OPENING_WITH_ERROR,
+        /**
          * A transitional state where the camera device is currently closing.
          *
          * <p>At the end of this state, the camera should move into the INITIALIZED state.
@@ -1949,6 +1973,7 @@ final class Camera2CameraImpl implements CameraInternal {
         State publicState;
         switch (state) {
             case INITIALIZED:
+            case OPENING_WITH_ERROR:
                 publicState = State.CLOSED;
                 break;
             case PENDING_OPEN:
@@ -2495,7 +2520,8 @@ final class Camera2CameraImpl implements CameraInternal {
 
             mCameraAvailable = true;
 
-            if (mState == InternalState.PENDING_OPEN) {
+            if (mState == InternalState.PENDING_OPEN
+                    || mState == InternalState.OPENING_WITH_ERROR) {
                 tryOpenCameraDevice(/*fromScheduledCameraReopen=*/false);
             }
         }
@@ -2514,7 +2540,8 @@ final class Camera2CameraImpl implements CameraInternal {
         @Override
         @ExecutedBy("mExecutor")
         public void onOpenAvailable() {
-            if (mState == InternalState.PENDING_OPEN) {
+            if (mState == InternalState.PENDING_OPEN
+                    || mState == InternalState.OPENING_WITH_ERROR) {
                 tryOpenCameraDevice(/*fromScheduledCameraReopen=*/false);
             }
         }
