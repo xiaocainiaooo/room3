@@ -395,9 +395,9 @@ internal inline fun <E> SparseArrayCompat<E>.commonValueAt(index: Int): E {
     if (garbage) {
         gc()
     }
-
-    // TODO(b/219834506): Check for OOB and throw instead of potentially casting a null value to
-    //  a non-null type.
+    if (index >= values.size) {
+        throw CollectionPlatformUtils.createIndexOutOfBoundsException()
+    }
     @Suppress("UNCHECKED_CAST") return values[index] as E
 }
 

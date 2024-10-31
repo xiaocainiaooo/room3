@@ -664,9 +664,9 @@ open class AndroidXMultiplatformExtension(val project: Project) {
             kotlinExtension.js() {
                 block?.execute(this)
                 binaries.library()
-                browser { testTask { it.useKarma { useChromeHeadless() } } }
                 project.configureJs()
                 project.configureKotlinJsTests()
+                configureBrowserForTests(project)
             }
         } else {
             null
@@ -681,12 +681,23 @@ open class AndroidXMultiplatformExtension(val project: Project) {
             kotlinExtension.wasmJs("wasmJs") {
                 block?.execute(this)
                 binaries.library()
-                browser { testTask { it.useKarma { useChromeHeadless() } } }
                 project.configureWasm()
                 project.configureKotlinJsTests()
+                configureBrowserForTests(project)
             }
         } else {
             null
+        }
+    }
+
+    private fun KotlinJsTargetDsl.configureBrowserForTests(project: Project) {
+        browser {
+            testTask {
+                it.useKarma {
+                    useChromeHeadless()
+                    useConfigDirectory(File(project.getSupportRootFolder(), "buildSrc/karmaconfig"))
+                }
+            }
         }
     }
 
@@ -761,7 +772,7 @@ private fun Project.configureKotlinJsTests() {
         task.doFirst {
             task.environment(
                 "CHROME_BIN",
-                (unzipChromeBuildServiceProvider.get() as UnzipChromeBuildService).getChromePath()
+                (unzipChromeBuildServiceProvider.get() as UnzipChromeBuildService).chromePath
             )
         }
     }
