@@ -17,7 +17,6 @@
 package androidx.room.solver.query.parameter
 
 import androidx.room.compiler.codegen.XCodeBlock
-import androidx.room.compiler.codegen.XCodeBlock.Builder.Companion.beginForEachControlFlow
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.processing.XNullability
 import androidx.room.ext.CollectionsSizeExprCode

@@ -19,7 +19,6 @@ package androidx.room.vo
 import androidx.room.BuiltInTypeConverters
 import androidx.room.compiler.codegen.CodeLanguage
 import androidx.room.compiler.codegen.XCodeBlock
-import androidx.room.compiler.codegen.XCodeBlock.Builder.Companion.addLocalVal
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.processing.XNullability
 import androidx.room.ext.CollectionTypeNames.ARRAY_MAP

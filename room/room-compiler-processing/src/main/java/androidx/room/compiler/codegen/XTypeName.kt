@@ -132,39 +132,43 @@ protected constructor(
 
     companion object {
         /** A convenience [XTypeName] that represents [Unit] in Kotlin and `void` in Java. */
+        @JvmField
         val UNIT_VOID = XTypeName(java = JTypeName.VOID, kotlin = com.squareup.kotlinpoet.UNIT)
 
         /** A convenience [XTypeName] that represents [Any] in Kotlin and [Object] in Java. */
+        @JvmField
         val ANY_OBJECT = XTypeName(java = JTypeName.OBJECT, kotlin = com.squareup.kotlinpoet.ANY)
 
         /**
          * A convenience [XTypeName] that represents [kotlin.Enum] in Kotlin and [java.lang.Enum] in
          * Java.
          */
+        @JvmField
         val ENUM =
             XTypeName(
                 java = JClassName.get(java.lang.Enum::class.java),
                 kotlin = com.squareup.kotlinpoet.ENUM
             )
 
-        val PRIMITIVE_BOOLEAN = Boolean::class.asPrimitiveTypeName()
-        val PRIMITIVE_BYTE = Byte::class.asPrimitiveTypeName()
-        val PRIMITIVE_SHORT = Short::class.asPrimitiveTypeName()
-        val PRIMITIVE_INT = Int::class.asPrimitiveTypeName()
-        val PRIMITIVE_LONG = Long::class.asPrimitiveTypeName()
-        val PRIMITIVE_CHAR = Char::class.asPrimitiveTypeName()
-        val PRIMITIVE_FLOAT = Float::class.asPrimitiveTypeName()
-        val PRIMITIVE_DOUBLE = Double::class.asPrimitiveTypeName()
+        @JvmField val PRIMITIVE_BOOLEAN = Boolean::class.asPrimitiveTypeName()
+        @JvmField val PRIMITIVE_BYTE = Byte::class.asPrimitiveTypeName()
+        @JvmField val PRIMITIVE_SHORT = Short::class.asPrimitiveTypeName()
+        @JvmField val PRIMITIVE_INT = Int::class.asPrimitiveTypeName()
+        @JvmField val PRIMITIVE_LONG = Long::class.asPrimitiveTypeName()
+        @JvmField val PRIMITIVE_CHAR = Char::class.asPrimitiveTypeName()
+        @JvmField val PRIMITIVE_FLOAT = Float::class.asPrimitiveTypeName()
+        @JvmField val PRIMITIVE_DOUBLE = Double::class.asPrimitiveTypeName()
 
-        val BOXED_BOOLEAN = Boolean::class.asClassName()
-        val BOXED_BYTE = Byte::class.asClassName()
-        val BOXED_SHORT = Short::class.asClassName()
-        val BOXED_INT = Int::class.asClassName()
-        val BOXED_LONG = Long::class.asClassName()
-        val BOXED_CHAR = Char::class.asClassName()
-        val BOXED_FLOAT = Float::class.asClassName()
-        val BOXED_DOUBLE = Double::class.asClassName()
+        @JvmField val BOXED_BOOLEAN = Boolean::class.asClassName()
+        @JvmField val BOXED_BYTE = Byte::class.asClassName()
+        @JvmField val BOXED_SHORT = Short::class.asClassName()
+        @JvmField val BOXED_INT = Int::class.asClassName()
+        @JvmField val BOXED_LONG = Long::class.asClassName()
+        @JvmField val BOXED_CHAR = Char::class.asClassName()
+        @JvmField val BOXED_FLOAT = Float::class.asClassName()
+        @JvmField val BOXED_DOUBLE = Double::class.asClassName()
 
+        @JvmField
         val ANY_WILDCARD =
             XTypeName(
                 java = JWildcardTypeName.subtypeOf(Object::class.java),

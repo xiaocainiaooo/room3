@@ -16,7 +16,6 @@
 
 package androidx.room.solver.query.result
 
-import androidx.room.compiler.codegen.XCodeBlock.Builder.Companion.addLocalVal
 import androidx.room.compiler.codegen.XPropertySpec
 import androidx.room.ext.AndroidTypeNames
 import androidx.room.solver.CodeGenScope

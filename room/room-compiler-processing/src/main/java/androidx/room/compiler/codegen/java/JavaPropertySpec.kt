@@ -42,8 +42,6 @@ internal class JavaPropertySpec(override val name: String, internal val actual: 
             error("Adding a property getter when code language is Java is not supported.")
         }
 
-        override fun build(): XPropertySpec {
-            return JavaPropertySpec(name, actual.build())
-        }
+        override fun build() = JavaPropertySpec(name, actual.build())
     }
 }

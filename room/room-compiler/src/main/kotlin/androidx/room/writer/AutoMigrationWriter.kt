@@ -20,10 +20,7 @@ import androidx.room.compiler.codegen.CodeLanguage
 import androidx.room.compiler.codegen.VisibilityModifier
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
-import androidx.room.compiler.codegen.XFunSpec.Builder.Companion.addStatement
 import androidx.room.compiler.codegen.XTypeSpec
-import androidx.room.compiler.codegen.XTypeSpec.Builder.Companion.addOriginatingElement
-import androidx.room.compiler.codegen.XTypeSpec.Builder.Companion.addProperty
 import androidx.room.compiler.processing.XTypeElement
 import androidx.room.ext.RoomMemberNames.DB_UTIL_FOREIGN_KEY_CHECK
 import androidx.room.ext.RoomTypeNames

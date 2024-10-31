@@ -31,8 +31,6 @@ internal class JavaAnnotationSpec(internal val actual: JAnnotationSpec) :
             actual.addMember(name, code.actual)
         }
 
-        override fun build(): XAnnotationSpec {
-            return JavaAnnotationSpec(actual.build())
-        }
+        override fun build() = JavaAnnotationSpec(actual.build())
     }
 }
