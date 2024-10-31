@@ -179,4 +179,63 @@ public class SearchNodeCtsTest {
         SearchNode searchNode = new SearchNode(node);
         assertThrows(NullPointerException.class, () -> searchNode.addProperty(null));
     }
+
+    @Test
+    public void testToString_noPropertyRestricts() {
+        TextNode node = new TextNode("foo");
+        SearchNode searchNode = new SearchNode(node);
+        assertThat(searchNode.toString()).isEqualTo("search(\"(foo)\")");
+    }
+
+    @Test
+    public void testToString_hasPropertyRestricts() {
+        TextNode node = new TextNode("foo");
+        List<PropertyPath> propertyPaths = List.of(new PropertyPath("example.path"),
+                new PropertyPath("anotherPath"));
+        SearchNode searchNode = new SearchNode(node, propertyPaths);
+        assertThat(searchNode.toString())
+                .isEqualTo("search(\"(foo)\", createList(\"example.path\", \"anotherPath\"))");
+    }
+
+    @Test
+    public void testToString_handlesStringLiteral() {
+        TextNode node = new TextNode("foo");
+        node.setVerbatim(true);
+        List<PropertyPath> propertyPaths = List.of(new PropertyPath("example.path"),
+                new PropertyPath("anotherPath"));
+        SearchNode searchNode = new SearchNode(node, propertyPaths);
+        assertThat(searchNode.toString())
+                .isEqualTo("search(\"(\\\"foo\\\")\", "
+                        + "createList(\"example.path\", \"anotherPath\"))");
+    }
+
+    @Test
+    public void testToString_doesAdditionalEscaping() {
+        TextNode node = new TextNode("(NOT \"foo\" OR bar:-baz) AND (property.path > 0)");
+        SearchNode searchNode = new SearchNode(node);
+
+        assertThat(searchNode.toString())
+                .isEqualTo("search(\"("
+                        + "\\\\(not \\\\\\\"foo\\\\\\\" or bar\\\\:\\\\-baz\\\\) and "
+                        + "\\\\(property\\\\.path \\\\> 0\\\\))"
+                        + "\")");
+    }
+
+    @Test
+    public void testToString_handlesNestedSearchNode() {
+        TextNode node = new TextNode("foo");
+        node.setVerbatim(true);
+        List<PropertyPath> propertyPaths =
+                List.of(new PropertyPath("example.path"),
+                        new PropertyPath("anotherPath"));
+        SearchNode nestedSearchNode = new SearchNode(node, propertyPaths);
+        SearchNode searchNode = new SearchNode(nestedSearchNode);
+
+        assertThat(searchNode.toString())
+                .isEqualTo("search(\""
+                        + "search("
+                        + "\\\"(\\\\\\\"foo\\\\\\\")\\\", "
+                        + "createList(\\\"example.path\\\", \\\"anotherPath\\\")"
+                        + ")\")");
+    }
 }

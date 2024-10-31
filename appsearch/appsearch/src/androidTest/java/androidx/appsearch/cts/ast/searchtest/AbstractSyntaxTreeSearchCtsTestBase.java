@@ -42,6 +42,7 @@ import androidx.appsearch.ast.operators.PropertyRestrictNode;
 import androidx.appsearch.ast.query.GetSearchStringParameterNode;
 import androidx.appsearch.ast.query.HasPropertyNode;
 import androidx.appsearch.ast.query.PropertyDefinedNode;
+import androidx.appsearch.ast.query.SearchNode;
 import androidx.appsearch.flags.CheckFlagsRule;
 import androidx.appsearch.flags.DeviceFlagsValueProvider;
 import androidx.appsearch.flags.Flags;
@@ -665,5 +666,261 @@ public abstract class AbstractSyntaxTreeSearchCtsTestBase {
                         .build());
         List<GenericDocument> documents = convertSearchResultsToDocuments(searchResults);
         assertThat(documents).containsExactly(emptyBodyEmail, nonEmptyBodyEmail);
+    }
+
+    @Test
+    public void testSearchNode_toString_noPropertyRestricts_retrievesSameDocuments()
+            throws Exception {
+        mDb1.setSchemaAsync(
+                new SetSchemaRequest.Builder().addSchemas(AppSearchEmail.SCHEMA).build()).get();
+
+        AppSearchEmail barBodyEmail = new AppSearchEmail.Builder("namespace", "id0")
+                .setBody("bar")
+                .build();
+
+        AppSearchEmail fooBodyEmail = new AppSearchEmail.Builder("namespace", "id1")
+                .setBody("foo")
+                .build();
+
+        AppSearchEmail fooFromEmail = new AppSearchEmail.Builder("namespace", "id2")
+                .setFrom("foo")
+                .setTo("baz")
+                .setBody("bar")
+                .build();
+        AppSearchEmail fooToEmail = new AppSearchEmail.Builder("namespace", "id3")
+                .setFrom("baz")
+                .setTo("foo")
+                .build();
+
+        checkIsBatchResultSuccess(mDb1.putAsync(
+                        new PutDocumentsRequest.Builder()
+                                .addGenericDocuments(
+                                        barBodyEmail,
+                                        fooBodyEmail,
+                                        fooFromEmail,
+                                        fooToEmail)
+                                .build()
+                )
+        );
+
+        // Query for the document
+        TextNode body = new TextNode("foo");
+        SearchNode search = new SearchNode(body);
+
+        SearchResults searchResults = mDb1.search(search.toString(), new SearchSpec.Builder()
+                .setTermMatch(SearchSpec.TERM_MATCH_EXACT_ONLY)
+                .setListFilterQueryLanguageEnabled(true)
+                .build());
+        List<GenericDocument> documents = convertSearchResultsToDocuments(searchResults);
+        assertThat(documents).containsExactly(fooBodyEmail, fooFromEmail, fooToEmail);
+    }
+
+    @Test
+    public void testSearchNode_toString_hasPropertyRestricts_retrievesDocumentsWithProperty()
+            throws Exception {
+        mDb1.setSchemaAsync(
+                new SetSchemaRequest.Builder().addSchemas(AppSearchEmail.SCHEMA).build()).get();
+
+        AppSearchEmail fooBodyEmail = new AppSearchEmail.Builder("namespace", "id1")
+                .setBody("foo")
+                .build();
+
+        AppSearchEmail fooFromEmail = new AppSearchEmail.Builder("namespace", "id2")
+                .setFrom("foo")
+                .setTo("baz")
+                .build();
+        AppSearchEmail fooToEmail = new AppSearchEmail.Builder("namespace", "id3")
+                .setFrom("baz")
+                .setTo("foo")
+                .build();
+
+        checkIsBatchResultSuccess(mDb1.putAsync(
+                        new PutDocumentsRequest.Builder()
+                                .addGenericDocuments(fooBodyEmail, fooFromEmail, fooToEmail)
+                                .build()
+                )
+        );
+
+        // Query for the document
+        TextNode body = new TextNode("foo");
+        List<PropertyPath> properties = List.of(new PropertyPath("from"), new PropertyPath("to"));
+        SearchNode search = new SearchNode(body, properties);
+
+        SearchResults searchResults = mDb1.search(search.toString(), new SearchSpec.Builder()
+                .setTermMatch(SearchSpec.TERM_MATCH_EXACT_ONLY)
+                .setListFilterQueryLanguageEnabled(true)
+                .build());
+        List<GenericDocument> documents = convertSearchResultsToDocuments(searchResults);
+        assertThat(documents).containsExactly(fooFromEmail, fooToEmail);
+    }
+
+    @Test
+    public void testSearchNode_toString_handlesStringLiterals() throws Exception {
+        AppSearchSchema schema = new AppSearchSchema.Builder("VerbatimSchema")
+                .addProperty(new StringPropertyConfig.Builder("verbatimProp")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setTokenizerType(StringPropertyConfig.TOKENIZER_TYPE_VERBATIM)
+                        .setIndexingType(StringPropertyConfig.INDEXING_TYPE_EXACT_TERMS)
+                        .build())
+                .build();
+        mDb1.setSchemaAsync(
+                new SetSchemaRequest.Builder().addSchemas(schema).build()).get();
+
+        SearchSpec searchSpec = new SearchSpec.Builder()
+                .setTermMatch(SearchSpec.TERM_MATCH_EXACT_ONLY)
+                .setVerbatimSearchEnabled(true)
+                .setListFilterQueryLanguageEnabled(true)
+                .build();
+
+        GenericDocument doc = new GenericDocument.Builder<>(
+                "namespace", "id1", "VerbatimSchema")
+                .setPropertyString("verbatimProp",
+                        "Hello, world!")
+                .build();
+
+        checkIsBatchResultSuccess(mDb1.putAsync(
+                new PutDocumentsRequest.Builder().addGenericDocuments(doc).build()));
+
+        // Check that searching using the query without setting it as a verbatim returns nothing.
+        TextNode nonVerbatimQuery = new TextNode("Hello, world!");
+        SearchNode searchNode = new SearchNode(nonVerbatimQuery);
+        SearchResults emptySearchResults = mDb1.search(searchNode.toString(),
+                searchSpec);
+        List<GenericDocument> emptyDocuments = convertSearchResultsToDocuments(emptySearchResults);
+        assertThat(emptyDocuments).isEmpty();
+
+        // Now check that search using the query with setting it as a verbatim returns the document.
+        TextNode verbatimQuery = new TextNode("Hello, world!");
+        verbatimQuery.setVerbatim(true);
+        searchNode.setChild(verbatimQuery);
+        SearchResults searchResults = mDb1.search(searchNode.toString(), searchSpec);
+        List<GenericDocument> documents = convertSearchResultsToDocuments(searchResults);
+        assertThat(documents).containsExactly(doc);
+    }
+
+    @Test
+    public void testSearchNode_toString_handlesPrefixedStringLiterals() throws Exception {
+        AppSearchSchema schema = new AppSearchSchema.Builder("VerbatimSchema")
+                .addProperty(new StringPropertyConfig.Builder("verbatimProp")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setTokenizerType(StringPropertyConfig.TOKENIZER_TYPE_VERBATIM)
+                        .setIndexingType(StringPropertyConfig.INDEXING_TYPE_PREFIXES)
+                        .build())
+                .build();
+        mDb1.setSchemaAsync(
+                new SetSchemaRequest.Builder().addSchemas(schema).build()).get();
+
+        SearchSpec searchSpec = new SearchSpec.Builder()
+                .setTermMatch(SearchSpec.TERM_MATCH_EXACT_ONLY)
+                .setVerbatimSearchEnabled(true)
+                .setListFilterQueryLanguageEnabled(true)
+                .build();
+
+        GenericDocument doc = new GenericDocument.Builder<>(
+                "namespace", "id1", "VerbatimSchema")
+                .setPropertyString("verbatimProp",
+                        "Hello, world!")
+                .build();
+
+        checkIsBatchResultSuccess(mDb1.putAsync(
+                new PutDocumentsRequest.Builder().addGenericDocuments(doc).build()));
+
+        // Check that searching using the verbatim query without setting it as a prefix returns
+        // nothing.
+        TextNode nonPrefixedVerbatimQuery = new TextNode("Hello, wor");
+        nonPrefixedVerbatimQuery.setVerbatim(true);
+        SearchNode searchNode = new SearchNode(nonPrefixedVerbatimQuery);
+        SearchResults emptySearchResults = mDb1.search(searchNode.toString(),
+                searchSpec);
+        List<GenericDocument> emptyDocuments = convertSearchResultsToDocuments(emptySearchResults);
+        assertThat(emptyDocuments).isEmpty();
+
+        // Check that Prefixed Verbatim Queries returns the document
+        TextNode prefixedVerbatimQuery = new TextNode("Hello, wor");
+        prefixedVerbatimQuery.setVerbatim(true);
+        prefixedVerbatimQuery.setPrefix(true);
+        searchNode.setChild(prefixedVerbatimQuery);
+        SearchResults prefixedSearchResults = mDb1.search(searchNode.toString(), searchSpec);
+        List<GenericDocument> prefixDocuments =
+                convertSearchResultsToDocuments(prefixedSearchResults);
+        assertThat(prefixDocuments).containsExactly(doc);
+    }
+
+    @Test
+    public void testSearchNode_toString_handlesNestedSearch() throws Exception {
+        // Schema Registration
+        AppSearchSchema verbatimSchema = new AppSearchSchema.Builder("VerbatimSchema")
+                .addProperty(new StringPropertyConfig.Builder("from")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setTokenizerType(StringPropertyConfig.TOKENIZER_TYPE_VERBATIM)
+                        .setIndexingType(StringPropertyConfig.INDEXING_TYPE_EXACT_TERMS)
+                        .build())
+                .addProperty(new StringPropertyConfig.Builder("to")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setTokenizerType(StringPropertyConfig.TOKENIZER_TYPE_VERBATIM)
+                        .setIndexingType(StringPropertyConfig.INDEXING_TYPE_EXACT_TERMS)
+                        .build())
+                .addProperty(new StringPropertyConfig.Builder("body")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setTokenizerType(StringPropertyConfig.TOKENIZER_TYPE_VERBATIM)
+                        .setIndexingType(StringPropertyConfig.INDEXING_TYPE_EXACT_TERMS)
+                        .build())
+                .build();
+        mDb1.setSchemaAsync(
+                new SetSchemaRequest.Builder()
+                        .addSchemas(AppSearchEmail.SCHEMA, verbatimSchema).build()).get();
+
+        GenericDocument fooBodyEmail = new GenericDocument.Builder<>(
+                "namespace",
+                "id1",
+                "VerbatimSchema")
+                .setPropertyString("body", "foo")
+                .build();
+        GenericDocument fooFromEmail = new GenericDocument.Builder<>(
+                "namespace",
+                "id2",
+                "VerbatimSchema")
+                .setPropertyString("from", "foo")
+                .setPropertyString("to", "bar")
+                .build();
+        GenericDocument fooToEmail = new GenericDocument.Builder<>(
+                "namespace",
+                "id3",
+                "VerbatimSchema")
+                .setPropertyString("from", "bar")
+                .setPropertyString("to", "foo")
+                .build();
+
+        checkIsBatchResultSuccess(mDb1.putAsync(
+                        new PutDocumentsRequest.Builder()
+                                .addGenericDocuments(fooBodyEmail, fooFromEmail, fooToEmail)
+                                .build()
+                )
+        );
+
+        // Check that the nested query returns the correct document.
+        TextNode body = new TextNode("foo");
+        body.setVerbatim(true);
+        List<PropertyPath> properties = List.of(new PropertyPath("from"), new PropertyPath("to"));
+        SearchNode nestedSearch = new SearchNode(body, properties);
+        SearchResults nestedSearchResults = mDb1.search(nestedSearch.toString(),
+                new SearchSpec.Builder()
+                        .setTermMatch(SearchSpec.TERM_MATCH_EXACT_ONLY)
+                        .setListFilterQueryLanguageEnabled(true)
+                        .setVerbatimSearchEnabled(true)
+                        .build());
+        List<GenericDocument> nestedDocuments =
+                convertSearchResultsToDocuments(nestedSearchResults);
+        assertThat(nestedDocuments).containsExactly(fooFromEmail, fooToEmail);
+
+        // Now check that the outer query returns the same documents as the nested query.
+        SearchNode searchNode = new SearchNode(nestedSearch);
+        SearchResults searchResults = mDb1.search(searchNode.toString(), new SearchSpec.Builder()
+                .setTermMatch(SearchSpec.TERM_MATCH_EXACT_ONLY)
+                .setListFilterQueryLanguageEnabled(true)
+                .setVerbatimSearchEnabled(true)
+                .build());
+        List<GenericDocument> documents = convertSearchResultsToDocuments(searchResults);
+        assertThat(documents).isEqualTo(nestedDocuments);
     }
 }

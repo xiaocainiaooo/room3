@@ -136,4 +136,87 @@ public final class SearchNode implements FunctionNode {
     public void addProperty(@NonNull PropertyPath propertyPath) {
         mProperties.add(Preconditions.checkNotNull(propertyPath));
     }
+
+    /**
+     * Get the query string representation of {@link SearchNode}.
+     *
+     * <p>If there are no property restricts, then the string representation is the function name
+     * followed by the string representation of the child subquery as a string literal, surrounded
+     * by parentheses. For example the node represented by
+     *
+     * <pre>{@code
+     * TextNode node = new TextNode("foo");
+     * SearchNode searchNode = new SearchNode(node);
+     * }</pre>
+     *
+     * will be represented by the query string `search("(foo)")`.
+     *
+     * <p>If there are property restricts, i.e. {@link #getProperties()} is not empty, then in
+     * addition to the string representation of the child subquery, the property restricts will be
+     * represented as inputs to the {@code createList} function, which itself will be an input.
+     * So for the node represented by
+     * <pre>{@code
+     * List<PropertyPath> propertyPaths = List.of(new PropertyPath("example.path"),
+     *                                            new PropertyPath("anotherPath"));
+     * TextNode node = new TextNode("foo");
+     * SearchNode searchNode = new SearchNode(node, propertyPaths);
+     * }</pre>
+     *
+     * the query string will be `search("(foo)", createList("example.path", "anotherPath"))`.
+     *
+     * <p>Operators in the query string are supported. As such additional escaping are applied
+     * to ensure that operators stay scoped to the search node. This applies recursively, so if we
+     * had three layers of search i.e. a search function that takes a query containing a nested
+     * search, we would apply three levels of escaping. So for the node represented by
+     * <pre>{@code
+     * TextNode node = new TextNode("foo");
+     * node.setVerbatim(true);
+     * SearchNode nestedSearchNode = new SearchNode(node);
+     * SearchNode searchNode = new SearchNode(nestedSearchNode);
+     * }</pre>
+     *
+     * the query string of {@code searchNode} will be `search("search(\"(\\\"foo\\\")\")")`
+     */
+    @NonNull
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder(FunctionNode.FUNCTION_NAME_SEARCH);
+        builder.append("(\"");
+        builder.append(escapeQuery(getChild().toString()));
+        builder.append("\"");
+        if (!mProperties.isEmpty()) {
+            builder.append(", createList(");
+            for (int i = 0; i < mProperties.size() - 1; i++) {
+                builder.append("\"");
+                builder.append(mProperties.get(i));
+                builder.append("\", ");
+            }
+            builder.append("\"");
+            builder.append(mProperties.get(mProperties.size() - 1));
+            builder.append("\")");
+        }
+        builder.append(")");
+        return builder.toString();
+    }
+
+    /**
+     * Escapes queries passed into {@link SearchNode}. Queries are assumed to be already escaped,
+     * but need additional escaping if they are an input of {@link SearchNode}.
+     */
+    private String escapeQuery(String strLiteral) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < strLiteral.length(); i++) {
+            // We want to add an escape character if:
+            // 1. There is a quote character ('"')
+            // 2. There is an escape character ('\')
+            // It is ok to add two escape characters for escaped quote characters ('\"') because if
+            // we to unescape we need to unescape both the original escape character and the quote
+            // character.
+            if (strLiteral.charAt(i) == '"' || strLiteral.charAt(i) == '\\') {
+                stringBuilder.append('\\');
+            }
+            stringBuilder.append(strLiteral.charAt(i));
+        }
+        return stringBuilder.toString();
+    }
 }
