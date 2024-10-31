@@ -2712,17 +2712,13 @@ internal object GetParcelableHelper {
 internal object PersistableBundleHelper {
     @Suppress("deprecation")
     fun equals(a: PersistableBundle?, b: PersistableBundle?): Boolean {
-        System.out.println("<<< EQ $a $b")
         if (a === b) {
-            System.out.println("<<< EQ1  true")
             return true
         }
         if (a == null || b == null) {
-            System.out.println("<<< EQ2  false ")
             return false
         }
         if (a.size() != b.size()) {
-            System.out.println("<<< EQ3  false ")
             return false
         }
         for (key in a.keySet()) {
@@ -2730,17 +2726,14 @@ internal object PersistableBundleHelper {
             val bVal = b.get(key) ?: return false
             if (aVal is PersistableBundle && bVal is PersistableBundle) {
                 if (!equals(aVal, bVal)) {
-                    System.out.println("<<< EQ4  false ")
                     return false
                 }
             } else {
                 if (aVal != bVal) {
-                    System.out.println("<<< EQ5  false ")
                     return false
                 }
             }
         }
-        System.out.println("<<< EQ6  true ")
         return true
     }
 
@@ -2758,7 +2751,6 @@ internal object PersistableBundleHelper {
                 hash = hash * 33 + v.hashCode()
             }
         }
-        System.out.println("<<< HASH " + bundle + " = " + hash)
         return hash
     }
 }
