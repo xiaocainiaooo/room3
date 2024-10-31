@@ -524,7 +524,6 @@ public class BiometricPrompt {
              * @return This builder.
              */
             @RequiresPermission(SET_BIOMETRIC_DIALOG_ADVANCED)
-            @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
             @NonNull
             public Builder setLogoRes(@DrawableRes int logoRes) {
                 mLogoRes = logoRes;
@@ -543,7 +542,6 @@ public class BiometricPrompt {
              * @return This builder.
              */
             @RequiresPermission(SET_BIOMETRIC_DIALOG_ADVANCED)
-            @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
             @NonNull
             public Builder setLogoBitmap(@NonNull Bitmap logoBitmap) {
                 mLogoBitmap = logoBitmap;
@@ -564,7 +562,6 @@ public class BiometricPrompt {
              *                                  character limit.
              */
             @RequiresPermission(SET_BIOMETRIC_DIALOG_ADVANCED)
-            @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
             @NonNull
             public Builder setLogoDescription(@NonNull String logoDescription) {
                 mLogoDescription = logoDescription;
@@ -598,11 +595,10 @@ public class BiometricPrompt {
             /**
              * Optional: Sets a description that will be shown on the prompt.
              *
-             * <p> Note that from API 35, the description set by
-             * {@link Builder#setDescription(CharSequence)} will be overridden by
-             * {@link Builder#setContentView(PromptContentView)}. The view provided to
-             * {@link Builder#setContentView(PromptContentView)} will be used if both methods are
-             * called.
+             * <p> Note that the description set by {@link Builder#setDescription(CharSequence)}
+             * will be overridden by {@link Builder#setContentView(PromptContentView)}. The view
+             * provided to {@link Builder#setContentView(PromptContentView)} will be used if both
+             * methods are called.
              *
              * @param description The description to display.
              * @return This builder.
@@ -625,7 +621,6 @@ public class BiometricPrompt {
              * @return This builder.
              */
             @NonNull
-            @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
             public Builder setContentView(@NonNull PromptContentView view) {
                 mPromptContentView = view;
                 return this;
@@ -833,7 +828,6 @@ public class BiometricPrompt {
          * @return The drawable resource of the logo, or -1 if the prompt has no logo resource set.
          */
         @RequiresPermission(SET_BIOMETRIC_DIALOG_ADVANCED)
-        @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
         @DrawableRes
         public int getLogoRes() {
             return mLogoRes;
@@ -846,7 +840,6 @@ public class BiometricPrompt {
          * @return The logo bitmap of the prompt, or null if the prompt has no logo bitmap set.
          */
         @RequiresPermission(SET_BIOMETRIC_DIALOG_ADVANCED)
-        @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
         @Nullable
         public Bitmap getLogoBitmap() {
             return mLogoBitmap;
@@ -861,7 +854,6 @@ public class BiometricPrompt {
          * set.
          */
         @RequiresPermission(SET_BIOMETRIC_DIALOG_ADVANCED)
-        @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
         @Nullable
         public String getLogoDescription() {
             return mLogoDescription;
@@ -909,7 +901,6 @@ public class BiometricPrompt {
          *
          * @return The content view for the prompt, or null if the prompt has no content view.
          */
-        @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
         @Nullable
         public PromptContentView getContentView() {
             return mPromptContentView;

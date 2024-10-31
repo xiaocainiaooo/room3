@@ -16,13 +16,8 @@
 
 package androidx.biometric;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
 /**
  * An item shown on {@link PromptContentView}.
  */
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 public interface PromptContentItem {
 }

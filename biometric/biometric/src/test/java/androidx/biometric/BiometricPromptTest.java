@@ -21,7 +21,6 @@ import static com.google.common.truth.Truth.assertThat;
 import android.graphics.Bitmap;
 import android.os.Build;
 
-import androidx.annotation.RequiresApi;
 import androidx.biometric.BiometricManager.Authenticators;
 
 import org.junit.Test;
@@ -61,7 +60,6 @@ public class BiometricPromptTest {
     }
 
     @Test
-    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     public void testPromptInfo_CanSetAndGetOptions_logoResAndDescription() {
         final int logoRes = R.drawable.fingerprint_dialog_fp_icon;
         final String logoDescription = "logo description";
@@ -81,7 +79,6 @@ public class BiometricPromptTest {
     }
 
     @Test
-    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     public void testPromptInfo_CanSetAndGetOptions_logoBitmap() {
         final Bitmap logoBitmap = Bitmap.createBitmap(400, 400, Bitmap.Config.RGB_565);
         final String logoDescription = "logo description";
@@ -99,7 +96,6 @@ public class BiometricPromptTest {
     }
 
     @Test
-    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     public void testPromptInfo_CanSetAndGetOptions_verticalListContent() {
         final String contentDescription = "test description";
         final String itemOne = "content item 1";
@@ -132,7 +128,6 @@ public class BiometricPromptTest {
     }
 
     @Test
-    @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     public void testPromptInfo_CanSetAndGetOptions_contentViewMoreOptionsButton() {
         final String contentDescription = "test description";
         final PromptContentViewWithMoreOptionsButton contentView =
