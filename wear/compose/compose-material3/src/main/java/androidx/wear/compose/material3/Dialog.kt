@@ -17,6 +17,7 @@
 package androidx.wear.compose.material3
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
@@ -25,6 +26,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,15 +74,19 @@ fun Dialog(
     val scaffoldState = LocalScaffoldState.current
     val backgroundAnimatable = remember { Animatable(1f) }
 
+    val backgroundAnimationSpec =
+        MaterialTheme.motionScheme.defaultEffectsSpec<Float>().faster(50f)
+            as FiniteAnimationSpec<Float>
+
     LaunchedEffect(Unit) {
         snapshotFlow { showState }
             .collectLatest {
                 if (it) {
-                    backgroundAnimatable.animateTo(0.85f, standard().slowSpatialSpec()) {
+                    backgroundAnimatable.animateTo(0.85f, backgroundAnimationSpec) {
                         scaffoldState.parentScale.floatValue = value
                     }
                 } else {
-                    backgroundAnimatable.animateTo(1f, standard().slowSpatialSpec()) {
+                    backgroundAnimatable.animateTo(1f, backgroundAnimationSpec) {
                         scaffoldState.parentScale.floatValue = value
                     }
                 }
@@ -145,11 +151,14 @@ fun Dialog(
 }
 
 @Composable
-private fun animateContentAlpha(transition: Transition<DialogVisibility>) =
-    transition.animateFloat(
+private fun animateContentAlpha(transition: Transition<DialogVisibility>): State<Float> {
+    val dialogAlphaAnimationSpec =
+        MaterialTheme.motionScheme.fastEffectsSpec<Float>().faster(50f)
+            as FiniteAnimationSpec<Float>
+    return transition.animateFloat(
         transitionSpec = {
             when (transition.targetState) {
-                DialogVisibility.Display -> standard().fastEffectsSpec()
+                DialogVisibility.Display -> dialogAlphaAnimationSpec
                 DialogVisibility.Hide -> standard().fastEffectsSpec()
             }
         },
@@ -160,23 +169,28 @@ private fun animateContentAlpha(transition: Transition<DialogVisibility>) =
             DialogVisibility.Display -> 1f
         }
     }
+}
 
 @Composable
-private fun animateDialogScale(transition: Transition<DialogVisibility>) =
-    transition.animateFloat(
+private fun animateDialogScale(transition: Transition<DialogVisibility>): State<Float> {
+    val dialogAnimationSpec =
+        MaterialTheme.motionScheme.defaultEffectsSpec<Float>().faster(50f)
+            as FiniteAnimationSpec<Float>
+    return transition.animateFloat(
         transitionSpec = {
             when (transition.targetState) {
-                DialogVisibility.Display -> standard().slowSpatialSpec()
-                DialogVisibility.Hide -> standard().slowSpatialSpec()
+                DialogVisibility.Display -> dialogAnimationSpec
+                DialogVisibility.Hide -> dialogAnimationSpec
             }
         },
         label = "scale"
     ) { stage ->
         when (stage) {
-            DialogVisibility.Hide -> 1.15f
+            DialogVisibility.Hide -> 1.25f
             DialogVisibility.Display -> 1.0f
         }
     }
+}
 
 private enum class DialogVisibility {
     Hide,
