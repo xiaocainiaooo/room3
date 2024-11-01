@@ -28,6 +28,7 @@ import android.widget.LinearLayout
 import androidx.privacysandbox.ui.client.view.SandboxedSdkUiSessionState
 import androidx.privacysandbox.ui.client.view.SandboxedSdkUiSessionStateChangedListener
 import androidx.privacysandbox.ui.client.view.SandboxedSdkView
+import androidx.privacysandbox.ui.core.SandboxedSdkViewUiInfo
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.tests.endtoend.IntegrationTestSetupRule.Companion.INITIAL_HEIGHT
 import androidx.privacysandbox.ui.tests.endtoend.IntegrationTestSetupRule.Companion.INITIAL_WIDTH
@@ -294,6 +295,53 @@ class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
             /* expectedWidth=*/ newWidth,
             /* expectedHeight=*/ newHeight
         )
+    }
+
+    @Test
+    fun testPaddingApplied() {
+        val sdkAdapter = sessionManager.createAdapterAndWaitToBeActive(viewForSession = view)
+        val paddingLeft = 10
+        val paddingTop = 10
+        val paddingRight = 20
+        val paddingBottom = 20
+        activityScenario.onActivity {
+            view.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
+        }
+
+        val testSession = sdkAdapter.session as TestSandboxedUiAdapter.TestSession
+        val expectedWidth = INITIAL_WIDTH - paddingLeft - paddingRight
+        val expectedHeight = INITIAL_HEIGHT - paddingTop - paddingBottom
+        assertWithMessage("Resized width").that(testSession.resizedWidth).isEqualTo(expectedWidth)
+        assertWithMessage("Resized height")
+            .that(testSession.resizedHeight)
+            .isEqualTo(expectedHeight)
+        testSession.assertResizeOccurred(expectedWidth, expectedHeight)
+    }
+
+    @Test
+    fun testSessionObserverSignalOnSettingPadding() {
+        val factory = TestSessionManager.SessionObserverFactoryImpl()
+        sessionManager.createAdapterAndWaitToBeActive(
+            viewForSession = view,
+            sessionObserverFactories = listOf(factory)
+        )
+        val sessionObserver = factory.sessionObservers[0]
+        val paddingLeft = 10
+        val paddingTop = 10
+        val paddingRight = 20
+        val paddingBottom = 20
+        activityScenario.onActivity {
+            view.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
+        }
+        val expectedWidth = INITIAL_WIDTH - paddingLeft - paddingRight
+        val expectedHeight = INITIAL_HEIGHT - paddingTop - paddingBottom
+        sessionObserver.assertOnUiContainerChangedSent()
+        val latestUiContainerInfo =
+            SandboxedSdkViewUiInfo.fromBundle(sessionObserver.latestUiChange)
+        assertThat(latestUiContainerInfo.uiContainerHeight).isEqualTo(expectedHeight)
+        assertThat(latestUiContainerInfo.uiContainerWidth).isEqualTo(expectedWidth)
+        assertThat(latestUiContainerInfo.onScreenGeometry.height()).isEqualTo(expectedHeight)
+        assertThat(latestUiContainerInfo.onScreenGeometry.width()).isEqualTo(expectedWidth)
     }
 
     @Test
