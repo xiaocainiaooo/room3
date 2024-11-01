@@ -240,7 +240,13 @@ object SandboxedUiAdapterFactory {
                 get() = getSignalOptionsMethod.invoke(origSession) as Set<String>
 
             override fun notifyResized(width: Int, height: Int) {
-                view.layout(0, 0, width, height)
+                val parentView = view.parent as View
+                view.layout(
+                    parentView.paddingLeft,
+                    parentView.paddingTop,
+                    parentView.paddingLeft + width,
+                    parentView.paddingTop + height
+                )
                 notifyResizedMethod.invoke(origSession, width, height)
             }
 
@@ -388,12 +394,14 @@ object SandboxedUiAdapterFactory {
             @SuppressLint("ClassVerificationFailure")
             override fun notifyResized(width: Int, height: Int) {
 
+                val parentView = surfaceView.parent as View
+
                 val clientResizeRunnable = Runnable {
                     surfaceView.layout(
-                        /* left = */ 0,
-                        /* top = */ 0,
-                        /* right = */ width,
-                        /* bottom = */ height
+                        /* left = */ parentView.paddingLeft,
+                        /* top = */ parentView.paddingTop,
+                        /* right = */ parentView.paddingLeft + width,
+                        /* bottom = */ parentView.paddingTop + height
                     )
                 }
 
