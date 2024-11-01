@@ -69,8 +69,7 @@ import androidx.compose.ui.util.fastForEach
  * @param view The parent compose view.
  */
 @RequiresApi(Build.VERSION_CODES.O)
-actual class AutofillManager internal constructor(view: AndroidComposeView) {
-    internal val view: AndroidComposeView = view
+internal class AndroidAutofillManager(val view: AndroidComposeView) : AutofillManager {
     internal var autofillManager: AutofillManagerWrapper = AutofillManagerWrapperImpl(view)
 
     init {
@@ -219,23 +218,15 @@ actual class AutofillManager internal constructor(view: AndroidComposeView) {
         autofillManager.notifyViewVisibilityChanged(semanticsId, !isInvisible)
     }
 
-    actual fun commit() {
+    override fun commit() {
         autofillManager.commit()
     }
 
-    actual fun cancel() {
+    override fun cancel() {
         autofillManager.cancel()
     }
 
-    /**
-     * Request autofill for previously focused element.
-     *
-     * This may have no effect, and it is not required that any autofill service will be notified.
-     *
-     * Any component that can be autofilled should call this when it is active to allow autofill
-     * services to respond. This is typically called inside a context menu or text toolbar.
-     */
-    fun requestAutofill() {
+    override fun requestAutofillForActiveElement() {
         currentSemanticsNodes[previouslyFocusedId]?.let {
             autofillManager.requestAutofill(previouslyFocusedId, it.adjustedBounds)
         }
@@ -287,12 +278,12 @@ actual class AutofillManager internal constructor(view: AndroidComposeView) {
             }
 
             /** Registers the autofill debug callback. */
-            fun register(androidAutofillManager: AutofillManager) {
+            fun register(androidAutofillManager: AndroidAutofillManager) {
                 androidAutofillManager.autofillManager.autofillManager.registerCallback(this)
             }
 
             /** Unregisters the autofill debug callback. */
-            fun unregister(androidAutofillManager: AutofillManager) {
+            fun unregister(androidAutofillManager: AndroidAutofillManager) {
                 androidAutofillManager.autofillManager.autofillManager.unregisterCallback(this)
             }
         }
@@ -300,7 +291,7 @@ actual class AutofillManager internal constructor(view: AndroidComposeView) {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-internal fun AutofillManager.populateViewStructure(root: ViewStructure) {
+internal fun AndroidAutofillManager.populateViewStructure(root: ViewStructure) {
     // Add child nodes. The function returns the index to the first item.
     val count =
         currentSemanticsNodes.count { _, semanticsNodeWithAdjustedBounds ->
@@ -454,7 +445,7 @@ internal fun SemanticsNode.populateViewStructure(child: ViewStructure) {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-internal fun AutofillManager.performAutofill(values: SparseArray<AutofillValue>) {
+internal fun AndroidAutofillManager.performAutofill(values: SparseArray<AutofillValue>) {
     for (index in 0 until values.size()) {
         val itemId = values.keyAt(index)
         val value = values[itemId]

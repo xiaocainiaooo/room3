@@ -221,14 +221,10 @@ package androidx.compose.ui.autofill {
     method public void requestAutofillForNode(androidx.compose.ui.autofill.AutofillNode autofillNode);
   }
 
-  @RequiresApi(android.os.Build.VERSION_CODES.O) public final class AutofillManager {
+  public interface AutofillManager {
     method public void cancel();
     method public void commit();
-    method public void requestAutofill();
-    field public static final androidx.compose.ui.autofill.AutofillManager.Companion Companion;
-  }
-
-  public static final class AutofillManager.Companion {
+    method public void requestAutofillForActiveElement();
   }
 
   public final class AutofillNode {

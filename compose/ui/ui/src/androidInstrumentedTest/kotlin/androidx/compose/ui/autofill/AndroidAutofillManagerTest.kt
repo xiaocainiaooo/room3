@@ -342,7 +342,7 @@ class AndroidAutofillManagerTest {
                                 contentDataType = ContentDataType.Text
                                 focused = hasFocus
                             }
-                            .clickable { autofillManager?.requestAutofill() }
+                            .clickable { autofillManager?.requestAutofillForActiveElement() }
                             .size(height, width)
                             .testTag(contextMenuTag)
                     else plainVisibleModifier(contextMenuTag)

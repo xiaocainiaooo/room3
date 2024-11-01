@@ -1375,9 +1375,8 @@ internal class TextFieldSelectionState(
      *
      * Inserts credentials (if there exist any that match this field type) into the text field.
      */
-    @Suppress("NewApi")
     fun autofill() {
-        autofillManager?.let { requestAutofill(it) }
+        autofillManager?.requestAutofillForActiveElement()
     }
 
     /**
@@ -1541,5 +1540,3 @@ private fun logDebug(text: () -> String) {
         println("$DEBUG_TAG: ${text()}")
     }
 }
-
-internal expect fun requestAutofill(autofillManager: AutofillManager)

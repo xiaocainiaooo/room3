@@ -692,9 +692,8 @@ internal class TextFieldSelectionManager(val undoManager: UndoManager? = null) {
         enterSelectionMode(showFloatingToolbar = true)
     }
 
-    @Suppress("NewApi")
     internal fun autofill() {
-        autofillManager?.let { requestAutofill(it) }
+        autofillManager?.requestAutofillForActiveElement()
     }
 
     internal fun getHandlePosition(isStartHandle: Boolean): Offset {
@@ -1103,5 +1102,3 @@ internal fun calculateSelectionMagnifierCenterAndroid(
 
     return Offset(centerX, centerY)
 }
-
-internal expect fun requestAutofill(autofillManager: AutofillManager)
