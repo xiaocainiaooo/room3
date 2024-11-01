@@ -35,8 +35,7 @@ internal class SurfaceGraph(
     private val streamGraphImpl: StreamGraphImpl,
     private val cameraController: CameraController,
     private val surfaceManager: CameraSurfaceManager,
-    private val imageSources: Map<StreamId, ImageSource>,
-    private val cameraGraphFlags: CameraGraph.Flags,
+    private val imageSources: Map<StreamId, ImageSource>
 ) {
     private val lock = Any()
 
@@ -67,17 +66,8 @@ internal class SurfaceGraph(
                         "Removed surface for $streamId"
                     }
                 }
-
-                if (cameraGraphFlags.disableGraphLevelSurfaceTracking) {
-                    if (surface == null) {
-                        surfaceMap.remove(streamId)
-                    } else {
-                        surfaceMap[streamId] = surface
-                    }
-                    return@synchronized null
-                }
-
                 var oldSurfaceToken: AutoCloseable? = null
+
                 if (surface == null) {
                     // TODO: Tell the graph processor that it should resubmit the repeating request
                     // or reconfigure the camera2 captureSession

@@ -141,15 +141,13 @@ internal abstract class SharedCameraGraphModules {
             streamGraphImpl: StreamGraphImpl,
             cameraController: CameraController,
             cameraSurfaceManager: CameraSurfaceManager,
-            imageSourceMap: ImageSourceMap,
-            graphConfig: CameraGraph.Config,
+            imageSourceMap: ImageSourceMap
         ): SurfaceGraph {
             return SurfaceGraph(
                 streamGraphImpl,
                 cameraController,
                 cameraSurfaceManager,
-                imageSourceMap.imageSources,
-                graphConfig.flags,
+                imageSourceMap.imageSources
             )
         }
 
