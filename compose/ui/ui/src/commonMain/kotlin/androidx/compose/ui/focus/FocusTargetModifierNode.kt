@@ -38,7 +38,20 @@ sealed interface FocusTargetModifierNode : DelegatableNode {
      *
      * @return true if focus was successfully requested
      */
+    @Deprecated(
+        message = "Use the version accepting FocusDirection",
+        replaceWith = ReplaceWith("this.requestFocus()"),
+        level = DeprecationLevel.HIDDEN
+    )
     fun requestFocus(): Boolean
+
+    /**
+     * Request focus for this node.
+     *
+     * @param focusDirection The direction from which the focus is being requested
+     * @return true if focus was successfully requested
+     */
+    fun requestFocus(focusDirection: FocusDirection = FocusDirection.Enter): Boolean
 
     /**
      * The [Focusability] for this node.
