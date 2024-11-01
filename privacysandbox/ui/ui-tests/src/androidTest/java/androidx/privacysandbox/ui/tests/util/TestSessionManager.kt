@@ -289,7 +289,7 @@ class TestSessionManager(
                 }
             }
 
-            private val testView: View =
+            val testView: View =
                 TestView(context).also {
                     it.setOnTouchListener { _, _ ->
                         touchedLatch.countDown()

@@ -299,11 +299,7 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
         this.contentView = contentView
         removeContentView()
 
-        if (contentView.layoutParams == null) {
-            super.addView(contentView, 0, generateDefaultLayoutParams())
-        } else {
-            super.addView(contentView, 0, contentView.layoutParams)
-        }
+        super.addView(contentView, 0, generateDefaultLayoutParams())
 
         // Wait for the next frame commit before sending an ACTIVE state change to listeners.
         CompatImpl.registerFrameCommitCallback(viewTreeObserver, frameCommitCallback)

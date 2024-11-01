@@ -249,6 +249,19 @@ class IntegrationTests(private val invokeBackwardsCompatFlow: Boolean) {
         )
     }
 
+    @Test
+    fun testSdkViewSizeChangeDoesNotChangeSandboxedSdkViewSize() {
+        val sdkAdapter = sessionManager.createAdapterAndWaitToBeActive(viewForSession = view)
+        val testSession = sdkAdapter.session as TestSandboxedUiAdapter.TestSession
+
+        testSession.testView.layout(0, 0, INITIAL_WIDTH * 2, INITIAL_HEIGHT * 2)
+
+        assertThat(testSession.testView.width).isEqualTo(INITIAL_WIDTH * 2)
+        assertThat(testSession.testView.height).isEqualTo(INITIAL_HEIGHT * 2)
+        assertThat(view.width).isEqualTo(INITIAL_WIDTH)
+        assertThat(view.height).isEqualTo(INITIAL_HEIGHT)
+    }
+
     /**
      * Tests that a provider-initiated resize is ignored if the view's parent provides exact
      * measurements.

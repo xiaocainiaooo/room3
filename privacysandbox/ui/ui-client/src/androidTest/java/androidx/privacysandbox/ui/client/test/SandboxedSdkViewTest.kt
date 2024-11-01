@@ -32,6 +32,7 @@ import android.view.ViewGroup.LayoutParams
 import android.view.ViewTreeObserver
 import android.widget.LinearLayout
 import android.widget.ScrollView
+import android.widget.TextView
 import androidx.lifecycle.Lifecycle
 import androidx.privacysandbox.ui.client.view.SandboxedSdkUiSessionState
 import androidx.privacysandbox.ui.client.view.SandboxedSdkUiSessionStateChangedListener
@@ -435,6 +436,86 @@ class SandboxedSdkViewTest {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
         assertThat(testSandboxedUiAdapter.wasOnConfigChangedCalled()).isFalse()
+    }
+
+    @Test
+    fun overrideProviderViewLayoutParams() {
+        val providerViewWidth = (0..1000).random()
+        val providerViewHeight = (0..1000).random()
+
+        class CustomSession : AbstractSandboxedUiAdapter.AbstractSession() {
+            override val view = View(context)
+
+            init {
+                view.layoutParams = LinearLayout.LayoutParams(providerViewWidth, providerViewHeight)
+            }
+        }
+
+        class CustomUiAdapter : AbstractSandboxedUiAdapter() {
+            override fun openSession(
+                context: Context,
+                windowInputToken: IBinder,
+                initialWidth: Int,
+                initialHeight: Int,
+                isZOrderOnTop: Boolean,
+                clientExecutor: Executor,
+                client: SandboxedUiAdapter.SessionClient
+            ) {
+                clientExecutor.execute { client.onSessionOpened(CustomSession()) }
+            }
+        }
+
+        view.setAdapter(CustomUiAdapter())
+        addViewToLayout(waitToBeActive = true)
+        val contentView = view.getChildAt(0)
+
+        assertThat(contentView.layoutParams.width).isNotEqualTo(providerViewWidth)
+        assertThat(contentView.layoutParams.height).isNotEqualTo(providerViewHeight)
+        assertThat(contentView.layoutParams.width).isEqualTo(LinearLayout.LayoutParams.WRAP_CONTENT)
+        assertThat(contentView.layoutParams.height)
+            .isEqualTo(LinearLayout.LayoutParams.WRAP_CONTENT)
+    }
+
+    // Verifies that session view resizing does not affect SandboxedSdkView's size
+    @Test
+    fun sandboxedSdkViewSizeUnchangedWhenSessionViewSizeChanges() {
+        val initialWidth = 100
+        val initialHeight = 100
+        view.layoutParams = LinearLayout.LayoutParams(initialWidth, initialHeight)
+
+        class CustomSession : AbstractSandboxedUiAdapter.AbstractSession() {
+            override val view = TextView(context)
+
+            init {
+                view.text = "Test View"
+            }
+        }
+
+        val customSession = CustomSession()
+
+        class CustomUiAdapter : AbstractSandboxedUiAdapter() {
+            override fun openSession(
+                context: Context,
+                windowInputToken: IBinder,
+                initialWidth: Int,
+                initialHeight: Int,
+                isZOrderOnTop: Boolean,
+                clientExecutor: Executor,
+                client: SandboxedUiAdapter.SessionClient
+            ) {
+                clientExecutor.execute { client.onSessionOpened(customSession) }
+            }
+        }
+
+        view.setAdapter(CustomUiAdapter())
+        addViewToLayout(waitToBeActive = true)
+
+        customSession.view.layout(0, 0, initialWidth * 2, initialHeight * 2)
+
+        assertThat(customSession.view.width).isEqualTo(initialWidth * 2)
+        assertThat(customSession.view.height).isEqualTo(initialHeight * 2)
+        assertThat(view.width).isEqualTo(initialWidth)
+        assertThat(view.height).isEqualTo(initialHeight)
     }
 
     @Test
