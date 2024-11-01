@@ -19,7 +19,6 @@ package androidx.wear.compose.material3
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
@@ -61,16 +60,11 @@ import androidx.wear.compose.foundation.CurvedModifier
 import androidx.wear.compose.foundation.CurvedScope
 import androidx.wear.compose.foundation.CurvedTextStyle
 import androidx.wear.compose.foundation.padding
-import androidx.wear.compose.material3.MotionScheme.Companion.expressive
-import androidx.wear.compose.material3.MotionScheme.Companion.standard
 import androidx.wear.compose.material3.tokens.ColorSchemeKeyTokens
-import androidx.wear.compose.material3.tokens.MotionTokens
-import androidx.wear.compose.material3.tokens.MotionTokens.DurationLong2
 import androidx.wear.compose.material3.tokens.MotionTokens.DurationShort2
 import androidx.wear.compose.material3.tokens.MotionTokens.DurationShort3
 import androidx.wear.compose.material3.tokens.ShapeTokens
 import androidx.wear.compose.materialcore.screenHeightDp
-import androidx.wear.compose.materialcore.screenHeightPx
 import androidx.wear.compose.materialcore.screenWidthDp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -201,15 +195,11 @@ fun Confirmation(
         onDismissRequest = onDismissRequest,
         properties = properties,
     ) {
-        val textTransitionStart = screenHeightPx() * ConfirmationTextTransitionFraction
-
-        val translationYAnimatable = remember { Animatable(textTransitionStart) }
         val alphaAnimatable = remember { Animatable(0f) }
-
+        val textOpacityAnimationSpec = TextOpacityAnimationSpec
         LaunchedEffect(Unit) {
-            delay(DurationShort3.toLong())
-            launch { translationYAnimatable.animateTo(0f, ConfirmationTranslationSpec) }
-            alphaAnimatable.animateTo(1f, AlphaAnimationSpec)
+            delay(DurationShort2.toLong())
+            alphaAnimatable.animateTo(1f, textOpacityAnimationSpec)
         }
 
         Box(Modifier.fillMaxSize()) {
@@ -242,7 +232,6 @@ fun Confirmation(
                         Column(
                             modifier =
                                 Modifier.fillMaxWidth().graphicsLayer {
-                                    translationY = translationYAnimatable.value
                                     alpha = alphaAnimatable.value
                                 },
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -579,7 +568,7 @@ object ConfirmationDefaults {
                     .also { defaultFailureConfirmationColorsCached = it }
         }
 
-    private val IconDelay = DurationShort2.toLong()
+    private const val IconDelay = DurationShort2.toLong()
 }
 
 /**
@@ -666,10 +655,10 @@ internal fun ConfirmationImpl(
         properties = properties,
     ) {
         val alphaAnimatable = remember { Animatable(0f) }
-
+        val textOpacityAnimationSpec = TextOpacityAnimationSpec
         LaunchedEffect(Unit) {
-            delay(DurationShort3.toLong())
-            alphaAnimatable.animateTo(1f, AlphaAnimationSpec)
+            delay(DurationShort2.toLong())
+            alphaAnimatable.animateTo(1f, textOpacityAnimationSpec)
         }
         Box(modifier = Modifier.fillMaxSize()) {
             content()
@@ -706,11 +695,14 @@ private fun confirmationIconContainer(
         remember(shapeAnimatable) {
             AnimatedRoundedCornerShape(startShape, targetShape) { shapeAnimatable.value }
         }
-
+    val heroShapeMorphAnimationSpec: AnimationSpec<Float> =
+        MaterialTheme.motionScheme.defaultSpatialSpec()
+    val heroShapeRotationAnimationSpec: AnimationSpec<Float> =
+        MaterialTheme.motionScheme.slowEffectsSpec()
     LaunchedEffect(Unit) {
-        delay(DurationShort3.toLong())
-        launch { shapeAnimatable.animateTo(1f, ContainerAnimationSpec) }
-        rotateAnimatable.animateTo(0f, StandardDecelerateSpec)
+        delay(DurationShort2.toLong())
+        launch { shapeAnimatable.animateTo(1f, heroShapeMorphAnimationSpec) }
+        rotateAnimatable.animateTo(0f, heroShapeRotationAnimationSpec)
     }
 
     Box(
@@ -732,8 +724,8 @@ private fun successIconContainer(color: Color): @Composable BoxScope.() -> Unit 
     val heightAnimatable = remember { Animatable(width) }
 
     LaunchedEffect(Unit) {
-        delay(DurationShort3.toLong())
-        heightAnimatable.animateTo(targetHeight, ContainerAnimationSpec)
+        delay(DurationShort2.toLong())
+        heightAnimatable.animateTo(targetHeight, SuccessContainerAnimationSpec)
     }
     Box(
         Modifier.size(width.dp, heightAnimatable.value.dp)
@@ -756,10 +748,11 @@ private fun failureIconContainer(color: Color): @Composable BoxScope.() -> Unit 
         remember(shapeAnimatable) {
             AnimatedRoundedCornerShape(startShape, targetShape) { shapeAnimatable.value }
         }
-
+    val failureContainerAnimationSpec: AnimationSpec<Float> =
+        MaterialTheme.motionScheme.fastEffectsSpec()
     LaunchedEffect(Unit) {
-        delay(DurationShort3.toLong())
-        shapeAnimatable.animateTo(1f, ContainerAnimationSpec)
+        delay(DurationShort2.toLong())
+        shapeAnimatable.animateTo(1f, failureContainerAnimationSpec)
     }
 
     Box(
@@ -789,7 +782,6 @@ private const val ConfirmationSizeFraction = 1 - ConfirmationSizePaddingFraction
 private const val LinearContentMaxLines = 3
 private const val HorizontalLinearContentPaddingFraction = 0.12f
 
-private const val ConfirmationTextTransitionFraction = 0.015f
 private const val ConfirmationIconInitialAngle = -45f
 
 private val FailureContentTransition = arrayOf(-8f, -15f, 0f)
@@ -805,8 +797,7 @@ private val FailureContentAnimationSpecs =
             stiffness = ExpressiveDefaultStiffness,
         )
     )
-private val AlphaAnimationSpec: AnimationSpec<Float> = standard().fastEffectsSpec()
-private val ConfirmationTranslationSpec: AnimationSpec<Float> = standard().slowSpatialSpec()
-private val ContainerAnimationSpec: AnimationSpec<Float> = expressive().defaultSpatialSpec()
-private val StandardDecelerateSpec: AnimationSpec<Float> =
-    tween(DurationLong2, easing = MotionTokens.EasingStandardDecelerate)
+private val TextOpacityAnimationSpec: AnimationSpec<Float>
+    @Composable get() = MaterialTheme.motionScheme.fastEffectsSpec()
+private val SuccessContainerAnimationSpec: AnimationSpec<Float> =
+    spring(dampingRatio = 0.55f, stiffness = 800f)
