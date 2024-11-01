@@ -105,23 +105,25 @@ internal class FocusRestorerNode(var fallback: FocusRequester) :
     Modifier.Node() {
 
     private var pinnedHandle: PinnedHandle? = null
-    private val onExit: (FocusDirection) -> FocusRequester = {
+    private val onExit: FocusEnterExitScope.() -> Unit = {
         saveFocusedChild()
         pinnedHandle?.release()
         pinnedHandle = pinFocusedChild()
-        Default
     }
 
-    private val onEnter: (FocusDirection) -> FocusRequester = {
-        val result = if (restoreFocusedChild()) Cancel else fallback
+    private val onEnter: FocusEnterExitScope.() -> Unit = {
         pinnedHandle?.release()
         pinnedHandle = null
-        result
+        if (restoreFocusedChild() || fallback == Cancel) {
+            cancelFocus()
+        } else if (fallback != Default) {
+            fallback.requestFocus()
+        }
     }
 
     override fun applyFocusProperties(focusProperties: FocusProperties) {
-        focusProperties.enter = onEnter
-        focusProperties.exit = onExit
+        focusProperties.onEnter = onEnter
+        focusProperties.onExit = onExit
     }
 
     override fun onDetach() {
