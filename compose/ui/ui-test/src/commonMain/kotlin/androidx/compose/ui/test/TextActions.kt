@@ -36,7 +36,6 @@ fun SemanticsNodeInteraction.performTextClearance() {
  * @param text Text to send.
  */
 fun SemanticsNodeInteraction.performTextInput(text: String) {
-    @OptIn(ExperimentalTestApi::class) invokeGlobalAssertions()
     tryPerformAccessibilityChecks()
     getNodeAndFocus()
     performSemanticsAction(SemanticsActions.InsertTextAtCursor) { it(AnnotatedString(text)) }
@@ -83,7 +82,6 @@ fun SemanticsNodeInteraction.performImeAction() {
     val errorOnFail = "Failed to perform IME action."
     assert(hasPerformImeAction()) { errorOnFail }
     assert(!hasImeAction(ImeAction.Default)) { errorOnFail }
-    @OptIn(ExperimentalTestApi::class) invokeGlobalAssertions()
     tryPerformAccessibilityChecks()
     val node = getNodeAndFocus(errorOnFail, requireEditable = false)
 
@@ -104,7 +102,6 @@ private fun SemanticsNodeInteraction.getNodeAndFocus(
     errorOnFail: String = "Failed to perform text input.",
     requireEditable: Boolean = true
 ): SemanticsNode {
-    @OptIn(ExperimentalTestApi::class) invokeGlobalAssertions()
     tryPerformAccessibilityChecks()
     val node = fetchSemanticsNode(errorOnFail)
     assert(isEnabled()) { errorOnFail }
