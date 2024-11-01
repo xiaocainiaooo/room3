@@ -890,7 +890,7 @@ class SelectionManagerTest {
 
         selectionManager.showToolbar = true
 
-        verify(textToolbar, times(1)).showMenu(any(), any(), isNull(), isNull(), any())
+        verify(textToolbar, times(1)).showMenu(any(), any(), isNull(), isNull(), any(), isNull())
     }
 
     @Test
@@ -922,7 +922,7 @@ class SelectionManagerTest {
 
         selectionManager.showToolbar = true
 
-        verify(textToolbar, never()).showMenu(any(), any(), isNull(), isNull(), isNull())
+        verify(textToolbar, never()).showMenu(any(), any(), isNull(), isNull(), isNull(), any())
     }
 
     @Test

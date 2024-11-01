@@ -16,10 +16,13 @@
 
 package androidx.compose.foundation.text.input.internal.selection
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.contextmenu.ContextMenuScope
 import androidx.compose.foundation.contextmenu.ContextMenuState
 import androidx.compose.foundation.text.TextContextMenuItems
 import androidx.compose.foundation.text.TextItem
+import androidx.compose.ui.autofill.AutofillManager
 
 internal fun TextFieldSelectionState.contextMenuBuilder(
     state: ContextMenuState,
@@ -30,4 +33,9 @@ internal fun TextFieldSelectionState.contextMenuBuilder(
     }
     TextItem(state, TextContextMenuItems.Paste, enabled = canPaste()) { paste() }
     TextItem(state, TextContextMenuItems.SelectAll, enabled = canSelectAll()) { selectAll() }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+internal actual fun requestAutofill(autofillManager: AutofillManager) {
+    autofillManager.requestAutofill()
 }
