@@ -1171,6 +1171,145 @@ class OverscrollTest {
         rule.runOnIdle { assertThat(inspectableConnection.preScrollVelocity.y).isEqualTo(0) }
     }
 
+    @Test
+    fun overscrollEffect_withoutDrawing_preDrag() {
+        var acummulatedScroll = 0f
+        val controller = TestOverscrollEffect(consumePreCycles = true)
+        val withoutDrawing = controller.withoutDrawing()
+        val scrollableState = ScrollableState { delta ->
+            acummulatedScroll += delta
+            delta
+        }
+        val viewConfig =
+            rule.setOverscrollContentAndReturnViewConfig(
+                scrollableState = scrollableState,
+                overscrollEffect = withoutDrawing
+            )
+
+        rule.onNodeWithTag(boxTag).performTouchInput {
+            down(center)
+            moveBy(Offset(1000f, 0f))
+        }
+
+        rule.runOnIdle {
+            val slop = viewConfig.touchSlop
+            // since we consume 1/10 of the delta in the pre scroll during overscroll, expect 9/10
+            assertThat(abs(acummulatedScroll)).isWithin(0.1f).of((1000f - slop) * 9 / 10)
+
+            assertThat(controller.lastPreScrollDelta).isEqualTo(Offset(1000f - slop, 0f))
+            assertThat(controller.lastNestedScrollSource).isEqualTo(NestedScrollSource.UserInput)
+
+            // We should not be drawn
+            assertThat(controller.drawCallsCount).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun overscrollEffect_withoutDrawing_preFling() {
+        var acummulatedScroll = 0f
+        var lastFlingReceived = 0f
+        val controller = TestOverscrollEffect(consumePreCycles = true)
+        val withoutDrawing = controller.withoutDrawing()
+        val scrollableState = ScrollableState { delta ->
+            acummulatedScroll += delta
+            delta
+        }
+        val flingBehavior =
+            object : FlingBehavior {
+                override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+                    lastFlingReceived = initialVelocity
+                    return initialVelocity
+                }
+            }
+        rule.setOverscrollContentAndReturnViewConfig(
+            scrollableState = scrollableState,
+            overscrollEffect = withoutDrawing,
+            flingBehavior = flingBehavior
+        )
+
+        rule.onNodeWithTag(boxTag).performTouchInput {
+            swipeWithVelocity(center, centerRight, endVelocity = 3000f)
+        }
+
+        rule.runOnIdle {
+            assertThat(abs(controller.preFlingVelocity.x)).isWithin(0.1f).of(3000f)
+            assertThat(abs(lastFlingReceived)).isWithin(0.1f).of(3000f * 9 / 10)
+
+            // We should not be drawn
+            assertThat(controller.drawCallsCount).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun overscrollEffect_withoutEventHandling_drag() {
+        var acummulatedScroll = 0f
+        val controller = TestOverscrollEffect(consumePreCycles = true)
+        val withoutEventHandling = controller.withoutEventHandling()
+        val scrollableState = ScrollableState { delta ->
+            acummulatedScroll += delta
+            delta
+        }
+        val viewConfig =
+            rule.setOverscrollContentAndReturnViewConfig(
+                scrollableState = scrollableState,
+                overscrollEffect = withoutEventHandling
+            )
+
+        // We should still be drawn
+        rule.waitUntil { controller.drawCallsCount == 1 }
+
+        rule.onNodeWithTag(boxTag).performTouchInput {
+            down(center)
+            moveBy(Offset(1000f, 0f))
+        }
+
+        rule.runOnIdle {
+            val slop = viewConfig.touchSlop
+            // Overscroll should not have handled these events
+            assertThat(abs(acummulatedScroll)).isWithin(0.1f).of(1000f - slop)
+
+            assertThat(controller.lastPreScrollDelta).isEqualTo(Offset.Zero)
+            assertThat(controller.lastNestedScrollSource).isNull()
+        }
+    }
+
+    @Test
+    fun overscrollEffect_withoutEventHandling_fling() {
+        var acummulatedScroll = 0f
+        var lastFlingReceived = 0f
+        val controller = TestOverscrollEffect(consumePreCycles = true)
+        val withoutEventHandling = controller.withoutEventHandling()
+        val scrollableState = ScrollableState { delta ->
+            acummulatedScroll += delta
+            delta
+        }
+        val flingBehavior =
+            object : FlingBehavior {
+                override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+                    lastFlingReceived = initialVelocity
+                    return initialVelocity
+                }
+            }
+        rule.setOverscrollContentAndReturnViewConfig(
+            scrollableState = scrollableState,
+            overscrollEffect = withoutEventHandling,
+            flingBehavior = flingBehavior
+        )
+
+        // We should still be drawn
+        rule.waitUntil { controller.drawCallsCount == 1 }
+
+        rule.onNodeWithTag(boxTag).performTouchInput {
+            swipeWithVelocity(center, centerRight, endVelocity = 3000f)
+        }
+
+        rule.runOnIdle {
+            // Overscroll should not have handled these events
+            assertThat(abs(controller.preFlingVelocity.x)).isEqualTo(0)
+            assertThat(abs(lastFlingReceived)).isWithin(0.1f).of(3000f)
+        }
+    }
+
     private fun assertSingleAxisValue(mainAxis: Float, crossAxis: Float) {
         assertThat(abs(mainAxis)).isGreaterThan(0)
         assertThat(crossAxis).isEqualTo(0)

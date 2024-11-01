@@ -250,6 +250,8 @@ package androidx.compose.foundation {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.OverscrollFactory?> getLocalOverscrollFactory();
     method public static androidx.compose.ui.Modifier overscroll(androidx.compose.ui.Modifier, androidx.compose.foundation.OverscrollEffect? overscrollEffect);
     method @androidx.compose.runtime.Composable public static androidx.compose.foundation.OverscrollEffect? rememberOverscrollEffect();
+    method @androidx.compose.runtime.Stable public static androidx.compose.foundation.OverscrollEffect withoutDrawing(androidx.compose.foundation.OverscrollEffect);
+    method @androidx.compose.runtime.Stable public static androidx.compose.foundation.OverscrollEffect withoutEventHandling(androidx.compose.foundation.OverscrollEffect);
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.OverscrollFactory?> LocalOverscrollFactory;
   }
 

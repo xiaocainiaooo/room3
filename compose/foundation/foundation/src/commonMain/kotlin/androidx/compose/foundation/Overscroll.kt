@@ -18,6 +18,7 @@ package androidx.compose.foundation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalAccessorScope
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalWithComputedDefaultOf
@@ -131,6 +132,105 @@ interface OverscrollEffect {
      * [DelegatableNode]s.
      */
     val node: DelegatableNode
+}
+
+/**
+ * Returns a wrapped version of [this] [OverscrollEffect] with an empty [OverscrollEffect.node] that
+ * will not draw / render, but will still handle events.
+ *
+ * This can be used along with [withoutEventHandling] in cases where you wish to change where
+ * overscroll is rendered for a given component. Pass this wrapped instance that doesn't render to
+ * the component that handles events (such as [androidx.compose.foundation.lazy.LazyColumn]) to
+ * prevent it from drawing the overscroll effect. Then to separately render the original overscroll
+ * effect, you can directly pass it to [Modifier.overscroll] (since that modifier only renders, and
+ * does not handle events). If instead you want to draw the overscroll in another component that
+ * handles events, such as a different lazy list, you need to first wrap the original overscroll
+ * effect with [withoutEventHandling] to prevent it from also dispatching events.
+ *
+ * @sample androidx.compose.foundation.samples.OverscrollRenderedOnTopOfLazyListDecorations
+ * @see withoutEventHandling
+ */
+@Stable
+fun OverscrollEffect.withoutDrawing(): OverscrollEffect =
+    WrappedOverscrollEffect(
+        drawingEnabled = false,
+        eventHandlingEnabled = true,
+        innerOverscrollEffect = this
+    )
+
+/**
+ * Returns a wrapped version of [this] [OverscrollEffect] that will not handle events / consume
+ * values provided through [OverscrollEffect.applyToScroll] / [OverscrollEffect.applyToFling], but
+ * will still render / attach [OverscrollEffect.node].
+ *
+ * This can be useful if you want to render an [OverscrollEffect] in a different component that
+ * normally provides events to overscroll, such as a [androidx.compose.foundation.lazy.LazyColumn].
+ * Use this along with [withoutDrawing] to create two wrapped instances: one that does not handle
+ * events, and one that does not draw, so you can ensure that the overscroll effect is only rendered
+ * once, and only receives events from one source.
+ *
+ * @see withoutDrawing
+ */
+@Stable
+fun OverscrollEffect.withoutEventHandling(): OverscrollEffect =
+    WrappedOverscrollEffect(
+        drawingEnabled = true,
+        eventHandlingEnabled = false,
+        innerOverscrollEffect = this
+    )
+
+@Immutable
+private class WrappedOverscrollEffect(
+    private val drawingEnabled: Boolean,
+    private val eventHandlingEnabled: Boolean,
+    private val innerOverscrollEffect: OverscrollEffect
+) : OverscrollEffect {
+    override fun applyToScroll(
+        delta: Offset,
+        source: NestedScrollSource,
+        performScroll: (Offset) -> Offset
+    ): Offset {
+        return if (eventHandlingEnabled) {
+            innerOverscrollEffect.applyToScroll(delta, source, performScroll)
+        } else {
+            performScroll(delta)
+        }
+    }
+
+    override suspend fun applyToFling(
+        velocity: Velocity,
+        performFling: suspend (Velocity) -> Velocity
+    ) {
+        if (eventHandlingEnabled) {
+            innerOverscrollEffect.applyToFling(velocity, performFling)
+        } else {
+            performFling(velocity)
+        }
+    }
+
+    override val isInProgress: Boolean
+        get() = innerOverscrollEffect.isInProgress
+
+    override val node: DelegatableNode =
+        if (drawingEnabled) innerOverscrollEffect.node else object : Modifier.Node() {}
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is WrappedOverscrollEffect) return false
+
+        if (drawingEnabled != other.drawingEnabled) return false
+        if (eventHandlingEnabled != other.eventHandlingEnabled) return false
+        if (innerOverscrollEffect != other.innerOverscrollEffect) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = drawingEnabled.hashCode()
+        result = 31 * result + eventHandlingEnabled.hashCode()
+        result = 31 * result + innerOverscrollEffect.hashCode()
+        return result
+    }
 }
 
 /**

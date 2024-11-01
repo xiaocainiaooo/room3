@@ -28,8 +28,12 @@ import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.overscroll
 import androidx.compose.foundation.rememberOverscrollEffect
+import androidx.compose.foundation.withoutDrawing
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,8 +43,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
@@ -251,4 +258,41 @@ fun OverscrollWithDraggable_After() {
     ) {
         Text("Drag position $dragPosition")
     }
+}
+
+@Sampled
+@Composable
+fun OverscrollRenderedOnTopOfLazyListDecorations() {
+    val items = remember { (1..100).toList() }
+    val state = rememberLazyListState()
+    val overscroll = rememberOverscrollEffect()
+    // Create a wrapped version of the above overscroll effect that does not draw. This will be
+    // used inside LazyColumn to provide events to overscroll, without letting LazyColumn draw the
+    // overscroll effect internally.
+    val overscrollWithoutDrawing = overscroll?.withoutDrawing()
+    LazyColumn(
+        content = { items(items) { Text("Item $it") } },
+        state = state,
+        modifier =
+            Modifier.size(300.dp)
+                .clip(RectangleShape)
+                // Manually render the overscroll on top of the lazy list _and_ the 'decorations' we
+                // are
+                // manually drawing, to make sure they will also be included in the overscroll
+                // effect.
+                .overscroll(overscroll)
+                .drawBehind {
+                    state.layoutInfo.visibleItemsInfo.drop(1).forEach { info ->
+                        val verticalOffset = info.offset.toFloat()
+                        drawLine(
+                            color = Color.Red,
+                            start = Offset(0f, verticalOffset),
+                            end = Offset(size.width, verticalOffset)
+                        )
+                    }
+                },
+        // Pass the overscroll effect that does not draw inside the LazyList to receive overscroll
+        // events
+        overscrollEffect = overscrollWithoutDrawing
+    )
 }
