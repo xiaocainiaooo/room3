@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.app.AppSearchResult;
 import androidx.appsearch.exceptions.AppSearchException;
+import androidx.appsearch.flags.Flags;
 import androidx.appsearch.localstorage.util.MapUtil;
 import androidx.collection.ArrayMap;
 import androidx.core.util.Preconditions;
@@ -30,6 +31,7 @@ import com.google.android.icing.proto.NamespaceStorageInfoProto;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * A class that encapsulates per-package document count tracking and limit enforcement.
@@ -76,17 +78,43 @@ public class DocumentLimiter {
      *
      * @param packageName the name of the package attempting to add the document
      *
+     * @param namespaceStorageInfoProducer a callable that returns an up-to-date list of
+     *                                    NamespaceStorageInfoProtos.
+     *
      * @throws AppSearchException if the document limit is in force (because the total number of
      * documents in the system exceeds {@link #mDocumentLimitStartThreshold}) and the package
      * identified by packageName has already added more documents than
      * {@link #mPerPackageDocumentCountLimit}.
      */
-    public void enforceDocumentCountLimit(@NonNull String packageName) throws AppSearchException {
+    public void enforceDocumentCountLimit(
+            @NonNull String packageName,
+            @NonNull Callable<List<NamespaceStorageInfoProto>> namespaceStorageInfoProducer)
+            throws AppSearchException {
         Preconditions.checkNotNull(packageName);
         if (mTotalDocumentCount < mDocumentLimitStartThreshold) {
             return;
         }
         Integer newDocumentCount = MapUtil.getOrDefault(mDocumentCountMap, packageName, 0) + 1;
+        if (!Flags.enableDocumentLimiterReplaceTracking()
+                && newDocumentCount > mPerPackageDocumentCountLimit) {
+            // Our management of mDocumentCountMap doesn't account for document
+            // replacements, so our counter might have overcounted if the app has replaced docs.
+            // Rebuild the counter from StorageInfo in case this is so.
+            try {
+                List<NamespaceStorageInfoProto> namespaceStorageInfos =
+                        namespaceStorageInfoProducer.call();
+                buildDocumentCountMap(namespaceStorageInfos);
+            } catch (AppSearchException e) {
+                throw e;
+            } catch (Exception e) {
+                // This should never happen.
+                throw new AppSearchException(
+                        AppSearchResult.RESULT_UNKNOWN_ERROR,
+                        "Encountered unexpected exception when retrieving namespace storage info.",
+                        e);
+            }
+            newDocumentCount = MapUtil.getOrDefault(mDocumentCountMap, packageName, 0) + 1;
+        }
         if (newDocumentCount > mPerPackageDocumentCountLimit) {
             // Now we really can't fit it in, even accounting for replacements.
             throw new AppSearchException(
