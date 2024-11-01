@@ -49,8 +49,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -292,9 +294,12 @@ fun SuccessConfirmation(
     durationMillis: Long = ConfirmationDefaults.ConfirmationDurationMillis,
     content: @Composable BoxScope.() -> Unit = ConfirmationDefaults.SuccessIcon,
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
     ConfirmationImpl(
         show = show,
-        performHapticFeedback = null,
+        performHapticFeedback = {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
+        },
         onDismissRequest = onDismissRequest,
         modifier = modifier,
         curvedText = curvedText,
@@ -347,9 +352,10 @@ fun FailureConfirmation(
     durationMillis: Long = ConfirmationDefaults.ConfirmationDurationMillis,
     content: @Composable BoxScope.() -> Unit = ConfirmationDefaults.FailureIcon,
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
     ConfirmationImpl(
         show = show,
-        performHapticFeedback = null,
+        performHapticFeedback = { hapticFeedback.performHapticFeedback(HapticFeedbackType.Reject) },
         onDismissRequest = onDismissRequest,
         modifier = modifier,
         curvedText = curvedText,
