@@ -28,7 +28,6 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Down
 import androidx.compose.ui.focus.FocusDirection.Companion.Left
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
-import androidx.compose.ui.focus.FocusRequester.Companion.Cancel
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -77,12 +76,12 @@ class TwoDimensionalFocusTraversalImplicitEnterTest(param: Param) {
         val (child1, child2, child3, child4) = FocusRequester.createRefs()
         val customFocusEnter =
             Modifier.focusProperties {
-                enter = {
-                    when (it) {
-                        Left -> child1
-                        Up -> child2
-                        Down -> child3
-                        Right -> child4
+                onEnter = {
+                    when (focusDirection) {
+                        Left -> child1.requestFocus()
+                        Up -> child2.requestFocus()
+                        Down -> child3.requestFocus()
+                        Right -> child4.requestFocus()
                         else -> error("Invalid Direction")
                     }
                 }
@@ -149,9 +148,9 @@ class TwoDimensionalFocusTraversalImplicitEnterTest(param: Param) {
         var directionSentToEnter: FocusDirection? = null
         val customFocusEnter =
             Modifier.focusProperties {
-                enter = {
-                    directionSentToEnter = it
-                    Cancel
+                onEnter = {
+                    directionSentToEnter = focusDirection
+                    cancelFocus()
                 }
             }
         when (focusDirection) {
@@ -228,9 +227,9 @@ class TwoDimensionalFocusTraversalImplicitEnterTest(param: Param) {
         var directionSentToEnter: FocusDirection? = null
         val customFocusEnter =
             Modifier.focusProperties {
-                enter = {
-                    directionSentToEnter = it
-                    Cancel
+                onEnter = {
+                    directionSentToEnter = focusDirection
+                    cancelFocus()
                 }
             }
         when (focusDirection) {
@@ -332,7 +331,7 @@ class TwoDimensionalFocusTraversalImplicitEnterTest(param: Param) {
         val (up, down, left, right) = List(4) { mutableStateOf(false) }
         val (item, other) = List(2) { mutableStateOf(false) }
         var (upItem, downItem, leftItem, rightItem) = FocusRequester.createRefs()
-        val customFocusEnter = Modifier.focusProperties { enter = { Cancel } }
+        val customFocusEnter = Modifier.focusProperties { onEnter = { cancelFocus() } }
         when (focusDirection) {
             Left -> rightItem = initialFocus
             Right -> leftItem = initialFocus
