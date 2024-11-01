@@ -28,7 +28,8 @@ internal class TextActionModeCallback(
     var onCopyRequested: (() -> Unit)? = null,
     var onPasteRequested: (() -> Unit)? = null,
     var onCutRequested: (() -> Unit)? = null,
-    var onSelectAllRequested: (() -> Unit)? = null
+    var onSelectAllRequested: (() -> Unit)? = null,
+    var onAutofillRequested: (() -> Unit)? = null
 ) {
     fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         requireNotNull(menu) { "onCreateActionMode requires a non-null menu" }
@@ -38,6 +39,7 @@ internal class TextActionModeCallback(
         onPasteRequested?.let { addMenuItem(menu, MenuItemOption.Paste) }
         onCutRequested?.let { addMenuItem(menu, MenuItemOption.Cut) }
         onSelectAllRequested?.let { addMenuItem(menu, MenuItemOption.SelectAll) }
+        onAutofillRequested?.let { addMenuItem(menu, MenuItemOption.Autofill) }
         return true
     }
 
@@ -55,6 +57,7 @@ internal class TextActionModeCallback(
             MenuItemOption.Paste.id -> onPasteRequested?.invoke()
             MenuItemOption.Cut.id -> onCutRequested?.invoke()
             MenuItemOption.SelectAll.id -> onSelectAllRequested?.invoke()
+            MenuItemOption.Autofill.id -> onAutofillRequested?.invoke()
             else -> return false
         }
         mode?.finish()
@@ -71,6 +74,7 @@ internal class TextActionModeCallback(
         addOrRemoveMenuItem(menu, MenuItemOption.Paste, onPasteRequested)
         addOrRemoveMenuItem(menu, MenuItemOption.Cut, onCutRequested)
         addOrRemoveMenuItem(menu, MenuItemOption.SelectAll, onSelectAllRequested)
+        addOrRemoveMenuItem(menu, MenuItemOption.Autofill, onAutofillRequested)
     }
 
     internal fun addMenuItem(menu: Menu, item: MenuItemOption) {
@@ -91,7 +95,8 @@ internal enum class MenuItemOption(val id: Int) {
     Copy(0),
     Paste(1),
     Cut(2),
-    SelectAll(3);
+    SelectAll(3),
+    Autofill(4);
 
     val titleResource: Int
         get() =
@@ -100,6 +105,7 @@ internal enum class MenuItemOption(val id: Int) {
                 Paste -> android.R.string.paste
                 Cut -> android.R.string.cut
                 SelectAll -> android.R.string.selectAll
+                Autofill -> android.R.string.autofill
             }
 
     /** This item will be shown before all items that have order greater than this value. */

@@ -575,6 +575,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 rect = rect,
                 onCopyRequested = if (isNonEmptySelection()) ::toolbarCopy else null,
                 onSelectAllRequested = if (isEntireContainerSelected()) null else ::selectAll,
+                onAutofillRequested = null
             )
         } else if (textToolbar.status == TextToolbarStatus.Shown) {
             textToolbar.hide()

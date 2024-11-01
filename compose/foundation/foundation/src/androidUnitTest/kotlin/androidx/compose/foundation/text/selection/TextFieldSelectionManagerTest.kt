@@ -497,7 +497,7 @@ class TextFieldSelectionManagerTest {
 
         manager.showSelectionToolbar()
 
-        verify(textToolbar, times(1)).showMenu(any(), any(), isNull(), any(), anyOrNull())
+        verify(textToolbar, times(1)).showMenu(any(), any(), isNull(), any(), anyOrNull(), isNull())
     }
 
     @Test
@@ -509,7 +509,7 @@ class TextFieldSelectionManagerTest {
         manager.showSelectionToolbar()
 
         verify(textToolbar, times(1))
-            .showMenu(anyOrNull(), anyOrNull(), any(), anyOrNull(), anyOrNull())
+            .showMenu(anyOrNull(), anyOrNull(), any(), anyOrNull(), anyOrNull(), isNull())
     }
 
     @Test
@@ -520,7 +520,7 @@ class TextFieldSelectionManagerTest {
 
         manager.showSelectionToolbar()
 
-        verify(textToolbar, times(1)).showMenu(any(), isNull(), any(), isNull(), anyOrNull())
+        verify(textToolbar, times(1)).showMenu(any(), isNull(), any(), isNull(), anyOrNull(), any())
     }
 
     @Test
@@ -530,7 +530,7 @@ class TextFieldSelectionManagerTest {
 
         manager.showSelectionToolbar()
 
-        verify(textToolbar, times(1)).showMenu(any(), isNull(), any(), isNull(), isNull())
+        verify(textToolbar, times(1)).showMenu(any(), isNull(), any(), isNull(), isNull(), any())
     }
 
     @Test
@@ -541,7 +541,7 @@ class TextFieldSelectionManagerTest {
 
         manager.showSelectionToolbar()
 
-        verify(textToolbar, times(1)).showMenu(any(), isNull(), isNull(), isNull(), isNull())
+        verify(textToolbar, times(1)).showMenu(any(), isNull(), isNull(), isNull(), isNull(), any())
     }
 
     @Test
@@ -553,7 +553,8 @@ class TextFieldSelectionManagerTest {
 
         manager.showSelectionToolbar()
 
-        verify(textToolbar, times(1)).showMenu(any(), isNull(), any(), isNull(), anyOrNull())
+        verify(textToolbar, times(1))
+            .showMenu(any(), isNull(), any(), isNull(), anyOrNull(), isNull())
     }
 
     @Test
