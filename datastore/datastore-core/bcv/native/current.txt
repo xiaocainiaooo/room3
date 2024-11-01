@@ -6,6 +6,10 @@
 // - Show declarations: true
 
 // Library unique name: <androidx.datastore:datastore-core>
+abstract interface <#A: kotlin/Any?> androidx.datastore.core/CurrentDataProviderStore : androidx.datastore.core/DataStore<#A> { // androidx.datastore.core/CurrentDataProviderStore|null[0]
+    abstract suspend fun currentData(): #A // androidx.datastore.core/CurrentDataProviderStore.currentData|currentData(){}[0]
+}
+
 abstract interface <#A: kotlin/Any?> androidx.datastore.core/DataMigration { // androidx.datastore.core/DataMigration|null[0]
     abstract suspend fun cleanUp() // androidx.datastore.core/DataMigration.cleanUp|cleanUp(){}[0]
     abstract suspend fun migrate(#A): #A // androidx.datastore.core/DataMigration.migrate|migrate(1:0){}[0]
