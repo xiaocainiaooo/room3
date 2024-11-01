@@ -130,6 +130,10 @@ public final class Flags {
     public static final String FLAG_ENABLE_SCHEMA_EMBEDDING_PROPERTY_CONFIG =
             FLAG_PREFIX + "enable_schema_embedding_property_config";
 
+    /** Enables embedding quantization. */
+    public static final String FLAG_ENABLE_SCHEMA_EMBEDDING_QUANTIZATION =
+            FLAG_PREFIX + "enable_schema_embedding_quantization";
+
     /** Enables informational ranking expressions. */
     public static final String FLAG_ENABLE_INFORMATIONAL_RANKING_EXPRESSIONS =
             FLAG_PREFIX + "enable_informational_ranking_expressions";
@@ -260,6 +264,11 @@ public final class Flags {
 
     /** Whether embedding search related APIs should be enabled. */
     public static boolean enableSchemaEmbeddingPropertyConfig() {
+        return true;
+    }
+
+    /** Whether embedding quantization is enabled. */
+    public static boolean enableSchemaEmbeddingQuantization() {
         return true;
     }
 

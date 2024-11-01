@@ -79,6 +79,8 @@ final class FeaturesImpl implements Features {
                 // fall through
             case Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG:
                 // fall through
+            case Features.SCHEMA_EMBEDDING_QUANTIZATION:
+                // fall through
             case Features.SCHEMA_SET_DESCRIPTION:
                 // fall through
             case Features.SEARCH_SPEC_ADD_INFORMATIONAL_RANKING_EXPRESSIONS:

@@ -973,6 +973,86 @@ public class AppSearchSchemaCtsTest {
     }
 
     @Test
+    @RequiresFlagsEnabled({Flags.FLAG_ENABLE_SCHEMA_EMBEDDING_PROPERTY_CONFIG,
+            Flags.FLAG_ENABLE_SCHEMA_EMBEDDING_QUANTIZATION})
+    public void testEmbeddingPropertyConfig_quantization() {
+        AppSearchSchema schema =
+                new AppSearchSchema.Builder("Test")
+                        .addProperty(
+                                new AppSearchSchema.EmbeddingPropertyConfig.Builder(
+                                        "quantizationOff")
+                                        .setCardinality(
+                                                AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL)
+                                        .setIndexingType(
+                                                AppSearchSchema.EmbeddingPropertyConfig
+                                                        .INDEXING_TYPE_SIMILARITY)
+                                        .setQuantizationType(
+                                                AppSearchSchema.EmbeddingPropertyConfig
+                                                        .QUANTIZATION_TYPE_NONE)
+                                        .build())
+                        .addProperty(
+                                new AppSearchSchema.EmbeddingPropertyConfig.Builder(
+                                        "quantization8Bit")
+                                        .setCardinality(
+                                                AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL)
+                                        .setIndexingType(
+                                                AppSearchSchema.EmbeddingPropertyConfig
+                                                        .INDEXING_TYPE_SIMILARITY)
+                                        .setQuantizationType(
+                                                AppSearchSchema.EmbeddingPropertyConfig
+                                                        .QUANTIZATION_TYPE_8_BIT)
+                                        .build())
+                        .build();
+
+        assertThat(schema.getSchemaType()).isEqualTo("Test");
+        List<AppSearchSchema.PropertyConfig> properties = schema.getProperties();
+        assertThat(properties).hasSize(2);
+
+        assertThat(properties.get(0).getName()).isEqualTo("quantizationOff");
+        assertThat(properties.get(0).getCardinality())
+                .isEqualTo(AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL);
+        assertThat(((AppSearchSchema.EmbeddingPropertyConfig) properties.get(0)).getIndexingType())
+                .isEqualTo(AppSearchSchema.EmbeddingPropertyConfig.INDEXING_TYPE_SIMILARITY);
+        assertThat(((AppSearchSchema.EmbeddingPropertyConfig) properties.get(0))
+                .getQuantizationType())
+                .isEqualTo(AppSearchSchema.EmbeddingPropertyConfig.QUANTIZATION_TYPE_NONE);
+
+        assertThat(properties.get(1).getName()).isEqualTo("quantization8Bit");
+        assertThat(properties.get(1).getCardinality())
+                .isEqualTo(AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL);
+        assertThat(((AppSearchSchema.EmbeddingPropertyConfig) properties.get(1)).getIndexingType())
+                .isEqualTo(AppSearchSchema.EmbeddingPropertyConfig.INDEXING_TYPE_SIMILARITY);
+        assertThat(((AppSearchSchema.EmbeddingPropertyConfig) properties.get(1))
+                .getQuantizationType())
+                .isEqualTo(AppSearchSchema.EmbeddingPropertyConfig.QUANTIZATION_TYPE_8_BIT);
+    }
+
+    @Test
+    @RequiresFlagsEnabled({Flags.FLAG_ENABLE_SCHEMA_EMBEDDING_PROPERTY_CONFIG,
+            Flags.FLAG_ENABLE_SCHEMA_EMBEDDING_QUANTIZATION})
+    public void testEmbeddingPropertyConfig_defaultQuantizationValue() {
+        AppSearchSchema.EmbeddingPropertyConfig builder =
+                new AppSearchSchema.EmbeddingPropertyConfig.Builder("test").build();
+        assertThat(builder.getQuantizationType()).isEqualTo(
+                AppSearchSchema.EmbeddingPropertyConfig.QUANTIZATION_TYPE_NONE);
+    }
+
+    @Test
+    @RequiresFlagsEnabled({Flags.FLAG_ENABLE_SCHEMA_EMBEDDING_PROPERTY_CONFIG,
+            Flags.FLAG_ENABLE_SCHEMA_EMBEDDING_QUANTIZATION})
+    public void testEmbeddingPropertyConfig_setQuantizationType() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new AppSearchSchema.EmbeddingPropertyConfig.Builder("titleEmbedding")
+                        .setQuantizationType(5).build());
+        assertThrows(IllegalArgumentException.class, () ->
+                new AppSearchSchema.EmbeddingPropertyConfig.Builder("titleEmbedding")
+                        .setQuantizationType(3).build());
+        assertThrows(IllegalArgumentException.class, () ->
+                new AppSearchSchema.EmbeddingPropertyConfig.Builder("titleEmbedding")
+                        .setQuantizationType(-1).build());
+    }
+
+    @Test
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
     public void testAppSearchSchemaBuilder_copyConstructor() {
         AppSearchSchema schema = new AppSearchSchema.Builder("Email")
