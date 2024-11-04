@@ -21,8 +21,10 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LookaheadScope
@@ -73,16 +75,21 @@ internal class ThreePaneScaffoldScopeImpl(
 }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+internal fun rememberThreePaneScaffoldPaneScope(
+    paneRole: ThreePaneScaffoldRole,
+    scaffoldScope: ThreePaneScaffoldScope,
+    paneMotion: PaneMotion
+): ThreePaneScaffoldPaneScope =
+    remember(scaffoldScope) { ThreePaneScaffoldPaneScopeImpl(paneRole, scaffoldScope) }
+        .apply { this.paneMotion = paneMotion }
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 internal class ThreePaneScaffoldPaneScopeImpl(
     override val paneRole: ThreePaneScaffoldRole,
     scaffoldScope: ThreePaneScaffoldScope,
 ) : ThreePaneScaffoldPaneScope, ThreePaneScaffoldScope by scaffoldScope {
     override var paneMotion: PaneMotion by mutableStateOf(PaneMotion.ExitToLeft)
-        private set
-
-    fun updatePaneMotion(paneMotions: ThreePaneMotion) {
-        paneMotion = paneMotions[paneRole]
-    }
 }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)

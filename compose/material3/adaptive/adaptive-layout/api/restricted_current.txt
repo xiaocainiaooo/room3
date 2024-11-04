@@ -314,6 +314,46 @@ package androidx.compose.material3.adaptive.layout {
     property public final androidx.compose.material3.adaptive.layout.ThreePaneScaffoldRole pane;
   }
 
+  @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi @androidx.compose.runtime.Immutable public final class ThreePaneScaffoldHorizontalOrder {
+    method public void forEach(kotlin.jvm.functions.Function1<? super androidx.compose.material3.adaptive.layout.ThreePaneScaffoldRole,kotlin.Unit> action);
+    method public void forEachIndexed(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super androidx.compose.material3.adaptive.layout.ThreePaneScaffoldRole,kotlin.Unit> action);
+    method public void forEachIndexedReversed(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super androidx.compose.material3.adaptive.layout.ThreePaneScaffoldRole,kotlin.Unit> action);
+    method public operator androidx.compose.material3.adaptive.layout.ThreePaneScaffoldRole get(int index);
+    method public int getSize();
+    method public int indexOf(androidx.compose.material3.adaptive.layout.ThreePaneScaffoldRole role);
+    property public int size;
+  }
+
+  public final class ThreePaneScaffoldKt {
+    method @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.adaptive.layout.ThreePaneScaffoldOverride> getLocalThreePaneScaffoldOverride();
+    property @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.adaptive.layout.ThreePaneScaffoldOverride> LocalThreePaneScaffoldOverride;
+  }
+
+  @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi public interface ThreePaneScaffoldOverride {
+    method @androidx.compose.runtime.Composable public void ThreePaneScaffold(androidx.compose.material3.adaptive.layout.ThreePaneScaffoldOverrideContext);
+  }
+
+  @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi public final class ThreePaneScaffoldOverrideContext {
+    method public androidx.compose.ui.Modifier getModifier();
+    method public kotlin.jvm.functions.Function1<androidx.compose.material3.adaptive.layout.PaneExpansionState,kotlin.Unit>? getPaneExpansionDragHandle();
+    method public androidx.compose.material3.adaptive.layout.PaneExpansionState getPaneExpansionState();
+    method public androidx.compose.material3.adaptive.layout.ThreePaneScaffoldHorizontalOrder getPaneOrder();
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> getPrimaryPane();
+    method public androidx.compose.material3.adaptive.layout.PaneScaffoldDirective getScaffoldDirective();
+    method public androidx.compose.material3.adaptive.layout.ThreePaneScaffoldState getScaffoldState();
+    method public kotlin.jvm.functions.Function0<kotlin.Unit> getSecondaryPane();
+    method public kotlin.jvm.functions.Function0<kotlin.Unit>? getTertiaryPane();
+    property public final androidx.compose.ui.Modifier modifier;
+    property public final kotlin.jvm.functions.Function1<androidx.compose.material3.adaptive.layout.PaneExpansionState,kotlin.Unit>? paneExpansionDragHandle;
+    property public final androidx.compose.material3.adaptive.layout.PaneExpansionState paneExpansionState;
+    property public final androidx.compose.material3.adaptive.layout.ThreePaneScaffoldHorizontalOrder paneOrder;
+    property public final kotlin.jvm.functions.Function0<kotlin.Unit> primaryPane;
+    property public final androidx.compose.material3.adaptive.layout.PaneScaffoldDirective scaffoldDirective;
+    property public final androidx.compose.material3.adaptive.layout.ThreePaneScaffoldState scaffoldState;
+    property public final kotlin.jvm.functions.Function0<kotlin.Unit> secondaryPane;
+    property public final kotlin.jvm.functions.Function0<kotlin.Unit>? tertiaryPane;
+  }
+
   @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi public sealed interface ThreePaneScaffoldPaneScope extends androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope androidx.compose.material3.adaptive.layout.ExtendedPaneScaffoldPaneScope<androidx.compose.material3.adaptive.layout.ThreePaneScaffoldRole,androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue> {
   }
 
