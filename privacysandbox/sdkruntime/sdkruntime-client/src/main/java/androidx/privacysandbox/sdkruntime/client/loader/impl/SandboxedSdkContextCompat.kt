@@ -16,12 +16,13 @@
 package androidx.privacysandbox.sdkruntime.client.loader.impl
 
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.SharedPreferences
 import android.database.DatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
 import android.os.Build
+import android.view.ContextThemeWrapper
 import androidx.annotation.RequiresApi
+import androidx.core.content.res.ResourcesCompat
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -48,7 +49,7 @@ internal class SandboxedSdkContextCompat(
     base: Context,
     private val sdkPackageName: String,
     private val classLoader: ClassLoader?
-) : ContextWrapper(base) {
+) : ContextThemeWrapper(base, ResourcesCompat.ID_NULL) {
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun createDeviceProtectedStorageContext(): Context {

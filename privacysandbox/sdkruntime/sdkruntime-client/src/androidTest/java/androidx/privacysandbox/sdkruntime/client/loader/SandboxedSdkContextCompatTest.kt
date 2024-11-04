@@ -17,6 +17,7 @@ package androidx.privacysandbox.sdkruntime.client.loader
 
 import android.content.Context
 import android.os.Build
+import android.view.LayoutInflater
 import androidx.privacysandbox.sdkruntime.client.loader.impl.SandboxedSdkContextCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.SdkSuppress
@@ -42,6 +43,12 @@ internal class SandboxedSdkContextCompatTest(
     fun getClassloader_returnSdkClassloader() {
         val sdkClassLoader = javaClass.classLoader!!.parent!!
         assertThat(sdkContextCompat.classLoader).isEqualTo(sdkClassLoader)
+    }
+
+    @Test
+    fun layoutInflater_hasCorrectContext() {
+        val layoutInflater = LayoutInflater.from(sdkContextCompat)
+        assertThat(layoutInflater.context).isEqualTo(sdkContextCompat)
     }
 
     @Test
