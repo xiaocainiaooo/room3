@@ -162,11 +162,13 @@
             android:name=".TinyInterstitialActivity"
             android:theme="@style/AppDayNightTheme"
             android:exported="true" />
+        <activity
+            android:name=".AsyncStartUpActivity"
+            android:exported="true" />
         <provider
             android:authorities="com.example.androidx.webkit.DropDataProvider"
             android:name="androidx.webkit.DropDataContentProvider"
             android:exported="false"
             android:grantUriPermissions="true"/>
-
     </application>
 </manifest>
