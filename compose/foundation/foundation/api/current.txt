@@ -432,8 +432,10 @@ package androidx.compose.foundation.gestures {
   }
 
   @androidx.compose.runtime.Stable public final class AnchoredDraggableState<T> {
-    ctor public AnchoredDraggableState(T initialValue, androidx.compose.foundation.gestures.DraggableAnchors<T> anchors, optional kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmValueChange);
-    ctor public AnchoredDraggableState(T initialValue, optional kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmValueChange);
+    ctor public AnchoredDraggableState(T initialValue);
+    ctor public AnchoredDraggableState(T initialValue, androidx.compose.foundation.gestures.DraggableAnchors<T> anchors);
+    ctor @Deprecated public AnchoredDraggableState(T initialValue, androidx.compose.foundation.gestures.DraggableAnchors<T> anchors, optional kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmValueChange);
+    ctor @Deprecated public AnchoredDraggableState(T initialValue, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmValueChange);
     method public suspend Object? anchoredDrag(optional androidx.compose.foundation.MutatePriority dragPriority, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.gestures.AnchoredDragScope,? super androidx.compose.foundation.gestures.DraggableAnchors<T>,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,? extends java.lang.Object?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public suspend Object? anchoredDrag(T targetValue, optional androidx.compose.foundation.MutatePriority dragPriority, kotlin.jvm.functions.Function4<? super androidx.compose.foundation.gestures.AnchoredDragScope,? super androidx.compose.foundation.gestures.DraggableAnchors<T>,? super T,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,? extends java.lang.Object?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public float dispatchRawDelta(float delta);
@@ -468,8 +470,9 @@ package androidx.compose.foundation.gestures {
   }
 
   public static final class AnchoredDraggableState.Companion {
+    method public <T> androidx.compose.runtime.saveable.Saver<androidx.compose.foundation.gestures.AnchoredDraggableState<T>,T> Saver();
     method @Deprecated public <T> androidx.compose.runtime.saveable.Saver<androidx.compose.foundation.gestures.AnchoredDraggableState<T>,T> Saver(androidx.compose.animation.core.AnimationSpec<java.lang.Float> snapAnimationSpec, androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> decayAnimationSpec, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> positionalThreshold, kotlin.jvm.functions.Function0<java.lang.Float> velocityThreshold, optional kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmValueChange);
-    method public <T> androidx.compose.runtime.saveable.Saver<androidx.compose.foundation.gestures.AnchoredDraggableState<T>,T> Saver(optional kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmValueChange);
+    method @Deprecated public <T> androidx.compose.runtime.saveable.Saver<androidx.compose.foundation.gestures.AnchoredDraggableState<T>,T> Saver(optional kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmValueChange);
   }
 
   @androidx.compose.runtime.Stable public interface BringIntoViewSpec {
