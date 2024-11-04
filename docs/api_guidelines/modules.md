@@ -121,13 +121,24 @@ available in our repo.
 It will create a new project with the proper structure and configuration based
 on your project needs!
 
-To use it:
+To use it, first install the virtualenv if it is not already installed
+
+*   (Linux) `sudo apt-get install virtualenv python3-venv`
+*   (Mac) `pip3 install virtualenv`
+*   (Mac homebrew) `brew install virtualenv`
+
+Then run the script:
 
 ```sh
 cd ~/androidx-main/frameworks/support && \
-cd development/project-creator && \
-./create_project.py androidx.foo foo-bar
+./development/project-creator/create_project.sh androidx.foo foo-bar
 ```
+
+If the module you are creating is an application (not a library), such as you
+might want for integration-tests, edit the project's `build.gradle` file and
+replace the plugin `id("com.android.library")` with
+`id("com.android.application")`. This allows you to run activities in that
+module from within Android Studio.
 
 If you are creating an unpublished module such as an integration test app with \
 the project creator script, it may not make sense to follow the same naming \
@@ -135,30 +146,6 @@ conventions as published libraries. In this situation it is safe to comment out
 \
 the `artifact_id` validation from the script or rename the module after it has \
 been created.
-
-If you see an error message `No module named 'toml'`, `'setuptools'`, or
-similar, try the following steps:
-
-*   Install necessary tools if they are not already installed
-    *   (Linux) `sudo apt-get install virtualenv python3-venv`
-    *   (Mac) `pip3 install virtualenv`
-    *   (Mac homebrew) `brew install virtualenv`
-*   Create a virtual environment with `virtualenv androidx_project_creator` (you
-    can choose another name for your virtualenv if you wish).
-*   Install the missing module(s) in your virtual environment with
-    `androidx_project_creator/bin/pip3 install setuptools toml`
-*   Run the project creator script from your virtual env with
-    `androidx_project_creator/bin/python3
-    ../../development/project-creator/create_project.py androidx.foo foo-bar`
-*   Delete your virtual env with `rm -rf ./androidx-project_creator`
-    *   virtualenv will automatically .gitignore itself, but you may want to to
-        remove it anyway.
-
-Note: if the module you are creating is an application (not a library), such as
-you might want for integration-tests, edit the project's `build.gradle` file and
-replace the plugin `id("com.android.library")` with
-`id("com.android.application")`. This allows you to run activities in that
-module from within Android Studio.
 
 #### Common sub-feature names {#module-naming-subfeature}
 
