@@ -94,8 +94,7 @@ abstract class CompositionContext internal constructor() {
 
     internal abstract fun movableContentStateReleased(
         reference: MovableContentStateReference,
-        data: MovableContentState,
-        applier: Applier<*>
+        data: MovableContentState
     )
 
     internal open fun movableContentStateResolve(
