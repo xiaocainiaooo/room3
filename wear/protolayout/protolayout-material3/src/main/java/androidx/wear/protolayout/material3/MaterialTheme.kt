@@ -17,15 +17,12 @@
 package androidx.wear.protolayout.material3
 
 import android.annotation.SuppressLint
-import androidx.wear.protolayout.ColorBuilders.ColorProp
+import androidx.annotation.OptIn
 import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
 import androidx.wear.protolayout.DimensionBuilders.SpProp
 import androidx.wear.protolayout.DimensionBuilders.sp
 import androidx.wear.protolayout.LayoutElementBuilders.FontStyle
-import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.expression.ProtoLayoutExperimental
-import androidx.wear.protolayout.material3.ColorTokens.ColorToken
-import androidx.wear.protolayout.material3.Shape.ShapeToken
 import androidx.wear.protolayout.material3.Typography.TypographyToken
 import androidx.wear.protolayout.material3.tokens.TextStyle
 
@@ -48,12 +45,12 @@ import androidx.wear.protolayout.material3.tokens.TextStyle
  *
  * ProtoLayout Material3 components use the values provided here to style their looks.
  *
- * @param customColorScheme The map with the customized colors. The keys are predefined in
- *   [ColorToken] as color roles, and the values in the provided map will override the defaults
- *   values correspondingly.
+ * @param colorScheme The customized colors for each color role.
  */
-// TODO: b/369350414 - Rethink API for Color/Typography/Shape with value instead of an enum.
-internal class MaterialTheme(private val customColorScheme: Map<Int, ColorProp> = emptyMap()) {
+internal class MaterialTheme(
+    internal val colorScheme: ColorScheme = ColorScheme(),
+    internal val shapes: Shapes = Shapes()
+) {
     /** Retrieves the [FontStyle.Builder] with the typography name. */
     internal fun getFontStyleBuilder(@TypographyToken typographyToken: Int) =
         createFontStyleBuilder(typographyToken)
@@ -61,20 +58,10 @@ internal class MaterialTheme(private val customColorScheme: Map<Int, ColorProp> 
     /** Retrieves the line height with the typography name. */
     internal fun getLineHeight(@TypographyToken typographyToken: Int) =
         Typography.fromToken(typographyToken).lineHeight
-
-    /** Retrieves the [ColorProp] with the color name. */
-    internal fun getColor(@ColorToken colorToken: Int): ColorProp =
-        customColorScheme.getOrDefault(colorToken, ColorTokens.fromToken(colorToken))
-
-    /** Retrieves the [Corner] with the shape name. */
-    internal fun getCornerShape(@ShapeToken shapeToken: Int): Corner = Shape.fromToken(shapeToken)
 }
 
-/** MaterialTheme that uses predefined default values without any customization. */
-@JvmField internal val DEFAULT_MATERIAL_THEME: MaterialTheme = MaterialTheme(emptyMap())
-
 @SuppressLint("ResourceType")
-@androidx.annotation.OptIn(ProtoLayoutExperimental::class)
+@OptIn(ProtoLayoutExperimental::class)
 internal fun createFontStyleBuilder(
     @TypographyToken typographyToken: Int,
     deviceConfiguration: DeviceParameters? = null,

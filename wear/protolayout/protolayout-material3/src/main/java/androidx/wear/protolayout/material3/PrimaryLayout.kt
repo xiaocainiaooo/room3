@@ -86,14 +86,14 @@ import androidx.wear.protolayout.material3.PrimaryLayoutDefaults.METADATA_TAG
  * @param titleSlot The app title in the top slot, just below the icon. This should be one line of
  *   [text] with [Typography.TITLE_SMALL] typography, describing the main purpose of this layout.
  *   Title is an optional slot which can be omitted to make space for other elements. Defaults to
- *   [ColorTokens.ON_BACKGROUND] color.
+ *   [ColorScheme.onBackground] color.
  * @param bottomSlot The content for bottom slot in this layout, that will be anchored to the bottom
  *   edge of the screen. This should be either a small non tappable content such as Text with
  *   optional label for it or tappable main action with [textEdgeButton] or [iconEdgeButton] which
  *   is designed to have its bottom following the screen's curvature. This bottom slot is optional,
  *   if unset the main content will expand more towards the edge of the screen.
  * @param labelForBottomSlot The label displayed just above the [bottomSlot]. Default will be one
- *   line of [text] with [Typography.TITLE_SMALL] typography, [ColorTokens.ON_SURFACE] color that
+ *   line of [text] with [Typography.TITLE_SMALL] typography, [ColorScheme.onSurface] color that
  *   should contain additional description of this layout. When the [bottomSlot] is not provided or
  *   it an edge button, the given label will be ignored.
  * @param onClick The clickable action for whole layout. If any area (outside of other added
@@ -142,7 +142,7 @@ internal fun MaterialScope.primaryLayoutWithOverrideIcon(
                     defaultTextElementStyle =
                         TextElementStyle(
                             typography = Typography.TITLE_SMALL,
-                            color = getColorProp(ColorTokens.ON_SURFACE)
+                            color = theme.colorScheme.onSurface
                         )
                 )
                 .labelForBottomSlot()
@@ -180,7 +180,7 @@ internal fun MaterialScope.primaryLayoutWithOverrideIcon(
                                 defaultTextElementStyle =
                                     TextElementStyle(
                                         typography = Typography.TITLE_SMALL,
-                                        color = getColorProp(ColorTokens.ON_BACKGROUND)
+                                        color = theme.colorScheme.onBackground
                                     )
                             )
                             .titleSlot()
@@ -209,8 +209,8 @@ private fun MaterialScope.getIconPlaceholder(overrideIcon: Boolean): LayoutEleme
             Modifiers.Builder()
                 .setBackground(
                     ModifiersBuilders.Background.Builder()
-                        .setCorner(getCorner(Shape.CORNER_FULL))
-                        .setColor(getColorProp(ColorTokens.ON_BACKGROUND))
+                        .setCorner(shapes.full)
+                        .setColor(theme.colorScheme.onBackground)
                         .build()
                 )
                 .build()

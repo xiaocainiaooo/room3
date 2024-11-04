@@ -17,8 +17,10 @@ package androidx.wear.protolayout.material3
 
 import android.graphics.Color
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.wear.protolayout.ColorBuilders
+import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.LayoutElementBuilders
+import androidx.wear.protolayout.material3.tokens.ColorTokens
+import androidx.wear.protolayout.material3.tokens.ShapeTokens
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,9 +31,11 @@ import org.robolectric.annotation.internal.DoNotInstrument
 class MaterialThemeTest {
     @Test
     fun defaultMaterialTheme_returnsTokenDefaults() {
+        val defaultTheme = MaterialTheme()
+
         for (i in 0 until Typography.TOKEN_COUNT) {
             val fontStyle: LayoutElementBuilders.FontStyle =
-                DEFAULT_MATERIAL_THEME.getFontStyleBuilder(i).build()
+                defaultTheme.getFontStyleBuilder(i).build()
             val textStyle = Typography.fromToken(i)
             assertThat(fontStyle.preferredFontFamilies).isEmpty()
             assertThat(fontStyle.size!!.value).isEqualTo(textStyle.size.value)
@@ -39,25 +43,17 @@ class MaterialThemeTest {
             assertThat(fontStyle.settings).isEqualTo(textStyle.fontSettings)
         }
 
-        for (i in 0 until ColorTokens.TOKEN_COUNT) {
-            assertThat(DEFAULT_MATERIAL_THEME.getColor(i).getArgb())
-                .isEqualTo(ColorTokens.fromToken(i).argb)
-        }
-
-        for (i in 0 until Shape.TOKEN_COUNT) {
-            assertThat(DEFAULT_MATERIAL_THEME.getCornerShape(i).getRadius()!!.getValue())
-                .isEqualTo(Shape.fromToken(i).radius!!.value)
-        }
+        assertThat(defaultTheme.colorScheme.primaryDim.argb).isEqualTo(ColorTokens.PRIMARY_DIM)
+        assertThat(defaultTheme.shapes.medium.toProto())
+            .isEqualTo(ShapeTokens.CORNER_MEDIUM.toProto())
     }
 
     @Test
     fun customMaterialTheme_overrideColor_returnsOverriddenValue() {
         assertThat(
-                MaterialTheme(
-                        customColorScheme =
-                            mapOf(ColorTokens.ERROR to ColorBuilders.argb(Color.MAGENTA))
-                    )
-                    .getColor(ColorTokens.ERROR)
+                MaterialTheme(colorScheme = ColorScheme(error = argb(Color.MAGENTA)))
+                    .colorScheme
+                    .error
                     .argb
             )
             .isEqualTo(Color.MAGENTA)
@@ -67,13 +63,11 @@ class MaterialThemeTest {
     fun customMaterialTheme_colorNotOverridden_returnsDefaultValue() {
         // Provides a custom color scheme with an overridden color.
         assertThat(
-                MaterialTheme(
-                        customColorScheme =
-                            mapOf(ColorTokens.SECONDARY to ColorBuilders.argb(Color.MAGENTA))
-                    )
-                    .getColor(ColorTokens.ON_ERROR)
+                MaterialTheme(colorScheme = ColorScheme(secondary = argb(Color.MAGENTA)))
+                    .colorScheme
+                    .onError
                     .argb
             )
-            .isEqualTo(ColorTokens.fromToken(ColorTokens.ON_ERROR).argb)
+            .isEqualTo(ColorTokens.ON_ERROR)
     }
 }

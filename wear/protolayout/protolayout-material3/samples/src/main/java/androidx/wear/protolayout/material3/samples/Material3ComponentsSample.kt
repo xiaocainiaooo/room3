@@ -19,15 +19,15 @@ package androidx.wear.protolayout.material3.samples
 import android.content.Context
 import androidx.annotation.Sampled
 import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
+import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
+import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint
 import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
-import androidx.wear.protolayout.material3.ColorTokens
 import androidx.wear.protolayout.material3.Typography
 import androidx.wear.protolayout.material3.buttonGroup
-import androidx.wear.protolayout.material3.getColorProp
 import androidx.wear.protolayout.material3.icon
 import androidx.wear.protolayout.material3.iconEdgeButton
 import androidx.wear.protolayout.material3.materialScope
@@ -56,7 +56,7 @@ fun helloWorldTextDynamicCustom(
                     .build(),
             stringLayoutConstraint = StringLayoutConstraint.Builder("Constraint").build(),
             typography = Typography.DISPLAY_LARGE,
-            color = getColorProp(ColorTokens.TERTIARY),
+            color = colorScheme.tertiary,
             underline = true,
             maxLines = 5
         )
@@ -97,7 +97,20 @@ fun topLeveLayout(
             titleSlot = { text("App title".prop()) },
             mainSlot = {
                 buttonGroup {
-                    // To be populated
+                    // To be populated with proper components
+                    buttonGroupItem {
+                        LayoutElementBuilders.Box.Builder()
+                            .setModifiers(
+                                ModifiersBuilders.Modifiers.Builder()
+                                    .setBackground(
+                                        ModifiersBuilders.Background.Builder()
+                                            .setCorner(shapes.full)
+                                            .build()
+                                    )
+                                    .build()
+                            )
+                            .build()
+                    }
                 }
             },
             bottomSlot = { iconEdgeButton(clickable, "Description".prop()) { icon("id") } }

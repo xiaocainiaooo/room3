@@ -17,9 +17,8 @@
 package androidx.wear.protolayout.material3
 
 import android.content.Context
-import android.provider.Settings
-import androidx.annotation.VisibleForTesting
 import androidx.wear.protolayout.ColorBuilders.ColorProp
+import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
 import androidx.wear.protolayout.DimensionBuilders.ImageDimension
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
@@ -27,11 +26,8 @@ import androidx.wear.protolayout.LayoutElementBuilders.TEXT_ALIGN_CENTER
 import androidx.wear.protolayout.LayoutElementBuilders.TEXT_OVERFLOW_ELLIPSIZE
 import androidx.wear.protolayout.LayoutElementBuilders.TextAlignment
 import androidx.wear.protolayout.LayoutElementBuilders.TextOverflow
-import androidx.wear.protolayout.ModifiersBuilders.Corner
-import androidx.wear.protolayout.material3.ColorTokens.ColorToken
-import androidx.wear.protolayout.material3.ColorTokens.fromToken
-import androidx.wear.protolayout.material3.Shape.ShapeToken
 import androidx.wear.protolayout.material3.Typography.TypographyToken
+import androidx.wear.protolayout.material3.tokens.ColorTokens
 
 /**
  * Receiver scope which is used by all ProtoLayout Material3 components and layout to support
@@ -55,19 +51,26 @@ public open class MaterialScope
 /**
  * @param context The Android Context for the Tile service
  * @param deviceConfiguration The device parameters for where the components will be rendered
- * @param theme The theme to be used. If not set, default Material theme will be applied
  * @param allowDynamicTheme If dynamic colors theme should be used on components, meaning that
+ * @param theme The theme to be used. If not set, default Material theme will be applied
  * @param defaultTextElementStyle The opinionated text style that text component can use as defaults
+ * @param defaultIconStyle The opinionated icon style that icon component can use as defaults
  */
 internal constructor(
     internal val context: Context,
     /** The device parameters for where the components will be rendered. */
     public val deviceConfiguration: DeviceParameters,
-    internal val theme: MaterialTheme = DEFAULT_MATERIAL_THEME,
-    internal val allowDynamicTheme: Boolean = true,
-    internal val defaultTextElementStyle: TextElementStyle = TextElementStyle(),
-    internal val defaultIconStyle: IconStyle = IconStyle()
+    internal val allowDynamicTheme: Boolean,
+    internal val theme: MaterialTheme,
+    internal val defaultTextElementStyle: TextElementStyle,
+    internal val defaultIconStyle: IconStyle
 ) {
+    /** Color Scheme used within this scope and its components. */
+    public val colorScheme: ColorScheme = theme.colorScheme
+
+    /** Shapes theme used within this scope and its components. */
+    public val shapes: Shapes = theme.shapes
+
     internal fun withStyle(
         defaultTextElementStyle: TextElementStyle = this.defaultTextElementStyle,
         defaultIconStyle: IconStyle = this.defaultIconStyle
@@ -83,77 +86,54 @@ internal constructor(
 }
 
 /**
- * Retrieves the [Corner] shape from the default Material theme with shape token name.
- *
- * @throws IllegalArgumentException if the token name is not recognized as one of the constants in
- *   [Shape]
- */
-public fun MaterialScope.getCorner(@ShapeToken shapeToken: Int): Corner =
-    theme.getCornerShape(shapeToken)
-
-/**
- * Retrieves the [ColorProp] from the customized or default Material theme or dynamic system theme
- * with the given color token name.
- *
- * @throws IllegalArgumentException if the token name is not recognized as one of the constants in
- *   [ColorTokens]
- */
-public fun MaterialScope.getColorProp(@ColorToken colorToken: Int): ColorProp =
-    if (isDynamicThemeEnabled(context) && allowDynamicTheme) {
-        DynamicMaterialTheme.getColorProp(context, colorToken) ?: theme.getColor(colorToken)
-    } else {
-        theme.getColor(colorToken)
-    }
-
-/**
- * Returns whether the dynamic colors theme (colors following the system theme) is enabled.
- *
- * If enabled, and elements or [MaterialScope] are opted in to using dynamic theme, colors will
- * change whenever system theme changes.
- */
-public fun isDynamicThemeEnabled(context: Context): Boolean {
-    val overlaySetting: String? =
-        Settings.Secure.getString(context.contentResolver, THEME_CUSTOMIZATION_OVERLAY_PACKAGES)
-    return (!overlaySetting.isNullOrEmpty() && overlaySetting != "{}")
-}
-
-/**
  * Creates a top-level receiver scope [MaterialScope] that calls the given [layout] to support for
- * opinionated defaults and building Material3 components and layout.
+ * opinionated defaults and building Material3 components and layout, with default dynamic theme.
  *
  * @param context The Android Context for the Tile service
  * @param deviceConfiguration The device parameters for where the components will be rendered
  * @param allowDynamicTheme If dynamic colors theme should be used on components, meaning that
  *   colors will follow the system theme if enabled on the device. If not set, defaults to using the
  *   system theme
+ * @param defaultColorScheme Color Scheme with static colors. The color theme to be used, when
+ *   `allowDynamicTheme` is false, or when dynamic theming is disabled by the system or user. If not
+ *   set, defaults to default theme.
  * @param layout Scoped slot for the content of layout to be displayed
  */
-// TODO: b/369350414 - Allow for overriding colors theme.
 // TODO: b/370976767 - Specify in docs that MaterialTileService should be used instead of using this
 // directly.
 public fun materialScope(
     context: Context,
     deviceConfiguration: DeviceParameters,
     allowDynamicTheme: Boolean = true,
+    defaultColorScheme: ColorScheme = ColorScheme(),
     layout: MaterialScope.() -> LayoutElement
 ): LayoutElement =
     MaterialScope(
             context = context,
             deviceConfiguration = deviceConfiguration,
-            allowDynamicTheme = allowDynamicTheme
+            allowDynamicTheme = allowDynamicTheme,
+            theme =
+                MaterialTheme(
+                    colorScheme =
+                        if (allowDynamicTheme) {
+                            dynamicColorScheme(
+                                context = context,
+                                defaultColorScheme = defaultColorScheme
+                            )
+                        } else {
+                            defaultColorScheme
+                        }
+                ),
+            defaultTextElementStyle = TextElementStyle(),
+            defaultIconStyle = IconStyle()
         )
         .layout()
 
 @DslMarker public annotation class MaterialScopeMarker
 
-/** This maps to `android.provider.Settings.Secure.THEME_CUSTOMIZATION_OVERLAY_PACKAGES`. */
-@VisibleForTesting
-internal const val THEME_CUSTOMIZATION_OVERLAY_PACKAGES: String =
-    "theme_customization_overlay_packages"
-
 internal class TextElementStyle(
     @TypographyToken val typography: Int = Typography.BODY_MEDIUM,
-    val color: ColorProp = fromToken(ColorTokens.PRIMARY),
+    val color: ColorProp = argb(ColorTokens.PRIMARY),
     val italic: Boolean = false,
     val underline: Boolean = false,
     val scalable: Boolean = TypographyFontSelection.getFontScalability(typography),
@@ -164,5 +144,5 @@ internal class TextElementStyle(
 
 internal class IconStyle(
     val size: ImageDimension = 24.toDp(),
-    val tintColor: ColorProp = fromToken(ColorTokens.PRIMARY),
+    val tintColor: ColorProp = argb(ColorTokens.PRIMARY),
 )
