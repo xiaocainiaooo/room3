@@ -28,6 +28,7 @@ import kotlinx.serialization.serializer
  * Returns a property delegate provider that manages the saving and restoring of a value of type [T]
  * within the [SavedStateRegistry] of this [SavedStateRegistryOwner].
  *
+ * @sample androidx.savedstate.serialization.savedStateRegistryOwner_saved_withKey_withSerializer
  * @param key The [String] key to use for storing the value in the [SavedStateRegistry].
  * @param serializer The [KSerializer] to use for serializing and deserializing the value.
  * @param init The function to provide the initial value of the property.
@@ -55,6 +56,7 @@ public fun <T : Any> SavedStateRegistryOwner.saved(
  * This is a convenience overload that uses the name of the property as the key for storing the
  * value in the [SavedStateRegistry]
  *
+ * @sample androidx.savedstate.serialization.savedStateRegistryOwner_saved_withSerializer
  * @param serializer The [KSerializer] to use for serializing and deserializing the value.
  * @param init The function to provide the initial value of the property.
  * @return A property delegate provider that manages the saving and restoring of the value.
@@ -77,6 +79,7 @@ public fun <T : Any> SavedStateRegistryOwner.saved(
  * Returns a property delegate provider that manages the saving and restoring of a value of type [T]
  * within the [SavedStateRegistry] of this [SavedStateRegistryOwner].
  *
+ * @sample androidx.savedstate.serialization.savedStateRegistryOwner_saved_withKey
  * @param key The [String] key to use for storing the value in the [SavedStateRegistry].
  * @param init The function to provide the initial value of the property.
  * @return A property delegate provider that manages the saving and restoring of the value.
@@ -99,6 +102,7 @@ public inline fun <reified T : Any> SavedStateRegistryOwner.saved(
  * The name of the property will be used as the key for storing the value in the
  * [SavedStateRegistry].
  *
+ * @sample androidx.savedstate.serialization.savedStateRegistryOwner_saved
  * @param init The function to provide the initial value of the property.
  * @return A property delegate provider that manages the saving and restoring of the value.
  * @see encodeToSavedState
