@@ -58,10 +58,6 @@ class SmallListStartupBenchmark(
     companion object {
         @Parameterized.Parameters(name = "startup={0},compilation={1}")
         @JvmStatic
-        fun parameters() =
-            createStartupCompilationParams(
-                startupModes = listOf(StartupMode.COLD),
-                compilationModes = listOf(CompilationMode.None())
-            )
+        fun parameters() = createStartupCompilationParams()
     }
 }
