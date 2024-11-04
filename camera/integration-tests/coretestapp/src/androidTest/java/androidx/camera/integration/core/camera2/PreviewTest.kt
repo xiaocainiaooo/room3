@@ -27,9 +27,9 @@ import androidx.camera.camera2.pipe.integration.CameraPipeConfig
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraXConfig
-import androidx.camera.core.ImageCapture
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceRequest
+import androidx.camera.core.SurfaceRequest.TransformationInfo
 import androidx.camera.core.impl.ImageOutputConfig
 import androidx.camera.core.impl.ImageOutputConfig.OPTION_RESOLUTION_SELECTOR
 import androidx.camera.core.impl.SessionConfig
@@ -96,6 +96,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     companion object {
         private const val ANY_THREAD_NAME = "any-thread-name"
         private val DEFAULT_RESOLUTION: Size by lazy { Size(640, 480) }
+        private val DEFAULT_RESOLUTION_PORTRAIT: Size by lazy { Size(480, 640) }
         private const val FRAMES_TO_VERIFY = 10
         private const val RESULT_TIMEOUT = 5000L
 
@@ -560,7 +561,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     }
 
     // ======================================================
-    //   Resolutions / Aspect Ratio
+    // Section 2: targetResolution / targetRotation / targetAspectRatio
     // ======================================================
 
     @Test
@@ -580,14 +581,46 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
             val config = useCase.currentConfig as ImageOutputConfig
             assertThat(config.targetAspectRatio).isEqualTo(AspectRatio.RATIO_4_3)
+            val resolution = useCase.resolutionInfo!!.resolution
+            assertThat(resolution.width.toFloat() / resolution.height).isEqualTo(4.0f / 3.0f)
+        }
+
+    @Suppress("DEPRECATION") // test for legacy resolution API
+    @Test
+    fun aspectRatio4_3_resolutionIsSet() =
+        runBlocking(Dispatchers.Main) {
+            val useCase = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3).build()
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
+            val config = useCase.currentConfig as ImageOutputConfig
+            assertThat(config.targetAspectRatio).isEqualTo(AspectRatio.RATIO_4_3)
+            val resolution = useCase.resolutionInfo!!.resolution
+            assertThat(resolution.width.toFloat() / resolution.height).isEqualTo(4.0f / 3.0f)
+        }
+
+    @Suppress("DEPRECATION") // test for legacy resolution API
+    @Test
+    fun aspectRatio16_9_resolutionIsSet() =
+        runBlocking(Dispatchers.Main) {
+            val useCase = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_16_9).build()
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
+            val config = useCase.currentConfig as ImageOutputConfig
+            assertThat(config.targetAspectRatio).isEqualTo(AspectRatio.RATIO_16_9)
+            val resolution = useCase.resolutionInfo!!.resolution
+            assertThat(resolution.width.toFloat() / resolution.height).isEqualTo(16.0f / 9.0f)
         }
 
     @Suppress("DEPRECATION") // legacy resolution API
     @Test
-    fun defaultAspectRatioWontBeSet_whenTargetResolutionIsSet() =
+    fun defaultAspectRatioWontBeSet_andResolutionIsSet_whenTargetResolutionIsSet() =
         runBlocking(Dispatchers.Main) {
-            assumeTrue(CameraUtil.hasCameraWithLensFacing(CameraSelector.LENS_FACING_BACK))
-            val useCase = Preview.Builder().setTargetResolution(DEFAULT_RESOLUTION).build()
+            assumeTrue(
+                CameraUtil.isCameraSensorPortraitInNativeOrientation(cameraSelector.lensFacing!!)
+            )
+            val useCase =
+                Preview.Builder()
+                    .setTargetResolution(DEFAULT_RESOLUTION_PORTRAIT)
+                    .setTargetRotation(Surface.ROTATION_0) // enforce native orientation.
+                    .build()
             assertThat(
                     useCase.currentConfig.containsOption(
                         ImageOutputConfig.OPTION_TARGET_ASPECT_RATIO
@@ -607,17 +640,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                     )
                 )
                 .isFalse()
-        }
-
-    @Test
-    fun useCaseConfigCanBeReset_afterUnbind() =
-        runBlocking(Dispatchers.Main) {
-            val preview = defaultBuilder!!.build()
-            val initialConfig = preview.currentConfig
-            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
-            cameraProvider.unbind(preview)
-            val configAfterUnbinding = preview.currentConfig
-            assertThat(initialConfig == configAfterUnbinding).isTrue()
+            assertThat(useCase.resolutionInfo!!.resolution).isEqualTo(DEFAULT_RESOLUTION)
         }
 
     @Test
@@ -649,6 +672,89 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
 
             assertThat(useCase.targetRotation).isEqualTo(displayRotation)
+        }
+
+    @Test
+    fun returnValidTargetRotation_afterUseCaseIsCreated() {
+        val preview = Preview.Builder().build()
+        assertThat(preview.targetRotation).isNotEqualTo(ImageOutputConfig.INVALID_ROTATION)
+    }
+
+    @Test
+    fun returnCorrectTargetRotation_afterUseCaseIsBound() =
+        runBlocking(Dispatchers.Main) {
+            val preview = Preview.Builder().setTargetRotation(Surface.ROTATION_180).build()
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+            assertThat(preview.targetRotation).isEqualTo(Surface.ROTATION_180)
+        }
+
+    @Suppress("DEPRECATION") // legacy resolution API
+    @Test
+    fun setTargetRotationOnBuilder_ResolutionIsSetCorrectly() =
+        runBlocking(Dispatchers.Main) {
+            assumeTrue(
+                CameraUtil.isCameraSensorPortraitInNativeOrientation(cameraSelector.lensFacing!!)
+            )
+            val preview =
+                Preview.Builder()
+                    .setTargetRotation(Surface.ROTATION_90)
+                    .setTargetResolution(DEFAULT_RESOLUTION)
+                    .build()
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+            assertThat(preview.resolutionInfo!!.resolution).isEqualTo(DEFAULT_RESOLUTION)
+            assertThat(preview.resolutionInfo!!.rotationDegrees).isEqualTo(0)
+        }
+
+    @Test
+    fun setTargetRotationAfterBind_transformationInfoIsUpdated() =
+        runBlocking(Dispatchers.Main) {
+            assumeTrue(
+                CameraUtil.isCameraSensorPortraitInNativeOrientation(cameraSelector.lensFacing!!)
+            )
+
+            var transformationInfoDeferred = CompletableDeferred<TransformationInfo>()
+            val surfaceProvidedDeferred = CompletableDeferred<SurfaceRequest>()
+
+            val preview = Preview.Builder().setTargetRotation(Surface.ROTATION_0).build()
+            preview.surfaceProvider =
+                Preview.SurfaceProvider { request ->
+                    request.setTransformationInfoListener(CameraXExecutors.directExecutor()) {
+                        transformationInfoDeferred.complete(it)
+                    }
+                    request.provideSurface(
+                        Surface(SurfaceTexture(0)),
+                        CameraXExecutors.directExecutor()
+                    ) {}
+                    surfaceProvidedDeferred.complete(request)
+                }
+
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+            surfaceProvidedDeferred.await()
+            var transformationInfo = withTimeoutOrNull(5000) { transformationInfoDeferred.await() }
+            assertThat(transformationInfo).isNotNull()
+            assertThat(transformationInfo!!.rotationDegrees).isEqualTo(90)
+
+            transformationInfoDeferred = CompletableDeferred()
+            preview.targetRotation = Surface.ROTATION_90
+
+            transformationInfo = withTimeoutOrNull(5000) { transformationInfoDeferred.await() }
+            assertThat(transformationInfo).isNotNull()
+            assertThat(transformationInfo!!.rotationDegrees).isEqualTo(0)
+        }
+
+    // ======================================================
+    // Section 3: UseCase Reusability Test
+    // ======================================================
+
+    @Test
+    fun useCaseConfigCanBeReset_afterUnbind() =
+        runBlocking(Dispatchers.Main) {
+            val preview = defaultBuilder!!.build()
+            val initialConfig = preview.currentConfig
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+            cameraProvider.unbind(preview)
+            val configAfterUnbinding = preview.currentConfig
+            assertThat(initialConfig == configAfterUnbinding).isTrue()
         }
 
     @Test
@@ -743,19 +849,9 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             .isEqualTo(SurfaceRequest.Result.RESULT_SURFACE_USED_SUCCESSFULLY)
     }
 
-    @Test
-    fun returnValidTargetRotation_afterUseCaseIsCreated() {
-        val imageCapture = ImageCapture.Builder().build()
-        assertThat(imageCapture.targetRotation).isNotEqualTo(ImageOutputConfig.INVALID_ROTATION)
-    }
-
-    @Test
-    fun returnCorrectTargetRotation_afterUseCaseIsBound() =
-        runBlocking(Dispatchers.Main) {
-            val preview = Preview.Builder().setTargetRotation(Surface.ROTATION_180).build()
-            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
-            assertThat(preview.targetRotation).isEqualTo(Surface.ROTATION_180)
-        }
+    // ======================================================
+    // Section 4: ResolutionSelector
+    // ======================================================
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
     @Test
@@ -867,6 +963,10 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             assertThat(resolutionSelector.allowedResolutionMode)
                 .isEqualTo(PREFER_HIGHER_RESOLUTION_OVER_CAPTURE_RATE)
         }
+
+    // ======================================================
+    // Section 5: Session error handling
+    // ======================================================
 
     @Test
     fun sessionErrorListenerReceivesError_getsFrame(): Unit = runBlocking {
