@@ -34,6 +34,8 @@ class SdkApiConstants {
                 const val SDK_RUNTIME_MEDIATEE = 1
                 const val SDK_RUNTIME_MEDIATEE_WITH_OVERLAY = 2
                 const val IN_APP_MEDIATEE = 3
+                // Only supported for banner ads.
+                const val REFRESHABLE_MEDIATION = 4
             }
         }
     }
