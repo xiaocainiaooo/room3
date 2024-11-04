@@ -70,15 +70,15 @@ fun ExplicitEnterExitWithCustomFocusEnterExitDemo() {
                 .focusProperties {
                     onEnter = {
                         when (requestedFocusDirection) {
-                            Down -> item1.requestFocus(requestedFocusDirection)
-                            Enter -> item2.requestFocus(requestedFocusDirection)
-                            Up -> item3.requestFocus(requestedFocusDirection)
+                            Down -> item1.requestFocus()
+                            Enter -> item2.requestFocus()
+                            Up -> item3.requestFocus()
                         }
                     }
                     onExit = {
                         when (requestedFocusDirection) {
-                            Left -> top.requestFocus(requestedFocusDirection)
-                            Right -> bottom.requestFocus(requestedFocusDirection)
+                            Left -> top.requestFocus()
+                            Right -> bottom.requestFocus()
                         }
                     }
                 }
