@@ -382,7 +382,7 @@ final class ProcessingCaptureSession implements CaptureSessionInterface {
                 break;
             case ON_CAPTURE_SESSION_STARTED:
                 for (CaptureConfig captureConfig : captureConfigs) {
-                    if (captureConfig.getTemplateType() == CameraDevice.TEMPLATE_STILL_CAPTURE) {
+                    if (isTemplateTypeForStillCapture(captureConfig.getTemplateType())) {
                         issueStillCaptureRequest(captureConfig);
                     } else {
                         issueTriggerRequest(captureConfig);
@@ -397,6 +397,12 @@ final class ProcessingCaptureSession implements CaptureSessionInterface {
                 break;
         }
     }
+
+    private boolean isTemplateTypeForStillCapture(int templateType) {
+        return templateType == CameraDevice.TEMPLATE_STILL_CAPTURE
+                || templateType == CameraDevice.TEMPLATE_VIDEO_SNAPSHOT;
+    }
+
     void issueStillCaptureRequest(@NonNull CaptureConfig captureConfig) {
         CaptureRequestOptions.Builder builder =
                 CaptureRequestOptions.Builder.from(
