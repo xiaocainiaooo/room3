@@ -20,7 +20,7 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.wear.protolayout.material3.DynamicMaterialTheme.getColorProp
+import androidx.wear.protolayout.material3.tokens.ColorTokens
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,12 +33,11 @@ class DynamicMaterialThemeTest {
     @Test
     @Config(sdk = [Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
     fun test_api34() {
-        assertThat(DynamicMaterialTheme.tokenNameToResourceId).hasSize(ColorTokens.TOKEN_COUNT)
+        enableDynamicTheme()
 
-        assertThat(
-                getColorProp(ApplicationProvider.getApplicationContext(), ColorTokens.SECONDARY)!!
-                    .argb
-            )
+        val colorScheme = dynamicColorScheme(ApplicationProvider.getApplicationContext())
+
+        assertThat(colorScheme.secondary.argb)
             .isEqualTo(
                 ApplicationProvider.getApplicationContext<Context>()
                     .resources
@@ -47,21 +46,16 @@ class DynamicMaterialThemeTest {
                         ApplicationProvider.getApplicationContext<Context>().theme
                     )
             )
-
-        // Check that any unknown color token is returned as null.
-        assertThat(getColorProp(ApplicationProvider.getApplicationContext(), -15)).isNull()
     }
 
     @Test
     @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
     fun test_apiLessThan34() {
-        assertThat(DynamicMaterialTheme.tokenNameToResourceId).isEmpty()
+        enableDynamicTheme()
+
+        val colorScheme = dynamicColorScheme(ApplicationProvider.getApplicationContext())
 
         // Check that any token color is returned as null from Dynamic Theme.
-        assertThat(getColorProp(ApplicationProvider.getApplicationContext(), ColorTokens.SECONDARY))
-            .isNull()
-
-        // Check that any unknown color token is also null.
-        assertThat(getColorProp(ApplicationProvider.getApplicationContext(), -15)).isNull()
+        assertThat(colorScheme.secondary.argb).isEqualTo(ColorTokens.SECONDARY)
     }
 }
