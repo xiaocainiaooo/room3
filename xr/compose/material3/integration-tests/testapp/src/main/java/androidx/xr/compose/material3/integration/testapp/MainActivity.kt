@@ -40,6 +40,7 @@ import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldDestinationIt
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,9 +57,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+private val navSuiteType = mutableStateOf(NavigationSuiteType.NavigationRail)
+
 @Composable
 private fun Content() {
     var navSuiteSelectedItem by remember { mutableStateOf(NavSuiteItem.HOME) }
+
     NavigationSuiteScaffold(
         navigationSuiteItems = {
             NavSuiteItem.values().forEach { item ->
@@ -69,14 +73,15 @@ private fun Content() {
                     label = { Text(item.label) },
                 )
             }
-        }
+        },
+        layoutType = navSuiteType.value
     ) {
         when (navSuiteSelectedItem) {
             NavSuiteItem.HOME -> {
                 Home()
             }
             NavSuiteItem.SETTINGS -> {
-                XrSettingsPane()
+                XrSettingsPane(navSuiteType)
             }
         }
     }
