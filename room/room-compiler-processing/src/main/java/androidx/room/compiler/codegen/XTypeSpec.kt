@@ -24,7 +24,6 @@ import androidx.room.compiler.processing.XElement
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.javapoet.JTypeSpec
 import com.squareup.kotlinpoet.javapoet.KTypeSpec
-import javax.lang.model.element.Modifier
 
 interface XTypeSpec : TargetLanguage {
 
@@ -66,24 +65,6 @@ interface XTypeSpec : TargetLanguage {
             }
             addProperty(builder.build())
         }
-
-        companion object {
-            fun Builder.apply(
-                javaTypeBuilder: com.squareup.javapoet.TypeSpec.Builder.() -> Unit,
-                kotlinTypeBuilder: com.squareup.kotlinpoet.TypeSpec.Builder.() -> Unit,
-            ): Builder = apply {
-                when (language) {
-                    CodeLanguage.JAVA -> {
-                        check(this is JavaTypeSpec.Builder)
-                        this.actual.javaTypeBuilder()
-                    }
-                    CodeLanguage.KOTLIN -> {
-                        check(this is KotlinTypeSpec.Builder)
-                        this.actual.kotlinTypeBuilder()
-                    }
-                }
-            }
-        }
     }
 
     companion object {
@@ -100,7 +81,7 @@ interface XTypeSpec : TargetLanguage {
                         actual =
                             JTypeSpec.classBuilder(className.java).apply {
                                 if (!isOpen) {
-                                    addModifiers(Modifier.FINAL)
+                                    addModifiers(JModifier.FINAL)
                                 }
                             }
                     )
@@ -161,7 +142,7 @@ interface XTypeSpec : TargetLanguage {
                         className = null,
                         actual =
                             JTypeSpec.classBuilder("Companion")
-                                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                                .addModifiers(JModifier.PUBLIC, JModifier.STATIC)
                     )
                 CodeLanguage.KOTLIN ->
                     KotlinTypeSpec.Builder(

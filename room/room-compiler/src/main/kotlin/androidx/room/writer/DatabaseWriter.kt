@@ -21,9 +21,9 @@ import androidx.room.compiler.codegen.VisibilityModifier
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XPropertySpec
-import androidx.room.compiler.codegen.XPropertySpec.Builder.Companion.apply
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.XTypeSpec
+import androidx.room.compiler.codegen.compat.XConverters.applyToJavaPoet
 import androidx.room.ext.CommonTypeNames
 import androidx.room.ext.KotlinCollectionMemberNames
 import androidx.room.ext.KotlinTypeNames
@@ -400,14 +400,11 @@ class DatabaseWriter(
                             initializer(lazyInit)
                         }
                     }
-                    .apply(
-                        javaFieldBuilder = {
-                            // The volatile modifier is needed since in Java the memoization is
-                            // generated.
-                            addModifiers(Modifier.VOLATILE)
-                        },
-                        kotlinPropertyBuilder = {}
-                    )
+                    .applyToJavaPoet {
+                        // The volatile modifier is needed since in Java the memoization is
+                        // generated.
+                        addModifiers(Modifier.VOLATILE)
+                    }
                     .build()
             builder.addProperty(privateDaoProperty)
             if (codeLanguage == CodeLanguage.KOTLIN && method.isProperty) {

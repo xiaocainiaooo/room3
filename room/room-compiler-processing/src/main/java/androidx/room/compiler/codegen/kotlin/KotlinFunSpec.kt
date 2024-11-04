@@ -16,20 +16,21 @@
 
 package androidx.room.compiler.codegen.kotlin
 
+import androidx.room.compiler.codegen.KFunSpec
+import androidx.room.compiler.codegen.KFunSpecBuilder
+import androidx.room.compiler.codegen.KParameterSpec
 import androidx.room.compiler.codegen.VisibilityModifier
 import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XTypeName
-import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.ParameterSpec
 
-internal class KotlinFunSpec(override val name: String, internal val actual: FunSpec) :
+internal class KotlinFunSpec(override val name: String, internal val actual: KFunSpec) :
     KotlinLang(), XFunSpec {
     override fun toString() = actual.toString()
 
-    internal class Builder(override val name: String, internal val actual: FunSpec.Builder) :
+    internal class Builder(override val name: String, internal val actual: KFunSpecBuilder) :
         KotlinLang(), XFunSpec.Builder {
 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
@@ -50,7 +51,7 @@ internal class KotlinFunSpec(override val name: String, internal val actual: Fun
             annotations: List<XAnnotationSpec>
         ) = apply {
             actual.addParameter(
-                ParameterSpec.builder(name, typeName.kotlin)
+                KParameterSpec.builder(name, typeName.kotlin)
                     .apply {
                         // TODO(b/247247439): Add other annotations
                     }
