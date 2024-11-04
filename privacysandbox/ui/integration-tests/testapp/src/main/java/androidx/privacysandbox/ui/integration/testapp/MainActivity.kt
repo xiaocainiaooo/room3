@@ -18,6 +18,7 @@ package androidx.privacysandbox.ui.integration.testapp
 
 import android.os.Build
 import android.os.Bundle
+import android.os.RemoteException
 import android.os.ext.SdkExtensions
 import android.util.Log
 import android.view.View
@@ -145,7 +146,11 @@ class MainActivity : AppCompatActivity() {
 
     /** Kill the sandbox process */
     private fun triggerSandboxDeath() {
-        currentFragment.getSdkApi().triggerProcessDeath()
+        try {
+            currentFragment.getSdkApi().triggerProcessDeath()
+        } catch (ignored: RemoteException) {
+            // avoids a crash when clicking the "trigger sandbox death" button twice
+        }
     }
 
     private fun initializeToggles() {
