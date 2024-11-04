@@ -173,6 +173,9 @@ public final class ScreenFlashView extends View {
 
     /** Update {@link #mScreenFlash} if required. */
     private void updateScreenFlash(Window window) {
+        Logger.d(TAG, "updateScreenFlash: is new window null = " + (window == null)
+                + ",  is new window same as previous = " + (window == mScreenFlashWindow));
+
         if (mScreenFlashWindow != window) {
             mScreenFlash = window == null ? null : new ScreenFlash() {
                 private float mPreviousBrightness;
@@ -194,7 +197,7 @@ public final class ScreenFlashView extends View {
 
                 @Override
                 public void clear() {
-                    Logger.d(TAG, "ScreenFlash#clearScreenFlashUi");
+                    Logger.d(TAG, "ScreenFlash#clear");
 
                     if (mAnimator != null) {
                         mAnimator.cancel();
