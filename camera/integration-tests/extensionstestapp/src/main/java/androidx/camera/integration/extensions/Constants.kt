@@ -76,6 +76,9 @@ object IntentExtraKey {
      */
     const val INTENT_EXTRA_KEY_IMAGE_ROTATION_DEGREES = "ImageRotationDegrees"
 
+    /** Used to pass the info that whether VideoCapture should be enabled. */
+    const val INTENT_EXTRA_KEY_VIDEO_CAPTURE_ENABLED = "VideoCaptureEnabled"
+
     /** Used to pass the request code to the callee activity. */
     const val INTENT_EXTRA_KEY_REQUEST_CODE = "RequestCode"
 

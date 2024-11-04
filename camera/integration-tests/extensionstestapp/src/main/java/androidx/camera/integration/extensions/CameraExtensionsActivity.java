@@ -29,6 +29,7 @@ import static androidx.camera.integration.extensions.IntentExtraKey.INTENT_EXTRA
 import static androidx.camera.integration.extensions.IntentExtraKey.INTENT_EXTRA_KEY_CAMERA_ID;
 import static androidx.camera.integration.extensions.IntentExtraKey.INTENT_EXTRA_KEY_DELETE_CAPTURED_IMAGE;
 import static androidx.camera.integration.extensions.IntentExtraKey.INTENT_EXTRA_KEY_EXTENSION_MODE;
+import static androidx.camera.integration.extensions.IntentExtraKey.INTENT_EXTRA_KEY_VIDEO_CAPTURE_ENABLED;
 import static androidx.camera.integration.extensions.utils.PermissionUtil.setupPermissions;
 import static androidx.camera.video.VideoRecordEvent.Finalize.ERROR_DURATION_LIMIT_REACHED;
 import static androidx.camera.video.VideoRecordEvent.Finalize.ERROR_FILE_SIZE_LIMIT_REACHED;
@@ -606,10 +607,15 @@ public class CameraExtensionsActivity extends AppCompatActivity
         mDeleteCapturedImage = getIntent().getBooleanExtra(INTENT_EXTRA_KEY_DELETE_CAPTURED_IMAGE,
                 mDeleteCapturedImage);
 
+        mToggleVideoCapture = findViewById(R.id.videoToggle);
+        boolean videoCaptureEnabled = mToggleVideoCapture.isChecked();
+        mToggleVideoCapture.setChecked(
+                getIntent().getBooleanExtra(INTENT_EXTRA_KEY_VIDEO_CAPTURE_ENABLED,
+                        videoCaptureEnabled));
+
         StrictMode.VmPolicy policy =
                 new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build();
         StrictMode.setVmPolicy(policy);
-        mToggleVideoCapture = findViewById(R.id.videoToggle);
         ViewStub viewFinderStub = findViewById(R.id.viewFinderStub);
         viewFinderStub.setLayoutResource(R.layout.full_previewview);
         mPreviewView = (PreviewView) viewFinderStub.inflate();
