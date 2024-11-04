@@ -28,7 +28,6 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -57,6 +56,7 @@ import androidx.compose.material3.tokens.ScrimTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.movableContentOf
@@ -100,6 +100,7 @@ import androidx.compose.ui.util.fastSumBy
 import androidx.compose.ui.util.lerp
 import kotlin.jvm.JvmInline
 import kotlin.math.min
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 
 /**
@@ -438,7 +439,11 @@ fun ModalWideNavigationRail(
         ModalWideNavigationRailDefaults.Properties,
     content: @Composable () -> Unit
 ) {
-    val rememberContent = remember(content) { movableContentOf(content) }
+    val rememberContent =
+        if (hideOnCollapse) {
+            content
+        } else remember(content) { movableContentOf(content) }
+
     val density = LocalDensity.current
     // TODO: Load the motionScheme tokens from the component tokens file.
     val modalStateAnimationSpec = MotionSchemeKeyTokens.DefaultSpatial.value<Float>()
@@ -456,31 +461,21 @@ fun ModalWideNavigationRail(
             // TODO: Load the motionScheme tokens from the component tokens file.
             animationSpec = MotionSchemeKeyTokens.DefaultEffects.value()
         )
-    val isCollapsed by remember { derivedStateOf { positionProgress.value == 0f } }
-    val modalExpanded by remember { derivedStateOf { positionProgress.value >= 0.3f } }
+    val isCollapsed: Boolean by remember { derivedStateOf { positionProgress.value == 0f } }
+    val modalExpanded: Boolean by remember { derivedStateOf { positionProgress.value >= 0.3f } }
     val animateToDismiss: suspend () -> Unit = {
         if (hideOnCollapse) {
-            if (
-                modalState.anchoredDraggableState.confirmValueChange(
-                    WideNavigationRailValue.Collapsed
-                )
-            ) {
-                modalState.collapse()
-                if (!modalState.isExpanded) state.collapse()
-            }
-        } else {
-            state.collapse()
+            modalState.collapse()
+        }
+        state.collapse()
+    }
+
+    val settleToDismiss: suspend (velocity: Float) -> Unit = {
+        if (hideOnCollapse) {
+            modalState.settle(it)
+            if (!modalState.isExpanded) state.collapse()
         }
     }
-    val settleToDismiss: suspend (velocity: Float) -> Unit =
-        if (hideOnCollapse) {
-            {
-                modalState.settle(it)
-                if (!modalState.isExpanded) state.collapse()
-            }
-        } else {
-            {}
-        }
 
     // Display a non modal rail when collapsed.
     if (!hideOnCollapse && isCollapsed) {
@@ -496,6 +491,23 @@ fun ModalWideNavigationRail(
             content = rememberContent
         )
     }
+
+    val channel = remember { Channel<Boolean>(Channel.CONFLATED) }
+    if (hideOnCollapse) {
+        LaunchedEffect(channel) {
+            for (target in channel) {
+                val newTarget = channel.tryReceive().getOrNull() ?: target
+                launch {
+                    if (newTarget) {
+                        modalState.expand()
+                    } else {
+                        modalState.collapse()
+                    }
+                }
+            }
+        }
+    }
+
     // Display a modal container when expanded.
     if (!isCollapsed) {
         if (!hideOnCollapse) {
@@ -504,9 +516,12 @@ fun ModalWideNavigationRail(
                 Spacer(modifier = modifier.widthIn(min = CollapsedRailWidth).fillMaxHeight())
             }
         }
+
         val scope = rememberCoroutineScope()
         val predictiveBackProgress = remember { Animatable(initialValue = 0f) }
         val predictiveBackState = remember { RailPredictiveBackState() }
+
+        SideEffect { channel.trySend(state.isExpanded) }
 
         ModalWideNavigationRailDialog(
             properties = expandedProperties,
@@ -518,20 +533,21 @@ fun ModalWideNavigationRail(
             predictiveBackState = predictiveBackState
         ) {
             Box(modifier = Modifier.fillMaxSize().imePadding()) {
+                val isScrimVisible =
+                    if (hideOnCollapse) {
+                        (modalState.targetValue != WideNavigationRailValue.Collapsed)
+                    } else {
+                        modalExpanded
+                    }
+
                 Scrim(
                     color = colors.modalScrimColor,
                     onDismissRequest = animateToDismiss,
-                    visible =
-                        @Suppress("IMPLICIT_CAST_TO_ANY")
-                        if (hideOnCollapse) {
-                            modalState.targetValue != WideNavigationRailValue.Collapsed
-                        } else {
-                            modalExpanded
-                        }
+                    visible = isScrimVisible
                 )
 
                 ModalWideNavigationRailContent(
-                    expanded = if (hideOnCollapse) true else modalExpanded,
+                    expanded = hideOnCollapse || modalExpanded,
                     isStandaloneModal = hideOnCollapse,
                     predictiveBackProgress = predictiveBackProgress,
                     predictiveBackState = predictiveBackState,
@@ -542,12 +558,10 @@ fun ModalWideNavigationRail(
                     shape = expandedShape,
                     openModalRailMaxWidth = ExpandedRailMaxWidth,
                     header = {
-                        if (expandedHeaderTopPadding == 0.dp) header?.invoke()
-                        else {
-                            Column {
-                                Spacer(Modifier.height(expandedHeaderTopPadding))
-                                header?.invoke()
-                            }
+                        Box(
+                            modifier = Modifier.padding(top = expandedHeaderTopPadding),
+                        ) {
+                            header?.invoke()
                         }
                     },
                     windowInsets = windowInsets,
@@ -555,18 +569,6 @@ fun ModalWideNavigationRail(
                     arrangement = arrangement,
                     content = rememberContent
                 )
-            }
-        }
-    }
-
-    if (hideOnCollapse) {
-        LaunchedEffect(state.isExpanded) {
-            if (!state.isExpanded) {
-                animateToDismiss()
-            } else {
-                // Make sure the modal rail animates in properly when it first appears.
-                state.expand()
-                modalState.expand()
             }
         }
     }
