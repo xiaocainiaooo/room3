@@ -624,6 +624,10 @@ public final class CustomTabsIntent {
      */
     public static final String EXTRA_NETWORK = "androidx.browser.customtabs.extra.NETWORK";
 
+    /** Extra that enables ephemeral browsing within the Custom Tab. */
+    public static final String EXTRA_ENABLE_EPHEMERAL_BROWSING =
+            "androidx.browser.customtabs.extra.ENABLE_EPHEMERAL_BROWSING";
+
     /**
      * Key that specifies the unique ID for an action button. To make a button to show on the
      * toolbar, use {@link #TOOLBAR_ACTION_BUTTON_ID} as its ID.
@@ -1466,6 +1470,22 @@ public final class CustomTabsIntent {
         }
 
         /**
+         * Sets whether to enable ephemeral browsing within the Custom Tab. If ephemeral browsing is
+         * enabled, and the browser supports it, the Custom Tab does not share cookies or other data
+         * with the browser.
+         *
+         *
+         * @param enabled Whether ephemeral browsing is enabled.
+         * @see CustomTabsIntent#EXTRA_ENABLE_EPHEMERAL_BROWSING
+         */
+        @ExperimentalEphemeralBrowsing
+        @NonNull
+        public Builder setEphemeralBrowsingEnabled(boolean enabled) {
+            mIntent.putExtra(EXTRA_ENABLE_EPHEMERAL_BROWSING, enabled);
+            return this;
+        }
+
+        /**
          * Combines all the options that have been set and returns a new {@link CustomTabsIntent}
          * object.
          */
@@ -1539,6 +1559,14 @@ public final class CustomTabsIntent {
             }
             Api34Impl.setShareIdentityEnabled(mActivityOptions, mShareIdentity);
         }
+    }
+
+    /**
+     * Returns whether ephemeral browsing is enabled.
+     */
+    @ExperimentalEphemeralBrowsing
+    public boolean isEphemeralBrowsingEnabled() {
+        return intent.getBooleanExtra(EXTRA_ENABLE_EPHEMERAL_BROWSING, false);
     }
 
     /**

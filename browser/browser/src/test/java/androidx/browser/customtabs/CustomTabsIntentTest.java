@@ -862,4 +862,13 @@ public class CustomTabsIntentTest {
         assertEquals(expectedNetworkHandle,
                 CustomTabsIntent.getNetwork(intent).getNetworkHandle());
     }
+
+    @Test
+    public void testPutsEphemeralBrowsing() {
+        Intent intent = new CustomTabsIntent.Builder()
+                .setEphemeralBrowsingEnabled(true)
+                .build()
+                .intent;
+        assertTrue(intent.getBooleanExtra(CustomTabsIntent.EXTRA_ENABLE_EPHEMERAL_BROWSING, false));
+    }
 }

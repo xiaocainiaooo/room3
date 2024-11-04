@@ -16,6 +16,7 @@
 
 package androidx.browser.auth;
 
+import static androidx.browser.customtabs.CustomTabsIntent.EXTRA_ENABLE_EPHEMERAL_BROWSING;
 import static androidx.browser.customtabs.CustomTabsIntent.EXTRA_SESSION;
 
 import android.app.Activity;
@@ -32,6 +33,8 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.browser.customtabs.ExperimentalEphemeralBrowsing;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -171,6 +174,14 @@ public class AuthTabIntent {
         launcher.launch(intent);
     }
 
+    /**
+     * Returns whether ephemeral browsing is enabled.
+     */
+    @ExperimentalEphemeralBrowsing
+    public boolean isEphemeralBrowsingEnabled() {
+        return intent.getBooleanExtra(EXTRA_ENABLE_EPHEMERAL_BROWSING, false);
+    }
+
     private AuthTabIntent(@NonNull Intent intent) {
         this.intent = intent;
     }
@@ -182,6 +193,21 @@ public class AuthTabIntent {
         private final Intent mIntent = new Intent(Intent.ACTION_VIEW);
 
         public Builder() {
+        }
+
+        /**
+         * Sets whether to enable ephemeral browsing within the Auth Tab. If ephemeral browsing is
+         * enabled, and the browser supports it, the Auth Tab does not share cookies or other data
+         * with the browser that handles the auth session.
+         *
+         * @param enabled Whether ephemeral browsing is enabled.
+         * @see CustomTabsIntent#EXTRA_ENABLE_EPHEMERAL_BROWSING
+         */
+        @ExperimentalEphemeralBrowsing
+        @NonNull
+        public AuthTabIntent.Builder setEphemeralBrowsingEnabled(boolean enabled) {
+            mIntent.putExtra(EXTRA_ENABLE_EPHEMERAL_BROWSING, enabled);
+            return this;
         }
 
         /**
