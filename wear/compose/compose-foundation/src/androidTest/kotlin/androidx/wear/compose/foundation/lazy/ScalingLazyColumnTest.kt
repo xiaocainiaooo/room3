@@ -61,7 +61,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlin.math.roundToInt
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -987,7 +986,6 @@ public class ScalingLazyColumnTest {
         assert(!focusSet)
     }
 
-    @Ignore("b/347700248 re-enable test after focusable semantics start working again")
     @Test
     fun scalingLazyColumnIsFocusedByDefault_withSemantics() {
         rule.setContent {
