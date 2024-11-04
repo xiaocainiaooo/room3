@@ -43,6 +43,7 @@ androidXMultiplatform {
 
         commonTest {
             dependencies {
+                implementation(project(":lifecycle:lifecycle-runtime"))
                 implementation(project(":kruth:kruth"))
                 implementation(libs.kotlinTest)
                 implementation(libs.kotlinTestCommon)

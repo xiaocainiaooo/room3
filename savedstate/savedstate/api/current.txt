@@ -131,13 +131,20 @@ package androidx.savedstate {
 package androidx.savedstate.serialization {
 
   public final class SavedStateDecoderKt {
-    method public static inline <reified T> T decodeFromSavedState(androidx.savedstate.SavedState savedState);
-    method public static <T> T decodeFromSavedState(DeserializationStrategy<T!> deserializer, androidx.savedstate.SavedState savedState);
+    method public static inline <reified T> T decodeFromSavedState(android.os.Bundle savedState);
+    method public static <T> T decodeFromSavedState(kotlinx.serialization.DeserializationStrategy<? extends T> deserializer, android.os.Bundle savedState);
   }
 
   public final class SavedStateEncoderKt {
-    method public static <T> androidx.savedstate.SavedState encodeToSavedState(SerializationStrategy<T!> serializer, T value);
-    method public static inline <reified T> androidx.savedstate.SavedState encodeToSavedState(T serializable);
+    method public static <T> android.os.Bundle encodeToSavedState(kotlinx.serialization.SerializationStrategy<? super T> serializer, T value);
+    method public static inline <reified T> android.os.Bundle encodeToSavedState(T serializable);
+  }
+
+  public final class SavedStateRegistryOwnerDelegatesKt {
+    method public static inline <reified T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, String key, kotlin.jvm.functions.Function0<? extends T> init);
+    method public static <T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, String key, kotlinx.serialization.KSerializer<T> serializer, kotlin.jvm.functions.Function0<? extends T> init);
+    method public static inline <reified T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, kotlin.jvm.functions.Function0<? extends T> init);
+    method public static <T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, kotlinx.serialization.KSerializer<T> serializer, kotlin.jvm.functions.Function0<? extends T> init);
   }
 
 }
