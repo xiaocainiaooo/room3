@@ -18,6 +18,8 @@ package androidx.room.compiler.codegen
 
 import androidx.room.compiler.codegen.java.JavaAnnotationSpec
 import androidx.room.compiler.codegen.kotlin.KotlinAnnotationSpec
+import com.squareup.kotlinpoet.javapoet.JAnnotationSpec
+import com.squareup.kotlinpoet.javapoet.KAnnotationSpec
 
 interface XAnnotationSpec : TargetLanguage {
 
@@ -36,13 +38,9 @@ interface XAnnotationSpec : TargetLanguage {
         fun builder(language: CodeLanguage, className: XClassName): Builder {
             return when (language) {
                 CodeLanguage.JAVA ->
-                    JavaAnnotationSpec.Builder(
-                        com.squareup.javapoet.AnnotationSpec.builder(className.java)
-                    )
+                    JavaAnnotationSpec.Builder(JAnnotationSpec.builder(className.java))
                 CodeLanguage.KOTLIN ->
-                    KotlinAnnotationSpec.Builder(
-                        com.squareup.kotlinpoet.AnnotationSpec.builder(className.kotlin)
-                    )
+                    KotlinAnnotationSpec.Builder(KAnnotationSpec.builder(className.kotlin))
             }
         }
     }

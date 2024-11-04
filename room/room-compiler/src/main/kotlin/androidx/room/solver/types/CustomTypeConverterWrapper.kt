@@ -21,8 +21,8 @@ import androidx.room.compiler.codegen.CodeLanguage
 import androidx.room.compiler.codegen.XClassName
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
-import androidx.room.compiler.codegen.XFunSpec.Builder.Companion.apply
 import androidx.room.compiler.codegen.XPropertySpec
+import androidx.room.compiler.codegen.compat.XConverters.applyToJavaPoet
 import androidx.room.ext.KotlinTypeNames
 import androidx.room.ext.decapitalize
 import androidx.room.solver.CodeGenScope
@@ -140,12 +140,11 @@ class CustomTypeConverterWrapper(val custom: CustomTypeConverter) :
                     builder: XFunSpec.Builder
                 ) {
                     val body = buildConvertFunctionBody(builder.language)
-                    builder.apply(
+                    builder.applyToJavaPoet {
                         // Apply synchronized modifier for Java since function checks and sets the
                         // converter in the shared field.
-                        javaMethodBuilder = { addModifiers(Modifier.SYNCHRONIZED) },
-                        kotlinFunctionBuilder = {}
-                    )
+                        addModifiers(Modifier.SYNCHRONIZED)
+                    }
                     builder.addCode(body)
                     builder.returns(custom.className)
                 }

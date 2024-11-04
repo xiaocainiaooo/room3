@@ -24,8 +24,6 @@ import androidx.room.compiler.processing.FunSpecHelper
 import androidx.room.compiler.processing.MethodSpecHelper
 import androidx.room.compiler.processing.XMethodElement
 import androidx.room.compiler.processing.XType
-import com.squareup.javapoet.MethodSpec
-import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 
 interface XFunSpec : TargetLanguage {
@@ -57,24 +55,6 @@ interface XFunSpec : TargetLanguage {
         fun returns(typeName: XTypeName): Builder
 
         fun build(): XFunSpec
-
-        companion object {
-            fun Builder.apply(
-                javaMethodBuilder: MethodSpec.Builder.() -> Unit,
-                kotlinFunctionBuilder: FunSpec.Builder.() -> Unit,
-            ): Builder = apply {
-                when (language) {
-                    CodeLanguage.JAVA -> {
-                        check(this is JavaFunSpec.Builder)
-                        this.actual.javaMethodBuilder()
-                    }
-                    CodeLanguage.KOTLIN -> {
-                        check(this is KotlinFunSpec.Builder)
-                        this.actual.kotlinFunctionBuilder()
-                    }
-                }
-            }
-        }
     }
 
     companion object {
@@ -90,7 +70,7 @@ interface XFunSpec : TargetLanguage {
                 CodeLanguage.JAVA -> {
                     JavaFunSpec.Builder(
                         name,
-                        MethodSpec.methodBuilder(name).apply {
+                        JFunSpec.methodBuilder(name).apply {
                             addModifiers(visibility.toJavaVisibilityModifier())
                             // TODO(b/247242374) Add nullability annotations for non-private params
                             // if (!isOpen) {
@@ -105,7 +85,7 @@ interface XFunSpec : TargetLanguage {
                 CodeLanguage.KOTLIN -> {
                     KotlinFunSpec.Builder(
                         name,
-                        FunSpec.builder(name).apply {
+                        KFunSpec.builder(name).apply {
                             addModifiers(visibility.toKotlinVisibilityModifier())
                             if (isOpen) {
                                 addModifiers(KModifier.OPEN)
@@ -126,7 +106,7 @@ interface XFunSpec : TargetLanguage {
                 CodeLanguage.JAVA -> {
                     JavaFunSpec.Builder(
                         name,
-                        MethodSpec.constructorBuilder().apply {
+                        JFunSpec.constructorBuilder().apply {
                             addModifiers(visibility.toJavaVisibilityModifier())
                         }
                     )
@@ -134,7 +114,7 @@ interface XFunSpec : TargetLanguage {
                 CodeLanguage.KOTLIN -> {
                     KotlinFunSpec.Builder(
                         name,
-                        FunSpec.constructorBuilder().apply {
+                        KFunSpec.constructorBuilder().apply {
                             // Workaround for the unreleased fix in
                             // https://github.com/square/kotlinpoet/pull/1342
                             if (visibility != VisibilityModifier.PUBLIC) {

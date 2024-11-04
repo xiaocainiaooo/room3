@@ -41,15 +41,11 @@ internal class JavaCodeBlock(internal val actual: JCodeBlock) : JavaLang(), XCod
         }
 
         override fun add(format: String, vararg args: Any?) = apply {
-            val processedFormat = processFormatString(format)
-            val processedArgs = processArgs(args)
-            actual.add(processedFormat, *processedArgs)
+            actual.add(formatString(format), *formatArgs(args))
         }
 
         override fun addStatement(format: String, vararg args: Any?) = apply {
-            val processedFormat = processFormatString(format)
-            val processedArgs = processArgs(args)
-            actual.addStatement(processedFormat, *processedArgs)
+            actual.addStatement(formatString(format), *formatArgs(args))
         }
 
         override fun addLocalVariable(
@@ -67,15 +63,11 @@ internal class JavaCodeBlock(internal val actual: JCodeBlock) : JavaLang(), XCod
         }
 
         override fun beginControlFlow(controlFlow: String, vararg args: Any?) = apply {
-            val processedControlFlow = processFormatString(controlFlow)
-            val processedArgs = processArgs(args)
-            actual.beginControlFlow(processedControlFlow, *processedArgs)
+            actual.beginControlFlow(formatString(controlFlow), *formatArgs(args))
         }
 
         override fun nextControlFlow(controlFlow: String, vararg args: Any?) = apply {
-            val processedControlFlow = processFormatString(controlFlow)
-            val processedArgs = processArgs(args)
-            actual.nextControlFlow(processedControlFlow, *processedArgs)
+            actual.nextControlFlow(formatString(controlFlow), *formatArgs(args))
         }
 
         override fun endControlFlow() = apply { actual.endControlFlow() }
@@ -87,7 +79,7 @@ internal class JavaCodeBlock(internal val actual: JCodeBlock) : JavaLang(), XCod
         override fun build() = JavaCodeBlock(actual.build())
 
         // Converts '%' place holders to '$' for JavaPoet
-        private fun processFormatString(format: String): String {
+        private fun formatString(format: String): String {
             // Replace KPoet's member name placeholder for a JPoet literal for a XMemberName arg.
             return format
                 .replace("%M", "\$L")
@@ -98,7 +90,7 @@ internal class JavaCodeBlock(internal val actual: JCodeBlock) : JavaLang(), XCod
 
         // Unwraps room.compiler.codegen types to their JavaPoet actual
         // TODO(b/247242375): Consider improving by wrapping args.
-        private fun processArgs(args: Array<out Any?>): Array<Any?> {
+        private fun formatArgs(args: Array<out Any?>): Array<Any?> {
             return Array(args.size) { index ->
                 val arg = args[index]
                 if (arg is TargetLanguage) {

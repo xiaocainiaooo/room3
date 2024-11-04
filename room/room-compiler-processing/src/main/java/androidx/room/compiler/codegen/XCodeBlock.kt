@@ -105,24 +105,6 @@ interface XCodeBlock : TargetLanguage {
         }
 
         fun build(): XCodeBlock
-
-        companion object {
-            fun Builder.apply(
-                javaCodeBuilder: com.squareup.javapoet.CodeBlock.Builder.() -> Unit,
-                kotlinCodeBuilder: com.squareup.kotlinpoet.CodeBlock.Builder.() -> Unit,
-            ) = apply {
-                when (language) {
-                    CodeLanguage.JAVA -> {
-                        check(this is JavaCodeBlock.Builder)
-                        this.actual.javaCodeBuilder()
-                    }
-                    CodeLanguage.KOTLIN -> {
-                        check(this is KotlinCodeBlock.Builder)
-                        this.actual.kotlinCodeBuilder()
-                    }
-                }
-            }
-        }
     }
 
     companion object {
@@ -172,12 +154,8 @@ interface XCodeBlock : TargetLanguage {
             return builder(language)
                 .apply {
                     when (language) {
-                        CodeLanguage.JAVA -> {
-                            add("(%T) (%L)", typeName, expressionBlock)
-                        }
-                        CodeLanguage.KOTLIN -> {
-                            add("(%L) as %T", expressionBlock, typeName)
-                        }
+                        CodeLanguage.JAVA -> add("(%T) (%L)", typeName, expressionBlock)
+                        CodeLanguage.KOTLIN -> add("(%L) as %T", expressionBlock, typeName)
                     }
                 }
                 .build()

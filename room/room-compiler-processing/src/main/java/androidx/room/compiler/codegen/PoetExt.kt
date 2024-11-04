@@ -22,6 +22,20 @@ typealias JCodeBlockBuilder = com.squareup.javapoet.CodeBlock.Builder
 
 typealias JAnnotationSpecBuilder = com.squareup.javapoet.AnnotationSpec.Builder
 
+typealias JPropertySpec = com.squareup.javapoet.FieldSpec
+
+typealias JPropertySpecBuilder = com.squareup.javapoet.FieldSpec.Builder
+
+typealias JParameterSpec = com.squareup.javapoet.ParameterSpec
+
+typealias JParameterSpecBuilder = com.squareup.javapoet.ParameterSpec.Builder
+
+typealias JFunSpec = com.squareup.javapoet.MethodSpec
+
+typealias JFunSpecBuilder = com.squareup.javapoet.MethodSpec.Builder
+
+typealias JModifier = javax.lang.model.element.Modifier
+
 typealias JTypeSpecBuilder = com.squareup.javapoet.TypeSpec.Builder
 
 typealias KCodeBlock = com.squareup.kotlinpoet.CodeBlock
@@ -29,6 +43,18 @@ typealias KCodeBlock = com.squareup.kotlinpoet.CodeBlock
 typealias KCodeBlockBuilder = com.squareup.kotlinpoet.CodeBlock.Builder
 
 typealias KAnnotationSpecBuilder = com.squareup.kotlinpoet.AnnotationSpec.Builder
+
+typealias KPropertySpec = com.squareup.kotlinpoet.PropertySpec
+
+typealias KPropertySpecBuilder = com.squareup.kotlinpoet.PropertySpec.Builder
+
+typealias KParameterSpec = com.squareup.kotlinpoet.ParameterSpec
+
+typealias KParameterSpecBuilder = com.squareup.kotlinpoet.ParameterSpec.Builder
+
+typealias KFunSpec = com.squareup.kotlinpoet.FunSpec
+
+typealias KFunSpecBuilder = com.squareup.kotlinpoet.FunSpec.Builder
 
 typealias KTypeSpecBuilder = com.squareup.kotlinpoet.TypeSpec.Builder
 
