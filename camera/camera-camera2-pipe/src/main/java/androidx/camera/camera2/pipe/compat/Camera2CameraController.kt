@@ -30,6 +30,7 @@ import androidx.camera.camera2.pipe.CameraSurfaceManager
 import androidx.camera.camera2.pipe.GraphState
 import androidx.camera.camera2.pipe.StreamGraph
 import androidx.camera.camera2.pipe.StreamId
+import androidx.camera.camera2.pipe.SurfaceTracker
 import androidx.camera.camera2.pipe.config.Camera2ControllerScope
 import androidx.camera.camera2.pipe.core.DurationNs
 import androidx.camera.camera2.pipe.core.Log
@@ -64,6 +65,7 @@ constructor(
     private val threads: Threads,
     private val graphConfig: CameraGraph.Config,
     private val graphListener: GraphListener,
+    private val surfaceTracker: SurfaceTracker,
     private val cameraStatusMonitor: CameraStatusMonitor,
     private val captureSessionFactory: CaptureSessionFactory,
     private val captureSequenceProcessorFactory: Camera2CaptureSequenceProcessorFactory,
@@ -171,6 +173,7 @@ constructor(
                             controllerState != ControllerState.STOPPED
                     ) {
                         Log.debug { "$this: Restarting Camera2CameraController..." }
+                        surfaceTracker.registerAllSurfaces()
                         stopLocked()
                         startLocked()
                     }
@@ -368,6 +371,8 @@ constructor(
             } else {
                 controllerState = ControllerState.STOPPED
             }
+
+            surfaceTracker.unregisterAllSurfaces()
             tryRestart()
         }
     }
