@@ -698,6 +698,7 @@ interface AnchoredDragScope {
  * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
  */
 @Deprecated(ConfigurationMovedToModifier, level = DeprecationLevel.WARNING)
+@Suppress("DEPRECATION") // confirmValueChange is deprecated
 fun <T> AnchoredDraggableState(
     initialValue: T,
     positionalThreshold: (totalDistance: Float) -> Float,
@@ -735,6 +736,7 @@ fun <T> AnchoredDraggableState(
  *   reached.
  */
 @Deprecated(ConfigurationMovedToModifier, level = DeprecationLevel.WARNING)
+@Suppress("DEPRECATION") // confirmValueChange is deprecated
 fun <T> AnchoredDraggableState(
     initialValue: T,
     anchors: DraggableAnchors<T>,
@@ -766,13 +768,39 @@ fun <T> AnchoredDraggableState(
  * change the state either immediately or by starting an animation.
  *
  * @param initialValue The initial value of the state.
- * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
  */
 @Stable
-class AnchoredDraggableState<T>(
-    initialValue: T,
-    internal val confirmValueChange: (newValue: T) -> Boolean = { true }
-) {
+class AnchoredDraggableState<T>(initialValue: T) {
+    /**
+     * Construct an [AnchoredDraggableState] instance with anchors.
+     *
+     * @param initialValue The initial value of the state.
+     * @param anchors The anchors of the state. Use [updateAnchors] to update the anchors later.
+     */
+    constructor(
+        initialValue: T,
+        anchors: DraggableAnchors<T>,
+    ) : this(initialValue) {
+        this.anchors = anchors
+        trySnapTo(initialValue)
+    }
+
+    /**
+     * Construct an [AnchoredDraggableState] instance with anchors.
+     *
+     * @param initialValue The initial value of the state.
+     * @param confirmValueChange Optional callback invoked to confirm or veto a pending state
+     *   change.
+     * @sample androidx.compose.foundation.samples.AnchoredDraggableDynamicAnchorsSample For an
+     *   example of using dynamic anchors to replace confirmValueChange.
+     */
+    @Deprecated(ConfirmValueChangeDeprecated, level = DeprecationLevel.WARNING)
+    constructor(
+        initialValue: T,
+        confirmValueChange: (newValue: T) -> Boolean
+    ) : this(initialValue) {
+        this.confirmValueChange = confirmValueChange
+    }
 
     /**
      * Construct an [AnchoredDraggableState] instance with anchors.
@@ -781,7 +809,11 @@ class AnchoredDraggableState<T>(
      * @param anchors The anchors of the state. Use [updateAnchors] to update the anchors later.
      * @param confirmValueChange Optional callback invoked to confirm or veto a pending state
      *   change.
+     * @sample androidx.compose.foundation.samples.AnchoredDraggableDynamicAnchorsSample For an
+     *   example of using dynamic anchors to replace confirmValueChange.
      */
+    @Deprecated(ConfirmValueChangeDeprecated, level = DeprecationLevel.WARNING)
+    @Suppress("DEPRECATION")
     constructor(
         initialValue: T,
         anchors: DraggableAnchors<T>,
@@ -791,6 +823,7 @@ class AnchoredDraggableState<T>(
         trySnapTo(initialValue)
     }
 
+    internal var confirmValueChange: (newValue: T) -> Boolean = { true }
     internal lateinit var positionalThreshold: (totalDistance: Float) -> Float
     internal lateinit var velocityThreshold: () -> Float
     @Deprecated(ConfigurationMovedToModifier, level = DeprecationLevel.WARNING)
@@ -1205,6 +1238,15 @@ class AnchoredDraggableState<T>(
 
     companion object {
         /** The default [Saver] implementation for [AnchoredDraggableState]. */
+        fun <T : Any> Saver() =
+            Saver<AnchoredDraggableState<T>, T>(
+                save = { it.currentValue },
+                restore = { AnchoredDraggableState(initialValue = it) }
+            )
+
+        /** The default [Saver] implementation for [AnchoredDraggableState]. */
+        @Deprecated(ConfirmValueChangeDeprecated, level = DeprecationLevel.WARNING)
+        @Suppress("DEPRECATION")
         fun <T : Any> Saver(confirmValueChange: (T) -> Boolean = { true }) =
             Saver<AnchoredDraggableState<T>, T>(
                 save = { it.currentValue },
@@ -1623,6 +1665,11 @@ private const val StartDragImmediatelyDeprecated =
     "startDragImmediately has been removed " +
         "without replacement. Modifier.anchoredDraggable sets startDragImmediately to true by " +
         "default when animations are running."
+private const val ConfirmValueChangeDeprecated =
+    "confirmValueChange is deprecated without replacement. Rather than relying on a callback to " +
+        "veto state changes, the anchor set should not include disallowed anchors. See " +
+        "androidx.compose.foundation.samples.AnchoredDraggableDynamicAnchorsSample for an " +
+        "example of using dynamic anchors over confirmValueChange."
 
 /**
  * Construct a [FlingBehavior] for use with [Modifier.anchoredDraggable].

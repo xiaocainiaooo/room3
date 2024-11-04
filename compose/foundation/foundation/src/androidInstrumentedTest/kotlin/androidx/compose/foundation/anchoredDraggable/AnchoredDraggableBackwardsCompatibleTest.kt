@@ -131,6 +131,7 @@ abstract class AnchoredDraggableBackwardsCompatibleTest(private val testNewBehav
                 "The velocity threshold resolved to $resolvedVelocityThreshold, but velocity " +
                     "thresholds are not configurable with testNewBehavior=true."
             }
+            @Suppress("DEPRECATION") /* confirmValueChange is deprecated */
             when (anchors) {
                 null ->
                     AnchoredDraggableState(
