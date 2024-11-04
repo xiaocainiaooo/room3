@@ -53,11 +53,11 @@ class TimeTextTest {
     }
 
     @Test
-    fun shows_time_by_default() {
-        val timeText = "test"
+    fun shows_time_by_default_on_non_round_device() {
+        val timeText = "time"
 
-        rule.setContent {
-            MaterialTheme() {
+        rule.setContentWithTheme {
+            DeviceConfigurationOverride(DeviceConfigurationOverride.RoundScreen(false)) {
                 TimeText(
                     timeSource =
                         object : TimeSource {
@@ -66,7 +66,9 @@ class TimeTextTest {
                 )
             }
         }
-        rule.onNodeWithText(timeText).assertExists()
+
+        // Note that onNodeWithText doesn't work for curved text, so only testing for non-round.
+        rule.onNodeWithText(timeText).assertIsDisplayed()
     }
 
     @Test
