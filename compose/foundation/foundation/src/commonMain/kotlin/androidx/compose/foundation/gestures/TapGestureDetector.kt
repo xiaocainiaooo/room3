@@ -16,6 +16,8 @@
 
 package androidx.compose.foundation.gestures
 
+import androidx.compose.foundation.ComposeFoundationFlags.isDetectTapGesturesImmediateCoroutineDispatchEnabled
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.internal.JvmDefaultWithCompatibility
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
@@ -88,7 +90,6 @@ private val NoPressGesture: suspend PressGestureScope.(Offset) -> Unit = {}
  * If the first down event is consumed somewhere else, the entire gesture will be skipped, including
  * [onPress].
  */
-@OptIn(ExperimentalTapGestureDetectorBehaviorApi::class)
 suspend fun PointerInputScope.detectTapGestures(
     onDoubleTap: ((Offset) -> Unit)? = null,
     onLongPress: ((Offset) -> Unit)? = null,
@@ -235,7 +236,6 @@ private suspend fun AwaitPointerEventScope.awaitSecondDown(
  * can be negative or larger than the element bounds if the touch target is smaller than the
  * [ViewConfiguration.minimumTouchTargetSize].
  */
-@OptIn(ExperimentalTapGestureDetectorBehaviorApi::class)
 internal suspend fun PointerInputScope.detectTapAndPress(
     onPress: suspend PressGestureScope.(Offset) -> Unit = NoPressGesture,
     onTap: ((Offset) -> Unit)? = null
@@ -399,6 +399,14 @@ internal sealed class LongPressResult {
     object Canceled : LongPressResult()
 }
 
+@Deprecated(
+    "The flag for this opt-in marker has been moved to ComposeFoundationFlags and renamed" +
+        " to isDetectTapGesturesImmediateCoroutineDispatchEnabled. For compatibility, " +
+        " DetectTapGesturesEnableNewDispatchingBehavior controls the new flag" +
+        " (isDetectTapGesturesImmediateCoroutineDispatchEnabled). Please use " +
+        " isDetectTapGesturesImmediateCoroutineDispatchEnabled instead.",
+    ReplaceWith("ExperimentalFoundationApi", "androidx.compose.foundation")
+)
 @Retention(AnnotationRetention.BINARY)
 @RequiresOptIn("This API feature-flags new behavior and will be removed in the future.")
 annotation class ExperimentalTapGestureDetectorBehaviorApi
@@ -408,18 +416,34 @@ annotation class ExperimentalTapGestureDetectorBehaviorApi
  * [detectTapAndPress], true by default. This might affect some implicit timing guarantees. Please
  * file a bug if this change is affecting your use case.
  */
+@Deprecated(
+    "This flag has been moved to ComposeFoundationFlags and renamed to" +
+        " isDetectTapGesturesImmediateCoroutineDispatchEnabled. For compatibility, " +
+        " DetectTapGesturesEnableNewDispatchingBehavior controls the new flag" +
+        " (isDetectTapGesturesImmediateCoroutineDispatchEnabled). Please use " +
+        " isDetectTapGesturesImmediateCoroutineDispatchEnabled instead.",
+    ReplaceWith(
+        "isDetectTapGesturesImmediateCoroutineDispatchEnabled",
+        "androidx.compose.foundation.ComposeFoundationFlags.isDetectTapGesturesImmediateCoroutineDispatchEnabled"
+    )
+)
+@OptIn(ExperimentalFoundationApi::class)
 // This lint does not translate well to top-level declarations
 @get:Suppress("GetterSetterNames")
-@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET", "DEPRECATION")
 @ExperimentalTapGestureDetectorBehaviorApi
 @get:ExperimentalTapGestureDetectorBehaviorApi
 @set:ExperimentalTapGestureDetectorBehaviorApi
-var DetectTapGesturesEnableNewDispatchingBehavior = true
+var DetectTapGesturesEnableNewDispatchingBehavior: Boolean
+    set(value) {
+        isDetectTapGesturesImmediateCoroutineDispatchEnabled = value
+    }
+    get() = isDetectTapGesturesImmediateCoroutineDispatchEnabled
 
-@OptIn(ExperimentalTapGestureDetectorBehaviorApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 private val coroutineStartForCurrentDispatchBehavior
     get() =
-        if (DetectTapGesturesEnableNewDispatchingBehavior) {
+        if (isDetectTapGesturesImmediateCoroutineDispatchEnabled) {
             CoroutineStart.UNDISPATCHED
         } else {
             CoroutineStart.DEFAULT
@@ -427,23 +451,23 @@ private val coroutineStartForCurrentDispatchBehavior
 
 /**
  * Launch a coroutine in [this] [CoroutineScope] with the specified [start]. If
- * [DetectTapGesturesEnableNewDispatchingBehavior] is true, await the [resetJob] and then execute
- * the [block]. If [DetectTapGesturesEnableNewDispatchingBehavior] is false, execute the [block]
- * straight away. If [DetectTapGesturesEnableNewDispatchingBehavior] is true, [start] will be
- * [CoroutineStart.UNDISPATCHED] by default, [CoroutineStart.DEFAULT] otherwise.
+ * [isDetectTapGesturesImmediateCoroutineDispatchEnabled] is true, await the [resetJob] and then
+ * execute the [block]. If [isDetectTapGesturesImmediateCoroutineDispatchEnabled] is false, execute
+ * the [block] straight away. If [isDetectTapGesturesImmediateCoroutineDispatchEnabled] is true,
+ * [start] will be [CoroutineStart.UNDISPATCHED] by default, [CoroutineStart.DEFAULT] otherwise.
  *
  * In some cases, coroutine cancellation of the reset job might still be processing when we are
  * already processing an up or cancel pointer event. We need to wait for the reset job to cancel and
  * complete so it can clean up properly (e.g. unlock the underlying mutex)
  */
-@OptIn(ExperimentalTapGestureDetectorBehaviorApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 private fun CoroutineScope.launchAwaitingReset(
     resetJob: Job,
     start: CoroutineStart = coroutineStartForCurrentDispatchBehavior,
     block: suspend CoroutineScope.() -> Unit
 ): Job =
     launch(start = start) {
-        if (DetectTapGesturesEnableNewDispatchingBehavior) {
+        if (isDetectTapGesturesImmediateCoroutineDispatchEnabled) {
             resetJob.join()
         }
         block()
