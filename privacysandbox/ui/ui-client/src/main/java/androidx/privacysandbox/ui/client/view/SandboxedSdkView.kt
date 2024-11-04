@@ -714,7 +714,11 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
                 checkNotNull(contentView)
                 check(isAttachedToWindow)
 
-                val surfaceView: SurfaceView = contentView as SurfaceView
+                val surfaceView: SurfaceView? = contentView as? SurfaceView
+                // TODO(b/339377737): Remove the need for this check with better listener handling.
+                if (surfaceView?.surfaceControl == null) {
+                    return
+                }
                 val attachedSurfaceControl =
                     checkNotNull(surfaceView.rootSurfaceControl) {
                         "attachedSurfaceControl should be non-null if the window is attached"
