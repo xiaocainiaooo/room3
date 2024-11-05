@@ -34,7 +34,8 @@ import androidx.core.util.Preconditions;
  *     single term "world peace" instead of terms "world" and "peace".
  *     <li> 49.99 is a number. {@link TextNode}s may represent integers or doubles and treat numbers
  *     as terms.
- *     <li> price is NOT a string but a property path as part of a {@link PropertyRestrictNode}.
+ *     <li> price is NOT a string but a property path as part of a
+ *     {@link androidx.appsearch.ast.operators.PropertyRestrictNode}.
  * </ul>
  *
  * <p>The node will be segmented and normalized based on the flags set in the Node.
