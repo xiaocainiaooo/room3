@@ -31,8 +31,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -225,17 +226,21 @@ private fun CircularProgressIndicatorImpl(
     enabled: Boolean = true,
 ) {
     val progressAnimationSpec = determinateCircularProgressAnimationSpec
-    val fullSweep = 360f - ((startAngle - endAngle) % 360 + 360) % 360
+    var shouldAnimateProgress by remember { mutableStateOf(false) }
+    val updatedProgress by rememberUpdatedState(progress)
     val animatedProgress = remember {
-        Animatable(coercedProgressWithGap(progress(), startAngle == endAngle))
+        Animatable(coercedProgressWithGap(updatedProgress(), startAngle == endAngle))
     }
 
-    LaunchedEffect(progress) {
-        snapshotFlow(progress).collectLatest {
-            val targetProgress = coercedProgressWithGap(it, startAngle == endAngle)
-
-            // Animate the progress arc.
-            animatedProgress.animateTo(targetProgress, animationSpec = progressAnimationSpec)
+    LaunchedEffect(Unit) {
+        snapshotFlow(updatedProgress).collectLatest {
+            if (shouldAnimateProgress) {
+                val targetProgress = coercedProgressWithGap(it, startAngle == endAngle)
+                // Animate the progress arc.
+                animatedProgress.animateTo(targetProgress, animationSpec = progressAnimationSpec)
+            } else {
+                shouldAnimateProgress = true
+            }
         }
     }
 
@@ -248,6 +253,7 @@ private fun CircularProgressIndicatorImpl(
             .focusable()
             .drawWithCache {
                 onDrawWithContent {
+                    val fullSweep = 360f - ((startAngle - endAngle) % 360 + 360) % 360
                     val stroke = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
                     val gapSizePx = gapSize.toPx()
                     val minSize = min(size.height, size.width)
@@ -317,18 +323,28 @@ private fun CircularProgressIndicatorWithOverflowImpl(
     gapSize: Dp,
     enabled: Boolean = true,
 ) {
-    var currentProgress by remember { mutableFloatStateOf(progress()) }
     val progressAnimationSpec = determinateCircularProgressAnimationSpec
     val colorAnimationSpec = progressOverflowColorAnimationSpec
-    val fullSweep = 360f - ((startAngle - endAngle) % 360 + 360) % 360
 
-    val animatedProgress = remember { Animatable(progress()) }
-    val animatedOverflowColor = remember { Animatable(if (progress() > 1f) 1f else 0f) }
+    var shouldAnimateProgress by remember { mutableStateOf(false) }
+    val updatedProgress by rememberUpdatedState(progress)
+    val animatedProgress = remember { Animatable(updatedProgress()) }
+    val animatedOverflowColor = remember { Animatable(if (updatedProgress() > 1f) 1f else 0f) }
 
-    LaunchedEffect(progress) {
-        snapshotFlow(progress).collectLatest {
+    LaunchedEffect(Unit) {
+        snapshotFlow(updatedProgress).collectLatest {
             val newProgress = it
-            if (newProgress <= 1f && currentProgress > 1f) {
+            if (!shouldAnimateProgress) {
+                shouldAnimateProgress = true
+            } else if (newProgress > 1f) {
+                // Animate the progress arc.
+                animatedProgress.animateTo(newProgress, progressAnimationSpec) {
+                    // Start overflow color transition when progress crosses 1 (full circle).
+                    if (animatedProgress.value.equalsWithTolerance(1f)) {
+                        launch { animatedOverflowColor.animateTo(1f, colorAnimationSpec) }
+                    }
+                }
+            } else if (newProgress <= 1f) {
                 // Reverse overflow color transition - animate the progress and color at the
                 // same time.
                 launch {
@@ -337,20 +353,7 @@ private fun CircularProgressIndicatorWithOverflowImpl(
                         async { animatedOverflowColor.animateTo(0f, colorAnimationSpec) }
                     )
                 }
-            } else if (newProgress > 1f && currentProgress <= 1f) {
-                // Animate the progress arc.
-                animatedProgress.animateTo(newProgress, progressAnimationSpec) {
-                    // Start overflow color transition when progress crosses 1 (full circle).
-                    if (animatedProgress.value.equalsWithTolerance(1f)) {
-                        launch { animatedOverflowColor.animateTo(1f, colorAnimationSpec) }
-                    }
-                }
-                animatedOverflowColor.snapTo(1f)
-            } else {
-                animatedProgress.animateTo(newProgress, progressAnimationSpec)
             }
-
-            currentProgress = newProgress
         }
     }
 
@@ -363,6 +366,7 @@ private fun CircularProgressIndicatorWithOverflowImpl(
             .focusable()
             .drawWithCache {
                 onDrawWithContent {
+                    val fullSweep = 360f - ((startAngle - endAngle) % 360 + 360) % 360
                     val stroke = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
                     val gapSizePx = gapSize.toPx()
                     val minSize = min(size.height, size.width)

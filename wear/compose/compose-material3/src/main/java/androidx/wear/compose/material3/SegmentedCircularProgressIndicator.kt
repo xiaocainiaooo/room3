@@ -24,9 +24,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -92,21 +92,33 @@ fun SegmentedCircularProgressIndicator(
     gapSize: Dp = CircularProgressIndicatorDefaults.calculateRecommendedGapSize(strokeWidth),
     enabled: Boolean = true,
 ) {
-    var currentProgress by remember { mutableFloatStateOf(progress()) }
     val progressAnimationSpec = determinateCircularProgressAnimationSpec
     val colorAnimationSpec = progressOverflowColorAnimationSpec
-    val fullSweep = 360f - ((startAngle - endAngle) % 360 + 360) % 360
 
+    var shouldAnimateProgress by remember { mutableStateOf(false) }
+    val updatedProgress by rememberUpdatedState(progress)
     val animatedProgress = remember {
-        Animatable(if (allowProgressOverflow) progress() else progress().coerceIn(0f, 1f))
+        Animatable(
+            if (allowProgressOverflow) updatedProgress() else updatedProgress().coerceIn(0f, 1f)
+        )
     }
-    val animatedOverflowColor = remember { Animatable(if (progress() > 1f) 1f else 0f) }
+    val animatedOverflowColor = remember { Animatable(if (updatedProgress() > 1f) 1f else 0f) }
 
-    LaunchedEffect(progress, allowProgressOverflow) {
-        snapshotFlow(progress).collectLatest {
+    LaunchedEffect(Unit) {
+        snapshotFlow(updatedProgress).collectLatest {
             val newProgress = if (allowProgressOverflow) it else it.coerceIn(0f, 1f)
 
-            if (allowProgressOverflow && newProgress <= 1f && currentProgress > 1f) {
+            if (!shouldAnimateProgress) {
+                shouldAnimateProgress = true
+            } else if (allowProgressOverflow && newProgress > 1f) {
+                // Animate the progress arc.
+                animatedProgress.animateTo(newProgress, progressAnimationSpec) {
+                    // Start overflow color transition when progress crosses 1 (full circle).
+                    if (animatedProgress.value.equalsWithTolerance(1f)) {
+                        launch { animatedOverflowColor.animateTo(1f, colorAnimationSpec) }
+                    }
+                }
+            } else if (allowProgressOverflow && newProgress <= 1f) {
                 // Reverse overflow color transition - animate the progress and color at the
                 // same time.
                 launch {
@@ -115,20 +127,9 @@ fun SegmentedCircularProgressIndicator(
                         async { animatedOverflowColor.animateTo(0f, colorAnimationSpec) }
                     )
                 }
-            } else if (allowProgressOverflow && newProgress > 1f && currentProgress <= 1f) {
-                // Animate the progress arc.
-                animatedProgress.animateTo(newProgress, progressAnimationSpec) {
-                    // Start overflow color transition when progress crosses 1 (full circle).
-                    if (animatedProgress.value.equalsWithTolerance(1f)) {
-                        launch { animatedOverflowColor.animateTo(1f, colorAnimationSpec) }
-                    }
-                }
-                animatedOverflowColor.snapTo(1f)
             } else {
                 animatedProgress.animateTo(newProgress, progressAnimationSpec)
             }
-
-            currentProgress = newProgress
         }
     }
 
@@ -138,6 +139,7 @@ fun SegmentedCircularProgressIndicator(
             .fillMaxSize()
             .drawWithCache {
                 onDrawWithContent {
+                    val fullSweep = 360f - ((startAngle - endAngle) % 360 + 360) % 360
                     val stroke = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
                     val minSize = min(size.height, size.width)
                     // Sweep angle between two progress indicator segments.
@@ -261,7 +263,6 @@ fun SegmentedCircularProgressIndicator(
 ) {
     var shouldAnimateProgress by remember { mutableStateOf(false) }
     val progressAnimationSpec = binarySegmentedProgressAnimationSpec
-    val fullSweep = 360f - ((startAngle - endAngle) % 360 + 360) % 360
     val animatedProgress = remember { Animatable(1f) }
 
     LaunchedEffect(segmentValue) {
@@ -283,6 +284,7 @@ fun SegmentedCircularProgressIndicator(
             .fillMaxSize()
             .drawWithCache {
                 onDrawWithContent {
+                    val fullSweep = 360f - ((startAngle - endAngle) % 360 + 360) % 360
                     val stroke = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
                     val minSize = min(size.height, size.width)
                     // Sweep angle between two progress indicator segments.
