@@ -38,10 +38,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.xr.compose.spatial.Edge
 import androidx.xr.compose.spatial.EdgeOffset
 import androidx.xr.compose.spatial.Orbiter
-import androidx.xr.compose.spatial.innerEdge
+import androidx.xr.compose.spatial.OrbiterEdge
 
 /**
  * <a href="https://m3.material.io/components/navigation-rail/overview" class="external"
@@ -85,7 +84,7 @@ public fun NavigationRail(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Orbiter(
-        position = Edge.Start,
+        position = OrbiterEdge.Start,
         alignment = Alignment.CenterVertically,
         offset = XrNavigationRailTokens.OrbiterEdgeOffset,
     ) {
@@ -111,7 +110,7 @@ public fun NavigationRail(
     // a FAB.
     if (header != null) {
         Orbiter(
-            position = Edge.Start,
+            position = OrbiterEdge.Start,
             alignment = Alignment.Top,
             offset = XrNavigationRailTokens.OrbiterEdgeOffset,
         ) {
@@ -127,7 +126,7 @@ public fun NavigationRail(
 private object XrNavigationRailTokens {
     /** The [EdgeOffset] for NavigationRail Orbiters in Full Space Mode (FSM). */
     val OrbiterEdgeOffset
-        @Composable get() = innerEdge(24.dp)
+        @Composable get() = EdgeOffset.inner(24.dp)
 
     /**
      * Vertical padding between the contents of the [NavigationRail] and its top/bottom, and

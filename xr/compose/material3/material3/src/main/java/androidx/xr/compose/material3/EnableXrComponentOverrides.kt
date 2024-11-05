@@ -21,7 +21,7 @@ import androidx.compose.material3.LocalNavigationRailComponentOverride
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidedValue
-import androidx.xr.compose.platform.XrMode
+import androidx.xr.compose.platform.LocalSpatialCapabilities
 
 /**
  * Clients can wrap their Compose hierarchy in this function to dynamically enable XR components
@@ -92,7 +92,7 @@ public value class XrComponentOverride private constructor(private val name: Str
 @ExperimentalMaterial3XrApi
 private object XrComponentOverrideEnablerContextImpl : XrComponentOverrideEnablerContext {
     override val isSpatializationEnabled: Boolean
-        @Composable get() = XrMode.isSpatialUiEnabled
+        @Composable get() = LocalSpatialCapabilities.current.isSpatialUiEnabled
 }
 
 @OptIn(ExperimentalMaterial3XrApi::class)
