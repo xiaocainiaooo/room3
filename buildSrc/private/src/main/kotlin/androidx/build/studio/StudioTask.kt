@@ -31,8 +31,12 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.internal.tasks.userinput.UserInputHandler
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.options.Option
 import org.gradle.internal.service.ServiceRegistry
 import org.gradle.process.ExecOperations
 import org.gradle.work.DisableCachingByDefault
@@ -44,6 +48,11 @@ import org.gradle.work.DisableCachingByDefault
  */
 @DisableCachingByDefault(because = "the purpose of this task is to launch Studio")
 abstract class StudioTask : DefaultTask() {
+
+    @get:Input
+    @get:Option(option = "acceptTos", description = "Accept Android Studio Terms of Service")
+    @get:Optional
+    abstract val acceptTos: Property<Boolean>
 
     // TODO: support -y and --update-only options? Can use @Option for this
     @TaskAction
@@ -266,10 +275,15 @@ abstract class StudioTask : DefaultTask() {
             val licensePath = with(platformUtilities) { licensePath }
 
             val userInput = services.get(UserInputHandler::class.java)
-            val acceptAgreement =
-                userInput.askYesNoQuestion("Do you accept the license agreement at $licensePath?")
-            if (acceptAgreement == null || !acceptAgreement) {
-                return false
+
+            if (!acceptTos.isPresent) {
+                val acceptAgreement =
+                    userInput.askYesNoQuestion(
+                        "Do you accept the license agreement at $licensePath?"
+                    )
+                if (acceptAgreement == null || !acceptAgreement) {
+                    return false
+                }
             }
             licenseAcceptedFile.createNewFile()
         }
