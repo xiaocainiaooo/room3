@@ -78,6 +78,7 @@ class FastScrollViewIntegrationTest {
             activity.setContentView(fastScrollView)
             // FastScrollView expects to be inflated from XML, so simulate this
             fastScrollView.onFinishInflate()
+            fastScrollView.setScrubberVisibility(true)
         }
     }
 
