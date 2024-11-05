@@ -96,6 +96,11 @@ suspend fun GlanceAppWidget.compose(
  *
  * If you need to call runComposition concurrently, you can omit [id] so that a random fake ID will
  * be used. Otherwise, call runComposition sequentially when using the same [id].
+ *
+ * By default, this function uses [UnmanagedSessionReceiver] as the [lambdaReceiver] target to
+ * receive any lambda actions while this function is running. If you need to run this function in a
+ * non-default process, you can declare a sub-class of UnmanagedSessionReceiver in that process and
+ * pass its [ComponentName] here.
  */
 @SuppressLint("PrimitiveInCollection")
 @ExperimentalGlanceApi
@@ -105,6 +110,7 @@ fun GlanceAppWidget.runComposition(
     options: Bundle = Bundle(),
     sizes: List<DpSize>? = null,
     state: Any? = null,
+    lambdaReceiver: ComponentName = ComponentName(context, UnmanagedSessionReceiver::class.java),
 ): Flow<RemoteViews> = flow {
     val session =
         AppWidgetSession(
@@ -113,7 +119,7 @@ fun GlanceAppWidget.runComposition(
             initialOptions =
                 sizes?.let { optionsBundleOf(it).apply { putAll(options) } } ?: options,
             initialGlanceState = state,
-            lambdaReceiver = ComponentName(context, UnmanagedSessionReceiver::class.java),
+            lambdaReceiver = lambdaReceiver,
             sizeMode =
                 if (sizes != null) {
                     // If sizes are provided to this function, override to SizeMode.Exact so we can
