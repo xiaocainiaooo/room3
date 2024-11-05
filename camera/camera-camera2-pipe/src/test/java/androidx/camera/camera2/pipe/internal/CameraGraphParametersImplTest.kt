@@ -17,26 +17,20 @@ package androidx.camera.camera2.pipe.internal
 
 import android.hardware.camera2.CaptureRequest
 import androidx.camera.camera2.pipe.graph.SessionLock
+import androidx.camera.camera2.pipe.testing.FakeGraphProcessor
 import androidx.camera.camera2.pipe.testing.FakeMetadata.Companion.TEST_KEY
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import org.junit.Before
+import kotlinx.coroutines.test.TestScope
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 /** Tests for [CameraGraphParametersImpl] */
 @RunWith(RobolectricTestRunner::class)
 class CameraGraphParametersImplTest {
-    private lateinit var parameters: CameraGraphParametersImpl
-    private var counter: Int = 0
-
-    @Before
-    fun setUp() {
-        parameters = CameraGraphParametersImpl(SessionLock())
-        parameters.setListener(this::increment)
-        counter = 0
-    }
+    private var parameters =
+        CameraGraphParametersImpl(SessionLock(), FakeGraphProcessor(), TestScope())
 
     @Test
     fun get_returnLatestValue() {
@@ -50,36 +44,14 @@ class CameraGraphParametersImplTest {
     }
 
     @Test
-    fun setNotDirty_listenerTriggered() {
-        parameters[TEST_KEY] = 42
+    fun setAll_multipleEntriesSet() {
+        parameters.setAll(
+            mapOf(TEST_KEY to 42, CAPTURE_REQUEST_KEY to 2, TEST_NULLABLE_KEY to null)
+        )
 
-        assertEquals(counter, 1)
-    }
-
-    @Test
-    fun setSameParameters_listenerNotTriggered() {
-        parameters[TEST_KEY] = 42
-        assertEquals(counter, 1)
-
-        parameters[CAPTURE_REQUEST_KEY] = 2
-        assertEquals(counter, 1)
-    }
-
-    @Test
-    fun multipleSetNoFetchUpdatedParameters_listenerTriggeredOnce() {
-        parameters[TEST_KEY] = 42
-        parameters[CAPTURE_REQUEST_KEY] = 2
-
-        assertEquals(counter, 1)
-    }
-
-    @Test
-    fun multipleSetFetchUpdatedParameters_listenerTriggeredWhenNotDirty() {
-        parameters[TEST_KEY] = 42
-        parameters.fetchUpdatedParameters()
-        parameters[CAPTURE_REQUEST_KEY] = 2
-
-        assertEquals(counter, 2)
+        assertEquals(parameters[TEST_KEY], 42)
+        assertEquals(parameters[CAPTURE_REQUEST_KEY], 2)
+        assertNull(parameters[TEST_NULLABLE_KEY])
     }
 
     @Test
@@ -92,50 +64,7 @@ class CameraGraphParametersImplTest {
     }
 
     @Test
-    fun removeNotDirty_listenerTriggered() {
-        parameters[TEST_KEY] = 42
-        parameters.fetchUpdatedParameters()
-        assertEquals(counter, 1)
-
-        parameters.remove(TEST_KEY)
-
-        assertEquals(counter, 2)
-    }
-
-    @Test
-    fun removeEmptyParameter_listenerNotTriggered() {
-        parameters.remove(TEST_KEY)
-
-        assertEquals(counter, 0)
-    }
-
-    @Test
-    fun multipleRemoveNoFetchUpdatedParameters_listenerTriggeredOnce() {
-        parameters[TEST_KEY] = 42
-        parameters[CAPTURE_REQUEST_KEY] = 2
-        parameters.fetchUpdatedParameters()
-        assertEquals(counter, 1)
-
-        parameters.remove(TEST_KEY)
-        parameters.remove(CAPTURE_REQUEST_KEY)
-
-        assertEquals(counter, 2)
-    }
-
-    @Test
-    fun clearNotDirty_listenerTriggered() {
-        parameters[TEST_KEY] = 42
-        parameters[CAPTURE_REQUEST_KEY] = 2
-        parameters.fetchUpdatedParameters()
-        assertEquals(counter, 1)
-
-        parameters.clear()
-
-        assertEquals(counter, 2)
-    }
-
-    @Test
-    fun clearParameters_valuesEmpty() {
+    fun removeAll_valuesEmpty() {
         parameters[TEST_KEY] = 42
         parameters[CAPTURE_REQUEST_KEY] = 2
 
@@ -145,8 +74,19 @@ class CameraGraphParametersImplTest {
         assertNull(parameters[CAPTURE_REQUEST_KEY])
     }
 
-    private fun increment() {
-        counter += 1
+    @Test
+    fun fetchUpdatedParameters_returnOnlyDirtyParameters() {
+        assertNull(parameters.fetchUpdatedParameters())
+
+        parameters[TEST_KEY] = 42
+        assertEquals(parameters.fetchUpdatedParameters(), mapOf<Any, Any?>(TEST_KEY to 42))
+        assertNull(parameters.fetchUpdatedParameters())
+
+        parameters[CAPTURE_REQUEST_KEY] = 2
+        assertEquals(
+            parameters.fetchUpdatedParameters(),
+            mapOf<Any, Any?>(TEST_KEY to 42, CAPTURE_REQUEST_KEY to 2)
+        )
     }
 
     companion object {

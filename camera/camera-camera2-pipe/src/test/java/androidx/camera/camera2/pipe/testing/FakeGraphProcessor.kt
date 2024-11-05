@@ -91,6 +91,7 @@ internal class FakeGraphProcessor(
                 isRepeating = false,
                 requests = listOf(currRepeatingRequest),
                 defaultParameters = defaultParameters,
+                graphParameters = mapOf<Any, Any?>(),
                 requiredParameters = requiredParameters,
                 listeners = defaultListeners
             )
@@ -186,6 +187,7 @@ internal class FakeGraphProcessor(
             isRepeating = true,
             requests = listOf(currRepeatingRequest),
             defaultParameters = defaultParameters,
+            graphParameters = mapOf<Any, Any?>(),
             requiredParameters = requiredParameters,
             listeners = defaultListeners
         )

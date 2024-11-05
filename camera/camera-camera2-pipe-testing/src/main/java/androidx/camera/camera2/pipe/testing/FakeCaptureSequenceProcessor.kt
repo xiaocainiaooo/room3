@@ -104,9 +104,10 @@ public class FakeCaptureSequenceProcessor(
         isRepeating: Boolean,
         requests: List<Request>,
         defaultParameters: Map<*, Any?>,
+        graphParameters: Map<*, Any?>,
         requiredParameters: Map<*, Any?>,
-        listeners: List<Request.Listener>,
-        sequenceListener: CaptureSequenceListener
+        sequenceListener: CaptureSequenceListener,
+        listeners: List<Request.Listener>
     ): FakeCaptureSequence? {
         throwTestExceptionIf(throwOnBuild)
 
@@ -119,6 +120,7 @@ public class FakeCaptureSequenceProcessor(
                 defaultTemplate,
                 defaultParameters,
                 requiredParameters,
+                graphParameters,
                 listeners,
                 sequenceListener
             )
@@ -227,6 +229,9 @@ public class FakeCaptureSequenceProcessor(
 
         public val Event.defaultParameters: Map<*, Any?>
             get() = checkNotNull(captureSequence).defaultParameters
+
+        public val Event.graphParameters: Map<*, Any?>
+            get() = checkNotNull(captureSequence).graphParameters
 
         // TODO: Decide if these should only work on successful submit or not.
         public val Event.isRepeating: Boolean
