@@ -26,12 +26,12 @@ import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XTypeName
 import com.squareup.kotlinpoet.KModifier
 
-internal class KotlinFunSpec(override val name: String, internal val actual: KFunSpec) :
-    KotlinLang(), XFunSpec {
+internal class KotlinFunSpec(internal val actual: KFunSpec) : KotlinLang(), XFunSpec {
+    override val name: String = actual.name
+
     override fun toString() = actual.toString()
 
-    internal class Builder(override val name: String, internal val actual: KFunSpecBuilder) :
-        KotlinLang(), XFunSpec.Builder {
+    internal class Builder(internal val actual: KFunSpecBuilder) : KotlinLang(), XFunSpec.Builder {
 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
             require(annotation is KotlinAnnotationSpec)
@@ -70,7 +70,7 @@ internal class KotlinFunSpec(override val name: String, internal val actual: KFu
 
         override fun returns(typeName: XTypeName) = apply { actual.returns(typeName.kotlin) }
 
-        override fun build() = KotlinFunSpec(name, actual.build())
+        override fun build() = KotlinFunSpec(actual.build())
     }
 }
 

@@ -18,8 +18,8 @@ package androidx.room.compiler.processing
 
 import androidx.room.compiler.codegen.CodeLanguage
 import androidx.room.compiler.codegen.XTypeSpec
-import androidx.room.compiler.codegen.java.JavaTypeSpec
-import androidx.room.compiler.codegen.kotlin.KotlinTypeSpec
+import androidx.room.compiler.codegen.compat.XConverters.toJavaPoet
+import androidx.room.compiler.codegen.compat.XConverters.toKotlinPoet
 import com.squareup.javapoet.JavaFile
 import com.squareup.kotlinpoet.FileSpec
 import java.io.OutputStream
@@ -82,21 +82,23 @@ fun FileSpec.writeTo(generator: XFiler, mode: XFiler.Mode = XFiler.Mode.Isolatin
     generator.write(this, mode)
 }
 
-fun XTypeSpec.writeTo(generator: XFiler, mode: XFiler.Mode = XFiler.Mode.Isolating) {
-    require(this.className.simpleNames.size == 1) { "XTypeSpec must be a top-level class." }
-    when (this.language) {
-        CodeLanguage.JAVA -> {
-            check(this is JavaTypeSpec)
-            JavaFile.builder(this.className.packageName, this.actual)
-                .build()
-                .writeTo(generator, mode)
-        }
+fun XTypeSpec.writeTo(
+    language: CodeLanguage,
+    packageName: String,
+    generator: XFiler,
+    mode: XFiler.Mode = XFiler.Mode.Isolating
+) =
+    when (language) {
+        CodeLanguage.JAVA ->
+            JavaFile.builder(packageName, toJavaPoet()).build().writeTo(generator, mode)
         CodeLanguage.KOTLIN -> {
-            check(this is KotlinTypeSpec)
-            FileSpec.builder(this.className.packageName, this.className.simpleNames.single())
-                .addType(this.actual)
+            val name =
+                checkNotNull(toKotlinPoet().name) {
+                    "Anonymous classes don't have a name so cannot be used to create a FileSpec."
+                }
+            FileSpec.builder(packageName, name)
+                .addType(toKotlinPoet())
                 .build()
                 .writeTo(generator, mode)
         }
     }
-}

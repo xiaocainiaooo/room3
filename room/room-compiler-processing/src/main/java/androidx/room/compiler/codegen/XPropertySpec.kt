@@ -53,7 +53,6 @@ interface XPropertySpec : TargetLanguage {
             return when (language) {
                 CodeLanguage.JAVA ->
                     JavaPropertySpec.Builder(
-                        name,
                         JPropertySpec.builder(typeName.java, name).apply {
                             val visibilityModifier = visibility.toJavaVisibilityModifier()
                             // TODO(b/247242374) Add nullability annotations for non-private fields
@@ -72,7 +71,6 @@ interface XPropertySpec : TargetLanguage {
                     )
                 CodeLanguage.KOTLIN ->
                     KotlinPropertySpec.Builder(
-                        name,
                         KPropertySpec.builder(name, typeName.kotlin).apply {
                             mutable(isMutable)
                             addModifiers(visibility.toKotlinVisibilityModifier())
@@ -92,10 +90,7 @@ interface XPropertySpec : TargetLanguage {
                 CodeLanguage.JAVA ->
                     error("Overriding a property is not supported when code language is Java.")
                 CodeLanguage.KOTLIN ->
-                    KotlinPropertySpec.Builder(
-                        name = element.name,
-                        actual = PropertySpecHelper.overriding(element, owner)
-                    )
+                    KotlinPropertySpec.Builder(PropertySpecHelper.overriding(element, owner))
             }
         }
     }
