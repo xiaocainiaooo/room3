@@ -17,6 +17,7 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.internal.JvmSynchronized
+import androidx.compose.foundation.text.getLineHeight
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.isUnspecified
@@ -196,6 +197,10 @@ internal class MultiWidgetSelectionDelegate(
     override fun getLastVisibleOffset(): Int {
         val textLayoutResult = layoutResultCallback() ?: return 0
         return textLayoutResult.lastVisibleOffset
+    }
+
+    override fun getLineHeight(offset: Int): Float {
+        return layoutResultCallback()?.getLineHeight(offset) ?: 0f
     }
 }
 

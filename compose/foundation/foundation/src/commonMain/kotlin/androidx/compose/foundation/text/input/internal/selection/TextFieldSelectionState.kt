@@ -28,6 +28,7 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.text.DefaultCursorThickness
 import androidx.compose.foundation.text.Handle
 import androidx.compose.foundation.text.TextDragObserver
+import androidx.compose.foundation.text.getLineHeight
 import androidx.compose.foundation.text.input.TextFieldCharSequence
 import androidx.compose.foundation.text.input.getSelectedText
 import androidx.compose.foundation.text.input.internal.IndexTransformationType.Deletion
@@ -266,10 +267,15 @@ internal class TextFieldSelectionState(
 
         if (!visible) return TextFieldHandleState.Hidden
 
+        // The line height field for the cursor handle state is currently unused.
+        // There is no need to calculate it.
+        val lineHeight = 0f
+
         // text direction is useless for cursor handle, any value is fine.
         return TextFieldHandleState(
             visible = true,
             position = if (includePosition) getCursorRect().bottomCenter else Offset.Unspecified,
+            lineHeight = lineHeight,
             direction = ResolvedTextDirection.Ltr,
             handlesCrossed = false
         )
@@ -1190,9 +1196,11 @@ internal class TextFieldSelectionState(
             } else {
                 Offset.Unspecified
             }
+        val handleOffset = if (isStartHandle) selection.start else selection.end
         return TextFieldHandleState(
             visible = true,
             position = coercedPosition,
+            lineHeight = layoutResult.getLineHeight(handleOffset),
             direction = direction,
             handlesCrossed = handlesCrossed
         )
