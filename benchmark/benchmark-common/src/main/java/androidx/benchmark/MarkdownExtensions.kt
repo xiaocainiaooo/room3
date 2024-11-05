@@ -21,7 +21,7 @@ import androidx.annotation.RestrictTo
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 object Markdown {
     /** Creates a Markdown link. Escapes relevant Markdown characters (e.g. brackets). */
-    private fun createLink(label: String, uri: String) = buildString {
+    fun createLink(label: String, uri: String) = buildString {
         fun emit(content: String, prefix: Char, suffix: Char) {
             append(prefix)
             var prev: Char? = null

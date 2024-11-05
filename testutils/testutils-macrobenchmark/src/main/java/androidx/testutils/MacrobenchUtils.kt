@@ -18,6 +18,9 @@ package androidx.testutils
 
 import android.content.Intent
 import android.os.Build
+import androidx.benchmark.ExperimentalBenchmarkConfigApi
+import androidx.benchmark.ExperimentalConfig
+import androidx.benchmark.StartupInsightsConfig
 import androidx.benchmark.macro.ArtMetric
 import androidx.benchmark.macro.BaselineProfileMode
 import androidx.benchmark.macro.CompilationMode
@@ -29,6 +32,7 @@ import androidx.benchmark.macro.StartupTimingMetric
 import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.isSupportedWithVmSettings
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
+import androidx.benchmark.perfetto.ExperimentalPerfettoCaptureApi
 
 /** Compilation modes to sweep over for jetpack internal macrobenchmarks */
 val COMPILATION_MODES =
@@ -70,6 +74,7 @@ fun getStartupMetrics() =
         MemoryUsageMetric(MemoryUsageMetric.Mode.Last)
     )
 
+@OptIn(ExperimentalBenchmarkConfigApi::class, ExperimentalPerfettoCaptureApi::class)
 fun MacrobenchmarkRule.measureStartup(
     compilationMode: CompilationMode,
     startupMode: StartupMode,
@@ -84,6 +89,8 @@ fun MacrobenchmarkRule.measureStartup(
         compilationMode = compilationMode,
         iterations = iterations,
         startupMode = startupMode,
+        experimentalConfig =
+            ExperimentalConfig(startupInsightsConfig = StartupInsightsConfig(true)),
         setupBlock = { pressHome() }
     ) {
         val intent = Intent()

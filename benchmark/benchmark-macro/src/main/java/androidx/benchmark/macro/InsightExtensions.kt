@@ -17,9 +17,14 @@
 package androidx.benchmark.macro
 
 import androidx.benchmark.Insight
+import androidx.benchmark.LinkFormat
 import androidx.benchmark.Markdown
 import androidx.benchmark.Outputs
 import androidx.benchmark.StartupInsightsConfig
+import androidx.benchmark.TraceDeepLink
+import androidx.benchmark.inMemoryTrace
+import androidx.benchmark.perfetto.PerfettoTraceProcessor
+import androidx.benchmark.perfetto.Row
 import java.net.URLEncoder
 import perfetto.protos.AndroidStartupMetric.SlowStartReason
 import perfetto.protos.AndroidStartupMetric.ThresholdValue.ThresholdUnit
@@ -31,9 +36,8 @@ import perfetto.protos.AndroidStartupMetric.ThresholdValue.ThresholdUnit
  * TODO(353692849): add unit tests
  */
 internal fun createInsightsIdeSummary(
-    rawInsights: List<List<SlowStartReason>>,
     startupInsightsConfig: StartupInsightsConfig?,
-    tracePaths: List<String>
+    iterationResults: List<IterationResult>
 ): List<Insight> {
     fun createInsightString(
         criterion: SlowStartReason,
@@ -86,38 +90,109 @@ internal fun createInsightsIdeSummary(
             append(")")
         }
 
-        val observedString =
-            observed.joinToString(" ", "seen in iterations: ") {
-                val actualValue = requireNotNull(it.value.actual_value?.value_)
-                val actualString: String =
-                    if (thresholdUnit == ThresholdUnit.TRUE_OR_FALSE) {
-                        require(actualValue in 0L..1L)
-                        if (actualValue == 0L) "false" else "true"
-                    } else {
-                        "$actualValue$unitSuffix"
-                    }
+        val observedMap =
+            listOf(LinkFormat.V2, LinkFormat.V3).associate { linkFormat ->
+                val observedString =
+                    observed.joinToString(" ", "seen in iterations: ") {
+                        val observedValue = requireNotNull(it.value.actual_value?.value_)
+                        val observedString: String =
+                            if (thresholdUnit == ThresholdUnit.TRUE_OR_FALSE) {
+                                require(observedValue in 0L..1L)
+                                if (observedValue == 0L) "false" else "true"
+                            } else {
+                                "$observedValue$unitSuffix"
+                            }
 
-                // TODO(364590575): implement zoom-in on relevant parts of the trace and then make
-                //  the 'actualString' also part of the link.
-                val relativePath =
-                    tracePaths.getOrNull(it.index)?.let { Outputs.relativePathFor(it) }
-                val traceLink =
-                    when (relativePath) {
-                        null -> "${it.index}"
-                        else -> Markdown.createFileLink("${it.index}", relativePath)
+                        // TODO(364590575): implement zoom-in on relevant parts of the trace and
+                        // then make
+                        //  the 'actualString' also part of the link.
+                        val tracePath = iterationResults.getOrNull(it.index)?.tracePath
+                        if (tracePath == null) "${it.index}($observedString)"
+                        else
+                            when (linkFormat) {
+                                LinkFormat.V2 -> {
+                                    val relativePath = Outputs.relativePathFor(tracePath)
+                                    val link = Markdown.createFileLink("${it.index}", relativePath)
+                                    "$link($observedString)"
+                                }
+                                LinkFormat.V3 -> {
+                                    TraceDeepLink(
+                                            outputRelativePath = Outputs.relativePathFor(tracePath),
+                                            selectionParams =
+                                                iterationResults[it.index]
+                                                    .defaultStartupInsightSelectionParams
+                                        )
+                                        .createMarkdownLink(
+                                            label = "${it.index}($observedString)",
+                                            linkFormat = LinkFormat.V3
+                                        )
+                                }
+                            }
                     }
-
-                "$traceLink($actualString)"
+                Pair(linkFormat, observedString)
             }
 
-        return Insight(criterionString, observedString)
+        return Insight(
+            criterion = criterionString,
+            observedV2 = observedMap[LinkFormat.V2]!!,
+            observedV3 = observedMap[LinkFormat.V3]!!
+        )
     }
 
     // Pivot from List<iteration_id -> insight_list> to List<insight -> iteration_list>
     // and convert to a format expected in Studio text output.
-    return rawInsights
+    return iterationResults
+        .map { it.insights }
         .flatMapIndexed { iterationId, insights -> insights.map { IndexedValue(iterationId, it) } }
         .groupBy { it.value.reason_id }
         .values
         .map { createInsightString(it.first().value, it) }
+}
+
+/**
+ * Sets [TraceDeepLink.SelectionParams] based on the last `Startup` slice. Temporary hack until we
+ * get this information directly from [SlowStartReason].
+ */
+internal fun PerfettoTraceProcessor.Session.extractStartupSliceSelectionParams(
+    packageName: String
+): TraceDeepLink.SelectionParams? {
+    inMemoryTrace("extractStartupSliceSelectionParams") {
+        // note: not using utid, upid as not stable between trace processor releases
+        // also note: https://perfetto.dev/docs/analysis/sql-tables#process
+        // also note: https://perfetto.dev/docs/analysis/sql-tables#thread
+        val query =
+            """
+                    select
+                        process.pid as pid,
+                        thread.tid as tid,
+                        slice.ts,
+                        slice.dur,
+                        slice.name, -- left for debugging, can be removed
+                        process.name as process_name -- left for debugging, can be removed
+                    from slice
+                        join thread_track on thread_track.id = slice.track_id
+                        join thread using(utid)
+                        join process using(upid)
+                    where slice.name = 'Startup' and process.name like '${packageName}%'
+                    """
+                .trimIndent()
+
+        val events = query(query).toList()
+        if (events.isEmpty()) {
+            return null
+        } else {
+            val queryResult: Row = events.first()
+            return TraceDeepLink.SelectionParams(
+                pid = queryResult.long("pid"),
+                tid = queryResult.long("tid"),
+                ts = queryResult.long("ts"),
+                dur = queryResult.long("dur"),
+                // query belongs in the [SlowStartReason] object (to be added there)
+                // we can't do anything here now, so setting it to something that will test
+                // that we're handling Unicode correctly
+                // see: http://shortn/_yWn9yR2OHr
+                query = "SELECT 🐲\nFROM 🐉\nWHERE \ud83d\udc09.NAME = 'ハク'"
+            )
+        }
+    }
 }
