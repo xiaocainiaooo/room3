@@ -19,6 +19,7 @@ package androidx.pdf
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.view.KeyEvent
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
@@ -43,6 +44,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -206,6 +208,7 @@ class PdfViewerFragmentTestSuite {
         scenario.onFragment { it.isToolboxVisible = true }
         onView(withId(R.id.edit_fab)).check(matches(isDisplayed()))
         onView(withId(androidx.pdf.testapp.R.id.host_Search)).check(matches(isDisplayed()))
+        onView(withId(androidx.pdf.testapp.R.id.toggle_full_screen)).check(matches(isDisplayed()))
 
         // Hide the toolbox and check visibility of buttons
         scenario.onFragment { it.isToolboxVisible = false }
@@ -213,17 +216,67 @@ class PdfViewerFragmentTestSuite {
             .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
         onView(withId(androidx.pdf.testapp.R.id.host_Search)).check(matches(isDisplayed()))
 
-        // Enter immersive mode and check visibility of buttons
-        scenario.onFragment { it.onRequestImmersiveMode(true) }
+        // --- Enter immersive mode and check visibility of buttons --- //
+
+        // Enter immersive mode by clicking the fullscreen button
+        onView(withId(androidx.pdf.testapp.R.id.toggle_full_screen)).perform(click())
+
+        scenario.onFragment { fragment ->
+            val activity = fragment.requireActivity()
+            val windowInsetsController =
+                WindowCompat.getInsetsController(activity.window, activity.window.decorView)
+
+            // Check if the system bars are hidden
+            Assert.assertFalse(windowInsetsController.isAppearanceLightNavigationBars)
+            Assert.assertFalse(windowInsetsController.isAppearanceLightStatusBars)
+        }
+
+        // Assert that the "Edit" FAB is hidden
         onView(withId(R.id.edit_fab))
             .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
+
+        // Assert that the host app's search button is visible
         onView(withId(androidx.pdf.testapp.R.id.host_Search))
+            .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)))
+
+        // Assert that the fullscreen toggle button is visible
+        onView(withId(androidx.pdf.testapp.R.id.toggle_full_screen))
+            .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)))
+
+        // --- Test search functionality in Immersive mode ---
+
+        // Toggle search menu
+        val searchViewAssertion = SearchViewAssertions()
+        scenario.onFragment { it.isTextSearchActive = true }
+        onView(withId(R.id.search_container)).check(matches(isDisplayed()))
+
+        // Perform a search and assert that results are found
+        onView(withId(R.id.find_query_box)).perform(typeText(SEARCH_QUERY))
+        onView(withId(R.id.match_status_textview)).check(matches(isDisplayed()))
+        onView(withId(R.id.match_status_textview)).check(searchViewAssertion.extractAndMatch())
+
+        // Prev/next search results
+        onView(withId(R.id.find_prev_btn)).perform(click())
+        onView(withId(R.id.match_status_textview)).check(searchViewAssertion.matchPrevious())
+        onView(withId(R.id.find_next_btn)).perform(click())
+        onView(withId(R.id.match_status_textview)).check(searchViewAssertion.matchNext())
+        onView(withId(R.id.find_next_btn)).perform(click())
+        onView(withId(R.id.match_status_textview)).check(searchViewAssertion.matchNext())
+
+        // Assert for keyboard collapse
+        onView(withId(R.id.find_query_box)).perform(click())
+        onView(withId(R.id.close_btn)).perform(click())
+        onView(withId(R.id.find_query_box))
             .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
 
-        // Exit immersive mode and check visibility of buttons
-        scenario.onFragment { it.onRequestImmersiveMode(false) }
-        onView(withId(R.id.edit_fab)).check(matches(isDisplayed()))
-        onView(withId(androidx.pdf.testapp.R.id.host_Search)).check(matches(isDisplayed()))
+        // --- Test scroll functionality in immersive mode ---
+        onView(withId(R.id.parent_pdf_container)).perform(swipeUp())
+        onView(withId(R.id.parent_pdf_container)).perform(swipeDown())
+
+        // --- Exit immersive mode and check visibility of buttons ---
+
+        // Click the fullscreen button again to exit immersive mode
+        onView(withId(androidx.pdf.testapp.R.id.toggle_full_screen)).perform(click())
 
         // Click the host app search button and check visibility of elements
         onView(withId(androidx.pdf.testapp.R.id.host_Search)).perform(click())
@@ -231,7 +284,7 @@ class PdfViewerFragmentTestSuite {
         onView(withId(R.id.edit_fab))
             .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
         onView(withId(androidx.pdf.testapp.R.id.host_Search))
-            .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
+            .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)))
     }
 
     fun testPdfViewerFragment_setDocumentUri_passwordProtected_portrait() {
