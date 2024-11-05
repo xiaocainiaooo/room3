@@ -20,7 +20,6 @@ import android.content.Context
 import android.os.Bundle
 import androidx.annotation.MainThread
 import androidx.annotation.RestrictTo
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.DEFAULT_ARGS_KEY
 import androidx.lifecycle.HasDefaultViewModelProviderFactory
 import androidx.lifecycle.Lifecycle
@@ -34,9 +33,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.enableSavedStateHandles
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.MutableCreationExtras
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.serialization.decodeArguments
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
@@ -149,7 +151,7 @@ private constructor(
             "You cannot access the NavBackStackEntry's SavedStateHandle after the " +
                 "NavBackStackEntry is destroyed."
         }
-        ViewModelProvider(this, NavResultSavedStateFactory(this))
+        ViewModelProvider(this, navResultSavedStateFactory)
             .get(SavedStateViewModel::class.java)
             .handle
     }
@@ -278,16 +280,8 @@ private constructor(
     }
 
     /** Used to create the {SavedStateViewModel} */
-    private class NavResultSavedStateFactory(owner: SavedStateRegistryOwner) :
-        AbstractSavedStateViewModelFactory(owner, null) {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(
-            key: String,
-            modelClass: Class<T>,
-            handle: SavedStateHandle
-        ): T {
-            return SavedStateViewModel(handle) as T
-        }
+    private val navResultSavedStateFactory by lazy {
+        viewModelFactory { initializer { SavedStateViewModel(createSavedStateHandle()) } }
     }
 
     private class SavedStateViewModel(val handle: SavedStateHandle) : ViewModel()
