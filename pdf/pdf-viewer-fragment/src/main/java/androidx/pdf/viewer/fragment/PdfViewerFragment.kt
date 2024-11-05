@@ -244,7 +244,9 @@ public open class PdfViewerFragment : Fragment() {
         get() = arguments?.getBoolean(KEY_TOOLBOX_VISIBILITY) ?: true
         set(value) {
             (arguments ?: Bundle()).apply { putBoolean(KEY_TOOLBOX_VISIBILITY, value) }
-            if (value) annotationButton?.show() else annotationButton?.hide()
+
+            if (value && isAnnotationIntentResolvable) annotationButton?.show()
+            else annotationButton?.hide()
         }
 
     /**
