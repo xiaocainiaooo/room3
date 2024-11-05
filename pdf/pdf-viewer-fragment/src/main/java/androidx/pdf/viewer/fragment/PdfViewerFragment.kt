@@ -310,6 +310,9 @@ public open class PdfViewerFragment : Fragment() {
         annotationButton = pdfViewer?.findViewById(R.id.edit_fab)
 
         zoomView?.setMetricEventCallback(mEventCallback)
+        findInFileView?.setOnVisibilityChangedListener { isVisible ->
+            fastScrollView?.setScrubberVisibility(!isVisible)
+        }
 
         // All views are inflated, update the view state.
         if (viewState.get() == ViewState.NO_VIEW || viewState.get() == ViewState.ERROR) {
