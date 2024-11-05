@@ -295,8 +295,7 @@ internal actual constructor(
     }
 }
 
-@PublishedApi
-internal fun SavedState.contentDeepEquals(other: SavedState): Boolean {
+private fun SavedState.contentDeepEquals(other: SavedState): Boolean {
     if (this === other) return true
     if (this.size() != other.size()) return false
 
@@ -306,9 +305,24 @@ internal fun SavedState.contentDeepEquals(other: SavedState): Boolean {
 
         when {
             v1 === v2 -> continue
+            v1 == v2 -> continue
             v1 == null || v2 == null -> return false
+
+            // container types
             v1 is SavedState && v2 is SavedState -> if (!v1.contentDeepEquals(v2)) return false
             v1 is Array<*> && v2 is Array<*> -> if (!v1.contentDeepEquals(v2)) return false
+
+            // primitive arrays
+            v1 is ByteArray && v2 is ByteArray -> if (!v1.contentEquals(v2)) return false
+            v1 is ShortArray && v2 is ShortArray -> if (!v1.contentEquals(v2)) return false
+            v1 is IntArray && v2 is IntArray -> if (!v1.contentEquals(v2)) return false
+            v1 is LongArray && v2 is LongArray -> if (!v1.contentEquals(v2)) return false
+            v1 is FloatArray && v2 is FloatArray -> if (!v1.contentEquals(v2)) return false
+            v1 is DoubleArray && v2 is DoubleArray -> if (!v1.contentEquals(v2)) return false
+            v1 is CharArray && v2 is CharArray -> if (!v1.contentEquals(v2)) return false
+            v1 is BooleanArray && v2 is BooleanArray -> if (!v1.contentEquals(v2)) return false
+
+            // if nothing else works
             else -> if (v1 != v2) return false
         }
     }

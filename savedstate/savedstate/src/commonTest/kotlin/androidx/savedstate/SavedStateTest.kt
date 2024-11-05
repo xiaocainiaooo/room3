@@ -96,20 +96,8 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun contentDeepEquals_withEqualContent_returnsTrue() {
-        val sharedState = savedState {
-            putInt(KEY_1, Int.MAX_VALUE)
-            putInt(KEY_2, Int.MAX_VALUE)
-        }
-        val state1 = savedState {
-            putInt(KEY_1, Int.MAX_VALUE)
-            putInt(KEY_2, Int.MAX_VALUE)
-            putSavedState(KEY_3, sharedState)
-        }
-        val state2 = savedState {
-            putInt(KEY_1, Int.MAX_VALUE)
-            putInt(KEY_2, Int.MAX_VALUE)
-            putSavedState(KEY_3, sharedState)
-        }
+        val state1 = createDefaultSavedState()
+        val state2 = createDefaultSavedState()
 
         val contentDeepEquals = state1.read { contentDeepEquals(state2) }
 
@@ -118,18 +106,24 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun contentDeepEquals_withMissingKey_returnsFalse() {
-        val sharedState = savedState {
+        val sharedState1 = savedState {
             putInt(KEY_1, Int.MAX_VALUE)
             putInt(KEY_2, Int.MAX_VALUE)
+            putIntArray(KEY_3, intArrayOf(1, 2, 3))
+        }
+        val sharedState2 = savedState {
+            putInt(KEY_1, Int.MAX_VALUE)
+            putInt(KEY_2, Int.MAX_VALUE)
+            putIntArray(KEY_3, intArrayOf(1, 2, 3))
         }
         val state1 = savedState {
             putInt(KEY_1, Int.MAX_VALUE)
             putInt(KEY_2, Int.MAX_VALUE)
-            putSavedState(KEY_3, sharedState)
+            putSavedState(KEY_3, sharedState1)
         }
         val state2 = savedState {
             putInt(KEY_1, Int.MAX_VALUE)
-            putSavedState(KEY_3, sharedState)
+            putSavedState(KEY_3, sharedState2)
         }
 
         val contentDeepEquals = state1.read { contentDeepEquals(state2) }
@@ -139,19 +133,25 @@ internal class SavedStateTest : RobolectricTest() {
 
     @Test
     fun contentDeepEquals_withDifferentContent_returnsFalse() {
-        val sharedState = savedState {
+        val sharedState1 = savedState {
             putInt(KEY_1, Int.MAX_VALUE)
             putInt(KEY_2, Int.MAX_VALUE)
+            putIntArray(KEY_3, intArrayOf(1, 2, 3))
+        }
+        val sharedState2 = savedState {
+            putInt(KEY_1, Int.MAX_VALUE)
+            putInt(KEY_2, Int.MAX_VALUE)
+            putIntArray(KEY_3, intArrayOf(1, 2, 3))
         }
         val state1 = savedState {
             putInt(KEY_1, Int.MAX_VALUE)
             putInt(KEY_2, Int.MAX_VALUE)
-            putSavedState(KEY_3, sharedState)
+            putSavedState(KEY_3, sharedState1)
         }
         val state2 = savedState {
             putFloat(KEY_1, Float.MAX_VALUE)
             putFloat(KEY_2, Float.MAX_VALUE)
-            putSavedState(KEY_3, sharedState)
+            putSavedState(KEY_3, sharedState2)
         }
 
         val contentDeepEquals = state1.read { contentDeepEquals(state2) }
@@ -1058,15 +1058,52 @@ internal class SavedStateTest : RobolectricTest() {
 
     // endregion
 
-    private companion object {
+    private companion object TestUtils {
         const val KEY_1 = "KEY_1"
         const val KEY_2 = "KEY_2"
         const val KEY_3 = "KEY_3"
         const val STRING_VALUE = "string-value"
         val LIST_INT_VALUE = List(size = 5) { idx -> idx }
         val LIST_STRING_VALUE = List(size = 5) { idx -> "index=$idx" }
-        val SET_INT_VALUE = LIST_INT_VALUE.toSet()
-        val SET_STRING_VALUE = LIST_STRING_VALUE.toSet()
         val SAVED_STATE_VALUE = savedState()
+
+        private fun createDefaultSavedState(): SavedState {
+            var key = 0
+            val savedState = savedState {
+                putBoolean(key = "KEY_${++key}", value = true)
+                putBooleanArray(key = "KEY_${++key}", values = booleanArrayOf(true, false))
+                putChar(key = "KEY_${++key}", value = Char.MAX_VALUE)
+                putCharArray(
+                    key = "KEY_${++key}",
+                    values = charArrayOf(Char.MIN_VALUE, Char.MAX_VALUE)
+                )
+                putDouble(key = "KEY_${++key}", value = Double.MAX_VALUE)
+                putDoubleArray(
+                    key = "KEY_${++key}",
+                    values = doubleArrayOf(Double.MIN_VALUE, Double.MAX_VALUE)
+                )
+                putFloat(key = "KEY_${++key}", value = Float.MAX_VALUE)
+                putFloatArray(
+                    key = "KEY_${++key}",
+                    values = floatArrayOf(Float.MIN_VALUE, Float.MAX_VALUE)
+                )
+                putInt(key = "KEY_${++key}", value = Int.MAX_VALUE)
+                putIntArray(key = "KEY_${++key}", values = intArrayOf(1, 2, 3))
+                putIntList(key = "KEY_${++key}", values = listOf(Int.MIN_VALUE, Int.MAX_VALUE))
+                putLong(key = "KEY_${++key}", value = Long.MAX_VALUE)
+                putLongArray(
+                    key = "KEY_${++key}",
+                    values = longArrayOf(Long.MIN_VALUE, Long.MAX_VALUE)
+                )
+                putNull(key = "KEY_${++key}")
+                putString(key = "KEY_${++key}", value = "Text")
+                putStringArray(key = "KEY_${++key}", values = arrayOf("Text3", "text4"))
+                putStringList(key = "KEY_${++key}", values = listOf("Text1", "text2"))
+            }
+            return savedState {
+                putAll(savedState)
+                putSavedState(key = "KEY_${++key}", savedState)
+            }
+        }
     }
 }

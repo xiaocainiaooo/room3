@@ -57,7 +57,6 @@ package androidx.savedstate {
   }
 
   public final class SavedStateReaderKt {
-    method @kotlin.PublishedApi internal static boolean contentDeepEquals(android.os.Bundle, android.os.Bundle other);
     method @kotlin.PublishedApi internal static inline Void keyNotFoundError(String key);
     method @kotlin.PublishedApi internal static inline Void valueNotFoundError(String key);
     property @kotlin.PublishedApi internal static final boolean DEFAULT_BOOLEAN;
