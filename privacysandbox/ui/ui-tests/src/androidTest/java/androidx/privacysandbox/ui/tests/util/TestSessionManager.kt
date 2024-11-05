@@ -17,12 +17,14 @@
 package androidx.privacysandbox.ui.tests.util
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Binder
 import android.os.Bundle
 import android.os.IBinder
+import android.view.Display
 import android.view.View
 import android.widget.FrameLayout
 import androidx.privacysandbox.ui.client.SandboxedUiAdapterFactory
@@ -96,6 +98,11 @@ class TestSessionManager(
                 .that(testSessionClient.isSessionOpened)
                 .isTrue()
         }
+
+        assertWithMessage("SdkContext passed to openSession")
+            .that(adapter.session!!.context)
+            .isInstanceOf(SdkContext::class.java)
+
         return adapter
     }
 
@@ -183,7 +190,7 @@ class TestSessionManager(
         var initialZOrderOnTop = false
         var touchedLatch = CountDownLatch(1)
 
-        var session: SandboxedUiAdapter.Session? = null
+        var session: TestSession? = null
         var initialHeight: Int = -1
         var initialWidth: Int = -1
 
@@ -221,7 +228,7 @@ class TestSessionManager(
          * A failing session that always sends error notice to the client when content is requested.
          */
         inner class FailingTestSession(
-            private val context: Context,
+            context: Context,
             sessionClient: SandboxedUiAdapter.SessionClient,
             private val clientExecutor: Executor
         ) : TestSession(context, sessionClient) {
@@ -245,7 +252,7 @@ class TestSessionManager(
         }
 
         open inner class TestSession(
-            private val context: Context,
+            val context: Context,
             val sessionClient: SandboxedUiAdapter.SessionClient,
             private val placeViewInsideFrameLayout: Boolean = false
         ) : AbstractSession() {
@@ -442,8 +449,14 @@ class TestSessionManager(
         }
     }
 
+    private class SdkContext(base: Context) : ContextWrapper(base) {
+        override fun createDisplayContext(display: Display): Context {
+            return SdkContext(baseContext.createDisplayContext(display))
+        }
+    }
+
     fun getCoreLibInfoFromAdapter(sdkAdapter: SandboxedUiAdapter): Bundle {
-        val bundle = sdkAdapter.toCoreLibInfo(context)
+        val bundle = sdkAdapter.toCoreLibInfo(SdkContext(context))
         bundle.putBoolean(TEST_ONLY_USE_REMOTE_ADAPTER, !invokeBackwardsCompatFlow)
         return bundle
     }
