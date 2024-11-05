@@ -41,8 +41,11 @@ class DatabaseWriter(
     val database: Database,
     writerContext: WriterContext,
 ) : TypeWriter(writerContext) {
+    private val className = database.implTypeName
+    override val packageName = className.packageName
+
     override fun createTypeSpecBuilder(): XTypeSpec.Builder {
-        return XTypeSpec.classBuilder(codeLanguage, database.implTypeName).apply {
+        return XTypeSpec.classBuilder(codeLanguage, className).apply {
             addOriginatingElement(database.element)
             superclass(database.typeName)
             setVisibility(

@@ -71,6 +71,8 @@ class DaoWriter(
     writerContext: WriterContext,
 ) : TypeWriter(writerContext) {
     private val declaredDao = dao.element.type
+    private val className = dao.implTypeName
+    override val packageName = className.packageName
 
     // TODO nothing prevents this from conflicting, we should fix.
     private val dbProperty: XPropertySpec =
@@ -99,7 +101,7 @@ class DaoWriter(
     }
 
     override fun createTypeSpecBuilder(): XTypeSpec.Builder {
-        val builder = XTypeSpec.classBuilder(codeLanguage, dao.implTypeName)
+        val builder = XTypeSpec.classBuilder(codeLanguage, className)
 
         val preparedQueries = dao.queryMethods.filterIsInstance<WriteQueryMethod>()
 

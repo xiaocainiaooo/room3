@@ -46,6 +46,8 @@ abstract class TypeWriter(val context: WriterContext) {
 
     val codeLanguage: CodeLanguage = context.codeLanguage
 
+    abstract val packageName: String
+
     abstract fun createTypeSpecBuilder(): XTypeSpec.Builder
 
     /**
@@ -74,7 +76,7 @@ abstract class TypeWriter(val context: WriterContext) {
         sharedMethodSpecs.values.forEach { builder.addFunction(it) }
         addGeneratedAnnotationIfAvailable(builder, processingEnv)
         addSuppressWarnings(builder)
-        builder.build().writeTo(processingEnv.filer)
+        builder.build().writeTo(codeLanguage, packageName, processingEnv.filer)
     }
 
     private fun addSuppressWarnings(builder: XTypeSpec.Builder) {

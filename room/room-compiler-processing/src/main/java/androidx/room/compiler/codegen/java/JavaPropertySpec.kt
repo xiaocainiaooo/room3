@@ -22,10 +22,11 @@ import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XPropertySpec
 
-internal class JavaPropertySpec(override val name: String, internal val actual: JPropertySpec) :
-    JavaLang(), XPropertySpec {
+internal class JavaPropertySpec(internal val actual: JPropertySpec) : JavaLang(), XPropertySpec {
 
-    internal class Builder(private val name: String, internal val actual: JPropertySpecBuilder) :
+    override val name: String = actual.name
+
+    internal class Builder(internal val actual: JPropertySpecBuilder) :
         JavaLang(), XPropertySpec.Builder {
 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
@@ -43,6 +44,6 @@ internal class JavaPropertySpec(override val name: String, internal val actual: 
             error("Adding a property getter when code language is Java is not supported.")
         }
 
-        override fun build() = JavaPropertySpec(name, actual.build())
+        override fun build() = JavaPropertySpec(actual.build())
     }
 }

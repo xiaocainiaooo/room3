@@ -23,10 +23,12 @@ import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XPropertySpec
 
-internal class KotlinPropertySpec(override val name: String, internal val actual: KPropertySpec) :
+internal class KotlinPropertySpec(internal val actual: KPropertySpec) :
     KotlinLang(), XPropertySpec {
 
-    internal class Builder(private val name: String, internal val actual: KPropertySpecBuilder) :
+    override val name: String = actual.name
+
+    internal class Builder(internal val actual: KPropertySpecBuilder) :
         KotlinLang(), XPropertySpec.Builder {
 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
@@ -44,6 +46,6 @@ internal class KotlinPropertySpec(override val name: String, internal val actual
             actual.getter(KFunSpec.getterBuilder().addCode(code.actual).build())
         }
 
-        override fun build() = KotlinPropertySpec(name, actual.build())
+        override fun build() = KotlinPropertySpec(actual.build())
     }
 }

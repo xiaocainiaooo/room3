@@ -30,12 +30,12 @@ import androidx.room.compiler.processing.XNullability
 import com.squareup.kotlinpoet.javapoet.JTypeName
 import javax.lang.model.element.Modifier
 
-internal class JavaFunSpec(override val name: String, internal val actual: JFunSpec) :
-    JavaLang(), XFunSpec {
+internal class JavaFunSpec(internal val actual: JFunSpec) : JavaLang(), XFunSpec {
+    override val name: String = actual.name
+
     override fun toString() = actual.toString()
 
-    internal class Builder(override val name: String, internal val actual: JFunSpecBuilder) :
-        JavaLang(), XFunSpec.Builder {
+    internal class Builder(internal val actual: JFunSpecBuilder) : JavaLang(), XFunSpec.Builder {
 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
             require(annotation is JavaAnnotationSpec)
@@ -99,7 +99,7 @@ internal class JavaFunSpec(override val name: String, internal val actual: JFunS
             actual.returns(typeName.java)
         }
 
-        override fun build() = JavaFunSpec(name, actual.build())
+        override fun build() = JavaFunSpec(actual.build())
     }
 }
 

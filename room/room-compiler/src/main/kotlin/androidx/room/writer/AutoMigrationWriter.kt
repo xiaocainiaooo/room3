@@ -42,14 +42,11 @@ class AutoMigrationWriter(
     private val renamedTables = autoMigration.schemaDiff.renamedTables
     private val complexChangedTables = autoMigration.schemaDiff.complexChangedTables
     private val deletedTables = autoMigration.schemaDiff.deletedTables
+    private val className = autoMigration.getImplTypeName(dbElement.asClassName())
+    override val packageName = className.packageName
 
     override fun createTypeSpecBuilder(): XTypeSpec.Builder {
-        val builder =
-            XTypeSpec.classBuilder(
-                codeLanguage,
-                autoMigration.getImplTypeName(dbElement.asClassName())
-            )
-        builder.apply {
+        return XTypeSpec.classBuilder(codeLanguage, className).apply {
             addOriginatingElement(dbElement)
             superclass(RoomTypeNames.MIGRATION)
             // Class is package-protected in Java (no visibility modifier) and internal in Kotlin
@@ -57,7 +54,7 @@ class AutoMigrationWriter(
                 setVisibility(VisibilityModifier.INTERNAL)
             }
             if (autoMigration.specClassName != null) {
-                builder.addProperty(
+                addProperty(
                     name = "callback",
                     typeName = RoomTypeNames.AUTO_MIGRATION_SPEC,
                     visibility = VisibilityModifier.PRIVATE,
@@ -72,7 +69,6 @@ class AutoMigrationWriter(
             addFunction(createConstructor())
             addFunction(createMigrateMethod())
         }
-        return builder
     }
 
     /**
