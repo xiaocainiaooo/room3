@@ -83,6 +83,7 @@ dependencies {
     androidTestImplementation(libs.testCore)
     androidTestImplementation(libs.kotlinTestJunit)
     androidTestImplementation(libs.testExtJunit)
+    androidTestImplementation(libs.testExtJunitKtx)
     androidTestImplementation(libs.testRunner)
     androidTestImplementation(libs.testRules)
     androidTestImplementation(libs.dexmakerMockito)
