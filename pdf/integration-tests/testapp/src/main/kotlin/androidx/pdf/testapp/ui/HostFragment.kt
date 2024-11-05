@@ -22,11 +22,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.os.OperationCanceledException
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.pdf.testapp.R
 import androidx.pdf.viewer.fragment.PdfViewerFragment
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 /**
@@ -37,11 +34,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 class HostFragment : PdfViewerFragment() {
     private var hostView: FrameLayout? = null
     private var search: FloatingActionButton? = null
-    private var fullScreen: FloatingActionButton? = null
-    private var isImmersiveModeEnabled = false
-
-    private var openPdfButton: MaterialButton? = null
-    private var searchButton: MaterialButton? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,7 +45,6 @@ class HostFragment : PdfViewerFragment() {
         // Inflate the custom layout for this fragment.
         hostView = inflater.inflate(R.layout.fragment_host, container, false) as FrameLayout
         search = hostView?.findViewById(R.id.host_Search)
-        fullScreen = hostView?.findViewById(R.id.toggle_full_screen)
 
         // Add the default PDF viewer to the custom layout
         hostView?.addView(view)
@@ -63,41 +54,12 @@ class HostFragment : PdfViewerFragment() {
 
         // Set up search button click listener
         search?.setOnClickListener { isTextSearchActive = true }
-        fullScreen?.setOnClickListener { toggleImmersiveMode() }
         return hostView
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        openPdfButton = activity?.findViewById(R.id.open_pdf)
-        searchButton = activity?.findViewById(R.id.search_button)
-    }
-
-    private fun toggleImmersiveMode() {
-        isImmersiveModeEnabled = !isImmersiveModeEnabled
-        updateSystemUi(!isImmersiveModeEnabled)
-        updateBottomButtonsVisibility(!isImmersiveModeEnabled)
-        onRequestImmersiveMode(isImmersiveModeEnabled)
-    }
-
-    private fun updateSystemUi(showSystemUi: Boolean) {
-        val insetsController =
-            WindowCompat.getInsetsController(requireActivity().window, hostView!!)
-        if (showSystemUi) {
-            insetsController.show(WindowInsetsCompat.Type.systemBars())
-        } else {
-            insetsController.hide(WindowInsetsCompat.Type.systemBars())
-        }
-    }
-
-    private fun updateBottomButtonsVisibility(visibility: Boolean) {
-        if (visibility) {
-            openPdfButton?.visibility = View.VISIBLE
-            searchButton?.visibility = View.VISIBLE
-        } else {
-            openPdfButton?.visibility = View.GONE
-            searchButton?.visibility = View.GONE
-        }
+    override fun onRequestImmersiveMode(enterImmersive: Boolean) {
+        super.onRequestImmersiveMode(enterImmersive)
+        if (!enterImmersive) search?.show() else search?.hide()
     }
 
     override fun onLoadDocumentError(error: Throwable) {
