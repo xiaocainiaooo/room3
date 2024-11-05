@@ -41,7 +41,9 @@ internal class TextActionModeCallback(
         onPasteRequested?.let { addMenuItem(menu, MenuItemOption.Paste) }
         onCutRequested?.let { addMenuItem(menu, MenuItemOption.Cut) }
         onSelectAllRequested?.let { addMenuItem(menu, MenuItemOption.SelectAll) }
-        onAutofillRequested?.let { addMenuItem(menu, MenuItemOption.Autofill) }
+        if (onAutofillRequested != null && Build.VERSION.SDK_INT >= 26) {
+            addMenuItem(menu, MenuItemOption.Autofill)
+        }
         return true
     }
 
