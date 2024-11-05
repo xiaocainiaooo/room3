@@ -20,6 +20,8 @@ import androidx.room.compiler.codegen.CodeLanguage
 import androidx.room.compiler.codegen.JAnnotationSpecBuilder
 import androidx.room.compiler.codegen.JCodeBlock
 import androidx.room.compiler.codegen.JCodeBlockBuilder
+import androidx.room.compiler.codegen.JFileSpec
+import androidx.room.compiler.codegen.JFileSpecBuilder
 import androidx.room.compiler.codegen.JFunSpec
 import androidx.room.compiler.codegen.JFunSpecBuilder
 import androidx.room.compiler.codegen.JParameterSpec
@@ -30,6 +32,8 @@ import androidx.room.compiler.codegen.JTypeSpecBuilder
 import androidx.room.compiler.codegen.KAnnotationSpecBuilder
 import androidx.room.compiler.codegen.KCodeBlock
 import androidx.room.compiler.codegen.KCodeBlockBuilder
+import androidx.room.compiler.codegen.KFileSpec
+import androidx.room.compiler.codegen.KFileSpecBuilder
 import androidx.room.compiler.codegen.KFunSpec
 import androidx.room.compiler.codegen.KFunSpecBuilder
 import androidx.room.compiler.codegen.KParameterSpec
@@ -40,6 +44,7 @@ import androidx.room.compiler.codegen.KTypeSpecBuilder
 import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XClassName
 import androidx.room.compiler.codegen.XCodeBlock
+import androidx.room.compiler.codegen.XFileSpec
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XMemberName
 import androidx.room.compiler.codegen.XName
@@ -49,18 +54,21 @@ import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.XTypeSpec
 import androidx.room.compiler.codegen.impl.XAnnotationSpecImpl
 import androidx.room.compiler.codegen.impl.XCodeBlockImpl
+import androidx.room.compiler.codegen.impl.XFileSpecImpl
 import androidx.room.compiler.codegen.impl.XFunSpecImpl
 import androidx.room.compiler.codegen.impl.XParameterSpecImpl
 import androidx.room.compiler.codegen.impl.XPropertySpecImpl
 import androidx.room.compiler.codegen.impl.XTypeSpecImpl
 import androidx.room.compiler.codegen.java.JavaAnnotationSpec
 import androidx.room.compiler.codegen.java.JavaCodeBlock
+import androidx.room.compiler.codegen.java.JavaFileSpec
 import androidx.room.compiler.codegen.java.JavaFunSpec
 import androidx.room.compiler.codegen.java.JavaParameterSpec
 import androidx.room.compiler.codegen.java.JavaPropertySpec
 import androidx.room.compiler.codegen.java.JavaTypeSpec
 import androidx.room.compiler.codegen.kotlin.KotlinAnnotationSpec
 import androidx.room.compiler.codegen.kotlin.KotlinCodeBlock
+import androidx.room.compiler.codegen.kotlin.KotlinFileSpec
 import androidx.room.compiler.codegen.kotlin.KotlinFunSpec
 import androidx.room.compiler.codegen.kotlin.KotlinParameterSpec
 import androidx.room.compiler.codegen.kotlin.KotlinPropertySpec
@@ -182,6 +190,22 @@ object XConverters {
             else -> error("Unsupported type: ${this.javaClass}")
         }
 
+    @JvmStatic
+    fun XFileSpec.toJavaPoet() =
+        when (this) {
+            is XFileSpecImpl -> java.actual
+            is JavaFileSpec -> actual
+            else -> error("Unsupported type: ${this.javaClass}")
+        }
+
+    @JvmStatic
+    fun XFileSpec.Builder.toJavaPoet() =
+        when (this) {
+            is XFileSpecImpl.Builder -> java.actual
+            is JavaFileSpec.Builder -> actual
+            else -> error("Unsupported type: ${this.javaClass}")
+        }
+
     @JvmStatic fun XName.toKotlinPoet() = kotlin
 
     @JvmStatic fun XMemberName.toKotlinPoet() = kotlin
@@ -283,6 +307,22 @@ object XConverters {
         when (this) {
             is XTypeSpecImpl.Builder -> kotlin.actual
             is KotlinTypeSpec.Builder -> actual
+            else -> error("Unsupported type: ${this.javaClass}")
+        }
+
+    @JvmStatic
+    fun XFileSpec.toKotlinPoet() =
+        when (this) {
+            is XFileSpecImpl -> kotlin.actual
+            is KotlinFileSpec -> actual
+            else -> error("Unsupported type: ${this.javaClass}")
+        }
+
+    @JvmStatic
+    fun XFileSpec.Builder.toKotlinPoet() =
+        when (this) {
+            is XFileSpecImpl.Builder -> kotlin.actual
+            is KotlinFileSpec.Builder -> actual
             else -> error("Unsupported type: ${this.javaClass}")
         }
 
@@ -393,6 +433,20 @@ object XConverters {
         )
 
     @JvmStatic
+    fun toXPoet(jFileSpec: JFileSpec, kFileSpec: KFileSpec): XFileSpec =
+        XFileSpecImpl(JavaFileSpec(jFileSpec), KotlinFileSpec(kFileSpec))
+
+    @JvmStatic
+    fun toXPoet(
+        jFileSpecBuilder: JFileSpecBuilder,
+        kFileSpecBuilder: KFileSpecBuilder
+    ): XFileSpec.Builder =
+        XFileSpecImpl.Builder(
+            JavaFileSpec.Builder(jFileSpecBuilder),
+            KotlinFileSpec.Builder(kFileSpecBuilder)
+        )
+
+    @JvmStatic
     fun XAnnotationSpec.Builder.applyToJavaPoet(block: JAnnotationSpecBuilder.() -> Unit) = apply {
         if (this is XAnnotationSpecImpl.Builder || this is JavaAnnotationSpec.Builder) {
             toJavaPoet().block()
@@ -430,6 +484,13 @@ object XConverters {
     @JvmStatic
     fun XTypeSpec.Builder.applyToJavaPoet(block: JTypeSpecBuilder.() -> Unit) = apply {
         if (this is XTypeSpecImpl.Builder || this is JavaTypeSpec.Builder) {
+            toJavaPoet().block()
+        }
+    }
+
+    @JvmStatic
+    fun XFileSpec.Builder.applyToJavaPoet(block: JFileSpecBuilder.() -> Unit) = apply {
+        if (this is XFileSpecImpl.Builder || this is JavaFileSpec.Builder) {
             toJavaPoet().block()
         }
     }
@@ -478,6 +539,13 @@ object XConverters {
     }
 
     @JvmStatic
+    fun XFileSpec.Builder.applyToKotlinPoet(block: KFileSpecBuilder.() -> Unit) = apply {
+        if (this is XFileSpecImpl.Builder || this is KotlinFileSpec.Builder) {
+            toKotlinPoet().block()
+        }
+    }
+
+    @JvmStatic
     fun XName.toString(language: CodeLanguage) =
         when (language) {
             CodeLanguage.JAVA -> toJavaPoet()
@@ -521,6 +589,13 @@ object XConverters {
 
     @JvmStatic
     fun XTypeSpec.toString(language: CodeLanguage) =
+        when (language) {
+            CodeLanguage.JAVA -> toJavaPoet().toString()
+            CodeLanguage.KOTLIN -> toKotlinPoet().toString()
+        }
+
+    @JvmStatic
+    fun XFileSpec.toString(language: CodeLanguage) =
         when (language) {
             CodeLanguage.JAVA -> toJavaPoet().toString()
             CodeLanguage.KOTLIN -> toKotlinPoet().toString()
