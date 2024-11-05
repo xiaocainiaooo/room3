@@ -17,7 +17,9 @@
 package androidx.appsearch.localstorage;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.annotation.RestrictTo;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.Features;
 
 /**
@@ -30,6 +32,7 @@ import androidx.appsearch.app.Features;
 public class AlwaysSupportedFeatures implements Features {
 
     @Override
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public boolean isFeatureSupported(@NonNull String feature) {
         switch (feature) {
             case Features.ADD_PERMISSIONS_AND_GET_VISIBILITY:

@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.annotation.Document;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.core.util.Preconditions;
 
 import java.lang.annotation.Retention;
@@ -35,6 +36,7 @@ import java.lang.annotation.RetentionPolicy;
  * {@link androidx.appsearch.app.PutDocumentsRequest.Builder#addTakenActions} API.
  */
 @Document(name = "builtin:TakenAction")
+@ExperimentalAppSearchApi
 public abstract class TakenAction {
     /** Default TTL for all related {@link TakenAction} documents: 60 days. */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)

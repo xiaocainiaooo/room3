@@ -22,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.annotation.Document;
 import androidx.appsearch.app.AppSearchSchema.StringPropertyConfig;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.core.util.Preconditions;
 
 /**
@@ -40,6 +41,7 @@ import androidx.core.util.Preconditions;
  * default TTL is 60 days.
  */
 @Document(name = "builtin:SearchAction")
+@ExperimentalAppSearchApi
 public class SearchAction extends TakenAction {
     @Nullable
     @Document.StringProperty(indexingType = StringPropertyConfig.INDEXING_TYPE_PREFIXES)

@@ -363,7 +363,7 @@ public final class GenericDocumentParcel extends AbstractSafeParcelable implemen
          * Sets the schema type of this document, changing the value provided in the constructor.
          *
          * <p>To successfully index a document, the schema type must match the name of an {@link
-         * AppSearchSchema} object previously provided to {@link AppSearchSession#setSchema}.
+         * AppSearchSchema} object previously provided to {@link AppSearchSession#setSchemaAsync}.
          */
         @CanIgnoreReturnValue
         @NonNull
@@ -407,7 +407,8 @@ public final class GenericDocumentParcel extends AbstractSafeParcelable implemen
          * System#currentTimeMillis} time base, the document will be auto-deleted.
          *
          * <p>The default value is 0, which means the document is permanent and won't be
-         * auto-deleted until the app is uninstalled or {@link AppSearchSession#remove} is called.
+         * auto-deleted until the app is uninstalled or {@link AppSearchSession#removeAsync} is
+         * called.
          *
          * @param ttlMillis a non-negative duration in milliseconds.
          * @throws IllegalArgumentException if ttlMillis is negative.
