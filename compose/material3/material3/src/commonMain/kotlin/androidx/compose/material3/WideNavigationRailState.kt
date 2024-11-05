@@ -156,7 +156,6 @@ internal class ModalWideNavigationRailState(
     state: WideNavigationRailState,
     density: Density,
     val animationSpec: AnimationSpec<Float>,
-    var confirmValueChange: (WideNavigationRailValue) -> Boolean = { true },
 ) : WideNavigationRailState by state {
     internal val anchoredDraggableState =
         AnchoredDraggableState(
@@ -166,7 +165,6 @@ internal class ModalWideNavigationRailState(
             positionalThreshold = { distance -> distance * 0.5f },
             velocityThreshold = { with(density) { 400.dp.toPx() } },
             animationSpec = { animationSpec },
-            confirmValueChange = confirmValueChange
         )
 
     /**
