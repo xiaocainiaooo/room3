@@ -43,6 +43,7 @@ androidXMultiplatform {
 
         commonTest {
             dependencies {
+                implementation(project(":lifecycle:lifecycle-runtime"))
                 implementation(project(":kruth:kruth"))
                 implementation(libs.kotlinTest)
                 implementation(libs.kotlinTestCommon)
@@ -172,5 +173,6 @@ androidx {
     inceptionYear = "2018"
     description = "Android Lifecycle Saved State"
     legacyDisableKotlinStrictApiMode = true
+    metalavaK2UastEnabled = false
     kotlinTarget = KotlinTarget.KOTLIN_1_9
 }
