@@ -97,7 +97,7 @@ class DragHandleTest {
     fun verticalDragHandle_customSize() {
         val customSize = DpSize(20.dp, 50.dp)
         rule.assertContentShape({ defaultVisualShape }, { customSize }, { defaultColor }) {
-            VerticalDragHandle(sizes = DragHandleDefaults.dragHandleSizes(customSize))
+            VerticalDragHandle(sizes = VerticalDragHandleDefaults.sizes(customSize))
         }
     }
 
@@ -112,7 +112,7 @@ class DragHandleTest {
             { press() }
         ) {
             VerticalDragHandle(
-                sizes = DragHandleDefaults.dragHandleSizes(pressedSize = customPressedSize)
+                sizes = VerticalDragHandleDefaults.sizes(pressedSize = customPressedSize)
             )
         }
     }
@@ -122,7 +122,7 @@ class DragHandleTest {
         val customSize = DpSize(20.dp, 50.dp)
         rule
             .setMaterialContentForSizeAssertions {
-                VerticalDragHandle(sizes = DragHandleDefaults.dragHandleSizes(customSize))
+                VerticalDragHandle(sizes = VerticalDragHandleDefaults.sizes(customSize))
             }
             .assertWidthIsEqualTo(defaultAccessibilitySize)
             .assertHeightIsEqualTo(customSize.height)
@@ -135,7 +135,7 @@ class DragHandleTest {
     fun verticalDragHandle_customShape() {
         val customShape = RectangleShape
         rule.assertContentShape({ customShape }, { defaultVisualSize }, { defaultColor }) {
-            VerticalDragHandle(shapes = DragHandleDefaults.dragHandleShapes(customShape))
+            VerticalDragHandle(shapes = VerticalDragHandleDefaults.shapes(customShape))
         }
     }
 
@@ -150,7 +150,7 @@ class DragHandleTest {
             { press() }
         ) {
             VerticalDragHandle(
-                shapes = DragHandleDefaults.dragHandleShapes(pressedShape = customPressedShape)
+                shapes = VerticalDragHandleDefaults.shapes(pressedShape = customPressedShape)
             )
         }
     }
@@ -160,7 +160,7 @@ class DragHandleTest {
     fun verticalDragHandle_customColor() {
         val customColor = Color.Red
         rule.assertContentShape({ defaultVisualShape }, { defaultVisualSize }, { customColor }) {
-            VerticalDragHandle(colors = DragHandleDefaults.dragHandleColors(customColor))
+            VerticalDragHandle(colors = VerticalDragHandleDefaults.colors(customColor))
         }
     }
 
@@ -175,7 +175,7 @@ class DragHandleTest {
             { press() }
         ) {
             VerticalDragHandle(
-                colors = DragHandleDefaults.dragHandleColors(pressedColor = customColor)
+                colors = VerticalDragHandleDefaults.colors(pressedColor = customColor)
             )
         }
     }

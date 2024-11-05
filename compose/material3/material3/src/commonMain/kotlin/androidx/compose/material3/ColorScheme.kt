@@ -475,6 +475,8 @@ class ColorScheme(
     internal var defaultElevatedFilterChipColorsCached: SelectableChipColors? = null
     internal var defaultInputChipColorsCached: SelectableChipColors? = null
 
+    internal var defaultVerticalDragHandleColorsCached: DragHandleColors? = null
+
     @OptIn(ExperimentalMaterial3Api::class)
     internal var defaultTopAppBarColorsCached: TopAppBarColors? = null
     @OptIn(ExperimentalMaterial3Api::class)
