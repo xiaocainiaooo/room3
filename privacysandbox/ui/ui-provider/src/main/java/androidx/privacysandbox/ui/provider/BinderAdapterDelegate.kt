@@ -118,6 +118,7 @@ private class BinderAdapterDelegate(
         private const val FRAME_TIMEOUT_MILLIS = 1000.toLong()
     }
 
+    /** Called in local mode via reflection. */
     override fun openSession(
         context: Context,
         windowInputToken: IBinder,
@@ -127,21 +128,28 @@ private class BinderAdapterDelegate(
         clientExecutor: Executor,
         client: SandboxedUiAdapter.SessionClient
     ) {
-        adapter.openSession(
-            context,
-            windowInputToken,
-            initialWidth,
-            initialHeight,
-            isZOrderOnTop,
-            clientExecutor,
-            SessionClientForObservers(client)
-        )
+        MainThreadExecutor.execute {
+            val displayManager =
+                sandboxContext.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+            val display = displayManager.getDisplay(Display.DEFAULT_DISPLAY)
+            val displayContext = sandboxContext.createDisplayContext(display)
+            openSessionInternal(
+                displayContext,
+                windowInputToken,
+                initialWidth,
+                initialHeight,
+                isZOrderOnTop,
+                clientExecutor,
+                client
+            )
+        }
     }
 
     override fun addObserverFactory(sessionObserverFactory: SessionObserverFactory) {}
 
     override fun removeObserverFactory(sessionObserverFactory: SessionObserverFactory) {}
 
+    /** Called in remote mode via binder call. */
     override fun openRemoteSession(
         windowInputToken: IBinder,
         displayId: Int,
@@ -155,8 +163,7 @@ private class BinderAdapterDelegate(
             return
         }
 
-        val mHandler = Handler(Looper.getMainLooper())
-        mHandler.post {
+        MainThreadExecutor.execute {
             try {
                 val displayManager =
                     sandboxContext.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
@@ -178,13 +185,13 @@ private class BinderAdapterDelegate(
                         errorHandler = { remoteSessionClient.onRemoteSessionError(it.message) }
                     )
 
-                openSession(
+                openSessionInternal(
                     displayContext,
                     windowInputToken,
                     initialWidth,
                     initialHeight,
                     isZOrderOnTop,
-                    MainThreadExecutor(mHandler),
+                    MainThreadExecutor,
                     deferredClient
                 )
 
@@ -195,10 +202,32 @@ private class BinderAdapterDelegate(
         }
     }
 
+    private fun openSessionInternal(
+        context: Context,
+        windowInputToken: IBinder,
+        initialWidth: Int,
+        initialHeight: Int,
+        isZOrderOnTop: Boolean,
+        clientExecutor: Executor,
+        client: SandboxedUiAdapter.SessionClient
+    ) {
+        adapter.openSession(
+            context,
+            windowInputToken,
+            initialWidth,
+            initialHeight,
+            isZOrderOnTop,
+            clientExecutor,
+            SessionClientForObservers(client)
+        )
+    }
+
     /** Avoiding all potential concurrency issues by executing callback only on main thread. */
-    private class MainThreadExecutor(private val mainHandler: Handler) : Executor {
+    private object MainThreadExecutor : Executor {
+        private val mainHandler = Handler(Looper.getMainLooper())
+
         override fun execute(command: Runnable) {
-            if (Looper.getMainLooper() == Looper.myLooper()) {
+            if (mainHandler.looper == Looper.myLooper()) {
                 command.run()
             } else {
                 mainHandler.post(command)
