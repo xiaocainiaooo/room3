@@ -26,10 +26,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,6 +55,7 @@ import androidx.wear.compose.material3.Slider
 import androidx.wear.compose.material3.SliderDefaults
 import androidx.wear.compose.material3.SwitchButton
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.samples.CircularProgressIndicatorContentSample
 import androidx.wear.compose.material3.samples.FullScreenProgressIndicatorSample
 import androidx.wear.compose.material3.samples.IndeterminateProgressArcSample
 import androidx.wear.compose.material3.samples.IndeterminateProgressIndicatorSample
@@ -110,6 +113,9 @@ val ProgressIndicatorDemos =
                 ComposableDemo("Customize") {
                     Centralize { CircularProgressCustomisableFullScreenDemo() }
                 },
+                ComposableDemo("Custom animation") {
+                    Centralize { CircularProgressIndicatorContentSample() }
+                },
             )
         ),
         Material3DemoCategory(
@@ -122,11 +128,11 @@ val ProgressIndicatorDemos =
                 ComposableDemo("Small size") {
                     Centralize { SmallSegmentedProgressIndicatorSample() }
                 },
-                ComposableDemo("Customize") {
-                    Centralize { SegmentedProgressCustomisableFullScreenDemo() }
-                },
                 ComposableDemo("Binary with switch") {
                     Centralize { SegmentedProgressIndicatorBinarySwitchDemo() }
+                },
+                ComposableDemo("Customize") {
+                    Centralize { SegmentedProgressCustomisableFullScreenDemo() }
                 },
             )
         ),
@@ -439,7 +445,7 @@ fun ProgressIndicatorCustomizer(
 
 @Composable
 fun SegmentedProgressIndicatorBinarySwitchDemo() {
-    val isEven = remember { mutableStateOf(true) }
+    var isEven by remember { mutableStateOf(true) }
     Box(
         modifier =
             Modifier.background(MaterialTheme.colorScheme.background)
@@ -448,13 +454,13 @@ fun SegmentedProgressIndicatorBinarySwitchDemo() {
     ) {
         SwitchButton(
             modifier = Modifier.align(Alignment.Center),
-            checked = isEven.value,
-            onCheckedChange = { isEven.value = it },
-            label = { Text("Toggle") },
+            checked = isEven,
+            onCheckedChange = { isEven = it },
+            label = { Text(if (isEven) "Even" else "Odd") },
         )
         SegmentedCircularProgressIndicator(
             segmentCount = 6,
-            segmentValue = if (isEven.value) { it -> it % 2 != 0 } else { it -> it % 2 != 1 },
+            segmentValue = if (isEven) { it -> it % 2 != 0 } else { it -> it % 2 != 1 },
         )
     }
 }
