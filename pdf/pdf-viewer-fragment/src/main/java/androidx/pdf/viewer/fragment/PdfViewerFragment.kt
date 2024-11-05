@@ -151,7 +151,6 @@ public open class PdfViewerFragment : Fragment() {
     private var annotationButton: FloatingActionButton? = null
     private var fileData: DisplayData? = null
     private var isFileRestoring: Boolean = false
-    private var shouldRedrawOnDocumentLoaded = false
     private var isAnnotationIntentResolvable = false
     private var documentLoaded = false
 
@@ -353,9 +352,6 @@ public open class PdfViewerFragment : Fragment() {
                 onDocumentLoaded = {
                     documentLoaded = true
                     onLoadDocumentSuccess()
-                    if (shouldRedrawOnDocumentLoaded) {
-                        shouldRedrawOnDocumentLoaded = false
-                    }
                     annotationButton?.let {
                         if ((savedInstanceState == null) && isAnnotationIntentResolvable) {
                             onRequestImmersiveMode(false)
