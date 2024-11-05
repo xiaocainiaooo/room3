@@ -287,7 +287,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             return this;
         }
 
-        /** Adds a property to the given type. */
+        /** Adds a property to the schema type. */
         @CanIgnoreReturnValue
         @NonNull
         public AppSearchSchema.Builder addProperty(@NonNull PropertyConfig propertyConfig) {
@@ -302,7 +302,8 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
         }
 
         /**
-         * Clears all properties from the given type.
+         * Clears all properties added through {@link #addProperty(PropertyConfig)} from the schema
+         * type.
          */
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
@@ -315,7 +316,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
         }
 
         /**
-         * Adds a parent type to the given type for polymorphism, so that the given type will be
+         * Adds a parent type to the schema type for polymorphism, so that the schema type will be
          * considered as a subtype of {@code parentSchemaType}.
          *
          * <p>Subtype relations are automatically considered transitive, so callers are only
@@ -386,7 +387,8 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
         }
 
         /**
-         * Clears all parent types from the given type.
+         * Clears all parent types added through {@link #addParentType(String)} from the schema
+         * type.
          */
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
