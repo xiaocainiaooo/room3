@@ -466,5 +466,14 @@ class PerfettoTraceProcessor {
 
 /** Helper for fuzzy matching process name to package */
 internal fun processNameLikePkg(pkg: String): String {
-    return """(process.name LIKE "$pkg" OR process.name LIKE "$pkg:%")"""
+    // check for truncated package names, which can sometimes occur if perfetto can't capture full
+    // names, and only has 16 bytes from sched info (which results in 15 chars due to null
+    // termination)
+    val truncated =
+        if (pkg.length > 15) {
+            " OR process.name LIKE \"${pkg.takeLast(15)}\""
+        } else {
+            ""
+        }
+    return """(process.name LIKE "$pkg" OR process.name LIKE "$pkg:%"$truncated)"""
 }
