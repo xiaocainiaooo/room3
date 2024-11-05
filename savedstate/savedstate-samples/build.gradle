@@ -34,12 +34,14 @@ plugins {
 
 dependencies {
     api(libs.kotlinStdlib)
+    implementation(project(":activity:activity-ktx"))
     implementation(project(":savedstate:savedstate"))
     compileOnly(project(":annotation:annotation-sampled"))
     implementation(libs.kotlinSerializationCore)
 }
 
 android {
+    compileSdk 35
     namespace "androidx.savedstate.samples"
 }
 
