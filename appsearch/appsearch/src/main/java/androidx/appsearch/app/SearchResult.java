@@ -119,11 +119,11 @@ public final class SearchResult extends AbstractSafeParcelable {
      * <p>This is equivalent to calling {@code getGenericDocument().toDocumentClass(T.class)}.
      *
      * @param documentClass the document class to be passed to
-     *                      {@link GenericDocument#toDocumentClass(Class)}.
+     *                      {@link GenericDocument#toDocumentClass}.
      * @return Document object which matched the query.
      * @throws AppSearchException if no factory for this document class could be found on the
      *       classpath.
-     * @see GenericDocument#toDocumentClass(Class)
+     * @see GenericDocument#toDocumentClass
      */
     @NonNull
     public <T> T getDocument(@NonNull java.lang.Class<T> documentClass) throws AppSearchException {
@@ -137,13 +137,13 @@ public final class SearchResult extends AbstractSafeParcelable {
      * documentClassMap)}.
      *
      * @param documentClass the document class to be passed to
-     *                      {@link GenericDocument#toDocumentClass(Class, Map)}.
+     *                      {@link GenericDocument#toDocumentClass}.
      * @param documentClassMap the document class map to be passed to
-     *                         {@link GenericDocument#toDocumentClass(Class, Map)}.
+     *                         {@link GenericDocument#toDocumentClass}.
      * @return Document object which matched the query.
      * @throws AppSearchException if no factory for this document class could be found on the
      *                            classpath.
-     * @see GenericDocument#toDocumentClass(Class, Map)
+     * @see GenericDocument#toDocumentClass
      */
     @NonNull
     public <T> T getDocument(@NonNull java.lang.Class<T> documentClass,

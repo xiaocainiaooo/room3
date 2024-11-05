@@ -126,6 +126,7 @@ public interface Features {
      * {@link AppSearchSchema#getDescription} and
      * {@link AppSearchSchema.PropertyConfig#getDescription}.
      */
+    @ExperimentalAppSearchApi
     String SCHEMA_SET_DESCRIPTION = "SCHEMA_SET_DESCRIPTION";
 
     /**
@@ -241,6 +242,7 @@ public interface Features {
     // TODO(b/273591938) improve the java doc when we support set blob property in GenericDocument
     // TODO(b/273591938) unhide the API once it read for API review.
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @ExperimentalAppSearchApi
     String BLOB_STORAGE = "BLOB_STORAGE";
 
     /**

@@ -180,6 +180,7 @@ public final class PutDocumentsRequest {
         @SuppressWarnings("MissingGetterMatchingBuilder")
         @CanIgnoreReturnValue
         @NonNull
+        @ExperimentalAppSearchApi
         public Builder addTakenActions(
                 @NonNull TakenAction... takenActions) throws AppSearchException {
             Preconditions.checkNotNull(takenActions);
@@ -198,6 +199,7 @@ public final class PutDocumentsRequest {
         @SuppressWarnings("MissingGetterMatchingBuilder")
         @CanIgnoreReturnValue
         @NonNull
+        @ExperimentalAppSearchApi
         public Builder addTakenActions(@NonNull Collection<? extends TakenAction> takenActions)
                 throws AppSearchException {
             Preconditions.checkNotNull(takenActions);

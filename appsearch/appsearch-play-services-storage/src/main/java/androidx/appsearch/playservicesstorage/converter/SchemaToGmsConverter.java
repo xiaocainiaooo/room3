@@ -17,8 +17,10 @@
 package androidx.appsearch.playservicesstorage.converter;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.app.AppSearchSchema;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.Features;
 import androidx.core.util.Preconditions;
 
@@ -39,6 +41,7 @@ public final class SchemaToGmsConverter {
      * {@link com.google.android.gms.appsearch.AppSearchSchema}.
      */
     @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public static com.google.android.gms.appsearch.AppSearchSchema toGmsSchema(
             @NonNull AppSearchSchema jetpackSchema) {
         Preconditions.checkNotNull(jetpackSchema);
@@ -92,6 +95,7 @@ public final class SchemaToGmsConverter {
     }
 
     @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     private static com.google.android.gms.appsearch.AppSearchSchema.PropertyConfig toGmsProperty(
             @NonNull AppSearchSchema.PropertyConfig jetpackProperty) {
         Preconditions.checkNotNull(jetpackProperty);

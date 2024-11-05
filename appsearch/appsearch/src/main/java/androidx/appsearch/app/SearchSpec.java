@@ -74,6 +74,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
      * @deprecated use {@link #SCHEMA_TYPE_WILDCARD} instead.
      */
     @Deprecated
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public static final String PROJECTION_SCHEMA_TYPE_WILDCARD = "*";
 
     /**
