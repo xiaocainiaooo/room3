@@ -993,18 +993,6 @@ sealed interface Composer {
      * not execute if parameter has not changed and the nothing else is forcing the function to
      * execute (such as its scope was invalidated or a static composition local it was changed) or
      * the composition is pausable and the composition is pausing.
-     *
-     * @param parametersChanged `true` if the parameters to the composable function have changed.
-     *   This is also `true` if the composition is [inserting] or if content is being reused.
-     * @param flags The `$changed` parameter that contains the forced recompose bit to allow the
-     *   composer to disambiguate when the parameters changed due the execution being forced or if
-     *   the parameters actually changed. This is only ambiguous in a [PausableComposition] and is
-     *   necessary to determine if the function can be paused. The bits, other than 0, are reserved
-     *   for future use (which would required the bit 31, which is unused in `$changed` values, to
-     *   be set to indicate that the flags carry additional information). Passing the `$changed`
-     *   flags directly, instead of masking the 0 bit, is more efficient as it allows less code to
-     *   be generated per call to `shouldExecute` which is every called in every restartable
-     *   function, as well as allowing for the API to be extended without a breaking changed.
      */
     @InternalComposeApi fun shouldExecute(parametersChanged: Boolean, flags: Int): Boolean
 
@@ -1378,7 +1366,7 @@ internal class ComposerImpl(
     private var insertFixups = FixupList()
 
     private var pausable: Boolean = false
-    private var shouldPauseCallback: ShouldPauseCallback? = null
+    private var shouldPauseCallback: (() -> Boolean)? = null
 
     override val applyCoroutineContext: CoroutineContext
         @TestOnly get() = parentContext.effectCoroutineContext
@@ -3094,7 +3082,7 @@ internal class ComposerImpl(
         if (((flags and 1) == 0) && (inserting || reusing)) {
             val callback = shouldPauseCallback ?: return true
             val scope = currentRecomposeScope ?: return true
-            val pausing = callback.shouldPause()
+            val pausing = callback()
             if (pausing) {
                 scope.used = true
                 // Force the composer back into the reusing state when this scope restarts.
@@ -3526,7 +3514,7 @@ internal class ComposerImpl(
     internal fun composeContent(
         invalidationsRequested: ScopeMap<RecomposeScopeImpl, Any>,
         content: @Composable () -> Unit,
-        shouldPause: ShouldPauseCallback?
+        shouldPause: (() -> Boolean)?
     ) {
         runtimeCheck(changes.isEmpty()) { "Expected applyChanges() to have been called" }
         this.shouldPauseCallback = shouldPause
@@ -3553,7 +3541,7 @@ internal class ComposerImpl(
      */
     internal fun recompose(
         invalidationsRequested: ScopeMap<RecomposeScopeImpl, Any>,
-        shouldPause: ShouldPauseCallback?
+        shouldPause: (() -> Boolean)?
     ): Boolean {
         runtimeCheck(changes.isEmpty()) { "Expected applyChanges() to have been called" }
         // even if invalidationsRequested is empty we still need to recompose if the Composer has
@@ -3917,14 +3905,14 @@ internal class ComposerImpl(
 
         override fun composeInitialPaused(
             composition: ControlledComposition,
-            shouldPause: ShouldPauseCallback,
+            shouldPause: () -> Boolean,
             content: @Composable () -> Unit
         ): ScatterSet<RecomposeScopeImpl> =
             parentContext.composeInitialPaused(composition, shouldPause, content)
 
         override fun recomposePaused(
             composition: ControlledComposition,
-            shouldPause: ShouldPauseCallback,
+            shouldPause: () -> Boolean,
             invalidScopes: ScatterSet<RecomposeScopeImpl>
         ): ScatterSet<RecomposeScopeImpl> =
             parentContext.recomposePaused(composition, shouldPause, invalidScopes)

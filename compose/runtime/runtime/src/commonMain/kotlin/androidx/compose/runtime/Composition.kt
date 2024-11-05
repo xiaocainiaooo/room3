@@ -297,20 +297,19 @@ sealed interface ControlledComposition : Composition {
      *   longer needed.
      * @see PausableComposition
      */
-    @Suppress("ExecutorRegistration")
-    fun getAndSetShouldPauseCallback(shouldPause: ShouldPauseCallback?): ShouldPauseCallback?
+    fun setShouldPauseCallback(shouldPause: (() -> Boolean)?): (() -> Boolean)?
 }
 
 /** Utility function to set and restore a should pause callback. */
 internal inline fun <R> ControlledComposition.pausable(
-    shouldPause: ShouldPauseCallback,
+    noinline shouldPause: () -> Boolean,
     block: () -> R
 ): R {
-    val previous = getAndSetShouldPauseCallback(shouldPause)
+    val previous = setShouldPauseCallback(shouldPause)
     return try {
         block()
     } finally {
-        getAndSetShouldPauseCallback(previous)
+        setShouldPauseCallback(previous)
     }
 }
 
@@ -552,7 +551,7 @@ internal class CompositionImpl(
      * If the [shouldPause] callback is set the composition is pausable and should pause whenever
      * the [shouldPause] callback returns `true`.
      */
-    private var shouldPause: ShouldPauseCallback? = null
+    private var shouldPause: (() -> Boolean)? = null
 
     private var pendingPausedComposition: PausedCompositionImpl? = null
 
@@ -1153,9 +1152,7 @@ internal class CompositionImpl(
         } else block()
     }
 
-    override fun getAndSetShouldPauseCallback(
-        shouldPause: ShouldPauseCallback?
-    ): ShouldPauseCallback? {
+    override fun setShouldPauseCallback(shouldPause: (() -> Boolean)?): (() -> Boolean)? {
         val previous = this.shouldPause
         this.shouldPause = shouldPause
         return previous
