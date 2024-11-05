@@ -108,7 +108,15 @@ internal fun Modifier.textFieldScrollable(
     }
 
 // Layout
-internal fun Modifier.textFieldScroll(
+// Expect/actual is needed due to a different implementation in uikit
+internal expect fun Modifier.textFieldScroll(
+    scrollerPosition: TextFieldScrollerPosition,
+    textFieldValue: TextFieldValue,
+    visualTransformation: VisualTransformation,
+    textLayoutResultProvider: () -> TextLayoutResultProxy?
+): Modifier
+
+internal fun Modifier.defaultTextFieldScroll(
     scrollerPosition: TextFieldScrollerPosition,
     textFieldValue: TextFieldValue,
     visualTransformation: VisualTransformation,
