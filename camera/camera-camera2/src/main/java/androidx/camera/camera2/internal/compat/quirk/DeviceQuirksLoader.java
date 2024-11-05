@@ -135,6 +135,11 @@ public class DeviceQuirksLoader {
                 PreviewUnderExposureQuirk.load())) {
             quirks.add(PreviewUnderExposureQuirk.INSTANCE);
         }
+        if (quirkSettings.shouldEnableQuirk(
+                CaptureSessionShouldUseMrirQuirk.class,
+                CaptureSessionShouldUseMrirQuirk.load())) {
+            quirks.add(new CaptureSessionShouldUseMrirQuirk());
+        }
 
         return quirks;
     }
