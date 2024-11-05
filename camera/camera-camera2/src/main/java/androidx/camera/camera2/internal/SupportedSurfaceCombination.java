@@ -184,10 +184,6 @@ final class SupportedSurfaceCombination {
             generate10BitSupportedCombinationList();
         }
 
-        if (isUltraHdrSupported()) {
-            generateUltraHdrSupportedCombinationList();
-        }
-
         mIsStreamUseCaseSupported = StreamUseCaseUtil.isStreamUseCaseSupported(mCharacteristics);
         if (mIsStreamUseCaseSupported) {
             generateStreamUseCaseSupportedCombinationList();
@@ -213,22 +209,6 @@ final class SupportedSurfaceCombination {
 
     boolean isBurstCaptureSupported() {
         return mIsBurstCaptureSupported;
-    }
-
-    private boolean isUltraHdrSupported() {
-        StreamConfigurationMapCompat mapCompat = mCharacteristics.getStreamConfigurationMapCompat();
-        int[] formats = mapCompat.getOutputFormats();
-        if (formats == null) {
-            return false;
-        }
-
-        for (int format : formats) {
-            if (format == ImageFormat.JPEG_R) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -289,6 +269,10 @@ final class SupportedSurfaceCombination {
         List<SurfaceCombination> supportedSurfaceCombinations = new ArrayList<>();
 
         if (featureSettings.isUltraHdrOn()) {
+            // Creates Ultra Hdr list only when it is needed.
+            if (mSurfaceCombinationsUltraHdr.isEmpty()) {
+                generateUltraHdrSupportedCombinationList();
+            }
             // For Ultra HDR output, only the default camera mode is currently supported.
             if (featureSettings.getCameraMode() == CameraMode.DEFAULT) {
                 supportedSurfaceCombinations.addAll(mSurfaceCombinationsUltraHdr);
