@@ -24,6 +24,7 @@ import android.os.Parcelable;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
 import androidx.annotation.RequiresFeature;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
@@ -108,6 +109,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
      *
      * @param builder the builder to append to.
      */
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     private void appendAppSearchSchemaString(@NonNull IndentingStringBuilder builder) {
         Preconditions.checkNotNull(builder);
 
@@ -153,6 +155,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
      * If {@link Builder#setDescription} is uncalled, then this method will return an empty string.
      */
     @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
+    @ExperimentalAppSearchApi
     @NonNull
     public String getDescription() {
         return mDescription;
@@ -186,6 +189,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
     }
 
     @Override
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public boolean equals(@Nullable Object other) {
         if (this == other) {
             return true;
@@ -207,6 +211,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
     }
 
     @Override
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public int hashCode() {
         return ObjectsCompat.hash(
             getSchemaType(),
@@ -240,6 +245,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
          * Creates a new {@link AppSearchSchema.Builder} from the given {@link AppSearchSchema}.
          */
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
+        @OptIn(markerClass = ExperimentalAppSearchApi.class)
         public Builder(@NonNull AppSearchSchema schema) {
             mSchemaType = schema.getSchemaType();
             mDescription = schema.getDescription();
@@ -271,6 +277,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                 enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                 name = Features.SCHEMA_SET_DESCRIPTION)
         @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
+        @ExperimentalAppSearchApi
         @CanIgnoreReturnValue
         @NonNull
         public AppSearchSchema.Builder setDescription(@NonNull String description) {
@@ -543,6 +550,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
          *
          * @param builder the builder to append to.
          */
+        @OptIn(markerClass = ExperimentalAppSearchApi.class)
         void appendPropertyConfigString(@NonNull IndentingStringBuilder builder) {
             Preconditions.checkNotNull(builder);
 
@@ -623,6 +631,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
          * string.
          */
         @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
+        @ExperimentalAppSearchApi
         @NonNull
         public String getDescription() {
             return mPropertyConfigParcel.getDescription();
@@ -676,6 +685,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
          */
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
         @NonNull
+        @OptIn(markerClass = ExperimentalAppSearchApi.class)
         public static PropertyConfig fromParcel(
                 @NonNull PropertyConfigParcel propertyConfigParcel) {
             Preconditions.checkNotNull(propertyConfigParcel);
@@ -918,6 +928,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                     enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                     name = Features.SCHEMA_SET_DESCRIPTION)
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
+            @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
             @NonNull
             public StringPropertyConfig.Builder setDescription(@NonNull String description) {
@@ -1157,6 +1168,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                     enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                     name = Features.SCHEMA_SET_DESCRIPTION)
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
+            @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
             @NonNull
             public LongPropertyConfig.Builder setDescription(@NonNull String description) {
@@ -1257,6 +1269,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                     enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                     name = Features.SCHEMA_SET_DESCRIPTION)
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
+            @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
             @NonNull
             public DoublePropertyConfig.Builder setDescription(@NonNull String description) {
@@ -1319,6 +1332,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                     enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                     name = Features.SCHEMA_SET_DESCRIPTION)
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
+            @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
             @NonNull
             public BooleanPropertyConfig.Builder setDescription(@NonNull String description) {
@@ -1381,6 +1395,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                     enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                     name = Features.SCHEMA_SET_DESCRIPTION)
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
+            @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
             @NonNull
             public BytesPropertyConfig.Builder setDescription(@NonNull String description) {
@@ -1505,6 +1520,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                     enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                     name = Features.SCHEMA_SET_DESCRIPTION)
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
+            @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
             @NonNull
             public DocumentPropertyConfig.Builder setDescription(@NonNull String description) {
@@ -1767,6 +1783,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                     enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                     name = Features.SCHEMA_SET_DESCRIPTION)
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
+            @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
             @NonNull
             public EmbeddingPropertyConfig.Builder setDescription(@NonNull String description) {

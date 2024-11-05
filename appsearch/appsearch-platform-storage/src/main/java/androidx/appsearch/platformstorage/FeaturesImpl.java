@@ -20,6 +20,8 @@ import android.os.Build;
 import android.os.ext.SdkExtensions;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.Features;
 import androidx.appsearch.platformstorage.util.AppSearchVersionUtil;
 import androidx.core.util.Preconditions;
@@ -37,6 +39,7 @@ final class FeaturesImpl implements Features {
     }
 
     @Override
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public boolean isFeatureSupported(@NonNull String feature) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             // AppSearch platform-storage is not available below Android S.

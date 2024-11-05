@@ -20,6 +20,7 @@ import android.util.Log;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.exceptions.AppSearchException;
 import androidx.appsearch.flags.FlaggedApi;
@@ -61,6 +62,7 @@ public final class AppSearchResult<ValueType> {
     })
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     @Retention(RetentionPolicy.SOURCE)
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public @interface ResultCode {}
 
     /** The call was successful. */
@@ -107,6 +109,7 @@ public final class AppSearchResult<ValueType> {
      * denylist rejections.
      */
     @FlaggedApi(Flags.FLAG_ENABLE_RESULT_DENIED_AND_RESULT_RATE_LIMITED)
+    @ExperimentalAppSearchApi
     public static final int RESULT_DENIED = 9;
 
     /**
@@ -114,14 +117,17 @@ public final class AppSearchResult<ValueType> {
      * caller is recommended to reschedule tasks with exponential backoff.
      */
     @FlaggedApi(Flags.FLAG_ENABLE_RESULT_DENIED_AND_RESULT_RATE_LIMITED)
+    @ExperimentalAppSearchApi
     public static final int RESULT_RATE_LIMITED = 10;
 
     /** The operation was timed out. */
     @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
+    @ExperimentalAppSearchApi
     public static final int RESULT_TIMED_OUT = 11;
 
     /** The operation is invalid because the resource already exists and can't be replaced.   */
     @FlaggedApi(Flags.FLAG_ENABLE_RESULT_ALREADY_EXISTS)
+    @ExperimentalAppSearchApi
     public static final int RESULT_ALREADY_EXISTS = 12;
 
     @ResultCode private final int mResultCode;

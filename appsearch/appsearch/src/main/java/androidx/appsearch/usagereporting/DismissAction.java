@@ -23,6 +23,7 @@ import androidx.annotation.RequiresFeature;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.annotation.Document;
 import androidx.appsearch.app.AppSearchSchema.StringPropertyConfig;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.Features;
 import androidx.core.util.Preconditions;
 
@@ -61,6 +62,7 @@ import androidx.core.util.Preconditions;
         enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
         name = Features.JOIN_SPEC_AND_QUALIFIED_ID)
 @Document(name = "builtin:DismissAction")
+@ExperimentalAppSearchApi
 public class DismissAction extends TakenAction {
     @Nullable
     @Document.StringProperty(indexingType = StringPropertyConfig.INDEXING_TYPE_PREFIXES)

@@ -19,8 +19,10 @@ package androidx.appsearch.localstorage.converter;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.app.AppSearchSchema;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.core.util.Preconditions;
 
 import com.google.android.icing.proto.DocumentIndexingConfig;
@@ -51,6 +53,7 @@ public final class SchemaToProtoConverter {
      */
     // TODO(b/284356266): Consider handling addition of schema name prefixes in this function.
     @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public static SchemaTypeConfigProto toSchemaTypeConfigProto(@NonNull AppSearchSchema schema,
             int version) {
         Preconditions.checkNotNull(schema);
@@ -68,6 +71,7 @@ public final class SchemaToProtoConverter {
     }
 
     @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     private static PropertyConfigProto toPropertyConfigProto(
             @NonNull AppSearchSchema.PropertyConfig property) {
         Preconditions.checkNotNull(property);
@@ -162,6 +166,7 @@ public final class SchemaToProtoConverter {
      */
     // TODO(b/284356266): Consider handling removal of schema name prefixes in this function.
     @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public static AppSearchSchema toAppSearchSchema(@NonNull SchemaTypeConfigProtoOrBuilder proto) {
         Preconditions.checkNotNull(proto);
         AppSearchSchema.Builder builder =
@@ -180,6 +185,7 @@ public final class SchemaToProtoConverter {
     }
 
     @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     private static AppSearchSchema.PropertyConfig toPropertyConfig(
             @NonNull PropertyConfigProto proto) {
         Preconditions.checkNotNull(proto);
@@ -214,6 +220,7 @@ public final class SchemaToProtoConverter {
     }
 
     @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     private static AppSearchSchema.StringPropertyConfig toStringPropertyConfig(
             @NonNull PropertyConfigProto proto) {
         AppSearchSchema.StringPropertyConfig.Builder builder =
@@ -234,6 +241,7 @@ public final class SchemaToProtoConverter {
     }
 
     @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     private static AppSearchSchema.DocumentPropertyConfig toDocumentPropertyConfig(
             @NonNull PropertyConfigProto proto) {
         AppSearchSchema.DocumentPropertyConfig.Builder builder =
@@ -249,6 +257,7 @@ public final class SchemaToProtoConverter {
     }
 
     @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     private static AppSearchSchema.LongPropertyConfig toLongPropertyConfig(
             @NonNull PropertyConfigProto proto) {
         AppSearchSchema.LongPropertyConfig.Builder builder =
@@ -265,6 +274,7 @@ public final class SchemaToProtoConverter {
     }
 
     @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     private static AppSearchSchema.EmbeddingPropertyConfig toEmbeddingPropertyConfig(
             @NonNull PropertyConfigProto proto) {
         AppSearchSchema.EmbeddingPropertyConfig.Builder builder =
