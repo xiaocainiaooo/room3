@@ -209,4 +209,92 @@ public final class SemanticSearchNode implements FunctionNode {
                 "Embedding search metric type");
         mDistanceMetric = distanceMetric;
     }
+
+    /**
+     * Get the query string representation of {@link SemanticSearchNode}.
+     *
+     * <p>The query string representation will be the function name, followed by the fields of
+     * {@link SemanticSearchNode} as arguments, surrounded by parentheses,
+     * but formatted in the following way:
+     * <ul>
+     *     <li>The vector index will appear as an argument to the function `getEmbeddingParameter`.
+     *     <li>The lower bound and upper bound will appear unchanged.
+     *     <li>The distance metric will be mapped to its corresponding string literal
+     *     representation. For example, if the distance metric is 1, then the corresponding string
+     *     literal would be {@code "COSINE"}.
+     * </ul>
+     * For example, the node
+     * {@code SemanticSearchNode(0, -1.5f, 2, SearchSpec.EMBEDDING_SEARCH_METRIC_TYPE_COSINE)} will
+     * look like `semanticSearch(getEmbeddingParameter(0), -1.5, 2, "COSINE")`
+     *
+     * <p>If possible, default parameters will be left out of the query string. For example the node
+     * {@code SemanticSearchNode(0)} will look like `semanticSearch(getEmbeddingParameter(0))`.
+     * However if some defaults are set and unset, the defaults will be included in the query
+     * string. For example, if the user does something like this:
+     *
+     * <pre>{@code
+     * SemanticSearchNode semanticSearchNode = new SemanticSearchNode(0, -1, 1);
+     * semanticSearchNode.setBounds(Float.NEGATIVE_INFINITY, 1);
+     * }</pre>
+     *
+     * Then the query string will look like
+     * `semanticSearch(getEmbeddingParameter(0), -Float.MAX_VALUE, 1)` where
+     * {@code Float.MAX_VALUE} is the max value of float.
+     */
+    @NonNull
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder(FunctionNode.FUNCTION_NAME_SEMANTIC_SEARCH);
+        builder.append("(getEmbeddingParameter(");
+        builder.append(mVectorIndex);
+        builder.append(")");
+        if (mDistanceMetric != SearchSpec.EMBEDDING_SEARCH_METRIC_TYPE_DEFAULT) {
+            // String will look like
+            // semanticSearch(vectorIndex, lowerBound, upperBound, distanceMetric)
+            formatBound(builder, mLowerBound);
+            formatBound(builder, mUpperBound);
+            builder.append(", ");
+            builder.append(getEmbeddingMetricString());
+        } else if (mUpperBound != Float.POSITIVE_INFINITY) {
+            // String will look like semanticSearch(vectorIndex, lowerBound, upperBound)
+            formatBound(builder, mLowerBound);
+            formatBound(builder, mUpperBound);
+        } else if (mLowerBound != Float.NEGATIVE_INFINITY) {
+            // String will look like semanticSearch(vectorIndex, lowerBound)
+            formatBound(builder, mLowerBound);
+        }
+        builder.append(")");
+        return builder.toString();
+    }
+
+    /**
+     * Formats the bounds for semantic search query strings. If the bound is finite, no formatting
+     * is done. If the bound is infinite, the max value of float will be returned.
+     */
+    private void formatBound(StringBuilder builder, float bound) {
+        builder.append(", ");
+        if (Float.isFinite(bound)) {
+            builder.append(bound);
+        } else if (bound == Float.NEGATIVE_INFINITY) {
+            builder.append(-Float.MAX_VALUE);
+        } else {
+            builder.append(Float.MAX_VALUE);
+        }
+    }
+
+    /**
+     * Returns the name of the embedding metric that the {@link SemanticSearchNode} is using to
+     * calculate similarity.
+     */
+    private String getEmbeddingMetricString() {
+        switch (mDistanceMetric) {
+            case SearchSpec.EMBEDDING_SEARCH_METRIC_TYPE_COSINE:
+                return "\"COSINE\"";
+            case SearchSpec.EMBEDDING_SEARCH_METRIC_TYPE_DOT_PRODUCT:
+                return "\"DOT_PRODUCT\"";
+            case SearchSpec.EMBEDDING_SEARCH_METRIC_TYPE_EUCLIDEAN:
+                return "\"EUCLIDEAN\"";
+        }
+        throw new IllegalStateException("Invalid Metric Type");
+    }
 }
