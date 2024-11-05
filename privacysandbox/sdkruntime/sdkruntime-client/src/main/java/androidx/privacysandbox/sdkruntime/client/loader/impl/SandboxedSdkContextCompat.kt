@@ -20,7 +20,9 @@ import android.content.SharedPreferences
 import android.database.DatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
 import android.os.Build
+import android.os.Bundle
 import android.view.ContextThemeWrapper
+import android.view.Display
 import androidx.annotation.RequiresApi
 import androidx.core.content.res.ResourcesCompat
 import java.io.File
@@ -55,6 +57,32 @@ internal class SandboxedSdkContextCompat(
     override fun createDeviceProtectedStorageContext(): Context {
         return SandboxedSdkContextCompat(
             Api24.createDeviceProtectedStorageContext(baseContext),
+            sdkPackageName,
+            classLoader
+        )
+    }
+
+    override fun createDisplayContext(display: Display): Context {
+        return SandboxedSdkContextCompat(
+            baseContext.createDisplayContext(display),
+            sdkPackageName,
+            classLoader
+        )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    override fun createWindowContext(type: Int, options: Bundle?): Context {
+        return SandboxedSdkContextCompat(
+            Api30.createWindowContext(baseContext, type, options),
+            sdkPackageName,
+            classLoader
+        )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    override fun createWindowContext(display: Display, type: Int, options: Bundle?): Context {
+        return SandboxedSdkContextCompat(
+            Api31.createWindowContext(baseContext, display, type, options),
             sdkPackageName,
             classLoader
         )
@@ -259,6 +287,22 @@ internal class SandboxedSdkContextCompat(
 
         fun deleteSharedPreferences(context: Context, name: String): Boolean =
             context.deleteSharedPreferences(name)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private object Api30 {
+        fun createWindowContext(context: Context, type: Int, options: Bundle?): Context =
+            context.createWindowContext(type, options)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private object Api31 {
+        fun createWindowContext(
+            context: Context,
+            display: Display,
+            type: Int,
+            options: Bundle?
+        ): Context = context.createWindowContext(display, type, options)
     }
 
     private companion object {
