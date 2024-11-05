@@ -101,6 +101,14 @@ package androidx.appsearch.app {
     method public androidx.appsearch.app.AppSearchBatchResult.Builder<KeyType!,ValueType!> setSuccess(KeyType, ValueType?);
   }
 
+  @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public final class AppSearchBlobHandle {
+    method public static androidx.appsearch.app.AppSearchBlobHandle createWithSha256(byte[], String, String, String);
+    method public String getDatabaseName();
+    method public String getNamespace();
+    method public String getPackageName();
+    method public byte[] getSha256Digest();
+  }
+
   @AnyThread public abstract class AppSearchDocumentClassMap {
     ctor public AppSearchDocumentClassMap();
     method @WorkerThread public static java.util.Map<java.lang.String!,java.util.List<java.lang.String!>!> getGlobalMap();
