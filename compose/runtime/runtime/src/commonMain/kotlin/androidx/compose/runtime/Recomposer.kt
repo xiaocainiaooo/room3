@@ -1163,7 +1163,7 @@ class Recomposer(effectCoroutineContext: CoroutineContext) : CompositionContext(
 
     internal override fun composeInitialPaused(
         composition: ControlledComposition,
-        shouldPause: ShouldPauseCallback,
+        shouldPause: () -> Boolean,
         content: @Composable () -> Unit
     ): ScatterSet<RecomposeScopeImpl> {
         return try {
@@ -1178,7 +1178,7 @@ class Recomposer(effectCoroutineContext: CoroutineContext) : CompositionContext(
 
     internal override fun recomposePaused(
         composition: ControlledComposition,
-        shouldPause: ShouldPauseCallback,
+        shouldPause: () -> Boolean,
         invalidScopes: ScatterSet<RecomposeScopeImpl>
     ): ScatterSet<RecomposeScopeImpl> {
         return try {

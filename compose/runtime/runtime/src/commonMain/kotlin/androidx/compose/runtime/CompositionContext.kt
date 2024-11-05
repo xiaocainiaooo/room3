@@ -55,13 +55,13 @@ abstract class CompositionContext internal constructor() {
 
     internal abstract fun composeInitialPaused(
         composition: ControlledComposition,
-        shouldPause: ShouldPauseCallback,
+        shouldPause: () -> Boolean,
         content: @Composable () -> Unit
     ): ScatterSet<RecomposeScopeImpl>
 
     internal abstract fun recomposePaused(
         composition: ControlledComposition,
-        shouldPause: ShouldPauseCallback,
+        shouldPause: () -> Boolean,
         invalidScopes: ScatterSet<RecomposeScopeImpl>
     ): ScatterSet<RecomposeScopeImpl>
 
