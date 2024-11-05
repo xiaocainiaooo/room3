@@ -36,6 +36,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.browser.customtabs.CustomTabsIntent;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -155,5 +156,14 @@ public class AuthTabIntentTest {
         AuthTabIntent.AuthResult result = contract.parseResult(100, intent);
         assertEquals(RESULT_UNKNOWN_CODE, result.resultCode);
         assertNull(result.resultUri);
+    }
+
+    @Test
+    public void testPutsEphemeralBrowsing() {
+        Intent intent = new AuthTabIntent.Builder()
+                .setEphemeralBrowsingEnabled(true)
+                .build()
+                .intent;
+        assertTrue(intent.getBooleanExtra(CustomTabsIntent.EXTRA_ENABLE_EPHEMERAL_BROWSING, false));
     }
 }
