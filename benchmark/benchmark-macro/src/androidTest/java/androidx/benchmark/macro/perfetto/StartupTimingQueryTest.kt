@@ -126,7 +126,7 @@ class StartupTimingQueryTest {
         )
 
     /**
-     * Validate that StartupTimingQuery returns null and doesn't crash when process name truncated
+     * Validate that StartupTimingQuery successfully captures metrics when process name truncated
      */
     @Test
     fun fixedApi29ColdProcessNameTruncated() =
@@ -134,6 +134,11 @@ class StartupTimingQueryTest {
             api = 29,
             startupMode = StartupMode.COLD,
             tracePrefix = "api29_cold_startup_processname_truncated",
-            expectedMetrics = null // process name is truncated, and we currently don't handle this
+            expectedMetrics =
+                StartupTimingQuery.SubMetrics(
+                    timeToInitialDisplayNs = 145119546,
+                    timeToFullDisplayNs = null,
+                    timelineRangeNs = 935014155850..935159275396
+                )
         )
 }
