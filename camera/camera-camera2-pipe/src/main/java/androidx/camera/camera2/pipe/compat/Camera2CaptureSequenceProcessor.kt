@@ -114,9 +114,10 @@ internal class Camera2CaptureSequenceProcessor(
         isRepeating: Boolean,
         requests: List<Request>,
         defaultParameters: Map<*, Any?>,
+        graphParameters: Map<*, Any?>,
         requiredParameters: Map<*, Any?>,
-        listeners: List<Request.Listener>,
-        sequenceListener: CaptureSequence.CaptureSequenceListener
+        sequenceListener: CaptureSequence.CaptureSequenceListener,
+        listeners: List<Request.Listener>
     ): Camera2CaptureSequence? {
         val requestList = ArrayList<Camera2RequestMetadata>(requests.size)
         val captureRequests = ArrayList<CaptureRequest>(requests.size)
@@ -186,6 +187,9 @@ internal class Camera2CaptureSequenceProcessor(
                 // Apply default parameters to the builder first.
                 requestBuilder.writeParameters(defaultParameters)
 
+                // Apply CameraGraph parameters to the builder.
+                requestBuilder.writeParameters(graphParameters)
+
                 // Apply request parameters to the builder.
                 requestBuilder.writeParameters(request.parameters)
 
@@ -231,6 +235,7 @@ internal class Camera2CaptureSequenceProcessor(
                             session,
                             highSpeedRequestList[0],
                             defaultParameters,
+                            graphParameters,
                             requiredParameters,
                             streamToSurfaceMap,
                             requestTemplate,
@@ -249,6 +254,7 @@ internal class Camera2CaptureSequenceProcessor(
                                 session,
                                 highSpeedRequestList[i],
                                 defaultParameters,
+                                graphParameters,
                                 requiredParameters,
                                 streamToSurfaceMap,
                                 requestTemplate,
@@ -267,6 +273,7 @@ internal class Camera2CaptureSequenceProcessor(
                         session,
                         captureRequest,
                         defaultParameters,
+                        graphParameters,
                         requiredParameters,
                         streamToSurfaceMap,
                         requestTemplate,
@@ -596,6 +603,7 @@ internal class Camera2RequestMetadata(
     private val cameraCaptureSessionWrapper: CameraCaptureSessionWrapper,
     private val captureRequest: CaptureRequest,
     private val defaultParameters: Map<*, Any?>,
+    private val graphParameters: Map<*, Any?>,
     private val requiredParameters: Map<*, Any?>,
     override val streams: Map<StreamId, Surface>,
     override val template: RequestTemplate,
@@ -615,6 +623,9 @@ internal class Camera2RequestMetadata(
             }
             request.extras.containsKey(key) -> {
                 request.extras[key] as T?
+            }
+            graphParameters.containsKey(key) -> {
+                graphParameters[key] as T?
             }
             else -> {
                 defaultParameters[key] as T?

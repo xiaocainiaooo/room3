@@ -115,8 +115,9 @@ private constructor(
         isRepeating: Boolean,
         requests: List<Request>,
         defaultParameters: Map<*, Any?>,
+        graphParameters: Map<*, Any?>,
         requiredParameters: Map<*, Any?>,
-        listeners: List<Request.Listener>,
+        listeners: List<Request.Listener>
     ): Boolean {
         // Reject incoming requests if this instance has been stopped or closed.
         if (closed.value) {
@@ -131,9 +132,10 @@ private constructor(
                     isRepeating,
                     requests,
                     defaultParameters,
+                    graphParameters,
                     requiredParameters,
-                    listeners,
-                    activeBurstListener
+                    activeBurstListener,
+                    listeners
                 )
             }
 
