@@ -124,6 +124,11 @@ package androidx.glance.appwidget {
     method @androidx.compose.runtime.Composable public static void LinearProgressIndicator(float progress, optional androidx.glance.GlanceModifier modifier, optional androidx.glance.unit.ColorProvider color, optional androidx.glance.unit.ColorProvider backgroundColor);
   }
 
+  public class MyPackageReplacedReceiver extends android.content.BroadcastReceiver {
+    ctor public MyPackageReplacedReceiver();
+    method public void onReceive(android.content.Context? context, android.content.Intent? intent);
+  }
+
   public sealed interface PreviewSizeMode extends androidx.glance.appwidget.SizeMode {
   }
 
