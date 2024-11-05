@@ -26,16 +26,46 @@ import androidx.build.LibraryType
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
+    id("androidx.stableaidl")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-android")
 }
 
 dependencies {
     api(libs.kotlinStdlib)
-    // Add dependencies here
+    api(project(":pdf:pdf-viewer"))
+    api("androidx.core:core:1.13.1")
+
+    androidTestImplementation(libs.testExtJunit)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.testCore)
+    androidTestImplementation(libs.testRules)
+    androidTestImplementation(libs.testRunner)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.mockitoCore)
+    androidTestImplementation(libs.dexmakerMockito)
+    androidTestImplementation(libs.truth)
+    androidTestImplementation(libs.espressoCore)
 }
 
 android {
     namespace "androidx.pdf.document.service"
+
+    defaultConfig {
+        minSdk 31
+        compileSdk 35
+    }
+
+    buildFeatures.aidl = true
+
+    buildTypes.configureEach {
+        stableAidl {
+            version 1
+        }
+    }
+
+    // Use Robolectric 4.+
+    testOptions.unitTests.includeAndroidResources = true
 }
 
 androidx {
