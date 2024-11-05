@@ -18,19 +18,11 @@
 
     <application>
         <service
-            android:name="androidx.pdf.service.PdfDocumentService"
+            android:name="androidx.pdf.service.PdfDocumentServiceImpl"
             android:isolatedProcess="true"
             android:exported="false"
             tools:ignore="MissingServiceExportedEqualsTrue" />
 
     </application>
-
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.VIEW" />
-            <category android:name="android.intent.category.BROWSABLE" />
-            <data android:scheme="https" />
-        </intent>
-    </queries>
-
 </manifest>
+

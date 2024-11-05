@@ -46,6 +46,7 @@ dependencies {
     androidTestImplementation(libs.dexmakerMockito)
     androidTestImplementation(libs.truth)
     androidTestImplementation(libs.espressoCore)
+    androidTestImplementation(libs.kotlinCoroutinesTest)
 }
 
 android {
