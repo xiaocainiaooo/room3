@@ -31,6 +31,7 @@ import com.google.android.gms.nearby.uwb.RangingSessionCallback
 import com.google.android.gms.nearby.uwb.UwbClient
 import com.google.android.gms.nearby.uwb.UwbComplexChannel
 import com.google.android.gms.nearby.uwb.UwbDevice
+import com.google.android.gms.nearby.uwb.UwbRangeDataNtfConfig
 import com.google.android.gms.nearby.uwb.UwbStatusCodes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -126,7 +127,7 @@ internal open class UwbClientSessionScopeImpl(
             }
         parametersBuilder.setSlotDuration(slotDuration)
         if (parameters.uwbRangeDataNtfConfig != null) {
-            val ntfConfig = com.google.android.gms.nearby.uwb.UwbRangeDataNtfConfig.Builder()
+            val ntfConfig = UwbRangeDataNtfConfig.Builder()
             ntfConfig.setRangeDataConfigType(parameters.uwbRangeDataNtfConfig.configType)
             ntfConfig.setNtfProximityNear(parameters.uwbRangeDataNtfConfig.ntfProximityNearCm)
             ntfConfig.setNtfProximityFar(parameters.uwbRangeDataNtfConfig.ntfProximityFarCm)

@@ -20,6 +20,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import androidx.core.uwb.RangingCapabilities
@@ -28,12 +29,15 @@ import androidx.core.uwb.RangingParameters.Companion.CONFIG_PROVISIONED_MULTICAS
 import androidx.core.uwb.RangingParameters.Companion.CONFIG_PROVISIONED_UNICAST_DS_TWR
 import androidx.core.uwb.RangingParameters.Companion.CONFIG_UNICAST_DS_TWR
 import androidx.core.uwb.UwbAddress
+import androidx.core.uwb.UwbAvailabilityCallback
 import androidx.core.uwb.UwbClientSessionScope
 import androidx.core.uwb.UwbComplexChannel
 import androidx.core.uwb.UwbControleeSessionScope
 import androidx.core.uwb.UwbControllerSessionScope
 import androidx.core.uwb.UwbManager
 import androidx.core.uwb.backend.IUwb
+import androidx.core.uwb.backend.IUwbAvailabilityObserver
+import androidx.core.uwb.backend.IUwbClient
 import androidx.core.uwb.exceptions.UwbServiceNotAvailableException
 import androidx.core.uwb.helper.checkSystemFeature
 import androidx.core.uwb.helper.handleApiException
@@ -41,6 +45,8 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.nearby.Nearby
+import com.google.android.gms.nearby.uwb.UwbClient
+import java.util.concurrent.Executor
 import kotlinx.coroutines.tasks.await
 
 internal class UwbManagerImpl(private val context: Context) : UwbManager {
@@ -54,6 +60,8 @@ internal class UwbManagerImpl(private val context: Context) : UwbManager {
                 CONFIG_PROVISIONED_MULTICAST_DS_TWR
             )
         var iUwb: IUwb? = null
+        var aospAvailabilityClient: IUwbClient? = null
+        var gmsAvailabilityClient: UwbClient? = null
     }
 
     init {
@@ -206,6 +214,50 @@ internal class UwbManagerImpl(private val context: Context) : UwbManager {
             }
         } catch (e: Exception) {
             throw e
+        }
+    }
+
+    override fun setUwbAvailabilityCallback(executor: Executor, observer: UwbAvailabilityCallback) {
+        checkSystemFeature(context)
+        val identity = Binder.clearCallingIdentity()
+        if (isGmsDevice()) {
+            try {
+                gmsAvailabilityClient?.unsubscribeFromUwbAvailability()
+
+                gmsAvailabilityClient = Nearby.getUwbControllerClient(context)
+                gmsAvailabilityClient?.subscribeToUwbAvailability { isAvailable, reason ->
+                    executor.execute { observer.onUwbStateChanged(isAvailable, reason) }
+                }
+            } catch (e: RuntimeException) {
+                throw e
+            } finally {
+                Binder.restoreCallingIdentity(identity)
+            }
+        } else {
+            try {
+                val availabilityObserver =
+                    object : IUwbAvailabilityObserver.Stub() {
+                        override fun onUwbStateChanged(isAvailable: Boolean, reason: Int) {
+                            executor.execute { observer.onUwbStateChanged(isAvailable, reason) }
+                        }
+                    }
+                aospAvailabilityClient = iUwb?.controllerClient
+                aospAvailabilityClient?.subscribeToAvailability(availabilityObserver)
+            } catch (e: RuntimeException) {
+                throw e
+            } finally {
+                Binder.restoreCallingIdentity(identity)
+            }
+        }
+    }
+
+    override fun clearUwbAvailabilityCallback() {
+        if (isGmsDevice()) {
+            gmsAvailabilityClient?.unsubscribeFromUwbAvailability()
+            gmsAvailabilityClient = null
+        } else {
+            aospAvailabilityClient?.unsubscribeFromAvailability()
+            aospAvailabilityClient = null
         }
     }
 }

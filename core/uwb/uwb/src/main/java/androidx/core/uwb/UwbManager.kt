@@ -18,6 +18,7 @@ package androidx.core.uwb
 
 import android.content.Context
 import androidx.core.uwb.impl.UwbManagerImpl
+import java.util.concurrent.Executor
 
 @JvmDefaultWithCompatibility
 public
@@ -74,4 +75,16 @@ interface UwbManager {
      *   not available on the device.
      */
     public suspend fun isAvailable(): Boolean
+
+    /**
+     * Subscribes to UWB availability. The user will be notified by the callback when UWB state
+     * changes.
+     *
+     * @param executor an executor to execute the callback
+     * @param observer a callback to receive UWB state change
+     */
+    public fun setUwbAvailabilityCallback(executor: Executor, observer: UwbAvailabilityCallback)
+
+    /** Unsubscribes from UWB availability. */
+    public fun clearUwbAvailabilityCallback()
 }
