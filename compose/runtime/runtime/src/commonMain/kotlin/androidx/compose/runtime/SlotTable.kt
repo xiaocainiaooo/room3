@@ -16,15 +16,18 @@
 
 package androidx.compose.runtime
 
+import androidx.collection.MutableIntList
 import androidx.collection.MutableIntObjectMap
 import androidx.collection.MutableIntSet
 import androidx.collection.MutableObjectList
+import androidx.collection.mutableIntListOf
 import androidx.compose.runtime.snapshots.fastAny
 import androidx.compose.runtime.snapshots.fastFilterIndexed
 import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.fastMap
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.CompositionGroup
+import kotlin.jvm.JvmInline
 import kotlin.math.max
 import kotlin.math.min
 
@@ -3799,7 +3802,8 @@ private fun ArrayList<Anchor>.locationOf(index: Int, effectiveSize: Int) =
  * that ensures that adding or removing a value is O(log N) operation even if values are repeatedly
  * added and removed.
  */
-internal class PrioritySet(private val list: MutableList<Int> = mutableListOf()) {
+@JvmInline
+internal value class PrioritySet(private val list: MutableIntList = mutableIntListOf()) {
     // Add a value to the heap
     fun add(value: Int) {
         // Filter trivial duplicates
