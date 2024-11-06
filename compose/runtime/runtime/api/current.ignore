@@ -1,6 +1,6 @@
 // Baseline format: 1.0
-AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#setShouldPauseCallback(kotlin.jvm.functions.Function0<java.lang.Boolean>):
-    Added method androidx.compose.runtime.ControlledComposition.setShouldPauseCallback(kotlin.jvm.functions.Function0<java.lang.Boolean>)
+AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#getAndSetShouldPauseCallback(androidx.compose.runtime.ShouldPauseCallback):
+    Added method androidx.compose.runtime.ControlledComposition.getAndSetShouldPauseCallback(androidx.compose.runtime.ShouldPauseCallback)
 
 
 BecameUnchecked: androidx.compose.runtime.Composer#compoundKeyHash:
