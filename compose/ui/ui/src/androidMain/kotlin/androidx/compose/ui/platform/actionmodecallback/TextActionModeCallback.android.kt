@@ -16,10 +16,12 @@
 
 package androidx.compose.ui.platform.actionmodecallback
 
+import android.os.Build
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.VisibleForTesting
+import androidx.compose.ui.R
 import androidx.compose.ui.geometry.Rect
 
 internal class TextActionModeCallback(
@@ -105,7 +107,12 @@ internal enum class MenuItemOption(val id: Int) {
                 Paste -> android.R.string.paste
                 Cut -> android.R.string.cut
                 SelectAll -> android.R.string.selectAll
-                Autofill -> android.R.string.autofill
+                Autofill ->
+                    if (Build.VERSION.SDK_INT <= 26) {
+                        R.string.autofill
+                    } else {
+                        android.R.string.autofill
+                    }
             }
 
     /** This item will be shown before all items that have order greater than this value. */
