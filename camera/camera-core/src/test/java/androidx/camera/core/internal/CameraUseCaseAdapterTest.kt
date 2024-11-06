@@ -45,6 +45,8 @@ import androidx.camera.core.TorchState
 import androidx.camera.core.UseCase
 import androidx.camera.core.ViewPort
 import androidx.camera.core.concurrent.CameraCoordinator
+import androidx.camera.core.impl.AdapterCameraControl
+import androidx.camera.core.impl.AdapterCameraInfo
 import androidx.camera.core.impl.AdapterCameraInternal
 import androidx.camera.core.impl.CameraConfig
 import androidx.camera.core.impl.CameraConfigs
@@ -56,8 +58,6 @@ import androidx.camera.core.impl.ImageFormatConstants.INTERNAL_DEFINED_IMAGE_FOR
 import androidx.camera.core.impl.MutableOptionsBundle
 import androidx.camera.core.impl.OptionsBundle
 import androidx.camera.core.impl.PreviewConfig
-import androidx.camera.core.impl.RestrictedCameraControl
-import androidx.camera.core.impl.RestrictedCameraInfo
 import androidx.camera.core.impl.SessionProcessor
 import androidx.camera.core.impl.StreamSpec
 import androidx.camera.core.impl.UseCaseConfigFactory
@@ -318,7 +318,7 @@ class CameraUseCaseAdapterTest {
             CameraUseCaseAdapter(
                 fakeCamera,
                 null,
-                RestrictedCameraInfo(fakeCamera.cameraInfoInternal, CameraConfigs.defaultConfig()),
+                AdapterCameraInfo(fakeCamera.cameraInfoInternal, CameraConfigs.defaultConfig()),
                 null,
                 CompositionSettings.DEFAULT,
                 CompositionSettings.DEFAULT,
@@ -348,7 +348,7 @@ class CameraUseCaseAdapterTest {
             CameraUseCaseAdapter(
                 fakeCamera,
                 null,
-                RestrictedCameraInfo(fakeCamera.cameraInfoInternal, extensionsConfig),
+                AdapterCameraInfo(fakeCamera.cameraInfoInternal, extensionsConfig),
                 null,
                 CompositionSettings.DEFAULT,
                 CompositionSettings.DEFAULT,
@@ -1008,7 +1008,7 @@ class CameraUseCaseAdapterTest {
 
     @RequiresApi(23)
     private fun createAdapterWithSupportedCameraOperations(
-        @RestrictedCameraInfo.CameraOperation supportedOps: Set<Int>
+        @AdapterCameraInfo.CameraOperation supportedOps: Set<Int>
     ): CameraUseCaseAdapter {
         val fakeSessionProcessor = FakeSessionProcessor()
         // no camera operations are supported.
@@ -1059,7 +1059,7 @@ class CameraUseCaseAdapterTest {
         // 1. Arrange
         val cameraUseCaseAdapter =
             createAdapterWithSupportedCameraOperations(
-                supportedOps = setOf(RestrictedCameraInfo.CAMERA_OPERATION_ZOOM)
+                supportedOps = setOf(AdapterCameraInfo.CAMERA_OPERATION_ZOOM)
             )
 
         // 2. Act && Assert
@@ -1075,7 +1075,7 @@ class CameraUseCaseAdapterTest {
         // 1. Arrange
         val cameraUseCaseAdapter =
             createAdapterWithSupportedCameraOperations(
-                supportedOps = setOf(RestrictedCameraInfo.CAMERA_OPERATION_TORCH)
+                supportedOps = setOf(AdapterCameraInfo.CAMERA_OPERATION_TORCH)
             )
 
         // 2. Act
@@ -1093,8 +1093,8 @@ class CameraUseCaseAdapterTest {
             createAdapterWithSupportedCameraOperations(
                 supportedOps =
                     setOf(
-                        RestrictedCameraInfo.CAMERA_OPERATION_AUTO_FOCUS,
-                        RestrictedCameraInfo.CAMERA_OPERATION_AF_REGION,
+                        AdapterCameraInfo.CAMERA_OPERATION_AUTO_FOCUS,
+                        AdapterCameraInfo.CAMERA_OPERATION_AF_REGION,
                     )
             )
 
@@ -1117,7 +1117,7 @@ class CameraUseCaseAdapterTest {
             createAdapterWithSupportedCameraOperations(
                 supportedOps =
                     setOf(
-                        RestrictedCameraInfo.CAMERA_OPERATION_AE_REGION,
+                        AdapterCameraInfo.CAMERA_OPERATION_AE_REGION,
                     )
             )
 
@@ -1140,7 +1140,7 @@ class CameraUseCaseAdapterTest {
             createAdapterWithSupportedCameraOperations(
                 supportedOps =
                     setOf(
-                        RestrictedCameraInfo.CAMERA_OPERATION_AWB_REGION,
+                        AdapterCameraInfo.CAMERA_OPERATION_AWB_REGION,
                     )
             )
 
@@ -1163,7 +1163,7 @@ class CameraUseCaseAdapterTest {
             createAdapterWithSupportedCameraOperations(
                 supportedOps =
                     setOf(
-                        RestrictedCameraInfo.CAMERA_OPERATION_AE_REGION,
+                        AdapterCameraInfo.CAMERA_OPERATION_AE_REGION,
                     )
             )
 
@@ -1182,7 +1182,7 @@ class CameraUseCaseAdapterTest {
         // 1. Arrange
         val cameraUseCaseAdapter =
             createAdapterWithSupportedCameraOperations(
-                supportedOps = setOf(RestrictedCameraInfo.CAMERA_OPERATION_EXPOSURE_COMPENSATION)
+                supportedOps = setOf(AdapterCameraInfo.CAMERA_OPERATION_EXPOSURE_COMPENSATION)
             )
 
         // 2. Act
@@ -1236,7 +1236,7 @@ class CameraUseCaseAdapterTest {
         // 1. Arrange
         val cameraUseCaseAdapter =
             createAdapterWithSupportedCameraOperations(
-                supportedOps = setOf(RestrictedCameraInfo.CAMERA_OPERATION_ZOOM)
+                supportedOps = setOf(AdapterCameraInfo.CAMERA_OPERATION_ZOOM)
             )
         fakeCameraInfo.setZoom(10f, 0.6f, 10f, 1f)
 
@@ -1257,7 +1257,7 @@ class CameraUseCaseAdapterTest {
         // 1. Arrange
         val cameraUseCaseAdapter =
             createAdapterWithSupportedCameraOperations(
-                supportedOps = setOf(RestrictedCameraInfo.CAMERA_OPERATION_TORCH)
+                supportedOps = setOf(AdapterCameraInfo.CAMERA_OPERATION_TORCH)
             )
         fakeCameraInfo.setTorch(TorchState.ON)
 
@@ -1274,8 +1274,8 @@ class CameraUseCaseAdapterTest {
             createAdapterWithSupportedCameraOperations(
                 supportedOps =
                     setOf(
-                        RestrictedCameraInfo.CAMERA_OPERATION_AUTO_FOCUS,
-                        RestrictedCameraInfo.CAMERA_OPERATION_AF_REGION
+                        AdapterCameraInfo.CAMERA_OPERATION_AUTO_FOCUS,
+                        AdapterCameraInfo.CAMERA_OPERATION_AF_REGION
                     )
             )
         fakeCameraInfo.setIsFocusMeteringSupported(true)
@@ -1295,7 +1295,7 @@ class CameraUseCaseAdapterTest {
             createAdapterWithSupportedCameraOperations(
                 supportedOps =
                     setOf(
-                        RestrictedCameraInfo.CAMERA_OPERATION_EXPOSURE_COMPENSATION,
+                        AdapterCameraInfo.CAMERA_OPERATION_EXPOSURE_COMPENSATION,
                     )
             )
         fakeCameraInfo.setExposureState(2, Range.create(0, 10), Rational(1, 1), true)
@@ -1317,7 +1317,7 @@ class CameraUseCaseAdapterTest {
         // 1. Arrange
         val cameraUseCaseAdapter =
             createAdapterWithSupportedCameraOperations(
-                supportedOps = setOf(RestrictedCameraInfo.CAMERA_OPERATION_FLASH)
+                supportedOps = setOf(AdapterCameraInfo.CAMERA_OPERATION_FLASH)
             )
 
         // 2. Act && Assert
@@ -1351,14 +1351,14 @@ class CameraUseCaseAdapterTest {
 
     @RequiresApi(23)
     @Test
-    fun returnsCorrectSessionProcessorFromRestrictedCameraControl() {
+    fun returnsCorrectSessionProcessorFromAdapterCameraControl() {
         val fakeSessionProcessor = FakeSessionProcessor()
         val cameraUseCaseAdapter =
             createCameraUseCaseAdapter(fakeCamera, FakeCameraConfig(fakeSessionProcessor))
 
         val cameraControl = cameraUseCaseAdapter.cameraControl
-        assertThat(cameraControl).isInstanceOf(RestrictedCameraControl::class.java)
-        assertThat((cameraControl as RestrictedCameraControl).sessionProcessor)
+        assertThat(cameraControl).isInstanceOf(AdapterCameraControl::class.java)
+        assertThat((cameraControl as AdapterCameraControl).sessionProcessor)
             .isSameInstanceAs(fakeSessionProcessor)
     }
 
@@ -1449,9 +1449,9 @@ class CameraUseCaseAdapterTest {
             CameraUseCaseAdapter(
                 camera,
                 secondaryCamera,
-                RestrictedCameraInfo(camera.cameraInfoInternal, cameraConfig),
+                AdapterCameraInfo(camera.cameraInfoInternal, cameraConfig),
                 if (secondaryCamera == null) null
-                else RestrictedCameraInfo(secondaryCamera.cameraInfoInternal, cameraConfig),
+                else AdapterCameraInfo(secondaryCamera.cameraInfoInternal, cameraConfig),
                 CompositionSettings.DEFAULT,
                 CompositionSettings.DEFAULT,
                 cameraCoordinator,

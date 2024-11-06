@@ -37,6 +37,7 @@ import androidx.camera.core.ImageCapture.OUTPUT_FORMAT_RAW
 import androidx.camera.core.ImageCapture.OUTPUT_FORMAT_RAW_JPEG
 import androidx.camera.core.MirrorMode.MIRROR_MODE_ON_FRONT_ONLY
 import androidx.camera.core.MirrorMode.MIRROR_MODE_UNSPECIFIED
+import androidx.camera.core.impl.AdapterCameraInfo
 import androidx.camera.core.impl.CameraConfig
 import androidx.camera.core.impl.CameraFactory
 import androidx.camera.core.impl.CaptureConfig
@@ -46,7 +47,6 @@ import androidx.camera.core.impl.ImageFormatConstants.INTERNAL_DEFINED_IMAGE_FOR
 import androidx.camera.core.impl.ImageOutputConfig.OPTION_SUPPORTED_RESOLUTIONS
 import androidx.camera.core.impl.MutableOptionsBundle
 import androidx.camera.core.impl.OptionsBundle
-import androidx.camera.core.impl.RestrictedCameraInfo
 import androidx.camera.core.impl.SessionConfig
 import androidx.camera.core.impl.SessionProcessor
 import androidx.camera.core.impl.StreamSpec
@@ -429,16 +429,16 @@ class ImageCaptureTest {
     }
 
     @Test
-    fun canGetSupportedOutputFormats_fromRestrictedCameraInfo_notOverwriteOutputFormats() {
+    fun canGetSupportedOutputFormats_fromAdapterCameraInfo_notOverwriteOutputFormats() {
         val cameraInfo = FakeCameraInfoInternal()
         cameraInfo.setSupportedResolutions(ImageFormat.JPEG, listOf())
         cameraInfo.setSupportedResolutions(ImageFormat.RAW_SENSOR, listOf())
 
-        val restrictedCameraInfo =
-            RestrictedCameraInfo(cameraInfo, createCameraConfigWithSupportedOutputFormats(null))
+        val adapterCameraInfo =
+            AdapterCameraInfo(cameraInfo, createCameraConfigWithSupportedOutputFormats(null))
 
         // Verify.
-        val capabilities = ImageCapture.getImageCaptureCapabilities(restrictedCameraInfo)
+        val capabilities = ImageCapture.getImageCaptureCapabilities(adapterCameraInfo)
         assertThat(capabilities.supportedOutputFormats)
             .containsExactlyElementsIn(
                 listOf(OUTPUT_FORMAT_JPEG, OUTPUT_FORMAT_RAW, OUTPUT_FORMAT_RAW_JPEG)
@@ -446,19 +446,19 @@ class ImageCaptureTest {
     }
 
     @Test
-    fun canGetSupportedOutputFormats_fromRestrictedCameraInfo_overwriteRawNotSupported() {
+    fun canGetSupportedOutputFormats_fromAdapterCameraInfo_overwriteRawNotSupported() {
         val cameraInfo = FakeCameraInfoInternal()
         cameraInfo.setSupportedResolutions(ImageFormat.JPEG, listOf())
         cameraInfo.setSupportedResolutions(ImageFormat.RAW_SENSOR, listOf())
 
-        val restrictedCameraInfo =
-            RestrictedCameraInfo(
+        val adapterCameraInfo =
+            AdapterCameraInfo(
                 cameraInfo,
                 createCameraConfigWithSupportedOutputFormats(listOf(ImageFormat.JPEG))
             )
 
         // Verify.
-        val capabilities = ImageCapture.getImageCaptureCapabilities(restrictedCameraInfo)
+        val capabilities = ImageCapture.getImageCaptureCapabilities(adapterCameraInfo)
         assertThat(capabilities.supportedOutputFormats)
             .containsExactlyElementsIn(listOf(OUTPUT_FORMAT_JPEG))
     }
@@ -483,8 +483,8 @@ class ImageCaptureTest {
         cameraInfo.setSupportedResolutions(ImageFormat.JPEG, listOf())
         cameraInfo.setSupportedResolutions(ImageFormat.JPEG_R, listOf())
 
-        val restrictedCameraInfo =
-            RestrictedCameraInfo(
+        val adapterCameraInfo =
+            AdapterCameraInfo(
                 cameraInfo,
                 createCameraConfigWithSupportedOutputFormats(
                     listOf(ImageFormat.JPEG, ImageFormat.JPEG_R)
@@ -492,7 +492,7 @@ class ImageCaptureTest {
             )
 
         // Verify.
-        val capabilities = ImageCapture.getImageCaptureCapabilities(restrictedCameraInfo)
+        val capabilities = ImageCapture.getImageCaptureCapabilities(adapterCameraInfo)
         assertThat(capabilities.supportedOutputFormats)
             .containsExactlyElementsIn(listOf(OUTPUT_FORMAT_JPEG, OUTPUT_FORMAT_JPEG_ULTRA_HDR))
     }
@@ -504,14 +504,14 @@ class ImageCaptureTest {
         cameraInfo.setSupportedResolutions(ImageFormat.JPEG, listOf())
         cameraInfo.setSupportedResolutions(ImageFormat.JPEG_R, listOf())
 
-        val restrictedCameraInfo =
-            RestrictedCameraInfo(
+        val adapterCameraInfo =
+            AdapterCameraInfo(
                 cameraInfo,
                 createCameraConfigWithSupportedOutputFormats(listOf(ImageFormat.JPEG))
             )
 
         // Verify.
-        val capabilities = ImageCapture.getImageCaptureCapabilities(restrictedCameraInfo)
+        val capabilities = ImageCapture.getImageCaptureCapabilities(adapterCameraInfo)
         assertThat(capabilities.supportedOutputFormats)
             .containsExactlyElementsIn(listOf(OUTPUT_FORMAT_JPEG))
     }

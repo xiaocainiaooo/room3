@@ -36,9 +36,9 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * A {@link CameraInfoInternal} that returns disabled state if the corresponding operation in the
- * given {@link RestrictedCameraControl} is disabled.
+ * given {@link AdapterCameraControl} is disabled.
  */
-public class RestrictedCameraInfo extends ForwardingCameraInfo {
+public class AdapterCameraInfo extends ForwardingCameraInfo {
     /**
      * Defines the list of supported camera operations.
      */
@@ -68,7 +68,7 @@ public class RestrictedCameraInfo extends ForwardingCameraInfo {
     @NonNull
     private final CameraConfig mCameraConfig;
 
-    public RestrictedCameraInfo(@NonNull CameraInfoInternal cameraInfo,
+    public AdapterCameraInfo(@NonNull CameraInfoInternal cameraInfo,
             @NonNull CameraConfig cameraConfig) {
         super(cameraInfo);
         mCameraInfo = cameraInfo;
@@ -91,7 +91,7 @@ public class RestrictedCameraInfo extends ForwardingCameraInfo {
     }
 
     /**
-     * Returns the session processor associated with the RestrictedCameraInfo.
+     * Returns the session processor associated with the AdapterCameraInfo.
      */
     @Nullable
     public SessionProcessor getSessionProcessor() {

@@ -29,9 +29,9 @@ import com.google.common.util.concurrent.ListenableFuture;
  * A {@link CameraControlInternal} whose capabilities can be restricted by the associated
  * {@link SessionProcessor}. Only the camera operations that can be retrieved from
  * {@link SessionProcessor#getSupportedCameraOperations()} can be supported by the
- * RestrictedCameraControl.
+ * AdapterCameraControl.
  */
-public class RestrictedCameraControl extends ForwardingCameraControl {
+public class AdapterCameraControl extends ForwardingCameraControl {
     private final CameraControlInternal mCameraControl;
     @Nullable
     private final SessionProcessor mSessionProcessor;
@@ -39,7 +39,7 @@ public class RestrictedCameraControl extends ForwardingCameraControl {
     /**
      * Creates the restricted version of the given {@link CameraControlInternal}.
      */
-    public RestrictedCameraControl(@NonNull CameraControlInternal cameraControl,
+    public AdapterCameraControl(@NonNull CameraControlInternal cameraControl,
             @Nullable SessionProcessor sessionProcessor) {
         super(cameraControl);
         mCameraControl = cameraControl;
@@ -56,7 +56,7 @@ public class RestrictedCameraControl extends ForwardingCameraControl {
     }
 
     /**
-     * Returns the {@link SessionProcessor} associated with the RestrictedCameraControl.
+     * Returns the {@link SessionProcessor} associated with the AdapterCameraControl.
      */
     @Nullable
     public SessionProcessor getSessionProcessor() {
@@ -67,7 +67,7 @@ public class RestrictedCameraControl extends ForwardingCameraControl {
     @Override
     public ListenableFuture<Void> enableTorch(boolean torch) {
         if (!SessionProcessorUtil.isOperationSupported(mSessionProcessor,
-                RestrictedCameraInfo.CAMERA_OPERATION_TORCH)) {
+                AdapterCameraInfo.CAMERA_OPERATION_TORCH)) {
             return Futures.immediateFailedFuture(
                     new IllegalStateException("Torch is not supported"));
         }
@@ -98,7 +98,7 @@ public class RestrictedCameraControl extends ForwardingCameraControl {
     @Override
     public ListenableFuture<Void> setZoomRatio(float ratio) {
         if (!SessionProcessorUtil.isOperationSupported(mSessionProcessor,
-                RestrictedCameraInfo.CAMERA_OPERATION_ZOOM)) {
+                AdapterCameraInfo.CAMERA_OPERATION_ZOOM)) {
             return Futures.immediateFailedFuture(
                     new IllegalStateException("Zoom is not supported"));
         }
@@ -109,7 +109,7 @@ public class RestrictedCameraControl extends ForwardingCameraControl {
     @Override
     public ListenableFuture<Void> setLinearZoom(float linearZoom) {
         if (!SessionProcessorUtil.isOperationSupported(mSessionProcessor,
-                RestrictedCameraInfo.CAMERA_OPERATION_ZOOM)) {
+                AdapterCameraInfo.CAMERA_OPERATION_ZOOM)) {
             return Futures.immediateFailedFuture(
                     new IllegalStateException("Zoom is not supported"));
         }
@@ -120,7 +120,7 @@ public class RestrictedCameraControl extends ForwardingCameraControl {
     @Override
     public ListenableFuture<Integer> setExposureCompensationIndex(int value) {
         if (!SessionProcessorUtil.isOperationSupported(mSessionProcessor,
-                RestrictedCameraInfo.CAMERA_OPERATION_EXPOSURE_COMPENSATION)) {
+                AdapterCameraInfo.CAMERA_OPERATION_EXPOSURE_COMPENSATION)) {
             return Futures.immediateFailedFuture(
                     new IllegalStateException("ExposureCompensation is not supported"));
         }

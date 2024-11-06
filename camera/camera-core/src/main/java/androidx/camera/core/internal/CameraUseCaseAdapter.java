@@ -64,6 +64,7 @@ import androidx.camera.core.Preview;
 import androidx.camera.core.UseCase;
 import androidx.camera.core.ViewPort;
 import androidx.camera.core.concurrent.CameraCoordinator;
+import androidx.camera.core.impl.AdapterCameraInfo;
 import androidx.camera.core.impl.AdapterCameraInternal;
 import androidx.camera.core.impl.AttachedSurfaceInfo;
 import androidx.camera.core.impl.CameraConfig;
@@ -77,7 +78,6 @@ import androidx.camera.core.impl.Config;
 import androidx.camera.core.impl.Identifier;
 import androidx.camera.core.impl.MutableOptionsBundle;
 import androidx.camera.core.impl.PreviewConfig;
-import androidx.camera.core.impl.RestrictedCameraInfo;
 import androidx.camera.core.impl.SessionConfig;
 import androidx.camera.core.impl.SessionProcessor;
 import androidx.camera.core.impl.StreamSpec;
@@ -189,7 +189,7 @@ public final class CameraUseCaseAdapter implements Camera {
             @NonNull UseCaseConfigFactory useCaseConfigFactory) {
         this(camera,
                 null,
-                new RestrictedCameraInfo(camera.getCameraInfoInternal(),
+                new AdapterCameraInfo(camera.getCameraInfoInternal(),
                         CameraConfigs.defaultConfig()),
                 null,
                 CompositionSettings.DEFAULT,
@@ -204,10 +204,10 @@ public final class CameraUseCaseAdapter implements Camera {
      *
      * @param camera                     The camera that is wrapped.
      * @param secondaryCamera            The secondary camera that is wrapped.
-     * @param restrictedCameraInfo       The {@link RestrictedCameraInfo} that contains the extra
+     * @param adapterCameraInfo       The {@link AdapterCameraInfo} that contains the extra
      *                                   information to configure the {@link CameraInternal} when
      *                                   attaching the uses cases of this adapter to the camera.
-     * @param secondaryRestrictedCameraInfo The {@link RestrictedCameraInfo} of secondary camera.
+     * @param secondaryAdapterCameraInfo The {@link AdapterCameraInfo} of secondary camera.
      * @param compositionSettings        The composition settings that will be used to configure the
      *                                   camera.
      * @param secondaryCompositionSettings  The composition settings that will be used to configure
@@ -221,18 +221,18 @@ public final class CameraUseCaseAdapter implements Camera {
     public CameraUseCaseAdapter(
             @NonNull CameraInternal camera,
             @Nullable CameraInternal secondaryCamera,
-            @NonNull RestrictedCameraInfo restrictedCameraInfo,
-            @Nullable RestrictedCameraInfo secondaryRestrictedCameraInfo,
+            @NonNull AdapterCameraInfo adapterCameraInfo,
+            @Nullable AdapterCameraInfo secondaryAdapterCameraInfo,
             @NonNull CompositionSettings compositionSettings,
             @NonNull CompositionSettings secondaryCompositionSettings,
             @NonNull CameraCoordinator cameraCoordinator,
             @NonNull CameraDeviceSurfaceManager cameraDeviceSurfaceManager,
             @NonNull UseCaseConfigFactory useCaseConfigFactory) {
-        mCameraConfig = restrictedCameraInfo.getCameraConfig();
-        mCameraInternal = new AdapterCameraInternal(camera, restrictedCameraInfo);
-        if (secondaryCamera != null && secondaryRestrictedCameraInfo != null) {
+        mCameraConfig = adapterCameraInfo.getCameraConfig();
+        mCameraInternal = new AdapterCameraInternal(camera, adapterCameraInfo);
+        if (secondaryCamera != null && secondaryAdapterCameraInfo != null) {
             mSecondaryCameraInternal = new AdapterCameraInternal(secondaryCamera,
-                    secondaryRestrictedCameraInfo);
+                    secondaryAdapterCameraInfo);
         } else {
             mSecondaryCameraInternal = null;
         }
@@ -241,16 +241,16 @@ public final class CameraUseCaseAdapter implements Camera {
         mCameraCoordinator = cameraCoordinator;
         mCameraDeviceSurfaceManager = cameraDeviceSurfaceManager;
         mUseCaseConfigFactory = useCaseConfigFactory;
-        mId = generateCameraId(restrictedCameraInfo, secondaryRestrictedCameraInfo);
+        mId = generateCameraId(adapterCameraInfo, secondaryAdapterCameraInfo);
     }
 
     /**
-     * Generate a identifier for the {@link RestrictedCameraInfo}.
+     * Generate a identifier for the {@link AdapterCameraInfo}.
      */
     @NonNull
     public static CameraId generateCameraId(
-            @NonNull RestrictedCameraInfo primaryCameraInfo,
-            @Nullable RestrictedCameraInfo secondaryCameraInfo) {
+            @NonNull AdapterCameraInfo primaryCameraInfo,
+            @Nullable AdapterCameraInfo secondaryCameraInfo) {
         return CameraId.create(
                 primaryCameraInfo.getCameraId()
                         + (secondaryCameraInfo == null ? "" : secondaryCameraInfo.getCameraId()),

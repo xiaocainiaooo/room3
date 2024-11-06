@@ -33,6 +33,7 @@ import androidx.camera.core.ConcurrentCamera.SingleCameraConfig
 import androidx.camera.core.Preview
 import androidx.camera.core.UseCaseGroup
 import androidx.camera.core.concurrent.CameraCoordinator.CAMERA_OPERATING_MODE_UNSPECIFIED
+import androidx.camera.core.impl.AdapterCameraInfo
 import androidx.camera.core.impl.CameraConfig
 import androidx.camera.core.impl.CameraFactory
 import androidx.camera.core.impl.CameraInfoInternal
@@ -40,7 +41,6 @@ import androidx.camera.core.impl.Config
 import androidx.camera.core.impl.ExtendedCameraConfigProviderStore
 import androidx.camera.core.impl.Identifier
 import androidx.camera.core.impl.MutableOptionsBundle
-import androidx.camera.core.impl.RestrictedCameraInfo
 import androidx.camera.core.impl.SessionProcessor
 import androidx.camera.core.impl.UseCaseConfigFactory.CaptureType
 import androidx.camera.core.impl.utils.executor.CameraXExecutors.mainThreadExecutor
@@ -698,11 +698,10 @@ class ProcessCameraProviderTest {
                 CameraSelector.Builder().addCameraFilter(FakeCameraFilter(id)).build()
 
             // Act.
-            val restrictedCameraInfo =
-                provider.getCameraInfo(cameraSelector) as RestrictedCameraInfo
+            val adapterCameraInfo = provider.getCameraInfo(cameraSelector) as AdapterCameraInfo
 
             // Assert.
-            assertThat(restrictedCameraInfo.isPostviewSupported).isTrue()
+            assertThat(adapterCameraInfo.isPostviewSupported).isTrue()
         }
     }
 
