@@ -240,6 +240,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.DOES_NOT_EXIST,
                 pasteState = ContextMenuItemState.DOES_NOT_EXIST,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.ENABLED,
             )
         }
 
@@ -254,6 +255,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.ENABLED,
                 pasteState = ContextMenuItemState.DOES_NOT_EXIST,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -268,6 +270,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.ENABLED,
                 pasteState = ContextMenuItemState.DOES_NOT_EXIST,
                 selectAllState = ContextMenuItemState.DOES_NOT_EXIST,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -282,6 +285,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.DOES_NOT_EXIST,
                 pasteState = ContextMenuItemState.ENABLED,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.ENABLED,
             )
         }
 
@@ -298,6 +302,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.ENABLED,
                 pasteState = ContextMenuItemState.ENABLED,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -312,6 +317,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.ENABLED,
                 pasteState = ContextMenuItemState.ENABLED,
                 selectAllState = ContextMenuItemState.DOES_NOT_EXIST,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -326,6 +332,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.DOES_NOT_EXIST,
                 pasteState = ContextMenuItemState.ENABLED,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.ENABLED,
             )
         }
 
@@ -340,6 +347,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.DOES_NOT_EXIST,
                 pasteState = ContextMenuItemState.ENABLED,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -354,6 +362,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.DOES_NOT_EXIST,
                 pasteState = ContextMenuItemState.ENABLED,
                 selectAllState = ContextMenuItemState.DOES_NOT_EXIST,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -369,6 +378,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.DOES_NOT_EXIST,
                 pasteState = ContextMenuItemState.DOES_NOT_EXIST,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -384,6 +394,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.ENABLED,
                 pasteState = ContextMenuItemState.DOES_NOT_EXIST,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -399,6 +410,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.ENABLED,
                 pasteState = ContextMenuItemState.DOES_NOT_EXIST,
                 selectAllState = ContextMenuItemState.DOES_NOT_EXIST,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -607,6 +619,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.DOES_NOT_EXIST,
                 pasteState = ContextMenuItemState.DOES_NOT_EXIST,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.ENABLED,
             )
         }
 
@@ -621,6 +634,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.ENABLED,
                 pasteState = ContextMenuItemState.DOES_NOT_EXIST,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -635,6 +649,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.ENABLED,
                 pasteState = ContextMenuItemState.DOES_NOT_EXIST,
                 selectAllState = ContextMenuItemState.DOES_NOT_EXIST,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -649,6 +664,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.DOES_NOT_EXIST,
                 pasteState = ContextMenuItemState.ENABLED,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.ENABLED,
             )
         }
 
@@ -663,6 +679,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.ENABLED,
                 pasteState = ContextMenuItemState.ENABLED,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -677,6 +694,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.ENABLED,
                 pasteState = ContextMenuItemState.ENABLED,
                 selectAllState = ContextMenuItemState.DOES_NOT_EXIST,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -691,6 +709,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.DOES_NOT_EXIST,
                 pasteState = ContextMenuItemState.ENABLED,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.ENABLED,
             )
         }
 
@@ -705,6 +724,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.DOES_NOT_EXIST,
                 pasteState = ContextMenuItemState.ENABLED,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -719,6 +739,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.DOES_NOT_EXIST,
                 pasteState = ContextMenuItemState.ENABLED,
                 selectAllState = ContextMenuItemState.DOES_NOT_EXIST,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -734,6 +755,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.DOES_NOT_EXIST,
                 pasteState = ContextMenuItemState.DOES_NOT_EXIST,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -749,6 +771,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.ENABLED,
                 pasteState = ContextMenuItemState.DOES_NOT_EXIST,
                 selectAllState = ContextMenuItemState.ENABLED,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 
@@ -764,6 +787,7 @@ class TextFieldContextMenuTest : FocusedWindowTest {
                 copyState = ContextMenuItemState.ENABLED,
                 pasteState = ContextMenuItemState.DOES_NOT_EXIST,
                 selectAllState = ContextMenuItemState.DOES_NOT_EXIST,
+                autofillState = ContextMenuItemState.DOES_NOT_EXIST,
             )
         }
 

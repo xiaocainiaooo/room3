@@ -100,4 +100,11 @@ internal fun TextFieldSelectionManager.contextMenuBuilder(
     ) {
         selectAll()
     }
+    TextItem(
+        state = contextMenuState,
+        label = TextContextMenuItems.Autofill,
+        enabled = editable && value.selection.collapsed
+    ) {
+        autofill()
+    }
 }
