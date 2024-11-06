@@ -4372,7 +4372,7 @@ private fun SlotWriter.removeData(index: Int, data: Any?) {
     runtimeCheck(data === result) { "Slot table is out of sync (expected $data, got $result)" }
 }
 
-private fun <K, V : Any> multiMap(initialCapacity: Int) =
+private fun <K : Any, V : Any> multiMap(initialCapacity: Int) =
     MultiValueMap<K, V>(MutableScatterMap(initialCapacity))
 
 private fun getKey(value: Any?, left: Any?, right: Any?): Any? =

@@ -35,8 +35,8 @@ import kotlin.jvm.JvmInline
  */
 @JvmInline
 @Suppress("UNCHECKED_CAST")
-internal value class MultiValueMap<K, V : Any>(
-    private val map: MutableScatterMap<K, Any> = MutableScatterMap()
+internal value class MultiValueMap<K : Any, V : Any>(
+    private val map: MutableScatterMap<Any, Any> = MutableScatterMap()
 ) {
     fun add(key: K, value: V) {
         // Only create a list if there more than one value is stored in the map. Otherwise,
