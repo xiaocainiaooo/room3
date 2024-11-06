@@ -186,5 +186,5 @@ mv "$tempOutPath" "$oldOutPath"
 echo
 echo diffing results
 # This script performs the diff, and filters out known issues and non-issues with baselines
-python development/validateRefactorHelper.py "$passThruArgs"
+python3 development/validateRefactorHelper.py "$passThruArgs"
 echo end of difference
