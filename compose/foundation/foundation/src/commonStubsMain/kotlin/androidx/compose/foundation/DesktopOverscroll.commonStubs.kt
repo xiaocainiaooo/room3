@@ -16,7 +16,12 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalAccessorScope
 
 internal actual fun CompositionLocalAccessorScope.defaultOverscrollFactory(): OverscrollFactory? =
+    implementedInJetBrainsFork()
+
+@Composable
+internal actual fun rememberPlatformOverscrollEffect(): OverscrollEffect? =
     implementedInJetBrainsFork()

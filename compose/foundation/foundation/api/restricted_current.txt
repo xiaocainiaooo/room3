@@ -223,13 +223,29 @@ package androidx.compose.foundation {
     method @kotlin.PublishedApi internal void unlock();
   }
 
+  @Deprecated @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public final class OverscrollConfiguration {
+    ctor @Deprecated public OverscrollConfiguration();
+    ctor @Deprecated public OverscrollConfiguration(optional long glowColor, optional androidx.compose.foundation.layout.PaddingValues drawPadding);
+    method @Deprecated public androidx.compose.foundation.layout.PaddingValues getDrawPadding();
+    method @Deprecated public long getGlowColor();
+    property @Deprecated public final androidx.compose.foundation.layout.PaddingValues drawPadding;
+    property @Deprecated public final long glowColor;
+  }
+
+  public final class OverscrollConfiguration_androidKt {
+    method @Deprecated @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.OverscrollConfiguration?> getLocalOverscrollConfiguration();
+    property @Deprecated @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.OverscrollConfiguration?> LocalOverscrollConfiguration;
+  }
+
   @androidx.compose.runtime.Stable public interface OverscrollEffect {
     method public suspend Object? applyToFling(long velocity, kotlin.jvm.functions.Function2<? super androidx.compose.ui.unit.Velocity,? super kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity>,? extends java.lang.Object?> performFling, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public long applyToScroll(long delta, int source, kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,androidx.compose.ui.geometry.Offset> performScroll);
-    method public androidx.compose.ui.node.DelegatableNode getNode();
+    method @Deprecated public default androidx.compose.ui.Modifier getEffectModifier();
+    method public default androidx.compose.ui.node.DelegatableNode getNode();
     method public boolean isInProgress();
+    property @Deprecated public default androidx.compose.ui.Modifier effectModifier;
     property public abstract boolean isInProgress;
-    property public abstract androidx.compose.ui.node.DelegatableNode node;
+    property public default androidx.compose.ui.node.DelegatableNode node;
   }
 
   public interface OverscrollFactory {
@@ -596,6 +612,7 @@ package androidx.compose.foundation.gestures {
 
   public final class ScrollableDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.gestures.FlingBehavior flingBehavior();
+    method @Deprecated @androidx.compose.runtime.Composable public androidx.compose.foundation.OverscrollEffect overscrollEffect();
     method public boolean reverseDirection(androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.foundation.gestures.Orientation orientation, boolean reverseScrolling);
     field public static final androidx.compose.foundation.gestures.ScrollableDefaults INSTANCE;
   }
