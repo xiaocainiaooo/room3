@@ -27,12 +27,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,14 +46,16 @@ class PdfViewPaginationTest {
         fun setup() {
             // PdfView creates a ScaleGestureDetector internally, which can only be done from Looper
             // threads, so let's make sure we're executing on one
-            Looper.prepare()
+            if (Looper.myLooper() == null) {
+                Looper.prepare()
+            }
         }
     }
 
     @Test
     fun testPageVisibility() = runTest {
         // Layout at 500x1000, and expect to see pages [0, 4] at 100x200
-        val pdfDocument = fakePdfDocument(10, Point(100, 200))
+        val pdfDocument = FakePdfDocument(List(10) { Point(100, 200) })
         val pdfView = setupPdfView(500, 1000, pdfDocument)
 
         pdfDocument.waitForLayout(untilPage = 4)
@@ -77,7 +76,7 @@ class PdfViewPaginationTest {
     @Test
     fun testPageVisibility_onSizeDecreased() = runTest {
         // Layout at 500x1000 initially, and expect to see pages [0, 3] at 100x300
-        val pdfDocument = fakePdfDocument(10, Point(100, 300))
+        val pdfDocument = FakePdfDocument(List(10) { Point(100, 300) })
         val pdfView = setupPdfView(500, 1000, pdfDocument)
         pdfDocument.waitForLayout(untilPage = 3)
         assertThat(pdfView.firstVisiblePage).isEqualTo(0)
@@ -92,7 +91,7 @@ class PdfViewPaginationTest {
     @Test
     fun testPageVisibility_onScrollChanged() = runTest {
         // Layout at 1000x2000 initially, and expect to see pages [0, 3] at 200x500
-        val pdfDocument = fakePdfDocument(10, Point(200, 500))
+        val pdfDocument = FakePdfDocument(List(10) { Point(200, 500) })
         val pdfView = setupPdfView(1000, 2000, pdfDocument)
         pdfDocument.waitForLayout(untilPage = 3)
         assertThat(pdfView.firstVisiblePage).isEqualTo(0)
@@ -108,7 +107,7 @@ class PdfViewPaginationTest {
     @Test
     fun testPageVisibility_onZoomChanged() = runTest {
         // Layout at 100x500 initially, and expect to see pages [0, 5] at 30x80
-        val pdfDocument = fakePdfDocument(10, Point(30, 80))
+        val pdfDocument = FakePdfDocument(List(10) { Point(30, 80) })
         val pdfView = setupPdfView(100, 500, pdfDocument)
         pdfDocument.waitForLayout(untilPage = 5)
         assertThat(pdfView.firstVisiblePage).isEqualTo(0)
@@ -130,28 +129,6 @@ class PdfViewPaginationTest {
         pdfDocument?.let { pdfView.pdfDocument = it }
         return pdfView
     }
-}
-
-/**
- * Laying out pages involves waiting for multiple coroutines that are started sequentially. It is
- * not possible to use TestScheduler alone to wait for a certain amount of layout to happen. This
- * uses a polling loop to wait for a certain number of pages to be laid out, up to [timeoutMillis]
- */
-@OptIn(ExperimentalCoroutinesApi::class)
-private suspend fun FakePdfDocument.waitForLayout(untilPage: Int, timeoutMillis: Long = 1000) {
-    // Jump to Dispatchers.Default, as TestDispatcher will skip delays and timeouts
-    withContext(Dispatchers.Default.limitedParallelism(1)) {
-        withTimeout(timeoutMillis) {
-            while (layoutReach < untilPage) {
-                delay(100)
-            }
-        }
-    }
-}
-
-/** Returns a [FakePdfDocument] containing [pages] pages with uniform [pageSize] dimensions */
-private fun fakePdfDocument(pages: Int, pageSize: Point): FakePdfDocument {
-    return FakePdfDocument(pages, List(pages) { pageSize })
 }
 
 private fun View.layoutAndMeasure(width: Int, height: Int) {

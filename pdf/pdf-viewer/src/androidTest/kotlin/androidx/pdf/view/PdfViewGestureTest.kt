@@ -40,7 +40,7 @@ class PdfViewGestureTest {
 
     @Test
     fun testScrollGesture() {
-        val fakePdfDocument = FakePdfDocument(100, List(100) { Point(500, 1000) })
+        val fakePdfDocument = FakePdfDocument(List(100) { Point(500, 1000) })
         PdfViewTestActivity.onCreateCallback = { activity ->
             val container = FrameLayout(activity)
             container.addView(

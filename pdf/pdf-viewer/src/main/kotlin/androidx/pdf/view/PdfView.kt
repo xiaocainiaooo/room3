@@ -18,8 +18,6 @@ package androidx.pdf.view
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
 import android.os.Looper
@@ -71,7 +69,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      * The [CoroutineScope] used to make suspending calls to [PdfDocument]. The size of the fixed
      * thread pool is arbitrary and subject to tuning.
      */
-    private val coroutineScope: CoroutineScope =
+    internal val coroutineScope: CoroutineScope =
         CoroutineScope(Executors.newFixedThreadPool(5).asCoroutineDispatcher())
 
     /** The maximum scaling factor that can be applied to this View using the [zoom] property */
@@ -125,8 +123,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     private val pages = SparseArray<Page>()
 
-    private val gestureTracker =
-        GestureTracker(context).apply { delegate = ZoomScrollGestureHandler(this@PdfView) }
+    private val gestureHandler = ZoomScrollGestureHandler(this@PdfView)
+    private val gestureTracker = GestureTracker(context).apply { delegate = gestureHandler }
 
     // To avoid allocations during drawing
     private val visibleAreaRect = Rect()
@@ -176,6 +174,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         val contentTop = round(scrollY / zoom).toInt()
         val contentBottom = round((height + scrollY) / zoom).toInt()
         visiblePages = localPaginationModel.getPagesInViewport(contentTop, contentBottom)
+
+        // If scale changed, update already-visible pages so they can re-render and redraw
+        // themselves accordingly
+        if (!gestureHandler.scaleInProgress && !gestureHandler.scrollInProgress) {
+            for (i in visiblePages.lower..visiblePages.upper) {
+                pages[i]?.maybeRender()
+            }
+        }
     }
 
     /** React to a change in visible pages (load new pages and clean up old ones) */
@@ -192,21 +198,16 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             loadPageDimensions(i)
         }
 
-        // Render visible pages
         for (i in visiblePages.lower..visiblePages.upper) {
-            // TODO(b/376135535) - Implement rendering of visible pages
+            pages[i]?.isVisible = true
         }
 
         // Clean up pages that are no longer visible
         for (pageIndex in pages.keyIterator()) {
             if (pageIndex < nearPages.lower || pageIndex > nearPages.upper) {
-                pages[pageIndex]?.close()
+                pages[pageIndex]?.isVisible = false
             }
         }
-
-        // TODO(b/376135535) - Defer invalidation until Bitmaps are ready, once "real" rendering is
-        // implemented
-        invalidate()
     }
 
     /** Loads dimensions for a single page */
@@ -221,7 +222,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                     pageNum,
                     Point(pageMetadata.width, pageMetadata.height)
                 )
-                val page = Page(pageNum, Size(pageMetadata.width, pageMetadata.height))
+                val page =
+                    Page(pageNum, Size(pageMetadata.width, pageMetadata.height), this@PdfView)
                 pages[pageNum] = page
                 if (pageNum >= visiblePages.lower && pageNum <= visiblePages.upper) {
                     // Make the page visible if it is, so it starts to render itself
@@ -311,53 +313,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
     }
 
-    /** A single PDF page that knows how to render and draw itself */
-    private inner class Page(val pageNum: Int, val size: Size) : AutoCloseable {
-
-        init {
-            require(pageNum >= 0) { "Invalid negative page" }
-        }
-
-        var isVisible: Boolean = false
-            set(value) {
-                field = value
-                // TODO(b/376135535) Start rendering once a page becomes visible
-            }
-
-        /** Draw this page's content to [canvas] at [locationInView] */
-        fun draw(canvas: Canvas, locationInView: Rect) {
-            canvas.drawRect(locationInView, DEBUG_PAINT)
-            canvas.drawText(
-                "Page $pageNum",
-                locationInView.centerX().toFloat(),
-                locationInView.centerY().toFloat(),
-                DEBUG_PAINT_TEXT,
-            )
-        }
-
-        override fun close() {
-            // TODO(b/376135535) - Once Bitmap rendering is implemented, clean up Bitmaps and
-            // rendering jobs here
-        }
-    }
-
     public companion object {
         public const val DEFAULT_PAGE_SPACING_PX: Int = 20
         public const val DEFAULT_INIT_ZOOM: Float = 1.0f
         public const val DEFAULT_MAX_ZOOM: Float = 25.0f
         public const val DEFAULT_MIN_ZOOM: Float = 0.1f
-
-        private val DEBUG_PAINT =
-            Paint().apply {
-                color = Color.RED
-                style = Paint.Style.STROKE
-                strokeWidth = 8f
-            }
-        private val DEBUG_PAINT_TEXT =
-            Paint().apply {
-                color = Color.RED
-                textSize = 24f
-            }
 
         private fun checkMainThread() {
             check(Looper.myLooper() == Looper.getMainLooper()) {

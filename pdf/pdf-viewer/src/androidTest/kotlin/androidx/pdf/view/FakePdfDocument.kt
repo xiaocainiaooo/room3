@@ -32,24 +32,52 @@ import androidx.pdf.content.PageMatchBounds
 import androidx.pdf.content.PageSelection
 import androidx.pdf.content.SelectionBoundary
 import kotlin.random.Random
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 
-/** Fake implementation of [PdfDocument], for testing */
+/**
+ * Fake implementation of [PdfDocument], for testing
+ *
+ * Provides an implementation of [getPageInfo] and [getPageInfos] that produces the dimensions
+ * provided as [pages]. Provides an implementation of [getPageBitmapSource] that produces a random
+ * solid RGB color bitmap for each page in [pages]. All other methods are fulfilled with no-op
+ * implementations that return empty values.
+ *
+ * Requests made against an instance can be tracked:
+ * - Using [layoutReach] to detect the maximum page whose dimensions have been requested
+ * - Using [renderReach] to detect the maximum page for which any bitmap has been requested from the
+ *   corresponding [PdfDocument.BitmapSource]
+ * - Using [bitmapRequests] to examine the type of bitmaps that have been requested for any page
+ *
+ * @param pages a list of [Point] defining the number of pages in the fake PDF and their dimensions
+ * @param formType one of [PDF_FORM_TYPE_ACRO_FORM], [PDF_FORM_TYPE_XFA_FULL],
+ *   [PDF_FORM_TYPE_XFA_FOREGROUND], or [PDF_FORM_TYPE_NONE] depending on the type of PDF form this
+ *   fake PDF should represent
+ * @param isLinearized true if this fake PDF is linearized
+ */
 @OpenForTesting
 internal open class FakePdfDocument(
-    override val pageCount: Int,
     /** A list of (x, y) page dimensions in content coordinates */
     private val pages: List<Point>,
     override val formType: Int = PDF_FORM_TYPE_NONE,
     override val isLinearized: Boolean = false,
 ) : PdfDocument {
+    override val pageCount: Int = pages.size
+
     override val uri: Uri
         get() = Uri.parse("content://test.app/document.pdf")
 
     @get:Synchronized @set:Synchronized internal var layoutReach: Int = 0
 
-    init {
-        require(pages.size == pageCount) { "Invalid page count" }
-    }
+    @get:Synchronized @set:Synchronized internal var renderReach: Int = 0
+
+    private val bitmapRequestsLock = Object()
+    private val _bitmapRequests = mutableMapOf<Int, SizeParams>()
+    internal val bitmapRequests
+        get() = _bitmapRequests
 
     override fun getPageBitmapSource(pageNumber: Int): PdfDocument.BitmapSource {
         return FakeBitmapSource(pageNumber)
@@ -101,10 +129,12 @@ internal open class FakePdfDocument(
     /**
      * A fake [PdfDocument.BitmapSource] that produces random RGB [Bitmap]s of the requested size
      */
-    private class FakeBitmapSource(override val pageNumber: Int) : PdfDocument.BitmapSource {
+    private inner class FakeBitmapSource(override val pageNumber: Int) : PdfDocument.BitmapSource {
 
         override suspend fun getBitmap(scaledPageSizePx: Size, tileRegion: Rect?): Bitmap {
-            // Fake: generate a solid random RGB bitmap at the requested size
+            renderReach = maxOf(renderReach, pageNumber)
+            logRequest(scaledPageSizePx, tileRegion)
+            // Generate a solid random RGB bitmap at the requested size
             val size =
                 if (tileRegion != null) Size(tileRegion.width(), tileRegion.height())
                 else scaledPageSizePx
@@ -123,17 +153,91 @@ internal open class FakePdfDocument(
             return bitmap
         }
 
+        /**
+         * Logs the nature of a bitmap request to [bitmapRequests], so that testing code can examine
+         * the total set of bitmap requests observed during a test
+         */
+        private fun logRequest(scaledPageSizePx: Size, tileRegion: Rect?) {
+            synchronized(bitmapRequestsLock) {
+                val requestedSize = _bitmapRequests[pageNumber]
+                // Not tiling, log a full bitmap request
+                if (tileRegion == null) {
+                    _bitmapRequests[pageNumber] = FullBitmap(scaledPageSizePx)
+                    // Tiling, and this is a new rect for a tile board we're already tracking
+                } else if (requestedSize != null && requestedSize is TileBoard) {
+                    requestedSize.withTile(tileRegion)
+                    // Tiling, and this is the first rect requested
+                } else {
+                    _bitmapRequests[pageNumber] =
+                        TileBoard(scaledPageSizePx).apply { withTile(tileRegion) }
+                }
+            }
+        }
+
         override fun close() {
             /* No-op, fake */
         }
     }
 }
 
+/** Represents the size and scale of a [Bitmap] requested from [PdfDocument.BitmapSource] */
+internal sealed class SizeParams(val scaledPageSizePx: Size)
+
+/** Represents a full page [Bitmap] requested from [PdfDocument.BitmapSource] */
+internal class FullBitmap(scaledPageSizePx: Size) : SizeParams(scaledPageSizePx)
+
+/** Represents a set of tile region [Bitmap] requested from [PdfDocument.BitmapSource] */
+internal class TileBoard(scaledPageSizePx: Size) : SizeParams(scaledPageSizePx) {
+    private val _tiles = mutableListOf<Rect>()
+    val tiles: List<Rect>
+        get() = _tiles
+
+    fun withTile(region: Rect) = _tiles.add(region)
+}
+
 // Duplicated from PdfRenderer to avoid a hard dependency on SDK 35
+/** Represents a PDF with no form fields */
 internal const val PDF_FORM_TYPE_NONE = 0
+
 /** Represents a PDF with form fields specified using the AcroForm spec */
 internal const val PDF_FORM_TYPE_ACRO_FORM = 1
+
 /** Represents a PDF with form fields specified using the entire XFA spec */
 internal const val PDF_FORM_TYPE_XFA_FULL = 2
+
 /** Represents a PDF with form fields specified using the XFAF subset of the XFA spec */
 internal const val PDF_FORM_TYPE_XFA_FOREGROUND = 3
+
+/**
+ * Laying out pages involves waiting for multiple coroutines that are started sequentially. It is
+ * not possible to use TestScheduler alone to wait for a certain amount of layout to happen. This
+ * uses a polling loop to wait for a certain number of pages to be laid out, up to [timeoutMillis]
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+internal suspend fun FakePdfDocument.waitForLayout(untilPage: Int, timeoutMillis: Long = 1000) {
+    // Jump to Dispatchers.Default, as TestDispatcher will skip delays and timeouts
+    withContext(Dispatchers.Default.limitedParallelism(1)) {
+        withTimeout(timeoutMillis) {
+            while (layoutReach < untilPage) {
+                delay(100)
+            }
+        }
+    }
+}
+
+/**
+ * Rendering pages involves waiting for multiple coroutines that are started sequentially. It is not
+ * possible to use TestScheduler alone to wait for a certain amount of rendering to happen. This
+ * uses a polling loop to wait for a certain number of pages to be rendered, up to [timeoutMillis]
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+internal suspend fun FakePdfDocument.waitForRender(untilPage: Int, timeoutMillis: Long = 1000) {
+    // Jump to Dispatchers.Default, as TestDispatcher will skip delays and timeouts
+    withContext(Dispatchers.Default.limitedParallelism(1)) {
+        withTimeout(timeoutMillis) {
+            while (renderReach < untilPage) {
+                delay(100)
+            }
+        }
+    }
+}
