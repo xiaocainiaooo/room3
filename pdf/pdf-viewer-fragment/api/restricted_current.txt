@@ -1,7 +1,7 @@
 // Signature format: 4.0
 package androidx.pdf.viewer.fragment {
 
-  public class PdfViewerFragment extends androidx.fragment.app.Fragment {
+  @RequiresExtension(extension=android.os.Build.VERSION_CODES.S, version=13) public class PdfViewerFragment extends androidx.fragment.app.Fragment {
     ctor public PdfViewerFragment();
     method public final android.net.Uri? getDocumentUri();
     method public final boolean isTextSearchActive();
