@@ -35,6 +35,7 @@ import android.location.Location;
 import android.media.MediaDataSource;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
+import android.system.Os;
 import android.system.OsConstants;
 import android.util.Log;
 import android.util.Pair;
@@ -42,7 +43,6 @@ import android.util.Pair;
 import androidx.annotation.IntDef;
 import androidx.annotation.RestrictTo;
 import androidx.annotation.VisibleForTesting;
-import androidx.exifinterface.media.ExifInterfaceUtils.Api21Impl;
 import androidx.exifinterface.media.ExifInterfaceUtils.Api23Impl;
 
 import org.jspecify.annotations.NonNull;
@@ -4113,13 +4113,13 @@ public class ExifInterface {
         mFilename = null;
 
         boolean isFdDuped = false;
-        if (Build.VERSION.SDK_INT >= 21 && isSeekableFD(fileDescriptor)) {
+        if (isSeekableFD(fileDescriptor)) {
             mSeekableFileDescriptor = fileDescriptor;
             // Keep the original file descriptor in order to save attributes when it's seekable.
             // Otherwise, just close the given file descriptor after reading it because the save
             // feature won't be working.
             try {
-                fileDescriptor = Api21Impl.dup(fileDescriptor);
+                fileDescriptor = Os.dup(fileDescriptor);
                 isFdDuped = true;
             } catch (Exception e) {
                 throw new IOException("Failed to duplicate file descriptor", e);
@@ -4824,18 +4824,15 @@ public class ExifInterface {
     }
 
     private static boolean isSeekableFD(FileDescriptor fd) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            try {
-                Api21Impl.lseek(fd, 0, OsConstants.SEEK_CUR);
-                return true;
-            } catch (Exception e) {
-                if (DEBUG) {
-                    Log.d(TAG, "The file descriptor for the given input is not seekable");
-                }
-                return false;
+        try {
+            Os.lseek(fd, /* offset= */ 0, /* whence= */ OsConstants.SEEK_CUR);
+            return true;
+        } catch (Exception e) {
+            if (DEBUG) {
+                Log.d(TAG, "The file descriptor for the given input is not seekable");
             }
+            return false;
         }
-        return false;
     }
 
     // Prints out attributes for debugging.
@@ -4899,12 +4896,11 @@ public class ExifInterface {
             if (mFilename != null) {
                 in = new FileInputStream(mFilename);
             } else {
-                // mSeekableFileDescriptor will be non-null only for SDK_INT >= 21, but this check
-                // is needed to prevent calling Os.lseek at runtime for SDK < 21.
-                if (Build.VERSION.SDK_INT >= 21) {
-                    Api21Impl.lseek(mSeekableFileDescriptor, 0, OsConstants.SEEK_SET);
-                    in = new FileInputStream(mSeekableFileDescriptor);
-                }
+                Os.lseek(
+                        mSeekableFileDescriptor,
+                        /* offset= */ 0,
+                        /* whence= */ OsConstants.SEEK_SET);
+                in = new FileInputStream(mSeekableFileDescriptor);
             }
             out = new FileOutputStream(tempFile);
             copy(in, out);
@@ -4926,12 +4922,9 @@ public class ExifInterface {
             if (mFilename != null) {
                 out = new FileOutputStream(mFilename);
             } else {
-                // mSeekableFileDescriptor will be non-null only for SDK_INT >= 21, but this check
-                // is needed to prevent calling Os.lseek at runtime for SDK < 21.
-                if (Build.VERSION.SDK_INT >= 21) {
-                    Api21Impl.lseek(mSeekableFileDescriptor, 0, OsConstants.SEEK_SET);
-                    out = new FileOutputStream(mSeekableFileDescriptor);
-                }
+                FileDescriptor fd = mSeekableFileDescriptor;
+                Os.lseek(fd, /* offset= */ 0, /* whence= */ OsConstants.SEEK_SET);
+                out = new FileOutputStream(mSeekableFileDescriptor);
             }
             bufferedIn = new BufferedInputStream(in);
             bufferedOut = new BufferedOutputStream(out);
@@ -4949,12 +4942,11 @@ public class ExifInterface {
                 if (mFilename != null) {
                     out = new FileOutputStream(mFilename);
                 } else {
-                    // mSeekableFileDescriptor will be non-null only for SDK_INT >= 21, but this
-                    // check is needed to prevent calling Os.lseek at runtime for SDK < 21.
-                    if (Build.VERSION.SDK_INT >= 21) {
-                        Api21Impl.lseek(mSeekableFileDescriptor, 0, OsConstants.SEEK_SET);
-                        out = new FileOutputStream(mSeekableFileDescriptor);
-                    }
+                    Os.lseek(
+                            mSeekableFileDescriptor,
+                            /* offset= */ 0,
+                            /* whence= */ OsConstants.SEEK_SET);
+                    out = new FileOutputStream(mSeekableFileDescriptor);
                 }
                 copy(in, out);
             } catch (Exception exception) {
@@ -5034,13 +5026,9 @@ public class ExifInterface {
             } else if (mFilename != null) {
                 in = new FileInputStream(mFilename);
             } else {
-                // mSeekableFileDescriptor will be non-null only for SDK_INT >= 21, but this check
-                // is needed to prevent calling Os.lseek and Os.dup at runtime for SDK < 21.
-                if (Build.VERSION.SDK_INT >= 21) {
-                    newFileDescriptor = Api21Impl.dup(mSeekableFileDescriptor);
-                    Api21Impl.lseek(newFileDescriptor, 0, OsConstants.SEEK_SET);
-                    in = new FileInputStream(newFileDescriptor);
-                }
+                newFileDescriptor = Os.dup(mSeekableFileDescriptor);
+                Os.lseek(newFileDescriptor, /* offset= */ 0, /* whence= */ OsConstants.SEEK_SET);
+                in = new FileInputStream(newFileDescriptor);
             }
             if (in == null) {
                 // Should not be reached this.
