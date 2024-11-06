@@ -336,6 +336,14 @@ abstract class AndroidXExtension(
     // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.runApiTasks")
     var runApiTasks: RunApiTasks = RunApiTasks.Auto
         get() = if (field == RunApiTasks.Auto && type != LibraryType.UNSET) type.checkApi else field
+        set(value) {
+            if (value is RunApiTasks.No) {
+                throw GradleException(
+                    "runApiTasks cannot be disabled from the AndroidX extension. Ensure you're using the correct library type if you really do not need API tracking"
+                )
+            }
+            field = value
+        }
 
     var doNotDocumentReason: String? = null
 
