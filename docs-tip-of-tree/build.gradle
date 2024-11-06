@@ -21,6 +21,7 @@ dependencies {
     samples("androidx.window:window-samples:1.3.0")
 
     docsForOptionalProject(":xr:xr")
+    docsForOptionalProject(":xr:compose:compose")
     docsForOptionalProject(":xr:runtime:runtime")
     docs(project(":activity:activity"))
     docs(project(":activity:activity-compose"))
