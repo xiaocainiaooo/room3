@@ -32,7 +32,6 @@ dependencies {
     implementation("androidx.annotation:annotation:1.7.0")
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.google.errorprone:error_prone_annotations:2.30.0")
-    implementation project(':tracing:tracing')
 
     testImplementation(project(":pdf:pdf-viewer-fragment"))
     testImplementation(libs.junit)
