@@ -328,6 +328,15 @@ class RecorderTest(
     }
 
     @Test
+    fun canRecordToNonExistFile() {
+        // Arrange.
+        val outputOptions = createFileOutputOptions(createTempFile().apply { delete() })
+
+        // Act & Assert.
+        recordingSession.createRecording(outputOptions = outputOptions).recordAndVerify()
+    }
+
+    @Test
     fun recordingWithSetTargetVideoEncodingBitRate() {
         testRecorderIsConfiguredBasedOnTargetVideoEncodingBitrate(6_000_000)
     }
