@@ -39,6 +39,15 @@ internal class EndpointUtils {
         const val BLUETOOTH_DEVICE_DEFAULT_NAME = "Bluetooth Device"
         private val TAG: String = EndpointUtils::class.java.simpleName.toString()
 
+        internal fun maybeRemoveEarpieceIfWiredEndpointPresent(
+            endpoints: MutableList<CallEndpointCompat>
+        ): MutableList<CallEndpointCompat> {
+            if (endpoints.any { it.type == CallEndpointCompat.TYPE_WIRED_HEADSET }) {
+                endpoints.removeIf { it.type == CallEndpointCompat.TYPE_EARPIECE }
+            }
+            return endpoints
+        }
+
         /** [AudioDeviceInfo]s to [CallEndpointCompat]s */
         fun getEndpointsFromAudioDeviceInfo(
             c: Context,
@@ -49,10 +58,14 @@ internal class EndpointUtils {
                 return listOf()
             }
             val endpoints: MutableList<CallEndpointCompat> = mutableListOf()
+            var foundWiredHeadset = false
             val omittedDevices = StringBuilder("omitting devices =[")
             adiArr.toList().forEach { audioDeviceInfo ->
                 val endpoint = getEndpointFromAudioDeviceInfo(c, flowId, audioDeviceInfo)
                 if (endpoint.type != CallEndpointCompat.TYPE_UNKNOWN) {
+                    if (endpoint.type == CallEndpointCompat.TYPE_WIRED_HEADSET) {
+                        foundWiredHeadset = true
+                    }
                     endpoints.add(endpoint)
                 } else {
                     omittedDevices.append(
@@ -63,6 +76,9 @@ internal class EndpointUtils {
             }
             omittedDevices.append("]")
             Log.i(TAG, omittedDevices.toString())
+            if (foundWiredHeadset) {
+                endpoints.removeIf { it.type == CallEndpointCompat.TYPE_EARPIECE }
+            }
             // Sort by endpoint type.  The first element has the highest priority!
             endpoints.sort()
             return endpoints

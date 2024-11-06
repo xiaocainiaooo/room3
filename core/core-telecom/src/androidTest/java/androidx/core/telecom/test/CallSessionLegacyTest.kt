@@ -19,6 +19,8 @@ package androidx.core.telecom.test
 import android.os.Build.VERSION_CODES
 import android.os.ParcelUuid
 import android.telecom.CallAudioState
+import android.telecom.CallAudioState.ROUTE_EARPIECE
+import android.telecom.CallAudioState.ROUTE_WIRED_HEADSET
 import android.telecom.CallEndpoint
 import androidx.annotation.RequiresApi
 import androidx.core.telecom.CallEndpointCompat
@@ -51,6 +53,30 @@ class CallSessionLegacyTest : BaseTelecomTest() {
     @After
     fun tearDown() {
         CallEndpointUuidTracker.endSession(mSessionId)
+    }
+
+    /**
+     * Test the setter for available endpoints removes the earpiece endpoint if the wired headset
+     * endpoint is available
+     */
+    @SmallTest
+    @Test
+    fun testRemovalOfEarpieceEndpointIfWiredEndpointIsPresent() {
+        setUpBackwardsCompatTest()
+        runBlocking {
+            val callSession =
+                initCallSessionLegacy(
+                    coroutineContext,
+                    null,
+                )
+            val supportedRouteMask = ROUTE_EARPIECE or ROUTE_WIRED_HEADSET
+            callSession.setAvailableCallEndpoints(
+                CallAudioState(false, ROUTE_WIRED_HEADSET, supportedRouteMask)
+            )
+            val res = callSession.getAvailableCallEndpointsForSession()
+            assertEquals(1, res.size)
+            assertEquals(res[0].type, CallEndpointCompat.TYPE_WIRED_HEADSET)
+        }
     }
 
     /**
@@ -109,7 +135,7 @@ class CallSessionLegacyTest : BaseTelecomTest() {
 
             val supportedRouteMask =
                 CallAudioState.ROUTE_BLUETOOTH or
-                    CallAudioState.ROUTE_WIRED_HEADSET or
+                    ROUTE_WIRED_HEADSET or
                     CallAudioState.ROUTE_SPEAKER
 
             val cas = CallAudioState(false, CallAudioState.ROUTE_BLUETOOTH, supportedRouteMask)
