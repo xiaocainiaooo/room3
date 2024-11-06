@@ -838,6 +838,7 @@ includeProject(":navigation:navigation-safe-args-gradle-plugin", [BuildType.MAIN
 includeProject(":navigation:navigation-testing", [BuildType.MAIN, BuildType.FLAN, BuildType.COMPOSE])
 includeProject(":navigation:navigation-ui", [BuildType.MAIN, BuildType.FLAN])
 includeProject(":navigation:navigation-ui-ktx", [BuildType.MAIN, BuildType.FLAN])
+includeProject(":navigation3:navigation3", [BuildType.COMPOSE])
 includeProject(":paging:integration-tests:testapp", [BuildType.MAIN])
 includeProject(":paging:paging-common", [BuildType.MAIN, BuildType.COMPOSE, BuildType.INFRAROGUE, BuildType.KMP])
 includeProject(":paging:paging-common-ktx", [BuildType.MAIN, BuildType.COMPOSE])
