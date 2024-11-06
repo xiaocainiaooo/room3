@@ -185,7 +185,6 @@ internal fun Pager(
                     flingBehavior = resolvedFlingBehavior,
                     interactionSource = state.internalInteractionSource,
                     overscrollEffect = overscrollEffect,
-                    useLocalOverscrollFactory = false,
                     bringIntoViewSpec = pagerBringIntoViewSpec
                 )
                 .dragDirectionDetector(state)

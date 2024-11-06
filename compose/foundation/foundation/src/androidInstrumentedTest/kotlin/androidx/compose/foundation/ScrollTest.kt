@@ -663,33 +663,21 @@ class ScrollTest(private val config: Config) {
     fun testInspectorValue_withoutOverscrollParameter() {
         val state = ScrollState(initial = 0)
         rule.setContent {
-            val modifiers =
+            val modifier =
                 when (config.orientation) {
                     Vertical -> Modifier.verticalScroll(state)
                     Horizontal -> Modifier.horizontalScroll(state)
-                }.toList()
-
-            val scrollableContainer = modifiers[0] as InspectableValue
-            val scroll = modifiers[1] as InspectableValue
-            assertThat(scrollableContainer.nameFallback).isEqualTo("scrollingContainer")
-            assertThat(scrollableContainer.valueOverride).isNull()
-            assertThat(scrollableContainer.inspectableElements.map { it.name }.asIterable())
-                .containsExactly(
-                    "state",
-                    "orientation",
-                    "enabled",
-                    "reverseScrolling",
-                    "flingBehavior",
-                    "interactionSource",
-                    "bringIntoViewSpec",
-                    "useLocalOverscrollFactory",
-                    "overscrollEffect"
-                )
-
-            assertThat(scroll.nameFallback).isEqualTo("scroll")
-            assertThat(scroll.valueOverride).isNull()
-            assertThat(scroll.inspectableElements.map { it.name }.asIterable())
-                .containsExactly("state", "reverseScrolling", "isVertical")
+                }
+                    as InspectableValue
+            val expectedName =
+                when (config.orientation) {
+                    Vertical -> "verticalScroll"
+                    Horizontal -> "horizontalScroll"
+                }
+            assertThat(modifier.nameFallback).isEqualTo(expectedName)
+            assertThat(modifier.valueOverride).isNull()
+            assertThat(modifier.inspectableElements.map { it.name }.asIterable())
+                .containsExactly("state", "enabled", "flingBehavior", "reverseScrolling")
         }
     }
 
@@ -717,7 +705,6 @@ class ScrollTest(private val config: Config) {
                     "flingBehavior",
                     "interactionSource",
                     "bringIntoViewSpec",
-                    "useLocalOverscrollFactory",
                     "overscrollEffect"
                 )
 
