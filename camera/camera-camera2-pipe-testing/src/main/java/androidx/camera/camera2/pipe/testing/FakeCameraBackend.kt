@@ -25,6 +25,7 @@ import androidx.camera.camera2.pipe.CameraGraphId
 import androidx.camera.camera2.pipe.CameraId
 import androidx.camera.camera2.pipe.CameraMetadata
 import androidx.camera.camera2.pipe.StreamGraph
+import androidx.camera.camera2.pipe.SurfaceTracker
 import androidx.camera.camera2.pipe.graph.GraphListener
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
@@ -63,7 +64,8 @@ public class FakeCameraBackend(private val fakeCameras: Map<CameraId, CameraMeta
         graphId: CameraGraphId,
         graphConfig: CameraGraph.Config,
         graphListener: GraphListener,
-        streamGraph: StreamGraph
+        streamGraph: StreamGraph,
+        surfaceTracker: SurfaceTracker,
     ): CameraController {
         val cameraController =
             CameraControllerSimulator(cameraContext, graphId, graphConfig, graphListener)

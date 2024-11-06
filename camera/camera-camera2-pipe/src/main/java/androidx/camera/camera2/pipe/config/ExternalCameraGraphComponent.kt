@@ -28,6 +28,7 @@ import androidx.camera.camera2.pipe.CameraId
 import androidx.camera.camera2.pipe.CameraMetadata
 import androidx.camera.camera2.pipe.RequestProcessor
 import androidx.camera.camera2.pipe.StreamGraph
+import androidx.camera.camera2.pipe.SurfaceTracker
 import androidx.camera.camera2.pipe.compat.ExternalCameraController
 import androidx.camera.camera2.pipe.graph.GraphListener
 import dagger.Module
@@ -88,7 +89,8 @@ internal class ExternalCameraGraphConfigModule(
                 graphId: CameraGraphId,
                 graphConfig: CameraGraph.Config,
                 graphListener: GraphListener,
-                streamGraph: StreamGraph
+                streamGraph: StreamGraph,
+                surfaceTracker: SurfaceTracker,
             ): CameraController {
                 throwUnsupportedOperationException()
             }

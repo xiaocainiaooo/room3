@@ -105,7 +105,8 @@ public interface CameraBackend {
         graphId: CameraGraphId,
         graphConfig: CameraGraph.Config,
         graphListener: GraphListener,
-        streamGraph: StreamGraph
+        streamGraph: StreamGraph,
+        surfaceTracker: SurfaceTracker,
     ): CameraController
 
     /** Connects and starts the underlying camera */
