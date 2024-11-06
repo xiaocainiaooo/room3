@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalAccessorScope
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
+import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
@@ -88,10 +89,38 @@ fun rememberPlatformOverscrollFactory(
     return AndroidEdgeEffectOverscrollFactory(context, density, glowColor, glowDrawPadding)
 }
 
+@OptIn(ExperimentalFoundationApi::class)
+@Suppress("DEPRECATION")
 internal actual fun CompositionLocalAccessorScope.defaultOverscrollFactory(): OverscrollFactory? {
     val context = LocalContext.currentValue
     val density = LocalDensity.currentValue
-    return AndroidEdgeEffectOverscrollFactory(context, density)
+    val config = LocalOverscrollConfiguration.currentValue
+    return if (config == null) {
+        null
+    } else {
+        AndroidEdgeEffectOverscrollFactory(context, density, config.glowColor, config.drawPadding)
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Suppress("DEPRECATION")
+@Composable
+internal actual fun rememberPlatformOverscrollEffect(): OverscrollEffect? {
+    val context = LocalContext.current
+    val density = LocalDensity.current
+    val config = LocalOverscrollConfiguration.current
+    return if (config == null) {
+        null
+    } else {
+        remember(context, density, config) {
+            AndroidEdgeEffectOverscrollEffect(
+                context,
+                density,
+                config.glowColor,
+                config.drawPadding
+            )
+        }
+    }
 }
 
 private class AndroidEdgeEffectOverscrollFactory(

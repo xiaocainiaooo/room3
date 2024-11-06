@@ -37,6 +37,9 @@ import androidx.compose.ui.unit.Velocity
  * container have been reached with a scroll or fling. To create an instance of the default /
  * currently provided [OverscrollFactory], use [rememberOverscrollEffect].
  *
+ * To implement, make sure to override [node] - this has a default implementation for compatibility
+ * reasons, but is required for an OverscrollEffect to render.
+ *
  * OverscrollEffect conceptually 'decorates' scroll / fling events: consuming some of the delta or
  * velocity before and/or after the event is consumed by the scrolling container. [applyToScroll]
  * applies overscroll to a scroll event, and [applyToFling] applies overscroll to a fling.
@@ -121,6 +124,21 @@ interface OverscrollEffect {
     val isInProgress: Boolean
 
     /**
+     * A [Modifier] that will draw this OverscrollEffect
+     *
+     * This API is deprecated- implementers should instead override [node]. Callers should use
+     * [Modifier.overscroll].
+     */
+    @Deprecated(
+        "This has been replaced with `node`. If you are calling this property to render overscroll, use Modifier.overscroll() instead. If you are implementing OverscrollEffect, override `node` instead to render your overscroll.",
+        level = DeprecationLevel.ERROR,
+        replaceWith =
+            ReplaceWith("Modifier.overscroll(this)", "androidx.compose.foundation.overscroll")
+    )
+    val effectModifier: Modifier
+        get() = Modifier
+
+    /**
      * The [DelegatableNode] that will render this OverscrollEffect and provide any required size or
      * other information to this effect.
      *
@@ -132,6 +150,7 @@ interface OverscrollEffect {
      * [DelegatableNode]s.
      */
     val node: DelegatableNode
+        get() = object : Modifier.Node() {}
 }
 
 /**
@@ -250,8 +269,14 @@ private class WrappedOverscrollEffect(
  * @sample androidx.compose.foundation.samples.OverscrollSample
  * @param overscrollEffect the [OverscrollEffect] to render
  */
-fun Modifier.overscroll(overscrollEffect: OverscrollEffect?): Modifier =
-    this.then(OverscrollModifierElement(overscrollEffect))
+@Suppress("DEPRECATION_ERROR")
+fun Modifier.overscroll(overscrollEffect: OverscrollEffect?): Modifier {
+    val effectModifier = overscrollEffect?.effectModifier ?: Modifier
+    val modifier =
+        if (effectModifier !== Modifier) effectModifier
+        else OverscrollModifierElement(overscrollEffect)
+    return this.then(modifier)
+}
 
 private class OverscrollModifierElement(
     private val overscrollEffect: OverscrollEffect?,
@@ -314,6 +339,14 @@ fun rememberOverscrollEffect(): OverscrollEffect? {
     val overscrollFactory = LocalOverscrollFactory.current ?: return null
     return remember(overscrollFactory) { overscrollFactory.createOverscrollEffect() }
 }
+
+/**
+ * Needed for behavioral backwards compatibility for
+ * [androidx.compose.foundation.gestures.ScrollableDefaults.overscrollEffect]. New code should use
+ * [rememberOverscrollEffect] instead, which takes into account theme provided overscroll, rather
+ * than always using the platform default, without any customizations.
+ */
+@Composable internal expect fun rememberPlatformOverscrollEffect(): OverscrollEffect?
 
 /**
  * A factory for creating [OverscrollEffect]s. You can provide a factory instance to
