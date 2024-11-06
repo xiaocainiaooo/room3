@@ -3129,8 +3129,8 @@ public class ExifInterface {
     private static final int WEBP_CHUNK_TYPE_BYTE_LENGTH = 4;
     private static final int WEBP_CHUNK_SIZE_BYTE_LENGTH = 4;
 
-    private static SimpleDateFormat sFormatterPrimary;
-    private static SimpleDateFormat sFormatterSecondary;
+    private static final SimpleDateFormat sFormatterPrimary;
+    private static final SimpleDateFormat sFormatterSecondary;
 
     // See Exchangeable image file format for digital still cameras: Exif version 2.2.
     // The following values are for parsing EXIF data area. There are tag groups in EXIF data area.
@@ -3164,17 +3164,16 @@ public class ExifInterface {
     private static final int SKIP_BUFFER_SIZE = 8192;
 
     // Names for the data formats for debugging purpose.
-    static final String[] IFD_FORMAT_NAMES = new String[] {
+    private static final String[] IFD_FORMAT_NAMES = new String[] {
             "", "BYTE", "STRING", "USHORT", "ULONG", "URATIONAL", "SBYTE", "UNDEFINED", "SSHORT",
             "SLONG", "SRATIONAL", "SINGLE", "DOUBLE", "IFD"
     };
     // Sizes of the components of each IFD value format
-    static final int[] IFD_FORMAT_BYTES_PER_FORMAT = new int[] {
+    private static final int[] IFD_FORMAT_BYTES_PER_FORMAT = new int[] {
             0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8, 1
     };
 
-    @SuppressWarnings("WeakerAccess") /* synthetic access */
-    static final byte[] EXIF_ASCII_PREFIX = new byte[] {
+    private static final byte[] EXIF_ASCII_PREFIX = new byte[] {
             0x41, 0x53, 0x43, 0x49, 0x49, 0x0, 0x0, 0x0
     };
 
@@ -3185,8 +3184,7 @@ public class ExifInterface {
         public final long numerator;
         public final long denominator;
 
-        @SuppressWarnings("WeakerAccess") /* synthetic access */
-        Rational(long numerator, long denominator) {
+        private Rational(long numerator, long denominator) {
             // Handle erroneous case
             if (denominator == 0) {
                 this.numerator = 0;
@@ -3252,12 +3250,10 @@ public class ExifInterface {
         public final long bytesOffset;
         public final byte[] bytes;
 
-        @SuppressWarnings("WeakerAccess") /* synthetic access */
         ExifAttribute(int format, int numberOfComponents, byte[] bytes) {
             this(format, numberOfComponents, BYTES_OFFSET_UNKNOWN, bytes);
         }
 
-        @SuppressWarnings("WeakerAccess") /* synthetic access */
         ExifAttribute(int format, int numberOfComponents, long bytesOffset, byte[] bytes) {
             this.format = format;
             this.numberOfComponents = numberOfComponents;
@@ -3359,7 +3355,6 @@ public class ExifInterface {
             return "(" + IFD_FORMAT_NAMES[format] + ", data length:" + bytes.length + ")";
         }
 
-        @SuppressWarnings("WeakerAccess") /* synthetic access */
         Object getValue(ByteOrder byteOrder) {
             ByteOrderedDataInputStream inputStream = null;
             try {
@@ -3607,13 +3602,12 @@ public class ExifInterface {
     }
 
     // A class for indicating EXIF tag.
-    static class ExifTag {
+    private static class ExifTag {
         public final int number;
         public final String name;
         public final int primaryFormat;
         public final int secondaryFormat;
 
-        @SuppressWarnings("WeakerAccess") /* synthetic access */
         ExifTag(String name, int number, int format) {
             this.name = name;
             this.number = number;
@@ -3621,7 +3615,6 @@ public class ExifInterface {
             this.secondaryFormat = -1;
         }
 
-        @SuppressWarnings("WeakerAccess") /* synthetic access */
         ExifTag(String name, int number, int primaryFormat, int secondaryFormat) {
             this.name = name;
             this.number = number;
@@ -3629,7 +3622,6 @@ public class ExifInterface {
             this.secondaryFormat = secondaryFormat;
         }
 
-        @SuppressWarnings("WeakerAccess") /* synthetic access */
         boolean isFormatCompatible(int format) {
             if (primaryFormat == IFD_FORMAT_UNDEFINED || format == IFD_FORMAT_UNDEFINED) {
                 return true;
@@ -3894,12 +3886,12 @@ public class ExifInterface {
             IFD_TYPE_ORF_CAMERA_SETTINGS, IFD_TYPE_ORF_IMAGE_PROCESSING, IFD_TYPE_PEF})
     public @interface IfdType {}
 
-    static final int IFD_TYPE_PRIMARY = 0;
+    private static final int IFD_TYPE_PRIMARY = 0;
     private static final int IFD_TYPE_EXIF = 1;
     private static final int IFD_TYPE_GPS = 2;
     private static final int IFD_TYPE_INTEROPERABILITY = 3;
-    static final int IFD_TYPE_THUMBNAIL = 4;
-    static final int IFD_TYPE_PREVIEW = 5;
+    private static final int IFD_TYPE_THUMBNAIL = 4;
+    private static final int IFD_TYPE_PREVIEW = 5;
     private static final int IFD_TYPE_ORF_MAKER_NOTE = 6;
     private static final int IFD_TYPE_ORF_CAMERA_SETTINGS = 7;
     private static final int IFD_TYPE_ORF_IMAGE_PROCESSING = 8;
@@ -3961,17 +3953,16 @@ public class ExifInterface {
     // The following values are defined for handling JPEG streams. In this implementation, we are
     // not only getting information from EXIF but also from some JPEG special segments such as
     // MARKER_COM for user comment and MARKER_SOFx for image width and height.
-    @SuppressWarnings("WeakerAccess") /* synthetic access */
-    static final Charset ASCII = Charset.forName("US-ASCII");
+    private static final Charset ASCII = Charset.forName("US-ASCII");
     // Identifier for EXIF APP1 segment in JPEG
-    static final byte[] IDENTIFIER_EXIF_APP1 = "Exif\0\0".getBytes(ASCII);
+    @VisibleForTesting static final byte[] IDENTIFIER_EXIF_APP1 = "Exif\0\0".getBytes(ASCII);
     // Identifier for XMP APP1 segment in JPEG
     private static final byte[] IDENTIFIER_XMP_APP1 =
             "http://ns.adobe.com/xap/1.0/\0".getBytes(ASCII);
     // JPEG segment markers, that each marker consumes two bytes beginning with 0xff and ending with
     // the indicator. There is no SOF4, SOF8, SOF16 markers in JPEG and SOFx markers indicates start
     // of frame(baseline DCT) and the image size info exists in its beginning part.
-    static final byte MARKER = (byte) 0xff;
+    private static final byte MARKER = (byte) 0xff;
     private static final byte MARKER_SOI = (byte) 0xd8;
     private static final byte MARKER_SOF0 = (byte) 0xc0;
     private static final byte MARKER_SOF1 = (byte) 0xc1;
@@ -3987,27 +3978,22 @@ public class ExifInterface {
     private static final byte MARKER_SOF14 = (byte) 0xce;
     private static final byte MARKER_SOF15 = (byte) 0xcf;
     private static final byte MARKER_SOS = (byte) 0xda;
-    static final byte MARKER_APP1 = (byte) 0xe1;
+    @VisibleForTesting static final byte MARKER_APP1 = (byte) 0xe1;
     private static final byte MARKER_COM = (byte) 0xfe;
-    static final byte MARKER_EOI = (byte) 0xd9;
+    private static final byte MARKER_EOI = (byte) 0xd9;
 
     // Supported Image File Types
-    static final int IMAGE_TYPE_UNKNOWN = 0;
-    static final int IMAGE_TYPE_ARW = 1;
-    static final int IMAGE_TYPE_CR2 = 2;
-    static final int IMAGE_TYPE_DNG = 3;
-    static final int IMAGE_TYPE_JPEG = 4;
-    static final int IMAGE_TYPE_NEF = 5;
-    static final int IMAGE_TYPE_NRW = 6;
-    static final int IMAGE_TYPE_ORF = 7;
-    static final int IMAGE_TYPE_PEF = 8;
-    static final int IMAGE_TYPE_RAF = 9;
-    static final int IMAGE_TYPE_RW2 = 10;
-    static final int IMAGE_TYPE_SRW = 11;
-    static final int IMAGE_TYPE_HEIC = 12;
-    static final int IMAGE_TYPE_PNG = 13;
-    static final int IMAGE_TYPE_WEBP = 14;
-    static final int IMAGE_TYPE_AVIF = 15;
+    private static final int IMAGE_TYPE_UNKNOWN = 0;
+    private static final int IMAGE_TYPE_DNG = 3;
+    private static final int IMAGE_TYPE_JPEG = 4;
+    private static final int IMAGE_TYPE_ORF = 7;
+    private static final int IMAGE_TYPE_PEF = 8;
+    private static final int IMAGE_TYPE_RAF = 9;
+    private static final int IMAGE_TYPE_RW2 = 10;
+    private static final int IMAGE_TYPE_HEIC = 12;
+    private static final int IMAGE_TYPE_PNG = 13;
+    private static final int IMAGE_TYPE_WEBP = 14;
+    private static final int IMAGE_TYPE_AVIF = 15;
 
     static {
         sFormatterPrimary = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.US);
@@ -4244,7 +4230,6 @@ public class ExifInterface {
      *
      * @param tag the name of the tag.
      */
-    @SuppressWarnings("deprecation")
     private @Nullable ExifAttribute getExifAttribute(@NonNull String tag) {
         if (tag == null) {
             throw new NullPointerException("tag shouldn't be null");
