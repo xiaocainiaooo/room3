@@ -25,9 +25,14 @@ import android.graphics.pdf.content.PdfPageTextContent
 import android.graphics.pdf.models.PageMatchBounds
 import android.graphics.pdf.models.selection.PageSelection
 import android.graphics.pdf.models.selection.SelectionBoundary
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 internal class PdfPageWrapperPostV(private val page: PdfRenderer.Page) : PdfPageWrapper {
 
     override val height = page.height

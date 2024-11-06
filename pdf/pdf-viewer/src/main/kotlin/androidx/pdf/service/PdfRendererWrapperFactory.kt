@@ -25,7 +25,10 @@ import androidx.annotation.RestrictTo
 @Suppress("ObsoleteSdkInt")
 internal object PdfRendererWrapperFactory {
     fun create(pfd: ParcelFileDescriptor, password: String?): PdfRendererWrapper {
-        return if (Build.VERSION.SDK_INT >= 35) {
+        return if (
+            Build.VERSION.SDK_INT >= 35 &&
+                SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 13
+        ) {
             PdfRendererWrapperPostV(pfd, password.orEmpty())
         } else if (SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 13) {
             PdfRendererWrapperPreV(pfd, password.orEmpty())

@@ -18,7 +18,9 @@ package androidx.pdf
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
+import android.os.Build
 import android.view.KeyEvent
+import androidx.annotation.RequiresExtension
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
@@ -41,6 +43,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.After
 import org.junit.Before
@@ -50,6 +53,8 @@ import org.junit.runner.RunWith
 @SuppressLint("BanThreadSleep")
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@SdkSuppress(minSdkVersion = 35)
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
 class PdfViewerFragmentTestSuite {
 
     private lateinit var scenario: FragmentScenario<TestPdfViewerFragment>

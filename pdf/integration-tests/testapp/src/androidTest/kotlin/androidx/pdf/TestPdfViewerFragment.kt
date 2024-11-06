@@ -16,11 +16,13 @@
 
 package androidx.pdf
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -29,6 +31,7 @@ import androidx.pdf.testapp.R
 import androidx.pdf.viewer.fragment.PdfViewerFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 internal class TestPdfViewerFragment : PdfViewerFragment() {
     private var hostView: FrameLayout? = null

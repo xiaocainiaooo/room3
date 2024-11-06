@@ -19,10 +19,13 @@ package androidx.pdf.service
 
 import android.graphics.pdf.LoadParams
 import android.graphics.pdf.PdfRendererPreV
+import android.os.Build
 import android.os.ParcelFileDescriptor
+import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
 import java.util.concurrent.ConcurrentHashMap
 
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 internal class PdfRendererWrapperPreV(
     parcelFileDescriptor: ParcelFileDescriptor,

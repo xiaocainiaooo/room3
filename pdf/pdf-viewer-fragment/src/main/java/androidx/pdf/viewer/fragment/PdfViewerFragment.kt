@@ -19,12 +19,14 @@ package androidx.pdf.viewer.fragment
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
+import androidx.annotation.RequiresExtension
 import androidx.annotation.RestrictTo
 import androidx.core.os.BundleCompat
 import androidx.core.view.ViewCompat
@@ -98,6 +100,7 @@ import kotlinx.coroutines.launch
  *
  * @see documentUri
  */
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
 public open class PdfViewerFragment : Fragment() {
 
     // ViewModel to manage PdfLoader state

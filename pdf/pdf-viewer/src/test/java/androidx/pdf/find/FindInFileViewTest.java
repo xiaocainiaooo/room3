@@ -24,12 +24,10 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doNothing;
 
-import android.os.Build;
-
+import androidx.pdf.ActivityUtils;
 import androidx.pdf.viewer.ImmersiveModeRequester;
 import androidx.pdf.viewer.PaginatedView;
 import androidx.pdf.viewer.loader.PdfLoader;
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.filters.SmallTest;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -43,15 +41,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 /**
  * Unit tests for {@link FindInFileView}
  */
 @SmallTest
 @RunWith(RobolectricTestRunner.class)
-//TODO: Remove minsdk check after sdk extension 13 release
-@Config(minSdk = Build.VERSION_CODES.VANILLA_ICE_CREAM)
 public class FindInFileViewTest extends TestCase {
     @Mock
     private PdfLoader mPdfLoader;
@@ -67,7 +62,7 @@ public class FindInFileViewTest extends TestCase {
     @Before
     public void setUp() throws Exception {
         mOpenMocks = MockitoAnnotations.openMocks(this);
-        mFindInFileView = new FindInFileView(ApplicationProvider.getApplicationContext());
+        mFindInFileView = new FindInFileView(ActivityUtils.INSTANCE.getThemedActivity());
         mFindInFileView.setPdfLoader(mPdfLoader);
         mFindInFileView.setPaginatedView(mPaginatedView);
         mFindInFileView.setAnnotationButton(mAnnotationButton, mImmersiveModeRequester);

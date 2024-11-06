@@ -191,6 +191,7 @@ class PdfPageAdapter implements AutoCloseable {
     private static void checkAndExecute(@NonNull Runnable block) {
         if (SdkExtensions.getExtensionVersion(Build.VERSION_CODES.S) >= 13) {
             block.run();
+            return;
         }
         throw new UnsupportedOperationException("Operation support above S");
     }
