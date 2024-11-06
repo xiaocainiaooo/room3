@@ -44,6 +44,9 @@ dependencies {
     implementation(project(":xr:compose:compose"))
     implementation(project(":xr:scenecore:scenecore"))
 
+    // TODO(b/364280345): Remove once JXR Core migration is complete
+    implementation(fileTree("../../../../../../../xr/xr-libs") { include("*.aar")})
+
     // TODO(b/374796755): Write unit-tests for this test app
 }
 
