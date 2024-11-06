@@ -17,6 +17,9 @@ package androidx.appsearch.safeparcel.stub;
 
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.app.AppSearchBlobHandle;
+import androidx.appsearch.app.AppSearchCommitBlobResponse;
+import androidx.appsearch.app.AppSearchOpenBlobForReadResponse;
+import androidx.appsearch.app.AppSearchOpenBlobForWriteResponse;
 import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.EmbeddingVector;
 import androidx.appsearch.app.GetByDocumentIdRequest;
@@ -200,5 +203,20 @@ public class StubCreators {
     /** Stub creator for {@link androidx.appsearch.app.AppSearchBlobHandle}. */
     public static class AppSearchBlobHandleCreator extends
             AbstractCreator<AppSearchBlobHandle> {
+    }
+
+    /** Stub creator for {@link AppSearchOpenBlobForWriteResponse}. */
+    public static class OpenBlobForWriteResponseCreator extends
+            AbstractCreator<AppSearchOpenBlobForWriteResponse> {
+    }
+
+    /** Stub creator for {@link AppSearchCommitBlobResponse}. */
+    public static class CommitBlobResponseCreator extends
+            AbstractCreator<AppSearchCommitBlobResponse> {
+    }
+
+    /** Stub creator for {@link AppSearchOpenBlobForReadResponse}. */
+    public static class OpenBlobForReadResponseCreator extends
+            AbstractCreator<AppSearchOpenBlobForReadResponse> {
     }
 }
