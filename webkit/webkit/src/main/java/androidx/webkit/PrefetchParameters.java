@@ -33,11 +33,13 @@ import java.util.Map;
 public final class PrefetchParameters {
     private final @NonNull Map<String, String> mAdditionalHeaders;
     private final @Nullable NoVarySearchData mExpectedNoVarySearchData;
+    private final boolean mIsJavaScriptEnabled;
 
     private PrefetchParameters(@NonNull Map<String, String> additionalHeaders,
-            @Nullable NoVarySearchData noVarySearchData) {
-        this.mAdditionalHeaders = additionalHeaders;
-        this.mExpectedNoVarySearchData = noVarySearchData;
+            @Nullable NoVarySearchData noVarySearchData, boolean isJavaScriptEnabled) {
+        mAdditionalHeaders = additionalHeaders;
+        mExpectedNoVarySearchData = noVarySearchData;
+        mIsJavaScriptEnabled = isJavaScriptEnabled;
     }
 
     /**
@@ -55,15 +57,24 @@ public final class PrefetchParameters {
     }
 
     /**
+     * @return The javascript enabled setting built using {@link Builder}.
+     */
+    public boolean isJavaScriptEnabled() {
+        return mIsJavaScriptEnabled;
+    }
+
+    /**
      * A builder class to use to construct the {@link PrefetchParameters}.
      */
     public static final class Builder {
         private final @NonNull Map<String, String> mAdditionalHeaders;
         private @Nullable NoVarySearchData mExpectedNoVarySearchData;
+        private boolean mIsJavaScriptEnabled;
 
         public Builder() {
             mAdditionalHeaders = new HashMap<>();
             mExpectedNoVarySearchData = null;
+            mIsJavaScriptEnabled = false;
         }
 
         /**
@@ -76,7 +87,8 @@ public final class PrefetchParameters {
         @Profile.ExperimentalUrlPrefetch
         @NonNull
         public PrefetchParameters build() {
-            return new PrefetchParameters(mAdditionalHeaders, mExpectedNoVarySearchData);
+            return new PrefetchParameters(mAdditionalHeaders, mExpectedNoVarySearchData,
+                    mIsJavaScriptEnabled);
         }
 
         /**
@@ -103,8 +115,21 @@ public final class PrefetchParameters {
         @NonNull
         public Builder setExpectedNoVarySearchData(
                 @NonNull NoVarySearchData expectedNoVarySearchData) {
-            this.mExpectedNoVarySearchData = expectedNoVarySearchData;
+            mExpectedNoVarySearchData = expectedNoVarySearchData;
             return this;
         }
+
+        /**
+         * {@code true} if the WebView's that will be loading the prefetched
+         * response will have javascript enabled. This affects whether or not
+         * client hints header is sent with the prefetch request.
+         */
+        @Profile.ExperimentalUrlPrefetch
+        @NonNull
+        public Builder setJavaScriptEnabled(boolean javaScriptEnabled) {
+            mIsJavaScriptEnabled = javaScriptEnabled;
+            return this;
+        }
+
     }
 }
