@@ -64,7 +64,6 @@ import kotlin.math.min
  *   panes.
  * @param scaffoldValue The current adapted value of the scaffold.
  * @param paneOrder The horizontal order of the panes from start to end in the scaffold.
- * @param paneMotions The specified motion of the panes.
  * @param secondaryPane The content of the secondary pane that has a priority lower then the primary
  *   pane but higher than the tertiary pane.
  * @param tertiaryPane The content of the tertiary pane that has the lowest priority.
@@ -79,7 +78,6 @@ internal fun ThreePaneScaffold(
     paneOrder: ThreePaneScaffoldHorizontalOrder,
     secondaryPane: @Composable ThreePaneScaffoldPaneScope.() -> Unit,
     tertiaryPane: (@Composable ThreePaneScaffoldPaneScope.() -> Unit)? = null,
-    paneMotions: ThreePaneMotion = calculateThreePaneMotion(scaffoldValue, paneOrder),
     paneExpansionState: PaneExpansionState = rememberPaneExpansionState(),
     paneExpansionDragHandle: (@Composable ThreePaneScaffoldScope.(PaneExpansionState) -> Unit)? =
         null,
@@ -94,7 +92,6 @@ internal fun ThreePaneScaffold(
         paneOrder = paneOrder,
         secondaryPane = secondaryPane,
         tertiaryPane = tertiaryPane,
-        paneMotions = paneMotions,
         paneExpansionState = paneExpansionState,
         paneExpansionDragHandle = paneExpansionDragHandle,
         primaryPane = primaryPane
@@ -110,7 +107,6 @@ internal fun ThreePaneScaffold(
     paneOrder: ThreePaneScaffoldHorizontalOrder,
     secondaryPane: @Composable ThreePaneScaffoldPaneScope.() -> Unit,
     tertiaryPane: (@Composable ThreePaneScaffoldPaneScope.() -> Unit)? = null,
-    paneMotions: ThreePaneMotion = scaffoldState.calculateThreePaneMotion(paneOrder),
     paneExpansionState: PaneExpansionState = rememberPaneExpansionState(),
     paneExpansionDragHandle: (@Composable ThreePaneScaffoldScope.(PaneExpansionState) -> Unit)? =
         null,
@@ -119,6 +115,7 @@ internal fun ThreePaneScaffold(
     val layoutDirection = LocalLayoutDirection.current
     val ltrPaneOrder =
         remember(paneOrder, layoutDirection) { paneOrder.toLtrOrder(layoutDirection) }
+    val paneMotions = scaffoldState.calculateThreePaneMotion(ltrPaneOrder)
     val motionScope =
         remember { ThreePaneScaffoldMotionScopeImpl() }
             .apply { updateThreePaneMotion(paneMotions, ltrPaneOrder) }
