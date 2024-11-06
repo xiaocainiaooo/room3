@@ -112,7 +112,6 @@ internal fun LazyStaggeredGrid(
                     reverseScrolling = reverseLayout,
                     flingBehavior = flingBehavior,
                     interactionSource = state.mutableInteractionSource,
-                    useLocalOverscrollFactory = false,
                     overscrollEffect = overscrollEffect
                 ),
         prefetchState = state.prefetchState,

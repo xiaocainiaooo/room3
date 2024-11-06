@@ -81,7 +81,6 @@ class ScrollingContainerTest {
                     reverseScrolling = false,
                     flingBehavior = null,
                     interactionSource = null,
-                    useLocalOverscrollFactory = false,
                     overscrollEffect = null,
                     bringIntoViewSpec = null
                 ) as InspectableValue
@@ -95,7 +94,6 @@ class ScrollingContainerTest {
                     "reverseScrolling",
                     "flingBehavior",
                     "interactionSource",
-                    "useLocalOverscrollFactory",
                     "overscrollEffect",
                     "bringIntoViewSpec"
                 )
@@ -119,7 +117,6 @@ class ScrollingContainerTest {
                             reverseScrolling = false,
                             flingBehavior = null,
                             interactionSource = null,
-                            useLocalOverscrollFactory = false,
                             overscrollEffect = null
                         )
                 ) {
@@ -177,7 +174,6 @@ class ScrollingContainerTest {
                                 reverseScrolling = false,
                                 flingBehavior = null,
                                 interactionSource = null,
-                                useLocalOverscrollFactory = false,
                                 overscrollEffect = null
                             )
                     )
@@ -211,7 +207,6 @@ class ScrollingContainerTest {
                     reverseScrolling = false,
                     flingBehavior = null,
                     interactionSource = null,
-                    useLocalOverscrollFactory = false,
                     overscrollEffect = overscrollEffect,
                     bringIntoViewSpec = null
                 )
@@ -236,7 +231,6 @@ class ScrollingContainerTest {
                     reverseScrolling = false,
                     flingBehavior = null,
                     interactionSource = null,
-                    useLocalOverscrollFactory = false,
                     overscrollEffect = effect,
                     bringIntoViewSpec = null
                 )
@@ -253,6 +247,7 @@ class ScrollingContainerTest {
         rule.runOnIdle {
             assertThat(overscrollEffect1.node.node.isAttached).isFalse()
             assertThat(overscrollEffect2.node.node.isAttached).isTrue()
+            effect = overscrollEffect2
         }
     }
 
@@ -289,7 +284,6 @@ class ScrollingContainerTest {
                             reverseScrolling = false,
                             flingBehavior = null,
                             interactionSource = null,
-                            useLocalOverscrollFactory = false,
                             overscrollEffect = overscrollEffect,
                             bringIntoViewSpec = null
                         )
@@ -305,207 +299,6 @@ class ScrollingContainerTest {
 
         // Should not crash - the node should not be added by Modifier.scrollingContainer
         rule.waitForIdle()
-    }
-
-    @Test
-    fun attachesLocalOverscrollFactoryOverscrollEffectNode() {
-        val overscrollEffect = TestOverscrollEffect()
-        val factory =
-            object : OverscrollFactory {
-                override fun createOverscrollEffect(): OverscrollEffect = overscrollEffect
-
-                override fun equals(other: Any?): Boolean = other === this
-
-                override fun hashCode(): Int = -1
-            }
-
-        rule.setContent {
-            CompositionLocalProvider(LocalOverscrollFactory provides factory) {
-                Box(
-                    Modifier.scrollingContainer(
-                        rememberScrollState(),
-                        orientation = Horizontal,
-                        enabled = true,
-                        reverseScrolling = false,
-                        flingBehavior = null,
-                        interactionSource = null,
-                        useLocalOverscrollFactory = true,
-                        overscrollEffect = null,
-                        bringIntoViewSpec = null
-                    )
-                )
-            }
-        }
-
-        rule.runOnIdle { assertThat(overscrollEffect.node.node.isAttached).isTrue() }
-    }
-
-    @Test
-    fun updatesToNewLocalOverscrollFactory() {
-        val overscrollEffect1 = TestOverscrollEffect()
-        val overscrollEffect2 = TestOverscrollEffect()
-
-        val factory1 =
-            object : OverscrollFactory {
-                override fun createOverscrollEffect(): OverscrollEffect = overscrollEffect1
-
-                override fun equals(other: Any?): Boolean = other === this
-
-                override fun hashCode(): Int = -1
-            }
-
-        val factory2 =
-            object : OverscrollFactory {
-                override fun createOverscrollEffect(): OverscrollEffect = overscrollEffect2
-
-                override fun equals(other: Any?): Boolean = other === this
-
-                override fun hashCode(): Int = -2
-            }
-
-        var factory by mutableStateOf<OverscrollFactory>(factory1)
-
-        rule.setContent {
-            CompositionLocalProvider(LocalOverscrollFactory provides factory) {
-                Box(
-                    Modifier.scrollingContainer(
-                        rememberScrollState(),
-                        orientation = Horizontal,
-                        enabled = true,
-                        reverseScrolling = false,
-                        flingBehavior = null,
-                        interactionSource = null,
-                        useLocalOverscrollFactory = true,
-                        overscrollEffect = null,
-                        bringIntoViewSpec = null
-                    )
-                )
-            }
-        }
-
-        rule.runOnIdle {
-            assertThat(overscrollEffect1.node.node.isAttached).isTrue()
-            assertThat(overscrollEffect2.node.node.isAttached).isFalse()
-            factory = factory2
-        }
-
-        // The old node should be detached, and the new one should be attached
-        rule.runOnIdle {
-            assertThat(overscrollEffect1.node.node.isAttached).isFalse()
-            assertThat(overscrollEffect2.node.node.isAttached).isTrue()
-        }
-    }
-
-    @Test
-    fun updatesBetweenProvidedOverscrollEffectAndLocalOverscrollFactory() {
-        val overscrollEffect1 = TestOverscrollEffect()
-        val overscrollEffect2 = TestOverscrollEffect()
-
-        val factory =
-            object : OverscrollFactory {
-                override fun createOverscrollEffect(): OverscrollEffect = overscrollEffect1
-
-                override fun equals(other: Any?): Boolean = other === this
-
-                override fun hashCode(): Int = -1
-            }
-
-        var useLocalOverscrollFactory by mutableStateOf(true)
-
-        rule.setContent {
-            CompositionLocalProvider(LocalOverscrollFactory provides factory) {
-                Box(
-                    Modifier.scrollingContainer(
-                        rememberScrollState(),
-                        orientation = Horizontal,
-                        enabled = true,
-                        reverseScrolling = false,
-                        flingBehavior = null,
-                        interactionSource = null,
-                        useLocalOverscrollFactory = useLocalOverscrollFactory,
-                        overscrollEffect = overscrollEffect2,
-                        bringIntoViewSpec = null
-                    )
-                )
-            }
-        }
-
-        // useLocalOverscrollFactory = true, so it will override the overscrollEffect2 we set
-        // on the modifier
-        rule.runOnIdle {
-            assertThat(overscrollEffect1.node.node.isAttached).isTrue()
-            assertThat(overscrollEffect2.node.node.isAttached).isFalse()
-            useLocalOverscrollFactory = false
-        }
-
-        // The factory-provided node should be detached, and the explicit node should be attached
-        rule.runOnIdle {
-            assertThat(overscrollEffect1.node.node.isAttached).isFalse()
-            assertThat(overscrollEffect2.node.node.isAttached).isTrue()
-            // Use the factory again
-            useLocalOverscrollFactory = true
-        }
-
-        // useLocalOverscrollFactory = true, so it should be used again
-        rule.runOnIdle {
-            assertThat(overscrollEffect1.node.node.isAttached).isTrue()
-            assertThat(overscrollEffect2.node.node.isAttached).isFalse()
-        }
-    }
-
-    @Test
-    fun changesToProvidedOverscrollEffectIgnoredIfUseLocalOverscrollFactoryTrue() {
-        val overscrollEffect1 = TestOverscrollEffect()
-        val overscrollEffect2 = TestOverscrollEffect()
-        var creationCalls = 0
-
-        val factory =
-            object : OverscrollFactory {
-                override fun createOverscrollEffect(): OverscrollEffect {
-                    creationCalls++
-                    return overscrollEffect1
-                }
-
-                override fun equals(other: Any?): Boolean = other === this
-
-                override fun hashCode(): Int = -1
-            }
-
-        var overscrollEffect by mutableStateOf<OverscrollEffect?>(null)
-
-        rule.setContent {
-            CompositionLocalProvider(LocalOverscrollFactory provides factory) {
-                Box(
-                    Modifier.scrollingContainer(
-                        rememberScrollState(),
-                        orientation = Horizontal,
-                        enabled = true,
-                        reverseScrolling = false,
-                        flingBehavior = null,
-                        interactionSource = null,
-                        useLocalOverscrollFactory = true,
-                        overscrollEffect = overscrollEffect,
-                        bringIntoViewSpec = null
-                    )
-                )
-            }
-        }
-
-        rule.runOnIdle {
-            assertThat(creationCalls).isEqualTo(1)
-            assertThat(overscrollEffect1.node.node.isAttached).isTrue()
-            assertThat(overscrollEffect2.node.node.isAttached).isFalse()
-            // Change the provided overscrollEffect - this should no-op as useLocalOverscrollFactory
-            // is true
-            overscrollEffect = overscrollEffect2
-        }
-
-        rule.runOnIdle {
-            // create should not be called again on the factory
-            assertThat(creationCalls).isEqualTo(1)
-            assertThat(overscrollEffect1.node.node.isAttached).isTrue()
-            assertThat(overscrollEffect2.node.node.isAttached).isFalse()
-        }
     }
 
     private fun Modifier.drawOutsideOfBounds() = drawBehind {
