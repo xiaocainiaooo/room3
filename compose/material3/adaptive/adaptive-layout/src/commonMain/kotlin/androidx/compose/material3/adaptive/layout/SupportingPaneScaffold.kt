@@ -41,10 +41,8 @@ import androidx.compose.ui.Modifier
  * @param extraPane the extra pane of the scaffold, which is supposed to hold any additional content
  *   besides the main and the supporting panes, for example, a styling panel in a doc app. See
  *   [SupportingPaneScaffoldRole.Extra].
- * @param paneExpansionDragHandle provide a custom pane expansion drag handle to allow users to
- *   resize panes and change the pane expansion state by dragging. This is `null` by default, which
- *   renders no drag handle. Even there's no drag handle, you can still change pane size directly
- *   via modifying [paneExpansionState].
+ * @param paneExpansionDragHandle the pane expansion drag handle to allow users to drag to change
+ *   pane expansion state, `null` by default.
  * @param paneExpansionState the state object of pane expansion.
  */
 @ExperimentalMaterial3AdaptiveApi
@@ -93,10 +91,8 @@ fun SupportingPaneScaffold(
  * @param extraPane the extra pane of the scaffold, which is supposed to hold any additional content
  *   besides the main and the supporting panes, for example, a styling panel in a doc app. See
  *   [SupportingPaneScaffoldRole.Extra].
- * @param paneExpansionDragHandle provide a custom pane expansion drag handle to allow users to
- *   resize panes and change the pane expansion state by dragging. This is `null` by default, which
- *   renders no drag handle. Even there's no drag handle, you can still change pane size directly
- *   via modifying [paneExpansionState].
+ * @param paneExpansionDragHandle the pane expansion drag handle to allow users to drag to change
+ *   pane expansion state, `null` by default.
  * @param paneExpansionState the state object of pane expansion.
  */
 @ExperimentalMaterial3AdaptiveApi
