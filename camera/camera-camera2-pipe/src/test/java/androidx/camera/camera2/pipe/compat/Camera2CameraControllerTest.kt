@@ -29,6 +29,7 @@ import androidx.camera.camera2.pipe.CameraStream
 import androidx.camera.camera2.pipe.CameraSurfaceManager
 import androidx.camera.camera2.pipe.StreamFormat
 import androidx.camera.camera2.pipe.StreamId
+import androidx.camera.camera2.pipe.SurfaceTracker
 import androidx.camera.camera2.pipe.core.TimeSource
 import androidx.camera.camera2.pipe.core.TimestampNs
 import androidx.camera.camera2.pipe.graph.GraphListener
@@ -66,6 +67,7 @@ class Camera2CameraControllerTest {
     private val streamId1 = StreamId(1)
     private val fakeGraphConfig = CameraGraph.Config(cameraId, listOf(streamConfig1))
     private val fakeGraphListener: GraphListener = mock()
+    private val fakeSurfaceTracker: SurfaceTracker = mock()
 
     // TODO: b/372258646 - Implement a proper fake implementation to simulate status changes.
     private val fakeCameraStatusMonitor = FakeCameraStatusMonitor(cameraId)
@@ -86,6 +88,7 @@ class Camera2CameraControllerTest {
             fakeThreads,
             fakeGraphConfig,
             fakeGraphListener,
+            fakeSurfaceTracker,
             fakeCameraStatusMonitor,
             fakeCaptureSessionFactory,
             fakeCaptureSequenceProcessorFactory,

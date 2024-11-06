@@ -22,6 +22,7 @@ import androidx.camera.camera2.pipe.CameraController
 import androidx.camera.camera2.pipe.CameraGraph
 import androidx.camera.camera2.pipe.CameraGraphId
 import androidx.camera.camera2.pipe.StreamGraph
+import androidx.camera.camera2.pipe.SurfaceTracker
 import androidx.camera.camera2.pipe.compat.AudioRestrictionController
 import androidx.camera.camera2.pipe.compat.AudioRestrictionControllerImpl
 import androidx.camera.camera2.pipe.compat.Camera2Backend
@@ -123,6 +124,7 @@ internal class Camera2ControllerConfig(
     private val graphConfig: CameraGraph.Config,
     private val graphListener: GraphListener,
     private val streamGraph: StreamGraph,
+    private val surfaceTracker: SurfaceTracker,
 ) {
     @Provides fun provideCameraGraphConfig() = graphConfig
 
@@ -133,6 +135,8 @@ internal class Camera2ControllerConfig(
     @Provides fun provideStreamGraph() = streamGraph as StreamGraphImpl
 
     @Provides fun provideGraphListener() = graphListener
+
+    @Provides fun provideSurfaceGraph() = surfaceTracker
 }
 
 @Module

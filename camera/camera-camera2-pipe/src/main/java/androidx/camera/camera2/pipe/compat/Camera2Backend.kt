@@ -25,6 +25,7 @@ import androidx.camera.camera2.pipe.CameraGraphId
 import androidx.camera.camera2.pipe.CameraId
 import androidx.camera.camera2.pipe.CameraMetadata
 import androidx.camera.camera2.pipe.StreamGraph
+import androidx.camera.camera2.pipe.SurfaceTracker
 import androidx.camera.camera2.pipe.config.Camera2ControllerComponent
 import androidx.camera.camera2.pipe.config.Camera2ControllerConfig
 import androidx.camera.camera2.pipe.graph.GraphListener
@@ -92,7 +93,8 @@ constructor(
         graphId: CameraGraphId,
         graphConfig: CameraGraph.Config,
         graphListener: GraphListener,
-        streamGraph: StreamGraph
+        streamGraph: StreamGraph,
+        surfaceTracker: SurfaceTracker,
     ): CameraController {
         // Use Dagger to create the camera2 controller component, then create the CameraController.
         val cameraControllerComponent =
@@ -104,6 +106,7 @@ constructor(
                         graphConfig,
                         graphListener,
                         streamGraph as StreamGraphImpl,
+                        surfaceTracker,
                     )
                 )
                 .build()
