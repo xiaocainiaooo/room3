@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text.selection
 
+import android.os.Build
 import androidx.compose.foundation.PlatformMagnifierFactory
 import androidx.compose.foundation.contextmenu.ContextMenuScope
 import androidx.compose.foundation.contextmenu.ContextMenuState
@@ -100,11 +101,13 @@ internal fun TextFieldSelectionManager.contextMenuBuilder(
     ) {
         selectAll()
     }
-    TextItem(
-        state = contextMenuState,
-        label = TextContextMenuItems.Autofill,
-        enabled = editable && value.selection.collapsed
-    ) {
-        autofill()
+    if (Build.VERSION.SDK_INT >= 26) {
+        TextItem(
+            state = contextMenuState,
+            label = TextContextMenuItems.Autofill,
+            enabled = editable && value.selection.collapsed
+        ) {
+            autofill()
+        }
     }
 }
