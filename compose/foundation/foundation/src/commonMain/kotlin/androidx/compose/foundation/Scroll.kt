@@ -38,6 +38,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Measurable
@@ -47,6 +48,7 @@ import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.horizontalScrollAxisRange
@@ -215,13 +217,24 @@ fun Modifier.verticalScroll(
     flingBehavior: FlingBehavior? = null,
     reverseScrolling: Boolean = false
 ) =
-    scroll(
-        state = state,
-        isScrollable = enabled,
-        reverseScrolling = reverseScrolling,
-        flingBehavior = flingBehavior,
-        isVertical = true,
-        useLocalOverscrollFactory = true
+    composed(
+        factory = {
+            verticalScroll(
+                state = state,
+                enabled = enabled,
+                flingBehavior = flingBehavior,
+                reverseScrolling = reverseScrolling,
+                overscrollEffect = rememberOverscrollEffect(),
+            )
+        },
+        inspectorInfo =
+            debugInspectorInfo {
+                name = "verticalScroll"
+                properties["state"] = state
+                properties["enabled"] = enabled
+                properties["flingBehavior"] = flingBehavior
+                properties["reverseScrolling"] = reverseScrolling
+            }
     )
 
 /**
@@ -256,7 +269,6 @@ fun Modifier.verticalScroll(
         reverseScrolling = reverseScrolling,
         flingBehavior = flingBehavior,
         isVertical = true,
-        useLocalOverscrollFactory = false,
         overscrollEffect = overscrollEffect
     )
 
@@ -284,13 +296,24 @@ fun Modifier.horizontalScroll(
     flingBehavior: FlingBehavior? = null,
     reverseScrolling: Boolean = false
 ) =
-    scroll(
-        state = state,
-        isScrollable = enabled,
-        reverseScrolling = reverseScrolling,
-        flingBehavior = flingBehavior,
-        isVertical = false,
-        useLocalOverscrollFactory = true
+    composed(
+        factory = {
+            horizontalScroll(
+                state = state,
+                enabled = enabled,
+                flingBehavior = flingBehavior,
+                reverseScrolling = reverseScrolling,
+                overscrollEffect = rememberOverscrollEffect(),
+            )
+        },
+        inspectorInfo =
+            debugInspectorInfo {
+                name = "horizontalScroll"
+                properties["state"] = state
+                properties["enabled"] = enabled
+                properties["flingBehavior"] = flingBehavior
+                properties["reverseScrolling"] = reverseScrolling
+            }
     )
 
 /**
@@ -325,7 +348,6 @@ fun Modifier.horizontalScroll(
         reverseScrolling = reverseScrolling,
         flingBehavior = flingBehavior,
         isVertical = false,
-        useLocalOverscrollFactory = false,
         overscrollEffect = overscrollEffect
     )
 
@@ -335,8 +357,7 @@ private fun Modifier.scroll(
     flingBehavior: FlingBehavior?,
     isScrollable: Boolean,
     isVertical: Boolean,
-    useLocalOverscrollFactory: Boolean,
-    overscrollEffect: OverscrollEffect? = null
+    overscrollEffect: OverscrollEffect?
 ): Modifier {
     val orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal
     return scrollingContainer(
@@ -346,7 +367,6 @@ private fun Modifier.scroll(
             reverseScrolling = reverseScrolling,
             flingBehavior = flingBehavior,
             interactionSource = state.internalInteractionSource,
-            useLocalOverscrollFactory = useLocalOverscrollFactory,
             overscrollEffect = overscrollEffect
         )
         .then(ScrollingLayoutElement(state, reverseScrolling, isVertical))

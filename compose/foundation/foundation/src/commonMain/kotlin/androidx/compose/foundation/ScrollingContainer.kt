@@ -28,27 +28,18 @@ import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.node.CompositionLocalConsumerModifierNode
 import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.DelegatingNode
 import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.node.ObserverModifierNode
-import androidx.compose.ui.node.currentValueOf
 import androidx.compose.ui.node.invalidatePlacement
-import androidx.compose.ui.node.observeReads
 import androidx.compose.ui.node.requireLayoutDirection
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 
 // TODO b/316559454 to make it public
-/**
- * Scrolling related information to transform a layout into a "Scrollable Container" If
- * [useLocalOverscrollFactory] is false, [overscrollEffect] will be used. If
- * [useLocalOverscrollFactory] is true, [overscrollEffect] will be ignored and
- * [LocalOverscrollFactory] will be used instead internally.
- */
+/** Scrolling related information to transform a layout into a "Scrollable Container" */
 internal fun Modifier.scrollingContainer(
     state: ScrollableState,
     orientation: Orientation,
@@ -56,7 +47,6 @@ internal fun Modifier.scrollingContainer(
     reverseScrolling: Boolean,
     flingBehavior: FlingBehavior?,
     interactionSource: MutableInteractionSource?,
-    useLocalOverscrollFactory: Boolean,
     overscrollEffect: OverscrollEffect?,
     bringIntoViewSpec: BringIntoViewSpec? = null
 ): Modifier {
@@ -69,7 +59,6 @@ internal fun Modifier.scrollingContainer(
             flingBehavior = flingBehavior,
             interactionSource = interactionSource,
             bringIntoViewSpec = bringIntoViewSpec,
-            useLocalOverscrollFactory = useLocalOverscrollFactory,
             overscrollEffect = overscrollEffect
         )
     )
@@ -88,7 +77,6 @@ private class ScrollingContainerElement(
     private val flingBehavior: FlingBehavior?,
     private val interactionSource: MutableInteractionSource?,
     private val bringIntoViewSpec: BringIntoViewSpec?,
-    private val useLocalOverscrollFactory: Boolean,
     private val overscrollEffect: OverscrollEffect?
 ) : ModifierNodeElement<ScrollingContainerNode>() {
     override fun create(): ScrollingContainerNode {
@@ -100,7 +88,6 @@ private class ScrollingContainerElement(
             flingBehavior = flingBehavior,
             interactionSource = interactionSource,
             bringIntoViewSpec = bringIntoViewSpec,
-            useLocalOverscrollFactory = useLocalOverscrollFactory,
             overscrollEffect = overscrollEffect
         )
     }
@@ -109,7 +96,6 @@ private class ScrollingContainerElement(
         node.update(
             state = state,
             orientation = orientation,
-            useLocalOverscrollFactory = useLocalOverscrollFactory,
             overscrollEffect = overscrollEffect,
             enabled = enabled,
             reverseScrolling = reverseScrolling,
@@ -128,7 +114,6 @@ private class ScrollingContainerElement(
         properties["flingBehavior"] = flingBehavior
         properties["interactionSource"] = interactionSource
         properties["bringIntoViewSpec"] = bringIntoViewSpec
-        properties["useLocalOverscrollFactory"] = useLocalOverscrollFactory
         properties["overscrollEffect"] = overscrollEffect
     }
 
@@ -145,7 +130,6 @@ private class ScrollingContainerElement(
         if (flingBehavior != other.flingBehavior) return false
         if (interactionSource != other.interactionSource) return false
         if (bringIntoViewSpec != other.bringIntoViewSpec) return false
-        if (useLocalOverscrollFactory != other.useLocalOverscrollFactory) return false
         if (overscrollEffect != other.overscrollEffect) return false
 
         return true
@@ -159,7 +143,6 @@ private class ScrollingContainerElement(
         result = 31 * result + (flingBehavior?.hashCode() ?: 0)
         result = 31 * result + (interactionSource?.hashCode() ?: 0)
         result = 31 * result + (bringIntoViewSpec?.hashCode() ?: 0)
-        result = 31 * result + useLocalOverscrollFactory.hashCode()
         result = 31 * result + (overscrollEffect?.hashCode() ?: 0)
         return result
     }
@@ -173,17 +156,11 @@ private class ScrollingContainerNode(
     private var flingBehavior: FlingBehavior?,
     private var interactionSource: MutableInteractionSource?,
     private var bringIntoViewSpec: BringIntoViewSpec?,
-    private var useLocalOverscrollFactory: Boolean,
     private var overscrollEffect: OverscrollEffect?
-) :
-    DelegatingNode(),
-    LayoutModifierNode,
-    CompositionLocalConsumerModifierNode,
-    ObserverModifierNode {
+) : DelegatingNode(), LayoutModifierNode {
     override val shouldAutoInvalidate = false
     private var scrollableNode: ScrollableNode? = null
     private var overscrollNode: DelegatableNode? = null
-    private var localOverscrollFactory: OverscrollFactory? = null
     private var shouldReverseDirection = false
 
     // Needs to be mutated to properly update the underlying layer, which relies on instance
@@ -233,7 +210,6 @@ private class ScrollingContainerNode(
             update(
                 state,
                 orientation,
-                useLocalOverscrollFactory,
                 overscrollEffect,
                 enabled,
                 reverseScrolling,
@@ -247,7 +223,6 @@ private class ScrollingContainerNode(
     fun update(
         state: ScrollableState,
         orientation: Orientation,
-        useLocalOverscrollFactory: Boolean,
         overscrollEffect: OverscrollEffect?,
         enabled: Boolean,
         reverseScrolling: Boolean,
@@ -266,22 +241,8 @@ private class ScrollingContainerNode(
             }
             invalidatePlacement()
         }
-        var useLocalOverscrollFactoryChanged = false
-        if (this.useLocalOverscrollFactory != useLocalOverscrollFactory) {
-            useLocalOverscrollFactoryChanged = true
-            this.useLocalOverscrollFactory = useLocalOverscrollFactory
-        }
-        var overscrollEffectChanged = false
         if (this.overscrollEffect != overscrollEffect) {
-            overscrollEffectChanged = true
             this.overscrollEffect = overscrollEffect
-        }
-        if (
-            useLocalOverscrollFactoryChanged ||
-                // If the overscroll effect changed but we are still using the local factory, this
-                // should no-op
-                overscrollEffectChanged && !useLocalOverscrollFactory
-        ) {
             overscrollNode?.let { undelegate(it) }
             overscrollNode = null
             attachOverscrollNodeIfNeeded()
@@ -314,31 +275,11 @@ private class ScrollingContainerNode(
     }
 
     private fun attachOverscrollNodeIfNeeded() {
-        if (overscrollNode == null) {
-            var effect: OverscrollEffect? = overscrollEffect
-            // Overrides overscrollEffect if set
-            if (useLocalOverscrollFactory) {
-                observeReads {
-                    localOverscrollFactory = currentValueOf(LocalOverscrollFactory)
-                    effect = localOverscrollFactory?.createOverscrollEffect()
-                }
+        if (overscrollNode == null && overscrollEffect != null) {
+            val node = overscrollEffect!!.node
+            if (!node.node.isAttached) {
+                overscrollNode = delegate(node)
             }
-            if (effect != null) {
-                val node = effect!!.node
-                if (!node.node.isAttached) {
-                    overscrollNode = delegate(node)
-                }
-            }
-        }
-    }
-
-    override fun onObservedReadsChanged() {
-        val factory = currentValueOf(LocalOverscrollFactory)
-        if (factory != localOverscrollFactory) {
-            localOverscrollFactory = factory
-            overscrollNode?.let { undelegate(it) }
-            overscrollNode = null
-            attachOverscrollNodeIfNeeded()
         }
     }
 }

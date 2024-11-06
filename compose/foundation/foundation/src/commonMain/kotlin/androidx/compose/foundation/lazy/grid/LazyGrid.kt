@@ -139,7 +139,6 @@ internal fun LazyGrid(
                     reverseScrolling = reverseLayout,
                     flingBehavior = flingBehavior,
                     interactionSource = state.internalInteractionSource,
-                    useLocalOverscrollFactory = false,
                     overscrollEffect = overscrollEffect
                 ),
         prefetchState = state.prefetchState,
