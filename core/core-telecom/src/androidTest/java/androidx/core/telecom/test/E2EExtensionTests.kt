@@ -413,6 +413,10 @@ class E2EExtensionTests(private val parameters: TestParameters) : BaseTelecomTes
      * This is an end to end test that verifies a VoIP application and InCallService can add the
      * LocalCallSilenceExtension and toggle the value.
      */
+    @SdkSuppress(
+        minSdkVersion = VERSION_CODES.O,
+        maxSdkVersion = VERSION_CODES.TIRAMISU
+    ) // TODO:: b/377707977
     @LargeTest
     @Test(timeout = 10000)
     fun testVoipAndIcsTogglingTheLocalCallSilenceExtension(): Unit = runBlocking {
