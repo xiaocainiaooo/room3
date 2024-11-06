@@ -44,8 +44,9 @@ internal class SavedStateRegistryOwnerDelegatesTest : RobolectricTest() {
                 lifecycleRegistry.currentState = State.CREATED
             }
 
-        val property by owner.saved(Int.serializer()) { Int.MAX_VALUE }
-        @Suppress("UNUSED_EXPRESSION") property // force access.
+        var property by owner.saved(Int.serializer()) { Int.MIN_VALUE }
+        property = Int.MAX_VALUE
+
         val actualState = savedState()
         owner.savedStateRegistryController.performSave(actualState)
 
@@ -138,8 +139,9 @@ internal class SavedStateRegistryOwnerDelegatesTest : RobolectricTest() {
                 lifecycleRegistry.currentState = State.CREATED
             }
 
-        val property by owner.saved(CUSTOM_KEY) { Int.MAX_VALUE }
-        @Suppress("UNUSED_EXPRESSION") property // force access.
+        var property by owner.saved(CUSTOM_KEY) { Int.MIN_VALUE }
+        property = Int.MAX_VALUE
+
         val actualState = savedState()
         owner.savedStateRegistryController.performSave(actualState)
 
