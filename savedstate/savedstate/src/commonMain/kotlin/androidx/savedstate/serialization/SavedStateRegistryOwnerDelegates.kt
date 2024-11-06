@@ -129,16 +129,18 @@ private class SavedStateReadWriteProperty<T : Any>(
         val qualifiedKey = key ?: (classNamePrefix + property.name)
 
         val restoredState = registry.consumeRestoredStateForKey(qualifiedKey)
-        val value =
+        val initialValue =
             if (restoredState != null && restoredState.read { !isEmpty() }) {
                 decodeFromSavedState(serializer, restoredState)
             } else {
                 init()
             }
 
-        registry.registerSavedStateProvider(qualifiedKey) { encodeToSavedState(serializer, value) }
+        registry.registerSavedStateProvider(qualifiedKey) {
+            encodeToSavedState(serializer, this.value)
+        }
 
-        this.value = value
+        this.value = initialValue
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
