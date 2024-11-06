@@ -32,8 +32,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.xr.compose.platform.LocalSession
-import androidx.xr.compose.platform.XrMode
-import androidx.xr.compose.platform.currentOrNull
+import androidx.xr.compose.platform.LocalSpatialCapabilities
 
 @Composable
 internal fun XrSettingsPane(navSuiteType: MutableState<NavigationSuiteType>) {
@@ -50,9 +49,9 @@ internal fun XrSettingsPane(navSuiteType: MutableState<NavigationSuiteType>) {
 
 @Composable
 private fun XrModeButton() {
-    val session = LocalSession.currentOrNull
+    val session = LocalSession.current
     val isDeviceXr = session != null
-    val isFullSpaceMode = XrMode.isSpatialUiEnabled
+    val isFullSpaceMode = LocalSpatialCapabilities.current.isSpatialUiEnabled
 
     Button(
         modifier = Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 16.dp),
