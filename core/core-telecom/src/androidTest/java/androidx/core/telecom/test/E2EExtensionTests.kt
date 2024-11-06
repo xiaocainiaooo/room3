@@ -58,6 +58,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Assume.assumeTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -414,6 +415,7 @@ class E2EExtensionTests(private val parameters: TestParameters) : BaseTelecomTes
      * LocalCallSilenceExtension and toggle the value.
      */
     @LargeTest
+    @Ignore("b/377706280")
     @Test(timeout = 10000)
     fun testVoipAndIcsTogglingTheLocalCallSilenceExtension(): Unit = runBlocking {
         usingIcs { ics ->
