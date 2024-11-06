@@ -52,4 +52,10 @@ public class PrefetchParametersAdapter implements
         return BoundaryInterfaceReflectionUtil.createInvocationHandlerFor(
                 new NoVarySearchDataAdapter(noVarySearchData));
     }
+
+    @Override
+    public boolean isJavaScriptEnabled() {
+        if (mPrefetchParameters == null) return false;
+        return mPrefetchParameters.isJavaScriptEnabled();
+    }
 }
