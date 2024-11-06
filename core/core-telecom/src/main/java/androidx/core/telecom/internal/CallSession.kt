@@ -35,6 +35,7 @@ import androidx.core.telecom.internal.utils.EndpointUtils.Companion.getSpeakerEn
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.isBluetoothAvailable
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.isEarpieceEndpoint
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.isWiredHeadsetOrBtEndpoint
+import androidx.core.telecom.internal.utils.EndpointUtils.Companion.maybeRemoveEarpieceIfWiredEndpointPresent
 import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CompletableDeferred
@@ -66,7 +67,7 @@ internal class CallSession(
     private var mPlatformInterface: CallControl? = null
     // cache the latest current and available endpoints
     private var mCurrentCallEndpoint: CallEndpointCompat? = null
-    private var mAvailableEndpoints: List<CallEndpointCompat> = ArrayList()
+    private var mAvailableEndpoints: MutableList<CallEndpointCompat> = mutableListOf()
     private var mLastClientRequestedEndpoint: CallEndpointCompat? = null
     // use CompletableDeferred objects to signal when all the endpoint values have initially
     // been received from the platform.
@@ -112,7 +113,7 @@ internal class CallSession(
 
     @VisibleForTesting
     fun setAvailableCallEndpoints(endpoints: List<CallEndpointCompat>) {
-        mAvailableEndpoints = endpoints
+        mAvailableEndpoints = endpoints.toMutableList()
     }
 
     /**
@@ -165,7 +166,9 @@ internal class CallSession(
     override fun onAvailableCallEndpointsChanged(endpoints: List<CallEndpoint>) {
         // due to the [CallsManager#getAvailableStartingCallEndpoints] API, endpoints the client
         // has can be different from the ones coming from the platform. Hence, a remapping is needed
-        mAvailableEndpoints = endpoints.map { toRemappedCallEndpointCompat(it) }.sorted()
+        mAvailableEndpoints =
+            endpoints.map { toRemappedCallEndpointCompat(it) }.sorted().toMutableList()
+        maybeRemoveEarpieceIfWiredEndpointPresent(mAvailableEndpoints)
         // send the current call endpoints out to the client
         callChannels.availableEndpointChannel.trySend(mAvailableEndpoints).getOrThrow()
         Log.i(TAG, "onAvailableCallEndpointsChanged: endpoints=[$endpoints]")

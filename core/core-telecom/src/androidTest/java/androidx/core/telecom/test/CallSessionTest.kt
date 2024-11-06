@@ -23,6 +23,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.telecom.CallEndpointCompat
 import androidx.core.telecom.internal.CallChannels
 import androidx.core.telecom.internal.CallSession
+import androidx.core.telecom.internal.utils.EndpointUtils
 import androidx.core.telecom.test.utils.BaseTelecomTest
 import androidx.core.telecom.test.utils.TestUtils
 import androidx.core.telecom.util.ExperimentalAppActions
@@ -55,6 +56,24 @@ class CallSessionTest : BaseTelecomTest() {
     private val mEarAndSpeakerEndpoints = listOf(mEarpieceEndpoint, mSpeakerEndpoint)
     private val mEarAndSpeakerAndBtEndpoints =
         listOf(mEarpieceEndpoint, mSpeakerEndpoint, mBluetoothEndpoint)
+    private val mWiredAndEarpieceEndpoints = listOf(mEarpieceEndpoint, mWiredEndpoint)
+
+    /**
+     * Test the helper method that removes the earpiece call endpoint if the wired headset endpoint
+     * is present
+     */
+    @SdkSuppress(minSdkVersion = VERSION_CODES.UPSIDE_DOWN_CAKE)
+    @SmallTest
+    @Test
+    fun testRemovalOfEarpieceEndpointIfWiredEndpointIsPresent() {
+        setUpV2Test()
+        val res =
+            EndpointUtils.maybeRemoveEarpieceIfWiredEndpointPresent(
+                mWiredAndEarpieceEndpoints.toMutableList()
+            )
+        assertEquals(1, res.size)
+        assertEquals(res[0].type, CallEndpointCompat.TYPE_WIRED_HEADSET)
+    }
 
     /**
      * verify maybeDelaySwitchToSpeaker does NOT switch to speakerphone if the bluetooth device
