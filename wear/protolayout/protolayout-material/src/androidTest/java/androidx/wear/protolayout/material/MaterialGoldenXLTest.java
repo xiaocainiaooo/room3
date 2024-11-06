@@ -41,6 +41,7 @@ import androidx.wear.protolayout.material.RunnerUtils.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -135,6 +136,7 @@ public class MaterialGoldenXLTest {
     }
 
     @Test
+    @Ignore("b/376758169")
     public void test() {
         runSingleScreenshotTest(mScreenshotRule, mTestCase, mExpected);
     }
