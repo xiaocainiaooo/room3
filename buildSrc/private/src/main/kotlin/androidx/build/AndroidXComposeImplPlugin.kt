@@ -198,6 +198,7 @@ private fun configureComposeCompilerPlugin(project: Project, extension: AndroidX
             } else {
                 compile.enableFeatureFlag(ComposeFeatureFlag.StrongSkipping)
                 compile.enableFeatureFlag(ComposeFeatureFlag.OptimizeNonSkippingGroups)
+                compile.enableFeatureFlag(ComposeFeatureFlag.PausableComposition)
             }
             if (shouldPublish) {
                 compile.addPluginOption(ComposeCompileOptions.SourceOption, "true")
@@ -310,4 +311,5 @@ private enum class ComposeCompileOptions(val pluginId: String, val key: String) 
 private enum class ComposeFeatureFlag(val featureName: String) {
     StrongSkipping("StrongSkipping"),
     OptimizeNonSkippingGroups("OptimizeNonSkippingGroups"),
+    PausableComposition("PausableComposition"),
 }
