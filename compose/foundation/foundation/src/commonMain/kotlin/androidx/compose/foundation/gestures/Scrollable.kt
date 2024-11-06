@@ -25,12 +25,15 @@ import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.ComposeFoundationFlags.NewNestedFlingPropagationEnabled
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.FocusedBoundsObserverNode
+import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.gestures.Orientation.Horizontal
 import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.relocation.BringIntoViewResponderNode
+import androidx.compose.foundation.rememberOverscrollEffect
+import androidx.compose.foundation.rememberPlatformOverscrollEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -58,6 +61,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.node.CompositionLocalConsumerModifierNode
+import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.node.TraversableNode
@@ -538,6 +542,46 @@ object ScrollableDefaults {
     fun flingBehavior(): FlingBehavior {
         val flingSpec = rememberSplineBasedDecay<Float>()
         return remember(flingSpec) { DefaultFlingBehavior(flingSpec) }
+    }
+
+    /**
+     * Returns a remembered [OverscrollEffect] created from the current value of
+     * [LocalOverscrollFactory].
+     *
+     * This API has been deprpecated, and replaced with [rememberOverscrollEffect]
+     */
+    @Deprecated(
+        "This API has been replaced with rememberOverscrollEffect, which queries theme provided OverscrollFactory values instead of the 'platform default' without customization.",
+        replaceWith =
+            ReplaceWith(
+                "rememberOverscrollEffect()",
+                "androidx.compose.foundation.rememberOverscrollEffect"
+            )
+    )
+    @Composable
+    fun overscrollEffect(): OverscrollEffect {
+        return rememberPlatformOverscrollEffect() ?: NoOpOverscrollEffect
+    }
+
+    private object NoOpOverscrollEffect : OverscrollEffect {
+        override fun applyToScroll(
+            delta: Offset,
+            source: NestedScrollSource,
+            performScroll: (Offset) -> Offset
+        ): Offset = performScroll(delta)
+
+        override suspend fun applyToFling(
+            velocity: Velocity,
+            performFling: suspend (Velocity) -> Velocity
+        ) {
+            performFling(velocity)
+        }
+
+        override val isInProgress: Boolean
+            get() = false
+
+        override val node: DelegatableNode
+            get() = object : Modifier.Node() {}
     }
 
     /**
