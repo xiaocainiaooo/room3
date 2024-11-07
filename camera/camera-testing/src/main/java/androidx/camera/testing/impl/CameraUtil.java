@@ -59,10 +59,10 @@ import androidx.camera.core.Logger;
 import androidx.camera.core.RetryPolicy;
 import androidx.camera.core.UseCase;
 import androidx.camera.core.concurrent.CameraCoordinator;
+import androidx.camera.core.impl.AdapterCameraInfo;
 import androidx.camera.core.impl.CameraConfig;
 import androidx.camera.core.impl.CameraConfigs;
 import androidx.camera.core.impl.CameraInternal;
-import androidx.camera.core.impl.RestrictedCameraInfo;
 import androidx.camera.core.impl.utils.futures.Futures;
 import androidx.camera.core.internal.CameraUseCaseAdapter;
 import androidx.camera.testing.impl.fakes.FakeCameraCoordinator;
@@ -631,7 +631,7 @@ public final class CameraUtil {
                     cameraSelector.select(cameraX.getCameraRepository().getCameras());
             return new CameraUseCaseAdapter(camera,
                     null,
-                    new RestrictedCameraInfo(camera.getCameraInfoInternal(), cameraConfig),
+                    new AdapterCameraInfo(camera.getCameraInfoInternal(), cameraConfig),
                     null,
                     CompositionSettings.DEFAULT,
                     CompositionSettings.DEFAULT,

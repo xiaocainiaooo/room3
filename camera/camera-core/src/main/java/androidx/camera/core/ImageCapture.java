@@ -98,6 +98,7 @@ import androidx.camera.core.imagecapture.ImagePipeline;
 import androidx.camera.core.imagecapture.PostviewSettings;
 import androidx.camera.core.imagecapture.TakePictureManager;
 import androidx.camera.core.imagecapture.TakePictureRequest;
+import androidx.camera.core.impl.AdapterCameraInfo;
 import androidx.camera.core.impl.CameraConfig;
 import androidx.camera.core.impl.CameraInfoInternal;
 import androidx.camera.core.impl.CameraInternal;
@@ -112,7 +113,6 @@ import androidx.camera.core.impl.ImageReaderProxy;
 import androidx.camera.core.impl.MutableConfig;
 import androidx.camera.core.impl.MutableOptionsBundle;
 import androidx.camera.core.impl.OptionsBundle;
-import androidx.camera.core.impl.RestrictedCameraInfo;
 import androidx.camera.core.impl.SessionConfig;
 import androidx.camera.core.impl.SessionProcessor;
 import androidx.camera.core.impl.StreamSpec;
@@ -1051,11 +1051,11 @@ public final class ImageCapture extends UseCase {
         @NonNull
         @Override
         public Set<@OutputFormat Integer> getSupportedOutputFormats() {
-            Set<Integer> outputFormatsFromRestrictedCameraInfo =
-                    getSupportedOutputFormatsFromRestrictedCameraInfo();
+            Set<Integer> outputFormatsFromAdapterCameraInfo =
+                    getSupportedOutputFormatsFromAdapterCameraInfo();
 
-            if (outputFormatsFromRestrictedCameraInfo != null) {
-                return outputFormatsFromRestrictedCameraInfo;
+            if (outputFormatsFromAdapterCameraInfo != null) {
+                return outputFormatsFromAdapterCameraInfo;
             }
 
             Set<Integer> formats = new HashSet<>();
@@ -1092,14 +1092,14 @@ public final class ImageCapture extends UseCase {
 
         @OptIn(markerClass = ExperimentalImageCaptureOutputFormat.class)
         @Nullable
-        private Set<Integer> getSupportedOutputFormatsFromRestrictedCameraInfo() {
-            if (!(mCameraInfo instanceof RestrictedCameraInfo)) {
+        private Set<Integer> getSupportedOutputFormatsFromAdapterCameraInfo() {
+            if (!(mCameraInfo instanceof AdapterCameraInfo)) {
                 return null;
             }
 
-            // If RestrictedCameraInfo is used to query the capabilities, retrieves the supported
+            // If AdapterCameraInfo is used to query the capabilities, retrieves the supported
             // output formats from the CameraConfig associated with it.
-            CameraConfig cameraConfig = ((RestrictedCameraInfo) mCameraInfo).getCameraConfig();
+            CameraConfig cameraConfig = ((AdapterCameraInfo) mCameraInfo).getCameraConfig();
             UseCaseConfigFactory useCaseConfigFactory = cameraConfig.getUseCaseConfigFactory();
             Config useCaseConfig = useCaseConfigFactory.getConfig(
                     UseCaseConfigFactory.CaptureType.IMAGE_CAPTURE, DEFAULT_CAPTURE_MODE);
@@ -1117,7 +1117,7 @@ public final class ImageCapture extends UseCase {
                 if (formatSizesPair.first == ImageFormat.JPEG_R) {
                     formats.add(OUTPUT_FORMAT_JPEG_ULTRA_HDR);
                     // Besides JPEG, only JPEG_ULTRA_HDR can be supported for now from the
-                    // restricted camera info. Breaks the for-loop when it has been confirmed that
+                    // adapter camera info. Breaks the for-loop when it has been confirmed that
                     // JPEG_ULTRA_HDR can be supported.
                     break;
                 }
