@@ -271,6 +271,8 @@ internal interface Owner : PositionCalculator {
 
     fun onLayoutNodeDeactivated(layoutNode: LayoutNode)
 
+    fun onLayoutNodeIdChange(layoutNode: LayoutNode, oldSemanticsId: Int) {}
+
     /**
      * The position and/or size of an interop view (typically, an android.view.View) has changed. On
      * Android, this schedules view tree layout observer callback to be invoked for the underlying
