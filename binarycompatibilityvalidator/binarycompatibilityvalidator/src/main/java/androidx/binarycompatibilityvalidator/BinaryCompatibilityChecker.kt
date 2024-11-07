@@ -314,6 +314,11 @@ class BinaryCompatibilityChecker(
                 modality == AbiModality.FINAL &&
                     kind == AbiPropertyKind.VAR &&
                     oldProperty.kind == AbiPropertyKind.VAL -> Unit
+                // changing var to val is allowed as long as the setter was private / internal (null
+                // in dump)
+                oldProperty.kind == AbiPropertyKind.VAR &&
+                    kind == AbiPropertyKind.VAL &&
+                    oldProperty.setter == null -> Unit
                 else ->
                     errors.add("kind changed from ${oldProperty.kind} to $kind for $qualifiedName")
             }

@@ -483,6 +483,27 @@ class BinaryCompatibilityCheckerTest {
     }
 
     @Test
+    fun propertyVarToValWithInternalSet() {
+        val beforeText =
+            """
+        open class my.lib/MyClass { // my.lib/MyClass|null[0]
+            constructor <init>() // my.lib/MyClass.<init>|<init>(){}[0]
+            open var myProperty // my.lib/MyClass.myProperty|{}myProperty[0]
+                open fun <get-myProperty>(): kotlin/Int // my.lib/MyClass.myProperty.<get-myProperty>|<get-myProperty>(){}[0]
+        }
+        """
+        val afterText =
+            """
+        open class my.lib/MyClass { // my.lib/MyClass|null[0]
+            constructor <init>() // my.lib/MyClass.<init>|<init>(){}[0]
+            open val myProperty // my.lib/MyClass.myProperty|{}myProperty[0]
+                open fun <get-myProperty>(): kotlin/Int // my.lib/MyClass.myProperty.<get-myProperty>|<get-myProperty>(){}[0]
+        }
+        """
+        testBeforeAndAfterIsCompatible(beforeText, afterText)
+    }
+
+    @Test
     fun paramInlineToCrossInline() {
         val beforeText =
             """
