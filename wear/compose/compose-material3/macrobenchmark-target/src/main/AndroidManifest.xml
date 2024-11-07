@@ -129,6 +129,17 @@
         </activity>
 
         <activity
+            android:name=".HorizontalPagerActivity"
+            android:theme="@style/AppTheme"
+            android:exported="true">
+            <intent-filter>
+                <action android:name=
+                    "androidx.wear.compose.material3.macrobenchmark.target.HORIZONTAL_PAGER_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".IconButtonActivity"
             android:theme="@style/AppTheme"
             android:exported="true">
