@@ -1,1 +1,24 @@
 // Signature format: 4.0
+package androidx.navigation3 {
+
+  public interface NavContentWrapper {
+    method public default void WrapBackStack(java.util.List<?> backStack);
+    method public void WrapContent(androidx.navigation3.Record record);
+  }
+
+  public final class NavWrapperManager {
+    ctor public NavWrapperManager(java.util.List<? extends androidx.navigation3.NavContentWrapper> navContentWrappers);
+    method public void ContentForRecord(androidx.navigation3.Record record);
+    method public void PrepareBackStack(java.util.List<?> backStack);
+  }
+
+  public final class NavWrapperManagerKt {
+    method public static androidx.navigation3.NavWrapperManager rememberNavWrapperManager(java.util.List<? extends androidx.navigation3.NavContentWrapper> navContentWrappers);
+  }
+
+  public final class Record {
+    ctor public Record(Object key, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit> content);
+  }
+
+}
+

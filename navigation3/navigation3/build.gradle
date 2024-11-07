@@ -27,13 +27,13 @@ import androidx.build.PlatformIdentifier
 
 plugins {
     id("AndroidXPlugin")
+    id("AndroidXComposePlugin")
     id("com.android.library")
 }
 
 androidXMultiplatform {
     android()
     jvmStubs()
-    linuxX64Stubs()
 
     defaultPlatform(PlatformIdentifier.ANDROID)
 
@@ -41,11 +41,16 @@ androidXMultiplatform {
         commonMain {
             dependencies {
                 implementation(libs.kotlinStdlib)
+                implementation("androidx.compose.runtime:runtime:1.7.5")
+                implementation("androidx.compose.runtime:runtime-saveable:1.7.5")
             }
         }
 
         commonTest {
             dependencies {
+                implementation(libs.kotlinTest)
+                implementation(project(":kruth:kruth"))
+                implementation(project(":compose:runtime:runtime-test-utils"))
             }
         }
 
@@ -78,10 +83,6 @@ androidXMultiplatform {
         }
 
         jvmStubsMain {
-            dependsOn(commonStubsMain)
-        }
-
-        linuxx64StubsMain {
             dependsOn(commonStubsMain)
         }
     }
