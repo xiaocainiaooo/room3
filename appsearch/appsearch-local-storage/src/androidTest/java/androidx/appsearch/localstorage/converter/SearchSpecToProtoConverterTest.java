@@ -259,7 +259,8 @@ public class SearchSpecToProtoConverterTest {
                                         prefix2 + "typeB", configProto))),
                         mLocalStorageIcingOptionsConfig);
 
-        VisibilityStore visibilityStore = new VisibilityStore(mAppSearchImpl);
+        VisibilityStore visibilityStore =
+                VisibilityStore.createDocumentVisibilityStore(mAppSearchImpl);
         converter.removeInaccessibleSchemaFilter(
                 new CallerAccess(/*callingPackageName=*/"package"),
                 visibilityStore,
@@ -1573,7 +1574,8 @@ public class SearchSpecToProtoConverterTest {
 
     @Test
     public void testRemoveInaccessibleSchemaFilter() throws Exception {
-        VisibilityStore visibilityStore = new VisibilityStore(mAppSearchImpl);
+        VisibilityStore visibilityStore =
+                VisibilityStore.createDocumentVisibilityStore(mAppSearchImpl);
 
         final String prefix = PrefixUtil.createPrefix("package", "database");
         SchemaTypeConfigProto schemaTypeConfigProto =
@@ -1673,7 +1675,8 @@ public class SearchSpecToProtoConverterTest {
 
     @Test
     public void testRemoveInaccessibleSchemaFilterWithEmptyNestedFilter() throws Exception {
-        VisibilityStore visibilityStore = new VisibilityStore(mAppSearchImpl);
+        VisibilityStore visibilityStore =
+                VisibilityStore.createDocumentVisibilityStore(mAppSearchImpl);
 
         final String prefix = PrefixUtil.createPrefix("package", "database");
         SchemaTypeConfigProto schemaTypeConfigProto =

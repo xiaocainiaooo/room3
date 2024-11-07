@@ -24,6 +24,8 @@ import androidx.appsearch.localstorage.util.PrefixUtil;
 import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -82,6 +84,17 @@ public class NamespaceCache {
     @NonNull
     public Set<String> getAllDocumentPrefixes() {
         return mDocumentNamespaceMap.keySet();
+    }
+
+
+    /**  Gets all prefixed blob namespaces in AppSearch.  */
+    @NonNull
+    public List<String> getAllPrefixedBlobNamespaces() {
+        List<String> prefixedBlobNamespaces = new ArrayList<>();
+        for (Set<String> value : mBlobNamespaceMap.values()) {
+            prefixedBlobNamespaces.addAll(value);
+        }
+        return prefixedBlobNamespaces;
     }
 
     /**  Removes prefixed document namespaces under the given prefix.  */

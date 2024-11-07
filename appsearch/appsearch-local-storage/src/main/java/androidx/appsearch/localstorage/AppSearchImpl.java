@@ -231,7 +231,12 @@ public final class AppSearchImpl implements Closeable {
     @Nullable
     @VisibleForTesting
     @GuardedBy("mReadWriteLock")
-    final VisibilityStore mVisibilityStoreLocked;
+    final VisibilityStore mDocumentVisibilityStoreLocked;
+
+    @Nullable
+    @VisibleForTesting
+    @GuardedBy("mReadWriteLock")
+    final VisibilityStore mBlobVisibilityStoreLocked;
 
     @Nullable
     @GuardedBy("mReadWriteLock")
@@ -445,8 +450,16 @@ public final class AppSearchImpl implements Closeable {
                 resetLocked(initStatsBuilder);
             }
 
+            // AppSearchImpl core parameters are initialized and we should be able to build
+            // VisibilityStores based on that. We shouldn't wipe out everything if we only failed to
+            // build VisibilityStores.
             long prepareVisibilityStoreLatencyStartMillis = SystemClock.elapsedRealtime();
-            mVisibilityStoreLocked = new VisibilityStore(this);
+            mDocumentVisibilityStoreLocked = VisibilityStore.createDocumentVisibilityStore(this);
+            if (mRevocableFileDescriptorStore != null) {
+                mBlobVisibilityStoreLocked = VisibilityStore.createBlobVisibilityStore(this);
+            } else {
+                mBlobVisibilityStoreLocked = null;
+            }
             long prepareVisibilityStoreLatencyEndMillis = SystemClock.elapsedRealtime();
             if (initStatsBuilder != null) {
                 initStatsBuilder.setPrepareVisibilityStoreLatencyMillis((int)
@@ -615,7 +628,7 @@ public final class AppSearchImpl implements Closeable {
                             packageName,
                             databaseName,
                             oldSchemaName,
-                            mVisibilityStoreLocked,
+                            mDocumentVisibilityStoreLocked,
                             mVisibilityCheckerLocked));
         }
         int getOldSchemaObserverLatencyMillis =
@@ -653,7 +666,7 @@ public final class AppSearchImpl implements Closeable {
                             packageName,
                             databaseName,
                             newSchemaName,
-                            mVisibilityStoreLocked,
+                            mDocumentVisibilityStoreLocked,
                             mVisibilityCheckerLocked));
         }
         long getNewSchemaObserverEndTimeMillis = SystemClock.elapsedRealtime();
@@ -840,7 +853,7 @@ public final class AppSearchImpl implements Closeable {
 
         // Since the constructor of VisibilityStore will set schema. Avoid call visibility
         // store before we have already created it.
-        if (mVisibilityStoreLocked != null) {
+        if (mDocumentVisibilityStoreLocked != null) {
             // Add prefix to all visibility documents.
             // Find out which Visibility document is deleted or changed to all-default settings.
             // We need to remove them from Visibility Store.
@@ -852,8 +865,8 @@ public final class AppSearchImpl implements Closeable {
             // all-default visibility settings, add deleted schemas. That's all we need to
             // remove.
             deprecatedVisibilityDocuments.addAll(rewrittenSchemaResults.mDeletedPrefixedTypes);
-            mVisibilityStoreLocked.removeVisibility(deprecatedVisibilityDocuments);
-            mVisibilityStoreLocked.setVisibility(prefixedVisibilityConfigs);
+            mDocumentVisibilityStoreLocked.removeVisibility(deprecatedVisibilityDocuments);
+            mDocumentVisibilityStoreLocked.setVisibility(prefixedVisibilityConfigs);
         }
         long saveVisibilitySettingEndTimeMillis = SystemClock.elapsedRealtime();
         if (setSchemaStatsBuilder != null) {
@@ -912,7 +925,7 @@ public final class AppSearchImpl implements Closeable {
                         callerAccess,
                         packageName,
                         prefixedSchemaType,
-                        mVisibilityStoreLocked,
+                        mDocumentVisibilityStoreLocked,
                         mVisibilityCheckerLocked)) {
                     // Caller doesn't have access to this type.
                     continue;
@@ -929,10 +942,10 @@ public final class AppSearchImpl implements Closeable {
 
                 // Populate visibility info. Since the constructor of VisibilityStore will get
                 // schema. Avoid call visibility store before we have already created it.
-                if (mVisibilityStoreLocked != null) {
+                if (mDocumentVisibilityStoreLocked != null) {
                     String typeName = typeConfig.getSchemaType().substring(typePrefix.length());
                     InternalVisibilityConfig visibilityConfig =
-                            mVisibilityStoreLocked.getVisibility(prefixedSchemaType);
+                            mDocumentVisibilityStoreLocked.getVisibility(prefixedSchemaType);
                     if (visibilityConfig != null) {
                         if (visibilityConfig.isNotDisplayedBySystem()) {
                             responseBuilder.addSchemaTypeNotDisplayedBySystem(typeName);
@@ -1115,7 +1128,7 @@ public final class AppSearchImpl implements Closeable {
                         document.getNamespace(),
                         document.getSchemaType(),
                         document.getId(),
-                        mVisibilityStoreLocked,
+                        mDocumentVisibilityStoreLocked,
                         mVisibilityCheckerLocked);
             }
         } finally {
@@ -1303,7 +1316,7 @@ public final class AppSearchImpl implements Closeable {
         mReadWriteLock.writeLock().lock();
         try {
             throwIfClosedLocked();
-            if (mVisibilityStoreLocked != null) {
+            if (mBlobVisibilityStoreLocked != null) {
                 String prefix = PrefixUtil.createPrefix(packageName, databaseName);
                 Set<String> removedVisibilityConfigs =
                         mNamespaceCacheLocked.getPrefixedBlobNamespaces(prefix);
@@ -1316,10 +1329,19 @@ public final class AppSearchImpl implements Closeable {
                 List<InternalVisibilityConfig> prefixedVisibilityConfigs = rewriteVisibilityConfigs(
                         prefix, visibilityConfigs, removedVisibilityConfigs);
                 for (int i = 0; i < prefixedVisibilityConfigs.size(); i++) {
+                    // We are using schema type to represent blob's namespace in
+                    // InternalVisibilityConfig.
                     mNamespaceCacheLocked.addToBlobNamespaceMap(prefix,
                             prefixedVisibilityConfigs.get(i).getSchemaType());
                 }
-                // TODO(b/273591938) apply visibility documents to visibility store
+                // Now removedVisibilityConfigs contains those existing schemas that has
+                // all-default visibility settings, add deleted schemas. That's all we need to
+                // remove.
+                mBlobVisibilityStoreLocked.setVisibility(prefixedVisibilityConfigs);
+                mBlobVisibilityStoreLocked.removeVisibility(removedVisibilityConfigs);
+            } else {
+                throw new UnsupportedOperationException(
+                        "BLOB_STORAGE is not available on this AppSearch implementation.");
             }
         } finally {
             mReadWriteLock.writeLock().unlock();
@@ -1392,7 +1414,7 @@ public final class AppSearchImpl implements Closeable {
                         callerAccess,
                         packageName,
                         documentProto.getSchema(),
-                        mVisibilityStoreLocked,
+                        mDocumentVisibilityStoreLocked,
                         mVisibilityCheckerLocked)) {
                     throw new AppSearchException(AppSearchResult.RESULT_NOT_FOUND);
                 }
@@ -1665,7 +1687,7 @@ public final class AppSearchImpl implements Closeable {
                             mNamespaceCacheLocked, mSchemaCacheLocked, mConfig);
             // Remove those inaccessible schemas.
             searchSpecToProtoConverter.removeInaccessibleSchemaFilter(
-                    callerAccess, mVisibilityStoreLocked, mVisibilityCheckerLocked);
+                    callerAccess, mDocumentVisibilityStoreLocked, mVisibilityCheckerLocked);
             if (searchSpecToProtoConverter.hasNothingToSearch()) {
                 // there is nothing to search over given their search filters, so we can return an
                 // empty SearchResult and skip sending request to Icing.
@@ -2070,7 +2092,7 @@ public final class AppSearchImpl implements Closeable {
                         namespace,
                         schemaType,
                         documentId,
-                        mVisibilityStoreLocked,
+                        mDocumentVisibilityStoreLocked,
                         mVisibilityCheckerLocked);
             }
         } finally {
@@ -2238,7 +2260,7 @@ public final class AppSearchImpl implements Closeable {
                         namespace,
                         schemaType,
                         uri,
-                        mVisibilityStoreLocked,
+                        mDocumentVisibilityStoreLocked,
                         mVisibilityCheckerLocked);
             }
         }
@@ -2609,8 +2631,8 @@ public final class AppSearchImpl implements Closeable {
                     for (String databaseName : databaseNames) {
                         String removedPrefix = createPrefix(packageName, databaseName);
                         Set<String> removedSchemas = mSchemaCacheLocked.removePrefix(removedPrefix);
-                        if (mVisibilityStoreLocked != null) {
-                            mVisibilityStoreLocked.removeVisibility(removedSchemas);
+                        if (mDocumentVisibilityStoreLocked != null) {
+                            mDocumentVisibilityStoreLocked.removeVisibility(removedSchemas);
                         }
 
                         mNamespaceCacheLocked.removeDocumentNamespaces(removedPrefix);
@@ -3066,6 +3088,21 @@ public final class AppSearchImpl implements Closeable {
         mReadWriteLock.readLock().lock();
         try {
             return mSchemaCacheLocked.getAllPrefixedSchemaTypes();
+        } finally {
+            mReadWriteLock.readLock().unlock();
+        }
+    }
+
+    /**
+     * Returns all prefixed blob namespaces saved in AppSearch.
+     *
+     * <p>This method is inefficient to call repeatedly.
+     */
+    @NonNull
+    public List<String> getAllPrefixedBlobNamespaces() {
+        mReadWriteLock.readLock().lock();
+        try {
+            return mNamespaceCacheLocked.getAllPrefixedBlobNamespaces();
         } finally {
             mReadWriteLock.readLock().unlock();
         }
