@@ -45,6 +45,7 @@ import androidx.camera.core.TorchState
 import androidx.camera.core.UseCase
 import androidx.camera.core.ViewPort
 import androidx.camera.core.concurrent.CameraCoordinator
+import androidx.camera.core.impl.AdapterCameraInternal
 import androidx.camera.core.impl.CameraConfig
 import androidx.camera.core.impl.CameraConfigs
 import androidx.camera.core.impl.CameraInfoInternal
@@ -90,7 +91,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.eq
 import org.mockito.ArgumentMatchers.isNull
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.verify
@@ -288,7 +288,7 @@ class CameraUseCaseAdapterTest {
     }
 
     @RequiresApi(33) // 10-bit HDR only supported on API 33+
-    @Test(expected = CameraException::class)
+    @Test
     fun useHDRWithExtensions_throwsException() {
         // Arrange: enable extensions.
         val adapter =
@@ -298,25 +298,27 @@ class CameraUseCaseAdapterTest {
             )
         // Act: add UseCase that uses HDR.
         val hdrUseCase = FakeUseCaseConfig.Builder().setDynamicRange(HDR_UNSPECIFIED_10_BIT).build()
-        adapter.addUseCases(setOf(hdrUseCase))
+        assertThrows<CameraException> { adapter.addUseCases(setOf(hdrUseCase)) }
     }
 
-    @RequiresApi(34) // Ultra HDR only supported on API 34+
-    @Test(expected = CameraException::class)
+    @Test
     fun useUltraHdrWithExtensions_throwsException() {
-        // Arrange: enable extensions.
-        val extensionsConfig = createCoexistingRequiredRuleCameraConfig(FakeSessionProcessor())
-        val cameraId = "fakeCameraId"
+        // Arrange:
         val fakeManager = FakeCameraDeviceSurfaceManager()
         fakeManager.setValidSurfaceCombos(
-            setOf(listOf(INTERNAL_DEFINED_IMAGE_FORMAT_PRIVATE, JPEG_R))
+            setOf(listOf(INTERNAL_DEFINED_IMAGE_FORMAT_PRIVATE, JPEG, RAW_SENSOR))
         )
-        val fakeCamera = FakeCamera(cameraId)
+        val fakeCameraInfo =
+            FakeCameraInfoInternal().apply {
+                setSupportedResolutions(INTERNAL_DEFINED_IMAGE_FORMAT_PRIVATE, listOf())
+                setSupportedResolutions(JPEG, listOf())
+            }
+        val fakeCamera = FakeCamera(FakeCameraControl(), fakeCameraInfo)
         val adapter =
             CameraUseCaseAdapter(
                 fakeCamera,
                 null,
-                RestrictedCameraInfo(fakeCamera.cameraInfoInternal, extensionsConfig),
+                RestrictedCameraInfo(fakeCamera.cameraInfoInternal, CameraConfigs.defaultConfig()),
                 null,
                 CompositionSettings.DEFAULT,
                 CompositionSettings.DEFAULT,
@@ -327,14 +329,12 @@ class CameraUseCaseAdapterTest {
 
         // Act: add ImageCapture that sets Ultra HDR.
         val imageCapture =
-            ImageCapture.Builder()
-                .setOutputFormat(ImageCapture.OUTPUT_FORMAT_JPEG_ULTRA_HDR)
-                .build()
-        adapter.addUseCases(setOf(imageCapture))
+            ImageCapture.Builder().setOutputFormat(ImageCapture.OUTPUT_FORMAT_RAW).build()
+        assertThrows<CameraException> { adapter.addUseCases(setOf(imageCapture)) }
     }
 
     @RequiresApi(23)
-    @Test(expected = CameraException::class)
+    @Test
     fun useRawWithExtensions_throwsException() {
         // Arrange: enable extensions.
         val extensionsConfig = createCoexistingRequiredRuleCameraConfig(FakeSessionProcessor())
@@ -360,11 +360,11 @@ class CameraUseCaseAdapterTest {
         // Act: add ImageCapture that sets Ultra HDR.
         val imageCapture =
             ImageCapture.Builder().setOutputFormat(ImageCapture.OUTPUT_FORMAT_RAW).build()
-        adapter.addUseCases(setOf(imageCapture))
+        assertThrows<CameraException> { adapter.addUseCases(setOf(imageCapture)) }
     }
 
     @RequiresApi(34) // Ultra HDR only supported on API 34+
-    @Test(expected = CameraException::class)
+    @Test
     fun useUltraHdrWithCameraEffect_throwsException() {
         // Arrange: add an image effect.
         val cameraId = "fakeCameraId"
@@ -386,10 +386,10 @@ class CameraUseCaseAdapterTest {
             ImageCapture.Builder()
                 .setOutputFormat(ImageCapture.OUTPUT_FORMAT_JPEG_ULTRA_HDR)
                 .build()
-        adapter.addUseCases(setOf(imageCapture))
+        assertThrows<CameraException> { adapter.addUseCases(setOf(imageCapture)) }
     }
 
-    @Test(expected = CameraException::class)
+    @Test
     fun useRawWithCameraEffect_throwsException() {
         // Arrange: add an image effect.
         val cameraId = "fakeCameraId"
@@ -409,10 +409,10 @@ class CameraUseCaseAdapterTest {
         // Act: add ImageCapture that sets Ultra HDR.
         val imageCapture =
             ImageCapture.Builder().setOutputFormat(ImageCapture.OUTPUT_FORMAT_RAW).build()
-        adapter.addUseCases(setOf(imageCapture))
+        assertThrows<CameraException> { adapter.addUseCases(setOf(imageCapture)) }
     }
 
-    @Test(expected = CameraException::class)
+    @Test
     fun addStreamSharing_throwsException() {
         val streamSharing =
             StreamSharing(
@@ -424,7 +424,7 @@ class CameraUseCaseAdapterTest {
                 useCaseConfigFactory
             )
         // Act: add use cases that can only be supported with StreamSharing
-        adapter.addUseCases(setOf(streamSharing, video, image))
+        assertThrows<CameraException> { adapter.addUseCases(setOf(streamSharing, video, image)) }
     }
 
     @Test
@@ -660,7 +660,8 @@ class CameraUseCaseAdapterTest {
         val fakeUseCase = FakeUseCase()
         adapter.addUseCases(listOf(fakeUseCase))
         adapter.detachUseCases()
-        assertThat(fakeUseCase.camera).isEqualTo(fakeCamera)
+        assertThat((fakeUseCase.camera as AdapterCameraInternal).implementation)
+            .isEqualTo(fakeCamera)
         assertThat(fakeCamera.attachedUseCases).isEmpty()
     }
 
@@ -682,15 +683,24 @@ class CameraUseCaseAdapterTest {
         val fakeUseCase = spy(FakeUseCase())
         adapter.addUseCases(listOf(fakeUseCase))
         verify(fakeUseCase)
-            .bindToCamera(eq(fakeCamera), isNull(), isNull(), any(FakeUseCaseConfig::class.java))
+            .bindToCamera(
+                any(AdapterCameraInternal::class.java),
+                isNull(),
+                isNull(),
+                any(FakeUseCaseConfig::class.java)
+            )
+        assertThat((fakeUseCase.camera as AdapterCameraInternal).implementation)
+            .isSameInstanceAs(fakeCamera)
     }
 
     @Test
     fun useCase_onDetach() {
         val fakeUseCase = spy(FakeUseCase())
         adapter.addUseCases(listOf(fakeUseCase))
+        val adapterCameraInternal = fakeUseCase.camera as AdapterCameraInternal
+        assertThat(adapterCameraInternal.implementation).isSameInstanceAs(fakeCamera)
         adapter.removeUseCases(listOf(fakeUseCase))
-        verify(fakeUseCase).unbindFromCamera(fakeCamera)
+        verify(fakeUseCase).unbindFromCamera(adapterCameraInternal)
     }
 
     @Test
