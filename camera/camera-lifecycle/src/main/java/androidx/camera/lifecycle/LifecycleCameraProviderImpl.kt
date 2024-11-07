@@ -77,6 +77,7 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
     @GuardedBy("mLock")
     private val cameraInfoMap: MutableMap<CameraUseCaseAdapter.CameraId, AdapterCameraInfo> =
         HashMap()
+    private val lifecycleCameraKeys = HashSet<LifecycleCameraRepository.Key>()
 
     internal fun initAsync(
         context: Context,
@@ -139,7 +140,7 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
     internal fun shutdownAsync(): ListenableFuture<Void> {
         Threads.runOnMainSync {
             unbindAll()
-            lifecycleCameraRepository.clear()
+            lifecycleCameraRepository.removeLifecycleCameras(lifecycleCameraKeys)
         }
 
         if (cameraX != null) {
@@ -154,6 +155,7 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
             cameraXInitializeFuture = null
             cameraXShutdownFuture = shutdownFuture
             cameraInfoMap.clear()
+            lifecycleCameraKeys.clear()
         }
         cameraX = null
         context = null
@@ -181,7 +183,7 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
                 )
             }
 
-            lifecycleCameraRepository.unbind(listOf(*useCases))
+            lifecycleCameraRepository.unbind(listOf(*useCases), lifecycleCameraKeys)
         }
 
     @MainThread
@@ -189,7 +191,7 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
         trace("CX:unbindAll") {
             Threads.checkMainThread()
             cameraOperatingMode = CAMERA_OPERATING_MODE_UNSPECIFIED
-            lifecycleCameraRepository.unbindAll()
+            lifecycleCameraRepository.unbindAll(lifecycleCameraKeys)
         }
 
     @Throws(CameraInfoUnavailableException::class)
@@ -537,14 +539,13 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
                     getCameraInfo(secondaryCameraSelector) as AdapterCameraInfo
             }
 
-            var lifecycleCameraToBind =
-                lifecycleCameraRepository.getLifecycleCamera(
-                    lifecycleOwner,
-                    CameraUseCaseAdapter.generateCameraId(
-                        primaryAdapterCameraInfo,
-                        secondaryAdapterCameraInfo
-                    )
+            val cameraId =
+                CameraUseCaseAdapter.generateCameraId(
+                    primaryAdapterCameraInfo,
+                    secondaryAdapterCameraInfo
                 )
+            var lifecycleCameraToBind =
+                lifecycleCameraRepository.getLifecycleCamera(lifecycleOwner, cameraId)
 
             // Check if there's another camera that has already been bound.
             val lifecycleCameras = lifecycleCameraRepository.lifecycleCameras
@@ -594,6 +595,8 @@ internal class LifecycleCameraProviderImpl : LifecycleCameraProvider {
                 useCases,
                 cameraX!!.cameraFactory.cameraCoordinator
             )
+
+            lifecycleCameraKeys.add(LifecycleCameraRepository.Key.create(lifecycleOwner, cameraId))
 
             return@trace lifecycleCameraToBind
         }
