@@ -749,34 +749,42 @@ private fun Project.configureWasm() {
 }
 
 private fun Project.configureNode() {
-    rootProject.extensions.findByType<NodeJsRootExtension>()?.let {
-        it.version = getVersionByName("node")
-        it.downloadBaseUrl =
-            File(project.getPrebuiltsRoot(), "androidx/external/org/nodejs/node").toURI().toString()
+    rootProject.extensions.findByType<NodeJsRootExtension>()?.let { nodeJs ->
+        nodeJs.version = getVersionByName("node")
+        if (!ProjectLayoutType.isPlayground(this)) {
+            nodeJs.downloadBaseUrl =
+                File(project.getPrebuiltsRoot(), "androidx/external/org/nodejs/node")
+                    .toURI()
+                    .toString()
+        }
     }
 
-    rootProject.extensions.findByType(YarnRootExtension::class.java)?.let {
-        it.version = getVersionByName("yarn")
-        it.lockFileDirectory = File(project.getPrebuiltsRoot(), "androidx/javascript-for-kotlin")
-        it.yarnLockMismatchReport = YarnLockMismatchReport.FAIL
-    }
-}
-
-private fun Project.configureKotlinJsTests() {
-    val unzipChromeBuildServiceProvider =
-        gradle.sharedServices.registrations.getByName("unzipChrome").service
-    tasks.withType(KotlinJsTest::class.java).configureEach { task ->
-        task.usesService(unzipChromeBuildServiceProvider)
-        // Remove doFirst and switch to FileProperty property to set browser path when issue
-        // https://youtrack.jetbrains.com/issue/KT-72514 is resolved
-        task.doFirst {
-            task.environment(
-                "CHROME_BIN",
-                (unzipChromeBuildServiceProvider.get() as UnzipChromeBuildService).chromePath
-            )
+    rootProject.extensions.findByType(YarnRootExtension::class.java)?.let { yarn ->
+        yarn.version = getVersionByName("yarn")
+        yarn.yarnLockMismatchReport = YarnLockMismatchReport.FAIL
+        if (!ProjectLayoutType.isPlayground(this)) {
+            yarn.lockFileDirectory =
+                File(project.getPrebuiltsRoot(), "androidx/javascript-for-kotlin")
         }
     }
 }
+
+private fun Project.configureKotlinJsTests() =
+    tasks.withType(KotlinJsTest::class.java).configureEach { task ->
+        if (!ProjectLayoutType.isPlayground(this)) {
+            val unzipChromeBuildServiceProvider =
+                gradle.sharedServices.registrations.getByName("unzipChrome").service
+            task.usesService(unzipChromeBuildServiceProvider)
+            // Remove doFirst and switch to FileProperty property to set browser path when issue
+            // https://youtrack.jetbrains.com/issue/KT-72514 is resolved
+            task.doFirst {
+                task.environment(
+                    "CHROME_BIN",
+                    (unzipChromeBuildServiceProvider.get() as UnzipChromeBuildService).chromePath
+                )
+            }
+        }
+    }
 
 fun Project.validatePublishedMultiplatformHasDefault() {
     val extension = project.extensions.getByType(AndroidXMultiplatformExtension::class.java)
