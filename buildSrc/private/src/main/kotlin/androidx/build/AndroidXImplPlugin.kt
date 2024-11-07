@@ -1658,6 +1658,9 @@ fun Project.workaroundPrebuiltTakingPrecedenceOverProject() {
 }
 
 private fun Project.configureUnzipChromeBuildService() {
+    if (ProjectLayoutType.isPlayground(this)) {
+        return
+    }
     gradle.sharedServices.registerIfAbsent("unzipChrome", UnzipChromeBuildService::class.java) {
         it.parameters.browserDir.set(File(getPrebuiltsRoot(), "androidx/chrome-for-testing/"))
         it.parameters.unzipToDir.set(getOutDirectory().resolve("chrome-bin"))
