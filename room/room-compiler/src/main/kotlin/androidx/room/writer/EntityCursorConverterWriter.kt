@@ -78,7 +78,6 @@ class EntityCursorConverterWriter(private val entity: Entity, private val userDr
                         typeName = XTypeName.PRIMITIVE_INT,
                         assignExpr =
                             XCodeBlock.of(
-                                language,
                                 "%M(%N, %S)",
                                 packageMember,
                                 cursorParamName,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,29 @@
  * limitations under the License.
  */
 
-package androidx.room.compiler.codegen.java
+package androidx.room.compiler.codegen.impl
 
-import androidx.room.compiler.codegen.JAnnotationSpecBuilder
 import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XSpec
-import androidx.room.compiler.codegen.impl.XCodeBlockImpl
-import com.squareup.kotlinpoet.javapoet.JAnnotationSpec
+import androidx.room.compiler.codegen.java.JavaAnnotationSpec
+import androidx.room.compiler.codegen.kotlin.KotlinAnnotationSpec
 
-internal class JavaAnnotationSpec(internal val actual: JAnnotationSpec) : XSpec(), XAnnotationSpec {
+internal class XAnnotationSpecImpl(
+    val java: JavaAnnotationSpec,
+    val kotlin: KotlinAnnotationSpec,
+) : XSpec(), XAnnotationSpec {
 
-    internal class Builder(internal val actual: JAnnotationSpecBuilder) :
-        XSpec.Builder(), XAnnotationSpec.Builder {
+    internal class Builder(
+        val java: JavaAnnotationSpec.Builder,
+        val kotlin: KotlinAnnotationSpec.Builder,
+    ) : XSpec.Builder(), XAnnotationSpec.Builder {
+        private val delegates: List<XAnnotationSpec.Builder> = listOf(java, kotlin)
+
         override fun addMember(name: String, code: XCodeBlock) = apply {
-            require(code is XCodeBlockImpl)
-            actual.addMember(name, code.java.actual)
+            delegates.forEach { it.addMember(name, code) }
         }
 
-        override fun build() = JavaAnnotationSpec(actual.build())
+        override fun build() = XAnnotationSpecImpl(java.build(), kotlin.build())
     }
 }

@@ -25,36 +25,41 @@ import androidx.room.compiler.codegen.VisibilityModifier
 import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
+import androidx.room.compiler.codegen.XName
+import androidx.room.compiler.codegen.XSpec
 import androidx.room.compiler.codegen.XTypeName
+import androidx.room.compiler.codegen.impl.XAnnotationSpecImpl
+import androidx.room.compiler.codegen.impl.XCodeBlockImpl
 import androidx.room.compiler.processing.XNullability
 import com.squareup.kotlinpoet.javapoet.JTypeName
 import javax.lang.model.element.Modifier
 
-internal class JavaFunSpec(internal val actual: JFunSpec) : JavaLang(), XFunSpec {
-    override val name: String = actual.name
+internal class JavaFunSpec(internal val actual: JFunSpec) : XSpec(), XFunSpec {
+    override val name: XName = XName.of(actual.name)
 
     override fun toString() = actual.toString()
 
-    internal class Builder(internal val actual: JFunSpecBuilder) : JavaLang(), XFunSpec.Builder {
+    internal class Builder(internal val actual: JFunSpecBuilder) :
+        XSpec.Builder(), XFunSpec.Builder {
 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
-            require(annotation is JavaAnnotationSpec)
-            actual.addAnnotation(annotation.actual)
+            require(annotation is XAnnotationSpecImpl)
+            actual.addAnnotation(annotation.java.actual)
         }
 
         override fun addAbstractModifier() = apply { actual.addModifiers(Modifier.ABSTRACT) }
 
         override fun addCode(code: XCodeBlock) = apply {
-            require(code is JavaCodeBlock)
-            actual.addCode(code.actual)
+            require(code is XCodeBlockImpl)
+            actual.addCode(code.java.actual)
         }
 
         override fun addParameter(
             typeName: XTypeName,
-            name: String,
+            name: XName,
             annotations: List<XAnnotationSpec>
         ) = apply {
-            val paramSpec = JParameterSpec.builder(typeName.java, name, Modifier.FINAL)
+            val paramSpec = JParameterSpec.builder(typeName.java, name.java, Modifier.FINAL)
             actual.addParameter(
                 // Adding nullability annotation to primitive parameters is redundant as
                 // primitives can never be null.
@@ -76,8 +81,8 @@ internal class JavaFunSpec(internal val actual: JFunSpec) : JavaLang(), XFunSpec
                 "super($L)",
                 JCodeBlock.join(
                     args.map {
-                        check(it is JavaCodeBlock)
-                        it.actual
+                        require(it is XCodeBlockImpl)
+                        it.java.actual
                     },
                     ", "
                 )

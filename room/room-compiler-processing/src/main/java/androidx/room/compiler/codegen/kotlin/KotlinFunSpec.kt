@@ -23,35 +23,38 @@ import androidx.room.compiler.codegen.VisibilityModifier
 import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
+import androidx.room.compiler.codegen.XName
+import androidx.room.compiler.codegen.XSpec
 import androidx.room.compiler.codegen.XTypeName
+import androidx.room.compiler.codegen.impl.XAnnotationSpecImpl
+import androidx.room.compiler.codegen.impl.XCodeBlockImpl
 import com.squareup.kotlinpoet.KModifier
 
-internal class KotlinFunSpec(internal val actual: KFunSpec) : KotlinLang(), XFunSpec {
-    override val name: String = actual.name
+internal class KotlinFunSpec(internal val actual: KFunSpec) : XSpec(), XFunSpec {
+    override val name: XName = XName.of(actual.name)
 
-    override fun toString() = actual.toString()
-
-    internal class Builder(internal val actual: KFunSpecBuilder) : KotlinLang(), XFunSpec.Builder {
+    internal class Builder(internal val actual: KFunSpecBuilder) :
+        XSpec.Builder(), XFunSpec.Builder {
 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
-            require(annotation is KotlinAnnotationSpec)
-            actual.addAnnotation(annotation.actual)
+            require(annotation is XAnnotationSpecImpl)
+            actual.addAnnotation(annotation.kotlin.actual)
         }
 
         override fun addAbstractModifier() = apply { actual.addModifiers(KModifier.ABSTRACT) }
 
         override fun addCode(code: XCodeBlock) = apply {
-            require(code is KotlinCodeBlock)
-            actual.addCode(code.actual)
+            require(code is XCodeBlockImpl)
+            actual.addCode(code.kotlin.actual)
         }
 
         override fun addParameter(
             typeName: XTypeName,
-            name: String,
+            name: XName,
             annotations: List<XAnnotationSpec>
         ) = apply {
             actual.addParameter(
-                KParameterSpec.builder(name, typeName.kotlin)
+                KParameterSpec.builder(name.kotlin, typeName.kotlin)
                     .apply {
                         // TODO(b/247247439): Add other annotations
                     }
@@ -62,8 +65,8 @@ internal class KotlinFunSpec(internal val actual: KFunSpec) : KotlinLang(), XFun
         override fun callSuperConstructor(vararg args: XCodeBlock) = apply {
             actual.callSuperConstructor(
                 args.map {
-                    check(it is KotlinCodeBlock)
-                    it.actual
+                    require(it is XCodeBlockImpl)
+                    it.kotlin.actual
                 }
             )
         }

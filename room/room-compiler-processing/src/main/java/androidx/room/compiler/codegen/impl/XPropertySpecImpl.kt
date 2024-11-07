@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,35 +14,36 @@
  * limitations under the License.
  */
 
-package androidx.room.compiler.codegen.java
+package androidx.room.compiler.codegen.impl
 
-import androidx.room.compiler.codegen.JPropertySpec
-import androidx.room.compiler.codegen.JPropertySpecBuilder
 import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XName
 import androidx.room.compiler.codegen.XPropertySpec
 import androidx.room.compiler.codegen.XSpec
-import androidx.room.compiler.codegen.impl.XAnnotationSpecImpl
-import androidx.room.compiler.codegen.impl.XCodeBlockImpl
+import androidx.room.compiler.codegen.java.JavaPropertySpec
+import androidx.room.compiler.codegen.kotlin.KotlinPropertySpec
 
-internal class JavaPropertySpec(internal val actual: JPropertySpec) : XSpec(), XPropertySpec {
+internal class XPropertySpecImpl(
+    val java: JavaPropertySpec,
+    val kotlin: KotlinPropertySpec,
+) : XSpec(), XPropertySpec {
+    override val name = XName(java.name.java, kotlin.name.kotlin)
 
-    override val name: XName = XName.of(actual.name)
-
-    internal class Builder(internal val actual: JPropertySpecBuilder) :
-        XSpec.Builder(), XPropertySpec.Builder {
+    internal class Builder(
+        val java: JavaPropertySpec.Builder,
+        val kotlin: KotlinPropertySpec.Builder,
+    ) : XSpec.Builder(), XPropertySpec.Builder {
+        private val delegates: List<XPropertySpec.Builder> = listOf(java, kotlin)
 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
-            require(annotation is XAnnotationSpecImpl)
-            actual.addAnnotation(annotation.java.actual)
+            delegates.forEach { it.addAnnotation(annotation) }
         }
 
         override fun initializer(initExpr: XCodeBlock) = apply {
-            require(initExpr is XCodeBlockImpl)
-            actual.initializer(initExpr.java.actual)
+            delegates.forEach { it.initializer(initExpr) }
         }
 
-        override fun build() = JavaPropertySpec(actual.build())
+        override fun build() = XPropertySpecImpl(java.build(), kotlin.build())
     }
 }

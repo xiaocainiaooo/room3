@@ -48,7 +48,6 @@ class PositionalDataSourceQueryResultBinder(
         val tableNamesList = tableNames.joinToString("") { ", \"$it\"" }
         val spec =
             XTypeSpec.anonymousClassBuilder(
-                    language = scope.language,
                     "%N, %L, %L, %L%L",
                     dbProperty,
                     roomSQLiteQueryVar,
@@ -67,7 +66,6 @@ class PositionalDataSourceQueryResultBinder(
     private fun XTypeSpec.Builder.addConvertRowsMethod(scope: CodeGenScope) {
         addFunction(
             XFunSpec.builder(
-                    language = language,
                     name = "convertRows",
                     visibility = VisibilityModifier.PROTECTED,
                     isOverride = true
