@@ -1616,6 +1616,12 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         }
     }
 
+    override fun onLayoutNodeIdChange(layoutNode: LayoutNode, oldSemanticsId: Int) {
+        // Keep the mapping up to date when the semanticsId changes
+        layoutNodes.remove(oldSemanticsId)
+        layoutNodes[layoutNode.semanticsId] = layoutNode
+    }
+
     override fun onInteropViewLayoutChange(view: InteropView) {
         isPendingInteropViewLayoutChangeDispatch = true
     }
