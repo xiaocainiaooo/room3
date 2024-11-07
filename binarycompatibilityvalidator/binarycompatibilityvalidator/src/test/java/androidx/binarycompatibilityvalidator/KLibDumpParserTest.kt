@@ -238,6 +238,19 @@ class KlibDumpParserTest {
     }
 
     @Test
+    fun parseAPropertyWithStarParamsInReceiver() {
+        val input =
+            """
+            final val androidx.compose.animation.core/isFinished
+                final fun (androidx.compose.animation.core/AnimationState<*, *>).<get-isFinished>(): kotlin/Boolean
+        """
+                .trimIndent()
+        val parsed = KlibDumpParser(input).parseProperty()
+        assertThat(parsed.getter).isNotNull()
+        assertThat(parsed.getter?.hasExtensionReceiverParameter).isTrue()
+    }
+
+    @Test
     fun parseAnEnumEntry() {
         val input = "enum entry GROUP_ID // androidx.annotation/RestrictTo.Scope.GROUP_ID|null[0]"
         val parsed =

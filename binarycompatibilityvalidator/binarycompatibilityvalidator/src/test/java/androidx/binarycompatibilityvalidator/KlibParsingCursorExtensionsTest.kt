@@ -331,6 +331,16 @@ class KlibParsingCursorExtensionsTest {
     }
 
     @Test
+    fun parseFunctionReceiverWithStarParams() {
+        val input = "(androidx.compose.animation.core/AnimationState<*, *>).<get-isFinished>()"
+        val cursor = Cursor(input)
+        val receiver = cursor.parseFunctionReceiver()
+        assertThat(receiver?.className.toString())
+            .isEqualTo("androidx.compose.animation.core/AnimationState")
+        assertThat(cursor.currentLine).isEqualTo("<get-isFinished>()")
+    }
+
+    @Test
     fun parseValueParamCrossinlineDefault() {
         val input = "crossinline kotlin/Function2<#A, #B, kotlin/Int> =..."
         val cursor = Cursor(input)
