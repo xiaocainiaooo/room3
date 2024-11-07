@@ -44,6 +44,8 @@ import androidx.appsearch.app.GetSchemaResponse;
 import androidx.appsearch.app.OpenBlobForReadResponse;
 import androidx.appsearch.app.OpenBlobForWriteResponse;
 import androidx.appsearch.app.PutDocumentsRequest;
+import androidx.appsearch.app.SchemaVisibilityConfig;
+import androidx.appsearch.app.SetBlobVisibilityRequest;
 import androidx.appsearch.app.SetSchemaRequest;
 import androidx.appsearch.app.StorageInfo;
 import androidx.appsearch.flags.Flags;
@@ -119,7 +121,6 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testWriteAndReadBlob() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
-        mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
 
         try (OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(mHandle1, mHandle2)).get()) {
@@ -174,7 +175,6 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testRemovePendingBlob() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
-        mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
 
         try (OpenBlobForWriteResponse writeResponse =
                      mDb1.openBlobForWriteAsync(ImmutableSet.of(mHandle1)).get()) {
@@ -341,7 +341,6 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testRewrite_notAllowed() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
-        mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
 
         try (OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(mHandle1)).get()) {
@@ -391,7 +390,6 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testOpenWriteForRead_allowed() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
-        mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
 
         try (OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(mHandle1)).get()) {
@@ -413,7 +411,6 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testOpenReadForWrite_notAllowed() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
-        mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
 
         try (OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(mHandle1)).get()) {
@@ -452,7 +449,6 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testCommitBlobWithWrongDigest() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
-        mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
 
         try (OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(mHandle1)).get()) {
@@ -559,7 +555,6 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testCloseWriteResponse() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
-        mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
 
         OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(mHandle1, mHandle2)).get();
@@ -588,7 +583,6 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testCloseReadResponse() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
-        mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
 
         try (OpenBlobForWriteResponse writeResponse =
                      mDb1.openBlobForWriteAsync(ImmutableSet.of(mHandle1, mHandle2)).get()) {
@@ -673,8 +667,8 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
                 digest, mPackageName, DB_NAME_1, "namespace");
         GenericDocument document = new GenericDocument.Builder<>("namespace", "id", "Type")
-                        .setPropertyBlobHandle("blob", handle)
-                        .build();
+                .setPropertyBlobHandle("blob", handle)
+                .build();
 
         mDb1.putAsync(new PutDocumentsRequest.Builder().addGenericDocuments(document).build())
                 .get();
@@ -685,6 +679,23 @@ public abstract class AppSearchSessionBlobCtsTestBase {
                         .build()).get();
         assertThat(getResult.isSuccess()).isTrue();
         assertThat(getResult.getSuccesses().get("id")).isEqualTo(document);
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testSetBlobVisibility() throws Exception {
+        assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
+
+        mDb1.setBlobVisibilityAsync(new SetBlobVisibilityRequest.Builder()
+                .setNamespaceDisplayedBySystem("namespace1", /*displayed=*/false)
+                .setNamespaceDisplayedBySystem("namespace1", /*displayed=*/true)
+                .setNamespaceDisplayedBySystem("namespace2", /*displayed=*/false)
+                .addNamespaceVisibleToConfig("namespace3",
+                        new SchemaVisibilityConfig.Builder().build())
+                .clearNamespaceVisibleToConfigs("namespace3")
+                .addNamespaceVisibleToConfig("namespace3",
+                        new SchemaVisibilityConfig.Builder().build())
+                .build()).get();
     }
 
     @Test
@@ -736,6 +747,10 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class,
                 () -> mDb1.putAsync(new PutDocumentsRequest.Builder()
                                 .addGenericDocuments(document).build()).get());
+        assertThat(exception).hasMessageThat().contains(
+                Features.BLOB_STORAGE + " is not available on this AppSearch implementation.");
+        exception = assertThrows(UnsupportedOperationException.class,
+                () -> mDb1.setBlobVisibilityAsync(new SetBlobVisibilityRequest.Builder().build()));
         assertThat(exception).hasMessageThat().contains(
                 Features.BLOB_STORAGE + " is not available on this AppSearch implementation.");
     }

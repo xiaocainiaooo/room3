@@ -45,6 +45,7 @@ import androidx.appsearch.app.SearchResults;
 import androidx.appsearch.app.SearchSpec;
 import androidx.appsearch.app.SearchSuggestionResult;
 import androidx.appsearch.app.SearchSuggestionSpec;
+import androidx.appsearch.app.SetBlobVisibilityRequest;
 import androidx.appsearch.app.SetSchemaRequest;
 import androidx.appsearch.app.SetSchemaResponse;
 import androidx.appsearch.app.StorageInfo;
@@ -197,6 +198,17 @@ class SearchSessionImpl implements AppSearchSession {
     @ExperimentalAppSearchApi
     public ListenableFuture<OpenBlobForReadResponse> openBlobForReadAsync(
             @NonNull Set<AppSearchBlobHandle> handles) {
+        // TODO(b/273591938) Implement this method when blob implementation is synced to the
+        //  framework.
+        throw new UnsupportedOperationException(Features.BLOB_STORAGE
+                + " is not available on this AppSearch implementation.");
+    }
+
+    @NonNull
+    @Override
+    @ExperimentalAppSearchApi
+    public ListenableFuture<Void> setBlobVisibilityAsync(
+            @NonNull SetBlobVisibilityRequest request) {
         // TODO(b/273591938) Implement this method when blob implementation is synced to the
         //  framework.
         throw new UnsupportedOperationException(Features.BLOB_STORAGE

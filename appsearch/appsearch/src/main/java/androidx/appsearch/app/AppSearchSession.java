@@ -259,6 +259,27 @@ public interface AppSearchSession extends Closeable {
             @NonNull Set<AppSearchBlobHandle> handles);
 
     /**
+     * Sets the visibility configuration for all blob namespaces within an appsearch database.
+     *
+     * <p> Blobs under the same namespace will share same visibility settings.
+     *
+     * <p> The default setting is blobs will be only visible to the owner package and System. To
+     * configure other kinds of sharing, set {@link SchemaVisibilityConfig} via
+     * {@link SetBlobVisibilityRequest}.
+     *
+     * @param request The request holds visibility settings for all blob namespaces
+     * @return The pending result of performing this operation which resolves to {@code null} on
+     *     success.
+     */
+    @RequiresFeature(
+            enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
+            name = Features.BLOB_STORAGE)
+    @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
+    @ExperimentalAppSearchApi
+    @NonNull
+    ListenableFuture<Void> setBlobVisibilityAsync(@NonNull SetBlobVisibilityRequest request);
+
+    /**
      * Retrieves documents from the open {@link AppSearchSession} that match a given query string
      * and type of search provided.
      *
