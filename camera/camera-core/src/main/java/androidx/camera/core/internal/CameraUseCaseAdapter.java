@@ -64,6 +64,7 @@ import androidx.camera.core.Preview;
 import androidx.camera.core.UseCase;
 import androidx.camera.core.ViewPort;
 import androidx.camera.core.concurrent.CameraCoordinator;
+import androidx.camera.core.impl.AdapterCameraInternal;
 import androidx.camera.core.impl.AttachedSurfaceInfo;
 import androidx.camera.core.impl.CameraConfig;
 import androidx.camera.core.impl.CameraConfigs;
@@ -76,7 +77,6 @@ import androidx.camera.core.impl.Config;
 import androidx.camera.core.impl.Identifier;
 import androidx.camera.core.impl.MutableOptionsBundle;
 import androidx.camera.core.impl.PreviewConfig;
-import androidx.camera.core.impl.RestrictedCameraControl;
 import androidx.camera.core.impl.RestrictedCameraInfo;
 import androidx.camera.core.impl.SessionConfig;
 import androidx.camera.core.impl.SessionProcessor;
@@ -111,9 +111,9 @@ import java.util.Set;
  */
 public final class CameraUseCaseAdapter implements Camera {
     @NonNull
-    private final CameraInternal mCameraInternal;
+    private final AdapterCameraInternal mCameraInternal;
     @Nullable
-    private final CameraInternal mSecondaryCameraInternal;
+    private final AdapterCameraInternal mSecondaryCameraInternal;
     private final CameraDeviceSurfaceManager mCameraDeviceSurfaceManager;
     private final UseCaseConfigFactory mUseCaseConfigFactory;
 
@@ -165,14 +165,6 @@ public final class CameraUseCaseAdapter implements Camera {
     @GuardedBy("mLock")
     @Nullable
     private StreamSharing mStreamSharing;
-
-    @NonNull
-    private final RestrictedCameraControl mAdapterCameraControl;
-    @NonNull
-    private final RestrictedCameraInfo mAdapterCameraInfo;
-
-    @Nullable
-    private final RestrictedCameraInfo mAdapterSecondaryCameraInfo;
 
     @NonNull
     private final CompositionSettings mCompositionSettings;
@@ -236,20 +228,19 @@ public final class CameraUseCaseAdapter implements Camera {
             @NonNull CameraCoordinator cameraCoordinator,
             @NonNull CameraDeviceSurfaceManager cameraDeviceSurfaceManager,
             @NonNull UseCaseConfigFactory useCaseConfigFactory) {
-        mCameraInternal = camera;
-        mSecondaryCameraInternal = secondaryCamera;
+        mCameraConfig = restrictedCameraInfo.getCameraConfig();
+        mCameraInternal = new AdapterCameraInternal(camera, restrictedCameraInfo);
+        if (secondaryCamera != null && secondaryRestrictedCameraInfo != null) {
+            mSecondaryCameraInternal = new AdapterCameraInternal(secondaryCamera,
+                    secondaryRestrictedCameraInfo);
+        } else {
+            mSecondaryCameraInternal = null;
+        }
         mCompositionSettings = compositionSettings;
         mSecondaryCompositionSettings = secondaryCompositionSettings;
         mCameraCoordinator = cameraCoordinator;
         mCameraDeviceSurfaceManager = cameraDeviceSurfaceManager;
         mUseCaseConfigFactory = useCaseConfigFactory;
-        mCameraConfig = restrictedCameraInfo.getCameraConfig();
-        SessionProcessor sessionProcessor = mCameraConfig.getSessionProcessor(null);
-        // TODO(b/279996499): bind the same restricted CameraControl and CameraInfo to use cases.
-        mAdapterCameraControl = new RestrictedCameraControl(
-                mCameraInternal.getCameraControlInternal(), sessionProcessor);
-        mAdapterCameraInfo = restrictedCameraInfo;
-        mAdapterSecondaryCameraInfo = secondaryRestrictedCameraInfo;
         mId = generateCameraId(restrictedCameraInfo, secondaryRestrictedCameraInfo);
     }
 
@@ -1044,11 +1035,6 @@ public final class CameraUseCaseAdapter implements Camera {
                         + "standard dynamic range.");
             }
 
-            if (hasUltraHdrImageCapture(useCases)) {
-                throw new IllegalArgumentException("Extensions are not supported for use with "
-                        + "Ultra HDR image capture.");
-            }
-
             if (hasRawImageCapture(useCases)) {
                 throw new IllegalArgumentException("Extensions are not supported for use with "
                         + "Raw image capture.");
@@ -1165,18 +1151,18 @@ public final class CameraUseCaseAdapter implements Camera {
     @NonNull
     @Override
     public CameraControl getCameraControl() {
-        return mAdapterCameraControl;
+        return mCameraInternal.getCameraControl();
     }
 
     @NonNull
     @Override
     public CameraInfo getCameraInfo() {
-        return mAdapterCameraInfo;
+        return mCameraInternal.getCameraInfo();
     }
 
     @Nullable
     public CameraInfo getSecondaryCameraInfo() {
-        return mAdapterSecondaryCameraInfo;
+        return mSecondaryCameraInternal != null ? mSecondaryCameraInternal.getCameraInfo() : null;
     }
 
     @Override

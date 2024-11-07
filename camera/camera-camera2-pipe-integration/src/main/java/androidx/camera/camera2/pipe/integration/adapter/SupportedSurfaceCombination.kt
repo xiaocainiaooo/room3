@@ -131,10 +131,6 @@ public class SupportedSurfaceCombination(
             generate10BitSupportedCombinationList()
         }
 
-        if (isUltraHdrSupported()) {
-            generateUltraHdrSupportedCombinationList()
-        }
-
         if (isPreviewStabilizationSupported) {
             generatePreviewStabilizationSupportedCombinationList()
         }
@@ -164,11 +160,6 @@ public class SupportedSurfaceCombination(
         }
     }
 
-    private fun isUltraHdrSupported(): Boolean {
-        return getStreamConfigurationMapCompat().getOutputFormats()?.contains(ImageFormat.JPEG_R)
-            ?: false
-    }
-
     private fun getOrderedSupportedStreamUseCaseSurfaceConfigList(
         featureSettings: FeatureSettings,
         surfaceConfigList: List<SurfaceConfig?>?
@@ -195,6 +186,9 @@ public class SupportedSurfaceCombination(
         }
         var supportedSurfaceCombinations: MutableList<SurfaceCombination> = mutableListOf()
         if (featureSettings.isUltraHdrOn) {
+            if (surfaceCombinationsUltraHdr.isEmpty()) {
+                generateUltraHdrSupportedCombinationList()
+            }
             // For Ultra HDR output, only the default camera mode is currently supported.
             if (featureSettings.cameraMode == CameraMode.DEFAULT) {
                 supportedSurfaceCombinations.addAll(surfaceCombinationsUltraHdr)
