@@ -17,6 +17,7 @@
 package androidx.wear.watchface.style
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.graphics.RectF
 import android.graphics.drawable.Icon
 import android.os.Build
@@ -24,6 +25,8 @@ import android.os.Parcel
 import androidx.annotation.RequiresApi
 import androidx.wear.watchface.complications.ComplicationSlotBounds
 import androidx.wear.watchface.style.UserStyleSetting.BooleanUserStyleSetting
+import androidx.wear.watchface.style.UserStyleSetting.ColorUserStyleSetting
+import androidx.wear.watchface.style.UserStyleSetting.ColorUserStyleSetting.ColorOption
 import androidx.wear.watchface.style.UserStyleSetting.ComplicationSlotsUserStyleSetting
 import androidx.wear.watchface.style.UserStyleSetting.CustomValueUserStyleSetting
 import androidx.wear.watchface.style.UserStyleSetting.DoubleRangeUserStyleSetting
@@ -433,6 +436,61 @@ public class StyleParcelableTest {
             .isEqualTo(option2.id.value.decodeToString())
         assertThat(unparcelled[styleSetting2]!!.id.value.decodeToString())
             .isEqualTo(option3.id.value.decodeToString())
+    }
+
+    @Test
+    public fun parcelAndUnparcelColorUserStyle() {
+        val settingIcon = Icon.createWithContentUri("settingIcon1")
+        val redGray =
+            ColorOption.Builder(
+                    Option.Id("color1"),
+                    "Red/Gray",
+                    "Red/Gray",
+                    listOf(Color.RED, Color.GRAY)
+                )
+                .build()
+        val blackWhite =
+            ColorOption.Builder(
+                    Option.Id("color2"),
+                    "Black/White",
+                    "Black/White",
+                    listOf(Color.BLACK, Color.WHITE),
+                )
+                .build()
+        val greenMagenta =
+            ColorOption.Builder(
+                    Option.Id("color3"),
+                    "Green/Magenta",
+                    "Green/Magenta",
+                    listOf(Color.GREEN, Color.MAGENTA),
+                )
+                .build()
+        val colorSetting =
+            ColorUserStyleSetting.Builder(
+                    UserStyleSetting.Id("color"),
+                    listOf(redGray, blackWhite, greenMagenta),
+                    listOf(WatchFaceLayer.BASE),
+                    "Color",
+                    "Of the backgroud"
+                )
+                .setIcon(settingIcon)
+                .build()
+        val schema = UserStyleSchema(listOf(colorSetting))
+        val userStyle =
+            UserStyle(hashMapOf(colorSetting as UserStyleSetting to blackWhite as Option))
+
+        val parcel = Parcel.obtain()
+        userStyle.toWireFormat().writeToParcel(parcel, 0)
+
+        parcel.setDataPosition(0)
+
+        val unparcelled =
+            UserStyle(UserStyleData(UserStyleWireFormat.CREATOR.createFromParcel(parcel)), schema)
+        parcel.recycle()
+
+        assertThat(unparcelled.size).isEqualTo(1)
+        assertThat(unparcelled[colorSetting]!!.id.value.decodeToString())
+            .isEqualTo(blackWhite.id.value.decodeToString())
     }
 
     @Test
