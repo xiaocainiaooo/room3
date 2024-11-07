@@ -58,6 +58,7 @@ import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -254,7 +255,7 @@ fun EdgeButton(
         content =
             provideScopeContent(
                 colors.contentColor(enabled = enabled),
-                MaterialTheme.typography.labelMedium,
+                MaterialTheme.typography.labelMedium.copy(textMotion = TextMotion.Animated),
                 textConfiguration =
                     TextConfiguration(
                         TextAlign.Center,
