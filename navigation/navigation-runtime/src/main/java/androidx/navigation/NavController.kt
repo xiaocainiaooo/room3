@@ -204,7 +204,10 @@ public open class NavController(
     private val lifecycleObserver: LifecycleObserver = LifecycleEventObserver { _, event ->
         hostLifecycleState = event.targetState
         if (_graph != null) {
-            for (entry in backQueue) {
+            // Operate on a copy of the queue to avoid issues with reentrant
+            // calls if updating the Lifecycle calls navigate() or popBackStack()
+            val backStack = backQueue.toMutableList()
+            for (entry in backStack) {
                 entry.handleLifecycleEvent(event)
             }
         }
