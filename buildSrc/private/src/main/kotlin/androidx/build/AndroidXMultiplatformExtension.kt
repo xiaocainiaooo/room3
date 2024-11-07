@@ -519,8 +519,7 @@ open class AndroidXMultiplatformExtension(val project: Project) {
             watchosX64(block),
             watchosArm32(block),
             watchosArm64(block),
-            // TODO: enable this once all the libraries are ready to use it.
-            // watchosDeviceArm64(block),
+            watchosDeviceArm64(block),
             watchosSimulatorArm64(block)
         )
     }
