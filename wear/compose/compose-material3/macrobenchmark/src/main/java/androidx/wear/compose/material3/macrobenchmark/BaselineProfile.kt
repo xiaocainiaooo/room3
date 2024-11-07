@@ -47,7 +47,7 @@ class BaselineProfile {
 
     @get:Rule val baselineRule = BaselineProfileRule()
 
-    @Test
+    @Test(timeout = 900_000) // The default 300_000 may not be enough for this test.
     fun profile() {
         baselineRule.collect(
             packageName = PACKAGE_NAME,
