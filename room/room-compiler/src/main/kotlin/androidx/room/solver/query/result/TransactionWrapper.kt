@@ -17,6 +17,7 @@
 package androidx.room.solver.query.result
 
 import androidx.room.compiler.codegen.XCodeBlock
+import androidx.room.compiler.codegen.XName
 
 /** helper class to create correct transaction code. */
 interface TransactionWrapper {
@@ -27,7 +28,7 @@ interface TransactionWrapper {
     fun endTransactionWithControlFlow()
 }
 
-fun XCodeBlock.Builder.transactionWrapper(dbPropertyName: String) =
+fun XCodeBlock.Builder.transactionWrapper(dbPropertyName: XName) =
     object : TransactionWrapper {
         override fun beginTransactionWithControlFlow() {
             addStatement("%N.beginTransaction()", dbPropertyName)
