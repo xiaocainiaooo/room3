@@ -21,12 +21,14 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.kruth.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.google.common.truth.Truth.assertWithMessage
 import kotlin.test.Test
 import org.junit.Rule
 import org.junit.runner.RunWith
@@ -135,6 +137,40 @@ class NavDisplayTest {
         composeTestRule.runOnIdle { onBackDispatcher.onBackPressed() }
 
         assertThat(composeTestRule.onNodeWithText(first).isDisplayed()).isTrue()
+    }
+
+    @Test
+    fun testStateOfInactiveContentIsRestoredWhenWeGoBackToIt() {
+        var increment = 0
+        var numberOnScreen1 = -1
+        lateinit var backstack: MutableList<Any>
+        composeTestRule.setContent {
+            backstack = remember { mutableStateListOf(first) }
+            val manager = rememberNavWrapperManager(emptyList())
+            NavDisplay(backstack = backstack, wrapperManager = manager) {
+                when (it) {
+                    first -> Record(first) { numberOnScreen1 = rememberSaveable { increment++ } }
+                    second -> Record(second) {}
+                    else -> error("Invalid key passed")
+                }
+            }
+        }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("Initial number should be 0").that(numberOnScreen1).isEqualTo(0)
+            numberOnScreen1 = -1
+            backstack.add(second)
+        }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("The number should be -1").that(numberOnScreen1).isEqualTo(-1)
+            // removeLast requires API 35
+            backstack.removeAt(backstack.size - 1)
+        }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("The number should be restored").that(numberOnScreen1).isEqualTo(0)
+        }
     }
 }
 
