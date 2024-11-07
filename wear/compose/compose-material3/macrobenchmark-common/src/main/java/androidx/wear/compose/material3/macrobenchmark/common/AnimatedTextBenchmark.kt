@@ -19,8 +19,6 @@ package androidx.wear.compose.material3.macrobenchmark.common
 import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.wear.compose.material3.macrobenchmark.common.baselineprofile.AnimatedTextScreen
 
 object AnimatedTextBenchmark : MacrobenchmarkScreen {

@@ -137,16 +137,22 @@ val AnimatedTextScreen =
 
         override val exercise: MacrobenchmarkScope.() -> Unit
             get() = {
-                device.wait(
-                    Until.findObject(By.desc(MinusContentDescription)),
-                    FIND_OBJECT_TIMEOUT_MS
-                )
                 repeat(3) {
-                    device.findObject(By.desc(MinusContentDescription)).click()
+                    device
+                        .wait(
+                            Until.findObject(By.desc(MinusContentDescription)),
+                            FIND_OBJECT_TIMEOUT_MS
+                        )
+                        .click()
                     SystemClock.sleep(250L)
                 }
                 repeat(3) {
-                    device.findObject(By.desc(PlusContentDescription)).click()
+                    device
+                        .wait(
+                            Until.findObject(By.desc(PlusContentDescription)),
+                            FIND_OBJECT_TIMEOUT_MS
+                        )
+                        .click()
                     SystemClock.sleep(250L)
                 }
                 device.waitForIdle()
