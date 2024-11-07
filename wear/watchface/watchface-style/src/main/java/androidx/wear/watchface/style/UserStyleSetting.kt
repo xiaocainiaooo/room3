@@ -1039,6 +1039,7 @@ private constructor(
      * A ColorUserStyleSetting allows the user to select colour(s) from a list of predefined
      * choices.
      */
+    @RequiresApi(34)
     public class ColorUserStyleSetting : UserStyleSetting {
 
         /** A Builder for [ColorUserStyleSetting]. */
@@ -1166,6 +1167,7 @@ private constructor(
         /**
          * Represents choice within a [ColorUserStyleSetting], these must be enumerated up front.
          */
+        @RequiresApi(34)
         public class ColorOption : Option {
             /** Backing field for [displayName]. */
             override val displayNameInternal: DisplayText
