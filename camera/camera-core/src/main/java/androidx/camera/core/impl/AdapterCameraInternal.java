@@ -27,10 +27,10 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collection;
 
 /**
- * A {@link CameraInternal} implementation that will contain {@link RestrictedCameraInfo} and
- * {@link RestrictedCameraControl} under the implementation. When retrieving
+ * A {@link CameraInternal} implementation that will contain {@link AdapterCameraInfo} and
+ * {@link AdapterCameraControl} under the implementation. When retrieving
  * {@link androidx.camera.core.CameraInfo} or {@link androidx.camera.core.CameraControl}, the
- * associated {@link RestrictedCameraInfo} or {@link RestrictedCameraControl} will be returned.
+ * associated {@link AdapterCameraInfo} or {@link AdapterCameraControl} will be returned.
  *
  * <p>For all other {@link CameraInfo} an {@link CameraControl} unrelated methods, the
  * AdapterCameraInternal forwards the invocations to the associated {@link CameraInternal}
@@ -39,15 +39,15 @@ import java.util.Collection;
 public class AdapterCameraInternal implements CameraInternal {
     @NonNull
     private final CameraInternal mCameraInternal;
-    private final RestrictedCameraInfo mRestrictedCameraInfo;
-    private final RestrictedCameraControl mRestrictedCameraControl;
+    private final AdapterCameraInfo mAdapterCameraInfo;
+    private final AdapterCameraControl mAdapterCameraControl;
 
     public AdapterCameraInternal(@NonNull CameraInternal cameraInternal,
-            @NonNull RestrictedCameraInfo restrictedCameraInfo) {
+            @NonNull AdapterCameraInfo adapterCameraInfo) {
         mCameraInternal = cameraInternal;
-        mRestrictedCameraInfo = restrictedCameraInfo;
-        CameraConfig cameraConfig = mRestrictedCameraInfo.getCameraConfig();
-        mRestrictedCameraControl = new RestrictedCameraControl(
+        mAdapterCameraInfo = adapterCameraInfo;
+        CameraConfig cameraConfig = mAdapterCameraInfo.getCameraConfig();
+        mAdapterCameraControl = new AdapterCameraControl(
                 mCameraInternal.getCameraControlInternal(), cameraConfig.getSessionProcessor(null));
     }
 
@@ -104,25 +104,25 @@ public class AdapterCameraInternal implements CameraInternal {
     @NonNull
     @Override
     public CameraControlInternal getCameraControlInternal() {
-        return mRestrictedCameraControl;
+        return mAdapterCameraControl;
     }
 
     @NonNull
     @Override
     public CameraInfoInternal getCameraInfoInternal() {
-        return mRestrictedCameraInfo;
+        return mAdapterCameraInfo;
     }
 
     @NonNull
     @Override
     public CameraControl getCameraControl() {
-        return mRestrictedCameraControl;
+        return mAdapterCameraControl;
     }
 
     @NonNull
     @Override
     public CameraInfo getCameraInfo() {
-        return mRestrictedCameraInfo;
+        return mAdapterCameraInfo;
     }
 
     @Override

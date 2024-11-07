@@ -39,11 +39,11 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.Preview
 import androidx.camera.core.UseCase
+import androidx.camera.core.impl.AdapterCameraControl
 import androidx.camera.core.impl.CameraInfoInternal
 import androidx.camera.core.impl.ImageFormatConstants
 import androidx.camera.core.impl.ImageOutputConfig
 import androidx.camera.core.impl.Quirk
-import androidx.camera.core.impl.RestrictedCameraControl
 import androidx.camera.core.impl.utils.AspectRatioUtil
 import androidx.camera.core.impl.utils.AspectRatioUtil.ASPECT_RATIO_16_9
 import androidx.camera.core.impl.utils.AspectRatioUtil.ASPECT_RATIO_4_3
@@ -510,7 +510,7 @@ class ResolutionSelectorDeviceTest(
     }
 
     private fun List<Size>.getClosestAspectRatioSublist(targetAspectRatio: Int): List<Size> {
-        val sensorRect = (camera.cameraControl as RestrictedCameraControl).sensorRect
+        val sensorRect = (camera.cameraControl as AdapterCameraControl).sensorRect
         val aspectRatios = getResolutionListGroupingAspectRatioKeys(this)
         val sortedAspectRatios =
             aspectRatios.sortedWith(
