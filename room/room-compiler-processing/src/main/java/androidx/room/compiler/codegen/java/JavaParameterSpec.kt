@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,23 @@
 
 package androidx.room.compiler.codegen.java
 
-import androidx.room.compiler.codegen.JPropertySpec
-import androidx.room.compiler.codegen.JPropertySpecBuilder
+import androidx.room.compiler.codegen.JParameterSpec
+import androidx.room.compiler.codegen.JParameterSpecBuilder
 import androidx.room.compiler.codegen.XAnnotationSpec
-import androidx.room.compiler.codegen.XCodeBlock
-import androidx.room.compiler.codegen.XPropertySpec
+import androidx.room.compiler.codegen.XParameterSpec
 import androidx.room.compiler.codegen.XSpec
 import androidx.room.compiler.codegen.impl.XAnnotationSpecImpl
-import androidx.room.compiler.codegen.impl.XCodeBlockImpl
 
-internal class JavaPropertySpec(internal val actual: JPropertySpec) : XSpec(), XPropertySpec {
-
+internal class JavaParameterSpec(internal val actual: JParameterSpec) : XSpec(), XParameterSpec {
     override val name = actual.name
 
-    internal class Builder(internal val actual: JPropertySpecBuilder) :
-        XSpec.Builder(), XPropertySpec.Builder {
-
+    internal class Builder(internal val actual: JParameterSpecBuilder) :
+        XSpec.Builder(), XParameterSpec.Builder {
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
             require(annotation is XAnnotationSpecImpl)
             actual.addAnnotation(annotation.java.actual)
         }
 
-        override fun initializer(initExpr: XCodeBlock) = apply {
-            require(initExpr is XCodeBlockImpl)
-            actual.initializer(initExpr.java.actual)
-        }
-
-        override fun build() = JavaPropertySpec(actual.build())
+        override fun build() = JavaParameterSpec(actual.build())
     }
 }

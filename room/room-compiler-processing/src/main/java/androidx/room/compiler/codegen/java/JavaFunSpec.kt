@@ -19,23 +19,24 @@ package androidx.room.compiler.codegen.java
 import androidx.room.compiler.codegen.JCodeBlock
 import androidx.room.compiler.codegen.JFunSpec
 import androidx.room.compiler.codegen.JFunSpecBuilder
-import androidx.room.compiler.codegen.JParameterSpec
 import androidx.room.compiler.codegen.L
 import androidx.room.compiler.codegen.VisibilityModifier
 import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XName
+import androidx.room.compiler.codegen.XParameterSpec
 import androidx.room.compiler.codegen.XSpec
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.impl.XAnnotationSpecImpl
 import androidx.room.compiler.codegen.impl.XCodeBlockImpl
+import androidx.room.compiler.codegen.impl.XParameterSpecImpl
 import androidx.room.compiler.processing.XNullability
 import com.squareup.kotlinpoet.javapoet.JTypeName
 import javax.lang.model.element.Modifier
 
 internal class JavaFunSpec(internal val actual: JFunSpec) : XSpec(), XFunSpec {
-    override val name: XName = XName.of(actual.name)
+    override val name = XName.of(actual.name)
 
     override fun toString() = actual.toString()
 
@@ -49,31 +50,14 @@ internal class JavaFunSpec(internal val actual: JFunSpec) : XSpec(), XFunSpec {
 
         override fun addAbstractModifier() = apply { actual.addModifiers(Modifier.ABSTRACT) }
 
+        override fun addParameter(parameter: XParameterSpec) = apply {
+            require(parameter is XParameterSpecImpl)
+            actual.addParameter(parameter.java.actual)
+        }
+
         override fun addCode(code: XCodeBlock) = apply {
             require(code is XCodeBlockImpl)
             actual.addCode(code.java.actual)
-        }
-
-        override fun addParameter(
-            typeName: XTypeName,
-            name: XName,
-            annotations: List<XAnnotationSpec>
-        ) = apply {
-            val paramSpec = JParameterSpec.builder(typeName.java, name.java, Modifier.FINAL)
-            actual.addParameter(
-                // Adding nullability annotation to primitive parameters is redundant as
-                // primitives can never be null.
-                if (typeName.isPrimitive) {
-                    paramSpec.build()
-                } else {
-                    when (typeName.nullability) {
-                        XNullability.NULLABLE -> paramSpec.addAnnotation(NULLABLE_ANNOTATION)
-                        XNullability.NONNULL -> paramSpec.addAnnotation(NONNULL_ANNOTATION)
-                        else -> paramSpec
-                    }.build()
-                }
-            )
-            // TODO(b/247247439): Add other annotations
         }
 
         override fun callSuperConstructor(vararg args: XCodeBlock) = apply {

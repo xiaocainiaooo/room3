@@ -18,7 +18,6 @@ package androidx.room.writer
 
 import androidx.room.compiler.codegen.VisibilityModifier
 import androidx.room.compiler.codegen.XFunSpec
-import androidx.room.compiler.codegen.XName
 import androidx.room.compiler.codegen.XTypeSpec
 import androidx.room.ext.CommonTypeNames
 import androidx.room.ext.RoomTypeNames
@@ -48,7 +47,7 @@ private constructor(
             )
     }
 
-    fun createAnonymous(typeWriter: TypeWriter, dbParam: XName, useDriverApi: Boolean): XTypeSpec {
+    fun createAnonymous(typeWriter: TypeWriter, dbParam: String, useDriverApi: Boolean): XTypeSpec {
         return if (useDriverApi) {
                 XTypeSpec.anonymousClassBuilder()
             } else {
