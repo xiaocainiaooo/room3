@@ -33,6 +33,7 @@ import androidx.room.compiler.codegen.impl.XCodeBlockImpl
 import androidx.room.compiler.codegen.impl.XParameterSpecImpl
 import androidx.room.compiler.processing.XNullability
 import com.squareup.kotlinpoet.javapoet.JTypeName
+import com.squareup.kotlinpoet.javapoet.JTypeVariableName
 import javax.lang.model.element.Modifier
 
 internal class JavaFunSpec(internal val actual: JFunSpec) : XSpec(), XFunSpec {
@@ -46,6 +47,11 @@ internal class JavaFunSpec(internal val actual: JFunSpec) : XSpec(), XFunSpec {
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
             require(annotation is XAnnotationSpecImpl)
             actual.addAnnotation(annotation.java.actual)
+        }
+
+        override fun addTypeVariable(typeVariable: XTypeName) = apply {
+            require(typeVariable.java is JTypeVariableName)
+            actual.addTypeVariable(typeVariable.java as JTypeVariableName)
         }
 
         override fun addAbstractModifier() = apply { actual.addModifiers(Modifier.ABSTRACT) }

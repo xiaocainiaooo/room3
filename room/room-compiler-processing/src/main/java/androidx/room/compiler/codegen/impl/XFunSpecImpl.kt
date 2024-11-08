@@ -42,6 +42,10 @@ internal class XFunSpecImpl(
             delegates.forEach { it.addAnnotation(annotation) }
         }
 
+        override fun addTypeVariable(typeVariable: XTypeName) = apply {
+            delegates.forEach { it.addTypeVariable(typeVariable) }
+        }
+
         override fun addAbstractModifier() = apply {
             delegates.forEach { it.addAbstractModifier() }
         }
