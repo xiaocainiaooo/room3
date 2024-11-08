@@ -22,10 +22,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.kruth.assertThat
+import androidx.savedstate.SavedStateRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertWithMessage
@@ -170,6 +172,43 @@ class NavDisplayTest {
 
         composeTestRule.runOnIdle {
             assertWithMessage("The number should be restored").that(numberOnScreen1).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun testIndividualSavedStateRegistries() {
+        lateinit var mainRegistry: SavedStateRegistry
+        lateinit var registry1: SavedStateRegistry
+        lateinit var registry2: SavedStateRegistry
+        lateinit var backstack: MutableList<Any>
+        composeTestRule.setContent {
+            mainRegistry = LocalSavedStateRegistryOwner.current.savedStateRegistry
+            backstack = remember { mutableStateListOf(first) }
+            val manager = rememberNavWrapperManager(listOf(SavedStateNavContentWrapper))
+            NavDisplay(backstack = backstack, wrapperManager = manager) {
+                when (it) {
+                    first ->
+                        Record(first) {
+                            registry1 = LocalSavedStateRegistryOwner.current.savedStateRegistry
+                        }
+                    second ->
+                        Record(second) {
+                            registry2 = LocalSavedStateRegistryOwner.current.savedStateRegistry
+                        }
+                    else -> error("Invalid key passed")
+                }
+            }
+        }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("Registries should be unique")
+                .that(mainRegistry)
+                .isNotEqualTo(registry1)
+            backstack.add(second)
+        }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("Registries should be unique").that(registry2).isNotEqualTo(registry1)
         }
     }
 }
