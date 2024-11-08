@@ -54,6 +54,10 @@ internal class XFunSpecImpl(
             delegates.forEach { it.addParameter(parameter) }
         }
 
+        override fun addParameter(name: String, typeName: XTypeName) = apply {
+            delegates.forEach { it.addParameter(name, typeName) }
+        }
+
         override fun addCode(code: XCodeBlock) = apply { delegates.forEach { it.addCode(code) } }
 
         override fun callSuperConstructor(vararg args: XCodeBlock) = apply {

@@ -41,8 +41,10 @@ internal class JavaFunSpec(internal val actual: JFunSpec) : XSpec(), XFunSpec {
 
     override fun toString() = actual.toString()
 
-    internal class Builder(internal val actual: JFunSpecBuilder) :
-        XSpec.Builder(), XFunSpec.Builder {
+    internal class Builder(
+        private val addJavaNullabilityAnnotation: Boolean,
+        internal val actual: JFunSpecBuilder
+    ) : XSpec.Builder(), XFunSpec.Builder {
 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
             require(annotation is XAnnotationSpecImpl)
@@ -60,6 +62,11 @@ internal class JavaFunSpec(internal val actual: JFunSpec) : XSpec(), XFunSpec {
             require(parameter is XParameterSpecImpl)
             actual.addParameter(parameter.java.actual)
         }
+
+        override fun addParameter(name: String, typeName: XTypeName) =
+            addParameter(
+                XParameterSpec.builder(name, typeName, addJavaNullabilityAnnotation).build()
+            )
 
         override fun addCode(code: XCodeBlock) = apply {
             require(code is XCodeBlockImpl)
@@ -83,12 +90,14 @@ internal class JavaFunSpec(internal val actual: JFunSpec) : XSpec(), XFunSpec {
             if (typeName.java == JTypeName.VOID) {
                 return@apply
             }
-            // TODO(b/247242374) Add nullability annotations for non-private methods
-            if (!actual.modifiers.contains(Modifier.PRIVATE)) {
-                if (typeName.nullability == XNullability.NULLABLE) {
-                    actual.addAnnotation(NULLABLE_ANNOTATION)
-                } else if (typeName.nullability == XNullability.NONNULL) {
-                    actual.addAnnotation(NONNULL_ANNOTATION)
+            if (addJavaNullabilityAnnotation) {
+                // TODO(b/247242374) Add nullability annotations for non-private methods
+                if (!actual.modifiers.contains(Modifier.PRIVATE)) {
+                    if (typeName.nullability == XNullability.NULLABLE) {
+                        actual.addAnnotation(NULLABLE_ANNOTATION)
+                    } else if (typeName.nullability == XNullability.NONNULL) {
+                        actual.addAnnotation(NONNULL_ANNOTATION)
+                    }
                 }
             }
             actual.returns(typeName.java)

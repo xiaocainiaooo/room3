@@ -402,7 +402,7 @@ class CustomTypeConverterResolutionTest {
                                         createConvertersAnnotation(useCollection = useCollection)
                                     )
                                 }
-                                addParameter(customType, "custom")
+                                addParameter("custom", customType)
                                     .apply {
                                         if (hasParameterConverters) {
                                             addAnnotation(

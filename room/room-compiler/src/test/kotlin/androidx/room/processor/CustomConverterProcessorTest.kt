@@ -375,7 +375,7 @@ class CustomConverterProcessorTest {
                                     .build()
                             )
                             .returns(to)
-                            .addParameter(from, "input")
+                            .addParameter("input", from)
                             .apply {
                                 if (to.isPrimitive) {
                                     addStatement("return 0")

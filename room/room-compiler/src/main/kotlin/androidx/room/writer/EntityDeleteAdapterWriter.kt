@@ -88,15 +88,15 @@ private constructor(val tableName: String, val pojoTypeName: XTypeName, val fiel
                         .apply {
                             val stmtParam = "statement"
                             addParameter(
+                                stmtParam,
                                 if (useDriverApi) {
                                     SQLiteDriverTypeNames.STATEMENT
                                 } else {
                                     SupportDbTypeNames.SQLITE_STMT
-                                },
-                                stmtParam
+                                }
                             )
                             val entityParam = "entity"
-                            addParameter(pojoTypeName, entityParam)
+                            addParameter(entityParam, pojoTypeName)
                             val mapped = FieldWithIndex.byOrder(fields)
                             val bindScope =
                                 CodeGenScope(writer = typeWriter, useDriverApi = useDriverApi)

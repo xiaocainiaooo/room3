@@ -94,7 +94,7 @@ class OpenDelegateWriter(val database: Database) {
                     )
                     .apply {
                         returns(RoomTypeNames.ROOM_OPEN_DELEGATE_VALIDATION_RESULT)
-                        addParameter(SQLiteDriverTypeNames.CONNECTION, connectionParamName)
+                        addParameter(connectionParamName, SQLiteDriverTypeNames.CONNECTION)
                         var statementCount = 0
                         while (!entities.isEmpty() && statementCount < VALIDATE_CHUNK_SIZE) {
                             val methodScope = scope.fork()
@@ -178,7 +178,7 @@ class OpenDelegateWriter(val database: Database) {
                 visibility = VisibilityModifier.PUBLIC,
                 isOverride = true
             )
-            .apply { addParameter(SQLiteDriverTypeNames.CONNECTION, connectionParamName) }
+            .apply { addParameter(connectionParamName, SQLiteDriverTypeNames.CONNECTION) }
             .build()
     }
 
@@ -189,7 +189,7 @@ class OpenDelegateWriter(val database: Database) {
                 isOverride = true
             )
             .apply {
-                addParameter(SQLiteDriverTypeNames.CONNECTION, connectionParamName)
+                addParameter(connectionParamName, SQLiteDriverTypeNames.CONNECTION)
                 if (database.enableForeignKeys) {
                     addStatement(
                         "%L",
@@ -212,7 +212,7 @@ class OpenDelegateWriter(val database: Database) {
                 isOverride = true
             )
             .apply {
-                addParameter(SQLiteDriverTypeNames.CONNECTION, connectionParamName)
+                addParameter(connectionParamName, SQLiteDriverTypeNames.CONNECTION)
                 database.bundle.buildCreateQueries().forEach { createQuery ->
                     addStatement(
                         "%L",
@@ -234,7 +234,7 @@ class OpenDelegateWriter(val database: Database) {
                 isOverride = true
             )
             .apply {
-                addParameter(SQLiteDriverTypeNames.CONNECTION, connectionParamName)
+                addParameter(connectionParamName, SQLiteDriverTypeNames.CONNECTION)
                 database.entities.forEach {
                     addStatement(
                         "%L",
@@ -266,7 +266,7 @@ class OpenDelegateWriter(val database: Database) {
                 isOverride = true
             )
             .apply {
-                addParameter(SQLiteDriverTypeNames.CONNECTION, connectionParamName)
+                addParameter(connectionParamName, SQLiteDriverTypeNames.CONNECTION)
                 addStatement(
                     "%M(%L)",
                     RoomMemberNames.DB_UTIL_DROP_FTS_SYNC_TRIGGERS,
@@ -283,7 +283,7 @@ class OpenDelegateWriter(val database: Database) {
                 isOverride = true
             )
             .apply {
-                addParameter(SQLiteDriverTypeNames.CONNECTION, connectionParamName)
+                addParameter(connectionParamName, SQLiteDriverTypeNames.CONNECTION)
                 database.entities
                     .filterIsInstance(FtsEntity::class.java)
                     .filter { it.ftsOptions.contentEntity != null }

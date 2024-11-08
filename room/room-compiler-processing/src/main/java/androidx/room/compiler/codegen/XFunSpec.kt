@@ -45,9 +45,7 @@ interface XFunSpec {
 
         fun addParameter(parameter: XParameterSpec): Builder
 
-        fun addParameter(typeName: XTypeName, name: String) = apply {
-            addParameter(XParameterSpec.builder(name, typeName).build())
-        }
+        fun addParameter(name: String, typeName: XTypeName): Builder
 
         fun addParameters(parameters: List<XParameterSpec>) = apply {
             parameters.forEach { addParameter(it) }
@@ -99,10 +97,12 @@ interface XFunSpec {
             name: XName,
             visibility: VisibilityModifier,
             isOpen: Boolean = false,
-            isOverride: Boolean = false
+            isOverride: Boolean = false,
+            addJavaNullabilityAnnotation: Boolean = true
         ): Builder =
             XFunSpecImpl.Builder(
                 JavaFunSpec.Builder(
+                    addJavaNullabilityAnnotation,
                     JFunSpec.methodBuilder(name.java).apply {
                         addModifiers(visibility.toJavaVisibilityModifier())
                         // TODO(b/247242374) Add nullability annotations for non-private params
@@ -128,9 +128,13 @@ interface XFunSpec {
             )
 
         @JvmStatic
-        fun constructorBuilder(visibility: VisibilityModifier): Builder =
+        fun constructorBuilder(
+            visibility: VisibilityModifier,
+            addJavaNullabilityAnnotation: Boolean = true
+        ): Builder =
             XFunSpecImpl.Builder(
                 JavaFunSpec.Builder(
+                    addJavaNullabilityAnnotation,
                     JFunSpec.constructorBuilder().apply {
                         addModifiers(visibility.toJavaVisibilityModifier())
                     }
@@ -147,9 +151,16 @@ interface XFunSpec {
             )
 
         @JvmStatic
-        fun overridingBuilder(element: XMethodElement, owner: XType): Builder =
+        fun overridingBuilder(
+            element: XMethodElement,
+            owner: XType,
+            addJavaNullabilityAnnotation: Boolean = true
+        ): Builder =
             XFunSpecImpl.Builder(
-                JavaFunSpec.Builder(MethodSpecHelper.overridingWithFinalParams(element, owner)),
+                JavaFunSpec.Builder(
+                    addJavaNullabilityAnnotation,
+                    MethodSpecHelper.overridingWithFinalParams(element, owner)
+                ),
                 KotlinFunSpec.Builder(FunSpecHelper.overriding(element, owner))
             )
     }
