@@ -18,18 +18,27 @@ package androidx.camera.integration.core.camera2
 import android.content.Context
 import android.graphics.ImageFormat
 import android.graphics.SurfaceTexture
+import android.hardware.camera2.CameraCaptureSession
+import android.hardware.camera2.CameraCaptureSession.CaptureCallback
+import android.hardware.camera2.CaptureRequest
+import android.hardware.camera2.CaptureResult
+import android.hardware.camera2.TotalCaptureResult
 import android.os.Build
+import android.util.Range
 import android.util.Size
 import android.view.Surface
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.camera2.internal.DisplayInfoManager
+import androidx.camera.camera2.interop.Camera2Interop
 import androidx.camera.camera2.pipe.integration.CameraPipeConfig
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraXConfig
+import androidx.camera.core.DynamicRange
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceRequest
 import androidx.camera.core.SurfaceRequest.TransformationInfo
+import androidx.camera.core.UseCaseGroup
 import androidx.camera.core.impl.ImageOutputConfig
 import androidx.camera.core.impl.ImageOutputConfig.OPTION_RESOLUTION_SELECTOR
 import androidx.camera.core.impl.SessionConfig
@@ -46,8 +55,9 @@ import androidx.camera.testing.impl.CameraPipeConfigTestRule
 import androidx.camera.testing.impl.CameraUtil
 import androidx.camera.testing.impl.CameraUtil.PreTestCameraIdList
 import androidx.camera.testing.impl.SurfaceTextureProvider
-import androidx.camera.testing.impl.WakelockEmptyActivityRule
 import androidx.camera.testing.impl.fakes.FakeLifecycleOwner
+import androidx.camera.video.Recorder
+import androidx.camera.video.VideoCapture
 import androidx.concurrent.futures.await
 import androidx.core.util.Consumer
 import androidx.test.core.app.ApplicationProvider
@@ -90,8 +100,6 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @get:Rule
     val cameraRule =
         CameraUtil.grantCameraPermissionAndPreTestAndPostTest(PreTestCameraIdList(cameraConfig))
-
-    @get:Rule val wakelockEmptyActivityRule = WakelockEmptyActivityRule()
 
     companion object {
         private const val ANY_THREAD_NAME = "any-thread-name"
@@ -1045,6 +1053,271 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             )
         }
         // Assert.
+        frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 10)
+    }
+
+    // ======================================================
+    // Section 6: Preview Stabilization, Dynamic Range, Frame rate
+    // ======================================================
+    @Test
+    fun previewStabilizationIsSetCorrectly(): Unit = runBlocking {
+        val preview = Preview.Builder().setPreviewStabilizationEnabled(true).build()
+        assertThat(preview.isPreviewStabilizationEnabled).isTrue()
+    }
+
+    @Test
+    fun previewStabilizationOn_videoStabilizationModeIsPreviewStabilization(): Unit = runBlocking {
+        val previewCapabilities =
+            Preview.getPreviewCapabilities(cameraProvider.getCameraInfo(cameraSelector))
+        assumeTrue(previewCapabilities.isStabilizationSupported)
+
+        val previewBuilder = Preview.Builder().setPreviewStabilizationEnabled(true)
+        verifyVideoStabilizationModeInResultAndFramesAvailable(
+            previewBuilder = previewBuilder,
+            expectedMode = CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION
+        )
+    }
+
+    @Test
+    fun previewStabilizationOnAndVideoOff_videoStabilizationModeIsOff(): Unit = runBlocking {
+        val previewCapabilities =
+            Preview.getPreviewCapabilities(cameraProvider.getCameraInfo(cameraSelector))
+        val videoCaptureCapabilities =
+            Recorder.getVideoCapabilities(cameraProvider.getCameraInfo(cameraSelector))
+        assumeTrue(
+            previewCapabilities.isStabilizationSupported &&
+                videoCaptureCapabilities.isStabilizationSupported
+        )
+
+        val previewBuilder = Preview.Builder().setPreviewStabilizationEnabled(true)
+        val videoCapture =
+            VideoCapture.Builder(Recorder.Builder().build())
+                .setVideoStabilizationEnabled(false)
+                .build()
+
+        verifyVideoStabilizationModeInResultAndFramesAvailable(
+            previewBuilder = previewBuilder,
+            videoCapture = videoCapture,
+            expectedMode = CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE_OFF
+        )
+    }
+
+    @Test
+    fun previewStabilizationOnAndVideoOn_videoStabilizationModeIsPreviewStabilization(): Unit =
+        runBlocking {
+            val previewCapabilities =
+                Preview.getPreviewCapabilities(cameraProvider.getCameraInfo(cameraSelector))
+            val videoCaptureCapabilities =
+                Recorder.getVideoCapabilities(cameraProvider.getCameraInfo(cameraSelector))
+            assumeTrue(
+                previewCapabilities.isStabilizationSupported &&
+                    videoCaptureCapabilities.isStabilizationSupported
+            )
+
+            val previewBuilder = Preview.Builder().setPreviewStabilizationEnabled(true)
+            val videoCapture =
+                VideoCapture.Builder(Recorder.Builder().build())
+                    .setVideoStabilizationEnabled(true)
+                    .build()
+
+            verifyVideoStabilizationModeInResultAndFramesAvailable(
+                previewBuilder = previewBuilder,
+                videoCapture = videoCapture,
+                expectedMode = CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION
+            )
+        }
+
+    private suspend fun verifyVideoStabilizationModeInResultAndFramesAvailable(
+        previewBuilder: Preview.Builder,
+        videoCapture: VideoCapture<Recorder>? = null,
+        expectedMode: Int
+    ) {
+        val captureResultDeferred = CompletableDeferred<TotalCaptureResult>()
+        Camera2Interop.Extender(previewBuilder)
+            .setSessionCaptureCallback(
+                object : CaptureCallback() {
+                    override fun onCaptureCompleted(
+                        session: CameraCaptureSession,
+                        request: CaptureRequest,
+                        result: TotalCaptureResult
+                    ) {
+                        captureResultDeferred.complete(result)
+                    }
+                }
+            )
+        val useCaseGroupBuilder = UseCaseGroup.Builder()
+        val preview = previewBuilder.build()
+        useCaseGroupBuilder.addUseCase(preview)
+        videoCapture?.let { useCaseGroupBuilder.addUseCase(it) }
+
+        withContext(Dispatchers.Main) {
+            preview.surfaceProvider =
+                getSurfaceProvider(frameAvailableListener = { frameSemaphore!!.release() })
+            cameraProvider.bindToLifecycle(
+                lifecycleOwner,
+                cameraSelector,
+                useCaseGroupBuilder.build()
+            )
+        }
+
+        assertThat(
+                withTimeoutOrNull(5000) { captureResultDeferred.await() }!!.get(
+                    CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE
+                )
+            )
+            .isEqualTo(expectedMode)
+        frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 10)
+    }
+
+    @Test
+    fun dynamicRange_HLG10BIT(): Unit = runBlocking {
+        assumeTrue(
+            cameraProvider
+                .getCameraInfo(cameraSelector)
+                .querySupportedDynamicRanges(setOf(DynamicRange.HLG_10_BIT))
+                .contains(DynamicRange.HLG_10_BIT)
+        )
+
+        val preview = Preview.Builder().setDynamicRange(DynamicRange.HLG_10_BIT).build()
+        withContext(Dispatchers.Main) {
+            preview.surfaceProvider =
+                getSurfaceProvider(frameAvailableListener = { frameSemaphore!!.release() })
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+        }
+
+        assertThat(preview.dynamicRange).isEqualTo(DynamicRange.HLG_10_BIT)
+        frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 5)
+    }
+
+    @Test
+    fun dynamicRangeIsSetInSurfaceRequest(): Unit = runBlocking {
+        assumeTrue(
+            cameraProvider
+                .getCameraInfo(cameraSelector)
+                .querySupportedDynamicRanges(setOf(DynamicRange.HLG_10_BIT))
+                .contains(DynamicRange.HLG_10_BIT)
+        )
+
+        val surfaceRequestDeferred = CompletableDeferred<SurfaceRequest>()
+        val preview = Preview.Builder().setDynamicRange(DynamicRange.HLG_10_BIT).build()
+        withContext(Dispatchers.Main) {
+            preview.surfaceProvider =
+                Preview.SurfaceProvider { surfaceRequest ->
+                    surfaceRequestDeferred.complete(surfaceRequest)
+                }
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+        }
+
+        assertThat(withTimeoutOrNull(3000) { surfaceRequestDeferred.await() }!!.dynamicRange)
+            .isEqualTo(DynamicRange.HLG_10_BIT)
+    }
+
+    @Test
+    fun dynamicRangeIsNotSet_SDRInSurfaceRequest(): Unit = runBlocking {
+        val surfaceRequestDeferred = CompletableDeferred<SurfaceRequest>()
+        val preview = Preview.Builder().build()
+        withContext(Dispatchers.Main) {
+            preview.surfaceProvider =
+                Preview.SurfaceProvider { surfaceRequest ->
+                    surfaceRequestDeferred.complete(surfaceRequest)
+                }
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+        }
+
+        assertThat(withTimeoutOrNull(3000) { surfaceRequestDeferred.await() }!!.dynamicRange)
+            .isEqualTo(DynamicRange.SDR)
+    }
+
+    @Test
+    fun canSetFrameRate30_30(): Unit = runBlocking {
+        val fpsToVerify = Range(30, 30)
+        assumeTrue(
+            cameraProvider
+                .getCameraInfo(cameraSelector)
+                .supportedFrameRateRanges
+                .contains(fpsToVerify)
+        )
+        val previewBuilder = Preview.Builder().setTargetFrameRate(fpsToVerify)
+
+        verifyFrameRateRangeInResultAndFramesAvailable(
+            previewBuilder = previewBuilder,
+            expectedFpsRange = fpsToVerify
+        )
+    }
+
+    @Test
+    fun frameRateIsSetInSurfaceRequest(): Unit = runBlocking {
+        val fpsToVerify = Range(30, 30)
+        assumeTrue(
+            cameraProvider
+                .getCameraInfo(cameraSelector)
+                .supportedFrameRateRanges
+                .contains(fpsToVerify)
+        )
+        val previewBuilder = Preview.Builder().setTargetFrameRate(fpsToVerify)
+
+        val preview = previewBuilder.build()
+        val surfaceRequestDeferred = CompletableDeferred<SurfaceRequest>()
+
+        withContext(Dispatchers.Main) {
+            preview.surfaceProvider =
+                Preview.SurfaceProvider { surfaceRequest ->
+                    surfaceRequestDeferred.complete(surfaceRequest)
+                }
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+        }
+        assertThat(withTimeoutOrNull(3000) { surfaceRequestDeferred.await() }!!.expectedFrameRate)
+            .isEqualTo(fpsToVerify)
+    }
+
+    @Test
+    fun canSetFrameRate60_60(): Unit = runBlocking {
+        val fpsToVerify = Range(60, 60)
+        assumeTrue(
+            cameraProvider
+                .getCameraInfo(cameraSelector)
+                .supportedFrameRateRanges
+                .contains(fpsToVerify)
+        )
+        val previewBuilder = Preview.Builder().setTargetFrameRate(fpsToVerify)
+
+        verifyFrameRateRangeInResultAndFramesAvailable(
+            previewBuilder = previewBuilder,
+            expectedFpsRange = fpsToVerify
+        )
+    }
+
+    private suspend fun verifyFrameRateRangeInResultAndFramesAvailable(
+        previewBuilder: Preview.Builder,
+        expectedFpsRange: Range<Int>
+    ) {
+        val captureResultDeferred = CompletableDeferred<TotalCaptureResult>()
+        Camera2Interop.Extender(previewBuilder)
+            .setSessionCaptureCallback(
+                object : CaptureCallback() {
+                    override fun onCaptureCompleted(
+                        session: CameraCaptureSession,
+                        request: CaptureRequest,
+                        result: TotalCaptureResult
+                    ) {
+                        captureResultDeferred.complete(result)
+                    }
+                }
+            )
+        val preview = previewBuilder.build()
+
+        withContext(Dispatchers.Main) {
+            preview.surfaceProvider =
+                getSurfaceProvider(frameAvailableListener = { frameSemaphore!!.release() })
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+        }
+
+        assertThat(
+                withTimeoutOrNull(5000) { captureResultDeferred.await() }!!.get(
+                    CaptureResult.CONTROL_AE_TARGET_FPS_RANGE
+                )
+            )
+            .isEqualTo(expectedFpsRange)
         frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 10)
     }
 
