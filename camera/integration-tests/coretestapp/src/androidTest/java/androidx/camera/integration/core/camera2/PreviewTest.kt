@@ -560,6 +560,32 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         assertThat(noFrameCome(3000L, 10000L)).isTrue()
     }
 
+    @Test
+    @Throws(InterruptedException::class)
+    fun surfaceClosed_resultCode_INVALID_SURFACE() = runBlocking {
+        // Arrange.
+        val preview = Preview.Builder().build()
+        val resultDeferred = CompletableDeferred<Int>()
+
+        // Act.
+        instrumentation.runOnMainSync {
+            preview.setSurfaceProvider(
+                CameraXExecutors.mainThreadExecutor(),
+                { request ->
+                    val surface = Surface(SurfaceTexture(0))
+                    surface.release()
+                    request.provideSurface(surface, CameraXExecutors.directExecutor()) {
+                        resultDeferred.complete(it.resultCode)
+                    }
+                }
+            )
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+        }
+
+        assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred.await() })
+            .isEqualTo(SurfaceRequest.Result.RESULT_INVALID_SURFACE)
+    }
+
     // ======================================================
     // Section 2: targetResolution / targetRotation / targetAspectRatio
     // ======================================================
