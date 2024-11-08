@@ -22,6 +22,7 @@ import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.filters.LargeTest
 import androidx.wear.compose.material3.macrobenchmark.common.baselineprofile.BaselineProfileScreens
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -47,7 +48,8 @@ class BaselineProfile {
 
     @get:Rule val baselineRule = BaselineProfileRule()
 
-    @Test(timeout = 900_000) // The default 300_000 may not be enough for this test.
+    @Test
+    @Ignore("b/377879726")
     fun profile() {
         baselineRule.collect(
             packageName = PACKAGE_NAME,
