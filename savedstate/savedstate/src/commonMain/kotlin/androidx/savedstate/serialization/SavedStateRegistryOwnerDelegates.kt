@@ -121,34 +121,35 @@ private class SavedStateReadWriteProperty<T : Any>(
 
     private lateinit var value: T
 
-    private fun lazyInit(thisRef: Any?, property: KProperty<*>) {
-        if (::value.isInitialized) return
-
-        val classNamePrefix = if (thisRef != null) thisRef::class.qualifiedName + "." else ""
-        val qualifiedKey = key ?: (classNamePrefix + property.name)
-
-        val restoredState = registry.consumeRestoredStateForKey(qualifiedKey)
-        val initialValue =
-            if (restoredState != null) {
-                decodeFromSavedState(serializer, restoredState)
-            } else {
-                init()
-            }
-
-        registry.registerSavedStateProvider(qualifiedKey) {
-            encodeToSavedState(serializer, this.value)
+    private fun loadValue(key: String): T? {
+        return registry.consumeRestoredStateForKey(key)?.let {
+            decodeFromSavedState(serializer, it)
         }
+    }
 
-        this.value = initialValue
+    private fun registerSave(key: String) {
+        registry.registerSavedStateProvider(key) { encodeToSavedState(serializer, this.value) }
+    }
+
+    private fun createDefaultKey(thisRef: Any?, property: KProperty<*>): String {
+        val classNamePrefix = if (thisRef != null) thisRef::class.qualifiedName + "." else ""
+        return classNamePrefix + property.name
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        lazyInit(thisRef, property)
-        return value
+        if (!::value.isInitialized) {
+            val qualifiedKey = key ?: createDefaultKey(thisRef, property)
+            registerSave(qualifiedKey)
+            this.value = loadValue(qualifiedKey) ?: init()
+        }
+        return this.value
     }
 
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        lazyInit(thisRef, property)
+        if (!::value.isInitialized) {
+            val qualifiedKey = key ?: createDefaultKey(thisRef, property)
+            registerSave(qualifiedKey)
+        }
         this.value = value
     }
 }

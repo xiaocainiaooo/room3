@@ -105,39 +105,33 @@ private class SerializablePropertyDelegate<T : Any>(
 ) : ReadWriteProperty<Any?, T> {
     private lateinit var value: T
 
-    private fun lazyInit(thisRef: Any?, property: KProperty<*>) {
-        if (::value.isInitialized) return
+    private fun loadValue(key: String): T? {
+        return savedStateHandle.get<SavedState>(key)?.let { decodeFromSavedState(serializer, it) }
+    }
 
-        val qualifiedKey =
-            if (key != null) {
-                key
-            } else {
-                val classNamePrefix =
-                    if (thisRef != null) thisRef::class.qualifiedName + "." else ""
-                classNamePrefix + property.name
-            }
+    private fun registerSave(key: String) {
+        savedStateHandle.setSavedStateProvider(key) { encodeToSavedState(serializer, this.value) }
+    }
 
-        val restoredState = savedStateHandle.get<SavedState>(qualifiedKey)
-        val value =
-            if (restoredState != null) {
-                decodeFromSavedState(serializer, restoredState)
-            } else {
-                init()
-            }
-        this.value = value
-
-        savedStateHandle.setSavedStateProvider(qualifiedKey) {
-            encodeToSavedState(serializer, this.value)
-        }
+    private fun createDefaultKey(thisRef: Any?, property: KProperty<*>): String {
+        val classNamePrefix = if (thisRef != null) thisRef::class.qualifiedName + "." else ""
+        return classNamePrefix + property.name
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        lazyInit(thisRef, property)
-        return value
+        if (!::value.isInitialized) {
+            val qualifiedKey = key ?: createDefaultKey(thisRef, property)
+            registerSave(qualifiedKey)
+            this.value = loadValue(qualifiedKey) ?: init()
+        }
+        return this.value
     }
 
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        lazyInit(thisRef, property)
+        if (!::value.isInitialized) {
+            val qualifiedKey = key ?: createDefaultKey(thisRef, property)
+            registerSave(qualifiedKey)
+        }
         this.value = value
     }
 }
