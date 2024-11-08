@@ -37,18 +37,15 @@ interface XFunSpec {
 
         fun addAbstractModifier(): Builder
 
-        // TODO(b/247247442): Maybe make a XParameterSpec ?
-        fun addParameter(
-            typeName: XTypeName,
-            name: String,
-            annotations: List<XAnnotationSpec> = emptyList()
-        ): Builder = addParameter(typeName, XName.of(name), annotations)
+        fun addParameter(parameter: XParameterSpec): Builder
 
-        fun addParameter(
-            typeName: XTypeName,
-            name: XName,
-            annotations: List<XAnnotationSpec> = emptyList()
-        ): Builder
+        fun addParameter(typeName: XTypeName, name: String) = apply {
+            addParameter(XParameterSpec.builder(name, typeName).build())
+        }
+
+        fun addParameters(parameters: List<XParameterSpec>) = apply {
+            parameters.forEach { addParameter(it) }
+        }
 
         fun addCode(code: XCodeBlock): Builder
 

@@ -32,7 +32,6 @@ import androidx.room.compiler.codegen.XTypeSpec.Builder.Companion.applyTo
 import androidx.room.compiler.codegen.buildCodeBlock
 import androidx.room.compiler.codegen.compat.XConverters.applyToJavaPoet
 import androidx.room.compiler.codegen.compat.XConverters.applyToKotlinPoet
-import androidx.room.compiler.codegen.compat.XConverters.toString
 import androidx.room.compiler.processing.PropertySpecHelper
 import androidx.room.ext.CommonTypeNames
 import androidx.room.ext.KotlinCollectionMemberNames
@@ -399,10 +398,7 @@ class DatabaseWriter(
                             PropertySpecHelper.overriding(method.element, database.type)
                                 .getter(
                                     KFunSpec.getterBuilder()
-                                        .addCode(
-                                            "return %L.value",
-                                            privateDaoProperty.name.toString(CodeLanguage.KOTLIN)
-                                        )
+                                        .addCode("return %L.value", privateDaoProperty.name)
                                         .build()
                                 )
                                 .build()

@@ -22,6 +22,8 @@ import androidx.room.compiler.codegen.JCodeBlock
 import androidx.room.compiler.codegen.JCodeBlockBuilder
 import androidx.room.compiler.codegen.JFunSpec
 import androidx.room.compiler.codegen.JFunSpecBuilder
+import androidx.room.compiler.codegen.JParameterSpec
+import androidx.room.compiler.codegen.JParameterSpecBuilder
 import androidx.room.compiler.codegen.JPropertySpec
 import androidx.room.compiler.codegen.JPropertySpecBuilder
 import androidx.room.compiler.codegen.JTypeSpecBuilder
@@ -30,6 +32,8 @@ import androidx.room.compiler.codegen.KCodeBlock
 import androidx.room.compiler.codegen.KCodeBlockBuilder
 import androidx.room.compiler.codegen.KFunSpec
 import androidx.room.compiler.codegen.KFunSpecBuilder
+import androidx.room.compiler.codegen.KParameterSpec
+import androidx.room.compiler.codegen.KParameterSpecBuilder
 import androidx.room.compiler.codegen.KPropertySpec
 import androidx.room.compiler.codegen.KPropertySpecBuilder
 import androidx.room.compiler.codegen.KTypeSpecBuilder
@@ -39,22 +43,26 @@ import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XMemberName
 import androidx.room.compiler.codegen.XName
+import androidx.room.compiler.codegen.XParameterSpec
 import androidx.room.compiler.codegen.XPropertySpec
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.XTypeSpec
 import androidx.room.compiler.codegen.impl.XAnnotationSpecImpl
 import androidx.room.compiler.codegen.impl.XCodeBlockImpl
 import androidx.room.compiler.codegen.impl.XFunSpecImpl
+import androidx.room.compiler.codegen.impl.XParameterSpecImpl
 import androidx.room.compiler.codegen.impl.XPropertySpecImpl
 import androidx.room.compiler.codegen.impl.XTypeSpecImpl
 import androidx.room.compiler.codegen.java.JavaAnnotationSpec
 import androidx.room.compiler.codegen.java.JavaCodeBlock
 import androidx.room.compiler.codegen.java.JavaFunSpec
+import androidx.room.compiler.codegen.java.JavaParameterSpec
 import androidx.room.compiler.codegen.java.JavaPropertySpec
 import androidx.room.compiler.codegen.java.JavaTypeSpec
 import androidx.room.compiler.codegen.kotlin.KotlinAnnotationSpec
 import androidx.room.compiler.codegen.kotlin.KotlinCodeBlock
 import androidx.room.compiler.codegen.kotlin.KotlinFunSpec
+import androidx.room.compiler.codegen.kotlin.KotlinParameterSpec
 import androidx.room.compiler.codegen.kotlin.KotlinPropertySpec
 import androidx.room.compiler.codegen.kotlin.KotlinTypeSpec
 import androidx.room.compiler.processing.XNullability
@@ -143,6 +151,22 @@ object XConverters {
         }
 
     @JvmStatic
+    fun XParameterSpec.toJavaPoet() =
+        when (this) {
+            is XParameterSpecImpl -> java.actual
+            is JavaParameterSpec -> actual
+            else -> error("Unsupported type: ${this.javaClass}")
+        }
+
+    @JvmStatic
+    fun XParameterSpec.Builder.toJavaPoet() =
+        when (this) {
+            is XParameterSpecImpl.Builder -> java.actual
+            is JavaParameterSpec.Builder -> actual
+            else -> error("Unsupported type: ${this.javaClass}")
+        }
+
+    @JvmStatic
     fun XTypeSpec.toJavaPoet() =
         when (this) {
             is XTypeSpecImpl -> java.actual
@@ -211,6 +235,22 @@ object XConverters {
         when (this) {
             is XFunSpecImpl.Builder -> kotlin.actual
             is KotlinFunSpec.Builder -> actual
+            else -> error("Unsupported type: ${this.javaClass}")
+        }
+
+    @JvmStatic
+    fun XParameterSpec.toKotlinPoet() =
+        when (this) {
+            is XParameterSpecImpl -> kotlin.actual
+            is KotlinParameterSpec -> actual
+            else -> error("Unsupported type: ${this.javaClass}")
+        }
+
+    @JvmStatic
+    fun XParameterSpec.Builder.toKotlinPoet() =
+        when (this) {
+            is XParameterSpecImpl.Builder -> kotlin.actual
+            is KotlinParameterSpec.Builder -> actual
             else -> error("Unsupported type: ${this.javaClass}")
         }
 
@@ -311,6 +351,20 @@ object XConverters {
         )
 
     @JvmStatic
+    fun toXPoet(jParameterSpec: JParameterSpec, kParameterSpec: KParameterSpec): XParameterSpec =
+        XParameterSpecImpl(JavaParameterSpec(jParameterSpec), KotlinParameterSpec(kParameterSpec))
+
+    @JvmStatic
+    fun toXPoet(
+        jParameterSpecBuilder: JParameterSpecBuilder,
+        kParameterSpecBuilder: KParameterSpecBuilder
+    ): XParameterSpec.Builder =
+        XParameterSpecImpl.Builder(
+            JavaParameterSpec.Builder(jParameterSpecBuilder),
+            KotlinParameterSpec.Builder(kParameterSpecBuilder)
+        )
+
+    @JvmStatic
     fun toXPoet(jPropertySpec: JPropertySpec, kPropertySpec: KPropertySpec): XPropertySpec =
         XPropertySpecImpl(JavaPropertySpec(jPropertySpec), KotlinPropertySpec(kPropertySpec))
 
@@ -360,6 +414,13 @@ object XConverters {
     }
 
     @JvmStatic
+    fun XParameterSpec.Builder.applyToJavaPoet(block: JParameterSpecBuilder.() -> Unit) = apply {
+        if (this is XParameterSpecImpl.Builder || this is JavaParameterSpec.Builder) {
+            toJavaPoet().block()
+        }
+    }
+
+    @JvmStatic
     fun XPropertySpec.Builder.applyToJavaPoet(block: JPropertySpecBuilder.() -> Unit) = apply {
         if (this is XPropertySpecImpl.Builder || this is JavaPropertySpec.Builder) {
             toJavaPoet().block()
@@ -391,6 +452,13 @@ object XConverters {
     @JvmStatic
     fun XFunSpec.Builder.applyToKotlinPoet(block: KFunSpecBuilder.() -> Unit) = apply {
         if (this is XFunSpecImpl.Builder || this is KotlinFunSpec.Builder) {
+            toKotlinPoet().block()
+        }
+    }
+
+    @JvmStatic
+    fun XParameterSpec.Builder.applyToKotlinPoet(block: KParameterSpecBuilder.() -> Unit) = apply {
+        if (this is XParameterSpecImpl.Builder || this is KotlinParameterSpec.Builder) {
             toKotlinPoet().block()
         }
     }
@@ -432,6 +500,13 @@ object XConverters {
 
     @JvmStatic
     fun XFunSpec.toString(language: CodeLanguage) =
+        when (language) {
+            CodeLanguage.JAVA -> toJavaPoet().toString()
+            CodeLanguage.KOTLIN -> toKotlinPoet().toString()
+        }
+
+    @JvmStatic
+    fun XParameterSpec.toString(language: CodeLanguage) =
         when (language) {
             CodeLanguage.JAVA -> toJavaPoet().toString()
             CodeLanguage.KOTLIN -> toKotlinPoet().toString()

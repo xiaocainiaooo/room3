@@ -18,16 +18,17 @@ package androidx.room.compiler.codegen.kotlin
 
 import androidx.room.compiler.codegen.KFunSpec
 import androidx.room.compiler.codegen.KFunSpecBuilder
-import androidx.room.compiler.codegen.KParameterSpec
 import androidx.room.compiler.codegen.VisibilityModifier
 import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XName
+import androidx.room.compiler.codegen.XParameterSpec
 import androidx.room.compiler.codegen.XSpec
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.impl.XAnnotationSpecImpl
 import androidx.room.compiler.codegen.impl.XCodeBlockImpl
+import androidx.room.compiler.codegen.impl.XParameterSpecImpl
 import com.squareup.kotlinpoet.KModifier
 
 internal class KotlinFunSpec(internal val actual: KFunSpec) : XSpec(), XFunSpec {
@@ -43,23 +44,14 @@ internal class KotlinFunSpec(internal val actual: KFunSpec) : XSpec(), XFunSpec 
 
         override fun addAbstractModifier() = apply { actual.addModifiers(KModifier.ABSTRACT) }
 
+        override fun addParameter(parameter: XParameterSpec) = apply {
+            require(parameter is XParameterSpecImpl)
+            actual.addParameter(parameter.kotlin.actual)
+        }
+
         override fun addCode(code: XCodeBlock) = apply {
             require(code is XCodeBlockImpl)
             actual.addCode(code.kotlin.actual)
-        }
-
-        override fun addParameter(
-            typeName: XTypeName,
-            name: XName,
-            annotations: List<XAnnotationSpec>
-        ) = apply {
-            actual.addParameter(
-                KParameterSpec.builder(name.kotlin, typeName.kotlin)
-                    .apply {
-                        // TODO(b/247247439): Add other annotations
-                    }
-                    .build()
-            )
         }
 
         override fun callSuperConstructor(vararg args: XCodeBlock) = apply {

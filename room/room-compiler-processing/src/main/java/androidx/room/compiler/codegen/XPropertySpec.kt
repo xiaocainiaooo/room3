@@ -27,7 +27,7 @@ import androidx.room.compiler.processing.XNullability
 
 interface XPropertySpec {
 
-    val name: XName
+    val name: String
 
     interface Builder {
         fun addAnnotation(annotation: XAnnotationSpec): Builder

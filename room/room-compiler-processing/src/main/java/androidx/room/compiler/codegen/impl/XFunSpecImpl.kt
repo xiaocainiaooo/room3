@@ -20,6 +20,7 @@ import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XName
+import androidx.room.compiler.codegen.XParameterSpec
 import androidx.room.compiler.codegen.XSpec
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.java.JavaFunSpec
@@ -45,11 +46,9 @@ internal class XFunSpecImpl(
             delegates.forEach { it.addAbstractModifier() }
         }
 
-        override fun addParameter(
-            typeName: XTypeName,
-            name: XName,
-            annotations: List<XAnnotationSpec>
-        ) = apply { delegates.forEach { it.addParameter(typeName, name, annotations) } }
+        override fun addParameter(parameter: XParameterSpec) = apply {
+            delegates.forEach { it.addParameter(parameter) }
+        }
 
         override fun addCode(code: XCodeBlock) = apply { delegates.forEach { it.addCode(code) } }
 

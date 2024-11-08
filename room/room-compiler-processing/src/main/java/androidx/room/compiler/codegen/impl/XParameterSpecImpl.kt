@@ -17,16 +17,15 @@
 package androidx.room.compiler.codegen.impl
 
 import androidx.room.compiler.codegen.XAnnotationSpec
-import androidx.room.compiler.codegen.XCodeBlock
-import androidx.room.compiler.codegen.XPropertySpec
+import androidx.room.compiler.codegen.XParameterSpec
 import androidx.room.compiler.codegen.XSpec
-import androidx.room.compiler.codegen.java.JavaPropertySpec
-import androidx.room.compiler.codegen.kotlin.KotlinPropertySpec
+import androidx.room.compiler.codegen.java.JavaParameterSpec
+import androidx.room.compiler.codegen.kotlin.KotlinParameterSpec
 
-internal class XPropertySpecImpl(
-    val java: JavaPropertySpec,
-    val kotlin: KotlinPropertySpec,
-) : XSpec(), XPropertySpec {
+internal class XParameterSpecImpl(
+    val java: JavaParameterSpec,
+    val kotlin: KotlinParameterSpec,
+) : XSpec(), XParameterSpec {
 
     override val name: String by lazy {
         check(java.name == kotlin.name)
@@ -34,19 +33,15 @@ internal class XPropertySpecImpl(
     }
 
     internal class Builder(
-        val java: JavaPropertySpec.Builder,
-        val kotlin: KotlinPropertySpec.Builder,
-    ) : XSpec.Builder(), XPropertySpec.Builder {
-        private val delegates: List<XPropertySpec.Builder> = listOf(java, kotlin)
+        val java: JavaParameterSpec.Builder,
+        val kotlin: KotlinParameterSpec.Builder,
+    ) : XSpec.Builder(), XParameterSpec.Builder {
+        private val delegates: List<XParameterSpec.Builder> = listOf(java, kotlin)
 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
             delegates.forEach { it.addAnnotation(annotation) }
         }
 
-        override fun initializer(initExpr: XCodeBlock) = apply {
-            delegates.forEach { it.initializer(initExpr) }
-        }
-
-        override fun build() = XPropertySpecImpl(java.build(), kotlin.build())
+        override fun build() = XParameterSpecImpl(java.build(), kotlin.build())
     }
 }
