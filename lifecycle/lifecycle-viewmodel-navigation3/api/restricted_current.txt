@@ -1,0 +1,10 @@
+// Signature format: 4.0
+package androidx.lifecycle.viewmodel.navigation3 {
+
+  public final class ViewModelStoreNavContentWrapper implements androidx.navigation3.NavContentWrapper {
+    method @androidx.compose.runtime.Composable public void WrapContent(androidx.navigation3.Record record);
+    field public static final androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavContentWrapper INSTANCE;
+  }
+
+}
+
