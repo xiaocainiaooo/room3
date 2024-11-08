@@ -33,6 +33,7 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.javapoet.KTypeVariableName
 
 internal class KotlinFunSpec(internal val actual: KFunSpec) : XSpec(), XFunSpec {
+
     override val name: XName = XName.of(actual.name)
 
     internal class Builder(internal val actual: KFunSpecBuilder) :

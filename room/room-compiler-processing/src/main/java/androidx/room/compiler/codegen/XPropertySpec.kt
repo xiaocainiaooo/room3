@@ -29,6 +29,8 @@ interface XPropertySpec {
 
     val name: String
 
+    val type: XTypeName
+
     interface Builder {
         fun addAnnotation(annotation: XAnnotationSpec): Builder
 
@@ -66,10 +68,15 @@ interface XPropertySpec {
             isMutable: Boolean = false,
         ): Builder =
             XPropertySpecImpl.Builder(
+                name,
+                typeName,
                 JavaPropertySpec.Builder(
+                    name,
+                    typeName,
                     JPropertySpec.builder(typeName.java, name).apply {
                         val visibilityModifier = visibility.toJavaVisibilityModifier()
-                        // TODO(b/247242374) Add nullability annotations for non-private fields
+                        addModifiers(visibilityModifier)
+                        // TODO(b/247242374) Add nullability annotations for private fields
                         if (visibilityModifier != JModifier.PRIVATE) {
                             if (typeName.nullability == XNullability.NULLABLE) {
                                 addAnnotation(NULLABLE_ANNOTATION)
@@ -77,13 +84,14 @@ interface XPropertySpec {
                                 addAnnotation(NONNULL_ANNOTATION)
                             }
                         }
-                        addModifiers(visibilityModifier)
                         if (!isMutable) {
                             addModifiers(JModifier.FINAL)
                         }
                     }
                 ),
                 KotlinPropertySpec.Builder(
+                    name,
+                    typeName,
                     KPropertySpec.builder(name, typeName.kotlin).apply {
                         mutable(isMutable)
                         addModifiers(visibility.toKotlinVisibilityModifier())
