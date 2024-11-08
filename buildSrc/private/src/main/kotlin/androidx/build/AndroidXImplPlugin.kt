@@ -973,22 +973,6 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
         SdkResourceGenerator.generateForHostTest(project)
     }
 
-    private fun getDefaultTargetJavaVersion(
-        libraryType: LibraryType,
-        projectName: String? = null,
-        targetName: String? = null
-    ): JavaVersion {
-        return when {
-            // TODO(b/353328300): Move room-compiler-processing to Java 17 once Dagger is ready.
-            projectName != null && projectName.contains("room-compiler-processing") -> VERSION_11
-            projectName != null && projectName.contains("desktop") -> VERSION_11
-            targetName != null && (targetName == "desktop" || targetName == "jvmStubs") ->
-                VERSION_11
-            libraryType.compilationTarget == CompilationTarget.HOST -> VERSION_17
-            else -> VERSION_1_8
-        }
-    }
-
     private fun configureWithJavaPlugin(project: Project, androidXExtension: AndroidXExtension) {
         if (
             project.multiplatformExtension != null &&
@@ -1448,6 +1432,21 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
 
         /** Fail the build if a non-Studio task runs longer than expected */
         const val TASK_TIMEOUT_MINUTES = 60L
+    }
+}
+
+internal fun getDefaultTargetJavaVersion(
+    libraryType: LibraryType,
+    projectName: String? = null,
+    targetName: String? = null
+): JavaVersion {
+    return when {
+        // TODO(b/353328300): Move room-compiler-processing to Java 17 once Dagger is ready.
+        projectName != null && projectName.contains("room-compiler-processing") -> VERSION_11
+        projectName != null && projectName.contains("desktop") -> VERSION_11
+        targetName != null && (targetName == "desktop" || targetName == "jvmStubs") -> VERSION_11
+        libraryType.compilationTarget == CompilationTarget.HOST -> VERSION_17
+        else -> VERSION_1_8
     }
 }
 
