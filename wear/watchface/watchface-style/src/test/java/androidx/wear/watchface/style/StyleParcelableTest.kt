@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.RectF
 import android.graphics.drawable.Icon
-import android.os.Build
 import android.os.Parcel
 import androidx.annotation.RequiresApi
 import androidx.wear.watchface.complications.ComplicationSlotBounds
@@ -50,7 +49,7 @@ private const val NAME_RESOURCE_ID = 123456
 private const val SCREEN_READER_NAME_RESOURCE_ID = 567890
 
 @RunWith(StyleTestRunner::class)
-@RequiresApi(Build.VERSION_CODES.P)
+@RequiresApi(34)
 public class StyleParcelableTest {
     private val icon1 = Icon.createWithContentUri("icon1")
     private val icon2 = Icon.createWithContentUri("icon2")
