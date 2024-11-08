@@ -29,5 +29,15 @@ package androidx.navigation3 {
     ctor public Record(Object key, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit> content);
   }
 
+  public final class SaveableStateNavContentWrapper implements androidx.navigation3.NavContentWrapper {
+    ctor public SaveableStateNavContentWrapper();
+    method public void WrapContent(androidx.navigation3.Record record);
+  }
+
+  public final class SavedStateNavContentWrapper implements androidx.navigation3.NavContentWrapper {
+    method @androidx.compose.runtime.Composable public void WrapContent(androidx.navigation3.Record record);
+    field public static final androidx.navigation3.SavedStateNavContentWrapper INSTANCE;
+  }
+
 }
 

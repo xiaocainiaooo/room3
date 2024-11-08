@@ -37,8 +37,13 @@ public fun rememberNavWrapperManager(
  * @param navContentWrappers the [NavContentWrapper]s that are providing data to the content
  */
 public class NavWrapperManager(navContentWrappers: List<NavContentWrapper>) {
-    /** Final list of wrappers. */
-    private val finalWrappers = navContentWrappers
+    /**
+     * Final list of wrappers. This always adds a [SaveableStateNavContentWrapper] by default, as it
+     * is required. It then filters out any duplicates to ensure there is always one instance of any
+     * wrapper at a given time.
+     */
+    private val finalWrappers =
+        (navContentWrappers + listOf(SaveableStateNavContentWrapper())).distinct()
 
     /**
      * Calls the [NavContentWrapper.WrapBackStack] functions on each wrapper

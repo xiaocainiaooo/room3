@@ -21,13 +21,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation3.NavDisplay
 import androidx.navigation3.Record
+import androidx.navigation3.SavedStateNavContentWrapper
 import androidx.navigation3.rememberNavWrapperManager
 
 @Sampled
 @Composable
 fun BasicNav() {
     val backStack = rememberMutableStateListOf(Profile)
-    val manager = rememberNavWrapperManager(emptyList())
+    val manager = rememberNavWrapperManager(listOf(SavedStateNavContentWrapper))
     NavDisplay(
         backstack = backStack,
         wrapperManager = manager,
