@@ -18,7 +18,6 @@ package androidx.wear.compose.material3
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -44,8 +43,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -54,7 +51,6 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
@@ -62,6 +58,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.material3.tokens.ChildButtonTokens
 import androidx.wear.compose.material3.tokens.CompactButtonTokens
 import androidx.wear.compose.material3.tokens.FilledButtonTokens
@@ -90,6 +87,8 @@ import androidx.wear.compose.material3.tokens.OutlinedButtonTokens
  * [ButtonDefaults.imageBackgroundButtonColors].
  *
  * Button can be enabled or disabled. A disabled button will not respond to click events.
+ *
+ * Button scales itself appropriately when used within the scope of a [TransformingLazyColumn].
  *
  * Example of a [Button]:
  *
@@ -167,7 +166,10 @@ fun Button(
  * [ButtonDefaults.childButtonColors]. Buttons can also take an image background using
  * [ButtonDefaults.imageBackgroundButtonColors].
  *
- * Button can be enabled or disabled. A disabled button will not respond to click events.
+ * FilledTonalButton can be enabled or disabled. A disabled button will not respond to click events.
+ *
+ * FilledTonalButton scales itself appropriately when used within the scope of a
+ * [TransformingLazyColumn].
  *
  * Example of a [FilledTonalButton]:
  *
@@ -244,7 +246,10 @@ fun FilledTonalButton(
  * [ButtonDefaults.childButtonColors]. Buttons can also take an image background using
  * [ButtonDefaults.imageBackgroundButtonColors].
  *
- * Button can be enabled or disabled. A disabled button will not respond to click events.
+ * OutlinedButton can be enabled or disabled. A disabled button will not respond to click events.
+ *
+ * OutlinedButton scales itself appropriately when used within the scope of a
+ * [TransformingLazyColumn].
  *
  * Example of an [OutlinedButton]:
  *
@@ -321,7 +326,9 @@ fun OutlinedButton(
  * [ButtonDefaults.outlinedButtonColors] and Buttons can also take an image background using
  * [ButtonDefaults.imageBackgroundButtonColors].
  *
- * Button can be enabled or disabled. A disabled button will not respond to click events.
+ * ChildButton can be enabled or disabled. A disabled button will not respond to click events.
+ *
+ * ChildButton scales itself appropriately when used within the scope of a [TransformingLazyColumn].
  *
  * Example of a [ChildButton]:
  *
@@ -401,6 +408,8 @@ fun ChildButton(
  * [ButtonDefaults.imageBackgroundButtonColors].
  *
  * [Button] can be enabled or disabled. A disabled button will not respond to click events.
+ *
+ * Button scales itself appropriately when used within the scope of a [TransformingLazyColumn].
  *
  * Example of a [Button] with an icon and secondary label:
  *
@@ -531,6 +540,9 @@ fun Button(
  * [FilledTonalButton] can be enabled or disabled. A disabled button will not respond to click
  * events.
  *
+ * FilledTonalButton scales itself appropriately when used within the scope of a
+ * [TransformingLazyColumn].
+ *
  * Example of a [FilledTonalButton] with an icon and secondary label:
  *
  * @sample androidx.wear.compose.material3.samples.FilledTonalButtonSample
@@ -646,6 +658,9 @@ fun FilledTonalButton(
  *
  * [OutlinedButton] can be enabled or disabled. A disabled button will not respond to click events.
  *
+ * OutlinedButton scales itself appropriately when used within the scope of a
+ * [TransformingLazyColumn].
+ *
  * Example of an [OutlinedButton] with an icon and secondary label:
  *
  * @sample androidx.wear.compose.material3.samples.OutlinedButtonSample
@@ -759,7 +774,9 @@ fun OutlinedButton(
  * [ButtonDefaults.outlinedButtonColors]. Buttons can also take an image background using
  * [ButtonDefaults.imageBackgroundButtonColors].
  *
- * [Button] can be enabled or disabled. A disabled button will not respond to click events.
+ * [ChildButton] can be enabled or disabled. A disabled button will not respond to click events.
+ *
+ * ChildButton scales itself appropriately when used within the scope of a [TransformingLazyColumn].
  *
  * Example of a [ChildButton] with an icon and secondary label:
  *
@@ -884,6 +901,9 @@ fun ChildButton(
  * [ButtonDefaults.imageBackgroundButtonColors].
  *
  * [CompactButton] can be enabled or disabled. A disabled button will not respond to click events.
+ *
+ * CompactButton scales itself appropriately when used within the scope of a
+ * [TransformingLazyColumn].
  *
  * Example of a [CompactButton] with an icon and a label
  *
@@ -1820,22 +1840,16 @@ private fun ButtonImpl(
     interactionSource: MutableInteractionSource?,
     content: @Composable RowScope.() -> Unit
 ) {
-    val borderModifier =
-        if (border != null) modifier.border(border = border, shape = shape) else modifier
     val hapticFeedback = LocalHapticFeedback.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
         // Fill the container height but not its width as buttons have fixed size height but we
         // want them to be able to fit their content
         modifier =
-            borderModifier
+            modifier
                 .fillMaxHeight()
-                .clip(shape = shape)
                 .width(intrinsicSize = IntrinsicSize.Max)
-                .paint(
-                    painter = colors.containerPainter(enabled = enabled),
-                    contentScale = ContentScale.Crop
-                )
+                .container(colors.containerPainter(enabled = enabled), shape, border)
                 .combinedClickable(
                     enabled = enabled,
                     onClick = onClick,

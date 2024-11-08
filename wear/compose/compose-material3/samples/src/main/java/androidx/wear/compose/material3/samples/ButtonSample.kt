@@ -36,8 +36,8 @@ import androidx.wear.compose.material3.Text
 
 @Sampled
 @Composable
-fun SimpleButtonSample() {
-    Button(onClick = { /* Do something */ }, label = { Text("Button") })
+fun SimpleButtonSample(modifier: Modifier = Modifier) {
+    Button(onClick = { /* Do something */ }, label = { Text("Button") }, modifier = modifier)
 }
 
 @Sampled

@@ -203,7 +203,9 @@ val WearMaterial3Demos =
                         },
                         ComposableDemo("Target Morphing Height Sample") {
                             TransformingLazyColumnTargetMorphingHeightSample()
-                        }
+                        },
+                        ComposableDemo("TLC Buttons") { TransformingLazyColumnButtons() },
+                        ComposableDemo("TLC Cards") { TransformingLazyColumnCards() }
                     )
                 )
             )
