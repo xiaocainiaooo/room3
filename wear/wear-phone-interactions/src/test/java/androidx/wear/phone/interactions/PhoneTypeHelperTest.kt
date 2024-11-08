@@ -65,7 +65,7 @@ class PhoneTypeHelperTest {
     @Test
     @Config(maxSdk = 28)
     fun testGetDeviceType_returnsIosWhenAltMode() {
-        createFakePhoneTypeQuery(PhoneTypeHelper.DEVICE_TYPE_IOS)
+        createFakePhoneTypeQuery(PhoneTypeHelper.IOS_MODE)
         assertThat(getPhoneDeviceType(ApplicationProvider.getApplicationContext()))
             .isEqualTo(PhoneTypeHelper.DEVICE_TYPE_IOS)
     }
@@ -73,7 +73,7 @@ class PhoneTypeHelperTest {
     @Test
     @Config(maxSdk = 28)
     fun testGetDeviceType_returnsAndroidWhenNonAltMode() {
-        createFakePhoneTypeQuery(PhoneTypeHelper.DEVICE_TYPE_ANDROID)
+        createFakePhoneTypeQuery(PhoneTypeHelper.ANDROID_MODE)
         assertThat(getPhoneDeviceType(ApplicationProvider.getApplicationContext()))
             .isEqualTo(PhoneTypeHelper.DEVICE_TYPE_ANDROID)
     }
@@ -96,11 +96,11 @@ class PhoneTypeHelperTest {
     @Test
     @Config(minSdk = 29)
     fun testGetDeviceType_returnsIosWhenAltMode_fromQ() {
-        createFakePhoneTypeQuery(PhoneTypeHelper.DEVICE_TYPE_IOS)
+        createFakePhoneTypeQuery(PhoneTypeHelper.IOS_MODE)
         Settings.Global.putInt(
             contentResolver,
             PhoneTypeHelper.PAIRED_DEVICE_OS_TYPE,
-            PhoneTypeHelper.DEVICE_TYPE_IOS
+            PhoneTypeHelper.IOS_MODE
         )
         assertThat(getPhoneDeviceType(ApplicationProvider.getApplicationContext()))
             .isEqualTo(PhoneTypeHelper.DEVICE_TYPE_IOS)
@@ -112,7 +112,7 @@ class PhoneTypeHelperTest {
         Settings.Global.putInt(
             contentResolver,
             PhoneTypeHelper.PAIRED_DEVICE_OS_TYPE,
-            PhoneTypeHelper.DEVICE_TYPE_ANDROID
+            PhoneTypeHelper.ANDROID_MODE
         )
         assertThat(getPhoneDeviceType(ApplicationProvider.getApplicationContext()))
             .isEqualTo(PhoneTypeHelper.DEVICE_TYPE_ANDROID)
@@ -131,7 +131,7 @@ class PhoneTypeHelperTest {
         Settings.Global.putInt(
             contentResolver,
             PhoneTypeHelper.PAIRED_DEVICE_OS_TYPE,
-            PhoneTypeHelper.DEVICE_TYPE_ANDROID
+            PhoneTypeHelper.ANDROID_MODE
         )
         assertThat(getPhoneDeviceType(ApplicationProvider.getApplicationContext()))
             .isEqualTo(PhoneTypeHelper.DEVICE_TYPE_ANDROID)
@@ -143,7 +143,7 @@ class PhoneTypeHelperTest {
         Settings.Global.putInt(
             contentResolver,
             PhoneTypeHelper.PAIRED_DEVICE_OS_TYPE,
-            PhoneTypeHelper.DEVICE_TYPE_UNKNOWN
+            PhoneTypeHelper.UNKNOWN_MODE
         )
         assertThat(getPhoneDeviceType(ApplicationProvider.getApplicationContext()))
             .isEqualTo(PhoneTypeHelper.DEVICE_TYPE_UNKNOWN)
@@ -155,7 +155,7 @@ class PhoneTypeHelperTest {
         Settings.Global.putInt(
             contentResolver,
             PhoneTypeHelper.PAIRED_DEVICE_OS_TYPE,
-            PhoneTypeHelper.DEVICE_TYPE_IOS
+            PhoneTypeHelper.IOS_MODE
         )
         assertThat(getPhoneDeviceType(ApplicationProvider.getApplicationContext()))
             .isEqualTo(PhoneTypeHelper.DEVICE_TYPE_IOS)
@@ -167,7 +167,7 @@ class PhoneTypeHelperTest {
         Settings.Global.putInt(
             contentResolver,
             PhoneTypeHelper.PAIRED_DEVICE_OS_TYPE,
-            PhoneTypeHelper.DEVICE_TYPE_NONE
+            PhoneTypeHelper.NONE_PAIRED_MODE
         )
         assertThat(getPhoneDeviceType(ApplicationProvider.getApplicationContext()))
             .isEqualTo(PhoneTypeHelper.DEVICE_TYPE_NONE)
