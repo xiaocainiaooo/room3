@@ -138,7 +138,7 @@ package androidx.wear.watchface.style {
     method public androidx.wear.watchface.style.UserStyleSetting.BooleanUserStyleSetting.Builder setWatchFaceEditorData(androidx.wear.watchface.style.UserStyleSetting.WatchFaceEditorData watchFaceEditorData);
   }
 
-  public static final class UserStyleSetting.ColorUserStyleSetting extends androidx.wear.watchface.style.UserStyleSetting {
+  @RequiresApi(34) public static final class UserStyleSetting.ColorUserStyleSetting extends androidx.wear.watchface.style.UserStyleSetting {
   }
 
   public static final class UserStyleSetting.ColorUserStyleSetting.Builder {
@@ -149,7 +149,7 @@ package androidx.wear.watchface.style {
     method public androidx.wear.watchface.style.UserStyleSetting.ColorUserStyleSetting.Builder setWatchFaceEditorData(androidx.wear.watchface.style.UserStyleSetting.WatchFaceEditorData watchFaceEditorData);
   }
 
-  public static final class UserStyleSetting.ColorUserStyleSetting.ColorOption extends androidx.wear.watchface.style.UserStyleSetting.Option {
+  @RequiresApi(34) public static final class UserStyleSetting.ColorUserStyleSetting.ColorOption extends androidx.wear.watchface.style.UserStyleSetting.Option {
     method public java.util.List<java.lang.Integer> getColors();
     method public CharSequence getDisplayName();
     method public CharSequence getScreenReaderName();
