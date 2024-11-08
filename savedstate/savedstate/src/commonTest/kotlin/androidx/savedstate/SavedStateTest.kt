@@ -178,6 +178,49 @@ internal class SavedStateTest : RobolectricTest() {
     }
 
     @Test
+    fun contentDeepHashCode_isConsistentForSameInstance() {
+        val state = createDefaultSavedState()
+
+        val hashCode1 = state.read { contentDeepHashCode() }
+        val hashCode2 = state.read { contentDeepHashCode() }
+
+        assertThat(hashCode1).isEqualTo(hashCode2)
+    }
+
+    @Test
+    fun contentDeepHashCode_isEqualForSameContent() {
+        val state1 = createDefaultSavedState()
+        val state2 = createDefaultSavedState()
+
+        val hashCode1 = state1.read { contentDeepHashCode() }
+        val hashCode2 = state2.read { contentDeepHashCode() }
+
+        assertThat(hashCode1).isEqualTo(hashCode2)
+    }
+
+    @Test
+    fun contentDeepHashCode_isDifferentForDifferentContent() {
+        val state1 = savedState { putInt("id", 1) }
+        val state2 = savedState { putInt("id", 2) }
+
+        val hashCode1 = state1.read { contentDeepHashCode() }
+        val hashCode2 = state2.read { contentDeepHashCode() }
+
+        assertThat(hashCode1).isNotEqualTo(hashCode2)
+    }
+
+    @Test
+    fun contentDeepHashCode_generatesUniqueValues() {
+        val states = List(size = 1000) { idx -> savedState { putInt("id", idx) } }
+
+        // Calculate the hash code, of each element, and remove any possible duplicate.
+        val hashCodes = states.map { state -> state.read { contentDeepHashCode() } }.toSet()
+
+        // Ensure that each hash code is unique.
+        assertThat(hashCodes.size).isEqualTo(states.size)
+    }
+
+    @Test
     fun toMap() {
         val sharedState = savedState {
             putInt(KEY_1, Int.MIN_VALUE)
