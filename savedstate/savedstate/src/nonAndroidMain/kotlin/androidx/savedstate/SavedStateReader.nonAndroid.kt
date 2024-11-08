@@ -229,6 +229,8 @@ internal actual constructor(
 
     actual fun contentDeepEquals(other: SavedState): Boolean = source.contentDeepEquals(other)
 
+    actual fun contentDeepHashCode(): Int = source.contentDeepHashCode()
+
     actual fun toMap(): Map<String, Any?> {
         return buildMap(capacity = source.map.size) {
             for (key in source.map.keys) {
@@ -270,4 +272,33 @@ private fun SavedState.contentDeepEquals(other: SavedState): Boolean {
         }
     }
     return true
+}
+
+private fun SavedState.contentDeepHashCode(): Int {
+    var result = 1
+
+    for (k in this.map.keys) {
+        val elementHash =
+            when (val element = this.map[k]) {
+                // container types
+                is SavedState -> element.contentDeepHashCode()
+                is Array<*> -> element.contentDeepHashCode()
+
+                // primitive arrays
+                is ByteArray -> element.contentHashCode()
+                is ShortArray -> element.contentHashCode()
+                is IntArray -> element.contentHashCode()
+                is LongArray -> element.contentHashCode()
+                is FloatArray -> element.contentHashCode()
+                is DoubleArray -> element.contentHashCode()
+                is CharArray -> element.contentHashCode()
+                is BooleanArray -> element.contentHashCode()
+
+                // if nothing else works
+                else -> element.hashCode()
+            }
+        result = 31 * result + elementHash
+    }
+
+    return result
 }
