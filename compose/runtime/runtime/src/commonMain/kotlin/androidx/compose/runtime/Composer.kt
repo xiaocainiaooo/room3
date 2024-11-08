@@ -70,11 +70,11 @@ private class GroupInfo(
  */
 internal interface RememberManager {
     /** The [RememberObserver] is being remembered by a slot in the slot table. */
-    fun remembering(instance: RememberObserver)
+    fun remembering(instance: RememberObserverHolder)
 
     /** The [RememberObserver] is being forgotten by a slot in the slot table. */
     fun forgetting(
-        instance: RememberObserver,
+        instance: RememberObserverHolder,
         endRelativeOrder: Int,
         priority: Int,
         endRelativeAfter: Int
@@ -2088,11 +2088,12 @@ internal class ComposerImpl(
     internal fun updateCachedValue(value: Any?) {
         val toStore =
             if (value is RememberObserver) {
+                val holder = RememberObserverHolder(value, rememberObserverAnchor())
                 if (inserting) {
-                    changeListWriter.remember(value)
+                    changeListWriter.remember(holder)
                 }
                 abandonSet.add(value)
-                RememberObserverHolder(value, rememberObserverAnchor())
+                holder
             } else value
         updateValue(toStore)
     }
@@ -4207,12 +4208,7 @@ internal fun SlotWriter.removeCurrentGroup(rememberManager: RememberManager) {
         if (slot is RememberObserverHolder) {
             val endRelativeSlotIndex = slotsSize - slotIndex
             withAfterAnchorInfo(slot.after) { priority, endRelativeAfter ->
-                rememberManager.forgetting(
-                    slot.wrapped,
-                    endRelativeSlotIndex,
-                    priority,
-                    endRelativeAfter
-                )
+                rememberManager.forgetting(slot, endRelativeSlotIndex, priority, endRelativeAfter)
             }
         }
         if (slot is RecomposeScopeImpl) {
@@ -4260,7 +4256,7 @@ internal fun SlotWriter.deactivateCurrentGroup(rememberManager: RememberManager)
                     val endRelativeOrder = slotsSize - slotIndex
                     withAfterAnchorInfo(data.after) { priority, endRelativeAfter ->
                         rememberManager.forgetting(
-                            wrapped,
+                            data,
                             endRelativeOrder,
                             priority,
                             endRelativeAfter

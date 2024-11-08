@@ -29,7 +29,6 @@ import androidx.compose.runtime.OffsetApplier
 import androidx.compose.runtime.RecomposeScopeImpl
 import androidx.compose.runtime.RecomposeScopeOwner
 import androidx.compose.runtime.RememberManager
-import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.RememberObserverHolder
 import androidx.compose.runtime.SlotTable
 import androidx.compose.runtime.SlotWriter
@@ -152,7 +151,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
 
     object Remember : Operation(objects = 1) {
         inline val Value
-            get() = ObjectParameter<RememberObserver>(0)
+            get() = ObjectParameter<RememberObserverHolder>(0)
 
         override fun objectParamName(parameter: ObjectParameter<*>) =
             when (parameter) {
@@ -251,7 +250,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
             val anchor = getObject(Anchor)
             val value = getObject(Value)
             if (value is RememberObserverHolder) {
-                rememberManager.remembering(value.wrapped)
+                rememberManager.remembering(value)
             }
             slots.appendSlot(anchor, value)
         }
@@ -282,7 +281,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
                         val endRelativeOrder = slotsSize - slotIndex
                         slots.withAfterAnchorInfo(value.after) { priority, endRelativeAfter ->
                             rememberManager.forgetting(
-                                instance = value.wrapped,
+                                instance = value,
                                 endRelativeOrder = endRelativeOrder,
                                 priority = priority,
                                 endRelativeAfter = endRelativeAfter
@@ -323,7 +322,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
             val value = getObject(Value)
             val groupSlotIndex = getInt(GroupSlotIndex)
             if (value is RememberObserverHolder) {
-                rememberManager.remembering(value.wrapped)
+                rememberManager.remembering(value)
             }
             when (val previous = slots.set(groupSlotIndex, value)) {
                 is RememberObserverHolder -> {
@@ -332,7 +331,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
                             slots.slotIndexOfGroupSlotIndex(slots.currentGroup, groupSlotIndex)
                     // Values are always updated in the composition order (not slot table order)
                     // so there is no need to reorder these.
-                    rememberManager.forgetting(previous.wrapped, endRelativeOrder, -1, -1)
+                    rememberManager.forgetting(previous, endRelativeOrder, -1, -1)
                 }
                 is RecomposeScopeImpl -> previous.release()
             }
@@ -371,7 +370,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
             val anchor = getObject(Anchor)
             val groupSlotIndex = getInt(GroupSlotIndex)
             if (value is RememberObserverHolder) {
-                rememberManager.remembering(value.wrapped)
+                rememberManager.remembering(value)
             }
             val groupIndex = slots.anchorIndex(anchor)
             when (val previous = slots.set(groupIndex, groupSlotIndex, value)) {
@@ -381,7 +380,7 @@ internal sealed class Operation(val ints: Int = 0, val objects: Int = 0) {
                             slots.slotIndexOfGroupSlotIndex(groupIndex, groupSlotIndex)
                     slots.withAfterAnchorInfo(previous.after) { priority, endRelativeAfter ->
                         rememberManager.forgetting(
-                            previous.wrapped,
+                            previous,
                             endRelativeSlotOrder,
                             priority,
                             endRelativeAfter
