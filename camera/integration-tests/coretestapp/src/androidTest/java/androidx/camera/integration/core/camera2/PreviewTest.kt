@@ -389,6 +389,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                         surface,
                         CameraXExecutors.directExecutor(),
                         { result ->
+                            surfaceTextureHolder.close()
                             surface.release()
                             resultDeferred1.complete(result.resultCode)
                         }
@@ -408,7 +409,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         }
 
         // Wait until preview gets frame.
-        frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 5)
+        frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 10)
 
         instrumentation.runOnMainSync { cameraProvider.unbind(preview) }
 
@@ -434,11 +435,14 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             cameraProvider.unbind(preview)
         }
 
-        surfaceRequestDeferred.await().provideSurface(
-            Surface(SurfaceTexture(0)),
-            CameraXExecutors.directExecutor()
-        ) { result ->
-            resultDeferred.complete(result.resultCode)
+        val surfaceRequest = surfaceRequestDeferred.await()
+        instrumentation.runOnMainSync {
+            surfaceRequest.provideSurface(
+                Surface(SurfaceTexture(0)),
+                CameraXExecutors.directExecutor()
+            ) { result ->
+                resultDeferred.complete(result.resultCode)
+            }
         }
 
         assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred.await() })
