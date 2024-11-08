@@ -1910,7 +1910,7 @@ public final class Recorder implements VideoOutput {
                                     setAudioState(AudioState.ERROR_SOURCE);
                                 }
                                 mAudioErrorCause = throwable;
-                                updateInProgressStatusEvent();
+                                updateInProgressStatusEvent(/*printLog=*/true);
                                 completer.set(null);
                             }
                         };
@@ -1921,7 +1921,7 @@ public final class Recorder implements VideoOutput {
                                     public void onSilenceStateChanged(boolean silenced) {
                                         if (mIsAudioSourceSilenced != silenced) {
                                             mIsAudioSourceSilenced = silenced;
-                                            updateInProgressStatusEvent();
+                                            updateInProgressStatusEvent(/*printLog=*/true);
                                         } else {
                                             Logger.w(TAG, "Audio source silenced transitions"
                                                     + " to the same state " + silenced);
@@ -2108,7 +2108,7 @@ public final class Recorder implements VideoOutput {
         mRecordingDurationNs = newRecordingDurationNs;
         mPreviousRecordingVideoDataTimeUs = currentPresentationTimeUs;
 
-        updateInProgressStatusEvent();
+        updateInProgressStatusEvent(encodedData.isKeyFrame());
 
         if (newRecordingBytes > mAvailableBytesAboveRequired) {
             long availableBytes = checkNotNull(mOutputStorage).getAvailableBytes();
@@ -2794,12 +2794,13 @@ public final class Recorder implements VideoOutput {
 
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
     @ExecutedBy("mSequentialExecutor")
-    void updateInProgressStatusEvent() {
+    void updateInProgressStatusEvent(boolean printLog) {
         if (mInProgressRecording != null) {
             mInProgressRecording.updateVideoRecordEvent(
                     VideoRecordEvent.status(
                             mInProgressRecording.getOutputOptions(),
-                            getInProgressRecordingStats()));
+                            getInProgressRecordingStats()),
+                    printLog);
         }
     }
 
@@ -3278,25 +3279,32 @@ public final class Recorder implements VideoOutput {
             }
         }
 
+        /** Updates the recording status and callback to users. */
+        void updateVideoRecordEvent(@NonNull VideoRecordEvent event) {
+            updateVideoRecordEvent(event, /*printLog=*/true);
+        }
+
         /**
          * Updates the recording status and callback to users.
          */
-        void updateVideoRecordEvent(@NonNull VideoRecordEvent event) {
+        void updateVideoRecordEvent(@NonNull VideoRecordEvent event, boolean printLog) {
             if (!Objects.equals(event.getOutputOptions(), getOutputOptions())) {
                 throw new AssertionError("Attempted to update event listener with event from "
                     + "incorrect recording [Recording: " + event.getOutputOptions()
                         + ", Expected: " + getOutputOptions() + "]");
             }
-            String message = "Sending VideoRecordEvent " + event.getClass().getSimpleName();
-            if (event instanceof VideoRecordEvent.Finalize) {
-                VideoRecordEvent.Finalize finalizeEvent = (VideoRecordEvent.Finalize) event;
-                if (finalizeEvent.hasError()) {
-                    message += String.format(" [error: %s]",
-                            VideoRecordEvent.Finalize.errorToString(
-                                    finalizeEvent.getError()));
+            if (printLog) {
+                String message = "Sending VideoRecordEvent " + event.getClass().getSimpleName();
+                if (event instanceof VideoRecordEvent.Finalize) {
+                    VideoRecordEvent.Finalize finalizeEvent = (VideoRecordEvent.Finalize) event;
+                    if (finalizeEvent.hasError()) {
+                        message += String.format(" [error: %s]",
+                                VideoRecordEvent.Finalize.errorToString(
+                                        finalizeEvent.getError()));
+                    }
                 }
+                Logger.d(TAG, message);
             }
-            Logger.d(TAG, message);
             updateRecordingState(event);
             if (getCallbackExecutor() != null && getEventListener() != null) {
                 try {
