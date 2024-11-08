@@ -6,6 +6,15 @@ package androidx.navigation3 {
     method public void WrapContent(androidx.navigation3.Record record);
   }
 
+  public final class NavDisplay {
+    method public java.util.Map<java.lang.String,java.lang.Object> isDialog(boolean boolean);
+    field public static final androidx.navigation3.NavDisplay INSTANCE;
+  }
+
+  public final class NavDisplay_androidKt {
+    method @androidx.compose.runtime.Composable public static void NavDisplay(java.util.List<?> backstack, androidx.navigation3.NavWrapperManager wrapperManager, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<java.lang.Object,androidx.navigation3.Record> recordProvider);
+  }
+
   public final class NavWrapperManager {
     ctor public NavWrapperManager(java.util.List<? extends androidx.navigation3.NavContentWrapper> navContentWrappers);
     method public void ContentForRecord(androidx.navigation3.Record record);
