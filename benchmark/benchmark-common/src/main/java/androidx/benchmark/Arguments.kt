@@ -87,7 +87,7 @@ object Arguments {
     internal val profilerSkipWhenDurationRisksAnr: Boolean
     internal val profilerPerfCompareEnable: Boolean
     internal val thermalThrottleSleepDurationSeconds: Long
-    private val cpuEventCounterEnable: Boolean
+    val cpuEventCounterEnable: Boolean // non-internal, checked in CpuEventCounterBenchmark
     internal val cpuEventCounterMask: Int
     internal val requireAot: Boolean
     internal val requireJitDisabledIfRooted: Boolean
