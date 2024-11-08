@@ -453,10 +453,26 @@ internal constructor(
      * corresponding keys are deeply equal. That is, if two corresponding elements are nested
      * [SavedState], they are also compared deeply.
      *
+     * If any of [SavedState] contains itself on any nesting level the behavior is undefined.
+     *
      * @param other the object to compare deeply with this.
      * @return `true` if the two are deeply equal, `false` otherwise.
      */
     public fun contentDeepEquals(other: SavedState): Boolean
+
+    /**
+     * Returns a hash code based on the "deep contents" of specified [SavedState]. If the
+     * [SavedState] contains other [SavedState] as elements, the hash code is based on their
+     * contents and so on.
+     *
+     * The computation of the hash code returned is as if the [SavedState] is a [List]. Nested
+     * [SavedState] are treated as lists too.
+     *
+     * If any of [SavedState] contains itself on any nesting level the behavior is undefined.
+     *
+     * @return a deep-content-based hash code for [SavedState].
+     */
+    public fun contentDeepHashCode(): Int
 
     /**
      * Returns a new [Map] containing all key-value pairs from the [SavedState].
