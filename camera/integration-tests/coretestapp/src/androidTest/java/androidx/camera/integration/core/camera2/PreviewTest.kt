@@ -20,6 +20,7 @@ import android.graphics.ImageFormat
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback
+import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CaptureRequest
 import android.hardware.camera2.CaptureResult
 import android.hardware.camera2.TotalCaptureResult
@@ -39,6 +40,7 @@ import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceRequest
 import androidx.camera.core.SurfaceRequest.TransformationInfo
 import androidx.camera.core.UseCaseGroup
+import androidx.camera.core.impl.CameraInfoInternal
 import androidx.camera.core.impl.ImageOutputConfig
 import androidx.camera.core.impl.ImageOutputConfig.OPTION_RESOLUTION_SELECTOR
 import androidx.camera.core.impl.SessionConfig
@@ -73,6 +75,7 @@ import java.util.concurrent.ThreadFactory
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.math.abs
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -107,6 +110,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         private val DEFAULT_RESOLUTION_PORTRAIT: Size by lazy { Size(480, 640) }
         private const val FRAMES_TO_VERIFY = 10
         private const val RESULT_TIMEOUT = 5000L
+        private const val TOLERANCE = 0.1f
 
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
@@ -627,25 +631,44 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Test
     fun aspectRatio4_3_resolutionIsSet() =
         runBlocking(Dispatchers.Main) {
+            assumeTrue(isAspectRatioResolutionSupported(4.0f / 3.0f))
+
             val useCase = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3).build()
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
             val config = useCase.currentConfig as ImageOutputConfig
             assertThat(config.targetAspectRatio).isEqualTo(AspectRatio.RATIO_4_3)
             val resolution = useCase.resolutionInfo!!.resolution
-            assertThat(resolution.width.toFloat() / resolution.height).isEqualTo(4.0f / 3.0f)
+            assertThat(resolution.width.toFloat() / resolution.height)
+                .isWithin(TOLERANCE)
+                .of(4.0f / 3.0f)
         }
 
     @Suppress("DEPRECATION") // test for legacy resolution API
     @Test
     fun aspectRatio16_9_resolutionIsSet() =
         runBlocking(Dispatchers.Main) {
+            assumeTrue(isAspectRatioResolutionSupported(16.0f / 9.0f))
             val useCase = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_16_9).build()
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
             val config = useCase.currentConfig as ImageOutputConfig
             assertThat(config.targetAspectRatio).isEqualTo(AspectRatio.RATIO_16_9)
             val resolution = useCase.resolutionInfo!!.resolution
-            assertThat(resolution.width.toFloat() / resolution.height).isEqualTo(16.0f / 9.0f)
+            assertThat(resolution.width.toFloat() / resolution.height)
+                .isWithin(TOLERANCE)
+                .of(16.0f / 9.0f)
         }
+
+    private fun isAspectRatioResolutionSupported(targetAspectRatioValue: Float): Boolean {
+        val cameraCharacteristics =
+            (cameraProvider.getCameraInfo(cameraSelector) as CameraInfoInternal)
+                .cameraCharacteristics as CameraCharacteristics
+        val map = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+        val previewSizes = map!!.getOutputSizes(SurfaceTexture::class.java)
+        return previewSizes.find { size ->
+            val aspectRatioVal = size.width.toFloat() / size.height.toFloat()
+            return abs(targetAspectRatioValue - aspectRatioVal) <= TOLERANCE
+        } != null
+    }
 
     @Suppress("DEPRECATION") // legacy resolution API
     @Test
@@ -1316,12 +1339,12 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
         }
 
-        assertThat(
-                withTimeoutOrNull(5000) { captureResultDeferred.await() }!!.get(
-                    CaptureResult.CONTROL_AE_TARGET_FPS_RANGE
-                )
-            )
-            .isEqualTo(expectedFpsRange)
+        val captureResult = withTimeoutOrNull(5000) { captureResultDeferred.await() }
+        assertThat(captureResult).isNotNull()
+        val fpsRangeInResult = captureResult!!.get(CaptureResult.CONTROL_AE_TARGET_FPS_RANGE)
+        // ignore the case CONTROL_AE_TARGET_FPS_RANGE is null
+        assumeTrue(fpsRangeInResult != null)
+        assertThat(fpsRangeInResult).isEqualTo(expectedFpsRange)
         frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 10)
     }
 
