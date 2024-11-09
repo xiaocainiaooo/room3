@@ -439,6 +439,14 @@ public final class SurfaceRequest {
      */
     public void provideSurface(@NonNull Surface surface, @NonNull Executor executor,
             @NonNull Consumer<Result> resultListener) {
+        if (!surface.isValid()) {
+            // Only check Surface validness. The resolution match check might cause unexpected
+            // compatibility issue.
+            executor.execute(
+                    () -> resultListener.accept(
+                            Result.of(Result.RESULT_INVALID_SURFACE, surface)));
+        }
+
         if (mSurfaceCompleter.set(surface) || mSurfaceFuture.isCancelled()) {
             // Session will be pending completion (or surface request was cancelled). Return the
             // session future.
