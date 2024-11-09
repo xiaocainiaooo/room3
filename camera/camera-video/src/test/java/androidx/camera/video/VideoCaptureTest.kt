@@ -19,6 +19,7 @@ package androidx.camera.video
 import android.content.Context
 import android.graphics.Matrix
 import android.graphics.Rect
+import android.graphics.SurfaceTexture
 import android.media.CamcorderProfile.QUALITY_1080P
 import android.media.CamcorderProfile.QUALITY_2160P
 import android.media.CamcorderProfile.QUALITY_480P
@@ -896,7 +897,7 @@ class VideoCaptureTest {
 
         var surfaceResult: SurfaceRequest.Result? = null
         val videoOutput = createVideoOutput { surfaceRequest, _ ->
-            surfaceRequest.provideSurface(mock(Surface::class.java), directExecutor()) {
+            surfaceRequest.provideSurface(Surface(SurfaceTexture(0)), directExecutor()) {
                 surfaceResult = it
             }
         }
@@ -925,7 +926,7 @@ class VideoCaptureTest {
 
         var surfaceResult: SurfaceRequest.Result? = null
         val videoOutput = createVideoOutput { surfaceRequest, _ ->
-            surfaceRequest.provideSurface(mock(Surface::class.java), directExecutor()) {
+            surfaceRequest.provideSurface(Surface(SurfaceTexture(0)), directExecutor()) {
                 surfaceResult = it
             }
         }
@@ -1407,7 +1408,10 @@ class VideoCaptureTest {
         val videoOutput =
             createVideoOutput(
                 surfaceRequestListener = { surfaceRequest, _ ->
-                    surfaceRequest.provideSurface(mock(Surface::class.java), mainThreadExecutor()) {
+                    surfaceRequest.provideSurface(
+                        Surface(SurfaceTexture(0)),
+                        mainThreadExecutor()
+                    ) {
                         appSurfaceReadyToRelease = true
                     }
                 }
