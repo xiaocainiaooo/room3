@@ -26,7 +26,7 @@ import androidx.annotation.RestrictTo
 import androidx.core.view.doOnDetach
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -56,24 +56,19 @@ internal class Page(
     fun maybeRender() {
         // If we're actively rendering or have rendered a bitmap for the current zoom level, there's
         // no need to refresh bitmaps
-        if (renderedZoom?.equals(pdfView.zoom) == true && bitmap != null) return
+        if (
+            renderedZoom?.equals(pdfView.zoom) == true &&
+                (bitmap != null || renderBitmapJob != null)
+        ) {
+            return
+        }
         renderBitmapJob?.cancel()
         fetchNewBitmap()
     }
 
     fun draw(canvas: Canvas, locationInView: Rect) {
         bitmap?.let {
-            if (DEBUG_DRAW) {
-                canvas.drawRect(locationInView, DEBUG_PAINT)
-                canvas.drawText(
-                    "Page $pageNum",
-                    locationInView.centerX().toFloat(),
-                    locationInView.centerY().toFloat(),
-                    DEBUG_PAINT_TEXT,
-                )
-            } else {
-                canvas.drawBitmap(it, /* src= */ null, locationInView, BMP_PAINT)
-            }
+            canvas.drawBitmap(it, /* src= */ null, locationInView, BMP_PAINT)
             return
         }
         canvas.drawRect(locationInView, BLANK_PAINT)
@@ -85,7 +80,7 @@ internal class Page(
                 ?: throw IllegalStateException("No PDF document to render")
         renderBitmapJob =
             pdfView.coroutineScope.launch {
-                if (!isActive) return@launch
+                ensureActive()
                 val zoom = pdfView.zoom
                 val width = (size.width * zoom).toInt()
                 val height = (size.height * zoom).toInt()
@@ -93,6 +88,7 @@ internal class Page(
                 bitmap = bitmapSource.getBitmap(Size(width, height))
                 withContext(Dispatchers.Main) { pdfView.invalidate() }
             }
+        renderBitmapJob?.invokeOnCompletion { renderBitmapJob = null }
     }
 
     private fun setInvisible() {
@@ -103,21 +99,9 @@ internal class Page(
     }
 }
 
-private const val DEBUG_DRAW = false
 private val BMP_PAINT = Paint(Paint.FILTER_BITMAP_FLAG)
 private val BLANK_PAINT =
     Paint().apply {
         color = Color.WHITE
         style = Paint.Style.FILL
-    }
-private val DEBUG_PAINT =
-    Paint().apply {
-        color = Color.RED
-        style = Paint.Style.STROKE
-        strokeWidth = 8f
-    }
-private val DEBUG_PAINT_TEXT =
-    Paint().apply {
-        color = Color.RED
-        textSize = 24f
     }

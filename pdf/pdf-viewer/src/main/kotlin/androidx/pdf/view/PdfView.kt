@@ -36,6 +36,7 @@ import kotlin.math.round
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -60,7 +61,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         set(value) {
             checkMainThread()
             value?.let {
+                val reset = field != null && field?.uri != value.uri
                 field = it
+                if (reset) reset()
                 onDocumentSet()
             }
         }
@@ -75,6 +78,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     /** The maximum scaling factor that can be applied to this View using the [zoom] property */
     // TODO(b/376299551) - Make maxZoom configurable via XML attribute
     public var maxZoom: Float = DEFAULT_MAX_ZOOM
+
     /** The minimum scaling factor that can be applied to this View using the [zoom] property */
     // TODO(b/376299551) - Make minZoom configurable via XML attribute
     public var minZoom: Float = DEFAULT_MIN_ZOOM
@@ -182,6 +186,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 pages[i]?.maybeRender()
             }
         }
+    }
+
+    private fun reset() {
+        scrollTo(0, 0)
+        zoom = DEFAULT_INIT_ZOOM
+        pages.clear()
+        coroutineScope.coroutineContext.cancelChildren()
     }
 
     /** React to a change in visible pages (load new pages and clean up old ones) */
