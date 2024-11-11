@@ -105,6 +105,16 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".CircularProgressIndicatorActivity"
+            android:theme="@style/AppTheme"
+            android:exported="true">
+            <intent-filter>
+                <action android:name=
+                    "androidx.wear.compose.material3.macrobenchmark.target.CIRCULAR_PROGRESS_INDICATOR_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".AlertDialogActivity"
