@@ -49,7 +49,6 @@ import android.view.Surface;
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.OptIn;
 import androidx.annotation.VisibleForTesting;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraControl;
@@ -1070,7 +1069,6 @@ public final class CameraUseCaseAdapter implements Camera {
         return is10Bit || isHdr;
     }
 
-    @OptIn(markerClass = androidx.camera.core.ExperimentalImageCaptureOutputFormat.class)
     private static boolean hasUltraHdrImageCapture(@NonNull Collection<UseCase> useCases) {
         for (UseCase useCase : useCases) {
             if (!isImageCapture(useCase)) {
