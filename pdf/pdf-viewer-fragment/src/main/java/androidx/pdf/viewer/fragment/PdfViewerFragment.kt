@@ -18,6 +18,7 @@ package androidx.pdf.viewer.fragment
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -729,7 +730,7 @@ public open class PdfViewerFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (!documentLoaded) {
+        if (!documentLoaded || paginatedView?.isConfigurationChanged == true) {
             return
         }
         setAnnotationIntentResolvability()
@@ -743,6 +744,11 @@ public open class PdfViewerFragment : Fragment() {
         ) {
             annotationButton?.post { onRequestImmersiveMode(false) }
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        paginatedView?.isConfigurationChanged = true
     }
 
     private fun destroyContentModel() {
