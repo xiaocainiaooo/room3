@@ -310,17 +310,6 @@ class ResolutionSelectorDeviceTest(
         )
 
     @Test
-    fun canSelectAnyHighResolutionForPreviewByResolutionFilter() =
-        canSelectAnyHighResolutionByResolutionFilter(
-            Preview::class.java,
-            // For Preview, need to override resolution strategy so that the output sizes larger
-            // than PREVIEW size can be selected.
-            cameraInfoInternal
-                .getSupportedHighResolutions(useCaseFormatMap[Preview::class.java]!!)
-                .maxWithOrNull(CompareSizesByArea())
-        )
-
-    @Test
     fun canSelectAnyResolutionForImageCaptureByResolutionFilter() =
         canSelectAnyResolutionByResolutionFilter(ImageCapture::class.java)
 

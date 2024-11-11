@@ -941,23 +941,26 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
     @Test
-    fun getsFrame_withHighResolutionEnabled() = runBlocking {
-        val camera =
-            withContext(Dispatchers.Main) {
-                cameraProvider.bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA)
-            }
-        val cameraInfo = camera.cameraInfo
-        val maxHighResolutionOutputSize =
-            CameraInfoUtil.getMaxHighResolutionOutputSize(cameraInfo, ImageFormat.PRIVATE)
+    fun verifyHighResolutionIsDisabledForPreview() = runBlocking {
+        val highResolutionOutputSizes =
+            CameraInfoUtil.getHighResolutionOutputSizes(
+                cameraProvider.getCameraInfo(CameraSelector.DEFAULT_BACK_CAMERA),
+                ImageFormat.PRIVATE
+            )
         // Only runs the test when the device has high resolution output sizes
-        assumeTrue(maxHighResolutionOutputSize != null)
+        assumeTrue(highResolutionOutputSizes.isNotEmpty())
 
         // Arrange.
+        // Sets the mode to allow high resolution support and uses a ResolutionFilter to verify the
+        // high resolution output sizes are not included in the provided sizes list
         val resolutionSelector =
             ResolutionSelector.Builder()
                 .setAllowedResolutionMode(PREFER_HIGHER_RESOLUTION_OVER_CAPTURE_RATE)
                 .setResolutionStrategy(ResolutionStrategy.HIGHEST_AVAILABLE_STRATEGY)
-                .setResolutionFilter { _, _ -> listOf(maxHighResolutionOutputSize) }
+                .setResolutionFilter { outputSizes, _ ->
+                    assertThat(outputSizes).containsNoneIn(highResolutionOutputSizes)
+                    outputSizes
+                }
                 .build()
         val preview = Preview.Builder().setResolutionSelector(resolutionSelector).build()
 
@@ -968,8 +971,6 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             // Act.
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
         }
-
-        assertThat(preview.resolutionInfo!!.resolution).isEqualTo(maxHighResolutionOutputSize)
 
         // Assert.
         frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 10)
