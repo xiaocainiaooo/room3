@@ -1101,7 +1101,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         val previewBuilder = Preview.Builder().setPreviewStabilizationEnabled(true)
         verifyVideoStabilizationModeInResultAndFramesAvailable(
             previewBuilder = previewBuilder,
-            expectedMode = CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION
+            expectedMode = CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION
         )
     }
 
@@ -1125,7 +1125,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         verifyVideoStabilizationModeInResultAndFramesAvailable(
             previewBuilder = previewBuilder,
             videoCapture = videoCapture,
-            expectedMode = CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE_OFF
+            expectedMode = CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_OFF
         )
     }
 
@@ -1188,9 +1188,9 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         }
 
         assertThat(
-                withTimeoutOrNull(5000) { captureResultDeferred.await() }!!.get(
-                    CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE
-                )
+                withTimeoutOrNull(5000) { captureResultDeferred.await() }!!
+                    .request
+                    .get(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE)
             )
             .isEqualTo(expectedMode)
         frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 10)
