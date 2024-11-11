@@ -341,6 +341,17 @@ class KlibParsingCursorExtensionsTest {
     }
 
     @Test
+    fun parseFunctionReceiverWithNullableParam() {
+        val input = "(kotlin.collections/List<#A?>)."
+        val cursor = Cursor(input)
+        val receiver = cursor.parseFunctionReceiver()
+        assertThat(receiver?.className.toString()).isEqualTo("kotlin.collections/List")
+        val typeArg = receiver?.arguments?.single()?.type
+        assertThat(typeArg?.nullability).isEqualTo(AbiTypeNullability.MARKED_NULLABLE)
+        assertThat(typeArg?.tag).isEqualTo("A")
+    }
+
+    @Test
     fun parseValueParamCrossinlineDefault() {
         val input = "crossinline kotlin/Function2<#A, #B, kotlin/Int> =..."
         val cursor = Cursor(input)
