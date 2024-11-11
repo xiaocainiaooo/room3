@@ -1702,12 +1702,12 @@ private fun ClockText(
         contentAlignment = Alignment.Center,
         modifier =
             modifier
-                .minimumInteractiveComponentSize()
-                .size(MinimumInteractiveSize)
                 .onGloballyPositioned {
                     parentCenter = it.parentCoordinates?.size?.center ?: IntOffset.Zero
                     center = it.boundsInParent().center
                 }
+                .minimumInteractiveComponentSize()
+                .size(MinimumInteractiveSize)
                 .focusable()
                 .semantics(mergeDescendants = true) {
                     onClick {
