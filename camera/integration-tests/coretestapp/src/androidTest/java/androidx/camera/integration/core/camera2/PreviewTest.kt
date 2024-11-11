@@ -32,6 +32,8 @@ import androidx.camera.camera2.Camera2Config
 import androidx.camera.camera2.internal.DisplayInfoManager
 import androidx.camera.camera2.interop.Camera2Interop
 import androidx.camera.camera2.pipe.integration.CameraPipeConfig
+import androidx.camera.camera2.pipe.integration.compat.quirk.DeviceQuirks
+import androidx.camera.camera2.pipe.integration.compat.quirk.ExtraCroppingQuirk
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraXConfig
@@ -124,7 +126,6 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private lateinit var cameraProvider: ProcessCameraProvider
     private val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-    private var defaultBuilder: Preview.Builder? = null
     private var previewResolution: Size? = null
     private var frameSemaphore: Semaphore? = null
     private val context: Context = ApplicationProvider.getApplicationContext()
@@ -137,12 +138,6 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
 
         ProcessCameraProvider.configureInstance(cameraConfig)
         cameraProvider = ProcessCameraProvider.getInstance(context).await()
-
-        // init CameraX before creating Preview to get preview size with CameraX's context
-        defaultBuilder =
-            Preview.Builder.fromConfig(Preview.DEFAULT_CONFIG.config).also {
-                it.mutableConfig.removeOption(ImageOutputConfig.OPTION_TARGET_ASPECT_RATIO)
-            }
         frameSemaphore = Semaphore(/* permits= */ 0)
         lifecycleOwner.startAndResume()
     }
@@ -158,7 +153,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     // ======================================================
     @Test
     fun surfaceProvider_isUsedAfterSetting() = runBlocking {
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
         val completableDeferred = CompletableDeferred<Unit>()
 
         instrumentation.runOnMainSync {
@@ -218,7 +213,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Throws(InterruptedException::class)
     fun setSurfaceProviderBeforeBind_getsFrame() {
         // Arrange.
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
         instrumentation.runOnMainSync {
             preview.setSurfaceProvider(
                 getSurfaceProvider(frameAvailableListener = { frameSemaphore!!.release() })
@@ -237,7 +232,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         val threadName = AtomicReference<String>()
 
         // Arrange.
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
         instrumentation.runOnMainSync {
             preview.setSurfaceProvider(
                 workExecutorWithNamedThread,
@@ -260,7 +255,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Throws(InterruptedException::class)
     fun setSurfaceProviderAfterBind_getsFrame() {
         // Arrange.
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
 
         instrumentation.runOnMainSync {
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
@@ -281,7 +276,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         val threadName = AtomicReference<String>()
 
         // Arrange.
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
 
         instrumentation.runOnMainSync {
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
@@ -303,7 +298,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Test
     @Throws(InterruptedException::class)
     fun setMultipleNonNullSurfaceProviders_getsFrame() {
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
 
         instrumentation.runOnMainSync {
             // Set a different SurfaceProvider which will provide a different surface to be used
@@ -331,7 +326,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Test
     @Throws(InterruptedException::class)
     fun setMultipleNullableSurfaceProviders_getsFrame() {
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
 
         instrumentation.runOnMainSync {
             // Set a different SurfaceProvider which will provide a different surface to be used
@@ -359,7 +354,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
 
     @Test
     fun willNotProvideSurface_resultCode_WILL_NOT_PROVIDE_SURFACE(): Unit = runBlocking {
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
 
         val resultDeferred = CompletableDeferred<Int>()
         instrumentation.runOnMainSync {
@@ -382,7 +377,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
 
     @Test
     fun provideSurfaceTwice_resultCode_SURFACE_ALREADY_PROVIDED(): Unit = runBlocking {
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
 
         val resultDeferred1 = CompletableDeferred<Int>()
         val resultDeferred2 = CompletableDeferred<Int>()
@@ -434,7 +429,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
 
     @Test
     fun surfaceRequestCancelled_resultCode_REQUEST_CANCELLED() = runBlocking {
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
 
         val resultDeferred = CompletableDeferred<Int>()
         val surfaceRequestDeferred = CompletableDeferred<SurfaceRequest>()
@@ -464,7 +459,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Test
     fun newSurfaceProviderAfterSurfaceProvided_resultCode_SURFACE_USED_SUCCESSFULLY() =
         runBlocking {
-            val preview = defaultBuilder!!.build()
+            val preview = Preview.Builder().build()
 
             val resultDeferred = CompletableDeferred<Int>()
             instrumentation.runOnMainSync {
@@ -498,7 +493,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
 
     @Test
     fun newSurfaceRequestAfterSurfaceProvided_resultCode_SURFACE_USED_SUCCESSFULLY() = runBlocking {
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
 
         val resultDeferred = CompletableDeferred<Int>()
         var surfaceRequestCount = 0
@@ -619,6 +614,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Test
     fun defaultAspectRatioWillBeSet_whenRatioDefaultIsSet() =
         runBlocking(Dispatchers.Main) {
+            assumeTrue(!hasExtraCroppingQuirk() && isAspectRatioResolutionSupported(4.0f / 3.0f))
             val useCase = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_DEFAULT).build()
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
             val config = useCase.currentConfig as ImageOutputConfig
@@ -631,7 +627,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Test
     fun aspectRatio4_3_resolutionIsSet() =
         runBlocking(Dispatchers.Main) {
-            assumeTrue(isAspectRatioResolutionSupported(4.0f / 3.0f))
+            assumeTrue(!hasExtraCroppingQuirk() && isAspectRatioResolutionSupported(4.0f / 3.0f))
 
             val useCase = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3).build()
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
@@ -647,7 +643,9 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Test
     fun aspectRatio16_9_resolutionIsSet() =
         runBlocking(Dispatchers.Main) {
-            assumeTrue(isAspectRatioResolutionSupported(16.0f / 9.0f))
+            assumeTrue(
+                !hasAspectRatioLegacyApi21Quirk() && isAspectRatioResolutionSupported(16.0f / 9.0f)
+            )
             val useCase = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_16_9).build()
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
             val config = useCase.currentConfig as ImageOutputConfig
@@ -666,8 +664,34 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         val previewSizes = map!!.getOutputSizes(SurfaceTexture::class.java)
         return previewSizes.find { size ->
             val aspectRatioVal = size.width.toFloat() / size.height.toFloat()
-            return abs(targetAspectRatioValue - aspectRatioVal) <= TOLERANCE
+            abs(targetAspectRatioValue - aspectRatioVal) <= TOLERANCE
         } != null
+    }
+
+    private fun hasExtraCroppingQuirk(): Boolean {
+        return (implName.contains(CameraPipeConfig::class.simpleName!!) &&
+            DeviceQuirks[ExtraCroppingQuirk::class.java] != null) ||
+            androidx.camera.camera2.internal.compat.quirk.DeviceQuirks.get(
+                androidx.camera.camera2.internal.compat.quirk.ExtraCroppingQuirk::class.java
+            ) != null
+    }
+
+    // Checks whether it is the device for AspectRatioLegacyApi21Quirk
+    private fun hasAspectRatioLegacyApi21Quirk(): Boolean {
+        val quirks =
+            (cameraProvider.getCameraInfo(cameraSelector) as CameraInfoInternal).cameraQuirks
+        return if (implName == CameraPipeConfig::class.simpleName) {
+            quirks.contains(
+                androidx.camera.camera2.pipe.integration.compat.quirk
+                        .AspectRatioLegacyApi21Quirk::class
+                    .java
+            )
+        } else {
+            quirks.contains(
+                androidx.camera.camera2.internal.compat.quirk.AspectRatioLegacyApi21Quirk::class
+                    .java
+            )
+        }
     }
 
     @Suppress("DEPRECATION") // legacy resolution API
@@ -707,7 +731,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Test
     fun targetRotationIsRetained_whenUseCaseIsReused() =
         runBlocking(Dispatchers.Main) {
-            val useCase = defaultBuilder!!.build()
+            val useCase = Preview.Builder().build()
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
 
             // Generally, the device can't be rotated to Surface.ROTATION_180. Therefore,
@@ -729,7 +753,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         runBlocking(Dispatchers.Main) {
             val displayRotation =
                 DisplayInfoManager.getInstance(context).getMaxSizeDisplay(true).rotation
-            val useCase = defaultBuilder!!.build()
+            val useCase = Preview.Builder().build()
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
 
             assertThat(useCase.targetRotation).isEqualTo(displayRotation)
@@ -810,7 +834,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Test
     fun useCaseConfigCanBeReset_afterUnbind() =
         runBlocking(Dispatchers.Main) {
-            val preview = defaultBuilder!!.build()
+            val preview = Preview.Builder().build()
             val initialConfig = preview.currentConfig
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
             cameraProvider.unbind(preview)
@@ -821,7 +845,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Test
     @Throws(InterruptedException::class)
     fun useCaseCanBeReusedInSameCamera() = runBlocking {
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
         var resultDeferred = CompletableDeferred<Int>()
 
         withContext(Dispatchers.Main) {
@@ -864,7 +888,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     fun useCaseCanBeReusedInDifferentCamera() = runBlocking {
         assumeTrue(CameraUtil.hasCameraWithLensFacing(CameraSelector.LENS_FACING_FRONT))
 
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
         var resultDeferred = CompletableDeferred<Int>()
         instrumentation.runOnMainSync {
             preview.setSurfaceProvider(
@@ -951,6 +975,78 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     }
 
     @Test
+    fun getsFrame_withHighestAvailableResolutionStrategy() = runBlocking {
+        // Arrange.
+        val resolutionSelector =
+            ResolutionSelector.Builder()
+                .setResolutionStrategy(ResolutionStrategy.HIGHEST_AVAILABLE_STRATEGY)
+                .build()
+        val preview = Preview.Builder().setResolutionSelector(resolutionSelector).build()
+
+        withContext(Dispatchers.Main) {
+            preview.setSurfaceProvider(
+                getSurfaceProvider(frameAvailableListener = { frameSemaphore!!.release() })
+            )
+            // Act.
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+        }
+
+        // Assert.
+        frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 10)
+    }
+
+    @Test
+    fun getsFrame_withAspectRatio_4_3_strategy() = runBlocking {
+        assumeTrue(!hasExtraCroppingQuirk() && isAspectRatioResolutionSupported(4.0f / 3.0f))
+        // Arrange.
+        val resolutionSelector =
+            ResolutionSelector.Builder()
+                .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
+                .build()
+        val preview = Preview.Builder().setResolutionSelector(resolutionSelector).build()
+
+        withContext(Dispatchers.Main) {
+            preview.setSurfaceProvider(
+                getSurfaceProvider(frameAvailableListener = { frameSemaphore!!.release() })
+            )
+            // Act.
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+        }
+
+        // Assert.
+        val resolution = preview.resolutionInfo!!.resolution
+        assertThat(resolution.width.toFloat() / resolution.height).isEqualTo(4.0f / 3.0f)
+        frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 10)
+    }
+
+    @Test
+    fun getsFrame_withAspectRatio_16_9_strategy() = runBlocking {
+        assumeTrue(
+            !hasAspectRatioLegacyApi21Quirk() && isAspectRatioResolutionSupported(16.0f / 9.0f)
+        )
+
+        // Arrange.
+        val resolutionSelector =
+            ResolutionSelector.Builder()
+                .setAspectRatioStrategy(AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+                .build()
+        val preview = Preview.Builder().setResolutionSelector(resolutionSelector).build()
+
+        withContext(Dispatchers.Main) {
+            preview.setSurfaceProvider(
+                getSurfaceProvider(frameAvailableListener = { frameSemaphore!!.release() })
+            )
+            // Act.
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+        }
+
+        // Assert.
+        val resolution = preview.resolutionInfo!!.resolution
+        assertThat(resolution.width.toFloat() / resolution.height).isEqualTo(16.0f / 9.0f)
+        frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 10)
+    }
+
+    @Test
     fun defaultMaxResolutionCanBeKept_whenResolutionStrategyIsNotSet() =
         runBlocking(Dispatchers.Main) {
             assumeTrue(CameraUtil.hasCameraWithLensFacing(CameraSelector.LENS_FACING_BACK))
@@ -1032,7 +1128,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Test
     fun sessionErrorListenerReceivesError_getsFrame(): Unit = runBlocking {
         // Arrange.
-        val preview = defaultBuilder!!.build()
+        val preview = Preview.Builder().build()
         withContext(Dispatchers.Main) {
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
             // Act.
