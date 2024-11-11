@@ -2006,6 +2006,17 @@ public class ExifInterfaceTest {
         ExifInterface exifInterface = exifInterfaceFactory.create(imageFile);
         exifInterface.setAttribute(ExifInterface.TAG_MAKE, "abc");
         exifInterface.setAttribute(ExifInterface.TAG_XMP, TEST_XMP);
+        // Check expected modifications are visible without saving to disk (but offsets are now
+        // unknown).
+        expect.that(exifInterface.getAttribute(ExifInterface.TAG_MAKE)).isEqualTo("abc");
+        expect.that(exifInterface.getAttributeRange(ExifInterface.TAG_MAKE))
+                .isEqualTo(new long[] {-1, 4});
+        byte[] expectedXmpBytes = TEST_XMP.getBytes(Charsets.UTF_8);
+        expect.that(exifInterface.getAttributeBytes(ExifInterface.TAG_XMP))
+                .isEqualTo(expectedXmpBytes);
+        expect.that(exifInterface.getAttributeRange(ExifInterface.TAG_XMP))
+                .isEqualTo(new long[] {-1, expectedXmpBytes.length});
+
         exifInterface.saveAttributes();
 
         ExpectedAttributes.Builder expectedAttributesBuilder =
