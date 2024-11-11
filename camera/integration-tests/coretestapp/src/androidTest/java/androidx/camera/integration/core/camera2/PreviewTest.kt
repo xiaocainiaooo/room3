@@ -36,6 +36,7 @@ import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraXConfig
 import androidx.camera.core.DynamicRange
+import androidx.camera.core.MirrorMode
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceRequest
 import androidx.camera.core.SurfaceRequest.TransformationInfo
@@ -1092,6 +1093,28 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         assertThat(preview.isPreviewStabilizationEnabled).isTrue()
     }
 
+    private fun isPreviewStabilizationModeSupported(cameraSelector: CameraSelector): Boolean {
+        val cameraInfoInternal = cameraProvider.getCameraInfo(cameraSelector) as CameraInfoInternal
+        val cameraCharacteristics =
+            cameraInfoInternal.cameraCharacteristics as CameraCharacteristics
+        val stabilizationModes =
+            cameraCharacteristics.get(
+                CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES
+            ) as IntArray
+        return stabilizationModes.contains(
+            CameraCharacteristics.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION
+        )
+    }
+
+    @Test
+    fun getPreviewCapabilitiesStabilizationSupportIsCorrect() {
+        val capabilities =
+            Preview.getPreviewCapabilities(cameraProvider.getCameraInfo(cameraSelector))
+
+        assertThat(capabilities.isStabilizationSupported())
+            .isEqualTo(isPreviewStabilizationModeSupported(cameraSelector))
+    }
+
     @Test
     fun previewStabilizationOn_videoStabilizationModeIsPreviewStabilization(): Unit = runBlocking {
         val previewCapabilities =
@@ -1153,6 +1176,133 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                 expectedMode = CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION
             )
         }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 21, maxSdkVersion = 32)
+    fun setMirrorModeIsNoOp_priorToAPI33() = runBlocking {
+        verifyMirrorMode(
+            CameraSelector.DEFAULT_BACK_CAMERA,
+            mirrorMode = MirrorMode.MIRROR_MODE_ON,
+            expectedMirrorMode = MirrorMode.MIRROR_MODE_ON_FRONT_ONLY,
+            expectedIsMirroringInTransformationInfo = false
+        )
+
+        verifyMirrorMode(
+            CameraSelector.DEFAULT_FRONT_CAMERA,
+            mirrorMode = MirrorMode.MIRROR_MODE_ON,
+            expectedMirrorMode = MirrorMode.MIRROR_MODE_ON_FRONT_ONLY,
+            expectedIsMirroringInTransformationInfo = true
+        )
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 33)
+    fun defaultMirrorMode() = runBlocking {
+        verifyMirrorMode(
+            CameraSelector.DEFAULT_BACK_CAMERA,
+            mirrorMode = null, // don't set the mirror mode
+            expectedMirrorMode = MirrorMode.MIRROR_MODE_ON_FRONT_ONLY,
+            expectedIsMirroringInTransformationInfo = false
+        )
+
+        verifyMirrorMode(
+            CameraSelector.DEFAULT_FRONT_CAMERA,
+            mirrorMode = null, // don't set the mirror mode
+            expectedMirrorMode = MirrorMode.MIRROR_MODE_ON_FRONT_ONLY,
+            expectedIsMirroringInTransformationInfo = true
+        )
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 33)
+    fun mirrorModeOn() = runBlocking {
+        verifyMirrorMode(
+            CameraSelector.DEFAULT_BACK_CAMERA,
+            mirrorMode = MirrorMode.MIRROR_MODE_ON,
+            expectedMirrorMode = MirrorMode.MIRROR_MODE_ON,
+            expectedIsMirroringInTransformationInfo = true
+        )
+
+        verifyMirrorMode(
+            CameraSelector.DEFAULT_FRONT_CAMERA,
+            mirrorMode = MirrorMode.MIRROR_MODE_ON,
+            expectedMirrorMode = MirrorMode.MIRROR_MODE_ON,
+            expectedIsMirroringInTransformationInfo = true
+        )
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 33)
+    fun mirrorModeOff() = runBlocking {
+        verifyMirrorMode(
+            CameraSelector.DEFAULT_BACK_CAMERA,
+            mirrorMode = MirrorMode.MIRROR_MODE_OFF,
+            expectedMirrorMode = MirrorMode.MIRROR_MODE_OFF,
+            expectedIsMirroringInTransformationInfo = false
+        )
+
+        verifyMirrorMode(
+            CameraSelector.DEFAULT_FRONT_CAMERA,
+            mirrorMode = MirrorMode.MIRROR_MODE_OFF,
+            expectedMirrorMode = MirrorMode.MIRROR_MODE_OFF,
+            expectedIsMirroringInTransformationInfo = false
+        )
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 33)
+    fun mirrorModeOnFrontOnly() = runBlocking {
+        verifyMirrorMode(
+            CameraSelector.DEFAULT_BACK_CAMERA,
+            mirrorMode = MirrorMode.MIRROR_MODE_ON_FRONT_ONLY,
+            expectedMirrorMode = MirrorMode.MIRROR_MODE_ON_FRONT_ONLY,
+            expectedIsMirroringInTransformationInfo = false
+        )
+
+        verifyMirrorMode(
+            CameraSelector.DEFAULT_FRONT_CAMERA,
+            MirrorMode.MIRROR_MODE_ON_FRONT_ONLY,
+            expectedMirrorMode = MirrorMode.MIRROR_MODE_ON_FRONT_ONLY,
+            expectedIsMirroringInTransformationInfo = true
+        )
+    }
+
+    private suspend fun verifyMirrorMode(
+        cameraSelector: CameraSelector,
+        mirrorMode: Int? = null,
+        expectedMirrorMode: Int,
+        expectedIsMirroringInTransformationInfo: Boolean
+    ) {
+        val preview =
+            Preview.Builder()
+                .also { builder -> mirrorMode?.let { builder.setMirrorMode(it) } }
+                .build()
+
+        val transformationInfoDeferred = CompletableDeferred<TransformationInfo>()
+        withContext(Dispatchers.Main) {
+            cameraProvider.unbindAll()
+            preview.surfaceProvider =
+                SurfaceTextureProvider.createAutoDrainingSurfaceTextureProvider(
+                    null,
+                    { surfaceRequest ->
+                        surfaceRequest.setTransformationInfoListener(
+                            CameraXExecutors.directExecutor(),
+                            { transformationInfo ->
+                                transformationInfoDeferred.complete(transformationInfo)
+                            }
+                        )
+                    },
+                    {}
+                )
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+        }
+
+        // TODO: better check the Camera2 OutputConfiguration but currently there is no way do that.
+        assertThat(preview.sessionConfig.outputConfigs.get(0).mirrorMode)
+            .isEqualTo(expectedMirrorMode)
+        assertThat(withTimeoutOrNull(1000) { transformationInfoDeferred.await() }!!.isMirroring)
+            .isEqualTo(expectedIsMirroringInTransformationInfo)
+    }
 
     private suspend fun verifyVideoStabilizationModeInResultAndFramesAvailable(
         previewBuilder: Preview.Builder,
@@ -1265,7 +1415,6 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                 .contains(fpsToVerify)
         )
         val previewBuilder = Preview.Builder().setTargetFrameRate(fpsToVerify)
-
         verifyFrameRateRangeInResultAndFramesAvailable(
             previewBuilder = previewBuilder,
             expectedFpsRange = fpsToVerify
@@ -1332,6 +1481,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                 }
             )
         val preview = previewBuilder.build()
+        assertThat(preview.targetFrameRate).isEqualTo(expectedFpsRange)
 
         withContext(Dispatchers.Main) {
             preview.surfaceProvider =
