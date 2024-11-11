@@ -17,6 +17,7 @@
 package androidx.xr.compose.material3
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalNavigationBarComponentOverride
 import androidx.compose.material3.LocalNavigationRailComponentOverride
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -46,6 +47,12 @@ public fun EnableXrComponentOverrides(
                     add(
                         LocalNavigationRailComponentOverride provides
                             XrNavigationRailComponentOverride
+                    )
+                }
+                if (context.shouldOverrideComponent(XrComponentOverride.NavigationBar)) {
+                    add(
+                        LocalNavigationBarComponentOverride provides
+                            XrNavigationBarComponentOverride
                     )
                 }
             }
@@ -86,6 +93,12 @@ public value class XrComponentOverride private constructor(private val name: Str
         @get:ExperimentalMaterial3XrApi
         @ExperimentalMaterial3XrApi
         public val NavigationRail: XrComponentOverride = XrComponentOverride("NavigationRail")
+
+        /** Material3 NavigationBar. */
+        @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+        @get:ExperimentalMaterial3XrApi
+        @ExperimentalMaterial3XrApi
+        public val NavigationBar: XrComponentOverride = XrComponentOverride("NavigationBar")
     }
 }
 
