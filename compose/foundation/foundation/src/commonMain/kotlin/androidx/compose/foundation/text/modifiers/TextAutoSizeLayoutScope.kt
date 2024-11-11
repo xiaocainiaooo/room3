@@ -17,25 +17,34 @@
 package androidx.compose.foundation.text.modifiers
 
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 
 /**
- * This interface is used by classes responsible for laying out text. Layout will be performed here
- * alongside logic that checks if the text overflows.
+ * An entity that allows performing text layout for auto sizing text.
  *
  * These methods are used by [TextAutoSize] in the [TextAutoSize.getFontSize] method, where
  * developers can lay out text with different font sizes and do certain logic depending on whether
  * or not the text overflows.
- *
- * This may be implemented in unit tests when testing [TextAutoSize.getFontSize] to see if the
- * method works as intended.
  */
-internal interface AutoSizeTextLayoutScope : Density {
+sealed interface TextAutoSizeLayoutScope : Density {
     /**
-     * Lay out the text with the given font size.
+     * Lay out the text and return the result of the measurement
      *
-     * @return true if the text overflows.
+     * @param constraints The constraints to lay the text out with
+     * @param text The text to lay out
+     * @param fontSize The font size to lay the text out with
+     * @return The result of the measurement
      */
-    fun performLayoutAndGetOverflow(fontSize: TextUnit): Boolean
+    fun performLayout(
+        constraints: Constraints,
+        text: AnnotatedString,
+        fontSize: TextUnit
+    ): TextLayoutResult
 }
+
+/** Used only in tests */
+internal abstract class SimpleTextAutoSizeLayoutScope : TextAutoSizeLayoutScope
