@@ -113,7 +113,6 @@ import androidx.camera.core.CameraInfo;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.DisplayOrientedMeteringPointFactory;
 import androidx.camera.core.DynamicRange;
-import androidx.camera.core.ExperimentalImageCaptureOutputFormat;
 import androidx.camera.core.ExperimentalLensFacing;
 import androidx.camera.core.ExposureState;
 import androidx.camera.core.FocusMeteringAction;
@@ -189,7 +188,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * lifecycle events are handled internally by CameraX.
  */
 @SuppressLint("NullAnnotationGroup")
-@OptIn(markerClass = ExperimentalImageCaptureOutputFormat.class)
 public class CameraXActivity extends AppCompatActivity {
     private static final String TAG = "CameraXActivity";
     private static final String[] REQUIRED_PERMISSIONS;

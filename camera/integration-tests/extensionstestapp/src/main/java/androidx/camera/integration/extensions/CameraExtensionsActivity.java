@@ -87,7 +87,6 @@ import androidx.camera.core.Camera;
 import androidx.camera.core.CameraControl;
 import androidx.camera.core.CameraInfo;
 import androidx.camera.core.CameraSelector;
-import androidx.camera.core.ExperimentalImageCaptureOutputFormat;
 import androidx.camera.core.FocusMeteringAction;
 import androidx.camera.core.FocusMeteringResult;
 import androidx.camera.core.ImageCapture;
@@ -137,7 +136,6 @@ import java.util.Map;
 import java.util.Set;
 
 /** An activity that shows off how extensions can be applied */
-@OptIn(markerClass = ExperimentalImageCaptureOutputFormat.class)
 public class CameraExtensionsActivity extends AppCompatActivity
         implements ActivityCompat.OnRequestPermissionsResultCallback {
 

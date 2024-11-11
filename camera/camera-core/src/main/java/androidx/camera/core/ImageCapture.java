@@ -299,7 +299,6 @@ public final class ImageCapture extends UseCase {
      * Captures 8-bit standard dynamic range (SDR) images using the {@link ImageFormat#JPEG}
      * image format.
      */
-    @ExperimentalImageCaptureOutputFormat
     public static final int OUTPUT_FORMAT_JPEG = 0;
 
     /**
@@ -312,7 +311,6 @@ public final class ImageCapture extends UseCase {
      * <p>For more information see
      * <a href="https://developer.android.com/media/grow/ultra-hdr">Support Ultra HDR</a>.
      */
-    @ExperimentalImageCaptureOutputFormat
     public static final int OUTPUT_FORMAT_JPEG_ULTRA_HDR = 1;
 
     /**
@@ -531,7 +529,6 @@ public final class ImageCapture extends UseCase {
         return false;
     }
 
-    @OptIn(markerClass = ExperimentalImageCaptureOutputFormat.class)
     private static boolean isOutputFormatUltraHdr(@NonNull MutableConfig config) {
         return Objects.equals(config.retrieveOption(OPTION_OUTPUT_FORMAT, null),
                 OUTPUT_FORMAT_JPEG_ULTRA_HDR);
@@ -891,7 +888,6 @@ public final class ImageCapture extends UseCase {
      *
      * @see ImageCapture.Builder#setOutputFormat(int)
      */
-    @ExperimentalImageCaptureOutputFormat
     @OutputFormat
     public int getOutputFormat() {
         return checkNotNull(getCurrentConfig().retrieveOption(OPTION_OUTPUT_FORMAT,
@@ -1047,7 +1043,6 @@ public final class ImageCapture extends UseCase {
             return false;
         }
 
-        @ExperimentalImageCaptureOutputFormat
         @NonNull
         @Override
         public Set<@OutputFormat Integer> getSupportedOutputFormats() {
@@ -1090,7 +1085,6 @@ public final class ImageCapture extends UseCase {
             return false;
         }
 
-        @OptIn(markerClass = ExperimentalImageCaptureOutputFormat.class)
         @Nullable
         private Set<Integer> getSupportedOutputFormatsFromAdapterCameraInfo() {
             if (!(mCameraInfo instanceof AdapterCameraInfo)) {
@@ -1377,8 +1371,7 @@ public final class ImageCapture extends UseCase {
     /**
      * Creates the pipeline for both capture request configuration and image post-processing.
      */
-    @OptIn(markerClass = {ExperimentalZeroShutterLag.class,
-            ExperimentalImageCaptureOutputFormat.class})
+    @OptIn(markerClass = {ExperimentalZeroShutterLag.class})
     @MainThread
     private SessionConfig.Builder createPipeline(@NonNull String cameraId,
             @NonNull ImageCaptureConfig config, @NonNull StreamSpec streamSpec) {
@@ -1785,7 +1778,6 @@ public final class ImageCapture extends UseCase {
     /**
      * The output format of the captured image.
      */
-    @OptIn(markerClass = androidx.camera.core.ExperimentalImageCaptureOutputFormat.class)
     @Target({ElementType.TYPE_USE})
     @IntDef({OUTPUT_FORMAT_JPEG, OUTPUT_FORMAT_JPEG_ULTRA_HDR,
             OUTPUT_FORMAT_RAW, OUTPUT_FORMAT_RAW_JPEG})
@@ -2050,7 +2042,6 @@ public final class ImageCapture extends UseCase {
      * <p>These values may be overridden by the implementation. They only provide a minimum set of
      * defaults that are implementation independent.
      */
-    @OptIn(markerClass = androidx.camera.core.ExperimentalImageCaptureOutputFormat.class)
     @RestrictTo(Scope.LIBRARY_GROUP)
     public static final class Defaults
             implements ConfigProvider<ImageCaptureConfig> {
@@ -3047,7 +3038,6 @@ public final class ImageCapture extends UseCase {
          * @see OutputFormat
          * @see ImageCaptureCapabilities#getSupportedOutputFormats()
          */
-        @ExperimentalImageCaptureOutputFormat
         @NonNull
         public Builder setOutputFormat(@OutputFormat int outputFormat) {
             getMutableConfig().insertOption(OPTION_OUTPUT_FORMAT, outputFormat);
