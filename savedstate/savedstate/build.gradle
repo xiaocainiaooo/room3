@@ -170,6 +170,7 @@ android {
 androidx {
     name = "Saved State"
     type = LibraryType.PUBLISHED_LIBRARY
+    samples(project(":savedstate:savedstate-samples"))
     inceptionYear = "2018"
     description = "Android Lifecycle Saved State"
     legacyDisableKotlinStrictApiMode = true
