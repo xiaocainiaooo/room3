@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -65,6 +66,7 @@ import androidx.wear.compose.material3.tokens.FilledButtonTokens
 import androidx.wear.compose.material3.tokens.FilledTonalButtonTokens
 import androidx.wear.compose.material3.tokens.ImageButtonTokens
 import androidx.wear.compose.material3.tokens.OutlinedButtonTokens
+import androidx.wear.compose.material3.tokens.ShapeTokens
 
 /**
  * Base level Wear Material3 [Button] that offers a single slot to take any content. Used as the
@@ -1028,13 +1030,13 @@ fun CompactButton(
 
 /** Contains the default values used by [Button] */
 object ButtonDefaults {
-    /** Recommended [Shape] for [Button]. */
-    val shape: Shape
-        @Composable get() = FilledButtonTokens.ContainerShape.value
+    /** Recommended [RoundedCornerShape] for [Button]. */
+    val shape: RoundedCornerShape
+        @Composable get() = ShapeTokens.CornerLarge
 
-    /** Recommended [Shape] for [CompactButton]. */
-    val compactButtonShape: Shape
-        @Composable get() = CompactButtonTokens.ContainerShape.value
+    /** Recommended [RoundedCornerShape] for [CompactButton]. */
+    val compactButtonShape: RoundedCornerShape
+        @Composable get() = ShapeTokens.CornerMedium
 
     /**
      * Creates a [ButtonColors] with a muted background and contrasting content color, the defaults

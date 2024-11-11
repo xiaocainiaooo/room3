@@ -16,10 +16,15 @@
 
 package androidx.wear.compose.material3.demos
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.shape.CornerBasedShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +33,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.wear.compose.foundation.lazy.ScalingLazyListScope
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.ButtonColors
 import androidx.wear.compose.material3.ButtonDefaults
@@ -36,6 +43,7 @@ import androidx.wear.compose.material3.CompactButton
 import androidx.wear.compose.material3.FilledTonalButton
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.ListSubHeader
+import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.OutlinedButton
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.samples.ButtonExtraLargeIconSample
@@ -789,3 +797,55 @@ private fun ButtonExtraLargeIcon(enabled: Boolean = true) {
         contentPadding = ButtonDefaults.ButtonWithExtraLargeIconContentPadding
     )
 }
+
+@Composable
+fun ButtonStackDemo() {
+    val cornerExtraSmall = MaterialTheme.shapes.extraSmall.topStart
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        ScalingLazyDemo {
+            item { ListHeader { Text(text = "Button Stack") } }
+
+            buttonStack(cornerExtraSmall)
+
+            // Additional spacing between button stacks to emphasise the groupings
+            item { Spacer(Modifier.height(8.dp)) }
+
+            buttonStack(cornerExtraSmall)
+        }
+    }
+}
+
+private fun ScalingLazyListScope.buttonStack(cornerSize: CornerSize) {
+    item {
+        Button(
+            onClick = {},
+            modifier = Modifier.fillMaxWidth(),
+            shape = ButtonDefaults.shape.bottom(cornerSize),
+            label = { Text("Top", Modifier.fillMaxWidth()) }
+        )
+    }
+
+    item {
+        Button(
+            onClick = {},
+            modifier = Modifier.fillMaxWidth(),
+            shape = ButtonDefaults.shape.copy(cornerSize),
+            label = { Text("Middle", Modifier.fillMaxWidth()) }
+        )
+    }
+
+    item {
+        Button(
+            onClick = {},
+            modifier = Modifier.fillMaxWidth(),
+            shape = ButtonDefaults.shape.top(cornerSize),
+            label = { Text("Bottom", Modifier.fillMaxWidth()) }
+        )
+    }
+}
+
+private fun CornerBasedShape.top(cornerSize: CornerSize): CornerBasedShape =
+    copy(topStart = cornerSize, topEnd = cornerSize)
+
+private fun CornerBasedShape.bottom(cornerSize: CornerSize): CornerBasedShape =
+    copy(bottomStart = cornerSize, bottomEnd = cornerSize)
