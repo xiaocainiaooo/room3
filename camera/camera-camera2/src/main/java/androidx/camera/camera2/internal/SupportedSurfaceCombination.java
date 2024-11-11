@@ -1439,36 +1439,31 @@ final class SupportedSurfaceCombination {
      */
     @NonNull
     private Size getRecordSize() {
-        int cameraId;
-
         try {
-            cameraId = Integer.parseInt(mCameraId);
+            int cameraId = Integer.parseInt(mCameraId);
+            Size recordSize = getRecordSizeFromCamcorderProfile(cameraId);
+            if (recordSize != null) {
+                return recordSize;
+            }
         } catch (NumberFormatException e) {
-            // The camera Id is not an integer because the camera may be a removable device. Use
-            // StreamConfigurationMap to determine the RECORD size.
-            return getRecordSizeFromStreamConfigurationMap();
+            // The camera Id is not an integer. The camera may be a removable device.
+        }
+        // Use StreamConfigurationMap to determine the RECORD size.
+        Size recordSize = getRecordSizeFromStreamConfigurationMap();
+        if (recordSize != null) {
+            return recordSize;
         }
 
-        CamcorderProfile profile = null;
-
-        if (mCamcorderProfileHelper.hasProfile(cameraId, CamcorderProfile.QUALITY_HIGH)) {
-            profile = mCamcorderProfileHelper.get(cameraId, CamcorderProfile.QUALITY_HIGH);
-        }
-
-        if (profile != null) {
-            return new Size(profile.videoFrameWidth, profile.videoFrameHeight);
-        }
-
-        return getRecordSizeByHasProfile(cameraId);
+        return RESOLUTION_480P;
     }
 
     /**
-     * Return the maximum supported video size for cameras using data from the stream
+     * Returns the maximum supported video size for cameras using data from the stream
      * configuration map.
      *
-     * @return Maximum supported video size.
+     * @return Maximum supported video size or null if none are found.
      */
-    @NonNull
+    @Nullable
     private Size getRecordSizeFromStreamConfigurationMap() {
         // Determining the record size needs to retrieve the output size from the original stream
         // configuration map without quirks applied.
@@ -1477,54 +1472,49 @@ final class SupportedSurfaceCombination {
                 MediaRecorder.class);
 
         if (videoSizeArr == null) {
-            return RESOLUTION_480P;
+            return null;
         }
 
         Arrays.sort(videoSizeArr, new CompareSizesByArea(true));
 
         for (Size size : videoSizeArr) {
-            // Returns the largest supported size under 1080P
             if (size.getWidth() <= RESOLUTION_1080P.getWidth()
                     && size.getHeight() <= RESOLUTION_1080P.getHeight()) {
                 return size;
             }
         }
 
-        return RESOLUTION_480P;
+        return null;
     }
 
     /**
-     * Return the maximum supported video size for cameras by
-     * {@link CamcorderProfile#hasProfile(int, int)}.
+     * Returns the maximum supported video size for cameras by {@link CamcorderProfile}.
      *
-     * @return Maximum supported video size.
+     * @return Maximum supported video size or null if none are found.
      */
-    @NonNull
-    private Size getRecordSizeByHasProfile(int cameraId) {
-        Size recordSize = RESOLUTION_480P;
-        CamcorderProfile profile = null;
+    @Nullable
+    private Size getRecordSizeFromCamcorderProfile(int cameraId) {
+        int[] qualities = {
+                CamcorderProfile.QUALITY_HIGH,
+                CamcorderProfile.QUALITY_8KUHD,
+                CamcorderProfile.QUALITY_4KDCI,
+                CamcorderProfile.QUALITY_2160P,
+                CamcorderProfile.QUALITY_2K,
+                CamcorderProfile.QUALITY_1080P,
+                CamcorderProfile.QUALITY_720P,
+                CamcorderProfile.QUALITY_480P
+        };
 
-        // Check whether 4KDCI, 2160P, 2K, 1080P, 720P, 480P (sorted by size) are supported by
-        // CamcorderProfile
-        if (mCamcorderProfileHelper.hasProfile(cameraId, CamcorderProfile.QUALITY_4KDCI)) {
-            profile = mCamcorderProfileHelper.get(cameraId, CamcorderProfile.QUALITY_4KDCI);
-        } else if (mCamcorderProfileHelper.hasProfile(cameraId, CamcorderProfile.QUALITY_2160P)) {
-            profile = mCamcorderProfileHelper.get(cameraId, CamcorderProfile.QUALITY_2160P);
-        } else if (mCamcorderProfileHelper.hasProfile(cameraId, CamcorderProfile.QUALITY_2K)) {
-            profile = mCamcorderProfileHelper.get(cameraId, CamcorderProfile.QUALITY_2K);
-        } else if (mCamcorderProfileHelper.hasProfile(cameraId, CamcorderProfile.QUALITY_1080P)) {
-            profile = mCamcorderProfileHelper.get(cameraId, CamcorderProfile.QUALITY_1080P);
-        } else if (mCamcorderProfileHelper.hasProfile(cameraId, CamcorderProfile.QUALITY_720P)) {
-            profile = mCamcorderProfileHelper.get(cameraId, CamcorderProfile.QUALITY_720P);
-        } else if (mCamcorderProfileHelper.hasProfile(cameraId, CamcorderProfile.QUALITY_480P)) {
-            profile = mCamcorderProfileHelper.get(cameraId, CamcorderProfile.QUALITY_480P);
+        for (int quality : qualities) {
+            if (mCamcorderProfileHelper.hasProfile(cameraId, quality)) {
+                CamcorderProfile profile = mCamcorderProfileHelper.get(cameraId, quality);
+                if (profile != null) {
+                    return new Size(profile.videoFrameWidth, profile.videoFrameHeight);
+                }
+            }
         }
 
-        if (profile != null) {
-            recordSize = new Size(profile.videoFrameWidth, profile.videoFrameHeight);
-        }
-
-        return recordSize;
+        return null;
     }
 
     @RequiresApi(23)
