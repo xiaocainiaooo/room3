@@ -51,9 +51,6 @@ import androidx.xr.compose.spatial.OrbiterEdge
  * Navigation rails provide access to primary destinations in apps when using tablet and desktop
  * screens.
  *
- * ![Navigation rail
- * image](https://developer.android.com/images/reference/androidx/compose/material3/navigation-rail.png)
- *
  * The navigation rail should be used to display three to seven app destinations and, optionally, a
  * [FloatingActionButton] or a logo header. Each destination is typically represented by an icon and
  * an optional text label.
@@ -72,9 +69,10 @@ import androidx.xr.compose.spatial.OrbiterEdge
  *   if [containerColor] is not a color from the theme.
  * @param header optional header that may hold a [FloatingActionButton] or a logo
  * @param content the content of this navigation rail, typically 3-7 [NavigationRailItem]s
- *
- * TODO(kmost): Add a @sample tag and create a new sample project for XR.
  */
+// TODO(kmost): Link to XR-specific NavRail image asset when available
+// TODO(kmost): Add a @sample tag and create a new sample project for XR.
+@ExperimentalMaterial3XrApi
 @Composable
 public fun NavigationRail(
     modifier: Modifier = Modifier,
