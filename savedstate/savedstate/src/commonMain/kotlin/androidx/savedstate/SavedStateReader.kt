@@ -25,10 +25,15 @@ import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
 @PublishedApi internal const val DEFAULT_BOOLEAN: Boolean = false
+
 @PublishedApi internal const val DEFAULT_CHAR: Char = 0.toChar()
+
 @PublishedApi internal const val DEFAULT_FLOAT: Float = 0F
+
 @PublishedApi internal const val DEFAULT_DOUBLE: Double = 0.0
+
 @PublishedApi internal const val DEFAULT_INT: Int = 0
+
 @PublishedApi internal const val DEFAULT_LONG: Long = 0L
 
 /**
@@ -85,6 +90,30 @@ internal constructor(
      *   found.
      */
     public inline fun getCharOrElse(key: String, defaultValue: () -> Char): Char
+
+    /**
+     * Retrieves a [CharSequence] value associated with the specified [key]. Throws an
+     * [IllegalStateException] if the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @return The [CharSequence] value associated with the [key].
+     * @throws IllegalStateException If the [key] is not found.
+     */
+    public inline fun getCharSequence(key: String): CharSequence
+
+    /**
+     * Retrieves a [CharSequence] value associated with the specified [key], or a default value if
+     * the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value if the [key] is not found.
+     * @return The [CharSequence] value associated with the [key], or the default value if the [key]
+     *   is not found.
+     */
+    public inline fun getCharSequenceOrElse(
+        key: String,
+        defaultValue: () -> CharSequence
+    ): CharSequence
 
     /**
      * Retrieves a [Double] value associated with the specified [key]. Throws an
@@ -239,6 +268,31 @@ internal constructor(
     ): List<String>
 
     /**
+     * Retrieves a [List] of elements of [CharArray] associated with the specified [key]. Throws an
+     * [IllegalStateException] if the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @return The [List] of elements of [CharArray] associated with the [key].
+     * @throws IllegalStateException If the [key] is not found.
+     */
+    public inline fun getCharSequenceList(key: String): List<CharSequence>
+
+    /**
+     * Retrieves a [List] of elements of [CharSequence] associated with the specified [key], or a
+     * default value if the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value if the [key] is not found or the
+     *   retrieved value is not a list of [CharSequence].
+     * @return The list of elements of [CharSequence] associated with the [key], or the default
+     *   value if the [key] is not found.
+     */
+    public inline fun getCharSequenceListOrElse(
+        key: String,
+        defaultValue: () -> List<CharSequence>
+    ): List<CharSequence>
+
+    /**
      * Retrieves a [BooleanArray] value associated with the specified [key]. Throws an
      * [IllegalStateException] if the [key] doesn't exist.
      *
@@ -282,6 +336,30 @@ internal constructor(
      *   not found.
      */
     public inline fun getCharArrayOrElse(key: String, defaultValue: () -> CharArray): CharArray
+
+    /**
+     * Retrieves a [CharArray] value associated with the specified [key]. Throws an
+     * [IllegalStateException] if the [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @return The [CharArray] value associated with the [key].
+     * @throws IllegalStateException If the [key] is not found.
+     */
+    public inline fun getCharSequenceArray(key: String): Array<CharSequence>
+
+    /**
+     * Retrieves a [CharArray] value associated with the specified [key], or a default value if the
+     * [key] doesn't exist.
+     *
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value if the [key] is not found.
+     * @return The [CharArray] value associated with the [key], or the default value if the [key] is
+     *   not found.
+     */
+    public inline fun getCharSequenceArrayOrElse(
+        key: String,
+        defaultValue: () -> Array<CharSequence>
+    ): Array<CharSequence>
 
     /**
      * Retrieves a [DoubleArray] value associated with the specified [key]. Throws an
