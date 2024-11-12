@@ -25,7 +25,6 @@ import androidx.compose.material3.adaptive.layout.SupportingPaneScaffold
 import androidx.compose.material3.adaptive.layout.SupportingPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldPaneScope
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
-import androidx.compose.material3.adaptive.layout.rememberPaneExpansionState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -51,7 +50,9 @@ import androidx.compose.ui.graphics.graphicsLayer
  *   happens. See [BackNavigationBehavior] for the use cases of each behavior.
  * @param paneExpansionDragHandle the pane expansion drag handle to allow users to drag to change
  *   pane expansion state, `null` by default.
- * @param paneExpansionState the state object of pane expansion.
+ * @param paneExpansionState the state object of pane expansion; when no value is provided but
+ *   [paneExpansionDragHandle] is not `null`, a default implementation will be created for the drag
+ *   handle to use.
  */
 @ExperimentalMaterial3AdaptiveApi
 @Composable
@@ -64,7 +65,7 @@ fun <T> NavigableListDetailPaneScaffold(
     defaultBackBehavior: BackNavigationBehavior = BackNavigationBehavior.PopUntilContentChange,
     paneExpansionDragHandle: (@Composable ThreePaneScaffoldScope.(PaneExpansionState) -> Unit)? =
         null,
-    paneExpansionState: PaneExpansionState = rememberPaneExpansionState(navigator.scaffoldValue),
+    paneExpansionState: PaneExpansionState? = null,
 ) {
     val predictiveBackScale = remember { Animatable(initialValue = 1f) }
 
@@ -104,7 +105,9 @@ fun <T> NavigableListDetailPaneScaffold(
  *   happens. See [BackNavigationBehavior] for the use cases of each behavior.
  * @param paneExpansionDragHandle the pane expansion drag handle to allow users to drag to change
  *   pane expansion state, `null` by default.
- * @param paneExpansionState the state object of pane expansion.
+ * @param paneExpansionState the state object of pane expansion; when no value is provided but
+ *   [paneExpansionDragHandle] is not `null`, a default implementation will be created for the drag
+ *   handle to use.
  */
 @ExperimentalMaterial3AdaptiveApi
 @Composable
@@ -117,7 +120,7 @@ fun <T> NavigableSupportingPaneScaffold(
     defaultBackBehavior: BackNavigationBehavior = BackNavigationBehavior.PopUntilContentChange,
     paneExpansionDragHandle: (@Composable ThreePaneScaffoldScope.(PaneExpansionState) -> Unit)? =
         null,
-    paneExpansionState: PaneExpansionState = rememberPaneExpansionState(navigator.scaffoldValue),
+    paneExpansionState: PaneExpansionState? = null,
 ) {
     val predictiveBackScale = remember { Animatable(initialValue = 1f) }
 
