@@ -206,7 +206,7 @@ class SnapshotStateObserverBenchmark : ComposeBenchmarkBase() {
         }
     }
 
-    private fun runOnUiThread(block: () -> Unit) = activityRule.runOnUiThread(block)
+    private fun runOnUiThread(block: () -> Unit) = activityScenario.onActivity { block() }
 
     private fun setupObservations() = nodes.forEach { observeForNode(it) }
 
