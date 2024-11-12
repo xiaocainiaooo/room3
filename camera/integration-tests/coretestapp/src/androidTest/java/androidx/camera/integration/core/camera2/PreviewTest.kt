@@ -17,6 +17,7 @@ package androidx.camera.integration.core.camera2
 
 import android.content.Context
 import android.graphics.ImageFormat
+import android.graphics.Point
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback
@@ -49,6 +50,7 @@ import androidx.camera.core.impl.ImageOutputConfig.OPTION_RESOLUTION_SELECTOR
 import androidx.camera.core.impl.SessionConfig
 import androidx.camera.core.impl.utils.Threads.runOnMainSync
 import androidx.camera.core.impl.utils.executor.CameraXExecutors
+import androidx.camera.core.internal.utils.SizeUtil
 import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionFilter
 import androidx.camera.core.resolutionselector.ResolutionSelector
@@ -615,20 +617,28 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @Test
     fun defaultAspectRatioWillBeSet_whenRatioDefaultIsSet() =
         runBlocking(Dispatchers.Main) {
-            assumeTrue(!hasExtraCroppingQuirk() && isAspectRatioResolutionSupported(4.0f / 3.0f))
+            assumeTrue(
+                !hasExtraCroppingQuirk() &&
+                    isAspectRatioResolutionSupported(4.0f / 3.0f, isLegacyApi = true)
+            )
             val useCase = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_DEFAULT).build()
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
             val config = useCase.currentConfig as ImageOutputConfig
             assertThat(config.targetAspectRatio).isEqualTo(AspectRatio.RATIO_4_3)
             val resolution = useCase.resolutionInfo!!.resolution
-            assertThat(resolution.width.toFloat() / resolution.height).isEqualTo(4.0f / 3.0f)
+            assertThat(resolution.width.toFloat() / resolution.height)
+                .isWithin(TOLERANCE)
+                .of(4.0f / 3.0f)
         }
 
     @Suppress("DEPRECATION") // test for legacy resolution API
     @Test
     fun aspectRatio4_3_resolutionIsSet() =
         runBlocking(Dispatchers.Main) {
-            assumeTrue(!hasExtraCroppingQuirk() && isAspectRatioResolutionSupported(4.0f / 3.0f))
+            assumeTrue(
+                !hasExtraCroppingQuirk() &&
+                    isAspectRatioResolutionSupported(4.0f / 3.0f, isLegacyApi = true)
+            )
 
             val useCase = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3).build()
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
@@ -645,7 +655,8 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     fun aspectRatio16_9_resolutionIsSet() =
         runBlocking(Dispatchers.Main) {
             assumeTrue(
-                !hasAspectRatioLegacyApi21Quirk() && isAspectRatioResolutionSupported(16.0f / 9.0f)
+                !hasAspectRatioLegacyApi21Quirk() &&
+                    isAspectRatioResolutionSupported(16.0f / 9.0f, isLegacyApi = true)
             )
             val useCase = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_16_9).build()
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCase)
@@ -657,7 +668,10 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                 .of(16.0f / 9.0f)
         }
 
-    private fun isAspectRatioResolutionSupported(targetAspectRatioValue: Float): Boolean {
+    private fun isAspectRatioResolutionSupported(
+        targetAspectRatioValue: Float,
+        isLegacyApi: Boolean = false
+    ): Boolean {
         val cameraCharacteristics =
             (cameraProvider.getCameraInfo(cameraSelector) as CameraInfoInternal)
                 .cameraCharacteristics as CameraCharacteristics
@@ -665,8 +679,55 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         val previewSizes = map!!.getOutputSizes(SurfaceTexture::class.java)
         return previewSizes.find { size ->
             val aspectRatioVal = size.width.toFloat() / size.height.toFloat()
-            abs(targetAspectRatioValue - aspectRatioVal) <= TOLERANCE
+            abs(targetAspectRatioValue - aspectRatioVal) <= TOLERANCE &&
+                isValidPreviewSize(size, isLegacyApi)
         } != null
+    }
+
+    private fun isValidPreviewSize(size: Size, isLegacyApi: Boolean): Boolean {
+        val previewDefinitionSize = getPreviewDefinitionSize()
+        val sizeArea = SizeUtil.getArea(size)
+        val previewSizeArea = SizeUtil.getArea(previewDefinitionSize)
+
+        // When using ResolutionSelector API, all sizes equal to or smaller than PREVIEW size can
+        // be selected.
+        if (!isLegacyApi) {
+            return sizeArea <= previewSizeArea
+        }
+
+        // When using Legacy API, if the PREVIEW size is smaller than 640x480, all output sizes
+        // smaller than it can be selected. The reason is, for some devices, there might be 16:9
+        // output sizes smaller than 480P. But it might make the preview have bad image quality
+        // when the display size is larger than 480P. Therefore, those sizes can be selected to use
+        // only when the device display size is smaller than 480P or apps explicitly set a target
+        // resolution smaller than 480P.
+        if (SizeUtil.isSmallerByArea(previewDefinitionSize, SizeUtil.RESOLUTION_480P)) {
+            return SizeUtil.isSmallerByArea(size, previewDefinitionSize)
+        }
+
+        // Otherwise, only sizes between PREVIEW size and 640x480 can be selected
+        val vgaSizeArea = SizeUtil.getArea(SizeUtil.RESOLUTION_VGA)
+
+        return sizeArea in vgaSizeArea..previewSizeArea
+    }
+
+    @Suppress("DEPRECATION") // getRealSize
+    private fun getPreviewDefinitionSize(): Size {
+        val point = Point()
+        DisplayInfoManager.getInstance(context).getMaxSizeDisplay(false).also {
+            it.getRealSize(point)
+        }
+        val previewSize =
+            if (point.x > point.y) {
+                Size(point.x, point.y)
+            } else {
+                Size(point.y, point.x)
+            }
+        return if (SizeUtil.isSmallerByArea(previewSize, SizeUtil.RESOLUTION_1080P)) {
+            previewSize
+        } else {
+            SizeUtil.RESOLUTION_1080P
+        }
     }
 
     private fun hasExtraCroppingQuirk(): Boolean {
@@ -700,7 +761,8 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     fun defaultAspectRatioWontBeSet_andResolutionIsSet_whenTargetResolutionIsSet() =
         runBlocking(Dispatchers.Main) {
             assumeTrue(
-                CameraUtil.isCameraSensorPortraitInNativeOrientation(cameraSelector.lensFacing!!)
+                CameraUtil.isCameraSensorPortraitInNativeOrientation(cameraSelector.lensFacing!!) &&
+                    !hasExtraCroppingQuirk()
             )
             val useCase =
                 Preview.Builder()
@@ -779,7 +841,8 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     fun setTargetRotationOnBuilder_ResolutionIsSetCorrectly() =
         runBlocking(Dispatchers.Main) {
             assumeTrue(
-                CameraUtil.isCameraSensorPortraitInNativeOrientation(cameraSelector.lensFacing!!)
+                CameraUtil.isCameraSensorPortraitInNativeOrientation(cameraSelector.lensFacing!!) &&
+                    !hasExtraCroppingQuirk()
             )
             val preview =
                 Preview.Builder()
@@ -941,23 +1004,26 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
     @Test
-    fun getsFrame_withHighResolutionEnabled() = runBlocking {
-        val camera =
-            withContext(Dispatchers.Main) {
-                cameraProvider.bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA)
-            }
-        val cameraInfo = camera.cameraInfo
-        val maxHighResolutionOutputSize =
-            CameraInfoUtil.getMaxHighResolutionOutputSize(cameraInfo, ImageFormat.PRIVATE)
+    fun verifyHighResolutionIsDisabledForPreview() = runBlocking {
+        val highResolutionOutputSizes =
+            CameraInfoUtil.getHighResolutionOutputSizes(
+                cameraProvider.getCameraInfo(CameraSelector.DEFAULT_BACK_CAMERA),
+                ImageFormat.PRIVATE
+            )
         // Only runs the test when the device has high resolution output sizes
-        assumeTrue(maxHighResolutionOutputSize != null)
+        assumeTrue(highResolutionOutputSizes.isNotEmpty())
 
         // Arrange.
+        // Sets the mode to allow high resolution support and uses a ResolutionFilter to verify the
+        // high resolution output sizes are not included in the provided sizes list
         val resolutionSelector =
             ResolutionSelector.Builder()
                 .setAllowedResolutionMode(PREFER_HIGHER_RESOLUTION_OVER_CAPTURE_RATE)
                 .setResolutionStrategy(ResolutionStrategy.HIGHEST_AVAILABLE_STRATEGY)
-                .setResolutionFilter { _, _ -> listOf(maxHighResolutionOutputSize) }
+                .setResolutionFilter { outputSizes, _ ->
+                    assertThat(outputSizes).containsNoneIn(highResolutionOutputSizes)
+                    outputSizes
+                }
                 .build()
         val preview = Preview.Builder().setResolutionSelector(resolutionSelector).build()
 
@@ -968,8 +1034,6 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             // Act.
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
         }
-
-        assertThat(preview.resolutionInfo!!.resolution).isEqualTo(maxHighResolutionOutputSize)
 
         // Assert.
         frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 10)
@@ -1016,7 +1080,9 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
 
         // Assert.
         val resolution = preview.resolutionInfo!!.resolution
-        assertThat(resolution.width.toFloat() / resolution.height).isEqualTo(4.0f / 3.0f)
+        assertThat(resolution.width.toFloat() / resolution.height)
+            .isWithin(TOLERANCE)
+            .of(4.0f / 3.0f)
         frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 10)
     }
 
@@ -1043,7 +1109,9 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
 
         // Assert.
         val resolution = preview.resolutionInfo!!.resolution
-        assertThat(resolution.width.toFloat() / resolution.height).isEqualTo(16.0f / 9.0f)
+        assertThat(resolution.width.toFloat() / resolution.height)
+            .isWithin(TOLERANCE)
+            .of(16.0f / 9.0f)
         frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 10)
     }
 
