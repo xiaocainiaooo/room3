@@ -72,6 +72,10 @@ internal class XTypeSpecImpl(
             delegates.forEach { it.addType(typeSpec) }
         }
 
+        override fun addTypeVariable(typeVariable: XTypeName) = apply {
+            delegates.forEach { it.addTypeVariable(typeVariable) }
+        }
+
         override fun setPrimaryConstructor(functionSpec: XFunSpec) = apply {
             delegates.forEach { it.setPrimaryConstructor(functionSpec) }
         }

@@ -35,6 +35,12 @@ interface XFunSpec {
 
         fun addAnnotation(annotation: XAnnotationSpec): Builder
 
+        fun addTypeVariable(typeVariable: XTypeName): Builder
+
+        fun addTypeVariables(typeVariables: List<XTypeName>) = apply {
+            typeVariables.forEach { addTypeVariable(it) }
+        }
+
         fun addAbstractModifier(): Builder
 
         fun addParameter(parameter: XParameterSpec): Builder

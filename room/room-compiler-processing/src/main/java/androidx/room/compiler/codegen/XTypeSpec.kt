@@ -42,6 +42,12 @@ interface XTypeSpec {
 
         fun addType(typeSpec: XTypeSpec): Builder
 
+        fun addTypeVariable(typeVariable: XTypeName): Builder
+
+        fun addTypeVariables(typeVariables: List<XTypeName>) = apply {
+            typeVariables.forEach { addTypeVariable(it) }
+        }
+
         fun setPrimaryConstructor(functionSpec: XFunSpec): Builder
 
         fun setVisibility(visibility: VisibilityModifier): Builder
