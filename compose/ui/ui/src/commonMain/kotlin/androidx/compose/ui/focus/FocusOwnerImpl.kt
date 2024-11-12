@@ -203,11 +203,17 @@ internal class FocusOwnerImpl(
      */
     override fun moveFocus(focusDirection: FocusDirection): Boolean {
         var requestFocusSuccess: Boolean? = false
+        val generationBefore = focusTransactionManager.generation
         val focusSearchSuccess =
             focusSearch(focusDirection, onFocusRectInterop()) {
                 requestFocusSuccess = it.requestFocus(focusDirection)
                 requestFocusSuccess ?: false
             }
+        val generationAfter = focusTransactionManager.generation
+        if (focusSearchSuccess == true && generationBefore != generationAfter) {
+            // There was a successful requestFocus() during the focusSearch
+            return true
+        }
 
         // If focus search was cancelled, or if focus search succeeded but request focus was
         // cancelled, it implies that moveFocus() failed.
