@@ -30,6 +30,7 @@ import androidx.room.compiler.codegen.impl.XAnnotationSpecImpl
 import androidx.room.compiler.codegen.impl.XCodeBlockImpl
 import androidx.room.compiler.codegen.impl.XParameterSpecImpl
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.javapoet.KTypeVariableName
 
 internal class KotlinFunSpec(internal val actual: KFunSpec) : XSpec(), XFunSpec {
     override val name: XName = XName.of(actual.name)
@@ -40,6 +41,11 @@ internal class KotlinFunSpec(internal val actual: KFunSpec) : XSpec(), XFunSpec 
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
             require(annotation is XAnnotationSpecImpl)
             actual.addAnnotation(annotation.kotlin.actual)
+        }
+
+        override fun addTypeVariable(typeVariable: XTypeName) = apply {
+            require(typeVariable.kotlin is KTypeVariableName)
+            actual.addTypeVariable(typeVariable.kotlin as KTypeVariableName)
         }
 
         override fun addAbstractModifier() = apply { actual.addModifiers(KModifier.ABSTRACT) }

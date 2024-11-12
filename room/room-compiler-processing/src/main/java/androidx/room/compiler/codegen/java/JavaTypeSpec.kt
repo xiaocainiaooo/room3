@@ -32,6 +32,7 @@ import androidx.room.compiler.codegen.impl.XTypeSpecImpl
 import androidx.room.compiler.processing.XElement
 import androidx.room.compiler.processing.addOriginatingElement
 import com.squareup.kotlinpoet.javapoet.JTypeSpec
+import com.squareup.kotlinpoet.javapoet.JTypeVariableName
 import javax.lang.model.element.Modifier
 
 internal class JavaTypeSpec(internal val actual: JTypeSpec) : XSpec(), XTypeSpec {
@@ -63,6 +64,11 @@ internal class JavaTypeSpec(internal val actual: JTypeSpec) : XSpec(), XTypeSpec
         override fun addType(typeSpec: XTypeSpec) = apply {
             require(typeSpec is XTypeSpecImpl)
             actual.addType(typeSpec.java.actual)
+        }
+
+        override fun addTypeVariable(typeVariable: XTypeName) = apply {
+            require(typeVariable.java is JTypeVariableName)
+            actual.addTypeVariable(typeVariable.java as JTypeVariableName)
         }
 
         override fun setPrimaryConstructor(functionSpec: XFunSpec) = addFunction(functionSpec)
