@@ -27,6 +27,12 @@ package androidx.navigation3 {
 
   public final class Record {
     ctor public Record(Object key, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit> content);
+    method public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit> getContent();
+    method public java.util.Map<java.lang.String,java.lang.Object> getFeatureMap();
+    method public Object getKey();
+    property public final kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit> content;
+    property public final java.util.Map<java.lang.String,java.lang.Object> featureMap;
+    property public final Object key;
   }
 
   public final class SaveableStateNavContentWrapper implements androidx.navigation3.NavContentWrapper {
