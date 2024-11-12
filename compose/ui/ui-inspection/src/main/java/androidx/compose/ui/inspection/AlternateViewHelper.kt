@@ -31,6 +31,10 @@ private const val PANEL_ENTITY_IMPL_CLASS =
     "com.google.vr.realitycore.runtime.androidxr.PanelEntityImpl"
 private const val JXR_CORE_SESSION_CLASS = "com.google.vr.androidx.xr.core.Session"
 
+private const val PANEL_ENTITY_CLASS_ANDROIDX = "androidx.xr.scenecore.PanelEntity"
+private const val PANEL_ENTITY_IMPL_CLASS_ANDROIDX = "androidx.xr.scenecore.PanelEntityImpl"
+private const val JXR_CORE_SESSION_CLASS_ANDROIDX = "androidx.xr.scenecore.Session"
+
 private const val GET_ENTITIES_OF_TYPE_METHOD = "getEntitiesOfType"
 private const val IS_HIDDEN_METHOD = "isHidden"
 
@@ -50,7 +54,7 @@ class AlternateViewHelper(private val environment: InspectorEnvironment) {
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun getExtraViewsImpl(): List<View> {
-        val sessionClass = loadClass(JXR_CORE_SESSION_CLASS)
+        val sessionClass = loadClass(JXR_CORE_SESSION_CLASS, JXR_CORE_SESSION_CLASS_ANDROIDX)
         val xrSessions = environment.artTooling().findInstances(sessionClass)
         return xrSessions.flatMap { getSessionViews(it) }
     }
@@ -60,7 +64,7 @@ class AlternateViewHelper(private val environment: InspectorEnvironment) {
     private fun getSessionViews(session: Any): List<View> {
         val entitiesFun =
             loadMethod(session.javaClass, GET_ENTITIES_OF_TYPE_METHOD, Class::class.java)
-        val entityClass = loadClass(PANEL_ENTITY_CLASS)
+        val entityClass = loadClass(PANEL_ENTITY_CLASS, PANEL_ENTITY_CLASS_ANDROIDX)
         val entities = entitiesFun.invoke(session, entityClass) as List<*>
         return entities.mapNotNull { entity -> entity?.let { getView(it) } }
     }
@@ -101,7 +105,7 @@ class AlternateViewHelper(private val environment: InspectorEnvironment) {
     @RequiresApi(Build.VERSION_CODES.R)
     private fun getRuntimeEntityView(instance: Any): View? {
         val clazz = instance.javaClass
-        if (clazz.name != PANEL_ENTITY_IMPL_CLASS) {
+        if (clazz.name !in listOf(PANEL_ENTITY_IMPL_CLASS, PANEL_ENTITY_IMPL_CLASS_ANDROIDX)) {
             return null
         }
         val surfaceControlViewHostField = loadField(clazz, SURFACE_CONTROL_VIEW_HOST_FIELD)
@@ -145,7 +149,12 @@ class AlternateViewHelper(private val environment: InspectorEnvironment) {
         return results
     }
 
-    private fun loadClass(name: String): Class<*> = activity.classLoader.loadClass(name)
+    private fun loadClass(name: String, alternateName: String): Class<*> =
+        try {
+            activity.classLoader.loadClass(name)
+        } catch (ex: ClassNotFoundException) {
+            activity.classLoader.loadClass(alternateName)
+        }
 
     private fun loadMethod(cls: Class<*>, name: String, vararg args: Class<*>): Method =
         cls.getDeclaredMethod(name, *args).apply { isAccessible = true }
