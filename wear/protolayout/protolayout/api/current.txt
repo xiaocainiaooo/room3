@@ -1481,3 +1481,26 @@ package androidx.wear.protolayout {
 
 }
 
+package androidx.wear.protolayout.types {
+
+  public final class LayoutString {
+    ctor public LayoutString(String staticValue);
+    ctor @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public LayoutString(String staticValue, androidx.wear.protolayout.expression.DynamicBuilders.DynamicString dynamicValue, androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint layoutConstraint);
+    method public androidx.wear.protolayout.expression.DynamicBuilders.DynamicString? getDynamicValue();
+    method public androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint? getLayoutConstraint();
+    method public String getStaticValue();
+    property public final androidx.wear.protolayout.expression.DynamicBuilders.DynamicString? dynamicValue;
+    property public final androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint? layoutConstraint;
+    property public final String staticValue;
+  }
+
+  public final class LayoutStringKt {
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint asLayoutConstraint(String, optional int alignment);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.types.LayoutString asLayoutString(androidx.wear.protolayout.expression.DynamicBuilders.DynamicString, String staticValue, androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint layoutConstraint);
+    method public static androidx.wear.protolayout.types.LayoutString getLayoutString(String);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint stringLayoutConstraint(String longestPattern);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint stringLayoutConstraint(String longestPattern, optional int alignment);
+  }
+
+}
+
