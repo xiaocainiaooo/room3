@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,11 @@
 
 package androidx.compose.material3
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.internal.ProvideContentColorTextStyle
-import androidx.compose.material3.tokens.DatePickerModalTokens
-import androidx.compose.material3.tokens.DialogTokens
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 
 /**
@@ -61,8 +48,8 @@ import androidx.compose.ui.window.DialogProperties
  * @param properties typically platform specific properties to further configure the dialog
  * @param content the content of the dialog (i.e. a [DatePicker], for example)
  */
-@ExperimentalMaterial3Api
 @Composable
+@ExperimentalMaterial3Api
 actual fun DatePickerDialog(
     onDismissRequest: () -> Unit,
     confirmButton: @Composable () -> Unit,
@@ -73,47 +60,4 @@ actual fun DatePickerDialog(
     colors: DatePickerColors,
     properties: DialogProperties,
     content: @Composable ColumnScope.() -> Unit
-) {
-    BasicAlertDialog(
-        onDismissRequest = onDismissRequest,
-        modifier = modifier.wrapContentHeight(),
-        properties = properties
-    ) {
-        Surface(
-            modifier =
-                Modifier.requiredWidth(DatePickerModalTokens.ContainerWidth)
-                    .heightIn(max = DatePickerModalTokens.ContainerHeight),
-            shape = shape,
-            color = colors.containerColor,
-            tonalElevation = tonalElevation,
-        ) {
-            Column(verticalArrangement = Arrangement.SpaceBetween) {
-                // Wrap the content with a Box and Modifier.weight(1f) to ensure that any "confirm"
-                // and "dismiss" buttons are not pushed out of view when running on small screens,
-                // or when nesting a DateRangePicker.
-                // Fill is false to support collapsing the dialog's height when switching to input
-                // mode.
-                Box(Modifier.weight(1f, fill = false)) { this@Column.content() }
-                // Buttons
-                Box(modifier = Modifier.align(Alignment.End).padding(DialogButtonsPadding)) {
-                    ProvideContentColorTextStyle(
-                        contentColor = DialogTokens.ActionLabelTextColor.value,
-                        textStyle = DialogTokens.ActionLabelTextFont.value
-                    ) {
-                        AlertDialogFlowRow(
-                            mainAxisSpacing = DialogButtonsMainAxisSpacing,
-                            crossAxisSpacing = DialogButtonsCrossAxisSpacing
-                        ) {
-                            dismissButton?.invoke()
-                            confirmButton()
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-private val DialogButtonsPadding = PaddingValues(bottom = 8.dp, end = 6.dp)
-private val DialogButtonsMainAxisSpacing = 8.dp
-private val DialogButtonsCrossAxisSpacing = 12.dp
+): Unit = implementedInJetBrainsFork()
