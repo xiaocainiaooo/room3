@@ -61,6 +61,7 @@ val WearMaterial3Demos =
                         ComposableDemo("Avatar Button") { AvatarButtonDemo() },
                         ComposableDemo("Button (Image Background)") { ButtonBackgroundImageDemo() },
                         ComposableDemo("Button Stack") { ButtonStackDemo() },
+                        ComposableDemo("Button Merge") { ButtonMergeDemo() },
                     )
                 ),
                 ComposableDemo("Color Scheme") { ColorSchemeDemos() },
