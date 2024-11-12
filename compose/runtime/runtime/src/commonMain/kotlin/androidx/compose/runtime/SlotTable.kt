@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
+
 package androidx.compose.runtime
 
 import androidx.collection.MutableIntList
@@ -1173,7 +1175,7 @@ internal class SlotReader(
     }
 
     override fun toString(): String =
-        "SlotReader(current=$currentGroup, key=$groupKey, " + "parent=$parent, end=$currentEnd)"
+        "SlotReader(current=$currentGroup, key=$groupKey, parent=$parent, end=$currentEnd)"
 
     /** Create an anchor to the current reader location or [index]. */
     fun anchor(index: Int = currentGroup) =
@@ -1603,7 +1605,6 @@ internal class SlotWriter(
     }
 
     /** Set the group's slot at [index] to [value]. Returns the previous value. */
-    @Suppress("NOTHING_TO_INLINE")
     inline fun set(index: Int, value: Any?): Any? = set(currentGroup, index, value)
 
     /** Convert a slot group index into a global slot index. */
@@ -3142,10 +3143,12 @@ internal class SlotWriter(
         get() = groups.size / Group_Fields_Size
 
     private fun groupIndexToAddress(index: Int) =
-        if (index < groupGapStart) index else index + groupGapLen
+        // Branch-less if (index < groupGapStart) index else index + groupGapLen
+        index + groupGapLen * if (index < groupGapStart) 0 else 1
 
     private fun dataIndexToDataAddress(dataIndex: Int) =
-        if (dataIndex < slotsGapStart) dataIndex else dataIndex + slotsGapLen
+        // Branch-less if (dataIndex < slotsGapStart) dataIndex else dataIndex + slotsGapLen
+        dataIndex + slotsGapLen * if (dataIndex < slotsGapStart) 0 else 1
 
     private fun IntArray.parent(index: Int) =
         parentAnchorToIndex(parentAnchor(groupIndexToAddress(index)))
@@ -3567,12 +3570,15 @@ private const val Group_Fields_Size = 5
 
 // Masks and flags
 private const val NodeBit_Mask = 0b0100_0000_0000_0000__0000_0000_0000_0000
+private const val NodeBit_Shift = 30
 private const val ObjectKey_Mask = 0b0010_0000_0000_0000__0000_0000_0000_0000
 private const val ObjectKey_Shift = 29
 private const val Aux_Mask = 0b0001_0000_0000_0000__0000_0000_0000_0000
 private const val Aux_Shift = 28
 private const val Mark_Mask = 0b0000_1000_0000_0000__0000_0000_0000_0000
+private const val Mark_Shift = 27
 private const val ContainsMark_Mask = 0b0000_0100_0000_0000__0000_0000_0000_0000
+private const val ContainsMark_Shift = 26
 private const val Slots_Shift = Aux_Shift
 private const val NodeCount_Mask = 0b0000_0011_1111_1111__1111_1111_1111_1111
 
@@ -3584,15 +3590,16 @@ private const val MinGroupGrowthSize = 32
 // The minimum number of data slots to allocate in the data slot table
 private const val MinSlotsGrowthSize = 32
 
-private fun IntArray.groupInfo(address: Int): Int =
+private inline fun IntArray.groupInfo(address: Int): Int =
     this[address * Group_Fields_Size + GroupInfo_Offset]
 
-private fun IntArray.isNode(address: Int) =
+private inline fun IntArray.isNode(address: Int) =
     this[address * Group_Fields_Size + GroupInfo_Offset] and NodeBit_Mask != 0
 
-private fun IntArray.nodeIndex(address: Int) = this[address * Group_Fields_Size + DataAnchor_Offset]
+private inline fun IntArray.nodeIndex(address: Int) =
+    this[address * Group_Fields_Size + DataAnchor_Offset]
 
-private fun IntArray.hasObjectKey(address: Int) =
+private inline fun IntArray.hasObjectKey(address: Int) =
     this[address * Group_Fields_Size + GroupInfo_Offset] and ObjectKey_Mask != 0
 
 private fun IntArray.objectKeyIndex(address: Int) =
@@ -3601,7 +3608,7 @@ private fun IntArray.objectKeyIndex(address: Int) =
             countOneBits(this[slot + GroupInfo_Offset] shr (ObjectKey_Shift + 1))
     }
 
-private fun IntArray.hasAux(address: Int) =
+private inline fun IntArray.hasAux(address: Int) =
     this[address * Group_Fields_Size + GroupInfo_Offset] and Aux_Mask != 0
 
 private fun IntArray.addAux(address: Int) {
@@ -3609,31 +3616,26 @@ private fun IntArray.addAux(address: Int) {
     this[arrayIndex] = this[arrayIndex] or Aux_Mask
 }
 
-private fun IntArray.hasMark(address: Int) =
+private inline fun IntArray.hasMark(address: Int) =
     this[address * Group_Fields_Size + GroupInfo_Offset] and Mark_Mask != 0
 
 private fun IntArray.updateMark(address: Int, value: Boolean) {
     val arrayIndex = address * Group_Fields_Size + GroupInfo_Offset
-    if (value) {
-        this[arrayIndex] = this[arrayIndex] or Mark_Mask
-    } else {
-        this[arrayIndex] = this[arrayIndex] and Mark_Mask.inv()
-    }
+    val element = this[arrayIndex]
+    this[arrayIndex] = (element and Mark_Mask.inv()) or (value.toBit() shl Mark_Shift)
 }
 
-private fun IntArray.containsMark(address: Int) =
+private inline fun IntArray.containsMark(address: Int) =
     this[address * Group_Fields_Size + GroupInfo_Offset] and ContainsMark_Mask != 0
 
 private fun IntArray.updateContainsMark(address: Int, value: Boolean) {
     val arrayIndex = address * Group_Fields_Size + GroupInfo_Offset
-    if (value) {
-        this[arrayIndex] = this[arrayIndex] or ContainsMark_Mask
-    } else {
-        this[arrayIndex] = this[arrayIndex] and ContainsMark_Mask.inv()
-    }
+    val element = this[arrayIndex]
+    this[arrayIndex] =
+        (element and ContainsMark_Mask.inv()) or (value.toBit() shl ContainsMark_Shift)
 }
 
-private fun IntArray.containsAnyMark(address: Int) =
+private inline fun IntArray.containsAnyMark(address: Int) =
     this[address * Group_Fields_Size + GroupInfo_Offset] and (ContainsMark_Mask or Mark_Mask) != 0
 
 private fun IntArray.auxIndex(address: Int) =
@@ -3649,26 +3651,15 @@ private fun IntArray.slotAnchor(address: Int) =
         this[slot + DataAnchor_Offset] + countOneBits(this[slot + GroupInfo_Offset] shr Slots_Shift)
     }
 
-// Count the 1 bits of value less than 8
-private fun countOneBits(value: Int) =
-    when (value) {
-        0 -> 0
-        1 -> 1
-        2 -> 1
-        3 -> 2
-        4 -> 1
-        5 -> 2
-        6 -> 2
-        else -> 3
-    }
+private inline fun countOneBits(value: Int) = value.countOneBits()
 
 // Key access
-private fun IntArray.key(address: Int) = this[address * Group_Fields_Size]
+private inline fun IntArray.key(address: Int) = this[address * Group_Fields_Size]
 
 private fun IntArray.keys(len: Int = size) = slice(Key_Offset until len step Group_Fields_Size)
 
 // Node count access
-private fun IntArray.nodeCount(address: Int) =
+private inline fun IntArray.nodeCount(address: Int) =
     this[address * Group_Fields_Size + GroupInfo_Offset] and NodeCount_Mask
 
 private fun IntArray.updateNodeCount(address: Int, value: Int) {
@@ -3682,10 +3673,10 @@ private fun IntArray.nodeCounts(len: Int = size) =
     slice(GroupInfo_Offset until len step Group_Fields_Size).fastMap { it and NodeCount_Mask }
 
 // Parent anchor
-private fun IntArray.parentAnchor(address: Int) =
+private inline fun IntArray.parentAnchor(address: Int) =
     this[address * Group_Fields_Size + ParentAnchor_Offset]
 
-private fun IntArray.updateParentAnchor(address: Int, value: Int) {
+private inline fun IntArray.updateParentAnchor(address: Int, value: Int) {
     this[address * Group_Fields_Size + ParentAnchor_Offset] = value
 }
 
@@ -3713,10 +3704,10 @@ private fun IntArray.groupSizes(len: Int = size) =
     slice(Size_Offset until len step Group_Fields_Size)
 
 // Data anchor access
-private fun IntArray.dataAnchor(address: Int) =
+private inline fun IntArray.dataAnchor(address: Int) =
     this[address * Group_Fields_Size + DataAnchor_Offset]
 
-private fun IntArray.updateDataAnchor(address: Int, anchor: Int) {
+private inline fun IntArray.updateDataAnchor(address: Int, anchor: Int) {
     this[address * Group_Fields_Size + DataAnchor_Offset] = anchor
 }
 
@@ -3733,16 +3724,21 @@ private fun IntArray.initGroup(
     parentAnchor: Int,
     dataAnchor: Int
 ) {
-    val nodeBit = if (isNode) NodeBit_Mask else 0
-    val dataKeyBit = if (hasDataKey) ObjectKey_Mask else 0
-    val dataBit = if (hasData) Aux_Mask else 0
     val arrayIndex = address * Group_Fields_Size
     this[arrayIndex + Key_Offset] = key
-    this[arrayIndex + GroupInfo_Offset] = nodeBit or dataKeyBit or dataBit
+    // We turn each boolean into its corresponding bit field at the same time as we "or"
+    // the fields together so we the generated aarch64 code can use left shifted operands
+    // in the "orr" instructions directly.
+    this[arrayIndex + GroupInfo_Offset] =
+        (isNode.toBit() shl NodeBit_Shift) or
+            (hasDataKey.toBit() shl ObjectKey_Shift) or
+            (hasData.toBit() shl Aux_Shift)
     this[arrayIndex + ParentAnchor_Offset] = parentAnchor
     this[arrayIndex + Size_Offset] = 0
     this[arrayIndex + DataAnchor_Offset] = dataAnchor
 }
+
+private inline fun Boolean.toBit() = if (this) 1 else 0
 
 private fun IntArray.updateGroupKey(
     address: Int,
@@ -3776,7 +3772,7 @@ private fun ArrayList<Anchor>.search(location: Int, effectiveSize: Int): Int {
     var high = size - 1
 
     while (low <= high) {
-        val mid = (low + high).ushr(1) // safe from overflows
+        val mid = (low + high) ushr 1 // safe from overflows
         val midVal = get(mid).location.let { if (it < 0) effectiveSize + it else it }
         val cmp = midVal.compareTo(location)
 
