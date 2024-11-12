@@ -37,6 +37,7 @@ import androidx.core.telecom.CallControlScope
 import androidx.core.telecom.CallEndpointCompat
 import androidx.core.telecom.CallException
 import androidx.core.telecom.internal.utils.EndpointUtils
+import androidx.core.telecom.internal.utils.EndpointUtils.Companion.getMaskedMacAddress
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.getSpeakerEndpoint
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.isBluetoothAvailable
 import androidx.core.telecom.internal.utils.EndpointUtils.Companion.isEarpieceEndpoint
@@ -439,7 +440,8 @@ internal class CallSessionLegacy(
 
     @Suppress("deprecation")
     @RequiresApi(VERSION_CODES.P)
-    private object Api28PlusImpl {
+    @VisibleForTesting
+    internal object Api28PlusImpl {
         @JvmStatic
         fun setAudio(
             callEndpoint: CallEndpointCompat,
@@ -474,18 +476,39 @@ internal class CallSessionLegacy(
             endpoint: CallEndpointCompat
         ): BluetoothDevice? {
             for (btDevice in btCacheList) {
-                if (bluetoothDeviceMatchesEndpoint(btDevice, endpoint)) {
+                var btName = ""
+                try {
+                    btName = btDevice.name
+                } catch (se: SecurityException) {
+                    // fall through
+                }
+                if (bluetoothDeviceMatchesEndpoint(btName, btDevice.address, endpoint)) {
                     return btDevice
                 }
             }
             return null
         }
 
-        fun bluetoothDeviceMatchesEndpoint(
-            btDevice: BluetoothDevice,
+        @VisibleForTesting
+        internal fun bluetoothDeviceMatchesEndpoint(
+            btName: String?,
+            btAddress: String?,
             endpoint: CallEndpointCompat
         ): Boolean {
-            return (btDevice.address?.equals(endpoint.mMackAddress) ?: false)
+            Log.i(
+                "bDME",
+                "{btName=[$btName], btAddress=${getMaskedMacAddress(btAddress)}}," +
+                    "{eName=[${endpoint.name}], eAddress=${getMaskedMacAddress(endpoint.mMackAddress)}}"
+            )
+            // If both endpoints have a populated mac address, we should match on that
+            return if (
+                endpoint.mMackAddress != CallEndpointCompat.UNKNOWN_MAC_ADDRESS && btAddress != null
+            ) {
+                endpoint.mMackAddress == btAddress
+            } else {
+                // otherwise, match on the bluetooth name
+                endpoint.name == btName
+            }
         }
     }
 
