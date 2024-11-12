@@ -65,9 +65,9 @@ data class Dashboard(val userId: String? = "no value given") {
 }
 
 @Composable
-fun Profile(viewModel: ProfileViewModel, navigateTo: (Any) -> Unit, onBack: () -> Unit) {
+fun Profile(navigateTo: (Any) -> Unit, onBack: () -> Unit) {
     Column(Modifier.fillMaxSize().then(Modifier.padding(8.dp))) {
-        Text(text = "${viewModel.name} ${stringResource(Profile.resourceId)}")
+        Text(text = stringResource(Profile.resourceId))
         NavigateButton(stringResource(Dashboard.resourceId)) { navigateTo(Dashboard()) }
         Divider(color = Color.Black)
         NavigateButton(stringResource(Scrollable.resourceId)) { navigateTo(Scrollable) }
