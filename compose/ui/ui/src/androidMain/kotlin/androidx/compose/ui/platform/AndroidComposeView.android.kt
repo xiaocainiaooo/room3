@@ -354,7 +354,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
             // cancelled.
             val focusWasMovedOrCancelled =
                 focusOwner.focusSearch(focusDirection, focusedRect) {
-                    it.requestFocus(focusDirection) ?: true
+                    it.requestFocus(focusDirection)
                 } ?: true
             if (focusWasMovedOrCancelled) return@onKeyEvent true
 
@@ -392,7 +392,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
             // Perform wrap-around focus search by running a focus search after clearing focus.
             return@onKeyEvent focusOwner.focusSearch(focusDirection, null) {
-                it.requestFocus(focusDirection) ?: true
+                it.requestFocus(focusDirection)
             } ?: true
         }
 
@@ -925,7 +925,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
             focusDirection = focusDirection,
             focusedRect = previouslyFocusedRect?.toComposeRect()
         ) {
-            it.requestFocus(focusDirection) ?: false
+            it.requestFocus(focusDirection)
         } ?: false
     }
 
