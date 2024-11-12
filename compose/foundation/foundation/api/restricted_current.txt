@@ -1697,21 +1697,9 @@ package androidx.compose.foundation.text {
     field public static final androidx.compose.foundation.text.AutoSizeDefaults INSTANCE;
   }
 
-  @kotlin.jvm.JvmInline public final value class AutofillHighlight {
-    ctor public AutofillHighlight(long autofillHighlightColor);
-    method public long getAutofillHighlightColor();
-    property public final long autofillHighlightColor;
-    field public static final androidx.compose.foundation.text.AutofillHighlight.Companion Companion;
-  }
-
-  public static final class AutofillHighlight.Companion {
-    method public long getDefault();
-    property public final long Default;
-  }
-
   public final class AutofillHighlightKt {
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.text.AutofillHighlight> getLocalAutofillHighlight();
-    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.text.AutofillHighlight> LocalAutofillHighlight;
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.graphics.Color> getLocalAutofillHighlightColor();
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.graphics.Color> LocalAutofillHighlightColor;
   }
 
   public final class BasicSecureTextFieldKt {
