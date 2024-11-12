@@ -801,6 +801,7 @@ includeProject(":lifecycle:lifecycle-viewmodel-ktx", [BuildType.MAIN, BuildType.
 includeProject(":lifecycle:lifecycle-viewmodel-savedstate", [BuildType.MAIN, BuildType.FLAN, BuildType.COMPOSE, BuildType.KMP])
 includeProject(":lifecycle:lifecycle-viewmodel-savedstate-samples", [BuildType.MAIN, BuildType.FLAN, BuildType.COMPOSE, BuildType.KMP])
 includeProject(":lifecycle:lifecycle-viewmodel-testing", [BuildType.MAIN, BuildType.FLAN, BuildType.COMPOSE, BuildType.INFRAROGUE, BuildType.KMP])
+includeProject(":lifecycle:lifecycle-viewmodel-navigation3", [BuildType.COMPOSE])
 includeProject(":lint:lint-gradle", [BuildType.MAIN])
 includeProject(":lint-checks")
 includeProject(":lint-checks:integration-tests")

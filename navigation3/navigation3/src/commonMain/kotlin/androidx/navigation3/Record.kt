@@ -27,7 +27,7 @@ import androidx.compose.runtime.Composable
  * @param content content for this record to be displayed when this record is active
  */
 public class Record(
-    internal val key: Any,
-    internal val featureMap: Map<String, Any> = emptyMap(),
-    internal val content: @Composable (Any) -> Unit,
+    public val key: Any,
+    public val featureMap: Map<String, Any> = emptyMap(),
+    public val content: @Composable (Any) -> Unit,
 )
