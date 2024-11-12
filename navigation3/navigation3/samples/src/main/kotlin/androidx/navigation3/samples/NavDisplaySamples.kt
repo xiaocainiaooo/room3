@@ -19,9 +19,6 @@ package androidx.navigation3.samples
 import androidx.annotation.Sampled
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavContentWrapper
 import androidx.navigation3.NavDisplay
 import androidx.navigation3.Record
 import androidx.navigation3.SavedStateNavContentWrapper
@@ -31,10 +28,7 @@ import androidx.navigation3.rememberNavWrapperManager
 @Composable
 fun BasicNav() {
     val backStack = rememberMutableStateListOf(Profile)
-    val manager =
-        rememberNavWrapperManager(
-            listOf(SavedStateNavContentWrapper, ViewModelStoreNavContentWrapper)
-        )
+    val manager = rememberNavWrapperManager(listOf(SavedStateNavContentWrapper))
     NavDisplay(
         backstack = backStack,
         wrapperManager = manager,
@@ -42,10 +36,7 @@ fun BasicNav() {
     ) { key ->
         when (key) {
             Profile -> {
-                Record(Profile) {
-                    val viewModel = viewModel<ProfileViewModel>()
-                    Profile(viewModel, { backStack.add(it) }) { backStack.removeLast() }
-                }
+                Record(Profile) { Profile({ backStack.add(it) }) { backStack.removeLast() } }
             }
             Scrollable -> {
                 Record(Scrollable) { Scrollable({ backStack.add(it) }) { backStack.removeLast() } }
@@ -66,8 +57,4 @@ fun BasicNav() {
             }
         }
     }
-}
-
-class ProfileViewModel : ViewModel() {
-    val name = "no user"
 }
