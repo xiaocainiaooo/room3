@@ -22,10 +22,11 @@ import androidx.room.compiler.codegen.java.NONNULL_ANNOTATION
 import androidx.room.compiler.codegen.java.NULLABLE_ANNOTATION
 import androidx.room.compiler.codegen.kotlin.KotlinParameterSpec
 import androidx.room.compiler.processing.XNullability
-import javax.lang.model.element.Modifier
 
 interface XParameterSpec {
     val name: String
+
+    val type: XTypeName
 
     interface Builder {
         fun addAnnotation(annotation: XAnnotationSpec): Builder
@@ -38,19 +39,18 @@ interface XParameterSpec {
     }
 
     companion object {
-        @JvmStatic
-        fun of(name: String, typeName: XTypeName) = builder(XName.of(name), typeName).build()
-
-        @JvmStatic fun of(name: XName, typeName: XTypeName) = builder(name, typeName).build()
+        @JvmStatic fun of(name: String, typeName: XTypeName) = builder(name, typeName).build()
 
         @JvmStatic
-        fun builder(name: String, typeName: XTypeName) = builder(XName.of(name), typeName)
-
-        @JvmStatic
-        fun builder(name: XName, typeName: XTypeName): Builder {
+        fun builder(name: String, typeName: XTypeName): Builder {
             return XParameterSpecImpl.Builder(
+                name,
+                typeName,
                 JavaParameterSpec.Builder(
-                    JParameterSpec.builder(typeName.java, name.java, Modifier.FINAL).apply {
+                    name,
+                    typeName,
+                    JParameterSpec.builder(typeName.java, name).apply {
+                        addModifiers(JModifier.FINAL)
                         // Adding nullability annotation to primitive parameters is redundant as
                         // primitives can never be null.
                         if (!typeName.isPrimitive) {
@@ -62,7 +62,11 @@ interface XParameterSpec {
                         }
                     }
                 ),
-                KotlinParameterSpec.Builder(KParameterSpec.builder(name.kotlin, typeName.kotlin))
+                KotlinParameterSpec.Builder(
+                    name,
+                    typeName,
+                    KParameterSpec.builder(name, typeName.kotlin)
+                )
             )
         }
     }

@@ -20,22 +20,22 @@ import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XPropertySpec
 import androidx.room.compiler.codegen.XSpec
+import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.java.JavaPropertySpec
 import androidx.room.compiler.codegen.kotlin.KotlinPropertySpec
 
 internal class XPropertySpecImpl(
-    val java: JavaPropertySpec,
-    val kotlin: KotlinPropertySpec,
+    override val name: String,
+    override val type: XTypeName,
+    internal val java: JavaPropertySpec,
+    internal val kotlin: KotlinPropertySpec,
 ) : XSpec(), XPropertySpec {
 
-    override val name: String by lazy {
-        check(java.name == kotlin.name)
-        java.name
-    }
-
     internal class Builder(
-        val java: JavaPropertySpec.Builder,
-        val kotlin: KotlinPropertySpec.Builder,
+        private val name: String,
+        private val type: XTypeName,
+        internal val java: JavaPropertySpec.Builder,
+        internal val kotlin: KotlinPropertySpec.Builder
     ) : XSpec.Builder(), XPropertySpec.Builder {
         private val delegates: List<XPropertySpec.Builder> = listOf(java, kotlin)
 
@@ -47,6 +47,6 @@ internal class XPropertySpecImpl(
             delegates.forEach { it.initializer(initExpr) }
         }
 
-        override fun build() = XPropertySpecImpl(java.build(), kotlin.build())
+        override fun build() = XPropertySpecImpl(name, type, java.build(), kotlin.build())
     }
 }
