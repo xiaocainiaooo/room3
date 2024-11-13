@@ -550,6 +550,18 @@ sealed class PaneExpansionAnchor private constructor() {
 }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+internal fun rememberDefaultPaneExpansionState(
+    keyProvider: () -> PaneExpansionStateKeyProvider,
+    mutable: Boolean
+): PaneExpansionState =
+    if (mutable) {
+        rememberPaneExpansionState(keyProvider())
+    } else {
+        remember { PaneExpansionState() } // Use a stub impl to avoid performance overhead
+    }
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @VisibleForTesting
 internal fun PaneExpansionStateSaver():
     Saver<MutableMap<PaneExpansionStateKey, PaneExpansionStateData>, *> =

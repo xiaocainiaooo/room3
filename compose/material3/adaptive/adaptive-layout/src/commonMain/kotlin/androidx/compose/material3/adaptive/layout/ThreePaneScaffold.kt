@@ -78,7 +78,7 @@ internal fun ThreePaneScaffold(
     paneOrder: ThreePaneScaffoldHorizontalOrder,
     secondaryPane: @Composable ThreePaneScaffoldPaneScope.() -> Unit,
     tertiaryPane: (@Composable ThreePaneScaffoldPaneScope.() -> Unit)? = null,
-    paneExpansionState: PaneExpansionState = rememberPaneExpansionState(),
+    paneExpansionState: PaneExpansionState? = null,
     paneExpansionDragHandle: (@Composable ThreePaneScaffoldScope.(PaneExpansionState) -> Unit)? =
         null,
     primaryPane: @Composable ThreePaneScaffoldPaneScope.() -> Unit,
@@ -107,11 +107,17 @@ internal fun ThreePaneScaffold(
     paneOrder: ThreePaneScaffoldHorizontalOrder,
     secondaryPane: @Composable ThreePaneScaffoldPaneScope.() -> Unit,
     tertiaryPane: (@Composable ThreePaneScaffoldPaneScope.() -> Unit)? = null,
-    paneExpansionState: PaneExpansionState = rememberPaneExpansionState(),
+    paneExpansionState: PaneExpansionState? = null,
     paneExpansionDragHandle: (@Composable ThreePaneScaffoldScope.(PaneExpansionState) -> Unit)? =
         null,
     primaryPane: @Composable ThreePaneScaffoldPaneScope.() -> Unit,
 ) {
+    val expansionState =
+        paneExpansionState
+            ?: rememberDefaultPaneExpansionState(
+                keyProvider = { scaffoldState.targetState },
+                mutable = paneExpansionDragHandle != null
+            )
     val layoutDirection = LocalLayoutDirection.current
     val ltrPaneOrder =
         remember(paneOrder, layoutDirection) { paneOrder.toLtrOrder(layoutDirection) }
@@ -171,7 +177,7 @@ internal fun ThreePaneScaffold(
                 },
                 {
                     if (paneExpansionDragHandle != null) {
-                        scaffoldScope.paneExpansionDragHandle(paneExpansionState)
+                        scaffoldScope.paneExpansionDragHandle(expansionState)
                     }
                 }
             )
@@ -181,7 +187,7 @@ internal fun ThreePaneScaffold(
                     ThreePaneContentMeasurePolicy(
                         scaffoldDirective,
                         scaffoldState.targetState,
-                        paneExpansionState,
+                        expansionState,
                         ltrPaneOrder,
                         motionScope
                     )
