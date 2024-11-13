@@ -2254,6 +2254,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             } else {
                 userResizeBehavior.onUserResizeComplete(this@SlidingPaneLayout, dragPositionX)
             }
+            drawableStateChanged()
             invalidate()
         }
 
