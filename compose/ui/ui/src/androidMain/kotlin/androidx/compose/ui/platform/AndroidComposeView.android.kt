@@ -64,8 +64,6 @@ import android.view.translation.ViewTranslationResponse
 import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
-import androidx.collection.MutableIntObjectMap
-import androidx.collection.mutableIntObjectMapOf
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -432,12 +430,9 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
                     .then(dragAndDropManager.modifier)
         }
 
-    override val layoutNodes: MutableIntObjectMap<LayoutNode> = mutableIntObjectMapOf()
-
     override val rootForTest: RootForTest = this
 
-    override val semanticsOwner: SemanticsOwner =
-        SemanticsOwner(root, rootSemanticsNode, layoutNodes)
+    override val semanticsOwner: SemanticsOwner = SemanticsOwner(root, rootSemanticsNode)
     private val composeAccessibilityDelegate = AndroidComposeViewAccessibilityDelegateCompat(this)
     internal var contentCaptureManager =
         AndroidContentCaptureManager(
@@ -1031,12 +1026,9 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         composeAccessibilityDelegate.SendRecurringAccessibilityEventsIntervalMillis = intervalMillis
     }
 
-    override fun onAttach(node: LayoutNode) {
-        layoutNodes[node.semanticsId] = node
-    }
+    override fun onAttach(node: LayoutNode) {}
 
     override fun onDetach(node: LayoutNode) {
-        layoutNodes.remove(node.semanticsId)
         measureAndLayoutDelegate.onNodeDetached(node)
         requestClearInvalidObservations()
         @OptIn(ExperimentalComposeUiApi::class)
@@ -1614,12 +1606,6 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         if (ComposeUiFlags.isRectTrackingEnabled) {
             rectManager.remove(layoutNode)
         }
-    }
-
-    override fun onLayoutNodeIdChange(layoutNode: LayoutNode, oldSemanticsId: Int) {
-        // Keep the mapping up to date when the semanticsId changes
-        layoutNodes.remove(oldSemanticsId)
-        layoutNodes[layoutNode.semanticsId] = layoutNode
     }
 
     override fun onInteropViewLayoutChange(view: InteropView) {
