@@ -21,18 +21,26 @@ import androidx.room.compiler.codegen.KParameterSpecBuilder
 import androidx.room.compiler.codegen.XAnnotationSpec
 import androidx.room.compiler.codegen.XParameterSpec
 import androidx.room.compiler.codegen.XSpec
+import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.impl.XAnnotationSpecImpl
 
-internal class KotlinParameterSpec(internal val actual: KParameterSpec) : XSpec(), XParameterSpec {
-    override val name = actual.name
+internal class KotlinParameterSpec(
+    override val name: String,
+    override val type: XTypeName,
+    internal val actual: KParameterSpec
+) : XSpec(), XParameterSpec {
 
-    internal class Builder(internal val actual: KParameterSpecBuilder) :
-        XSpec.Builder(), XParameterSpec.Builder {
+    internal class Builder(
+        private val name: String,
+        private val type: XTypeName,
+        internal val actual: KParameterSpecBuilder
+    ) : XSpec.Builder(), XParameterSpec.Builder {
+
         override fun addAnnotation(annotation: XAnnotationSpec) = apply {
             require(annotation is XAnnotationSpecImpl)
             actual.addAnnotation(annotation.kotlin.actual)
         }
 
-        override fun build() = KotlinParameterSpec(actual.build())
+        override fun build() = KotlinParameterSpec(name, type, actual.build())
     }
 }

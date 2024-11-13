@@ -24,9 +24,7 @@ import androidx.room.compiler.codegen.JFileSpec
 import androidx.room.compiler.codegen.JFileSpecBuilder
 import androidx.room.compiler.codegen.JFunSpec
 import androidx.room.compiler.codegen.JFunSpecBuilder
-import androidx.room.compiler.codegen.JParameterSpec
 import androidx.room.compiler.codegen.JParameterSpecBuilder
-import androidx.room.compiler.codegen.JPropertySpec
 import androidx.room.compiler.codegen.JPropertySpecBuilder
 import androidx.room.compiler.codegen.JTypeSpecBuilder
 import androidx.room.compiler.codegen.KAnnotationSpecBuilder
@@ -36,9 +34,7 @@ import androidx.room.compiler.codegen.KFileSpec
 import androidx.room.compiler.codegen.KFileSpecBuilder
 import androidx.room.compiler.codegen.KFunSpec
 import androidx.room.compiler.codegen.KFunSpecBuilder
-import androidx.room.compiler.codegen.KParameterSpec
 import androidx.room.compiler.codegen.KParameterSpecBuilder
-import androidx.room.compiler.codegen.KPropertySpec
 import androidx.room.compiler.codegen.KPropertySpecBuilder
 import androidx.room.compiler.codegen.KTypeSpecBuilder
 import androidx.room.compiler.codegen.XAnnotationSpec
@@ -388,34 +384,6 @@ object XConverters {
         XFunSpecImpl.Builder(
             JavaFunSpec.Builder(jFunSpecBuilder),
             KotlinFunSpec.Builder(kFunSpecBuilder)
-        )
-
-    @JvmStatic
-    fun toXPoet(jParameterSpec: JParameterSpec, kParameterSpec: KParameterSpec): XParameterSpec =
-        XParameterSpecImpl(JavaParameterSpec(jParameterSpec), KotlinParameterSpec(kParameterSpec))
-
-    @JvmStatic
-    fun toXPoet(
-        jParameterSpecBuilder: JParameterSpecBuilder,
-        kParameterSpecBuilder: KParameterSpecBuilder
-    ): XParameterSpec.Builder =
-        XParameterSpecImpl.Builder(
-            JavaParameterSpec.Builder(jParameterSpecBuilder),
-            KotlinParameterSpec.Builder(kParameterSpecBuilder)
-        )
-
-    @JvmStatic
-    fun toXPoet(jPropertySpec: JPropertySpec, kPropertySpec: KPropertySpec): XPropertySpec =
-        XPropertySpecImpl(JavaPropertySpec(jPropertySpec), KotlinPropertySpec(kPropertySpec))
-
-    @JvmStatic
-    fun toXPoet(
-        jPropertySpecBuilder: JPropertySpecBuilder,
-        kPropertySpecBuilder: KPropertySpecBuilder
-    ): XPropertySpec.Builder =
-        XPropertySpecImpl.Builder(
-            JavaPropertySpec.Builder(jPropertySpecBuilder),
-            KotlinPropertySpec.Builder(kPropertySpecBuilder)
         )
 
     @JvmStatic
