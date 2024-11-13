@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  Copyright 2024 The Android Open Source Project
+  Copyright 2023 The Android Open Source Project
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -14,11 +14,13 @@
   limitations under the License.
   -->
 
-<resources>
-    <public type="attr" name="isOverlappingEnabled"/>
-    <public type="attr" name="isUserResizingEnabled"/>
-    <public type="attr" name="userResizingDividerDrawable"/>
-    <public type="attr" name="userResizingDividerTint"/>
-    <public type="attr" name="isChildClippingToResizeDividerEnabled"/>
-    <public type="attr" name="userResizeBehavior"/>
-</resources>
+<androidx.slidingpanelayout.widget.SlidingPaneLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:isUserResizingEnabled="true"
+    app:userResizingDividerDrawable="@android:drawable/ic_menu_add"
+    app:userResizingDividerTint="@android:color/primary_text_dark">
+
+</androidx.slidingpanelayout.widget.SlidingPaneLayout>
