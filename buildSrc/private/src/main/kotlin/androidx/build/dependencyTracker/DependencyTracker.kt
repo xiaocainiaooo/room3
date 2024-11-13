@@ -26,20 +26,20 @@ import org.gradle.api.logging.Logger
  * other. This is mainly used by [AffectedModuleDetector] to find out which projects should be run.
  */
 class DependencyTracker(rootProject: Project, logger: Logger?) : Serializable {
-    private val dependentList: Map<String, Set<String>>
+    val dependentList: Map<String, Set<String>>
 
     init {
         val result = mutableMapOf<String, MutableSet<String>>()
         val stringBuilder = StringBuilder()
         rootProject.subprojects.forEach { project ->
             project.configurations.forEach { config ->
-                config.dependencies.filterIsInstance<ProjectDependency>().forEach {
+                config.dependencies.filterIsInstance(ProjectDependency::class.java).forEach {
                     stringBuilder.append(
                         "there is a dependency from ${project.path} (${config.name}) to " +
-                            it.path +
+                            it.dependencyProject.path +
                             "\n"
                     )
-                    result.getOrPut(it.path) { mutableSetOf() }.add(project.path)
+                    result.getOrPut(it.dependencyProject.path) { mutableSetOf() }.add(project.path)
                 }
             }
         }
