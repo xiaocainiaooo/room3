@@ -1244,16 +1244,22 @@ final class SupportedSurfaceCombination {
      */
     private Size getMaxOutputSizeByFormat(StreamConfigurationMap map, int imageFormat,
             boolean highResolutionIncluded) {
-        Size[] outputSizes;
-        if (imageFormat == ImageFormatConstants.INTERNAL_DEFINED_IMAGE_FORMAT_PRIVATE) {
-            // This is a little tricky that 0x22 that is internal defined in
-            // StreamConfigurationMap.java to be equal to ImageFormat.PRIVATE that is public
-            // after Android level 23 but not public in Android L. Use {@link SurfaceTexture}
-            // or {@link MediaCodec} will finally mapped to 0x22 in StreamConfigurationMap to
-            // retrieve the output sizes information.
-            outputSizes = map.getOutputSizes(SurfaceTexture.class);
-        } else {
-            outputSizes = map.getOutputSizes(imageFormat);
+        Size[] outputSizes = null;
+        try {
+            // b/378508360: try-catch to workaround the exception when using
+            // StreamConfigurationMap provided by Robolectric.
+            if (imageFormat == ImageFormatConstants.INTERNAL_DEFINED_IMAGE_FORMAT_PRIVATE) {
+                // This is a little tricky that 0x22 that is internal defined in
+                // StreamConfigurationMap.java to be equal to ImageFormat.PRIVATE that is public
+                // after Android level 23 but not public in Android L. Use {@link SurfaceTexture}
+                // or {@link MediaCodec} will finally mapped to 0x22 in StreamConfigurationMap to
+                // retrieve the output sizes information.
+                outputSizes = map.getOutputSizes(SurfaceTexture.class);
+            } else {
+                outputSizes = map.getOutputSizes(imageFormat);
+            }
+        } catch (Throwable t) {
+            // No-Op.
         }
 
         if (outputSizes == null || outputSizes.length == 0) {
@@ -1468,8 +1474,14 @@ final class SupportedSurfaceCombination {
         // Determining the record size needs to retrieve the output size from the original stream
         // configuration map without quirks applied.
         StreamConfigurationMapCompat mapCompat = mCharacteristics.getStreamConfigurationMapCompat();
-        Size[] videoSizeArr = mapCompat.toStreamConfigurationMap().getOutputSizes(
-                MediaRecorder.class);
+        Size[] videoSizeArr = null;
+        try {
+            // b/378508360: try-catch to workaround the exception when using
+            // StreamConfigurationMap provided by Robolectric.
+            videoSizeArr = mapCompat.toStreamConfigurationMap().getOutputSizes(MediaRecorder.class);
+        } catch (Throwable t) {
+            // No-Op
+        }
 
         if (videoSizeArr == null) {
             return null;
