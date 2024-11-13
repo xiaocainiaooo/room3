@@ -20,6 +20,7 @@ import static androidx.appsearch.compiler.CodegenUtils.createNewArrayExpr;
 import static androidx.appsearch.compiler.IntrospectionHelper.APPSEARCH_EXCEPTION_CLASS;
 import static androidx.appsearch.compiler.IntrospectionHelper.DOCUMENT_CLASS_MAPPING_CONTEXT_CLASS;
 import static androidx.appsearch.compiler.IntrospectionHelper.GENERIC_DOCUMENT_CLASS;
+import static androidx.appsearch.compiler.IntrospectionHelper.isNonNullKotlinField;
 
 import androidx.annotation.NonNull;
 import androidx.appsearch.compiler.AnnotatedGetterOrField.ElementTypeCategory;
@@ -37,6 +38,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -451,14 +453,22 @@ class FromGenericDocumentCodeGenerator {
     private CodeBlock listCallArraysAsList(
             @NonNull DataPropertyAnnotation annotation,
             @NonNull AnnotatedGetterOrField getterOrField) {
-        return CodeBlock.builder()
+        boolean isNonNull = isNonNullKotlinField(getterOrField);
+        CodeBlock.Builder builder = CodeBlock.builder()
                 .addStatement("$T[] $NCopy = genericDoc.$N($S)",
                         annotation.getUnderlyingTypeWithinGenericDoc(mHelper),
                         getterOrField.getJvmName(),
                         annotation.getGenericDocArrayGetterName(),
-                        annotation.getName())
-                .addStatement("$T<$T> $NConv = null",
-                        List.class, getterOrField.getComponentType(), getterOrField.getJvmName())
+                        annotation.getName());
+        if (isNonNull) {
+            builder.addStatement("$T<$T> $NConv = $T.emptyList()",
+                    List.class, getterOrField.getComponentType(), getterOrField.getJvmName(),
+                    Collections.class);
+        } else {
+            builder.addStatement("$T<$T> $NConv = null",
+                    List.class, getterOrField.getComponentType(), getterOrField.getJvmName());
+        }
+        return builder
                 .beginControlFlow("if ($NCopy != null)", getterOrField.getJvmName())
                 .addStatement("$NConv = $T.asList($NCopy)",
                         getterOrField.getJvmName(), Arrays.class, getterOrField.getJvmName())

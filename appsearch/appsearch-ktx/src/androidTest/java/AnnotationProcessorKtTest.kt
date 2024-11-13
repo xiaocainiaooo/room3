@@ -170,6 +170,28 @@ public class AnnotationProcessorKtTest {
         }
     }
 
+    @Document
+    internal data class NullabilityDefaults(
+        @Document.Namespace val namespace: String,
+        @Document.Id val id: String,
+        @Document.StringProperty val nonNullList: List<String>,
+        @Document.StringProperty val nullableList: List<String>?,
+        @Document.BooleanProperty val nonNullBoolean: Boolean,
+        @Document.BooleanProperty val nullableBoolean: Boolean?
+    ) {}
+
+    @Test
+    fun testAnnotationProcessor_nullabilityDefaults() {
+        // Create an empty GenericDocument
+        val genericDocument =
+            GenericDocument.Builder<GenericDocument.Builder<*>>("ns", "id", "schema").build()
+        val classDocument = genericDocument.toDocumentClass(NullabilityDefaults::class.java)
+        assertThat(classDocument.nullableBoolean).isNull()
+        assertThat(classDocument.nullableList).isNull()
+        assertThat(classDocument.nonNullBoolean).isNotNull()
+        assertThat(classDocument.nonNullList).isNotNull()
+    }
+
     @Test
     fun testAnnotationProcessor() {
         session
