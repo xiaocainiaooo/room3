@@ -2820,7 +2820,16 @@ package androidx.compose.ui.layout {
     ctor public SubcomposeLayoutState();
     ctor public SubcomposeLayoutState(androidx.compose.ui.layout.SubcomposeSlotReusePolicy slotReusePolicy);
     ctor @Deprecated public SubcomposeLayoutState(int maxSlotsToRetainForReuse);
+    method public androidx.compose.ui.layout.SubcomposeLayoutState.PausedPrecomposition createPausedPrecomposition(Object? slotId, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method public androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle precompose(Object? slotId, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  }
+
+  public static sealed interface SubcomposeLayoutState.PausedPrecomposition {
+    method public androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle apply();
+    method public void cancel();
+    method public boolean isComplete();
+    method public boolean resume(androidx.compose.runtime.ShouldPauseCallback shouldPause);
+    property public abstract boolean isComplete;
   }
 
   public static interface SubcomposeLayoutState.PrecomposedSlotHandle {
