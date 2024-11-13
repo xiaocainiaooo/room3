@@ -87,8 +87,7 @@ private object InvalidateSemantics {
     level = DeprecationLevel.HIDDEN
 )
 @JsName("funFocusTargetModifierNode")
-fun FocusTargetModifierNode(): FocusTargetModifierNode =
-    FocusTargetNode(onDispatchEventsCompleted = InvalidateSemantics::onDispatchEventsCompleted)
+fun FocusTargetModifierNode(): FocusTargetModifierNode = FocusTargetNode()
 
 /**
  * Create a [FocusTargetModifierNode] that can be delegated to in order to create a modifier that
