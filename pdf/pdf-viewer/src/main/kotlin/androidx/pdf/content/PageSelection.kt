@@ -33,5 +33,5 @@ public class PageSelection(
     public val page: Int,
     public val start: SelectionBoundary,
     public val stop: SelectionBoundary,
-    public val selectedContents: List<PdfPageTextContent>
+    public val selectedTextContents: List<PdfPageTextContent>
 )
