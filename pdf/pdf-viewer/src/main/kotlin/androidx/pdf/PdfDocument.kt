@@ -14,25 +14,29 @@
  * limitations under the License.
  */
 
-package androidx.pdf.loader
+package androidx.pdf
 
 import android.graphics.Bitmap
 import android.graphics.PointF
 import android.graphics.Rect
-import android.graphics.pdf.content.PdfPageGotoLinkContent
-import android.graphics.pdf.content.PdfPageImageContent
-import android.graphics.pdf.content.PdfPageLinkContent
-import android.graphics.pdf.content.PdfPageTextContent
-import android.graphics.pdf.models.PageMatchBounds
-import android.graphics.pdf.models.selection.PageSelection
+import android.net.Uri
 import android.util.Size
 import android.util.SparseArray
 import androidx.annotation.RestrictTo
+import androidx.pdf.content.PageMatchBounds
+import androidx.pdf.content.PageSelection
+import androidx.pdf.content.PdfPageGotoLinkContent
+import androidx.pdf.content.PdfPageImageContent
+import androidx.pdf.content.PdfPageLinkContent
+import androidx.pdf.content.PdfPageTextContent
 import java.io.Closeable
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 /** Represents a PDF document and provides methods to interact with its content. */
 public interface PdfDocument : Closeable {
+
+    /** The URI of the document represented by this object */
+    public val uri: Uri
 
     /** The total number of pages in the document. */
     public val pageCount: Int
@@ -85,7 +89,7 @@ public interface PdfDocument : Closeable {
         pageNumber: Int,
         start: PointF,
         stop: PointF
-    ): PageSelection
+    ): PageSelection?
 
     /**
      * Asynchronously retrieves the content (text and images) of the specified page.
@@ -93,7 +97,7 @@ public interface PdfDocument : Closeable {
      * @param pageNumber The page number (0-based).
      * @return A [PdfPageContent] object representing the page's content.
      */
-    public suspend fun getPageContent(pageNumber: Int): PdfPageContent
+    public suspend fun getPageContent(pageNumber: Int): PdfPageContent?
 
     /**
      * Asynchronously retrieves the links (Go To and external) present on the specified page.
@@ -122,6 +126,8 @@ public interface PdfDocument : Closeable {
 
     /** A source for retrieving bitmap representations of PDF pages. */
     public interface BitmapSource : Closeable {
+        public val pageNumber: Int
+
         /**
          * Asynchronously retrieves a bitmap representation of the page, optionally constrained to a
          * specific tile region.
