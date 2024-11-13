@@ -46,8 +46,7 @@ import androidx.compose.ui.util.trace
 
 internal class FocusTargetNode(
     focusability: Focusability = Focusability.Always,
-    private val onFocusChange: ((previous: FocusState, current: FocusState) -> Unit)? = null,
-    private val onDispatchEventsCompleted: ((FocusTargetNode) -> Unit)? = null
+    private val onFocusChange: ((previous: FocusState, current: FocusState) -> Unit)? = null
 ) :
     CompositionLocalConsumerModifierNode,
     FocusTargetModifierNode,
@@ -276,7 +275,7 @@ internal class FocusTargetNode(
         val focusState = focusState
         // Avoid invoking callback when we initialize the state (from `null` to Inactive) or
         // if we are detached and go from Inactive to `null` - there isn't a conceptual focus
-        // state change here.
+        // state change here
         if (previousOrInactive != focusState) {
             onFocusChange?.invoke(previousOrInactive, focusState)
         }
@@ -284,8 +283,6 @@ internal class FocusTargetNode(
             // TODO(251833873): Consider caching it.getFocusState().
             it.onFocusEvent(it.getFocusState())
         }
-
-        onDispatchEventsCompleted?.invoke(this)
     }
 
     internal object FocusTargetElement : ModifierNodeElement<FocusTargetNode>() {
