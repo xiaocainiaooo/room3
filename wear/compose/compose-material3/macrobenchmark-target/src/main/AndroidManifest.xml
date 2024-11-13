@@ -57,7 +57,8 @@
         <activity
             android:name=".AnimatedTextActivity"
             android:exported="true"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            tools:targetApi="s">
             <intent-filter>
                 <action android:name="androidx.wear.compose.material3.macrobenchmark.target.ANIMATED_TEXT_ACTIVITY" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -112,6 +113,18 @@
             <intent-filter>
                 <action android:name=
                     "androidx.wear.compose.material3.macrobenchmark.target.CIRCULAR_PROGRESS_INDICATOR_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".DatePickerActivity"
+            android:theme="@style/AppTheme"
+            android:exported="true"
+            tools:targetApi="o">
+            <intent-filter>
+                <action android:name=
+                    "androidx.wear.compose.material3.macrobenchmark.target.DATE_PICKER_ACTIVITY" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -218,6 +231,18 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="androidx.wear.compose.material3.macrobenchmark.target.SWIPE_TO_REVEAL_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".TimePickerActivity"
+            android:theme="@style/AppTheme"
+            android:exported="true"
+            tools:targetApi="o">
+            <intent-filter>
+                <action android:name=
+                    "androidx.wear.compose.material3.macrobenchmark.target.TIME_PICKER_ACTIVITY" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
