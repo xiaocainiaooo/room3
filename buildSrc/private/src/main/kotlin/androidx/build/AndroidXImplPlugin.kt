@@ -990,6 +990,12 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
     }
 
     private fun configureWithJavaPlugin(project: Project, androidXExtension: AndroidXExtension) {
+        if (
+            project.multiplatformExtension != null &&
+                !project.multiplatformExtension!!.hasJvmTarget()
+        ) {
+            return
+        }
         project.configureErrorProneForJava()
 
         // Force Java 1.8 source- and target-compatibility for all Java libraries.
@@ -1030,18 +1036,6 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
 
         project.configureProjectForApiTasks(apiTaskConfig, androidXExtension)
         project.setUpCheckDocsTask(androidXExtension)
-
-        project.afterEvaluate {
-            if (androidXExtension.shouldRelease()) {
-                project.extra.set("publish", true)
-            }
-        }
-
-        // Workaround for b/120487939 wherein Gradle's default resolution strategy prefers external
-        // modules with lower versions over local projects with higher versions.
-        project.configurations.configureEach { configuration ->
-            configuration.resolutionStrategy.preferProjectModules()
-        }
 
         if (project.multiplatformExtension == null) {
             project.addToBuildOnServer("jar")
@@ -1710,6 +1704,9 @@ internal fun Project.hasAndroidMultiplatformPlugin(): Boolean =
 
 internal fun KotlinMultiplatformExtension.hasJavaEnabled(): Boolean =
     targets.withType(KotlinJvmTarget::class.java).singleOrNull()?.withJavaEnabled ?: false
+
+internal fun KotlinMultiplatformExtension.hasJvmTarget(): Boolean =
+    targets.withType(KotlinJvmTarget::class.java).isEmpty().not()
 
 internal fun String.camelCase() = replaceFirstChar {
     if (it.isLowerCase()) it.titlecase() else it.toString()
