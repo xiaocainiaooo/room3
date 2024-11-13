@@ -3429,21 +3429,27 @@ private class SourceInformationGroupDataIterator(
         }
 }
 
+private val EmptyLongArray = LongArray(0)
+
 internal class BitVector {
     private var first: Long = 0
     private var second: Long = 0
-    private var others: LongArray? = null
+    private var others: LongArray = EmptyLongArray
 
     val size
-        get() = others.let { if (it != null) (it.size + 2) * 64 else 128 }
+        get() = (others.size + 2) * 64
 
     operator fun get(index: Int): Boolean {
-        if (index < 0 || index >= size) error("Index $index out of bound")
         if (index < 64) return first and (1L shl index) != 0L
         if (index < 128) return second and (1L shl (index - 64)) != 0L
-        val others = others ?: return false
+
+        val others = others
+        val size = others.size
+        if (size == 0) return false
+
         val address = (index / 64) - 2
-        if (address >= others.size) return false
+        if (address >= size) return false
+
         val bit = index % 64
         return (others[address] and (1L shl bit)) != 0L
     }
@@ -3451,48 +3457,101 @@ internal class BitVector {
     operator fun set(index: Int, value: Boolean) {
         if (index < 64) {
             val mask = 1L shl index
-            first = if (value) first or mask else first and mask.inv()
+            first = (first and mask.inv()) or (value.toBit().toLong() shl index)
             return
         }
+
         if (index < 128) {
             val mask = 1L shl (index - 64)
-            second = if (value) second or mask else second and mask.inv()
+            second = (second and mask.inv()) or (value.toBit().toLong() shl index)
             return
         }
+
         val address = (index / 64) - 2
-        val mask = 1L shl (index % 64)
-        var others =
-            others
-                ?: run {
-                    val others = LongArray(address + 1)
-                    this.others = others
-                    others
-                }
+        val newIndex = index % 64
+        val mask = 1L shl newIndex
+        var others = others
         if (address >= others.size) {
             others = others.copyOf(address + 1)
             this.others = others
         }
+
         val bits = others[address]
-        others[address] = if (value) bits or mask else bits and mask.inv()
+        others[address] = (bits and mask.inv()) or (value.toBit().toLong() shl newIndex)
     }
 
-    fun nextSet(index: Int): Int {
-        val size = size
-        for (bit in index until size) {
-            if (this[bit]) return bit
+    fun nextSet(index: Int) = nextBit(index) { it }
+
+    fun nextClear(index: Int) = nextBit(index) { it.inv() }
+
+    /**
+     * Returns the index of the next bit in this bit vector, starting at index. The [valueSelector]
+     * lets the caller modify the value before finding its first bit set.
+     */
+    @Suppress("NAME_SHADOWING")
+    private inline fun nextBit(index: Int, valueSelector: (Long) -> Long): Int {
+        if (index < 64) {
+            // We shift right (unsigned) then back left to drop the first "index"
+            // bits. This will set them all to 0, thus guaranteeing that the search
+            // performed by [firstBitSet] will start at index
+            val bit = (valueSelector(first) ushr index shl index).firstBitSet
+            if (bit < 64) return bit
         }
+
+        if (index < 128) {
+            val index = index - 64
+            val bit = (valueSelector(second) ushr index shl index).firstBitSet
+            if (bit < 64) return 64 + bit
+        }
+
+        val index = max(index, 128)
+        val start = (index / 64) - 2
+        val others = others
+
+        for (i in start until others.size) {
+            var value = valueSelector(others[i])
+            // For the first element, the start index may be in the middle of the
+            // 128 bit word, so we apply the same shift trick as for [first] and
+            // [second] to start at the right spot in the bit field.
+            if (i == start) {
+                val shift = index % 64
+                value = value ushr shift shl shift
+            }
+            val bit = value.firstBitSet
+            if (bit < 64) return 128 + i * 64 + bit
+        }
+
         return Int.MAX_VALUE
     }
 
-    fun nextClear(index: Int): Int {
-        val size = size
-        for (bit in index until size) {
-            if (!this[bit]) return bit
-        }
-        return Int.MAX_VALUE
-    }
-
+    @Suppress("NAME_SHADOWING")
     fun setRange(start: Int, end: Int) {
+        var start = start
+
+        // If the range is valid we will use ~0L as our mask to create strings of 1s below,
+        // otherwise we use 0 so we don't set any bits. We could return when start >= end
+        // but this won't be a common case, so skip the branch
+        val bits = if (start < end) -1L else 0L
+
+        // Set the bits to 0 if we don't need to set any bit in the first word
+        var selector = bits * (start < 64).toBit()
+        // Take our selector (either all 0s or all 1s), perform an unsigned shift to the
+        // right to create a new word with "clampedEnd - start" bits, then shift it back
+        // left to where the range begins. This lets us set up to 64 bits at a time without
+        // doing an expensive loop that calls set()
+        val firstValue = (selector ushr (64 - (min(64, end) - start))) shl start
+        first = first or firstValue
+        // If we need to set bits in the second word, clamp our start otherwise return now
+        if (end > 64) start = max(start, 64) else return
+
+        // Set the bits to 0 if we don't need to set any bit in the second word
+        selector = bits * (start < 128).toBit()
+        // See firstValue above
+        val secondValue = (selector ushr (128 - (min(128, end) - start))) shl start
+        second = second or secondValue
+        // If we need to set bits in the remainder array, clamp our start otherwise return now
+        if (end > 128) start = max(start, 128) else return
+
         for (bit in start until end) this[bit] = true
     }
 
@@ -3509,6 +3568,9 @@ internal class BitVector {
         append(']')
     }
 }
+
+private val Long.firstBitSet
+    inline get() = this.countTrailingZeroBits()
 
 private class SourceInformationGroupIterator(
     val table: SlotTable,
@@ -3664,7 +3726,7 @@ private inline fun IntArray.nodeCount(address: Int) =
 
 private fun IntArray.updateNodeCount(address: Int, value: Int) {
     @Suppress("ConvertTwoComparisonsToRangeCheck")
-    runtimeCheck(value >= 0 && value < NodeCount_Mask)
+    debugRuntimeCheck(value >= 0 && value < NodeCount_Mask)
     this[address * Group_Fields_Size + GroupInfo_Offset] =
         (this[address * Group_Fields_Size + GroupInfo_Offset] and NodeCount_Mask.inv()) or value
 }
@@ -3687,7 +3749,7 @@ private fun IntArray.parentAnchors(len: Int = size) =
 private fun IntArray.groupSize(address: Int) = this[address * Group_Fields_Size + Size_Offset]
 
 private fun IntArray.updateGroupSize(address: Int, value: Int) {
-    runtimeCheck(value >= 0)
+    debugRuntimeCheck(value >= 0)
     this[address * Group_Fields_Size + Size_Offset] = value
 }
 
@@ -3828,7 +3890,7 @@ internal value class PrioritySet(private val list: MutableIntList = mutableIntLi
 
     // Remove a de-duplicated value from the heap
     fun takeMax(): Int {
-        runtimeCheck(list.size > 0) { "Set is empty" }
+        debugRuntimeCheck(list.size > 0) { "Set is empty" }
         val value = list[0]
 
         // Skip duplicates. It is not time efficient to remove duplicates from the list while
