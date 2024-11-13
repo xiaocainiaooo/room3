@@ -1836,7 +1836,7 @@ class TopAppBarState(
  * container color according to the top app bar scroll state. It does not animate the leading,
  * headline, or trailing colors.
  *
- * @param containerColor the color used for the background of this BottomAppBar. Use
+ * @param containerColor the color used for the background of this TopAppBar. Use
  *   [Color.Transparent] to have no color.
  * @param scrolledContainerColor the container color when content is scrolled behind it
  * @param navigationIconContentColor the content color used for the navigation icon
