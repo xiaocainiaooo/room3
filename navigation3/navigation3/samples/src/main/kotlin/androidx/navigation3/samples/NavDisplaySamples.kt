@@ -17,11 +17,14 @@
 package androidx.navigation3.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavContentWrapper
+import androidx.navigation3.AnimatedNavDisplay
 import androidx.navigation3.NavDisplay
 import androidx.navigation3.Record
 import androidx.navigation3.SavedStateNavContentWrapper
@@ -70,4 +73,65 @@ fun BasicNav() {
 
 class ProfileViewModel : ViewModel() {
     val name = "no user"
+}
+
+@Sampled
+@Composable
+fun AnimatedNav() {
+    val backStack = rememberMutableStateListOf(Profile)
+    val manager =
+        rememberNavWrapperManager(
+            listOf(SavedStateNavContentWrapper, ViewModelStoreNavContentWrapper)
+        )
+    AnimatedNavDisplay(
+        backstack = backStack,
+        wrapperManager = manager,
+        onBack = { backStack.removeLast() },
+    ) { key ->
+        when (key) {
+            Profile -> {
+                Record(
+                    Profile,
+                    AnimatedNavDisplay.transition(
+                        slideInHorizontally { it },
+                        slideOutHorizontally { it }
+                    )
+                ) {
+                    val viewModel = viewModel<ProfileViewModel>()
+                    Profile(viewModel, { backStack.add(it) }) { backStack.removeLast() }
+                }
+            }
+            Scrollable -> {
+                Record(
+                    Scrollable,
+                    AnimatedNavDisplay.transition(
+                        slideInHorizontally { it },
+                        slideOutHorizontally { it }
+                    )
+                ) {
+                    Scrollable({ backStack.add(it) }) { backStack.removeLast() }
+                }
+            }
+            Dialog -> {
+                Record(Dialog, featureMap = NavDisplay.isDialog(true)) {
+                    DialogContent { backStack.removeLast() }
+                }
+            }
+            Dashboard -> {
+                Record(
+                    Dashboard,
+                    AnimatedNavDisplay.transition(
+                        slideInHorizontally { it },
+                        slideOutHorizontally { it }
+                    )
+                ) { dashboardArgs ->
+                    val userId = (dashboardArgs as Dashboard).userId
+                    Dashboard(userId, onBack = { backStack.removeLast() })
+                }
+            }
+            else -> {
+                Record(Unit) { Text(text = "Invalid Key") }
+            }
+        }
+    }
 }

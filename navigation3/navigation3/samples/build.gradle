@@ -37,6 +37,7 @@ dependencies {
     compileOnly(project(":annotation:annotation-sampled"))
 
     implementation(libs.kotlinStdlib)
+    implementation("androidx.compose.animation:animation:1.7.5")
     implementation("androidx.compose.foundation:foundation:1.7.5")
     implementation("androidx.compose.foundation:foundation-layout:1.7.5")
     implementation("androidx.compose.material:material:1.7.5")
