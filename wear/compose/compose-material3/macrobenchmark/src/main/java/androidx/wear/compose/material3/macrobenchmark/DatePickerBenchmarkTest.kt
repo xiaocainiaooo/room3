@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package androidx.wear.compose.material3.macrobenchmark.target
+package androidx.wear.compose.material3.macrobenchmark
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.wear.compose.material3.macrobenchmark.common.AnimatedTextBenchmark
+import androidx.benchmark.macro.CompilationMode
+import androidx.test.filters.LargeTest
+import androidx.wear.compose.material3.macrobenchmark.common.DatePickerBenchmark
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
-@RequiresApi(Build.VERSION_CODES.S)
-class AnimatedTextActivity : BenchmarkBaseActivity(AnimatedTextBenchmark)
+@RequiresApi(Build.VERSION_CODES.O)
+@LargeTest
+@RunWith(Parameterized::class)
+class DatePickerBenchmarkTest(compilationMode: CompilationMode) :
+    BenchmarkTestBase(
+        compilationMode = compilationMode,
+        macrobenchmarkScreen = DatePickerBenchmark,
+        actionSuffix = "DATE_PICKER_ACTIVITY"
+    )
