@@ -60,12 +60,14 @@ private const val CHECK_RELEASE_NAME = "checkAbiRelease"
 private const val UPDATE_NAME = "updateAbi"
 private const val EXTRACT_NAME = "extractAbi"
 private const val EXTRACT_RELEASE_NAME = "extractAbiRelease"
+private const val IGNORE_CHANGES_NAME = "ignoreAbiChanges"
 
 private const val KLIB_DUMPS_DIRECTORY = "klib"
 private const val KLIB_MERGE_DIRECTORY = "merged"
 private const val KLIB_EXTRACTED_DIRECTORY = "extracted"
 private const val NATIVE_SUFFIX = "native"
 internal const val CURRENT_API_FILE_NAME = "current.txt"
+private const val IGNORE_FILE_NAME = "current.ignore"
 private const val ABI_GROUP_NAME = "abi"
 
 class BinaryCompatibilityValidation(
@@ -104,6 +106,7 @@ class BinaryCompatibilityValidation(
         }
         val projectVersion: Version = project.version()
         val projectAbiDir = project.getBcvFileDirectory().dir(NATIVE_SUFFIX)
+        val currentIgnoreFile = projectAbiDir.file(IGNORE_FILE_NAME)
         val buildAbiDir = project.getBuiltBcvFileDirectory().map { it.dir(NATIVE_SUFFIX) }
 
         val klibDumpDir = project.layout.buildDirectory.dir(KLIB_DUMPS_DIRECTORY)
@@ -128,7 +131,8 @@ class BinaryCompatibilityValidation(
             project.checkKlibAbiReleaseTask(
                 generatedAndMergedApiFile,
                 projectAbiDir,
-                klibExtractedFileDir
+                klibExtractedFileDir,
+                currentIgnoreFile
             )
 
         updateKlibAbi.configure { update ->
@@ -164,7 +168,8 @@ class BinaryCompatibilityValidation(
     private fun Project.checkKlibAbiReleaseTask(
         mergedApiFile: Provider<RegularFileProperty>,
         klibApiDir: Directory,
-        klibExtractDir: Provider<Directory>
+        klibExtractDir: Provider<Directory>,
+        ignoreFile: RegularFile,
     ) =
         project.getRequiredCompatibilityAbiLocation(NATIVE_SUFFIX)?.let { requiredCompatFile ->
             val extractReleaseTask =
@@ -181,6 +186,13 @@ class BinaryCompatibilityValidation(
                     it.outputAbiFile.set(klibExtractDir.map { it.file(requiredCompatFile.name) })
                     (it as DefaultTask).group = ABI_GROUP_NAME
                 }
+            project.tasks.register(IGNORE_CHANGES_NAME, IgnoreAbiChangesTask::class.java) {
+                it.currentApiDump.set(mergedApiFile.map { fileProperty -> fileProperty.get() })
+                it.previousApiDump.set(
+                    extractReleaseTask.map { extract -> extract.outputAbiFile.get() }
+                )
+                it.ignoreFile.set(ignoreFile)
+            }
             project.tasks
                 .register(CHECK_RELEASE_NAME, CheckAbiIsCompatibleTask::class.java) {
                     it.currentApiDump.set(mergedApiFile.map { fileProperty -> fileProperty.get() })
@@ -192,6 +204,7 @@ class BinaryCompatibilityValidation(
                         extractReleaseTask.map { extract ->
                             extract.outputAbiFile.get().asFile.nameWithoutExtension
                         }
+                    it.ignoreFile.set(ignoreFile)
                     it.group = ABI_GROUP_NAME
                 }
                 .also { checkRelease ->
