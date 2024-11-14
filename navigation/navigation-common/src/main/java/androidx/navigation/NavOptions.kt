@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import androidx.annotation.AnimatorRes
 import androidx.annotation.IdRes
 import androidx.annotation.RestrictTo
 import androidx.navigation.NavDestination.Companion.createRoute
+import androidx.navigation.NavOptions.Builder
 import androidx.navigation.serialization.generateHashCode
 import kotlin.reflect.KClass
 import kotlinx.serialization.InternalSerializationApi

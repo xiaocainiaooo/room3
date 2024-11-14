@@ -18,10 +18,10 @@ package androidx.navigation
 
 import androidx.annotation.IdRes
 import androidx.annotation.RestrictTo
-import androidx.core.os.bundleOf
 import androidx.navigation.serialization.generateHashCode
 import androidx.navigation.serialization.generateNavArguments
 import androidx.navigation.serialization.generateRoutePattern
+import androidx.savedstate.savedState
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlinx.serialization.InternalSerializationApi
@@ -331,8 +331,7 @@ public class NavActionBuilder {
         NavAction(
             destinationId,
             navOptions,
-            if (defaultArguments.isEmpty()) null
-            else bundleOf(*defaultArguments.toList().toTypedArray())
+            if (defaultArguments.isEmpty()) null else savedState(defaultArguments)
         )
 }
 

@@ -19,9 +19,11 @@
 package androidx.navigation.serialization
 
 import android.net.Uri
-import android.os.Bundle
 import androidx.navigation.CollectionNavType
 import androidx.navigation.NavType
+import androidx.savedstate.SavedState
+import androidx.savedstate.read
+import androidx.savedstate.write
 import java.io.Serializable
 import kotlin.reflect.KType
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -203,9 +205,9 @@ internal object UNKNOWN : NavType<String>(false) {
     override val name: String
         get() = "unknown"
 
-    override fun put(bundle: Bundle, key: String, value: String) {}
+    override fun put(bundle: SavedState, key: String, value: String) {}
 
-    override fun get(bundle: Bundle, key: String): String? = null
+    override fun get(bundle: SavedState, key: String): String? = null
 
     override fun parseValue(value: String): String = "null"
 }
@@ -216,17 +218,15 @@ internal object InternalNavType {
             override val name: String
                 get() = "integer_nullable"
 
-            override fun put(bundle: Bundle, key: String, value: Int?) {
+            override fun put(bundle: SavedState, key: String, value: Int?) {
                 // store null as serializable inside bundle, so that decoder will use the null
                 // instead of default value
-                if (value == null) bundle.putSerializable(key, null)
+                if (value == null) bundle.write { putNull(key) }
                 else IntType.put(bundle, key, value)
             }
 
-            @Suppress("DEPRECATION")
-            override fun get(bundle: Bundle, key: String): Int? {
-                return bundle[key] as? Int
-            }
+            override fun get(bundle: SavedState, key: String): Int? =
+                bundle.read { if (contains(key) && !isNull(key)) getInt(key) else null }
 
             override fun parseValue(value: String): Int? {
                 return if (value == "null") null else IntType.parseValue(value)
@@ -238,15 +238,13 @@ internal object InternalNavType {
             override val name: String
                 get() = "boolean_nullable"
 
-            override fun put(bundle: Bundle, key: String, value: Boolean?) {
-                if (value == null) bundle.putSerializable(key, null)
+            override fun put(bundle: SavedState, key: String, value: Boolean?) {
+                if (value == null) bundle.write { putNull(key) }
                 else BoolType.put(bundle, key, value)
             }
 
-            @Suppress("DEPRECATION")
-            override fun get(bundle: Bundle, key: String): Boolean? {
-                return bundle[key] as? Boolean
-            }
+            override fun get(bundle: SavedState, key: String): Boolean? =
+                bundle.read { if (contains(key) && !isNull(key)) getBoolean(key) else null }
 
             override fun parseValue(value: String): Boolean? {
                 return if (value == "null") null else BoolType.parseValue(value)
@@ -258,14 +256,12 @@ internal object InternalNavType {
             override val name: String
                 get() = "double"
 
-            override fun put(bundle: Bundle, key: String, value: Double) {
-                bundle.putDouble(key, value)
+            override fun put(bundle: SavedState, key: String, value: Double) {
+                bundle.write { putDouble(key, value) }
             }
 
-            @Suppress("DEPRECATION")
-            override fun get(bundle: Bundle, key: String): Double {
-                return bundle[key] as Double
-            }
+            override fun get(bundle: SavedState, key: String): Double =
+                bundle.read { getDouble(key) }
 
             override fun parseValue(value: String): Double = value.toDouble()
         }
@@ -275,15 +271,13 @@ internal object InternalNavType {
             override val name: String
                 get() = "double_nullable"
 
-            override fun put(bundle: Bundle, key: String, value: Double?) {
-                if (value == null) bundle.putSerializable(key, null)
+            override fun put(bundle: SavedState, key: String, value: Double?) {
+                if (value == null) bundle.write { putNull(key) }
                 else DoubleType.put(bundle, key, value)
             }
 
-            @Suppress("DEPRECATION")
-            override fun get(bundle: Bundle, key: String): Double? {
-                return bundle[key] as? Double
-            }
+            override fun get(bundle: SavedState, key: String): Double? =
+                bundle.read { if (contains(key) && !isNull(key)) getDouble(key) else null }
 
             override fun parseValue(value: String): Double? {
                 return if (value == "null") null else DoubleType.parseValue(value)
@@ -295,15 +289,13 @@ internal object InternalNavType {
             override val name: String
                 get() = "float_nullable"
 
-            override fun put(bundle: Bundle, key: String, value: Float?) {
-                if (value == null) bundle.putSerializable(key, null)
+            override fun put(bundle: SavedState, key: String, value: Float?) {
+                if (value == null) bundle.write { putNull(key) }
                 else FloatType.put(bundle, key, value)
             }
 
-            @Suppress("DEPRECATION")
-            override fun get(bundle: Bundle, key: String): Float? {
-                return bundle[key] as? Float
-            }
+            override fun get(bundle: SavedState, key: String): Float? =
+                bundle.read { if (contains(key) && !isNull(key)) getFloat(key) else null }
 
             override fun parseValue(value: String): Float? {
                 return if (value == "null") null else FloatType.parseValue(value)
@@ -315,15 +307,13 @@ internal object InternalNavType {
             override val name: String
                 get() = "long_nullable"
 
-            override fun put(bundle: Bundle, key: String, value: Long?) {
-                if (value == null) bundle.putSerializable(key, null)
+            override fun put(bundle: SavedState, key: String, value: Long?) {
+                if (value == null) bundle.write { putNull(key) }
                 else LongType.put(bundle, key, value)
             }
 
-            @Suppress("DEPRECATION")
-            override fun get(bundle: Bundle, key: String): Long? {
-                return bundle[key] as? Long
-            }
+            override fun get(bundle: SavedState, key: String): Long? =
+                bundle.read { if (contains(key) && !isNull(key)) getLong(key) else null }
 
             override fun parseValue(value: String): Long? {
                 return if (value == "null") null else LongType.parseValue(value)
@@ -335,12 +325,12 @@ internal object InternalNavType {
             override val name: String
                 get() = "string_non_nullable"
 
-            override fun put(bundle: Bundle, key: String, value: String) {
-                bundle.putString(key, value)
+            override fun put(bundle: SavedState, key: String, value: String) {
+                bundle.write { putString(key, value) }
             }
 
-            @Suppress("DEPRECATION")
-            override fun get(bundle: Bundle, key: String): String = bundle.getString(key) ?: "null"
+            override fun get(bundle: SavedState, key: String): String =
+                bundle.read { if (contains(key) && !isNull(key)) getString(key) else "null" }
 
             // "null" is still parsed as "null"
             override fun parseValue(value: String): String = value
@@ -354,13 +344,20 @@ internal object InternalNavType {
             override val name: String
                 get() = "string_nullable[]"
 
-            override fun put(bundle: Bundle, key: String, value: Array<String?>?) {
-                bundle.putStringArray(key, value)
+            override fun put(bundle: SavedState, key: String, value: Array<String?>?) {
+                bundle.write {
+                    if (value == null) putNull(key)
+                    else putStringArray(key, value.map { it ?: "null" }.toTypedArray())
+                }
             }
 
-            @Suppress("UNCHECKED_CAST", "DEPRECATION")
-            override fun get(bundle: Bundle, key: String): Array<String?>? =
-                bundle[key] as Array<String?>?
+            @Suppress("UNCHECKED_CAST")
+            override fun get(bundle: SavedState, key: String): Array<String?>? =
+                bundle.read {
+                    if (contains(key) && !isNull(key)) {
+                        getStringArray(key).map { StringType.parseValue(it) }.toTypedArray()
+                    } else null
+                }
 
             // match String? behavior where null -> null, and "null" -> null
             override fun parseValue(value: String): Array<String?> =
@@ -385,14 +382,19 @@ internal object InternalNavType {
             override val name: String
                 get() = "List<String?>"
 
-            override fun put(bundle: Bundle, key: String, value: List<String?>?) {
-                bundle.putStringArray(key, value?.toTypedArray())
+            override fun put(bundle: SavedState, key: String, value: List<String?>?) {
+                bundle.write {
+                    if (value == null) putNull(key)
+                    else putStringArray(key, value.map { it ?: "null" }.toTypedArray())
+                }
             }
 
-            @Suppress("UNCHECKED_CAST", "DEPRECATION")
-            override fun get(bundle: Bundle, key: String): List<String?>? {
-                return (bundle[key] as Array<String?>?)?.toList()
-            }
+            override fun get(bundle: SavedState, key: String): List<String?>? =
+                bundle.read {
+                    if (contains(key) && !isNull(key)) {
+                        getStringArray(key).toList().map { StringType.parseValue(it) }
+                    } else null
+                }
 
             override fun parseValue(value: String): List<String?> {
                 return listOf(StringType.parseValue(value))
@@ -419,13 +421,12 @@ internal object InternalNavType {
             override val name: String
                 get() = "double[]"
 
-            override fun put(bundle: Bundle, key: String, value: DoubleArray?) {
-                bundle.putDoubleArray(key, value)
+            override fun put(bundle: SavedState, key: String, value: DoubleArray?) {
+                bundle.write { if (value == null) putNull(key) else putDoubleArray(key, value) }
             }
 
-            @Suppress("DEPRECATION")
-            override fun get(bundle: Bundle, key: String): DoubleArray? =
-                bundle[key] as DoubleArray?
+            override fun get(bundle: SavedState, key: String): DoubleArray? =
+                bundle.read { if (contains(key) && !isNull(key)) getDoubleArray(key) else null }
 
             override fun parseValue(value: String): DoubleArray =
                 doubleArrayOf(DoubleType.parseValue(value))
@@ -450,13 +451,16 @@ internal object InternalNavType {
             override val name: String
                 get() = "List<Double>"
 
-            override fun put(bundle: Bundle, key: String, value: List<Double>?) {
-                bundle.putDoubleArray(key, value?.toDoubleArray())
+            override fun put(bundle: SavedState, key: String, value: List<Double>?) {
+                bundle.write {
+                    if (value == null) putNull(key) else putDoubleArray(key, value.toDoubleArray())
+                }
             }
 
-            @Suppress("DEPRECATION")
-            override fun get(bundle: Bundle, key: String): List<Double>? =
-                (bundle[key] as? DoubleArray?)?.toList()
+            override fun get(bundle: SavedState, key: String): List<Double>? =
+                bundle.read {
+                    if (contains(key) && !isNull(key)) getDoubleArray(key).toList() else null
+                }
 
             override fun parseValue(value: String): List<Double> =
                 listOf(DoubleType.parseValue(value))
@@ -482,12 +486,12 @@ internal object InternalNavType {
         override val name: String
             get() = "List<${enumNavType.name}}>"
 
-        override fun put(bundle: Bundle, key: String, value: List<D>?) {
+        override fun put(bundle: SavedState, key: String, value: List<D>?) {
             bundle.putSerializable(key, value?.let { ArrayList(value) })
         }
 
         @Suppress("DEPRECATION", "UNCHECKED_CAST")
-        override fun get(bundle: Bundle, key: String): List<D>? = (bundle[key] as? List<D>?)
+        override fun get(bundle: SavedState, key: String): List<D>? = (bundle[key] as? List<D>?)
 
         override fun parseValue(value: String): List<D> = listOf(enumNavType.parseValue(value))
 
@@ -555,12 +559,12 @@ internal object InternalNavType {
             }
         }
 
-        override fun put(bundle: Bundle, key: String, value: D?) {
+        override fun put(bundle: SavedState, key: String, value: D?) {
             bundle.putSerializable(key, type.cast(value))
         }
 
         @Suppress("UNCHECKED_CAST", "DEPRECATION")
-        override fun get(bundle: Bundle, key: String): D? {
+        override fun get(bundle: SavedState, key: String): D? {
             return bundle[key] as? D
         }
 
