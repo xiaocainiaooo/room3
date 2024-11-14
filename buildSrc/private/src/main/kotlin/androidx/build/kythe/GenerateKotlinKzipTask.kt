@@ -99,14 +99,18 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
             listOf(
                 "-jvm-target",
                 jvmTarget.get().target,
+                "-Xjdk-release",
+                jvmTarget.get().target,
+                "-Xjvm-default=all",
                 "-language-version",
                 kotlinTarget.get().apiVersion.version,
                 "-api-version",
                 kotlinTarget.get().apiVersion.version,
                 "-no-reflect",
                 "-no-stdlib",
-                "-Xjvm-default=all",
-                "-opt-in=kotlin.contracts.ExperimentalContracts"
+                "-opt-in=androidx.room.compiler.processing.ExperimentalProcessingApi",
+                "-opt-in=com.squareup.kotlinpoet.javapoet.KotlinPoetJavaPoetPreview",
+                "-opt-in=kotlin.contracts.ExperimentalContracts",
             )
 
         val commonSourceFiles =
