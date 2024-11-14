@@ -1595,6 +1595,9 @@ class Recomposer(effectCoroutineContext: CoroutineContext) : CompositionContext(
     ): MovableContentState? =
         synchronized(stateLock) { movableContentStatesAvailable.remove(reference) }
 
+    override val composition: Composition?
+        get() = null
+
     /**
      * hack: the companion object is thread local in Kotlin/Native to avoid freezing
      * [_runningRecomposers] with the current memory model. As a side effect, recomposers are now
@@ -1616,6 +1619,10 @@ class Recomposer(effectCoroutineContext: CoroutineContext) : CompositionContext(
          */
         val runningRecomposers: StateFlow<Set<RecomposerInfo>>
             get() = _runningRecomposers
+
+        internal fun currentRunningRecomposers(): Set<RecomposerInfo> {
+            return _runningRecomposers.value
+        }
 
         internal fun setHotReloadEnabled(value: Boolean) {
             _hotReloadEnabled.set(value)
