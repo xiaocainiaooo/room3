@@ -438,7 +438,13 @@ fun ChildButtonDemo() {
         item {
             ChildButton(
                 onClick = { /* Do something */ },
-                label = { Text("Child Button") },
+                label = {
+                    Text(
+                        "Child Button",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
                 enabled = false,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -548,7 +554,7 @@ fun CompactButtonDemo() {
             }
         }
         item { ListHeader { Text("Icon and Label") } }
-        item { CompactButtonSample() }
+        item { CompactButtonSample(modifier = Modifier.fillMaxWidth()) }
         item {
             CompactButton(
                 onClick = { /* Do something */ },
@@ -622,12 +628,13 @@ fun CompactButtonDemo() {
         item { ListHeader { Text("Long Click") } }
         item {
             CompactButtonWithOnLongClickSample(
+                modifier = Modifier.fillMaxWidth(),
                 onClickHandler = { showOnClickToast(context) },
                 onLongClickHandler = { showOnLongClickToast(context) }
             )
         }
         item { ListHeader { Text("Expandable") } }
-        item { OutlinedCompactButtonSample() }
+        item { OutlinedCompactButtonSample(modifier = Modifier.fillMaxWidth()) }
     }
 }
 
