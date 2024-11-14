@@ -31,10 +31,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.ButtonDefaults.buttonColors
 import androidx.wear.compose.material3.Card
 import androidx.wear.compose.material3.EdgeButton
+import androidx.wear.compose.material3.EdgeButtonDefaults
 import androidx.wear.compose.material3.EdgeButtonSize
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
@@ -54,7 +54,7 @@ fun EdgeButtonSample() {
             Icon(
                 Icons.Filled.Check,
                 contentDescription = "Check icon",
-                modifier = Modifier.size(ButtonDefaults.IconSize)
+                modifier = Modifier.size(EdgeButtonDefaults.MediumIconSize)
             )
         }
     }
