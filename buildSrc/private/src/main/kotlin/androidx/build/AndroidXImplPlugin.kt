@@ -28,6 +28,7 @@ import androidx.build.checkapi.configureProjectForApiTasks
 import androidx.build.docs.CheckTipOfTreeDocsTask.Companion.setUpCheckDocsTask
 import androidx.build.gitclient.getHeadShaProvider
 import androidx.build.gradle.isRoot
+import androidx.build.kythe.configureProjectForKzipTasks
 import androidx.build.license.addLicensesToPublishedArtifacts
 import androidx.build.resources.CopyPublicResourcesDirTask
 import androidx.build.resources.configurePublicResourcesStub
@@ -694,6 +695,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
         project.disableStrictVersionConstraints()
 
         project.configureProjectForApiTasks(AndroidMultiplatformApiTaskConfig, androidXExtension)
+        project.configureProjectForKzipTasks(AndroidMultiplatformApiTaskConfig, androidXExtension)
 
         kotlinMultiplatformAndroidComponentsExtension.onVariant { it.configureTests() }
 
@@ -933,6 +935,10 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                     LibraryApiTaskConfig(variant),
                     androidXExtension
                 )
+                project.configureProjectForKzipTasks(
+                    LibraryApiTaskConfig(variant),
+                    androidXExtension
+                )
             }
             if (variant.name == DEFAULT_PUBLISH_CONFIG) {
                 project.configureSourceJarForAndroid(variant, androidXExtension.samplesProjects)
@@ -1019,6 +1025,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
             }
 
         project.configureProjectForApiTasks(apiTaskConfig, androidXExtension)
+        project.configureProjectForKzipTasks(apiTaskConfig, androidXExtension)
         project.setUpCheckDocsTask(androidXExtension)
 
         if (project.multiplatformExtension == null) {

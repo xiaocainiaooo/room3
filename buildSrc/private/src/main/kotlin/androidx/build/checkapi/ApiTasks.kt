@@ -21,11 +21,9 @@ import androidx.build.Release
 import androidx.build.RunApiTasks
 import androidx.build.Version
 import androidx.build.binarycompatibilityvalidator.BinaryCompatibilityValidation
-import androidx.build.getDefaultTargetJavaVersion
 import androidx.build.getSupportRootFolder
 import androidx.build.isWriteVersionedApiFilesEnabled
 import androidx.build.java.JavaCompileInputs
-import androidx.build.kythe.GenerateKotlinKzipTask
 import androidx.build.metalava.MetalavaTasks
 import androidx.build.multiplatformExtension
 import androidx.build.resources.ResourceTasks
@@ -37,6 +35,7 @@ import com.android.build.api.variant.LibraryVariant
 import java.io.File
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.RegularFile
@@ -163,61 +162,10 @@ fun Project.configureProjectForApiTasks(config: ApiTaskConfig, extension: Androi
                 listOf(currentApiLocation)
             }
 
-        val javaInputs: JavaCompileInputs
-        val androidManifest: Provider<RegularFile>?
-        when (config) {
-            is LibraryApiTaskConfig -> {
-                if (config.variant.name != Release.DEFAULT_PUBLISH_CONFIG) {
-                    return@afterEvaluate
-                }
-                javaInputs = JavaCompileInputs.fromLibraryVariant(config.variant, project)
-                androidManifest = config.variant.artifacts.get(SingleArtifact.MERGED_MANIFEST)
-            }
-            is AndroidMultiplatformApiTaskConfig -> {
-                javaInputs = JavaCompileInputs.fromKmpAndroidTarget(project)
-                androidManifest = null
-            }
-            is KmpApiTaskConfig -> {
-                javaInputs = JavaCompileInputs.fromKmpJvmTarget(project)
-                androidManifest = null
-            }
-            is JavaApiTaskConfig -> {
-                val javaExtension = extensions.getByType<JavaPluginExtension>()
-                val mainSourceSet = javaExtension.sourceSets.getByName("main")
-                javaInputs = JavaCompileInputs.fromSourceSet(mainSourceSet, this)
-                androidManifest = null
-            }
-        }
-
+        val (javaInputs, androidManifest) =
+            configureJavaInputsAndManifest(config) ?: return@afterEvaluate
         val baselinesApiLocation = ApiBaselinesLocation.fromApiLocation(currentApiLocation)
-
-        val generateApiDependencies =
-            configurations.create("GenerateApiDependencies") {
-                it.isCanBeConsumed = false
-                it.isTransitive = false
-                it.attributes.attribute(
-                    BuildTypeAttr.ATTRIBUTE,
-                    project.objects.named(BuildTypeAttr::class.java, "release")
-                )
-                it.attributes.attribute(
-                    Usage.USAGE_ATTRIBUTE,
-                    objects.named(Usage::class.java, Usage.JAVA_API)
-                )
-                it.attributes.attribute(
-                    ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE,
-                    ArtifactTypeDefinition.JAR_TYPE
-                )
-            }
-
-        dependencies.add(generateApiDependencies.name, project.project(project.path))
-
-        GenerateKotlinKzipTask.setupProject(
-            project,
-            javaInputs,
-            generateApiDependencies,
-            extension.kotlinTarget,
-            getDefaultTargetJavaVersion(extension.type, project.name)
-        )
+        val generateApiDependencies = createReleaseApiConfiguration()
 
         MetalavaTasks.setupProject(
             project,
@@ -254,6 +202,53 @@ fun Project.configureProjectForApiTasks(config: ApiTaskConfig, extension: Androi
                 .setupBinaryCompatibilityValidatorTasks()
         }
     }
+}
+
+internal fun Project.configureJavaInputsAndManifest(
+    config: ApiTaskConfig
+): Pair<JavaCompileInputs, Provider<RegularFile>?>? {
+    return when (config) {
+        is LibraryApiTaskConfig -> {
+            if (config.variant.name != Release.DEFAULT_PUBLISH_CONFIG) {
+                return null
+            }
+            JavaCompileInputs.fromLibraryVariant(config.variant, project) to
+                config.variant.artifacts.get(SingleArtifact.MERGED_MANIFEST)
+        }
+        is AndroidMultiplatformApiTaskConfig -> {
+            JavaCompileInputs.fromKmpAndroidTarget(project) to null
+        }
+        is KmpApiTaskConfig -> {
+            JavaCompileInputs.fromKmpJvmTarget(project) to null
+        }
+        is JavaApiTaskConfig -> {
+            val javaExtension = extensions.getByType<JavaPluginExtension>()
+            val mainSourceSet = javaExtension.sourceSets.getByName("main")
+            JavaCompileInputs.fromSourceSet(mainSourceSet, this) to null
+        }
+    }
+}
+
+internal fun Project.createReleaseApiConfiguration(): Configuration {
+    return configurations.findByName("ReleaseApiDependencies")
+        ?: configurations
+            .create("ReleaseApiDependencies") {
+                it.isCanBeConsumed = false
+                it.isTransitive = false
+                it.attributes.attribute(
+                    BuildTypeAttr.ATTRIBUTE,
+                    project.objects.named(BuildTypeAttr::class.java, "release")
+                )
+                it.attributes.attribute(
+                    Usage.USAGE_ATTRIBUTE,
+                    objects.named(Usage::class.java, Usage.JAVA_API)
+                )
+                it.attributes.attribute(
+                    ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE,
+                    ArtifactTypeDefinition.JAR_TYPE
+                )
+            }
+            .apply { project.dependencies.add(name, project.project(path)) }
 }
 
 internal class BlankApiRegularFile(project: Project) : RegularFile {
