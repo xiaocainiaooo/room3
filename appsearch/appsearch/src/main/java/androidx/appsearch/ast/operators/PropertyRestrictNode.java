@@ -42,7 +42,7 @@ import java.util.List;
  */
 @ExperimentalAppSearchApi
 @FlaggedApi(Flags.FLAG_ENABLE_ABSTRACT_SYNTAX_TREES)
-public class PropertyRestrictNode implements Node {
+public final class PropertyRestrictNode implements Node {
     private PropertyPath mProperty;
     private final List<Node> mChildren = new ArrayList<>(1);
 
