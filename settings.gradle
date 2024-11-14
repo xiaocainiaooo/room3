@@ -1141,6 +1141,7 @@ includeOptionalProject(":xr:runtime:runtime", new File(repoRoot, "xr/runtime/run
 includeOptionalProject(":xr:runtime:runtime-testing", new File(repoRoot, "xr/runtime/runtime-testing"), [BuildType.XR])
 includeOptionalProject(":xr:runtime:runtime-openxr", new File(repoRoot, "xr/runtime/runtime-openxr"), [BuildType.XR])
 includeOptionalProject(":xr:scenecore:scenecore", new File(repoRoot, "xr/scenecore/scenecore"), [BuildType.XR])
+includeOptionalProject(":xr:scenecore:scenecore-testing", new File(repoRoot, "xr/scenecore/scenecore-testing"), [BuildType.XR])
 
 /////////////////////////////
 //
