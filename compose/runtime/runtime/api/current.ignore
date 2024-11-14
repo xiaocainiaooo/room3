@@ -1,11 +1,29 @@
 // Baseline format: 1.0
-AddedAbstractMethod: androidx.compose.runtime.ControlledComposition#getAndSetShouldPauseCallback(androidx.compose.runtime.ShouldPauseCallback):
-    Added method androidx.compose.runtime.ControlledComposition.getAndSetShouldPauseCallback(androidx.compose.runtime.ShouldPauseCallback)
+AddedMethod: androidx.compose.runtime.snapshots.SnapshotId_jvmKt#toLong(long):
+    Added method androidx.compose.runtime.snapshots.SnapshotId_jvmKt.toLong(long)
 
 
-BecameUnchecked: androidx.compose.runtime.Composer#compoundKeyHash:
-    Removed property Composer.compoundKeyHash from compatibility checked API surface
-BecameUnchecked: androidx.compose.runtime.Composer#recomposeScope:
-    Removed property Composer.recomposeScope from compatibility checked API surface
-BecameUnchecked: androidx.compose.runtime.internal.LiveLiteralKt#isLiveLiteralsEnabled:
-    Removed property LiveLiteralKt.isLiveLiteralsEnabled from compatibility checked API surface
+RemovedField: androidx.compose.runtime.snapshots.SnapshotId_jvmKt#SnapshotIdInvalidValue:
+    Removed field androidx.compose.runtime.snapshots.SnapshotId_jvmKt.SnapshotIdInvalidValue
+RemovedField: androidx.compose.runtime.snapshots.SnapshotId_jvmKt#SnapshotIdMax:
+    Removed field androidx.compose.runtime.snapshots.SnapshotId_jvmKt.SnapshotIdMax
+RemovedField: androidx.compose.runtime.snapshots.SnapshotId_jvmKt#SnapshotIdSize:
+    Removed field androidx.compose.runtime.snapshots.SnapshotId_jvmKt.SnapshotIdSize
+RemovedField: androidx.compose.runtime.snapshots.SnapshotId_jvmKt#SnapshotIdZero:
+    Removed field androidx.compose.runtime.snapshots.SnapshotId_jvmKt.SnapshotIdZero
+
+
+RemovedMethod: androidx.compose.runtime.snapshots.SnapshotId_jvmKt#compareTo(long, int):
+    Removed method androidx.compose.runtime.snapshots.SnapshotId_jvmKt.compareTo(long,int)
+RemovedMethod: androidx.compose.runtime.snapshots.SnapshotId_jvmKt#compareTo(long, long):
+    Removed method androidx.compose.runtime.snapshots.SnapshotId_jvmKt.compareTo(long,long)
+RemovedMethod: androidx.compose.runtime.snapshots.SnapshotId_jvmKt#div(long, int):
+    Removed method androidx.compose.runtime.snapshots.SnapshotId_jvmKt.div(long,int)
+RemovedMethod: androidx.compose.runtime.snapshots.SnapshotId_jvmKt#minus(long, int):
+    Removed method androidx.compose.runtime.snapshots.SnapshotId_jvmKt.minus(long,int)
+RemovedMethod: androidx.compose.runtime.snapshots.SnapshotId_jvmKt#minus(long, long):
+    Removed method androidx.compose.runtime.snapshots.SnapshotId_jvmKt.minus(long,long)
+RemovedMethod: androidx.compose.runtime.snapshots.SnapshotId_jvmKt#plus(long, int):
+    Removed method androidx.compose.runtime.snapshots.SnapshotId_jvmKt.plus(long,int)
+RemovedMethod: androidx.compose.runtime.snapshots.SnapshotId_jvmKt#times(long, int):
+    Removed method androidx.compose.runtime.snapshots.SnapshotId_jvmKt.times(long,int)
