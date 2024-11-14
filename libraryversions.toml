@@ -213,7 +213,7 @@ CONCURRENT = { group = "androidx.concurrent", atomicGroupVersion = "versions.FUT
 CONSTRAINTLAYOUT = { group = "androidx.constraintlayout" }
 CONTENTPAGER = { group = "androidx.contentpager", atomicGroupVersion = "versions.CONTENTPAGER" }
 COORDINATORLAYOUT = { group = "androidx.coordinatorlayout", atomicGroupVersion = "versions.COORDINATORLAYOUT" }
-CORE = { group = "androidx.core" }
+CORE = { group = "androidx.core", overrideInclude = [ ":core:core-viewtree" ] }
 CORE_HAPTICS = { group = "androidx.core.haptics", atomicGroupVersion = "versions.CORE_HAPTICS" }
 CORE_UWB = { group = "androidx.core.uwb", atomicGroupVersion = "versions.CORE_UWB" }
 CREDENTIALS = { group = "androidx.credentials", atomicGroupVersion = "versions.CREDENTIALS" }
