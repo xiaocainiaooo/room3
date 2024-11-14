@@ -41,11 +41,12 @@ androidXMultiplatform {
     sourceSets {
         commonMain {
             dependencies {
+                api("androidx.lifecycle:lifecycle-viewmodel:2.8.7")
+                api("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+
                 implementation(libs.kotlinStdlib)
                 implementation("androidx.compose.runtime:runtime:1.7.5")
                 implementation("androidx.compose.runtime:runtime-saveable:1.7.5")
-                implementation("androidx.lifecycle:lifecycle-viewmodel:2.8.7")
-                implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
             }
         }
 
