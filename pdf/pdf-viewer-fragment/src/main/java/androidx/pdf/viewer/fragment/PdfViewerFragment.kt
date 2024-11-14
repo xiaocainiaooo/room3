@@ -992,8 +992,13 @@ public open class PdfViewerFragment : Fragment() {
         intent.setData(localUri)
         intent.putExtra(EXTRA_PDF_FILE_NAME, getFileName(localUri!!))
         // TODO: Pass current page number to restore it in edit mode.
-        intent.putExtra(EXTRA_STARTING_PAGE, 0)
+        intent.putExtra(EXTRA_STARTING_PAGE, getStartingPageNumber())
         startActivity(intent)
+    }
+
+    private fun getStartingPageNumber(): Int {
+        // Return the page that is centered in the view.
+        return paginationModel?.midPage ?: 0
     }
 
     private fun hideSpinner() {
