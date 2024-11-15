@@ -22,6 +22,7 @@ import android.os.Looper
 import android.view.View
 import android.view.View.MeasureSpec
 import androidx.pdf.PdfDocument
+import androidx.test.annotation.UiThreadTest
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -65,6 +66,7 @@ class PdfViewPaginationTest {
     }
 
     @Test
+    @UiThreadTest
     fun testPageVisibility_withoutPdfDocument() {
         val pdfView = setupPdfViewOnMain(500, 1000, null)
 
