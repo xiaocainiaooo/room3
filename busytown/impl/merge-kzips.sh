@@ -39,13 +39,10 @@ fi
 mkdir -p "$DIST_DIR"
 export DIST_DIR="$DIST_DIR"
 
+# Default KZIP_NAME to the latest Git commit hash
+: ${KZIP_NAME:=$(git rev-parse HEAD)}
 
-# If the SUPERPROJECT_REVISION is defined as a sha, use this as the default value
-if [[ ${SUPERPROJECT_REVISION:-} =~ [0-9a-f]{40} ]]; then
-  : ${KZIP_NAME:=${SUPERPROJECT_REVISION:-}}
-fi
-
-: ${KZIP_NAME:=${BUILD_NUMBER:-}}
+# Fallback to a UUID if Git commit hash is not there
 : ${KZIP_NAME:=$(uuidgen)}
 
 
@@ -61,4 +58,3 @@ else
 fi
 
 "$BUILD_TOOLS_DIR/merge_zips" "$DIST_DIR/$allkzip" @<(find "$OUT_DIR/androidx" -name '*.kzip')
-
