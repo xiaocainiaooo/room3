@@ -25,15 +25,10 @@ import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
 @PublishedApi internal const val DEFAULT_BOOLEAN: Boolean = false
-
 @PublishedApi internal const val DEFAULT_CHAR: Char = 0.toChar()
-
 @PublishedApi internal const val DEFAULT_FLOAT: Float = 0F
-
 @PublishedApi internal const val DEFAULT_DOUBLE: Double = 0.0
-
 @PublishedApi internal const val DEFAULT_INT: Int = 0
-
 @PublishedApi internal const val DEFAULT_LONG: Long = 0L
 
 /**
@@ -50,65 +45,66 @@ internal constructor(
 ) {
 
     /**
-     * Retrieves a [Boolean] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [Boolean] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [Boolean] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
      */
     public inline fun getBoolean(key: String): Boolean
 
     /**
-     * Retrieves a [Boolean] value associated with the specified [key], or a default value if the
-     * [key] doesn't exist.
+     * Retrieves a [Boolean] value associated with the specified [key], or returns [defaultValue] if
+     * the [key] is not found or the associated value has the wrong type.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [Boolean] value associated with the [key], or the default value if the [key] is
-     *   not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getBooleanOrElse(key: String, defaultValue: () -> Boolean): Boolean
 
     /**
-     * Retrieves a [Char] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [Char] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [Char] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
      */
     public inline fun getChar(key: String): Char
 
     /**
-     * Retrieves a [Char] value associated with the specified [key], or a default value if the [key]
-     * doesn't exist.
+     * Retrieves a [Char] value associated with the specified [key], or returns [defaultValue] if
+     * the [key] is not found or the associated value has the wrong type.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [Char] value associated with the [key], or the default value if the [key] is not
-     *   found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getCharOrElse(key: String, defaultValue: () -> Char): Char
 
     /**
-     * Retrieves a [CharSequence] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [CharSequence] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [CharSequence] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getCharSequence(key: String): CharSequence
 
     /**
-     * Retrieves a [CharSequence] value associated with the specified [key], or a default value if
-     * the [key] doesn't exist.
+     * Retrieves a [CharSequence] value associated with the specified [key], or returns
+     * [defaultValue] if the [key] is not found or the associated value has the wrong type.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [CharSequence] value associated with the [key], or the default value if the [key]
-     *   is not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getCharSequenceOrElse(
         key: String,
@@ -116,117 +112,118 @@ internal constructor(
     ): CharSequence
 
     /**
-     * Retrieves a [Double] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [Double] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [Double] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
      */
     public inline fun getDouble(key: String): Double
 
     /**
-     * Retrieves a [Double] value associated with the specified [key], or a default value if the
-     * [key] doesn't exist.
+     * Retrieves a [Double] value associated with the specified [key], or returns [defaultValue] if
+     * the [key] is not found or the associated value has the wrong type.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [Double] value associated with the [key], or the default value if the [key] is
-     *   not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getDoubleOrElse(key: String, defaultValue: () -> Double): Double
 
     /**
-     * Retrieves a [Float] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [Float] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [Float] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
      */
     public inline fun getFloat(key: String): Float
 
     /**
-     * Retrieves a [Float] value associated with the specified [key], or a default value if the
-     * [key] doesn't exist.
+     * Retrieves a [Float] value associated with the specified [key], or returns [defaultValue] if
+     * the [key] is not found or the associated value has the wrong type.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [Float] value associated with the [key], or the default value if the [key] is not
-     *   found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getFloatOrElse(key: String, defaultValue: () -> Float): Float
 
     /**
-     * Retrieves an [Int] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves an [Int] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [Int] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
      */
     public inline fun getInt(key: String): Int
 
     /**
-     * Retrieves an [Int] value associated with the specified [key], or a default value if the [key]
-     * doesn't exist.
+     * Retrieves a [Int] value associated with the specified [key], or returns [defaultValue] if the
+     * [key] is not found or the associated value has the wrong type.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [Int] value associated with the [key], or the default value if the [key] is not
-     *   found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getIntOrElse(key: String, defaultValue: () -> Int): Int
 
     /**
-     * Retrieves an [Long] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves an [Long] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [Long] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
      */
     public inline fun getLong(key: String): Long
 
     /**
-     * Retrieves an [Int] value associated with the specified [key], or a default value if the [key]
-     * doesn't exist.
+     * Retrieves a [Long] value associated with the specified [key], or returns [defaultValue] if
+     * the [key] is not found or the associated value has the wrong type.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [Int] value associated with the [key], or the default value if the [key] is not
-     *   found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getLongOrElse(key: String, defaultValue: () -> Long): Long
 
     /**
-     * Retrieves a [String] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [String] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [String] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getString(key: String): String
 
     /**
-     * Retrieves a [String] value associated with the specified [key], or a default value if the
-     * [key] doesn't exist.
+     * Retrieves a [String] value associated with the specified [key], or returns [defaultValue] if
+     * the [key] is not found or the associated value has the wrong type.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [String] value associated with the [key], or the default value if the [key] is
-     *   not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getStringOrElse(key: String, defaultValue: () -> String): String
 
     /**
-     * Retrieves a [List] of elements of [Int] associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [List] of elements of [Int] associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [List] of elements of [Int] associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getIntList(key: String): List<Int>
 
@@ -235,20 +232,20 @@ internal constructor(
      * value if the [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found or the
-     *   retrieved value is not a list of [Int].
-     * @return The list of elements of [Int] associated with the [key], or the default value if the
-     *   [key] is not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getIntListOrElse(key: String, defaultValue: () -> List<Int>): List<Int>
 
     /**
-     * Retrieves a [List] of elements of [String] associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [List] of elements of [String] associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [List] of elements of [String] associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getStringList(key: String): List<String>
 
@@ -257,10 +254,10 @@ internal constructor(
      * value if the [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found or the
-     *   retrieved value is not a list of [String].
-     * @return The list of elements of [String] associated with the [key], or the default value if
-     *   the [key] is not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getStringListOrElse(
         key: String,
@@ -268,12 +265,12 @@ internal constructor(
     ): List<String>
 
     /**
-     * Retrieves a [List] of elements of [CharArray] associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [List] of elements of [CharArray] associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [List] of elements of [CharArray] associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getCharSequenceList(key: String): List<CharSequence>
 
@@ -282,10 +279,10 @@ internal constructor(
      * default value if the [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found or the
-     *   retrieved value is not a list of [CharSequence].
-     * @return The list of elements of [CharSequence] associated with the [key], or the default
-     *   value if the [key] is not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getCharSequenceListOrElse(
         key: String,
@@ -293,12 +290,12 @@ internal constructor(
     ): List<CharSequence>
 
     /**
-     * Retrieves a [BooleanArray] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [BooleanArray] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [BooleanArray] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getBooleanArray(key: String): BooleanArray
 
@@ -307,9 +304,10 @@ internal constructor(
      * the [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [BooleanArray] value associated with the [key], or the default value if the [key]
-     *   is not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getBooleanArrayOrElse(
         key: String,
@@ -317,12 +315,12 @@ internal constructor(
     ): BooleanArray
 
     /**
-     * Retrieves a [CharArray] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [CharArray] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [CharArray] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getCharArray(key: String): CharArray
 
@@ -331,19 +329,20 @@ internal constructor(
      * [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [CharArray] value associated with the [key], or the default value if the [key] is
-     *   not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getCharArrayOrElse(key: String, defaultValue: () -> CharArray): CharArray
 
     /**
-     * Retrieves a [CharArray] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [CharArray] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [CharArray] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getCharSequenceArray(key: String): Array<CharSequence>
 
@@ -352,9 +351,10 @@ internal constructor(
      * [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [CharArray] value associated with the [key], or the default value if the [key] is
-     *   not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getCharSequenceArrayOrElse(
         key: String,
@@ -362,12 +362,12 @@ internal constructor(
     ): Array<CharSequence>
 
     /**
-     * Retrieves a [DoubleArray] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [DoubleArray] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [DoubleArray] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getDoubleArray(key: String): DoubleArray
 
@@ -376,9 +376,10 @@ internal constructor(
      * the [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [DoubleArray] value associated with the [key], or the default value if the [key]
-     *   is not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getDoubleArrayOrElse(
         key: String,
@@ -386,12 +387,12 @@ internal constructor(
     ): DoubleArray
 
     /**
-     * Retrieves a [FloatArray] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [FloatArray] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [FloatArray] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getFloatArray(key: String): FloatArray
 
@@ -400,19 +401,20 @@ internal constructor(
      * [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [FloatArray] value associated with the [key], or the default value if the [key]
-     *   is not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getFloatArrayOrElse(key: String, defaultValue: () -> FloatArray): FloatArray
 
     /**
-     * Retrieves a [IntArray] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [IntArray] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [IntArray] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getIntArray(key: String): IntArray
 
@@ -421,19 +423,20 @@ internal constructor(
      * [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [IntArray] value associated with the [key], or the default value if the [key] is
-     *   not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getIntArrayOrElse(key: String, defaultValue: () -> IntArray): IntArray
 
     /**
-     * Retrieves a [LongArray] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [LongArray] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [LongArray] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getLongArray(key: String): LongArray
 
@@ -442,19 +445,20 @@ internal constructor(
      * [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [LongArray] value associated with the [key], or the default value if the [key] is
-     *   not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getLongArrayOrElse(key: String, defaultValue: () -> LongArray): LongArray
 
     /**
-     * Retrieves a [Array] of [String] value associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [Array] of [String] value associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [Array] of [String] value associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getStringArray(key: String): Array<String>
 
@@ -463,9 +467,10 @@ internal constructor(
      * if the [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found.
-     * @return The [Array] of [String] value associated with the [key], or the default value if the
-     *   [key] is not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getStringArrayOrElse(
         key: String,
@@ -473,12 +478,12 @@ internal constructor(
     ): Array<String>
 
     /**
-     * Retrieves a [SavedState] object associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [SavedState] object associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [SavedState] object associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     public inline fun getSavedState(key: String): SavedState
 
@@ -487,9 +492,10 @@ internal constructor(
      * the [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default [SavedState] if the [key] is not found.
-     * @return The [SavedState] object associated with the [key], or the default value if the [key]
-     *   is not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     public inline fun getSavedStateOrElse(key: String, defaultValue: () -> SavedState): SavedState
 
