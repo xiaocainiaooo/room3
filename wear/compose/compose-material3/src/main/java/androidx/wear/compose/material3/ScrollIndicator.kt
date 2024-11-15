@@ -597,7 +597,10 @@ internal class ScalingLazyColumnStateAdapter(private val state: ScalingLazyListS
         val isLastItem = lastVisibleItem.index == layoutInfo.totalItemsCount - 1
         // If our visible item is last in the list, we add afterContentPadding to its size
         val lastVisibleItemSize =
-            lastVisibleItem.size + (if (isLastItem) layoutInfo.afterContentPadding else 0)
+            lastVisibleItem.size +
+                (if (isLastItem)
+                    layoutInfo.afterContentPadding + layoutInfo.afterAutoCenteringPadding
+                else 0)
         // This is the offset of the last item w.r.t. the ScalingLazyColumn coordinate system where
         // 0 in the center of the visible viewport and +/-(state.viewportHeightPx / 2f) are the
         // start and end of the viewport.
@@ -633,7 +636,9 @@ internal class ScalingLazyColumnStateAdapter(private val state: ScalingLazyListS
         val isFirstItem = firstVisibleItem.index == 0
         // If our visible item is first in the list, we set beforeFirstItemPadding to the padding
         // before the first item. Then we add it to the size of the first item in our calculations.
-        val beforeFirstItemPadding = (if (isFirstItem) layoutInfo.beforeContentPadding else 0)
+        val beforeFirstItemPadding =
+            if (isFirstItem) layoutInfo.beforeContentPadding + layoutInfo.beforeAutoCenteringPadding
+            else 0
 
         val firstItemStartOffset =
             firstVisibleItem.startOffset(layoutInfo.anchorType) - beforeFirstItemPadding
