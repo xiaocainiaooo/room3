@@ -946,7 +946,7 @@ package androidx.appsearch.ast.operators {
     method public void setChildren(java.util.List<androidx.appsearch.ast.Node!>);
   }
 
-  @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public class ComparatorNode implements androidx.appsearch.ast.Node {
+  @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public final class ComparatorNode implements androidx.appsearch.ast.Node {
     ctor public ComparatorNode(int, androidx.appsearch.app.PropertyPath, long);
     method public int getComparator();
     method public androidx.appsearch.app.PropertyPath getPropertyPath();
@@ -970,7 +970,7 @@ package androidx.appsearch.ast.operators {
     method public void setChildren(java.util.List<androidx.appsearch.ast.Node!>);
   }
 
-  @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public class PropertyRestrictNode implements androidx.appsearch.ast.Node {
+  @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public final class PropertyRestrictNode implements androidx.appsearch.ast.Node {
     ctor public PropertyRestrictNode(androidx.appsearch.app.PropertyPath, androidx.appsearch.ast.Node);
     method public androidx.appsearch.ast.Node getChild();
     method public androidx.appsearch.app.PropertyPath getProperty();
