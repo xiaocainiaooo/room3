@@ -29,10 +29,13 @@ import java.lang.reflect.Method
 private const val PANEL_ENTITY_CLASS = "com.google.vr.androidx.xr.core.PanelEntity"
 private const val PANEL_ENTITY_IMPL_CLASS =
     "com.google.vr.realitycore.runtime.androidxr.PanelEntityImpl"
+private const val MAIN_PANEL_ENTITY_CLASS =
+    "com.google.vr.realitycore.runtime.androidxr.MainPanelEntityImpl"
 private const val JXR_CORE_SESSION_CLASS = "com.google.vr.androidx.xr.core.Session"
 
 private const val PANEL_ENTITY_CLASS_ANDROIDX = "androidx.xr.scenecore.PanelEntity"
 private const val PANEL_ENTITY_IMPL_CLASS_ANDROIDX = "androidx.xr.scenecore.PanelEntityImpl"
+private const val MAIN_PANEL_ENTITY_CLASS_ANDROIDX = "androidx.xr.scenecore.MainPanelEntityImpl"
 private const val JXR_CORE_SESSION_CLASS_ANDROIDX = "androidx.xr.scenecore.Session"
 
 private const val GET_ENTITIES_OF_TYPE_METHOD = "getEntitiesOfType"
@@ -40,6 +43,7 @@ private const val IS_HIDDEN_METHOD = "isHidden"
 
 private const val SURFACE_CONTROL_VIEW_HOST_FIELD = "surfaceControlViewHost"
 private const val RT_PANEL_ENTITY_FIELD = "rtPanelEntity"
+private const val RUNTIME_ACTIVITY_FIELD = "runtimeActivity"
 
 class AlternateViewHelper(private val environment: InspectorEnvironment) {
     private val activity = environment.artTooling().findInstances(Activity::class.java).first()
@@ -77,7 +81,7 @@ class AlternateViewHelper(private val environment: InspectorEnvironment) {
         return entity
             .mapAllFields { field ->
                 if (field.name == RT_PANEL_ENTITY_FIELD) {
-                    getRuntimeEntityView(field.get(entity)!!)
+                    getEntityView(field.get(entity)!!)
                 } else {
                     null
                 }
@@ -103,12 +107,22 @@ class AlternateViewHelper(private val environment: InspectorEnvironment) {
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
+    private fun getEntityView(instance: Any): View? {
+        val clazz = instance.javaClass
+        return when (clazz.name) {
+            PANEL_ENTITY_IMPL_CLASS,
+            PANEL_ENTITY_IMPL_CLASS_ANDROIDX -> getRuntimeEntityView(instance)
+            MAIN_PANEL_ENTITY_CLASS,
+            MAIN_PANEL_ENTITY_CLASS_ANDROIDX -> getMainPanelEntityImplView(instance)
+            else -> null
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun getRuntimeEntityView(instance: Any): View? {
         val clazz = instance.javaClass
-        if (clazz.name !in listOf(PANEL_ENTITY_IMPL_CLASS, PANEL_ENTITY_IMPL_CLASS_ANDROIDX)) {
-            return null
-        }
-        val surfaceControlViewHostField = loadField(clazz, SURFACE_CONTROL_VIEW_HOST_FIELD)
+        val surfaceControlViewHostField =
+            runCatching { clazz.getDeclaredField(SURFACE_CONTROL_VIEW_HOST_FIELD) }.getOrNull()
         if (surfaceControlViewHostField != null) {
             surfaceControlViewHostField.isAccessible = true
             val surfaceControlViewHost =
@@ -116,6 +130,19 @@ class AlternateViewHelper(private val environment: InspectorEnvironment) {
             return surfaceControlViewHost.view
         } else {
             return null
+        }
+    }
+
+    private fun getMainPanelEntityImplView(instance: Any): View? {
+        val clazz = instance.javaClass
+        val runtimeActivityField =
+            runCatching { clazz.getDeclaredField(RUNTIME_ACTIVITY_FIELD) }.getOrNull()
+        return if (runtimeActivityField != null) {
+            runtimeActivityField.isAccessible = true
+            val runtimeActivityInstance = runtimeActivityField.get(instance) as Activity
+            runtimeActivityInstance.window.decorView
+        } else {
+            null
         }
     }
 
