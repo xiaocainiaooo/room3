@@ -77,12 +77,9 @@ sealed class Metric {
         init {
             val expectedArtMainlineVersion = expectedArtMainlineVersion(apiLevel)
             if (expectedArtMainlineVersion != null) {
+                // require exact match
                 require(artMainlineVersion == expectedArtMainlineVersion) {
                     "For API level $apiLevel, expected artMainlineVersion to be $expectedArtMainlineVersion, observed $artMainlineVersion"
-                }
-            } else if (artMainlineVersion != null) {
-                require(artMainlineVersion > 1L) {
-                    "For API level $apiLevel, expected artMainlineVersion to be > 1, observed $artMainlineVersion"
                 }
             }
         }
@@ -92,6 +89,8 @@ sealed class Metric {
                 when {
                     apiLevel == 30 -> 1L
                     apiLevel < 30 -> -1
+                    // can't reason about other levels, since low ram go devices
+                    // may not have mainline updates enabled at all, e.g. wembley
                     else -> null
                 }
 
