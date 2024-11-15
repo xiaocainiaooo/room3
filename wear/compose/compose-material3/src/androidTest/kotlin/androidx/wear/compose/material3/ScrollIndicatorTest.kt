@@ -159,7 +159,19 @@ class ScrollIndicatorTest {
 
     @Test
     fun scalingLazyColumnStateAdapter_shortContent_scrolled() {
-        verifySlcScrollToCenter(expectedIndicatorSize = 0.75f, itemsCount = 4)
+        val itemsCount = 4
+
+        // By default in this test we use SLC with AutoCentering at 0th item. Last item will also be
+        // centered. Knowing that, the size of the screen and size of the item, we can say that the
+        // top and bottom paddings should be equal to itemSizeDp + itemSpacingDp.
+        val autoCenteringPadding = itemSizeDp + itemSpacingDp
+        // We can get an approximate indicator size by dividing viewPort size by the length of all
+        // items - including visible (top) auto centering padding.
+        val expectedIndicatorSize =
+            viewportSizeDp /
+                (itemSizeDp * itemsCount + itemSpacingDp * (itemsCount - 1) + autoCenteringPadding)
+
+        verifySlcScrollToCenter(expectedIndicatorSize = expectedIndicatorSize, itemsCount = 4)
     }
 
     @Test
@@ -325,9 +337,10 @@ class ScrollIndicatorTest {
             expectedIndicatorSize = {
                 Truth.assertThat(it).isWithin(0.05f).of(expectedIndicatorSize)
             },
-            // Scrolling by half of the list height, minus original central position of the list,
-            // which is 1.5th item.
-            scrollByItems = itemsCount / 2f - 1.5f,
+            initialCenterItemIndex = 0,
+            // Scrolling by half of the total list height, minus original central position of the
+            // list, which is 0.5th item.
+            scrollByItems = itemsCount / 2f - 0.5f,
             itemsCount = itemsCount
         )
     }
@@ -356,8 +369,9 @@ class ScrollIndicatorTest {
         verticalArrangement: Arrangement.Vertical =
             Arrangement.spacedBy(space = itemSpacingDp, alignment = Alignment.Bottom),
         reverseLayout: Boolean = false,
-        autoCentering: AutoCenteringParams? = AutoCenteringParams(),
         initialCenterItemIndex: Int = 1,
+        autoCentering: AutoCenteringParams? =
+            AutoCenteringParams(itemIndex = initialCenterItemIndex),
         contentPaddingDp: Dp = 0.dp,
         scrollByItems: Float = 0f,
         itemsCount: Int = 0,
