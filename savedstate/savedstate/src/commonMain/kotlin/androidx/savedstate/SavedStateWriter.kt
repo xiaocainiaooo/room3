@@ -45,7 +45,21 @@ internal constructor(
      */
     public inline fun putBoolean(key: String, value: Boolean)
 
+    /**
+     * Stores a char value associated with the specified key in the [SavedState].
+     *
+     * @param key The key to associate the value with.
+     * @param value The char value to store.
+     */
     public inline fun putChar(key: String, value: Char)
+
+    /**
+     * Stores a char sequence value associated with the specified key in the [SavedState].
+     *
+     * @param key The key to associate the value with.
+     * @param value The char sequence value to store.
+     */
+    public inline fun putCharSequence(key: String, value: CharSequence)
 
     /**
      * Stores a double value associated with the specified key in the [SavedState].
@@ -103,6 +117,15 @@ internal constructor(
     public inline fun putIntList(key: String, values: List<Int>)
 
     /**
+     * Stores a list of elements of [CharSequence] associated with the specified key in the
+     * [SavedState].
+     *
+     * @param key The key to associate the value with.
+     * @param values The list of elements to store.
+     */
+    public inline fun putCharSequenceList(key: String, values: List<CharSequence>)
+
+    /**
      * Stores a list of elements of [String] associated with the specified key in the [SavedState].
      *
      * @param key The key to associate the value with.
@@ -127,6 +150,15 @@ internal constructor(
      * @param values The array of elements to store.
      */
     public inline fun putCharArray(key: String, values: CharArray)
+
+    /**
+     * Stores an [Array] of elements of [CharSequence] associated with the specified key in the
+     * [SavedState].
+     *
+     * @param key The key to associate the value with.
+     * @param values The array of elements to store.
+     */
+    public inline fun putCharSequenceArray(key: String, values: Array<CharSequence>)
 
     /**
      * Stores an [Array] of elements of [Double] associated with the specified key in the

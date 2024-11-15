@@ -39,6 +39,10 @@ internal actual constructor(
         source.map[key] = value
     }
 
+    actual inline fun putCharSequence(key: String, value: CharSequence) {
+        source.map[key] = value
+    }
+
     actual inline fun putDouble(key: String, value: Double) {
         source.map[key] = value
     }
@@ -63,6 +67,10 @@ internal actual constructor(
         source.map[key] = value
     }
 
+    actual inline fun putCharSequenceList(key: String, values: List<CharSequence>) {
+        source.map[key] = values
+    }
+
     actual inline fun putIntList(key: String, values: List<Int>) {
         source.map[key] = values
     }
@@ -76,6 +84,10 @@ internal actual constructor(
     }
 
     actual inline fun putCharArray(key: String, values: CharArray) {
+        source.map[key] = values
+    }
+
+    actual inline fun putCharSequenceArray(key: String, values: Array<CharSequence>) {
         source.map[key] = values
     }
 
