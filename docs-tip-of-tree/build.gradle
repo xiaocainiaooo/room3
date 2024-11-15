@@ -23,8 +23,13 @@ dependencies {
     samples("androidx.window:window-samples:1.3.0")
 
     docsForOptionalProject(":xr:xr")
+    docsForOptionalProject(":xr:arcore:arcore")
     docsForOptionalProject(":xr:compose:compose")
     docsForOptionalProject(":xr:runtime:runtime")
+    docsForOptionalProject(":xr:runtime:runtime-openxr")
+    docsForOptionalProject(":xr:runtime:runtime-testing")
+    docsForOptionalProject(":xr:scenecore:scenecore")
+    docsForOptionalProject(":xr:scenecore:scenecore-testing")
     docs(project(":activity:activity"))
     docs(project(":activity:activity-compose"))
     docs(project(":activity:activity-ktx"))
