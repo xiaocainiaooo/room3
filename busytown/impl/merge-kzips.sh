@@ -39,10 +39,15 @@ fi
 mkdir -p "$DIST_DIR"
 export DIST_DIR="$DIST_DIR"
 
-# Default KZIP_NAME to the latest Git commit hash
+REVISION=$(grep 'path="frameworks/support"' "$MANIFEST" | sed -n 's/.*revision="\([^"]*\).*/\1/p')
+
+# Default KZIP_NAME to the revision value from the XML file
+: ${KZIP_NAME:=$REVISION}
+
+# Fallback to the latest Git commit hash if revision is not found
 : ${KZIP_NAME:=$(git rev-parse HEAD)}
 
-# Fallback to a UUID if Git commit hash is not there
+# Fallback to a UUID if both the revision and Git commit hash are not there
 : ${KZIP_NAME:=$(uuidgen)}
 
 
