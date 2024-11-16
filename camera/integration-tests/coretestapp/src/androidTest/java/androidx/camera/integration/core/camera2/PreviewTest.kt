@@ -180,6 +180,12 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         withTimeout(3_000) { completableDeferred.await() }
     }
 
+    private fun <T> CompletableDeferred<T>.completeOnceOnly(value: T) {
+        if (!this.complete(value)) {
+            throw IllegalStateException("Result Listener being invoked twice")
+        }
+    }
+
     @Test
     @Throws(InterruptedException::class)
     fun previewUnbound_RESULT_SURFACE_USED_SUCCESSFULLY_isCalled() = runBlocking {
@@ -192,7 +198,9 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                 CameraXExecutors.mainThreadExecutor(),
                 getSurfaceProvider(
                     frameAvailableListener = { frameSemaphore!!.release() },
-                    resultListener = { result -> resultDeferred.complete(result.resultCode) }
+                    resultListener = { result ->
+                        resultDeferred.completeOnceOnly(result.resultCode)
+                    }
                 )
             )
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
@@ -368,7 +376,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                 // RESULT_WILL_NOT_PROVIDE_SURFACE will be notified.
                 surfaceRequest.provideSurface(surface, CameraXExecutors.directExecutor()) { result
                     ->
-                    resultDeferred.complete(result.resultCode)
+                    resultDeferred.completeOnceOnly(result.resultCode)
                 }
             }
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
@@ -401,7 +409,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                         { result ->
                             surfaceTextureHolder.close()
                             surface.release()
-                            resultDeferred1.complete(result.resultCode)
+                            resultDeferred1.completeOnceOnly(result.resultCode)
                         }
                     )
 
@@ -411,7 +419,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                         Surface(SurfaceTexture(1)),
                         CameraXExecutors.directExecutor()
                     ) { result ->
-                        resultDeferred2.complete(result.resultCode)
+                        resultDeferred2.completeOnceOnly(result.resultCode)
                     }
                 }
             }
@@ -451,7 +459,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                 Surface(SurfaceTexture(0)),
                 CameraXExecutors.directExecutor()
             ) { result ->
-                resultDeferred.complete(result.resultCode)
+                resultDeferred.completeOnceOnly(result.resultCode)
             }
         }
 
@@ -464,27 +472,31 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
         runBlocking {
             val preview = Preview.Builder().build()
 
-            val resultDeferred = CompletableDeferred<Int>()
+            val resultDeferred1 = CompletableDeferred<Int>()
+            val resultDeferred2 = CompletableDeferred<Int>()
             instrumentation.runOnMainSync {
                 preview.setSurfaceProvider(CameraXExecutors.mainThreadExecutor()) { surfaceRequest
                     ->
                     val surface = Surface(SurfaceTexture(0))
                     surfaceRequest.provideSurface(surface, CameraXExecutors.directExecutor()) {
                         result ->
-                        resultDeferred.complete(result.resultCode)
+                        resultDeferred1.completeOnceOnly(result.resultCode)
                     }
 
                     // After the surface is provided, if there is a new request (here we trigger by
                     // setting another surfaceProvider), the previous surfaceRequest will receive
                     // RESULT_SURFACE_USED_SUCCESSFULLY.
                     preview.setSurfaceProvider(
-                        getSurfaceProvider(frameAvailableListener = { frameSemaphore!!.release() })
+                        getSurfaceProvider(
+                            frameAvailableListener = { frameSemaphore!!.release() },
+                            resultListener = { resultDeferred2.completeOnceOnly(it.resultCode) }
+                        )
                     )
                 }
                 cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
             }
 
-            assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred.await() })
+            assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred1.await() })
                 .isEqualTo(SurfaceRequest.Result.RESULT_SURFACE_USED_SUCCESSFULLY)
 
             // Wait until preview gets frame.
@@ -492,22 +504,32 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                 frameCount = FRAMES_TO_VERIFY,
                 timeoutInSeconds = 5
             )
+
+            instrumentation.runOnMainSync { cameraProvider.unbindAll() }
+
+            assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred2.await() })
+                .isEqualTo(SurfaceRequest.Result.RESULT_SURFACE_USED_SUCCESSFULLY)
         }
 
     @Test
     fun newSurfaceRequestAfterSurfaceProvided_resultCode_SURFACE_USED_SUCCESSFULLY() = runBlocking {
         val preview = Preview.Builder().build()
 
-        val resultDeferred = CompletableDeferred<Int>()
+        val resultDeferred1 = CompletableDeferred<Int>()
+        val resultDeferred2 = CompletableDeferred<Int>()
+
         var surfaceRequestCount = 0
         instrumentation.runOnMainSync {
             preview.setSurfaceProvider(CameraXExecutors.mainThreadExecutor()) { surfaceRequest ->
-                // the surface will be requested twice on the same CameraProvider instance.
+                // the surface will be requested twice on the same SurfaceProvider instance.
                 if (surfaceRequestCount == 0) {
-                    val surface = Surface(SurfaceTexture(0))
+                    val surfaceTexture = SurfaceTexture(0)
+                    val surface = Surface(surfaceTexture)
                     surfaceRequest.provideSurface(surface, CameraXExecutors.directExecutor()) {
                         result ->
-                        resultDeferred.complete(result.resultCode)
+                        surfaceTexture.release()
+                        surface.release()
+                        resultDeferred1.completeOnceOnly(result.resultCode)
                     }
 
                     // After the surface is provided, if there is a new request (here we trigger by
@@ -527,8 +549,10 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                                 .await()
                         val surface = Surface(surfaceTextureHolder.surfaceTexture)
                         surfaceRequest.provideSurface(surface, CameraXExecutors.directExecutor()) {
+                            result ->
                             surfaceTextureHolder.close()
                             surface.release()
+                            resultDeferred2.completeOnceOnly(result.resultCode)
                         }
                     }
                 }
@@ -536,11 +560,16 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
         }
 
-        assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred.await() })
+        assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred1.await() })
             .isEqualTo(SurfaceRequest.Result.RESULT_SURFACE_USED_SUCCESSFULLY)
 
         // Wait until preview gets frame.
         frameSemaphore!!.verifyFramesReceived(frameCount = FRAMES_TO_VERIFY, timeoutInSeconds = 5)
+
+        instrumentation.runOnMainSync { cameraProvider.unbindAll() }
+
+        assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred2.await() })
+            .isEqualTo(SurfaceRequest.Result.RESULT_SURFACE_USED_SUCCESSFULLY)
     }
 
     @Test
@@ -579,25 +608,49 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     fun surfaceClosed_resultCode_INVALID_SURFACE() = runBlocking {
         // Arrange.
         val preview = Preview.Builder().build()
-        val resultDeferred = CompletableDeferred<Int>()
+        val resultDeferred1 = CompletableDeferred<Int>()
+        val resultDeferred2 = CompletableDeferred<Int>()
+        val resultDeferred3 = CompletableDeferred<Int>()
 
         // Act.
         instrumentation.runOnMainSync {
             preview.setSurfaceProvider(
                 CameraXExecutors.mainThreadExecutor(),
                 { request ->
-                    val surface = Surface(SurfaceTexture(0))
-                    surface.release()
-                    request.provideSurface(surface, CameraXExecutors.directExecutor()) {
-                        resultDeferred.complete(it.resultCode)
+                    request.provideSurface(
+                        Surface(SurfaceTexture(0)).also { it.release() }, // invalid surface
+                        CameraXExecutors.directExecutor()
+                    ) { result ->
+                        resultDeferred1.completeOnceOnly(result.resultCode)
+                    }
+
+                    request.provideSurface(
+                        Surface(SurfaceTexture(0)).also { it.release() }, // invalid surface
+                        CameraXExecutors.directExecutor()
+                    ) { result ->
+                        resultDeferred2.completeOnceOnly(result.resultCode)
+                    }
+
+                    request.provideSurface(
+                        Surface(SurfaceTexture(0)), // valid surface
+                        CameraXExecutors.directExecutor()
+                    ) { result ->
+                        resultDeferred3.completeOnceOnly(result.resultCode)
                     }
                 }
             )
+
             cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
         }
 
-        assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred.await() })
+        assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred1.await() })
             .isEqualTo(SurfaceRequest.Result.RESULT_INVALID_SURFACE)
+
+        assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred2.await() })
+            .isEqualTo(SurfaceRequest.Result.RESULT_SURFACE_ALREADY_PROVIDED)
+
+        assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred3.await() })
+            .isEqualTo(SurfaceRequest.Result.RESULT_SURFACE_ALREADY_PROVIDED)
     }
 
     // ======================================================
@@ -916,7 +969,9 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             preview.setSurfaceProvider(
                 getSurfaceProvider(
                     frameAvailableListener = { frameSemaphore!!.release() },
-                    resultListener = { result -> resultDeferred.complete(result.resultCode) }
+                    resultListener = { result ->
+                        resultDeferred.completeOnceOnly(result.resultCode)
+                    }
                 )
             )
             // This is the first time the use case bound to the lifecycle.
@@ -958,7 +1013,9 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             preview.setSurfaceProvider(
                 getSurfaceProvider(
                     frameAvailableListener = { frameSemaphore!!.release() },
-                    resultListener = { result -> resultDeferred.complete(result.resultCode) }
+                    resultListener = { result ->
+                        resultDeferred.completeOnceOnly(result.resultCode)
+                    }
                 )
             )
             // This is the first time the use case bound to the lifecycle.
