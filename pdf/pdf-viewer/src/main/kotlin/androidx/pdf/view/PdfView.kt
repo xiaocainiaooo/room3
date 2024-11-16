@@ -23,12 +23,10 @@ import android.graphics.Rect
 import android.os.Looper
 import android.util.AttributeSet
 import android.util.Range
-import android.util.SparseArray
 import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.RestrictTo
 import androidx.core.os.HandlerCompat
-import androidx.core.util.keyIterator
 import androidx.pdf.PdfDocument
 import java.util.concurrent.Executors
 import kotlinx.coroutines.CoroutineScope
@@ -86,7 +84,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
 
     private val visiblePages: Range<Int>
-        get() = paginationManager?.visiblePages?.value ?: Range(0, 0)
+        get() = pageLayoutManager?.visiblePages?.value ?: Range(0, 0)
 
     /** The first page in the viewport, including partially-visible pages. 0-indexed. */
     public val firstVisiblePage: Int
@@ -103,11 +101,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     internal val backgroundScope: CoroutineScope =
         CoroutineScope(Executors.newFixedThreadPool(5).asCoroutineDispatcher() + SupervisorJob())
 
-    private var paginationManager: PaginationManager? = null
+    private var pageLayoutManager: PageLayoutManager? = null
+    private var pageManager: PageManager? = null
     private var visiblePagesCollector: Job? = null
     private var dimensionsCollector: Job? = null
-
-    private val pages = SparseArray<Page>()
+    private var invalidationCollector: Job? = null
 
     private val gestureHandler = ZoomScrollGestureHandler(this@PdfView)
     private val gestureTracker = GestureTracker(context).apply { delegate = gestureHandler }
@@ -117,10 +115,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val localPaginationManager = paginationManager ?: return
+        val localPaginationManager = pageLayoutManager ?: return
         canvas.scale(zoom, zoom)
         for (i in visiblePages.lower..visiblePages.upper) {
-            pages[i]?.draw(
+            pageManager?.drawPage(
+                i,
                 canvas,
                 localPaginationManager.getPageLocation(i, getVisibleAreaInContentCoords())
             )
@@ -134,12 +133,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        paginationManager?.onViewportChanged(scrollY, height, zoom)
+        pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
     }
 
     override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
         super.onScrollChanged(l, t, oldl, oldt)
-        paginationManager?.onViewportChanged(scrollY, height, zoom)
+        pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
     }
 
     override fun onAttachedToWindow() {
@@ -155,12 +154,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         stopCollectingData()
+        pageManager?.onDetached()
     }
 
     private fun startCollectingData() {
         val mainScope =
             CoroutineScope(HandlerCompat.createAsync(handler.looper).asCoroutineDispatcher())
-        paginationManager?.let { manager ->
+        pageLayoutManager?.let { manager ->
             // Don't let two copies of this run concurrently
             val dimensionsToJoin = dimensionsCollector?.apply { cancel() }
             dimensionsCollector =
@@ -182,22 +182,30 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                     }
                 }
         }
+        pageManager?.let { manager ->
+            val invalidationToJoin = invalidationCollector?.apply { cancel() }
+            invalidationCollector =
+                mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                    // Prevent 2 copies from running concurrently
+                    invalidationToJoin?.join()
+                    manager.updatedPagesFlow.collect { invalidate() }
+                }
+        }
     }
 
     private fun stopCollectingData() {
         dimensionsCollector?.cancel()
         visiblePagesCollector?.cancel()
+        invalidationCollector?.cancel()
     }
 
     /** Start using the [PdfDocument] to present PDF content */
     private fun onDocumentSet() {
         val localPdfDocument = pdfDocument ?: return
-        paginationManager =
-            PaginationManager(
-                    localPdfDocument,
-                    backgroundScope,
-                )
+        pageLayoutManager =
+            PageLayoutManager(localPdfDocument, backgroundScope, DEFAULT_PAGE_PREFETCH_RADIUS)
                 .apply { onViewportChanged(scrollY, height, zoom) }
+        pageManager = PageManager(localPdfDocument, backgroundScope, DEFAULT_PAGE_PREFETCH_RADIUS)
         // If not, we'll start doing this when we _are_ attached to a visible window
         if (isAttachedToVisibleWindow) {
             startCollectingData()
@@ -212,47 +220,32 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      * position or size changes.
      */
     internal fun onZoomChanged() {
-        paginationManager?.onViewportChanged(scrollY, height, zoom)
-        // If scale changed, update already-visible pages so they can re-render and redraw
-        // themselves accordingly
+        pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
         if (!gestureHandler.scaleInProgress && !gestureHandler.scrollInProgress) {
-            for (i in visiblePages.lower..visiblePages.upper) {
-                pages[i]?.maybeRender()
-            }
+            pageManager?.maybeUpdateBitmaps(visiblePages, zoom)
         }
     }
 
     private fun reset() {
         scrollTo(0, 0)
         zoom = DEFAULT_INIT_ZOOM
-        pages.clear()
+        pageManager = null
+        pageLayoutManager = null
         backgroundScope.coroutineContext.cancelChildren()
         stopCollectingData()
     }
 
     /** React to a change in visible pages (load new pages and clean up old ones) */
     private fun onVisiblePagesChanged() {
-        for (i in visiblePages.lower..visiblePages.upper) {
-            pages[i]?.isVisible = true
-        }
-
-        // Clean up pages that are no longer visible
-        for (pageIndex in pages.keyIterator()) {
-            if (pageIndex < visiblePages.lower || pageIndex > visiblePages.upper) {
-                pages[pageIndex]?.isVisible = false
-            }
-        }
+        pageManager?.maybeUpdateBitmaps(visiblePages, zoom)
     }
 
     /** React to a page's dimensions being made available */
     private fun onPageDimensionsReceived(pageNum: Int, size: Point) {
-        if (!pages.contains(pageNum)) {
-            pages[pageNum] = Page(pageNum, size, this)
-            if (visiblePages.contains(pageNum)) pages[pageNum].isVisible = true
-        }
+        pageManager?.onPageSizeReceived(pageNum, size, visiblePages.contains(pageNum), zoom)
         // Learning the dimensions of a page can change our understanding of the content that's in
         // the viewport
-        paginationManager?.onViewportChanged(scrollY, height, zoom)
+        pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
     }
 
     /** Set the zoom, using the given point as a pivot point to zoom in or out of */
@@ -328,6 +321,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         public const val DEFAULT_INIT_ZOOM: Float = 1.0f
         public const val DEFAULT_MAX_ZOOM: Float = 25.0f
         public const val DEFAULT_MIN_ZOOM: Float = 0.1f
+
+        private const val DEFAULT_PAGE_PREFETCH_RADIUS: Int = 2
 
         private fun checkMainThread() {
             check(Looper.myLooper() == Looper.getMainLooper()) {
