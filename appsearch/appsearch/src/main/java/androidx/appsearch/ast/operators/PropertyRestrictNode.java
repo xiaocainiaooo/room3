@@ -27,6 +27,7 @@ import androidx.core.util.Preconditions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * {@link Node} that represents a property restrict.
@@ -114,5 +115,19 @@ public final class PropertyRestrictNode implements Node {
     @Override
     public String toString() {
         return "(" + mProperty + ":" + getChild() + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PropertyRestrictNode)) return false;
+        PropertyRestrictNode that = (PropertyRestrictNode) o;
+        return Objects.equals(mProperty, that.mProperty) && Objects.equals(
+                mChildren, that.mChildren);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mProperty, mChildren);
     }
 }
