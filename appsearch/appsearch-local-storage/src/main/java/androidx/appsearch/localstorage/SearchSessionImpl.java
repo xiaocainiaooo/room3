@@ -43,6 +43,7 @@ import androidx.appsearch.app.Migrator;
 import androidx.appsearch.app.OpenBlobForReadResponse;
 import androidx.appsearch.app.OpenBlobForWriteResponse;
 import androidx.appsearch.app.PutDocumentsRequest;
+import androidx.appsearch.app.RemoveBlobResponse;
 import androidx.appsearch.app.RemoveByDocumentIdRequest;
 import androidx.appsearch.app.ReportUsageRequest;
 import androidx.appsearch.app.SearchResults;
@@ -441,6 +442,28 @@ class SearchSessionImpl implements AppSearchSession {
                 }
             }
             return new OpenBlobForWriteResponse(resultBuilder.build());
+        });
+    }
+
+    @NonNull
+    @Override
+    @ExperimentalAppSearchApi
+    public ListenableFuture<RemoveBlobResponse> removeBlobAsync(
+            @NonNull Set<AppSearchBlobHandle> handles) {
+        Preconditions.checkNotNull(handles);
+        Preconditions.checkState(!mIsClosed, "AppSearchSession has already been closed");
+        return execute(() -> {
+            AppSearchBatchResult.Builder<AppSearchBlobHandle, Void> resultBuilder =
+                    new AppSearchBatchResult.Builder<>();
+            for (AppSearchBlobHandle handle : handles) {
+                try {
+                    mAppSearchImpl.removeBlob(mPackageName, mDatabaseName, handle);
+                    resultBuilder.setSuccess(handle, null);
+                } catch (Throwable t) {
+                    resultBuilder.setResult(handle, throwableToFailedResult(t));
+                }
+            }
+            return new RemoveBlobResponse(resultBuilder.build());
         });
     }
 

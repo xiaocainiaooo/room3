@@ -1133,7 +1133,6 @@ public final class AppSearchImpl implements Closeable {
         }
     }
 
-
     /**
      * Gets the {@link ParcelFileDescriptor} for write purpose of the given
      * {@link AppSearchBlobHandle}.
@@ -1163,9 +1162,43 @@ public final class AppSearchImpl implements Closeable {
 
             checkSuccess(result.getStatus());
             ParcelFileDescriptor pfd = ParcelFileDescriptor.adoptFd(result.getFileDescriptor());
-
             return mRevocableFileDescriptorStore
                     .wrapToRevocableFileDescriptor(handle.getPackageName(), pfd);
+        } finally {
+            mReadWriteLock.writeLock().unlock();
+        }
+    }
+
+    /**
+     * Remove and delete the blob file of given {@link AppSearchBlobHandle} from AppSearch
+     * storage.
+     *
+     * <p> This method will delete pending blob or committed blobs. Remove blobs that have reference
+     * documents linked to it will make those reference document has nothing to read.
+     *
+     * @param packageName    The package name that owns this blob.
+     * @param databaseName   The databaseName this blob resides in.
+     * @param handle         The {@link AppSearchBlobHandle} represent the blob.
+     */
+    @ExperimentalAppSearchApi
+    public void removeBlob(
+            @NonNull String packageName,
+            @NonNull String databaseName,
+            @NonNull AppSearchBlobHandle handle)
+            throws AppSearchException, IOException {
+        if (mRevocableFileDescriptorStore == null) {
+            throw new UnsupportedOperationException(
+                    "BLOB_STORAGE is not available on this AppSearch implementation.");
+        }
+        mReadWriteLock.writeLock().lock();
+        try {
+            throwIfClosedLocked();
+            verifyCallingBlobHandle(packageName, databaseName, handle);
+
+            BlobProto result = mIcingSearchEngineLocked.removeBlob(
+                    BlobHandleToProtoConverter.toBlobHandleProto(handle));
+
+            checkSuccess(result.getStatus());
         } finally {
             mReadWriteLock.writeLock().unlock();
         }
