@@ -121,7 +121,9 @@ public class SchemaToProtoConverterTest {
                                         .setDescription("The time at which the email was sent.")
                                         .setDataType(PropertyConfigProto.DataType.Code.INT64)
                                         .setCardinality(
-                                                PropertyConfigProto.Cardinality.Code.OPTIONAL))
+                                                PropertyConfigProto.Cardinality.Code.OPTIONAL)
+                                        .setScorableType(
+                                                PropertyConfigProto.ScorableType.Code.DISABLED))
                         .addProperties(
                                 PropertyConfigProto.newBuilder()
                                         .setPropertyName("importanceScore")
@@ -129,7 +131,9 @@ public class SchemaToProtoConverterTest {
                                                 "A value representing this document's importance.")
                                         .setDataType(PropertyConfigProto.DataType.Code.DOUBLE)
                                         .setCardinality(
-                                                PropertyConfigProto.Cardinality.Code.OPTIONAL))
+                                                PropertyConfigProto.Cardinality.Code.OPTIONAL)
+                                        .setScorableType(
+                                                PropertyConfigProto.ScorableType.Code.DISABLED))
                         .addProperties(
                                 PropertyConfigProto.newBuilder()
                                         .setPropertyName("read")
@@ -137,7 +141,9 @@ public class SchemaToProtoConverterTest {
                                                 "Whether the email has been read by the recipient")
                                         .setDataType(PropertyConfigProto.DataType.Code.BOOLEAN)
                                         .setCardinality(
-                                                PropertyConfigProto.Cardinality.Code.OPTIONAL))
+                                                PropertyConfigProto.Cardinality.Code.OPTIONAL)
+                                        .setScorableType(
+                                                PropertyConfigProto.ScorableType.Code.DISABLED))
                         .addProperties(
                                 PropertyConfigProto.newBuilder()
                                         .setPropertyName("attachment")
@@ -209,9 +215,8 @@ public class SchemaToProtoConverterTest {
                                 StringIndexingConfig.newBuilder()
                                         .setTokenizerType(
                                                 StringIndexingConfig.TokenizerType.Code.PLAIN)
-                                        .setTermMatchType(TermMatchType.Code.PREFIX)
-                        )
-                ).addProperties(PropertyConfigProto.newBuilder()
+                                        .setTermMatchType(TermMatchType.Code.PREFIX)))
+                .addProperties(PropertyConfigProto.newBuilder()
                         .setPropertyName("body")
                         .setDescription("")
                         .setDataType(PropertyConfigProto.DataType.Code.STRING)
@@ -220,9 +225,8 @@ public class SchemaToProtoConverterTest {
                                 StringIndexingConfig.newBuilder()
                                         .setTokenizerType(
                                                 StringIndexingConfig.TokenizerType.Code.PLAIN)
-                                        .setTermMatchType(TermMatchType.Code.PREFIX)
-                        )
-                ).build();
+                                        .setTermMatchType(TermMatchType.Code.PREFIX)))
+                .build();
 
         assertThat(SchemaToProtoConverter.toSchemaTypeConfigProto(emailSchema, /*version=*/12345))
                 .isEqualTo(expectedEmailProto);
@@ -265,6 +269,7 @@ public class SchemaToProtoConverterTest {
                         .setDescription("")
                         .setDataType(PropertyConfigProto.DataType.Code.INT64)
                         .setCardinality(PropertyConfigProto.Cardinality.Code.OPTIONAL)
+                        .setScorableType(PropertyConfigProto.ScorableType.Code.DISABLED)
                 ).build();
 
         assertThat(SchemaToProtoConverter.toSchemaTypeConfigProto(
@@ -543,6 +548,56 @@ public class SchemaToProtoConverterTest {
         assertThat(SchemaToProtoConverter.toSchemaTypeConfigProto(emailSchema, /*version=*/12345))
                 .isEqualTo(expectedEmailProto);
         assertThat(SchemaToProtoConverter.toAppSearchSchema(expectedEmailProto))
+                .isEqualTo(emailSchema);
+    }
+
+    public void testGetProto_withScorablePropertyEnabled() {
+        AppSearchSchema emailSchema = new AppSearchSchema.Builder("Email")
+                .addProperty(new AppSearchSchema.LongPropertyConfig.Builder("viewTimes")
+                        .setCardinality(AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setScoringEnabled(true)
+                        .build())
+                .addProperty(new AppSearchSchema.DoublePropertyConfig.Builder("score")
+                        .setCardinality(AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setScoringEnabled(true)
+                        .build())
+                .addProperty(new AppSearchSchema.BooleanPropertyConfig.Builder("read")
+                        .setCardinality(AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setScoringEnabled(true)
+                        .build())
+                .build();
+
+        SchemaTypeConfigProto expectedProto = SchemaTypeConfigProto.newBuilder()
+                .setSchemaType("Email")
+                .setDescription("")
+                .setVersion(0)
+                .addProperties(PropertyConfigProto.newBuilder()
+                        .setPropertyName("viewTimes")
+                        .setDescription("")
+                        .setDataType(PropertyConfigProto.DataType.Code.INT64)
+                        .setCardinality(PropertyConfigProto.Cardinality.Code.OPTIONAL)
+                        .setScorableType(
+                                PropertyConfigProto.ScorableType.Code.ENABLED))
+                .addProperties(PropertyConfigProto.newBuilder()
+                        .setPropertyName("score")
+                        .setDescription("")
+                        .setDataType(PropertyConfigProto.DataType.Code.DOUBLE)
+                        .setCardinality(PropertyConfigProto.Cardinality.Code.OPTIONAL)
+                        .setScorableType(
+                                PropertyConfigProto.ScorableType.Code.ENABLED))
+                .addProperties(PropertyConfigProto.newBuilder()
+                        .setPropertyName("read")
+                        .setDescription("")
+                        .setDataType(PropertyConfigProto.DataType.Code.BOOLEAN)
+                        .setCardinality(PropertyConfigProto.Cardinality.Code.OPTIONAL)
+                        .setScorableType(
+                                PropertyConfigProto.ScorableType.Code.ENABLED))
+                .build();
+
+        assertThat(SchemaToProtoConverter.toSchemaTypeConfigProto(
+                emailSchema, /*version=*/0))
+                .isEqualTo(expectedProto);
+        assertThat(SchemaToProtoConverter.toAppSearchSchema(expectedProto))
                 .isEqualTo(emailSchema);
     }
 }

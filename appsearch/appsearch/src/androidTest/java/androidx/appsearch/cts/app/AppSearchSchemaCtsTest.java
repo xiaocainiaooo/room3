@@ -22,6 +22,8 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import androidx.appsearch.app.AppSearchSchema;
+import androidx.appsearch.app.AppSearchSchema.BooleanPropertyConfig;
+import androidx.appsearch.app.AppSearchSchema.DoublePropertyConfig;
 import androidx.appsearch.app.AppSearchSchema.LongPropertyConfig;
 import androidx.appsearch.app.AppSearchSchema.PropertyConfig;
 import androidx.appsearch.app.AppSearchSchema.StringPropertyConfig;
@@ -63,6 +65,34 @@ public class AppSearchSchemaCtsTest {
         LongPropertyConfig builder = new LongPropertyConfig.Builder("test").build();
         assertThat(builder.getIndexingType()).isEqualTo(LongPropertyConfig.INDEXING_TYPE_NONE);
         assertThat(builder.getCardinality()).isEqualTo(PropertyConfig.CARDINALITY_OPTIONAL);
+        assertThat(builder.isScoringEnabled()).isEqualTo(false);
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
+    public void testLongPropertyConfigWithScorableConfig() {
+        LongPropertyConfig.Builder builder = new LongPropertyConfig.Builder("test");
+        assertThat(builder.build().isScoringEnabled()).isEqualTo(false);
+        builder.setScoringEnabled(true);
+        assertThat(builder.build().isScoringEnabled()).isEqualTo(true);
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
+    public void testDoublePropertyConfigWithScorableConfig() {
+        DoublePropertyConfig.Builder builder = new DoublePropertyConfig.Builder("test");
+        assertThat(builder.build().isScoringEnabled()).isEqualTo(false);
+        builder.setScoringEnabled(true);
+        assertThat(builder.build().isScoringEnabled()).isEqualTo(true);
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
+    public void testBooleanPropertyConfigWithScorableConfig() {
+        BooleanPropertyConfig.Builder builder = new BooleanPropertyConfig.Builder("test");
+        assertThat(builder.build().isScoringEnabled()).isEqualTo(false);
+        builder.setScoringEnabled(true);
+        assertThat(builder.build().isScoringEnabled()).isEqualTo(true);
     }
 
     @Test
@@ -110,15 +140,34 @@ public class AppSearchSchemaCtsTest {
                         .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
                         .setIndexingType(StringPropertyConfig.INDEXING_TYPE_PREFIXES)
                         .setTokenizerType(StringPropertyConfig.TOKENIZER_TYPE_PLAIN)
-                        .build()
-                ).build();
+                        .build())
+                .build();
         AppSearchSchema schema2 = new AppSearchSchema.Builder("Email")
                 .addProperty(new StringPropertyConfig.Builder("subject")
                         .setTokenizerType(StringPropertyConfig.TOKENIZER_TYPE_PLAIN)
                         .setIndexingType(StringPropertyConfig.INDEXING_TYPE_PREFIXES)
                         .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
-                        .build()
-                ).build();
+                        .build())
+                .build();
+        assertThat(schema1).isEqualTo(schema2);
+        assertThat(schema1.hashCode()).isEqualTo(schema2.hashCode());
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
+    public void testEquals_differentOrderWithScorableProperty() {
+        AppSearchSchema schema1 = new AppSearchSchema.Builder("Email")
+                .addProperty(new LongPropertyConfig.Builder("viewTimes")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setScoringEnabled(true)
+                        .build())
+                .build();
+        AppSearchSchema schema2 = new AppSearchSchema.Builder("Email")
+                .addProperty(new LongPropertyConfig.Builder("viewTimes")
+                        .setScoringEnabled(true)
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .build())
+                .build();
         assertThat(schema1).isEqualTo(schema2);
         assertThat(schema1.hashCode()).isEqualTo(schema2.hashCode());
     }
@@ -137,6 +186,26 @@ public class AppSearchSchemaCtsTest {
                         .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
                         .setIndexingType(StringPropertyConfig.INDEXING_TYPE_EXACT_TERMS)  // Diff
                         .setTokenizerType(StringPropertyConfig.TOKENIZER_TYPE_PLAIN)
+                        .build()
+                ).build();
+        assertThat(schema1).isNotEqualTo(schema2);
+        assertThat(schema1.hashCode()).isNotEqualTo(schema2.hashCode());
+    }
+
+    @Test
+    public void testEquals_failWithDifferentScorableTypes() {
+        AppSearchSchema schema1 = new AppSearchSchema.Builder("Email")
+                .addProperty(new LongPropertyConfig.Builder("id")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setScoringEnabled(true)
+                        .setIndexingType(LongPropertyConfig.INDEXING_TYPE_RANGE)
+                        .build()
+                ).build();
+        AppSearchSchema schema2 = new AppSearchSchema.Builder("Email")
+                .addProperty(new LongPropertyConfig.Builder("id")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setScoringEnabled(false)
+                        .setIndexingType(LongPropertyConfig.INDEXING_TYPE_RANGE)
                         .build()
                 ).build();
         assertThat(schema1).isNotEqualTo(schema2);

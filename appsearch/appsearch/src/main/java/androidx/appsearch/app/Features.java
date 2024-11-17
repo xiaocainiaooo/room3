@@ -229,6 +229,16 @@ public interface Features {
 
     /**
      * Feature for {@link #isFeatureSupported(String)}. This feature covers
+     * {@link AppSearchSchema.LongPropertyConfig.Builder#setScoringEnabled(boolean)},
+     * {@link AppSearchSchema.DoublePropertyConfig.Builder#setScoringEnabled(boolean)},
+     * {@link AppSearchSchema.BooleanPropertyConfig.Builder#setScoringEnabled(boolean)}.
+     * {@link SearchSpec.Builder#setScorablePropertyRankingEnabled(boolean)}.
+     */
+    @ExperimentalAppSearchApi
+    String SCHEMA_SCORABLE_PROPERTY_CONFIG = FeatureConstants.SCHEMA_SCORABLE_PROPERTY_CONFIG;
+
+    /**
+     * Feature for {@link #isFeatureSupported(String)}. This feature covers
      * {@link SearchSpec.Builder#setSearchSourceLogTag(String)}.
      */
     String SEARCH_SPEC_SET_SEARCH_SOURCE_LOG_TAG = "SEARCH_SPEC_SET_SEARCH_SOURCE_LOG_TAG";

@@ -228,7 +228,6 @@ public interface IcingOptionsConfig {
      */
     boolean getBuildPropertyExistenceMetadataHits();
 
-
     /**
      * Flag for {@link com.google.android.icing.proto.IcingSearchEngineOptions}.
      *
@@ -236,7 +235,6 @@ public interface IcingOptionsConfig {
      * and retrieve blobs.
      */
     boolean getEnableBlobStore();
-
 
     /**
      * Config for {@link com.google.android.icing.proto.IcingSearchEngineOptions}.

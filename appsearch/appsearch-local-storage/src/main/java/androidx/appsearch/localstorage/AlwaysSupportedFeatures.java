@@ -94,6 +94,8 @@ public class AlwaysSupportedFeatures implements Features {
             case Features.BLOB_STORAGE:
                 // fall through
             case Features.SEARCH_SPEC_ADD_FILTER_DOCUMENT_IDS:
+                // fall through
+            case Features.SCHEMA_SCORABLE_PROPERTY_CONFIG:
                 return true;
             default:
                 return false;
