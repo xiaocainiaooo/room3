@@ -56,6 +56,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 
@@ -102,6 +103,139 @@ class AndroidAutofillManagerTest {
         }
 
         rule.runOnIdle { verifyNoMoreInteractions(autofillManagerMock) }
+    }
+
+    @Test
+    @SmallTest
+    fun autofillManager_doNotCallCommit_nodesAppeared() {
+        val usernameTag = "username_tag"
+        var isVisible by mutableStateOf(false)
+
+        rule.setContentWithAutofillEnabled {
+            if (isVisible) {
+                Box(
+                    Modifier.semantics { contentType = ContentType.Username }
+                        .size(height, width)
+                        .testTag(usernameTag)
+                )
+            }
+        }
+
+        rule.runOnIdle { isVisible = true }
+
+        // `commit` should not be called when an autofillable component appears onscreen.
+        rule.runOnIdle { verify(autofillManagerMock, times(0)).commit() }
+    }
+
+    @Test
+    @SmallTest
+    fun autofillManager_doNotCallCommit_autofillTagsAdded() {
+        val usernameTag = "username_tag"
+        var isRelatedToAutofill by mutableStateOf(false)
+
+        rule.setContentWithAutofillEnabled {
+            Box(
+                modifier =
+                    if (isRelatedToAutofill)
+                        Modifier.semantics {
+                                contentType = ContentType.Username
+                                contentDataType = ContentDataType.Text
+                            }
+                            .size(height, width)
+                            .testTag(usernameTag)
+                    else Modifier.size(height, width).testTag(usernameTag)
+            )
+        }
+
+        rule.runOnIdle { isRelatedToAutofill = true }
+
+        // `commit` should not be called a component becomes relevant to autofill.
+        rule.runOnIdle { verify(autofillManagerMock, times(0)).commit() }
+    }
+
+    @Test
+    @SmallTest
+    fun autofillManager_callCommit_nodesDisappeared() {
+        val usernameTag = "username_tag"
+        var revealFirstUsername by mutableStateOf(true)
+
+        rule.setContentWithAutofillEnabled {
+            if (revealFirstUsername) {
+                Box(
+                    Modifier.semantics { contentType = ContentType.Username }
+                        .size(height, width)
+                        .testTag(usernameTag)
+                )
+            }
+        }
+
+        rule.runOnIdle { revealFirstUsername = false }
+
+        // `commit` should be called when an autofillable component leaves the screen.
+        rule.runOnIdle { verify(autofillManagerMock, times(1)).commit() }
+    }
+
+    @Test
+    @SmallTest
+    fun autofillManager_callCommit_nodesDisappearedAndAppeared() {
+        val username1Tag = "username_tag"
+        val username2Tag = "username_tag"
+        var revealFirstUsername by mutableStateOf(true)
+        var revealSecondUsername by mutableStateOf(false)
+
+        rule.setContentWithAutofillEnabled {
+            if (revealFirstUsername) {
+                Box(
+                    Modifier.semantics { contentType = ContentType.Username }
+                        .size(height, width)
+                        .testTag(username1Tag)
+                )
+            }
+            if (revealSecondUsername) {
+                Box(
+                    Modifier.semantics { contentType = ContentType.Username }
+                        .size(height, width)
+                        .testTag(username2Tag)
+                )
+            }
+        }
+
+        rule.runOnIdle { revealFirstUsername = false }
+        rule.runOnIdle { revealSecondUsername = true }
+
+        // `commit` should be called when an autofillable component leaves onscreen, even when
+        // another, different autofillable component is added.
+        rule.runOnIdle { verify(autofillManagerMock, times(1)).commit() }
+    }
+
+    @Test
+    @SmallTest
+    fun autofillManager_callCommit_nodesBecomeAutofillRelatedAndDisappear() {
+        val usernameTag = "username_tag"
+        var isVisible by mutableStateOf(true)
+        var isRelatedToAutofill by mutableStateOf(false)
+
+        rule.setContentWithAutofillEnabled {
+            if (isVisible) {
+                Box(
+                    modifier =
+                        if (isRelatedToAutofill)
+                            Modifier.semantics {
+                                    contentType = ContentType.Username
+                                    contentDataType = ContentDataType.Text
+                                }
+                                .size(height, width)
+                                .testTag(usernameTag)
+                        else Modifier.size(height, width).testTag(usernameTag)
+                )
+            }
+        }
+
+        rule.runOnIdle { isRelatedToAutofill = true }
+        rule.runOnIdle { isVisible = false }
+
+        // `commit` should be called when component becomes autofillable, then leaves the screen.
+        rule.runOnIdle { verify(autofillManagerMock, times(1)).commit() }
     }
 
     @Test
@@ -343,7 +477,6 @@ class AndroidAutofillManagerTest {
             .testTag(testTag)
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     @RequiresApi(Build.VERSION_CODES.O)
     private fun ComposeContentTestRule.setContentWithAutofillEnabled(
         content: @Composable () -> Unit
@@ -354,6 +487,7 @@ class AndroidAutofillManagerTest {
             androidComposeView = LocalView.current as AndroidComposeView
             androidComposeView._autofillManager?.currentSemanticsNodesInvalidated = true
             androidComposeView._autofillManager?.autofillManager = autofillManagerMock
+            @OptIn(ExperimentalComposeUiApi::class)
             isSemanticAutofillEnabled = true
 
             composeView = LocalView.current
