@@ -674,6 +674,9 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
             excludeVersionFiles(packaging.resources)
         }
 
+        project.extensions.getByType(AndroidComponentsExtension::class.java).apply {
+            onVariants { it.configureLocalAsbSigning(project.getKeystore()) }
+        }
         project.configureJavaCompilationWarnings(androidXExtension)
     }
 
