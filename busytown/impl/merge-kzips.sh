@@ -52,4 +52,13 @@ fi
 rm -rf $DIST_DIR/*.kzip
 declare -r allkzip="$KZIP_NAME.kzip"
 echo "Merging Kzips..."
-"$PREBUILTS_DIR/build-tools/linux-x86/bin/merge_zips" "$DIST_DIR/$allkzip" @<(find "$OUT_DIR/androidx" -name '*.kzip')
+
+# Determine the directory based on OS
+if [[ "$(uname)" == "Darwin" ]]; then
+  BUILD_TOOLS_DIR="$PREBUILTS_DIR/build-tools/darwin-x86/bin"
+else
+  BUILD_TOOLS_DIR="$PREBUILTS_DIR/build-tools/linux-x86/bin"
+fi
+
+"$BUILD_TOOLS_DIR/merge_zips" "$DIST_DIR/$allkzip" @<(find "$OUT_DIR/androidx" -name '*.kzip')
+
