@@ -21,19 +21,24 @@ import androidx.build.Release
 import androidx.build.RunApiTasks
 import androidx.build.Version
 import androidx.build.binarycompatibilityvalidator.BinaryCompatibilityValidation
+import androidx.build.getDefaultTargetJavaVersion
 import androidx.build.getSupportRootFolder
 import androidx.build.isWriteVersionedApiFilesEnabled
 import androidx.build.java.JavaCompileInputs
+import androidx.build.kythe.GenerateKotlinKzipTask
 import androidx.build.metalava.MetalavaTasks
 import androidx.build.multiplatformExtension
 import androidx.build.resources.ResourceTasks
 import androidx.build.stableaidl.setupWithStableAidlPlugin
 import androidx.build.version
 import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.attributes.BuildTypeAttr
 import com.android.build.api.variant.LibraryVariant
 import java.io.File
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.artifacts.type.ArtifactTypeDefinition
+import org.gradle.api.attributes.Usage
 import org.gradle.api.file.RegularFile
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
@@ -186,9 +191,38 @@ fun Project.configureProjectForApiTasks(config: ApiTaskConfig, extension: Androi
 
         val baselinesApiLocation = ApiBaselinesLocation.fromApiLocation(currentApiLocation)
 
+        val generateApiDependencies =
+            configurations.create("GenerateApiDependencies") {
+                it.isCanBeConsumed = false
+                it.isTransitive = false
+                it.attributes.attribute(
+                    BuildTypeAttr.ATTRIBUTE,
+                    project.objects.named(BuildTypeAttr::class.java, "release")
+                )
+                it.attributes.attribute(
+                    Usage.USAGE_ATTRIBUTE,
+                    objects.named(Usage::class.java, Usage.JAVA_API)
+                )
+                it.attributes.attribute(
+                    ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE,
+                    ArtifactTypeDefinition.JAR_TYPE
+                )
+            }
+
+        dependencies.add(generateApiDependencies.name, project.project(project.path))
+
+        GenerateKotlinKzipTask.setupProject(
+            project,
+            javaInputs,
+            generateApiDependencies,
+            extension.kotlinTarget,
+            getDefaultTargetJavaVersion(extension.type, project.name)
+        )
+
         MetalavaTasks.setupProject(
             project,
             javaInputs,
+            generateApiDependencies,
             extension,
             androidManifest,
             baselinesApiLocation,
