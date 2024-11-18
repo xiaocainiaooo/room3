@@ -52,6 +52,7 @@ import androidx.camera.camera2.pipe.integration.compat.quirk.CloseCameraDeviceOn
 import androidx.camera.camera2.pipe.integration.compat.quirk.CloseCaptureSessionOnDisconnectQuirk
 import androidx.camera.camera2.pipe.integration.compat.quirk.CloseCaptureSessionOnVideoQuirk
 import androidx.camera.camera2.pipe.integration.compat.quirk.DeviceQuirks
+import androidx.camera.camera2.pipe.integration.compat.quirk.DisableAbortCapturesOnStopQuirk
 import androidx.camera.camera2.pipe.integration.compat.quirk.DisableAbortCapturesOnStopWithSessionProcessorQuirk
 import androidx.camera.camera2.pipe.integration.compat.quirk.FinalizeSessionOnCloseQuirk
 import androidx.camera.camera2.pipe.integration.compat.quirk.QuickSuccessiveImageCaptureFailsRepeatingRequestQuirk
@@ -1102,6 +1103,7 @@ constructor(
                         DeviceQuirks[
                             DisableAbortCapturesOnStopWithSessionProcessorQuirk::class.java] !=
                             null -> false
+                    DeviceQuirks[DisableAbortCapturesOnStopQuirk::class.java] != null -> false
                     /** @see [CameraGraph.Flags.abortCapturesOnStop] */
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> true
                     else -> false
