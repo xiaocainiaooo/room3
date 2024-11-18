@@ -94,10 +94,10 @@ fun Modifier.scrollTransform(
     shape: Shape = RectangleShape
 ): Modifier =
     with(scope) {
-        var minMorphingHeight by remember { mutableStateOf<Float?>(null) }
-        val spec = remember { LazyColumnScrollTransformBehavior { minMorphingHeight } }
+        var minMorphingHeight by remember(scope) { mutableStateOf<Float?>(null) }
+        val spec = remember(scope) { LazyColumnScrollTransformBehavior { minMorphingHeight } }
         val painter =
-            remember(backgroundColor, shape) {
+            remember(scope, backgroundColor, shape) {
                 ScalingMorphingBackgroundPainter(
                     spec,
                     shape,
@@ -139,10 +139,10 @@ fun Modifier.scrollTransform(
     border: BorderStroke? = null
 ): Modifier =
     with(scope) {
-        var minMorphingHeight by remember { mutableStateOf<Float?>(null) }
-        val spec = remember { LazyColumnScrollTransformBehavior { minMorphingHeight } }
+        var minMorphingHeight by remember(scope) { mutableStateOf<Float?>(null) }
+        val spec = remember(scope) { LazyColumnScrollTransformBehavior { minMorphingHeight } }
         val morphingPainter =
-            remember(painter, shape, border) {
+            remember(scope, painter, shape, border) {
                 ScalingMorphingBackgroundPainter(spec, shape, border, painter) { scrollProgress }
             }
         this@scrollTransform then
