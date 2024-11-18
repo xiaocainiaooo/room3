@@ -48,7 +48,7 @@ android {
 androidx {
     name = "androidx.core:core-viewtree"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenVersion = LibraryVersions.CORE
+    mavenVersion = LibraryVersions.CORE_VIEWTREE
     inceptionYear = "2024"
     description = "Provides ViewTree extensions packaged for use by other core androidx libraries"
 }
