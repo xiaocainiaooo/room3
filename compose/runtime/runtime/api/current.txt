@@ -974,22 +974,8 @@ package androidx.compose.runtime.snapshots {
   }
 
   public final class SnapshotId_jvmKt {
-    method public static inline operator int compareTo(long, int other);
-    method public static inline operator int compareTo(long, long other);
-    method public static inline operator long div(long, int other);
-    method public static inline operator long minus(long, int other);
-    method public static inline operator long minus(long, long other);
-    method public static inline operator long plus(long, int other);
-    method public static inline operator long times(long, int other);
     method public static inline int toInt(long);
-    property public static final long SnapshotIdInvalidValue;
-    property public static final long SnapshotIdMax;
-    property public static final int SnapshotIdSize;
-    property public static final long SnapshotIdZero;
-    field public static final long SnapshotIdInvalidValue = -1L; // 0xffffffffffffffffL
-    field public static final long SnapshotIdMax = 9223372036854775807L; // 0x7fffffffffffffffL
-    field public static final int SnapshotIdSize = 64; // 0x40
-    field public static final long SnapshotIdZero = 0L; // 0x0L
+    method public static inline long toLong(long);
   }
 
   public final class SnapshotKt {
