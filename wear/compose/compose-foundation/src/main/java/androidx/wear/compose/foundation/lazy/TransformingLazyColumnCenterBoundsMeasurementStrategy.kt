@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastForEach
+import androidx.wear.compose.foundation.lazy.layout.LazyLayoutKeyIndexMap
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
@@ -49,6 +50,7 @@ internal class TransformingLazyColumnCenterBoundsMeasurementStrategy :
     override fun measure(
         itemsCount: Int,
         measuredItemProvider: MeasuredItemProvider,
+        keyIndexMap: LazyLayoutKeyIndexMap,
         itemSpacing: Int,
         containerConstraints: Constraints,
         anchorItemIndex: Int,
