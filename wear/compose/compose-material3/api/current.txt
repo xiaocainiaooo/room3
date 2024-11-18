@@ -119,8 +119,10 @@ package androidx.wear.compose.material3 {
     method public float getCompactButtonVerticalPadding();
     method public androidx.compose.foundation.layout.PaddingValues getContentPadding();
     method public float getExtraLargeIconSize();
+    method public float getExtraSmallIconSize();
     method public float getHeight();
     method public float getIconSize();
+    method public float getIconSpacing();
     method public float getLargeIconSize();
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.shape.RoundedCornerShape getShape();
     method public float getSmallIconSize();
@@ -141,8 +143,10 @@ package androidx.wear.compose.material3 {
     property public final float CompactButtonVerticalPadding;
     property public final androidx.compose.foundation.layout.PaddingValues ContentPadding;
     property public final float ExtraLargeIconSize;
+    property public final float ExtraSmallIconSize;
     property public final float Height;
     property public final float IconSize;
+    property public final float IconSpacing;
     property public final float LargeIconSize;
     property public final float SmallIconSize;
     property @androidx.compose.runtime.Composable public final androidx.compose.foundation.shape.RoundedCornerShape compactButtonShape;
