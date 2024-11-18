@@ -22,20 +22,20 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
+import android.view.ViewGroup.LayoutParams
 import androidx.annotation.RestrictTo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.pdf.R
 import androidx.pdf.exceptions.PdfPasswordException
+import androidx.pdf.view.PdfView
 import kotlinx.coroutines.launch
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class PdfViewerFragmentV2 : Fragment() {
     private val documentViewModel: PdfDocumentViewModel by
         viewModels() { PdfDocumentViewModel.Factory }
-    private lateinit var pdfViewer: FrameLayout
+    private lateinit var pdfView: PdfView
 
     public var documentUri: Uri? = null
         set(value) {
@@ -48,8 +48,11 @@ public class PdfViewerFragmentV2 : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        pdfViewer = inflater.inflate(R.layout.pdf_viewer_container, container, false) as FrameLayout
-        return pdfViewer
+        pdfView =
+            PdfView(requireContext()).apply {
+                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+            }
+        return pdfView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -60,6 +63,7 @@ public class PdfViewerFragmentV2 : Fragment() {
                 if (result != null) {
                     if (result.isSuccess) {
                         // Document loaded
+                        pdfView.pdfDocument = result.getOrNull()
                         Log.i("DDDDD", "Document has been loaded successfully")
                     } else if (result.exceptionOrNull() is PdfPasswordException) {
                         // Display password prompt
