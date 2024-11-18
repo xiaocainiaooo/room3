@@ -51,7 +51,7 @@ public object ViewModelStoreNavContentWrapper : NavContentWrapper {
     }
 
     @Composable
-    override fun WrapContent(record: Record) {
+    override fun <T : Any> WrapContent(record: Record<T>) {
         val key = record.key
         val recordViewModelStoreProvider = viewModel { RecordViewModel() }
         val viewModelStore = recordViewModelStoreProvider.viewModelStoreForKey(key)
