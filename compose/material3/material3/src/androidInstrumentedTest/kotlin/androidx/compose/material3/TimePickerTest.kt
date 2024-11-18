@@ -671,10 +671,15 @@ class TimePickerTest {
             rule
                 .onNodeWithTimeValue(number, TimePickerSelectionMode.Hour, is24Hour = true)
                 .performClick()
+
             rule.runOnIdle {
                 state.selection = TimePickerSelectionMode.Hour
                 assertThat(state.hour).isEqualTo(number)
             }
+
+            rule
+                .onNodeWithTimeValue(number, TimePickerSelectionMode.Hour, is24Hour = true)
+                .assertIsSelected()
         }
     }
 
@@ -701,6 +706,10 @@ class TimePickerTest {
                 state.selection = TimePickerSelectionMode.Hour
                 assertThat(state.hour).isEqualTo(number)
             }
+
+            rule
+                .onNodeWithTimeValue(hour, TimePickerSelectionMode.Hour, is24Hour = false)
+                .assertIsSelected()
         }
     }
 
