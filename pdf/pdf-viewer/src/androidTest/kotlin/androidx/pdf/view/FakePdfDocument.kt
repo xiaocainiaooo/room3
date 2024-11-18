@@ -61,9 +61,10 @@ import kotlinx.coroutines.withTimeout
 @OpenForTesting
 internal open class FakePdfDocument(
     /** A list of (x, y) page dimensions in content coordinates */
-    private val pages: List<Point>,
+    private val pages: List<Point> = listOf(),
     override val formType: Int = PDF_FORM_TYPE_NONE,
     override val isLinearized: Boolean = false,
+    private val searchResults: SparseArray<List<PageMatchBounds>> = SparseArray()
 ) : PdfDocument {
     override val pageCount: Int = pages.size
 
@@ -108,8 +109,7 @@ internal open class FakePdfDocument(
         query: String,
         pageRange: IntRange
     ): SparseArray<List<PageMatchBounds>> {
-        // TODO - provide a useful implementation when it's needed for testing
-        return SparseArray()
+        return searchResults
     }
 
     override suspend fun getPageInfos(pageRange: IntRange): List<PdfDocument.PageInfo> {
