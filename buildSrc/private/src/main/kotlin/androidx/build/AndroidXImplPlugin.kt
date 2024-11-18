@@ -851,6 +851,11 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                 // are:
                 //   - net.java.dev.jna:jna:5.5.0
                 excludes.add("/META-INF/LGPL2.1")
+
+                // AGP is unable to merge these and multiple artifacts ship this files
+                // e.g. org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar
+                //      org/bouncycastle/bcprov-jdk18on/1.78.1/bcprov-jdk18on-1.78.1.jar
+                pickFirsts.add("META-INF/versions/9/OSGI-INF/MANIFEST.MF")
             }
         }
     }
