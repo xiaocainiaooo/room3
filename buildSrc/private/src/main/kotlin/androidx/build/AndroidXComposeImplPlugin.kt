@@ -113,11 +113,6 @@ private fun configureComposeCompilerPlugin(project: Project, extension: AndroidX
         // If a project has opted-out of Compose compiler plugin, don't add it
         if (!extension.composeCompilerPluginEnabled) return@afterEvaluate
 
-        val androidXExtension =
-            project.extensions.findByType(AndroidXExtension::class.java)
-                ?: throw Exception("You have applied AndroidXComposePlugin without AndroidXPlugin")
-        val shouldPublish = androidXExtension.shouldPublish()
-
         // Create configuration that we'll use to load Compose compiler plugin
         val configuration =
             project.configurations.create(COMPILER_PLUGIN_CONFIGURATION) {
@@ -200,9 +195,8 @@ private fun configureComposeCompilerPlugin(project: Project, extension: AndroidX
                 compile.enableFeatureFlag(ComposeFeatureFlag.OptimizeNonSkippingGroups)
                 compile.enableFeatureFlag(ComposeFeatureFlag.PausableComposition)
             }
-            if (shouldPublish) {
-                compile.addPluginOption(ComposeCompileOptions.SourceOption, "true")
-            }
+
+            compile.addPluginOption(ComposeCompileOptions.SourceOption, "true")
         }
 
         if (enableMetrics) {
