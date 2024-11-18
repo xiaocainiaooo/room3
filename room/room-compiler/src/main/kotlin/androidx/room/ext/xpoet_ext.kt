@@ -393,7 +393,7 @@ fun Function1TypeSpec(
                         isOverride = true
                     )
                     .apply {
-                        addParameter(parameterTypeName, parameterName)
+                        addParameter(parameterName, parameterTypeName)
                         returns(returnTypeName)
                         callBody()
                     }

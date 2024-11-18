@@ -378,11 +378,12 @@ object XConverters {
 
     @JvmStatic
     fun toXPoet(
+        addJavaNullabilityAnnotation: Boolean,
         jFunSpecBuilder: JFunSpecBuilder,
         kFunSpecBuilder: KFunSpecBuilder
     ): XFunSpec.Builder =
         XFunSpecImpl.Builder(
-            JavaFunSpec.Builder(jFunSpecBuilder),
+            JavaFunSpec.Builder(addJavaNullabilityAnnotation, jFunSpecBuilder),
             KotlinFunSpec.Builder(kFunSpecBuilder)
         )
 

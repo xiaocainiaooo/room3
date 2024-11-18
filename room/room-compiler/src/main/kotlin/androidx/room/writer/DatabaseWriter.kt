@@ -538,11 +538,11 @@ class DatabaseWriter(
                     )
                 returns(CommonTypeNames.LIST.parametrizedBy(RoomTypeNames.MIGRATION))
                 addParameter(
+                    specsMapParamName,
                     CommonTypeNames.MAP.parametrizedBy(
                         classOfAutoMigrationSpecTypeName,
                         RoomTypeNames.AUTO_MIGRATION_SPEC,
-                    ),
-                    specsMapParamName
+                    )
                 )
                 addCode(body)
             }

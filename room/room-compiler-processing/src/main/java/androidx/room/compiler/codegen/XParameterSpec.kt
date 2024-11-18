@@ -39,10 +39,16 @@ interface XParameterSpec {
     }
 
     companion object {
-        @JvmStatic fun of(name: String, typeName: XTypeName) = builder(name, typeName).build()
+        @JvmStatic
+        fun of(name: String, typeName: XTypeName, addJavaNullabilityAnnotation: Boolean = true) =
+            builder(name, typeName, addJavaNullabilityAnnotation).build()
 
         @JvmStatic
-        fun builder(name: String, typeName: XTypeName): Builder {
+        fun builder(
+            name: String,
+            typeName: XTypeName,
+            addJavaNullabilityAnnotation: Boolean = true
+        ): Builder {
             return XParameterSpecImpl.Builder(
                 name,
                 typeName,
@@ -51,13 +57,15 @@ interface XParameterSpec {
                     typeName,
                     JParameterSpec.builder(typeName.java, name).apply {
                         addModifiers(JModifier.FINAL)
-                        // Adding nullability annotation to primitive parameters is redundant as
-                        // primitives can never be null.
-                        if (!typeName.isPrimitive) {
-                            when (typeName.nullability) {
-                                XNullability.NULLABLE -> addAnnotation(NULLABLE_ANNOTATION)
-                                XNullability.NONNULL -> addAnnotation(NONNULL_ANNOTATION)
-                                XNullability.UNKNOWN -> {}
+                        if (addJavaNullabilityAnnotation) {
+                            // Adding nullability annotation to primitive parameters is redundant as
+                            // primitives can never be null.
+                            if (!typeName.isPrimitive) {
+                                when (typeName.nullability) {
+                                    XNullability.NULLABLE -> addAnnotation(NULLABLE_ANNOTATION)
+                                    XNullability.NONNULL -> addAnnotation(NONNULL_ANNOTATION)
+                                    XNullability.UNKNOWN -> {}
+                                }
                             }
                         }
                     }
