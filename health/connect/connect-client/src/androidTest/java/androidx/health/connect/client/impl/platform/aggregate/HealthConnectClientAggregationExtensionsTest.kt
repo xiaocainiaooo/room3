@@ -23,7 +23,8 @@ import android.os.Build
 import android.os.ext.SdkExtensions
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.impl.HealthConnectClientUpsideDownImpl
-import androidx.health.connect.client.impl.converters.datatype.RECORDS_CLASS_NAME_MAP
+import androidx.health.connect.client.impl.platform.records.SDK_TO_PLATFORM_RECORD_CLASS
+import androidx.health.connect.client.impl.platform.records.SDK_TO_PLATFORM_RECORD_CLASS_EXT_13
 import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_PREFIX
 import androidx.health.connect.client.records.BloodPressureRecord
 import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
@@ -87,8 +88,14 @@ class HealthConnectClientAggregationExtensionsTest {
 
     @After
     fun tearDown() = runTest {
-        for (recordType in RECORDS_CLASS_NAME_MAP.keys) {
+        for (recordType in SDK_TO_PLATFORM_RECORD_CLASS.keys) {
             healthConnectClient.deleteRecords(recordType, TimeRangeFilter.none())
+        }
+
+        if (SdkExtensions.getExtensionVersion(Build.VERSION_CODES.UPSIDE_DOWN_CAKE) >= 13) {
+            for (recordType in SDK_TO_PLATFORM_RECORD_CLASS_EXT_13.keys) {
+                healthConnectClient.deleteRecords(recordType, TimeRangeFilter.none())
+            }
         }
     }
 
