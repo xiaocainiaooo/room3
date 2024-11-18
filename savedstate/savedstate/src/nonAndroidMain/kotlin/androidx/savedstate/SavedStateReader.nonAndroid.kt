@@ -51,6 +51,19 @@ internal actual constructor(
         return source.map[key] as? Char ?: defaultValue()
     }
 
+    actual inline fun getCharSequence(key: String): CharSequence {
+        if (key !in this) keyNotFoundError(key)
+        return source.map[key] as? CharSequence ?: valueNotFoundError(key)
+    }
+
+    actual inline fun getCharSequenceOrElse(
+        key: String,
+        defaultValue: () -> CharSequence
+    ): CharSequence {
+        if (key !in this) defaultValue()
+        return source.map[key] as? CharSequence ?: defaultValue()
+    }
+
     actual inline fun getDouble(key: String): Double {
         if (key !in this) keyNotFoundError(key)
         return source.map[key] as? Double ?: DEFAULT_DOUBLE
@@ -101,31 +114,42 @@ internal actual constructor(
         return source.map[key] as? String ?: defaultValue()
     }
 
-    @Suppress("UNCHECKED_CAST")
+    actual inline fun getCharSequenceList(key: String): List<CharSequence> {
+        if (key !in this) keyNotFoundError(key)
+        @Suppress("UNCHECKED_CAST")
+        return source.map[key] as? List<CharSequence> ?: valueNotFoundError(key)
+    }
+
+    actual inline fun getCharSequenceListOrElse(
+        key: String,
+        defaultValue: () -> List<CharSequence>
+    ): List<CharSequence> {
+        if (key !in this) defaultValue()
+        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<CharSequence> ?: defaultValue()
+    }
+
     actual inline fun getIntList(key: String): List<Int> {
         if (key !in this) keyNotFoundError(key)
-        return source.map[key] as? List<Int> ?: valueNotFoundError(key)
+        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<Int> ?: valueNotFoundError(key)
     }
 
-    @Suppress("UNCHECKED_CAST")
     actual inline fun getIntListOrElse(key: String, defaultValue: () -> List<Int>): List<Int> {
         if (key !in this) defaultValue()
-        return source.map[key] as? List<Int> ?: defaultValue()
+        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<Int> ?: defaultValue()
     }
 
-    @Suppress("UNCHECKED_CAST")
     actual inline fun getStringList(key: String): List<String> {
         if (key !in this) keyNotFoundError(key)
+        @Suppress("UNCHECKED_CAST")
         return source.map[key] as? List<String> ?: valueNotFoundError(key)
     }
 
-    @Suppress("UNCHECKED_CAST")
     actual inline fun getStringListOrElse(
         key: String,
         defaultValue: () -> List<String>
     ): List<String> {
         if (key !in this) defaultValue()
-        return source.map[key] as? List<String> ?: defaultValue()
+        @Suppress("UNCHECKED_CAST") return source.map[key] as? List<String> ?: defaultValue()
     }
 
     actual inline fun getCharArray(key: String): CharArray {
@@ -136,6 +160,20 @@ internal actual constructor(
     actual inline fun getCharArrayOrElse(key: String, defaultValue: () -> CharArray): CharArray {
         if (key !in this) defaultValue()
         return source.map[key] as? CharArray ?: defaultValue()
+    }
+
+    actual inline fun getCharSequenceArray(key: String): Array<CharSequence> {
+        if (key !in this) keyNotFoundError(key)
+        @Suppress("UNCHECKED_CAST")
+        return source.map[key] as? Array<CharSequence> ?: valueNotFoundError(key)
+    }
+
+    actual inline fun getCharSequenceArrayOrElse(
+        key: String,
+        defaultValue: () -> Array<CharSequence>
+    ): Array<CharSequence> {
+        if (key !in this) defaultValue()
+        @Suppress("UNCHECKED_CAST") return source.map[key] as? Array<CharSequence> ?: defaultValue()
     }
 
     actual inline fun getBooleanArray(key: String): BooleanArray {
