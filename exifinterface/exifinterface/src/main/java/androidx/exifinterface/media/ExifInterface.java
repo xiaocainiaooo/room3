@@ -3101,9 +3101,9 @@ public class ExifInterface {
             (byte) 0x47, (byte) 0x0d, (byte) 0x0a, (byte) 0x1a, (byte) 0x0a};
     // See "Extensions to the PNG 1.2 Specification, Version 1.5.0",
     // 3.7. eXIf Exchangeable Image File (Exif) Profile
-    private static final int PNG_CHUNK_TYPE_EXIF = intFromBytes('e', 'X', 'I', 'f');
-    private static final int PNG_CHUNK_TYPE_IHDR = intFromBytes('I', 'H', 'D', 'R');
-    private static final int PNG_CHUNK_TYPE_IEND = intFromBytes('I', 'E', 'N', 'D');
+    private static final int PNG_CHUNK_TYPE_EXIF = 'e' << 24 | 'X' << 16 | 'I' << 8 | 'f';
+    private static final int PNG_CHUNK_TYPE_IHDR = 'I' << 24 | 'H' << 16 | 'D' << 8 | 'R';
+    private static final int PNG_CHUNK_TYPE_IEND = 'I' << 24 | 'E' << 16 | 'N' << 8 | 'D';
     private static final int PNG_CHUNK_TYPE_BYTE_LENGTH = 4;
     private static final int PNG_CHUNK_CRC_BYTE_LENGTH = 4;
 
@@ -8327,13 +8327,5 @@ public class ExifInterface {
             return true;
         }
         return false;
-    }
-
-    /*
-     * Combines the lower eight bits of each parameter into a 32-bit int. {@code b1} is the highest
-     * byte of the result, {@code b4} is the lowest.
-     */
-    private static int intFromBytes(int b1, int b2, int b3, int b4) {
-        return ((b1 & 0xFF) << 24) | ((b2 & 0xFF) << 16) | ((b3 & 0xFF) << 8) | (b4 & 0xFF);
     }
 }
