@@ -836,7 +836,6 @@ internal class SlotReader(
 
     /** The current group that will be started with [startGroup] or skipped with [skipGroup]. */
     var currentGroup = 0
-        private set
 
     /** The end of the [parent] group. */
     var currentEnd = groupsSize
@@ -909,6 +908,14 @@ internal class SlotReader(
      * start.
      */
     fun groupSize(index: Int) = groups.groupSize(index)
+
+    /** Get the slot size for [group]. Will throw an exception if [group] is not a group start. */
+    fun slotSize(group: Int): Int {
+        val start = groups.slotAnchor(group)
+        val next = group + 1
+        val end = if (next < groupsSize) groups.dataAnchor(next) else slotsSize
+        return end - start
+    }
 
     /** Get location the end of the currently started group. */
     val groupEnd
@@ -1700,7 +1707,10 @@ internal class SlotWriter(
         groups.dataIndex(groupIndexToAddress(groupIndex + groupSize(groupIndex)))
 
     private val currentGroupSlotIndex: Int
-        get() = currentSlot - slotsStartIndex(parent) + (deferredSlotWrites?.get(parent)?.size ?: 0)
+        get() = groupSlotIndex(parent)
+
+    fun groupSlotIndex(group: Int) =
+        currentSlot - slotsStartIndex(group) + (deferredSlotWrites?.get(group)?.size ?: 0)
 
     /**
      * Advance [currentGroup] by [amount]. The [currentGroup] group cannot be advanced outside the
@@ -2890,7 +2900,7 @@ internal class SlotWriter(
         } else false
     }
 
-    private fun sourceInformationOf(group: Int): GroupSourceInformation? =
+    internal fun sourceInformationOf(group: Int): GroupSourceInformation? =
         sourceInformationMap?.let { map -> tryAnchor(group)?.let { anchor -> map[anchor] } }
 
     internal fun tryAnchor(group: Int) =

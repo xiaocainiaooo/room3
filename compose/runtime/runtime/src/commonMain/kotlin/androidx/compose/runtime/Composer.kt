@@ -31,8 +31,6 @@ import androidx.collection.ScatterSet
 import androidx.collection.emptyScatterMap
 import androidx.collection.mutableScatterMapOf
 import androidx.collection.mutableScatterSetOf
-import androidx.compose.runtime.Composer.Companion.equals
-import androidx.compose.runtime.ComposerImpl.CompositionContextHolder
 import androidx.compose.runtime.changelist.ChangeList
 import androidx.compose.runtime.changelist.ComposerChangeListWriter
 import androidx.compose.runtime.changelist.FixupList
@@ -48,10 +46,16 @@ import androidx.compose.runtime.snapshots.currentSnapshot
 import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.fastMap
 import androidx.compose.runtime.snapshots.fastToSet
+import androidx.compose.runtime.tooling.ComposeTraceFrame
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.CompositionGroup
 import androidx.compose.runtime.tooling.CompositionInstance
 import androidx.compose.runtime.tooling.LocalInspectionTables
+import androidx.compose.runtime.tooling.attachComposeTrace
+import androidx.compose.runtime.tooling.currentTrace
+import androidx.compose.runtime.tooling.findLocation
+import androidx.compose.runtime.tooling.findSubcompositionContextGroup
+import androidx.compose.runtime.tooling.traceForGroup
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
@@ -1231,6 +1235,22 @@ sealed interface Composer {
         fun setTracer(tracer: CompositionTracer?) {
             compositionTracer = tracer
         }
+
+        /**
+         * Enable composition stack traces based on the source information. When this flag is
+         * enabled, composition will record source information at runtime. When crash occurs,
+         * Compose will append a suppressed exception that contains a stack trace pointing to the
+         * place in composition closest to the crash.
+         *
+         * Note that:
+         * - Recording source information introduces additional performance overhead, so this option
+         *   should NOT be enabled in release builds.
+         * - Compose ships with a minifier config that removes source information from the release
+         *   builds. Enabling this flag in minified builds will have no effect.
+         */
+        fun setDiagnosticStackTraceEnabled(enabled: Boolean) {
+            compositionStackTraceEnabled = enabled
+        }
     }
 }
 
@@ -1297,6 +1317,8 @@ interface CompositionTracer {
 }
 
 @OptIn(InternalComposeTracingApi::class) private var compositionTracer: CompositionTracer? = null
+
+internal var compositionStackTraceEnabled: Boolean = false
 
 /**
  * Internal tracing API.
@@ -3600,6 +3622,43 @@ internal class ComposerImpl(
         sourceMarkersEnabled = false
     }
 
+    internal fun compositionTraceForValue(value: Any): List<ComposeTraceFrame> {
+        if (!sourceMarkersEnabled) return emptyList()
+
+        return slotTable
+            .findLocation { it === value }
+            ?.let { (groupIndex, dataIndex) ->
+                sourceTraceForGroup(groupIndex, dataIndex) + parentContext.sourceTrace()
+            } ?: emptyList()
+    }
+
+    private fun currentSourceTrace(): List<ComposeTraceFrame> {
+        if (!sourceMarkersEnabled) return emptyList()
+
+        val trace = mutableListOf<ComposeTraceFrame>()
+        trace.addAll(writer.currentTrace())
+        trace.addAll(reader.currentTrace())
+
+        return trace.apply { addAll(parentContext.sourceTrace()) }
+    }
+
+    private fun sourceTraceForGroup(group: Int, dataOffset: Int?): List<ComposeTraceFrame> {
+        if (!sourceMarkersEnabled) return emptyList()
+
+        return slotTable.read { it.traceForGroup(group, dataOffset) }
+    }
+
+    private fun CompositionContext.sourceTrace(): List<ComposeTraceFrame> {
+        val composition = composition as? CompositionImpl ?: return emptyList()
+        val position = composition.slotTable.findSubcompositionContextGroup(parentContext)
+
+        return if (position != null) {
+            composition.slotTable.read { reader -> reader.traceForGroup(position, null) }
+        } else {
+            emptyList()
+        }
+    }
+
     /**
      * Synchronously compose the initial composition of [content]. This collects all the changes
      * which must be applied by [ControlledComposition.applyChanges] to build the tree implied by
@@ -3708,6 +3767,8 @@ internal class ComposerImpl(
                 }
                 endRoot()
                 complete = true
+            } catch (e: Exception) {
+                throw e.attachComposeTrace { currentSourceTrace() }
             } finally {
                 isComposing = false
                 invalidations.clear()
@@ -4605,7 +4666,7 @@ private const val rootKey = 100
 private const val nodeKey = 125
 
 // An arbitrary key value that marks the default parameter group
-private const val defaultsKey = -127
+internal const val defaultsKey = -127
 
 @PublishedApi internal const val invocationKey = 200
 
@@ -4849,33 +4910,10 @@ internal class CompositionDataImpl(val composition: Composition) :
 
     override fun findContextGroup(): CompositionGroup? {
         val parentSlotTable = composition.parent?.slotTable ?: return null
-        val context = composition.context
+        val context = composition.context ?: return null
 
-        parentSlotTable.read { reader ->
-            fun scanGroup(group: Int, end: Int): CompositionGroup? {
-                var current = group
-                while (current < end) {
-                    val next = current + reader.groupSize(current)
-                    if (
-                        reader.hasMark(current) &&
-                            reader.groupKey(current) == referenceKey &&
-                            reader.groupObjectKey(current) == reference
-                    ) {
-                        val contextHolder = reader.groupGet(current, 0) as? CompositionContextHolder
-                        if (contextHolder != null && contextHolder.ref == context) {
-                            return parentSlotTable.compositionGroupOf(current)
-                        }
-                    }
-                    if (reader.containsMark(current)) {
-                        scanGroup(current + 1, next)?.let {
-                            return it
-                        }
-                    }
-                    current = next
-                }
-                return null
-            }
-            return scanGroup(0, reader.size)
+        return parentSlotTable.findSubcompositionContextGroup(context)?.let {
+            parentSlotTable.compositionGroupOf(it)
         }
     }
 
