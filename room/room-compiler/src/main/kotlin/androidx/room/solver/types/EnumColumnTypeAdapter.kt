@@ -149,7 +149,7 @@ class EnumColumnTypeAdapter(private val enumTypeElement: XEnumTypeElement, out: 
                     }
                     builder.apply {
                         returns(CommonTypeNames.STRING.copy(nullable = false))
-                        addParameter(enumTypeElement.asClassName(), paramName)
+                        addParameter(paramName, enumTypeElement.asClassName())
                         addCode(body)
                     }
                 }
@@ -219,7 +219,7 @@ class EnumColumnTypeAdapter(private val enumTypeElement: XEnumTypeElement, out: 
                     }
                     builder.apply {
                         returns(enumTypeElement.asClassName())
-                        addParameter(CommonTypeNames.STRING.copy(nullable = false), paramName)
+                        addParameter(paramName, CommonTypeNames.STRING.copy(nullable = false))
                         addCode(body)
                     }
                 }

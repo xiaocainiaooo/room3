@@ -56,6 +56,9 @@ internal class KotlinFunSpec(internal val actual: KFunSpec) : XSpec(), XFunSpec 
             actual.addParameter(parameter.kotlin.actual)
         }
 
+        override fun addParameter(name: String, typeName: XTypeName) =
+            addParameter(XParameterSpec.builder(name, typeName).build())
+
         override fun addCode(code: XCodeBlock) = apply {
             require(code is XCodeBlockImpl)
             actual.addCode(code.kotlin.actual)

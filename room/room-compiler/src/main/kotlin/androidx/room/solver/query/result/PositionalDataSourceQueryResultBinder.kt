@@ -73,7 +73,7 @@ class PositionalDataSourceQueryResultBinder(
                 .apply {
                     returns(LIST.parametrizedBy(itemTypeName))
                     val cursorParamName = "cursor"
-                    addParameter(CURSOR, cursorParamName)
+                    addParameter(cursorParamName, CURSOR)
                     val resultVar = scope.getTmpVar("_res")
                     val rowsScope = scope.fork()
                     listAdapter?.convert(resultVar, cursorParamName, rowsScope)

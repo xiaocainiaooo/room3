@@ -107,9 +107,9 @@ class RelationCollectorFunctionWriter(
         }
         builder.apply {
             if (useDriverApi) {
-                addParameter(SQLiteDriverTypeNames.CONNECTION, PARAM_CONNECTION_VARIABLE)
+                addParameter(PARAM_CONNECTION_VARIABLE, SQLiteDriverTypeNames.CONNECTION)
             }
-            addParameter(collector.mapTypeName, PARAM_MAP_VARIABLE)
+            addParameter(PARAM_MAP_VARIABLE, collector.mapTypeName)
             addCode(scope.generate())
         }
     }
