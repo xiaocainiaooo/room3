@@ -2891,6 +2891,164 @@ public class AppSearchImplTest {
     }
 
     @Test
+    @RequiresFlagsDisabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testGlobalReadBlob_notSupported() throws Exception {
+        String visiblePrefix = PrefixUtil.createPrefix("package", "db1");
+        VisibilityChecker mockVisibilityChecker =
+                createMockVisibilityChecker(ImmutableSet.of(visiblePrefix + "visibleNamespace"));
+        mAppSearchImpl = AppSearchImpl.create(
+                mAppSearchDir,
+                new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new LocalStorageIcingOptionsConfig()),
+                /*initStatsBuilder=*/ null,
+                mockVisibilityChecker,
+                /*revocableFileDescriptorStore=*/ null,
+                ALWAYS_OPTIMIZE);
+
+        byte[] data = generateRandomBytes(20 * 1024); // 20 KiB
+        byte[] digest = calculateDigest(data);
+        AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
+                digest, "package", "db1", "ns");
+        // nonVisibleHandle is not visible to the caller.
+        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class,
+                () -> mAppSearchImpl.globalOpenReadBlob(handle, mSelfCallerAccess));
+        assertThat(exception).hasMessageThat().contains(
+                Features.BLOB_STORAGE + " is not available on this AppSearch implementation.");
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testGlobalReadBlob() throws Exception {
+        String visiblePrefix = PrefixUtil.createPrefix("package", "db1");
+        VisibilityChecker mockVisibilityChecker =
+                createMockVisibilityChecker(ImmutableSet.of(visiblePrefix + "visibleNamespace"));
+        mAppSearchImpl = AppSearchImpl.create(
+                mAppSearchDir,
+                new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new LocalStorageIcingOptionsConfig()),
+                /*initStatsBuilder=*/ null,
+                mockVisibilityChecker,
+                new JetpackRevocableFileDescriptorStore(mUnlimitedConfig),
+                ALWAYS_OPTIMIZE);
+
+        // Set mock visibility setting.
+        InternalVisibilityConfig config =
+                new InternalVisibilityConfig.Builder("visibleNamespace").build();
+        mAppSearchImpl.setBlobNamespaceVisibility(
+                "package", "db1", ImmutableList.of(config));
+
+        byte[] data = generateRandomBytes(20 * 1024); // 20 KiB
+        byte[] digest = calculateDigest(data);
+        AppSearchBlobHandle visibleHandle = AppSearchBlobHandle.createWithSha256(
+                digest, "package", "db1", "visibleNamespace");
+        try (ParcelFileDescriptor writePfd =
+                     mAppSearchImpl.openWriteBlob("package", "db1", visibleHandle);
+                OutputStream outputStream = new ParcelFileDescriptor
+                         .AutoCloseOutputStream(writePfd)) {
+            outputStream.write(data);
+            outputStream.flush();
+        }
+        mAppSearchImpl.commitBlob("package", "db1", visibleHandle);
+
+        AppSearchBlobHandle nonVisibleHandle = AppSearchBlobHandle.createWithSha256(
+                digest, "package", "db1", "nonVisibleNamespace");
+        try (ParcelFileDescriptor writePfd =
+                     mAppSearchImpl.openWriteBlob("package", "db1", nonVisibleHandle);
+                OutputStream outputStream = new ParcelFileDescriptor
+                        .AutoCloseOutputStream(writePfd)) {
+            outputStream.write(data);
+            outputStream.flush();
+        }
+        mAppSearchImpl.commitBlob("package", "db1", nonVisibleHandle);
+
+        // visibleHandle is visible to the caller.
+        byte[] readBytes = new byte[20 * 1024];
+        try (ParcelFileDescriptor readPfd =
+                     mAppSearchImpl.globalOpenReadBlob(visibleHandle, mSelfCallerAccess);
+                 InputStream inputStream = new ParcelFileDescriptor.AutoCloseInputStream(readPfd)) {
+            inputStream.read(readBytes);
+        }
+        assertThat(readBytes).isEqualTo(data);
+
+        // nonVisibleHandle is not visible to the caller.
+        AppSearchException e = assertThrows(AppSearchException.class,
+                () -> mAppSearchImpl.globalOpenReadBlob(nonVisibleHandle, mSelfCallerAccess));
+        assertThat(e.getResultCode()).isEqualTo(AppSearchResult.RESULT_NOT_FOUND);
+        assertThat(e.getMessage()).contains("Cannot find the blob for handle");
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testGlobalReadBlob_sameErrorMessage() throws Exception {
+        String visiblePrefix = PrefixUtil.createPrefix("package", "db1");
+        VisibilityChecker mockVisibilityChecker =
+                createMockVisibilityChecker(ImmutableSet.of(visiblePrefix + "visibleNamespace"));
+        mAppSearchImpl = AppSearchImpl.create(
+                mAppSearchDir,
+                new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new LocalStorageIcingOptionsConfig()),
+                /*initStatsBuilder=*/ null,
+                mockVisibilityChecker,
+                new JetpackRevocableFileDescriptorStore(mUnlimitedConfig),
+                ALWAYS_OPTIMIZE);
+
+        // Set mock visibility setting.
+        InternalVisibilityConfig config =
+                new InternalVisibilityConfig.Builder("visibleNamespace").build();
+        mAppSearchImpl.setBlobNamespaceVisibility(
+                "package", "db1", ImmutableList.of(config));
+
+        byte[] data = generateRandomBytes(20 * 1024); // 20 KiB
+        byte[] digest = calculateDigest(data);
+        AppSearchBlobHandle visibleHandle = AppSearchBlobHandle.createWithSha256(
+                digest, "package", "db1", "visibleNamespace");
+        try (ParcelFileDescriptor writePfd =
+                     mAppSearchImpl.openWriteBlob("package", "db1", visibleHandle);
+                OutputStream outputStream = new ParcelFileDescriptor
+                        .AutoCloseOutputStream(writePfd)) {
+            outputStream.write(data);
+            outputStream.flush();
+        }
+        mAppSearchImpl.commitBlob("package", "db1", visibleHandle);
+
+        AppSearchBlobHandle nonVisibleHandle = AppSearchBlobHandle.createWithSha256(
+                digest, "package", "db1", "nonVisibleNamespace");
+        try (ParcelFileDescriptor writePfd =
+                     mAppSearchImpl.openWriteBlob("package", "db1", nonVisibleHandle);
+                 OutputStream outputStream = new ParcelFileDescriptor
+                        .AutoCloseOutputStream(writePfd)) {
+            outputStream.write(data);
+            outputStream.flush();
+        }
+        mAppSearchImpl.commitBlob("package", "db1", nonVisibleHandle);
+
+        // visibleHandle is visible to the caller.
+        byte[] readBytes = new byte[20 * 1024];
+        try (ParcelFileDescriptor readPfd =
+                     mAppSearchImpl.globalOpenReadBlob(visibleHandle, mSelfCallerAccess);
+                InputStream inputStream = new ParcelFileDescriptor.AutoCloseInputStream(readPfd)) {
+            inputStream.read(readBytes);
+        }
+        assertThat(readBytes).isEqualTo(data);
+
+        // nonVisibleHandle is not visible to the caller.
+        AppSearchException exception1 = assertThrows(AppSearchException.class,
+                () -> mAppSearchImpl.globalOpenReadBlob(nonVisibleHandle, mSelfCallerAccess));
+        assertThat(exception1.getResultCode()).isEqualTo(AppSearchResult.RESULT_NOT_FOUND);
+        assertThat(exception1.getMessage()).contains("Cannot find the blob for handle:");
+        assertThat(exception1.getCause()).isNull();
+
+        // Remove visibleHandle and verify the error code and message should be same between not
+        // found and inaccessible.
+        mAppSearchImpl.removeBlob("package", "db1", visibleHandle);
+        AppSearchException exception2 = assertThrows(AppSearchException.class,
+                () -> mAppSearchImpl.globalOpenReadBlob(visibleHandle, mSelfCallerAccess));
+        assertThat(exception2.getCause()).isNull();
+        assertThat(exception2.getResultCode()).isEqualTo(exception1.getResultCode());
+        assertThat(exception2.getMessage()).isEqualTo(exception1.getMessage());
+    }
+
+    @Test
     public void testClearPackageData() throws Exception {
         List<SchemaTypeConfigProto> existingSchemas =
                 mAppSearchImpl.getSchemaProtoLocked().getTypesList();
@@ -5560,7 +5718,7 @@ public class AppSearchImplTest {
 
     @Test
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
-    public void testLimitConfig_activeFds() throws Exception {
+    public void testLimitConfig_activeWriteFds() throws Exception {
         mAppSearchImpl.close();
         File tempFolder = mTemporaryFolder.newFolder();
         AppSearchConfig config = new AppSearchConfigImpl(new LimitConfig() {
@@ -5600,13 +5758,13 @@ public class AppSearchImplTest {
         byte[] digest1 = calculateDigest(data1);
         AppSearchBlobHandle handle1 = AppSearchBlobHandle.createWithSha256(
                 digest1, "package", "db1", "ns");
-        mAppSearchImpl.openWriteBlob("package", "db1", handle1);
+        ParcelFileDescriptor writer1 = mAppSearchImpl.openWriteBlob("package", "db1", handle1);
 
         byte[] data2 = generateRandomBytes(20 * 1024); // 20 KiB
         byte[] digest2 = calculateDigest(data2);
         AppSearchBlobHandle handle2 = AppSearchBlobHandle.createWithSha256(
                 digest2, "package", "db1", "ns");
-        mAppSearchImpl.openWriteBlob("package", "db1", handle2);
+        ParcelFileDescriptor writer2 = mAppSearchImpl.openWriteBlob("package", "db1", handle2);
 
         // Open 3rd fd will fail.
         byte[] data3 = generateRandomBytes(20 * 1024); // 20 KiB
@@ -5619,6 +5777,108 @@ public class AppSearchImplTest {
         assertThat(e).hasMessageThat().contains(
                 "Package \"package\" exceeded limit of 2 opened file descriptors. "
                         + "Some file descriptors must be closed to open additional ones.");
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testLimitConfig_activeReadFds() throws Exception {
+        mAppSearchImpl.close();
+        File tempFolder = mTemporaryFolder.newFolder();
+        AppSearchConfig config = new AppSearchConfigImpl(new LimitConfig() {
+            @Override
+            public int getMaxDocumentSizeBytes() {
+                return Integer.MAX_VALUE;
+            }
+
+            @Override
+            public int getPerPackageDocumentCountLimit() {
+                return Integer.MAX_VALUE;
+            }
+
+            @Override
+            public int getDocumentCountLimitStartThreshold() {
+                return Integer.MAX_VALUE;
+            }
+
+            @Override
+            public int getMaxSuggestionCount() {
+                return Integer.MAX_VALUE;
+            }
+
+            @Override
+            public int getMaxOpenBlobCount() {
+                return 2;
+            }
+        }, new LocalStorageIcingOptionsConfig());
+        mAppSearchImpl = AppSearchImpl.create(
+                tempFolder,
+                config,
+                /*initStatsBuilder=*/ null, /*visibilityChecker=*/ null,
+                new JetpackRevocableFileDescriptorStore(config),
+                ALWAYS_OPTIMIZE);
+
+        // Write and commit one blob
+        byte[] data = generateRandomBytes(20 * 1024); // 20 KiB
+        byte[] digest = calculateDigest(data);
+        AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
+                digest, mContext.getPackageName(), "db1", "ns");
+        try (ParcelFileDescriptor writePfd = mAppSearchImpl.openWriteBlob(
+                mContext.getPackageName(), "db1", handle);
+                OutputStream outputStream = new ParcelFileDescriptor
+                        .AutoCloseOutputStream(writePfd)) {
+            outputStream.write(data);
+            outputStream.flush();
+        }
+        mAppSearchImpl.commitBlob(mContext.getPackageName(), "db1", handle);
+
+        ParcelFileDescriptor reader1 =
+                mAppSearchImpl.openReadBlob(mContext.getPackageName(), "db1", handle);
+        ParcelFileDescriptor reader2 =
+                mAppSearchImpl.openReadBlob(mContext.getPackageName(), "db1", handle);
+        // Open 3rd fd will fail.
+        AppSearchException e = assertThrows(AppSearchException.class,
+                () -> mAppSearchImpl.openReadBlob(mContext.getPackageName(), "db1", handle));
+        assertThat(e.getResultCode()).isEqualTo(RESULT_OUT_OF_SPACE);
+        assertThat(e).hasMessageThat().contains(
+                "Package \"" + mContext.getPackageName() + "\" exceeded limit of 2 opened file "
+                        + "descriptors. Some file descriptors must be closed to open additional "
+                        + "ones.");
+
+        // Close 1st fd and open 3rd fd will success
+        reader1.close();
+        ParcelFileDescriptor reader3 =
+                mAppSearchImpl.openReadBlob(mContext.getPackageName(), "db1", handle);
+
+        // GlobalOpenRead will share same limit.
+        e = assertThrows(AppSearchException.class,
+                () -> mAppSearchImpl.globalOpenReadBlob(handle, mSelfCallerAccess));
+        assertThat(e.getResultCode()).isEqualTo(RESULT_OUT_OF_SPACE);
+        assertThat(e).hasMessageThat().contains(
+                "Package \"" + mContext.getPackageName() + "\" exceeded limit of 2 opened file "
+                        + "descriptors. Some file descriptors must be closed to open additional "
+                        + "ones.");
+        // Close 2st fd and global open fd will success
+        reader2.close();
+        ParcelFileDescriptor reader4 = mAppSearchImpl.globalOpenReadBlob(handle, mSelfCallerAccess);
+
+        // Keep opening will fail
+        e = assertThrows(AppSearchException.class,
+                () -> mAppSearchImpl.openReadBlob(mContext.getPackageName(), "db1", handle));
+        assertThat(e.getResultCode()).isEqualTo(RESULT_OUT_OF_SPACE);
+        assertThat(e).hasMessageThat().contains(
+                "Package \"" + mContext.getPackageName() + "\" exceeded limit of 2 opened file "
+                        + "descriptors. Some file descriptors must be closed to open additional "
+                        + "ones.");
+        e = assertThrows(AppSearchException.class,
+                () -> mAppSearchImpl.globalOpenReadBlob(handle, mSelfCallerAccess));
+        assertThat(e.getResultCode()).isEqualTo(RESULT_OUT_OF_SPACE);
+        assertThat(e).hasMessageThat().contains(
+                "Package \"" + mContext.getPackageName() + "\" exceeded limit of 2 opened file "
+                        + "descriptors. Some file descriptors must be closed to open additional "
+                        + "ones.");
+
+        reader3.close();
+        reader4.close();
     }
 
     /**

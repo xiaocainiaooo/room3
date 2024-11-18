@@ -1284,8 +1284,59 @@ public final class AppSearchImpl implements Closeable {
             checkSuccess(result.getStatus());
 
             ParcelFileDescriptor pfd = ParcelFileDescriptor.fromFd(result.getFileDescriptor());
+            return mRevocableFileDescriptorStore.wrapToRevocableFileDescriptor(packageName, pfd);
+        } finally {
+            mReadWriteLock.readLock().unlock();
+        }
+    }
+
+    /**
+     * Gets the {@link ParcelFileDescriptor} for read only purpose of the given
+     * {@link AppSearchBlobHandle}.
+     *
+     * <p>The target must be committed via {@link #commitBlob};
+     *
+     * @param handle         The {@link AppSearchBlobHandle} represent the blob.
+     */
+    @NonNull
+    @ExperimentalAppSearchApi
+    public ParcelFileDescriptor globalOpenReadBlob(@NonNull AppSearchBlobHandle handle,
+            @NonNull CallerAccess access)
+            throws AppSearchException, IOException {
+        if (mRevocableFileDescriptorStore == null) {
+            throw new UnsupportedOperationException(
+                    "BLOB_STORAGE is not available on this AppSearch implementation.");
+        }
+
+        mReadWriteLock.readLock().lock();
+        try {
+            throwIfClosedLocked();
+            mRevocableFileDescriptorStore.checkBlobStoreLimit(access.getCallingPackageName());
+            String prefixedNamespace =
+                    createPrefix(handle.getPackageName(), handle.getDatabaseName())
+                            + handle.getNamespace();
+            PropertyProto.BlobHandleProto blobHandleProto =
+                    BlobHandleToProtoConverter.toBlobHandleProto(handle);
+            // We are using namespace to check blob's visibility.
+            if (!VisibilityUtil.isSchemaSearchableByCaller(
+                    access,
+                    handle.getPackageName(),
+                    prefixedNamespace,
+                    mBlobVisibilityStoreLocked,
+                    mVisibilityCheckerLocked)) {
+                // Caller doesn't have access to this namespace.
+                throw new AppSearchException(AppSearchResult.RESULT_NOT_FOUND,
+                        "Cannot find the blob for handle: "
+                                + blobHandleProto.getDigest().toStringUtf8());
+            }
+
+            BlobProto result = mIcingSearchEngineLocked.openReadBlob(blobHandleProto);
+
+            checkSuccess(result.getStatus());
+
+            ParcelFileDescriptor pfd = ParcelFileDescriptor.fromFd(result.getFileDescriptor());
             return mRevocableFileDescriptorStore
-                    .wrapToRevocableFileDescriptor(handle.getPackageName(), pfd);
+                    .wrapToRevocableFileDescriptor(access.getCallingPackageName(), pfd);
         } finally {
             mReadWriteLock.readLock().unlock();
         }

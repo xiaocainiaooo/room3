@@ -164,8 +164,11 @@ public interface AppSearchSession extends Closeable {
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     @ExperimentalAppSearchApi
     @NonNull
-    ListenableFuture<OpenBlobForWriteResponse> openBlobForWriteAsync(
-            @NonNull Set<AppSearchBlobHandle> handles);
+    default ListenableFuture<OpenBlobForWriteResponse> openBlobForWriteAsync(
+            @NonNull Set<AppSearchBlobHandle> handles) {
+        throw new UnsupportedOperationException(Features.BLOB_STORAGE
+                + " is not available on this AppSearch implementation.");
+    }
 
     /**
      * Removes the blob data from AppSearch.
@@ -194,7 +197,11 @@ public interface AppSearchSession extends Closeable {
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     @ExperimentalAppSearchApi
     @NonNull
-    ListenableFuture<RemoveBlobResponse> removeBlobAsync(@NonNull Set<AppSearchBlobHandle> handles);
+    default ListenableFuture<RemoveBlobResponse> removeBlobAsync(
+            @NonNull Set<AppSearchBlobHandle> handles) {
+        throw new UnsupportedOperationException(Features.BLOB_STORAGE
+                + " is not available on this AppSearch implementation.");
+    }
 
     /**
      * Commits the blobs to make it retrievable and immutable.
@@ -232,7 +239,11 @@ public interface AppSearchSession extends Closeable {
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     @ExperimentalAppSearchApi
     @NonNull
-    ListenableFuture<CommitBlobResponse> commitBlobAsync(@NonNull Set<AppSearchBlobHandle> handles);
+    default ListenableFuture<CommitBlobResponse> commitBlobAsync(
+            @NonNull Set<AppSearchBlobHandle> handles) {
+        throw new UnsupportedOperationException(Features.BLOB_STORAGE
+                + " is not available on this AppSearch implementation.");
+    }
 
     /**
      * Opens a batch of AppSearch Blobs for reading.
@@ -255,8 +266,11 @@ public interface AppSearchSession extends Closeable {
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     @ExperimentalAppSearchApi
     @NonNull
-    ListenableFuture<OpenBlobForReadResponse> openBlobForReadAsync(
-            @NonNull Set<AppSearchBlobHandle> handles);
+    default ListenableFuture<OpenBlobForReadResponse> openBlobForReadAsync(
+            @NonNull Set<AppSearchBlobHandle> handles) {
+        throw new UnsupportedOperationException(Features.BLOB_STORAGE
+                + " is not available on this AppSearch implementation.");
+    }
 
     /**
      * Sets the visibility configuration for all blob namespaces within an appsearch database.
@@ -277,7 +291,11 @@ public interface AppSearchSession extends Closeable {
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     @ExperimentalAppSearchApi
     @NonNull
-    ListenableFuture<Void> setBlobVisibilityAsync(@NonNull SetBlobVisibilityRequest request);
+    default ListenableFuture<Void> setBlobVisibilityAsync(
+            @NonNull SetBlobVisibilityRequest request) {
+        throw new UnsupportedOperationException(Features.BLOB_STORAGE
+                + " is not available on this AppSearch implementation.");
+    }
 
     /**
      * Retrieves documents from the open {@link AppSearchSession} that match a given query string

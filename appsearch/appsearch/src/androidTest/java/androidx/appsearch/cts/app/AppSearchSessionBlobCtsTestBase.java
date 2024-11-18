@@ -482,6 +482,8 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     public void testGetStorageInfo() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
 
+        StorageInfo before = mDb1.getStorageInfoAsync().get();
+
         OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(mHandle1, mHandle2)).get();
         AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
@@ -503,15 +505,17 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         }
         writeResponse.close();
 
-        StorageInfo storageInfo = mDb1.getStorageInfoAsync().get();
-        assertThat(storageInfo.getBlobCount()).isEqualTo(2);
-        assertThat(storageInfo.getBlobSizeBytes()).isEqualTo(mData1.length + mData2.length);
+        StorageInfo after = mDb1.getStorageInfoAsync().get();
+        assertThat(after.getBlobCount()).isEqualTo(before.getBlobCount() + 2);
+        assertThat(after.getBlobSizeBytes()).isEqualTo(
+                before.getBlobSizeBytes() + mData1.length + mData2.length);
     }
 
     @Test
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testGetStorageInfoAfterRemoveBlob() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
+        StorageInfo before = mDb1.getStorageInfoAsync().get();
 
         OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(mHandle1, mHandle2)).get();
@@ -534,21 +538,23 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         }
         writeResponse.close();
 
-        StorageInfo storageInfo = mDb1.getStorageInfoAsync().get();
-        assertThat(storageInfo.getBlobCount()).isEqualTo(2);
-        assertThat(storageInfo.getBlobSizeBytes()).isEqualTo(mData1.length + mData2.length);
+        StorageInfo after = mDb1.getStorageInfoAsync().get();
+        assertThat(after.getBlobCount()).isEqualTo(before.getBlobCount() + 2);
+        assertThat(after.getBlobSizeBytes()).isEqualTo(
+                before.getBlobSizeBytes() + mData1.length + mData2.length);
 
         // remove blob 1
         mDb1.removeBlobAsync(ImmutableSet.of(mHandle1)).get();
-        storageInfo = mDb1.getStorageInfoAsync().get();
-        assertThat(storageInfo.getBlobCount()).isEqualTo(1);
-        assertThat(storageInfo.getBlobSizeBytes()).isEqualTo(mData2.length);
+        StorageInfo afterRemove1 = mDb1.getStorageInfoAsync().get();
+        assertThat(afterRemove1.getBlobCount()).isEqualTo(before.getBlobCount() + 1);
+        assertThat(afterRemove1.getBlobSizeBytes()).isEqualTo(
+                before.getBlobSizeBytes() + mData2.length);
 
         // remove blob 2
         mDb1.removeBlobAsync(ImmutableSet.of(mHandle2)).get();
-        storageInfo = mDb1.getStorageInfoAsync().get();
-        assertThat(storageInfo.getBlobCount()).isEqualTo(0);
-        assertThat(storageInfo.getBlobSizeBytes()).isEqualTo(0);
+        StorageInfo afterRemove2 = mDb1.getStorageInfoAsync().get();
+        assertThat(afterRemove2.getBlobCount()).isEqualTo(before.getBlobCount());
+        assertThat(afterRemove2.getBlobSizeBytes()).isEqualTo(before.getBlobSizeBytes());
     }
 
     @Test
@@ -699,7 +705,8 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     }
 
     @Test
-    public void testWriteAndReadBlob_notSupported() throws Exception {
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testBlobApis_notSupported() throws Exception {
         assumeFalse(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
 
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class,
@@ -714,9 +721,20 @@ public abstract class AppSearchSessionBlobCtsTestBase {
                 () -> mDb1.openBlobForReadAsync(ImmutableSet.of(mHandle1)));
         assertThat(exception).hasMessageThat().contains(
                 Features.BLOB_STORAGE + " is not available on this AppSearch implementation.");
+        exception = assertThrows(UnsupportedOperationException.class,
+                () -> mDb1.removeBlobAsync(ImmutableSet.of(mHandle1)));
+        assertThat(exception).hasMessageThat().contains(
+                Features.BLOB_STORAGE + " is not available on this AppSearch implementation.");
+        exception = assertThrows(UnsupportedOperationException.class,
+                () -> mDb1.setBlobVisibilityAsync(new SetBlobVisibilityRequest.Builder()
+                        .setNamespaceDisplayedBySystem("namespace", /*displayed=*/false)
+                        .build()).get());
+        assertThat(exception).hasMessageThat().contains(
+                Features.BLOB_STORAGE + " is not available on this AppSearch implementation.");
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testSetBlobSchema_notSupported() throws Exception {
         assumeFalse(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
         AppSearchSchema schema = new AppSearchSchema.Builder("Type")
@@ -733,6 +751,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testPutDocumentWithBlobProperty_notSupported() throws Exception {
         assumeFalse(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
 
