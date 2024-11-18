@@ -55,7 +55,6 @@ androidx {
     name = "Compose Material3 XR"
     description = "Compose Material3 components for XR"
     type = LibraryType.PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS
-    publish = Publish.NONE
     inceptionYear = "2024"
     kotlinTarget = KotlinTarget.KOTLIN_1_9
 }
