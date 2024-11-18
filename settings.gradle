@@ -33,7 +33,7 @@ buildscript {
         if (agpOverride != null) {
             classpath("com.android.settings:com.android.settings.gradle.plugin:$agpOverride")
         } else {
-            classpath("com.android.settings:com.android.settings.gradle.plugin:8.8.0-alpha06")
+            classpath("com.android.settings:com.android.settings.gradle.plugin:8.9.0-alpha01")
         }
     }
 }
