@@ -125,7 +125,7 @@ fun TransformingLazyColumnButtons() {
             ListHeader { Text("Buttons", style = MaterialTheme.typography.labelLarge) }
         }
 
-        item { SimpleButtonSample() }
+        item { SimpleButtonSample(modifier = Modifier.fillMaxWidth()) }
         item { ButtonSample() }
         item { ButtonLargeIconSample() }
         item { ButtonExtraLargeIconSample() }
@@ -137,9 +137,9 @@ fun TransformingLazyColumnButtons() {
         item { OutlinedButtonSample() }
         item { SimpleChildButtonSample() }
         item { ChildButtonSample() }
-        item { CompactButtonSample() }
-        item { FilledTonalCompactButtonSample() }
-        item { OutlinedCompactButtonSample() }
+        item { CompactButtonSample(modifier = Modifier.fillMaxWidth()) }
+        item { FilledTonalCompactButtonSample(modifier = Modifier.fillMaxWidth()) }
+        item { OutlinedCompactButtonSample(modifier = Modifier.fillMaxWidth()) }
         item { ButtonBackgroundImage(painterResource(R.drawable.backgroundimage), enabled = true) }
         item { ButtonBackgroundImage(painterResource(R.drawable.backgroundimage), enabled = false) }
         item { ListHeader { Text("Complex Buttons") } }
