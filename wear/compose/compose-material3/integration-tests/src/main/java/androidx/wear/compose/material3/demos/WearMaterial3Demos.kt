@@ -38,6 +38,7 @@ import androidx.wear.compose.material3.samples.SwipeToRevealNonAnchoredSample
 import androidx.wear.compose.material3.samples.SwipeToRevealSample
 import androidx.wear.compose.material3.samples.SwipeToRevealSingleActionCardSample
 import androidx.wear.compose.material3.samples.TransformingLazyColumnScalingMorphingEffectSample
+import androidx.wear.compose.material3.samples.TransformingLazyColumnScrollingSample
 import androidx.wear.compose.material3.samples.TransformingLazyColumnTargetMorphingHeightSample
 import androidx.wear.compose.material3.samples.VerticalPagerScaffoldSample
 
@@ -207,7 +208,8 @@ val WearMaterial3Demos =
                             TransformingLazyColumnTargetMorphingHeightSample()
                         },
                         ComposableDemo("TLC Buttons") { TransformingLazyColumnButtons() },
-                        ComposableDemo("TLC Cards") { TransformingLazyColumnCards() }
+                        ComposableDemo("TLC Cards") { TransformingLazyColumnCards() },
+                        ComposableDemo("TLC add/remove") { TransformingLazyColumnScrollingSample() }
                     )
                 )
             )
