@@ -1,6 +1,16 @@
 // Signature format: 4.0
 package androidx.navigation3 {
 
+  public final class AnimatedNavDisplay {
+    method public java.util.Map<java.lang.String,java.lang.Object> isDialog(boolean boolean);
+    method public java.util.Map<java.lang.String,java.lang.Object> transition(androidx.compose.animation.EnterTransition? enter, androidx.compose.animation.ExitTransition? exit);
+    field public static final androidx.navigation3.AnimatedNavDisplay INSTANCE;
+  }
+
+  public final class AnimatedNavDisplay_androidKt {
+    method @androidx.compose.runtime.Composable public static void AnimatedNavDisplay(java.util.List<?> backstack, androidx.navigation3.NavWrapperManager wrapperManager, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.Alignment contentAlignment, optional androidx.compose.animation.SizeTransform? sizeTransform, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<java.lang.Object,androidx.navigation3.Record> recordProvider);
+  }
+
   public interface NavContentWrapper {
     method public default void WrapBackStack(java.util.List<?> backStack);
     method public void WrapContent(androidx.navigation3.Record record);
