@@ -43,7 +43,7 @@ import java.lang.annotation.RetentionPolicy;
  */
 @ExperimentalAppSearchApi
 @FlaggedApi(Flags.FLAG_ENABLE_ABSTRACT_SYNTAX_TREES)
-public class ComparatorNode implements Node {
+public final class ComparatorNode implements Node {
     /**
      * Enums representing different comparators for numeric search expressions in the query
      * language.
