@@ -17,6 +17,7 @@
 @file:OptIn(
     InternalComposeApi::class,
 )
+@file:Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
 
 package androidx.compose.runtime
 
@@ -4106,7 +4107,6 @@ internal class ComposerImpl(
         }
     }
 
-    @Suppress("NOTHING_TO_INLINE")
     private inline fun updateCompoundKeyWhenWeEnterGroup(
         groupKey: Int,
         rGroupIndex: Int,
@@ -4121,12 +4121,10 @@ internal class ComposerImpl(
         else updateCompoundKeyWhenWeEnterGroupKeyHash(dataKey.hashCode(), 0)
     }
 
-    @Suppress("NOTHING_TO_INLINE")
     private inline fun updateCompoundKeyWhenWeEnterGroupKeyHash(keyHash: Int, rGroupIndex: Int) {
         compoundKeyHash = (((compoundKeyHash rol 3) xor keyHash) rol 3) xor rGroupIndex
     }
 
-    @Suppress("NOTHING_TO_INLINE")
     private inline fun updateCompoundKeyWhenWeExitGroup(
         groupKey: Int,
         rGroupIndex: Int,
@@ -4141,7 +4139,6 @@ internal class ComposerImpl(
         else updateCompoundKeyWhenWeExitGroupKeyHash(dataKey.hashCode(), 0)
     }
 
-    @Suppress("NOTHING_TO_INLINE")
     private inline fun updateCompoundKeyWhenWeExitGroupKeyHash(groupKey: Int, rGroupIndex: Int) {
         compoundKeyHash = (((compoundKeyHash xor rGroupIndex) ror 3) xor groupKey.hashCode()) ror 3
     }
@@ -4645,7 +4642,9 @@ internal inline fun debugRuntimeCheck(value: Boolean, lazyMessage: () -> String)
     }
 }
 
-internal fun runtimeCheck(value: Boolean) = runtimeCheck(value) { "Check failed" }
+internal inline fun debugRuntimeCheck(value: Boolean) = debugRuntimeCheck(value) { "Check failed" }
+
+internal inline fun runtimeCheck(value: Boolean) = runtimeCheck(value) { "Check failed" }
 
 internal fun composeRuntimeError(message: String): Nothing {
     throw ComposeRuntimeError(
