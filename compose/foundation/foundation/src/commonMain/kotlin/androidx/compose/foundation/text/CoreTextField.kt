@@ -673,11 +673,11 @@ internal fun CoreTextField(
             }
         }
 
-    val autofillHighlight = LocalAutofillHighlight.current
+    val autofillHighlightColor = LocalAutofillHighlightColor.current
     val drawDecorationModifier =
         Modifier.drawBehind {
             if (state.autofillHighlightOn || state.justAutofilled) {
-                drawRect(color = autofillHighlight.autofillHighlightColor)
+                drawRect(color = autofillHighlightColor)
             }
         }
 

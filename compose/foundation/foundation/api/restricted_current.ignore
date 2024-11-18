@@ -1,7 +1,11 @@
 // Baseline format: 1.0
-AddedMethod: androidx.compose.foundation.OverscrollKt#withoutVisualEffect(androidx.compose.foundation.OverscrollEffect):
-    Added method androidx.compose.foundation.OverscrollKt.withoutVisualEffect(androidx.compose.foundation.OverscrollEffect)
+AddedMethod: androidx.compose.foundation.text.AutofillHighlightKt#getLocalAutofillHighlightColor():
+    Added method androidx.compose.foundation.text.AutofillHighlightKt.getLocalAutofillHighlightColor()
 
 
-RemovedMethod: androidx.compose.foundation.OverscrollKt#withoutDrawing(androidx.compose.foundation.OverscrollEffect):
-    Removed method androidx.compose.foundation.OverscrollKt.withoutDrawing(androidx.compose.foundation.OverscrollEffect)
+RemovedClass: androidx.compose.foundation.text.AutofillHighlight_androidKt:
+    Removed class androidx.compose.foundation.text.AutofillHighlight_androidKt
+
+
+RemovedMethod: androidx.compose.foundation.text.AutofillHighlightKt#getLocalAutofillHighlight():
+    Removed method androidx.compose.foundation.text.AutofillHighlightKt.getLocalAutofillHighlight()
