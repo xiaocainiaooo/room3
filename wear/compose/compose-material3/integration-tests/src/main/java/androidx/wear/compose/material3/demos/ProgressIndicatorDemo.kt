@@ -47,12 +47,14 @@ import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.CircularProgressIndicator
 import androidx.wear.compose.material3.CircularProgressIndicatorDefaults
 import androidx.wear.compose.material3.IconButtonDefaults
+import androidx.wear.compose.material3.LinearProgressIndicator
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ProgressIndicatorDefaults
 import androidx.wear.compose.material3.SegmentedCircularProgressIndicator
 import androidx.wear.compose.material3.Slider
 import androidx.wear.compose.material3.SliderDefaults
+import androidx.wear.compose.material3.Stepper
 import androidx.wear.compose.material3.SwitchButton
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.samples.CircularProgressIndicatorContentSample
@@ -136,7 +138,17 @@ val ProgressIndicatorDemos =
                 },
             )
         ),
-        ComposableDemo("Linear progress") { Centralize { LinearProgressIndicatorSamples() } },
+        Material3DemoCategory(
+            title = "Linear progress",
+            listOf(
+                ComposableDemo("Linear Samples") {
+                    Centralize { LinearProgressIndicatorSamples() }
+                },
+                ComposableDemo("Animation") {
+                    Centralize { LinearProgressIndicatorAnimatedDemo() }
+                },
+            )
+        ),
         Material3DemoCategory(
             title = "Arc Progress Indicator",
             listOf(
@@ -553,6 +565,35 @@ fun ArcIndicatorCustomizer(
                 onCheckedChange = { hasCustomColors.value = it },
                 label = { Text("Custom colors") },
             )
+        }
+    }
+}
+
+@Composable
+fun LinearProgressIndicatorAnimatedDemo() {
+    var progress by remember { mutableFloatStateOf(0.25f) }
+    val valueRange = 0f..1f
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Stepper(
+            value = progress,
+            onValueChange = { progress = it },
+            valueRange = valueRange,
+            steps = 3,
+        ) {
+            ScalingLazyColumn(
+                modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                item { Text(String.format("Progress: %.0f%%", progress * 100)) }
+                item {
+                    LinearProgressIndicator(
+                        modifier = Modifier.padding(top = 8.dp),
+                        progress = { progress }
+                    )
+                }
+            }
         }
     }
 }
