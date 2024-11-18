@@ -21,6 +21,8 @@
  * Please use that script when creating a new project, rather than copying an existing project and
  * modifying its settings.
  */
+
+import androidx.build.KotlinTarget
 import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -117,4 +119,5 @@ androidx {
     type = LibraryType.ANNOTATION_PROCESSOR_UTILS
     inceptionYear = "2020"
     description = "Processing Environment Abstraction for AndroidX Room"
+    kotlinTarget = KotlinTarget.KOTLIN_1_9
 }
