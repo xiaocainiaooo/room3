@@ -16,11 +16,15 @@
 
 package androidx.lifecycle.viewmodel.navigation3
 
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.kruth.assertWithMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.NavDisplay
 import androidx.navigation3.Record
+import androidx.navigation3.rememberNavWrapperManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import kotlin.test.Test
@@ -63,8 +67,66 @@ class ViewModelStoreNavContentWrapperTest {
                 .isEqualTo(record2Arg)
         }
     }
+
+    @Test
+    fun testViewModelSaved() {
+        lateinit var backStack: MutableList<Any>
+        composeTestRule.setContent {
+            backStack = remember { mutableStateListOf("Home") }
+            val manager = rememberNavWrapperManager(listOf(ViewModelStoreNavContentWrapper))
+            NavDisplay(
+                backstack = backStack,
+                wrapperManager = manager,
+                onBack = { backStack.removeAt(backStack.lastIndex) },
+            ) { key ->
+                when (key) {
+                    "Home" -> {
+                        Record(key) { viewModel<HomeViewModel>() }
+                    }
+                    "AnotherScreen" -> {
+                        Record(key) { viewModel<HomeViewModel>() }
+                    }
+                    else -> error("Unknown key: $key")
+                }
+            }
+        }
+
+        composeTestRule.waitForIdle()
+        assertWithMessage("Only one viewModel should be created")
+            .that(globalViewModelCount)
+            .isEqualTo(1)
+
+        composeTestRule.runOnIdle { backStack.add("AnotherScreen") }
+
+        composeTestRule.waitForIdle()
+        assertWithMessage("Another viewModel should be created")
+            .that(globalViewModelCount)
+            .isEqualTo(2)
+
+        composeTestRule.runOnIdle { backStack.removeAt(backStack.lastIndex) }
+
+        composeTestRule.waitForIdle()
+        assertWithMessage("We should be reusing the old ViewModel since we popped")
+            .that(globalViewModelCount)
+            .isEqualTo(2)
+
+        composeTestRule.runOnIdle { backStack.add("AnotherScreen") }
+
+        composeTestRule.waitForIdle()
+        assertWithMessage("Another viewModel should be created")
+            .that(globalViewModelCount)
+            .isEqualTo(3)
+    }
 }
 
 class MyViewModel : ViewModel() {
     var myArg = "default"
+}
+
+var globalViewModelCount = 0
+
+class HomeViewModel : ViewModel() {
+    init {
+        globalViewModelCount++
+    }
 }

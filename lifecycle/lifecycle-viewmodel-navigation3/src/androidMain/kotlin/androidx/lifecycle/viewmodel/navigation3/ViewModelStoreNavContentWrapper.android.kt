@@ -16,14 +16,11 @@
 
 package androidx.lifecycle.viewmodel.navigation3
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.lifecycle.HasDefaultViewModelProviderFactory
 import androidx.lifecycle.SAVED_STATE_REGISTRY_OWNER_KEY
@@ -47,20 +44,31 @@ import androidx.navigation3.Record
 public object ViewModelStoreNavContentWrapper : NavContentWrapper {
 
     @Composable
+    override fun WrapBackStack(backStack: List<Any>) {
+        val recordViewModelStoreProvider = viewModel { RecordViewModel() }
+        recordViewModelStoreProvider.ownerInBackStack.clear()
+        recordViewModelStoreProvider.ownerInBackStack.addAll(backStack)
+    }
+
+    @Composable
     override fun WrapContent(record: Record) {
         val key = record.key
         val recordViewModelStoreProvider = viewModel { RecordViewModel() }
         val viewModelStore = recordViewModelStoreProvider.viewModelStoreForKey(key)
         // This ensures we always keep viewModels on config changes.
-        val activity = LocalContext.current.findActivity()
+        val activity = LocalActivity.current
         remember(key, viewModelStore) {
             object : RememberObserver {
                 override fun onAbandoned() {
-                    disposeIfNotChangingConfiguration()
+                    if (!recordViewModelStoreProvider.ownerInBackStack.contains(key)) {
+                        disposeIfNotChangingConfiguration()
+                    }
                 }
 
                 override fun onForgotten() {
-                    disposeIfNotChangingConfiguration()
+                    if (!recordViewModelStoreProvider.ownerInBackStack.contains(key)) {
+                        disposeIfNotChangingConfiguration()
+                    }
                 }
 
                 override fun onRemembered() {}
@@ -98,6 +106,7 @@ public object ViewModelStoreNavContentWrapper : NavContentWrapper {
 
 private class RecordViewModel : ViewModel() {
     private val owners = mutableMapOf<Any, ViewModelStore>()
+    val ownerInBackStack = mutableListOf<Any>()
 
     fun viewModelStoreForKey(key: Any): ViewModelStore = owners.getOrPut(key) { ViewModelStore() }
 
@@ -106,13 +115,4 @@ private class RecordViewModel : ViewModel() {
     override fun onCleared() {
         owners.forEach { (_, store) -> store.clear() }
     }
-}
-
-private fun Context.findActivity(): Activity? {
-    var context = this
-    while (context is ContextWrapper) {
-        if (context is Activity) return context
-        context = context.baseContext
-    }
-    return null
 }
