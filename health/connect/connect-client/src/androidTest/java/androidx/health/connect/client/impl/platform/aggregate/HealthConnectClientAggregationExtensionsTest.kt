@@ -34,6 +34,7 @@ import androidx.health.connect.client.records.StepsCadenceRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.metadata.DataOrigin
 import androidx.health.connect.client.request.AggregateRequest
+import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Velocity
 import androidx.health.connect.client.units.grams
@@ -308,7 +309,9 @@ class HealthConnectClientAggregationExtensionsTest {
 
         val count =
             healthConnectClient
-                .readRecordsFlow(StepsRecord::class, TimeRangeFilter.none(), emptySet())
+                .readRecordsFlow(
+                    ReadRecordsRequest(StepsRecord::class, TimeRangeFilter.none(), emptySet())
+                )
                 .fold(0) { currentCount, records -> currentCount + records.size }
 
         assertThat(count).isEqualTo(10_000L)
@@ -322,12 +325,14 @@ class HealthConnectClientAggregationExtensionsTest {
         val count =
             healthConnectClient
                 .readRecordsFlow(
-                    StepsRecord::class,
-                    TimeRangeFilter.between(
-                        START_TIME + 10_000.seconds,
-                        START_TIME + 90_000.seconds
-                    ),
-                    emptySet()
+                    ReadRecordsRequest(
+                        StepsRecord::class,
+                        TimeRangeFilter.between(
+                            START_TIME + 10_000.seconds,
+                            START_TIME + 90_000.seconds
+                        ),
+                        emptySet()
+                    )
                 )
                 .fold(0) { currentCount, records -> currentCount + records.size }
 
@@ -342,9 +347,11 @@ class HealthConnectClientAggregationExtensionsTest {
         val count =
             healthConnectClient
                 .readRecordsFlow(
-                    StepsRecord::class,
-                    TimeRangeFilter.none(),
-                    setOf(DataOrigin(context.packageName))
+                    ReadRecordsRequest(
+                        StepsRecord::class,
+                        TimeRangeFilter.none(),
+                        setOf(DataOrigin(context.packageName))
+                    )
                 )
                 .fold(0) { currentCount, records -> currentCount + records.size }
 
@@ -358,9 +365,11 @@ class HealthConnectClientAggregationExtensionsTest {
         val count =
             healthConnectClient
                 .readRecordsFlow(
-                    StepsRecord::class,
-                    TimeRangeFilter.none(),
-                    setOf(DataOrigin("some random package name"))
+                    ReadRecordsRequest(
+                        StepsRecord::class,
+                        TimeRangeFilter.none(),
+                        setOf(DataOrigin("some random package name"))
+                    )
                 )
                 .fold(0) { currentCount, records -> currentCount + records.size }
 
