@@ -30,6 +30,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.autoSaver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -40,6 +42,9 @@ import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.savedstate.SavedState
+import androidx.savedstate.serialization.decodeFromSavedState
+import androidx.savedstate.serialization.encodeToSavedState
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -168,35 +173,29 @@ private val phrases =
 
 @Composable
 fun rememberMutableStateListOf(vararg elements: Any): SnapshotStateList<Any> {
-    return rememberSaveable(saver = snapshotStateListSaver()) {
+    return rememberSaveable(saver = snapshotStateListSaver(serializableListSaver())) {
         elements.toList().toMutableStateList()
     }
 }
 
-private fun snapshotStateListSaver() =
-    listSaver<SnapshotStateList<Any>, Int>(
-        save = { stateList ->
-            stateList
-                .map {
-                    when (it) {
-                        is Profile -> 1
-                        is Scrollable -> 2
-                        is Dialog -> 3
-                        else -> 4
-                    }
-                }
-                .toMutableStateList()
-        },
-        restore = { list ->
-            list
-                .map {
-                    when (it) {
-                        1 -> Profile
-                        2 -> Scrollable
-                        3 -> Dialog
-                        else -> Dashboard
-                    }
-                }
-                .toMutableStateList()
-        },
+inline fun <reified T : Any> serializableListSaver() =
+    listSaver<List<T>, SavedState>(
+        save = { list -> list.map { encodeToSavedState<T>(it) } },
+        restore = { list -> list.map { decodeFromSavedState(it) } }
     )
+
+@Suppress("UNCHECKED_CAST")
+fun <T> snapshotStateListSaver(
+    listSaver: Saver<List<T>, out Any> = autoSaver()
+): Saver<SnapshotStateList<T>, Any> =
+    with(listSaver as Saver<List<T>, Any>) {
+        Saver(
+            save = { state ->
+                // We use toMutableList() here to ensure that save() is
+                // sent a list that is saveable by default (e.g., something
+                // that autoSaver() can handle)
+                save(state.toList().toMutableList())
+            },
+            restore = { state -> restore(state)?.toMutableStateList() }
+        )
+    }
