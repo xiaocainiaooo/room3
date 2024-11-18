@@ -122,6 +122,7 @@ dependencies {
     docs(project(":core:core-animation"))
     docs(project(":core:core-animation-testing"))
     docs(project(":core:core-appdigest"))
+    docs(project(":core:core-backported-fixes"))
     docs(project(":core:core-google-shortcuts"))
     docs(project(":core:haptics:haptics"))
     docs(project(":core:core-i18n"))
