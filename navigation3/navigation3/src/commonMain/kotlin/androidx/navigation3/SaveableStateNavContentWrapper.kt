@@ -19,7 +19,6 @@ package androidx.navigation3
 import androidx.collection.MutableObjectIntMap
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
@@ -34,11 +33,15 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 public class SaveableStateNavContentWrapper : NavContentWrapper {
     private var savedStateHolder: SaveableStateHolder? = null
     private val refCount: MutableObjectIntMap<Any> = MutableObjectIntMap()
-    private var initializing = true
     private var backstackSize = 0
 
     @Composable
     override fun WrapBackStack(backStack: List<Any>) {
+        DisposableEffect(key1 = backStack) {
+            refCount.clear()
+            onDispose {}
+        }
+
         savedStateHolder = rememberSaveableStateHolder()
         backstackSize = backStack.size
         backStack.forEach { key ->
@@ -60,13 +63,6 @@ public class SaveableStateNavContentWrapper : NavContentWrapper {
                     }
                 }
             }
-        }
-        LaunchedEffect(key1 = backStack) {
-            if (!initializing) {
-                refCount.clear()
-                initializing = true
-            }
-            initializing = false
         }
     }
 
