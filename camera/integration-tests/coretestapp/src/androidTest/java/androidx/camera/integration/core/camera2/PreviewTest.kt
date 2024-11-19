@@ -71,6 +71,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.testutils.fail
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executor
@@ -367,23 +368,37 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     fun willNotProvideSurface_resultCode_WILL_NOT_PROVIDE_SURFACE(): Unit = runBlocking {
         val preview = Preview.Builder().build()
 
-        val resultDeferred = CompletableDeferred<Int>()
-        instrumentation.runOnMainSync {
-            preview.setSurfaceProvider { surfaceRequest ->
-                surfaceRequest.willNotProvideSurface()
-                val surface = Surface(SurfaceTexture(0))
-                // can't provideSurface successfully after willNotProvideSurface.
-                // RESULT_WILL_NOT_PROVIDE_SURFACE will be notified.
-                surfaceRequest.provideSurface(surface, CameraXExecutors.directExecutor()) { result
-                    ->
-                    resultDeferred.completeOnceOnly(result.resultCode)
+        val result: Int =
+            withContext(Dispatchers.Main) {
+                val surfaceRequestDeferred = CompletableDeferred<SurfaceRequest>()
+                preview.setSurfaceProvider { request ->
+                    if (!surfaceRequestDeferred.complete(request)) {
+                        // Ignore any new results. Could also call preview.setSurfaceProvider(null)
+                        // on successful completion to ensure no further requests are sent.
+                        request.willNotProvideSurface()
+                    }
                 }
-            }
-            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
-        }
 
-        assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred.await() })
-            .isEqualTo(SurfaceRequest.Result.RESULT_WILL_NOT_PROVIDE_SURFACE)
+                cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+
+                withTimeoutOrNull(RESULT_TIMEOUT) { surfaceRequestDeferred.await() }
+                    ?.let { request ->
+                        val resultDeferred = CompletableDeferred<Int>()
+                        request.willNotProvideSurface()
+                        val surface = Surface(SurfaceTexture(0))
+                        // can't provideSurface successfully after willNotProvideSurface.
+                        // RESULT_WILL_NOT_PROVIDE_SURFACE will be notified.
+                        request.provideSurface(surface, CameraXExecutors.directExecutor()) { result
+                            ->
+                            resultDeferred.completeOnceOnly(result.resultCode)
+                        }
+
+                        withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred.await() }
+                            ?: fail("Timed out while waiting for surface result.")
+                    } ?: fail("Timed out while waiting for surface request.")
+            }
+
+        assertThat(result).isEqualTo(SurfaceRequest.Result.RESULT_WILL_NOT_PROVIDE_SURFACE)
     }
 
     @Test
@@ -604,53 +619,47 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     }
 
     @Test
-    @Throws(InterruptedException::class)
     fun surfaceClosed_resultCode_INVALID_SURFACE() = runBlocking {
         // Arrange.
         val preview = Preview.Builder().build()
-        val resultDeferred1 = CompletableDeferred<Int>()
-        val resultDeferred2 = CompletableDeferred<Int>()
-        val resultDeferred3 = CompletableDeferred<Int>()
 
         // Act.
-        instrumentation.runOnMainSync {
-            preview.setSurfaceProvider(
-                CameraXExecutors.mainThreadExecutor(),
-                { request ->
-                    request.provideSurface(
-                        Surface(SurfaceTexture(0)).also { it.release() }, // invalid surface
-                        CameraXExecutors.directExecutor()
-                    ) { result ->
-                        resultDeferred1.completeOnceOnly(result.resultCode)
-                    }
+        val results: List<Int> =
+            withContext(Dispatchers.Main) {
+                val surfaceRequestDeferred = CompletableDeferred<SurfaceRequest>()
+                preview.setSurfaceProvider { request -> surfaceRequestDeferred.complete(request) }
 
-                    request.provideSurface(
-                        Surface(SurfaceTexture(0)).also { it.release() }, // invalid surface
-                        CameraXExecutors.directExecutor()
-                    ) { result ->
-                        resultDeferred2.completeOnceOnly(result.resultCode)
-                    }
+                cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
 
-                    request.provideSurface(
-                        Surface(SurfaceTexture(0)), // valid surface
-                        CameraXExecutors.directExecutor()
-                    ) { result ->
-                        resultDeferred3.completeOnceOnly(result.resultCode)
-                    }
-                }
+                withTimeoutOrNull(RESULT_TIMEOUT) { surfaceRequestDeferred.await() }
+                    ?.let { request ->
+                        listOf(
+                                Surface(SurfaceTexture(0)).also { it.release() }, // invalid surface
+                                Surface(SurfaceTexture(0)).also { it.release() }, // invalid surface
+                                Surface(SurfaceTexture(0)) // valid surface
+                            )
+                            .mapIndexed { i, surface ->
+                                val resultDeferred = CompletableDeferred<Int>()
+                                request.provideSurface(
+                                    surface,
+                                    CameraXExecutors.directExecutor()
+                                ) { result ->
+                                    resultDeferred.completeOnceOnly(result.resultCode)
+                                }
+                                withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred.await() }
+                                    ?: fail("Timed out while waiting for surface result ${i+1}.")
+                            }
+                    } ?: fail("Timed out while waiting for surface request.")
+            }
+
+        // Assert.
+        assertThat(results)
+            .containsExactly(
+                SurfaceRequest.Result.RESULT_INVALID_SURFACE,
+                SurfaceRequest.Result.RESULT_SURFACE_ALREADY_PROVIDED,
+                SurfaceRequest.Result.RESULT_SURFACE_ALREADY_PROVIDED
             )
-
-            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
-        }
-
-        assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred1.await() })
-            .isEqualTo(SurfaceRequest.Result.RESULT_INVALID_SURFACE)
-
-        assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred2.await() })
-            .isEqualTo(SurfaceRequest.Result.RESULT_SURFACE_ALREADY_PROVIDED)
-
-        assertThat(withTimeoutOrNull(RESULT_TIMEOUT) { resultDeferred3.await() })
-            .isEqualTo(SurfaceRequest.Result.RESULT_SURFACE_ALREADY_PROVIDED)
+            .inOrder()
     }
 
     // ======================================================
