@@ -170,7 +170,7 @@ private class PreferredWidthElement(
 
 private class PreferredWidthNode(var width: Dp) : ParentDataModifierNode, Modifier.Node() {
     override fun Density.modifyParentData(parentData: Any?) =
-        ((parentData as? PaneScaffoldParentData) ?: PaneScaffoldParentData()).also {
+        ((parentData as? PaneScaffoldParentDataImpl) ?: PaneScaffoldParentDataImpl()).also {
             it.preferredWidth = with(this) { width.toPx() }
         }
 }
@@ -206,11 +206,12 @@ private object AnimatedPaneElement : ModifierNodeElement<AnimatedPaneNode>() {
 
 private class AnimatedPaneNode : ParentDataModifierNode, Modifier.Node() {
     override fun Density.modifyParentData(parentData: Any?) =
-        ((parentData as? PaneScaffoldParentData) ?: PaneScaffoldParentData()).also {
+        ((parentData as? PaneScaffoldParentDataImpl) ?: PaneScaffoldParentDataImpl()).also {
             it.isAnimatedPane = true
         }
 }
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 internal val List<Measurable>.minTouchTargetSize: Dp
     get() =
         fastMaxOfOrNull {
@@ -223,9 +224,33 @@ internal val List<Measurable>.minTouchTargetSize: Dp
             }
         } ?: 0.dp
 
-internal data class PaneScaffoldParentData(
-    var preferredWidth: Float? = null,
+/**
+ * The parent data passed to pane scaffolds by their contents like panes and drag handles.
+ *
+ * @see PaneScaffoldScope.preferredWidth
+ */
+@ExperimentalMaterial3AdaptiveApi
+sealed interface PaneScaffoldParentData {
+    /**
+     * The preferred width of the child, which is supposed to be set via
+     * [PaneScaffoldScope.preferredWidth] on a pane composable, like [AnimatedPane].
+     */
+    val preferredWidth: Float
+
+    /** `true` to indicate that the child is an [AnimatedPane]; otherwise `false`. */
+    val isAnimatedPane: Boolean
+
+    /**
+     * The minimum touch target size of the child, which is supposed to be set via
+     * [PaneScaffoldScope.paneExpansionDraggable] on a drag handle component.
+     */
+    val minTouchTargetSize: Dp
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+internal data class PaneScaffoldParentDataImpl(
+    override var preferredWidth: Float = Float.NaN,
     var paneMargins: PaneMargins = PaneMargins.Unspecified,
-    var isAnimatedPane: Boolean = false,
-    var minTouchTargetSize: Dp = Dp.Unspecified
-)
+    override var isAnimatedPane: Boolean = false,
+    override var minTouchTargetSize: Dp = Dp.Unspecified
+) : PaneScaffoldParentData
