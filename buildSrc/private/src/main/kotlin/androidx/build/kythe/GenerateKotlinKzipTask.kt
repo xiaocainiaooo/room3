@@ -24,6 +24,7 @@ import androidx.build.getOperatingSystem
 import androidx.build.getPrebuiltsRoot
 import androidx.build.getSupportRootFolder
 import androidx.build.java.JavaCompileInputs
+import androidx.build.multiplatformExtension
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
@@ -32,6 +33,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
@@ -45,6 +47,7 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 /** Generates kzip files that are used to index the Kotlin source code in Kythe. */
 @CacheableTask
@@ -58,6 +61,10 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
 
     /** Must be run in the checkout root so as to be free of relative markers */
     @get:Internal val checkoutRoot: File = project.getCheckoutRoot()
+
+    @get:Internal val isKmp: Boolean = project.multiplatformExtension != null
+
+    @get:Input abstract val kotlincFreeCompilerArgs: ListProperty<String>
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -95,32 +102,35 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
             return
         }
 
-        val args =
-            listOf(
-                "-jvm-target",
-                jvmTarget.get().target,
-                "-Xjdk-release",
-                jvmTarget.get().target,
-                "-Xjvm-default=all",
-                "-language-version",
-                kotlinTarget.get().apiVersion.version,
-                "-api-version",
-                kotlinTarget.get().apiVersion.version,
-                "-no-reflect",
-                "-no-stdlib",
-                "-opt-in=androidx.room.compiler.processing.ExperimentalProcessingApi",
-                "-opt-in=com.squareup.kotlinpoet.javapoet.KotlinPoetJavaPoetPreview",
-                "-opt-in=kotlin.contracts.ExperimentalContracts",
-            )
-
         val commonSourceFiles =
             commonModuleSourcePaths.asFileTree.files
                 .filter { it.extension == "kt" || it.extension == "java" }
                 .map { it.relativeTo(checkoutRoot) }
 
-        val commonSourcesArgs =
-            if (commonSourceFiles.isNotEmpty()) {
-                listOf("-Xmulti-platform", "-Xexpect-actual-classes")
+        val dependencyClasspath =
+            dependencyClasspath.asFileTree.files
+                .filter { it.extension == "jar" }
+                .map { it.relativeTo(checkoutRoot) }
+
+        val args = buildList {
+            addAll(
+                listOf(
+                    "-jvm-target",
+                    jvmTarget.get().target,
+                    "-no-reflect",
+                    "-no-stdlib",
+                    "-api-version",
+                    kotlinTarget.get().apiVersion.version,
+                    "-language-version",
+                    kotlinTarget.get().apiVersion.version,
+                    "-opt-in=kotlin.contracts.ExperimentalContracts"
+                )
+            )
+        }
+
+        val multiplatformArg =
+            if (isKmp) {
+                listOf("-Xmulti-platform")
             } else emptyList()
 
         val command = buildList {
@@ -136,14 +146,13 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                     "-vnames",
                     vnamesJson.get().asFile.relativeTo(checkoutRoot).path,
                     "-args",
-                    (args + commonSourcesArgs).joinToString(" ")
+                    (args + multiplatformArg + kotlincFreeCompilerArgs.get().distinct())
+                        .joinToString(" ")
                 )
             )
-            sourceFiles.forEach { file -> addAll(listOf("-srcs", file.path)) }
-            commonSourceFiles.forEach { file -> addAll(listOf("-common_srcs", file.path)) }
-            dependencyClasspath.files
-                .map { it.relativeTo(checkoutRoot).path }
-                .forEach { file -> addAll(listOf("-cp", file)) }
+            sourceFiles.forEach { addAll(listOf("-srcs", it.path)) }
+            commonSourceFiles.forEach { addAll(listOf("-common_srcs", it.path)) }
+            dependencyClasspath.forEach { addAll(listOf("-cp", it.path)) }
         }
 
         execOperations.exec {
@@ -160,6 +169,32 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
             kotlinTarget: Property<KotlinTarget>,
             javaVersion: JavaVersion,
         ) {
+            // TODO(b/379936315): Make these compatible with koltinc/javac that indexer is using
+            if (
+                project.path in
+                    listOf(
+                        ":buildSrc-tests",
+                        ":compose:foundation:foundation",
+                        ":compose:material3:material3",
+                        ":concurrent:concurrent-futures-ktx",
+                        ":glance:glance-appwidget",
+                        ":glance:glance-appwidget-multiprocess",
+                        ":privacysandbox:tools:integration-tests:testsdk",
+                        ":room:room-compiler-processing",
+                        ":room:room-compiler-processing-testing",
+                        ":room:room-runtime",
+                        ":security:security-state"
+                    )
+            ) {
+                return
+            }
+
+            val kotlincFreeCompilerArgs =
+                project.objects.listProperty(String::class.java).apply {
+                    project.tasks.withType(KotlinCompilationTask::class.java).configureEach {
+                        addAll(it.compilerOptions.freeCompilerArgs)
+                    }
+                }
             project.tasks
                 .register("generateKotlinKzip", GenerateKotlinKzipTask::class.java) { task ->
                     task.apply {
@@ -172,7 +207,9 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                         sourcePaths.setFrom(javaInputs.sourcePaths)
                         commonModuleSourcePaths.from(javaInputs.commonModuleSourcePaths)
                         vnamesJson.set(File(project.getSupportRootFolder(), "buildSrc/vnames.json"))
-                        dependencyClasspath.setFrom(javaInputs.dependencyClasspath)
+                        dependencyClasspath.setFrom(
+                            javaInputs.dependencyClasspath + javaInputs.bootClasspath
+                        )
                         this.compiledSources.setFrom(compiledSources)
                         this.kotlinTarget.set(kotlinTarget)
                         jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
@@ -182,6 +219,7 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                                 "kzips/${project.group}-${project.name}.kotlin.kzip"
                             )
                         )
+                        this.kotlincFreeCompilerArgs.set(kotlincFreeCompilerArgs)
                     }
                 }
                 .also { project.addToBuildOnServer(it) }
