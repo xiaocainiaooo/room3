@@ -1083,11 +1083,13 @@ class RecorderTest(
         recording.recordAndVerify()
 
         // Assert.
+        val videoEncoderBitrateRange =
+            recorder.videoEncoderBitrateRange.fetchData().get(3, TimeUnit.SECONDS)
         assertThat(recorder.mFirstRecordingVideoBitrate)
             .isIn(
                 com.google.common.collect.Range.closed(
-                    recorder.mVideoEncoderBitrateRange.lower,
-                    recorder.mVideoEncoderBitrateRange.upper
+                    videoEncoderBitrateRange.lower,
+                    videoEncoderBitrateRange.upper
                 )
             )
     }
