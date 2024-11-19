@@ -45,6 +45,50 @@ package androidx.navigation3 {
     property public final T key;
   }
 
+  public final class RecordClassProvider<T> {
+    ctor public RecordClassProvider(kotlin.reflect.KClass<T> clazz, java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+    method public kotlin.reflect.KClass<T> component1();
+    method public java.util.Map<java.lang.String,java.lang.Object> component2();
+    method public kotlin.jvm.functions.Function1<T,kotlin.Unit> component3();
+    method public androidx.navigation3.RecordClassProvider<T> copy(kotlin.reflect.KClass<T> clazz, java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+    method public kotlin.reflect.KClass<T> getClazz();
+    method public kotlin.jvm.functions.Function1<T,kotlin.Unit> getContent();
+    method public java.util.Map<java.lang.String,java.lang.Object> getFeatureMap();
+    property public final kotlin.reflect.KClass<T> clazz;
+    property public final kotlin.jvm.functions.Function1<T,kotlin.Unit> content;
+    property public final java.util.Map<java.lang.String,java.lang.Object> featureMap;
+  }
+
+  @kotlin.DslMarker public @interface RecordDsl {
+  }
+
+  public final class RecordProvider<T> {
+    ctor public RecordProvider(T key, java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+    method public T component1();
+    method public java.util.Map<java.lang.String,java.lang.Object> component2();
+    method public kotlin.jvm.functions.Function1<T,kotlin.Unit> component3();
+    method public androidx.navigation3.RecordProvider<T> copy(T key, java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+    method public kotlin.jvm.functions.Function1<T,kotlin.Unit> getContent();
+    method public java.util.Map<java.lang.String,java.lang.Object> getFeatureMap();
+    method public T getKey();
+    property public final kotlin.jvm.functions.Function1<T,kotlin.Unit> content;
+    property public final java.util.Map<java.lang.String,java.lang.Object> featureMap;
+    property public final T key;
+  }
+
+  @androidx.navigation3.RecordDsl public final class RecordProviderBuilder {
+    ctor public RecordProviderBuilder(kotlin.jvm.functions.Function1<java.lang.Object,? extends androidx.navigation3.Record<? extends java.lang.Object?>> fallback);
+    method public <T> void addRecordProvider(kotlin.reflect.KClass<T> clazz, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+    method public <T> void addRecordProvider(T key, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+    method public kotlin.jvm.functions.Function1<java.lang.Object,androidx.navigation3.Record<? extends java.lang.Object?>> build();
+  }
+
+  public final class RecordProviderKt {
+    method public static inline <reified T> void record(androidx.navigation3.RecordProviderBuilder, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+    method public static <T> void record(androidx.navigation3.RecordProviderBuilder, T key, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+    method public static inline kotlin.jvm.functions.Function1<java.lang.Object,androidx.navigation3.Record<? extends java.lang.Object?>> recordProvider(optional kotlin.jvm.functions.Function1<java.lang.Object,? extends androidx.navigation3.Record<? extends java.lang.Object?>> fallback, kotlin.jvm.functions.Function1<? super androidx.navigation3.RecordProviderBuilder,kotlin.Unit> builder);
+  }
+
   public final class SaveableStateNavContentWrapper implements androidx.navigation3.NavContentWrapper {
     ctor public SaveableStateNavContentWrapper();
     method public <T> void WrapContent(androidx.navigation3.Record<T> record);
