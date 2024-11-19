@@ -117,6 +117,33 @@ class KlibDumpParserTest {
     }
 
     @Test
+    fun parseASerializerClass() {
+        val input =
+            """
+                final object ${'$'}serializer : kotlinx.serialization.internal/GeneratedSerializer<androidx.room.migration.bundle/DatabaseBundle> { // androidx.room.migration.bundle/DatabaseBundle.${'$'}serializer|null[0]
+                    final val descriptor // androidx.room.migration.bundle/DatabaseBundle.${'$'}serializer.descriptor|{}descriptor[0]
+                        final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // androidx.room.migration.bundle/DatabaseBundle.${'$'}serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+                    final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // androidx.room.migration.bundle/DatabaseBundle.${'$'}serializer.childSerializers|childSerializers(){}[0]
+                    final fun deserialize(kotlinx.serialization.encoding/Decoder): androidx.room.migration.bundle/DatabaseBundle // androidx.room.migration.bundle/DatabaseBundle.${'$'}serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+                    final fun serialize(kotlinx.serialization.encoding/Encoder, androidx.room.migration.bundle/DatabaseBundle) // androidx.room.migration.bundle/DatabaseBundle.${'$'}serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;androidx.room.migration.bundle.DatabaseBundle){}[0]
+                }
+        """
+                .trimIndent()
+        val parsed =
+            KlibDumpParser(input)
+                .parseClass(
+                    AbiQualifiedName(
+                        AbiCompoundName("androidx.room.migration.bundle"),
+                        AbiCompoundName("DatabaseBundle")
+                    )
+                )
+        assertThat(parsed).isNotNull()
+        assertThat(parsed.qualifiedName.toString())
+            .isEqualTo("androidx.room.migration.bundle/DatabaseBundle.\$serializer")
+    }
+
+    @Test
     fun parseAFunction() {
         val input =
             "final inline fun <#A1: kotlin/Any?> " +
