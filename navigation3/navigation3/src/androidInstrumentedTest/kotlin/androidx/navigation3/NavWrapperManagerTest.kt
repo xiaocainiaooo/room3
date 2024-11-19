@@ -42,7 +42,7 @@ class NavWrapperManagerTest {
                 }
 
                 @Composable
-                override fun WrapContent(record: Record) {
+                override fun <T : Any> WrapContent(record: Record<T>) {
                     calledWrapContent = true
                 }
             }
@@ -70,7 +70,7 @@ class NavWrapperManagerTest {
                 }
 
                 @Composable
-                override fun WrapContent(record: Record) {
+                override fun <T : Any> WrapContent(record: Record<T>) {
                     calledWrapContentCount++
                 }
             }

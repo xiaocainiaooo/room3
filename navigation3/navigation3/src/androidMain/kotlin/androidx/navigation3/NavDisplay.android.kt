@@ -50,12 +50,12 @@ public object NavDisplay {
  * @sample androidx.navigation3.samples.BasicNav
  */
 @Composable
-public fun NavDisplay(
-    backstack: List<Any>,
+public fun <T : Any> NavDisplay(
+    backstack: List<T>,
     wrapperManager: NavWrapperManager,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = {},
-    recordProvider: (key: Any) -> Record
+    recordProvider: (key: T) -> Record<out T>
 ) {
     BackHandler(backstack.size > 1, onBack)
     wrapperManager.PrepareBackStack(backStack = backstack)

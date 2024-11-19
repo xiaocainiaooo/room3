@@ -58,9 +58,9 @@ fun BasicNav() {
                     DialogContent { backStack.removeLast() }
                 }
             }
-            Dashboard -> {
-                Record(Dashboard) { dashboardArgs ->
-                    val userId = (dashboardArgs as Dashboard).userId
+            is Dashboard -> {
+                Record(key) { dashboardArgs ->
+                    val userId = dashboardArgs.userId
                     Dashboard(userId, onBack = { backStack.removeLast() })
                 }
             }
@@ -117,15 +117,15 @@ fun AnimatedNav() {
                     DialogContent { backStack.removeLast() }
                 }
             }
-            Dashboard -> {
+            is Dashboard -> {
                 Record(
-                    Dashboard,
+                    key,
                     AnimatedNavDisplay.transition(
                         slideInHorizontally { it },
                         slideOutHorizontally { it }
                     )
                 ) { dashboardArgs ->
-                    val userId = (dashboardArgs as Dashboard).userId
+                    val userId = dashboardArgs.userId
                     Dashboard(userId, onBack = { backStack.removeLast() })
                 }
             }

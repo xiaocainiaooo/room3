@@ -39,7 +39,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 public object SavedStateNavContentWrapper : NavContentWrapper {
 
     @Composable
-    override fun WrapContent(record: Record) {
+    override fun <T : Any> WrapContent(record: Record<T>) {
         val key = record.key
         val childRegistry by
             rememberSaveable(

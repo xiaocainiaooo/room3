@@ -70,14 +70,14 @@ public object AnimatedNavDisplay {
  * @sample androidx.navigation3.samples.AnimatedNav
  */
 @Composable
-public fun AnimatedNavDisplay(
-    backstack: List<Any>,
+public fun <T : Any> AnimatedNavDisplay(
+    backstack: List<T>,
     wrapperManager: NavWrapperManager,
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
     sizeTransform: SizeTransform? = null,
     onBack: () -> Unit = {},
-    recordProvider: (key: Any) -> Record
+    recordProvider: (key: T) -> Record<out T>
 ) {
     BackHandler(backstack.size > 1, onBack)
     wrapperManager.PrepareBackStack(backStack = backstack)
