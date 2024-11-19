@@ -166,42 +166,6 @@ abstract class <#A: kotlin/Any, #B: kotlin/Any> androidx.paging/PagingSource { /
     }
 }
 
-abstract class <#A: kotlin/Any, #B: kotlin/Any> androidx.paging/RemoteMediator { // androidx.paging/RemoteMediator|null[0]
-    constructor <init>() // androidx.paging/RemoteMediator.<init>|<init>(){}[0]
-
-    abstract suspend fun load(androidx.paging/LoadType, androidx.paging/PagingState<#A, #B>): androidx.paging/RemoteMediator.MediatorResult // androidx.paging/RemoteMediator.load|load(androidx.paging.LoadType;androidx.paging.PagingState<1:0,1:1>){}[0]
-    open suspend fun initialize(): androidx.paging/RemoteMediator.InitializeAction // androidx.paging/RemoteMediator.initialize|initialize(){}[0]
-
-    final enum class InitializeAction : kotlin/Enum<androidx.paging/RemoteMediator.InitializeAction> { // androidx.paging/RemoteMediator.InitializeAction|null[0]
-        enum entry LAUNCH_INITIAL_REFRESH // androidx.paging/RemoteMediator.InitializeAction.LAUNCH_INITIAL_REFRESH|null[0]
-        enum entry SKIP_INITIAL_REFRESH // androidx.paging/RemoteMediator.InitializeAction.SKIP_INITIAL_REFRESH|null[0]
-
-        final val entries // androidx.paging/RemoteMediator.InitializeAction.entries|#static{}entries[0]
-            final fun <get-entries>(): kotlin.enums/EnumEntries<androidx.paging/RemoteMediator.InitializeAction> // androidx.paging/RemoteMediator.InitializeAction.entries.<get-entries>|<get-entries>#static(){}[0]
-
-        final fun valueOf(kotlin/String): androidx.paging/RemoteMediator.InitializeAction // androidx.paging/RemoteMediator.InitializeAction.valueOf|valueOf#static(kotlin.String){}[0]
-        final fun values(): kotlin/Array<androidx.paging/RemoteMediator.InitializeAction> // androidx.paging/RemoteMediator.InitializeAction.values|values#static(){}[0]
-    }
-
-    sealed class MediatorResult { // androidx.paging/RemoteMediator.MediatorResult|null[0]
-        constructor <init>() // androidx.paging/RemoteMediator.MediatorResult.<init>|<init>(){}[0]
-
-        final class Error : androidx.paging/RemoteMediator.MediatorResult { // androidx.paging/RemoteMediator.MediatorResult.Error|null[0]
-            constructor <init>(kotlin/Throwable) // androidx.paging/RemoteMediator.MediatorResult.Error.<init>|<init>(kotlin.Throwable){}[0]
-
-            final val throwable // androidx.paging/RemoteMediator.MediatorResult.Error.throwable|{}throwable[0]
-                final fun <get-throwable>(): kotlin/Throwable // androidx.paging/RemoteMediator.MediatorResult.Error.throwable.<get-throwable>|<get-throwable>(){}[0]
-        }
-
-        final class Success : androidx.paging/RemoteMediator.MediatorResult { // androidx.paging/RemoteMediator.MediatorResult.Success|null[0]
-            constructor <init>(kotlin/Boolean) // androidx.paging/RemoteMediator.MediatorResult.Success.<init>|<init>(kotlin.Boolean){}[0]
-
-            final val endOfPaginationReached // androidx.paging/RemoteMediator.MediatorResult.Success.endOfPaginationReached|{}endOfPaginationReached[0]
-                final fun <get-endOfPaginationReached>(): kotlin/Boolean // androidx.paging/RemoteMediator.MediatorResult.Success.endOfPaginationReached.<get-endOfPaginationReached>|<get-endOfPaginationReached>(){}[0]
-        }
-    }
-}
-
 abstract class <#A: kotlin/Any> androidx.paging/PagingDataPresenter { // androidx.paging/PagingDataPresenter|null[0]
     constructor <init>(kotlin.coroutines/CoroutineContext = ..., androidx.paging/PagingData<#A>? = ...) // androidx.paging/PagingDataPresenter.<init>|<init>(kotlin.coroutines.CoroutineContext;androidx.paging.PagingData<1:0>?){}[0]
 
@@ -233,7 +197,6 @@ final class <#A: kotlin/Any, #B: kotlin/Any> androidx.paging/InvalidatingPagingS
 }
 
 final class <#A: kotlin/Any, #B: kotlin/Any> androidx.paging/Pager { // androidx.paging/Pager|null[0]
-    constructor <init>(androidx.paging/PagingConfig, #A? = ..., androidx.paging/RemoteMediator<#A, #B>?, kotlin/Function0<androidx.paging/PagingSource<#A, #B>>) // androidx.paging/Pager.<init>|<init>(androidx.paging.PagingConfig;1:0?;androidx.paging.RemoteMediator<1:0,1:1>?;kotlin.Function0<androidx.paging.PagingSource<1:0,1:1>>){}[0]
     constructor <init>(androidx.paging/PagingConfig, #A? = ..., kotlin/Function0<androidx.paging/PagingSource<#A, #B>>) // androidx.paging/Pager.<init>|<init>(androidx.paging.PagingConfig;1:0?;kotlin.Function0<androidx.paging.PagingSource<1:0,1:1>>){}[0]
 
     final val flow // androidx.paging/Pager.flow|{}flow[0]

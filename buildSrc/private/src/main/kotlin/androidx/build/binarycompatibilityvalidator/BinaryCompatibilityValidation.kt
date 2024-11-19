@@ -314,6 +314,7 @@ class BinaryCompatibilityValidation(
                 GENERATE_NAME.appendCapitalized(target.targetName),
                 KotlinKlibAbiBuildTask::class.java
             ) {
+                it.nonPublicMarkers.addAll(nonPublicMarkers)
                 it.target.set(target)
                 it.klibFile.from(compilation.output.classesDirs)
                 it.signatureVersion.set(KlibSignatureVersion.LATEST)
@@ -338,5 +339,59 @@ private fun KotlinMultiplatformExtension.nativeTargets() =
 
 private fun KotlinNativeTarget.klibTargetName(): String =
     KlibTarget(targetName, konanTargetNameMapping[konanTarget.name]!!).toString()
+
+// Not ideal to have a list instead of a pattern to match but this is all the API supports right now
+private val nonPublicMarkers =
+    setOf(
+        "androidx.annotation.Experimental",
+        "androidx.benchmark.BenchmarkState.Companion.ExperimentalExternalReport",
+        "androidx.benchmark.ExperimentalBenchmarkConfigApi",
+        "androidx.benchmark.ExperimentalBenchmarkStateApi",
+        "androidx.benchmark.ExperimentalBlackHoleApi",
+        "androidx.benchmark.macro.ExperimentalMacrobenchmarkApi",
+        "androidx.benchmark.macro.ExperimentalMetricApi",
+        "androidx.benchmark.perfetto.ExperimentalPerfettoCaptureApi",
+        "androidx.benchmark.perfetto.ExperimentalPerfettoTraceProcessorApi",
+        "androidx.camera.core.ExperimentalUseCaseApi",
+        "androidx.car.app.annotations.ExperimentalCarApi",
+        "androidx.compose.animation.ExperimentalAnimationApi",
+        "androidx.compose.animation.ExperimentalSharedTransitionApi",
+        "androidx.compose.animation.core.ExperimentalAnimatableApi",
+        "androidx.compose.animation.core.ExperimentalAnimationSpecApi",
+        "androidx.compose.animation.core.ExperimentalTransitionApi",
+        "androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi",
+        "androidx.compose.foundation.ExperimentalFoundationApi",
+        "androidx.compose.foundation.layout.ExperimentalLayoutApi",
+        "androidx.compose.material.ExperimentalMaterialApi",
+        "androidx.compose.runtime.ExperimentalComposeApi",
+        "androidx.compose.runtime.ExperimentalComposeRuntimeApi",
+        "androidx.compose.ui.ExperimentalComposeUiApi",
+        "androidx.compose.ui.input.pointer.util.ExperimentalVelocityTrackerApi",
+        "androidx.compose.ui.test.ExperimentalTestApi",
+        "androidx.compose.ui.text.ExperimentalTextApi",
+        "androidx.compose.ui.unit.ExperimentalUnitApi",
+        "androidx.constraintlayout.compose.ExperimentalMotionApi",
+        "androidx.core.telecom.util.ExperimentalAppActions",
+        "androidx.credentials.ExperimentalDigitalCredentialApi",
+        "androidx.glance.ExperimentalGlanceApi",
+        "androidx.glance.appwidget.ExperimentalGlanceRemoteViewsApi",
+        "androidx.health.connect.client.ExperimentalDeduplicationApi",
+        "androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi",
+        "androidx.ink.authoring.ExperimentalLatencyDataApi",
+        "androidx.ink.brush.ExperimentalInkCustomBrushApi",
+        "androidx.paging.ExperimentalPagingApi",
+        "androidx.privacysandbox.ads.adservices.common.ExperimentalFeatures.RegisterSourceOptIn",
+        "androidx.privacysandbox.ads.adservices.common.ExperimentalFeatures.Ext8OptIn",
+        "androidx.privacysandbox.ads.adservices.common.ExperimentalFeatures.Ext10OptIn",
+        "androidx.privacysandbox.ads.adservices.common.ExperimentalFeatures.Ext11OptIn",
+        "androidx.privacysandbox.ads.adservices.common.ExperimentalFeatures.Ext12OptIn",
+        "androidx.privacysandbox.ui.core.ExperimentalFeatures.DelegatingAdapterApi",
+        "androidx.room.ExperimentalRoomApi",
+        "androidx.room.compiler.processing.ExperimentalProcessingApi",
+        "androidx.tv.foundation.ExperimentalTvFoundationApi",
+        "androidx.wear.compose.foundation.ExperimentalWearFoundationApi",
+        "androidx.wear.compose.material.ExperimentalWearMaterialApi",
+        "androidx.window.core.ExperimentalWindowApi",
+    )
 
 const val NEW_ISSUE_URL = "https://b.corp.google.com/issues/new?component=1102332"
