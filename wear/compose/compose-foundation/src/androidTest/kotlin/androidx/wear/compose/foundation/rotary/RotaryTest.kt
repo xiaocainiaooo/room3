@@ -20,9 +20,6 @@
 
 package androidx.wear.compose.foundation.rotary
 
-import android.content.Context
-import android.hardware.input.InputManager
-import android.view.InputDevice.SOURCE_ROTARY_ENCODER
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollFactory
 import androidx.compose.foundation.layout.height
@@ -43,9 +40,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performRotaryScrollInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth
-import org.junit.Assume
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -173,7 +168,6 @@ class RotaryScrollTest {
     fun fast_scroll_with_fling() {
         var itemIndex = 0
 
-        Assume.assumeTrue(hasRotaryInputDevice())
         testScroll(
             beforeScroll = { itemIndex = state.firstVisibleItemIndex },
             rotaryAction = {
@@ -295,23 +289,6 @@ class RotaryScrollTest {
 
     companion object {
         const val TEST_TAG = "test-tag"
-    }
-
-    private fun hasRotaryInputDevice(): Boolean {
-        with(
-            ApplicationProvider.getApplicationContext<Context>()
-                .getSystemService(Context.INPUT_SERVICE) as InputManager
-        ) {
-            inputDeviceIds.forEach { deviceId ->
-                if (
-                    getInputDevice(deviceId)?.motionRanges?.find {
-                        it.source == SOURCE_ROTARY_ENCODER
-                    } != null
-                )
-                    return true
-            }
-        }
-        return false
     }
 }
 
