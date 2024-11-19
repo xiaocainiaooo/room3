@@ -30,6 +30,7 @@ dependencies {
     docsForOptionalProject(":xr:runtime:runtime-testing")
     docsForOptionalProject(":xr:scenecore:scenecore")
     docsForOptionalProject(":xr:scenecore:scenecore-testing")
+    docsForOptionalProject(":xr:xr-stubs")
     docs(project(":activity:activity"))
     docs(project(":activity:activity-compose"))
     docs(project(":activity:activity-ktx"))
