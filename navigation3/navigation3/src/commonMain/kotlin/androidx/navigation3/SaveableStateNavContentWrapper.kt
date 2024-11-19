@@ -71,7 +71,7 @@ public class SaveableStateNavContentWrapper : NavContentWrapper {
     }
 
     @Composable
-    public override fun WrapContent(record: Record) {
+    public override fun <T : Any> WrapContent(record: Record<T>) {
         val key = record.key
         DisposableEffect(key1 = key) {
             refCount[key] = refCount.getOrDefault(key, 0).plus(1)

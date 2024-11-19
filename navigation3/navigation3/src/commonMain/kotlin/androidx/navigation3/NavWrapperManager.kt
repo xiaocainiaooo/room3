@@ -63,7 +63,7 @@ public class NavWrapperManager(navContentWrappers: List<NavContentWrapper>) {
      * should not be called directly.
      */
     @Composable
-    public fun ContentForRecord(record: Record) {
+    public fun <T : Any> ContentForRecord(record: Record<T>) {
         val key = record.key
         finalWrappers
             .distinct()
