@@ -386,6 +386,8 @@ public final class Recorder implements VideoOutput {
             EncoderNotUsePersistentInputSurfaceQuirk.class) != null;
     private final @VideoCapabilitiesSource int mVideoCapabilitiesSource;
     private final long mRequiredFreeStorageBytes;
+    private final MutableStateObservable<Range<Integer>> mVideoEncoderBitrateRange =
+            MutableStateObservable.withInitialState(null);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                          Members only accessed when holding mLock                          //
@@ -466,9 +468,6 @@ public final class Recorder implements VideoOutput {
     @VisibleForTesting
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
     int mFirstRecordingVideoBitrate = 0;
-    @VisibleForTesting
-    @SuppressWarnings("WeakerAccess") /* synthetic accessor */
-    Range<Integer> mVideoEncoderBitrateRange = null;
     @VisibleForTesting
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
     long mFirstRecordingAudioDataTimeUs = Long.MAX_VALUE;
@@ -753,6 +752,14 @@ public final class Recorder implements VideoOutput {
      */
     public int getTargetVideoEncodingBitRate() {
         return getObservableData(mMediaSpec).getVideoSpec().getBitrate().getLower();
+    }
+
+    /** Gets an {@link Observable} of the video encoder's supported bitrate range. */
+    @VisibleForTesting
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    @NonNull
+    public Observable<Range<Integer>> getVideoEncoderBitrateRange() {
+        return mVideoEncoderBitrateRange;
     }
 
     /**
@@ -1330,9 +1337,9 @@ public final class Recorder implements VideoOutput {
     @ExecutedBy("mSequentialExecutor")
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
     void onVideoEncoderReady(@NonNull VideoEncoderSession videoEncoderSession) {
-        mVideoEncoder = videoEncoderSession.getVideoEncoder();
-        mVideoEncoderBitrateRange =
-                ((VideoEncoderInfo) mVideoEncoder.getEncoderInfo()).getSupportedBitrateRange();
+        mVideoEncoder = checkNotNull(videoEncoderSession.getVideoEncoder());
+        mVideoEncoderBitrateRange.setState(
+                ((VideoEncoderInfo) mVideoEncoder.getEncoderInfo()).getSupportedBitrateRange());
         mFirstRecordingVideoBitrate = mVideoEncoder.getConfiguredBitrate();
         mActiveSurface = videoEncoderSession.getActiveSurface();
         setLatestSurface(mActiveSurface);
