@@ -52,7 +52,7 @@ class PaginationModelTest {
 
     @Test
     fun propertyDefaults_withNoPagesAdded() {
-        assertThat(paginationModel.reach).isEqualTo(0)
+        assertThat(paginationModel.reach).isEqualTo(-1)
         assertThat(paginationModel.maxWidth).isEqualTo(0)
         assertThat(paginationModel.totalEstimatedHeight).isEqualTo(0)
     }
@@ -71,10 +71,10 @@ class PaginationModelTest {
             paginationModel.addPage(i, pageSize)
         }
 
-        assertThat(paginationModel.reach).isEqualTo(knownPages)
-        // Accumulated height of all added pages, plus 2 x page spacing * known pages
+        assertThat(paginationModel.reach).isEqualTo(knownPages - 1)
+        // Accumulated height of all added pages, plus page spacing * known pages
         val totalKnownHeight = totalHeight + PAGE_SPACING_PX * (knownPages - 1)
-        // (Average height of all known pages + 2 x page spacing) * unknown pages
+        // (Average height of all known pages + page spacing) * unknown pages
         val estimatedRemainingHeight =
             ((totalHeight / knownPages) + PAGE_SPACING_PX) * (NUM_PAGES - knownPages)
         assertThat(paginationModel.totalEstimatedHeight)
@@ -94,7 +94,7 @@ class PaginationModelTest {
             paginationModel.addPage(i, pageSize)
         }
 
-        assertThat(paginationModel.reach).isEqualTo(NUM_PAGES)
+        assertThat(paginationModel.reach).isEqualTo(NUM_PAGES - 1)
         assertThat(paginationModel.totalEstimatedHeight)
             .isEqualTo(totalHeight + PAGE_SPACING_PX * NUM_PAGES)
         assertThat(paginationModel.maxWidth).isEqualTo(maxWidth)
@@ -167,10 +167,10 @@ class PaginationModelTest {
                 viewportBottom = contentBottom + 100
             )
 
-        // When the viewport is below the end of this model, we expect an empty range just past
-        // the last known page
-        assertThat(visiblePages.upper).isEqualTo(3)
-        assertThat(visiblePages.lower).isEqualTo(3)
+        // When the viewport is below the end of this model, we expect an empty range at the last
+        // known page
+        assertThat(visiblePages.upper).isEqualTo(2)
+        assertThat(visiblePages.lower).isEqualTo(2)
     }
 
     @Test

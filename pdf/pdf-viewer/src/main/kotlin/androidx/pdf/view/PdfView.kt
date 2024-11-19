@@ -23,24 +23,22 @@ import android.graphics.Rect
 import android.os.Looper
 import android.util.AttributeSet
 import android.util.Range
-import android.util.Size
 import android.util.SparseArray
 import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.RestrictTo
+import androidx.core.os.HandlerCompat
 import androidx.core.util.keyIterator
 import androidx.pdf.PdfDocument
 import java.util.concurrent.Executors
-import kotlin.math.max
-import kotlin.math.round
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.android.asCoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 
 /**
  * A [View] for presenting PDF content, represented by [PdfDocument].
@@ -68,13 +66,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             }
         }
 
-    /**
-     * The [CoroutineScope] used to make suspending calls to [PdfDocument]. The size of the fixed
-     * thread pool is arbitrary and subject to tuning.
-     */
-    internal val coroutineScope: CoroutineScope =
-        CoroutineScope(Executors.newFixedThreadPool(5).asCoroutineDispatcher())
-
     /** The maximum scaling factor that can be applied to this View using the [zoom] property */
     // TODO(b/376299551) - Make maxZoom configurable via XML attribute
     public var maxZoom: Float = DEFAULT_MAX_ZOOM
@@ -91,24 +82,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         set(value) {
             checkMainThread()
             field = value
-            updateVisibleContent()
-            invalidate()
+            onZoomChanged()
         }
 
-    /**
-     * The radius of pages around the current viewport for which dimensions and other metadata will
-     * be loaded
-     */
-    // TODO(b/376299551) - Make page prefetch radius configurable via XML attribute
-    public var pagePrefetchRadius: Int = 1
-
-    private var visiblePages: Range<Int> = Range(0, 1)
-        set(value) {
-            // Debounce setting the range to the same value
-            if (field == value) return
-            field = value
-            onVisiblePagesChanged()
-        }
+    private val visiblePages: Range<Int>
+        get() = paginationManager?.visiblePages?.value ?: Range(0, 0)
 
     /** The first page in the viewport, including partially-visible pages. 0-indexed. */
     public val firstVisiblePage: Int
@@ -116,14 +94,18 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     /** The number of pages visible in the viewport, including partially visible pages */
     public val visiblePagesCount: Int
-        get() = visiblePages.upper - visiblePages.lower + 1
+        get() = if (pdfDocument != null) visiblePages.upper - visiblePages.lower + 1 else 0
 
     /**
-     * [PdfDocument] is backed by a single-threaded PDF parser, so only allow one thread to access
-     * at a time
+     * The [CoroutineScope] used to make suspending calls to [PdfDocument]. The size of the fixed
+     * thread pool is arbitrary and subject to tuning.
      */
-    private var pdfDocumentMutex = Mutex()
-    private var paginationModel: PaginationModel? = null
+    internal val backgroundScope: CoroutineScope =
+        CoroutineScope(Executors.newFixedThreadPool(5).asCoroutineDispatcher() + SupervisorJob())
+
+    private var paginationManager: PaginationManager? = null
+    private var visiblePagesCollector: Job? = null
+    private var dimensionsCollector: Job? = null
 
     private val pages = SparseArray<Page>()
 
@@ -135,12 +117,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val localPaginationModel = paginationModel ?: return
+        val localPaginationManager = paginationManager ?: return
         canvas.scale(zoom, zoom)
         for (i in visiblePages.lower..visiblePages.upper) {
             pages[i]?.draw(
                 canvas,
-                localPaginationModel.getPageLocation(i, getVisibleAreaInContentCoords())
+                localPaginationManager.getPageLocation(i, getVisibleAreaInContentCoords())
             )
         }
     }
@@ -152,33 +134,85 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        updateVisibleContent()
+        paginationManager?.onViewportChanged(scrollY, height, zoom)
     }
 
     override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
         super.onScrollChanged(l, t, oldl, oldt)
-        updateVisibleContent()
+        paginationManager?.onViewportChanged(scrollY, height, zoom)
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        stopCollectingData()
+    }
+
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        if (visibility == VISIBLE) startCollectingData() else stopCollectingData()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        stopCollectingData()
+    }
+
+    private fun startCollectingData() {
+        val mainScope =
+            CoroutineScope(HandlerCompat.createAsync(handler.looper).asCoroutineDispatcher())
+        paginationManager?.let { manager ->
+            // Don't let two copies of this run concurrently
+            val dimensionsToJoin = dimensionsCollector?.apply { cancel() }
+            dimensionsCollector =
+                mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                    manager.dimensions.collect {
+                        // Prevent 2 copies from running concurrently
+                        dimensionsToJoin?.join()
+                        onPageDimensionsReceived(it.first, it.second)
+                    }
+                }
+            // Don't let two copies of this run concurrently
+            val visiblePagesToJoin = visiblePagesCollector?.apply { cancel() }
+            visiblePagesCollector =
+                mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                    manager.visiblePages.collect {
+                        // Prevent 2 copies from running concurrently
+                        visiblePagesToJoin?.join()
+                        onVisiblePagesChanged()
+                    }
+                }
+        }
+    }
+
+    private fun stopCollectingData() {
+        dimensionsCollector?.cancel()
+        visiblePagesCollector?.cancel()
     }
 
     /** Start using the [PdfDocument] to present PDF content */
     private fun onDocumentSet() {
         val localPdfDocument = pdfDocument ?: return
-        // TODO(b/376299551) - Make page margin configurable via XML attribute
-        paginationModel = PaginationModel(DEFAULT_PAGE_SPACING_PX, localPdfDocument.pageCount)
-        updateVisibleContent()
+        paginationManager =
+            PaginationManager(
+                    localPdfDocument,
+                    backgroundScope,
+                )
+                .apply { onViewportChanged(scrollY, height, zoom) }
+        // If not, we'll start doing this when we _are_ attached to a visible window
+        if (isAttachedToVisibleWindow) {
+            startCollectingData()
+        }
     }
+
+    private val View.isAttachedToVisibleWindow
+        get() = isAttachedToWindow && windowVisibility == VISIBLE
 
     /**
      * Compute what content is visible from the current position of this View. Generally invoked on
      * position or size changes.
      */
-    internal fun updateVisibleContent() {
-        val localPaginationModel = paginationModel ?: return
-
-        val contentTop = round(scrollY / zoom).toInt()
-        val contentBottom = round((height + scrollY) / zoom).toInt()
-        visiblePages = localPaginationModel.getPagesInViewport(contentTop, contentBottom)
-
+    internal fun onZoomChanged() {
+        paginationManager?.onViewportChanged(scrollY, height, zoom)
         // If scale changed, update already-visible pages so they can re-render and redraw
         // themselves accordingly
         if (!gestureHandler.scaleInProgress && !gestureHandler.scrollInProgress) {
@@ -192,59 +226,33 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         scrollTo(0, 0)
         zoom = DEFAULT_INIT_ZOOM
         pages.clear()
-        coroutineScope.coroutineContext.cancelChildren()
+        backgroundScope.coroutineContext.cancelChildren()
+        stopCollectingData()
     }
 
     /** React to a change in visible pages (load new pages and clean up old ones) */
     private fun onVisiblePagesChanged() {
-        val localPaginationModel = paginationModel ?: return
-        val nearPages =
-            Range(
-                maxOf(0, visiblePages.lower - pagePrefetchRadius),
-                minOf(visiblePages.upper + pagePrefetchRadius, localPaginationModel.numPages - 1),
-            )
-
-        // Fetch dimensions for near pages
-        for (i in max(localPaginationModel.reach - 1, nearPages.lower)..nearPages.upper) {
-            loadPageDimensions(i)
-        }
-
         for (i in visiblePages.lower..visiblePages.upper) {
             pages[i]?.isVisible = true
         }
 
         // Clean up pages that are no longer visible
         for (pageIndex in pages.keyIterator()) {
-            if (pageIndex < nearPages.lower || pageIndex > nearPages.upper) {
+            if (pageIndex < visiblePages.lower || pageIndex > visiblePages.upper) {
                 pages[pageIndex]?.isVisible = false
             }
         }
     }
 
-    /** Loads dimensions for a single page */
-    private fun loadPageDimensions(pageNum: Int) {
-        coroutineScope.launch {
-            val pageMetadata = withPdfDocument { it.getPageInfo(pageNum) }
-            // Update mutable state on the main thread
-            withContext(Dispatchers.Main) {
-                val localPaginationModel =
-                    paginationModel ?: throw IllegalStateException("No PdfDocument")
-                localPaginationModel.addPage(
-                    pageNum,
-                    Point(pageMetadata.width, pageMetadata.height)
-                )
-                val page =
-                    Page(pageNum, Size(pageMetadata.width, pageMetadata.height), this@PdfView)
-                pages[pageNum] = page
-                if (pageNum >= visiblePages.lower && pageNum <= visiblePages.upper) {
-                    // Make the page visible if it is, so it starts to render itself
-                    page.isVisible = true
-                }
-                // Learning the dimensions of a page might affect our understanding of which pages
-                // are visible
-                updateVisibleContent()
-            }
+    /** React to a page's dimensions being made available */
+    private fun onPageDimensionsReceived(pageNum: Int, size: Point) {
+        if (!pages.contains(pageNum)) {
+            pages[pageNum] = Page(pageNum, size, this)
+            if (visiblePages.contains(pageNum)) pages[pageNum].isVisible = true
         }
+        // Learning the dimensions of a page can change our understanding of the content that's in
+        // the viewport
+        paginationManager?.onViewportChanged(scrollY, height, zoom)
     }
 
     /** Set the zoom, using the given point as a pivot point to zoom in or out of */
@@ -316,16 +324,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         return (viewCoord + scroll) / zoom
     }
 
-    /** Helper to use [PdfDocument] behind a mutex to ensure FIFO semantics for requests */
-    private suspend fun <T> withPdfDocument(block: suspend (PdfDocument) -> T): T {
-        pdfDocumentMutex.withLock {
-            val localPdfDocument = pdfDocument ?: throw IllegalStateException("No PdfDocument")
-            return block(localPdfDocument)
-        }
-    }
-
     public companion object {
-        public const val DEFAULT_PAGE_SPACING_PX: Int = 20
         public const val DEFAULT_INIT_ZOOM: Float = 1.0f
         public const val DEFAULT_MAX_ZOOM: Float = 25.0f
         public const val DEFAULT_MIN_ZOOM: Float = 0.1f

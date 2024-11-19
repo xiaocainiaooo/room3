@@ -16,127 +16,138 @@
 
 package androidx.pdf.view
 
-import android.content.Context
 import android.graphics.Point
-import android.os.Looper
 import android.view.View
 import android.view.View.MeasureSpec
-import androidx.pdf.PdfDocument
-import androidx.test.annotation.UiThreadTest
-import androidx.test.core.app.ApplicationProvider
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.test.core.app.ActivityScenario
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
-import org.junit.BeforeClass
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class PdfViewPaginationTest {
-    private val context = ApplicationProvider.getApplicationContext<Context>()
-    private val testScope = TestScope()
-
-    companion object {
-        @BeforeClass
-        @JvmStatic
-        fun setup() {
-            // PdfView creates a ScaleGestureDetector internally, which can only be done from Looper
-            // threads, so let's make sure we're executing on one
-            if (Looper.myLooper() == null) {
-                Looper.prepare()
-            }
-        }
+    @After
+    fun tearDown() {
+        PdfViewTestActivity.onCreateCallback = {}
     }
 
     @Test
     fun testPageVisibility() = runTest {
         // Layout at 500x1000, and expect to see pages [0, 4] at 100x200
         val pdfDocument = FakePdfDocument(List(10) { Point(100, 200) })
-        val pdfView = setupPdfView(500, 1000, pdfDocument)
+        setupPdfView(500, 1000, pdfDocument)
 
-        pdfDocument.waitForLayout(untilPage = 4)
-
-        assertThat(pdfView.firstVisiblePage).isEqualTo(0)
-        assertThat(pdfView.visiblePagesCount).isEqualTo(5)
+        with(ActivityScenario.launch(PdfViewTestActivity::class.java)) {
+            pdfDocument.waitForLayout(untilPage = 4)
+            Espresso.onView(withId(PDF_VIEW_ID))
+                .checkPagesAreVisible(firstVisiblePage = 0, visiblePages = 5)
+            close()
+        }
     }
 
     @Test
-    @UiThreadTest
     fun testPageVisibility_withoutPdfDocument() {
-        val pdfView = setupPdfViewOnMain(500, 1000, null)
+        setupPdfView(500, 1000, null)
 
-        assertThat(pdfView.firstVisiblePage).isEqualTo(0)
-        // Default visible pages is [0, 1]
-        assertThat(pdfView.visiblePagesCount).isEqualTo(2)
+        with(ActivityScenario.launch(PdfViewTestActivity::class.java)) {
+            Espresso.onView(withId(PDF_VIEW_ID))
+                .checkPagesAreVisible(firstVisiblePage = 0, visiblePages = 0)
+            close()
+        }
     }
 
     @Test
     fun testPageVisibility_onSizeDecreased() = runTest {
         // Layout at 500x1000 initially, and expect to see pages [0, 3] at 100x300
         val pdfDocument = FakePdfDocument(List(10) { Point(100, 300) })
-        val pdfView = setupPdfView(500, 1000, pdfDocument)
-        pdfDocument.waitForLayout(untilPage = 3)
-        assertThat(pdfView.firstVisiblePage).isEqualTo(0)
-        assertThat(pdfView.visiblePagesCount).isEqualTo(4)
+        setupPdfView(500, 1000, pdfDocument)
+        with(ActivityScenario.launch(PdfViewTestActivity::class.java)) {
+            pdfDocument.waitForLayout(untilPage = 3)
+            Espresso.onView(withId(PDF_VIEW_ID))
+                .checkPagesAreVisible(firstVisiblePage = 0, visiblePages = 4)
 
-        // Reduce size to 100x200, and expect to see only page 0
-        pdfView.layoutAndMeasure(100, 200)
-        assertThat(pdfView.firstVisiblePage).isEqualTo(0)
-        assertThat(pdfView.visiblePagesCount).isEqualTo(1)
+            // Reduce size to 100x200, and expect to see only page 0
+            onActivity { activity ->
+                activity.findViewById<View>(PDF_VIEW_ID).apply {
+                    measure(
+                        MeasureSpec.makeMeasureSpec(100, MeasureSpec.EXACTLY),
+                        MeasureSpec.makeMeasureSpec(200, MeasureSpec.EXACTLY)
+                    )
+                    layout(0, 0, 100, 200)
+                }
+            }
+            Espresso.onIdle()
+
+            Espresso.onView(withId(PDF_VIEW_ID))
+                .checkPagesAreVisible(firstVisiblePage = 0, visiblePages = 1)
+            close()
+        }
     }
 
     @Test
     fun testPageVisibility_onScrollChanged() = runTest {
         // Layout at 1000x2000 initially, and expect to see pages [0, 3] at 200x500
         val pdfDocument = FakePdfDocument(List(10) { Point(200, 500) })
-        val pdfView = setupPdfView(1000, 2000, pdfDocument)
-        pdfDocument.waitForLayout(untilPage = 3)
-        assertThat(pdfView.firstVisiblePage).isEqualTo(0)
-        assertThat(pdfView.visiblePagesCount).isEqualTo(4)
+        setupPdfView(1000, 2000, pdfDocument)
 
-        // Scroll until the viewport spans [500, 2500] vertically and expect to see pages [1, 4]
-        pdfView.scrollBy(0, 500)
-        pdfDocument.waitForLayout(untilPage = 4)
-        assertThat(pdfView.firstVisiblePage).isEqualTo(1)
-        assertThat(pdfView.visiblePagesCount).isEqualTo(4)
+        with(ActivityScenario.launch(PdfViewTestActivity::class.java)) {
+            pdfDocument.waitForLayout(untilPage = 3)
+            Espresso.onView(withId(PDF_VIEW_ID))
+                .checkPagesAreVisible(firstVisiblePage = 0, visiblePages = 4)
+
+            // Scroll until the viewport spans [500, 2500] vertically and expect to see pages [1, 4]
+            Espresso.onView(withId(PDF_VIEW_ID)).scrollByY(500)
+            pdfDocument.waitForLayout(untilPage = 4)
+            Espresso.onView(withId(PDF_VIEW_ID))
+                .checkPagesAreVisible(firstVisiblePage = 1, visiblePages = 4)
+
+            close()
+        }
     }
 
     @Test
     fun testPageVisibility_onZoomChanged() = runTest {
         // Layout at 100x500 initially, and expect to see pages [0, 5] at 30x80
         val pdfDocument = FakePdfDocument(List(10) { Point(30, 80) })
-        val pdfView = setupPdfView(100, 500, pdfDocument)
-        pdfDocument.waitForLayout(untilPage = 5)
-        assertThat(pdfView.firstVisiblePage).isEqualTo(0)
-        assertThat(pdfView.visiblePagesCount).isEqualTo(6)
+        setupPdfView(100, 500, pdfDocument)
 
-        // Set zoom to 2f and expect to see pages [0, 2]
-        withContext(Dispatchers.Main) { pdfView.zoom = 2f }
-        assertThat(pdfView.firstVisiblePage).isEqualTo(0)
-        assertThat(pdfView.visiblePagesCount).isEqualTo(3)
-    }
+        with(ActivityScenario.launch(PdfViewTestActivity::class.java)) {
+            pdfDocument.waitForLayout(untilPage = 5)
+            Espresso.onView(withId(PDF_VIEW_ID))
+                .checkPagesAreVisible(firstVisiblePage = 0, visiblePages = 6)
 
-    /** Create, measure, and layout a [PdfView] at the specified [width] and [height] */
-    private suspend fun setupPdfView(width: Int, height: Int, pdfDocument: FakePdfDocument?) =
-        withContext(Dispatchers.Main) { setupPdfViewOnMain(width, height, pdfDocument) }
+            // Set zoom to 2f and expect to see pages [0, 2]
+            Espresso.onView(withId(PDF_VIEW_ID)).zoomTo(2f)
+            Espresso.onView(withId(PDF_VIEW_ID))
+                .checkPagesAreVisible(firstVisiblePage = 0, visiblePages = 3)
 
-    private fun setupPdfViewOnMain(width: Int, height: Int, pdfDocument: PdfDocument?): PdfView {
-        val pdfView = PdfView(context)
-        pdfView.layoutAndMeasure(width, height)
-        pdfDocument?.let { pdfView.pdfDocument = it }
-        return pdfView
+            close()
+        }
     }
 }
 
-private fun View.layoutAndMeasure(width: Int, height: Int) {
-    measure(
-        MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-        MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
-    )
-    layout(0, 0, measuredWidth, measuredHeight)
+/** Create, measure, and layout a [PdfView] at the specified [width] and [height] */
+private fun setupPdfView(width: Int, height: Int, fakePdfDocument: FakePdfDocument?) {
+    PdfViewTestActivity.onCreateCallback = { activity ->
+        val container = FrameLayout(activity)
+        container.addView(
+            PdfView(activity).apply {
+                pdfDocument = fakePdfDocument
+                id = PDF_VIEW_ID
+            },
+            ViewGroup.LayoutParams(width, height)
+        )
+        activity.setContentView(container)
+    }
 }
+
+/** Arbitrary fixed ID for PdfView */
+private const val PDF_VIEW_ID = 123456789
