@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
@@ -50,6 +52,7 @@ import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -398,7 +401,7 @@ object SplitButtonDefaults {
         // TODO Load the motionScheme tokens from the component tokens file
         val defaultAnimationSpec = MotionSchemeKeyTokens.DefaultEffects.value<Float>()
         val pressed by interactionSource.collectIsPressedAsState()
-
+        val layoutDirection = LocalLayoutDirection.current
         val shape = shapeByInteraction(shapes, pressed, false, defaultAnimationSpec)
 
         Surface(
@@ -423,16 +426,22 @@ object SplitButtonDefaults {
                         )
                         .then(
                             when (shape) {
-                                is ShapeWithOpticalCentering -> {
-                                    Modifier.opticalCentering(
+                                is ShapeWithHorizontalCenterOptically -> {
+                                    Modifier.horizontalCenterOptically(
                                         shape = shape,
-                                        basePadding = contentPadding
+                                        maxStartOffset =
+                                            contentPadding.calculateStartPadding(layoutDirection),
+                                        maxEndOffset =
+                                            contentPadding.calculateEndPadding(layoutDirection)
                                     )
                                 }
                                 is CornerBasedShape -> {
-                                    Modifier.opticalCentering(
+                                    Modifier.horizontalCenterOptically(
                                         shape = shape,
-                                        basePadding = contentPadding
+                                        maxStartOffset =
+                                            contentPadding.calculateStartPadding(layoutDirection),
+                                        maxEndOffset =
+                                            contentPadding.calculateEndPadding(layoutDirection)
                                     )
                                 }
                                 else -> {
@@ -503,7 +512,7 @@ object SplitButtonDefaults {
         // TODO Load the motionScheme tokens from the component tokens file
         val defaultAnimationSpec = MotionSchemeKeyTokens.DefaultEffects.value<Float>()
         val pressed by interactionSource.collectIsPressedAsState()
-
+        val layoutDirection = LocalLayoutDirection.current
         val density = LocalDensity.current
         val shape = shapeByInteraction(shapes, pressed, checked, defaultAnimationSpec)
 
@@ -542,16 +551,22 @@ object SplitButtonDefaults {
                         )
                         .then(
                             when (shape) {
-                                is ShapeWithOpticalCentering -> {
-                                    Modifier.opticalCentering(
+                                is ShapeWithHorizontalCenterOptically -> {
+                                    Modifier.horizontalCenterOptically(
                                         shape = shape,
-                                        basePadding = contentPadding
+                                        maxStartOffset =
+                                            contentPadding.calculateStartPadding(layoutDirection),
+                                        maxEndOffset =
+                                            contentPadding.calculateEndPadding(layoutDirection)
                                     )
                                 }
                                 is CornerBasedShape -> {
-                                    Modifier.opticalCentering(
+                                    Modifier.horizontalCenterOptically(
                                         shape = shape,
-                                        basePadding = contentPadding
+                                        maxStartOffset =
+                                            contentPadding.calculateStartPadding(layoutDirection),
+                                        maxEndOffset =
+                                            contentPadding.calculateEndPadding(layoutDirection)
                                     )
                                 }
                                 else -> {
