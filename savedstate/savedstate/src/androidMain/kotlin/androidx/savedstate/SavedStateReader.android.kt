@@ -40,11 +40,10 @@ internal actual constructor(
 ) {
 
     /**
-     * Retrieves a [IBinder] object associated with the specified key. Throws an
-     * [IllegalStateException] if the key doesn't exist.
+     * Retrieves an [IBinder] object associated with the specified key.
      *
      * @param key The key to retrieve the value for.
-     * @return The [IBinder] object associated with the key.
+     * @return The value associated with the [key].
      * @throws IllegalStateException If the key is not found.
      */
     inline fun getBinder(key: String): IBinder {
@@ -53,13 +52,14 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves a [IBinder] object associated with the specified key, or a default value if the key
-     * doesn't exist.
+     * Retrieves an [IBinder] value associated with the specified [key], or returns [defaultValue]
+     * if the [key] is not found or the associated value has the wrong type.
      *
-     * @param key The key to retrieve the value for.
-     * @param defaultValue A function providing the default [IBinder] if the key is not found.
-     * @return The [IBinder] object associated with the key, or the default value if the key is not
-     *   found.
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     inline fun getBinderOrElse(key: String, defaultValue: () -> IBinder): IBinder {
         if (key !in this) defaultValue()
@@ -140,11 +140,10 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves a [Parcelable] object associated with the specified key. Throws an
-     * [IllegalStateException] if the key doesn't exist.
+     * Retrieves a [Parcelable] object associated with the specified key.
      *
      * @param key The key to retrieve the value for.
-     * @return The [Parcelable] object associated with the key.
+     * @return The value associated with the [key].
      * @throws IllegalStateException If the key is not found.
      */
     inline fun <reified T : Parcelable> getParcelable(key: String): T {
@@ -153,13 +152,14 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves a [Parcelable] object associated with the specified key, or a default value if the
-     * key doesn't exist.
+     * Retrieves a [Parcelable] value associated with the specified [key], or returns [defaultValue]
+     * if the [key] is not found or the associated value has the wrong type.
      *
-     * @param key The key to retrieve the value for.
-     * @param defaultValue A function providing the default [Parcelable] if the key is not found.
-     * @return The [Parcelable] object associated with the key, or the default value if the key is
-     *   not found.
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     inline fun <reified T : Parcelable> getParcelableOrElse(key: String, defaultValue: () -> T): T {
         if (key !in this) defaultValue()
@@ -167,11 +167,10 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves a [Serializable] object associated with the specified key. Throws an
-     * [IllegalStateException] if the key doesn't exist.
+     * Retrieves a [Serializable] object associated with the specified key.
      *
      * @param key The key to retrieve the value for.
-     * @return The [Serializable] object associated with the key.
+     * @return The value associated with the [key].
      * @throws IllegalStateException If the key is not found.
      */
     inline fun <reified T : Serializable> getSerializable(key: String): T {
@@ -180,13 +179,14 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves a [Serializable] object associated with the specified key, or a default value if
-     * the key doesn't exist.
+     * Retrieves a [Serializable] value associated with the specified [key], or returns
+     * [defaultValue] if the [key] is not found or the associated value has the wrong type.
      *
-     * @param key The key to retrieve the value for.
-     * @param defaultValue A function providing the default [Serializable] if the key is not found.
-     * @return The [Serializable] object associated with the key, or the default value if the key is
-     *   not found.
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     inline fun <reified T : Serializable> getSerializableOrElse(
         key: String,
@@ -197,11 +197,10 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves a [Size] object associated with the specified key. Throws an
-     * [IllegalStateException] if the key doesn't exist.
+     * Retrieves a [Size] object associated with the specified key.
      *
      * @param key The key to retrieve the value for.
-     * @return The [Size] object associated with the key.
+     * @return The value associated with the [key].
      * @throws IllegalStateException If the key is not found.
      */
     inline fun getSize(key: String): Size {
@@ -210,13 +209,14 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves a [Size] object associated with the specified key, or a default value if the key
-     * doesn't exist.
+     * Retrieves a [Size] value associated with the specified [key], or returns [defaultValue] if
+     * the [key] is not found or the associated value has the wrong type.
      *
-     * @param key The key to retrieve the value for.
-     * @param defaultValue A function providing the default [Size] if the key is not found.
-     * @return The [Size] object associated with the key, or the default value if the key is not
-     *   found.
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     inline fun getSizeOrElse(key: String, defaultValue: () -> Size): Size {
         if (key !in this) defaultValue()
@@ -224,11 +224,10 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves a [SizeF] object associated with the specified key. Throws an
-     * [IllegalStateException] if the key doesn't exist.
+     * Retrieves a [SizeF] object associated with the specified key.
      *
      * @param key The key to retrieve the value for.
-     * @return The [SizeF] object associated with the key.
+     * @return The value associated with the [key].
      * @throws IllegalStateException If the key is not found.
      */
     inline fun getSizeF(key: String): SizeF {
@@ -237,13 +236,14 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves a [SizeF] object associated with the specified key, or a default value if the key
-     * doesn't exist.
+     * Retrieves a [SizeF] value associated with the specified [key], or returns [defaultValue] if
+     * the [key] is not found or the associated value has the wrong type.
      *
-     * @param key The key to retrieve the value for.
-     * @param defaultValue A function providing the default [SizeF] if the key is not found.
-     * @return The [SizeF] object associated with the key, or the default value if the key is not
-     *   found.
+     * @param key The [key] to retrieve the value for.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     inline fun getSizeFOrElse(key: String, defaultValue: () -> SizeF): SizeF {
         if (key !in this) defaultValue()
@@ -297,12 +297,12 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves a [List] of elements of [Parcelable] associated with the specified [key]. Throws an
-     * [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [List] of elements of [Parcelable] associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [List] of elements of [Parcelable] associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     inline fun <reified T : Parcelable> getParcelableList(key: String): List<T> {
         if (key !in this) keyNotFoundError(key)
@@ -314,10 +314,10 @@ internal actual constructor(
      * default value if the [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found or the
-     *   retrieved value is not a [List] of [Parcelable].
-     * @return The list of elements of [Parcelable] associated with the [key], or the default value
-     *   if the [key] is not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     inline fun <reified T : Parcelable> getParcelableListOrElse(
         key: String,
@@ -422,12 +422,12 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves an [Array] of elements of [Parcelable] associated with the specified [key]. Throws
-     * an [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves an [Array] of elements of [Parcelable] associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [Array] of elements of [Parcelable] associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     @Suppress("ArrayReturn")
     inline fun <reified T : Parcelable> getParcelableArray(key: String): Array<T> {
@@ -442,10 +442,10 @@ internal actual constructor(
      * default value if the [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found or the
-     *   retrieved value is not a [Array] of [Parcelable].
-     * @return The [Array] of elements of [Parcelable] associated with the [key], or the default
-     *   value if the [key] is not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     @Suppress("ArrayReturn")
     inline fun <reified T : Parcelable> getParcelableArrayOrElse(
@@ -458,12 +458,12 @@ internal actual constructor(
     }
 
     /**
-     * Retrieves an [SparseArray] of elements of [Parcelable] associated with the specified [key].
-     * Throws an [IllegalStateException] if the [key] doesn't exist.
+     * Retrieves a [SparseArray] of elements of [Parcelable] associated with the specified [key].
      *
      * @param key The [key] to retrieve the value for.
-     * @return The [SparseArray] of elements of [Parcelable] associated with the [key].
-     * @throws IllegalStateException If the [key] is not found.
+     * @return The value associated with the [key].
+     * @throws IllegalArgumentException If the [key] is not found.
+     * @throws IllegalStateException if associated value has wrong type.
      */
     inline fun <reified T : Parcelable> getSparseParcelableArray(key: String): SparseArray<T> {
         if (key !in this) keyNotFoundError(key)
@@ -476,10 +476,10 @@ internal actual constructor(
      * a default value if the [key] doesn't exist.
      *
      * @param key The [key] to retrieve the value for.
-     * @param defaultValue A function providing the default value if the [key] is not found or the
-     *   retrieved value is not a [SparseArray] of [Parcelable].
-     * @return The [SparseArray] of elements of [Parcelable] associated with the [key], or the
-     *   default value if the [key] is not found.
+     * @param defaultValue A function providing the default value to return if the key is not found
+     *   or the associated value has the wrong type.
+     * @return The value associated with the [key], or the result of [defaultValue] if the key is
+     *   not found or the associated value has the wrong type.
      */
     inline fun <reified T : Parcelable> getSparseParcelableArrayOrElse(
         key: String,
