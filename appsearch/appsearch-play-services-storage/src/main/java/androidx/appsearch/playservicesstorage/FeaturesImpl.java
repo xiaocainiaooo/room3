@@ -95,6 +95,8 @@ final class FeaturesImpl implements Features {
                 // fall through
             case Features.SEARCH_RESULT_PARENT_TYPES:
                 // fall through
+            case Features.SCHEMA_STRING_PROPERTY_CONFIG_DELETE_PROPAGATION_TYPE_PROPAGATE_FROM:
+                // fall through
             default:
                 return false; // AppSearch features absent in GMSCore AppSearch.
         }

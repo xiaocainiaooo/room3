@@ -136,6 +136,7 @@ public final class SchemaToPlatformConverter {
                         TOKENIZER_TYPE_NONE, TOKENIZER_TYPE_PLAIN, "tokenizerType");
             }
 
+            // Check joinable value type.
             if (stringProperty.getJoinableValueType()
                     == AppSearchSchema.StringPropertyConfig.JOINABLE_VALUE_TYPE_QUALIFIED_ID) {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -145,6 +146,16 @@ public final class SchemaToPlatformConverter {
                 }
                 ApiHelperForU.setJoinableValueType(platformBuilder,
                         stringProperty.getJoinableValueType());
+            }
+
+            // Check delete propagation type.
+            if (stringProperty.getDeletePropagationType()
+                    != AppSearchSchema.StringPropertyConfig.DELETE_PROPAGATION_TYPE_NONE) {
+                // TODO(b/376913014): add isAtLeastW check to allow
+                //  DELETE_PROPAGATION_TYPE_PROPAGATE_FROM after Android W.
+                throw new UnsupportedOperationException(
+                        "StringPropertyConfig.DELETE_PROPAGATION_TYPE_PROPAGATE_FROM is not"
+                                + " supported on this AppSearch implementation.");
             }
             return platformBuilder.build();
         } else if (jetpackProperty instanceof AppSearchSchema.LongPropertyConfig) {

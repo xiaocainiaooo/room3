@@ -118,6 +118,14 @@ public final class SchemaToGmsConverter {
                     == AppSearchSchema.StringPropertyConfig.JOINABLE_VALUE_TYPE_QUALIFIED_ID) {
                 gmsBuilder.setJoinableValueType(stringProperty.getJoinableValueType());
             }
+            if (stringProperty.getDeletePropagationType()
+                    == AppSearchSchema.StringPropertyConfig
+                            .DELETE_PROPAGATION_TYPE_PROPAGATE_FROM) {
+                // TODO(b/376913014): remove this once delete propagation API is available.
+                throw new UnsupportedOperationException(
+                        "StringPropertyConfig.DELETE_PROPAGATION_TYPE_PROPAGATE_FROM is not"
+                                + " supported on this AppSearch implementation.");
+            }
             return gmsBuilder.build();
         } else if (jetpackProperty instanceof AppSearchSchema.LongPropertyConfig) {
             AppSearchSchema.LongPropertyConfig longProperty =
