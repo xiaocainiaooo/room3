@@ -68,12 +68,15 @@ import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.SearchBarDefaults.InputFieldHeight
 import androidx.compose.material3.internal.BackEventCompat
+import androidx.compose.material3.internal.BackEventProgress
 import androidx.compose.material3.internal.BackHandler
 import androidx.compose.material3.internal.BasicEdgeToEdgeDialog
 import androidx.compose.material3.internal.MutableWindowInsets
 import androidx.compose.material3.internal.PredictiveBack
 import androidx.compose.material3.internal.PredictiveBackHandler
+import androidx.compose.material3.internal.PredictiveBackState
 import androidx.compose.material3.internal.Strings
+import androidx.compose.material3.internal.SwipeEdge
 import androidx.compose.material3.internal.getString
 import androidx.compose.material3.internal.textFieldBackground
 import androidx.compose.material3.tokens.ElevationTokens
@@ -506,11 +509,12 @@ internal fun ExpandedFullScreenSearchBar(
 
     BasicEdgeToEdgeDialog(
         onDismissRequest = { coroutineScope.launch { state.animateToCollapsed() } }
-    ) {
+    ) { predictiveBackState ->
         val softwareKeyboardController = LocalSoftwareKeyboardController.current
         SideEffect { state.softwareKeyboardController = softwareKeyboardController }
         FullScreenSearchBarLayout(
             state = state,
+            predictiveBackState = predictiveBackState,
             inputField = inputField,
             modifier = modifier,
             collapsedShape = collapsedShape,
@@ -1845,6 +1849,7 @@ private fun SearchBarLayout(
 @Composable
 private fun FullScreenSearchBarLayout(
     state: SearchBarState,
+    predictiveBackState: PredictiveBackState,
     inputField: @Composable () -> Unit,
     modifier: Modifier,
     collapsedShape: Shape,
@@ -1854,6 +1859,26 @@ private fun FullScreenSearchBarLayout(
     windowInsets: WindowInsets,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val backEvent by remember { derivedStateOf { predictiveBackState.value } }
+    val firstInProgressValue =
+        remember { mutableStateOf<BackEventProgress.InProgress?>(null) }
+            .apply {
+                when (val event = backEvent) {
+                    is BackEventProgress.InProgress -> if (value == null) value = event
+                    BackEventProgress.NotRunning -> value = null
+                    BackEventProgress.Completed -> Unit
+                }
+            }
+    val lastInProgressValue =
+        remember { mutableStateOf<BackEventProgress.InProgress?>(null) }
+            .apply {
+                when (val event = backEvent) {
+                    is BackEventProgress.InProgress -> value = event
+                    BackEventProgress.NotRunning -> value = null
+                    BackEventProgress.Completed -> Unit
+                }
+            }
+
     val density = LocalDensity.current
     val fullScreenShape = SearchBarDefaults.fullScreenShape
     val animatedShape =
@@ -1863,7 +1888,8 @@ private fun FullScreenSearchBarLayout(
                     // The shape can only be animated if it's the default spec value
                     val radius =
                         with(density) {
-                            val fraction = 1 - state.progress
+                            val fraction =
+                                max(1 - state.progress, lastInProgressValue.value.transform())
                             (SearchBarCornerRadius * fraction).toPx()
                         }
                     if (radius < 1e-3) {
@@ -1919,13 +1945,23 @@ private fun FullScreenSearchBarLayout(
             }
         },
     ) { measurables, constraints ->
+        val predictiveBackProgress = lastInProgressValue.value.transform()
+
+        val predictiveBackEndWidth =
+            (constraints.maxWidth * SearchBarPredictiveBackMinScale)
+                .roundToInt()
+                .coerceAtLeast(state.collapsedBounds.width)
+        val predictiveBackEndHeight =
+            (constraints.maxHeight * SearchBarPredictiveBackMinScale)
+                .roundToInt()
+                .coerceAtLeast(state.collapsedBounds.height)
+        val endWidth = lerp(constraints.maxWidth, predictiveBackEndWidth, predictiveBackProgress)
+        val endHeight = lerp(constraints.maxHeight, predictiveBackEndHeight, predictiveBackProgress)
         val width =
-            constraints.constrainWidth(
-                lerp(state.collapsedBounds.width, constraints.maxWidth, state.progress)
-            )
+            constraints.constrainWidth(lerp(state.collapsedBounds.width, endWidth, state.progress))
         val height =
             constraints.constrainHeight(
-                lerp(state.collapsedBounds.height, constraints.maxHeight, state.progress)
+                lerp(state.collapsedBounds.height, endHeight, state.progress)
             )
 
         val surfaceMeasurable = measurables.fastFirst { it.layoutId == LayoutIdSurface }
@@ -1950,11 +1986,53 @@ private fun FullScreenSearchBarLayout(
             val topPadding =
                 unconsumedInsets.getTop(this@Layout) + SearchBarVerticalPadding.roundToPx()
             val bottomPadding = SearchBarVerticalPadding.roundToPx()
-            val animatedTopPadding = lerp(0, topPadding, state.progress)
+            val animatedTopPadding =
+                lerp(0, topPadding, min(state.progress, 1 - predictiveBackProgress))
             val animatedBottomPadding = lerp(0, bottomPadding, state.progress)
 
-            val offsetX = lerp(state.collapsedBounds.left, 0, state.progress)
-            val offsetY = lerp(state.collapsedBounds.top, 0, state.progress)
+            fun BackEventProgress.InProgress.endOffsetX(): Int =
+                (if (swipeEdge == SwipeEdge.Left) {
+                        constraints.maxWidth -
+                            SearchBarPredictiveBackMinMargin.roundToPx() -
+                            predictiveBackEndWidth
+                    } else {
+                        SearchBarPredictiveBackMinMargin.roundToPx()
+                    })
+                    .coerceAtLeast(state.collapsedBounds.right - predictiveBackEndWidth)
+                    .coerceAtMost(state.collapsedBounds.left)
+
+            fun BackEventProgress.InProgress.endOffsetY(): Int {
+                val absoluteDeltaY = this.touchY - (firstInProgressValue.value?.touchY ?: return 0)
+                val relativeDeltaY = abs(absoluteDeltaY) / constraints.maxHeight
+
+                val availableVerticalSpace =
+                    ((constraints.maxHeight - predictiveBackEndHeight) / 2 -
+                            SearchBarPredictiveBackMinMargin.roundToPx())
+                        .coerceAtLeast(0)
+                val totalOffsetY =
+                    min(
+                        availableVerticalSpace,
+                        SearchBarPredictiveBackMaxOffsetY.roundToPx(),
+                    )
+                val interpolatedOffsetY = lerp(0, totalOffsetY, relativeDeltaY)
+                return (interpolatedOffsetY * sign(absoluteDeltaY).toInt() + topPadding)
+                    .coerceAtMost(state.collapsedBounds.top)
+            }
+
+            val endOffsetX =
+                lerp(
+                    0,
+                    lastInProgressValue.value?.endOffsetX() ?: 0,
+                    predictiveBackProgress,
+                )
+            val endOffsetY =
+                lerp(
+                    0,
+                    lastInProgressValue.value?.endOffsetY() ?: 0,
+                    predictiveBackProgress,
+                )
+            val offsetX = lerp(state.collapsedBounds.left, endOffsetX, state.progress)
+            val offsetY = lerp(state.collapsedBounds.top, endOffsetY, state.progress)
 
             surfacePlaceable.place(x = offsetX, y = offsetY)
             inputFieldPlaceable.place(x = offsetX, y = offsetY + animatedTopPadding)
@@ -1970,6 +2048,9 @@ private fun FullScreenSearchBarLayout(
         }
     }
 }
+
+private fun BackEventProgress.InProgress?.transform(): Float =
+    if (this == null) 0f else PredictiveBack.transform(this.progress)
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
