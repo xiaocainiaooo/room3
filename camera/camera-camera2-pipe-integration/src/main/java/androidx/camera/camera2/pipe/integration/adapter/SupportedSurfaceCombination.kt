@@ -44,6 +44,7 @@ import androidx.camera.camera2.pipe.integration.internal.StreamUseCaseUtil
 import androidx.camera.core.DynamicRange
 import androidx.camera.core.impl.AttachedSurfaceInfo
 import androidx.camera.core.impl.CameraMode
+import androidx.camera.core.impl.EncoderProfilesProvider
 import androidx.camera.core.impl.ImageFormatConstants
 import androidx.camera.core.impl.StreamSpec
 import androidx.camera.core.impl.SurfaceCombination
@@ -78,7 +79,7 @@ import kotlin.math.min
 public class SupportedSurfaceCombination(
     context: Context,
     private val cameraMetadata: CameraMetadata,
-    private val encoderProfilesProviderAdapter: EncoderProfilesProviderAdapter
+    private val encoderProfilesProvider: EncoderProfilesProvider
 ) {
     private val cameraId = cameraMetadata.camera.value
     private val hardwareLevel =
@@ -1464,8 +1465,8 @@ public class SupportedSurfaceCombination(
             )
 
         for (quality in qualities) {
-            if (encoderProfilesProviderAdapter.hasProfile(quality)) {
-                val profiles = encoderProfilesProviderAdapter.getAll(quality)
+            if (encoderProfilesProvider.hasProfile(quality)) {
+                val profiles = encoderProfilesProvider.getAll(quality)
                 if (profiles != null && profiles.videoProfiles.isNotEmpty()) {
                     return profiles.videoProfiles[0]!!.let { Size(it.width, it.height) }
                 }
