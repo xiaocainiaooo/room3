@@ -21,6 +21,9 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.FEATURE_CAMERA_CONCURRENT
+import android.graphics.Rect
+import android.util.Rational
+import android.view.Surface
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraFilter
@@ -30,8 +33,11 @@ import androidx.camera.core.CameraSelector.LENS_FACING_BACK
 import androidx.camera.core.CameraSelector.LENS_FACING_FRONT
 import androidx.camera.core.CameraXConfig
 import androidx.camera.core.ConcurrentCamera.SingleCameraConfig
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageCapture
 import androidx.camera.core.Preview
 import androidx.camera.core.UseCaseGroup
+import androidx.camera.core.ViewPort
 import androidx.camera.core.concurrent.CameraCoordinator.CAMERA_OPERATING_MODE_UNSPECIFIED
 import androidx.camera.core.impl.AdapterCameraInfo
 import androidx.camera.core.impl.CameraConfig
@@ -44,9 +50,11 @@ import androidx.camera.core.impl.MutableOptionsBundle
 import androidx.camera.core.impl.SessionProcessor
 import androidx.camera.core.impl.UseCaseConfigFactory.CaptureType
 import androidx.camera.core.impl.utils.executor.CameraXExecutors.mainThreadExecutor
+import androidx.camera.core.internal.utils.ImageUtil
 import androidx.camera.testing.fakes.FakeAppConfig
 import androidx.camera.testing.fakes.FakeCamera
 import androidx.camera.testing.fakes.FakeCameraInfoInternal
+import androidx.camera.testing.impl.CameraUtil
 import androidx.camera.testing.impl.fakes.FakeCameraConfig
 import androidx.camera.testing.impl.fakes.FakeCameraCoordinator
 import androidx.camera.testing.impl.fakes.FakeCameraDeviceSurfaceManager
@@ -59,6 +67,8 @@ import androidx.camera.testing.impl.fakes.FakeSurfaceProcessor
 import androidx.camera.testing.impl.fakes.FakeUseCase
 import androidx.camera.testing.impl.fakes.FakeUseCaseConfig
 import androidx.camera.testing.impl.fakes.FakeUseCaseConfigFactory
+import androidx.camera.video.Recorder
+import androidx.camera.video.VideoCapture
 import androidx.concurrent.futures.await
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.SdkSuppress
@@ -497,6 +507,56 @@ class ProcessCameraProviderTest {
                 )
             }
             assertThat(provider.isConcurrentCameraModeOn).isFalse()
+        }
+    }
+
+    @Test
+    fun bindUseCases_viewPortUpdated() {
+        runBlocking(MainScope().coroutineContext) {
+            // Arrange.
+            provider = ProcessCameraProvider.awaitInstance(context)
+            val rotation = CameraUtil.getSensorOrientation(LENS_FACING_BACK)!!
+            val preview = Preview.Builder().build()
+            val imageCapture = ImageCapture.Builder().build()
+            val imageAnalysis = ImageAnalysis.Builder().build()
+            val videoCapture = VideoCapture.Builder(Recorder.Builder().build()).build()
+            val viewPort =
+                ViewPort.Builder(
+                        Rational(2, 1),
+                        if (rotation % 180 != 0) Surface.ROTATION_90 else Surface.ROTATION_0
+                    )
+                    .build()
+
+            // Act.
+            provider.bindToLifecycle(
+                FakeLifecycleOwner(),
+                CameraSelector.DEFAULT_BACK_CAMERA,
+                UseCaseGroup.Builder()
+                    .setViewPort(viewPort)
+                    .addUseCase(preview)
+                    .addUseCase(imageCapture)
+                    .addUseCase(imageAnalysis)
+                    .addUseCase(videoCapture)
+                    .build()
+            )
+
+            // Assert: The aspect ratio of the use cases should be close to the aspect ratio of the
+            // view port set to the UseCaseGroup.
+            val aspectRatioThreshold = 0.01
+            val expectedRatio =
+                ImageUtil.getRotatedAspectRatio(rotation, viewPort.aspectRatio).toDouble()
+            assertThat(preview.viewPortCropRect!!.aspectRatio().toDouble())
+                .isWithin(aspectRatioThreshold)
+                .of(expectedRatio)
+            assertThat(imageCapture.viewPortCropRect!!.aspectRatio().toDouble())
+                .isWithin(aspectRatioThreshold)
+                .of(expectedRatio)
+            assertThat(imageAnalysis.viewPortCropRect!!.aspectRatio().toDouble())
+                .isWithin(aspectRatioThreshold)
+                .of(expectedRatio)
+            assertThat(videoCapture.viewPortCropRect!!.aspectRatio().toDouble())
+                .isWithin(aspectRatioThreshold)
+                .of(expectedRatio)
         }
     }
 
@@ -1116,6 +1176,11 @@ class ProcessCameraProviderTest {
                 .setUseCaseConfigFactoryProvider { FakeUseCaseConfigFactory() }
 
         return appConfigBuilder.build()
+    }
+
+    private fun Rect.aspectRatio(rotationDegrees: Int = 0): Rational {
+        return if (rotationDegrees % 180 != 0) Rational(height(), width())
+        else Rational(width(), height())
     }
 }
 

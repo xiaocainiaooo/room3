@@ -27,6 +27,7 @@ import android.hardware.camera2.CaptureResult
 import android.hardware.camera2.TotalCaptureResult
 import android.os.Build
 import android.util.Range
+import android.util.Rational
 import android.util.Size
 import android.view.Surface
 import androidx.camera.camera2.Camera2Config
@@ -44,6 +45,7 @@ import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceRequest
 import androidx.camera.core.SurfaceRequest.TransformationInfo
 import androidx.camera.core.UseCaseGroup
+import androidx.camera.core.ViewPort
 import androidx.camera.core.impl.CameraInfoInternal
 import androidx.camera.core.impl.ImageOutputConfig
 import androidx.camera.core.impl.ImageOutputConfig.OPTION_RESOLUTION_SELECTOR
@@ -948,6 +950,46 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             assertThat(transformationInfo).isNotNull()
             assertThat(transformationInfo!!.rotationDegrees).isEqualTo(0)
         }
+
+    @Test
+    fun viewPort_OverwriteTransformation() = runBlocking {
+        // Arrange.
+        val rotation =
+            if (CameraUtil.getSensorOrientation(CameraSelector.LENS_FACING_BACK)!! % 180 != 0)
+                Surface.ROTATION_90
+            else Surface.ROTATION_0
+        val transformationInfoDeferred = CompletableDeferred<TransformationInfo>()
+        val preview = Preview.Builder().setTargetRotation(rotation).build()
+        val viewPort = ViewPort.Builder(Rational(2, 1), preview.targetRotation).build()
+
+        // Act.
+        withContext(Dispatchers.Main) {
+            preview.setSurfaceProvider { request ->
+                request.setTransformationInfoListener(CameraXExecutors.directExecutor()) {
+                    transformationInfoDeferred.complete(it)
+                }
+            }
+            val useCaseGroup =
+                UseCaseGroup.Builder().setViewPort(viewPort).addUseCase(preview).build()
+            cameraProvider.bindToLifecycle(
+                lifecycleOwner,
+                CameraSelector.DEFAULT_BACK_CAMERA,
+                useCaseGroup
+            )
+        }
+        val transformationInfo = withTimeoutOrNull(5000) { transformationInfoDeferred.await() }
+
+        // Assert.
+        assertThat(
+                Rational(
+                        transformationInfo!!.cropRect.width(),
+                        transformationInfo.cropRect.height()
+                    )
+                    .toFloat()
+            )
+            .isWithin(TOLERANCE)
+            .of(viewPort.aspectRatio.toFloat())
+    }
 
     // ======================================================
     // Section 3: UseCase Reusability Test
