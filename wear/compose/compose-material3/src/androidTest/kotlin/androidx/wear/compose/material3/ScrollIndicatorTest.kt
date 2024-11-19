@@ -74,7 +74,7 @@ class ScrollIndicatorTest {
     fun scalingLazyColumnStateAdapter_veryLongContent() {
         verifySlcPositionAndSize(
             expectedIndicatorPosition = 0f,
-            expectedIndicatorSize = 0.2f,
+            expectedIndicatorSize = 0.3f,
             itemsCount = 40
         )
     }
@@ -83,7 +83,7 @@ class ScrollIndicatorTest {
     fun scalingLazyColumnStateAdapter_longContent() {
         verifySlcPositionAndSize(
             expectedIndicatorPosition = 0f,
-            expectedIndicatorSize = 0.2f,
+            expectedIndicatorSize = 0.3f,
             itemsCount = 15
         )
     }
@@ -101,7 +101,7 @@ class ScrollIndicatorTest {
     fun scalingLazyColumnStateAdapter_shortContent() {
         verifySlcPositionAndSize(
             expectedIndicatorPosition = 0f,
-            expectedIndicatorSize = 0.8f,
+            expectedIndicatorSize = 0.7f,
             itemsCount = 3
         )
     }
@@ -110,7 +110,7 @@ class ScrollIndicatorTest {
     fun scalingLazyColumnStateAdapter_veryShortContent() {
         verifySlcPositionAndSize(
             expectedIndicatorPosition = 0f,
-            expectedIndicatorSize = 0.8f,
+            expectedIndicatorSize = 0.7f,
             itemsCount = 1
         )
     }
@@ -144,12 +144,12 @@ class ScrollIndicatorTest {
 
     @Test
     fun scalingLazyColumnStateAdapter_veryLongContent_scrolled() {
-        verifySlcScrollToCenter(expectedIndicatorSize = 0.2f, itemsCount = 40)
+        verifySlcScrollToCenter(expectedIndicatorSize = 0.3f, itemsCount = 40)
     }
 
     @Test
     fun scalingLazyColumnStateAdapter_longContent_scrolled() {
-        verifySlcScrollToCenter(expectedIndicatorSize = 0.2f, itemsCount = 16)
+        verifySlcScrollToCenter(expectedIndicatorSize = 0.3f, itemsCount = 16)
     }
 
     @Test
@@ -190,7 +190,7 @@ class ScrollIndicatorTest {
     fun lazyColumnStateAdapter_veryLongContent() {
         verifyLazyColumnPositionAndSize(
             expectedIndicatorPosition = 0f,
-            expectedIndicatorSize = 0.2f,
+            expectedIndicatorSize = 0.3f,
             itemsCount = 40
         )
     }
@@ -199,7 +199,7 @@ class ScrollIndicatorTest {
     fun lazyColumnStateAdapter_longContent() {
         verifyLazyColumnPositionAndSize(
             expectedIndicatorPosition = 0f,
-            expectedIndicatorSize = 0.2f,
+            expectedIndicatorSize = 0.3f,
             itemsCount = 15
         )
     }
@@ -215,12 +215,12 @@ class ScrollIndicatorTest {
 
     @Test
     fun lazyColumnStateAdapter_veryLongContent_scrolled() {
-        verifyLazyColumnScrollToCenter(expectedIndicatorSize = 0.2f, itemsCount = 40)
+        verifyLazyColumnScrollToCenter(expectedIndicatorSize = 0.3f, itemsCount = 40)
     }
 
     @Test
     fun lazyColumnStateAdapter_longContent_scrolled() {
-        verifyLazyColumnScrollToCenter(expectedIndicatorSize = 0.2f, itemsCount = 16)
+        verifyLazyColumnScrollToCenter(expectedIndicatorSize = 0.3f, itemsCount = 16)
     }
 
     @Test
@@ -230,7 +230,7 @@ class ScrollIndicatorTest {
 
     @Test
     fun lazyColumnStateAdapter_shortContent_scrolled() {
-        verifyLazyColumnScrollToCenter(expectedIndicatorSize = 0.75f, itemsCount = 4)
+        verifyLazyColumnScrollToCenter(expectedIndicatorSize = 0.7f, itemsCount = 4)
     }
 
     @Test
@@ -249,7 +249,7 @@ class ScrollIndicatorTest {
     fun transformingLazyColumnStateAdapter_veryLongContent() {
         verifyTransformingLazyColumnPositionAndSize(
             expectedIndicatorPosition = 0f,
-            expectedIndicatorSize = 0.2f,
+            expectedIndicatorSize = 0.3f,
             itemsCount = 40
         )
     }
@@ -258,7 +258,7 @@ class ScrollIndicatorTest {
     fun transformingLazyColumnStateAdapter_longContent() {
         verifyTransformingLazyColumnPositionAndSize(
             expectedIndicatorPosition = 0f,
-            expectedIndicatorSize = 0.2f,
+            expectedIndicatorSize = 0.3f,
             itemsCount = 15
         )
     }
@@ -276,7 +276,7 @@ class ScrollIndicatorTest {
     fun columnStateAdapter_veryLongContent() {
         verifyColumnPositionAndSize(
             expectedIndicatorPosition = 0f,
-            expectedIndicatorSize = 0.2f,
+            expectedIndicatorSize = 0.3f,
             itemsCount = 40
         )
     }
@@ -285,7 +285,7 @@ class ScrollIndicatorTest {
     fun columnStateAdapter_longContent() {
         verifyColumnPositionAndSize(
             expectedIndicatorPosition = 0f,
-            expectedIndicatorSize = 0.2f,
+            expectedIndicatorSize = 0.3f,
             itemsCount = 15
         )
     }
@@ -301,12 +301,12 @@ class ScrollIndicatorTest {
 
     @Test
     fun columnStateAdapter_veryLongContent_scrolled() {
-        verifyColumnScrollToCenter(expectedIndicatorSize = 0.2f, itemsCount = 40)
+        verifyColumnScrollToCenter(expectedIndicatorSize = 0.3f, itemsCount = 40)
     }
 
     @Test
     fun columnStateAdapter_longContent_scrolled() {
-        verifyColumnScrollToCenter(expectedIndicatorSize = 0.2f, itemsCount = 16)
+        verifyColumnScrollToCenter(expectedIndicatorSize = 0.3f, itemsCount = 16)
     }
 
     @Test
@@ -316,7 +316,7 @@ class ScrollIndicatorTest {
 
     @Test
     fun columnStateAdapter_shortContent_scrolled() {
-        verifyColumnScrollToCenter(expectedIndicatorSize = 0.75f, itemsCount = 4)
+        verifyColumnScrollToCenter(expectedIndicatorSize = 0.7f, itemsCount = 4)
     }
 
     @Test

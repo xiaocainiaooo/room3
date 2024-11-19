@@ -240,11 +240,20 @@ object ScrollIndicatorDefaults {
     val PositionAnimationSpec: AnimationSpec<Float> =
         tween(durationMillis = 500, easing = CubicBezierEasing(0f, 0f, 0f, 1f))
 
-    internal const val minSizeFraction = 0.2f
-    internal const val maxSizeFraction = 0.8f
+    internal const val minSizeFraction = 0.3f
+    internal const val maxSizeFraction = 0.7f
 
     internal val indicatorHeight = 50.dp
-    internal val indicatorWidth = 4.dp
+
+    internal val indicatorWidth
+        @Composable
+        get(): Dp {
+            val screenHeight = LocalConfiguration.current.screenHeightDp
+            return if (screenHeight >= 225) 6.dp else 5.dp
+        }
+
+    internal val gapHeight = 3.dp
+
     internal val edgePadding = PaddingDefaults.edgePadding
 }
 
@@ -318,6 +327,7 @@ internal fun IndicatorImpl(
 
     val isScreenRound = isRoundDevice()
     val layoutDirection = LocalLayoutDirection.current
+    val gapHeight = ScrollIndicatorDefaults.gapHeight
 
     val positionFractionAnimatable = remember { Animatable(0f) }
     val sizeFractionAnimatable = remember { Animatable(0f) }
@@ -418,8 +428,6 @@ internal fun IndicatorImpl(
                 val paddingHorizontalPx = paddingHorizontal.toPx()
                 onDrawWithContent {
                     if (isScreenRound) {
-                        val gapHeight = 1.dp
-
                         drawCurvedIndicator(
                             screenWidthDp.toPx(),
                             color,
