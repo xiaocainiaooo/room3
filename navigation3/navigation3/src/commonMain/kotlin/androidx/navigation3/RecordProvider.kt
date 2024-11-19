@@ -23,20 +23,20 @@ import kotlin.reflect.KClass
 
 /** Creates an [RecordProviderBuilder] with the record providers provided in the builder. */
 public inline fun recordProvider(
-    noinline fallback: (unknownScreen: Any) -> Record<*> = {
+    noinline fallback: (unknownScreen: Any) -> NavRecord<*> = {
         throw IllegalStateException("Unknown screen $it")
     },
     builder: RecordProviderBuilder.() -> Unit
-): (Any) -> Record<*> = RecordProviderBuilder(fallback).apply(builder).build()
+): (Any) -> NavRecord<*> = RecordProviderBuilder(fallback).apply(builder).build()
 
-/** DSL for constructing a new [Record] */
+/** DSL for constructing a new [NavRecord] */
 @Suppress("TopLevelBuilder")
 @RecordDsl
-public class RecordProviderBuilder(private val fallback: (unknownScreen: Any) -> Record<*>) {
+public class RecordProviderBuilder(private val fallback: (unknownScreen: Any) -> NavRecord<*>) {
     private val clazzProviders = mutableMapOf<KClass<*>, RecordClassProvider<*>>()
     private val providers = mutableMapOf<Any, RecordProvider<*>>()
 
-    /** Builds a [Record] for the given [key] that displays [content]. */
+    /** Builds a [NavRecord] for the given [key] that displays [content]. */
     @Suppress("SetterReturnsThis", "MissingGetterMatchingBuilder")
     public fun <T : Any> addRecordProvider(
         key: T,
@@ -49,7 +49,7 @@ public class RecordProviderBuilder(private val fallback: (unknownScreen: Any) ->
         providers[key] = RecordProvider(key, featureMap, content)
     }
 
-    /** Builds a [Record] for the given [clazz] that displays [content]. */
+    /** Builds a [NavRecord] for the given [clazz] that displays [content]. */
     @Suppress("SetterReturnsThis", "MissingGetterMatchingBuilder")
     public fun <T : Any> addRecordProvider(
         clazz: KClass<T>,
@@ -66,11 +66,11 @@ public class RecordProviderBuilder(private val fallback: (unknownScreen: Any) ->
      * Returns an instance of recordProvider created from the record providers set on this builder.
      */
     @Suppress("UNCHECKED_CAST")
-    public fun build(): (Any) -> Record<*> = { key ->
+    public fun build(): (Any) -> NavRecord<*> = { key ->
         val recordClassProvider = clazzProviders[key::class] as? RecordClassProvider<Any>
         val recordProvider = providers[key] as? RecordProvider<Any>
-        recordClassProvider?.run { Record(key, featureMap, content) }
-            ?: recordProvider?.run { Record(key, featureMap, content) }
+        recordClassProvider?.run { NavRecord(key, featureMap, content) }
+            ?: recordProvider?.run { NavRecord(key, featureMap, content) }
             ?: fallback.invoke(key)
     }
 }
