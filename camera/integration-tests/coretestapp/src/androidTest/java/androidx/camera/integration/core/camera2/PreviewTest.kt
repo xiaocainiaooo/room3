@@ -62,6 +62,7 @@ import androidx.camera.testing.impl.CameraPipeConfigTestRule
 import androidx.camera.testing.impl.CameraUtil
 import androidx.camera.testing.impl.CameraUtil.PreTestCameraIdList
 import androidx.camera.testing.impl.SurfaceTextureProvider
+import androidx.camera.testing.impl.WakelockEmptyActivityRule
 import androidx.camera.testing.impl.fakes.FakeLifecycleOwner
 import androidx.camera.video.Recorder
 import androidx.camera.video.VideoCapture
@@ -108,6 +109,10 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     @get:Rule
     val cameraRule =
         CameraUtil.grantCameraPermissionAndPreTestAndPostTest(PreTestCameraIdList(cameraConfig))
+
+    // Launch activity when testing in Vivo devices to prevent testing process from being killed.
+    @get:Rule
+    val wakelockEmptyActivityRule = WakelockEmptyActivityRule(brandsToEnable = listOf("vivo"))
 
     companion object {
         private const val ANY_THREAD_NAME = "any-thread-name"
@@ -1655,7 +1660,8 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
 
         val captureResult = withTimeoutOrNull(5000) { captureResultDeferred.await() }
         assertThat(captureResult).isNotNull()
-        val fpsRangeInResult = captureResult!!.get(CaptureResult.CONTROL_AE_TARGET_FPS_RANGE)
+        val fpsRangeInResult =
+            captureResult!!.request.get(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE)
         // ignore the case CONTROL_AE_TARGET_FPS_RANGE is null
         assumeTrue(fpsRangeInResult != null)
         assertThat(fpsRangeInResult).isEqualTo(expectedFpsRange)
