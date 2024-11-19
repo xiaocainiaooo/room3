@@ -1261,34 +1261,34 @@ internal class SavedStateTest : RobolectricTest() {
             var key = 0
             val savedState = savedState {
                 putBoolean(key = "KEY_${++key}", value = true)
-                putBooleanArray(key = "KEY_${++key}", values = booleanArrayOf(true, false))
+                putBooleanArray(key = "KEY_${++key}", value = booleanArrayOf(true, false))
                 putChar(key = "KEY_${++key}", value = Char.MAX_VALUE)
                 putCharArray(
                     key = "KEY_${++key}",
-                    values = charArrayOf(Char.MIN_VALUE, Char.MAX_VALUE)
+                    value = charArrayOf(Char.MIN_VALUE, Char.MAX_VALUE)
                 )
                 putDouble(key = "KEY_${++key}", value = Double.MAX_VALUE)
                 putDoubleArray(
                     key = "KEY_${++key}",
-                    values = doubleArrayOf(Double.MIN_VALUE, Double.MAX_VALUE)
+                    value = doubleArrayOf(Double.MIN_VALUE, Double.MAX_VALUE)
                 )
                 putFloat(key = "KEY_${++key}", value = Float.MAX_VALUE)
                 putFloatArray(
                     key = "KEY_${++key}",
-                    values = floatArrayOf(Float.MIN_VALUE, Float.MAX_VALUE)
+                    value = floatArrayOf(Float.MIN_VALUE, Float.MAX_VALUE)
                 )
                 putInt(key = "KEY_${++key}", value = Int.MAX_VALUE)
-                putIntArray(key = "KEY_${++key}", values = intArrayOf(1, 2, 3))
-                putIntList(key = "KEY_${++key}", values = listOf(Int.MIN_VALUE, Int.MAX_VALUE))
+                putIntArray(key = "KEY_${++key}", value = intArrayOf(1, 2, 3))
+                putIntList(key = "KEY_${++key}", value = listOf(Int.MIN_VALUE, Int.MAX_VALUE))
                 putLong(key = "KEY_${++key}", value = Long.MAX_VALUE)
                 putLongArray(
                     key = "KEY_${++key}",
-                    values = longArrayOf(Long.MIN_VALUE, Long.MAX_VALUE)
+                    value = longArrayOf(Long.MIN_VALUE, Long.MAX_VALUE)
                 )
                 putNull(key = "KEY_${++key}")
                 putString(key = "KEY_${++key}", value = "Text")
-                putStringArray(key = "KEY_${++key}", values = arrayOf("Text3", "text4"))
-                putStringList(key = "KEY_${++key}", values = listOf("Text1", "text2"))
+                putStringArray(key = "KEY_${++key}", value = arrayOf("Text3", "text4"))
+                putStringList(key = "KEY_${++key}", value = listOf("Text1", "text2"))
             }
             return savedState {
                 putAll(savedState)

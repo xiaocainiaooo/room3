@@ -112,36 +112,36 @@ package androidx.savedstate {
 
   @kotlin.jvm.JvmInline public final value class SavedStateWriter {
     method public inline void clear();
-    method public inline void putAll(android.os.Bundle values);
+    method public inline void putAll(android.os.Bundle from);
     method public inline void putBinder(String key, android.os.IBinder value);
     method public inline void putBoolean(String key, boolean value);
-    method public inline void putBooleanArray(String key, boolean[] values);
+    method public inline void putBooleanArray(String key, boolean[] value);
     method public inline void putChar(String key, char value);
-    method public inline void putCharArray(String key, char[] values);
+    method public inline void putCharArray(String key, char[] value);
     method public inline void putCharSequence(String key, CharSequence value);
-    method public inline void putCharSequenceArray(String key, CharSequence[] values);
-    method public inline void putCharSequenceList(String key, java.util.List<? extends java.lang.CharSequence> values);
+    method public inline void putCharSequenceArray(String key, CharSequence[] value);
+    method public inline void putCharSequenceList(String key, java.util.List<? extends java.lang.CharSequence> value);
     method public inline void putDouble(String key, double value);
-    method public inline void putDoubleArray(String key, double[] values);
+    method public inline void putDoubleArray(String key, double[] value);
     method public inline void putFloat(String key, float value);
-    method public inline void putFloatArray(String key, float[] values);
+    method public inline void putFloatArray(String key, float[] value);
     method public inline void putInt(String key, int value);
-    method public inline void putIntArray(String key, int[] values);
-    method public inline void putIntList(String key, java.util.List<java.lang.Integer> values);
+    method public inline void putIntArray(String key, int[] value);
+    method public inline void putIntList(String key, java.util.List<java.lang.Integer> value);
     method public inline void putLong(String key, long value);
-    method public inline void putLongArray(String key, long[] values);
+    method public inline void putLongArray(String key, long[] value);
     method public inline void putNull(String key);
     method public inline <reified T extends android.os.Parcelable> void putParcelable(String key, T value);
-    method public inline <reified T extends android.os.Parcelable> void putParcelableArray(String key, T[] values);
-    method public inline <reified T extends android.os.Parcelable> void putParcelableList(String key, java.util.List<? extends T> values);
+    method public inline <reified T extends android.os.Parcelable> void putParcelableArray(String key, T[] value);
+    method public inline <reified T extends android.os.Parcelable> void putParcelableList(String key, java.util.List<? extends T> value);
     method public inline void putSavedState(String key, android.os.Bundle value);
     method public inline <reified T extends java.io.Serializable> void putSerializable(String key, T value);
     method public inline void putSize(String key, android.util.Size value);
     method public inline void putSizeF(String key, android.util.SizeF value);
-    method public inline <reified T extends android.os.Parcelable> void putSparseParcelableArray(String key, android.util.SparseArray<T> values);
+    method public inline <reified T extends android.os.Parcelable> void putSparseParcelableArray(String key, android.util.SparseArray<T> value);
     method public inline void putString(String key, String value);
-    method public inline void putStringArray(String key, String[] values);
-    method public inline void putStringList(String key, java.util.List<java.lang.String> values);
+    method public inline void putStringArray(String key, String[] value);
+    method public inline void putStringList(String key, java.util.List<java.lang.String> value);
     method public inline void remove(String key);
   }
 
