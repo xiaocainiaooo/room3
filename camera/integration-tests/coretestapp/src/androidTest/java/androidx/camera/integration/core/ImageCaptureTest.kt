@@ -333,6 +333,15 @@ class ImageCaptureTest(private val implName: String, private val cameraXConfig: 
     }
 
     @Test
+    fun canCaptureMaxQualityImageWithFlashModeOn() {
+        canTakeImages(
+            defaultBuilder
+                .setFlashMode(ImageCapture.FLASH_MODE_ON)
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
+        )
+    }
+
+    @Test
     fun canCaptureImageWithFlashModeOn_frontCamera() {
         // This test also wants to ensure that the image can be captured without the flash unit.
         // Front camera usually doesn't have a flash unit.
