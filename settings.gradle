@@ -1137,6 +1137,7 @@ File repoRoot = new File(rootDir, "../..").canonicalFile
 includeOptionalProject(":xr:xr", new File(repoRoot, "xr/xr"), [BuildType.XR])
 includeOptionalProject(":xr:arcore:arcore", new File(repoRoot, "xr/arcore/arcore"), [BuildType.XR])
 includeOptionalProject(":xr:compose:compose", new File(repoRoot, "xr/compose/compose"), [BuildType.XR])
+includeOptionalProject(":xr:compose:compose-testing", new File(repoRoot, "xr/compose/compose-testing"), [BuildType.XR])
 includeOptionalProject(":xr:runtime:runtime", new File(repoRoot, "xr/runtime/runtime"), [BuildType.XR])
 includeOptionalProject(":xr:runtime:runtime-testing", new File(repoRoot, "xr/runtime/runtime-testing"), [BuildType.XR])
 includeOptionalProject(":xr:runtime:runtime-openxr", new File(repoRoot, "xr/runtime/runtime-openxr"), [BuildType.XR])

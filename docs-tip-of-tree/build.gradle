@@ -25,6 +25,7 @@ dependencies {
     docsForOptionalProject(":xr:xr")
     docsForOptionalProject(":xr:arcore:arcore")
     docsForOptionalProject(":xr:compose:compose")
+    docsForOptionalProject(":xr:compose:compose-testing")
     docsForOptionalProject(":xr:runtime:runtime")
     docsForOptionalProject(":xr:runtime:runtime-openxr")
     docsForOptionalProject(":xr:runtime:runtime-testing")
