@@ -165,8 +165,9 @@ public class JetpackRevocableFileDescriptorStore implements
 
         void setCloseListener(
                 @NonNull ParcelFileDescriptor.OnCloseListener onCloseListener) {
-            Preconditions.checkState(mOnCloseListener == null,
-                    "The close listener has already been set.");
+            if (mOnCloseListener != null) {
+                throw new IllegalStateException("The close listener has already been set.");
+            }
             mOnCloseListener = Preconditions.checkNotNull(onCloseListener);
         }
 

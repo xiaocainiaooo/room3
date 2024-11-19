@@ -67,7 +67,7 @@ public final class AppSearchOpenBlobForWriteResponse extends AbstractSafeParcela
         this(AppSearchBatchResultGeneralKeyParcel.fromBlobHandleToPfd(result));
     }
 
-    @AbstractSafeParcelable.Constructor
+    @Constructor
     AppSearchOpenBlobForWriteResponse(
             @AbstractSafeParcelable.Param(id = 1)
             @NonNull AppSearchBatchResultGeneralKeyParcel<AppSearchBlobHandle, ParcelFileDescriptor>

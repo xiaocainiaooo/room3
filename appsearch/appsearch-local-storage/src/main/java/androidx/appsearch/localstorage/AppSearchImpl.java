@@ -40,7 +40,6 @@ import androidx.appsearch.app.AppSearchBlobHandle;
 import androidx.appsearch.app.AppSearchResult;
 import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
-import androidx.appsearch.app.Features;
 import androidx.appsearch.app.GenericDocument;
 import androidx.appsearch.app.GetByDocumentIdRequest;
 import androidx.appsearch.app.GetSchemaResponse;
@@ -1149,8 +1148,8 @@ public final class AppSearchImpl implements Closeable {
             @NonNull AppSearchBlobHandle handle)
             throws AppSearchException, IOException {
         if (mRevocableFileDescriptorStore == null) {
-            throw new UnsupportedOperationException(Features.BLOB_STORAGE
-                    + " is not available on this AppSearch implementation.");
+            throw new UnsupportedOperationException(
+                    "BLOB_STORAGE is not available on this AppSearch implementation.");
         }
         mReadWriteLock.writeLock().lock();
         try {
@@ -1186,8 +1185,8 @@ public final class AppSearchImpl implements Closeable {
             @NonNull String databaseName,
             @NonNull AppSearchBlobHandle handle) throws AppSearchException {
         if (mRevocableFileDescriptorStore == null) {
-            throw new UnsupportedOperationException(Features.BLOB_STORAGE
-                    + " is not available on this AppSearch implementation.");
+            throw new UnsupportedOperationException(
+                    "BLOB_STORAGE is not available on this AppSearch implementation.");
         }
         mReadWriteLock.writeLock().lock();
         try {
@@ -1220,8 +1219,8 @@ public final class AppSearchImpl implements Closeable {
             @NonNull AppSearchBlobHandle handle)
             throws AppSearchException, IOException {
         if (mRevocableFileDescriptorStore == null) {
-            throw new UnsupportedOperationException(Features.BLOB_STORAGE
-                    + " is not available on this AppSearch implementation.");
+            throw new UnsupportedOperationException(
+                    "BLOB_STORAGE is not available on this AppSearch implementation.");
         }
 
         mReadWriteLock.readLock().lock();

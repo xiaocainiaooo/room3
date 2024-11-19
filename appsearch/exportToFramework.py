@@ -193,6 +193,7 @@ class ExportToFramework:
             .replace('@exportToFramework:hide', '@hide')
             .replace('// @exportToFramework:skipFile()', '')
             .replace('@ExperimentalAppSearchApi', '')
+            .replace('@OptIn(markerClass = ExperimentalAppSearchApi.class)', '')
         )
         contents = re.sub(r'\/\/ @exportToFramework:copyToPath\([^)]+\)', '', contents)
         contents = re.sub(r'@RequiresFeature\([^)]*\)', '', contents, flags=re.DOTALL)
