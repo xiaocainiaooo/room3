@@ -93,13 +93,9 @@ fun ListHeader(
  * ListSubHeader scales itself appropriately when used within the scope of a
  * [TransformingLazyColumn].
  *
- * Example of a [ListSubHeader]:
+ * Example with use of [ListSubHeader]:
  *
- * @sample androidx.wear.compose.material3.samples.ListSubHeaderSample
- *
- * Example of a [ListSubHeader] with an icon:
- *
- * @sample androidx.wear.compose.material3.samples.ListSubHeaderWithIconSample
+ * @sample androidx.wear.compose.material3.samples.ListHeaderSample
  * @param modifier The modifier for the [ListSubHeader].
  * @param backgroundColor The background color to apply - typically Color.Transparent
  * @param contentColor The color to apply to content.
