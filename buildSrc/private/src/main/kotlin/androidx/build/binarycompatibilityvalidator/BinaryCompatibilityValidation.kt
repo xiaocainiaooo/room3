@@ -341,6 +341,7 @@ private fun KotlinNativeTarget.klibTargetName(): String =
     KlibTarget(targetName, konanTargetNameMapping[konanTarget.name]!!).toString()
 
 // Not ideal to have a list instead of a pattern to match but this is all the API supports right now
+// https://github.com/Kotlin/binary-compatibility-validator/issues/280
 private val nonPublicMarkers =
     setOf(
         "androidx.annotation.Experimental",
