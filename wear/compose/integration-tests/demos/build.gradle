@@ -27,7 +27,7 @@ android {
         applicationId "androidx.wear.compose.integration.demos"
         minSdk 25
         versionCode 52
-        versionName "1.52"
+        versionName "1.54"
     }
 
     buildTypes {
