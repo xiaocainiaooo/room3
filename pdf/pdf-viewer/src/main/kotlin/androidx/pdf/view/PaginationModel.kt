@@ -52,7 +52,7 @@ internal class PaginationModel(val pageSpacingPx: Int, val numPages: Int) : Parc
     /** The maximum width of any page known to this model */
     var maxWidth: Int = 0
 
-    private var _reach: Int = 0
+    private var _reach: Int = -1
 
     /** The last page whose dimensions are known to this model, 0-indexed */
     val reach: Int
@@ -86,7 +86,7 @@ internal class PaginationModel(val pageSpacingPx: Int, val numPages: Int) : Parc
     private val pageTops: List<Int> =
         object : AbstractList<Int>() {
             override val size: Int
-                get() = reach
+                get() = reach + 1
 
             override fun get(index: Int): Int {
                 return pagePositions[index]
@@ -100,7 +100,7 @@ internal class PaginationModel(val pageSpacingPx: Int, val numPages: Int) : Parc
     private val pageBottoms: List<Int> =
         object : AbstractList<Int>() {
             override val size: Int
-                get() = reach
+                get() = reach + 1
 
             override fun get(index: Int): Int {
                 return pagePositions[index] + pages[index].y
@@ -132,7 +132,7 @@ internal class PaginationModel(val pageSpacingPx: Int, val numPages: Int) : Parc
         require(pageNum in 0 until numPages) { "Page out of range" }
         require(pageSize.y >= 0 && pageSize.x >= 0) { "Negative size page" }
         // Edge case: missing pages. This model expects pages to be added sequentially
-        for (i in _reach until pageNum) {
+        for (i in maxOf(_reach, 0) until pageNum) {
             if (pages[i] == UNKNOWN_SIZE) {
                 pages[i] = pageSize
             }
@@ -142,9 +142,9 @@ internal class PaginationModel(val pageSpacingPx: Int, val numPages: Int) : Parc
         }
         pages[pageNum] = pageSize
         // Defensive: never set _reach to a smaller value, if pages are loaded out of order
-        _reach = max(_reach, pageNum + 1)
+        _reach = max(_reach, pageNum)
         accumulatedPageHeight += pageSize.y
-        averagePageHeight = accumulatedPageHeight / _reach
+        averagePageHeight = accumulatedPageHeight / maxOf(_reach + 1, 1)
 
         if (pageNum > 0) {
             pagePositions[pageNum] =
@@ -213,15 +213,16 @@ internal class PaginationModel(val pageSpacingPx: Int, val numPages: Int) : Parc
     }
 
     private fun computeEstimatedHeight(): Int {
-        return if (_reach == 0) {
+        return if (_reach < 0) {
             0
-        } else if (_reach == numPages) {
-            val lastPageHeight = pages[_reach - 1].y
-            pagePositions[_reach - 1] + lastPageHeight + (pageSpacingPx)
+        } else if (_reach == numPages - 1) {
+            val lastPageHeight = pages[_reach].y
+            pagePositions[_reach] + lastPageHeight + (pageSpacingPx)
             // Otherwise, we have to guess
         } else {
-            val totalKnownHeight = pagePositions[_reach - 1] + pages[_reach - 1].y
-            val estimatedRemainingHeight = (averagePageHeight + pageSpacingPx) * (numPages - _reach)
+            val totalKnownHeight = pagePositions[_reach] + pages[_reach].y
+            val estimatedRemainingHeight =
+                (averagePageHeight + pageSpacingPx) * (numPages - _reach - 1)
             totalKnownHeight + estimatedRemainingHeight
         }
     }
