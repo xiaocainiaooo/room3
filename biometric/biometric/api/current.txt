@@ -116,6 +116,10 @@ package androidx.biometric {
   }
 
   public sealed interface AuthenticationResult {
+    method public default androidx.biometric.AuthenticationResult.Error? error();
+    method public default boolean isError();
+    method public default boolean isSuccess();
+    method public default androidx.biometric.AuthenticationResult.Success? success();
   }
 
   public static final class AuthenticationResult.Error implements androidx.biometric.AuthenticationResult {
@@ -132,6 +136,22 @@ package androidx.biometric {
     method public androidx.biometric.BiometricPrompt.CryptoObject? getCrypto();
     property public final int authType;
     property public final androidx.biometric.BiometricPrompt.CryptoObject? crypto;
+  }
+
+  public fun interface AuthenticationResultCallback {
+    method public void onAuthResult(androidx.biometric.AuthenticationResult result);
+  }
+
+  @MainThread public interface AuthenticationResultLauncher {
+    method public void cancel();
+    method public void launch(androidx.biometric.AuthenticationRequest input);
+  }
+
+  public final class AuthenticationUtils {
+    method public static androidx.biometric.AuthenticationResultLauncher registerForAuthenticationResult(androidx.fragment.app.Fragment, androidx.biometric.AuthenticationResultCallback resultCallback);
+    method public static androidx.biometric.AuthenticationResultLauncher registerForAuthenticationResult(androidx.fragment.app.Fragment, optional kotlin.jvm.functions.Function0<kotlin.Unit> onAuthFailedCallback, androidx.biometric.AuthenticationResultCallback resultCallback);
+    method public static androidx.biometric.AuthenticationResultLauncher registerForAuthenticationResult(androidx.fragment.app.FragmentActivity, androidx.biometric.AuthenticationResultCallback resultCallback);
+    method public static androidx.biometric.AuthenticationResultLauncher registerForAuthenticationResult(androidx.fragment.app.FragmentActivity, optional kotlin.jvm.functions.Function0<kotlin.Unit> onAuthFailedCallback, androidx.biometric.AuthenticationResultCallback resultCallback);
   }
 
   public class BiometricManager {
