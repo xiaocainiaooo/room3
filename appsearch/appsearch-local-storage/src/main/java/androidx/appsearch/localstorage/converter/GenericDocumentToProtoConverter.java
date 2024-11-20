@@ -17,9 +17,12 @@
 package androidx.appsearch.localstorage.converter;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.annotation.RestrictTo;
+import androidx.appsearch.app.AppSearchBlobHandle;
 import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.EmbeddingVector;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.GenericDocument;
 import androidx.appsearch.exceptions.AppSearchException;
 import androidx.appsearch.localstorage.AppSearchConfig;
@@ -66,6 +69,7 @@ public final class GenericDocumentToProtoConverter {
      */
     @NonNull
     @SuppressWarnings("unchecked")
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public static DocumentProto toDocumentProto(@NonNull GenericDocument document) {
         Preconditions.checkNotNull(document);
         DocumentProto.Builder mProtoBuilder = DocumentProto.newBuilder();
@@ -118,6 +122,12 @@ public final class GenericDocumentToProtoConverter {
                     propertyProto.addVectorValues(
                             embeddingVectorToVectorProto(embeddingValues[j]));
                 }
+            } else if (property instanceof AppSearchBlobHandle[]) {
+                AppSearchBlobHandle[] blobHandleValues = (AppSearchBlobHandle[]) property;
+                for (int j = 0; j < blobHandleValues.length; j++) {
+                    propertyProto.addBlobHandleValues(
+                            BlobHandleToProtoConverter.toBlobHandleProto(blobHandleValues[j]));
+                }
             } else if (property == null) {
                 throw new IllegalStateException(
                         String.format("Property \"%s\" doesn't have any value!", name));
@@ -148,6 +158,7 @@ public final class GenericDocumentToProtoConverter {
      *                      that has all empty values.
      */
     @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public static GenericDocument toGenericDocument(@NonNull DocumentProtoOrBuilder proto,
             @NonNull String prefix,
             @NonNull Map<String, SchemaTypeConfigProto> schemaTypeMap,
@@ -221,6 +232,14 @@ public final class GenericDocumentToProtoConverter {
                     values[j] = vectorProtoToEmbeddingVector(property.getVectorValues(j));
                 }
                 documentBuilder.setPropertyEmbedding(name, values);
+            } else if (property.getBlobHandleValuesCount() > 0) {
+                AppSearchBlobHandle[] values =
+                        new AppSearchBlobHandle[property.getBlobHandleValuesCount()];
+                for (int j = 0; j < values.length; j++) {
+                    values[j] = BlobHandleToProtoConverter.toAppSearchBlobHandle(
+                            property.getBlobHandleValues(j));
+                }
+                documentBuilder.setPropertyBlobHandle(name, values);
             } else {
                 // TODO(b/184966497): Optimize by caching PropertyConfigProto
                 SchemaTypeConfigProto schema =
