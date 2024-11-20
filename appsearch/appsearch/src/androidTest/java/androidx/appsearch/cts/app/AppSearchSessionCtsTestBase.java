@@ -11104,7 +11104,182 @@ public abstract class AppSearchSessionCtsTestBase {
     @Test
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
     public void testRankWithScorableProperty_joinWithChildQuery() throws Exception {
-        // TODO(b/309826655): Implement this test once cl/696927163 is imported to AppSearch.
+        assumeTrue(mDb1.getFeatures().isFeatureSupported(
+                Features.SCHEMA_SCORABLE_PROPERTY_CONFIG));
+        assumeTrue(mDb1.getFeatures().isFeatureSupported(
+                Features.SEARCH_SPEC_ADVANCED_RANKING_EXPRESSION));
+        assumeTrue(mDb1.getFeatures()
+                .isFeatureSupported(Features.JOIN_SPEC_AND_QUALIFIED_ID));
+
+        AppSearchSchema personSchema = new AppSearchSchema.Builder("Person")
+                .addProperty(new StringPropertyConfig.Builder("name")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setIndexingType(StringPropertyConfig.INDEXING_TYPE_PREFIXES)
+                        .setTokenizerType(StringPropertyConfig.TOKENIZER_TYPE_PLAIN)
+                        .build())
+                .addProperty(new DoublePropertyConfig.Builder("income")
+                        .setCardinality(PropertyConfig.CARDINALITY_REPEATED)
+                        .setScoringEnabled(true)
+                        .build())
+                .addProperty(new BooleanPropertyConfig.Builder("isStarred")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setScoringEnabled(true)
+                        .build())
+                .build();
+        AppSearchSchema callLogSchema = new AppSearchSchema.Builder("CallLog")
+                .addProperty(new StringPropertyConfig.Builder("personQualifiedId")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setJoinableValueType(StringPropertyConfig.JOINABLE_VALUE_TYPE_QUALIFIED_ID)
+                        .build())
+                .addProperty(new DoublePropertyConfig.Builder("rfsScore")
+                        .setCardinality(PropertyConfig.CARDINALITY_REPEATED)
+                        .setScoringEnabled(true)
+                        .build())
+                .build();
+        AppSearchSchema smsLogSchema = new AppSearchSchema.Builder("SmsLog")
+                .addProperty(new StringPropertyConfig.Builder("personQualifiedId")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setJoinableValueType(StringPropertyConfig.JOINABLE_VALUE_TYPE_QUALIFIED_ID)
+                        .build())
+                .addProperty(new DoublePropertyConfig.Builder("rfsScore")
+                        .setCardinality(PropertyConfig.CARDINALITY_REPEATED)
+                        .setScoringEnabled(true)
+                        .build())
+                .build();
+        mDb1.setSchemaAsync(
+                new SetSchemaRequest.Builder()
+                        .addSchemas(personSchema, callLogSchema, smsLogSchema).build()).get();
+
+        // John will have two CallLog docs to join and one sms log to join.
+        GenericDocument personJohn = new GenericDocument.Builder<>(
+                "namespace", "johnId", "Person")
+                .setPropertyString("name", "John")
+                .setPropertyBoolean("isStarred", true)
+                .setPropertyDouble("income", 30)
+                .setScore(10)
+                .build();
+        // Kevin will have two CallLog docs to join and one sms log to join.
+        GenericDocument personKevin = new GenericDocument.Builder<>(
+                "namespace", "kevinId", "Person")
+                .setPropertyString("name", "Kevin")
+                .setPropertyBoolean("isStarred", false)
+                .setPropertyDouble("income", 40)
+                .setScore(20)
+                .build();
+        // Tim has no CallLog or SmsLog to join.
+        GenericDocument personTim = new GenericDocument.Builder<>("namespace", "timId", "Person")
+                .setPropertyString("name", "Tim")
+                .setPropertyDouble("income", 60)
+                .setPropertyBoolean("isStarred", true)
+                .setScore(50)
+                .build();
+
+        GenericDocument johnCallLog1 =
+                new GenericDocument.Builder<>(
+                        "namespace", "johnCallLog1", "CallLog")
+                        .setScore(5)
+                        .setPropertyDouble("rfsScore", 100, 200)
+                        .setPropertyString("personQualifiedId",
+                                DocumentIdUtil.createQualifiedId(mContext.getPackageName(),
+                                        DB_NAME_1, personJohn))
+                        .build();
+        GenericDocument johnCallLog2 =
+                new GenericDocument.Builder<>(
+                        "namespace", "johnCallLog2", "CallLog")
+                        .setScore(5)
+                        .setPropertyDouble("rfsScore", 300, 500)
+                        .setPropertyString("personQualifiedId",
+                                DocumentIdUtil.createQualifiedId(mContext.getPackageName(),
+                                        DB_NAME_1, personJohn))
+                        .build();
+        GenericDocument kevinCallLog1 =
+                new GenericDocument.Builder<>(
+                        "namespace", "kevinCallLog1", "CallLog")
+                        .setScore(5)
+                        .setPropertyDouble("rfsScore", 300, 400)
+                        .setPropertyString("personQualifiedId",
+                                DocumentIdUtil.createQualifiedId(mContext.getPackageName(),
+                                        DB_NAME_1, personKevin))
+                        .build();
+        GenericDocument kevinCallLog2 =
+                new GenericDocument.Builder<>(
+                        "namespace", "kevinCallLog2", "CallLog")
+                        .setScore(5)
+                        .setPropertyDouble("rfsScore", 500, 800)
+                        .setPropertyString("personQualifiedId",
+                                DocumentIdUtil.createQualifiedId(mContext.getPackageName(),
+                                        DB_NAME_1, personKevin))
+                        .build();
+        GenericDocument johnSmsLog1 =
+                new GenericDocument.Builder<>(
+                        "namespace", "johnSmsLog1", "SmsLog")
+                        .setScore(5)
+                        .setPropertyDouble("rfsScore", 1000, 2000)
+                        .setPropertyString("personQualifiedId",
+                                DocumentIdUtil.createQualifiedId(mContext.getPackageName(),
+                                        DB_NAME_1, personJohn))
+                        .build();
+        GenericDocument kevinSmsLog1 =
+                new GenericDocument.Builder<>(
+                        "namespace", "kevinSmsLog1", "SmsLog")
+                        .setScore(5)
+                        .setPropertyDouble("rfsScore",  2000, 3000)
+                        .setPropertyString("personQualifiedId",
+                                DocumentIdUtil.createQualifiedId(mContext.getPackageName(),
+                                        DB_NAME_1, personKevin))
+                        .build();
+
+        // Put all documents to AppSearch and verify its success.
+        AppSearchBatchResult<String, Void> result =
+                checkIsBatchResultSuccess(
+                        mDb1.putAsync(
+                                new PutDocumentsRequest.Builder()
+                                        .addGenericDocuments(
+                                                personTim, personJohn, personKevin,
+                                                kevinCallLog1, kevinCallLog2, kevinSmsLog1,
+                                                johnCallLog1, johnCallLog2, johnSmsLog1)
+                                        .build()));
+        assertThat(result.getSuccesses().size()).isEqualTo(9);
+        assertThat(result.getFailures()).isEmpty();
+
+        String childRankingStrategy =
+                "sum(getScorableProperty(\"CallLog\", \"rfsScore\")) + " +
+                        "sum(getScorableProperty(\"SmsLog\", \"rfsScore\"))";
+        double johnChildDocScore = 100 + 200 + 300 + 500 + 1000 + 2000;
+        double kevinChildDocScore = 300 + 400 + 500 + 800 + 2000 + 3000;
+        double timChildDocScore = 0;
+
+        SearchSpec childSearchSpec = new SearchSpec.Builder()
+                .setScorablePropertyRankingEnabled(true)
+                .setRankingStrategy(childRankingStrategy)
+                .build();
+        JoinSpec js = new JoinSpec.Builder("personQualifiedId")
+                .setNestedSearch("", childSearchSpec)
+                .build();
+        String parentRankingStrategy =
+                        "sum(getScorableProperty(\"Person\", \"income\")) + " +
+                        "20 * sum(getScorableProperty(\"Person\", \"isStarred\")) + " +
+                        "sum(this.childrenRankingSignals())";
+        SearchSpec parentSearchSpec = new SearchSpec.Builder()
+                .setScorablePropertyRankingEnabled(true)
+                .setJoinSpec(js)
+                .setRankingStrategy(parentRankingStrategy)
+                .addFilterSchemas("Person")
+                .build();
+        double johnExpectScore = /*income=*/30 + 20 * /*isStarred=*/1 + johnChildDocScore;
+        double kevinExpectScore = /*income=*/40 + 20 * /*isStarred=*/0 + kevinChildDocScore;
+        double timExpectScore = /*income=*/60 + 20 * /*isStarred=*/1 + timChildDocScore;
+
+        SearchResults searchResults =
+                mDb1.search("", parentSearchSpec);
+        List<SearchResult> results = retrieveAllSearchResults(searchResults);
+        assertThat(results).hasSize(3);
+        assertThat(results.get(0).getRankingSignal())
+                .isWithin(0.00001).of(kevinExpectScore);
+        assertThat(results.get(1).getRankingSignal())
+                .isWithin(0.00001).of(johnExpectScore);
+        assertThat(results.get(2).getRankingSignal())
+                .isWithin(0.00001).of(timExpectScore);
     }
 
     @Test
