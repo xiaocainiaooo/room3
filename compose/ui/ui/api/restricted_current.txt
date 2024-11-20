@@ -3527,6 +3527,18 @@ package androidx.compose.ui.platform {
 
 }
 
+package androidx.compose.ui.relocation {
+
+  public interface BringIntoViewModifierNode extends androidx.compose.ui.node.DelegatableNode {
+    method public suspend Object? bringIntoView(androidx.compose.ui.layout.LayoutCoordinates childCoordinates, kotlin.jvm.functions.Function0<androidx.compose.ui.geometry.Rect?> boundsProvider, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+  }
+
+  public final class BringIntoViewModifierNodeKt {
+    method public static suspend Object? bringIntoView(androidx.compose.ui.node.DelegatableNode, optional kotlin.jvm.functions.Function0<androidx.compose.ui.geometry.Rect?>? bounds, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+  }
+
+}
+
 package androidx.compose.ui.res {
 
   public final class ColorResources_androidKt {

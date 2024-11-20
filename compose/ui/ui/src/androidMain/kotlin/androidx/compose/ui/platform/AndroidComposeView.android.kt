@@ -158,15 +158,18 @@ import androidx.compose.ui.input.pointer.SuspendingPointerInputModifierNode
 import androidx.compose.ui.input.rotary.RotaryScrollEvent
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.internal.checkPreconditionNotNull
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.PlacementScope
 import androidx.compose.ui.layout.RootMeasurePolicy
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
 import androidx.compose.ui.node.LayoutNodeDrawScope
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
+import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.Nodes
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
@@ -176,6 +179,7 @@ import androidx.compose.ui.node.visitSubtree
 import androidx.compose.ui.platform.MotionEventVerifierApi29.isValidMotionEvent
 import androidx.compose.ui.platform.coreshims.ContentCaptureSessionCompat
 import androidx.compose.ui.platform.coreshims.ViewCompatShims
+import androidx.compose.ui.relocation.BringIntoViewModifierNode
 import androidx.compose.ui.scrollcapture.ScrollCapture
 import androidx.compose.ui.semantics.EmptySemanticsElement
 import androidx.compose.ui.semantics.EmptySemanticsModifier
@@ -258,6 +262,22 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
     private val rootSemanticsNode = EmptySemanticsModifier()
     private val semanticsModifier = EmptySemanticsElement(rootSemanticsNode)
+    private val bringIntoViewNode =
+        object : ModifierNodeElement<BringIntoViewOnScreenResponderNode>() {
+            override fun create() = BringIntoViewOnScreenResponderNode(this@AndroidComposeView)
+
+            override fun update(node: BringIntoViewOnScreenResponderNode) {
+                node.view = this@AndroidComposeView
+            }
+
+            override fun InspectorInfo.inspectableProperties() {
+                name = "BringIntoViewOnScreen"
+            }
+
+            override fun hashCode(): Int = this@AndroidComposeView.hashCode()
+
+            override fun equals(other: Any?) = other === this
+        }
 
     override val focusOwner: FocusOwner =
         FocusOwnerImpl(
@@ -428,6 +448,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
                     .then(keyInputModifier)
                     .then(focusOwner.modifier)
                     .then(dragAndDropManager.modifier)
+                    .then(bringIntoViewNode)
         }
 
     override val rootForTest: RootForTest = this
@@ -2852,4 +2873,18 @@ private fun View.getContentCaptureSessionCompat(): ContentCaptureSessionCompat? 
         ViewCompatShims.IMPORTANT_FOR_CONTENT_CAPTURE_YES
     )
     return ViewCompatShims.getContentCaptureSession(this)
+}
+
+private class BringIntoViewOnScreenResponderNode(var view: ViewGroup) :
+    Modifier.Node(), BringIntoViewModifierNode {
+    override suspend fun bringIntoView(
+        childCoordinates: LayoutCoordinates,
+        boundsProvider: () -> androidx.compose.ui.geometry.Rect?
+    ) {
+        val childOffset = childCoordinates.positionInRoot()
+        val rootRect = boundsProvider()?.translate(childOffset)
+        if (rootRect != null) {
+            view.requestRectangleOnScreen(rootRect.toAndroidRect(), false)
+        }
+    }
 }
