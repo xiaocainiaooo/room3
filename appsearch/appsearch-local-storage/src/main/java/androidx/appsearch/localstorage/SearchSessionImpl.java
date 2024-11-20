@@ -623,7 +623,6 @@ class SearchSessionImpl implements AppSearchSession {
 
     @Override
     @NonNull
-    @ExperimentalAppSearchApi
     public ListenableFuture<StorageInfo> getStorageInfoAsync() {
         Preconditions.checkState(!mIsClosed, "AppSearchSession has already been closed");
         return execute(() -> mAppSearchImpl.getStorageInfoForDatabase(mPackageName, mDatabaseName));
