@@ -44,6 +44,7 @@ import kotlinx.coroutines.runBlocking
  */
 abstract class BaseFragment : Fragment() {
     private lateinit var sdkApi: ISdkApi
+
     private lateinit var sdkSandboxManager: SdkSandboxManagerCompat
     private lateinit var activity: Activity
 
@@ -139,9 +140,9 @@ abstract class BaseFragment : Fragment() {
     }
 
     companion object {
-        private const val SDK_NAME = "androidx.privacysandbox.ui.integration.testsdkprovider"
+        private const val SDK_NAME = "androidx.privacysandbox.ui.integration.testsdkproviderwrapper"
         private const val MEDIATEE_SDK_NAME =
-            "androidx.privacysandbox.ui.integration.mediateesdkprovider"
+            "androidx.privacysandbox.ui.integration.mediateesdkproviderwrapper"
         const val TAG = "TestSandboxClient"
         var isZOrderOnTop = true
         @AdType var currentAdType = AdType.BASIC_NON_WEBVIEW
