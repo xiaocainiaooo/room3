@@ -98,6 +98,7 @@ class KlibDumpParser(klibDump: String, private val fileName: String? = null) {
                                 platformTargets = listOf(),
                                 compilerVersion = "",
                                 abiVersion = "",
+                                libraryVersion = "",
                                 irProviderName = ""
                             )
                     )
