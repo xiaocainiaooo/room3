@@ -176,8 +176,8 @@ fun Modifier.scrollTransform(
     scope: TransformingLazyColumnItemScope,
 ): Modifier =
     with(scope) {
-        var minMorphingHeight by remember { mutableStateOf<Float?>(null) }
-        val spec = remember { LazyColumnScrollTransformBehavior { minMorphingHeight } }
+        var minMorphingHeight by remember(scope) { mutableStateOf<Float?>(null) }
+        val spec = remember(scope) { LazyColumnScrollTransformBehavior { minMorphingHeight } }
 
         this@scrollTransform then
             TargetMorphingHeightConsumerModifierElement { minMorphingHeight = it?.toFloat() }
