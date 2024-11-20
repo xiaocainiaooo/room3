@@ -73,6 +73,7 @@ androidXMultiplatform {
         jvmMain {
             dependsOn(commonMain)
             dependencies {
+                api(libs.jspecify)
             }
         }
 
