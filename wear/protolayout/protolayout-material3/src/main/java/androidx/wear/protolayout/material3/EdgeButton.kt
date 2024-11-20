@@ -156,7 +156,7 @@ public fun MaterialScope.textEdgeButton(
  * @sample androidx.wear.protolayout.material3.samples.edgeButtonSampleIcon
  */
 // TODO(b/346958146): link EdgeButton visuals in DAC
-internal fun MaterialScope.edgeButton(
+private fun MaterialScope.edgeButton(
     onClick: Clickable,
     contentDescription: StringProp,
     colors: EdgeButtonColors,

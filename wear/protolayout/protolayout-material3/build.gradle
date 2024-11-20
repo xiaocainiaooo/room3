@@ -50,11 +50,30 @@ dependencies {
     testImplementation(libs.testRules)
     testImplementation(libs.truth)
     testImplementation(project(":wear:protolayout:protolayout-proto"))
+
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.testCore)
+    androidTestImplementation(libs.testExtJunit)
+    androidTestImplementation(libs.testRules)
+    androidTestImplementation(libs.testRunner)
+    androidTestImplementation(project(":test:screenshot:screenshot"))
+    androidTestImplementation("androidx.core:core:1.7.0")
+    androidTestImplementation(project(":test:screenshot:screenshot"))
+    androidTestImplementation(project(":wear:protolayout:protolayout-renderer"))
+    androidTestImplementation(project(":wear:protolayout:protolayout-proto"))
 }
 
 android {
     defaultConfig {
         minSdkVersion 26
+    }
+
+    sourceSets {
+        androidTest.assets.srcDirs += project.rootDir.absolutePath + "/../../golden/wear/wear-protolayout-material3"
+    }
+
+    defaultConfig {
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     namespace "androidx.wear.protolayout.material3"

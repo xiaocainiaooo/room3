@@ -32,6 +32,7 @@ import androidx.wear.protolayout.material3.icon
 import androidx.wear.protolayout.material3.iconEdgeButton
 import androidx.wear.protolayout.material3.materialScope
 import androidx.wear.protolayout.material3.primaryLayout
+import androidx.wear.protolayout.material3.prop
 import androidx.wear.protolayout.material3.text
 import androidx.wear.protolayout.material3.textEdgeButton
 
@@ -116,5 +117,3 @@ fun topLeveLayout(
             bottomSlot = { iconEdgeButton(clickable, "Description".prop()) { icon("id") } }
         )
     }
-
-fun String.prop() = StringProp.Builder(this).build()
