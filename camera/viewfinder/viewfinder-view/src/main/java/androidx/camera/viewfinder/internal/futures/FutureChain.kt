@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package androidx.camera.viewfinder.core.impl.utils.futures
+package androidx.camera.viewfinder.internal.futures
 
-import androidx.arch.core.util.Function
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.core.util.Preconditions
 import com.google.common.util.concurrent.ListenableFuture
@@ -38,20 +37,6 @@ import java.util.concurrent.TimeoutException
 open class FutureChain<V> : ListenableFuture<V> {
     private val mDelegate: ListenableFuture<V>
     private var mCompleter: CallbackToFutureAdapter.Completer<V>? = null
-
-    /**
-     * Returns a new `Future` whose result is derived from the result of this `Future`. If this
-     * input `Future` fails, the returned `Future` fails with the same exception (and the function
-     * is not invoked).
-     *
-     * @param function A Function to transform the results of this future to the results of the
-     *   returned future.
-     * @param executor Executor to run the function in.
-     * @return A future that holds result of the transformation.
-     */
-    fun <T> transform(function: Function<in V?, out T>, executor: Executor): FutureChain<T> {
-        return Futures.transform(this, function, executor) as FutureChain<T>
-    }
 
     internal constructor(delegate: ListenableFuture<V>) {
         mDelegate = Preconditions.checkNotNull(delegate)

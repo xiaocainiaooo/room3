@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package androidx.camera.viewfinder.core.impl.utils.futures
+package androidx.camera.viewfinder.internal.futures
 
-import androidx.camera.viewfinder.core.impl.utils.Logger
+import android.util.Log
 import androidx.core.util.Preconditions
 import com.google.common.util.concurrent.ListenableFuture
-import java.util.concurrent.Delayed
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executor
-import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
 /**
- * An implementation of [ListenableFuture] which immediately contains a result.
+ * An implementation of [com.google.common.util.concurrent.ListenableFuture] which immediately
+ * contains a result.
  *
  * This implementation is based off of the Guava ImmediateSuccessfulFuture class.
  *
@@ -41,7 +40,7 @@ internal abstract class ImmediateFuture<V> : ListenableFuture<V> {
         } catch (e: RuntimeException) {
             // ListenableFuture does not throw runtime exceptions, so swallow the exception and
             // log it here.
-            Logger.e(
+            Log.e(
                 TAG,
                 "Experienced RuntimeException while attempting to notify " +
                     listener +
@@ -93,17 +92,6 @@ internal abstract class ImmediateFuture<V> : ListenableFuture<V> {
         override fun toString(): String {
             // Behaviour analogous to AbstractResolvableFuture#toString().
             return super.toString() + "[status=FAILURE, cause=[" + mCause + "]]"
-        }
-    }
-
-    internal class ImmediateFailedScheduledFuture<V>(cause: Throwable) :
-        ImmediateFailedFuture<V>(cause), ScheduledFuture<V> {
-        override fun getDelay(timeUnit: TimeUnit): Long {
-            return 0
-        }
-
-        override fun compareTo(other: Delayed): Int {
-            return -1
         }
     }
 

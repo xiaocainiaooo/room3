@@ -20,12 +20,12 @@ import android.annotation.SuppressLint
 import android.graphics.RectF
 import android.util.Size
 import android.view.Surface
-import androidx.camera.viewfinder.compose.internal.RefCounted
 import androidx.camera.viewfinder.compose.internal.SurfaceTransformationUtil
 import androidx.camera.viewfinder.compose.internal.TransformUtil.surfaceRotationToRotationDegrees
 import androidx.camera.viewfinder.core.ImplementationMode
 import androidx.camera.viewfinder.core.TransformationInfo
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
+import androidx.camera.viewfinder.core.impl.RefCounted
 import androidx.compose.foundation.AndroidEmbeddedExternalSurface
 import androidx.compose.foundation.AndroidExternalSurface
 import androidx.compose.foundation.AndroidExternalSurfaceScope

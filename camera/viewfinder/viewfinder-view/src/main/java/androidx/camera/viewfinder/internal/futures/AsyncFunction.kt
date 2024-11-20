@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.camera.viewfinder.core.impl.utils.futures
+package androidx.camera.viewfinder.internal.futures
 
 import com.google.common.util.concurrent.ListenableFuture
 import java.util.concurrent.Future

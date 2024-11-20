@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package androidx.camera.viewfinder.core.impl.utils.futures
+package androidx.camera.viewfinder.internal.futures
 
-import androidx.camera.viewfinder.core.impl.utils.executor.ViewfinderExecutors
 import androidx.core.util.Preconditions
 import com.google.common.util.concurrent.ListenableFuture
 import java.lang.reflect.UndeclaredThrowableException
@@ -159,7 +158,7 @@ internal class ChainingListenableFuture<I, O>(
             val sourceResult: I =
                 try {
                     Futures.getUninterruptibly(mInputFuture!!)
-                } catch (e: CancellationException) {
+                } catch (_: CancellationException) {
                     // Cancel this future and return.
                     // At this point, mInputFuture is cancelled and mOutputFuture doesn't
                     // exist, so the value of mayInterruptIfRunning is irrelevant.
@@ -189,7 +188,7 @@ internal class ChainingListenableFuture<I, O>(
                         // UninterruptibleListenableFuture, but we don't want to start a
                         // combinatorial explosion of interfaces, so we have to make do.
                         set(Futures.getUninterruptibly(outputFuture))
-                    } catch (e: CancellationException) {
+                    } catch (_: CancellationException) {
                         // Cancel this future and return.
                         // At this point, mInputFuture and mOutputFuture are done, so the
                         // value of mayInterruptIfRunning is irrelevant.
@@ -203,7 +202,7 @@ internal class ChainingListenableFuture<I, O>(
                         mOutputFuture = null
                     }
                 },
-                ViewfinderExecutors.directExecutor()
+                Runnable::run
             )
         } catch (e: UndeclaredThrowableException) {
             // Set the cause of the exception as this future's exception
@@ -232,7 +231,7 @@ internal class ChainingListenableFuture<I, O>(
                 interrupted =
                     try {
                         return queue.take()
-                    } catch (e: InterruptedException) {
+                    } catch (_: InterruptedException) {
                         true
                     }
             }
@@ -252,7 +251,7 @@ internal class ChainingListenableFuture<I, O>(
                     try {
                         queue.put(element)
                         return
-                    } catch (e: InterruptedException) {
+                    } catch (_: InterruptedException) {
                         true
                     }
             }

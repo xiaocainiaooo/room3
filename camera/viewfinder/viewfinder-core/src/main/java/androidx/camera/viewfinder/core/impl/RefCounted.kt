@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.camera.viewfinder.compose.internal
+package androidx.camera.viewfinder.core.impl
 
 import android.util.Log
 import kotlinx.atomicfu.atomic
