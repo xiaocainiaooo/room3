@@ -24,8 +24,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 
 /**
- * Wraps the content of a [Record] with a [SaveableStateHolder.SaveableStateProvider] to ensure that
- * calls to [rememberSaveable] within the content work properly and that state can be saved.
+ * Wraps the content of a [NavRecord] with a [SaveableStateHolder.SaveableStateProvider] to ensure
+ * that calls to [rememberSaveable] within the content work properly and that state can be saved.
  *
  * This [NavContentWrapper] is the only one that is **required** as saving state is considered a
  * non-optional feature.
@@ -67,7 +67,7 @@ public class SaveableStateNavContentWrapper : NavContentWrapper {
     }
 
     @Composable
-    public override fun <T : Any> WrapContent(record: Record<T>) {
+    public override fun <T : Any> WrapContent(record: NavRecord<T>) {
         val key = record.key
         DisposableEffect(key1 = key) {
             refCount[key] = refCount.getOrDefault(key, 0).plus(1)

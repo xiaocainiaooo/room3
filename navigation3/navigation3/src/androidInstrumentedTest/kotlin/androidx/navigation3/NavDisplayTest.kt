@@ -47,7 +47,7 @@ class NavDisplayTest {
         composeTestRule.setContent {
             val manager = rememberNavWrapperManager(emptyList())
             NavDisplay(backstack = mutableStateListOf(first), wrapperManager = manager) {
-                Record(first) { Text(first) }
+                NavRecord(first) { Text(first) }
             }
         }
 
@@ -62,8 +62,8 @@ class NavDisplayTest {
             val manager = rememberNavWrapperManager(emptyList())
             NavDisplay(backstack = backstack, wrapperManager = manager) {
                 when (it) {
-                    first -> Record(first) { Text(first) }
-                    second -> Record(second) { Text(second) }
+                    first -> NavRecord(first) { Text(first) }
+                    second -> NavRecord(second) { Text(second) }
                     else -> error("Invalid key passed")
                 }
             }
@@ -92,8 +92,8 @@ class NavDisplayTest {
                 }
             ) {
                 when (it) {
-                    first -> Record(first) { Text(first) }
-                    second -> Record(second, NavDisplay.isDialog(true)) { Text(second) }
+                    first -> NavRecord(first) { Text(first) }
+                    second -> NavRecord(second, NavDisplay.isDialog(true)) { Text(second) }
                     else -> error("Invalid key passed")
                 }
             }
@@ -125,8 +125,8 @@ class NavDisplayTest {
                 }
             ) {
                 when (it) {
-                    first -> Record(first) { Text(first) }
-                    second -> Record(second) { Text(second) }
+                    first -> NavRecord(first) { Text(first) }
+                    second -> NavRecord(second) { Text(second) }
                     else -> error("Invalid key passed")
                 }
             }
@@ -153,8 +153,8 @@ class NavDisplayTest {
             val manager = rememberNavWrapperManager(emptyList())
             NavDisplay(backstack = backstack, wrapperManager = manager) {
                 when (it) {
-                    first -> Record(first) { numberOnScreen1 = rememberSaveable { increment++ } }
-                    second -> Record(second) {}
+                    first -> NavRecord(first) { numberOnScreen1 = rememberSaveable { increment++ } }
+                    second -> NavRecord(second) {}
                     else -> error("Invalid key passed")
                 }
             }
@@ -190,11 +190,11 @@ class NavDisplayTest {
             NavDisplay(backstack = backstack, wrapperManager = manager) {
                 when (it) {
                     first ->
-                        Record(first) {
+                        NavRecord(first) {
                             registry1 = LocalSavedStateRegistryOwner.current.savedStateRegistry
                         }
                     second ->
-                        Record(second) {
+                        NavRecord(second) {
                             registry2 = LocalSavedStateRegistryOwner.current.savedStateRegistry
                         }
                     else -> error("Invalid key passed")
@@ -234,16 +234,15 @@ class NavDisplayTest {
                         2 -> backStack2
                         else -> backStack3
                     },
-                wrapperManager = manager
-            ) {
-                when (it) {
-                    first -> Record(first) { Text(first) }
-                    second -> Record(second) { Text(second) }
-                    third -> Record(third) { Text(third) }
-                    forth -> Record(forth) { Text(forth) }
-                    else -> error("Invalid key passed")
-                }
-            }
+                wrapperManager = manager,
+                recordProvider =
+                    recordProvider {
+                        record(first) { Text(first) }
+                        record(second) { Text(second) }
+                        record(third) { Text(third) }
+                        record(forth) { Text(forth) }
+                    }
+            )
         }
 
         composeTestRule.waitForIdle()
