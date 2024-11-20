@@ -1103,4 +1103,35 @@ public class AppSearchSchemaCtsTest {
         assertThat(schema.getSchemaType()).isEqualTo("Email");
         assertThat(schema.getParentTypes()).isEmpty();
     }
+
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testBlobHandlePropertyConfig() {
+        AppSearchSchema schema = new AppSearchSchema.Builder("Test")
+                .addProperty(
+                        new AppSearchSchema.BlobHandlePropertyConfig.Builder("blob")
+                                .setCardinality(
+                                        AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL)
+                                .setDescription("The blob property")
+                                .build())
+                .build();
+
+        assertThat(schema.getSchemaType()).isEqualTo("Test");
+        List<AppSearchSchema.PropertyConfig> properties = schema.getProperties();
+        assertThat(properties).hasSize(1);
+
+        assertThat(properties.get(0).getName()).isEqualTo("blob");
+        assertThat(properties.get(0).getCardinality())
+                .isEqualTo(AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL);
+        assertThat(properties.get(0).getDescription()).isEqualTo("The blob property");
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testBlobHandlePropertyConfig_defaultValues() {
+        AppSearchSchema.BlobHandlePropertyConfig builder =
+                new AppSearchSchema.BlobHandlePropertyConfig.Builder("test").build();
+        assertThat(builder.getCardinality()).isEqualTo(
+                AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL);
+        assertThat(builder.getDescription()).isEqualTo("");
+    }
 }

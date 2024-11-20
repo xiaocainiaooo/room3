@@ -1133,7 +1133,9 @@ public final class AppSearchImpl implements Closeable {
      * Gets the {@link ParcelFileDescriptor} for write purpose of the given
      * {@link AppSearchBlobHandle}.
      *
-     * @param handle    The {@link AppSearchBlobHandle} represent the blob.
+     * @param packageName    The package name that owns this blob.
+     * @param databaseName   The databaseName this blob resides in.
+     * @param handle         The {@link AppSearchBlobHandle} represent the blob.
      */
     @NonNull
     @ExperimentalAppSearchApi
@@ -1155,7 +1157,7 @@ public final class AppSearchImpl implements Closeable {
                     BlobHandleToProtoConverter.toBlobHandleProto(handle));
 
             checkSuccess(result.getStatus());
-            ParcelFileDescriptor pfd = ParcelFileDescriptor.fromFd(result.getFileDescriptor());
+            ParcelFileDescriptor pfd = ParcelFileDescriptor.adoptFd(result.getFileDescriptor());
 
             return mRevocableFileDescriptorStore
                     .wrapToRevocableFileDescriptor(handle.getPackageName(), pfd);
@@ -1170,7 +1172,9 @@ public final class AppSearchImpl implements Closeable {
      * <p>After this call, the blob is readable via {@link #openReadBlob}. And any rewrite is not
      * allowed.
      *
-     * @param handle    The {@link AppSearchBlobHandle} represent the blob.
+     * @param packageName    The package name that owns this blob.
+     * @param databaseName   The databaseName this blob resides in.
+     * @param handle         The {@link AppSearchBlobHandle} represent the blob.
      */
     @ExperimentalAppSearchApi
     public void commitBlob(
@@ -1200,7 +1204,9 @@ public final class AppSearchImpl implements Closeable {
      *
      * <p>The target must be committed via {@link #commitBlob};
      *
-     * @param handle    The {@link AppSearchBlobHandle} represent the blob.
+     * @param packageName    The package name that owns this blob.
+     * @param databaseName   The databaseName this blob resides in.
+     * @param handle         The {@link AppSearchBlobHandle} represent the blob.
      */
     @NonNull
     @ExperimentalAppSearchApi

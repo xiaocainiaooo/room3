@@ -22,11 +22,13 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
+import androidx.appsearch.app.AppSearchBlobHandle;
 import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.AppSearchSchema.PropertyConfig.Cardinality;
 import androidx.appsearch.app.AppSearchSchema.PropertyConfig.DataType;
 import androidx.appsearch.app.AppSearchSchema.StringPropertyConfig.JoinableValueType;
 import androidx.appsearch.app.AppSearchSchema.StringPropertyConfig.TokenizerType;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.safeparcel.stub.StubCreators.DocumentIndexingConfigParcelCreator;
 import androidx.appsearch.safeparcel.stub.StubCreators.EmbeddingIndexingConfigParcelCreator;
 import androidx.appsearch.safeparcel.stub.StubCreators.IntegerIndexingConfigParcelCreator;
@@ -253,6 +255,26 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
                 /*joinableConfigParcel=*/ null,
                 Objects.requireNonNull(description),
                 new EmbeddingIndexingConfigParcel(indexingType, quantizationType));
+    }
+
+    /** Creates a {@link PropertyConfigParcel} for {@link AppSearchBlobHandle}. */
+    @NonNull
+    @ExperimentalAppSearchApi
+    public static PropertyConfigParcel createForBlobHandle(
+            @NonNull String propertyName,
+            @NonNull String description,
+            @Cardinality int cardinality) {
+        return new PropertyConfigParcel(
+                Objects.requireNonNull(propertyName),
+                AppSearchSchema.PropertyConfig.DATA_TYPE_BLOB_HANDLE,
+                cardinality,
+                /*schemaType=*/ null,
+                /*stringIndexingConfigParcel=*/ null,
+                /*documentIndexingConfigParcel=*/ null,
+                /*integerIndexingConfigParcel=*/ null,
+                /*joinableConfigParcel=*/ null,
+                Objects.requireNonNull(description),
+                /*embeddingIndexingConfigParcel=*/ null);
     }
 
     /** Gets name for the property. */

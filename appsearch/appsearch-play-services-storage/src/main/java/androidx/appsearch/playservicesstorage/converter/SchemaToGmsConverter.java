@@ -166,6 +166,10 @@ public final class SchemaToGmsConverter {
             //  become available but quantization has not yet.
             throw new UnsupportedOperationException(Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG
                     + " is not available on this AppSearch implementation.");
+        } else if (jetpackProperty instanceof AppSearchSchema.BlobHandlePropertyConfig) {
+            // TODO(b/273591938): Remove this once blob APIs are available.
+            throw new UnsupportedOperationException(Features.BLOB_STORAGE
+                    + " is not available on this AppSearch implementation.");
         } else {
             throw new IllegalArgumentException(
                     "Invalid dataType: " + jetpackProperty.getDataType());
