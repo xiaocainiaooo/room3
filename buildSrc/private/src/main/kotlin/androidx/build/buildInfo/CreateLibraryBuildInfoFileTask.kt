@@ -60,7 +60,6 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.configure
 import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
-import org.jetbrains.kotlin.utils.mapToSetOrEmpty
 
 /**
  * This task generates a library build information file containing the artifactId, groupId, and
@@ -321,8 +320,7 @@ fun Project.addCreateLibraryBuildInfoFileTasks(
                         shouldPublishDocs = androidXExtension.requiresDocs(),
                         isKmp = androidXKmpExtension.supportedPlatforms.isNotEmpty(),
                         buildTarget = buildTarget,
-                        kmpChildren =
-                            androidXKmpExtension.supportedPlatforms.mapToSetOrEmpty { it.id },
+                        kmpChildren = androidXKmpExtension.supportedPlatforms.map { it.id }.toSet(),
                         testModuleNames = androidXExtension.testModuleNames,
                         isolatedProjectEnabled = androidXExtension.isIsolatedProjectsEnabled(),
                     )
