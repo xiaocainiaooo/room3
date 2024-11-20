@@ -19,9 +19,12 @@ package androidx.appsearch.platformstorage.converter;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
+import androidx.appsearch.app.AppSearchBlobHandle;
 import androidx.appsearch.app.EmbeddingVector;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.Features;
 import androidx.appsearch.app.GenericDocument;
 import androidx.core.util.Preconditions;
@@ -41,6 +44,7 @@ public final class GenericDocumentToPlatformConverter {
      * {@link android.app.appsearch.GenericDocument}.
      */
     @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public static android.app.appsearch.GenericDocument toPlatformGenericDocument(
             @NonNull GenericDocument jetpackDocument) {
         Preconditions.checkNotNull(jetpackDocument);
@@ -92,6 +96,10 @@ public final class GenericDocumentToPlatformConverter {
             } else if (property instanceof EmbeddingVector[]) {
                 // TODO(b/326656531): Remove this once embedding search APIs are available.
                 throw new UnsupportedOperationException(Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG
+                        + " is not available on this AppSearch implementation.");
+            } else if (property instanceof AppSearchBlobHandle[]) {
+                // TODO(b/273591938): Remove this once blob APIs are available.
+                throw new UnsupportedOperationException(Features.BLOB_STORAGE
                         + " is not available on this AppSearch implementation.");
             } else {
                 throw new IllegalStateException(

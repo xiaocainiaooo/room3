@@ -24,6 +24,8 @@ import android.util.Log;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
+import androidx.annotation.RequiresFeature;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.annotation.CurrentTimeMillisLong;
@@ -424,6 +426,7 @@ public class GenericDocument {
      * @return the raw property
      */
     @Nullable
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     @SuppressWarnings("deprecation")
     private static Object getRawPropertyFromRawDocument(
             @NonNull PropertyPath path, int pathIndex,
@@ -484,6 +487,11 @@ public class GenericDocument {
                     EmbeddingVector[] embeddingValues = propertyParcel.getEmbeddingValues();
                     if (embeddingValues != null && index < embeddingValues.length) {
                         extractedValue = Arrays.copyOfRange(embeddingValues, index, index + 1);
+                    }
+                } else if (propertyParcel.getBlobHandleValues() != null) {
+                    AppSearchBlobHandle[] blobHandlesValues = propertyParcel.getBlobHandleValues();
+                    if (blobHandlesValues != null && index < blobHandlesValues.length) {
+                        extractedValue = Arrays.copyOfRange(blobHandlesValues, index, index + 1);
                     }
                 } else {
                     throw new IllegalStateException(
@@ -803,6 +811,31 @@ public class GenericDocument {
         return propertyArray[0];
     }
 
+    /**
+     * Retrieves an {@link AppSearchBlobHandle} property by path.
+     *
+     * <p>See {@link #getProperty} for a detailed description of the path syntax.
+     *
+     * <p>See {@link AppSearchSession#openBlobForReadAsync} for how to use
+     * {@link AppSearchBlobHandle} to retrieve blob data.
+     *
+     * @param path The path to look for.
+     * @return The first {@link AppSearchBlobHandle} associated with the given path or
+     * {@code null} if there is no such value or the value is of a different type.
+     */
+    @Nullable
+    @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
+    @ExperimentalAppSearchApi
+    public AppSearchBlobHandle getPropertyBlobHandle(@NonNull String path) {
+        Preconditions.checkNotNull(path);
+        AppSearchBlobHandle[] propertyArray = getPropertyBlobHandleArray(path);
+        if (propertyArray == null || propertyArray.length == 0) {
+            return null;
+        }
+        warnIfSinglePropertyTooLong("BlobHandle", path, propertyArray.length);
+        return propertyArray[0];
+    }
+
     /** Prints a warning to logcat if the given propertyLength is greater than 1. */
     private static void warnIfSinglePropertyTooLong(
             @NonNull String propertyType, @NonNull String path, int propertyLength) {
@@ -985,6 +1018,32 @@ public class GenericDocument {
         Preconditions.checkNotNull(path);
         Object value = getProperty(path);
         return safeCastProperty(path, value, EmbeddingVector[].class);
+    }
+
+    /**
+     * Retrieves a repeated {@code AppSearchBlobHandle[]} property by path.
+     *
+     * <p>See {@link #getProperty} for a detailed description of the path syntax.
+     *
+     * <p>If the property has not been set via {@link Builder#setPropertyBlobHandle}, this method
+     * returns {@code null}.
+     *
+     * <p>If it has been set via {@link Builder#setPropertyBlobHandle} to an empty
+     * {@code AppSearchBlobHandle[]}, this method returns an empty
+     * {@code AppSearchBlobHandle[]}.
+     *
+     * @param path The path to look for.
+     * @return The {@code AppSearchBlobHandle[]} associated with the given path, or
+     * {@code null} if no value is set or the value is of a different type.
+     */
+    @SuppressLint({"ArrayReturn", "NullableCollection"})
+    @Nullable
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
+    @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
+    public AppSearchBlobHandle[] getPropertyBlobHandleArray(@NonNull String path) {
+        Preconditions.checkNotNull(path);
+        Object value = getProperty(path);
+        return safeCastProperty(path, value, AppSearchBlobHandle[].class);
     }
 
     /**
@@ -1529,6 +1588,8 @@ public class GenericDocument {
         /**
          * Sets one or multiple {@code byte[]} for a property, replacing its previous values.
          *
+         * <p> For large byte data and lazy retrieval, see {@link #setPropertyBlobHandle}.
+         *
          * @param name   the name associated with the {@code values}. Must match the name
          *               for this property as given in
          *               {@link AppSearchSchema.PropertyConfig#getName}.
@@ -1594,6 +1655,9 @@ public class GenericDocument {
         @CanIgnoreReturnValue
         @NonNull
         @FlaggedApi(Flags.FLAG_ENABLE_SCHEMA_EMBEDDING_PROPERTY_CONFIG)
+        @RequiresFeature(
+                enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
+                name = Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG)
         public BuilderType setPropertyEmbedding(@NonNull String name,
                 @NonNull EmbeddingVector... values) {
             Preconditions.checkNotNull(name);
@@ -1603,6 +1667,45 @@ public class GenericDocument {
                 if (values[i] == null) {
                     throw new IllegalArgumentException(
                             "The EmbeddingVector at " + i + " is null.");
+                }
+            }
+            mDocumentParcelBuilder.putInPropertyMap(name, values);
+            return mBuilderTypeInstance;
+        }
+
+        /**
+         * Sets one or multiple {@link AppSearchBlobHandle} values for a property, replacing
+         * its previous values.
+         *
+         * <p>{@link AppSearchBlobHandle} is a pointer to a blob of data.
+         *
+         * <p>Store large byte via the {@link android.os.ParcelFileDescriptor} returned from
+         * {@link AppSearchSession#openBlobForWriteAsync}. Once the blob data is committed via
+         * {@link AppSearchSession#commitBlobAsync}, the blob is retrievable via
+         * {@link AppSearchSession#openBlobForReadAsync}.
+         *
+         * @param name   the name associated with the {@code values}. Must match the name
+         *               for this property as given in
+         *               {@link AppSearchSchema.PropertyConfig#getName}.
+         * @param values the {@link AppSearchBlobHandle} values of the property.
+         * @throws IllegalArgumentException if the name is empty or {@code null}.
+         */
+        @CanIgnoreReturnValue
+        @NonNull
+        @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
+        @ExperimentalAppSearchApi
+        @RequiresFeature(
+                enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
+                name = Features.BLOB_STORAGE)
+        public BuilderType setPropertyBlobHandle(@NonNull String name,
+                @NonNull AppSearchBlobHandle... values) {
+            Preconditions.checkNotNull(name);
+            Preconditions.checkNotNull(values);
+            validatePropertyName(name);
+            for (int i = 0; i < values.length; i++) {
+                if (values[i] == null) {
+                    throw new IllegalArgumentException(
+                            "The BlobHandle at " + i + " is null.");
                 }
             }
             mDocumentParcelBuilder.putInPropertyMap(name, values);

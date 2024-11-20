@@ -22,12 +22,15 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.annotation.CurrentTimeMillisLong;
+import androidx.appsearch.app.AppSearchBlobHandle;
 import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.AppSearchSession;
 import androidx.appsearch.app.EmbeddingVector;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.GenericDocument;
 import androidx.collection.ArrayMap;
 
@@ -276,6 +279,7 @@ public final class GenericDocumentParcel extends AbstractSafeParcelable implemen
     }
 
     /** The builder class for {@link GenericDocumentParcel}. */
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public static final class Builder {
         private String mNamespace;
         private String mId;
@@ -451,7 +455,7 @@ public final class GenericDocumentParcel extends AbstractSafeParcelable implemen
             return this;
         }
 
-        /** puts an array of {@link String} in property map. */
+        /** Puts an array of {@link String} in the property map. */
         @CanIgnoreReturnValue
         @NonNull
         public Builder putInPropertyMap(@NonNull String name, @NonNull String[] values)
@@ -461,7 +465,7 @@ public final class GenericDocumentParcel extends AbstractSafeParcelable implemen
             return this;
         }
 
-        /** puts an array of boolean in property map. */
+        /** Puts an array of boolean in the property map. */
         @CanIgnoreReturnValue
         @NonNull
         public Builder putInPropertyMap(@NonNull String name, @NonNull boolean[] values) {
@@ -470,7 +474,7 @@ public final class GenericDocumentParcel extends AbstractSafeParcelable implemen
             return this;
         }
 
-        /** puts an array of double in property map. */
+        /** Puts an array of double in the property map. */
         @CanIgnoreReturnValue
         @NonNull
         public Builder putInPropertyMap(@NonNull String name, @NonNull double[] values) {
@@ -479,7 +483,7 @@ public final class GenericDocumentParcel extends AbstractSafeParcelable implemen
             return this;
         }
 
-        /** puts an array of long in property map. */
+        /** Puts an array of long in the property map. */
         @CanIgnoreReturnValue
         @NonNull
         public Builder putInPropertyMap(@NonNull String name, @NonNull long[] values) {
@@ -499,7 +503,7 @@ public final class GenericDocumentParcel extends AbstractSafeParcelable implemen
             return this;
         }
 
-        /** puts an array of {@link GenericDocumentParcel} in property map. */
+        /** Puts an array of {@link GenericDocumentParcel} in the property map. */
         @CanIgnoreReturnValue
         @NonNull
         public Builder putInPropertyMap(@NonNull String name,
@@ -509,7 +513,7 @@ public final class GenericDocumentParcel extends AbstractSafeParcelable implemen
             return this;
         }
 
-        /** puts an array of {@link EmbeddingVector} in property map. */
+        /** Puts an array of {@link EmbeddingVector} in the property map. */
         @CanIgnoreReturnValue
         @NonNull
         public Builder putInPropertyMap(@NonNull String name,
@@ -519,7 +523,19 @@ public final class GenericDocumentParcel extends AbstractSafeParcelable implemen
             return this;
         }
 
-        /** Directly puts a {@link PropertyParcel} in property map. */
+        /** Puts an array of {@link AppSearchBlobHandle} in the property map. */
+        @CanIgnoreReturnValue
+        @NonNull
+        @ExperimentalAppSearchApi
+        public Builder putInPropertyMap(@NonNull String name,
+                @NonNull AppSearchBlobHandle[] values) {
+            Objects.requireNonNull(values);
+            putInPropertyMap(name,
+                    new PropertyParcel.Builder(name).setBlobHandleValues(values).build());
+            return this;
+        }
+
+        /** Directly puts a {@link PropertyParcel} in the property map. */
         @CanIgnoreReturnValue
         @NonNull
         public Builder putInPropertyMap(@NonNull String name,

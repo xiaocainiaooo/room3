@@ -396,6 +396,8 @@ package androidx.appsearch.app {
     method public String getId();
     method public String getNamespace();
     method public Object? getProperty(String);
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public androidx.appsearch.app.AppSearchBlobHandle? getPropertyBlobHandle(String);
+    method public androidx.appsearch.app.AppSearchBlobHandle![]? getPropertyBlobHandleArray(String);
     method public boolean getPropertyBoolean(String);
     method public boolean[]? getPropertyBooleanArray(String);
     method public byte[]? getPropertyBytes(String);
@@ -426,11 +428,12 @@ package androidx.appsearch.app {
     method public BuilderType setCreationTimestampMillis(long);
     method public BuilderType setId(String);
     method public BuilderType setNamespace(String);
+    method @SuppressCompatibility @RequiresFeature(enforcement="androidx.appsearch.app.Features#isFeatureSupported", name="BLOB_STORAGE") @androidx.appsearch.app.ExperimentalAppSearchApi public BuilderType setPropertyBlobHandle(String, androidx.appsearch.app.AppSearchBlobHandle!...);
     method public BuilderType setPropertyBoolean(String, boolean...);
     method public BuilderType setPropertyBytes(String, byte[]!...);
     method public BuilderType setPropertyDocument(String, androidx.appsearch.app.GenericDocument!...);
     method public BuilderType setPropertyDouble(String, double...);
-    method public BuilderType setPropertyEmbedding(String, androidx.appsearch.app.EmbeddingVector!...);
+    method @RequiresFeature(enforcement="androidx.appsearch.app.Features#isFeatureSupported", name=androidx.appsearch.app.Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG) public BuilderType setPropertyEmbedding(String, androidx.appsearch.app.EmbeddingVector!...);
     method public BuilderType setPropertyLong(String, long...);
     method public BuilderType setPropertyString(String, java.lang.String!...);
     method public BuilderType setSchemaType(String);
