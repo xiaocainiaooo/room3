@@ -42,6 +42,7 @@ import androidx.appsearch.app.AppSearchSession;
 import androidx.appsearch.app.Features;
 import androidx.appsearch.app.GetSchemaResponse;
 import androidx.appsearch.app.SetSchemaRequest;
+import androidx.appsearch.app.StorageInfo;
 import androidx.appsearch.flags.CheckFlagsRule;
 import androidx.appsearch.flags.DeviceFlagsValueProvider;
 import androidx.appsearch.flags.Flags;
@@ -102,9 +103,9 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         byte[] digest1 = calculateDigest(data1);
         byte[] digest2 = calculateDigest(data2);
         AppSearchBlobHandle handle1 = AppSearchBlobHandle.createWithSha256(
-                digest1, mPackageName, DB_NAME_1, "ns");
+                digest1, mPackageName, DB_NAME_1, "namespace");
         AppSearchBlobHandle handle2 = AppSearchBlobHandle.createWithSha256(
-                digest2, mPackageName, DB_NAME_1, "ns");
+                digest2, mPackageName, DB_NAME_1, "namespace");
 
         try (AppSearchOpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle1, handle2)).get()) {
@@ -162,7 +163,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         byte[] data = generateRandomBytes(10); // 10 Bytes
         byte[] digest = calculateDigest(data);
         AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
-                digest, mPackageName, DB_NAME_1, "ns");
+                digest, mPackageName, DB_NAME_1, "namespace");
 
         try (AppSearchOpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle)).get()) {
@@ -200,7 +201,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         byte[] data = generateRandomBytes(10); // 10 Bytes
         byte[] digest = calculateDigest(data);
         AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
-                digest, mPackageName, DB_NAME_1, "ns");
+                digest, mPackageName, DB_NAME_1, "namespace");
 
         try (AppSearchOpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle)).get()) {
@@ -252,7 +253,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         byte[] data = generateRandomBytes(10); // 10 Bytes
         byte[] digest = calculateDigest(data);
         AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
-                digest, mPackageName, DB_NAME_1, "ns");
+                digest, mPackageName, DB_NAME_1, "namespace");
 
         try (AppSearchOpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle)).get()) {
@@ -277,7 +278,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         byte[] data = generateRandomBytes(10); // 10 Bytes
         byte[] digest = calculateDigest(data);
         AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
-                digest, mPackageName, DB_NAME_1, "ns");
+                digest, mPackageName, DB_NAME_1, "namespace");
 
         try (AppSearchOpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle)).get()) {
@@ -320,7 +321,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         byte[] data2 = generateRandomBytes(10); // 10 Bytes
         byte[] digest = calculateDigest(data1);
         AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
-                digest, mPackageName, DB_NAME_1, "ns");
+                digest, mPackageName, DB_NAME_1, "namespace");
 
         try (AppSearchOpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle)).get()) {
@@ -347,6 +348,48 @@ public abstract class AppSearchSessionBlobCtsTestBase {
                 .isEqualTo(RESULT_INVALID_ARGUMENT);
         assertThat(commitResult.getFailures().get(handle).getErrorMessage())
                 .contains("The blob content doesn't match to the digest");
+    }
+
+    // TODO(b/273591938) add test to get storage after abandon a blob, when abandon blob API is
+    //  ready.
+    @Test
+    public void testGetStorageInfo() throws Exception {
+        assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
+
+        mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
+        byte[] data1 = generateRandomBytes(10 * 1024); // 10 KiB
+        byte[] data2 = generateRandomBytes(20 * 1024); // 20 KiB
+        byte[] digest1 = calculateDigest(data1);
+        byte[] digest2 = calculateDigest(data2);
+        AppSearchBlobHandle handle1 = AppSearchBlobHandle.createWithSha256(
+                digest1, mPackageName, DB_NAME_1, "namespace");
+        AppSearchBlobHandle handle2 = AppSearchBlobHandle.createWithSha256(
+                digest2, mPackageName, DB_NAME_1, "namespace");
+
+        AppSearchOpenBlobForWriteResponse writeResponse =
+                mDb1.openBlobForWriteAsync(ImmutableSet.of(handle1, handle2)).get();
+        AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
+                writeResponse.getResult();
+        assertTrue(writeResult.isSuccess());
+
+        ParcelFileDescriptor writePfd1 = writeResult.getSuccesses().get(handle1);
+        try (OutputStream outputStream =
+                     new ParcelFileDescriptor.AutoCloseOutputStream(writePfd1)) {
+            outputStream.write(data1);
+            outputStream.flush();
+        }
+
+        ParcelFileDescriptor writePfd2 = writeResult.getSuccesses().get(handle2);
+        try (OutputStream outputStream =
+                     new ParcelFileDescriptor.AutoCloseOutputStream(writePfd2)) {
+            outputStream.write(data2);
+            outputStream.flush();
+        }
+        writeResponse.close();
+
+        StorageInfo storageInfo = mDb1.getStorageInfoAsync().get();
+        assertThat(storageInfo.getBlobCount()).isEqualTo(2);
+        assertThat(storageInfo.getBlobSizeBytes()).isEqualTo(30 * 1024);
     }
 
     @Test
@@ -469,7 +512,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         byte[] data = generateRandomBytes(10); // 10 Bytes
         byte[] digest = calculateDigest(data);
         AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
-                digest, mPackageName, DB_NAME_1, "ns");
+                digest, mPackageName, DB_NAME_1, "namespace");
 
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class,
                 () -> mDb1.openBlobForWriteAsync(ImmutableSet.of(handle)));
