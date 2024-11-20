@@ -141,6 +141,13 @@ public interface Features {
 
     /**
      * Feature for {@link #isFeatureSupported(String)}. This feature covers
+     * {@link AppSearchSchema.EmbeddingPropertyConfig.Builder#setQuantizationType(int)}.
+     */
+    @ExperimentalAppSearchApi
+    String SCHEMA_EMBEDDING_QUANTIZATION = "SCHEMA_EMBEDDING_QUANTIZATION";
+
+    /**
+     * Feature for {@link #isFeatureSupported(String)}. This feature covers
      * {@link SearchSpec#GROUPING_TYPE_PER_SCHEMA}
      */
     String SEARCH_SPEC_GROUPING_TYPE_PER_SCHEMA = "SEARCH_SPEC_GROUPING_TYPE_PER_SCHEMA";

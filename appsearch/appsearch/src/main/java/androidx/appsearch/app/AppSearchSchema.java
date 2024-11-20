@@ -1744,6 +1744,29 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
          */
         public static final int INDEXING_TYPE_SIMILARITY = 1;
 
+        /**
+         * Indicates whether the vector contents of this property should be quantized.
+         *
+         * @exportToFramework:hide
+         */
+        @IntDef(value = {
+                QUANTIZATION_TYPE_NONE,
+                QUANTIZATION_TYPE_8_BIT,
+        })
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        @Retention(RetentionPolicy.SOURCE)
+        @ExperimentalAppSearchApi
+        public @interface QuantizationType {
+        }
+
+        /** Contents in this property will not be quantized. */
+        @ExperimentalAppSearchApi
+        public static final int QUANTIZATION_TYPE_NONE = 0;
+
+        /** Contents in this property will be quantized to 8 bits. */
+        @ExperimentalAppSearchApi
+        public static final int QUANTIZATION_TYPE_8_BIT = 1;
+
         EmbeddingPropertyConfig(@NonNull PropertyConfigParcel propertyConfigParcel) {
             super(propertyConfigParcel);
         }
@@ -1759,8 +1782,26 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             return indexingConfigParcel.getIndexingType();
         }
 
+        /**
+         * Returns how the embedding contents of this property should be quantized.
+         *
+         * <p>If the property isn't indexed, returns {@link #QUANTIZATION_TYPE_NONE}.
+         */
+        @EmbeddingPropertyConfig.QuantizationType
+        @ExperimentalAppSearchApi
+        @FlaggedApi(Flags.FLAG_ENABLE_SCHEMA_EMBEDDING_QUANTIZATION)
+        public int getQuantizationType() {
+            PropertyConfigParcel.EmbeddingIndexingConfigParcel indexingConfigParcel =
+                    mPropertyConfigParcel.getEmbeddingIndexingConfigParcel();
+            if (indexingConfigParcel == null) {
+                return QUANTIZATION_TYPE_NONE;
+            }
+            return indexingConfigParcel.getQuantizationType();
+        }
+
         /** Builder for {@link EmbeddingPropertyConfig}. */
         @FlaggedApi(Flags.FLAG_ENABLE_SCHEMA_EMBEDDING_PROPERTY_CONFIG)
+        @OptIn(markerClass = ExperimentalAppSearchApi.class)
         public static final class Builder {
             private final String mPropertyName;
             private String mDescription = "";
@@ -1768,6 +1809,8 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             private int mCardinality = CARDINALITY_OPTIONAL;
             @EmbeddingPropertyConfig.IndexingType
             private int mIndexingType = INDEXING_TYPE_NONE;
+            @EmbeddingPropertyConfig.QuantizationType
+            private int mQuantizationType = QUANTIZATION_TYPE_NONE;
 
             /** Creates a new {@link EmbeddingPropertyConfig.Builder}. */
             public Builder(@NonNull String propertyName) {
@@ -1828,6 +1871,33 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             }
 
             /**
+             * Configures whether the vector contents of this property should be quantized.
+             *
+             * <p>Quantization can reduce the size of the embedding search index, potentially
+             * leading to faster embedding search due to lower I/O bandwidth. Quantization is
+             * usually very reliable and in most cases will have a negligible impact on recall.
+             * Using quantization is strongly recommended.
+             *
+             * <p>If this method is not called, the default quantization type is
+             * {@link EmbeddingPropertyConfig#QUANTIZATION_TYPE_NONE}.
+             */
+            @ExperimentalAppSearchApi
+            @RequiresFeature(
+                    enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
+                    name = Features.SCHEMA_EMBEDDING_QUANTIZATION)
+            @FlaggedApi(Flags.FLAG_ENABLE_SCHEMA_EMBEDDING_QUANTIZATION)
+            @CanIgnoreReturnValue
+            @NonNull
+            public EmbeddingPropertyConfig.Builder setQuantizationType(
+                    @EmbeddingPropertyConfig.QuantizationType int quantizationType) {
+                Preconditions.checkArgumentInRange(
+                        quantizationType, QUANTIZATION_TYPE_NONE, QUANTIZATION_TYPE_8_BIT,
+                        "quantizationType");
+                mQuantizationType = quantizationType;
+                return this;
+            }
+
+            /**
              * Constructs a new {@link EmbeddingPropertyConfig} from the contents of this
              * builder.
              */
@@ -1835,7 +1905,8 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             public EmbeddingPropertyConfig build() {
                 return new EmbeddingPropertyConfig(
                         PropertyConfigParcel.createForEmbedding(
-                                mPropertyName, mDescription, mCardinality, mIndexingType));
+                                mPropertyName, mDescription, mCardinality, mIndexingType,
+                                mQuantizationType));
             }
         }
     }

@@ -240,7 +240,8 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
             @NonNull String propertyName,
             @NonNull String description,
             @Cardinality int cardinality,
-            @AppSearchSchema.EmbeddingPropertyConfig.IndexingType int indexingType) {
+            @AppSearchSchema.EmbeddingPropertyConfig.IndexingType int indexingType,
+            @AppSearchSchema.EmbeddingPropertyConfig.QuantizationType int quantizationType) {
         return new PropertyConfigParcel(
                 Objects.requireNonNull(propertyName),
                 AppSearchSchema.PropertyConfig.DATA_TYPE_EMBEDDING,
@@ -251,7 +252,7 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
                 /*integerIndexingConfigParcel=*/ null,
                 /*joinableConfigParcel=*/ null,
                 Objects.requireNonNull(description),
-                new EmbeddingIndexingConfigParcel(indexingType));
+                new EmbeddingIndexingConfigParcel(indexingType, quantizationType));
     }
 
     /** Gets name for the property. */
@@ -643,18 +644,31 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
         @Field(id = 1, getter = "getIndexingType")
         private final int mIndexingType;
 
+        @AppSearchSchema.EmbeddingPropertyConfig.QuantizationType
+        @Field(id = 2, getter = "getQuantizationType")
+        private final int mQuantizationType;
+
         /** Constructor for {@link EmbeddingIndexingConfigParcel}. */
         @Constructor
         public EmbeddingIndexingConfigParcel(
                 @Param(id = 1) @AppSearchSchema.EmbeddingPropertyConfig.IndexingType
-                int indexingType) {
+                int indexingType,
+                @Param(id = 2) @AppSearchSchema.EmbeddingPropertyConfig.QuantizationType
+                int quantizationType) {
             mIndexingType = indexingType;
+            mQuantizationType = quantizationType;
         }
 
         /** Gets the indexing type for this embedding property. */
         @AppSearchSchema.EmbeddingPropertyConfig.IndexingType
         public int getIndexingType() {
             return mIndexingType;
+        }
+
+        /** Gets the quantization type for this embedding property. */
+        @AppSearchSchema.EmbeddingPropertyConfig.QuantizationType
+        public int getQuantizationType() {
+            return mQuantizationType;
         }
 
         @Override
@@ -664,7 +678,7 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
 
         @Override
         public int hashCode() {
-            return ObjectsCompat.hashCode(mIndexingType);
+            return ObjectsCompat.hash(mIndexingType, mQuantizationType);
         }
 
         @Override
@@ -676,13 +690,15 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
                 return false;
             }
             EmbeddingIndexingConfigParcel otherObject = (EmbeddingIndexingConfigParcel) other;
-            return ObjectsCompat.equals(mIndexingType, otherObject.mIndexingType);
+            return ObjectsCompat.equals(mIndexingType, otherObject.mIndexingType)
+                    && ObjectsCompat.equals(mQuantizationType, otherObject.mQuantizationType);
         }
 
         @Override
         @NonNull
         public String toString() {
-            return "{indexingType: " + mIndexingType + "}";
+            return "{indexingType: " + mIndexingType
+                    + ", quantizationType: " + mQuantizationType + "}";
         }
     }
 }

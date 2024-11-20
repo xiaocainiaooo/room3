@@ -154,6 +154,9 @@ public class SchemaToProtoConverterTest {
                                         EmbeddingIndexingConfig.newBuilder()
                                                 .setEmbeddingIndexingType(EmbeddingIndexingConfig
                                                         .EmbeddingIndexingType.Code.LINEAR_SEARCH)
+                                                .setQuantizationType(
+                                                        EmbeddingIndexingConfig
+                                                                .QuantizationType.Code.NONE)
                                 ))
                         .addProperties(
                                 PropertyConfigProto.newBuilder()
@@ -414,6 +417,20 @@ public class SchemaToProtoConverterTest {
                                 .setIndexingType(
                                         AppSearchSchema.EmbeddingPropertyConfig
                                                 .INDEXING_TYPE_SIMILARITY)
+                                .setQuantizationType(
+                                        AppSearchSchema.EmbeddingPropertyConfig
+                                                .QUANTIZATION_TYPE_NONE)
+                                .build())
+                .addProperty(
+                        new AppSearchSchema.EmbeddingPropertyConfig.Builder("quantizedEmbedding")
+                                .setCardinality(
+                                        AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL)
+                                .setIndexingType(
+                                        AppSearchSchema.EmbeddingPropertyConfig
+                                                .INDEXING_TYPE_SIMILARITY)
+                                .setQuantizationType(
+                                        AppSearchSchema.EmbeddingPropertyConfig
+                                                .QUANTIZATION_TYPE_8_BIT)
                                 .build())
                 .build();
 
@@ -458,6 +475,22 @@ public class SchemaToProtoConverterTest {
                                         .setEmbeddingIndexingType(
                                                 EmbeddingIndexingConfig.EmbeddingIndexingType.Code
                                                         .LINEAR_SEARCH)
+                                        .setQuantizationType(
+                                                EmbeddingIndexingConfig.QuantizationType.Code.NONE)
+                        )
+                ).addProperties(PropertyConfigProto.newBuilder()
+                        .setPropertyName("quantizedEmbedding")
+                        .setDescription("")
+                        .setDataType(PropertyConfigProto.DataType.Code.VECTOR)
+                        .setCardinality(PropertyConfigProto.Cardinality.Code.OPTIONAL)
+                        .setEmbeddingIndexingConfig(
+                                EmbeddingIndexingConfig.newBuilder()
+                                        .setEmbeddingIndexingType(
+                                                EmbeddingIndexingConfig.EmbeddingIndexingType.Code
+                                                        .LINEAR_SEARCH)
+                                        .setQuantizationType(
+                                                EmbeddingIndexingConfig
+                                                        .QuantizationType.Code.QUANTIZE_8_BIT)
                         )
                 ).build();
 

@@ -110,6 +110,12 @@ public class FlagsTest {
     }
 
     @Test
+    public void testFlagValue_enableSchemaEmbeddingQuantization() {
+        assertThat(Flags.FLAG_ENABLE_SCHEMA_EMBEDDING_QUANTIZATION)
+                .isEqualTo("com.android.appsearch.flags.enable_schema_embedding_quantization");
+    }
+
+    @Test
     public void testFlagValue_enableSearchSpecSearchStringParameters() {
         assertThat(Flags.FLAG_ENABLE_SEARCH_SPEC_SEARCH_STRING_PARAMETERS)
                 .isEqualTo(
