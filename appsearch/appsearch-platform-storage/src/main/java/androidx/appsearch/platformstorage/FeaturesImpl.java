@@ -136,6 +136,9 @@ final class FeaturesImpl implements Features {
             case Features.SEARCH_SPEC_ADD_FILTER_DOCUMENT_IDS:
                 // TODO(b/367464836) : Update when feature is ready in service-appsearch.
                 // fall through
+            case Features.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION:
+                // TODO(b/377215223) : Update when feature is ready in service-appsearch.
+                // fall through
             default:
                 return false;
         }

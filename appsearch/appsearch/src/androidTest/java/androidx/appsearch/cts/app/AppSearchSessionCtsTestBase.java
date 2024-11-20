@@ -7187,6 +7187,143 @@ public abstract class AppSearchSessionCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION)
+    public void testQuery_matchScoreExpression() throws Exception {
+        assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.LIST_FILTER_QUERY_LANGUAGE));
+        assumeTrue(
+                mDb1.getFeatures().isFeatureSupported(
+                        Features.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION));
+        AppSearchSchema schema = new AppSearchSchema.Builder("Schema")
+                .addProperty(new StringPropertyConfig.Builder("prop")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setIndexingType(StringPropertyConfig.INDEXING_TYPE_PREFIXES)
+                        .setTokenizerType(StringPropertyConfig.TOKENIZER_TYPE_PLAIN)
+                        .build()
+                ).build();
+        mDb1.setSchemaAsync(new SetSchemaRequest.Builder()
+                .setForceOverride(true).addSchemas(schema).build()).get();
+
+        // Put documents with document scores 3, 4, and 5.
+        GenericDocument doc1 = new GenericDocument.Builder<>(
+                "namespace", "id1", "Schema")
+                .setPropertyString("prop", "Hello, world!")
+                .setScore(3)
+                .build();
+        GenericDocument doc2 = new GenericDocument.Builder<>(
+                "namespace", "id2", "Schema")
+                .setPropertyString("prop", "Hello, world!")
+                .setScore(4)
+                .build();
+        GenericDocument doc3 = new GenericDocument.Builder<>(
+                "namespace", "id3", "Schema")
+                .setPropertyString("prop", "Hello, world!")
+                .setScore(5)
+                .build();
+        mDb1.putAsync(new PutDocumentsRequest.Builder()
+                .addGenericDocuments(doc1, doc2, doc3).build()).get();
+
+        // Get documents of scores in [3, 4], which should return doc1 and doc2.
+        SearchSpec searchSpec = new SearchSpec.Builder()
+                .setListFilterQueryLanguageEnabled(true)
+                .setListFilterMatchScoreExpressionFunctionEnabled(true)
+                .setTermMatch(SearchSpec.TERM_MATCH_EXACT_ONLY)
+                .build();
+        SearchResults searchResults = mDb1.search(
+                "matchScoreExpression(\"this.documentScore()\", 3, 4)", searchSpec);
+        List<SearchResult> page = searchResults.getNextPageAsync().get();
+        assertThat(page).hasSize(2);
+        assertThat(page.get(0).getGenericDocument().getId()).isEqualTo("id2");
+        assertThat(page.get(1).getGenericDocument().getId()).isEqualTo("id1");
+
+        // Get documents of scores in [3, 5], which should return all documents.
+        searchResults = mDb1.search(
+                "matchScoreExpression(\"this.documentScore()\", 3, 5)", searchSpec);
+        page = searchResults.getNextPageAsync().get();
+        assertThat(page).hasSize(3);
+        assertThat(page.get(0).getGenericDocument().getId()).isEqualTo("id3");
+        assertThat(page.get(1).getGenericDocument().getId()).isEqualTo("id2");
+        assertThat(page.get(2).getGenericDocument().getId()).isEqualTo("id1");
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION)
+    public void testQuery_listFilterQueryMatchScoreExpressionFunction_notSupported()
+            throws Exception {
+        assumeFalse(
+                mDb1.getFeatures().isFeatureSupported(
+                        Features.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION));
+
+        // UnsupportedOperationException will be thrown with these queries so no need to
+        // define a schema and index document.
+        SearchSpec.Builder builder = new SearchSpec.Builder();
+        SearchSpec searchSpec = builder
+                .setListFilterMatchScoreExpressionFunctionEnabled(true)
+                .build();
+
+        UnsupportedOperationException exception = assertThrows(
+                UnsupportedOperationException.class,
+                () -> mDb1.search("\"Hello, world!\"", searchSpec));
+        assertThat(exception).hasMessageThat().contains(
+                Features.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION
+                        + " is not available on this AppSearch implementation.");
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION)
+    public void testQuery_matchScoreExpressionFunctionWithoutEnablingFeatureFails()
+            throws Exception {
+        assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.LIST_FILTER_QUERY_LANGUAGE));
+        assumeTrue(mDb1.getFeatures().isFeatureSupported(
+                Features.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION));
+        AppSearchSchema schema = new AppSearchSchema.Builder("Schema")
+                .addProperty(new StringPropertyConfig.Builder("prop")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setIndexingType(StringPropertyConfig.INDEXING_TYPE_PREFIXES)
+                        .setTokenizerType(StringPropertyConfig.TOKENIZER_TYPE_PLAIN)
+                        .build()
+                ).build();
+        mDb1.setSchemaAsync(new SetSchemaRequest.Builder()
+                .setForceOverride(true).addSchemas(schema).build()).get();
+
+        GenericDocument doc = new GenericDocument.Builder<>(
+                "namespace", "id", "Schema")
+                .setPropertyString("prop", "Hello, world!")
+                .build();
+        mDb1.putAsync(new PutDocumentsRequest.Builder().addGenericDocuments(doc).build()).get();
+
+        // Enable LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION but disable
+        // LIST_FILTER_QUERY_LANGUAGE in the SearchSpec.
+        SearchSpec searchSpec = new SearchSpec.Builder()
+                .setListFilterQueryLanguageEnabled(false)
+                .setListFilterMatchScoreExpressionFunctionEnabled(true)
+                .build();
+        SearchResults searchResults = mDb1.search(
+                "matchScoreExpression(\"this.documentScore()\", 3, 4)", searchSpec);
+        ExecutionException executionException = assertThrows(ExecutionException.class,
+                () -> searchResults.getNextPageAsync().get());
+        assertThat(executionException).hasCauseThat().isInstanceOf(AppSearchException.class);
+        AppSearchException exception = (AppSearchException) executionException.getCause();
+        assertThat(exception.getResultCode()).isEqualTo(RESULT_INVALID_ARGUMENT);
+        assertThat(exception).hasMessageThat().contains("Attempted use of unenabled feature");
+        assertThat(exception).hasMessageThat().contains(Features.LIST_FILTER_QUERY_LANGUAGE);
+
+        // Disable LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION in the SearchSpec.
+        searchSpec = new SearchSpec.Builder()
+                .setListFilterQueryLanguageEnabled(true)
+                .setListFilterMatchScoreExpressionFunctionEnabled(false)
+                .build();
+        SearchResults searchResults2 = mDb1.search(
+                "matchScoreExpression(\"this.documentScore()\", 3, 4)", searchSpec);
+        executionException = assertThrows(ExecutionException.class,
+                () -> searchResults2.getNextPageAsync().get());
+        assertThat(executionException).hasCauseThat().isInstanceOf(AppSearchException.class);
+        exception = (AppSearchException) executionException.getCause();
+        assertThat(exception.getResultCode()).isEqualTo(RESULT_INVALID_ARGUMENT);
+        assertThat(exception).hasMessageThat().contains("Attempted use of unenabled feature");
+        assertThat(exception).hasMessageThat().contains("MATCH_SCORE_EXPRESSION");
+    }
+
+    @Test
     public void testQuery_propertyWeightsNotSupported() throws Exception {
         assumeFalse(mDb1.getFeatures().isFeatureSupported(Features.SEARCH_SPEC_PROPERTY_WEIGHTS));
 

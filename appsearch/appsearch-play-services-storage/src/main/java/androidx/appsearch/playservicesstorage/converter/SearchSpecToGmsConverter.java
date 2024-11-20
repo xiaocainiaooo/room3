@@ -90,6 +90,12 @@ public final class SearchSpecToGmsConverter {
             if (jetpackSearchSpec.isListFilterHasPropertyFunctionEnabled()) {
                 gmsBuilder.setListFilterHasPropertyFunctionEnabled(true);
             }
+            if (jetpackSearchSpec.isListFilterMatchScoreExpressionFunctionEnabled()) {
+                // TODO(b/377215223): Remove this once matchScoreExpression is supported.
+                throw new UnsupportedOperationException(
+                        Features.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION
+                                + " is not available on this AppSearch implementation.");
+            }
         }
         if (!jetpackSearchSpec.getEmbeddingParameters().isEmpty()) {
             // TODO(b/326656531): Remove this once embedding search APIs are available.
