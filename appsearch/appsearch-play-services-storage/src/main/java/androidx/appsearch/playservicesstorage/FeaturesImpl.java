@@ -91,6 +91,8 @@ final class FeaturesImpl implements Features {
                 // fall through
             case Features.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION:
                 // fall through
+            case Features.SCHEMA_SCORABLE_PROPERTY_CONFIG:
+                // fall through
             default:
                 return false; // AppSearch features absent in GMSCore AppSearch.
         }

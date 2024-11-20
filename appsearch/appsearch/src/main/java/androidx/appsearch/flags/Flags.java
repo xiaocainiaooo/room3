@@ -162,6 +162,10 @@ public final class Flags {
     public static final String FLAG_ENABLE_ABSTRACT_SYNTAX_TREES =
             FLAG_PREFIX + "enable_abstract_syntax_trees";
 
+    /** Enables the feature of scorable property. */
+    public static final String FLAG_ENABLE_SCORABLE_PROPERTY =
+            FLAG_PREFIX + "enable_scorable_property";
+
     /**
      * Enable the {@link androidx.appsearch.app.SearchSpec.Builder#addFilterDocumentIds}.
      */
@@ -346,6 +350,11 @@ public final class Flags {
      * enabled.
      */
     public static boolean enableSearchSpecFilterDocumentIds() {
+        return true;
+    }
+
+    /** Whether the feature of the scorable property should be enabled. */
+    public static boolean enableScorableProperty() {
         return true;
     }
 }

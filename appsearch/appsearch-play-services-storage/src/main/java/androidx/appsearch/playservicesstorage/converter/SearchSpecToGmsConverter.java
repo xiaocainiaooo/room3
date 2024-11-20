@@ -138,6 +138,13 @@ public final class SearchSpecToGmsConverter {
                             + " is not available on this AppSearch implementation.");
         }
 
+        if (jetpackSearchSpec.isScorablePropertyRankingEnabled()) {
+            // TODO(b/379743983): Remove once this feature is available.
+            throw new UnsupportedOperationException(
+                    Features.SCHEMA_SCORABLE_PROPERTY_CONFIG
+                            + " is not available on this AppSearch implementation.");
+        }
+
         return gmsBuilder.build();
     }
 }
