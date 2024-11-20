@@ -148,9 +148,6 @@ val taskNamesKnownToDuplicateOutputs =
         // destinationDirectory to the project's build directory
         "wasmJsTestTestDevelopmentExecutableCompileSync",
         "wasmJsTestTestProductionExecutableCompileSync",
-
-        // TODO file a bug
-        "kotlinNodeJsSetup",
     )
 
 fun shouldValidateTaskOutput(task: Task): Boolean {
