@@ -56,6 +56,13 @@ package androidx.camera.viewfinder.core {
     property public int width;
   }
 
+  public interface ViewfinderSurfaceSession extends java.lang.AutoCloseable {
+    method public androidx.camera.viewfinder.core.ViewfinderSurfaceRequest getRequest();
+    method public android.view.Surface getSurface();
+    property public abstract androidx.camera.viewfinder.core.ViewfinderSurfaceRequest request;
+    property public abstract android.view.Surface surface;
+  }
+
   public final class ViewfinderSurfaceRequestUtil {
     method public static androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.Builder populateFromCharacteristics(androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.Builder, android.hardware.camera2.CameraCharacteristics cameraCharacteristics);
   }
