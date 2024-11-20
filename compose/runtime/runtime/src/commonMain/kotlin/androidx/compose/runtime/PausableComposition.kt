@@ -171,7 +171,7 @@ internal class PausedCompositionImpl(
 ) : PausedComposition {
     private var state = PausedCompositionState.InitialPending
     private var invalidScopes = emptyScatterSet<RecomposeScopeImpl>()
-    internal val rememberManager = RememberEventDispatcher(abandonSet)
+    internal val rememberManager = RememberEventDispatcher(abandonSet, composer.errorContext)
     internal val pausableApplier = RecordingApplier(applier.current)
 
     override val isComplete: Boolean

@@ -150,7 +150,7 @@ interface CompositionTestScope : CoroutineScope {
     var validator: (MockViewValidator.() -> Unit)?
 
     /** Access to the composition created for the call to [compose] */
-    val composition: Composition?
+    var composition: Composition?
 }
 
 /** Create a mock view validator and validate the view. */

@@ -27,7 +27,10 @@ internal expect class DiagnosticComposeException(
     trace: List<ComposeTraceFrame>,
 ) : RuntimeException
 
-internal class ComposeTraceFrame(val sourceInfo: ParsedSourceInformation, val groupOffset: Int?)
+internal data class ComposeTraceFrame(
+    val sourceInfo: ParsedSourceInformation,
+    val groupOffset: Int?
+)
 
 internal class ParsedSourceInformation(
     val isCall: Boolean,

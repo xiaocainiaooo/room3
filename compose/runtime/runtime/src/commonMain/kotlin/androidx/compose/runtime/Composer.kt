@@ -48,11 +48,12 @@ import androidx.compose.runtime.snapshots.fastMap
 import androidx.compose.runtime.snapshots.fastToSet
 import androidx.compose.runtime.tooling.ComposeTraceFrame
 import androidx.compose.runtime.tooling.CompositionData
+import androidx.compose.runtime.tooling.CompositionErrorContextImpl
 import androidx.compose.runtime.tooling.CompositionGroup
 import androidx.compose.runtime.tooling.CompositionInstance
 import androidx.compose.runtime.tooling.LocalInspectionTables
 import androidx.compose.runtime.tooling.attachComposeTrace
-import androidx.compose.runtime.tooling.currentTrace
+import androidx.compose.runtime.tooling.buildTrace
 import androidx.compose.runtime.tooling.findLocation
 import androidx.compose.runtime.tooling.findSubcompositionContextGroup
 import androidx.compose.runtime.tooling.traceForGroup
@@ -1424,8 +1425,10 @@ internal class ComposerImpl(
     private var reusingGroup = -1
     private var childrenComposing: Int = 0
     private var compositionToken: Int = 0
+
     private var sourceMarkersEnabled =
         parentContext.collectingSourceInformation || parentContext.collectingCallByInformation
+
     private val derivedStateObserver =
         object : DerivedStateObserver {
             override fun start(derivedState: DerivedState<*>) {
@@ -1470,6 +1473,9 @@ internal class ComposerImpl(
 
     private var pausable: Boolean = false
     private var shouldPauseCallback: ShouldPauseCallback? = null
+
+    internal val errorContext: CompositionErrorContextImpl? = CompositionErrorContextImpl(this)
+        get() = if (sourceMarkersEnabled) field else null
 
     override val applyCoroutineContext: CoroutineContext
         @TestOnly get() = parentContext.effectCoroutineContext
@@ -3622,13 +3628,13 @@ internal class ComposerImpl(
         sourceMarkersEnabled = false
     }
 
-    internal fun compositionTraceForValue(value: Any): List<ComposeTraceFrame> {
+    internal fun compositionTraceForValue(value: Any?): List<ComposeTraceFrame> {
         if (!sourceMarkersEnabled) return emptyList()
 
         return slotTable
             .findLocation { it === value }
             ?.let { (groupIndex, dataIndex) ->
-                sourceTraceForGroup(groupIndex, dataIndex) + parentContext.sourceTrace()
+                sourceTraceForGroup(groupIndex, dataIndex) + parentCompositionTrace()
             } ?: emptyList()
     }
 
@@ -3636,10 +3642,10 @@ internal class ComposerImpl(
         if (!sourceMarkersEnabled) return emptyList()
 
         val trace = mutableListOf<ComposeTraceFrame>()
-        trace.addAll(writer.currentTrace())
-        trace.addAll(reader.currentTrace())
+        trace.addAll(writer.buildTrace())
+        trace.addAll(reader.buildTrace())
 
-        return trace.apply { addAll(parentContext.sourceTrace()) }
+        return trace.apply { addAll(parentCompositionTrace()) }
     }
 
     private fun sourceTraceForGroup(group: Int, dataOffset: Int?): List<ComposeTraceFrame> {
@@ -3648,12 +3654,12 @@ internal class ComposerImpl(
         return slotTable.read { it.traceForGroup(group, dataOffset) }
     }
 
-    private fun CompositionContext.sourceTrace(): List<ComposeTraceFrame> {
-        val composition = composition as? CompositionImpl ?: return emptyList()
+    fun parentCompositionTrace(): List<ComposeTraceFrame> {
+        val composition = parentContext.composition as? CompositionImpl ?: return emptyList()
         val position = composition.slotTable.findSubcompositionContextGroup(parentContext)
 
         return if (position != null) {
-            composition.slotTable.read { reader -> reader.traceForGroup(position, null) }
+            composition.slotTable.read { reader -> reader.traceForGroup(position, 0) }
         } else {
             emptyList()
         }
