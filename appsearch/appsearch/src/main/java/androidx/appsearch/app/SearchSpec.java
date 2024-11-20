@@ -793,6 +793,16 @@ public final class SearchSpec extends AbstractSafeParcelable {
     }
 
     /**
+     * Returns whether the LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION feature is enabled.
+     */
+    @ExperimentalAppSearchApi
+    @FlaggedApi(Flags.FLAG_ENABLE_LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION)
+    public boolean isListFilterMatchScoreExpressionFunctionEnabled() {
+        return mEnabledFeatures.contains(
+                FeatureConstants.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION);
+    }
+
+    /**
      * Get the list of enabled features that the caller is intending to use in this search call.
      *
      * @return the set of {@link Features} enabled in this {@link SearchSpec} Entry.
@@ -2294,6 +2304,28 @@ public final class SearchSpec extends AbstractSafeParcelable {
         @FlaggedApi(Flags.FLAG_ENABLE_LIST_FILTER_HAS_PROPERTY_FUNCTION)
         public Builder setListFilterHasPropertyFunctionEnabled(boolean enabled) {
             modifyEnabledFeature(FeatureConstants.LIST_FILTER_HAS_PROPERTY_FUNCTION, enabled);
+            return this;
+        }
+
+        /**
+         * Sets the LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION feature as enabled/disabled
+         * according to the enabled parameter.
+         *
+         * <p>If not enabled, the use of the "matchScoreExpression" function is disallowed. See
+         * {@link AppSearchSession#search} for more details about the function.
+         *
+         * @param enabled Enables the feature if true, otherwise disables it
+         */
+        @CanIgnoreReturnValue
+        @RequiresFeature(
+                enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
+                name = Features.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION)
+        @NonNull
+        @ExperimentalAppSearchApi
+        @FlaggedApi(Flags.FLAG_ENABLE_LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION)
+        public Builder setListFilterMatchScoreExpressionFunctionEnabled(boolean enabled) {
+            modifyEnabledFeature(
+                    FeatureConstants.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION, enabled);
             return this;
         }
 

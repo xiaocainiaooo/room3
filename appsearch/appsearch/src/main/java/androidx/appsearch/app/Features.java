@@ -121,6 +121,16 @@ public interface Features {
     String LIST_FILTER_HAS_PROPERTY_FUNCTION = FeatureConstants.LIST_FILTER_HAS_PROPERTY_FUNCTION;
 
     /**
+     * Feature for {@link #isFeatureSupported(String)}. This feature covers the use of the
+     * "matchScoreExpression" function in query expressions.
+     *
+     * <p>For details on the "matchScoreExpression" function in the query language, see
+     * {@link AppSearchSession#search}.
+     */
+    String LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION =
+            FeatureConstants.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION;
+
+    /**
      * Feature for {@link #isFeatureSupported(String)}. This feature covers whether or not the
      * AppSearch backend can store the descriptions returned by
      * {@link AppSearchSchema#getDescription} and

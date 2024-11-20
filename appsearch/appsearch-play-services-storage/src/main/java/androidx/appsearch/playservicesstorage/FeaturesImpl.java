@@ -89,6 +89,8 @@ final class FeaturesImpl implements Features {
                 // fall through
             case Features.SEARCH_SPEC_ADD_FILTER_DOCUMENT_IDS:
                 // fall through
+            case Features.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION:
+                // fall through
             default:
                 return false; // AppSearch features absent in GMSCore AppSearch.
         }

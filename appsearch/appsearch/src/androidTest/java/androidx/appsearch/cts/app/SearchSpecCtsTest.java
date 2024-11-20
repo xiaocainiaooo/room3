@@ -174,6 +174,24 @@ public class SearchSpecCtsTest {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION)
+    public void testBuildSearchSpec_matchScoreExpression() {
+        SearchSpec searchSpec = new SearchSpec.Builder()
+                .setNumericSearchEnabled(true)
+                .setVerbatimSearchEnabled(true)
+                .setListFilterQueryLanguageEnabled(true)
+                .setListFilterHasPropertyFunctionEnabled(true)
+                .setListFilterMatchScoreExpressionFunctionEnabled(true)
+                .build();
+
+        assertThat(searchSpec.isNumericSearchEnabled()).isTrue();
+        assertThat(searchSpec.isVerbatimSearchEnabled()).isTrue();
+        assertThat(searchSpec.isListFilterQueryLanguageEnabled()).isTrue();
+        assertThat(searchSpec.isListFilterHasPropertyFunctionEnabled()).isTrue();
+        assertThat(searchSpec.isListFilterMatchScoreExpressionFunctionEnabled()).isTrue();
+    }
+
+    @Test
     public void testGetProjectionTypePropertyMasks() {
         SearchSpec searchSpec = new SearchSpec.Builder()
                 .setTermMatch(SearchSpec.TERM_MATCH_PREFIX)
@@ -477,6 +495,25 @@ public class SearchSpecCtsTest {
                 .build();
         assertThat(searchSpec.isListFilterQueryLanguageEnabled()).isFalse();
         assertThat(searchSpec.isListFilterHasPropertyFunctionEnabled()).isFalse();
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION)
+    public void testSetFeatureEnabledToFalse_matchScoreExpression() {
+        SearchSpec.Builder builder = new SearchSpec.Builder();
+        SearchSpec searchSpec = builder
+                .setListFilterQueryLanguageEnabled(true)
+                .setListFilterMatchScoreExpressionFunctionEnabled(true)
+                .build();
+        assertThat(searchSpec.isListFilterQueryLanguageEnabled()).isTrue();
+        assertThat(searchSpec.isListFilterMatchScoreExpressionFunctionEnabled()).isTrue();
+
+        searchSpec = builder
+                .setListFilterQueryLanguageEnabled(false)
+                .setListFilterMatchScoreExpressionFunctionEnabled(false)
+                .build();
+        assertThat(searchSpec.isListFilterQueryLanguageEnabled()).isFalse();
+        assertThat(searchSpec.isListFilterMatchScoreExpressionFunctionEnabled()).isFalse();
     }
 
     @Test

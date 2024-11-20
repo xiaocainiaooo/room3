@@ -582,6 +582,9 @@ public final class SearchSpecToProtoConverter {
             String appSearchFeature = appSearchFeatures.get(i);
             if (appSearchFeature.equals(FeatureConstants.LIST_FILTER_HAS_PROPERTY_FUNCTION)) {
                 result.add("HAS_PROPERTY_FUNCTION");
+            } else if (appSearchFeature.equals(
+                    FeatureConstants.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION)) {
+                result.add("MATCH_SCORE_EXPRESSION_FUNCTION");
             } else {
                 result.add(appSearchFeature);
             }

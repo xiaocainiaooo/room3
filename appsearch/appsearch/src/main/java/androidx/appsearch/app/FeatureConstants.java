@@ -41,6 +41,10 @@ public final class FeatureConstants {
     public static final String LIST_FILTER_HAS_PROPERTY_FUNCTION =
             "LIST_FILTER_HAS_PROPERTY_FUNCTION";
 
+    /** Feature constants for {@link Features#LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION}. */
+    public static final String LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION =
+            "LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION";
+
     /** A feature constant for the "semanticSearch" function in {@link AppSearchSession#search}. */
     public static final String EMBEDDING_SEARCH = "EMBEDDING_SEARCH";
 
