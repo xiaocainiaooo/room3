@@ -26,7 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavContentWrapper
 import androidx.navigation3.AnimatedNavDisplay
 import androidx.navigation3.NavDisplay
-import androidx.navigation3.Record
+import androidx.navigation3.NavRecord
 import androidx.navigation3.SavedStateNavContentWrapper
 import androidx.navigation3.record
 import androidx.navigation3.recordProvider
@@ -45,7 +45,7 @@ fun BasicNav() {
         wrapperManager = manager,
         onBack = { backStack.removeLast() },
         recordProvider =
-            recordProvider({ Record(Unit) { Text(text = "Invalid Key") } }) {
+            recordProvider({ NavRecord(Unit) { Text(text = "Invalid Key") } }) {
                 record<Profile> {
                     val viewModel = viewModel<ProfileViewModel>()
                     Profile(viewModel, { backStack.add(it) }) { backStack.removeLast() }
@@ -79,7 +79,7 @@ fun AnimatedNav() {
         wrapperManager = manager,
         onBack = { backStack.removeLast() },
         recordProvider =
-            recordProvider({ Record(Unit) { Text(text = "Invalid Key") } }) {
+            recordProvider({ NavRecord(Unit) { Text(text = "Invalid Key") } }) {
                 record<Profile>(
                     AnimatedNavDisplay.transition(
                         slideInHorizontally { it },
