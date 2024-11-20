@@ -139,6 +139,9 @@ final class FeaturesImpl implements Features {
             case Features.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION:
                 // TODO(b/377215223) : Update when feature is ready in service-appsearch.
                 // fall through
+            case Features.SCHEMA_SCORABLE_PROPERTY_CONFIG:
+                // TODO(b/357105837) : Update when feature is ready in service-appsearch.
+                // fall through
             default:
                 return false;
         }

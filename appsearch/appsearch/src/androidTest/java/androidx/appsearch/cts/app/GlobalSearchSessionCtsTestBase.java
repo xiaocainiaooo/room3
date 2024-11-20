@@ -2026,4 +2026,52 @@ public abstract class GlobalSearchSessionCtsTestBase {
         assertThat(resultsWithoutWeights.get(0).getRankingSignal()).isEqualTo(
                 resultsWithoutWeights.get(1).getRankingSignal());
     }
+
+    @Test
+    public void testRankWithScorableProperty_searchFromMultipleDbs() throws Exception {
+        assumeTrue(mGlobalSearchSession.getFeatures()
+                .isFeatureSupported(Features.SCHEMA_SCORABLE_PROPERTY_CONFIG));
+
+        AppSearchSchema schema = new AppSearchSchema.Builder("Gmail")
+                .addProperty(new AppSearchSchema.BooleanPropertyConfig.Builder("important")
+                        .setCardinality(PropertyConfig.CARDINALITY_OPTIONAL)
+                        .setScoringEnabled(true)
+                        .build())
+                .build();
+        mDb1.setSchemaAsync(new SetSchemaRequest.Builder().addSchemas(schema).build()).get();
+        mDb2.setSchemaAsync(new SetSchemaRequest.Builder().addSchemas(schema).build()).get();
+
+        GenericDocument docInDb1 =
+                new GenericDocument.Builder<>("namespace", "id1", "Gmail")
+                        .setPropertyBoolean("important", true)
+                        .setScore(1)
+                        .build();
+        GenericDocument docInDb2 =
+                new GenericDocument.Builder<>("namespace", "id1", "Gmail")
+                        .setPropertyBoolean("important", true)
+                        .setScore(3)
+                        .build();
+        double docInDb1Score = 2;
+        double docInDb2Score = 4;
+        checkIsBatchResultSuccess(mDb1.putAsync(
+                new PutDocumentsRequest.Builder().addGenericDocuments(docInDb1).build()));
+        checkIsBatchResultSuccess(mDb2.putAsync(
+                new PutDocumentsRequest.Builder().addGenericDocuments(docInDb2).build()));
+
+        SearchSpec searchSpec = new SearchSpec.Builder()
+                .setScorablePropertyRankingEnabled(true)
+                .setRankingStrategy(
+                        "this.documentScore() + sum(getScorableProperty(\"Gmail\", \"important\"))")
+                .build();
+        SearchResults searchResults =
+                mGlobalSearchSession.search("", searchSpec);
+        List<SearchResult> results = retrieveAllSearchResults(searchResults);
+        assertThat(results).hasSize(2);
+        assertThat(results.get(0).getGenericDocument()).isEqualTo(docInDb2);
+        assertThat(results.get(0).getRankingSignal())
+                .isWithin(0.00001).of(docInDb2Score);
+        assertThat(results.get(1).getGenericDocument()).isEqualTo(docInDb1);
+        assertThat(results.get(1).getRankingSignal())
+                .isWithin(0.00001).of(docInDb1Score);
+    }
 }

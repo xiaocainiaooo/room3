@@ -171,4 +171,10 @@ public class FlagsTest {
         assertThat(Flags.FLAG_ENABLE_SEARCH_SPEC_FILTER_DOCUMENT_IDS).isEqualTo(
                 "com.android.appsearch.flags.enable_search_spec_filter_document_ids");
     }
+
+    @Test
+    public void testFlagValue_enableScorableSchemaProperty() {
+        assertThat(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
+                .isEqualTo("com.android.appsearch.flags.enable_scorable_property");
+    }
 }

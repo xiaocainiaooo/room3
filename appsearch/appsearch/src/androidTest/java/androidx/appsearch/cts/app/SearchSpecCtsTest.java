@@ -88,6 +88,7 @@ public class SearchSpecCtsTest {
                 .setNumericSearchEnabled(true)
                 .setVerbatimSearchEnabled(true)
                 .setListFilterQueryLanguageEnabled(true)
+                .setScorablePropertyRankingEnabled(true)
                 .build();
 
         assertThat(searchSpec.getTermMatch()).isEqualTo(SearchSpec.TERM_MATCH_PREFIX);
@@ -125,6 +126,7 @@ public class SearchSpecCtsTest {
         assertThat(searchSpec.isNumericSearchEnabled()).isTrue();
         assertThat(searchSpec.isVerbatimSearchEnabled()).isTrue();
         assertThat(searchSpec.isListFilterQueryLanguageEnabled()).isTrue();
+        assertThat(searchSpec.isScorablePropertyRankingEnabled()).isTrue();
     }
 
     @Test
@@ -938,6 +940,7 @@ public class SearchSpecCtsTest {
                 .setNumericSearchEnabled(true)
                 .setVerbatimSearchEnabled(true)
                 .setListFilterQueryLanguageEnabled(true)
+                .setScorablePropertyRankingEnabled(true)
                 .build();
         SearchSpec searchSpecCopy = new SearchSpec.Builder(searchSpec).build();
         assertThat(searchSpecCopy.getTermMatch()).isEqualTo(searchSpec.getTermMatch());
@@ -968,6 +971,7 @@ public class SearchSpecCtsTest {
                 searchSpec.isVerbatimSearchEnabled());
         assertThat(searchSpecCopy.isListFilterQueryLanguageEnabled()).isEqualTo(
                 searchSpec.isListFilterQueryLanguageEnabled());
+        assertThat(searchSpecCopy.isScorablePropertyRankingEnabled()).isTrue();
     }
 
     @Test
@@ -1115,5 +1119,28 @@ public class SearchSpecCtsTest {
                 .clearFilterDocumentIds()
                 .build();
         assertThat(searchSpec.getFilterDocumentIds()).isEmpty();
+    }
+
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
+    public void testSetAndGetEnableScorablePropertyRanking() {
+        SearchSpec defaultSearchSpec = new SearchSpec.Builder().build();
+        assertThat(defaultSearchSpec.isScorablePropertyRankingEnabled()).isFalse();
+
+        SearchSpec searchSpecWithScorablePropertyEnabled = new SearchSpec.Builder()
+                .setScorablePropertyRankingEnabled(true).build();
+        assertThat(
+                searchSpecWithScorablePropertyEnabled.isScorablePropertyRankingEnabled()).isTrue();
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
+    public void testGetIsScorablePropertyRankingEnabled_copyFromSearchSpecBuilder() {
+        SearchSpec searchSpec = new SearchSpec.Builder()
+                .setScorablePropertyRankingEnabled(true)
+                .build();
+
+        SearchSpec.Builder newSearchSpecBuilder = new SearchSpec.Builder(searchSpec);
+        SearchSpec newSearchSpecCopied = newSearchSpecBuilder.build();
+        assertThat(newSearchSpecCopied.isScorablePropertyRankingEnabled()).isTrue();
     }
 }

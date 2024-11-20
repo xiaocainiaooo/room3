@@ -1159,6 +1159,13 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             return indexingConfigParcel.getIndexingType();
         }
 
+        /** Returns if the property is enabled for scoring. */
+        @ExperimentalAppSearchApi
+        @FlaggedApi(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
+        public boolean isScoringEnabled() {
+            return mPropertyConfigParcel.isScoringEnabled();
+        }
+
         /** Builder for {@link LongPropertyConfig}. */
         public static final class Builder {
             private final String mPropertyName;
@@ -1167,6 +1174,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             private int mCardinality = CARDINALITY_OPTIONAL;
             @LongPropertyConfig.IndexingType
             private int mIndexingType = INDEXING_TYPE_NONE;
+            private boolean mScoringEnabled = false;
 
             /** Creates a new {@link LongPropertyConfig.Builder}. */
             public Builder(@NonNull String propertyName) {
@@ -1225,12 +1233,37 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                 return this;
             }
 
+            /**
+             * Sets the property enabled or disabled for scoring.
+             *
+             * <p>If this method is not called, the default value is false.
+             *
+             * <p>If enabled, it can be used in the advanced ranking expression via the function of
+             * 'getScorableProperty'.
+             *
+             * <p>For the detailed documentation, see
+             * {@link SearchSpec.Builder#setRankingStrategy(String)}.
+             */
+            @CanIgnoreReturnValue
+            @RequiresFeature(
+                    enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
+                    name = Features.SCHEMA_SCORABLE_PROPERTY_CONFIG)
+            @ExperimentalAppSearchApi
+            @FlaggedApi(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
+            @NonNull
+            public LongPropertyConfig.Builder setScoringEnabled(
+                    boolean scoringEnabled) {
+                mScoringEnabled = scoringEnabled;
+                return this;
+            }
+
             /** Constructs a new {@link LongPropertyConfig} from the contents of this builder. */
             @NonNull
             public LongPropertyConfig build() {
                 return new LongPropertyConfig(
                         PropertyConfigParcel.createForLong(
-                                mPropertyName, mDescription, mCardinality, mIndexingType));
+                                mPropertyName, mDescription, mCardinality, mIndexingType,
+                                mScoringEnabled));
             }
         }
 
@@ -1262,12 +1295,20 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             super(propertyConfigParcel);
         }
 
+        /** Returns if the property is enabled for scoring. */
+        @ExperimentalAppSearchApi
+        @FlaggedApi(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
+        public boolean isScoringEnabled() {
+            return mPropertyConfigParcel.isScoringEnabled();
+        }
+
         /** Builder for {@link DoublePropertyConfig}. */
         public static final class Builder {
             private final String mPropertyName;
             private String mDescription = "";
             @Cardinality
             private int mCardinality = CARDINALITY_OPTIONAL;
+            private boolean mScoringEnabled = false;
 
             /** Creates a new {@link DoublePropertyConfig.Builder}. */
             public Builder(@NonNull String propertyName) {
@@ -1309,12 +1350,36 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                 return this;
             }
 
+            /**
+             * Sets the property enabled or disabled for scoring.
+             *
+             * <p>If this method is not called, the default value is false.
+             *
+             * <p>If enabled, it can be used in the advanced ranking expression via the function of
+             * 'getScorableProperty'.
+             *
+             * <p>For the detailed documentation, see
+             * {@link SearchSpec.Builder#setRankingStrategy(String)}.
+             */
+            @CanIgnoreReturnValue
+            @RequiresFeature(
+                    enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
+                    name = Features.SCHEMA_SCORABLE_PROPERTY_CONFIG)
+            @ExperimentalAppSearchApi
+            @FlaggedApi(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
+            @NonNull
+            public DoublePropertyConfig.Builder setScoringEnabled(
+                    boolean scoringEnabled) {
+                mScoringEnabled = scoringEnabled;
+                return this;
+            }
+
             /** Constructs a new {@link DoublePropertyConfig} from the contents of this builder. */
             @NonNull
             public DoublePropertyConfig build() {
                 return new DoublePropertyConfig(
                         PropertyConfigParcel.createForDouble(
-                                mPropertyName, mDescription, mCardinality));
+                                mPropertyName, mDescription, mCardinality, mScoringEnabled));
             }
         }
     }
@@ -1325,12 +1390,20 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             super(propertyConfigParcel);
         }
 
+        /** Returns if the property is enabled for scoring. */
+        @ExperimentalAppSearchApi
+        @FlaggedApi(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
+        public boolean isScoringEnabled() {
+            return mPropertyConfigParcel.isScoringEnabled();
+        }
+
         /** Builder for {@link BooleanPropertyConfig}. */
         public static final class Builder {
             private final String mPropertyName;
             private String mDescription = "";
             @Cardinality
             private int mCardinality = CARDINALITY_OPTIONAL;
+            private boolean mScoringEnabled = false;
 
             /** Creates a new {@link BooleanPropertyConfig.Builder}. */
             public Builder(@NonNull String propertyName) {
@@ -1372,12 +1445,36 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                 return this;
             }
 
+            /**
+             * Sets the property enabled or disabled for scoring.
+             *
+             * <p>If this method is not called, the default value is false.
+             *
+             * <p>If enabled, it can be used in the advanced ranking expression via the function of
+             * 'getScorableProperty'.
+             *
+             * <p>For the detailed documentation, see
+             * {@link SearchSpec.Builder#setRankingStrategy(String)}.
+             */
+            @CanIgnoreReturnValue
+            @RequiresFeature(
+                    enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
+                    name = Features.SCHEMA_SCORABLE_PROPERTY_CONFIG)
+            @ExperimentalAppSearchApi
+            @FlaggedApi(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
+            @NonNull
+            public BooleanPropertyConfig.Builder setScoringEnabled(
+                    boolean ScoringEnabled) {
+                mScoringEnabled = ScoringEnabled;
+                return this;
+            }
+
             /** Constructs a new {@link BooleanPropertyConfig} from the contents of this builder. */
             @NonNull
             public BooleanPropertyConfig build() {
                 return new BooleanPropertyConfig(
                         PropertyConfigParcel.createForBoolean(
-                                mPropertyName, mDescription, mCardinality));
+                                mPropertyName, mDescription, mCardinality, mScoringEnabled));
             }
         }
     }
