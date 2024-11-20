@@ -234,7 +234,7 @@ class SdkApi(private val sdkContext: Context) : ISdkApi.Stub() {
 
     companion object {
         private const val MEDIATEE_SDK =
-            "androidx.privacysandbox.ui.integration.mediateesdkprovider"
+            "androidx.privacysandbox.ui.integration.mediateesdkproviderwrapper"
         private const val UPDATE_DELEGATE_INTERVAL: Long = 5000L
     }
 }

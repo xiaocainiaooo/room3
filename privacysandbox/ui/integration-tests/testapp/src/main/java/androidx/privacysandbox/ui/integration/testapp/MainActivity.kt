@@ -296,8 +296,8 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "TestSandboxClient"
 
         /** Name of the SDK to be loaded. */
-        private const val SDK_NAME = "androidx.privacysandbox.ui.integration.testsdkprovider"
+        private const val SDK_NAME = "androidx.privacysandbox.ui.integration.testsdkproviderwrapper"
         private const val MEDIATEE_SDK_NAME =
-            "androidx.privacysandbox.ui.integration.mediateesdkprovider"
+            "androidx.privacysandbox.ui.integration.mediateesdkproviderwrapper"
     }
 }
