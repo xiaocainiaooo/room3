@@ -467,8 +467,8 @@ object SplitButtonDefaults {
      *
      * The default text style for internal [Text] components will be set to [Typography.labelLarge].
      *
-     * @param checked indicates whether the button is toggled to a `checked` state. This will
-     *   trigger the corner morphing animation to reflect the updated state.
+     * @param checked indicates whether the button is checked. This will trigger the corner morphing
+     *   animation to reflect the updated state.
      * @param onCheckedChange called when the button is clicked
      * @param modifier the [Modifier] to be applied to this button.
      * @param enabled controls the enabled state of the split button. When `false`, this component
@@ -649,8 +649,8 @@ object SplitButtonDefaults {
      *
      * The default text style for internal [Text] components will be set to [Typography.labelLarge].
      *
-     * @param checked indicates whether the button is toggled to a `checked` state. This will
-     *   trigger the corner morphing animation to reflect the updated state.
+     * @param checked indicates whether the button is checked. This will trigger the corner morphing
+     *   animation to reflect the updated state.
      * @param onCheckedChange called when the button is clicked
      * @param modifier the [Modifier] to be applied to this button.
      * @param enabled controls the enabled state of the split button. When `false`, this component
@@ -770,8 +770,8 @@ object SplitButtonDefaults {
      *
      * The default text style for internal [Text] components will be set to [Typography.labelLarge].
      *
-     * @param checked indicates whether the button is toggled to a `checked` state. This will
-     *   trigger the corner morphing animation to reflect the updated state.
+     * @param checked indicates whether the button is checked. This will trigger the corner morphing
+     *   animation to reflect the updated state.
      * @param onCheckedChange called when the button is clicked
      * @param modifier the [Modifier] to be applied to this button.
      * @param enabled controls the enabled state of the split button. When `false`, this component
@@ -891,8 +891,8 @@ object SplitButtonDefaults {
      *
      * The default text style for internal [Text] components will be set to [Typography.labelLarge].
      *
-     * @param checked indicates whether the button is toggled to a `checked` state. This will
-     *   trigger the corner morphing animation to reflect the updated state.
+     * @param checked indicates whether the button is checked. This will trigger the corner morphing
+     *   animation to reflect the updated state.
      * @param onCheckedChange called when the button is clicked
      * @param modifier the [Modifier] to be applied to this button.
      * @param enabled controls the enabled state of the split button. When `false`, this component
