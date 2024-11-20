@@ -17,7 +17,6 @@
 package androidx.camera.camera2.pipe.compat
 
 import android.graphics.SurfaceTexture
-import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraDevice
 import android.os.Build
 import android.view.Surface
@@ -58,14 +57,29 @@ constructor(
     ) {
         val unwrappedCameraDevice = cameraDeviceWrapper?.unwrapAs(CameraDevice::class)
         if (unwrappedCameraDevice != null) {
+            val cameraId = CameraId.fromCamera2Id(unwrappedCameraDevice.id)
             cameraDevice?.let {
-                check(unwrappedCameraDevice.id == it.id) {
-                    "Unwrapped camera device has camera ID ${unwrappedCameraDevice.id}, " +
+                check(cameraId.value == it.id) {
+                    "Unwrapped camera device has camera ID ${cameraId.value}, " +
                         "but the wrapped camera device has camera ID ${it.id}!"
                 }
             }
-            closeCameraDevice(unwrappedCameraDevice, closeUnderError, androidCameraState)
+
+            if (
+                camera2Quirks.shouldCreateCaptureSessionBeforeClosing(cameraId) && !closeUnderError
+            ) {
+                Debug.trace("Camera2DeviceCloserImpl#createCaptureSession") {
+                    Log.debug {
+                        "Creating an empty capture session before closing camera $cameraId"
+                    }
+                    createCaptureSession(cameraDeviceWrapper)
+                    Log.debug { "Empty capture session quirk completed" }
+                }
+            }
+
+            closeCameraDevice(unwrappedCameraDevice, androidCameraState)
             cameraDeviceWrapper.onDeviceClosed()
+
             /**
              * Only remove the audio restriction when CameraDeviceWrapper is present. When
              * closeCamera is called without a CameraDeviceWrapper, that means a wrapper hadn't been
@@ -79,23 +93,14 @@ constructor(
             // Return here.
             return
         }
-        cameraDevice?.let { closeCameraDevice(it, closeUnderError, androidCameraState) }
+        cameraDevice?.let { closeCameraDevice(it, androidCameraState) }
     }
 
     private fun closeCameraDevice(
         cameraDevice: CameraDevice,
-        closeUnderError: Boolean,
         androidCameraState: AndroidCameraState,
     ) {
         Log.debug { "$this#closeCameraDevice($cameraDevice)" }
-        val cameraId = CameraId.fromCamera2Id(cameraDevice.id)
-        if (camera2Quirks.shouldCreateCaptureSessionBeforeClosing(cameraId) && !closeUnderError) {
-            Debug.trace("Camera2DeviceCloserImpl#createCaptureSession") {
-                Log.debug { "Creating an empty capture session before closing camera $cameraId" }
-                createCaptureSession(cameraDevice)
-                Log.debug { "Empty capture session quirk completed" }
-            }
-        }
         Threading.runBlockingCheckedOrNull(threads.backgroundDispatcher, CAMERA_CLOSE_TIMEOUT_MS) {
             cameraDevice.closeWithTrace()
         }
@@ -105,6 +110,7 @@ constructor(
                         "The camera is likely in a bad state."
                 }
             }
+        val cameraId = CameraId.fromCamera2Id(cameraDevice.id)
         if (camera2Quirks.shouldWaitForCameraDeviceOnClosed(cameraId)) {
             Log.debug { "Waiting for OnClosed from $cameraId" }
             if (androidCameraState.awaitCameraDeviceClosed(timeoutMillis = 5000)) {
@@ -115,14 +121,14 @@ constructor(
         }
     }
 
-    private fun createCaptureSession(cameraDevice: CameraDevice) {
+    private fun createCaptureSession(cameraDeviceWrapper: CameraDeviceWrapper) {
         val surfaceTexture = SurfaceTexture(0).also { it.setDefaultBufferSize(640, 480) }
         val surface = Surface(surfaceTexture)
         val surfaceReleased = atomic(false)
         val sessionConfigured = CountDownLatch(1)
         val callback =
-            object : CameraCaptureSession.StateCallback() {
-                override fun onConfigured(session: CameraCaptureSession) {
+            object : CameraCaptureSessionWrapper.StateCallback {
+                override fun onConfigured(session: CameraCaptureSessionWrapper) {
                     Log.debug { "Empty capture session configured. Closing it" }
                     // We don't need to wait for the session to close, instead we can just invoke
                     // close() and end here.
@@ -130,7 +136,7 @@ constructor(
                     sessionConfigured.countDown()
                 }
 
-                override fun onClosed(session: CameraCaptureSession) {
+                override fun onClosed(session: CameraCaptureSessionWrapper) {
                     Log.debug { "Empty capture session closed" }
                     if (surfaceReleased.compareAndSet(expect = false, update = true)) {
                         surface.release()
@@ -138,7 +144,7 @@ constructor(
                     }
                 }
 
-                override fun onConfigureFailed(session: CameraCaptureSession) {
+                override fun onConfigureFailed(session: CameraCaptureSessionWrapper) {
                     Log.debug { "Empty capture session configure failed" }
                     if (surfaceReleased.compareAndSet(expect = false, update = true)) {
                         surface.release()
@@ -146,16 +152,19 @@ constructor(
                     }
                     sessionConfigured.countDown()
                 }
+
+                override fun onReady(session: CameraCaptureSessionWrapper) {}
+
+                override fun onCaptureQueueEmpty(session: CameraCaptureSessionWrapper) {}
+
+                override fun onSessionFinalized() {}
+
+                override fun onActive(session: CameraCaptureSessionWrapper) {}
             }
-        try {
-            // This function was deprecated in Android Q, but is required since this quirk is
-            // needed on older API levels.
-            @Suppress("deprecation")
-            cameraDevice.createCaptureSession(listOf(surface), callback, threads.camera2Handler)
-        } catch (throwable: Throwable) {
-            Log.error(throwable) {
-                "Failed to create a blank capture session. " +
-                    "Surfaces may not be disconnected properly"
+        if (!cameraDeviceWrapper.createCaptureSession(listOf(surface), callback)) {
+            Log.error {
+                "Failed to create a blank capture session! " +
+                    "Surfaces may not be disconnected properly."
             }
             if (surfaceReleased.compareAndSet(expect = false, update = true)) {
                 surface.release()
