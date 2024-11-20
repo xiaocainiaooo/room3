@@ -2459,6 +2459,7 @@ package androidx.compose.ui.layout {
     method public int getHeight();
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     method public java.util.List<androidx.compose.ui.layout.ModifierInfo> getModifierInfo();
+    method public default Object? getOpaqueOwner();
     method public androidx.compose.ui.layout.LayoutInfo? getParentInfo();
     method public int getSemanticsId();
     method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
@@ -2473,6 +2474,7 @@ package androidx.compose.ui.layout {
     property public default boolean isDeactivated;
     property public abstract boolean isPlaced;
     property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
+    property public default Object? opaqueOwner;
     property public abstract androidx.compose.ui.layout.LayoutInfo? parentInfo;
     property public abstract int semanticsId;
     property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
