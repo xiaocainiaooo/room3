@@ -19,7 +19,12 @@ package androidx.appsearch.playservicesstorage;
 import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.app.AppSearchBatchResult;
+import androidx.appsearch.app.AppSearchBlobHandle;
+import androidx.appsearch.app.AppSearchCommitBlobResponse;
+import androidx.appsearch.app.AppSearchOpenBlobForReadResponse;
+import androidx.appsearch.app.AppSearchOpenBlobForWriteResponse;
 import androidx.appsearch.app.AppSearchSession;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.Features;
 import androidx.appsearch.app.GenericDocument;
 import androidx.appsearch.app.GetByDocumentIdRequest;
@@ -117,6 +122,39 @@ class SearchSessionImpl implements AppSearchSession, Closeable {
                         mDatabaseName),
                 result -> AppSearchResultToGmsConverter.gmsAppSearchBatchResultToJetpack(
                         result, /* valueMapper= */ i -> i), mExecutor);
+    }
+
+    @NonNull
+    @Override
+    @ExperimentalAppSearchApi
+    public ListenableFuture<AppSearchOpenBlobForWriteResponse> openBlobForWriteAsync(
+            @NonNull Set<AppSearchBlobHandle> handles) {
+        // TODO(b/273591938) Implement this method when blob implementation is synced to the
+        //  GmsCore.
+        throw new UnsupportedOperationException(Features.BLOB_STORAGE
+                + " is not available on this AppSearch implementation.");
+    }
+
+    @NonNull
+    @Override
+    @ExperimentalAppSearchApi
+    public ListenableFuture<AppSearchCommitBlobResponse> commitBlobAsync(
+            @NonNull Set<AppSearchBlobHandle> handles) {
+        // TODO(b/273591938) Implement this method when blob implementation is synced to the
+        //  GmsCore.
+        throw new UnsupportedOperationException(Features.BLOB_STORAGE
+                + " is not available on this AppSearch implementation.");
+    }
+
+    @NonNull
+    @Override
+    @ExperimentalAppSearchApi
+    public ListenableFuture<AppSearchOpenBlobForReadResponse> openBlobForReadAsync(
+            @NonNull Set<AppSearchBlobHandle> handles) {
+        // TODO(b/273591938) Implement this method when blob implementation is synced to the
+        //  GmsCore.
+        throw new UnsupportedOperationException(Features.BLOB_STORAGE
+                + " is not available on this AppSearch implementation.");
     }
 
     @NonNull
