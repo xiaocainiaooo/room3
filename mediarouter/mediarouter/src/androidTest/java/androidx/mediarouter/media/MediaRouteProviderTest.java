@@ -23,14 +23,14 @@ import static org.junit.Assert.assertNull;
 import android.content.Context;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.mediarouter.media.MediaRouteProvider.RouteControllerOptions;
 import androidx.test.annotation.UiThreadTest;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SmallTest;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -100,8 +100,7 @@ public class MediaRouteProviderTest {
         }
 
         @Override
-        @Nullable
-        public DynamicGroupRouteController onCreateDynamicGroupRouteController(
+        public @Nullable DynamicGroupRouteController onCreateDynamicGroupRouteController(
                 @NonNull String initialMemberRouteId,
                 @NonNull RouteControllerOptions routeControllerOptions) {
             return new TestDynamicGroupRouteController(
@@ -116,8 +115,7 @@ public class MediaRouteProviderTest {
         }
 
         @Override
-        @Nullable
-        public DynamicGroupRouteController onCreateDynamicGroupRouteController(
+        public @Nullable DynamicGroupRouteController onCreateDynamicGroupRouteController(
                 @NonNull String initialMemberRouteId) {
             return new TestDynamicGroupRouteController(
                     initialMemberRouteId, /* routeControllerOptions= */ null);
@@ -128,22 +126,20 @@ public class MediaRouteProviderTest {
             extends MediaRouteProvider.DynamicGroupRouteController {
 
         private final String mInitialMemberRouteId;
-        @NonNull private final MediaRouteProvider.RouteControllerOptions mRouteControllerOptions;
+        private final MediaRouteProvider.@NonNull RouteControllerOptions mRouteControllerOptions;
 
         private TestDynamicGroupRouteController(
                 String initialMemberRouteId,
-                @NonNull MediaRouteProvider.RouteControllerOptions routeControllerOptions) {
+                MediaRouteProvider.@NonNull RouteControllerOptions routeControllerOptions) {
             mInitialMemberRouteId = initialMemberRouteId;
             mRouteControllerOptions = routeControllerOptions;
         }
 
-        @NonNull
-        public String getInitialMemberRouteId() {
+        public @NonNull String getInitialMemberRouteId() {
             return mInitialMemberRouteId;
         }
 
-        @NonNull
-        public RouteControllerOptions getRouteControllerOptions() {
+        public @NonNull RouteControllerOptions getRouteControllerOptions() {
             return mRouteControllerOptions;
         }
 
