@@ -151,9 +151,14 @@ public final class SchemaToProtoConverter {
             if (embeddingProperty.getIndexingType()
                     != AppSearchSchema.EmbeddingPropertyConfig.INDEXING_TYPE_NONE) {
                 EmbeddingIndexingConfig embeddingIndexingConfig =
-                        EmbeddingIndexingConfig.newBuilder().setEmbeddingIndexingType(
-                                convertEmbeddingIndexingTypeToProto(
-                                        embeddingProperty.getIndexingType())).build();
+                        EmbeddingIndexingConfig.newBuilder()
+                                .setEmbeddingIndexingType(
+                                        convertEmbeddingIndexingTypeToProto(
+                                                embeddingProperty.getIndexingType()))
+                                .setQuantizationType(
+                                        convertEmbeddingQuantizationTypeToProto(
+                                                embeddingProperty.getQuantizationType()))
+                                .build();
                 builder.setEmbeddingIndexingConfig(embeddingIndexingConfig);
             }
         }
@@ -287,6 +292,14 @@ public final class SchemaToProtoConverter {
                 proto.getEmbeddingIndexingConfig().getEmbeddingIndexingType();
         builder.setIndexingType(convertEmbeddingIndexingTypeFromProto(embeddingIndexingType));
 
+        // Set quantizationType
+        if (embeddingIndexingType != EmbeddingIndexingConfig.EmbeddingIndexingType.Code.UNKNOWN) {
+            EmbeddingIndexingConfig.QuantizationType.Code embeddingQuantizationType =
+                    proto.getEmbeddingIndexingConfig().getQuantizationType();
+            builder.setQuantizationType(
+                    convertEmbeddingQuantizationTypeTypeFromProto(embeddingQuantizationType));
+        }
+
         return builder.build();
     }
 
@@ -418,6 +431,38 @@ public final class SchemaToProtoConverter {
                 // extent possible.
                 Log.w(TAG, "Invalid indexingType: " + indexingType.getNumber());
                 return AppSearchSchema.EmbeddingPropertyConfig.INDEXING_TYPE_NONE;
+        }
+    }
+
+    @NonNull
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
+    private static EmbeddingIndexingConfig.QuantizationType.Code
+            convertEmbeddingQuantizationTypeToProto(
+            @AppSearchSchema.EmbeddingPropertyConfig.QuantizationType int quantizationType) {
+        switch (quantizationType) {
+            case AppSearchSchema.EmbeddingPropertyConfig.QUANTIZATION_TYPE_NONE:
+                return EmbeddingIndexingConfig.QuantizationType.Code.NONE;
+            case AppSearchSchema.EmbeddingPropertyConfig.QUANTIZATION_TYPE_8_BIT:
+                return EmbeddingIndexingConfig.QuantizationType.Code.QUANTIZE_8_BIT;
+            default:
+                throw new IllegalArgumentException("Invalid quantizationType: " + quantizationType);
+        }
+    }
+
+    @AppSearchSchema.EmbeddingPropertyConfig.QuantizationType
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
+    private static int convertEmbeddingQuantizationTypeTypeFromProto(
+            @NonNull EmbeddingIndexingConfig.QuantizationType.Code quantizationType) {
+        switch (quantizationType) {
+            case NONE:
+                return AppSearchSchema.EmbeddingPropertyConfig.QUANTIZATION_TYPE_NONE;
+            case QUANTIZE_8_BIT:
+                return AppSearchSchema.EmbeddingPropertyConfig.QUANTIZATION_TYPE_8_BIT;
+            default:
+                // Avoid crashing in the 'read' path; we should try to interpret the document to the
+                // extent possible.
+                Log.w(TAG, "Invalid quantizationType: " + quantizationType.getNumber());
+                return AppSearchSchema.EmbeddingPropertyConfig.QUANTIZATION_TYPE_NONE;
         }
     }
 }

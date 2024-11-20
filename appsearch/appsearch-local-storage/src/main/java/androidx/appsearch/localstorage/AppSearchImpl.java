@@ -326,6 +326,8 @@ public final class AppSearchImpl implements Closeable {
                             mConfig.getBuildPropertyExistenceMetadataHits())
                     .setEnableBlobStore(mConfig.getEnableBlobStore())
                     .setOrphanBlobTimeToLiveMs(mConfig.getOrphanBlobTimeToLiveMs())
+                    .setEnableEmbeddingIndex(Flags.enableSchemaEmbeddingPropertyConfig())
+                    .setEnableEmbeddingQuantization(Flags.enableSchemaEmbeddingQuantization())
                     .build();
             LogUtil.piiTrace(TAG, "Constructing IcingSearchEngine, request", options);
             mIcingSearchEngineLocked = new IcingSearchEngine(options);

@@ -162,6 +162,8 @@ public final class SchemaToGmsConverter {
                             documentProperty.getIndexableNestedProperties()).build();
         } else if (jetpackProperty instanceof AppSearchSchema.EmbeddingPropertyConfig) {
             // TODO(b/326656531): Remove this once embedding search APIs are available.
+            // TODO(b/359959345): Remember to add the check for quantization when embedding has
+            //  become available but quantization has not yet.
             throw new UnsupportedOperationException(Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG
                     + " is not available on this AppSearch implementation.");
         } else {

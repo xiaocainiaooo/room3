@@ -121,6 +121,9 @@ final class FeaturesImpl implements Features {
             case Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG:
                 // TODO(b/326656531) : Update when feature is ready in service-appsearch.
                 // fall through
+            case Features.SCHEMA_EMBEDDING_QUANTIZATION:
+                // TODO(b/359959345) : Update when feature is ready in service-appsearch.
+                // fall through
             case Features.SCHEMA_SET_DESCRIPTION:
                 // TODO(b/326987971) : Update when feature is ready in service-appsearch.
                 // fall through
