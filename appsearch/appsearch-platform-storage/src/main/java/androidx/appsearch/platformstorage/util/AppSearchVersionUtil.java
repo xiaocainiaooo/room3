@@ -43,11 +43,12 @@ public class AppSearchVersionUtil {
     public static class MainlineVersions {
         public static final long U_BASE = 340800000;
         public static final long M2023_11 = 341113000;
+        public static final long M2024_11 = 351112060;
     }
 
     private static final String APPSEARCH_MODULE_NAME = "com.android.appsearch";
 
-    // This will be set to -1 to indicate the AppSearch version code hasn't bee checked, then to
+    // This will be set to -1 to indicate the AppSearch version code hasn't been checked, then to
     // 0 if it is not found, or the version code if it is found.
     private static volatile long sAppSearchVersionCode = -1;
 

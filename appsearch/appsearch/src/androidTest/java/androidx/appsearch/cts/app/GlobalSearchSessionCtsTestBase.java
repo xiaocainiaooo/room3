@@ -2074,4 +2074,41 @@ public abstract class GlobalSearchSessionCtsTestBase {
         assertThat(results.get(1).getRankingSignal())
                 .isWithin(0.00001).of(docInDb1Score);
     }
+
+// @exportToFramework:startStrip()
+    // Do not export these tests to platform, as it's possible the tests are ran before the apps
+    // indexer has had a chance to run, which would cause a race condition.
+    @Test
+    public void testAppsIndexerEnabled() throws Exception {
+        assumeTrue(mGlobalSearchSession.getFeatures().isFeatureSupported(
+                Features.INDEXER_MOBILE_APPLICATIONS));
+
+        // There should at least be a MobileApplication document for settings
+        SearchResults results = mGlobalSearchSession.search("", new SearchSpec.Builder()
+                .addFilterNamespaces("apps")
+                .addFilterPackageNames("android")
+                .setResultCountPerPage(1)
+                .build());
+        List<SearchResult> resultList = results.getNextPageAsync().get();
+        assertThat(resultList).isNotEmpty();
+
+        GenericDocument appDocument = resultList.get(0).getGenericDocument();
+        assertThat(appDocument.getNamespace()).isEqualTo("apps");
+    }
+
+    @Test
+    public void testAppsIndexerDisabled() throws Exception {
+        assumeFalse(mGlobalSearchSession.getFeatures().isFeatureSupported(
+                Features.INDEXER_MOBILE_APPLICATIONS));
+
+        // Shouldn't be any MobileApplication documents
+        SearchResults results = mGlobalSearchSession.search("", new SearchSpec.Builder()
+                .addFilterNamespaces("apps")
+                .addFilterPackageNames("android")
+                .setResultCountPerPage(1)
+                .build());
+        List<SearchResult> resultList = results.getNextPageAsync().get();
+        assertThat(resultList).isEmpty();
+    }
+// @exportToFramework:startStrip()
 }
