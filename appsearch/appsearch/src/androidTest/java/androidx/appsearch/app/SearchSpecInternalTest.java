@@ -18,6 +18,9 @@ package androidx.appsearch.app;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import androidx.appsearch.flags.Flags;
+import androidx.appsearch.flags.RequiresFlagsEnabled;
+
 import com.google.common.collect.ImmutableMap;
 
 import org.junit.Test;
@@ -170,6 +173,23 @@ public class SearchSpecInternalTest {
         assertThat(searchSpec.getEnabledFeatures()).containsExactly(
                 Features.NUMERIC_SEARCH, Features.VERBATIM_SEARCH,
                 Features.LIST_FILTER_QUERY_LANGUAGE, Features.LIST_FILTER_HAS_PROPERTY_FUNCTION);
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION)
+    public void testGetBundle_matchScoreExpression() {
+        SearchSpec searchSpec = new SearchSpec.Builder()
+                .setNumericSearchEnabled(true)
+                .setVerbatimSearchEnabled(true)
+                .setListFilterQueryLanguageEnabled(true)
+                .setListFilterHasPropertyFunctionEnabled(true)
+                .setListFilterMatchScoreExpressionFunctionEnabled(true)
+                .build();
+
+        assertThat(searchSpec.getEnabledFeatures()).containsExactly(
+                Features.NUMERIC_SEARCH, Features.VERBATIM_SEARCH,
+                Features.LIST_FILTER_QUERY_LANGUAGE, Features.LIST_FILTER_HAS_PROPERTY_FUNCTION,
+                Features.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION);
     }
 
     @Test
