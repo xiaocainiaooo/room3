@@ -27,6 +27,7 @@ import android.util.SizeF
 import android.util.SparseArray
 import java.io.Serializable
 
+@Suppress("ValueClassDefinition")
 @JvmInline
 actual value class SavedStateWriter
 @PublishedApi
