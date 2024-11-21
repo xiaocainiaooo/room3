@@ -80,15 +80,9 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxSize(),
                         ) {
                             Text(text = "Screen 2", color = MaterialTheme.colors.onSurface)
-                            Spacer(modifier = Modifier.fillMaxWidth().height(4.dp))
                             CompactChip(
                                 onClick = { navController.navigate(SCREEN3) },
                                 label = { Text("Click for next screen") },
-                            )
-                            Spacer(modifier = Modifier.fillMaxWidth().height(4.dp))
-                            CompactChip(
-                                onClick = { navController.popBackStack() },
-                                label = { Text("Go Back") },
                             )
                         }
                     }
@@ -99,15 +93,9 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxSize(),
                         ) {
                             Text(text = "Screen 3", color = MaterialTheme.colors.onSurface)
-                            Spacer(modifier = Modifier.fillMaxWidth().height(4.dp))
                             Text(
                                 text = "Swipe right to go back",
                                 color = MaterialTheme.colors.onSurface,
-                            )
-                            Spacer(modifier = Modifier.fillMaxWidth().height(4.dp))
-                            CompactChip(
-                                onClick = { navController.popBackStack() },
-                                label = { Text("Go Back") },
                             )
                         }
                     }
