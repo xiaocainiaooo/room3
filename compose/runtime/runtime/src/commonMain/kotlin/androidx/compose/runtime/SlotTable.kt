@@ -3218,6 +3218,10 @@ private fun String.summarize(size: Int) =
         .replace("MutableState", "σ")
         .let { it.substring(0, min(size, it.length)) }
 
+internal fun SlotTable.compositionGroupOf(group: Int): CompositionGroup {
+    return SlotTableGroup(this, group, this.version)
+}
+
 private class SlotTableGroup(
     val table: SlotTable,
     val group: Int,
