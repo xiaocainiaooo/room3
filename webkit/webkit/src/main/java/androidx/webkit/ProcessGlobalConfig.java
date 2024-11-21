@@ -21,6 +21,7 @@ import android.content.Context;
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresFeature;
+import androidx.annotation.RestrictTo;
 import androidx.webkit.internal.ApiHelperForP;
 import androidx.webkit.internal.StartupApiFeature;
 import androidx.webkit.internal.WebViewFeatureInternal;
@@ -68,6 +69,7 @@ public class ProcessGlobalConfig {
     String mDataDirectorySuffix;
     String mDataDirectoryBasePath;
     String mCacheDirectoryBasePath;
+    Boolean mPartitionedCookiesEnabled;
 
     /**
      * Creates a {@link ProcessGlobalConfig} object.
@@ -191,6 +193,28 @@ public class ProcessGlobalConfig {
     }
 
     /**
+     * Configures whether partitioned cookies {@see https://github.com/privacycg/CHIPS}
+     * should be enabled or not.
+     *
+     * Partitioned cookies will be enabled by default for apps that target Android B and above.
+     * For apps that target below Android B, this is disabled.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @RequiresFeature(name = WebViewFeature.STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES,
+            enforcement =
+                    "androidx.webkit.WebViewFeature#isConfigFeatureSupported(String, Context)")
+    public @NonNull ProcessGlobalConfig setPartitionedCookiesEnabled(
+            @NonNull Context context, boolean isEnabled) {
+        final StartupApiFeature.NoFramework feature =
+                WebViewFeatureInternal.STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES;
+        if (!feature.isSupported(context)) {
+            throw WebViewFeatureInternal.getUnsupportedOperationException();
+        }
+        mPartitionedCookiesEnabled = isEnabled;
+        return this;
+    }
+
+    /**
      * Applies the configuration to be used by WebView on loading.
      * <p>
      * This method can only be called once.
@@ -247,6 +271,10 @@ public class ProcessGlobalConfig {
         if (config.mCacheDirectoryBasePath != null) {
             configMap.put(ProcessGlobalConfigConstants.CACHE_DIRECTORY_BASE_PATH,
                     config.mCacheDirectoryBasePath);
+        }
+        if (config.mPartitionedCookiesEnabled != null) {
+            configMap.put(ProcessGlobalConfigConstants.CONFIGURE_PARTITIONED_COOKIES,
+                    config.mPartitionedCookiesEnabled);
         }
         if (!sProcessGlobalConfig.compareAndSet(null, configMap)) {
             throw new RuntimeException("Attempting to set ProcessGlobalConfig"

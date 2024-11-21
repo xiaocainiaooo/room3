@@ -402,6 +402,16 @@ public class WebViewFeatureInternal {
 
     /**
      * This feature covers
+     * {@link androidx.webkit.ProcessGlobalConfig#setPartitionedCookiesEnabled(Context, boolean)}.
+     */
+    public static final StartupApiFeature.NoFramework
+                STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES =
+                        new StartupApiFeature.NoFramework(
+                                WebViewFeature.STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES,
+                                StartupFeatures.STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES);
+
+    /**
+     * This feature covers
      * {@link WebViewCompat#getWebViewRenderProcessClient(android.webkit.WebView)},
      * {@link WebViewCompat#setWebViewRenderProcessClient(WebView, androidx.webkit.WebViewRenderProcessClient)},
      * {@link android.webkit.WebViewRenderProcessClient#onRenderProcessUnresponsive(WebView, android.webkit.WebViewRenderProcess)},
