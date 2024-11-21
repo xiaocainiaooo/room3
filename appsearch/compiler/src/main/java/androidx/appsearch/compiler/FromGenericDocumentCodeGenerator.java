@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
@@ -411,6 +412,28 @@ class FromGenericDocumentCodeGenerator {
         }
     }
 
+    // TODO(b/378122240): Determine if this should be done for other types of collections
+    /**
+     * Writes the assignment of a default list value to codeBlockBuilder.
+     *
+     * <p>If the list is a non-null Kotlin list, it will be initialized to an empty list. Otherwise,
+     * if it is a nullable Kotlin list or Java list, it will be initialized to null.
+     */
+    private void addDefaultValueForList(@NonNull CodeBlock.Builder codeBlockBuilder,
+            @NonNull AnnotatedGetterOrField getterOrField) {
+        Objects.requireNonNull(codeBlockBuilder);
+        Objects.requireNonNull(getterOrField);
+
+        if (isNonNullKotlinField(getterOrField)) {
+            codeBlockBuilder.addStatement("$T<$T> $NConv = $T.emptyList()",
+                    List.class, getterOrField.getComponentType(), getterOrField.getJvmName(),
+                    Collections.class);
+        } else {
+            codeBlockBuilder.addStatement("$T<$T> $NConv = null",
+                    List.class, getterOrField.getComponentType(), getterOrField.getJvmName());
+        }
+    }
+
     // 1a: ListForLoopAssign
     //     List contains boxed Long, Integer, Double, Float, Boolean or byte[]. We have to
     //     unpack it from a primitive array of type long[], double[], boolean[], or byte[][]
@@ -421,15 +444,16 @@ class FromGenericDocumentCodeGenerator {
             @NonNull DataPropertyAnnotation annotation,
             @NonNull AnnotatedGetterOrField getterOrField) {
         TypeMirror serializedType = annotation.getUnderlyingTypeWithinGenericDoc(mHelper);
-        return CodeBlock.builder()
+        CodeBlock.Builder codeBlockBuilder = CodeBlock.builder()
                 .addStatement("$T[] $NCopy = genericDoc.$N($S)",
                         serializedType,
                         getterOrField.getJvmName(),
                         annotation.getGenericDocArrayGetterName(),
-                        annotation.getName())
-                .addStatement("$T<$T> $NConv = null",
-                        List.class, getterOrField.getComponentType(), getterOrField.getJvmName())
-                .beginControlFlow("if ($NCopy != null)", getterOrField.getJvmName())
+                        annotation.getName());
+
+        addDefaultValueForList(codeBlockBuilder, getterOrField);
+
+        return codeBlockBuilder.beginControlFlow("if ($NCopy != null)", getterOrField.getJvmName())
                 .addStatement("$NConv = new $T<>($NCopy.length)",
                         getterOrField.getJvmName(), ArrayList.class, getterOrField.getJvmName())
                 .beginControlFlow("for (int i = 0; i < $NCopy.length; i++)",
@@ -453,21 +477,13 @@ class FromGenericDocumentCodeGenerator {
     private CodeBlock listCallArraysAsList(
             @NonNull DataPropertyAnnotation annotation,
             @NonNull AnnotatedGetterOrField getterOrField) {
-        boolean isNonNull = isNonNullKotlinField(getterOrField);
         CodeBlock.Builder builder = CodeBlock.builder()
                 .addStatement("$T[] $NCopy = genericDoc.$N($S)",
                         annotation.getUnderlyingTypeWithinGenericDoc(mHelper),
                         getterOrField.getJvmName(),
                         annotation.getGenericDocArrayGetterName(),
                         annotation.getName());
-        if (isNonNull) {
-            builder.addStatement("$T<$T> $NConv = $T.emptyList()",
-                    List.class, getterOrField.getComponentType(), getterOrField.getJvmName(),
-                    Collections.class);
-        } else {
-            builder.addStatement("$T<$T> $NConv = null",
-                    List.class, getterOrField.getComponentType(), getterOrField.getJvmName());
-        }
+        addDefaultValueForList(builder, getterOrField);
         return builder
                 .beginControlFlow("if ($NCopy != null)", getterOrField.getJvmName())
                 .addStatement("$NConv = $T.asList($NCopy)",
@@ -484,12 +500,11 @@ class FromGenericDocumentCodeGenerator {
     private CodeBlock listForLoopCallFromGenericDocument(
             @NonNull DataPropertyAnnotation annotation,
             @NonNull AnnotatedGetterOrField getterOrField) {
-        return CodeBlock.builder()
+        CodeBlock.Builder codeBlockBuilder = CodeBlock.builder()
                 .addStatement("$T[] $NCopy = genericDoc.getPropertyDocumentArray($S)",
-                        GENERIC_DOCUMENT_CLASS, getterOrField.getJvmName(), annotation.getName())
-                .addStatement("$T<$T> $NConv = null",
-                        List.class, getterOrField.getComponentType(), getterOrField.getJvmName())
-                .beginControlFlow("if ($NCopy != null)", getterOrField.getJvmName())
+                        GENERIC_DOCUMENT_CLASS, getterOrField.getJvmName(), annotation.getName());
+        addDefaultValueForList(codeBlockBuilder, getterOrField);
+        return codeBlockBuilder.beginControlFlow("if ($NCopy != null)", getterOrField.getJvmName())
                 .addStatement("$NConv = new $T<>($NCopy.length)",
                         getterOrField.getJvmName(), ArrayList.class, getterOrField.getJvmName())
                 .beginControlFlow("for (int i = 0; i < $NCopy.length; i++)",
@@ -516,14 +531,14 @@ class FromGenericDocumentCodeGenerator {
             @NonNull SerializerClass serializerClass) {
         TypeMirror customType = getterOrField.getComponentType();
         String jvmName = getterOrField.getJvmName(); // e.g. mProp|prop
-        return CodeBlock.builder()
+        CodeBlock.Builder codeBlockBuilder = CodeBlock.builder()
                 .addStatement("$T[] $NCopy = genericDoc.$N($S)",
                         annotation.getUnderlyingTypeWithinGenericDoc(mHelper),
                         jvmName,
                         annotation.getGenericDocArrayGetterName(),
-                        annotation.getName())
-                .addStatement("$T<$T> $NConv = null", List.class, customType, jvmName)
-                .beginControlFlow("if ($NCopy != null)", jvmName)
+                        annotation.getName());
+        addDefaultValueForList(codeBlockBuilder, getterOrField);
+        return codeBlockBuilder.beginControlFlow("if ($NCopy != null)", jvmName)
                 .addStatement("$NConv = new $T<>($NCopy.length)", jvmName, ArrayList.class, jvmName)
                 .addStatement("$T serializer = new $T()",
                         serializerClass.getElement(), serializerClass.getElement())

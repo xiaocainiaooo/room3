@@ -3549,6 +3549,56 @@ public class AppSearchCompilerTest {
                 "Boolean nullableBooleanConv = null;");
     }
 
+    @Test
+    public void testKotlinNullability_nullabilityLists() throws Exception {
+        compileKotlin("""
+                import androidx.appsearch.app.EmbeddingVector
+                @Document
+                data class Gift {
+                    @Document.Namespace String namespace
+                    @Document.Id String id
+                }
+                @Document
+                data class KotlinGift(
+                    @Document.Namespace val namespace: String,
+                    @Document.Id val id: String,
+                    @Document.StringProperty val nonNullStrings: List<String>,
+                    @Document.StringProperty val nullableStrings: List<String>?,
+                    @Document.LongProperty val nonNullLongs: List<Long>,
+                    @Document.LongProperty val nullableLongs: List<Long>?,
+                    @Document.BooleanProperty val nonNullBooleans: List<Boolean>,
+                    @Document.BooleanProperty val nullableBooleans: List<Boolean>?,
+                    @Document.DocumentProperty val nonNullCustomTypes: List<Gift>,
+                    @Document.DocumentProperty val nullableCustomTypes: List<Gift>?,
+                    @Document.EmbeddingProperty val nonNullEmbeddings: List<EmbeddingVector>,
+                    @Document.EmbeddingProperty val nullableEmbeddings: List<EmbeddingVector>?,
+                ) {}
+                """);
+
+        checkEqualsGolden("KotlinGift.java");
+
+        checkResultContains("KotlinGift.java",
+                "List<String> nonNullStringsConv = Collections.emptyList();");
+        checkResultContains("KotlinGift.java",
+                "List<String> nullableStringsConv = null;");
+        checkResultContains("KotlinGift.java",
+                "List<Long> nonNullLongsConv = Collections.emptyList();");
+        checkResultContains("KotlinGift.java",
+                "List<Long> nullableLongsConv = null;");
+        checkResultContains("KotlinGift.java",
+                "List<Boolean> nonNullBooleansConv = Collections.emptyList();");
+        checkResultContains("KotlinGift.java",
+                "List<Boolean> nullableBooleansConv = null;");
+        checkResultContains("KotlinGift.java",
+                "List<Gift> nonNullCustomTypesConv = Collections.emptyList();");
+        checkResultContains("KotlinGift.java",
+                "List<Gift> nullableCustomTypesConv = null;");
+        checkResultContains("KotlinGift.java",
+                "List<EmbeddingVector> nonNullEmbeddingsConv = Collections.emptyList();");
+        checkResultContains("KotlinGift.java",
+                "List<EmbeddingVector> nullableEmbeddingsConv = null;");
+    }
+
     private void compileKotlin(String classBody) throws IOException {
         String src = "package com.example.appsearch\n"
                 + "import androidx.appsearch.annotation.Document\n"
