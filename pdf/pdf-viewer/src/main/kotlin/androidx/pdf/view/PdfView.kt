@@ -28,7 +28,9 @@ import android.view.View
 import androidx.annotation.RestrictTo
 import androidx.core.os.HandlerCompat
 import androidx.pdf.PdfDocument
+import androidx.pdf.util.ZoomUtils
 import java.util.concurrent.Executors
+import kotlin.math.round
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
@@ -107,11 +109,128 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private var dimensionsCollector: Job? = null
     private var invalidationCollector: Job? = null
 
+    private var deferredScrollPage: Int? = null
+    private var deferredScrollPosition: PdfPoint? = null
+
     private val gestureHandler = ZoomScrollGestureHandler(this@PdfView)
     private val gestureTracker = GestureTracker(context).apply { delegate = gestureHandler }
 
     // To avoid allocations during drawing
     private val visibleAreaRect = Rect()
+
+    /**
+     * Scrolls to the 0-indexed [pageNum], optionally animating the scroll
+     *
+     * This View cannot scroll to a page until it knows its dimensions. If [pageNum] is distant from
+     * the currently-visible page in a large PDF, there may be some delay while dimensions are being
+     * loaded from the PDF.
+     */
+    @Suppress("UNUSED_PARAMETER")
+    public fun scrollToPage(pageNum: Int, animateScroll: Boolean = false) {
+        checkMainThread()
+        val localPageLayoutManager =
+            pageLayoutManager
+                ?: throw IllegalStateException("Can't scrollToPage without PdfDocument")
+        require(pageNum < (pdfDocument?.pageCount ?: Int.MIN_VALUE)) {
+            "Page $pageNum not in document"
+        }
+
+        if (localPageLayoutManager.reach >= pageNum) {
+            gotoPage(pageNum)
+        } else {
+            localPageLayoutManager.increaseReach(pageNum)
+            deferredScrollPage = pageNum
+            deferredScrollPosition = null
+        }
+    }
+
+    /**
+     * Scrolls to [position], optionally animating the scroll
+     *
+     * This View cannot scroll to a page until it knows its dimensions. If [position] is distant
+     * from the currently-visible page in a large PDF, there may be some delay while dimensions are
+     * being loaded from the PDF.
+     */
+    @Suppress("UNUSED_PARAMETER")
+    public fun scrollToPosition(position: PdfPoint, animateScroll: Boolean = false) {
+        checkMainThread()
+        val localPageLayoutManager =
+            pageLayoutManager
+                ?: throw IllegalStateException("Can't scrollToPage without PdfDocument")
+        require(position.pageNum < (pdfDocument?.pageCount ?: Int.MIN_VALUE)) {
+            "Page ${position.pageNum} not in document"
+        }
+
+        if (localPageLayoutManager.reach >= position.pageNum) {
+            gotoPoint(position)
+        } else {
+            localPageLayoutManager.increaseReach(position.pageNum)
+            deferredScrollPosition = position
+            deferredScrollPage = null
+        }
+    }
+
+    private fun gotoPage(pageNum: Int) {
+        checkMainThread()
+        val localPageLayoutManager =
+            pageLayoutManager
+                ?: throw IllegalStateException("Can't scrollToPage without PdfDocument")
+        check(pageNum <= localPageLayoutManager.reach) { "Can't gotoPage that's not laid out" }
+
+        val pageRect =
+            localPageLayoutManager.getPageLocation(pageNum, getVisibleAreaInContentCoords())
+        // Zoom should match the width of the page
+        val zoom =
+            ZoomUtils.calculateZoomToFit(
+                viewportWidth.toFloat(),
+                viewportHeight.toFloat(),
+                pageRect.width().toFloat(),
+                1f
+            )
+        val x = round((pageRect.left + pageRect.width() / 2f) * zoom - (viewportWidth / 2f))
+        val y = round((pageRect.top + pageRect.height() / 2f) * zoom - (viewportHeight / 2f))
+
+        // Scroll to the center of the page, then set zoom to fit the width of the page
+        // TODO(b/376136621) - Animate scrolling if requested by scrollToPage API
+        scrollTo(x.toInt(), y.toInt())
+        this.zoom = zoom
+    }
+
+    private fun gotoPoint(position: PdfPoint) {
+        checkMainThread()
+        val localPageLayoutManager =
+            pageLayoutManager
+                ?: throw IllegalStateException("Can't scrollToPage without PdfDocument")
+        check(position.pageNum <= localPageLayoutManager.reach) {
+            "Can't gotoPoint on page that's not laid out"
+        }
+
+        val pageRect =
+            localPageLayoutManager.getPageLocation(
+                position.pageNum,
+                getVisibleAreaInContentCoords()
+            )
+        // Zoom should match the width of the page
+        val zoom =
+            ZoomUtils.calculateZoomToFit(
+                viewportWidth.toFloat(),
+                viewportHeight.toFloat(),
+                pageRect.width().toFloat(),
+                1f
+            )
+
+        val x = round((pageRect.left + pageRect.width() / 2f) * zoom - (viewportWidth / 2f))
+        val y = round((pageRect.top + position.pagePoint.y) * zoom - (viewportHeight / 2f))
+
+        // Scroll to the requested Y position on the page, then set zoom to fit the width of the
+        // page
+        // TODO(b/376136621) - Animate scrolling if requested by scrollToPage API
+        scrollTo(
+            toViewCoord(x, this.zoom, scrollX).toInt(),
+            toViewCoord(y, this.zoom, scrollY).toInt()
+        )
+        this.zoom = zoom
+    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -246,6 +365,16 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         // Learning the dimensions of a page can change our understanding of the content that's in
         // the viewport
         pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
+
+        val localDeferredPosition = deferredScrollPosition
+        val localDeferredPage = deferredScrollPage
+        if (localDeferredPosition != null && localDeferredPosition.pageNum <= pageNum) {
+            gotoPoint(localDeferredPosition)
+            deferredScrollPosition = null
+        } else if (localDeferredPage != null && localDeferredPage <= pageNum) {
+            gotoPage(pageNum)
+            deferredScrollPage = null
+        }
     }
 
     /** Set the zoom, using the given point as a pivot point to zoom in or out of */
