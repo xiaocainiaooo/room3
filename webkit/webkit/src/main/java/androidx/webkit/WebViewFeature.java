@@ -645,7 +645,6 @@ public class WebViewFeature {
      * This feature covers
      * {@link androidx.webkit.WebViewCompat#setDefaultTrafficStatsTag(int)}}
      */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public static final String DEFAULT_TRAFFICSTATS_TAGGING = "DEFAULT_TRAFFICSTATS_TAGGING";
 
     /**
