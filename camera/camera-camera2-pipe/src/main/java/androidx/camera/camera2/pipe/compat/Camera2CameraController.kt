@@ -259,6 +259,9 @@ constructor(
     private fun onCameraStatusChanged(cameraStatus: CameraStatus) {
         Log.debug { "$this ($cameraId) camera status changed: $cameraStatus" }
         synchronized(lock) {
+            if (controllerState == ControllerState.CLOSED) {
+                return
+            }
             when (cameraStatus) {
                 is CameraStatus.CameraAvailable -> cameraAvailability = cameraStatus
                 is CameraStatus.CameraUnavailable -> cameraAvailability = cameraStatus
@@ -355,6 +358,9 @@ constructor(
 
     private fun onStateClosed(cameraState: CameraStateClosed) {
         synchronized(lock) {
+            if (controllerState == ControllerState.CLOSED) {
+                return
+            }
             if (cameraState.cameraErrorCode != null) {
                 lastCameraError = cameraState.cameraErrorCode
                 if (
