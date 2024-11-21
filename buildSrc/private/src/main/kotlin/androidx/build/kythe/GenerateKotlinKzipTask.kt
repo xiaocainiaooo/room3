@@ -174,7 +174,6 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                 project.path in
                     listOf(
                         ":buildSrc-tests",
-                        ":compose:foundation:foundation",
                         ":compose:material3:material3",
                         ":concurrent:concurrent-futures-ktx",
                         ":glance:glance-appwidget",
