@@ -314,6 +314,27 @@ class Camera2CameraControllerTest {
         }
 
     @Test
+    fun testControllerStateDoesNotChangeAfterClosed() =
+        testScope.runTest {
+            val cameraController = createCamera2CameraController()
+            cameraController.updateSurfaceMap(mapOf(streamId1 to fakeSurface))
+            cameraController.start()
+            testScope.advanceUntilIdle()
+
+            cameraController.close()
+            testScope.advanceUntilIdle()
+            assertEquals(cameraController.controllerState, ControllerState.CLOSED)
+
+            fakeCamera2DeviceManager.simulateCameraError(cameraId, CameraError.ERROR_CAMERA_DEVICE)
+            testScope.advanceUntilIdle()
+            assertEquals(cameraController.controllerState, ControllerState.CLOSED)
+
+            fakeCamera2DeviceManager.simulateCameraError(cameraId, CameraError.ERROR_CAMERA_IN_USE)
+            testScope.advanceUntilIdle()
+            assertEquals(cameraController.controllerState, ControllerState.CLOSED)
+        }
+
+    @Test
     fun testControllerStateErrorWhenNonrecoverableCameraError() =
         testScope.runTest {
             val cameraController = createCamera2CameraController()
