@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // TODO(b/337793172): Replace with a default fragment
-                switchContentFragment(ResizeFragment(), "Resize Fragment")
+                switchContentFragment(ResizeFragment(), "Resize CUJ")
 
                 setWindowsInsetsListener()
                 initializeOptionsButton()
