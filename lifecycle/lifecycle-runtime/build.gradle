@@ -129,6 +129,7 @@ androidXMultiplatform {
 }
 
 dependencies {
+    api(libs.jspecify)
     lintPublish(project(":lifecycle:lifecycle-runtime-lint"))
 }
 
