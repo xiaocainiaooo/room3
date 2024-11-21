@@ -1103,7 +1103,10 @@ public final class AppSearchImpl implements Closeable {
                 // Although a replacement document will consume a document id, the limit is only
                 // intended to apply to "living" documents. It is the responsibility of AppSearch's
                 // optimization task to reclaim space when needed.
-                mDocumentLimiterLocked.reportDocumentAdded(packageName);
+                mDocumentLimiterLocked.reportDocumentAdded(
+                        packageName,
+                        () -> getRawStorageInfoProto().getDocumentStorageInfo()
+                                .getNamespaceStorageInfoList());
             }
 
             // Prepare notifications
