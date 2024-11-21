@@ -138,6 +138,14 @@ final value class androidx.savedstate/SavedStateWriter { // androidx.savedstate/
     final inline fun remove(kotlin/String) // androidx.savedstate/SavedStateWriter.remove|remove(kotlin.String){}[0]
 }
 
+final object androidx.savedstate.serialization.serializers/SavedStateSerializer : kotlinx.serialization/KSerializer<androidx.savedstate/SavedState> { // androidx.savedstate.serialization.serializers/SavedStateSerializer|null[0]
+    final val descriptor // androidx.savedstate.serialization.serializers/SavedStateSerializer.descriptor|{}descriptor[0]
+        final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // androidx.savedstate.serialization.serializers/SavedStateSerializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+    final fun deserialize(kotlinx.serialization.encoding/Decoder): androidx.savedstate/SavedState // androidx.savedstate.serialization.serializers/SavedStateSerializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+    final fun serialize(kotlinx.serialization.encoding/Encoder, androidx.savedstate/SavedState) // androidx.savedstate.serialization.serializers/SavedStateSerializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;androidx.savedstate.SavedState){}[0]
+}
+
 final const val androidx.savedstate/DEFAULT_BOOLEAN // androidx.savedstate/DEFAULT_BOOLEAN|{}DEFAULT_BOOLEAN[0]
     final fun <get-DEFAULT_BOOLEAN>(): kotlin/Boolean // androidx.savedstate/DEFAULT_BOOLEAN.<get-DEFAULT_BOOLEAN>|<get-DEFAULT_BOOLEAN>(){}[0]
 final const val androidx.savedstate/DEFAULT_CHAR // androidx.savedstate/DEFAULT_CHAR|{}DEFAULT_CHAR[0]

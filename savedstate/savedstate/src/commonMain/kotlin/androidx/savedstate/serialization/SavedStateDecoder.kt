@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalSerializationApi::class)
-
 package androidx.savedstate.serialization
 
 import androidx.savedstate.SavedState
 import androidx.savedstate.read
+import androidx.savedstate.serialization.serializers.SavedStateSerializer
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
@@ -66,9 +65,8 @@ inline fun <reified T : Any> decodeFromSavedState(savedState: SavedState): T =
  *
  * @property savedState The [SavedState] to decode from.
  */
-private class SavedStateDecoder(
-    private val savedState: SavedState,
-) : AbstractDecoder() {
+@OptIn(ExperimentalSerializationApi::class)
+private class SavedStateDecoder(private val savedState: SavedState) : AbstractDecoder() {
     override val serializersModule: SerializersModule = EmptySerializersModule()
     private var key: String = ""
     private var index = 0
@@ -135,6 +133,14 @@ private class SavedStateDecoder(
         return savedState.read { getStringArray(key) }
     }
 
+    private fun decodeSavedState(): SavedState {
+        return if (key == "") { // root
+            savedState
+        } else {
+            savedState.read { getSavedState(key) }
+        }
+    }
+
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder =
         if (key == "") {
             this
@@ -148,18 +154,26 @@ private class SavedStateDecoder(
 
     @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
-        return when (deserializer.descriptor) {
-            intListDescriptor -> decodeIntList()
-            stringListDescriptor -> decodeStringList()
-            booleanArrayDescriptor -> decodeBooleanArray()
-            charArrayDescriptor -> decodeCharArray()
-            doubleArrayDescriptor -> decodeDoubleArray()
-            floatArrayDescriptor -> decodeFloatArray()
-            intArrayDescriptor -> decodeIntArray()
-            longArrayDescriptor -> decodeLongArray()
-            stringArrayDescriptor -> decodeStringArray()
-            else -> super.decodeSerializableValue(deserializer)
-        }
-            as T
+        return platformSpecificDecodeSerializableValue(savedState, deserializer, key)
+            ?: when (deserializer.descriptor) {
+                intListDescriptor -> decodeIntList()
+                stringListDescriptor -> decodeStringList()
+                booleanArrayDescriptor -> decodeBooleanArray()
+                charArrayDescriptor -> decodeCharArray()
+                doubleArrayDescriptor -> decodeDoubleArray()
+                floatArrayDescriptor -> decodeFloatArray()
+                intArrayDescriptor -> decodeIntArray()
+                longArrayDescriptor -> decodeLongArray()
+                stringArrayDescriptor -> decodeStringArray()
+                SavedStateSerializer.descriptor -> decodeSavedState()
+                else -> super.decodeSerializableValue(deserializer)
+            }
+                as T
     }
 }
+
+internal expect fun <T> platformSpecificDecodeSerializableValue(
+    savedState: SavedState,
+    deserializer: DeserializationStrategy<T>,
+    key: String
+): T?
