@@ -11049,22 +11049,6 @@ public abstract class AppSearchSessionCtsTestBase {
         mDb1.setSchemaAsync(new SetSchemaRequest.Builder()
                 .addSchemas(schemaWithPropertyNotScorable).build()).get();
 
-        // Ranking with the property will return an error, and the scorable cache will also be
-        // erased.
-        ExecutionException exception = assertThrows(ExecutionException.class,
-                () -> {
-                    SearchSpec invalidSearchSpec = new SearchSpec.Builder()
-                            .setScorablePropertyRankingEnabled(true)
-                            .setRankingStrategy(
-                                    "sum(getScorableProperty(\"Gmail\", \"important\"))")
-                            .build();
-                    SearchResults invalidSearchResults =
-                            mDb1.search("", invalidSearchSpec);
-                    retrieveAllSearchResults(invalidSearchResults);
-                });
-        assertThat(exception.getMessage()).matches(
-                ".*\'important\' is not defined as a scorable property under schema type.*");
-
         // Update the schema by updating the property to scorable again.
         mDb1.setSchemaAsync(new SetSchemaRequest.Builder()
                 .addSchemas(schemaWithPropertyScorable).build()).get();

@@ -48,6 +48,8 @@ import androidx.appsearch.app.SearchResults;
 import androidx.appsearch.app.SearchSpec;
 import androidx.appsearch.app.SetSchemaRequest;
 import androidx.appsearch.exceptions.AppSearchException;
+import androidx.appsearch.flags.CheckFlagsRule;
+import androidx.appsearch.flags.DeviceFlagsValueProvider;
 import androidx.appsearch.flags.Flags;
 import androidx.appsearch.flags.RequiresFlagsEnabled;
 import androidx.appsearch.observer.DocumentChangeInfo;
@@ -64,6 +66,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -84,6 +87,9 @@ public abstract class GlobalSearchSessionCtsTestBase {
     protected AppSearchSession mDb2;
 
     protected GlobalSearchSession mGlobalSearchSession;
+
+    @Rule
+    public final CheckFlagsRule mCheckFlagsRule = DeviceFlagsValueProvider.createCheckFlagsRule();
 
     protected abstract ListenableFuture<AppSearchSession> createSearchSessionAsync(
             @NonNull String dbName) throws Exception;
@@ -2028,6 +2034,7 @@ public abstract class GlobalSearchSessionCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
     public void testRankWithScorableProperty_searchFromMultipleDbs() throws Exception {
         assumeTrue(mGlobalSearchSession.getFeatures()
                 .isFeatureSupported(Features.SCHEMA_SCORABLE_PROPERTY_CONFIG));

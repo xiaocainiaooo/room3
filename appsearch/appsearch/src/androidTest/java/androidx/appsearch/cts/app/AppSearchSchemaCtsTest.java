@@ -193,6 +193,7 @@ public class AppSearchSchemaCtsTest {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
     public void testEquals_failWithDifferentScorableTypes() {
         AppSearchSchema schema1 = new AppSearchSchema.Builder("Email")
                 .addProperty(new LongPropertyConfig.Builder("id")

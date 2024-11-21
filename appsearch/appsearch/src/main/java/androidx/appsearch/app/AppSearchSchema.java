@@ -1463,9 +1463,8 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             @ExperimentalAppSearchApi
             @FlaggedApi(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
             @NonNull
-            public BooleanPropertyConfig.Builder setScoringEnabled(
-                    boolean ScoringEnabled) {
-                mScoringEnabled = ScoringEnabled;
+            public BooleanPropertyConfig.Builder setScoringEnabled(boolean scoringEnabled) {
+                mScoringEnabled = scoringEnabled;
                 return this;
             }
 
