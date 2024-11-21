@@ -27,11 +27,9 @@ import android.content.pm.ServiceInfo;
 import android.media.MediaRoute2ProviderService;
 import android.os.Build;
 import android.os.Handler;
-import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.annotation.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,7 +48,6 @@ final class RegisteredMediaRouteProviderWatcher {
     private final PackageManager mPackageManager;
 
     private final ArrayList<RegisteredMediaRouteProvider> mProviders = new ArrayList<>();
-    private boolean mMediaTransferRestrictedToSelfProviders;
     private boolean mRunning;
 
     RegisteredMediaRouteProviderWatcher(Context context, Callback callback) {
@@ -98,17 +95,6 @@ final class RegisteredMediaRouteProviderWatcher {
                 mProviders.get(i).stop();
             }
         }
-    }
-
-    /* package */ void setMediaTransferRestrictedToSelfProviders(
-            boolean mediaTransferRestrictedToSelfProviders) {
-        mMediaTransferRestrictedToSelfProviders = mediaTransferRestrictedToSelfProviders;
-        rescan();
-    }
-
-    @VisibleForTesting
-    /* package */ boolean isMediaTransferRestrictedToSelfProvidersForTesting() {
-        return mMediaTransferRestrictedToSelfProviders;
     }
 
     void scanPackages() {
@@ -185,13 +171,7 @@ final class RegisteredMediaRouteProviderWatcher {
 
         List<ServiceInfo> serviceInfoList = new ArrayList<>();
         for (ResolveInfo resolveInfo : mPackageManager.queryIntentServices(intent, 0)) {
-            ServiceInfo serviceInfo = resolveInfo.serviceInfo;
-            if (mMediaTransferRestrictedToSelfProviders
-                    && !TextUtils.equals(mContext.getPackageName(), serviceInfo.packageName)) {
-                // The app only allows its own Media Router provider to be a MediaRoute2 provider.
-                continue;
-            }
-            serviceInfoList.add(serviceInfo);
+            serviceInfoList.add(resolveInfo.serviceInfo);
         }
         return serviceInfoList;
     }
