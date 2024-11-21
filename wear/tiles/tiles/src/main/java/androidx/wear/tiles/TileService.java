@@ -41,6 +41,7 @@ import androidx.wear.protolayout.proto.DeviceParametersProto.DeviceParameters;
 import androidx.wear.protolayout.protobuf.InvalidProtocolBufferException;
 import androidx.wear.tiles.EventBuilders.TileAddEvent;
 import androidx.wear.tiles.EventBuilders.TileEnterEvent;
+import androidx.wear.tiles.EventBuilders.TileInteractionEvent;
 import androidx.wear.tiles.EventBuilders.TileLeaveEvent;
 import androidx.wear.tiles.EventBuilders.TileRemoveEvent;
 import androidx.wear.tiles.RequestBuilders.ResourcesRequest;
@@ -60,6 +61,7 @@ import java.lang.ref.WeakReference;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -242,8 +244,10 @@ public abstract class TileService extends Service {
      * <p>Note that this is called from your app's main thread, which is usually also the UI thread.
      *
      * @param requestParams Parameters about the request. See {@link TileEnterEvent} for more info.
+     * @deprecated use {@link #processRecentInteractionEvents(List)}.
      */
     @MainThread
+    @Deprecated
     protected void onTileEnterEvent(@NonNull TileEnterEvent requestParams) {}
 
     /**
@@ -252,9 +256,23 @@ public abstract class TileService extends Service {
      * <p>Note that this is called from your app's main thread, which is usually also the UI thread.
      *
      * @param requestParams Parameters about the request. See {@link TileLeaveEvent} for more info.
+     * @deprecated use {@link #processRecentInteractionEvents(List)}.
      */
     @MainThread
+    @Deprecated
     protected void onTileLeaveEvent(@NonNull TileLeaveEvent requestParams) {}
+
+    /**
+     * Called when the system sends a batch of Tile interaction events that happened since the last
+     * time this method was called. The time between calls to this method may vary, do not depend on
+     * it for time-sensitive or critical tasks.
+     *
+     * <p>This method is called from your app's main thread, which is usually also the UI thread.
+     *
+     * @param events A list of {@link TileInteractionEvent} representing interactions that occurred.
+     */
+    @MainThread
+    protected void processRecentInteractionEvents(@NonNull List<TileInteractionEvent> events) {}
 
     /**
      * Gets an instance of {@link TileUpdateRequester} to allow a Tile Provider to notify the tile's
@@ -600,7 +618,14 @@ public abstract class TileService extends Service {
                                                 EventProto.TileEnterEvent.parseFrom(
                                                         data.getContents()));
                                 tileService.markTileAsActiveLegacy(evt.getTileId());
+
                                 tileService.onTileEnterEvent(evt);
+                                tileService.processRecentInteractionEvents(
+                                        List.of(
+                                                new TileInteractionEvent.Builder(
+                                                                evt.getTileId(),
+                                                                TileInteractionEvent.ENTER)
+                                                        .build()));
                             } catch (InvalidProtocolBufferException ex) {
                                 Log.e(TAG, "Error deserializing TileEnterEvent payload.", ex);
                             }
@@ -629,12 +654,60 @@ public abstract class TileService extends Service {
                                                 EventProto.TileLeaveEvent.parseFrom(
                                                         data.getContents()));
                                 tileService.markTileAsActiveLegacy(evt.getTileId());
+
                                 tileService.onTileLeaveEvent(evt);
+                                tileService.processRecentInteractionEvents(
+                                        List.of(
+                                                new TileInteractionEvent.Builder(
+                                                                evt.getTileId(),
+                                                                TileInteractionEvent.LEAVE)
+                                                        .build()));
                             } catch (InvalidProtocolBufferException ex) {
                                 Log.e(TAG, "Error deserializing TileLeaveEvent payload.", ex);
                             }
                         }
                     });
+        }
+
+        @Override
+        public void processRecentInteractionEvents(List<TileInteractionEventData> data) {
+            mHandler.post(
+                    () -> {
+                        TileService tileService = mServiceRef.get();
+
+                        if (data.isEmpty() || tileService == null) {
+                            return;
+                        }
+
+                        if (data.get(0).getVersion() != TileInteractionEventData.VERSION_PROTOBUF) {
+                            Log.e(
+                                    TAG,
+                                    "TileInteractionEventData had unexpected version: "
+                                            + data.get(0).getVersion());
+                            return;
+                        }
+
+                        List<TileInteractionEvent> events =
+                                data.stream()
+                                        .map(TileProviderWrapper::tileInteractionEventFromProto)
+                                        .filter(Optional::isPresent)
+                                        .map(Optional::get)
+                                        .collect(Collectors.toList());
+                        tileService.processRecentInteractionEvents(events);
+                    });
+        }
+
+        @NonNull
+        private static Optional<TileInteractionEvent> tileInteractionEventFromProto(
+                TileInteractionEventData data) {
+            try {
+                return Optional.of(
+                        TileInteractionEvent.fromProto(
+                                EventProto.TileInteractionEvent.parseFrom(data.getContents())));
+            } catch (InvalidProtocolBufferException ex) {
+                Log.e(TAG, "Error deserializing TileInteractionEvent payload.", ex);
+                return Optional.empty();
+            }
         }
     }
 
