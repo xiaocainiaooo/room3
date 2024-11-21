@@ -22,8 +22,10 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
+import android.graphics.RectF
 import android.util.Size
 import androidx.annotation.RestrictTo
+import androidx.annotation.VisibleForTesting
 import androidx.pdf.PdfDocument
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -48,22 +50,22 @@ internal class Page(
         require(pageNum >= 0) { "Invalid negative page" }
     }
 
+    /**
+     * Pre-allocated [Paint] to draw [Highlight]s, color is changed at drawing time to the value
+     * defined by the [Highlight]
+     */
+    private val highlightPaint = Paint().apply { style = Paint.Style.FILL }
+
+    /**
+     * Pre-allocated [RectF] used to represent the View-coordinate location of a [Highlight] during
+     * drawing
+     */
+    private val highlightRect = RectF()
+
     private var isVisible: Boolean = false
     private var renderedZoom: Float? = null
-    private var renderBitmapJob: Job? = null
-    private var bitmap: Bitmap? = null
-
-    fun maybeUpdateBitmaps(zoom: Float) {
-        // If we're actively rendering or have rendered a bitmap for the current zoom level, there's
-        // no need to refresh bitmaps
-        if (renderedZoom?.equals(zoom) == true && (bitmap != null || renderBitmapJob != null)) {
-            return
-        }
-        renderBitmapJob?.cancel()
-        // If we're not visible, don't bother fetching new bitmaps
-        if (!isVisible) return
-        fetchNewBitmap(zoom)
-    }
+    @VisibleForTesting internal var renderBitmapJob: Job? = null
+    @VisibleForTesting internal var bitmap: Bitmap? = null
 
     fun setVisible(zoom: Float) {
         isVisible = true
@@ -78,12 +80,32 @@ internal class Page(
         renderedZoom = null
     }
 
-    fun draw(canvas: Canvas, locationInView: Rect) {
-        bitmap?.let {
-            canvas.drawBitmap(it, /* src= */ null, locationInView, BMP_PAINT)
+    fun draw(canvas: Canvas, locationInView: Rect, highlights: List<Highlight>) {
+        if (bitmap == null) {
+            canvas.drawRect(locationInView, BLANK_PAINT)
             return
         }
-        canvas.drawRect(locationInView, BLANK_PAINT)
+        bitmap?.let { canvas.drawBitmap(it, /* src= */ null, locationInView, BMP_PAINT) }
+        for (highlight in highlights) {
+            // Highlight locations are defined in content coordinates, compute their location
+            // in View coordinates using locationInView
+            highlightRect.set(highlight.area.pageRect)
+            highlightRect.offset(locationInView.left.toFloat(), locationInView.top.toFloat())
+            highlightPaint.color = highlight.color
+            canvas.drawRect(highlightRect, highlightPaint)
+        }
+    }
+
+    private fun maybeUpdateBitmaps(zoom: Float) {
+        // If we're actively rendering or have rendered a bitmap for the current zoom level, there's
+        // no need to refresh bitmaps
+        if (renderedZoom?.equals(zoom) == true && (bitmap != null || renderBitmapJob != null)) {
+            return
+        }
+        renderBitmapJob?.cancel()
+        // If we're not visible, don't bother fetching new bitmaps
+        if (!isVisible) return
+        fetchNewBitmap(zoom)
     }
 
     private fun fetchNewBitmap(zoom: Float) {
@@ -102,8 +124,10 @@ internal class Page(
     }
 }
 
-private val BMP_PAINT = Paint(Paint.FILTER_BITMAP_FLAG)
-private val BLANK_PAINT =
+/** Constant [Paint]s used in drawing */
+@VisibleForTesting internal val BMP_PAINT = Paint(Paint.FILTER_BITMAP_FLAG)
+@VisibleForTesting
+internal val BLANK_PAINT =
     Paint().apply {
         color = Color.WHITE
         style = Paint.Style.FILL

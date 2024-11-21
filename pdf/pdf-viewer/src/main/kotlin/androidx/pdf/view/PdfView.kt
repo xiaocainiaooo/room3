@@ -87,6 +87,20 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             onZoomChanged()
         }
 
+    /**
+     * A set of areas to be highlighted. Each [Highlight] may be a different color. Setting this
+     * property overrides any previous highlights, there is no merging behavior of new and previous
+     * values.
+     */
+    public var highlights: List<Highlight> = listOf()
+        set(value) {
+            checkMainThread()
+            val localPageManager =
+                pageManager
+                    ?: throw IllegalStateException("Can't highlightAreas without PdfDocument")
+            localPageManager.setHighlights(value)
+        }
+
     private val visiblePages: Range<Int>
         get() = pageLayoutManager?.visiblePages?.value ?: Range(0, 0)
 
@@ -243,6 +257,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val localPaginationManager = pageLayoutManager ?: return
+        canvas.save()
         canvas.scale(zoom, zoom)
         for (i in visiblePages.lower..visiblePages.upper) {
             pageManager?.drawPage(
@@ -251,6 +266,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 localPaginationManager.getPageLocation(i, getVisibleAreaInContentCoords())
             )
         }
+        canvas.restore()
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -393,7 +409,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
                     // Prevent 2 copies from running concurrently
                     invalidationToJoin?.join()
-                    manager.updatedPagesFlow.collect { invalidate() }
+                    manager.invalidationSignalFlow.collect { invalidate() }
                 }
         }
     }
