@@ -16,9 +16,10 @@
 
 package androidx.webkit;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresFeature;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -85,8 +86,7 @@ public final class PrefetchParameters {
         @RequiresFeature(name = WebViewFeature.PROFILE_URL_PREFETCH,
                 enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
         @Profile.ExperimentalUrlPrefetch
-        @NonNull
-        public PrefetchParameters build() {
+        public @NonNull PrefetchParameters build() {
             return new PrefetchParameters(mAdditionalHeaders, mExpectedNoVarySearchData,
                     mIsJavaScriptEnabled);
         }
@@ -98,8 +98,7 @@ public final class PrefetchParameters {
          * Header keys must be RFC 2616-compliant.
          */
         @Profile.ExperimentalUrlPrefetch
-        @NonNull
-        public Builder addAdditionalHeader(@NonNull String key, @NonNull String value) {
+        public @NonNull Builder addAdditionalHeader(@NonNull String key, @NonNull String value) {
             mAdditionalHeaders.put(key, value);
             return this;
         }
@@ -112,8 +111,7 @@ public final class PrefetchParameters {
          * (i.e. start a network request).
          */
         @Profile.ExperimentalUrlPrefetch
-        @NonNull
-        public Builder setExpectedNoVarySearchData(
+        public @NonNull Builder setExpectedNoVarySearchData(
                 @NonNull NoVarySearchData expectedNoVarySearchData) {
             mExpectedNoVarySearchData = expectedNoVarySearchData;
             return this;
@@ -125,8 +123,7 @@ public final class PrefetchParameters {
          * client hints header is sent with the prefetch request.
          */
         @Profile.ExperimentalUrlPrefetch
-        @NonNull
-        public Builder setJavaScriptEnabled(boolean javaScriptEnabled) {
+        public @NonNull Builder setJavaScriptEnabled(boolean javaScriptEnabled) {
             mIsJavaScriptEnabled = javaScriptEnabled;
             return this;
         }

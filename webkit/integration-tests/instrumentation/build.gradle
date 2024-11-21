@@ -36,6 +36,7 @@ androidComponents {
 }
 
 dependencies {
+    api(libs.jspecify)
     androidTestImplementation(project(":webkit:webkit"))
 
     androidTestImplementation(libs.okhttpMockwebserver)

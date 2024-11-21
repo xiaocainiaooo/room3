@@ -27,10 +27,11 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.annotation.StringDef;
 import androidx.webkit.internal.WebViewFeatureInternal;
+
+import org.jspecify.annotations.NonNull;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -643,7 +644,7 @@ public class WebViewFeature {
      * @param feature the feature to be checked
      * @return whether the feature is supported given the current platform SDK and WebView version
      */
-    public static boolean isFeatureSupported(@NonNull @WebViewSupportFeature String feature) {
+    public static boolean isFeatureSupported(@WebViewSupportFeature @NonNull String feature) {
         return WebViewFeatureInternal.isSupported(feature);
     }
 
@@ -666,7 +667,7 @@ public class WebViewFeature {
      * @return whether the feature is supported given the current platform SDK and WebView version
      */
     public static boolean isStartupFeatureSupported(@NonNull Context context,
-            @NonNull @WebViewStartupFeature String startupFeature) {
+            @WebViewStartupFeature @NonNull String startupFeature) {
         return WebViewFeatureInternal.isStartupFeatureSupported(startupFeature, context);
     }
 }

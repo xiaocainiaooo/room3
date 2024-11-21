@@ -16,13 +16,13 @@
 
 package androidx.webkit.internal;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.webkit.NoVarySearchData;
 import androidx.webkit.PrefetchParameters;
 
 import org.chromium.support_lib_boundary.PrefetchParamsBoundaryInterface;
 import org.chromium.support_lib_boundary.util.BoundaryInterfaceReflectionUtil;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationHandler;
 import java.util.HashMap;
@@ -36,16 +36,14 @@ public class PrefetchParametersAdapter implements
         mPrefetchParameters = impl;
     }
 
-    @NonNull
     @Override
-    public Map<String, String> getAdditionalHeaders() {
+    public @NonNull Map<String, String> getAdditionalHeaders() {
         if (mPrefetchParameters == null) return new HashMap<>();
         return mPrefetchParameters.getAdditionalHeaders();
     }
 
-    @Nullable
     @Override
-    public InvocationHandler getNoVarySearchData() {
+    public @Nullable InvocationHandler getNoVarySearchData() {
         if (mPrefetchParameters == null) return null;
         NoVarySearchData noVarySearchData = mPrefetchParameters.getExpectedNoVarySearchData();
         if (noVarySearchData == null) return null;

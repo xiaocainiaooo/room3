@@ -31,8 +31,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.annotation.AnyThread;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresFeature;
 import androidx.annotation.RequiresOptIn;
 import androidx.annotation.RestrictTo;
@@ -53,6 +51,8 @@ import androidx.webkit.internal.WebViewRenderProcessClientFrameworkAdapter;
 import androidx.webkit.internal.WebViewRenderProcessImpl;
 
 import org.chromium.support_lib_boundary.WebViewProviderBoundaryInterface;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -177,7 +177,7 @@ public class WebViewCompat {
     @RequiresFeature(name = WebViewFeature.VISUAL_STATE_CALLBACK,
             enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
     public static void postVisualStateCallback(@NonNull WebView webview, long requestId,
-            @NonNull final VisualStateCallback callback) {
+            final @NonNull VisualStateCallback callback) {
         ApiFeature.M feature = WebViewFeatureInternal.VISUAL_STATE_CALLBACK;
         if (feature.isSupportedByFramework()) {
             ApiHelperForM.postVisualStateCallback(webview, requestId, callback);
@@ -333,10 +333,9 @@ public class WebViewCompat {
      * @return the url pointing to a privacy policy document which can be displayed to users.
      */
     @AnyThread
-    @NonNull
     @RequiresFeature(name = WebViewFeature.SAFE_BROWSING_PRIVACY_POLICY_URL,
             enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
-    public static Uri getSafeBrowsingPrivacyPolicyUrl() {
+    public static @NonNull Uri getSafeBrowsingPrivacyPolicyUrl() {
         ApiFeature.O_MR1 feature =
                 WebViewFeatureInternal.SAFE_BROWSING_PRIVACY_POLICY_URL;
         if (feature.isSupportedByFramework()) {
@@ -362,8 +361,7 @@ public class WebViewCompat {
     // Note that this API is not protected by a {@link androidx.webkit.WebViewFeature} since
     // this feature is not dependent on the WebView APK.
     @AnyThread
-    @Nullable
-    public static PackageInfo getCurrentWebViewPackage(@NonNull Context context) {
+    public static @Nullable PackageInfo getCurrentWebViewPackage(@NonNull Context context) {
         PackageInfo info = getCurrentLoadedWebViewPackage();
         if (info != null) return info;
 
@@ -378,9 +376,8 @@ public class WebViewCompat {
      * @return the loaded WebView package, or null if no WebView is created.
      */
     @AnyThread
-    @Nullable
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    public static PackageInfo getCurrentLoadedWebViewPackage() {
+    public static @Nullable PackageInfo getCurrentLoadedWebViewPackage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return ApiHelperForO.getCurrentWebViewPackage();
         } else { // L-N
@@ -462,7 +459,7 @@ public class WebViewCompat {
     @UiThread
     @RequiresFeature(name = WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
             enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
-    public static @NonNull WebMessagePortCompat[] createWebMessageChannel(
+    public static WebMessagePortCompat @NonNull [] createWebMessageChannel(
             @NonNull WebView webview) {
         final ApiFeature.M feature = WebViewFeatureInternal.CREATE_WEB_MESSAGE_CHANNEL;
         if (feature.isSupportedByFramework()) {
@@ -958,7 +955,7 @@ public class WebViewCompat {
             enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
     public static void setWebViewRenderProcessClient(
             @NonNull WebView webview,
-            @NonNull /* @CallbackExecutor */ Executor executor,
+            /* @CallbackExecutor */ @NonNull Executor executor,
             @NonNull WebViewRenderProcessClient webViewRenderProcessClient) {
         final ApiFeature.Q feature =
                 WebViewFeatureInternal.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE;
@@ -1138,11 +1135,10 @@ public class WebViewCompat {
      * @throws IllegalStateException if the WebView has been destroyed.
      */
     @UiThread
-    @NonNull
     @RequiresFeature(
             name = WebViewFeature.MULTI_PROFILE,
             enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
-    public static Profile getProfile(@NonNull WebView webView) {
+    public static @NonNull Profile getProfile(@NonNull WebView webView) {
         final ApiFeature.NoFramework feature = WebViewFeatureInternal.MULTI_PROFILE;
         if (feature.isSupportedByWebView()) {
             return getProvider(webView).getProfile();
