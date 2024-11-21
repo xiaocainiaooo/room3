@@ -18,6 +18,10 @@ package androidx.compose.foundation
 
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.awaitAllPointersUp
+import androidx.compose.foundation.gestures.awaitDragOrCancellation
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitVerticalPointerSlopOrCancellation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.interaction.DragInteraction
@@ -37,6 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
@@ -1075,6 +1081,83 @@ class DraggableTest {
         rule.runOnIdle {
             assertThat(parentDeltas).isNonZero()
             assertThat(childDeltas).isNonZero()
+        }
+    }
+
+    // b/380242617
+    @Test
+    fun nestedDraggable_childStopsConsumingMidway_shouldAllowParentToConsume() {
+        var parentDeltas = 0.0f
+        val parentDraggableController = DraggableState { parentDeltas += it }
+        var keepChild by mutableStateOf(true)
+        var childDeltas = 0f
+        val dragDistance = with(rule.density) { 400.dp.toPx() }
+
+        var eventDropHappened = false
+        var extraUnconsumed = 0f
+        var parentStartOffset = 0f
+
+        rule.setContent {
+            Box(
+                Modifier.size(400.dp)
+                    .draggable(
+                        parentDraggableController,
+                        onDragStarted = { parentStartOffset = it.y },
+                        orientation = Orientation.Vertical
+                    )
+            ) {
+                if (keepChild) {
+                    Box(
+                        Modifier.testTag("childDraggable").size(400.dp).pointerInput(keepChild) {
+                            awaitPointerEventScope {
+                                val down = awaitFirstDown()
+                                awaitVerticalPointerSlopOrCancellation(
+                                    pointerId = down.id,
+                                    pointerType = down.type
+                                ) { change, overSlop ->
+                                    change.consume()
+                                    childDeltas += overSlop
+                                }
+                                while (keepChild) {
+                                    val drag = awaitDragOrCancellation(down.id) ?: break
+                                    if (
+                                        childDeltas.absoluteValue < dragDistance * 0.2 ||
+                                            eventDropHappened
+                                    ) {
+                                        childDeltas += drag.positionChange().y
+                                        drag.consume()
+                                    } else {
+                                        extraUnconsumed += drag.positionChange().y
+                                        eventDropHappened = true
+                                    }
+                                    if (childDeltas.absoluteValue > dragDistance * 0.4) {
+                                        keepChild = false
+                                    }
+                                }
+                                awaitAllPointersUp()
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
+        var swipeStartOffset = 0f
+        rule.onRoot().performTouchInput {
+            swipeUp()
+            swipeStartOffset = bottom
+        }
+
+        rule.onNodeWithTag("childDraggable").assertDoesNotExist()
+
+        // the total drag distance should be reflected on the parent's drag callbacks.
+        rule.runOnIdle {
+            assertThat(dragDistance)
+                .isWithin(2f)
+                .of(
+                    (parentStartOffset - swipeStartOffset).absoluteValue +
+                        parentDeltas.absoluteValue
+                )
         }
     }
 
