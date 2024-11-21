@@ -39,25 +39,25 @@ import androidx.core.util.Preconditions;
 @SuppressWarnings("HiddenSuperclass")
 @SafeParcelable.Class(creator = "CommitBlobResponseCreator")
 @ExperimentalAppSearchApi
-public final class AppSearchCommitBlobResponse extends AbstractSafeParcelable {
+public final class CommitBlobResponse extends AbstractSafeParcelable {
 
     @NonNull
-    public static final Parcelable.Creator<AppSearchCommitBlobResponse> CREATOR =
+    public static final Parcelable.Creator<CommitBlobResponse> CREATOR =
             new CommitBlobResponseCreator();
 
     @Field(id = 1, getter = "getResponseParcel")
     private final AppSearchBatchResultGeneralKeyParcel<AppSearchBlobHandle, Void> mResultParcel;
 
     /**
-     * Creates a {@link AppSearchCommitBlobResponse} with given {@link AppSearchBatchResult}.
+     * Creates a {@link CommitBlobResponse} with given {@link AppSearchBatchResult}.
      */
-    public AppSearchCommitBlobResponse(
+    public CommitBlobResponse(
             @NonNull AppSearchBatchResult<AppSearchBlobHandle, Void> result) {
         this(AppSearchBatchResultGeneralKeyParcel.fromBlobHandleToVoid(result));
     }
 
     @Constructor
-    AppSearchCommitBlobResponse(
+    CommitBlobResponse(
             @Param(id = 1) @NonNull AppSearchBatchResultGeneralKeyParcel<AppSearchBlobHandle, Void>
                     resultParcel) {
         mResultParcel = Preconditions.checkNotNull(resultParcel);
