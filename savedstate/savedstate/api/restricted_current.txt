@@ -202,3 +202,55 @@ package androidx.savedstate.serialization {
 
 }
 
+package androidx.savedstate.serialization.serializers {
+
+  public final class CharSequenceArrayListSerializer implements kotlinx.serialization.KSerializer<java.util.ArrayList<? extends java.lang.CharSequence>> {
+    field public static final androidx.savedstate.serialization.serializers.CharSequenceArrayListSerializer INSTANCE;
+  }
+
+  public final class CharSequenceArraySerializer implements kotlinx.serialization.KSerializer<java.lang.CharSequence[]> {
+    field public static final androidx.savedstate.serialization.serializers.CharSequenceArraySerializer INSTANCE;
+  }
+
+  public final class CharSequenceSerializer implements kotlinx.serialization.KSerializer<java.lang.CharSequence> {
+    field public static final androidx.savedstate.serialization.serializers.CharSequenceSerializer INSTANCE;
+  }
+
+  public final class IBinderSerializer implements kotlinx.serialization.KSerializer<android.os.IBinder> {
+    field public static final androidx.savedstate.serialization.serializers.IBinderSerializer INSTANCE;
+  }
+
+  public final class ParcelableArrayListSerializer implements kotlinx.serialization.KSerializer<java.util.ArrayList<? extends android.os.Parcelable>> {
+    field public static final androidx.savedstate.serialization.serializers.ParcelableArrayListSerializer INSTANCE;
+  }
+
+  public final class ParcelableArraySerializer implements kotlinx.serialization.KSerializer<android.os.Parcelable[]> {
+    field public static final androidx.savedstate.serialization.serializers.ParcelableArraySerializer INSTANCE;
+  }
+
+  public final class ParcelableSerializer implements kotlinx.serialization.KSerializer<android.os.Parcelable> {
+    field public static final androidx.savedstate.serialization.serializers.ParcelableSerializer INSTANCE;
+  }
+
+  public final class SavedStateSerializer implements kotlinx.serialization.KSerializer<android.os.Bundle> {
+    field public static final androidx.savedstate.serialization.serializers.SavedStateSerializer INSTANCE;
+  }
+
+  public final class SerializableSerializer implements kotlinx.serialization.KSerializer<java.io.Serializable> {
+    field public static final androidx.savedstate.serialization.serializers.SerializableSerializer INSTANCE;
+  }
+
+  public final class SizeFSerializer implements kotlinx.serialization.KSerializer<android.util.SizeF> {
+    field public static final androidx.savedstate.serialization.serializers.SizeFSerializer INSTANCE;
+  }
+
+  public final class SizeSerializer implements kotlinx.serialization.KSerializer<android.util.Size> {
+    field public static final androidx.savedstate.serialization.serializers.SizeSerializer INSTANCE;
+  }
+
+  public final class SparseParcelableArraySerializer implements kotlinx.serialization.KSerializer<android.util.SparseArray<? extends android.os.Parcelable>> {
+    field public static final androidx.savedstate.serialization.serializers.SparseParcelableArraySerializer INSTANCE;
+  }
+
+}
+
