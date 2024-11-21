@@ -24,47 +24,58 @@ import android.graphics.Point
 import android.graphics.Rect
 import android.util.Size
 import androidx.annotation.RestrictTo
-import androidx.core.view.doOnDetach
-import kotlinx.coroutines.Dispatchers
+import androidx.pdf.PdfDocument
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /** A single PDF page that knows how to render and draw itself */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 internal class Page(
-    val pageNum: Int,
-    val size: Point,
-    private val pdfView: PdfView,
+    /** The 0-based index of this page in the PDF */
+    private val pageNum: Int,
+    /** The size of this PDF page, in content coordinates */
+    private val size: Point,
+    /** The [PdfDocument] this [Page] belongs to */
+    private val pdfDocument: PdfDocument,
+    /** The [CoroutineScope] to use for background work */
+    private val backgroundScope: CoroutineScope,
+    /** A function to call when the [PdfView] hosting this [Page] ought to invalidate itself */
+    private val onPageUpdate: () -> Unit,
 ) {
-
     init {
         require(pageNum >= 0) { "Invalid negative page" }
-        pdfView.doOnDetach { setInvisible() }
     }
 
-    var isVisible: Boolean = false
-        set(value) {
-            field = value
-            if (field) maybeRender() else setInvisible()
-        }
-
+    private var isVisible: Boolean = false
     private var renderedZoom: Float? = null
     private var renderBitmapJob: Job? = null
     private var bitmap: Bitmap? = null
 
-    fun maybeRender() {
+    fun maybeUpdateBitmaps(zoom: Float) {
         // If we're actively rendering or have rendered a bitmap for the current zoom level, there's
         // no need to refresh bitmaps
-        if (
-            renderedZoom?.equals(pdfView.zoom) == true &&
-                (bitmap != null || renderBitmapJob != null)
-        ) {
+        if (renderedZoom?.equals(zoom) == true && (bitmap != null || renderBitmapJob != null)) {
             return
         }
         renderBitmapJob?.cancel()
-        fetchNewBitmap()
+        // If we're not visible, don't bother fetching new bitmaps
+        if (!isVisible) return
+        fetchNewBitmap(zoom)
+    }
+
+    fun setVisible(zoom: Float) {
+        isVisible = true
+        maybeUpdateBitmaps(zoom)
+    }
+
+    fun setInvisible() {
+        isVisible = false
+        renderBitmapJob?.cancel()
+        renderBitmapJob = null
+        bitmap = null
+        renderedZoom = null
     }
 
     fun draw(canvas: Canvas, locationInView: Rect) {
@@ -75,28 +86,19 @@ internal class Page(
         canvas.drawRect(locationInView, BLANK_PAINT)
     }
 
-    private fun fetchNewBitmap() {
-        val bitmapSource =
-            pdfView.pdfDocument?.getPageBitmapSource(pageNum)
-                ?: throw IllegalStateException("No PDF document to render")
+    private fun fetchNewBitmap(zoom: Float) {
+        val bitmapSource = pdfDocument.getPageBitmapSource(pageNum)
         renderBitmapJob =
-            pdfView.backgroundScope.launch {
+            backgroundScope.launch {
                 ensureActive()
-                val zoom = pdfView.zoom
                 val width = (size.x * zoom).toInt()
                 val height = (size.y * zoom).toInt()
                 renderedZoom = zoom
                 bitmap = bitmapSource.getBitmap(Size(width, height))
-                withContext(Dispatchers.Main) { pdfView.invalidate() }
+                ensureActive()
+                onPageUpdate.invoke()
             }
         renderBitmapJob?.invokeOnCompletion { renderBitmapJob = null }
-    }
-
-    private fun setInvisible() {
-        renderBitmapJob?.cancel()
-        renderBitmapJob = null
-        bitmap = null
-        renderedZoom = null
     }
 }
 

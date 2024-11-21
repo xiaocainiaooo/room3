@@ -43,7 +43,7 @@ import org.robolectric.RobolectricTestRunner
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 @SmallTest
-class PaginationManagerTest {
+class PageLayoutManagerTest {
     private val pdfDocument =
         mock<PdfDocument> {
             on { pageCount } doReturn TOTAL_PAGES
@@ -59,14 +59,14 @@ class PaginationManagerTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
     private val testScope = TestScope(testDispatcher)
-    private lateinit var paginationManager: PaginationManager
+    private lateinit var paginationManager: PageLayoutManager
 
     @Before
     fun setup() {
         // Required because loadPageDimensions jumps to the main thread to update PaginationModel
         Dispatchers.setMain(testDispatcher)
         paginationManager =
-            PaginationManager(pdfDocument, testScope, pagePrefetchRadius = PAGE_PREFETCH_RADIUS)
+            PageLayoutManager(pdfDocument, testScope, pagePrefetchRadius = PAGE_PREFETCH_RADIUS)
     }
 
     @Test

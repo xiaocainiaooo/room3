@@ -39,10 +39,10 @@ import kotlinx.coroutines.withContext
  *
  * Not thread safe
  */
-internal class PaginationManager(
+internal class PageLayoutManager(
     private val pdfDocument: PdfDocument,
     private val backgroundScope: CoroutineScope,
-    private val pagePrefetchRadius: Int = DEFAULT_PAGE_PREFETCH_RADIUS,
+    private val pagePrefetchRadius: Int,
     // TODO(b/376299551) - Make page margin configurable via XML attribute
     pageSpacingPx: Int = DEFAULT_PAGE_SPACING_PX,
     private val paginationModel: PaginationModel =
@@ -140,6 +140,5 @@ internal class PaginationManager(
 
     companion object {
         private const val DEFAULT_PAGE_SPACING_PX: Int = 20
-        private const val DEFAULT_PAGE_PREFETCH_RADIUS: Int = 2
     }
 }
