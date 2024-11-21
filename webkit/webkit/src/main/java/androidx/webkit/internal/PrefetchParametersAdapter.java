@@ -19,7 +19,6 @@ package androidx.webkit.internal;
 import androidx.webkit.NoVarySearchData;
 import androidx.webkit.PrefetchParameters;
 
-import org.chromium.support_lib_boundary.PrefetchParamsBoundaryInterface;
 import org.chromium.support_lib_boundary.util.BoundaryInterfaceReflectionUtil;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -28,21 +27,18 @@ import java.lang.reflect.InvocationHandler;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PrefetchParametersAdapter implements
-        PrefetchParamsBoundaryInterface {
+public class PrefetchParametersAdapter  {
     private final PrefetchParameters mPrefetchParameters;
 
     public PrefetchParametersAdapter(@Nullable PrefetchParameters impl) {
         mPrefetchParameters = impl;
     }
 
-    @Override
     public @NonNull Map<String, String> getAdditionalHeaders() {
         if (mPrefetchParameters == null) return new HashMap<>();
         return mPrefetchParameters.getAdditionalHeaders();
     }
 
-    @Override
     public @Nullable InvocationHandler getNoVarySearchData() {
         if (mPrefetchParameters == null) return null;
         NoVarySearchData noVarySearchData = mPrefetchParameters.getExpectedNoVarySearchData();
@@ -51,7 +47,6 @@ public class PrefetchParametersAdapter implements
                 new NoVarySearchDataAdapter(noVarySearchData));
     }
 
-    @Override
     public boolean isJavaScriptEnabled() {
         if (mPrefetchParameters == null) return false;
         return mPrefetchParameters.isJavaScriptEnabled();
