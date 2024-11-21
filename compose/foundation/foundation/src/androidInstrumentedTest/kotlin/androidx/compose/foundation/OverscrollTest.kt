@@ -135,6 +135,41 @@ class OverscrollTest {
     }
 
     @Test
+    fun modifierUndelegatesNodeOnDetach() {
+        val overscrollEffect = TestOverscrollEffect()
+
+        var addModifier by mutableStateOf(true)
+
+        rule.setContent {
+            Box(if (addModifier) Modifier.overscroll(overscrollEffect) else Modifier)
+        }
+
+        rule.runOnIdle {
+            // The node property points to the 'real node in the tree', so it will be different
+            // from node if it has been delegated to. I.e., assert that this node has been delegated
+            // to.
+            assertThat(overscrollEffect.node.node).isNotEqualTo(overscrollEffect.node)
+            assertThat(overscrollEffect.node.node.isAttached).isTrue()
+            // Remove the overscroll modifier
+            addModifier = false
+        }
+
+        rule.runOnIdle {
+            // Assert that this node is no longer delegated - the node property should point to
+            // itself.
+            assertThat(overscrollEffect.node.node).isEqualTo(overscrollEffect.node)
+            assertThat(overscrollEffect.node.node.isAttached).isFalse()
+            addModifier = true
+        }
+
+        rule.runOnIdle {
+            // The node should be delegated again, and attached.
+            assertThat(overscrollEffect.node.node).isNotEqualTo(overscrollEffect.node)
+            assertThat(overscrollEffect.node.node.isAttached).isTrue()
+        }
+    }
+
+    @Test
     fun modifierUpdatesToNewNode() {
         val overscrollEffect1 = TestOverscrollEffect()
         val overscrollEffect2 = TestOverscrollEffect()
