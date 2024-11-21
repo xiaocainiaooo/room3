@@ -251,7 +251,6 @@ internal suspend fun PointerInputScope.detectDragGestures(
         val down = awaitFirstDown(requireUnconsumed = false)
         var drag: PointerInputChange?
         overSlop = Offset.Zero
-
         if (awaitTouchSlop) {
             do {
                 drag =
@@ -269,7 +268,7 @@ internal suspend fun PointerInputScope.detectDragGestures(
         }
 
         // if the pointer is still down, keep reading events in case we need to pick up the gesture.
-        if (
+        while (
             DragGesturePickUpEnabled && drag == null && currentEvent.changes.fastAny { it.pressed }
         ) {
             var event: PointerEvent
