@@ -19,8 +19,10 @@ package androidx.pdf.view
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Point
+import android.graphics.PointF
 import android.graphics.Rect
 import android.os.Looper
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.util.Range
 import android.view.MotionEvent
@@ -111,6 +113,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     private var deferredScrollPage: Int? = null
     private var deferredScrollPosition: PdfPoint? = null
+
+    /** Used to restore saved state */
+    private var stateToRestore: PdfViewSavedState? = null
+    private var awaitingFirstLayout: Boolean = true
+    private var scrollPositionToRestore: PointF? = null
+    private var zoomToRestore: Float? = null
 
     private val gestureHandler = ZoomScrollGestureHandler(this@PdfView)
     private val gestureTracker = GestureTracker(context).apply { delegate = gestureHandler }
@@ -260,9 +268,19 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
     }
 
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        val localScrollPositionToRestore = scrollPositionToRestore
+        if (awaitingFirstLayout && localScrollPositionToRestore != null) {
+            scrollToRestoredPosition(localScrollPositionToRestore, zoomToRestore ?: zoom)
+        }
+        awaitingFirstLayout = false
+    }
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         stopCollectingData()
+        awaitingFirstLayout = true
     }
 
     override fun onWindowVisibilityChanged(visibility: Int) {
@@ -273,7 +291,68 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         stopCollectingData()
+        awaitingFirstLayout = true
         pageManager?.onDetached()
+    }
+
+    override fun onSaveInstanceState(): Parcelable? {
+        val superState = super.onSaveInstanceState()
+        val state = PdfViewSavedState(superState)
+        state.contentCenterX = scrollX.toFloat() + width / 2
+        state.contentCenterY = scrollY.toFloat() + height / 2
+        state.zoom = zoom
+        state.documentUri = pdfDocument?.uri
+        state.paginationModel = pageLayoutManager?.paginationModel
+        return state
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        if (state !is PdfViewSavedState) {
+            super.onRestoreInstanceState(state)
+            return
+        }
+        super.onRestoreInstanceState(state.superState)
+        stateToRestore = state
+        if (pdfDocument != null) {
+            restoreState()
+        }
+    }
+
+    private fun restoreState() {
+        val localStateToRestore = stateToRestore ?: return
+        val localPdfDocument = pdfDocument ?: return
+        if (
+            localPdfDocument.uri != localStateToRestore.documentUri ||
+                !localStateToRestore.hasEnoughStateToRestore
+        ) {
+            stateToRestore = null
+            return
+        }
+        pageLayoutManager =
+            PageLayoutManager(
+                    localPdfDocument,
+                    backgroundScope,
+                    DEFAULT_PAGE_PREFETCH_RADIUS,
+                    paginationModel = localStateToRestore.paginationModel!!
+                )
+                .apply { onViewportChanged(scrollY, height, zoom) }
+        val positionToRestore =
+            PointF(localStateToRestore.contentCenterX, localStateToRestore.contentCenterY)
+        if (awaitingFirstLayout) {
+            scrollPositionToRestore = positionToRestore
+            zoomToRestore = localStateToRestore.zoom
+        } else {
+            scrollToRestoredPosition(positionToRestore, localStateToRestore.zoom)
+        }
+
+        stateToRestore = null
+    }
+
+    private fun scrollToRestoredPosition(position: PointF, zoom: Float) {
+        scrollTo(round(position.x - width / 2f).toInt(), round(position.y - height / 2f).toInt())
+        this.zoom = zoom
+        scrollPositionToRestore = null
+        zoomToRestore = null
     }
 
     private fun startCollectingData() {
@@ -321,10 +400,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     /** Start using the [PdfDocument] to present PDF content */
     private fun onDocumentSet() {
         val localPdfDocument = pdfDocument ?: return
-        pageLayoutManager =
-            PageLayoutManager(localPdfDocument, backgroundScope, DEFAULT_PAGE_PREFETCH_RADIUS)
-                .apply { onViewportChanged(scrollY, height, zoom) }
         pageManager = PageManager(localPdfDocument, backgroundScope, DEFAULT_PAGE_PREFETCH_RADIUS)
+        if (stateToRestore != null) {
+            restoreState()
+        } else {
+            pageLayoutManager =
+                PageLayoutManager(localPdfDocument, backgroundScope, DEFAULT_PAGE_PREFETCH_RADIUS)
+                    .apply { onViewportChanged(scrollY, height, zoom) }
+        }
         // If not, we'll start doing this when we _are_ attached to a visible window
         if (isAttachedToVisibleWindow) {
             startCollectingData()

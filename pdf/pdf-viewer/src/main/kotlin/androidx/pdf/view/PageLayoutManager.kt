@@ -45,7 +45,7 @@ internal class PageLayoutManager(
     private val pagePrefetchRadius: Int,
     // TODO(b/376299551) - Make page margin configurable via XML attribute
     pageSpacingPx: Int = DEFAULT_PAGE_SPACING_PX,
-    private val paginationModel: PaginationModel =
+    internal val paginationModel: PaginationModel =
         PaginationModel(pageSpacingPx, pdfDocument.pageCount)
 ) {
     /** The 0-indexed maximum page number whose dimensions are known to this model */
@@ -83,6 +83,14 @@ internal class PageLayoutManager(
     private var currentDimensionsJob: Job? = null
 
     init {
+        // If we received a PaginationModel that already has some dimensions, emit those to the View
+        // This is the restored instanceState case
+        if (paginationModel.reach >= 0) {
+            for (i in 0..paginationModel.reach) {
+                _dimensions.tryEmit(i to paginationModel.getPageSize(i))
+            }
+        }
+
         increaseReach(pagePrefetchRadius - 1)
     }
 
