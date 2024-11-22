@@ -143,6 +143,27 @@ class PdfViewStateChangeTest {
     }
 
     @Test
+    fun recreate_withoutPdfDocument() = runTest {
+        withContext(Dispatchers.Main) { setupPdfView(500, 1000, fakePdfDocument = null) }
+        with(ActivityScenario.launch(PdfViewTestActivity::class.java)) {
+            // Recreate without ever setting a document on PdfView initially
+            recreate()
+
+            // Set PdfDocument on the new PdfView instance, and make sure we can interact with it
+            val pdfDocument = FakePdfDocument(List(10) { Point(100, 200) })
+            onActivity { activity ->
+                activity.findViewById<PdfView>(PDF_VIEW_ID)?.also { it.pdfDocument = pdfDocument }
+            }
+
+            pdfDocument.waitForLayout(untilPage = 4)
+            Espresso.onView(withId(PDF_VIEW_ID)).scrollToPage(3)
+            Espresso.onView(withId(PDF_VIEW_ID))
+                .checkPagesAreVisible(firstVisiblePage = 3, visiblePages = 1)
+            close()
+        }
+    }
+
+    @Test
     fun resetDocument() = runTest {
         val pdfDocument =
             FakePdfDocument(
