@@ -107,7 +107,6 @@ import androidx.compose.ui.focus.calculateBoundingRectRelativeTo
 import androidx.compose.ui.focus.focusRect
 import androidx.compose.ui.focus.is1dFocusSearch
 import androidx.compose.ui.focus.isBetterCandidate
-import androidx.compose.ui.focus.requestFocus
 import androidx.compose.ui.focus.requestInteropFocus
 import androidx.compose.ui.focus.toAndroidFocusDirection
 import androidx.compose.ui.focus.toFocusDirection
@@ -326,28 +325,73 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
     override val windowInfo: WindowInfo
         get() = _windowInfo
 
+    /**
+     * Because AndroidComposeView always accepts focus, we have to divert focus to another View if
+     * there is nothing focusable within. However, if there are only nonfocusable ComposeViews, then
+     * the redirection can recurse infinitely. This makes sure that if that happens, then it can
+     * bail when it is detected
+     */
+    private var isInRequestFocus = false
+
     // When move focus is triggered by a key event, and move focus does not cause any focus change,
     // we return the key event to the view system if focus search finds a suitable view which is not
     // a compose sub-view. However if move focus is triggered programmatically, we have to manually
     // implement this behavior because the view system does not have a moveFocus API.
     private fun onMoveFocusInChildren(focusDirection: FocusDirection): Boolean {
-
         // The view system does not have an API corresponding to Enter/Exit.
         if (focusDirection == Enter || focusDirection == Exit) return false
 
+        val androidViewsHandler = _androidViewsHandler ?: return false
+
         val direction =
             checkNotNull(focusDirection.toAndroidFocusDirection()) { "Invalid focus direction" }
-        val focusedRect = onFetchFocusRect()?.toAndroidRect()
 
-        val nextView =
-            FocusFinder.getInstance().let {
-                if (focusedRect == null) {
-                    it.findNextFocus(this, findFocus(), direction)
-                } else {
-                    it.findNextFocusFromRect(this, focusedRect, direction)
-                }
+        val root = rootView as ViewGroup
+
+        val currentFocus = root.findFocus()
+
+        val focusFinder = FocusFinder.getInstance()
+        val nextView: View?
+        val focusedRect: Rect?
+        if (currentFocus == null) {
+            focusedRect = null
+            nextView = focusFinder.findNextFocus(root, null, direction)
+        } else if (focusDirection.is1dFocusSearch() && androidViewsHandler.hasFocus()) {
+            focusedRect = null
+            if (SDK_INT >= O) {
+                // On newer devices, the focus is normal and we can expect forward/next to work
+                nextView = focusFinder.findNextFocus(root, currentFocus, direction)
+            } else {
+                // On older devices, FocusFinder doesn't properly order Views, so we have to use
+                // a copy of the focus finder the corrects the order
+                nextView = FocusFinderCompat.instance.findNextFocus1d(root, currentFocus, direction)
             }
-        return nextView?.requestInteropFocus(direction, focusedRect) ?: false
+        } else {
+            focusedRect = onFetchFocusRect()?.toAndroidRect()
+            nextView = focusFinder.findNextFocusFromRect(root, focusedRect, direction)
+            nextView?.getLocationInWindow(tmpPositionArray)
+            val nextPositionX = tmpPositionArray[0]
+            val nextPositionY = tmpPositionArray[1]
+            getLocationInWindow(tmpPositionArray)
+            focusedRect!!.offset(
+                tmpPositionArray[0] - nextPositionX,
+                tmpPositionArray[1] - nextPositionY
+            )
+        }
+
+        // is it part of the compose hierarchy?
+        if (nextView == null || nextView === currentFocus) {
+            return false
+        }
+
+        var nextParent = nextView.parent
+        while (nextParent != null && nextParent !== androidViewsHandler) {
+            nextParent = nextParent.parent
+        }
+        if (nextParent == null) {
+            return false // not a part of the compose hierarchy
+        }
+        return nextView.requestInteropFocus(direction, focusedRect)
     }
 
     // If this root view is focused, we can get the focus rect from focusOwner. But if a sub-view
@@ -390,11 +434,20 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
             // instead be visited when the AndroidView around them gets a moveFocus(Enter)).
             val androidDirection =
                 checkNotNull(focusDirection.toAndroidFocusDirection()) { "Invalid focus direction" }
-            val androidRect = checkNotNull(focusedRect?.toAndroidRect()) { "Invalid rect" }
 
             val nextView = findNextNonChildView(androidDirection).takeIf { it != this }
-            if (nextView != null && nextView.requestInteropFocus(androidDirection, androidRect)) {
-                return@onKeyEvent true
+            if (nextView != null) {
+                val androidRect = checkNotNull(focusedRect?.toAndroidRect()) { "Invalid rect" }
+                nextView.getLocationInWindow(tmpPositionArray)
+                val nextX = tmpPositionArray[0]
+                val nextY = tmpPositionArray[1]
+                getLocationInWindow(tmpPositionArray)
+                val currentX = tmpPositionArray[0]
+                val currentY = tmpPositionArray[1]
+                androidRect.offset(currentX - nextX, currentY - nextY)
+                if (nextView.requestInteropFocus(androidDirection, androidRect)) {
+                    return@onKeyEvent true
+                }
             }
 
             // Focus finder couldn't find another view. We manually wrap around since focus remained
@@ -418,10 +471,9 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
     private fun findNextNonChildView(direction: Int): View? {
         var currentView: View? = this
+        val focusFinder = FocusFinder.getInstance()
         while (currentView != null) {
-            currentView =
-                FocusFinder.getInstance()
-                    .findNextFocus(rootView as ViewGroup, currentView, direction)
+            currentView = focusFinder.findNextFocus(rootView as ViewGroup, currentView, direction)
             if (currentView != null && !containsDescendant(currentView)) return currentView
         }
         return null
@@ -934,6 +986,10 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         // This view is already focused.
         if (isFocused) return true
 
+        // There is nothing focusable and we've looped around all Views back to this one, so
+        // we just return false to indicate that nothing can be focused.
+        if (isInRequestFocus) return false
+
         // If the root has focus, it means a sub-view is focused,
         // and is trying to move focus within itself.
         if (focusOwner.rootState.hasFocus) {
@@ -941,12 +997,41 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         }
 
         val focusDirection = toFocusDirection(direction) ?: Enter
-        return focusOwner.focusSearch(
-            focusDirection = focusDirection,
-            focusedRect = previouslyFocusedRect?.toComposeRect()
-        ) {
-            it.requestFocus(focusDirection)
-        } ?: false
+        var foundFocusable = false
+        val focusSearchResult =
+            focusOwner.focusSearch(
+                focusDirection = focusDirection,
+                focusedRect = previouslyFocusedRect?.toComposeRect()
+            ) {
+                foundFocusable = true
+                it.requestFocus(focusDirection)
+            }
+        if (focusSearchResult == null) {
+            return false // The focus search was canceled
+        }
+        if (focusSearchResult) {
+            return true // We found something to focus on
+        }
+        if (foundFocusable) {
+            return false // The requestFocus() from within the focusSearch was canceled
+        }
+
+        // We advertised ourselves as focusable, but we aren't. Try to just move the focus to the
+        // next item.
+        val nextFocusedView = findNextNonChildView(direction)
+
+        // Can crash if we return false when we've advertised ourselves as focusable and we aren't
+        // b/369256395
+        if (nextFocusedView == null || nextFocusedView === this) {
+            // There is no next View, so just return true so we don't cause a crash
+            return true
+        }
+
+        // Try to focus on the next focusable View
+        isInRequestFocus = true
+        val requestFocusResult = nextFocusedView.requestFocus(direction)
+        isInRequestFocus = false
+        return requestFocusResult
     }
 
     private fun onRequestFocusForOwner(
