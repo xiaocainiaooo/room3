@@ -115,6 +115,7 @@ public final class GenericDocumentToPlatformConverter {
      * {@link androidx.appsearch.app.GenericDocument}.
      */
     @NonNull
+    @SuppressWarnings("deprecation")
     public static GenericDocument toJetpackGenericDocument(
             @NonNull android.app.appsearch.GenericDocument platformDocument) {
         Preconditions.checkNotNull(platformDocument);

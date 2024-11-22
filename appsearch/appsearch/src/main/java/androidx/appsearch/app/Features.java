@@ -280,6 +280,15 @@ public interface Features {
     String BLOB_STORAGE = "BLOB_STORAGE";
 
     /**
+     * Feature for {@link #isFeatureSupported(String)}. This feature covers whether to wrap the
+     * parent types of a document in the corresponding
+     * {@link androidx.appsearch.app.SearchResult}, instead of in
+     * {@link androidx.appsearch.app.GenericDocument}.
+     */
+    @ExperimentalAppSearchApi
+    String SEARCH_RESULT_PARENT_TYPES = "SEARCH_RESULT_PARENT_TYPES";
+
+    /**
      * Returns whether a feature is supported at run-time. Feature support depends on the
      * feature in question, the AppSearch backend being used and the Android version of the
      * device.

@@ -294,7 +294,7 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testToScoringSpecProto() {
+    public void testToScoringSpecProto() throws Exception {
         String prefix = PrefixUtil.createPrefix("package", "database1");
         String schemaType = "schemaType";
         String namespace = "namespace";
@@ -328,7 +328,7 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testGenerateScoringSpecProtoWhenScorableRankingIsEnabled() {
+    public void testGenerateScoringSpecProtoWhenScorableRankingIsEnabled() throws Exception {
         String prefix1 = PrefixUtil.createPrefix("package1", "database2");
         String prefix2 = PrefixUtil.createPrefix("package2", "database1");
         String gmailSchemaType = "gmail";
@@ -508,7 +508,7 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testToResultSpecProto_projection_withJoinSpec_packageFilter() {
+    public void testToResultSpecProto_projection_withJoinSpec_packageFilter() throws Exception {
         String personPrefix = PrefixUtil.createPrefix("contacts", "database");
         String actionPrefix = PrefixUtil.createPrefix("aiai", "database");
 
@@ -618,7 +618,8 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testToResultSpecProto_projection_removeSchemaWithoutParentInFilter() {
+    public void testToResultSpecProto_projection_removeSchemaWithoutParentInFilter()
+            throws Exception {
         SearchSpec searchSpec = new SearchSpec.Builder()
                 .addFilterSchemas("Person")
                 .addProjection("Artist", ImmutableList.of("name"))
@@ -671,7 +672,7 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testToSearchSpecProto_propertyFilter_withJoinSpec_packageFilter() {
+    public void testToSearchSpecProto_propertyFilter_withJoinSpec_packageFilter() throws Exception {
         String personPrefix = PrefixUtil.createPrefix("contacts", "database");
         String actionPrefix = PrefixUtil.createPrefix("aiai", "database");
 
@@ -748,7 +749,8 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testToSearchSpecProto_propertyFilter_removeSchemaWithoutParentInFilter() {
+    public void testToSearchSpecProto_propertyFilter_removeSchemaWithoutParentInFilter()
+            throws Exception {
         SearchSpec searchSpec = new SearchSpec.Builder()
                 .addFilterSchemas("Person")
                 .addFilterProperties("Artist", ImmutableList.of("name"))
@@ -1370,7 +1372,7 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testGetTargetSchemaFilters_emptySearchingFilter() {
+    public void testGetTargetSchemaFilters_emptySearchingFilter() throws Exception {
         SearchSpec searchSpec = new SearchSpec.Builder().build();
         String prefix1 = createPrefix("package", "database1");
         String prefix2 = createPrefix("package", "database2");
@@ -1398,7 +1400,7 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testGetTargetSchemaFilters_searchPartialFilter() {
+    public void testGetTargetSchemaFilters_searchPartialFilter() throws Exception {
         SearchSpec searchSpec = new SearchSpec.Builder().build();
         String prefix1 = createPrefix("package", "database1");
         String prefix2 = createPrefix("package", "database2");
@@ -1426,7 +1428,7 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testGetTargetSchemaFilters_intersectionWithSearchingFilter() {
+    public void testGetTargetSchemaFilters_intersectionWithSearchingFilter() throws Exception {
         // Put some searching schemas.
         SearchSpec searchSpec = new SearchSpec.Builder()
                 .addFilterSchemas("typeA", "nonExist").build();
@@ -1453,7 +1455,7 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testGetTargetSchemaFilters_polymorphismExpansion() {
+    public void testGetTargetSchemaFilters_polymorphismExpansion() throws Exception {
         SearchSpec searchSpec = new SearchSpec.Builder()
                 .addFilterSchemas("Person", "nonExist").build();
         String prefix = createPrefix("package", "database");
@@ -1492,7 +1494,7 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testGetTargetSchemaFilters_polymorphismExpansion_multipleLevel() {
+    public void testGetTargetSchemaFilters_polymorphismExpansion_multipleLevel() throws Exception {
         SearchSpec searchSpec = new SearchSpec.Builder()
                 .addFilterSchemas("A", "B").build();
         String prefix = createPrefix("package", "database");
@@ -1543,7 +1545,7 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testGetTargetSchemaFilters_intersectionWithNonExistFilter() {
+    public void testGetTargetSchemaFilters_intersectionWithNonExistFilter() throws Exception {
         // Put non-exist searching schema.
         SearchSpec searchSpec = new SearchSpec.Builder()
                 .addFilterSchemas("nonExist").build();
@@ -1611,7 +1613,7 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testIsNothingToSearch() {
+    public void testIsNothingToSearch() throws Exception {
         String prefix = PrefixUtil.createPrefix("package", "database");
         SearchSpec nestedSearchSpec = new SearchSpec.Builder().build();
         JoinSpec joinSpec = new JoinSpec.Builder("entity")
@@ -1710,7 +1712,7 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testConvertPropertyWeights() {
+    public void testConvertPropertyWeights() throws Exception {
         String prefix1 = PrefixUtil.createPrefix("package", "database1");
         String prefix2 = PrefixUtil.createPrefix("package", "database2");
         String schemaTypeA = "typeA";
@@ -1776,7 +1778,7 @@ public class SearchSpecToProtoConverterTest {
     }
 
     @Test
-    public void testConvertPropertyWeights_whenNoWeightsSet() {
+    public void testConvertPropertyWeights_whenNoWeightsSet() throws Exception {
         SearchSpec searchSpec = new SearchSpec.Builder().build();
         String prefix1 = PrefixUtil.createPrefix("package", "database1");
         SchemaTypeConfigProto schemaTypeConfigProto =
