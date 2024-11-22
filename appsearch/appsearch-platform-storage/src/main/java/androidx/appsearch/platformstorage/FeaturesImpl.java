@@ -145,6 +145,9 @@ final class FeaturesImpl implements Features {
             case Features.SEARCH_RESULT_PARENT_TYPES:
                 // TODO(b/371610934) : Update when feature is ready in service-appsearch.
                 // fall through
+            case Features.SCHEMA_STRING_PROPERTY_CONFIG_DELETE_PROPAGATION_TYPE_PROPAGATE_FROM:
+                // TODO(b/376913014) : Update when feature is ready in service-appsearch.
+                // fall through
             default:
                 return false;
         }

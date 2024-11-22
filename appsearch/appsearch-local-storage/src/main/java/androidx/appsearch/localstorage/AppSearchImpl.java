@@ -328,6 +328,8 @@ public final class AppSearchImpl implements Closeable {
                     .setEnableEmbeddingIndex(Flags.enableSchemaEmbeddingPropertyConfig())
                     .setEnableEmbeddingQuantization(Flags.enableSchemaEmbeddingQuantization())
                     .setEnableScorableProperties(Flags.enableScorableProperty())
+                    .setEnableQualifiedIdJoinIndexV3AndDeletePropagateFrom(
+                            Flags.enableDeletePropagationType())
                     .build();
             LogUtil.piiTrace(TAG, "Constructing IcingSearchEngine, request", options);
             mIcingSearchEngineLocked = new IcingSearchEngine(options);
