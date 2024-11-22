@@ -115,6 +115,8 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
         val args = buildList {
             addAll(
                 listOf(
+                    // Kythe drops arg[0] as it's unix convention that is the executable name
+                    "kotlinc",
                     "-jvm-target",
                     jvmTarget.get().target,
                     "-no-reflect",
@@ -133,6 +135,9 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                 listOf("-Xmulti-platform")
             } else emptyList()
 
+        val filteredKotlincFreeCompilerArgs =
+            kotlincFreeCompilerArgs.get().distinct().filter { !it.startsWith("-Xjdk-release") }
+
         val command = buildList {
             add(kotlincExtractorBin.get().asFile)
             addAll(
@@ -146,8 +151,7 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                     "-vnames",
                     vnamesJson.get().asFile.relativeTo(checkoutRoot).path,
                     "-args",
-                    (args + multiplatformArg + kotlincFreeCompilerArgs.get().distinct())
-                        .joinToString(" ")
+                    (args + multiplatformArg + filteredKotlincFreeCompilerArgs).joinToString(" ")
                 )
             )
             sourceFiles.forEach { addAll(listOf("-srcs", it.path)) }
