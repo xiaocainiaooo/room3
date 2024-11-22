@@ -21,8 +21,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.runtime.Composable
@@ -45,10 +47,12 @@ import androidx.wear.compose.material3.ScreenConfiguration
 import androidx.wear.compose.material3.ScreenSize
 import androidx.wear.compose.material3.Stepper
 import androidx.wear.compose.material3.StepperDefaults
+import androidx.wear.compose.material3.StepperDefaults.IconSize
 import androidx.wear.compose.material3.TEST_TAG
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.goldenIdentifier
 import androidx.wear.compose.material3.setContentWithTheme
+import androidx.wear.compose.materialcore.RangeIcons
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import org.junit.Rule
@@ -73,7 +77,9 @@ class StepperScreenshotTest {
                 modifier = Modifier.testTag(TEST_TAG),
                 value = 2f,
                 steps = 3,
-                onValueChange = {}
+                onValueChange = {},
+                increaseIcon = { IncreaseIcon() },
+                decreaseIcon = { DecreaseIcon() },
             ) {}
         }
     }
@@ -101,7 +107,9 @@ class StepperScreenshotTest {
                 modifier = Modifier.testTag(TEST_TAG),
                 value = 2f,
                 steps = 3,
-                onValueChange = {}
+                onValueChange = {},
+                increaseIcon = { IncreaseIcon() },
+                decreaseIcon = { DecreaseIcon() },
             ) {
                 FilledTonalButton(
                     onClick = {},
@@ -120,6 +128,8 @@ class StepperScreenshotTest {
                 value = 2f,
                 steps = 3,
                 onValueChange = {},
+                increaseIcon = { IncreaseIcon() },
+                decreaseIcon = { DecreaseIcon() },
                 colors =
                     StepperDefaults.colors(
                         buttonContainerColor = Color.Green,
@@ -140,6 +150,8 @@ class StepperScreenshotTest {
                 valueRange = 0f..4f,
                 value = 4f,
                 steps = 3,
+                increaseIcon = { IncreaseIcon() },
+                decreaseIcon = { DecreaseIcon() },
                 onValueChange = {}
             ) {}
         }
@@ -153,6 +165,8 @@ class StepperScreenshotTest {
                 valueRange = 0f..4f,
                 value = 0f,
                 steps = 3,
+                increaseIcon = { IncreaseIcon() },
+                decreaseIcon = { DecreaseIcon() },
                 onValueChange = {}
             ) {}
         }
@@ -168,6 +182,8 @@ class StepperScreenshotTest {
                 steps = 3,
                 onValueChange = {},
                 enabled = false,
+                increaseIcon = { IncreaseIcon() },
+                decreaseIcon = { DecreaseIcon() },
             ) {}
         }
     }
@@ -190,3 +206,19 @@ class StepperScreenshotTest {
             .assertAgainstGolden(screenshotRule, testName.goldenIdentifier())
     }
 }
+
+@Composable
+private fun IncreaseIcon() =
+    Icon(
+        imageVector = Icons.Filled.Add,
+        contentDescription = "Increase",
+        modifier = Modifier.size(IconSize)
+    )
+
+@Composable
+private fun DecreaseIcon() =
+    Icon(
+        imageVector = RangeIcons.Minus,
+        contentDescription = "Decrease",
+        modifier = Modifier.size(IconSize)
+    )
