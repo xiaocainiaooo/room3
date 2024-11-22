@@ -16,6 +16,9 @@
 
 package androidx.wear.tiles;
 
+import static android.content.Intent.ACTION_MAIN;
+import static android.content.Intent.CATEGORY_HOME;
+
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -24,6 +27,8 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.Settings;
@@ -48,6 +53,7 @@ class SysUiTileUpdateRequester implements TileUpdateRequester {
 
     public static final String ACTION_BIND_UPDATE_REQUESTER =
             "androidx.wear.tiles.action.BIND_UPDATE_REQUESTER";
+    private static final String CATEGORY_HOME_MAIN = CATEGORY_HOME + "_MAIN";
 
     final Context mAppContext;
 
@@ -89,7 +95,29 @@ class SysUiTileUpdateRequester implements TileUpdateRequester {
         bindAndUpdate(bindIntent);
     }
 
+    private String getSysUiPackageNameOnU() {
+        Intent queryIntent = new Intent(ACTION_MAIN);
+        queryIntent.addCategory(CATEGORY_HOME_MAIN);
+
+        PackageManager pm = mAppContext.getPackageManager();
+        ResolveInfo homeActivity =
+                pm.resolveActivity(queryIntent, PackageManager.MATCH_DEFAULT_ONLY);
+
+        if (homeActivity == null) {
+            Log.e(TAG, "Couldn't find SysUi packageName");
+            return DEFAULT_TARGET_SYSUI;
+        }
+
+        return homeActivity.activityInfo.packageName;
+    }
+
     private String getSysUiPackageName() {
+        if (VERSION.SDK_INT == VERSION_CODES.UPSIDE_DOWN_CAKE
+                && mAppContext.getApplicationInfo().targetSdkVersion
+                        > VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            return getSysUiPackageNameOnU();
+        }
+
         String sysUiPackageName =
                 Settings.Global.getString(mAppContext.getContentResolver(), SYSUI_SETTINGS_KEY);
 
@@ -101,7 +129,6 @@ class SysUiTileUpdateRequester implements TileUpdateRequester {
     }
 
     @Nullable
-    @SuppressWarnings("deprecation")
     private Intent buildUpdateBindIntent() {
         Intent bindIntent = new Intent(ACTION_BIND_UPDATE_REQUESTER);
         bindIntent.setPackage(getSysUiPackageName());
