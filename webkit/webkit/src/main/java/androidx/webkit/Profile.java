@@ -22,11 +22,12 @@ import android.webkit.ServiceWorkerController;
 import android.webkit.WebStorage;
 
 import androidx.annotation.AnyThread;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresFeature;
 import androidx.annotation.RequiresOptIn;
 import androidx.core.os.CancellationSignal;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -50,10 +51,9 @@ public interface Profile {
      * ProfileStore create methods.
      */
     @AnyThread
-    @NonNull
     @RequiresFeature(name = WebViewFeature.MULTI_PROFILE,
             enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
-    String getName();
+    @NonNull String getName();
 
     /**
      * Returns the profile's cookie manager.
@@ -64,10 +64,9 @@ public interface Profile {
      *                               {@link ProfileStore#deleteProfile(String)}}.
      */
     @AnyThread
-    @NonNull
     @RequiresFeature(name = WebViewFeature.MULTI_PROFILE,
             enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
-    CookieManager getCookieManager();
+    @NonNull CookieManager getCookieManager();
 
     /**
      * Returns the profile's web storage.
@@ -78,10 +77,9 @@ public interface Profile {
      *                               {@link ProfileStore#deleteProfile(String)}}.
      */
     @AnyThread
-    @NonNull
     @RequiresFeature(name = WebViewFeature.MULTI_PROFILE,
             enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
-    WebStorage getWebStorage();
+    @NonNull WebStorage getWebStorage();
 
     /**
      * Returns the geolocation permissions of the profile.
@@ -92,10 +90,9 @@ public interface Profile {
      *                               {@link ProfileStore#deleteProfile(String)}}.
      */
     @AnyThread
-    @NonNull
     @RequiresFeature(name = WebViewFeature.MULTI_PROFILE,
             enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
-    GeolocationPermissions getGeolocationPermissions();
+    @NonNull GeolocationPermissions getGeolocationPermissions();
 
     /**
      * Returns the service worker controller of the profile.
@@ -106,10 +103,9 @@ public interface Profile {
      *                               {@link ProfileStore#deleteProfile(String)}}.
      */
     @AnyThread
-    @NonNull
     @RequiresFeature(name = WebViewFeature.MULTI_PROFILE,
             enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
-    ServiceWorkerController getServiceWorkerController();
+    @NonNull ServiceWorkerController getServiceWorkerController();
 
     /**
      * Denotes that the UrlPrefetch API surface is experimental.
