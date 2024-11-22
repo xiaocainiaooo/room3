@@ -1201,7 +1201,7 @@ public class WebViewCompat {
      * {@link WebViewCompat#startUpWebView(WebViewStartUpConfig, WebViewStartUpCallback)}.
      */
     @ExperimentalAsyncStartUp
-    public interface WebViewStartUpCallback {
+    public interface  WebViewStartUpCallback {
         /**
          * Called when WebView startup completes successfully.
          *
@@ -1213,9 +1213,9 @@ public class WebViewCompat {
     /**
      * Asynchronously trigger WebView startup.
      * <p>
-     * WebView startup is a time-consuming process that is  normally triggered during the first
+     * WebView startup is a time-consuming process that is normally triggered during the first
      * usage of WebView related APIs. WebView startup happens once per process.
-     * For example, the first call to `new WebView()` can take longer to
+     * For example, the first call to {@code new WebView()} can take longer to
      * complete than future calls due to WebView startup being triggered. The Android
      * UI thread remains blocked till the startup completes.
      * <p>
@@ -1225,8 +1225,8 @@ public class WebViewCompat {
      * This method ensures that the portions of WebView startup which are able to run in the
      * background will do so. Other portions of startup will still run on the UI thread.
      * <p>
-     * Any APIs in `android.webkit` and `androidx.webkit` (including
-     * {@link WebViewFeature} MUST only be called after the callback is invoked in order to
+     * Any APIs in {@code android.webkit} and {@code androidx.webkit} (including
+     * {@link WebViewFeature}) MUST only be called after the callback is invoked in order to
      * ensure the maximum benefit.
      * There is no feature check or call to {@link WebViewFeature} required for using this method.
      * <p>
@@ -1245,14 +1245,54 @@ public class WebViewCompat {
     public static void startUpWebView(
             @NonNull WebViewStartUpConfig config, @NonNull WebViewStartUpCallback callback) {
         config.getBackgroundExecutor().execute(() -> {
+            // Invoke provider init.
+            WebViewGlueCommunicator.getWebViewClassLoader();
+            if (!config.shouldRunUiThreadStartUpTasks()) {
+                new Handler(Looper.getMainLooper()).post(
+                        () -> callback.onSuccess(new NullReturningWebViewStartUpResult()));
+                return;
+            }
+            if (WebViewFeatureInternal.ASYNC_WEBVIEW_STARTUP.isSupportedByWebView()) {
+                // We want to ensure that the callback is run on the Android main looper. The callee
+                // doesn't guarantee this. It's also desirable to post it to make sure that we don't
+                // run the app's callback synchronously from inside startChromiumLocked:
+                // - This helps avoid making the blocking task longer.
+                // - If the app's callback has a problem the stack trace will hopefully make it
+                // clearer that it's not WebView's fault since WebView code will not be in the
+                // stack trace.
+                getFactory().startUpWebView(config, (result) -> {
+                    new Handler(Looper.getMainLooper()).post(() -> callback.onSuccess(result));
+                });
+                return;
+            }
             // We never access the context in Chromium-based WebView and `startUpWebView` will
             // only be called on Android API versions where the WebView is Chromium-based, so
             // passing `null`.
+            // This method implicitly does WebView startup.
             WebSettings.getDefaultUserAgent(null);
             // Trigger the callback from the main looper.
-            new Handler(Looper.getMainLooper()).post(() -> callback.onSuccess(
-                    new WebViewStartUpResult() {}));
+            // The framework doesn't support providing any diagnostic information, therefore,
+            // returning `null` for every method.
+            new Handler(Looper.getMainLooper()).post(
+                    () -> callback.onSuccess(new NullReturningWebViewStartUpResult()));
         });
+    }
+
+    private static class NullReturningWebViewStartUpResult implements WebViewStartUpResult {
+        @Override
+        public Long getTotalTimeInUiThreadMillis() {
+            return null;
+        }
+
+        @Override
+        public Long getMaxTimePerTaskInUiThreadMillis() {
+            return null;
+        }
+
+        @Override
+        public List<BlockingStartUpLocation> getBlockingStartUpLocations() {
+            return null;
+        }
     }
 
     private static WebViewProviderFactory getFactory() {

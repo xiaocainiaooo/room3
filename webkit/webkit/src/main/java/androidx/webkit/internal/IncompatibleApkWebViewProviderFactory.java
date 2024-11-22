@@ -18,6 +18,9 @@ package androidx.webkit.internal;
 
 import android.webkit.WebView;
 
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewStartUpConfig;
+
 import org.chromium.support_lib_boundary.DropDataContentProviderBoundaryInterface;
 import org.chromium.support_lib_boundary.ProfileStoreBoundaryInterface;
 import org.chromium.support_lib_boundary.ProxyControllerBoundaryInterface;
@@ -82,6 +85,12 @@ public class IncompatibleApkWebViewProviderFactory implements WebViewProviderFac
 
     @Override
     public @NonNull ProfileStoreBoundaryInterface getProfileStore() {
+        throw new UnsupportedOperationException(UNSUPPORTED_EXCEPTION_EXPLANATION);
+    }
+
+    @Override
+    public void startUpWebView(@NonNull WebViewStartUpConfig config,
+            WebViewCompat.@NonNull WebViewStartUpCallback callback) {
         throw new UnsupportedOperationException(UNSUPPORTED_EXCEPTION_EXPLANATION);
     }
 }

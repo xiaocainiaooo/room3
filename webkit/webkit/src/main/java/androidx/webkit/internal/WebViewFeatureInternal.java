@@ -45,6 +45,7 @@ import androidx.webkit.WebResourceRequestCompat;
 import androidx.webkit.WebViewClientCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
+import androidx.webkit.WebViewStartUpConfig;
 
 import org.chromium.support_lib_boundary.util.Features;
 import org.jspecify.annotations.NonNull;
@@ -657,6 +658,18 @@ public class WebViewFeatureInternal {
                     return super.isSupportedByWebView();
                 }
             };
+
+    /**
+     * Feature that is relevant for the implementation of
+     * {@link androidx.webkit.WebViewCompat#startUpWebView(WebViewStartUpConfig, WebViewCompat.WebViewStartUpCallback)}
+     *
+     * This feature is not referred to by the app and is only used by the library to choose
+     * different code paths based on underlying support from WebView.
+     */
+    public static final ApiFeature.NoFramework ASYNC_WEBVIEW_STARTUP =
+            new ApiFeature.NoFramework("IMPLEMENTATION_ONLY_FEATURE",
+                    Features.ASYNC_WEBVIEW_STARTUP);
+
 
     // --- Add new feature constants above this line ---
 
