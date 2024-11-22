@@ -51,6 +51,7 @@ import androidx.wear.protolayout.proto.ResourceProto;
 import androidx.wear.protolayout.protobuf.ExtensionRegistryLite;
 import androidx.wear.tiles.EventBuilders.TileAddEvent;
 import androidx.wear.tiles.EventBuilders.TileEnterEvent;
+import androidx.wear.tiles.EventBuilders.TileInteractionEvent;
 import androidx.wear.tiles.EventBuilders.TileLeaveEvent;
 import androidx.wear.tiles.EventBuilders.TileRemoveEvent;
 import androidx.wear.tiles.RequestBuilders.ResourcesRequest;
@@ -81,6 +82,7 @@ import org.robolectric.annotation.internal.DoNotInstrument;
 import org.robolectric.shadows.ShadowSystemClock;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -653,6 +655,24 @@ public class TileServiceTest {
     }
 
     @Test
+    public void tileService_onTileEnter_callsProcessRecentInteractionEvents() throws Exception {
+        EventProto.TileEnterEvent enterRequest =
+                EventProto.TileEnterEvent.newBuilder().setTileId(TILE_ID).build();
+
+        mTileProviderServiceStub.onTileEnterEvent(
+                new TileEnterEventData(
+                        enterRequest.toByteArray(), TileEnterEventData.VERSION_PROTOBUF));
+        shadowOf(Looper.getMainLooper()).idle();
+
+        expect.that(mFakeTileServiceController.get().mLastEventBatch).isNotEmpty();
+        TileInteractionEvent interactionEvent =
+                mFakeTileServiceController.get().mLastEventBatch.get(0);
+
+        expect.that(interactionEvent.getTileId()).isEqualTo(TILE_ID);
+        expect.that(interactionEvent.getEventType()).isEqualTo(TileInteractionEvent.ENTER);
+    }
+
+    @Test
     public void tileService_onTileLeave() throws Exception {
         EventProto.TileLeaveEvent leaveRequest =
                 EventProto.TileLeaveEvent.newBuilder().setTileId(TILE_ID).build();
@@ -664,6 +684,65 @@ public class TileServiceTest {
 
         expect.that(mFakeTileServiceController.get().mOnTileLeaveCalled).isTrue();
         expect.that(mFakeTileServiceController.get().mTileId).isEqualTo(TILE_ID);
+    }
+
+    @Test
+    public void tileService_onTileLeave_callsProcessRecentInteractionEvents() throws Exception {
+        EventProto.TileLeaveEvent leaveRequest =
+                EventProto.TileLeaveEvent.newBuilder().setTileId(TILE_ID).build();
+
+        mTileProviderServiceStub.onTileLeaveEvent(
+                new TileLeaveEventData(
+                        leaveRequest.toByteArray(), TileLeaveEventData.VERSION_PROTOBUF));
+        shadowOf(Looper.getMainLooper()).idle();
+
+        expect.that(mFakeTileServiceController.get().mLastEventBatch).isNotEmpty();
+        TileInteractionEvent interactionEvent =
+                mFakeTileServiceController.get().mLastEventBatch.get(0);
+
+        expect.that(interactionEvent.getTileId()).isEqualTo(TILE_ID);
+        expect.that(interactionEvent.getEventType()).isEqualTo(TileInteractionEvent.LEAVE);
+    }
+
+    @Test
+    public void tileService_processRecentInteractionEvents() throws Exception {
+        long fakeTimestamp = 112233L;
+        ImmutableList<EventProto.TileInteractionEvent> eventProtos =
+                ImmutableList.of(
+                        EventProto.TileInteractionEvent.newBuilder()
+                                .setTileId(TILE_ID)
+                                .setTimestampEpochMillis(fakeTimestamp)
+                                .setEnter(EventProto.TileEnter.getDefaultInstance())
+                                .build(),
+                        EventProto.TileInteractionEvent.newBuilder()
+                                .setTileId(TILE_ID)
+                                .setTimestampEpochMillis(fakeTimestamp)
+                                .setLeave(EventProto.TileLeave.getDefaultInstance())
+                                .build());
+
+        mTileProviderServiceStub.processRecentInteractionEvents(
+                eventProtos.stream()
+                        .map(
+                                e ->
+                                        new TileInteractionEventData(
+                                                e.toByteArray(),
+                                                TileInteractionEventData.VERSION_PROTOBUF))
+                        .collect(toImmutableList()));
+        shadowOf(Looper.getMainLooper()).idle();
+
+        List<TileInteractionEvent> receivedEvents =
+                mFakeTileServiceController.get().mLastEventBatch;
+        expect.that(receivedEvents).hasSize(2);
+
+        expect.that(receivedEvents.get(0).getTileId()).isEqualTo(TILE_ID);
+        expect.that(receivedEvents.get(0).getTimestamp())
+                .isEqualTo(Instant.ofEpochMilli(fakeTimestamp));
+        expect.that(receivedEvents.get(0).getEventType()).isEqualTo(TileInteractionEvent.ENTER);
+
+        expect.that(receivedEvents.get(1).getTileId()).isEqualTo(TILE_ID);
+        expect.that(receivedEvents.get(1).getTimestamp())
+                .isEqualTo(Instant.ofEpochMilli(fakeTimestamp));
+        expect.that(receivedEvents.get(1).getEventType()).isEqualTo(TileInteractionEvent.LEAVE);
     }
 
     @Test
@@ -882,6 +961,7 @@ public class TileServiceTest {
         @Nullable ResourcesRequest mResourcesRequestParams = null;
         @Nullable RuntimeException mRequestFailure = null;
         int mTileId = -1;
+        List<TileInteractionEvent> mLastEventBatch;
 
         @Override
         TimeSourceClock getTimeSourceClock() {
@@ -901,15 +981,22 @@ public class TileServiceTest {
         }
 
         @Override
+        @SuppressWarnings("deprecation") // Testing backward compatibility
         protected void onTileEnterEvent(@NonNull TileEnterEvent requestParams) {
             mOnTileEnterCalled = true;
             mTileId = requestParams.getTileId();
         }
 
         @Override
+        @SuppressWarnings("deprecation") // Testing backward compatibility
         protected void onTileLeaveEvent(@NonNull TileLeaveEvent requestParams) {
             mOnTileLeaveCalled = true;
             mTileId = requestParams.getTileId();
+        }
+
+        @Override
+        protected void processRecentInteractionEvents(@NonNull List<TileInteractionEvent> events) {
+            mLastEventBatch = events;
         }
 
         @Override
@@ -956,9 +1043,11 @@ public class TileServiceTest {
         protected void onTileRemoveEvent(@NonNull TileRemoveEvent requestParams) {}
 
         @Override
+        @SuppressWarnings("deprecation") // Testing backward compatibility
         protected void onTileEnterEvent(@NonNull TileEnterEvent requestParams) {}
 
         @Override
+        @SuppressWarnings("deprecation") // Testing backward compatibility
         protected void onTileLeaveEvent(@NonNull TileLeaveEvent requestParams) {}
 
         @Override
