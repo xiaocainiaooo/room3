@@ -17,10 +17,12 @@
 package androidx.xr.compose.material3
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ColorScheme
@@ -90,9 +92,9 @@ public fun NavigationBar(
             Row(
                 // XR-changed: Original NavigationBar uses fillMaxWidth() and windowInsets,
                 // which do not produce the desired result in XR.
-                // TODO(b/377758560): Find a way to make this row wrap content only
                 modifier =
-                    Modifier.heightIn(min = XrNavigationBarTokens.ContainerHeight)
+                    Modifier.width(IntrinsicSize.Min)
+                        .heightIn(min = XrNavigationBarTokens.ContainerHeight)
                         .padding(horizontal = XrNavigationBarTokens.HorizontalPadding)
                         .selectableGroup(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -108,7 +110,7 @@ private object XrNavigationBarTokens {
     val OrbiterEdgeOffset
         @Composable get() = EdgeOffset.inner(24.dp)
 
-    val HorizontalPadding = 20.dp
+    val HorizontalPadding = 8.dp
 
     val ContainerHeight = 80.0.dp
 }
