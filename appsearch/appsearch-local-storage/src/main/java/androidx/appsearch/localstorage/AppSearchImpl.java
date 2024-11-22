@@ -396,7 +396,7 @@ public final class AppSearchImpl implements Closeable {
                 }
 
                 // Populate schema parent-to-children map
-                mSchemaCacheLocked.rebuildSchemaParentToChildrenMap();
+                mSchemaCacheLocked.rebuildCache();
 
                 // Populate namespace map
                 List<String> prefixedNamespaceList =
@@ -823,7 +823,7 @@ public final class AppSearchImpl implements Closeable {
             mSchemaCacheLocked.removeFromSchemaMap(prefix, schemaType);
         }
 
-        mSchemaCacheLocked.rebuildSchemaParentToChildrenMapForPrefix(prefix);
+        mSchemaCacheLocked.rebuildCacheForPrefix(prefix);
 
         // Since the constructor of VisibilityStore will set schema. Avoid call visibility
         // store before we have already created it.
@@ -1322,10 +1322,8 @@ public final class AppSearchImpl implements Closeable {
             DocumentProto.Builder documentBuilder = documentProto.toBuilder();
             removePrefixesFromDocument(documentBuilder);
             String prefix = createPrefix(packageName, databaseName);
-            Map<String, SchemaTypeConfigProto> schemaTypeMap =
-                    mSchemaCacheLocked.getSchemaMapForPrefix(prefix);
             return GenericDocumentToProtoConverter.toGenericDocument(documentBuilder.build(),
-                    prefix, schemaTypeMap, mConfig);
+                    prefix, mSchemaCacheLocked, mConfig);
         } finally {
             mReadWriteLock.readLock().unlock();
         }
@@ -1364,10 +1362,8 @@ public final class AppSearchImpl implements Closeable {
             // The schema type map cannot be null at this point. It could only be null if no
             // schema had ever been set for that prefix. Given we have retrieved a document from
             // the index, we know a schema had to have been set.
-            Map<String, SchemaTypeConfigProto> schemaTypeMap =
-                    mSchemaCacheLocked.getSchemaMapForPrefix(prefix);
             return GenericDocumentToProtoConverter.toGenericDocument(documentBuilder.build(),
-                    prefix, schemaTypeMap, mConfig);
+                    prefix, mSchemaCacheLocked, mConfig);
         } finally {
             mReadWriteLock.readLock().unlock();
         }

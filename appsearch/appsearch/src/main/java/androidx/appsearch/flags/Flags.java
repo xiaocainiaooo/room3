@@ -182,6 +182,14 @@ public final class Flags {
     public static final String FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS =
             FLAG_PREFIX + "enable_additional_builder_copy_constructors";
 
+    /**
+     * Enables wrapping the parent types of a document in the corresponding
+     * {@link androidx.appsearch.app.SearchResult}, instead of in
+     * {@link androidx.appsearch.app.GenericDocument}.
+     */
+    public static final String FLAG_ENABLE_SEARCH_RESULT_PARENT_TYPES =
+            FLAG_PREFIX + "enable_search_result_parent_types";
+
     // Whether the features should be enabled.
     //
     // In Jetpack, those should always return true.
@@ -355,6 +363,15 @@ public final class Flags {
 
     /** Whether the feature of the scorable property should be enabled. */
     public static boolean enableScorableProperty() {
+        return true;
+    }
+
+    /**
+     * Whether to wrap the parent types of a document in the corresponding
+     * {@link androidx.appsearch.app.SearchResult}, instead of in
+     * {@link androidx.appsearch.app.GenericDocument}.
+     */
+    public static boolean enableSearchResultParentTypes() {
         return true;
     }
 }

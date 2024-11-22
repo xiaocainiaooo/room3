@@ -105,6 +105,9 @@ public class IntrospectionHelper {
     static final ClassName RESTRICT_TO_SCOPE_CLASS =
             RESTRICT_TO_ANNOTATION_CLASS.nestedClass("Scope");
 
+    static final ClassName DOCUMENT_CLASS_MAPPING_CONTEXT_CLASS =
+            ClassName.get(APPSEARCH_PKG, "DocumentClassMappingContext");
+
     public final TypeMirror mStringType;
     public final TypeMirror mLongPrimitiveType;
     public final TypeMirror mIntPrimitiveType;

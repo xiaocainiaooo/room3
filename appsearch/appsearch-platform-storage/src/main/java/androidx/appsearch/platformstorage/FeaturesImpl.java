@@ -142,6 +142,9 @@ final class FeaturesImpl implements Features {
             case Features.SCHEMA_SCORABLE_PROPERTY_CONFIG:
                 // TODO(b/357105837) : Update when feature is ready in service-appsearch.
                 // fall through
+            case Features.SEARCH_RESULT_PARENT_TYPES:
+                // TODO(b/371610934) : Update when feature is ready in service-appsearch.
+                // fall through
             default:
                 return false;
         }

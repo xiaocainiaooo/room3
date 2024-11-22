@@ -177,4 +177,11 @@ public class FlagsTest {
         assertThat(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
                 .isEqualTo("com.android.appsearch.flags.enable_scorable_property");
     }
+
+    @Test
+    public void testFlagValue_enableSearchResultParentTypes() {
+        assertThat(Flags.FLAG_ENABLE_SEARCH_RESULT_PARENT_TYPES)
+                .isEqualTo(
+                        "com.android.appsearch.flags.enable_search_result_parent_types");
+    }
 }
