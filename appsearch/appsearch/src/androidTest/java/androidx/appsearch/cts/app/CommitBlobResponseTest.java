@@ -23,8 +23,8 @@ import static com.google.common.truth.Truth.assertThat;
 
 import androidx.appsearch.app.AppSearchBatchResult;
 import androidx.appsearch.app.AppSearchBlobHandle;
-import androidx.appsearch.app.AppSearchCommitBlobResponse;
 import androidx.appsearch.app.AppSearchResult;
+import androidx.appsearch.app.CommitBlobResponse;
 import androidx.appsearch.flags.CheckFlagsRule;
 import androidx.appsearch.flags.DeviceFlagsValueProvider;
 import androidx.appsearch.flags.Flags;
@@ -34,7 +34,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
-public class AppSearchCommitBlobResponseTest {
+public class CommitBlobResponseTest {
     @Rule
     public final CheckFlagsRule mCheckFlagsRule = DeviceFlagsValueProvider.createCheckFlagsRule();
 
@@ -70,11 +70,11 @@ public class AppSearchCommitBlobResponseTest {
                         .setResult(blobHandle4, failureResult)
                         .build();
 
-        AppSearchCommitBlobResponse appSearchCommitBlobResponse =
-                new AppSearchCommitBlobResponse(batchResult);
+        CommitBlobResponse commitBlobResponse =
+                new CommitBlobResponse(batchResult);
 
         AppSearchBatchResult<AppSearchBlobHandle, Void> outResult =
-                appSearchCommitBlobResponse.getResult();
+                commitBlobResponse.getResult();
         assertThat(outResult.getSuccesses()).containsExactly(
                 blobHandle1, null, blobHandle3, null);
         assertThat(outResult.getFailures()).containsExactly(

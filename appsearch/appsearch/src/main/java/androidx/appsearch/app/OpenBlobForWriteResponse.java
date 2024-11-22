@@ -25,7 +25,7 @@ import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
 import androidx.appsearch.safeparcel.AbstractSafeParcelable;
 import androidx.appsearch.safeparcel.SafeParcelable;
-import androidx.appsearch.safeparcel.stub.StubCreators.OpenBlobForReadResponseCreator;
+import androidx.appsearch.safeparcel.stub.StubCreators.OpenBlobForWriteResponseCreator;
 import androidx.core.util.Preconditions;
 
 import java.io.Closeable;
@@ -33,9 +33,9 @@ import java.io.IOException;
 
 /**
  * The response to provide batch operation results of
- * {@link AppSearchSession#openBlobForReadAsync}.
+ * {@link AppSearchSession#openBlobForWriteAsync}.
  *
- * <p> This class is used to retrieve the result of a batch read operation on a collection of
+ * <p> This class is used to retrieve the result of a batch write operation on a collection of
  * blob handles.
  *
  * <p class="caution">
@@ -46,30 +46,29 @@ import java.io.IOException;
  */
 @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
 @SuppressWarnings("HiddenSuperclass")
-@SafeParcelable.Class(creator = "OpenBlobForReadResponseCreator")
+@SafeParcelable.Class(creator = "OpenBlobForWriteResponseCreator")
 @ExperimentalAppSearchApi
-public final class AppSearchOpenBlobForReadResponse extends AbstractSafeParcelable implements
+public final class OpenBlobForWriteResponse extends AbstractSafeParcelable implements
         Closeable {
 
     @NonNull
-    public static final Parcelable.Creator<AppSearchOpenBlobForReadResponse> CREATOR =
-            new OpenBlobForReadResponseCreator();
+    public static final Parcelable.Creator<OpenBlobForWriteResponse> CREATOR =
+            new OpenBlobForWriteResponseCreator();
 
     @Field(id = 1)
     final AppSearchBatchResultGeneralKeyParcel<AppSearchBlobHandle, ParcelFileDescriptor>
             mResultParcel;
 
     /**
-     * Creates a {@link AppSearchOpenBlobForReadResponse} with given {@link AppSearchBatchResult}.
+     * Creates a {@link OpenBlobForWriteResponse} with given {@link AppSearchBatchResult}.
      */
-    public AppSearchOpenBlobForReadResponse(
+    public OpenBlobForWriteResponse(
             @NonNull AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> result) {
         this(AppSearchBatchResultGeneralKeyParcel.fromBlobHandleToPfd(result));
     }
 
-
     @Constructor
-    AppSearchOpenBlobForReadResponse(
+    OpenBlobForWriteResponse(
             @AbstractSafeParcelable.Param(id = 1)
             @NonNull AppSearchBatchResultGeneralKeyParcel<AppSearchBlobHandle, ParcelFileDescriptor>
                     resultParcel) {
@@ -77,11 +76,11 @@ public final class AppSearchOpenBlobForReadResponse extends AbstractSafeParcelab
     }
 
     /**
-     * Returns the {@link AppSearchBatchResult} object containing the results of the read blob for
-     * read operation for each {@link AppSearchBlobHandle}.
+     * Returns the {@link AppSearchBatchResult} object containing the results of the write blob for
+     * write operation for each {@link AppSearchBlobHandle}.
      *
      * @return A {@link AppSearchBatchResult} maps {@link AppSearchBlobHandle}s which is a unique
-     * identifier for a specific blob being committed to the outcome of that read operation. If the
+     * identifier for a specific blob being committed to the outcome of that write operation. If the
      * operation was successful, the result for that handle is {@link ParcelFileDescriptor}; if
      * there was an error, the result contains an {@link AppSearchResult} with details of the
      * failure.
@@ -106,6 +105,6 @@ public final class AppSearchOpenBlobForReadResponse extends AbstractSafeParcelab
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
-        OpenBlobForReadResponseCreator.writeToParcel(this, dest, flags);
+        OpenBlobForWriteResponseCreator.writeToParcel(this, dest, flags);
     }
 }

@@ -124,7 +124,7 @@ public interface AppSearchSession extends Closeable {
      *
      * <p> This call will create a empty blob file for each given {@link AppSearchBlobHandle}, and
      * a {@link android.os.ParcelFileDescriptor} of that blob file will be returned in the
-     * {@link AppSearchOpenBlobForWriteResponse}.
+     * {@link OpenBlobForWriteResponse}.
      *
      * <p> If the blob file is already stored in AppSearch and committed. A failed
      * {@link AppSearchResult} with error code {@link AppSearchResult#RESULT_ALREADY_EXISTS} will be
@@ -146,7 +146,7 @@ public interface AppSearchSession extends Closeable {
      * they has been created for an extended period (default is 1 week).
      *
      * <p class="caution">
-     * The returned {@link AppSearchOpenBlobForWriteResponse} must be closed after use to avoid
+     * The returned {@link OpenBlobForWriteResponse} must be closed after use to avoid
      * resource leaks. Failing to close it will result in system file descriptor exhaustion.
      * </p>
      *
@@ -162,7 +162,7 @@ public interface AppSearchSession extends Closeable {
     @ExperimentalAppSearchApi
     // TODO(b/273591938) improve the java doc when we support abandon pending blobs.
     @NonNull
-    ListenableFuture<AppSearchOpenBlobForWriteResponse> openBlobForWriteAsync(
+    ListenableFuture<OpenBlobForWriteResponse> openBlobForWriteAsync(
             @NonNull Set<AppSearchBlobHandle> handles);
 
 
@@ -194,7 +194,7 @@ public interface AppSearchSession extends Closeable {
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     @ExperimentalAppSearchApi
     @NonNull
-    ListenableFuture<AppSearchCommitBlobResponse> commitBlobAsync(
+    ListenableFuture<CommitBlobResponse> commitBlobAsync(
             @NonNull Set<AppSearchBlobHandle> handles);
 
     /**
@@ -203,7 +203,7 @@ public interface AppSearchSession extends Closeable {
      * <p> Only blobs committed via {@link #commitBlobAsync} are available for reading.
      *
      * <p class="caution">
-     * The returned {@link AppSearchOpenBlobForReadResponse} must be closed after use to avoid
+     * The returned {@link OpenBlobForReadResponse} must be closed after use to avoid
      * resource leaks. Failing to close it will result in system file descriptor exhaustion.
      * </p>
      *
@@ -218,7 +218,7 @@ public interface AppSearchSession extends Closeable {
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     @ExperimentalAppSearchApi
     @NonNull
-    ListenableFuture<AppSearchOpenBlobForReadResponse> openBlobForReadAsync(
+    ListenableFuture<OpenBlobForReadResponse> openBlobForReadAsync(
             @NonNull Set<AppSearchBlobHandle> handles);
 
     /**
