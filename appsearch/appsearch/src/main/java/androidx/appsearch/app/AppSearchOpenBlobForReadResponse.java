@@ -68,7 +68,7 @@ public final class AppSearchOpenBlobForReadResponse extends AbstractSafeParcelab
     }
 
 
-    @AbstractSafeParcelable.Constructor
+    @Constructor
     AppSearchOpenBlobForReadResponse(
             @AbstractSafeParcelable.Param(id = 1)
             @NonNull AppSearchBatchResultGeneralKeyParcel<AppSearchBlobHandle, ParcelFileDescriptor>
