@@ -26,6 +26,7 @@ import androidx.appsearch.app.AppSearchBlobHandle;
 import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.AppSearchSchema.PropertyConfig.Cardinality;
 import androidx.appsearch.app.AppSearchSchema.PropertyConfig.DataType;
+import androidx.appsearch.app.AppSearchSchema.StringPropertyConfig.DeletePropagationType;
 import androidx.appsearch.app.AppSearchSchema.StringPropertyConfig.JoinableValueType;
 import androidx.appsearch.app.AppSearchSchema.StringPropertyConfig.TokenizerType;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
@@ -438,16 +439,16 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
         @Field(id = 1, getter = "getJoinableValueType")
         private final int mJoinableValueType;
 
-        @Field(id = 2, getter = "getDeletionPropagation")
-        private final boolean mDeletionPropagation;
+        @Field(id = 3, getter = "getDeletePropagationType")
+        private final int mDeletePropagationType;
 
         /** Constructor for {@link JoinableConfigParcel}. */
         @Constructor
         public JoinableConfigParcel(
                 @Param(id = 1) @JoinableValueType int joinableValueType,
-                @Param(id = 2) boolean deletionPropagation) {
+                @Param(id = 3) @DeletePropagationType int deletePropagationType) {
             mJoinableValueType = joinableValueType;
-            mDeletionPropagation = deletionPropagation;
+            mDeletePropagationType = deletePropagationType;
         }
 
         /** Gets {@link JoinableValueType} of the join. */
@@ -456,9 +457,10 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
             return mJoinableValueType;
         }
 
-        /** Gets whether delete will be propagated. */
-        public boolean getDeletionPropagation() {
-            return mDeletionPropagation;
+        /** Gets {@link DeletePropagationType} of the join. */
+        @DeletePropagationType
+        public int getDeletePropagationType() {
+            return mDeletePropagationType;
         }
 
         @Override
@@ -468,7 +470,7 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
 
         @Override
         public int hashCode() {
-            return ObjectsCompat.hash(mJoinableValueType, mDeletionPropagation);
+            return ObjectsCompat.hash(mJoinableValueType, mDeletePropagationType);
         }
 
         @Override
@@ -481,14 +483,15 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
             }
             JoinableConfigParcel otherObject = (JoinableConfigParcel) other;
             return ObjectsCompat.equals(mJoinableValueType, otherObject.mJoinableValueType)
-                    && ObjectsCompat.equals(mDeletionPropagation, otherObject.mDeletionPropagation);
+                    && ObjectsCompat.equals(
+                            mDeletePropagationType, otherObject.mDeletePropagationType);
         }
 
         @Override
         @NonNull
         public String toString() {
             return "{joinableValueType: " + mJoinableValueType
-                    + ", deletePropagation " + mDeletionPropagation + "}";
+                    + ", deletePropagationType: " + mDeletePropagationType + "}";
         }
     }
 
@@ -555,7 +558,7 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
         @NonNull
         public String toString() {
             return "{indexingType: " + mIndexingType
-                    + ", tokenizerType " + mTokenizerType + "}";
+                    + ", tokenizerType: " + mTokenizerType + "}";
         }
     }
 

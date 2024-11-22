@@ -190,6 +190,10 @@ public final class Flags {
     public static final String FLAG_ENABLE_SEARCH_RESULT_PARENT_TYPES =
             FLAG_PREFIX + "enable_search_result_parent_types";
 
+    /** Enables delete propagation type related APIs. */
+    public static final String FLAG_ENABLE_DELETE_PROPAGATION_TYPE =
+            FLAG_PREFIX + "enable_delete_propagation_type";
+
     // Whether the features should be enabled.
     //
     // In Jetpack, those should always return true.
@@ -372,6 +376,11 @@ public final class Flags {
      * {@link androidx.appsearch.app.GenericDocument}.
      */
     public static boolean enableSearchResultParentTypes() {
+        return true;
+    }
+
+    /** Whether delete propagation related APIs should be enabled. */
+    public static boolean enableDeletePropagationType() {
         return true;
     }
 }
