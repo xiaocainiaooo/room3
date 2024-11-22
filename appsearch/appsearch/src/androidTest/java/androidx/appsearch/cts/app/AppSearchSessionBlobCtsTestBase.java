@@ -33,16 +33,16 @@ import android.os.ParcelFileDescriptor;
 import androidx.annotation.NonNull;
 import androidx.appsearch.app.AppSearchBatchResult;
 import androidx.appsearch.app.AppSearchBlobHandle;
-import androidx.appsearch.app.AppSearchCommitBlobResponse;
-import androidx.appsearch.app.AppSearchOpenBlobForReadResponse;
-import androidx.appsearch.app.AppSearchOpenBlobForWriteResponse;
 import androidx.appsearch.app.AppSearchResult;
 import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.AppSearchSession;
+import androidx.appsearch.app.CommitBlobResponse;
 import androidx.appsearch.app.Features;
 import androidx.appsearch.app.GenericDocument;
 import androidx.appsearch.app.GetByDocumentIdRequest;
 import androidx.appsearch.app.GetSchemaResponse;
+import androidx.appsearch.app.OpenBlobForReadResponse;
+import androidx.appsearch.app.OpenBlobForWriteResponse;
 import androidx.appsearch.app.PutDocumentsRequest;
 import androidx.appsearch.app.SetSchemaRequest;
 import androidx.appsearch.flags.CheckFlagsRule;
@@ -109,7 +109,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         AppSearchBlobHandle handle2 = AppSearchBlobHandle.createWithSha256(
                 digest2, mPackageName, DB_NAME_1, "ns");
 
-        try (AppSearchOpenBlobForWriteResponse writeResponse =
+        try (OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle1, handle2)).get()) {
             AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
                     writeResponse.getResult();
@@ -136,7 +136,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         byte[] readBytes1 = new byte[10]; // 10 Bytes
         byte[] readBytes2 = new byte[20]; // 20 Bytes
 
-        try (AppSearchOpenBlobForReadResponse readResponse =
+        try (OpenBlobForReadResponse readResponse =
                 mDb1.openBlobForReadAsync(ImmutableSet.of(handle1, handle2)).get()) {
             AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> readResult =
                     readResponse.getResult();
@@ -167,7 +167,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
                 digest, mPackageName, DB_NAME_1, "ns");
 
-        try (AppSearchOpenBlobForWriteResponse writeResponse =
+        try (OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle)).get()) {
             AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
                     writeResponse.getResult();
@@ -182,7 +182,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         }
 
         // Read blob without commit the blob first.
-        try (AppSearchOpenBlobForReadResponse readResponse =
+        try (OpenBlobForReadResponse readResponse =
                 mDb1.openBlobForReadAsync(ImmutableSet.of(handle)).get()) {
             AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> readResult =
                     readResponse.getResult();
@@ -205,7 +205,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
                 digest, mPackageName, DB_NAME_1, "ns");
 
-        try (AppSearchOpenBlobForWriteResponse writeResponse =
+        try (OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle)).get()) {
             AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
                     writeResponse.getResult();
@@ -222,7 +222,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         }
 
         // Open a new write session and rewrite is allowed before commit.
-        try (AppSearchOpenBlobForWriteResponse reWriteResponse =
+        try (OpenBlobForWriteResponse reWriteResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle)).get()) {
             AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> reWriteResult =
                     reWriteResponse.getResult();
@@ -257,7 +257,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
                 digest, mPackageName, DB_NAME_1, "ns");
 
-        try (AppSearchOpenBlobForWriteResponse writeResponse =
+        try (OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle)).get()) {
             AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
                     writeResponse.getResult();
@@ -282,7 +282,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
                 digest, mPackageName, DB_NAME_1, "ns");
 
-        try (AppSearchOpenBlobForWriteResponse writeResponse =
+        try (OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle)).get()) {
             AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
                     writeResponse.getResult();
@@ -298,7 +298,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         // Commit the blob
         assertTrue(mDb1.commitBlobAsync(ImmutableSet.of(handle)).get().getResult().isSuccess());
 
-        try (AppSearchOpenBlobForReadResponse readResponse =
+        try (OpenBlobForReadResponse readResponse =
                 mDb1.openBlobForReadAsync(ImmutableSet.of(handle)).get()) {
             AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> readResult =
                     readResponse.getResult();
@@ -325,7 +325,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
                 digest, mPackageName, DB_NAME_1, "ns");
 
-        try (AppSearchOpenBlobForWriteResponse writeResponse =
+        try (OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle)).get()) {
             AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
                     writeResponse.getResult();
@@ -341,7 +341,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         }
 
         // Commit the blob
-        AppSearchCommitBlobResponse commitBlobResponse =
+        CommitBlobResponse commitBlobResponse =
                 mDb1.commitBlobAsync(ImmutableSet.of(handle)).get();
         AppSearchBatchResult<AppSearchBlobHandle, Void> commitResult =
                 commitBlobResponse.getResult();
@@ -365,7 +365,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         AppSearchBlobHandle handle2 = AppSearchBlobHandle.createWithSha256(
                 digest2, mPackageName, DB_NAME_1, "ns");
 
-        AppSearchOpenBlobForWriteResponse writeResponse =
+        OpenBlobForWriteResponse writeResponse =
                 mDb1.openBlobForWriteAsync(ImmutableSet.of(handle1, handle2)).get();
         AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
                 writeResponse.getResult();
@@ -401,7 +401,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         AppSearchBlobHandle handle2 = AppSearchBlobHandle.createWithSha256(
                 digest2, mPackageName, DB_NAME_1, "ns");
 
-        try (AppSearchOpenBlobForWriteResponse writeResponse =
+        try (OpenBlobForWriteResponse writeResponse =
                      mDb1.openBlobForWriteAsync(ImmutableSet.of(handle1, handle2)).get()) {
             AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
                     writeResponse.getResult();
@@ -428,7 +428,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
         byte[] readBytes1 = new byte[10]; // 10 Bytes
         byte[] readBytes2 = new byte[20]; // 20 Bytes
 
-        AppSearchOpenBlobForReadResponse readResponse =
+        OpenBlobForReadResponse readResponse =
                 mDb1.openBlobForReadAsync(ImmutableSet.of(handle1, handle2)).get();
         AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> readResult =
                 readResponse.getResult();

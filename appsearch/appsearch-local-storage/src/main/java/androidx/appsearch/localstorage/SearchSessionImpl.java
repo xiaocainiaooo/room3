@@ -30,10 +30,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 import androidx.appsearch.app.AppSearchBatchResult;
 import androidx.appsearch.app.AppSearchBlobHandle;
-import androidx.appsearch.app.AppSearchCommitBlobResponse;
-import androidx.appsearch.app.AppSearchOpenBlobForReadResponse;
-import androidx.appsearch.app.AppSearchOpenBlobForWriteResponse;
 import androidx.appsearch.app.AppSearchSession;
+import androidx.appsearch.app.CommitBlobResponse;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.Features;
 import androidx.appsearch.app.GenericDocument;
@@ -42,6 +40,8 @@ import androidx.appsearch.app.GetSchemaResponse;
 import androidx.appsearch.app.InternalSetSchemaResponse;
 import androidx.appsearch.app.InternalVisibilityConfig;
 import androidx.appsearch.app.Migrator;
+import androidx.appsearch.app.OpenBlobForReadResponse;
+import androidx.appsearch.app.OpenBlobForWriteResponse;
 import androidx.appsearch.app.PutDocumentsRequest;
 import androidx.appsearch.app.RemoveByDocumentIdRequest;
 import androidx.appsearch.app.ReportUsageRequest;
@@ -422,7 +422,7 @@ class SearchSessionImpl implements AppSearchSession {
     @Override
     @ExperimentalAppSearchApi
     // TODO(b/273591938) support change notification for put blob.
-    public ListenableFuture<AppSearchOpenBlobForWriteResponse>
+    public ListenableFuture<OpenBlobForWriteResponse>
             openBlobForWriteAsync(@NonNull Set<AppSearchBlobHandle> handles) {
         Preconditions.checkNotNull(handles);
         Preconditions.checkState(!mIsClosed, "AppSearchSession has already been closed");
@@ -440,7 +440,7 @@ class SearchSessionImpl implements AppSearchSession {
                     resultBuilder.setResult(handle, throwableToFailedResult(t));
                 }
             }
-            return new AppSearchOpenBlobForWriteResponse(resultBuilder.build());
+            return new OpenBlobForWriteResponse(resultBuilder.build());
         });
     }
 
@@ -448,7 +448,7 @@ class SearchSessionImpl implements AppSearchSession {
     @Override
     @ExperimentalAppSearchApi
     // TODO(b/273591938) support change notification for put blob.
-    public ListenableFuture<AppSearchCommitBlobResponse> commitBlobAsync(
+    public ListenableFuture<CommitBlobResponse> commitBlobAsync(
             @NonNull Set<AppSearchBlobHandle> handles) {
         Preconditions.checkNotNull(handles);
         Preconditions.checkState(!mIsClosed, "AppSearchSession has already been closed");
@@ -465,7 +465,7 @@ class SearchSessionImpl implements AppSearchSession {
                     resultBuilder.setResult(handle, throwableToFailedResult(t));
                 }
             }
-            return new AppSearchCommitBlobResponse(resultBuilder.build());
+            return new CommitBlobResponse(resultBuilder.build());
         });
     }
 
@@ -473,7 +473,7 @@ class SearchSessionImpl implements AppSearchSession {
     @NonNull
     @Override
     @ExperimentalAppSearchApi
-    public ListenableFuture<AppSearchOpenBlobForReadResponse> openBlobForReadAsync(
+    public ListenableFuture<OpenBlobForReadResponse> openBlobForReadAsync(
             @NonNull Set<AppSearchBlobHandle> handles) {
         Preconditions.checkNotNull(handles);
         Preconditions.checkState(!mIsClosed, "AppSearchSession has already been closed");
@@ -491,7 +491,7 @@ class SearchSessionImpl implements AppSearchSession {
                     resultBuilder.setResult(handle, throwableToFailedResult(t));
                 }
             }
-            return new AppSearchOpenBlobForReadResponse(resultBuilder.build());
+            return new OpenBlobForReadResponse(resultBuilder.build());
         });
     }
 

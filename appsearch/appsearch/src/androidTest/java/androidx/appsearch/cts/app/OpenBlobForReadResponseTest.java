@@ -29,8 +29,8 @@ import android.os.ParcelFileDescriptor;
 
 import androidx.appsearch.app.AppSearchBatchResult;
 import androidx.appsearch.app.AppSearchBlobHandle;
-import androidx.appsearch.app.AppSearchOpenBlobForReadResponse;
 import androidx.appsearch.app.AppSearchResult;
+import androidx.appsearch.app.OpenBlobForReadResponse;
 import androidx.appsearch.flags.CheckFlagsRule;
 import androidx.appsearch.flags.DeviceFlagsValueProvider;
 import androidx.appsearch.flags.Flags;
@@ -44,7 +44,7 @@ import org.junit.Test;
 import java.io.File;
 
 @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
-public class AppSearchOpenBlobForReadResponseTest {
+public class OpenBlobForReadResponseTest {
     @Rule
     public final CheckFlagsRule mCheckFlagsRule = DeviceFlagsValueProvider.createCheckFlagsRule();
 
@@ -94,8 +94,8 @@ public class AppSearchOpenBlobForReadResponseTest {
                         .setResult(blobHandle4, mFailureResult)
                         .build();
 
-        try (AppSearchOpenBlobForReadResponse response =
-                new AppSearchOpenBlobForReadResponse(batchResult)) {
+        try (OpenBlobForReadResponse response =
+                new OpenBlobForReadResponse(batchResult)) {
 
             AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> outResult =
                     response.getResult();
@@ -119,8 +119,8 @@ public class AppSearchOpenBlobForReadResponseTest {
                 new AppSearchBatchResult.Builder<AppSearchBlobHandle, ParcelFileDescriptor>()
                         .setResult(blobHandle, mSuccessResult)
                         .build();
-        try (AppSearchOpenBlobForReadResponse ignored =
-                    new AppSearchOpenBlobForReadResponse(batchResult)) {
+        try (OpenBlobForReadResponse ignored =
+                    new OpenBlobForReadResponse(batchResult)) {
             // Pfd is accessible now
             mPfd.detachFd();
         }
