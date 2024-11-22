@@ -32,6 +32,12 @@ import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.materialcore.fontscaling.FontScaleConverterFactory
 import java.nio.charset.StandardCharsets
 
+/**
+ * The breakpoint value defining the screen width on and after which, some properties should be
+ * changed, depending on the use case.
+ */
+internal const val SCREEN_WIDTH_BREAKPOINT_DP = 225
+
 /** Returns byte array representation of tag from String. */
 internal fun String.toTagBytes(): ByteArray = toByteArray(StandardCharsets.UTF_8)
 
