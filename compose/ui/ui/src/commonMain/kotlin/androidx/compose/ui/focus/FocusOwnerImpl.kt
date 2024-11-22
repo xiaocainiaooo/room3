@@ -222,8 +222,12 @@ internal class FocusOwnerImpl(
         // If focus search and request focus succeeded, move focus succeeded.
         if (focusSearchSuccess == true && requestFocusSuccess == true) return true
 
-        // To wrap focus around, we clear focus and request initial focus.
-        if (focusDirection.is1dFocusSearch()) {
+        // If we couldn't move focus within compose, we attempt to move focus within embedded views.
+        val moveFocusInteropResult = onMoveFocusInterop(focusDirection)
+
+        // If there is no View to be focused on and it is Next or Previous direction, wrap
+        // around.
+        if (!moveFocusInteropResult && focusDirection.is1dFocusSearch()) {
             val clearFocus =
                 clearFocus(
                     force = false,
@@ -233,11 +237,7 @@ internal class FocusOwnerImpl(
                 )
             return clearFocus && takeFocus(focusDirection, previouslyFocusedRect = null)
         }
-
-        // If we couldn't move focus within compose, we attempt to move focus within embedded views.
-        // We don't need this for 1D focus search because the wrap-around logic triggers a
-        // focus exit which will perform a focus search among the subviews.
-        return onMoveFocusInterop(focusDirection)
+        return moveFocusInteropResult
     }
 
     override fun focusSearch(
