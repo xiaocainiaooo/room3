@@ -38,8 +38,6 @@ import android.view.Display;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.MainThread;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.collection.ArrayMap;
 import androidx.core.util.ObjectsCompat;
@@ -50,6 +48,9 @@ import androidx.mediarouter.media.MediaRouteProvider.ProviderMetadata;
 import androidx.mediarouter.media.MediaRouteProvider.RouteController;
 
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -269,8 +270,7 @@ public final class MediaRouter {
      * a strong reference to this object as long as it is in use.
      */
     @MainThread
-    @NonNull
-    public static MediaRouter getInstance(@NonNull Context context) {
+    public static @NonNull MediaRouter getInstance(@NonNull Context context) {
         if (context == null) {
             throw new IllegalArgumentException("context must not be null");
         }
@@ -311,8 +311,7 @@ public final class MediaRouter {
 
     /** Gets the initialized global router. */
     @RestrictTo(LIBRARY_GROUP)
-    @NonNull
-    static GlobalMediaRouter getGlobalRouter() {
+    static @NonNull GlobalMediaRouter getGlobalRouter() {
         if (sGlobal == null) {
             throw new IllegalStateException(
                     "getGlobalRouter cannot be called when sGlobal is " + "null");
@@ -327,8 +326,7 @@ public final class MediaRouter {
      * <p>Must be called on the main thread.
      */
     @MainThread
-    @NonNull
-    public List<RouteInfo> getRoutes() {
+    public @NonNull List<RouteInfo> getRoutes() {
         checkCallingThread();
         return getGlobalRouter().getRoutes();
     }
@@ -340,8 +338,7 @@ public final class MediaRouter {
      * <p>Must be called on the main thread.
      */
     @MainThread
-    @NonNull
-    public List<ProviderInfo> getProviders() {
+    public @NonNull List<ProviderInfo> getProviders() {
         checkCallingThread();
         return getGlobalRouter().getProviders();
     }
@@ -357,8 +354,7 @@ public final class MediaRouter {
      * @return The default route, which is guaranteed to never be null.
      */
     @MainThread
-    @NonNull
-    public RouteInfo getDefaultRoute() {
+    public @NonNull RouteInfo getDefaultRoute() {
         checkCallingThread();
         return getGlobalRouter().getDefaultRoute();
     }
@@ -371,8 +367,7 @@ public final class MediaRouter {
      * @return A bluetooth route, if exist, otherwise null.
      */
     @MainThread
-    @Nullable
-    public RouteInfo getBluetoothRoute() {
+    public @Nullable RouteInfo getBluetoothRoute() {
         checkCallingThread();
         return getGlobalRouter().getBluetoothRoute();
     }
@@ -424,8 +419,7 @@ public final class MediaRouter {
      * @see RouteInfo#supportsControlRequest
      */
     @MainThread
-    @NonNull
-    public RouteInfo getSelectedRoute() {
+    public @NonNull RouteInfo getSelectedRoute() {
         checkCallingThread();
         return getGlobalRouter().getSelectedRoute();
     }
@@ -444,8 +438,7 @@ public final class MediaRouter {
      * @see RouteInfo#matchesSelector
      */
     @MainThread
-    @NonNull
-    public RouteInfo updateSelectedRoute(@NonNull MediaRouteSelector selector) {
+    public @NonNull RouteInfo updateSelectedRoute(@NonNull MediaRouteSelector selector) {
         if (selector == null) {
             throw new IllegalArgumentException("selector must not be null");
         }
@@ -940,8 +933,7 @@ public final class MediaRouter {
         getGlobalRouter().setMediaSessionCompat(mediaSession);
     }
 
-    @Nullable
-    public MediaSessionCompat.Token getMediaSessionToken() {
+    public MediaSessionCompat.@Nullable Token getMediaSessionToken() {
         return sGlobal == null ? null : sGlobal.getMediaSessionToken();
         // Use sGlobal exceptionally due to unchecked thread.
     }
@@ -953,8 +945,7 @@ public final class MediaRouter {
      * <p>Must be called on the main thread.
      */
     @MainThread
-    @Nullable
-    public MediaRouterParams getRouterParams() {
+    public @Nullable MediaRouterParams getRouterParams() {
         checkCallingThread();
         return getGlobalRouter().getRouterParams();
     }
@@ -1433,8 +1424,7 @@ public final class MediaRouter {
         /**
          * Gets information about the provider of this media route.
          */
-        @NonNull
-        public ProviderInfo getProvider() {
+        public @NonNull ProviderInfo getProvider() {
             return mProvider;
         }
 
@@ -1448,8 +1438,7 @@ public final class MediaRouter {
          *
          * @return The unique id of the route, never null.
          */
-        @NonNull
-        public String getId() {
+        public @NonNull String getId() {
             return mUniqueId;
         }
 
@@ -1463,8 +1452,7 @@ public final class MediaRouter {
          * @return The user-visible name of a media route.  This is the string presented
          * to users who may select this as the active route.
          */
-        @NonNull
-        public String getName() {
+        public @NonNull String getName() {
             return mName;
         }
 
@@ -1477,8 +1465,7 @@ public final class MediaRouter {
          *
          * @return The description of the route, or null if none.
          */
-        @Nullable
-        public String getDescription() {
+        public @Nullable String getDescription() {
             return mDescription;
         }
 
@@ -1490,8 +1477,7 @@ public final class MediaRouter {
          *
          * @return The URI of the icon representing this route, or null if none.
          */
-        @Nullable
-        public Uri getIconUri() {
+        public @Nullable Uri getIconUri() {
             return mIconUri;
         }
 
@@ -1610,8 +1596,7 @@ public final class MediaRouter {
          * @see #supportsControlCategory
          * @see #supportsControlRequest
          */
-        @NonNull
-        public List<IntentFilter> getControlFilters() {
+        public @NonNull List<IntentFilter> getControlFilters() {
             return mControlFilters;
         }
 
@@ -1931,8 +1916,7 @@ public final class MediaRouter {
          * @see android.app.Presentation
          */
         @MainThread
-        @Nullable
-        public Display getPresentationDisplay() {
+        public @Nullable Display getPresentationDisplay() {
             checkCallingThread();
             if (mPresentationDisplayId >= 0 && mPresentationDisplay == null) {
                 mPresentationDisplay = getGlobalRouter().getDisplay(mPresentationDisplayId);
@@ -1952,8 +1936,7 @@ public final class MediaRouter {
          * Gets a collection of extra properties about this route that were supplied
          * by its media route provider, or null if none.
          */
-        @Nullable
-        public Bundle getExtras() {
+        public @Nullable Bundle getExtras() {
             return mExtras;
         }
 
@@ -1961,8 +1944,7 @@ public final class MediaRouter {
          * Gets an intent sender for launching a settings activity for this
          * route.
          */
-        @Nullable
-        public IntentSender getSettingsIntent() {
+        public @Nullable IntentSender getSettingsIntent() {
             return mSettingsIntent;
         }
 
@@ -2001,8 +1983,7 @@ public final class MediaRouter {
          * Gets the dynamic group state of the given route.
          */
         @RestrictTo(LIBRARY)
-        @Nullable
-        public DynamicGroupState getDynamicGroupState(@NonNull RouteInfo route) {
+        public @Nullable DynamicGroupState getDynamicGroupState(@NonNull RouteInfo route) {
             if (route == null) {
                 throw new NullPointerException("route must not be null");
             }
@@ -2019,8 +2000,7 @@ public final class MediaRouter {
          * @return The list of the routes in this group
          */
         @RestrictTo(LIBRARY)
-        @NonNull
-        public List<RouteInfo> getMemberRoutes() {
+        public @NonNull List<RouteInfo> getMemberRoutes() {
             return Collections.unmodifiableList(mMemberRoutes);
         }
 
@@ -2029,8 +2009,7 @@ public final class MediaRouter {
          */
         @MainThread
         @RestrictTo(LIBRARY)
-        @Nullable
-        public DynamicGroupRouteController getDynamicGroupController() {
+        public @Nullable DynamicGroupRouteController getDynamicGroupController() {
             checkCallingThread();
             //TODO: handle multiple controllers case
             RouteController controller = getGlobalRouter().mSelectedRouteController;
@@ -2041,8 +2020,7 @@ public final class MediaRouter {
         }
 
         @Override
-        @NonNull
-        public String toString() {
+        public @NonNull String toString() {
             StringBuilder sb = new StringBuilder();
 
             sb.append("MediaRouter.RouteInfo{ uniqueId=").append(mUniqueId)
@@ -2241,8 +2219,7 @@ public final class MediaRouter {
         }
 
         @RestrictTo(LIBRARY)
-        @NonNull
-        public MediaRouteProvider getProviderInstance() {
+        public @NonNull MediaRouteProvider getProviderInstance() {
             return mProvider.getProviderInstance();
         }
 
@@ -2344,9 +2321,8 @@ public final class MediaRouter {
          *
          * <p>Must be called on the main thread.
          */
-        @NonNull
         @MainThread
-        public MediaRouteProvider getProviderInstance() {
+        public @NonNull MediaRouteProvider getProviderInstance() {
             checkCallingThread();
             return mProviderInstance;
         }
@@ -2354,16 +2330,14 @@ public final class MediaRouter {
         /**
          * Gets the package name of the media route provider.
          */
-        @NonNull
-        public String getPackageName() {
+        public @NonNull String getPackageName() {
             return mMetadata.getPackageName();
         }
 
         /**
          * Gets the component name of the media route provider.
          */
-        @NonNull
-        public ComponentName getComponentName() {
+        public @NonNull ComponentName getComponentName() {
             return mMetadata.getComponentName();
         }
 
@@ -2373,8 +2347,7 @@ public final class MediaRouter {
          * <p>Must be called on the main thread.
          */
         @MainThread
-        @NonNull
-        public List<RouteInfo> getRoutes() {
+        public @NonNull List<RouteInfo> getRoutes() {
             checkCallingThread();
             return Collections.unmodifiableList(mRoutes);
         }
@@ -2410,9 +2383,8 @@ public final class MediaRouter {
             return mDescriptor != null && mDescriptor.supportsDynamicGroupRoute();
         }
 
-        @NonNull
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return "MediaRouter.RouteProviderInfo{ packageName=" + getPackageName() + " }";
         }
     }
@@ -2620,8 +2592,7 @@ public final class MediaRouter {
          *     previous route.
          */
         @MainThread
-        @Nullable
-        ListenableFuture<Void> onPrepareTransfer(
+        @Nullable ListenableFuture<Void> onPrepareTransfer(
                 @NonNull RouteInfo fromRoute, @NonNull RouteInfo toRoute);
     }
 
@@ -2697,8 +2668,7 @@ public final class MediaRouter {
         private final RouteInfo mFromRoute;
         final RouteInfo mToRoute;
         private final RouteInfo mRequestedRoute;
-        @Nullable
-        final List<DynamicRouteDescriptor> mMemberRoutes;
+        final @Nullable List<DynamicRouteDescriptor> mMemberRoutes;
         private final WeakReference<GlobalMediaRouter> mRouter;
 
         private ListenableFuture<Void> mFuture = null;
