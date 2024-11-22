@@ -16,7 +16,7 @@
 
 package androidx.webkit;
 
-import androidx.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.Executor;
 

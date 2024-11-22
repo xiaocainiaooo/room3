@@ -16,7 +16,7 @@
 
 package androidx.webkit;
 
-import androidx.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Callback interface for prefetch operations.

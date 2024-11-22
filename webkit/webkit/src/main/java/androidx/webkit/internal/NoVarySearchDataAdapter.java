@@ -16,10 +16,10 @@
 
 package androidx.webkit.internal;
 
-import androidx.annotation.NonNull;
 import androidx.webkit.NoVarySearchData;
 
 import org.chromium.support_lib_boundary.NoVarySearchDataBoundaryInterface;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
@@ -40,15 +40,13 @@ public class NoVarySearchDataAdapter implements NoVarySearchDataBoundaryInterfac
         return mImpl.ignoreDifferencesInParameters;
     }
 
-    @NonNull
     @Override
-    public List<String> getIgnoredQueryParameters() {
+    public @NonNull List<String> getIgnoredQueryParameters() {
         return mImpl.ignoredQueryParameters;
     }
 
-    @NonNull
     @Override
-    public List<String> getConsideredQueryParameters() {
+    public @NonNull List<String> getConsideredQueryParameters() {
         return mImpl.consideredQueryParameters;
     }
 }

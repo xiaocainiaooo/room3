@@ -22,8 +22,6 @@ import android.webkit.GeolocationPermissions;
 import android.webkit.ServiceWorkerController;
 import android.webkit.WebStorage;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.os.CancellationSignal;
 import androidx.webkit.PrefetchException;
 import androidx.webkit.PrefetchOperationCallback;
@@ -34,6 +32,8 @@ import org.chromium.support_lib_boundary.PrefetchOperationResultBoundaryInterfac
 import org.chromium.support_lib_boundary.PrefetchStatusCodeBoundaryInterface;
 import org.chromium.support_lib_boundary.ProfileBoundaryInterface;
 import org.chromium.support_lib_boundary.util.BoundaryInterfaceReflectionUtil;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationHandler;
 
@@ -54,8 +54,7 @@ public class ProfileImpl implements Profile {
     }
 
     @Override
-    @NonNull
-    public String getName() {
+    public @NonNull String getName() {
         ApiFeature.NoFramework feature = WebViewFeatureInternal.MULTI_PROFILE;
         if (feature.isSupportedByWebView()) {
             return mProfileImpl.getName();
@@ -65,8 +64,7 @@ public class ProfileImpl implements Profile {
     }
 
     @Override
-    @NonNull
-    public CookieManager getCookieManager() throws IllegalStateException {
+    public @NonNull CookieManager getCookieManager() throws IllegalStateException {
         ApiFeature.NoFramework feature = WebViewFeatureInternal.MULTI_PROFILE;
         if (feature.isSupportedByWebView()) {
             return mProfileImpl.getCookieManager();
@@ -76,8 +74,7 @@ public class ProfileImpl implements Profile {
     }
 
     @Override
-    @NonNull
-    public WebStorage getWebStorage() throws IllegalStateException {
+    public @NonNull WebStorage getWebStorage() throws IllegalStateException {
         ApiFeature.NoFramework feature = WebViewFeatureInternal.MULTI_PROFILE;
         if (feature.isSupportedByWebView()) {
             return mProfileImpl.getWebStorage();
@@ -86,9 +83,9 @@ public class ProfileImpl implements Profile {
         }
     }
 
-    @NonNull
     @Override
-    public GeolocationPermissions getGeolocationPermissions() throws IllegalStateException {
+    public @NonNull GeolocationPermissions getGeolocationPermissions()
+            throws IllegalStateException {
         ApiFeature.NoFramework feature = WebViewFeatureInternal.MULTI_PROFILE;
         if (feature.isSupportedByWebView()) {
             return mProfileImpl.getGeoLocationPermissions();
@@ -97,9 +94,9 @@ public class ProfileImpl implements Profile {
         }
     }
 
-    @NonNull
     @Override
-    public ServiceWorkerController getServiceWorkerController() throws IllegalStateException {
+    public @NonNull ServiceWorkerController getServiceWorkerController()
+            throws IllegalStateException {
         ApiFeature.NoFramework feature = WebViewFeatureInternal.MULTI_PROFILE;
         if (feature.isSupportedByWebView()) {
             return mProfileImpl.getServiceWorkerController();

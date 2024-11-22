@@ -16,7 +16,7 @@
 
 package androidx.webkit;
 
-import androidx.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Super class for all asynchronous exceptions produced by
