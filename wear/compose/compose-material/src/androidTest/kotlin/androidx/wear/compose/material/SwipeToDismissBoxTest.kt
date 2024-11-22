@@ -16,6 +16,7 @@
 
 package androidx.wear.compose.material
 
+import android.os.Build
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,7 @@ import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.test.swipeWithVelocity
+import androidx.test.filters.SdkSuppress
 import androidx.wear.compose.foundation.SwipeToDismissBoxState
 import androidx.wear.compose.foundation.SwipeToDismissValue
 import androidx.wear.compose.foundation.edgeSwipeToDismiss
@@ -272,6 +274,7 @@ class SwipeToDismissBoxTest {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     fun edgeswipe_modifier_edge_swiped_right_dismissed() {
         verifyEdgeSwipeWithNestedScroll(gesture = { swipeRight() }, expectedToDismiss = true)
     }
@@ -311,6 +314,7 @@ class SwipeToDismissBoxTest {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     fun edgeswipe_swipe_edge_content_was_not_swiped_right() {
         val initialScrollState = 200
         lateinit var horizontalScrollState: ScrollState
@@ -351,6 +355,7 @@ class SwipeToDismissBoxTest {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     fun edgeswipe_swipe_edge_content_right_then_left_no_scroll() {
         testBothDirectionScroll(
             initialTouch = 10,
@@ -363,6 +368,7 @@ class SwipeToDismissBoxTest {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     fun edgeswipe_fling_edge_content_right_then_left_no_scroll() {
         testBothDirectionScroll(
             initialTouch = 10,
