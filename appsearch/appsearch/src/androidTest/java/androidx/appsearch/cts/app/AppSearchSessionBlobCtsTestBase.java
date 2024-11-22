@@ -45,6 +45,7 @@ import androidx.appsearch.app.OpenBlobForReadResponse;
 import androidx.appsearch.app.OpenBlobForWriteResponse;
 import androidx.appsearch.app.PutDocumentsRequest;
 import androidx.appsearch.app.SetSchemaRequest;
+import androidx.appsearch.app.StorageInfo;
 import androidx.appsearch.flags.Flags;
 import androidx.appsearch.testutil.AppSearchTestUtils;
 import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
@@ -478,6 +479,80 @@ public abstract class AppSearchSessionBlobCtsTestBase {
                 .isEqualTo(RESULT_INVALID_ARGUMENT);
         assertThat(commitResult.getFailures().get(mHandle1).getErrorMessage())
                 .contains("The blob content doesn't match to the digest");
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testGetStorageInfo() throws Exception {
+        assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
+
+        OpenBlobForWriteResponse writeResponse =
+                mDb1.openBlobForWriteAsync(ImmutableSet.of(mHandle1, mHandle2)).get();
+        AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
+                writeResponse.getResult();
+        assertTrue(writeResult.isSuccess());
+
+        ParcelFileDescriptor writePfd1 = writeResult.getSuccesses().get(mHandle1);
+        try (OutputStream outputStream =
+                     new ParcelFileDescriptor.AutoCloseOutputStream(writePfd1)) {
+            outputStream.write(mData1);
+            outputStream.flush();
+        }
+
+        ParcelFileDescriptor writePfd2 = writeResult.getSuccesses().get(mHandle2);
+        try (OutputStream outputStream =
+                     new ParcelFileDescriptor.AutoCloseOutputStream(writePfd2)) {
+            outputStream.write(mData2);
+            outputStream.flush();
+        }
+        writeResponse.close();
+
+        StorageInfo storageInfo = mDb1.getStorageInfoAsync().get();
+        assertThat(storageInfo.getBlobCount()).isEqualTo(2);
+        assertThat(storageInfo.getBlobSizeBytes()).isEqualTo(mData1.length + mData2.length);
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testGetStorageInfoAfterRemoveBlob() throws Exception {
+        assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
+
+        OpenBlobForWriteResponse writeResponse =
+                mDb1.openBlobForWriteAsync(ImmutableSet.of(mHandle1, mHandle2)).get();
+        AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
+                writeResponse.getResult();
+        assertTrue(writeResult.isSuccess());
+
+        ParcelFileDescriptor writePfd1 = writeResult.getSuccesses().get(mHandle1);
+        try (OutputStream outputStream =
+                     new ParcelFileDescriptor.AutoCloseOutputStream(writePfd1)) {
+            outputStream.write(mData1);
+            outputStream.flush();
+        }
+
+        ParcelFileDescriptor writePfd2 = writeResult.getSuccesses().get(mHandle2);
+        try (OutputStream outputStream =
+                     new ParcelFileDescriptor.AutoCloseOutputStream(writePfd2)) {
+            outputStream.write(mData2);
+            outputStream.flush();
+        }
+        writeResponse.close();
+
+        StorageInfo storageInfo = mDb1.getStorageInfoAsync().get();
+        assertThat(storageInfo.getBlobCount()).isEqualTo(2);
+        assertThat(storageInfo.getBlobSizeBytes()).isEqualTo(mData1.length + mData2.length);
+
+        // remove blob 1
+        mDb1.removeBlobAsync(ImmutableSet.of(mHandle1)).get();
+        storageInfo = mDb1.getStorageInfoAsync().get();
+        assertThat(storageInfo.getBlobCount()).isEqualTo(1);
+        assertThat(storageInfo.getBlobSizeBytes()).isEqualTo(mData2.length);
+
+        // remove blob 2
+        mDb1.removeBlobAsync(ImmutableSet.of(mHandle2)).get();
+        storageInfo = mDb1.getStorageInfoAsync().get();
+        assertThat(storageInfo.getBlobCount()).isEqualTo(0);
+        assertThat(storageInfo.getBlobSizeBytes()).isEqualTo(0);
     }
 
     @Test
