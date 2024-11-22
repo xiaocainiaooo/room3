@@ -23,10 +23,16 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.support.customtabs.IAuthTabCallback;
 import android.support.customtabs.ICustomTabsCallback;
 import android.support.customtabs.ICustomTabsService;
 
+import androidx.browser.auth.AuthTabCallback;
+import androidx.browser.auth.AuthTabSession;
+
 import org.jspecify.annotations.NonNull;
+
+import java.util.concurrent.Executor;
 
 /**
  * Utilities for unit testing Custom Tabs.
@@ -55,5 +61,18 @@ public class TestUtil {
         assertEquals(session.getBinder(), intent.getExtras().getBinder(
                 CustomTabsIntent.EXTRA_SESSION));
         assertEquals(session.getId(), intent.getParcelableExtra(CustomTabsIntent.EXTRA_SESSION_ID));
+    }
+
+    /** Create s a mock {@link AuthTabSession} for testing. */
+    @NonNull
+    public static AuthTabSession makeMockAuthTabSession() {
+        return new AuthTabSession(mock(IAuthTabCallback.class),
+                new ComponentName("", ""), makeMockPendingIntent());
+    }
+
+    /** Creates a mock {@link AuthTabSession.PendingSession} for testing. */
+    public static AuthTabSession.@NonNull PendingSession makeMockPendingAuthTabSession() {
+        return new AuthTabSession.PendingSession(makeMockPendingIntent(), mock(Executor.class),
+                mock(AuthTabCallback.class));
     }
 }

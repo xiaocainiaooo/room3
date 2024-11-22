@@ -25,11 +25,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.IBinder.DeathRecipient;
 import android.os.RemoteException;
+import android.support.customtabs.IAuthTabCallback;
 import android.support.customtabs.ICustomTabsCallback;
 import android.support.customtabs.ICustomTabsService;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.RestrictTo;
+import androidx.browser.auth.AuthTabSessionToken;
+import androidx.browser.auth.ExperimentalAuthTab;
 import androidx.collection.SimpleArrayMap;
 
 import org.jspecify.annotations.NonNull;
@@ -333,6 +336,23 @@ public abstract class CustomTabsService extends Service {
                 return bundle.getParcelable(CustomTabsSession.TARGET_ORIGIN_KEY);
             }
         }
+
+        @ExperimentalAuthTab
+        @Override
+        public boolean newAuthTabSession(IAuthTabCallback callback, Bundle extras) {
+            PendingIntent sessionId = getSessionIdFromBundle(extras);
+            AuthTabSessionToken sessionToken = new AuthTabSessionToken(callback, sessionId);
+            try {
+                DeathRecipient deathRecipient = () -> cleanUpSession(sessionToken);
+                synchronized (mDeathRecipientMap) {
+                    callback.asBinder().linkToDeath(deathRecipient, 0);
+                    mDeathRecipientMap.put(callback.asBinder(), deathRecipient);
+                }
+                return CustomTabsService.this.newAuthTabSession(sessionToken);
+            } catch (RemoteException e) {
+                return false;
+            }
+        }
     };
 
     @Override
@@ -350,6 +370,31 @@ public abstract class CustomTabsService extends Service {
      * same binder will return false.
      */
     protected boolean cleanUpSession(@NonNull CustomTabsSessionToken sessionToken) {
+        try {
+            synchronized (mDeathRecipientMap) {
+                IBinder binder = sessionToken.getCallbackBinder();
+                if (binder == null) return false;
+                DeathRecipient deathRecipient = mDeathRecipientMap.get(binder);
+                binder.unlinkToDeath(deathRecipient, 0);
+                mDeathRecipientMap.remove(binder);
+            }
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Called when the client side {@link IBinder} for this {@link AuthTabSessionToken} is dead.
+     * Can also be used to clean up {@link DeathRecipient} instances allocated for the given token.
+     *
+     * @param sessionToken The session token for which the {@link DeathRecipient} call has been
+     *                     received.
+     * @return Whether the clean up was successful. Multiple calls with two tokens holdings the
+     * same binder will return false.
+     */
+    @ExperimentalAuthTab
+    protected boolean cleanUpSession(@NonNull AuthTabSessionToken sessionToken) {
         try {
             synchronized (mDeathRecipientMap) {
                 IBinder binder = sessionToken.getCallbackBinder();
@@ -619,6 +664,22 @@ public abstract class CustomTabsService extends Service {
      */
     @ExperimentalEphemeralBrowsing
     protected boolean isEphemeralBrowsingSupported(@NonNull Bundle extras) {
+        return false;
+    }
+
+    /**
+     * Creates a new Auth Tab session through an ICustomTabsService with the optional callback. This
+     * session can be used to associate any related communication through the service with an intent
+     * and then later with an Auth Tab. The client can then send later service calls or intents
+     * through the same session-intent-Auth Tab association.
+     *
+     * @param sessionToken Session token to be used as a unique identifier. This also has access
+     *                     to the {@link AuthTabCallback} passed from the client side through
+     *                     {@link AuthTabSessionToken#getCallback()}.
+     * @return Whether a new session was successfully created.
+     */
+    @ExperimentalAuthTab
+    protected boolean newAuthTabSession(@NonNull AuthTabSessionToken sessionToken) {
         return false;
     }
 }
