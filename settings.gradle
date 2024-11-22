@@ -447,6 +447,7 @@ includeProject(":camera:integration-tests:camera-testapp-timing", "camera/integr
 includeProject(":camera:integration-tests:camera-testapp-uiwidgets", "camera/integration-tests/uiwidgetstestapp", [BuildType.CAMERA])
 includeProject(":camera:integration-tests:camera-testapp-viewfinder", "camera/integration-tests/viewfindertestapp", [BuildType.CAMERA])
 includeProject(":camera:integration-tests:camera-testapp-view", "camera/integration-tests/viewtestapp", [BuildType.CAMERA])
+includeProject(":camera:media3:media3-effect", [BuildType.MAIN])
 includeProject(":camera:viewfinder:viewfinder-compose", [BuildType.CAMERA])
 includeProject(":camera:viewfinder:viewfinder-core", [BuildType.CAMERA])
 includeProject(":camera:viewfinder:viewfinder-core:viewfinder-core-samples", "camera/viewfinder/viewfinder-core/samples", [BuildType.CAMERA])
