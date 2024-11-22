@@ -1161,6 +1161,29 @@ class DraggableTest {
         }
     }
 
+    // On tests this wouldn't fail due to usage of a UnconfinedTestDispatcher. Using a
+    // standard test dispatcher will reveal this issue.
+    @Test
+    fun assertDraggableCallbackOrder() {
+        var onStartCalled = false
+        val draggableController = DraggableState { assertTrue { onStartCalled } }
+
+        rule.setContent {
+            Box(
+                Modifier.size(400.dp)
+                    .draggable(
+                        draggableController,
+                        orientation = Orientation.Vertical,
+                        onDragStarted = { onStartCalled = true },
+                        onDragStopped = { assertTrue { onStartCalled } }
+                    )
+            )
+        }
+
+        rule.onRoot().performTouchInput { swipeUp() }
+        rule.waitForIdle()
+    }
+
     @Test
     fun equalInputs_shouldResolveToEquals() {
         val state = DraggableState {}
