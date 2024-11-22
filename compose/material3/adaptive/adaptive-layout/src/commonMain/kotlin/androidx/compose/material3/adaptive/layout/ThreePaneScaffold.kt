@@ -777,6 +777,7 @@ private class ThreePaneContentMeasurePolicy(
     }
 }
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 private class PaneMeasurable(
     val measurable: Measurable,
     val priority: Int,
@@ -784,16 +785,17 @@ private class PaneMeasurable(
     defaultPreferredWidth: Int
 ) {
     private val data =
-        ((measurable.parentData as? PaneScaffoldParentData) ?: PaneScaffoldParentData())
+        ((measurable.parentData as? PaneScaffoldParentData) ?: PaneScaffoldParentDataImpl())
 
     var measuringWidth =
-        if (data.preferredWidth == null || data.preferredWidth!!.isNaN()) {
+        if (data.preferredWidth.isNaN()) {
             defaultPreferredWidth
         } else {
-            data.preferredWidth!!.toInt()
+            data.preferredWidth.toInt()
         }
 
-    val margins: PaneMargins = data.paneMargins
+    // TODO(conradchen): uncomment it when we can expose PaneMargins
+    // val margins: PaneMargins = data.paneMargins
 
     val isAnimatedPane = data.isAnimatedPane
 
