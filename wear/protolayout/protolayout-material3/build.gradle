@@ -51,6 +51,7 @@ dependencies {
     testImplementation(libs.testRules)
     testImplementation(libs.truth)
     testImplementation(project(":wear:protolayout:protolayout-proto"))
+    testImplementation(project(":wear:protolayout:protolayout-testing"))
 
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.testCore)

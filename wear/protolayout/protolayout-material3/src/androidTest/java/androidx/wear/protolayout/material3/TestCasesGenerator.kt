@@ -38,8 +38,8 @@ private const val CONTENT_DESCRIPTION_PLACEHOLDER = "Description"
 
 object TestCasesGenerator {
     private const val ICON_ID: String = "icon"
+    private const val IMAGE_ID: String = "avatar_image"
     private const val NORMAL_SCALE_SUFFIX: String = ""
-    internal const val XXXL_SCALE_SUFFIX: String = "_xxxl"
 
     /**
      * This function will append goldenSuffix on the name of the golden images that should be
@@ -135,7 +135,20 @@ object TestCasesGenerator {
                 allowDynamicTheme = false
             ) {
                 primaryLayout(
-                    mainSlot = { coloredBox(color = colorScheme.onTertiary, shape = shapes.small) },
+                    mainSlot = {
+                        card(
+                            onClick = clickable,
+                            contentDescription = "Card".prop(),
+                            width = expand(),
+                            height = expand(),
+                            background = { backgroundImage(protoLayoutResourceId = IMAGE_ID) }
+                        ) {
+                            text(
+                                "Card with image background".prop(),
+                                color = colorScheme.onBackground
+                            )
+                        }
+                    },
                     bottomSlot = {
                         iconEdgeButton(
                             onClick = clickable,
@@ -144,9 +157,7 @@ object TestCasesGenerator {
                             colors = filledTonal()
                         )
                     },
-                    titleSlot = {
-                        text("Title that overflows".prop(), color = colorScheme.tertiary)
-                    }
+                    titleSlot = { text("Title that overflows".prop(), color = colorScheme.error) }
                 )
             }
         testCases["primarylayout_bottomslot_golden$goldenSuffix"] =

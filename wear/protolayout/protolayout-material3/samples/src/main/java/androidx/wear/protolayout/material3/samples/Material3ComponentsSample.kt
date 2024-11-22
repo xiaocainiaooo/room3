@@ -19,6 +19,7 @@ package androidx.wear.protolayout.material3.samples
 import android.content.Context
 import androidx.annotation.Sampled
 import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
+import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.ModifiersBuilders
@@ -27,7 +28,9 @@ import androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint
 import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
 import androidx.wear.protolayout.material3.Typography
+import androidx.wear.protolayout.material3.backgroundImage
 import androidx.wear.protolayout.material3.buttonGroup
+import androidx.wear.protolayout.material3.card
 import androidx.wear.protolayout.material3.icon
 import androidx.wear.protolayout.material3.iconEdgeButton
 import androidx.wear.protolayout.material3.materialScope
@@ -71,7 +74,7 @@ fun edgeButtonSampleIcon(
 ): LayoutElement =
     materialScope(context, deviceConfiguration) {
         iconEdgeButton(onClick = clickable, contentDescription = "Description of a button".prop()) {
-            icon("id")
+            icon(protoLayoutResourceId = "id")
         }
     }
 
@@ -115,5 +118,27 @@ fun topLeveLayout(
                 }
             },
             bottomSlot = { iconEdgeButton(clickable, "Description".prop()) { icon("id") } }
+        )
+    }
+
+@Sampled
+fun cardSample(
+    context: Context,
+    deviceConfiguration: DeviceParameters,
+    clickable: Clickable
+): LayoutElement =
+    materialScope(context, deviceConfiguration) {
+        primaryLayout(
+            mainSlot = {
+                card(
+                    onClick = clickable,
+                    contentDescription = "Card with image background".prop(),
+                    width = expand(),
+                    height = expand(),
+                    background = { backgroundImage(protoLayoutResourceId = "id") }
+                ) {
+                    text("Content of the Card!".prop())
+                }
+            }
         )
     }
