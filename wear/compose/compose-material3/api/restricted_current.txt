@@ -495,8 +495,7 @@ package androidx.wear.compose.material3 {
   }
 
   public final class DynamicColorSchemeKt {
-    method public static androidx.wear.compose.material3.ColorScheme dynamicColorScheme(android.content.Context context, optional androidx.wear.compose.material3.ColorScheme defaultColorScheme);
-    method public static boolean isDynamicColorSchemeEnabled(android.content.Context context);
+    method public static androidx.wear.compose.material3.ColorScheme? dynamicColorScheme(android.content.Context context);
   }
 
   public final class EdgeButtonDefaults {
