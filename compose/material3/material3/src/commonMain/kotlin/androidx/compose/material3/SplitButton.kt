@@ -946,6 +946,7 @@ object SplitButtonDefaults {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun shapeByInteraction(
     shapes: SplitButtonShapes,
@@ -974,9 +975,34 @@ private fun shapeByInteraction(
  * @property pressedShape is the pressed shape.
  * @property checkedShape is the checked shape.
  */
-data class SplitButtonShapes(val shape: Shape, val pressedShape: Shape?, val checkedShape: Shape?)
+@ExperimentalMaterial3ExpressiveApi
+class SplitButtonShapes(val shape: Shape, val pressedShape: Shape?, val checkedShape: Shape?) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is SplitButtonShapes) return false
 
-internal val SplitButtonShapes.hasRoundedCornerShapes: Boolean
+        if (shape != other.shape) return false
+        if (pressedShape != other.pressedShape) return false
+        if (checkedShape != other.checkedShape) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = shape.hashCode()
+        if (pressedShape != null) {
+            result = 31 * result + pressedShape.hashCode()
+        }
+        if (checkedShape != null) {
+            result = 31 * result + checkedShape.hashCode()
+        }
+
+        return result
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+private val SplitButtonShapes.hasRoundedCornerShapes: Boolean
     get() {
         // Ignore null shapes and only check default shape for RoundedCorner
         if (pressedShape != null && pressedShape !is RoundedCornerShape) return false
