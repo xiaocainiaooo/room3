@@ -71,6 +71,7 @@ constructor(
     private val captureSequenceProcessorFactory: Camera2CaptureSequenceProcessorFactory,
     private val camera2DeviceManager: Camera2DeviceManager,
     private val cameraSurfaceManager: CameraSurfaceManager,
+    private val camera2Quirks: Camera2Quirks,
     private val timeSource: TimeSource,
     override val cameraGraphId: CameraGraphId
 ) : CameraController {
@@ -296,7 +297,10 @@ constructor(
             cameraStatusMonitor.close()
 
             detachSessionAndCamera(session, camera)
-            if (graphConfig.flags.closeCameraDeviceOnClose) {
+            if (
+                graphConfig.flags.closeCameraDeviceOnClose ||
+                    camera2Quirks.shouldCloseCameraBeforeCreatingCaptureSession(cameraId)
+            ) {
                 Log.debug { "Quirk: Closing all camera devices" }
                 camera2DeviceManager.closeAll()
             }
@@ -363,11 +367,7 @@ constructor(
             }
             if (cameraState.cameraErrorCode != null) {
                 lastCameraError = cameraState.cameraErrorCode
-                if (
-                    cameraState.cameraErrorCode == CameraError.ERROR_CAMERA_DISCONNECTED ||
-                        cameraState.cameraErrorCode == CameraError.ERROR_CAMERA_IN_USE ||
-                        cameraState.cameraErrorCode == CameraError.ERROR_CAMERA_LIMIT_EXCEEDED
-                ) {
+                if (cameraState.cameraErrorCode.isDisconnected()) {
                     controllerState = ControllerState.DISCONNECTED
                     Log.debug { "$this is disconnected" }
                 } else {
