@@ -23,6 +23,7 @@ import androidx.build.checkapi.createReleaseApiConfiguration
 import androidx.build.getDefaultTargetJavaVersion
 import org.gradle.api.Project
 
+/** Sets up tasks for generating kzip files that are used for generating xref support on website. */
 fun Project.configureProjectForKzipTasks(config: ApiTaskConfig, extension: AndroidXExtension) =
     // afterEvaluate required to read extension properties
     afterEvaluate {
