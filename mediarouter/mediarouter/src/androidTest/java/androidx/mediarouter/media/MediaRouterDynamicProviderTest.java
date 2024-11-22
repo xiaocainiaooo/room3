@@ -29,11 +29,11 @@ import android.os.Build;
 import android.os.ConditionVariable;
 import android.os.Looper;
 
-import androidx.annotation.NonNull;
 import androidx.mediarouter.testing.MediaRouterTestHelper;
 import androidx.test.filters.SdkSuppress;
 import androidx.test.filters.SmallTest;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -170,15 +170,15 @@ public final class MediaRouterDynamicProviderTest {
         @Override
         public void onRouteSelected(
                 @NonNull MediaRouter router,
-                @NonNull MediaRouter.RouteInfo selectedRoute,
+                MediaRouter.@NonNull RouteInfo selectedRoute,
                 int reason,
-                @NonNull MediaRouter.RouteInfo requestedRoute) {
+                MediaRouter.@NonNull RouteInfo requestedRoute) {
             mSelectedRouteChangeConditionVariable.open();
         }
 
         @Override
         public void onRouteAdded(
-                @NonNull MediaRouter router, @NonNull MediaRouter.RouteInfo route) {
+                @NonNull MediaRouter router, MediaRouter.@NonNull RouteInfo route) {
             if (getCurrentRoutesAsMap().keySet().containsAll(mRouteIdsPending)) {
                 mPendingRoutesConditionVariable.open();
             }

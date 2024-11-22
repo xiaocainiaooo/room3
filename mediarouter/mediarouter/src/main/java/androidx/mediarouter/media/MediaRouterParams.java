@@ -22,9 +22,10 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -131,9 +132,8 @@ public class MediaRouterParams {
 
     /**
      */
-    @NonNull
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    public Bundle getExtras() {
+    public @NonNull Bundle getExtras() {
         return mExtras;
     }
 
@@ -184,8 +184,7 @@ public class MediaRouterParams {
          * @see #DIALOG_TYPE_DEFAULT
          * @see #DIALOG_TYPE_DYNAMIC_GROUP
          */
-        @NonNull
-        public Builder setDialogType(@DialogType int dialogType) {
+        public @NonNull Builder setDialogType(@DialogType int dialogType) {
             mDialogType = dialogType;
             return this;
         }
@@ -204,8 +203,7 @@ public class MediaRouterParams {
          * It could result in getting invalid routes.
          * @see MediaTransferReceiver
          */
-        @NonNull
-        public Builder setMediaTransferReceiverEnabled(boolean enabled) {
+        public @NonNull Builder setMediaTransferReceiverEnabled(boolean enabled) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 mMediaTransferEnabled = enabled;
             }
@@ -224,8 +222,7 @@ public class MediaRouterParams {
          * If set to {@code false}, {@link androidx.mediarouter.app.MediaRouteButton
          * MediaRouteButton} will show the dialog type which is set by {@link #setDialogType(int)}.
          */
-        @NonNull
-        public Builder setOutputSwitcherEnabled(boolean enabled) {
+        public @NonNull Builder setOutputSwitcherEnabled(boolean enabled) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 mOutputSwitcherEnabled = enabled;
             }
@@ -246,8 +243,7 @@ public class MediaRouterParams {
          * Note: This method will be no-op for Android versions earlier than Android R. It has
          * effect only when {@link MediaTransferReceiver media transfer is enabled}.
          */
-        @NonNull
-        public Builder setTransferToLocalEnabled(boolean enabled) {
+        public @NonNull Builder setTransferToLocalEnabled(boolean enabled) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 mTransferToLocalEnabled = enabled;
             }
@@ -259,17 +255,13 @@ public class MediaRouterParams {
          *
          */
         @RestrictTo(RestrictTo.Scope.LIBRARY)
-        @NonNull
-        public Builder setExtras(@Nullable Bundle extras) {
+        public @NonNull Builder setExtras(@Nullable Bundle extras) {
             mExtras = (extras == null) ? null : new Bundle(extras);
             return this;
         }
 
-        /**
-         * Builds the {@link MediaRouterParams} instance.
-         */
-        @NonNull
-        public MediaRouterParams build() {
+        /** Builds the {@link MediaRouterParams} instance. */
+        public @NonNull MediaRouterParams build() {
             return new MediaRouterParams(this);
         }
     }
