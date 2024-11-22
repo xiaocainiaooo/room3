@@ -74,6 +74,7 @@ dependencies {
     docs(project(":camera:camera-testing"))
     docs(project(":camera:camera-video"))
     docs(project(":camera:camera-view"))
+    docs(project(":camera:media3:media3-effect"))
     docs(project(":camera:viewfinder:viewfinder-compose"))
     docs(project(":camera:viewfinder:viewfinder-core"))
     docs(project(":camera:viewfinder:viewfinder-view"))
