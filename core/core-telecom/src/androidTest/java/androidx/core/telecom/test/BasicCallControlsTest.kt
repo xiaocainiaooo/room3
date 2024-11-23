@@ -281,6 +281,21 @@ class BasicCallControlsTest : BaseTelecomTest() {
         }
     }
 
+    /** Add test coverage for [CallControlScope.getCallId] */
+    @SdkSuppress(minSdkVersion = VERSION_CODES.O)
+    @LargeTest
+    @Test
+    fun testGetCallId() {
+        runBlocking {
+            assertWithinTimeout_addCall(TestUtils.OUTGOING_CALL_ATTRIBUTES) {
+                launch {
+                    assertNotNull(getCallId())
+                    disconnect(DisconnectCause(DisconnectCause.LOCAL))
+                }
+            }
+        }
+    }
+
     /**
      * ********************************************************************************************
      * Helpers
