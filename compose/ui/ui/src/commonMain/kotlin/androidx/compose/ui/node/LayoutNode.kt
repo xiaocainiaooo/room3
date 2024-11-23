@@ -1288,6 +1288,9 @@ internal class LayoutNode(
     override var isDeactivated = false
         private set
 
+    override val opaqueOwner: Any?
+        get() = owner
+
     override fun onReuse() {
         requirePrecondition(isAttached) { "onReuse is only expected on attached node" }
         interopViewFactoryHolder?.onReuse()
