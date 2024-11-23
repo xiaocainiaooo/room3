@@ -23,12 +23,6 @@ dependencies {
     samples("androidx.window:window-samples:1.3.0")
 
     docsForOptionalProject(":xr:xr")
-    docsForOptionalProject(":xr:arcore:arcore")
-    docsForOptionalProject(":xr:compose:compose")
-    docsForOptionalProject(":xr:compose:compose-testing")
-    docsForOptionalProject(":xr:runtime:runtime")
-    docsForOptionalProject(":xr:runtime:runtime-openxr")
-    docsForOptionalProject(":xr:runtime:runtime-testing")
     docsForOptionalProject(":xr:scenecore:scenecore")
     docsForOptionalProject(":xr:scenecore:scenecore-testing")
     docs(project(":activity:activity"))
@@ -420,7 +414,13 @@ dependencies {
     docs(project(":work:work-rxjava2"))
     docs(project(":work:work-rxjava3"))
     docs(project(":work:work-testing"))
+    docs(project(":xr:arcore:arcore"))
+    docs(project(":xr:compose:compose"))
+    docs(project(":xr:compose:compose-testing"))
     docs(project(":xr:compose:material3:material3"))
+    docs(project(":xr:runtime:runtime"))
+    docs(project(":xr:runtime:runtime-openxr"))
+    docs(project(":xr:runtime:runtime-testing"))
     docs(project(":xr:xr-stubs"))
 }
 afterEvaluate {

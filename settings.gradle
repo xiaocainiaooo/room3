@@ -1126,8 +1126,14 @@ includeProject(":work:work-runtime-lint", "work/work-lint", [BuildType.MAIN])
 includeProject(":work:work-rxjava2", [BuildType.MAIN])
 includeProject(":work:work-rxjava3", [BuildType.MAIN])
 includeProject(":work:work-testing", [BuildType.MAIN])
+includeProject(":xr:arcore:arcore", [BuildType.XR])
+includeProject(":xr:compose:compose", [BuildType.XR])
+includeProject(":xr:compose:compose-testing", [BuildType.XR])
 includeProject(":xr:compose:material3:material3", [BuildType.XR])
 includeProject(":xr:compose:material3:integration-tests:testapp", [BuildType.XR])
+includeProject(":xr:runtime:runtime", [BuildType.XR])
+includeProject(":xr:runtime:runtime-openxr", [BuildType.XR])
+includeProject(":xr:runtime:runtime-testing", [BuildType.XR])
 includeProject(":xr:xr-stubs", [BuildType.XR])
 
 
@@ -1140,12 +1146,6 @@ includeProject(":xr:xr-stubs", [BuildType.XR])
 File repoRoot = new File(rootDir, "../..").canonicalFile
 
 includeOptionalProject(":xr:xr", new File(repoRoot, "xr/xr"), [BuildType.XR])
-includeOptionalProject(":xr:arcore:arcore", new File(repoRoot, "xr/arcore/arcore"), [BuildType.XR])
-includeOptionalProject(":xr:compose:compose", new File(repoRoot, "xr/compose/compose"), [BuildType.XR])
-includeOptionalProject(":xr:compose:compose-testing", new File(repoRoot, "xr/compose/compose-testing"), [BuildType.XR])
-includeOptionalProject(":xr:runtime:runtime", new File(repoRoot, "xr/runtime/runtime"), [BuildType.XR])
-includeOptionalProject(":xr:runtime:runtime-testing", new File(repoRoot, "xr/runtime/runtime-testing"), [BuildType.XR])
-includeOptionalProject(":xr:runtime:runtime-openxr", new File(repoRoot, "xr/runtime/runtime-openxr"), [BuildType.XR])
 includeOptionalProject(":xr:scenecore:scenecore", new File(repoRoot, "xr/scenecore/scenecore"), [BuildType.XR])
 includeOptionalProject(":xr:scenecore:scenecore-testing", new File(repoRoot, "xr/scenecore/scenecore-testing"), [BuildType.XR])
 
