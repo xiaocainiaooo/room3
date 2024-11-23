@@ -23,8 +23,6 @@ dependencies {
     samples("androidx.window:window-samples:1.3.0")
 
     docsForOptionalProject(":xr:xr")
-    docsForOptionalProject(":xr:scenecore:scenecore")
-    docsForOptionalProject(":xr:scenecore:scenecore-testing")
     docs(project(":activity:activity"))
     docs(project(":activity:activity-compose"))
     docs(project(":activity:activity-ktx"))
@@ -421,6 +419,8 @@ dependencies {
     docs(project(":xr:runtime:runtime"))
     docs(project(":xr:runtime:runtime-openxr"))
     docs(project(":xr:runtime:runtime-testing"))
+    docs(project(":xr:scenecore:scenecore"))
+    docs(project(":xr:scenecore:scenecore-testing"))
     docs(project(":xr:xr-stubs"))
 }
 afterEvaluate {
