@@ -69,6 +69,13 @@ interface LayoutInfo {
      */
     val isDeactivated: Boolean
         get() = false
+
+    /**
+     * The owner this layout info. This is used by tooling to match a layer to the associated
+     * AndroidComposeView.
+     */
+    val opaqueOwner: Any?
+        get() = null
 }
 
 /** Used by tooling to examine the modifiers on a [LayoutInfo]. */
