@@ -285,8 +285,13 @@ import java.util.Set;
                 addProvider(mMr2Provider, /* treatRouteDescriptorIdsAsUnique= */ true);
                 // Make sure mDiscoveryRequestForMr2Provider is updated
                 updateDiscoveryRequest();
-                mRegisteredProviderWatcher.rescan();
             }
+            boolean mediaTransferRestrictedToSelfProviders =
+                    params != null && params.isMediaTransferRestrictedToSelfProviders();
+            mMr2Provider.setMediaTransferRestrictedToSelfProviders(
+                    mediaTransferRestrictedToSelfProviders);
+            mRegisteredProviderWatcher.setMediaTransferRestrictedToSelfProviders(
+                    mediaTransferRestrictedToSelfProviders);
 
             boolean oldTransferToLocalEnabled =
                     oldParams != null && oldParams.isTransferToLocalEnabled();
@@ -1335,6 +1340,11 @@ import java.util.Set;
                 mMediaSession.clearVolumeHandling();
             }
         }
+    }
+
+    @VisibleForTesting
+    /* package */ MediaRoute2Provider getMediaRoute2ProviderForTesting() {
+        return mMr2Provider;
     }
 
     private final class ProviderCallback extends MediaRouteProvider.Callback {
