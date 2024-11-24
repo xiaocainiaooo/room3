@@ -17,7 +17,17 @@
 package androidx.camera.camera2.pipe.compat
 
 /** Base class for CameraCaptureSession.StateCallback() */
-public interface OnSessionFinalized {
+public interface SessionStateCallback {
+
+    /**
+     * Event indicating the session should be discard any necessary resources or complete certain
+     * actions in order for a new capture session to be created. This method should be invoked on
+     * the current session before we create a new session.
+     *
+     * See b/146773463, b/267557892, b/379347826 for more details.
+     */
+    public fun onSessionDisconnected()
+
     /**
      * Artificial event indicating the session is no longer in use and may be called several times.
      * onClosed() and [onConfigureFailed() methods should call this method directly. This method

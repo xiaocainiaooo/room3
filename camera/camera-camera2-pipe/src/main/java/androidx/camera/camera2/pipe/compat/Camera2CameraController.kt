@@ -253,7 +253,7 @@ constructor(
 
         controllerState = ControllerState.STOPPING
         Log.debug { "Stopping Camera2CameraController" }
-        disconnectSessionAndCamera(session, camera)
+        detachSessionAndCamera(session, camera)
     }
 
     private fun onCameraStatusChanged(cameraStatus: CameraStatus) {
@@ -295,7 +295,7 @@ constructor(
             cameraPrioritiesJob = null
             cameraStatusMonitor.close()
 
-            disconnectSessionAndCamera(session, camera)
+            detachSessionAndCamera(session, camera)
             if (graphConfig.flags.closeCameraDeviceOnClose) {
                 Log.debug { "Quirk: Closing all camera devices" }
                 camera2DeviceManager.closeAll()
@@ -342,10 +342,10 @@ constructor(
                         session.cameraDevice = cameraState.cameraDevice
                     }
                     is CameraStateClosing -> {
-                        session.disconnect()
+                        session.shutdown()
                     }
                     is CameraStateClosed -> {
-                        session.disconnect()
+                        session.shutdown()
                         onStateClosed(cameraState)
                     }
                     else -> {
@@ -383,10 +383,10 @@ constructor(
         }
     }
 
-    private fun disconnectSessionAndCamera(session: CaptureSessionState?, camera: VirtualCamera?) {
+    private fun detachSessionAndCamera(session: CaptureSessionState?, camera: VirtualCamera?) {
         val deferred =
             scope.async {
-                session?.disconnect()
+                session?.shutdown()
                 camera?.disconnect()
             }
         if (

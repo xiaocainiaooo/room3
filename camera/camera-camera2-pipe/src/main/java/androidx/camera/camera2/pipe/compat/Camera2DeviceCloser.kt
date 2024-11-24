@@ -157,6 +157,8 @@ constructor(
 
                 override fun onCaptureQueueEmpty(session: CameraCaptureSessionWrapper) {}
 
+                override fun onSessionDisconnected() {}
+
                 override fun onSessionFinalized() {}
 
                 override fun onActive(session: CameraCaptureSessionWrapper) {}

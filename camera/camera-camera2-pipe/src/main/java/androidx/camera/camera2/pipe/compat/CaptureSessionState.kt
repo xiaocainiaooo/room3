@@ -155,14 +155,14 @@ internal class CaptureSessionState(
     override fun onClosed(session: CameraCaptureSessionWrapper) {
         Log.debug { "$this Closed" }
         Debug.traceStart { "$this#onClosed" }
-        disconnect()
+        shutdown()
         Debug.traceStop()
     }
 
     override fun onConfigureFailed(session: CameraCaptureSessionWrapper) {
         Log.warn { "$this Configuration Failed" }
         Debug.traceStart { "$this#onConfigureFailed" }
-        disconnect()
+        shutdown()
         Debug.traceStop()
     }
 
@@ -181,12 +181,19 @@ internal class CaptureSessionState(
         Log.debug { "$this CaptureQueueEmpty" }
     }
 
+    override fun onSessionDisconnected() {
+        Log.debug { "$this session disconnecting" }
+        Debug.traceStart { "$this#onSessionDisconnected" }
+        disconnect()
+        Debug.traceStop()
+    }
+
     override fun onSessionFinalized() {
         // Only invoke finalizeSession once regardless of the number of times it is invoked.
         if (finalized.compareAndSet(expect = false, update = true)) {
-            Log.debug { "$this Finalizing Session" }
+            Log.debug { "$this session finalizing" }
             Debug.traceStart { "$this#onSessionFinalized" }
-            disconnect()
+            shutdown()
             finalizeSession(0L)
             Debug.traceStop()
         }
@@ -256,17 +263,11 @@ internal class CaptureSessionState(
 
     /**
      * This is used to disconnect the cached [CameraCaptureSessionWrapper] and put this object into
-     * a closed state. This will not cancel repeating requests or abort captures.
+     * a closing state. This may stop the repeating request, abort captures, as well as release
+     * resources and perform any further actions to facilitate/enable the creation of the next
+     * capture session.
      */
     fun disconnect() {
-        shutdown(abortAndStopRepeating = cameraGraphFlags.abortCapturesOnStop)
-    }
-
-    /**
-     * This is used to disconnect the cached [CameraCaptureSessionWrapper] and put this object into
-     * a closed state. This may stop the repeating request and abort captures.
-     */
-    private fun shutdown(abortAndStopRepeating: Boolean) {
         var configuredCaptureSession: ConfiguredCameraCaptureSession? = null
 
         synchronized(lock) {
@@ -297,7 +298,7 @@ internal class CaptureSessionState(
             Debug.traceStart { "$graphListener#onGraphStopped" }
             graphListener.onGraphStopped(graphProcessor)
             Debug.traceStop()
-            if (abortAndStopRepeating) {
+            if (cameraGraphFlags.abortCapturesOnStop) {
                 Debug.traceStart { "$this#stopRepeating" }
                 graphProcessor.stopRepeating()
                 Debug.traceStop()
@@ -336,6 +337,15 @@ internal class CaptureSessionState(
             graphListener.onGraphStopped(null)
             Debug.traceStop()
         }
+    }
+
+    /**
+     * This is used to disconnect, shutdown the cached [CameraCaptureSessionWrapper] and put this
+     * object into a closed state. This would finalize pending resources if any, such as surface
+     * usage tracking.
+     */
+    fun shutdown() {
+        disconnect()
 
         var shouldFinalizeSession = false
         var finalizeSessionDelayMs = 0L
