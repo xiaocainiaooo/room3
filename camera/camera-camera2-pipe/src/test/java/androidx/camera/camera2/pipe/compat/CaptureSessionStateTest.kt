@@ -90,7 +90,7 @@ class CaptureSessionStateTest {
     }
 
     @Test
-    fun disconnectBeforeCameraDoesNotAcceptCamera() = runTest {
+    fun shutdownBeforeCameraDoesNotAcceptCamera() = runTest {
         val state =
             CaptureSessionState(
                 fakeGraphListener,
@@ -102,7 +102,7 @@ class CaptureSessionStateTest {
                 this
             )
         // When disconnect is called first
-        state.disconnect()
+        state.shutdown()
 
         // Setting a camera device has no effect
         state.cameraDevice = fakeCameraDevice
@@ -113,7 +113,7 @@ class CaptureSessionStateTest {
     }
 
     @Test
-    fun disconnectBeforeCameraCallsSurfaceListener() = runTest {
+    fun shutdownBeforeCameraCallsSurfaceListener() = runTest {
         val state =
             CaptureSessionState(
                 fakeGraphListener,
@@ -131,7 +131,7 @@ class CaptureSessionStateTest {
         verify(fakeSurfaceListener, times(1)).onSurfaceActive(eq(surface2))
 
         // And a device is never set
-        state.disconnect()
+        state.shutdown()
 
         // Then fakeSurfaceListener marks surfaces as inactive.
         advanceUntilIdle()
@@ -141,7 +141,7 @@ class CaptureSessionStateTest {
     }
 
     @Test
-    fun disconnectAfterCaptureSessionDoesNotCallOnSurfaceInactive() = runTest {
+    fun shutdownAfterCaptureSessionDoesNotCallOnSurfaceInactive() = runTest {
         val state =
             CaptureSessionState(
                 fakeGraphListener,
@@ -165,7 +165,7 @@ class CaptureSessionStateTest {
         advanceUntilIdle()
 
         // And the state is then disconnected
-        state.disconnect()
+        state.shutdown()
 
         // Then fakeSurfaceListener does not mark surfaces as inactive.
         advanceUntilIdle()
@@ -276,7 +276,7 @@ class CaptureSessionStateTest {
         state.onConfigured(fakeCaptureSession)
 
         // And the state is then disconnected
-        state.disconnect()
+        state.shutdown()
 
         // Then make sure we do close the capture session.
         advanceUntilIdle()
