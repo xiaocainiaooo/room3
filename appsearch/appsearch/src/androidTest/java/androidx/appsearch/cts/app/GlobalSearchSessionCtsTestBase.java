@@ -2028,6 +2028,7 @@ public abstract class GlobalSearchSessionCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
     public void testRankWithScorableProperty_searchFromMultipleDbs() throws Exception {
         assumeTrue(mGlobalSearchSession.getFeatures()
                 .isFeatureSupported(Features.SCHEMA_SCORABLE_PROPERTY_CONFIG));
