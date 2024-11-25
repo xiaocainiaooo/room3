@@ -126,7 +126,8 @@ class BinaryCompatibilityValidation(
             project.updateKlibAbiTask(
                 projectAbiDir,
                 generatedAndMergedApiFile,
-                projectVersion.toString()
+                projectVersion.toString(),
+                runtimeClasspath
             )
 
         val extractKlibAbi =
@@ -221,7 +222,8 @@ class BinaryCompatibilityValidation(
     private fun Project.updateKlibAbiTask(
         klibApiDir: Directory,
         mergedKlibFile: Provider<RegularFileProperty>,
-        projectVersion: String
+        projectVersion: String,
+        runtimeClasspath: ConfigurableFileCollection
     ) =
         project.tasks.register(
             UPDATE_NAME.appendCapitalized(NATIVE_SUFFIX),
@@ -233,6 +235,7 @@ class BinaryCompatibilityValidation(
             it.shouldWriteVersionedApiFile.set(project.shouldWriteVersionedApiFile())
             it.group = ABI_GROUP_NAME
             it.unsupportedNativeTargetNames.set(unsupportedNativeTargetNames())
+            it.runtimeClasspath.from(runtimeClasspath)
         }
 
     /**
