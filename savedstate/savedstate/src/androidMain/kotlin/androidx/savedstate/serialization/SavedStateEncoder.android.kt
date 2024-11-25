@@ -25,10 +25,10 @@ import androidx.savedstate.serialization.serializers.CharSequenceArrayListSerial
 import androidx.savedstate.serialization.serializers.CharSequenceArraySerializer
 import androidx.savedstate.serialization.serializers.CharSequenceSerializer
 import androidx.savedstate.serialization.serializers.IBinderSerializer
+import androidx.savedstate.serialization.serializers.JavaSerializableSerializer
 import androidx.savedstate.serialization.serializers.ParcelableArrayListSerializer
 import androidx.savedstate.serialization.serializers.ParcelableArraySerializer
 import androidx.savedstate.serialization.serializers.ParcelableSerializer
-import androidx.savedstate.serialization.serializers.SerializableSerializer
 import androidx.savedstate.serialization.serializers.SizeFSerializer
 import androidx.savedstate.serialization.serializers.SizeSerializer
 import androidx.savedstate.serialization.serializers.SparseParcelableArraySerializer
@@ -54,7 +54,7 @@ internal actual fun <T> platformSpecificEncodeSerializableValue(
             CharSequenceSerializer.descriptor -> {
                 putCharSequence(key, value as CharSequence)
             }
-            SerializableSerializer.descriptor -> {
+            JavaSerializableSerializer.descriptor -> {
                 putJavaSerializable(key, value as Serializable)
             }
             ParcelableSerializer.descriptor -> {
