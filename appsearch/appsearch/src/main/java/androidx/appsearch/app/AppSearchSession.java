@@ -176,6 +176,11 @@ public interface AppSearchSession extends Closeable {
      * {@link AppSearchResult} with error code {@link AppSearchResult#RESULT_ALREADY_EXISTS} will be
      * associated with the {@link AppSearchBlobHandle}.
      *
+     * <p>If the blob content doesn't match the digest in {@link AppSearchBlobHandle}, a failed
+     * {@link AppSearchResult} with error code {@link AppSearchResult#RESULT_INVALID_ARGUMENT} will
+     * be associated with the {@link AppSearchBlobHandle}. The pending Blob file will be removed
+     * from AppSearch.
+     *
      * <p> Pending blobs won't be lost or auto-commit if {@link AppSearchSession} closed.
      * Pending blobs will store in disk rather than memory. You can re-open {@link AppSearchSession}
      * and re-write the pending blobs.

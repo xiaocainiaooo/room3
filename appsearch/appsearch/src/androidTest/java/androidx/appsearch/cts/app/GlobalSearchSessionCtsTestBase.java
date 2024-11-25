@@ -48,15 +48,15 @@ import androidx.appsearch.app.SearchResults;
 import androidx.appsearch.app.SearchSpec;
 import androidx.appsearch.app.SetSchemaRequest;
 import androidx.appsearch.exceptions.AppSearchException;
-import androidx.appsearch.flags.CheckFlagsRule;
-import androidx.appsearch.flags.DeviceFlagsValueProvider;
 import androidx.appsearch.flags.Flags;
-import androidx.appsearch.flags.RequiresFlagsEnabled;
 import androidx.appsearch.observer.DocumentChangeInfo;
 import androidx.appsearch.observer.ObserverSpec;
 import androidx.appsearch.observer.SchemaChangeInfo;
 import androidx.appsearch.testutil.AppSearchEmail;
 import androidx.appsearch.testutil.TestObserverCallback;
+import androidx.appsearch.testutil.flags.CheckFlagsRule;
+import androidx.appsearch.testutil.flags.DeviceFlagsValueProvider;
+import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.collect.ImmutableList;

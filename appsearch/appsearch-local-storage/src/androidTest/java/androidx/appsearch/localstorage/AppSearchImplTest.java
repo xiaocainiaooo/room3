@@ -53,6 +53,7 @@ import androidx.appsearch.app.SearchSuggestionSpec;
 import androidx.appsearch.app.SetSchemaResponse;
 import androidx.appsearch.app.StorageInfo;
 import androidx.appsearch.exceptions.AppSearchException;
+import androidx.appsearch.flags.Flags;
 import androidx.appsearch.localstorage.stats.InitializeStats;
 import androidx.appsearch.localstorage.stats.OptimizeStats;
 import androidx.appsearch.localstorage.util.PrefixUtil;
@@ -64,6 +65,9 @@ import androidx.appsearch.observer.DocumentChangeInfo;
 import androidx.appsearch.observer.ObserverSpec;
 import androidx.appsearch.observer.SchemaChangeInfo;
 import androidx.appsearch.testutil.TestObserverCallback;
+import androidx.appsearch.testutil.flags.CheckFlagsRule;
+import androidx.appsearch.testutil.flags.DeviceFlagsValueProvider;
+import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
 import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
 import androidx.test.core.app.ApplicationProvider;
@@ -115,6 +119,10 @@ public class AppSearchImplTest {
      * Always trigger optimize in this class. OptimizeStrategy will be tested in its own test class.
      */
     private static final OptimizeStrategy ALWAYS_OPTIMIZE = optimizeInfo -> true;
+
+    @Rule
+    public final CheckFlagsRule mCheckFlagsRule = DeviceFlagsValueProvider.createCheckFlagsRule();
+
     @Rule
     public TemporaryFolder mTemporaryFolder = new TemporaryFolder();
     private File mAppSearchDir;
@@ -2253,6 +2261,7 @@ public class AppSearchImplTest {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testWriteAndReadBlob() throws Exception {
         mAppSearchImpl = AppSearchImpl.create(
                 mAppSearchDir,
@@ -2284,6 +2293,7 @@ public class AppSearchImplTest {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testOpenReadForWrite_notAllowed() throws Exception {
         mAppSearchImpl = AppSearchImpl.create(
                 mAppSearchDir,
@@ -2319,6 +2329,7 @@ public class AppSearchImplTest {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testOpenWriteForRead_allowed() throws Exception {
         mAppSearchImpl = AppSearchImpl.create(
                 mAppSearchDir,
@@ -2341,6 +2352,7 @@ public class AppSearchImplTest {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testOptimizeBlob() throws Exception {
         // Create a new AppSearchImpl with lower orphan blob time to live.
         mAppSearchImpl.close();
@@ -2384,6 +2396,7 @@ public class AppSearchImplTest {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testOptimizeBlobWithDocument() throws Exception {
         // Create a new AppSearchImpl with lower orphan blob time to live.
         mAppSearchImpl.close();
@@ -2463,6 +2476,7 @@ public class AppSearchImplTest {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testRevokeFileDescriptor() throws Exception {
         mAppSearchImpl = AppSearchImpl.create(
                 mAppSearchDir,
@@ -2507,6 +2521,8 @@ public class AppSearchImplTest {
         }
     }
 
+    // Verify the blob handle won't sent request to Icing. So no need to enable
+    // FLAG_ENABLE_BLOB_STORE.
     @Test
     public void testInvalidBlobHandle() throws Exception {
         mAppSearchImpl = AppSearchImpl.create(

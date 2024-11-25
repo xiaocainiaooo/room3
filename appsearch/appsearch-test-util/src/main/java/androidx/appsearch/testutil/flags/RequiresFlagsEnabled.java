@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 // @exportToFramework:skipFile()
-package androidx.appsearch.flags;
+package androidx.appsearch.testutil.flags;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

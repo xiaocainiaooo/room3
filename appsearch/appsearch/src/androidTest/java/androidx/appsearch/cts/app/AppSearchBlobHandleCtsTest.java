@@ -24,10 +24,10 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import androidx.appsearch.app.AppSearchBlobHandle;
-import androidx.appsearch.flags.CheckFlagsRule;
-import androidx.appsearch.flags.DeviceFlagsValueProvider;
 import androidx.appsearch.flags.Flags;
-import androidx.appsearch.flags.RequiresFlagsEnabled;
+import androidx.appsearch.testutil.flags.CheckFlagsRule;
+import androidx.appsearch.testutil.flags.DeviceFlagsValueProvider;
+import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
 
 import org.junit.Rule;
 import org.junit.Test;

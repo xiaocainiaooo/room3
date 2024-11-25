@@ -20,7 +20,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
-import androidx.appsearch.app.aidl.AppSearchBatchResultGeneralKeyParcel;
+import androidx.appsearch.app.aidl.AppSearchBatchResultParcelV2;
 import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
 import androidx.appsearch.safeparcel.AbstractSafeParcelable;
@@ -46,19 +46,19 @@ public final class CommitBlobResponse extends AbstractSafeParcelable {
             new CommitBlobResponseCreator();
 
     @Field(id = 1, getter = "getResponseParcel")
-    private final AppSearchBatchResultGeneralKeyParcel<AppSearchBlobHandle, Void> mResultParcel;
+    private final AppSearchBatchResultParcelV2<AppSearchBlobHandle, Void> mResultParcel;
 
     /**
      * Creates a {@link CommitBlobResponse} with given {@link AppSearchBatchResult}.
      */
     public CommitBlobResponse(
             @NonNull AppSearchBatchResult<AppSearchBlobHandle, Void> result) {
-        this(AppSearchBatchResultGeneralKeyParcel.fromBlobHandleToVoid(result));
+        this(AppSearchBatchResultParcelV2.fromBlobHandleToVoid(result));
     }
 
     @Constructor
     CommitBlobResponse(
-            @Param(id = 1) @NonNull AppSearchBatchResultGeneralKeyParcel<AppSearchBlobHandle, Void>
+            @Param(id = 1) @NonNull AppSearchBatchResultParcelV2<AppSearchBlobHandle, Void>
                     resultParcel) {
         mResultParcel = Preconditions.checkNotNull(resultParcel);
     }
@@ -83,7 +83,7 @@ public final class CommitBlobResponse extends AbstractSafeParcelable {
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @NonNull
-    public AppSearchBatchResultGeneralKeyParcel<AppSearchBlobHandle, Void> getResponseParcel() {
+    public AppSearchBatchResultParcelV2<AppSearchBlobHandle, Void> getResponseParcel() {
         return mResultParcel;
     }
 

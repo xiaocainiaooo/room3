@@ -28,11 +28,11 @@ import androidx.appsearch.app.AppSearchSchema.LongPropertyConfig;
 import androidx.appsearch.app.AppSearchSchema.PropertyConfig;
 import androidx.appsearch.app.AppSearchSchema.StringPropertyConfig;
 import androidx.appsearch.app.PropertyPath;
-import androidx.appsearch.flags.CheckFlagsRule;
-import androidx.appsearch.flags.DeviceFlagsValueProvider;
 import androidx.appsearch.flags.Flags;
-import androidx.appsearch.flags.RequiresFlagsEnabled;
 import androidx.appsearch.testutil.AppSearchEmail;
+import androidx.appsearch.testutil.flags.CheckFlagsRule;
+import androidx.appsearch.testutil.flags.DeviceFlagsValueProvider;
+import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
 
 import org.junit.Rule;
 import org.junit.Test;

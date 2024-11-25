@@ -360,7 +360,7 @@ public class LocalStorage {
                 /* storeParentInfoAsSyntheticProperty= */ false,
                 /* shouldRetrieveParentInfo= */ true
         );
-        AppSearchRevocableFileDescriptorStore revocableFileDescriptorStore = null;
+        RevocableFileDescriptorStore revocableFileDescriptorStore = null;
         if (Flags.enableBlobStore()) {
             revocableFileDescriptorStore = new JetpackRevocableFileDescriptorStore(config);
         }
