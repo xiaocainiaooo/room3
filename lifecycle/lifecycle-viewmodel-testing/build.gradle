@@ -58,6 +58,9 @@ androidXMultiplatform {
                 api(project(":lifecycle:lifecycle-viewmodel"))
                 api(libs.kotlinStdlib)
                 api(libs.kotlinCoroutinesCore)
+                implementation(project(":lifecycle:lifecycle-runtime"))
+                implementation(project(":lifecycle:lifecycle-runtime-testing"))
+                implementation(project(":lifecycle:lifecycle-viewmodel-savedstate"))
             }
         }
 
@@ -71,11 +74,6 @@ androidXMultiplatform {
 
         androidMain {
             dependsOn(commonMain)
-            dependencies {
-                implementation(project(":lifecycle:lifecycle-runtime"))
-                implementation(project(":lifecycle:lifecycle-runtime-testing"))
-                implementation(project(":lifecycle:lifecycle-viewmodel-savedstate"))
-            }
         }
 
         androidInstrumentedTest {
