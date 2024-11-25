@@ -18,20 +18,15 @@ package androidx.privacysandbox.ui.client.view
 
 import android.content.Context
 import android.content.res.Configuration
-import android.graphics.Rect
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.AttributeSet
-import android.view.SurfaceControl
-import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewParent
 import android.view.ViewTreeObserver
 import androidx.annotation.RequiresApi
-import androidx.annotation.VisibleForTesting
 import androidx.core.util.Consumer
 import androidx.customview.poolingcontainer.PoolingContainerListener
 import androidx.customview.poolingcontainer.addPoolingContainerListener
@@ -111,23 +106,6 @@ internal interface RefreshableSessionClient : SessionClient {
 class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     ViewGroup(context, attrs) {
 
-    // This will only be invoked when the content view has been set and the window is attached.
-    private val surfaceChangedCallback =
-        object : SurfaceHolder.Callback {
-            override fun surfaceCreated(p0: SurfaceHolder) {
-                updateAndSetClippingBounds(true)
-                viewTreeObserver.addOnGlobalLayoutListener(globalLayoutChangeListener)
-            }
-
-            override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {}
-
-            override fun surfaceDestroyed(p0: SurfaceHolder) {}
-        }
-
-    // This will only be invoked when the content view has been set and the window is attached.
-    private val globalLayoutChangeListener =
-        ViewTreeObserver.OnGlobalLayoutListener { updateAndSetClippingBounds() }
-
     private val scrollChangedListener =
         ViewTreeObserver.OnScrollChangedListener { signalMeasurer?.maybeSendSignals() }
 
@@ -143,7 +121,6 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
     private var windowInputToken: IBinder? = null
     private var previousChildWidth = -1
     private var previousChildHeight = -1
-    private var currentClippingBounds = Rect()
     internal val stateListenerManager: StateListenerManager = StateListenerManager()
     private var viewContainingPoolingContainerListener: View? = null
     private var poolingContainerListener = PoolingContainerListener {}
@@ -190,33 +167,6 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
         client?.notifyZOrderChanged(providerUiOnTop)
         isZOrderOnTop = providerUiOnTop
         checkClientOpenSession()
-    }
-
-    internal fun updateAndSetClippingBounds(forceUpdate: Boolean = false) {
-        if (maybeUpdateClippingBounds(currentClippingBounds) || forceUpdate) {
-            CompatImpl.setClippingBounds(contentView, isAttachedToWindow, currentClippingBounds)
-        }
-    }
-
-    /**
-     * Computes the window space coordinates for the bounding parent of this view, and stores the
-     * result in [rect].
-     *
-     * Returns true if the coordinates have changed, false otherwise.
-     */
-    @VisibleForTesting
-    internal fun maybeUpdateClippingBounds(rect: Rect): Boolean {
-        val prevBounds = Rect(rect)
-        var viewParent: ViewParent? = parent
-        while (viewParent != null && viewParent is View) {
-            val v = viewParent as View
-            if (v.isScrollContainer || v.id == android.R.id.content) {
-                v.getGlobalVisibleRect(rect)
-                return prevBounds != rect
-            }
-            viewParent = viewParent.getParent()
-        }
-        return false
     }
 
     private fun checkClientOpenSession(
@@ -285,12 +235,6 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
         CompatImpl.unregisterFrameCommitCallback(viewTreeObserver, frameCommitCallback)
     }
 
-    private fun removeCallbacks() {
-        // TODO(b/339377737): Handle leak of listeners when this is called.
-        (contentView as? SurfaceView)?.holder?.removeCallback(surfaceChangedCallback)
-        viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutChangeListener)
-    }
-
     internal fun setContentView(contentView: View) {
         if (childCount > 0) {
             throw IllegalStateException("Number of children views must not exceed 1")
@@ -303,10 +247,6 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
 
         // Wait for the next frame commit before sending an ACTIVE state change to listeners.
         CompatImpl.registerFrameCommitCallback(viewTreeObserver, frameCommitCallback)
-
-        if (contentView is SurfaceView) {
-            contentView.holder.addCallback(surfaceChangedCallback)
-        }
     }
 
     internal fun onClientClosedSession(error: Throwable? = null) {
@@ -415,7 +355,6 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
         client?.close()
         client = null
         windowInputToken = null
-        removeCallbacks()
     }
 
     private fun attachPoolingContainerListener() {
@@ -675,20 +614,6 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
             }
         }
 
-        fun setClippingBounds(
-            contentView: View?,
-            isAttachedToWindow: Boolean,
-            currentClippingBounds: Rect
-        ) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                Api34PlusImpl.setClippingBounds(
-                    contentView,
-                    isAttachedToWindow,
-                    currentClippingBounds
-                )
-            }
-        }
-
         fun registerFrameCommitCallback(observer: ViewTreeObserver, callback: Runnable) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 Api29PlusImpl.registerFrameCommitCallback(observer, callback)
@@ -705,47 +630,6 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
 
         @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
         private object Api34PlusImpl {
-
-            @JvmStatic
-            fun setClippingBounds(
-                contentView: View?,
-                isAttachedToWindow: Boolean,
-                currentClippingBounds: Rect
-            ) {
-                checkNotNull(contentView)
-                check(isAttachedToWindow)
-
-                val surfaceView: SurfaceView? = contentView as? SurfaceView
-                // TODO(b/339377737): Remove the need for this check with better listener handling.
-                if (surfaceView?.surfaceControl == null) {
-                    return
-                }
-                val attachedSurfaceControl =
-                    checkNotNull(surfaceView.rootSurfaceControl) {
-                        "attachedSurfaceControl should be non-null if the window is attached"
-                    }
-                val name = "clippingBounds-${System.currentTimeMillis()}"
-                val clippingBoundsSurfaceControl = SurfaceControl.Builder().setName(name).build()
-                val reparentSurfaceControlTransaction =
-                    SurfaceControl.Transaction()
-                        .reparent(surfaceView.surfaceControl, clippingBoundsSurfaceControl)
-
-                val reparentClippingBoundsTransaction =
-                    checkNotNull(
-                        attachedSurfaceControl.buildReparentTransaction(
-                            clippingBoundsSurfaceControl
-                        )
-                    ) {
-                        "Reparent transaction should be non-null if the window is attached"
-                    }
-                reparentClippingBoundsTransaction.setCrop(
-                    clippingBoundsSurfaceControl,
-                    currentClippingBounds
-                )
-                reparentClippingBoundsTransaction.setVisibility(clippingBoundsSurfaceControl, true)
-                reparentSurfaceControlTransaction.merge(reparentClippingBoundsTransaction)
-                attachedSurfaceControl.applyTransactionOnDraw(reparentSurfaceControlTransaction)
-            }
 
             @JvmStatic
             fun attachTemporarySurfaceViewAndOpenSession(
