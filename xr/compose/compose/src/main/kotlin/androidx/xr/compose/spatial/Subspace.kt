@@ -189,9 +189,7 @@ private fun NestedSubspace(
                         depth = placeables.maxOf { it.measuredDepth },
                     )
                 layout(measuredSize.width, measuredSize.height, measuredSize.depth) {
-                    for (placeable in placeables) {
-                        placeable.place(Pose.Identity)
-                    }
+                    placeables.forEach { it.place(Pose.Identity) }
                 }
             }
         }

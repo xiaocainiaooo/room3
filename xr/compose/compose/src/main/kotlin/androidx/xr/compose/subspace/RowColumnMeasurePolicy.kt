@@ -57,7 +57,7 @@ internal class RowColumnMeasurePolicy(
         val resolvedMeasurables = measurables.map { ResolvedMeasurable(it) }
 
         // We will measure non-weighted children in this pass.
-        for (resolvedMeasurable in resolvedMeasurables) {
+        resolvedMeasurables.forEach { resolvedMeasurable ->
             if (resolvedMeasurable.weightInfo.weight > 0f) {
                 // Children with weight will be measured after all others
                 totalWeight += resolvedMeasurable.weightInfo.weight
@@ -91,14 +91,14 @@ internal class RowColumnMeasurePolicy(
             // so
             // that the row/column will be the exact size we need.
             var remainder = remainingToTarget
-            for (resolvedMeasurable in resolvedMeasurables) {
-                if (resolvedMeasurable.weightInfo.weight <= 0f) continue
+            resolvedMeasurables.forEach { resolvedMeasurable ->
+                if (resolvedMeasurable.weightInfo.weight <= 0f) return@forEach
                 val weightedSize = resolvedMeasurable.weightInfo.weight * weightUnitSpace
                 remainder -= weightedSize.fastRoundToInt()
             }
 
-            for (resolvedMeasurable in resolvedMeasurables) {
-                if (resolvedMeasurable.weightInfo.weight <= 0f) continue
+            resolvedMeasurables.forEach { resolvedMeasurable ->
+                if (resolvedMeasurable.weightInfo.weight <= 0f) return@forEach
                 val childMainAxisSize = run {
                     val remainderUnit = remainder.sign
                     remainder -= remainderUnit
@@ -142,7 +142,7 @@ internal class RowColumnMeasurePolicy(
                 alignment.verticalOffset(contentSize.height, containerSize.height) +
                     contentSize.height / 2
             }
-        for (resolvedMeasurable in resolvedMeasurables) {
+        resolvedMeasurables.forEach { resolvedMeasurable ->
             // Adjust main-axis offset appropriately.
             resolvedMeasurable.mainAxisPosition =
                 resolvedMeasurable.mainAxisPosition!! + mainAxisOffset
@@ -167,7 +167,7 @@ internal class RowColumnMeasurePolicy(
         }
 
         return layout(containerSize.width, containerSize.height, containerSize.depth) {
-            for (resolvedMeasurable in resolvedMeasurables) {
+            resolvedMeasurables.forEach { resolvedMeasurable ->
                 val placeable = resolvedMeasurable.placeable!!
                 val mainAxisPosition = resolvedMeasurable.mainAxisPosition!!
                 val crossAxisPosition = resolvedMeasurable.crossAxisPosition!!
@@ -253,7 +253,7 @@ internal class RowColumnMeasurePolicy(
         // Content's cross-axis and depth size are the max measured value of all children
         var crossAxisSize = 0
         var depthSize = 0
-        for (resolvedMeasurable in this) {
+        this.forEach { resolvedMeasurable ->
             val placeable = resolvedMeasurable.placeable!!
             resolvedMeasurable.mainAxisPosition =
                 ((mainAxisSize + placeable.mainAxisSize() / 2.0f) * mainAxisMultiplier)

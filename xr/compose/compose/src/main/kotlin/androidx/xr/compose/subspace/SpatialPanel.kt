@@ -294,11 +294,7 @@ private fun LayoutPanelEntity(
         }
 
         // Reserve space in the original composition
-        layout(maxWidth, maxHeight, maxSize.depth) {
-            for (placeable in placeables) {
-                placeable.place(Pose())
-            }
-        }
+        layout(maxWidth, maxHeight, maxSize.depth) { placeables.forEach { it.place(Pose()) } }
     }
 }
 
