@@ -39,8 +39,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.wear.protolayout.ResourceBuilders.Resources;
@@ -66,6 +64,8 @@ import com.google.common.truth.Expect;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -1000,8 +1000,7 @@ public class TileServiceTest {
         }
 
         @Override
-        @NonNull
-        protected ListenableFuture<TileBuilders.Tile> onTileRequest(
+        protected @NonNull ListenableFuture<TileBuilders.Tile> onTileRequest(
                 @NonNull TileRequest requestParams) {
             mTileRequestParams = requestParams;
             mTileId = requestParams.getTileId();
@@ -1012,8 +1011,7 @@ public class TileServiceTest {
         }
 
         @Override
-        @NonNull
-        protected ListenableFuture<Resources> onTileResourcesRequest(
+        protected @NonNull ListenableFuture<Resources> onTileResourcesRequest(
                 @NonNull ResourcesRequest requestParams) {
             mResourcesRequestParams = requestParams;
             mTileId = requestParams.getTileId();
@@ -1051,16 +1049,14 @@ public class TileServiceTest {
         protected void onTileLeaveEvent(@NonNull TileLeaveEvent requestParams) {}
 
         @Override
-        @NonNull
-        protected ListenableFuture<TileBuilders.Tile> onTileRequest(
+        protected @NonNull ListenableFuture<TileBuilders.Tile> onTileRequest(
                 @NonNull TileRequest requestParams) {
             return Futures.immediateFuture(DUMMY_TILE_TO_RETURN);
         }
 
         @Override
-        @NonNull
         @SuppressWarnings("deprecation") // for backward compatibility
-        protected ListenableFuture<androidx.wear.tiles.ResourceBuilders.Resources>
+        protected @NonNull ListenableFuture<androidx.wear.tiles.ResourceBuilders.Resources>
                 onResourcesRequest(@NonNull ResourcesRequest requestParams) {
             androidx.wear.tiles.ResourceBuilders.Resources resources =
                     new androidx.wear.tiles.ResourceBuilders.Resources.Builder()

@@ -15,8 +15,9 @@
  */
 package androidx.wear.tiles;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Holder for Tiles' TileInteractionEvent class, to be parceled and transferred to a Tile Service.
@@ -29,7 +30,7 @@ public final class TileInteractionEventData extends ProtoParcelable {
     public static final Creator<TileInteractionEventData> CREATOR =
             newCreator(TileInteractionEventData.class, TileInteractionEventData::new);
 
-    public TileInteractionEventData(@NonNull byte[] params, int version) {
+    public TileInteractionEventData(byte @NonNull [] params, int version) {
         super(params, version);
     }
 }
