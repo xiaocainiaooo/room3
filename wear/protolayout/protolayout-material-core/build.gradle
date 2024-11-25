@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+    api(libs.jspecify)
     annotationProcessor(libs.nullaway)
     api("androidx.annotation:annotation:1.8.1")
     api(project(":wear:protolayout:protolayout"))
