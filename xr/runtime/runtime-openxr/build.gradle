@@ -25,7 +25,6 @@
 import androidx.build.AndroidXConfig
 import androidx.build.KotlinTarget
 import androidx.build.LibraryType
-import androidx.build.Publish
 
 plugins {
     id("AndroidXPlugin")
@@ -60,7 +59,6 @@ android {
 androidx {
     name = "XR OpenXR Runtime"
     type = LibraryType.PUBLISHED_LIBRARY
-    publish = Publish.NONE
     inceptionYear = "2024"
     description = "An implementation of the XR runtime using OpenXR."
     kotlinTarget = KotlinTarget.KOTLIN_1_9

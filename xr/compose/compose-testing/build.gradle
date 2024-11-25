@@ -23,7 +23,7 @@
  */
 
 import androidx.build.LibraryType
-import androidx.build.Publish
+import androidx.build.KotlinTarget
 
 plugins {
     id("AndroidXPlugin")
@@ -64,7 +64,7 @@ android {
 androidx {
     name = "XR Compose Testing"
     type = LibraryType.PUBLISHED_TEST_LIBRARY
-    publish = Publish.NONE
     inceptionYear = "2024"
     description = "Libraries to aid in unit testing Compose for XR clients."
+    kotlinTarget = KotlinTarget.KOTLIN_1_9
 }
