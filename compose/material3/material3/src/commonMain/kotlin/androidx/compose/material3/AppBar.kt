@@ -2226,18 +2226,19 @@ private class ExitAlwaysScrollBehavior(
             ): Offset {
                 if (!canScroll()) return Offset.Zero
                 state.contentOffset += consumed.y
-                if (state.heightOffset == 0f || state.heightOffset == state.heightOffsetLimit) {
-                    if (consumed.y == 0f && available.y > 0f) {
-                        // Reset the total content offset to zero when scrolling all the way down.
-                        // This will eliminate some float precision inaccuracies.
-                        state.contentOffset = 0f
-                    }
-                }
                 state.heightOffset = state.heightOffset + consumed.y
                 return Offset.Zero
             }
 
             override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                if (
+                    available.y > 0f &&
+                        (state.heightOffset == 0f || state.heightOffset == state.heightOffsetLimit)
+                ) {
+                    // Reset the total content offset to zero when scrolling all the way down.
+                    // This will eliminate some float precision inaccuracies.
+                    state.contentOffset = 0f
+                }
                 val superConsumed = super.onPostFling(consumed, available)
                 return superConsumed +
                     settleAppBarBottom(state, available.y, flingAnimationSpec, snapAnimationSpec)
@@ -2837,14 +2838,17 @@ private class PinnedScrollBehavior(
                 source: NestedScrollSource
             ): Offset {
                 if (!canScroll()) return Offset.Zero
-                if (consumed.y == 0f && available.y > 0f) {
+                state.contentOffset += consumed.y
+                return Offset.Zero
+            }
+
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                if (available.y > 0f) {
                     // Reset the total content offset to zero when scrolling all the way down.
                     // This will eliminate some float precision inaccuracies.
                     state.contentOffset = 0f
-                } else {
-                    state.contentOffset += consumed.y
                 }
-                return Offset.Zero
+                return super.onPostFling(consumed, available)
             }
         }
 }
@@ -2904,18 +2908,19 @@ private class EnterAlwaysScrollBehavior(
             ): Offset {
                 if (!canScroll()) return Offset.Zero
                 state.contentOffset += consumed.y
-                if (state.heightOffset == 0f || state.heightOffset == state.heightOffsetLimit) {
-                    if (consumed.y == 0f && available.y > 0f) {
-                        // Reset the total content offset to zero when scrolling all the way down.
-                        // This will eliminate some float precision inaccuracies.
-                        state.contentOffset = 0f
-                    }
-                }
                 if (!reverseLayout) state.heightOffset += consumed.y
                 return Offset.Zero
             }
 
             override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                if (
+                    available.y > 0f &&
+                        (state.heightOffset == 0f || state.heightOffset == state.heightOffsetLimit)
+                ) {
+                    // Reset the total content offset to zero when scrolling all the way down.
+                    // This will eliminate some float precision inaccuracies.
+                    state.contentOffset = 0f
+                }
                 val superConsumed = super.onPostFling(consumed, available)
                 return superConsumed +
                     settleAppBar(state, available.y, flingAnimationSpec, snapAnimationSpec)
@@ -2980,12 +2985,6 @@ private class ExitUntilCollapsedScrollBehavior(
                     return Offset(0f, state.heightOffset - oldHeightOffset)
                 }
 
-                if (consumed.y == 0f && available.y > 0) {
-                    // Reset the total content offset to zero when scrolling all the way down. This
-                    // will eliminate some float precision inaccuracies.
-                    state.contentOffset = 0f
-                }
-
                 if (available.y > 0f) {
                     // Adjust the height offset in case the consumed delta Y is less than what was
                     // recorded as available delta Y in the pre-scroll.
@@ -2997,6 +2996,11 @@ private class ExitUntilCollapsedScrollBehavior(
             }
 
             override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                if (available.y > 0) {
+                    // Reset the total content offset to zero when scrolling all the way down. This
+                    // will eliminate some float precision inaccuracies.
+                    state.contentOffset = 0f
+                }
                 val superConsumed = super.onPostFling(consumed, available)
                 return superConsumed +
                     settleAppBar(state, available.y, flingAnimationSpec, snapAnimationSpec)
