@@ -73,9 +73,7 @@ public fun Volume(
 
         // Reserve space in the original composition
         layout(maxSize.width, maxSize.height, maxSize.depth) {
-            for (placeable in placeables) {
-                placeable.place(Pose())
-            }
+            placeables.forEach { it.place(Pose()) }
         }
     }
 }
