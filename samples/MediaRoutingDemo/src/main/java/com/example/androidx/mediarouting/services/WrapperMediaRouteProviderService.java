@@ -16,19 +16,19 @@
 
 package com.example.androidx.mediarouting.services;
 
-import androidx.annotation.NonNull;
 import androidx.mediarouter.media.MediaRouteProvider;
 import androidx.mediarouter.media.MediaRouteProviderService;
 
 import com.example.androidx.mediarouting.providers.WrapperMediaRouteProvider;
 
+import org.jspecify.annotations.NonNull;
+
 public class WrapperMediaRouteProviderService extends MediaRouteProviderService {
 
     private WrapperMediaRouteProvider mWrapperMediaRouteProvider;
 
-    @NonNull
     @Override
-    public MediaRouteProvider onCreateMediaRouteProvider() {
+    public @NonNull MediaRouteProvider onCreateMediaRouteProvider() {
         if (mWrapperMediaRouteProvider == null) {
             mWrapperMediaRouteProvider = new WrapperMediaRouteProvider(/* context= */ this);
         }

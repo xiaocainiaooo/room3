@@ -31,8 +31,6 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Switch;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.mediarouter.media.MediaRouter;
@@ -46,6 +44,9 @@ import com.example.androidx.mediarouting.activities.systemrouting.SystemRoutingA
 import com.example.androidx.mediarouting.services.SampleDynamicGroupMediaRouteProviderService;
 import com.example.androidx.mediarouting.ui.RoutesAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Allows the user to control dialog types, enabling or disabling Dynamic Groups, enabling or
@@ -247,7 +248,7 @@ public final class SettingsActivity extends AppCompatActivity {
 
     private static class ProviderServiceConnection implements ServiceConnection {
 
-        @Nullable private SampleDynamicGroupMediaRouteProviderService mService;
+        private @Nullable SampleDynamicGroupMediaRouteProviderService mService;
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
