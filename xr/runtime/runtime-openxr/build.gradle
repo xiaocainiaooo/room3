@@ -39,13 +39,13 @@ dependencies {
 
     implementation("androidx.annotation:annotation:1.8.1")
 
-    testImplementation(libs.kotlinCoroutinesTest)
-    testImplementation(libs.junit)
-    testImplementation(libs.robolectric)
-    testImplementation(libs.testExtJunit)
-    testImplementation(libs.testRunner)
-    testImplementation(libs.truth)
-    testImplementation(project(":kruth:kruth"))
+    androidTestImplementation(libs.kotlinCoroutinesTest)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.testExtJunit)
+    androidTestImplementation(libs.testRunner)
+    androidTestImplementation(libs.truth)
+    androidTestImplementation(project(":appcompat:appcompat"))
+    androidTestImplementation(project(":kruth:kruth"))
 }
 
 android {
@@ -53,6 +53,9 @@ android {
     sourceSets.main {
         resources.srcDirs += "src/main/resources"
         jniLibs.srcDirs += new File(AndroidXConfig.getPrebuiltsRoot(project), "androidx/xr/android")
+    }
+    sourceSets.androidTest {
+        jniLibs.srcDirs += new File(AndroidXConfig.getPrebuiltsRoot(project), "androidx/xr/androidTest")
     }
 }
 
