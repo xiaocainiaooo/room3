@@ -35,8 +35,10 @@ public class FlagsTest {
 
     @Test
     public void testFlagValue_enableListFilterMatchScoreExpressionFunction() {
-        assertThat(Flags.FLAG_ENABLE_LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION).isEqualTo(
-                "com.android.appsearch.flags.enable_list_filter_match_score_expression_function");
+        assertThat(Flags.FLAG_ENABLE_LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION)
+                .isEqualTo(
+                        "com.android.appsearch"
+                                + ".flags.enable_list_filter_match_score_expression_function");
     }
 
     @Test

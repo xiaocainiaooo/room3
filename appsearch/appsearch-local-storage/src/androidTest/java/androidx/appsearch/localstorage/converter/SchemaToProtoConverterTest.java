@@ -554,6 +554,7 @@ public class SchemaToProtoConverterTest {
                 .isEqualTo(emailSchema);
     }
 
+    @Test
     public void testGetProto_withScorablePropertyEnabled() {
         AppSearchSchema emailSchema = new AppSearchSchema.Builder("Email")
                 .addProperty(new AppSearchSchema.LongPropertyConfig.Builder("viewTimes")

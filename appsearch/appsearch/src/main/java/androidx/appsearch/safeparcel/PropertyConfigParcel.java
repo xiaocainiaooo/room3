@@ -388,7 +388,7 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
                 mJoinableConfigParcel, otherProperty.mJoinableConfigParcel)
                 && ObjectsCompat.equals(
                 mEmbeddingIndexingConfigParcel, otherProperty.mEmbeddingIndexingConfigParcel)
-                && ObjectsCompat.equals(mScoringEnabled, otherProperty.mScoringEnabled);
+                && mScoringEnabled == otherProperty.mScoringEnabled;
     }
 
     @Override
@@ -550,7 +550,7 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
                 return false;
             }
             StringIndexingConfigParcel otherObject = (StringIndexingConfigParcel) other;
-            return ObjectsCompat.equals(mIndexingType, otherObject.mIndexingType)
+            return mIndexingType == otherObject.mIndexingType
                     && ObjectsCompat.equals(mTokenizerType, otherObject.mTokenizerType);
         }
 
@@ -605,7 +605,7 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
                 return false;
             }
             IntegerIndexingConfigParcel otherObject = (IntegerIndexingConfigParcel) other;
-            return ObjectsCompat.equals(mIndexingType, otherObject.mIndexingType);
+            return mIndexingType == otherObject.mIndexingType;
         }
 
         @Override
@@ -739,8 +739,8 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
                 return false;
             }
             EmbeddingIndexingConfigParcel otherObject = (EmbeddingIndexingConfigParcel) other;
-            return ObjectsCompat.equals(mIndexingType, otherObject.mIndexingType)
-                    && ObjectsCompat.equals(mQuantizationType, otherObject.mQuantizationType);
+            return mIndexingType == otherObject.mIndexingType
+                    && mQuantizationType == otherObject.mQuantizationType;
         }
 
         @Override

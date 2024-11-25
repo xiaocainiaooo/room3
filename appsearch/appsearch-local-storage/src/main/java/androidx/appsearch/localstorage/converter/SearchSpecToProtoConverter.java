@@ -541,6 +541,8 @@ public final class SearchSpecToProtoConverter {
         protoBuilder.addAllAdditionalAdvancedScoringExpressions(
                 mSearchSpec.getInformationalRankingExpressions());
 
+        // TODO(b/380924970): create extractEnabledScoringFeatures() for populating scorable
+        // features
         if (mSearchSpec.isScorablePropertyRankingEnabled()) {
             protoBuilder.addScoringFeatureTypesEnabled(
                     ScoringFeatureType.SCORABLE_PROPERTY_RANKING);
@@ -1110,8 +1112,17 @@ public final class SearchSpecToProtoConverter {
 
     List<String> extractEnabledSearchFeatures(List<String> allEnabledFeatures) {
         List<String> searchFeatures = new ArrayList<>();
-        for (String feature : allEnabledFeatures) {
+        for (int i = 0; i < allEnabledFeatures.size(); ++i) {
+            String feature = allEnabledFeatures.get(i);
             if (FeatureConstants.SCORABLE_FEATURE_SET.contains(feature)) {
+                // The `allEnabledFeatures` set contains both scorable features and search features.
+                // Here, we extract the search related features and populate them to
+                // `SearchSpecProto`. The scoring related features are later populated to the
+                // `ScoringSpecProto` individually in `toScoringSpecProto()`.
+                // - This is because in Icing, the search expression and scoring expression are
+                //   parsed separately, and the enforcement of these enabled features are separate.
+                //   Icing needs the two different proto messages to distinguish between
+                //   features in the search expression and features in the scoring expression.
                 continue;
             }
             searchFeatures.add(feature);
