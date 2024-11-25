@@ -314,19 +314,25 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         super.onRestoreInstanceState(state.superState)
         stateToRestore = state
         if (pdfDocument != null) {
-            restoreState()
+            maybeRestoreState()
         }
     }
 
-    private fun restoreState() {
-        val localStateToRestore = stateToRestore ?: return
-        val localPdfDocument = pdfDocument ?: return
+    /**
+     * Returns true if we are able to restore a previous state from savedInstanceState
+     *
+     * We are not be able to restore our previous state if it pertains to a different document, or
+     * if it is missing critical data like page layout information.
+     */
+    private fun maybeRestoreState(): Boolean {
+        val localStateToRestore = stateToRestore ?: return false
+        val localPdfDocument = pdfDocument ?: return false
         if (
             localPdfDocument.uri != localStateToRestore.documentUri ||
                 !localStateToRestore.hasEnoughStateToRestore
         ) {
             stateToRestore = null
-            return
+            return false
         }
         pageLayoutManager =
             PageLayoutManager(
@@ -346,6 +352,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
 
         stateToRestore = null
+        return true
     }
 
     private fun scrollToRestoredPosition(position: PointF, zoom: Float) {
@@ -401,9 +408,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private fun onDocumentSet() {
         val localPdfDocument = pdfDocument ?: return
         pageManager = PageManager(localPdfDocument, backgroundScope, DEFAULT_PAGE_PREFETCH_RADIUS)
-        if (stateToRestore != null) {
-            restoreState()
-        } else {
+        // We'll either create our layout manager from restored state, or instantiate a new one
+        if (!maybeRestoreState()) {
             pageLayoutManager =
                 PageLayoutManager(localPdfDocument, backgroundScope, DEFAULT_PAGE_PREFETCH_RADIUS)
                     .apply { onViewportChanged(scrollY, height, zoom) }
