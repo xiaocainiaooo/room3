@@ -23,7 +23,7 @@
  */
 
 import androidx.build.LibraryType
-import androidx.build.Publish
+import androidx.build.KotlinTarget
 
 plugins {
     id("AndroidXPlugin")
@@ -76,7 +76,7 @@ android {
 androidx {
     name = "XR Compose"
     type = LibraryType.PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS
-    publish = Publish.NONE
     inceptionYear = "2024"
     description = "Compose libraries for the androidx.xr namespace."
+    kotlinTarget = KotlinTarget.KOTLIN_1_9
 }

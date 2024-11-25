@@ -23,7 +23,8 @@
  */
 
 import androidx.build.LibraryType
-import androidx.build.Publish
+import androidx.build.KotlinTarget
+
 
 plugins {
     id("AndroidXPlugin")
@@ -87,10 +88,10 @@ android {
 androidx {
     name = "XR SceneCore"
     type = LibraryType.PUBLISHED_LIBRARY
-    publish = Publish.NONE
     inceptionYear = "2024"
     description = "Scene building libraries for the androidx.xr namespace."
 
     // TODO: b/379715750 - Remove this flag once the deprecated methods have been removed from the API.
     failOnDeprecationWarnings = false
+    kotlinTarget = KotlinTarget.KOTLIN_1_9
 }

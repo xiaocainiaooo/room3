@@ -22,8 +22,8 @@
  * modifying its settings.
  */
 
+import androidx.build.KotlinTarget
 import androidx.build.LibraryType
-import androidx.build.Publish
 
 plugins {
     id("AndroidXPlugin")
@@ -52,10 +52,10 @@ android {
 androidx {
     name = "XR SceneCore Testing"
     type = LibraryType.PUBLISHED_TEST_LIBRARY
-    publish = Publish.NONE
     inceptionYear = "2024"
     description = "Libraries to aid in unit testing SceneCore clients."
 
     // TODO: b/379715750 - Remove this flag once the deprecated methods have been removed from the API.
     failOnDeprecationWarnings = false
+    kotlinTarget = KotlinTarget.KOTLIN_1_9
 }

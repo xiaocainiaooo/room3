@@ -24,7 +24,6 @@
 
 import androidx.build.KotlinTarget
 import androidx.build.LibraryType
-import androidx.build.Publish
 
 plugins {
     id("AndroidXPlugin")
@@ -61,7 +60,6 @@ android {
 androidx {
     name = "ARCore"
     type = LibraryType.PUBLISHED_LIBRARY
-    publish = Publish.NONE
     inceptionYear = "2024"
     description = "Provides augmented reality (AR) functionality."
     kotlinTarget = KotlinTarget.KOTLIN_1_9

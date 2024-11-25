@@ -22,8 +22,8 @@
  * modifying its settings.
  */
 
+import androidx.build.KotlinTarget
 import androidx.build.LibraryType
-import androidx.build.Publish
 
 plugins {
     id("AndroidXPlugin")
@@ -41,9 +41,10 @@ android {
 androidx {
     name = "Android XR Extensions Stub"
     type = LibraryType.PUBLISHED_LIBRARY
-    publish = Publish.NONE
     inceptionYear = "2024"
     description = "Stub implementation of the Android XR Extensions."
     // TODO: b/379715750 - Remove this flag once the deprecated methods have been removed from the API.
     failOnDeprecationWarnings = false
+    kotlinTarget = KotlinTarget.KOTLIN_1_9
+
 }
