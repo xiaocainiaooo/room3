@@ -20,6 +20,9 @@ package androidx.privacysandbox.ui.core {
   @SuppressCompatibility @kotlin.RequiresOptIn(message="This API is experimental. It may be changed in the future without notice.", level=kotlin.RequiresOptIn.Level.WARNING) @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public static @interface ExperimentalFeatures.DelegatingAdapterApi {
   }
 
+  @SuppressCompatibility @kotlin.RequiresOptIn(message="This API is experimental. It may be changed in the future without notice.", level=kotlin.RequiresOptIn.Level.WARNING) @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public static @interface ExperimentalFeatures.SharedUiPresentationApi {
+  }
+
   public final class SandboxedSdkViewUiInfo {
     ctor public SandboxedSdkViewUiInfo(int uiContainerWidth, int uiContainerHeight, android.graphics.Rect onScreenGeometry, float uiContainerOpacityHint);
     method public static androidx.privacysandbox.ui.core.SandboxedSdkViewUiInfo fromBundle(android.os.Bundle bundle);
@@ -84,6 +87,19 @@ package androidx.privacysandbox.ui.core {
 
   public fun interface SessionObserverFactory {
     method public androidx.privacysandbox.ui.core.SessionObserver create();
+  }
+
+  @SuppressCompatibility @androidx.privacysandbox.ui.core.ExperimentalFeatures.SharedUiPresentationApi public interface SharedUiAdapter {
+    method public void openSession(java.util.concurrent.Executor clientExecutor, androidx.privacysandbox.ui.core.SharedUiAdapter.SessionClient client);
+  }
+
+  public static interface SharedUiAdapter.Session extends java.lang.AutoCloseable {
+    method public void close();
+  }
+
+  public static interface SharedUiAdapter.SessionClient {
+    method public void onSessionError(Throwable throwable);
+    method public void onSessionOpened(androidx.privacysandbox.ui.core.SharedUiAdapter.Session session);
   }
 
 }
