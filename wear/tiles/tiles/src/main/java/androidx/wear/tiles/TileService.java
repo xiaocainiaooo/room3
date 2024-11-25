@@ -29,8 +29,6 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import androidx.annotation.MainThread;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
@@ -56,6 +54,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.wear.Sdk;
 import com.google.wear.services.tiles.TileInstance;
 import com.google.wear.services.tiles.TilesManager;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.time.Duration;
@@ -152,8 +153,8 @@ public abstract class TileService extends Service {
      * @param requestParams Parameters about the request. See {@link TileRequest} for more info.
      */
     @MainThread
-    @NonNull
-    protected abstract ListenableFuture<Tile> onTileRequest(@NonNull TileRequest requestParams);
+    protected abstract @NonNull ListenableFuture<Tile> onTileRequest(
+            @NonNull TileRequest requestParams);
 
     /**
      * Called when the system is requesting a resource bundle from this Tile Provider. The returned
@@ -167,10 +168,9 @@ public abstract class TileService extends Service {
      * @deprecated Use {@link #onTileResourcesRequest} instead.
      */
     @MainThread
-    @NonNull
     @Deprecated
-    protected ListenableFuture<androidx.wear.tiles.ResourceBuilders.Resources> onResourcesRequest(
-            @NonNull ResourcesRequest requestParams) {
+    protected @NonNull ListenableFuture<androidx.wear.tiles.ResourceBuilders.Resources>
+    onResourcesRequest(@NonNull ResourcesRequest requestParams) {
         return ON_RESOURCES_REQUEST_NOT_IMPLEMENTED;
     }
 
@@ -190,9 +190,8 @@ public abstract class TileService extends Service {
      *     info.
      */
     @MainThread
-    @NonNull
     @SuppressWarnings({"AsyncSuffixFuture", "deprecation"}) // For backward compatibility
-    protected ListenableFuture<Resources> onTileResourcesRequest(
+    protected @NonNull ListenableFuture<Resources> onTileResourcesRequest(
             @NonNull ResourcesRequest requestParams) {
         // We are offering a default implementation for onTileResourcesRequest for backward
         // compatibility as older clients are overriding onResourcesRequest.
@@ -280,8 +279,7 @@ public abstract class TileService extends Service {
      *
      * @param context The application context.
      */
-    @NonNull
-    public static TileUpdateRequester getUpdater(@NonNull Context context) {
+    public static @NonNull TileUpdateRequester getUpdater(@NonNull Context context) {
 
         List<TileUpdateRequester> requesters = new ArrayList<>();
         requesters.add(new SysUiTileUpdateRequester(context));
@@ -313,8 +311,7 @@ public abstract class TileService extends Service {
      *     context} present in the carousel, or a value based on platform-specific fallback
      *     behavior.
      */
-    @NonNull
-    public static ListenableFuture<List<ActiveTileIdentifier>> getActiveTilesAsync(
+    public static @NonNull ListenableFuture<List<ActiveTileIdentifier>> getActiveTilesAsync(
             @NonNull Context context, @NonNull Executor executor) {
         if (useWearSdkImpl(context)
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -325,8 +322,7 @@ public abstract class TileService extends Service {
     }
 
     @VisibleForTesting
-    @NonNull
-    static ListenableFuture<List<ActiveTileIdentifier>> getActiveTilesAsyncLegacy(
+    static @NonNull ListenableFuture<List<ActiveTileIdentifier>> getActiveTilesAsyncLegacy(
             @NonNull Context context,
             @NonNull Executor executor,
             @NonNull TimeSourceClock timeSourceClock) {
@@ -344,8 +340,7 @@ public abstract class TileService extends Service {
     private TileProvider.Stub mBinder;
 
     @Override
-    @Nullable
-    public IBinder onBind(@NonNull Intent intent) {
+    public @Nullable IBinder onBind(@NonNull Intent intent) {
         if (ACTION_BIND_TILE_PROVIDER.equals(intent.getAction())) {
             if (mBinder == null) {
                 mBinder = new TileProviderWrapper(this, new Handler(getMainLooper()));
@@ -697,8 +692,7 @@ public abstract class TileService extends Service {
                     });
         }
 
-        @NonNull
-        private static Optional<TileInteractionEvent> tileInteractionEventFromProto(
+        private static @NonNull Optional<TileInteractionEvent> tileInteractionEventFromProto(
                 TileInteractionEventData data) {
             try {
                 return Optional.of(
@@ -755,8 +749,7 @@ public abstract class TileService extends Service {
 
     @RequiresApi(34)
     private static class Api34Impl {
-        @NonNull
-        static ListenableFuture<List<ActiveTileIdentifier>> getActiveTilesAsync(
+        static @NonNull ListenableFuture<List<ActiveTileIdentifier>> getActiveTilesAsync(
                 @NonNull TilesManager tilesManager, @NonNull Executor executor) {
             return CallbackToFutureAdapter.getFuture(
                     completer -> {
