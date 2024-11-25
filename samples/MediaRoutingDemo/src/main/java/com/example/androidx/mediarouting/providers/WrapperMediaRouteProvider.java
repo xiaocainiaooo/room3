@@ -18,8 +18,9 @@ package com.example.androidx.mediarouting.providers;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
 import androidx.mediarouter.media.MediaRouteProvider;
+
+import org.jspecify.annotations.NonNull;
 
 public class WrapperMediaRouteProvider extends MediaRouteProvider {
     private static final String TAG = "WrapperMrp";

@@ -21,10 +21,10 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.example.androidx.mediarouting.services.SampleMediaRouteProviderService;
 import com.example.androidx.mediarouting.services.WrapperMediaRouteProviderService;
+
+import org.jspecify.annotations.NonNull;
 
 public class Utils {
     private static final String TAG = "Utils";
