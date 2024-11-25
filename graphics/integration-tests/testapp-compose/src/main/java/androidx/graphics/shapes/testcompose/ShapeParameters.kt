@@ -432,7 +432,7 @@ open class ShapeParameters(
     fun serialized(): String =
         """
             val features: List<Feature> = FeatureSerializer.parse("${FeatureSerializer.serialize(genShape().features)}")
-            val triangle: RoundedPolygon = RoundedPolygon(features, centerX = <recommended to add>, centerY = <recommended to add>)
+            val shape: RoundedPolygon = RoundedPolygon(features, centerX = <recommended to add>, centerY = <recommended to add>)
         """
             .trimIndent()
 
