@@ -16,7 +16,71 @@
 
 package androidx.lifecycle.viewmodel.testing
 
+import androidx.lifecycle.DEFAULT_ARGS_KEY
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.SAVED_STATE_REGISTRY_OWNER_KEY
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.VIEW_MODEL_STORE_OWNER_KEY
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.enableSavedStateHandles
+import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.MutableCreationExtras
+import androidx.savedstate.SavedState
+import androidx.savedstate.SavedStateRegistryController
+import androidx.savedstate.SavedStateRegistryOwner
+import androidx.savedstate.savedState
 
-/** Creates a default instance of [CreationExtras]. */
-@Suppress("FunctionName") public expect fun DefaultCreationExtras(): CreationExtras
+/**
+ * Creates a default instance of [CreationExtras] pre-configured with all keys required to use
+ * [SavedStateHandle].
+ *
+ * This function sets up the instance with:
+ * - A fake [SavedStateRegistryOwner] assigned to [SAVED_STATE_REGISTRY_OWNER_KEY], delegating the
+ *   [LifecycleOwner] to a [TestLifecycleOwner].
+ * - A fake [ViewModelStoreOwner] assigned to [VIEW_MODEL_STORE_OWNER_KEY], containing an empty
+ *   [ViewModelStore].
+ */
+@Suppress("FunctionName")
+public fun DefaultCreationExtras(): CreationExtras {
+    return DefaultCreationExtras(defaultArgs = savedState())
+}
+
+/**
+ * Creates a default instance of [CreationExtras] pre-configured with all keys required to use
+ * [SavedStateHandle], with the specified [defaultArgs] as the [DEFAULT_ARGS_KEY].
+ *
+ * This function sets up the instance with:
+ * - A fake [SavedStateRegistryOwner] assigned to [SAVED_STATE_REGISTRY_OWNER_KEY], delegating the
+ *   [LifecycleOwner] to a [TestLifecycleOwner].
+ * - A fake [ViewModelStoreOwner] assigned to [VIEW_MODEL_STORE_OWNER_KEY], containing an empty
+ *   [ViewModelStore].
+ */
+@Suppress("FunctionName")
+public fun DefaultCreationExtras(defaultArgs: SavedState): CreationExtras {
+    val owner =
+        object : ViewModelStoreOwner, LifecycleOwner, SavedStateRegistryOwner {
+            override val viewModelStore = ViewModelStore()
+
+            val lifecycleRegistry = LifecycleRegistry.createUnsafe(owner = this)
+            override val lifecycle: Lifecycle = lifecycleRegistry
+
+            val savedStateRegistryController = SavedStateRegistryController.create(owner = this)
+            override val savedStateRegistry = savedStateRegistryController.savedStateRegistry
+        }
+
+    owner.savedStateRegistryController.performAttach()
+    owner.savedStateRegistryController.performRestore(savedState = null)
+    owner.enableSavedStateHandles()
+
+    owner.lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
+
+    return MutableCreationExtras().apply {
+        this[SAVED_STATE_REGISTRY_OWNER_KEY] = owner
+        this[VIEW_MODEL_STORE_OWNER_KEY] = owner
+        this[DEFAULT_ARGS_KEY] = defaultArgs
+    }
+}
