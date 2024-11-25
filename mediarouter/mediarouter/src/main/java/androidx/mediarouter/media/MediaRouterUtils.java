@@ -16,7 +16,7 @@
 
 package androidx.mediarouter.media;
 
-import org.jspecify.annotations.NonNull;
+import androidx.annotation.NonNull;
 
 /** Utils for usage with platform {@link android.media.MediaRouter} */
 class MediaRouterUtils {
@@ -33,31 +33,31 @@ class MediaRouterUtils {
     }
 
     public interface Callback {
-        void onRouteSelected(int type, android.media.MediaRouter.@NonNull RouteInfo route);
+        void onRouteSelected(int type, @NonNull android.media.MediaRouter.RouteInfo route);
 
-        void onRouteUnselected(int type, android.media.MediaRouter.@NonNull RouteInfo route);
+        void onRouteUnselected(int type, @NonNull android.media.MediaRouter.RouteInfo route);
 
-        void onRouteAdded(android.media.MediaRouter.@NonNull RouteInfo route);
+        void onRouteAdded(@NonNull android.media.MediaRouter.RouteInfo route);
 
-        void onRouteRemoved(android.media.MediaRouter.@NonNull RouteInfo route);
+        void onRouteRemoved(@NonNull android.media.MediaRouter.RouteInfo route);
 
-        void onRouteChanged(android.media.MediaRouter.@NonNull RouteInfo route);
+        void onRouteChanged(@NonNull android.media.MediaRouter.RouteInfo route);
 
-        void onRouteGrouped(android.media.MediaRouter.@NonNull RouteInfo route,
-                android.media.MediaRouter.@NonNull RouteGroup group, int index);
+        void onRouteGrouped(@NonNull android.media.MediaRouter.RouteInfo route,
+                @NonNull android.media.MediaRouter.RouteGroup group, int index);
 
-        void onRouteUngrouped(android.media.MediaRouter.@NonNull RouteInfo route,
-                android.media.MediaRouter.@NonNull RouteGroup group);
+        void onRouteUngrouped(@NonNull android.media.MediaRouter.RouteInfo route,
+                @NonNull android.media.MediaRouter.RouteGroup group);
 
-        void onRouteVolumeChanged(android.media.MediaRouter.@NonNull RouteInfo route);
+        void onRouteVolumeChanged(@NonNull android.media.MediaRouter.RouteInfo route);
 
-        void onRoutePresentationDisplayChanged(android.media.MediaRouter.@NonNull RouteInfo route);
+        void onRoutePresentationDisplayChanged(@NonNull android.media.MediaRouter.RouteInfo route);
     }
 
     public interface VolumeCallback {
-        void onVolumeSetRequest(android.media.MediaRouter.@NonNull RouteInfo route, int volume);
+        void onVolumeSetRequest(@NonNull android.media.MediaRouter.RouteInfo route, int volume);
 
-        void onVolumeUpdateRequest(android.media.MediaRouter.@NonNull RouteInfo route,
+        void onVolumeUpdateRequest(@NonNull android.media.MediaRouter.RouteInfo route,
                 int direction);
     }
 

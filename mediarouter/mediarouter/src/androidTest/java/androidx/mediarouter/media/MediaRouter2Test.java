@@ -33,6 +33,7 @@ import android.os.Messenger;
 import android.support.mediacompat.testlib.util.PollingCheck;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.mediarouter.media.MediaRouter.RouteInfo;
 import androidx.mediarouter.testing.MediaRouterTestHelper;
 import androidx.test.core.app.ApplicationProvider;
@@ -41,7 +42,6 @@ import androidx.test.filters.MediumTest;
 import androidx.test.filters.SdkSuppress;
 import androidx.test.filters.SmallTest;
 
-import org.jspecify.annotations.NonNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

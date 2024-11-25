@@ -29,10 +29,9 @@ import android.os.Build;
 import android.os.Handler;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
-
-import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -180,7 +179,8 @@ final class RegisteredMediaRouteProviderWatcher {
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    @NonNull List<ServiceInfo> getMediaRoute2ProviderServices() {
+    @NonNull
+    List<ServiceInfo> getMediaRoute2ProviderServices() {
         Intent intent = new Intent(MediaRoute2ProviderService.SERVICE_INTERFACE);
 
         List<ServiceInfo> serviceInfoList = new ArrayList<>();
@@ -227,6 +227,6 @@ final class RegisteredMediaRouteProviderWatcher {
         void removeProvider(@NonNull MediaRouteProvider provider);
 
         void releaseProviderController(@NonNull RegisteredMediaRouteProvider provider,
-                MediaRouteProvider.@NonNull RouteController controller);
+                @NonNull MediaRouteProvider.RouteController controller);
     }
 }

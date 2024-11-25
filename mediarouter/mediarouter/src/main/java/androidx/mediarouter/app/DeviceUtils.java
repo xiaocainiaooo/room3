@@ -25,20 +25,26 @@ import android.hardware.SensorManager;
 import android.os.Build;
 
 import androidx.annotation.Dimension;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.mediarouter.R;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /** Utility methods for checking properties of the current device. */
 final class DeviceUtils {
-    private static @Nullable Boolean sIsPhone;
-    private static @Nullable Boolean sIsTablet;
-    private static @Nullable Boolean sIsFoldable;
-    private static @Nullable Boolean sIsSevenInchTablet;
-    private static @Nullable Boolean sIsWearable;
-    private static @Nullable Boolean sIsAuto;
-    private static @Nullable Boolean sIsTv;
+    @Nullable
+    private static Boolean sIsPhone;
+    @Nullable
+    private static Boolean sIsTablet;
+    @Nullable
+    private static Boolean sIsFoldable;
+    @Nullable
+    private static Boolean sIsSevenInchTablet;
+    @Nullable
+    private static Boolean sIsWearable;
+    @Nullable
+    private static Boolean sIsAuto;
+    @Nullable
+    private static Boolean sIsTv;
 
     /** The feature name for Auto devices. */
     private static final String FEATURE_AUTO = "android.hardware.type.automotive";
