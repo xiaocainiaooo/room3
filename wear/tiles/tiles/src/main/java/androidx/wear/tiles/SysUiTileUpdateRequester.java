@@ -35,8 +35,9 @@ import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.GuardedBy;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -128,8 +129,7 @@ class SysUiTileUpdateRequester implements TileUpdateRequester {
         }
     }
 
-    @Nullable
-    private Intent buildUpdateBindIntent() {
+    private @Nullable Intent buildUpdateBindIntent() {
         Intent bindIntent = new Intent(ACTION_BIND_UPDATE_REQUESTER);
         bindIntent.setPackage(getSysUiPackageName());
 
