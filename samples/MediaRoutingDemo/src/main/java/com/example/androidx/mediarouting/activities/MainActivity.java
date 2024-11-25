@@ -47,8 +47,6 @@ import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -84,6 +82,9 @@ import com.example.androidx.mediarouting.util.Utils;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.util.List;
@@ -318,9 +319,9 @@ public class MainActivity extends AppCompatActivity {
         if (mediaRouteActionProvider != null) {
             mediaRouteActionProvider.setRouteSelector(mSelector);
             mediaRouteActionProvider.setDialogFactory(new MediaRouteDialogFactory() {
-                @NonNull
                 @Override
-                public MediaRouteControllerDialogFragment onCreateControllerDialogFragment() {
+                public @NonNull MediaRouteControllerDialogFragment
+                        onCreateControllerDialogFragment() {
                     return new ControllerDialogFragment(MainActivity.this,
                             mUseDefaultControlCheckBox);
                 }
@@ -545,8 +546,7 @@ public class MainActivity extends AppCompatActivity {
         mSeekBar.setEnabled(item != null && item.getDuration() > 0);
     }
 
-    @Nullable
-    private PlaylistItem getCheckedPlaylistItem() {
+    private @Nullable PlaylistItem getCheckedPlaylistItem() {
         int count = mPlayListView.getCount();
         int index = mPlayListView.getCheckedItemPosition();
         if (count > 0) {
@@ -564,8 +564,7 @@ public class MainActivity extends AppCompatActivity {
                 ? 0 : (SystemClock.elapsedRealtime() - item.getTimestamp()));
     }
 
-    @NonNull
-    private MediaRouterParams getRouterParams() {
+    private @NonNull MediaRouterParams getRouterParams() {
         MediaRouterParams.Builder routerParams =
                 new MediaRouterParams.Builder()
                         .setDialogType(MediaRouterParams.DIALOG_TYPE_DEFAULT)
@@ -592,13 +591,12 @@ public class MainActivity extends AppCompatActivity {
     public static final class DiscoveryFragment extends MediaRouteDiscoveryFragment {
         private MediaRouter.Callback mCallback;
 
-        public void setCallback(@Nullable MediaRouter.Callback cb) {
+        public void setCallback(MediaRouter.@Nullable Callback cb) {
             mCallback = cb;
         }
 
-        @Nullable
         @Override
-        public MediaRouter.Callback onCreateCallback() {
+        public MediaRouter.@Nullable Callback onCreateCallback() {
             return mCallback;
         }
 
@@ -761,9 +759,8 @@ public class MainActivity extends AppCompatActivity {
             mUseDefaultControlCheckBox = customControlViewCheckBox;
         }
 
-        @NonNull
         @Override
-        public MediaRouteControllerDialog onCreateControllerDialog(
+        public @NonNull MediaRouteControllerDialog onCreateControllerDialog(
                 @NonNull Context context, @Nullable Bundle savedInstanceState) {
             mMainActivity.updateStatusFromSessionManager();
             mControllerDialog =
@@ -818,9 +815,8 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(30)
     private class TransferListener implements MediaRouter.OnPrepareTransferListener {
-        @Nullable
         @Override
-        public ListenableFuture<Void> onPrepareTransfer(@NonNull RouteInfo fromRoute,
+        public @Nullable ListenableFuture<Void> onPrepareTransfer(@NonNull RouteInfo fromRoute,
                 @NonNull RouteInfo toRoute) {
             Log.d(TAG, "onPrepareTransfer: from=" + fromRoute.getId()
                     + ", to=" + toRoute.getId());

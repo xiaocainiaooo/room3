@@ -20,13 +20,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
 import com.example.androidx.mediarouting.R;
 import com.example.androidx.mediarouting.util.Utils;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /** The preference fragment to show the switch settings. */
 public class SettingsPreferenceFragment extends PreferenceFragmentCompat
