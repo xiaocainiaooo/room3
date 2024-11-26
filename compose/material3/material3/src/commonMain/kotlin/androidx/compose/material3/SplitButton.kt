@@ -445,10 +445,11 @@ object SplitButtonDefaults {
                                     )
                                 }
                                 else -> {
-                                    Modifier.padding(contentPadding)
+                                    Modifier
                                 }
                             }
-                        ),
+                        )
+                        .padding(contentPadding),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                     content = content
@@ -570,10 +571,11 @@ object SplitButtonDefaults {
                                     )
                                 }
                                 else -> {
-                                    Modifier.padding(contentPadding)
+                                    Modifier
                                 }
                             }
-                        ),
+                        )
+                        .padding(contentPadding),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                     content = content
