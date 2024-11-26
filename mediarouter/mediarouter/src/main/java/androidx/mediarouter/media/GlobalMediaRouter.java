@@ -38,6 +38,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.app.ActivityManagerCompat;
@@ -47,9 +49,6 @@ import androidx.core.util.Pair;
 import androidx.media.VolumeProviderCompat;
 
 import com.google.common.util.concurrent.ListenableFuture;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -268,7 +267,8 @@ import java.util.Set;
         return mRoutes;
     }
 
-        /* package */ @Nullable MediaRouterParams getRouterParams() {
+    @Nullable
+        /* package */ MediaRouterParams getRouterParams() {
         return mRouterParams;
     }
 
@@ -319,11 +319,13 @@ import java.util.Set;
         }
     }
 
-        /* package */ @NonNull List<MediaRouter.ProviderInfo> getProviders() {
+    @NonNull
+        /* package */ List<MediaRouter.ProviderInfo> getProviders() {
         return mProviders;
     }
 
-        /* package */ MediaRouter.@NonNull RouteInfo getDefaultRoute() {
+    @NonNull
+        /* package */ MediaRouter.RouteInfo getDefaultRoute() {
         if (mDefaultRoute == null) {
             // This should never happen once the media router has been fully
             // initialized but it is good to check for the error in case there
@@ -339,7 +341,8 @@ import java.util.Set;
         return mBluetoothRoute;
     }
 
-        /* package */ MediaRouter.@NonNull RouteInfo getSelectedRoute() {
+    @NonNull
+        /* package */ MediaRouter.RouteInfo getSelectedRoute() {
         if (mSelectedRoute == null) {
             // This should never happen once the media router has been fully
             // initialized but it is good to check for the error in case there
@@ -351,12 +354,13 @@ import java.util.Set;
         return mSelectedRoute;
     }
 
-        /* package */ MediaRouter.RouteInfo.@Nullable DynamicGroupState getDynamicGroupState(
+    @Nullable
+        /* package */ MediaRouter.RouteInfo.DynamicGroupState getDynamicGroupState(
             MediaRouter.RouteInfo route) {
         return mSelectedRoute.getDynamicGroupState(route);
     }
 
-    /* package */ void addMemberToDynamicGroup(MediaRouter.@NonNull RouteInfo route) {
+    /* package */ void addMemberToDynamicGroup(@NonNull MediaRouter.RouteInfo route) {
         if (!(mSelectedRouteController instanceof MediaRouteProvider.DynamicGroupRouteController)) {
             throw new IllegalStateException("There is no currently selected dynamic group route.");
         }
@@ -371,7 +375,7 @@ import java.util.Set;
                 .onAddMemberRoute(route.getDescriptorId());
     }
 
-    /* package */ void removeMemberFromDynamicGroup(MediaRouter.@NonNull RouteInfo route) {
+    /* package */ void removeMemberFromDynamicGroup(@NonNull MediaRouter.RouteInfo route) {
         if (!(mSelectedRouteController instanceof MediaRouteProvider.DynamicGroupRouteController)) {
             throw new IllegalStateException("There is no currently selected dynamic group route.");
         }
@@ -390,7 +394,7 @@ import java.util.Set;
                 .onRemoveMemberRoute(route.getDescriptorId());
     }
 
-    /* package */ void transferToRoute(MediaRouter.@NonNull RouteInfo route) {
+    /* package */ void transferToRoute(@NonNull MediaRouter.RouteInfo route) {
         if (!(mSelectedRouteController instanceof MediaRouteProvider.DynamicGroupRouteController)) {
             throw new IllegalStateException("There is no currently selected dynamic group route.");
         }
@@ -424,7 +428,7 @@ import java.util.Set;
      *     explicit application route selection.
      */
     /* package */ void selectRoute(
-            MediaRouter.@NonNull RouteInfo route,
+            @NonNull MediaRouter.RouteInfo route,
             @MediaRouter.UnselectReason int unselectReason,
             boolean syncMediaRoute1Provider) {
         if (!mRoutes.contains(route)) {
@@ -673,7 +677,7 @@ import java.util.Set;
     @Override
     public void releaseProviderController(
             @NonNull RegisteredMediaRouteProvider provider,
-            MediaRouteProvider.@NonNull RouteController controller) {
+            @NonNull MediaRouteProvider.RouteController controller) {
         if (mSelectedRouteController == controller) {
             selectRoute(
                     chooseFallbackRoute(),
@@ -992,7 +996,7 @@ import java.util.Set;
     }
 
     /* package */ void selectRouteInternal(
-            MediaRouter.@NonNull RouteInfo route,
+            @NonNull MediaRouter.RouteInfo route,
             @MediaRouter.UnselectReason int unselectReason,
             boolean syncMediaRoute1Provider) {
         if (mSelectedRoute == route) {
@@ -1145,11 +1149,12 @@ import java.util.Set;
     /* package */ void notifyTransfer(
             GlobalMediaRouter router,
             MediaRouter.RouteInfo route,
-            MediaRouteProvider.@Nullable RouteController routeController,
+            @Nullable MediaRouteProvider.RouteController routeController,
             @MediaRouter.UnselectReason int reason,
             boolean syncMediaRoute1Provider,
-            MediaRouter.@Nullable RouteInfo requestedRoute,
-                                @Nullable Collection<
+            @Nullable MediaRouter.RouteInfo requestedRoute,
+            @Nullable
+                    Collection<
                                     MediaRouteProvider.DynamicGroupRouteController
                                             .DynamicRouteDescriptor>
                             memberRoutes) {
@@ -1188,9 +1193,10 @@ import java.util.Set;
                             .OnDynamicRoutesChangedListener() {
                         @Override
                         public void onRoutesChanged(
-                                MediaRouteProvider.@NonNull DynamicGroupRouteController controller,
+                                @NonNull MediaRouteProvider.DynamicGroupRouteController controller,
                                 @Nullable MediaRouteDescriptor groupRouteDescriptor,
-                                                                        @NonNull Collection<
+                                @NonNull
+                                        Collection<
                                                         MediaRouteProvider
                                                                 .DynamicGroupRouteController
                                                                 .DynamicRouteDescriptor>
@@ -1395,7 +1401,7 @@ import java.util.Set;
         }
 
         @Override
-        public void onReleaseController(MediaRouteProvider.@NonNull RouteController controller) {
+        public void onReleaseController(@NonNull MediaRouteProvider.RouteController controller) {
             if (controller == mSelectedRouteController) {
                 // Stop casting
                 selectRouteToFallbackRoute(UNSELECT_REASON_STOPPED);
@@ -1555,8 +1561,8 @@ import java.util.Set;
         public static final int MSG_ROUTER_PARAMS_CHANGED = MSG_TYPE_ROUTER | 1;
 
         /* package */ void postRouteSelectedMessage(
-                MediaRouter.@Nullable RouteInfo fromRoute,
-                MediaRouter.@NonNull RouteInfo targetRoute,
+                @Nullable MediaRouter.RouteInfo fromRoute,
+                @NonNull MediaRouter.RouteInfo targetRoute,
                 int reason,
                 boolean syncMediaRoute1Provider) {
             RouteSelectedMessageParams params =
@@ -1567,8 +1573,8 @@ import java.util.Set;
         }
 
         /* package */ void postAnotherRouteSelectedMessage(
-                MediaRouter.@Nullable RouteInfo requestedRoute,
-                MediaRouter.@NonNull RouteInfo targetRoute,
+                @Nullable MediaRouter.RouteInfo requestedRoute,
+                @NonNull MediaRouter.RouteInfo targetRoute,
                 int reason,
                 boolean syncMediaRoute1Provider) {
             RouteSelectedMessageParams params =
@@ -1755,15 +1761,15 @@ import java.util.Set;
          * Holds the origin route for {@link CallbackHandler#MSG_ROUTE_SELECTED}, or the originally
          * requested route for {@link CallbackHandler#MSG_ROUTE_ANOTHER_SELECTED}.
          */
-        public final MediaRouter.@Nullable RouteInfo mFromOrRequestedRoute;
+        @Nullable public final MediaRouter.RouteInfo mFromOrRequestedRoute;
 
-        public final MediaRouter.@NonNull RouteInfo mTargetRoute;
+        @NonNull public final MediaRouter.RouteInfo mTargetRoute;
 
         public final boolean mSyncMediaRoute1Provider;
 
         private RouteSelectedMessageParams(
-                MediaRouter.@Nullable RouteInfo fromOrRequestedRoute,
-                MediaRouter.@NonNull RouteInfo targetRoute,
+                @Nullable MediaRouter.RouteInfo fromOrRequestedRoute,
+                @NonNull MediaRouter.RouteInfo targetRoute,
                 boolean syncMediaRoute1Provider) {
             mFromOrRequestedRoute = fromOrRequestedRoute;
             mTargetRoute = targetRoute;

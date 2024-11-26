@@ -73,12 +73,11 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.ArraySet;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.annotation.RequiresApi;
 import androidx.mediarouter.media.MediaRouter.RouteInfo;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -119,8 +118,8 @@ class MediaRouter2Utils {
     private MediaRouter2Utils() {}
 
     @OptIn(markerClass = androidx.core.os.BuildCompat.PrereleaseSdkCheck.class)
-    public static @Nullable MediaRoute2Info toFwkMediaRoute2Info(
-            @Nullable MediaRouteDescriptor descriptor) {
+    @Nullable
+    public static MediaRoute2Info toFwkMediaRoute2Info(@Nullable MediaRouteDescriptor descriptor) {
         if (descriptor == null) {
             return null;
         } else if (TextUtils.isEmpty(descriptor.getId())
@@ -179,7 +178,8 @@ class MediaRouter2Utils {
         return builder.build();
     }
 
-    public static @Nullable MediaRouteDescriptor toMediaRouteDescriptor(
+    @Nullable
+    public static MediaRouteDescriptor toMediaRouteDescriptor(
             @Nullable MediaRoute2Info fwkMediaRoute2Info) {
         if (fwkMediaRoute2Info == null) {
             return null;
@@ -250,7 +250,8 @@ class MediaRouter2Utils {
         return features;
     }
 
-    static @NonNull List<IntentFilter> toControlFilters(@Nullable Collection<String> features) {
+    @NonNull
+    static List<IntentFilter> toControlFilters(@Nullable Collection<String> features) {
         if (features == null) {
             return new ArrayList<>();
         }
@@ -276,7 +277,8 @@ class MediaRouter2Utils {
         return controlFilters;
     }
 
-    static @NonNull List<String> getRouteIds(@Nullable List<MediaRoute2Info> routes) {
+    @NonNull
+    static List<String> getRouteIds(@Nullable List<MediaRoute2Info> routes) {
         if (routes == null) {
             return new ArrayList<>();
         }
@@ -291,7 +293,8 @@ class MediaRouter2Utils {
         return routeIds;
     }
 
-    static @NonNull MediaRouteDiscoveryRequest toMediaRouteDiscoveryRequest(
+    @NonNull
+    static MediaRouteDiscoveryRequest toMediaRouteDiscoveryRequest(
             @NonNull RouteDiscoveryPreference preference) {
         List<String> controlCategories = new ArrayList<>();
         for (String feature : preference.getPreferredFeatures()) {
@@ -304,7 +307,8 @@ class MediaRouter2Utils {
         return new MediaRouteDiscoveryRequest(selector, preference.shouldPerformActiveScan());
     }
 
-    static @NonNull RouteDiscoveryPreference toDiscoveryPreference(
+    @NonNull
+    static RouteDiscoveryPreference toDiscoveryPreference(
             @Nullable MediaRouteDiscoveryRequest discoveryRequest) {
         if (discoveryRequest == null || !discoveryRequest.isValid()) {
             return new RouteDiscoveryPreference.Builder(new ArrayList<>(), false).build();

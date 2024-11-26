@@ -18,12 +18,11 @@ package androidx.mediarouter.app;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.mediarouter.media.MediaRouteSelector;
 import androidx.mediarouter.media.MediaRouter;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Media route discovery fragment.
@@ -58,7 +57,8 @@ public class MediaRouteDiscoveryFragment extends Fragment {
     /**
      * Gets the media router instance.
      */
-    public @NonNull MediaRouter getMediaRouter() {
+    @NonNull
+    public MediaRouter getMediaRouter() {
         ensureRouter();
         return mRouter;
     }
@@ -74,7 +74,8 @@ public class MediaRouteDiscoveryFragment extends Fragment {
      *
      * @return The selector, never null.
      */
-    public @NonNull MediaRouteSelector getRouteSelector() {
+    @NonNull
+    public MediaRouteSelector getRouteSelector() {
         ensureRouteSelector();
         return mSelector;
     }
@@ -130,7 +131,8 @@ public class MediaRouteDiscoveryFragment extends Fragment {
      *
      * @return The new callback, or null if no callback should be registered.
      */
-    public MediaRouter.@Nullable Callback onCreateCallback() {
+    @Nullable
+    public MediaRouter.Callback onCreateCallback() {
         return new MediaRouter.Callback() { };
     }
 

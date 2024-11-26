@@ -74,6 +74,8 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.util.SparseArray;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 import androidx.collection.ArrayMap;
@@ -85,9 +87,6 @@ import androidx.mediarouter.media.MediaRouteProvider.DynamicGroupRouteController
 import androidx.mediarouter.media.MediaRouteProvider.DynamicGroupRouteController.OnDynamicRoutesChangedListener;
 import androidx.mediarouter.media.MediaRouteProvider.RouteController;
 import androidx.mediarouter.media.MediaRouteProvider.RouteControllerOptions;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -217,7 +216,7 @@ public abstract class MediaRouteProviderService extends Service {
      * @param listener a @code{@link Consumer} that takes a list of {@link ClientInfo}
      */
     public void addClientInfoListener(
-            /* @CallbackExecutor */ @NonNull Executor listenerExecutor,
+            @NonNull /* @CallbackExecutor */ Executor listenerExecutor,
             @NonNull Consumer<List<ClientInfo>> listener) {
         mImpl.addClientInfoListener(listenerExecutor, listener);
     }
@@ -238,10 +237,12 @@ public abstract class MediaRouteProviderService extends Service {
      * @return The media route provider offered by this service, or null if
      * this service has decided not to offer a media route provider.
      */
-    public abstract @Nullable MediaRouteProvider onCreateMediaRouteProvider();
+    @Nullable
+    public abstract MediaRouteProvider onCreateMediaRouteProvider();
 
     @Override
-    public @Nullable IBinder onBind(@NonNull Intent intent) {
+    @Nullable
+    public IBinder onBind(@NonNull Intent intent) {
         return mImpl.onBind(intent);
     }
 
@@ -259,7 +260,8 @@ public abstract class MediaRouteProviderService extends Service {
      *
      * @see #onCreateMediaRouteProvider()
      */
-    public @Nullable MediaRouteProvider getMediaRouteProvider() {
+    @Nullable
+    public MediaRouteProvider getMediaRouteProvider() {
         return mProvider;
     }
 
@@ -362,7 +364,8 @@ public abstract class MediaRouteProviderService extends Service {
          *
          * @return The package name of the client
          */
-        public @NonNull String getPackageName() {
+        @NonNull
+        public String getPackageName() {
             return packageName;
         }
 
@@ -375,7 +378,8 @@ public abstract class MediaRouteProviderService extends Service {
             }
 
             /** Builds and returns the {@link ClientInfo} object. */
-            public @NonNull ClientInfo build() {
+            @NonNull
+            public ClientInfo build() {
                 return new ClientInfo(packageName);
             }
         }
@@ -577,7 +581,8 @@ public abstract class MediaRouteProviderService extends Service {
         MediaRouteDiscoveryRequest mCompositeDiscoveryRequest;
         MediaRouteDiscoveryRequest mBaseDiscoveryRequest;
         long mBaseDiscoveryRequestTimestamp;
-        private final @Nullable Map<Consumer<List<ClientInfo>>, Executor> mClientInfoListeners =
+        @Nullable
+        private final Map<Consumer<List<ClientInfo>>, Executor> mClientInfoListeners =
                 new HashMap<>();
         private final Object mClientInfoListenersLock = new Object();
         private final MediaRouterActiveScanThrottlingHelper mActiveScanThrottlingHelper =
@@ -1170,8 +1175,9 @@ public abstract class MediaRouteProviderService extends Service {
                         .obtainMessage(PRIVATE_MSG_CLIENT_DIED, mMessenger).sendToTarget();
             }
 
+            @NonNull
             @Override
-            public @NonNull String toString() {
+            public String toString() {
                 return getClientId(mMessenger);
             }
 
@@ -1222,7 +1228,7 @@ public abstract class MediaRouteProviderService extends Service {
 
         @Override
         public void addClientInfoListener (
-                /* @CallbackExecutor */ @NonNull Executor listenerExecutor,
+                @NonNull /* @CallbackExecutor */ Executor listenerExecutor,
                 @NonNull Consumer<List<ClientInfo>> listener) {
             synchronized (mClientInfoListenersLock) {
                 mClientInfoListeners.put(listener, listenerExecutor);

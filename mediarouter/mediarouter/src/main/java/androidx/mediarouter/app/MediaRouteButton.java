@@ -31,6 +31,8 @@ import android.util.SparseArray;
 import android.view.SoundEffectConstants;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.TooltipCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -42,9 +44,6 @@ import androidx.mediarouter.R;
 import androidx.mediarouter.media.MediaRouteSelector;
 import androidx.mediarouter.media.MediaRouter;
 import androidx.mediarouter.media.MediaRouterParams;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * The media route button allows the user to select routes and to control the currently selected
@@ -202,7 +201,8 @@ public class MediaRouteButton extends View {
      *
      * @return The selector, never null.
      */
-    public @NonNull MediaRouteSelector getRouteSelector() {
+    @NonNull
+    public MediaRouteSelector getRouteSelector() {
         return mSelector;
     }
 
@@ -237,7 +237,8 @@ public class MediaRouteButton extends View {
      *
      * @return The dialog factory, never null.
      */
-    public @NonNull MediaRouteDialogFactory getDialogFactory() {
+    @NonNull
+    public MediaRouteDialogFactory getDialogFactory() {
         return mDialogFactory;
     }
 
@@ -407,7 +408,8 @@ public class MediaRouteButton extends View {
     }
 
     @Override
-    protected int @NonNull [] onCreateDrawableState(int extraSpace) {
+    @NonNull
+    protected int[] onCreateDrawableState(int extraSpace) {
         final int[] drawableState = super.onCreateDrawableState(extraSpace + 1);
 
         // Technically we should be handling this more completely, but these
@@ -675,49 +677,49 @@ public class MediaRouteButton extends View {
         }
 
         @Override
-        public void onRouteAdded(@NonNull MediaRouter router, MediaRouter.@NonNull RouteInfo info) {
+        public void onRouteAdded(@NonNull MediaRouter router, @NonNull MediaRouter.RouteInfo info) {
             refreshRoute();
         }
 
         @Override
         public void onRouteRemoved(@NonNull MediaRouter router,
-                MediaRouter.@NonNull RouteInfo info) {
+                @NonNull MediaRouter.RouteInfo info) {
             refreshRoute();
         }
 
         @Override
         public void onRouteChanged(@NonNull MediaRouter router,
-                MediaRouter.@NonNull RouteInfo info) {
+                @NonNull MediaRouter.RouteInfo info) {
             refreshRoute();
         }
 
         @Override
         public void onRouteSelected(@NonNull MediaRouter router,
-                MediaRouter.@NonNull RouteInfo info) {
+                @NonNull MediaRouter.RouteInfo info) {
             refreshRoute();
         }
 
         @Override
         public void onRouteUnselected(@NonNull MediaRouter router,
-                MediaRouter.@NonNull RouteInfo info) {
+                @NonNull MediaRouter.RouteInfo info) {
             refreshRoute();
         }
 
         @Override
         public void onProviderAdded(@NonNull MediaRouter router,
-                MediaRouter.@NonNull ProviderInfo provider) {
+                @NonNull MediaRouter.ProviderInfo provider) {
             refreshRoute();
         }
 
         @Override
         public void onProviderRemoved(@NonNull MediaRouter router,
-                MediaRouter.@NonNull ProviderInfo provider) {
+                @NonNull MediaRouter.ProviderInfo provider) {
             refreshRoute();
         }
 
         @Override
         public void onProviderChanged(@NonNull MediaRouter router,
-                MediaRouter.@NonNull ProviderInfo provider) {
+                @NonNull MediaRouter.ProviderInfo provider) {
             refreshRoute();
         }
 

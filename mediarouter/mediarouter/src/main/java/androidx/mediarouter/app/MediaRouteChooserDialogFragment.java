@@ -23,12 +23,11 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.fragment.app.DialogFragment;
 import androidx.mediarouter.media.MediaRouteSelector;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Media route chooser dialog fragment.
@@ -58,7 +57,8 @@ public class MediaRouteChooserDialogFragment extends DialogFragment {
      *
      * @return The selector, never null.
      */
-    public @NonNull MediaRouteSelector getRouteSelector() {
+    @NonNull
+    public MediaRouteSelector getRouteSelector() {
         ensureRouteSelector();
         return mSelector;
     }
@@ -125,8 +125,8 @@ public class MediaRouteChooserDialogFragment extends DialogFragment {
      * Called when the device picker dialog is being created.
      */
     @RestrictTo(LIBRARY)
-    public @NonNull MediaRouteDynamicChooserDialog onCreateDynamicChooserDialog(
-            @NonNull Context context) {
+    @NonNull
+    public MediaRouteDynamicChooserDialog onCreateDynamicChooserDialog(@NonNull Context context) {
         return new MediaRouteDynamicChooserDialog(context);
     }
 
@@ -136,13 +136,15 @@ public class MediaRouteChooserDialogFragment extends DialogFragment {
      * Subclasses may override this method to customize the dialog.
      * </p>
      */
-    public @NonNull MediaRouteChooserDialog onCreateChooserDialog(
+    @NonNull
+    public MediaRouteChooserDialog onCreateChooserDialog(
             @NonNull Context context, @Nullable Bundle savedInstanceState) {
         return new MediaRouteChooserDialog(context);
     }
 
     @Override
-    public @NonNull Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+    @NonNull
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         if (mUseDynamicGroup) {
             mDialog = onCreateDynamicChooserDialog(getContext());
             ((MediaRouteDynamicChooserDialog) mDialog).setRouteSelector(getRouteSelector());
