@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
@@ -102,15 +103,8 @@ suspend fun PointerInputScope.detectTapGestures(
         down.consume()
         var resetJob =
             launch(start = coroutineStartForCurrentDispatchBehavior) { pressScope.reset() }
-        // In some cases, coroutine cancellation of the reset job might still be processing when we
-        // are already processing an up or cancel pointer event. We need to wait for the reset job
-        // to cancel and complete so it can clean up properly (e.g. unlock the underlying mutex)
-        suspend fun awaitResetOrSkip() {
-            if (DetectTapGesturesEnableNewDispatchingBehavior) {
-                resetJob.join()
-            }
-        }
-        if (onPress !== NoPressGesture) launch { pressScope.onPress(down.position) }
+        if (onPress !== NoPressGesture)
+            launchAwaitingReset(resetJob) { pressScope.onPress(down.position) }
         val upOrCancel: PointerInputChange?
         val cancelOrReleaseJob: Job?
 
@@ -123,10 +117,7 @@ suspend fun PointerInputScope.detectTapGestures(
                     LongPressResult.Success -> {
                         onLongPress.invoke(down.position)
                         consumeUntilUp()
-                        launch(start = coroutineStartForCurrentDispatchBehavior) {
-                            awaitResetOrSkip()
-                            pressScope.release()
-                        }
+                        launchAwaitingReset(resetJob) { pressScope.release() }
                         // End the current gesture
                         return@awaitEachGesture
                     }
@@ -137,18 +128,13 @@ suspend fun PointerInputScope.detectTapGestures(
 
         if (upOrCancel == null) {
             cancelOrReleaseJob =
-                launch(start = coroutineStartForCurrentDispatchBehavior) {
-                    awaitResetOrSkip()
+                launchAwaitingReset(resetJob) {
                     // tap-up was canceled
                     pressScope.cancel()
                 }
         } else {
             upOrCancel.consume()
-            cancelOrReleaseJob =
-                launch(start = coroutineStartForCurrentDispatchBehavior) {
-                    awaitResetOrSkip()
-                    pressScope.release()
-                }
+            cancelOrReleaseJob = launchAwaitingReset(resetJob) { pressScope.release() }
         }
 
         if (upOrCancel != null) {
@@ -169,7 +155,7 @@ suspend fun PointerInputScope.detectTapGestures(
                             pressScope.reset()
                         }
                     if (onPress !== NoPressGesture) {
-                        launch { pressScope.onPress(secondDown.position) }
+                        launchAwaitingReset(resetJob) { pressScope.onPress(secondDown.position) }
                     }
 
                     // Might have a long second press as the second tap
@@ -190,10 +176,7 @@ suspend fun PointerInputScope.detectTapGestures(
                                     onLongPress.invoke(secondDown.position)
                                     consumeUntilUp()
 
-                                    launch(start = coroutineStartForCurrentDispatchBehavior) {
-                                        awaitResetOrSkip()
-                                        pressScope.release()
-                                    }
+                                    launchAwaitingReset(resetJob) { pressScope.release() }
                                     return@awaitEachGesture
                                 }
                                 is LongPressResult.Released -> longPressResult.finalUpChange
@@ -202,16 +185,10 @@ suspend fun PointerInputScope.detectTapGestures(
                         }
                     if (secondUp != null) {
                         secondUp.consume()
-                        launch(start = coroutineStartForCurrentDispatchBehavior) {
-                            awaitResetOrSkip()
-                            pressScope.release()
-                        }
+                        launchAwaitingReset(resetJob) { pressScope.release() }
                         onDoubleTap(secondUp.position)
                     } else {
-                        launch(start = coroutineStartForCurrentDispatchBehavior) {
-                            awaitResetOrSkip()
-                            pressScope.cancel()
-                        }
+                        launchAwaitingReset(resetJob) { pressScope.cancel() }
                         onTap?.invoke(upOrCancel.position)
                     }
                 }
@@ -268,31 +245,22 @@ internal suspend fun PointerInputScope.detectTapAndPress(
         awaitEachGesture {
             val resetJob =
                 launch(start = coroutineStartForCurrentDispatchBehavior) { pressScope.reset() }
-            suspend fun awaitResetOrSkip() {
-                if (DetectTapGesturesEnableNewDispatchingBehavior) {
-                    resetJob.join()
-                }
-            }
 
             val down = awaitFirstDown().also { it.consume() }
 
             if (onPress !== NoPressGesture) {
-                launch { pressScope.onPress(down.position) }
+                launchAwaitingReset(resetJob) { pressScope.onPress(down.position) }
             }
 
             val up = waitForUpOrCancellation()
             if (up == null) {
-                launch(start = coroutineStartForCurrentDispatchBehavior) {
-                    awaitResetOrSkip()
+                launchAwaitingReset(resetJob) {
                     // tap-up was canceled
                     pressScope.cancel()
                 }
             } else {
                 up.consume()
-                launch(start = coroutineStartForCurrentDispatchBehavior) {
-                    awaitResetOrSkip()
-                    pressScope.release()
-                }
+                launchAwaitingReset(resetJob) { pressScope.release() }
                 onTap?.invoke(up.position)
             }
         }
@@ -446,7 +414,7 @@ annotation class ExperimentalTapGestureDetectorBehaviorApi
 @ExperimentalTapGestureDetectorBehaviorApi
 @get:ExperimentalTapGestureDetectorBehaviorApi
 @set:ExperimentalTapGestureDetectorBehaviorApi
-var DetectTapGesturesEnableNewDispatchingBehavior = false
+var DetectTapGesturesEnableNewDispatchingBehavior = true
 
 @OptIn(ExperimentalTapGestureDetectorBehaviorApi::class)
 private val coroutineStartForCurrentDispatchBehavior
@@ -456,6 +424,30 @@ private val coroutineStartForCurrentDispatchBehavior
         } else {
             CoroutineStart.DEFAULT
         }
+
+/**
+ * Launch a coroutine in [this] [CoroutineScope] with the specified [start]. If
+ * [DetectTapGesturesEnableNewDispatchingBehavior] is true, await the [resetJob] and then execute
+ * the [block]. If [DetectTapGesturesEnableNewDispatchingBehavior] is false, execute the [block]
+ * straight away. If [DetectTapGesturesEnableNewDispatchingBehavior] is true, [start] will be
+ * [CoroutineStart.UNDISPATCHED] by default, [CoroutineStart.DEFAULT] otherwise.
+ *
+ * In some cases, coroutine cancellation of the reset job might still be processing when we are
+ * already processing an up or cancel pointer event. We need to wait for the reset job to cancel and
+ * complete so it can clean up properly (e.g. unlock the underlying mutex)
+ */
+@OptIn(ExperimentalTapGestureDetectorBehaviorApi::class)
+private fun CoroutineScope.launchAwaitingReset(
+    resetJob: Job,
+    start: CoroutineStart = coroutineStartForCurrentDispatchBehavior,
+    block: suspend CoroutineScope.() -> Unit
+): Job =
+    launch(start = start) {
+        if (DetectTapGesturesEnableNewDispatchingBehavior) {
+            resetJob.join()
+        }
+        block()
+    }
 
 /** [detectTapGestures]'s implementation of [PressGestureScope]. */
 internal class PressGestureScopeImpl(density: Density) : PressGestureScope, Density by density {
