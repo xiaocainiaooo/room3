@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package androidx.security.state
+package androidx.security.state.provider
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
+import androidx.security.state.SecurityPatchState
 import androidx.security.state.SecurityPatchState.Companion.COMPONENT_SYSTEM
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import java.time.LocalDate
