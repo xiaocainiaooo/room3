@@ -16,6 +16,8 @@
 
 package androidx.kruth
 
+import kotlin.jvm.JvmStatic
+
 /**
  * In a fluent assertion chain, an object with which you can do any of the following:
  * - Set an optional message with [withMessage].
@@ -32,6 +34,7 @@ actual open class StandardSubjectBuilder internal actual constructor(metadata: F
 
     actual companion object {
         /** Returns a new instance that invokes the given [FailureStrategy] when a check fails. */
+        @JvmStatic
         actual fun forCustomFailureStrategy(
             failureStrategy: FailureStrategy
         ): StandardSubjectBuilder = commonForCustomFailureStrategy(failureStrategy)
