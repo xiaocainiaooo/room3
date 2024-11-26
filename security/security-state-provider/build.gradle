@@ -27,14 +27,20 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.kotlinSerialization)
 }
 
 dependencies {
-    api(libs.kotlinStdlib)
-    // Add dependencies here
+    implementation(libs.kotlinSerializationJson)
+    implementation project(':security:security-state')
+
+    testImplementation(libs.testExtJunit)
+    testImplementation(libs.mockitoKotlin4)
+    testImplementation(libs.robolectric)
 }
 
 android {
+    compileSdk 35
     namespace "androidx.security.state.provider"
 }
 

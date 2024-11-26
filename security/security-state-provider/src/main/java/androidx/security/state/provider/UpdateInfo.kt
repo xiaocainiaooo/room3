@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.security.state
+package androidx.security.state.provider
 
+import androidx.security.state.SecurityPatchState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Objects
