@@ -43,6 +43,7 @@ androidXMultiplatform {
         }
         withAndroidTestOnJvmBuilder {
             it.defaultSourceSetName = "androidUnitTest"
+            it.compilationName = "unitTest"
         }
     }
     desktop()
