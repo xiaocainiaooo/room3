@@ -286,7 +286,42 @@ public class AsyncStartUpTest {
         Assert.assertTrue(webViewCurrentlyLoaded());
         Assert.assertNull(result.getTotalTimeInUiThreadMillis());
         Assert.assertNull(result.getMaxTimePerTaskInUiThreadMillis());
-        Assert.assertNull(result.getBlockingStartUpLocations());
+    }
+
+    /**
+     * Tests that
+     * {@link WebViewCompat#startUpWebView(WebViewStartUpConfig, WebViewCompat.WebViewStartUpCallback)}
+     * with {@link WebViewStartUpConfig.Builder#setShouldRunUiThreadStartUpTasks()} as
+     * {@code false} returns a blocking startup location if provider init is triggered on the main
+     * looper.
+     */
+    @Test
+    @MediumTest
+    @Ignore("b/376656739")
+    public void
+            testAsyncStartUp_withoutRunningUiThreadStartUpReturnsBlockingLocationWithProviderInit()
+            throws Throwable {
+        Assume.assumeFalse(webViewCurrentlyLoaded());
+        WebViewStartUpConfig config = new WebViewStartUpConfig.Builder(
+                Executors.newSingleThreadExecutor())
+                .setShouldRunUiThreadStartUpTasks(false).build();
+        final ResolvableFuture<WebViewStartUpResult> startUpFinishedFuture =
+                ResolvableFuture.create();
+
+        // Triggers provider init.
+        new Handler(Looper.getMainLooper()).post(WebViewGlueCommunicator::getWebViewClassLoader);
+        WebViewCompat.startUpWebView(config,
+                startUpFinishedFuture::set);
+        // Wait until the callback has triggered.
+        WebViewStartUpResult result = WebkitUtils.waitForFuture(startUpFinishedFuture);
+
+        Assert.assertNull(result.getTotalTimeInUiThreadMillis());
+        Assert.assertNull(result.getMaxTimePerTaskInUiThreadMillis());
+        Assert.assertNotNull(result);
+        Assert.assertEquals(1,
+                Objects.requireNonNull(result.getBlockingStartUpLocations()).size());
+        Assert.assertTrue(result.getBlockingStartUpLocations().get(0).getStackInformation()
+                .contains("Provider init"));
     }
 
     /**
