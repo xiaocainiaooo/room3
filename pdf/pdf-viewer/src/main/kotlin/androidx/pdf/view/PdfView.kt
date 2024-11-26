@@ -33,6 +33,7 @@ import androidx.core.os.HandlerCompat
 import androidx.pdf.PdfDocument
 import androidx.pdf.util.ZoomUtils
 import java.util.concurrent.Executors
+import kotlin.math.max
 import kotlin.math.round
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
@@ -87,6 +88,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             checkMainThread()
             field = value
             onZoomChanged()
+            invalidate()
         }
 
     /**
@@ -462,9 +464,23 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     }
 
     /** Start using the [PdfDocument] to present PDF content */
+    // Display.width and height are deprecated in favor of WindowMetrics, but in this case we
+    // actually want to use the size of the display and not the size of the window.
+    @Suppress("deprecation")
     private fun onDocumentSet() {
         val localPdfDocument = pdfDocument ?: return
-        pageManager = PageManager(localPdfDocument, backgroundScope, DEFAULT_PAGE_PREFETCH_RADIUS)
+        /* We use the maximum pixel dimension of the display as the maximum pixel dimension for any
+        single Bitmap we render, i.e. the threshold for tiled rendering. This is an arbitrary,
+        but reasonable threshold to use that does not depend on volatile state like the current
+        screen orientation or the current size of our application's Window. */
+        val maxBitmapDimensionPx = max(context.display.width, context.display.height)
+        pageManager =
+            PageManager(
+                localPdfDocument,
+                backgroundScope,
+                DEFAULT_PAGE_PREFETCH_RADIUS,
+                Point(maxBitmapDimensionPx, maxBitmapDimensionPx)
+            )
         // We'll either create our layout manager from restored state, or instantiate a new one
         if (!maybeRestoreState()) {
             pageLayoutManager =
@@ -484,11 +500,21 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      * Compute what content is visible from the current position of this View. Generally invoked on
      * position or size changes.
      */
-    internal fun onZoomChanged() {
+    private fun onZoomChanged() {
         pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
-        if (!gestureHandler.scaleInProgress && !gestureHandler.scrollInProgress) {
+        // Don't fetch new Bitmaps while the user is actively zooming, to avoid jank and rendering
+        // churn
+        if (!gestureTracker.matches(GestureTracker.Gesture.ZOOM)) {
             pageManager?.maybeUpdateBitmaps(visiblePages, zoom)
         }
+    }
+
+    /**
+     * Invoked by gesture handlers to let this view know that its position has stabilized, i.e. it's
+     * not actively changing due to user input
+     */
+    internal fun onStableZoom() {
+        pageManager?.maybeUpdateBitmaps(visiblePages, zoom)
     }
 
     private fun reset() {

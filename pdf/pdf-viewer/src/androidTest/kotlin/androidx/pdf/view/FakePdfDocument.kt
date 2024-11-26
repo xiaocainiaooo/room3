@@ -162,12 +162,12 @@ internal open class FakePdfDocument(
                 if (tileRegion == null) {
                     _bitmapRequests[pageNumber] = FullBitmap(scaledPageSizePx)
                     // Tiling, and this is a new rect for a tile board we're already tracking
-                } else if (requestedSize != null && requestedSize is TileBoard) {
+                } else if (requestedSize != null && requestedSize is Tiles) {
                     requestedSize.withTile(tileRegion)
                     // Tiling, and this is the first rect requested
                 } else {
                     _bitmapRequests[pageNumber] =
-                        TileBoard(scaledPageSizePx).apply { withTile(tileRegion) }
+                        Tiles(scaledPageSizePx).apply { withTile(tileRegion) }
                 }
             }
         }
@@ -185,7 +185,7 @@ internal sealed class SizeParams(val scaledPageSizePx: Size)
 internal class FullBitmap(scaledPageSizePx: Size) : SizeParams(scaledPageSizePx)
 
 /** Represents a set of tile region [Bitmap] requested from [PdfDocument.BitmapSource] */
-internal class TileBoard(scaledPageSizePx: Size) : SizeParams(scaledPageSizePx) {
+internal class Tiles(scaledPageSizePx: Size) : SizeParams(scaledPageSizePx) {
     private val _tiles = mutableListOf<Rect>()
     val tiles: List<Rect>
         get() = _tiles
