@@ -54,7 +54,7 @@ androidx {
 }
 
 android {
-    compileSdk 35
+    compileSdkPreview "Baklava"
     namespace "androidx.appsearch.playservicesstorage"
      defaultConfig {
     }

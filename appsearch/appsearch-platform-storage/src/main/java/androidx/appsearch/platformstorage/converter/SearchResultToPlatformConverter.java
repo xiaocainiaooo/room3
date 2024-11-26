@@ -24,6 +24,7 @@ import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.app.GenericDocument;
 import androidx.appsearch.app.SearchResult;
+import androidx.appsearch.platformstorage.util.AppSearchVersionUtil;
 import androidx.core.util.Preconditions;
 
 import java.util.List;
@@ -60,7 +61,13 @@ public class SearchResultToPlatformConverter {
                 builder.addJoinedResult(toJetpackSearchResult(joinedResult));
             }
         }
-        // TODO(b/332642571): Add informational ranking signal once it is available in platform.
+        if (AppSearchVersionUtil.isAtLeastB()) {
+            List<Double> informationalRankingSignals =
+                    ApiHelperForB.getInformationalRankingSignals(platformResult);
+            for (int i = 0; i < informationalRankingSignals.size(); i++) {
+                builder.addInformationalRankingSignal(informationalRankingSignals.get(i));
+            }
+        }
         // TODO(b/371610934): Set parentTypeMap once it is available in platform.
         return builder.build();
     }
@@ -117,6 +124,18 @@ public class SearchResultToPlatformConverter {
         static List<android.app.appsearch.SearchResult> getJoinedResults(@NonNull
                 android.app.appsearch.SearchResult result) {
             return result.getJoinedResults();
+        }
+    }
+
+    @RequiresApi(36)
+    private static class ApiHelperForB {
+        private ApiHelperForB() {
+        }
+
+        @DoNotInline
+        static List<Double> getInformationalRankingSignals(
+                @NonNull android.app.appsearch.SearchResult result) {
+            return result.getInformationalRankingSignals();
         }
     }
 }

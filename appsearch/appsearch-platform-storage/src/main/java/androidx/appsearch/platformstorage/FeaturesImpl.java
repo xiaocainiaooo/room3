@@ -107,9 +107,6 @@ final class FeaturesImpl implements Features {
 
 
             // Beyond Android V Features
-            case Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG:
-                // TODO(b/326656531) : Update when feature is ready in service-appsearch.
-                // fall through
             case Features.SCHEMA_EMBEDDING_QUANTIZATION:
                 // TODO(b/359959345) : Update when feature is ready in service-appsearch.
                 // fall through
@@ -118,9 +115,6 @@ final class FeaturesImpl implements Features {
                 // fall through
             case Features.SEARCH_SPEC_SEARCH_STRING_PARAMETERS:
                 // TODO(b/332620561) : Update when feature is ready in service-appsearch.
-                // fall through
-            case Features.SEARCH_SPEC_ADD_INFORMATIONAL_RANKING_EXPRESSIONS:
-                // TODO(b/332642571) : Update when feature is ready in service-appsearch.
                 // fall through
             case Features.SEARCH_SPEC_ADD_FILTER_DOCUMENT_IDS:
                 // TODO(b/367464836) : Update when feature is ready in service-appsearch.
@@ -141,11 +135,13 @@ final class FeaturesImpl implements Features {
 
             // Android B Features
             case Features.INDEXER_MOBILE_APPLICATIONS:
-                // TODO(b/275592563) : Update when B version code is available
-                return Build.VERSION.SDK_INT > Build.VERSION_CODES.VANILLA_ICE_CREAM
+                return AppSearchVersionUtil.isAtLeastB()
                         || AppSearchVersionUtil.getAppSearchVersionCode(mContext)
                         >= AppSearchVersionUtil.MainlineVersions.M2024_11;
-
+            case Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG:
+                // fall through
+            case Features.SEARCH_SPEC_ADD_INFORMATIONAL_RANKING_EXPRESSIONS:
+                return AppSearchVersionUtil.isAtLeastB();
             default:
                 return false;
         }
