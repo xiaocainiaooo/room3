@@ -21,7 +21,7 @@ import androidx.benchmark.InsightSummary
 import androidx.benchmark.TraceDeepLink
 import androidx.benchmark.createInsightSummaries
 import androidx.benchmark.macro.perfetto.queryStartupInsights
-import androidx.benchmark.perfetto.PerfettoTraceProcessor
+import androidx.benchmark.traceprocessor.TraceProcessor
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
@@ -117,7 +117,7 @@ class InsightTest {
     @MediumTest
     @Test
     fun queryStartupInsights() {
-        PerfettoTraceProcessor.runSingleSessionServer(api35ColdStart) {
+        TraceProcessor.runSingleSessionServer(api35ColdStart) {
             assertThat(
                     queryStartupInsights(
                         helpUrlBase = "https://d.android.com/test#",

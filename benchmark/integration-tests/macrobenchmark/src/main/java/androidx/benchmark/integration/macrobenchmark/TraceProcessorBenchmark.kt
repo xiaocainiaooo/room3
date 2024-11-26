@@ -20,11 +20,11 @@ import androidx.benchmark.Outputs
 import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
-import androidx.benchmark.perfetto.ExperimentalPerfettoCaptureApi
-import androidx.benchmark.perfetto.ExperimentalPerfettoTraceProcessorApi
+import androidx.benchmark.macro.runServer
+import androidx.benchmark.macro.runSingleSessionServer
 import androidx.benchmark.perfetto.PerfettoHelper
-import androidx.benchmark.perfetto.PerfettoTrace
-import androidx.benchmark.perfetto.PerfettoTraceProcessor
+import androidx.benchmark.traceprocessor.PerfettoTrace
+import androidx.benchmark.traceprocessor.TraceProcessor
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -37,13 +37,8 @@ import org.junit.Test
 
 @SmallTest
 @SdkSuppress(minSdkVersion = 29)
-@OptIn(
-    ExperimentalMetricApi::class,
-    ExperimentalPerfettoTraceProcessorApi::class,
-    ExperimentalPerfettoCaptureApi::class
-)
-class PerfettoTraceProcessorBenchmark {
-
+@OptIn(ExperimentalMetricApi::class)
+class TraceProcessorBenchmark {
     @get:Rule val benchmarkRule = MacrobenchmarkRule()
 
     private val traceFile = createTempFileFromAsset("api32_startup_warm", ".perfetto-trace")
@@ -57,7 +52,7 @@ class PerfettoTraceProcessorBenchmark {
             metrics = measureBlockMetric,
             iterations = 5,
         ) {
-            measureBlock { PerfettoTraceProcessor.runServer {} }
+            measureBlock { TraceProcessor.runServer {} }
         }
 
     @Test
@@ -68,9 +63,7 @@ class PerfettoTraceProcessorBenchmark {
             iterations = 5,
         ) {
             measureBlock {
-                PerfettoTraceProcessor.runServer {
-                    loadTrace(PerfettoTrace(traceFile.absolutePath)) {}
-                }
+                TraceProcessor.runServer { loadTrace(PerfettoTrace(traceFile.absolutePath)) {} }
             }
         }
 
@@ -82,7 +75,7 @@ class PerfettoTraceProcessorBenchmark {
             iterations = 5,
         ) {
             measureBlock {
-                PerfettoTraceProcessor.runServer {
+                TraceProcessor.runServer {
                     loadTrace(PerfettoTrace(traceFile.absolutePath)) {}
                     loadTrace(PerfettoTrace(traceFile.absolutePath)) {}
                 }
@@ -108,7 +101,7 @@ class PerfettoTraceProcessorBenchmark {
         runProcessQuery()
     }
 
-    private fun benchmarkWithTrace(block: PerfettoTraceProcessor.Session.() -> Unit) =
+    private fun benchmarkWithTrace(block: TraceProcessor.Session.() -> Unit) =
         benchmarkRule.measureRepeated(
             packageName = PACKAGE_NAME,
             metrics = measureBlockMetric,
@@ -118,18 +111,18 @@ class PerfettoTraceProcessorBenchmark {
                 // This will run perfetto trace processor http server on the specified port 10555.
                 // Note that this is an arbitrary number and the default cannot be used because
                 // the macrobenchmark instance of the server is running at the same time.
-                PerfettoTraceProcessor.runSingleSessionServer(
+                TraceProcessor.runSingleSessionServer(
                     absoluteTracePath = traceFile.absolutePath,
                     block = block
                 )
             }
         }
 
-    private fun PerfettoTraceProcessor.Session.runComputeStartupMetric() {
+    private fun TraceProcessor.Session.runComputeStartupMetric() {
         getTraceMetrics("android_startup")
     }
 
-    private fun PerfettoTraceProcessor.Session.runSlicesQuery() {
+    private fun TraceProcessor.Session.runSlicesQuery() {
         query(
             """
                 SELECT slice.name, slice.ts, slice.dur, thread_track.id, thread_track.name
@@ -142,7 +135,7 @@ class PerfettoTraceProcessorBenchmark {
         )
     }
 
-    private fun PerfettoTraceProcessor.Session.runCounterQuery() {
+    private fun TraceProcessor.Session.runCounterQuery() {
         query(
             """
                 SELECT track.name, counter.value, counter.ts
@@ -153,7 +146,7 @@ class PerfettoTraceProcessorBenchmark {
         )
     }
 
-    private fun PerfettoTraceProcessor.Session.runProcessQuery() {
+    private fun TraceProcessor.Session.runProcessQuery() {
         query(
             """
                 SELECT upid
@@ -177,7 +170,7 @@ class PerfettoTraceProcessorBenchmark {
 
     companion object {
         private const val PACKAGE_NAME = "androidx.benchmark.integration.macrobenchmark.target"
-        private const val SECTION_NAME = "PerfettoTraceProcessorBenchmark"
+        private const val SECTION_NAME = "TraceProcessorBenchmark"
 
         /** Measures single call to [measureBlock] function */
         private val measureBlockMetric =
