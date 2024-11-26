@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// @exportToFramework:copyToPath(../../../cts/tests/appsearch/testutils/src/android/app/appsearch/testutil/external/AlwaysSupportedFeatures.java)
+// @exportToFramework:copyToPath(../../../cts/tests/appsearch/testutils/src/android/app/appsearch/testutil/external/FeaturesImpl.java)
 package androidx.appsearch.localstorage;
 
 import androidx.annotation.NonNull;
@@ -23,13 +23,11 @@ import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.Features;
 
 /**
- * An implementation of {@link Features}. This implementation always returns true. This is
- * sufficient for the use in the local backend because all features are always available on the
- * local backend.
+ * An implementation of {@link Features} available on the local backend.
  * @exportToFramework:hide
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-public class AlwaysSupportedFeatures implements Features {
+public class FeaturesImpl implements Features {
 
     @Override
     @OptIn(markerClass = ExperimentalAppSearchApi.class)
@@ -101,6 +99,12 @@ public class AlwaysSupportedFeatures implements Features {
                 // fall through
             case Features.SCHEMA_STRING_PROPERTY_CONFIG_DELETE_PROPAGATION_TYPE_PROPAGATE_FROM:
                 return true;
+            case Features.INDEXER_MOBILE_APPLICATIONS:
+                // The Apps Indexer is only available on platform storage and some versions of
+                // GMSCore AppSearch. It can't be ran by local storage because local storage
+                // does not have a service component or any background jobs. It would also
+                // duplicate documents already indexed and available in PlatformStorage.
+                return false;
             default:
                 return false;
         }

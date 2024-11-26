@@ -281,6 +281,28 @@ public interface Features {
     String BLOB_STORAGE = "BLOB_STORAGE";
 
     /**
+     * Feature for {@link #isFeatureSupported(String)}. This feature indicates whether or not the
+     * MobileApplication corpus is being indexed.
+     *
+     * <p>This corpus contains documents representing applications installed on the device, and each
+     * document includes an icon uri, a package id, a display name, and nicknames of the app. This
+     * corpus may be queried by applications interested in querying for and launching applications,
+     * such as a search app. {@link androidx.appsearch.builtintypes.MobileApplication} can be used
+     * to parse documents returned from this corpus.
+     *
+     * <p>This corpus can be queried with a {@link GlobalSearchSession}, by filtering on the
+     * "android" package and the "apps" namespace, for example:
+     * <code>
+     * globalSession.query("",
+     * new SearchSpec.Builder().addFilterPackageNames("android").addFilterNamespace("apps").build())
+     * </code>
+     *
+     * @see androidx.appsearch.builtintypes.MobileApplication
+     */
+    @ExperimentalAppSearchApi
+    String INDEXER_MOBILE_APPLICATIONS = "INDEXER_MOBILE_APPLICATIONS";
+
+    /**
      * Feature for {@link #isFeatureSupported(String)}. This feature covers whether to wrap the
      * parent types of a document in the corresponding
      * {@link androidx.appsearch.app.SearchResult}, instead of in
