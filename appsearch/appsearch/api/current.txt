@@ -357,7 +357,7 @@ package androidx.appsearch.app {
     field public static final String GLOBAL_SEARCH_SESSION_REGISTER_OBSERVER_CALLBACK = "GLOBAL_SEARCH_SESSION_REGISTER_OBSERVER_CALLBACK";
     field public static final String JOIN_SPEC_AND_QUALIFIED_ID = "JOIN_SPEC_AND_QUALIFIED_ID";
     field public static final String LIST_FILTER_HAS_PROPERTY_FUNCTION = "LIST_FILTER_HAS_PROPERTY_FUNCTION";
-    field public static final String LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION = "LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION";
+    field @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public static final String LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION = "LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION";
     field public static final String LIST_FILTER_QUERY_LANGUAGE = "LIST_FILTER_QUERY_LANGUAGE";
     field public static final String NUMERIC_SEARCH = "NUMERIC_SEARCH";
     field public static final String SCHEMA_ADD_INDEXABLE_NESTED_PROPERTIES = "SCHEMA_ADD_INDEXABLE_NESTED_PROPERTIES";
