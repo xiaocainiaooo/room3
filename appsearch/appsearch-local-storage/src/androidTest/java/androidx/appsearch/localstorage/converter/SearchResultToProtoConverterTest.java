@@ -120,10 +120,18 @@ public class SearchResultToProtoConverterTest {
         if (Flags.enableSearchResultParentTypes()) {
             assertThat(result.getParentTypeMap()).isEqualTo(
                     ImmutableMap.of(schemaType, ImmutableList.of(parentSchemaType)));
+// @exportToFramework:startStrip()
+            // TODO(b/371610934): Remove this once GenericDocument#getParentTypes is fully
+            //  deprecated.
+            // GenericDocument#getParentTypes is annotated with @hide in platform and will be
+            // removed after deprecation.
             assertThat(result.getGenericDocument().getParentTypes()).isNull();
+// @exportToFramework:endStrip()
         } else {
             assertThat(result.getParentTypeMap()).isEmpty();
+// @exportToFramework:startStrip()
             assertThat(result.getGenericDocument().getParentTypes()).contains(parentSchemaType);
+// @exportToFramework:endStrip()
         }
     }
 
