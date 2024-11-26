@@ -16,6 +16,7 @@
 
 package androidx.camera.media3.effect
 
+import android.annotation.SuppressLint
 import android.util.Size
 import androidx.camera.core.CameraEffect
 import androidx.camera.core.SurfaceRequest
@@ -31,6 +32,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /** Instrumented tests for [Media3Effect]. */
+@SuppressLint("RestrictedApiAndroidX")
 @SmallTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = 21)

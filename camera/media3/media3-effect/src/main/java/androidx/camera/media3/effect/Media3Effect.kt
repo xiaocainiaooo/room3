@@ -47,7 +47,7 @@ import java.util.concurrent.Executor
  * @param errorListener invoked if the effect runs into unrecoverable errors. The [Throwable] will
  *   be the error thrown by this [Media3Effect]. This is invoked on the provided executor.
  */
-@SuppressLint("UnsafeOptInUsageError")
+@SuppressLint("UnsafeOptInUsageError", "RestrictedApiAndroidX")
 public class Media3Effect(
     context: Context,
     targets: Int,

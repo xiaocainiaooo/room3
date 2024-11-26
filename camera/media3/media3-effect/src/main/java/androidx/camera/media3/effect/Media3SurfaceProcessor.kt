@@ -61,7 +61,7 @@ import java.util.concurrent.Executor
  *    |            |  no
  *    --------------
  */
-@SuppressLint("UnsafeOptInUsageError")
+@SuppressLint("UnsafeOptInUsageError", "RestrictedApiAndroidX")
 internal class Media3SurfaceProcessor(
     private val context: Context,
     private val listenerExecutor: Executor,
