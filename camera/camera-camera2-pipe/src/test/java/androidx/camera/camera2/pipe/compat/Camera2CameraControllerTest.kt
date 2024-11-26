@@ -35,6 +35,8 @@ import androidx.camera.camera2.pipe.core.TimestampNs
 import androidx.camera.camera2.pipe.graph.GraphListener
 import androidx.camera.camera2.pipe.internal.CameraStatusMonitor
 import androidx.camera.camera2.pipe.testing.FakeCamera2DeviceManager
+import androidx.camera.camera2.pipe.testing.FakeCamera2MetadataProvider
+import androidx.camera.camera2.pipe.testing.FakeCameraMetadata
 import androidx.camera.camera2.pipe.testing.FakeCameraStatusMonitor
 import androidx.camera.camera2.pipe.testing.FakeThreads
 import androidx.camera.camera2.pipe.testing.RobolectricCameraPipeTestRunner
@@ -76,6 +78,9 @@ class Camera2CameraControllerTest {
     private val fakeCaptureSequenceProcessorFactory: Camera2CaptureSequenceProcessorFactory = mock()
     private val fakeCamera2DeviceManager = FakeCamera2DeviceManager()
     private val fakeCameraSurfaceManager = CameraSurfaceManager()
+    private val fakeCameraMetadata = FakeCameraMetadata(cameraId = cameraId)
+    private val fakeCamera2Quirks =
+        Camera2Quirks(FakeCamera2MetadataProvider(mapOf(cameraId to fakeCameraMetadata)))
     private val fakeTimeSource: TimeSource = mock()
     private val fakeGraphId = CameraGraphId.nextId()
 
@@ -94,6 +99,7 @@ class Camera2CameraControllerTest {
             fakeCaptureSequenceProcessorFactory,
             fakeCamera2DeviceManager,
             fakeCameraSurfaceManager,
+            fakeCamera2Quirks,
             fakeTimeSource,
             fakeGraphId,
         )
