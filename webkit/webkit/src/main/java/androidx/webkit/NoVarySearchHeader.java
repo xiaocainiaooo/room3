@@ -32,7 +32,7 @@ import java.util.List;
  * to learn more about No-Vary-Search.
  */
 @Profile.ExperimentalUrlPrefetch
-public class NoVarySearchData {
+public class NoVarySearchHeader {
 
     /**
      * If {@code true} this indicates that differences in the order of
@@ -81,7 +81,7 @@ public class NoVarySearchData {
      * Private constructor to prevent constructing invalid No-Vary-Search
      * data. Static methods should be used instead e.g. {@link #neverVaryData}.
      */
-    private NoVarySearchData(boolean varyOnKeyOrder,
+    private NoVarySearchHeader(boolean varyOnKeyOrder,
             boolean ignoreDifferencesInParameters,
             @NonNull List<String> ignoredQueryParameters,
             @NonNull List<String> consideredQueryParameters) {
@@ -98,8 +98,8 @@ public class NoVarySearchData {
      * identical URLs in cache matching.
      */
     @Profile.ExperimentalUrlPrefetch
-    public static @NonNull NoVarySearchData neverVaryData() {
-        return new NoVarySearchData(false, true, new ArrayList<>(), new ArrayList<>());
+    public static @NonNull NoVarySearchHeader neverVaryData() {
+        return new NoVarySearchHeader(false, true, new ArrayList<>(), new ArrayList<>());
     }
 
     /**
@@ -108,8 +108,8 @@ public class NoVarySearchData {
      * identical URLs in cache matching.
      */
     @Profile.ExperimentalUrlPrefetch
-    public static @NonNull NoVarySearchData alwaysVaryData() {
-        return new NoVarySearchData(true, false, new ArrayList<>(), new ArrayList<>());
+    public static @NonNull NoVarySearchHeader alwaysVaryData() {
+        return new NoVarySearchHeader(true, false, new ArrayList<>(), new ArrayList<>());
     }
 
     /**
@@ -125,10 +125,10 @@ public class NoVarySearchData {
      *                                  in cache matching.
      */
     @Profile.ExperimentalUrlPrefetch
-    public static @NonNull NoVarySearchData neverVaryExcept(
+    public static @NonNull NoVarySearchHeader neverVaryExcept(
             boolean varyOnOrdering,
             @NonNull List<String> consideredQueryParameters) {
-        return new NoVarySearchData(varyOnOrdering, true, new ArrayList<>(),
+        return new NoVarySearchHeader(varyOnOrdering, true, new ArrayList<>(),
                 consideredQueryParameters);
     }
 
@@ -145,10 +145,10 @@ public class NoVarySearchData {
      *                               in cache matching.
      */
     @Profile.ExperimentalUrlPrefetch
-    public static @NonNull NoVarySearchData varyExcept(
+    public static @NonNull NoVarySearchHeader varyExcept(
             boolean varyOnOrdering,
             @NonNull List<String> ignoredQueryParameters) {
-        return new NoVarySearchData(varyOnOrdering, false,
+        return new NoVarySearchHeader(varyOnOrdering, false,
                 ignoredQueryParameters, new ArrayList<>());
     }
 

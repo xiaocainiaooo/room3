@@ -16,9 +16,10 @@
 
 package androidx.webkit.internal;
 
-import androidx.webkit.NoVarySearchData;
-import androidx.webkit.PrefetchParameters;
+import androidx.webkit.NoVarySearchHeader;
+import androidx.webkit.SpeculativeLoadingParameters;
 
+import org.chromium.support_lib_boundary.SpeculativeLoadingParametersBoundaryInterface;
 import org.chromium.support_lib_boundary.util.BoundaryInterfaceReflectionUtil;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -27,28 +28,34 @@ import java.lang.reflect.InvocationHandler;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PrefetchParametersAdapter  {
-    private final PrefetchParameters mPrefetchParameters;
+public class SpeculativeLoadingParametersAdapter
+        implements SpeculativeLoadingParametersBoundaryInterface {
 
-    public PrefetchParametersAdapter(@Nullable PrefetchParameters impl) {
-        mPrefetchParameters = impl;
+    private final SpeculativeLoadingParameters mSpeculativeLoadingParameters;
+
+    public SpeculativeLoadingParametersAdapter(@Nullable SpeculativeLoadingParameters impl) {
+        mSpeculativeLoadingParameters = impl;
     }
 
+    @Override
     public @NonNull Map<String, String> getAdditionalHeaders() {
-        if (mPrefetchParameters == null) return new HashMap<>();
-        return mPrefetchParameters.getAdditionalHeaders();
+        if (mSpeculativeLoadingParameters == null) return new HashMap<>();
+        return mSpeculativeLoadingParameters.getAdditionalHeaders();
     }
 
+    @Override
     public @Nullable InvocationHandler getNoVarySearchData() {
-        if (mPrefetchParameters == null) return null;
-        NoVarySearchData noVarySearchData = mPrefetchParameters.getExpectedNoVarySearchData();
-        if (noVarySearchData == null) return null;
+        if (mSpeculativeLoadingParameters == null) return null;
+        NoVarySearchHeader noVarySearchHeader =
+                mSpeculativeLoadingParameters.getExpectedNoVarySearchData();
+        if (noVarySearchHeader == null) return null;
         return BoundaryInterfaceReflectionUtil.createInvocationHandlerFor(
-                new NoVarySearchDataAdapter(noVarySearchData));
+                new NoVarySearchHeaderAdapter(noVarySearchHeader));
     }
 
+    @Override
     public boolean isJavaScriptEnabled() {
-        if (mPrefetchParameters == null) return false;
-        return mPrefetchParameters.isJavaScriptEnabled();
+        if (mSpeculativeLoadingParameters == null) return false;
+        return mSpeculativeLoadingParameters.isJavaScriptEnabled();
     }
 }
