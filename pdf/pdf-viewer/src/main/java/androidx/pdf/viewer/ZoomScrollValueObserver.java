@@ -110,7 +110,7 @@ public class ZoomScrollValueObserver implements ObservableValue.ValueObserver<Zo
                 });
             }
         } else if (mPaginatedView.isConfigurationChanged()
-                && position.scrollY != oldPosition.scrollY) {
+                && !position.stable) {
             mPaginatedView.setConfigurationChanged(false);
         }
     }
