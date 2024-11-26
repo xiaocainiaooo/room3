@@ -515,8 +515,7 @@ public class UiObject2 implements Searchable {
         if (!node.isClickable()) {
             Log.w(TAG, String.format("Clicking on non-clickable object: %s", node));
         }
-        mGestureController.performGestureAndWait(Until.newWindow(), 500,
-                Gestures.click(center, getDisplayId()));
+        mGestureController.performGesture(Gestures.click(center, getDisplayId()));
     }
 
     /**
@@ -531,8 +530,7 @@ public class UiObject2 implements Searchable {
         if (!node.isClickable()) {
             Log.w(TAG, String.format("Clicking on non-clickable object: %s", node));
         }
-        mGestureController.performGestureAndWait(Until.newWindow(), 500,
-                Gestures.click(point, getDisplayId()));
+        mGestureController.performGesture(Gestures.click(point, getDisplayId()));
     }
 
     /** Clicks on this object's center for {@code duration} milliseconds. */
@@ -543,8 +541,7 @@ public class UiObject2 implements Searchable {
         if (!node.isClickable()) {
             Log.w(TAG, String.format("Clicking on non-clickable object: %s", node));
         }
-        mGestureController.performGestureAndWait(Until.newWindow(), 500,
-                Gestures.click(center, duration, getDisplayId()));
+        mGestureController.performGesture(Gestures.click(center, duration, getDisplayId()));
     }
 
     /**
@@ -560,8 +557,7 @@ public class UiObject2 implements Searchable {
         if (!node.isClickable()) {
             Log.w(TAG, String.format("Clicking on non-clickable object: %s", node));
         }
-        mGestureController.performGestureAndWait(Until.newWindow(), 500,
-                Gestures.click(point, duration, getDisplayId()));
+        mGestureController.performGesture(Gestures.click(point, duration, getDisplayId()));
     }
 
     /**
