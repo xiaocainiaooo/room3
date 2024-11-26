@@ -44,7 +44,7 @@ import kotlin.time.Duration
 import kotlin.time.toJavaDuration
 
 /**
- * The Session provides the primary interface to JXRCore functionality for the application. Each
+ * The Session provides the primary interface to SceneCore functionality for the application. Each
  * spatialized Activity must create and hold an instance of Session.
  *
  * Once created, the application can use the Session interfaces to create spatialized entities, such
@@ -85,7 +85,7 @@ public class Session(
         PanelEntity.createMainPanelEntity(runtime, entityManager)
 
     /**
-     * The PerceptionSpace represents the origin of the space in which the JXRPerception API
+     * The PerceptionSpace represents the origin of the space in which the ARCore for XR API
      * provides tracking info. The transformations provided by the PerceptionSpace are only valid
      * for the call frame, as the transformation can be changed by the system at any time.
      */
@@ -262,13 +262,16 @@ public class Session(
     public fun requestHomeSpaceMode(): Unit = runtime.requestHomeSpaceMode()
 
     /**
-     * Public factory function for a GLTFModel, where the GLTF is asynchronously loaded.
+     * Public factory function for a [GltfModel], where the glTF is asynchronously loaded.
      *
      * This method must be called from the main thread.
      * https://developer.android.com/guide/components/processes-and-threads
      *
-     * @param name The path for a GLTF model to be loaded
-     * @return a ListenableFuture<GLTFModel>. Listeners will be called on the main thread if
+     * Currently, only URLs and relative paths from the android_assets/ directory are supported.
+     * Currently, only binary glTF (.glb) files are supported.
+     *
+     * @param name The URL or asset-relative path of a binary glTF (.glb) model to be loaded
+     * @return a ListenableFuture<GltfModel>. Listeners will be called on the main thread if
      *   Runnable::run is supplied.
      */
     @MainThread
@@ -285,14 +288,14 @@ public class Session(
     public fun createExrImageResource(name: String): ExrImage = ExrImage.create(runtime, name)
 
     /**
-     * Public factory function for a GLTFEntity.
+     * Public factory function for a [GltfModelEntity].
      *
      * This method must be called from the main thread.
      * https://developer.android.com/guide/components/processes-and-threads
      *
      * @param model The [GltfModel] this Entity is referencing.
      * @param pose The initial pose of the entity.
-     * @return a GLTFEntity instance
+     * @return a GltfModelEntity instance
      */
     // TODO: b/341372472 - Rename createGltfEntity to createGltfModelEntity
     @JvmOverloads
@@ -435,7 +438,7 @@ public class Session(
     }
 
     /**
-     * Public factory function for an AnchorEntity which uses an Anchor from ARCore for Android XR.
+     * Public factory function for an AnchorEntity which uses an Anchor from ARCore for XR.
      *
      * @param anchor The PerceptionAnchor to use for this AnchorEntity.
      */

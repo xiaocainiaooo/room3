@@ -30,7 +30,7 @@ public class SpatialSoundPool private constructor() {
         /**
          * Plays a spatialized sound effect emitted relative [Node] in the [PointSourceAttributes].
          *
-         * @param session The current JXRCore [Session] instance.
+         * @param session The current SceneCore [Session] instance.
          * @param soundPool The [SoundPool] to use to the play the sound.
          * @param soundID a soundId returned by the load() function.
          * @param attributes attributes to specify sound source. [PointSourceAttributes]
@@ -66,7 +66,7 @@ public class SpatialSoundPool private constructor() {
         /**
          * Plays a spatialized sound effect as a sound field.
          *
-         * @param session The current JXRCore [Session] instance.
+         * @param session The current SceneCore [Session] instance.
          * @param soundPool The [SoundPool] to use to the play the sound.
          * @param soundID a soundId returned by the load() function.
          * @param attributes attributes to specify sound source. [SoundFieldAttributes]
@@ -100,7 +100,7 @@ public class SpatialSoundPool private constructor() {
         }
 
         /**
-         * @param session The current JXRCore [Session] instance.
+         * @param session The current SceneCore [Session] instance.
          * @param soundPool The [SoundPool] to use to get its SourceType.
          * @param streamID a streamID returned by the play(), playAsPointSource(), or
          *   playAsSoundField().

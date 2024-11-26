@@ -21,10 +21,10 @@ import androidx.xr.compose.subspace.node.SubspaceModifierElement
 import androidx.xr.runtime.math.Pose
 
 /**
- * Moves a subspace element (i.e. currently only affects JXR Entity Panels/Volumes) in space. The
- * order of the [SubspaceModifier]s is important. Please take note of this when using movable. If
- * you have the following modifier chain: SubspaceModifier.offset().size().movable(), the modifiers
- * will work as expected. If instead you have this modifier chain:
+ * Moves a subspace element (i.e. currently only affects Jetpack XR Entity Panels/Volumes) in space.
+ * The order of the [SubspaceModifier]s is important. Please take note of this when using movable.
+ * If you have the following modifier chain: SubspaceModifier.offset().size().movable(), the
+ * modifiers will work as expected. If instead you have this modifier chain:
  * SubspaceModifier.size().offset().movable(), you will experience unexpected placement behavior
  * when using the movable modifier. In general, the offset modifier should be specified before the
  * size modifier, and the movable modifier should be specified last.

@@ -250,7 +250,7 @@ private fun SpatialPanel(
  * Lay out the SpatialPanel using the provided [CorePanelEntity].
  *
  * @param coreEntity The [CorePanelEntity] associated with this SpatialPanel. It should be based on
- *   a JXR Core panel entity.
+ *   a SceneCore panel entity.
  * @param name The name of the panel for debugging purposes.
  * @param shape The shape of this Spatial Panel.
  * @param modifier The [SubspaceModifier] attached to this compose node.

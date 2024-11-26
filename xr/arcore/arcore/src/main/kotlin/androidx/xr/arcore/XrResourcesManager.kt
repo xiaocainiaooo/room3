@@ -22,7 +22,7 @@ import androidx.xr.runtime.internal.Trackable as RuntimeTrackable
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.flow.update
 
-/** Manages all XR resources that are used by the ARCore for Android XR API. */
+/** Manages all XR resources that are used by the ARCore for XR API. */
 internal class XrResourcesManager {
 
     /** List of [Updatable]s that are updated every frame. */

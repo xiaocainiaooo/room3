@@ -21,17 +21,17 @@ import androidx.concurrent.futures.ResolvableFuture
 import androidx.xr.scenecore.JxrPlatformAdapter.GltfModelResource as RtGltfModel
 import com.google.common.util.concurrent.ListenableFuture
 
-/** Represents a 3D model in JXRCore. */
+/** Represents a 3D model in SceneCore. */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface Model
 
 /**
- * GLTFModel represents a GLTF resource in JXRCore. These can be used as part of the [Environment]
- * or to display 3D models with [GltfModelEntity]. These are created by the [Session].
+ * [GltfModel] represents a glTF resource in SceneCore. These can be used as part of the
+ * [Environment] or to display 3D models with [GltfModelEntity]. These are created by the [Session].
  */
 // TODO: b/319269278 - Make this and ExrImage derive from a common Resource base class which has
 //                     async helpers.
 // TODO: b/362368652 - Add an interface which returns an integer animation IDX given a string
-//                     animation name for a loaded GLTF, as well as an interface for selecting the
+//                     animation name for a loaded glTF, as well as an interface for selecting the
 //                     playback animation from the integer index.
 // TODO: b/362368652 - Add an interface which returns a list of available animation names
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
@@ -44,7 +44,7 @@ public class GltfModel internal constructor(public val model: RtGltfModel) : Mod
         )
         internal fun create(runtime: JxrPlatformAdapter, name: String): GltfModel {
             val gltfResourceFuture = runtime.loadGltfByAssetName(name)
-            // TODO: b/320858652 - Implement async loading of GLTFResource.
+            // TODO: b/320858652 - Implement async loading of GltfModel.
             return GltfModel(gltfResourceFuture!!.get())
         }
 

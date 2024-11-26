@@ -23,7 +23,6 @@ import androidx.xr.compose.subspace.layout.ParentLayoutParamsAdjustable
 import androidx.xr.compose.subspace.layout.Placeable
 import androidx.xr.compose.subspace.layout.SubspaceLayoutCoordinates
 import androidx.xr.compose.subspace.layout.SubspaceModifier
-import androidx.xr.compose.subspace.layout.findInstance
 import androidx.xr.compose.unit.IntVolumeSize
 import androidx.xr.compose.unit.VolumeConstraints
 import androidx.xr.runtime.math.Pose
@@ -48,10 +47,12 @@ internal class SubspaceLayoutModifierNodeCoordinator(
     internal var layoutNode: SubspaceLayoutNode? = null
 
     internal val parent: SubspaceLayoutModifierNodeCoordinator?
-        get() = baseNode.parent?.coordinator
+        get() =
+            generateSequence(baseNode.parent) { it.parent }.firstNotNullOfOrNull { it.coordinator }
 
     internal val child: SubspaceLayoutModifierNodeCoordinator?
-        get() = baseNode.child?.coordinator
+        get() =
+            generateSequence(baseNode.child) { it.child }.firstNotNullOfOrNull { it.coordinator }
 
     /** The pose of this layout in the local coordinates space. */
     override val pose: Pose
@@ -84,9 +85,7 @@ internal class SubspaceLayoutModifierNodeCoordinator(
      * other [SubspaceLayoutModifierNode] is present.
      */
     private val coordinatesInRoot: SubspaceLayoutCoordinates?
-        get() =
-            traverseAncestors().findInstance<SubspaceLayoutModifierNodeCoordinator>()
-                ?: layoutNode?.measurableLayout?.parentCoordinatesInRoot
+        get() = parent ?: layoutNode?.measurableLayout?.parentCoordinatesInRoot
 
     /**
      * The layout coordinates up to the nearest parent [CoreEntity] including mutations from any
@@ -97,9 +96,7 @@ internal class SubspaceLayoutModifierNodeCoordinator(
      * other [SubspaceLayoutModifierNode] is present.
      */
     private val coordinatesInParentEntity: SubspaceLayoutCoordinates?
-        get() =
-            traverseAncestors().findInstance<SubspaceLayoutModifierNodeCoordinator>()
-                ?: layoutNode?.measurableLayout?.parentCoordinatesInParentEntity
+        get() = parent ?: layoutNode?.measurableLayout?.parentCoordinatesInParentEntity
 
     /** The size of this layout in the local coordinates space. */
     override val size: IntVolumeSize
@@ -138,8 +135,7 @@ internal class SubspaceLayoutModifierNodeCoordinator(
      */
     override fun measure(constraints: VolumeConstraints): Placeable {
         with(layoutModifierNode) {
-            val measurable: Measurable =
-                traverseDescendants().firstOrNull() ?: layoutNode!!.measurableLayout
+            val measurable: Measurable = child ?: layoutNode!!.measurableLayout
             val measureResult: MeasureResult =
                 object : MeasureScope {}.measure(measurable, constraints).also {
                     this@SubspaceLayoutModifierNodeCoordinator.measureResult = it
@@ -160,24 +156,4 @@ internal class SubspaceLayoutModifierNodeCoordinator(
     override fun adjustParams(params: ParentLayoutParamsAdjustable) {
         layoutNode?.measurableLayout?.adjustParams(params)
     }
-}
-
-/**
- * Generates a lazy sequence that walks up the node tree to the root.
- *
- * If this node is the root, an empty sequence is returned.
- */
-internal fun SubspaceLayoutModifierNodeCoordinator.traverseAncestors():
-    Sequence<SubspaceLayoutModifierNodeCoordinator> {
-    return generateSequence(seed = parent) { it.parent }
-}
-
-/**
- * Generates a lazy sequence that walks down the node tree.
- *
- * If this node is a leaf node, an empty sequence is returned.
- */
-internal fun SubspaceLayoutModifierNodeCoordinator.traverseDescendants():
-    Sequence<SubspaceLayoutModifierNodeCoordinator> {
-    return generateSequence(seed = child) { it.child }
 }

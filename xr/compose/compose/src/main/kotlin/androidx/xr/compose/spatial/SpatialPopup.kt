@@ -19,8 +19,6 @@ package androidx.xr.compose.spatial
 import android.graphics.Rect
 import androidx.annotation.RestrictTo
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.derivedStateOf
@@ -44,7 +42,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastRoundToInt
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -217,14 +214,6 @@ private fun LayoutSpatialPopup(
     val fullScreenRect = getWindowVisibleDisplayFrame()
     val windowSize = IntSize(fullScreenRect.width(), fullScreenRect.height())
 
-    val constraints =
-        Constraints(
-            minWidth = 0,
-            maxWidth = Constraints.Infinity,
-            minHeight = 0,
-            maxHeight = Constraints.Infinity,
-        )
-
     val popupOffset by remember {
         derivedStateOf {
             popupPositionProvider.calculatePosition(
@@ -255,22 +244,27 @@ private fun LayoutSpatialPopup(
         layout(0, 0) {}
     }
 
-    Popup(
-        alignment = Alignment.Center,
-        offset = IntOffset.Zero,
-        properties = properties.toPopupProperties(),
-        onDismissRequest = { onDismissRequest?.invoke() },
-    ) {
-        Spacer(Modifier.size(1.dp))
-    }
-
-    // TODO(b/344599930): Issue with rendering rounded corners of elevated panel.
     ElevatedPanel(
         spatialElevationLevel = restingLevel,
         contentSize = contentSize,
         contentOffset = Offset(popupOffset.x.toFloat(), popupOffset.y.toFloat()),
     ) {
-        Box(Modifier.constrainTo(constraints).onSizeChanged { contentSize = it }) { content() }
+        OutsideInputHandler(enabled = properties.dismissOnClickOutside) {
+            onDismissRequest?.invoke()
+        }
+        Box(
+            Modifier.constrainTo(
+                    Constraints(
+                        minWidth = 0,
+                        maxWidth = Constraints.Infinity,
+                        minHeight = 0,
+                        maxHeight = Constraints.Infinity,
+                    )
+                )
+                .onSizeChanged { contentSize = it }
+        ) {
+            content()
+        }
     }
 }
 

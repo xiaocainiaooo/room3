@@ -23,7 +23,8 @@ import androidx.xr.compose.unit.DpVolumeSize
 import androidx.xr.compose.unit.IntVolumeSize
 
 /**
- * Resize a subspace element (i.e. currently only affects JXR Entity Panels/Volumes) in space.
+ * Resize a subspace element (i.e. currently only affects Jetpack XR Entity Panels/Volumes) in
+ * space.
  *
  * @param enabled - true if this composable should be resizable.
  * @param minimumSize - the smallest allowed dimensions for this composable.

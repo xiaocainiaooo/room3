@@ -245,7 +245,7 @@ internal class SubspaceLayoutNode : ComposeSubspaceNode {
         return treeString
     }
 
-    /** Call this method to see a dump of the JXR node hierarchy. */
+    /** Call this method to see a dump of the Jetpack XR node hierarchy. */
     @Suppress("unused")
     internal fun debugEntityTreeToString(depth: Int = 0): String {
         val tree = StringBuilder()

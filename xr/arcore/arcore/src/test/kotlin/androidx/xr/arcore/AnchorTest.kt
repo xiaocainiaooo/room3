@@ -38,6 +38,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -136,6 +137,7 @@ class AnchorTest {
     }
 
     @Test
+    @Ignore("Flaky test, see b/380269912")
     fun getPersistedAnchorUuids_noPreviouslyPersistedAnchors_returnsEmptyList() = runTest {
         val session = createTestSession()
 

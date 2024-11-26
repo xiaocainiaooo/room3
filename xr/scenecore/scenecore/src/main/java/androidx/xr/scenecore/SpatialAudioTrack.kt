@@ -30,7 +30,7 @@ public class SpatialAudioTrack {
          * [SpatializerExtensions.NOT_SPATIALIZED] for tracks that didn't use spatial audio
          * attributes.
          *
-         * @param session The current JXRCore [Session] instance.
+         * @param session The current SceneCore [Session] instance.
          * @param track The [AudioTrack] from which to get the [SpatializerConstants.SourceType].
          * @return The [SpatializerExtensions.SourceType] of the provided track.
          */
@@ -45,7 +45,7 @@ public class SpatialAudioTrack {
         /**
          * Gets the [PointSourceAttributes] of the provided [AudioTrack].
          *
-         * @param session The current JXRCore [Session] instance.
+         * @param session The current SceneCore [Session] instance.
          * @param track The [AudioTrack] from which to get the [PointSourceAttributes].
          * @return The [PointSourceAttributes] of the provided track, null if not set.
          */
@@ -62,7 +62,7 @@ public class SpatialAudioTrack {
         /**
          * Gets the [SoundFieldAttributes] of the provided [AudioTrack].
          *
-         * @param session The current JXRCore [Session] instance.
+         * @param session The current SceneCore [Session] instance.
          * @param track The [AudioTrack] from which to get the [SoundFieldAttributes].
          * @return The [SoundFieldAttributes] of the provided track, null if not set.
          */
@@ -87,7 +87,7 @@ public class SpatialAudioTrackBuilder private constructor() {
         /**
          * Sets the [PointSourceAttributes] on the provided [AudioTrack.Builder].
          *
-         * @param session The current JXRCore [Session] instance.
+         * @param session The current SceneCore [Session] instance.
          * @param builder The Builder on which to set the attributes.
          * @param attributes The source attributes to be set.
          * @return The same [AudioTrack.Builder] instance provided.
@@ -109,7 +109,7 @@ public class SpatialAudioTrackBuilder private constructor() {
         /**
          * Sets the [SoundFieldAttributes] on the provided [AudioTrack.Builder].
          *
-         * @param session The current JXRCore [Session] instance.
+         * @param session The current SceneCore [Session] instance.
          * @param builder The Builder on which to set the attributes.
          * @param attributes The source attributes to be set.
          * @return The same [AudioTrack.Builder] instance provided.

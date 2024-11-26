@@ -59,7 +59,7 @@ public interface SpatializerConstants {
     public annotation class SourceType
 }
 
-/** Converts the [JxrPlatformAdapter] SourceType IntDef to the JXR API. */
+/** Converts the [JxrPlatformAdapter] SourceType IntDef to the SceneCore API. */
 @SpatializerConstants.SourceType
 internal fun @receiver:JxrPlatformAdapter.SpatializerConstants.SourceType Int.sourceTypeToJxr():
     Int {
@@ -77,7 +77,7 @@ internal fun @receiver:JxrPlatformAdapter.SpatializerConstants.SourceType Int.so
     }
 }
 
-/** Converts the [JxrPlatformAdapter] SourceType IntDef to the JXR API. */
+/** Converts the [JxrPlatformAdapter] SourceType IntDef to the SceneCore API. */
 @SpatializerConstants.AmbisonicsOrder
 internal fun @receiver:JxrPlatformAdapter.SpatializerConstants.AmbisonicsOrder
 Int.ambisonicsOrderToJxr(): Int {

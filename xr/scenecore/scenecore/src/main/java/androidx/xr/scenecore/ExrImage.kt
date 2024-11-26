@@ -19,11 +19,11 @@ package androidx.xr.scenecore
 import androidx.annotation.RestrictTo
 import androidx.xr.scenecore.JxrPlatformAdapter.ExrImageResource as RtExrImage
 
-/** Interface for image formats in JXRCore. */
+/** Interface for image formats in SceneCore. */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface Image
 
 /**
- * ExrImage represents an EXR Image resource in JXRCore. EXR images are used by the [Environment]
+ * ExrImage represents an EXR Image resource in SceneCore. EXR images are used by the [Environment]
  * for drawing skyboxes.
  */
 // TODO(b/319269278): Make this and GltfModel derive from a common Resource base class which has
@@ -34,7 +34,7 @@ public class ExrImage internal constructor(public val image: RtExrImage) : Image
     internal companion object {
         internal fun create(runtime: JxrPlatformAdapter, name: String): ExrImage {
             val exrImageFuture = runtime.loadExrImageByAssetName(name)
-            // TODO: b/320858652 - Implement async loading of GLTFResource.
+            // TODO: b/323022003 - Implement async loading of [ExrImage].
             return ExrImage(exrImageFuture!!.get())
         }
     }

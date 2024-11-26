@@ -98,10 +98,10 @@ public fun SubspaceLayout(
  * the [measurePolicy] instance. See [MeasurePolicy] for more details.
  *
  * @param modifier SubspaceModifier to apply during layout.
- * @param coreEntity JxrCore Entity being placed in this layout. This parameter is generally not
+ * @param coreEntity SceneCore Entity being placed in this layout. This parameter is generally not
  *   needed for most use cases and should be avoided unless you have specific requirements to manage
  *   entities outside the Compose framework. If provided, it will associate the [SubspaceLayout]
- *   with the given JXR Core Entity.
+ *   with the given SceneCore Entity.
  * @param name a name for the ComposeSubspaceNode. This can be useful for debugging.
  * @param measurePolicy a policy defining the measurement and positioning of the layout.
  */
@@ -134,10 +134,10 @@ internal fun SubspaceLayout(
  * the [measurePolicy] instance. See [MeasurePolicy] for more details.
  *
  * @param modifier SubspaceModifier to apply during layout
- * @param coreEntity JxrCore Entity being placed in this layout. This parameter is generally not
+ * @param coreEntity SceneCore Entity being placed in this layout. This parameter is generally not
  *   needed for most use cases and should be avoided unless you have specific requirements to manage
  *   entities outside the Compose framework. If provided, it will associate the [SubspaceLayout]
- *   with the given JXR Core Entity.
+ *   with the given SceneCore Entity.
  * @param content the children composable to be laid out.
  * @param name a name for the ComposeSubspaceNode. This can be useful for debugging.
  * @param measurePolicy a policy defining the measurement and positioning of the layout.
