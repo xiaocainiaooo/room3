@@ -1138,17 +1138,6 @@ includeProject(":xr:scenecore:scenecore", [BuildType.XR])
 includeProject(":xr:scenecore:scenecore-testing", [BuildType.XR])
 includeProject(":xr:xr-stubs", [BuildType.XR])
 
-
-/////////////////////////////
-//
-// Optional projects
-//
-/////////////////////////////
-
-File repoRoot = new File(rootDir, "../..").canonicalFile
-
-includeOptionalProject(":xr:xr", new File(repoRoot, "xr/xr"), [BuildType.XR])
-
 /////////////////////////////
 //
 // Plugins
