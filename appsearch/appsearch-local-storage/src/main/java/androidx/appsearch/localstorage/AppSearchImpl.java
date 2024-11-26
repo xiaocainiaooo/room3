@@ -247,7 +247,7 @@ public final class AppSearchImpl implements Closeable {
     private int mOptimizeIntervalCountLocked = 0;
 
     @Nullable
-    private AppSearchRevocableFileDescriptorStore mRevocableFileDescriptorStore;
+    private RevocableFileDescriptorStore mRevocableFileDescriptorStore;
 
     /** Whether this instance has been closed, and therefore unusable. */
     @GuardedBy("mReadWriteLock")
@@ -275,7 +275,7 @@ public final class AppSearchImpl implements Closeable {
             @NonNull AppSearchConfig config,
             @Nullable InitializeStats.Builder initStatsBuilder,
             @Nullable VisibilityChecker visibilityChecker,
-            @Nullable AppSearchRevocableFileDescriptorStore revocableFileDescriptorStore,
+            @Nullable RevocableFileDescriptorStore revocableFileDescriptorStore,
             @NonNull OptimizeStrategy optimizeStrategy)
             throws AppSearchException {
         return new AppSearchImpl(icingDir, config, initStatsBuilder, visibilityChecker,
@@ -290,7 +290,7 @@ public final class AppSearchImpl implements Closeable {
             @NonNull AppSearchConfig config,
             @Nullable InitializeStats.Builder initStatsBuilder,
             @Nullable VisibilityChecker visibilityChecker,
-            @Nullable AppSearchRevocableFileDescriptorStore revocableFileDescriptorStore,
+            @Nullable RevocableFileDescriptorStore revocableFileDescriptorStore,
             @NonNull OptimizeStrategy optimizeStrategy)
             throws AppSearchException {
         Preconditions.checkNotNull(icingDir);
@@ -323,7 +323,7 @@ public final class AppSearchImpl implements Closeable {
                     .setUseNewQualifiedIdJoinIndex(mConfig.getUseNewQualifiedIdJoinIndex())
                     .setBuildPropertyExistenceMetadataHits(
                             mConfig.getBuildPropertyExistenceMetadataHits())
-                    .setEnableBlobStore(mConfig.getEnableBlobStore())
+                    .setEnableBlobStore(Flags.enableBlobStore())
                     .setOrphanBlobTimeToLiveMs(mConfig.getOrphanBlobTimeToLiveMs())
                     .setEnableEmbeddingIndex(Flags.enableSchemaEmbeddingPropertyConfig())
                     .setEnableEmbeddingQuantization(Flags.enableSchemaEmbeddingQuantization())

@@ -19,7 +19,7 @@ package androidx.appsearch.app;
 import static com.google.common.truth.Truth.assertThat;
 
 import androidx.appsearch.flags.Flags;
-import androidx.appsearch.flags.RequiresFlagsEnabled;
+import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
 
 import com.google.common.collect.ImmutableMap;
 

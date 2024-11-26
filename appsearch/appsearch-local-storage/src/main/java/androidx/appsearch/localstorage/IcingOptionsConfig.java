@@ -229,14 +229,6 @@ public interface IcingOptionsConfig {
     boolean getBuildPropertyExistenceMetadataHits();
 
     /**
-     * Flag for {@link com.google.android.icing.proto.IcingSearchEngineOptions}.
-     *
-     * <p>Whether to enable the blob store. If set to true, the BlobStore will be created to store
-     * and retrieve blobs.
-     */
-    boolean getEnableBlobStore();
-
-    /**
      * Config for {@link com.google.android.icing.proto.IcingSearchEngineOptions}.
      *
      * <p>The maximum time in millisecond for a orphan blob to get recycled and deleted if there is

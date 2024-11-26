@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 // @exportToFramework:skipFile()
-package androidx.appsearch.flags;
+package androidx.appsearch.testutil.flags;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -27,7 +30,8 @@ import org.junit.runners.model.Statement;
  */
 public final class CheckFlagsRule implements TestRule {
     @Override
-    public Statement apply(Statement base, Description description) {
+    @NonNull
+    public Statement apply(@NonNull Statement base, @Nullable Description description) {
         return base;
     }
 }

@@ -26,40 +26,40 @@ import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.core.util.Preconditions;
 
 /**
- * A dummy version of AppSearchBatchResultGeneralKeyParcel in jetpack.
+ * A dummy version of AppSearchBatchResultParcelV2 in jetpack.
  * @param <KeyType> The type of keys in the batch result, such as {@link AppSearchBlobHandle}.
  * @param <ValueType> The type of values in the batch result, such as {@link ParcelFileDescriptor}
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @ExperimentalAppSearchApi
-public final class AppSearchBatchResultGeneralKeyParcel<KeyType, ValueType> {
+public final class AppSearchBatchResultParcelV2<KeyType, ValueType> {
     private final AppSearchBatchResult<KeyType, ValueType> mResult;
 
-    private AppSearchBatchResultGeneralKeyParcel(
+    private AppSearchBatchResultParcelV2(
             @NonNull AppSearchBatchResult<KeyType, ValueType> result) {
         mResult = Preconditions.checkNotNull(result);
     }
 
     /**
-     * Creates an instance of {@link AppSearchBatchResultGeneralKeyParcel} with key type
+     * Creates an instance of {@link AppSearchBatchResultParcelV2} with key type
      * {@link AppSearchBlobHandle} and value type {@link ParcelFileDescriptor}.
      */
     @NonNull
-    public static AppSearchBatchResultGeneralKeyParcel<AppSearchBlobHandle, ParcelFileDescriptor>
+    public static AppSearchBatchResultParcelV2<AppSearchBlobHandle, ParcelFileDescriptor>
             fromBlobHandleToPfd(
             @NonNull AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> result) {
-        return new AppSearchBatchResultGeneralKeyParcel<>(result);
+        return new AppSearchBatchResultParcelV2<>(result);
     }
 
     /**
-     * Creates an instance of {@link AppSearchBatchResultGeneralKeyParcel} with key type
+     * Creates an instance of {@link AppSearchBatchResultParcelV2} with key type
      * {@link AppSearchBlobHandle} and value type {@link Void}.
      */
     @NonNull
-    public static AppSearchBatchResultGeneralKeyParcel<AppSearchBlobHandle, Void>
+    public static AppSearchBatchResultParcelV2<AppSearchBlobHandle, Void>
             fromBlobHandleToVoid(
             @NonNull AppSearchBatchResult<AppSearchBlobHandle, Void> result) {
-        return new AppSearchBatchResultGeneralKeyParcel<>(result);
+        return new AppSearchBatchResultParcelV2<>(result);
     }
 
     /** Returns the wrapped batch result.  */

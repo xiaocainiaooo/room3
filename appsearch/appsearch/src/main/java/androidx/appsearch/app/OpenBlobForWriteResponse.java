@@ -20,7 +20,7 @@ import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
-import androidx.appsearch.app.aidl.AppSearchBatchResultGeneralKeyParcel;
+import androidx.appsearch.app.aidl.AppSearchBatchResultParcelV2;
 import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
 import androidx.appsearch.safeparcel.AbstractSafeParcelable;
@@ -56,7 +56,7 @@ public final class OpenBlobForWriteResponse extends AbstractSafeParcelable imple
             new OpenBlobForWriteResponseCreator();
 
     @Field(id = 1)
-    final AppSearchBatchResultGeneralKeyParcel<AppSearchBlobHandle, ParcelFileDescriptor>
+    final AppSearchBatchResultParcelV2<AppSearchBlobHandle, ParcelFileDescriptor>
             mResultParcel;
 
     /**
@@ -64,13 +64,13 @@ public final class OpenBlobForWriteResponse extends AbstractSafeParcelable imple
      */
     public OpenBlobForWriteResponse(
             @NonNull AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> result) {
-        this(AppSearchBatchResultGeneralKeyParcel.fromBlobHandleToPfd(result));
+        this(AppSearchBatchResultParcelV2.fromBlobHandleToPfd(result));
     }
 
     @Constructor
     OpenBlobForWriteResponse(
             @AbstractSafeParcelable.Param(id = 1)
-            @NonNull AppSearchBatchResultGeneralKeyParcel<AppSearchBlobHandle, ParcelFileDescriptor>
+            @NonNull AppSearchBatchResultParcelV2<AppSearchBlobHandle, ParcelFileDescriptor>
                     resultParcel) {
         mResultParcel = Preconditions.checkNotNull(resultParcel);
     }
