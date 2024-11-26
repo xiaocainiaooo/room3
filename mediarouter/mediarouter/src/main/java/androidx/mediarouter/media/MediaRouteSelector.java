@@ -18,8 +18,8 @@ package androidx.mediarouter.media;
 import android.content.IntentFilter;
 import android.os.Bundle;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,7 +65,8 @@ public final class MediaRouteSelector {
      *
      * @return The list of categories.
      */
-    public @NonNull List<String> getControlCategories() {
+    @NonNull
+    public List<String> getControlCategories() {
         ensureControlCategories();
         return new ArrayList<>(mControlCategories);
     }
@@ -179,8 +180,9 @@ public final class MediaRouteSelector {
         return mControlCategories.hashCode();
     }
 
+    @NonNull
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return "MediaRouteSelector{ "
                 + "controlCategories="
                 + Arrays.toString(getControlCategories().toArray())
@@ -192,7 +194,8 @@ public final class MediaRouteSelector {
      *
      * @return The contents of the object represented as a bundle.
      */
-    public @NonNull Bundle asBundle() {
+    @NonNull
+    public Bundle asBundle() {
         return mBundle;
     }
 
@@ -202,7 +205,8 @@ public final class MediaRouteSelector {
      * @param bundle The bundle, or null if none.
      * @return The new instance, or null if the bundle was null.
      */
-    public static @Nullable MediaRouteSelector fromBundle(@Nullable Bundle bundle) {
+    @Nullable
+    public static MediaRouteSelector fromBundle(@Nullable Bundle bundle) {
         return bundle != null ? new MediaRouteSelector(bundle, null) : null;
     }
 
@@ -240,7 +244,8 @@ public final class MediaRouteSelector {
          * {@link MediaControlIntent#CATEGORY_LIVE_AUDIO}.
          * @return The builder instance for chaining.
          */
-        public @NonNull Builder addControlCategory(@NonNull String category) {
+        @NonNull
+        public Builder addControlCategory(@NonNull String category) {
             if (category == null) {
                 throw new IllegalArgumentException("category must not be null");
             }
@@ -261,7 +266,8 @@ public final class MediaRouteSelector {
          * such as {@link MediaControlIntent#CATEGORY_LIVE_AUDIO}.
          * @return The builder instance for chaining.
          */
-        public @NonNull Builder addControlCategories(@NonNull Collection<String> categories) {
+        @NonNull
+        public Builder addControlCategories(@NonNull Collection<String> categories) {
             if (categories == null) {
                 throw new IllegalArgumentException("categories must not be null");
             }
@@ -280,7 +286,8 @@ public final class MediaRouteSelector {
          * @param selector The media route selector whose contents are to be added.
          * @return The builder instance for chaining.
          */
-        public @NonNull Builder addSelector(@NonNull MediaRouteSelector selector) {
+        @NonNull
+        public Builder addSelector(@NonNull MediaRouteSelector selector) {
             if (selector == null) {
                 throw new IllegalArgumentException("selector must not be null");
             }
@@ -292,7 +299,8 @@ public final class MediaRouteSelector {
         /**
          * Builds the {@link MediaRouteSelector media route selector}.
          */
-        public @NonNull MediaRouteSelector build() {
+        @NonNull
+        public MediaRouteSelector build() {
             if (mControlCategories == null) {
                 return EMPTY;
             }

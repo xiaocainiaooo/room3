@@ -35,6 +35,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.appcompat.app.AppCompatDialog;
 import androidx.mediarouter.R;
@@ -42,9 +44,6 @@ import androidx.mediarouter.media.MediaRouteSelector;
 import androidx.mediarouter.media.MediaRouter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -116,7 +115,8 @@ public class MediaRouteDynamicChooserDialog extends AppCompatDialog {
      *
      * @return The selector, never null.
      */
-    public @NonNull MediaRouteSelector getRouteSelector() {
+    @NonNull
+    public MediaRouteSelector getRouteSelector() {
         return mSelector;
     }
 
@@ -169,7 +169,7 @@ public class MediaRouteDynamicChooserDialog extends AppCompatDialog {
      * @param route The route to consider, never null.
      * @return {@code true} if the route should be included in the device picker dialog.
      */
-    public boolean onFilterRoute(MediaRouter.@NonNull RouteInfo route) {
+    public boolean onFilterRoute(@NonNull MediaRouter.RouteInfo route) {
         return !route.isDefaultOrBluetooth() && route.isEnabled()
                 && route.matchesSelector(mSelector);
     }
@@ -261,25 +261,25 @@ public class MediaRouteDynamicChooserDialog extends AppCompatDialog {
         }
 
         @Override
-        public void onRouteAdded(@NonNull MediaRouter router, MediaRouter.@NonNull RouteInfo info) {
+        public void onRouteAdded(@NonNull MediaRouter router, @NonNull MediaRouter.RouteInfo info) {
             refreshRoutes();
         }
 
         @Override
         public void onRouteRemoved(@NonNull MediaRouter router,
-                MediaRouter.@NonNull RouteInfo info) {
+                @NonNull MediaRouter.RouteInfo info) {
             refreshRoutes();
         }
 
         @Override
         public void onRouteChanged(@NonNull MediaRouter router,
-                MediaRouter.@NonNull RouteInfo info) {
+                @NonNull MediaRouter.RouteInfo info) {
             refreshRoutes();
         }
 
         @Override
         public void onRouteSelected(@NonNull MediaRouter router,
-                MediaRouter.@NonNull RouteInfo route) {
+                @NonNull MediaRouter.RouteInfo route) {
             dismiss();
         }
     }
@@ -331,8 +331,8 @@ public class MediaRouteDynamicChooserDialog extends AppCompatDialog {
         }
 
         @Override
-        public RecyclerView.@NonNull ViewHolder onCreateViewHolder(
-                @NonNull ViewGroup parent, int viewType) {
+        @NonNull
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view;
 
             switch (viewType) {
@@ -349,7 +349,7 @@ public class MediaRouteDynamicChooserDialog extends AppCompatDialog {
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.@NonNull ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
             int viewType = getItemViewType(position);
             Item item = getItem(position);
 

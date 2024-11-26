@@ -18,11 +18,10 @@ package androidx.mediarouter.media;
 import android.content.Context;
 import android.content.IntentFilter;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 import androidx.mediarouter.media.MediaRouteProvider.DynamicGroupRouteController.DynamicRouteDescriptor;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,7 +61,7 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
         private final MediaRouteDescriptor mGroupDescriptor;
         private final Set<String> mCurrentSelectedRouteIds = new HashSet<>();
         private boolean mCurrentlyScanning = false;
-        private @Nullable DynamicGroupRouteController mGroupController;
+        @Nullable private DynamicGroupRouteController mGroupController;
 
         Provider(@NonNull Context context) {
             super(context);
@@ -101,8 +100,9 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
             return newController;
         }
 
+        @Nullable
         @Override
-        public @Nullable DynamicGroupRouteController onCreateDynamicGroupRouteController(
+        public DynamicGroupRouteController onCreateDynamicGroupRouteController(
                 @NonNull String initialMemberRouteId,
                 @NonNull RouteControllerOptions routeControllerOptions) {
             mGroupController = new StubDynamicRouteController();

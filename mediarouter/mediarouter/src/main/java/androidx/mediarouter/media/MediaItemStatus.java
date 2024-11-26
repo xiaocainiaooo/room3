@@ -20,10 +20,9 @@ import android.app.PendingIntent;
 import android.os.Bundle;
 import android.os.SystemClock;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.util.TimeUtils;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Describes the playback status of a media item.
@@ -251,12 +250,14 @@ public final class MediaItemStatus {
      * The extras will be ignored by the media router but they may be used
      * by applications.
      */
-    public @Nullable Bundle getExtras() {
+    @Nullable
+    public Bundle getExtras() {
         return mBundle.getBundle(KEY_EXTRAS);
     }
 
+    @NonNull
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         StringBuilder result = new StringBuilder();
         result.append("MediaItemStatus{ ");
         result.append("timestamp=");
@@ -297,7 +298,8 @@ public final class MediaItemStatus {
      *
      * @return The contents of the object represented as a bundle.
      */
-    public @NonNull Bundle asBundle() {
+    @NonNull
+    public Bundle asBundle() {
         return mBundle;
     }
 
@@ -307,7 +309,8 @@ public final class MediaItemStatus {
      * @param bundle The bundle, or null if none.
      * @return The new instance, or null if the bundle was null.
      */
-    public static @Nullable MediaItemStatus fromBundle(@Nullable Bundle bundle) {
+    @Nullable
+    public static MediaItemStatus fromBundle(@Nullable Bundle bundle) {
         return bundle != null ? new MediaItemStatus(bundle) : null;
     }
 
@@ -345,7 +348,8 @@ public final class MediaItemStatus {
          * Sets the timestamp associated with the status information in
          * milliseconds since boot in the {@link SystemClock#elapsedRealtime} time base.
          */
-        public @NonNull Builder setTimestamp(long elapsedRealtimeTimestamp) {
+        @NonNull
+        public Builder setTimestamp(long elapsedRealtimeTimestamp) {
             mBundle.putLong(KEY_TIMESTAMP, elapsedRealtimeTimestamp);
             return this;
         }
@@ -353,7 +357,8 @@ public final class MediaItemStatus {
         /**
          * Sets the playback state of the media item.
          */
-        public @NonNull Builder setPlaybackState(int playbackState) {
+        @NonNull
+        public Builder setPlaybackState(int playbackState) {
             mBundle.putInt(KEY_PLAYBACK_STATE, playbackState);
             return this;
         }
@@ -362,7 +367,8 @@ public final class MediaItemStatus {
          * Sets the content playback position as a long integer number of milliseconds
          * from the beginning of the content.
          */
-        public @NonNull Builder setContentPosition(long positionMilliseconds) {
+        @NonNull
+        public Builder setContentPosition(long positionMilliseconds) {
             mBundle.putLong(KEY_CONTENT_POSITION, positionMilliseconds);
             return this;
         }
@@ -371,7 +377,8 @@ public final class MediaItemStatus {
          * Sets the total duration of the content to be played as a long integer number
          * of milliseconds.
          */
-        public @NonNull Builder setContentDuration(long durationMilliseconds) {
+        @NonNull
+        public Builder setContentDuration(long durationMilliseconds) {
             mBundle.putLong(KEY_CONTENT_DURATION, durationMilliseconds);
             return this;
         }
@@ -381,7 +388,8 @@ public final class MediaItemStatus {
          * The extras will be ignored by the media router but they may be used
          * by applications.
          */
-        public @NonNull Builder setExtras(@Nullable Bundle extras) {
+        @NonNull
+        public Builder setExtras(@Nullable Bundle extras) {
             if (extras == null) {
                 mBundle.putBundle(KEY_EXTRAS, null);
             } else {
@@ -393,7 +401,8 @@ public final class MediaItemStatus {
         /**
          * Builds the {@link MediaItemStatus media item status object}.
          */
-        public @NonNull MediaItemStatus build() {
+        @NonNull
+        public MediaItemStatus build() {
             return new MediaItemStatus(mBundle);
         }
     }

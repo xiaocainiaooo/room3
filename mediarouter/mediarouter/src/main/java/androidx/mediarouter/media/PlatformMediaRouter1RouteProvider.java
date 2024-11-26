@@ -31,10 +31,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.mediarouter.R;
-
-import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -206,7 +205,7 @@ abstract class PlatformMediaRouter1RouteProvider extends MediaRouteProvider {
         }
 
         @Override
-        public void onRouteAdded(android.media.MediaRouter.@NonNull RouteInfo route) {
+        public void onRouteAdded(@NonNull android.media.MediaRouter.RouteInfo route) {
             if (addSystemRouteNoPublish(route)) {
                 publishRoutes();
             }
@@ -262,7 +261,7 @@ abstract class PlatformMediaRouter1RouteProvider extends MediaRouteProvider {
         }
 
         @Override
-        public void onRouteRemoved(android.media.MediaRouter.@NonNull RouteInfo route) {
+        public void onRouteRemoved(@NonNull android.media.MediaRouter.RouteInfo route) {
             if (getUserRouteRecord(route) == null) {
                 int index = findSystemRouteRecord(route);
                 if (index >= 0) {
@@ -273,7 +272,7 @@ abstract class PlatformMediaRouter1RouteProvider extends MediaRouteProvider {
         }
 
         @Override
-        public void onRouteChanged(android.media.MediaRouter.@NonNull RouteInfo route) {
+        public void onRouteChanged(@NonNull android.media.MediaRouter.RouteInfo route) {
             if (getUserRouteRecord(route) == null) {
                 int index = findSystemRouteRecord(route);
                 if (index >= 0) {
@@ -285,7 +284,7 @@ abstract class PlatformMediaRouter1RouteProvider extends MediaRouteProvider {
         }
 
         @Override
-        public void onRouteVolumeChanged(android.media.MediaRouter.@NonNull RouteInfo route) {
+        public void onRouteVolumeChanged(@NonNull android.media.MediaRouter.RouteInfo route) {
             if (getUserRouteRecord(route) == null) {
                 int index = findSystemRouteRecord(route);
                 if (index >= 0) {
@@ -304,7 +303,7 @@ abstract class PlatformMediaRouter1RouteProvider extends MediaRouteProvider {
 
         @Override
         public void onRouteSelected(int type,
-                android.media.MediaRouter.@NonNull RouteInfo route) {
+                @NonNull android.media.MediaRouter.RouteInfo route) {
             if (route != mRouter.getSelectedRoute(ALL_ROUTE_TYPES)) {
                 // The currently selected route has already changed so this callback
                 // is stale.  Drop it to prevent getting into sync loops.
@@ -327,25 +326,25 @@ abstract class PlatformMediaRouter1RouteProvider extends MediaRouteProvider {
 
         @Override
         public void onRouteUnselected(int type,
-                android.media.MediaRouter.@NonNull RouteInfo route) {
+                @NonNull android.media.MediaRouter.RouteInfo route) {
             // Nothing to do when a route is unselected.
             // We only need to handle when a route is selected.
         }
 
         @Override
-        public void onRouteGrouped(android.media.MediaRouter.@NonNull RouteInfo route,
-                android.media.MediaRouter.@NonNull RouteGroup group, int index) {
+        public void onRouteGrouped(@NonNull android.media.MediaRouter.RouteInfo route,
+                @NonNull android.media.MediaRouter.RouteGroup group, int index) {
             // Route grouping is deprecated and no longer supported.
         }
 
         @Override
-        public void onRouteUngrouped(android.media.MediaRouter.@NonNull RouteInfo route,
-                android.media.MediaRouter.@NonNull RouteGroup group) {
+        public void onRouteUngrouped(@NonNull android.media.MediaRouter.RouteInfo route,
+                @NonNull android.media.MediaRouter.RouteGroup group) {
             // Route grouping is deprecated and no longer supported.
         }
 
         @Override
-        public void onVolumeSetRequest(android.media.MediaRouter.@NonNull RouteInfo route,
+        public void onVolumeSetRequest(@NonNull android.media.MediaRouter.RouteInfo route,
                 int volume) {
             UserRouteRecord record = getUserRouteRecord(route);
             if (record != null) {
@@ -354,7 +353,7 @@ abstract class PlatformMediaRouter1RouteProvider extends MediaRouteProvider {
         }
 
         @Override
-        public void onVolumeUpdateRequest(android.media.MediaRouter.@NonNull RouteInfo route,
+        public void onVolumeUpdateRequest(@NonNull android.media.MediaRouter.RouteInfo route,
                 int direction) {
             UserRouteRecord record = getUserRouteRecord(route);
             if (record != null) {
@@ -571,7 +570,7 @@ abstract class PlatformMediaRouter1RouteProvider extends MediaRouteProvider {
 
         @Override
         public void onRoutePresentationDisplayChanged(
-                android.media.MediaRouter.@NonNull RouteInfo route) {
+                @NonNull android.media.MediaRouter.RouteInfo route) {
             int index = findSystemRouteRecord(route);
             if (index >= 0) {
                 SystemRouteRecord record = mSystemRouteRecords.get(index);

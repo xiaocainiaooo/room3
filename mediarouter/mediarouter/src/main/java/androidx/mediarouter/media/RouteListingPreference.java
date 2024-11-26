@@ -21,12 +21,11 @@ import android.content.Intent;
 import android.text.TextUtils;
 
 import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 import androidx.core.util.Preconditions;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -72,9 +71,9 @@ public final class RouteListingPreference {
     @SuppressLint("ActionValue") // Field & value copied from android.media.RouteListingPreference.
     public static final String EXTRA_ROUTE_ID = android.media.RouteListingPreference.EXTRA_ROUTE_ID;
 
-    private final @NonNull List<RouteListingPreference.Item> mItems;
+    @NonNull private final List<RouteListingPreference.Item> mItems;
     private final boolean mIsSystemOrderingEnabled;
-    private final @Nullable ComponentName mLinkedItemComponentName;
+    @Nullable private final ComponentName mLinkedItemComponentName;
 
     // Must be package private to avoid a synthetic accessor for the builder.
     /* package */ RouteListingPreference(RouteListingPreference.Builder builder) {
@@ -87,7 +86,8 @@ public final class RouteListingPreference {
      * Returns an unmodifiable list containing the {@link RouteListingPreference.Item items} that
      * the app wants to be listed for media routing.
      */
-    public @NonNull List<RouteListingPreference.Item> getItems() {
+    @NonNull
+    public List<RouteListingPreference.Item> getItems() {
         return mItems;
     }
 
@@ -116,7 +116,8 @@ public final class RouteListingPreference {
      * returned {@link ComponentName}, using action {@link #ACTION_TRANSFER_MEDIA}, with the extra
      * {@link #EXTRA_ROUTE_ID}.
      */
-    public @Nullable ComponentName getLinkedItemComponentName() {
+    @Nullable
+    public ComponentName getLinkedItemComponentName() {
         return mLinkedItemComponentName;
     }
 
@@ -144,8 +145,8 @@ public final class RouteListingPreference {
     // Internal methods.
 
     @RequiresApi(api = 34)
-/* package */
-    android.media.@NonNull RouteListingPreference toPlatformRouteListingPreference() {
+    @NonNull /* package */
+    android.media.RouteListingPreference toPlatformRouteListingPreference() {
         return Api34Impl.toPlatformRouteListingPreference(this);
     }
 
@@ -170,7 +171,8 @@ public final class RouteListingPreference {
          *
          * <p>The default value is an empty list.
          */
-        public RouteListingPreference.@NonNull Builder setItems(
+        @NonNull
+        public RouteListingPreference.Builder setItems(
                 @NonNull List<RouteListingPreference.Item> items) {
             mItems = Collections.unmodifiableList(new ArrayList<>(Objects.requireNonNull(items)));
             return this;
@@ -181,7 +183,8 @@ public final class RouteListingPreference {
          *
          * <p>The default value is {@code true}.
          */
-        public RouteListingPreference.@NonNull Builder setSystemOrderingEnabled(
+        @NonNull
+        public RouteListingPreference.Builder setSystemOrderingEnabled(
                 boolean systemOrderingEnabled) {
             mIsSystemOrderingEnabled = systemOrderingEnabled;
             return this;
@@ -192,7 +195,8 @@ public final class RouteListingPreference {
          *
          * <p>The default value is {@code null}.
          */
-        public RouteListingPreference.@NonNull Builder setLinkedItemComponentName(
+        @NonNull
+        public RouteListingPreference.Builder setLinkedItemComponentName(
                 @Nullable ComponentName linkedItemComponentName) {
             mLinkedItemComponentName = linkedItemComponentName;
             return this;
@@ -202,7 +206,8 @@ public final class RouteListingPreference {
          * Creates and returns a new {@link RouteListingPreference} instance with the given
          * parameters.
          */
-        public @NonNull RouteListingPreference build() {
+        @NonNull
+        public RouteListingPreference build() {
             return new RouteListingPreference(this);
         }
     }
@@ -345,15 +350,15 @@ public final class RouteListingPreference {
         public static final int SUBTEXT_CUSTOM =
                 android.media.RouteListingPreference.Item.SUBTEXT_CUSTOM;
 
-        private final @NonNull String mRouteId;
+        @NonNull private final String mRouteId;
         @SelectionBehavior private final int mSelectionBehavior;
         @Flags private final int mFlags;
         @SubText private final int mSubText;
 
-        private final @Nullable CharSequence mCustomSubtextMessage;
+        @Nullable private final CharSequence mCustomSubtextMessage;
 
         // Must be package private to avoid a synthetic accessor for the builder.
-        /* package */ Item(RouteListingPreference.Item.@NonNull Builder builder) {
+        /* package */ Item(@NonNull RouteListingPreference.Item.Builder builder) {
             mRouteId = builder.mRouteId;
             mSelectionBehavior = builder.mSelectionBehavior;
             mFlags = builder.mFlags;
@@ -367,7 +372,8 @@ public final class RouteListingPreference {
          *
          * @see MediaRouter.RouteInfo#getId()
          */
-        public @NonNull String getRouteId() {
+        @NonNull
+        public String getRouteId() {
             return mRouteId;
         }
 
@@ -432,7 +438,8 @@ public final class RouteListingPreference {
          * subtexts listed in {@link #getSubText()} in order to guarantee correct visual
          * representation and localization on all form factors.
          */
-        public @Nullable CharSequence getCustomSubtextMessage() {
+        @Nullable
+        public CharSequence getCustomSubtextMessage() {
             return mCustomSubtextMessage;
         }
 
@@ -497,8 +504,8 @@ public final class RouteListingPreference {
              *
              * <p>The default value is {@link #ACTION_TRANSFER_MEDIA}.
              */
-            public RouteListingPreference.Item.@NonNull Builder setSelectionBehavior(
-                    int selectionBehavior) {
+            @NonNull
+            public RouteListingPreference.Item.Builder setSelectionBehavior(int selectionBehavior) {
                 mSelectionBehavior = selectionBehavior;
                 return this;
             }
@@ -508,7 +515,8 @@ public final class RouteListingPreference {
              *
              * <p>The default value is zero (no flags).
              */
-            public RouteListingPreference.Item.@NonNull Builder setFlags(int flags) {
+            @NonNull
+            public RouteListingPreference.Item.Builder setFlags(int flags) {
                 mFlags = flags;
                 return this;
             }
@@ -518,7 +526,8 @@ public final class RouteListingPreference {
              *
              * <p>The default value is {@link #SUBTEXT_NONE}.
              */
-            public RouteListingPreference.Item.@NonNull Builder setSubText(int subText) {
+            @NonNull
+            public RouteListingPreference.Item.Builder setSubText(int subText) {
                 mSubText = subText;
                 return this;
             }
@@ -528,7 +537,8 @@ public final class RouteListingPreference {
              *
              * <p>The default value is {@code null}.
              */
-            public RouteListingPreference.Item.@NonNull Builder setCustomSubtextMessage(
+            @NonNull
+            public RouteListingPreference.Item.Builder setCustomSubtextMessage(
                     @Nullable CharSequence customSubtextMessage) {
                 mCustomSubtextMessage = customSubtextMessage;
                 return this;
@@ -538,7 +548,8 @@ public final class RouteListingPreference {
              * Creates and returns a new {@link RouteListingPreference.Item} with the given
              * parameters.
              */
-            public RouteListingPreference.@NonNull Item build() {
+            @NonNull
+            public RouteListingPreference.Item build() {
                 return new RouteListingPreference.Item(this);
             }
         }
@@ -550,8 +561,8 @@ public final class RouteListingPreference {
             // This class is not instantiable.
         }
 
-        public static android.media.@NonNull RouteListingPreference
-                toPlatformRouteListingPreference(
+        @NonNull
+        public static android.media.RouteListingPreference toPlatformRouteListingPreference(
                 RouteListingPreference routeListingPreference) {
             ArrayList<android.media.RouteListingPreference.Item> platformRlpItems =
                     new ArrayList<>();
@@ -566,7 +577,8 @@ public final class RouteListingPreference {
                     .build();
         }
 
-        public static android.media.RouteListingPreference.@NonNull Item toPlatformItem(Item item) {
+        @NonNull
+        public static android.media.RouteListingPreference.Item toPlatformItem(Item item) {
             return new android.media.RouteListingPreference.Item.Builder(item.getRouteId())
                     .setFlags(item.getFlags())
                     .setSubText(item.getSubText())

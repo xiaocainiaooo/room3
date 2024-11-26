@@ -64,6 +64,8 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.util.ObjectsCompat;
 import androidx.core.view.accessibility.AccessibilityEventCompat;
@@ -71,9 +73,6 @@ import androidx.mediarouter.R;
 import androidx.mediarouter.media.MediaRouteSelector;
 import androidx.mediarouter.media.MediaRouter;
 import androidx.palette.graphics.Palette;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -227,7 +226,8 @@ public class MediaRouteControllerDialog extends AlertDialog {
     /**
      * Gets the route that this dialog is controlling.
      */
-    public MediaRouter.@NonNull RouteInfo getRoute() {
+    @NonNull
+    public MediaRouter.RouteInfo getRoute() {
         return mRoute;
     }
 
@@ -242,7 +242,8 @@ public class MediaRouteControllerDialog extends AlertDialog {
      * @param savedInstanceState The dialog's saved instance state.
      * @return The media control view, or null if none.
      */
-    public @Nullable View onCreateMediaControlView(@Nullable Bundle savedInstanceState) {
+    @Nullable
+    public View onCreateMediaControlView(@Nullable Bundle savedInstanceState) {
         return null;
     }
 
@@ -251,7 +252,8 @@ public class MediaRouteControllerDialog extends AlertDialog {
      *
      * @return The media control view, or null if none.
      */
-    public @Nullable View getMediaControlView() {
+    @Nullable
+    public View getMediaControlView() {
         return mCustomControlView;
     }
 
@@ -311,7 +313,8 @@ public class MediaRouteControllerDialog extends AlertDialog {
      *
      * @return The token for the session to use or null if none.
      */
-    public MediaSessionCompat.@Nullable Token getMediaSession() {
+    @Nullable
+    public MediaSessionCompat.Token getMediaSession() {
         return mMediaController == null ? null : mMediaController.getSessionToken();
     }
 
@@ -1134,19 +1137,19 @@ public class MediaRouteControllerDialog extends AlertDialog {
 
         @Override
         public void onRouteUnselected(@NonNull MediaRouter router,
-                MediaRouter.@NonNull RouteInfo route) {
+                @NonNull MediaRouter.RouteInfo route) {
             update(false);
         }
 
         @Override
         public void onRouteChanged(@NonNull MediaRouter router,
-                MediaRouter.@NonNull RouteInfo route) {
+                @NonNull MediaRouter.RouteInfo route) {
             update(true);
         }
 
         @Override
         public void onRouteVolumeChanged(@NonNull MediaRouter router,
-                MediaRouter.@NonNull RouteInfo route) {
+                @NonNull MediaRouter.RouteInfo route) {
             SeekBar volumeSlider = mVolumeSliderMap.get(route);
             int volume = route.getVolume();
             if (DEBUG) {
