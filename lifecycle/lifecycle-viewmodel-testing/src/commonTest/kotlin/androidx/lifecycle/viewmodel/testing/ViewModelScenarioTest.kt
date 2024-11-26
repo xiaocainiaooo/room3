@@ -17,15 +17,45 @@
 package androidx.lifecycle.viewmodel.testing
 
 import androidx.kruth.assertThat
+import androidx.kruth.assertThrows
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.SAVED_STATE_REGISTRY_OWNER_KEY
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.VIEW_MODEL_STORE_OWNER_KEY
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.MutableCreationExtras
+import androidx.savedstate.SavedStateRegistryController
+import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.savedState
 import kotlin.test.Test
 
 internal class ViewModelScenarioTest : RobolectricTest() {
+
+    @Test
+    fun init_withCustomSavedStateRegistryOwner_throws() {
+        val initialExtras =
+            MutableCreationExtras().apply { this[SAVED_STATE_REGISTRY_OWNER_KEY] = TestOwner() }
+
+        assertThrows<IllegalArgumentException> {
+            viewModelScenario(initialExtras) { TestViewModel() }
+        }
+    }
+
+    @Test
+    fun init_withCustomViewModelStoreOwner_throws() {
+        val initialExtras =
+            MutableCreationExtras().apply { this[VIEW_MODEL_STORE_OWNER_KEY] = TestOwner() }
+
+        assertThrows<IllegalArgumentException> {
+            viewModelScenario(initialExtras) { TestViewModel() }
+        }
+    }
 
     @Test
     fun viewModel_createsInstance() {
@@ -110,6 +140,20 @@ internal class ViewModelScenarioTest : RobolectricTest() {
         assertThat(scenario.viewModel.handle.get<String>("key")).isEqualTo("value")
     }
 
+    @Test
+    fun recreate() {
+        val scenario = viewModelScenario { TestViewModel(handle = createSavedStateHandle()) }
+        scenario.viewModel.handle["key"] = "value"
+
+        val viewModelBefore = scenario.viewModel
+        scenario.recreate()
+        val viewModelAfter = scenario.viewModel
+
+        assertThat(viewModelAfter).isNotSameInstanceAs(viewModelBefore)
+        assertThat(viewModelAfter.handle).isNotSameInstanceAs(viewModelBefore.handle)
+        assertThat(viewModelAfter.handle.get<String>("key")).isEqualTo(expected = "value")
+    }
+
     private val CREATION_EXTRAS_KEY = CreationExtras.Key<String>()
 
     private class TestViewModel(
@@ -123,5 +167,16 @@ internal class ViewModelScenarioTest : RobolectricTest() {
         override fun onCleared() {
             onClearedCount++
         }
+    }
+
+    private class TestOwner : ViewModelStoreOwner, LifecycleOwner, SavedStateRegistryOwner {
+
+        override val viewModelStore = ViewModelStore()
+
+        val lifecycleRegistry = LifecycleRegistry.createUnsafe(owner = this)
+        override val lifecycle: Lifecycle = lifecycleRegistry
+
+        val savedStateRegistryController = SavedStateRegistryController.create(owner = this)
+        override val savedStateRegistry = savedStateRegistryController.savedStateRegistry
     }
 }
