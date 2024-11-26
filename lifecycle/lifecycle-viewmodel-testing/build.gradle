@@ -86,6 +86,14 @@ androidXMultiplatform {
             dependsOn(jvmMain)
         }
 
+        androidUnitTest {
+            dependsOn(commonTest)
+            dependsOn(jvmTest)
+            dependencies {
+                implementation(libs.robolectric)
+            }
+        }
+
         androidInstrumentedTest {
             dependsOn(commonTest)
             dependsOn(jvmTest)
@@ -142,13 +150,23 @@ androidXMultiplatform {
         }
 
         targets.configureEach { target ->
-            if (target.platformType == KotlinPlatformType.native) {
+            if (target.platformType == org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.native) {
                 target.compilations["main"].defaultSourceSet {
                     def konanTargetFamily = target.konanTarget.family
-                    if (konanTargetFamily == Family.OSX || konanTargetFamily == Family.IOS) {
+                    if (konanTargetFamily == org.jetbrains.kotlin.konan.target.Family.OSX || konanTargetFamily == org.jetbrains.kotlin.konan.target.Family.IOS) {
                         dependsOn(darwinMain)
-                    } else if (konanTargetFamily == Family.LINUX) {
+                    } else if (konanTargetFamily == org.jetbrains.kotlin.konan.target.Family.LINUX) {
                         dependsOn(linuxMain)
+                    } else {
+                        throw new GradleException("unknown native target ${target}")
+                    }
+                }
+                target.compilations["test"].defaultSourceSet {
+                    def konanTargetFamily = target.konanTarget.family
+                    if (konanTargetFamily == org.jetbrains.kotlin.konan.target.Family.OSX || konanTargetFamily == org.jetbrains.kotlin.konan.target.Family.IOS) {
+                        dependsOn(darwinTest)
+                    } else if (konanTargetFamily == org.jetbrains.kotlin.konan.target.Family.LINUX) {
+                        dependsOn(linuxTest)
                     } else {
                         throw new GradleException("unknown native target ${target}")
                     }
