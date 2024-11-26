@@ -26,12 +26,15 @@ import androidx.build.getSupportRootFolder
 import androidx.build.java.JavaCompileInputs
 import androidx.build.multiplatformExtension
 import java.io.File
+import java.util.jar.JarOutputStream
+import java.util.zip.ZipEntry
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -41,6 +44,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -89,6 +93,8 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
 
     @get:OutputFile abstract val kzipOutputFile: RegularFileProperty
 
+    @get:OutputDirectory abstract val kytheClassJarsDir: DirectoryProperty
+
     @TaskAction
     fun exec() {
         val sourceFiles =
@@ -108,9 +114,24 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                 .map { it.relativeTo(checkoutRoot) }
 
         val dependencyClasspath =
-            dependencyClasspath.asFileTree.files
-                .filter { it.extension == "jar" }
-                .map { it.relativeTo(checkoutRoot) }
+            dependencyClasspath.files
+                .filter { it.exists() }
+                .mapNotNull { file ->
+                    when {
+                        file.isFile && file.extension == "jar" -> {
+                            file.relativeTo(checkoutRoot)
+                        }
+                        file.isDirectory -> {
+                            file
+                                .createJarFromDirectory(
+                                    kytheClassJarsDir.get().asFile,
+                                    checkoutRoot
+                                )
+                                .relativeTo(checkoutRoot)
+                        }
+                        else -> null
+                    }
+                }
 
         val args = buildList {
             addAll(
@@ -177,15 +198,17 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
             if (
                 project.path in
                     listOf(
-                        ":buildSrc-tests",
-                        ":concurrent:concurrent-futures-ktx",
-                        ":glance:glance-appwidget",
-                        ":glance:glance-appwidget-multiprocess",
-                        ":privacysandbox:tools:integration-tests:testsdk",
+                        // Uses Java 9+ APIs, which are not part of any dependency in the classpath
                         ":room:room-compiler-processing",
                         ":room:room-compiler-processing-testing",
-                        ":room:room-runtime",
-                        ":security:security-state"
+                        // Conflicts arise as Kythe adds all dependencies to friend paths, affecting
+                        // visibility and inheritance
+                        ":glance:glance-appwidget",
+                        ":glance:glance-appwidget-multiprocess",
+                        ":security:security-state",
+                        // KSP generated folders not visible to AGP variant api (b/380363756)
+                        ":privacysandbox:tools:integration-tests:testsdk",
+                        ":room:room-runtime"
                     )
             ) {
                 return
@@ -221,6 +244,7 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                                 "kzips/${project.group}-${project.name}.kotlin.kzip"
                             )
                         )
+                        kytheClassJarsDir.set(project.layout.buildDirectory.dir("kythe-class-jars"))
                         this.kotlincFreeCompilerArgs.set(kotlincFreeCompilerArgs)
                     }
                 }
@@ -235,3 +259,22 @@ private fun osName() =
         OperatingSystem.MAC -> "darwin-x86"
         OperatingSystem.WINDOWS -> error("Kzip generation not supported in Windows")
     }
+
+/* Kythe processes only JARs, so we create JARs from directory content. */
+private fun File.createJarFromDirectory(kytheClassJarsDir: File, baseDir: File): File {
+    val jarParentDir = File(kytheClassJarsDir, this.relativeTo(baseDir).invariantSeparatorsPath)
+    jarParentDir.mkdirs()
+
+    val jarFile = File(jarParentDir, "${this.name}.jar")
+    JarOutputStream(jarFile.outputStream()).use { jarOut ->
+        this.walkTopDown()
+            .filter { it.isFile }
+            .forEach { file ->
+                val entryName = file.relativeTo(this).invariantSeparatorsPath
+                jarOut.putNextEntry(ZipEntry(entryName))
+                file.inputStream().use { it.copyTo(jarOut) }
+                jarOut.closeEntry()
+            }
+    }
+    return jarFile
+}
