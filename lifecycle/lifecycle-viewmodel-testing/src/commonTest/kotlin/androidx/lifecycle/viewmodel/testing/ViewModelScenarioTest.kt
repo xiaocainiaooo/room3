@@ -17,9 +17,12 @@
 package androidx.lifecycle.viewmodel.testing
 
 import androidx.kruth.assertThat
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.MutableCreationExtras
+import androidx.savedstate.savedState
 import kotlin.test.Test
 
 class ViewModelScenarioTest {
@@ -58,9 +61,9 @@ class ViewModelScenarioTest {
     @Test
     fun viewModel_whenNotCleared_usesCustomCreationExtras() {
         val expectedExtras = MutableCreationExtras().apply { this[CREATION_EXTRAS_KEY] = "value" }
-        val scenario = viewModelScenario(expectedExtras) { TestViewModel(creationExtras = this) }
+        val scenario = viewModelScenario(expectedExtras) { TestViewModel(extras = this) }
 
-        val actualExtras = scenario.viewModel.creationExtras
+        val actualExtras = scenario.viewModel.extras
 
         assertThat(actualExtras[CREATION_EXTRAS_KEY]).isEqualTo(expectedExtras[CREATION_EXTRAS_KEY])
     }
@@ -68,11 +71,11 @@ class ViewModelScenarioTest {
     @Test
     fun viewModel_whenCleared_reusesCustomCreationExtras() {
         val expectedExtras = MutableCreationExtras().apply { this[CREATION_EXTRAS_KEY] = "value" }
-        val scenario = viewModelScenario(expectedExtras) { TestViewModel(creationExtras = this) }
+        val scenario = viewModelScenario(expectedExtras) { TestViewModel(extras = this) }
 
-        val actualExtras1 = scenario.viewModel.creationExtras
+        val actualExtras1 = scenario.viewModel.extras
         scenario.close()
-        val actualExtras2 = scenario.viewModel.creationExtras
+        val actualExtras2 = scenario.viewModel.extras
 
         assertThat(actualExtras1[CREATION_EXTRAS_KEY]).isEqualTo(actualExtras2[CREATION_EXTRAS_KEY])
     }
@@ -88,18 +91,37 @@ class ViewModelScenarioTest {
         assertThat(actualModel1.onClearedCount).isEqualTo(expected = 1)
         assertThat(actualModel2.onClearedCount).isEqualTo(expected = 0)
     }
-}
 
-private val CREATION_EXTRAS_KEY = CreationExtras.Key<String>()
+    @Test
+    fun createSavedStateHandle_withDefaultExtras() {
+        val scenario = viewModelScenario { TestViewModel(handle = createSavedStateHandle()) }
 
-private class TestViewModel(
-    val creationExtras: CreationExtras = CreationExtras.Empty,
-) : ViewModel() {
+        // assert `.viewModel` does not throw.
+        assertThat(scenario.viewModel.handle).isNotNull()
+    }
 
-    var onClearedCount = 0
-        private set
+    @Test
+    fun createSavedStateHandle_withInitialExtras() {
+        val defaultArgs = savedState { putString("key", "value") }
+        val creationExtras = DefaultCreationExtras(defaultArgs)
+        val scenario =
+            viewModelScenario(creationExtras) { TestViewModel(handle = createSavedStateHandle()) }
 
-    override fun onCleared() {
-        onClearedCount++
+        assertThat(scenario.viewModel.handle.get<String>("key")).isEqualTo("value")
+    }
+
+    private val CREATION_EXTRAS_KEY = CreationExtras.Key<String>()
+
+    private class TestViewModel(
+        val handle: SavedStateHandle = SavedStateHandle(),
+        val extras: CreationExtras = CreationExtras.Empty,
+    ) : ViewModel() {
+
+        var onClearedCount = 0
+            private set
+
+        override fun onCleared() {
+            onClearedCount++
+        }
     }
 }
