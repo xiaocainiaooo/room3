@@ -30,8 +30,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -46,12 +44,8 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.material3.internal.Strings.Companion.StepperDecreaseIconContentDescription
-import androidx.wear.compose.material3.internal.Strings.Companion.StepperIncreaseIconContentDescription
-import androidx.wear.compose.material3.internal.getString
 import androidx.wear.compose.material3.tokens.ColorSchemeKeyTokens
 import androidx.wear.compose.materialcore.RangeDefaults
-import androidx.wear.compose.materialcore.RangeIcons
 import androidx.wear.compose.materialcore.repeatableClickable
 import kotlin.math.roundToInt
 
@@ -99,9 +93,9 @@ fun Stepper(
     value: Float,
     onValueChange: (Float) -> Unit,
     steps: Int,
+    decreaseIcon: @Composable () -> Unit,
+    increaseIcon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    decreaseIcon: @Composable () -> Unit = StepperDefaults.DecreaseIcon,
-    increaseIcon: @Composable () -> Unit = StepperDefaults.IncreaseIcon,
     enabled: Boolean = true,
     valueRange: ClosedFloatingPointRange<Float> = 0f..(steps + 1).toFloat(),
     colors: StepperColors = StepperDefaults.colors(),
@@ -164,9 +158,9 @@ fun Stepper(
     value: Int,
     onValueChange: (Int) -> Unit,
     valueProgression: IntProgression,
+    decreaseIcon: @Composable () -> Unit,
+    increaseIcon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    decreaseIcon: @Composable () -> Unit = StepperDefaults.DecreaseIcon,
-    increaseIcon: @Composable () -> Unit = StepperDefaults.IncreaseIcon,
     enabled: Boolean = true,
     colors: StepperColors = StepperDefaults.colors(),
     content: @Composable BoxScope.() -> Unit
@@ -189,24 +183,6 @@ fun Stepper(
 object StepperDefaults {
     /** Default size for increase and decrease icons. */
     val IconSize = 24.dp
-
-    /** Default icon for the increase button. */
-    val IncreaseIcon: @Composable () -> Unit = {
-        Icon(
-            imageVector = Icons.Filled.Add,
-            contentDescription = getString(StepperIncreaseIconContentDescription),
-            modifier = Modifier.size(IconSize)
-        )
-    }
-
-    /** Default icon for the decrease button. */
-    val DecreaseIcon: @Composable () -> Unit = {
-        Icon(
-            imageVector = RangeIcons.Minus,
-            contentDescription = getString(StepperDecreaseIconContentDescription),
-            modifier = Modifier.size(IconSize)
-        )
-    }
 
     /** Creates a [StepperColors] that represents the default colors used in a [Stepper]. */
     @Composable fun colors() = MaterialTheme.colorScheme.defaultStepperColors
