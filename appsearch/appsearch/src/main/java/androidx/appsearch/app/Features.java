@@ -127,6 +127,7 @@ public interface Features {
      * <p>For details on the "matchScoreExpression" function in the query language, see
      * {@link AppSearchSession#search}.
      */
+    @ExperimentalAppSearchApi
     String LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION =
             FeatureConstants.LIST_FILTER_MATCH_SCORE_EXPRESSION_FUNCTION;
 
