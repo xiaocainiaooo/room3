@@ -175,8 +175,8 @@ internal class TransformingLazyColumnContentPaddingMeasurementStrategy(
             coroutineScope = coroutineScope,
             density = density,
             itemSpacing = itemSpacing,
-            beforeContentPadding = 0,
-            afterContentPadding = 0,
+            beforeContentPadding = beforeContentPadding,
+            afterContentPadding = afterContentPadding,
             measureResult =
                 layout(containerConstraints.maxWidth, containerConstraints.maxHeight) {
                     visibleItems.fastForEach { it.place(this) }

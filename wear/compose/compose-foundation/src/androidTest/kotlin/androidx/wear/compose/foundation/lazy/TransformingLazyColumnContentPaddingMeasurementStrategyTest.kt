@@ -155,6 +155,25 @@ class TransformingLazyColumnContentPaddingMeasurementStrategyTest {
 
         assertThat(result.visibleItems.map { it.offset })
             .isEqualTo(listOf(0 + topPaddingPx, screenHeight / 2 + topPaddingPx))
+        assertThat(result.beforeContentPadding).isEqualTo(topPaddingPx)
+    }
+
+    @Test
+    fun twoItemsWithLastOneAlignedWithPadding_measuredWithCorrectOffsets() {
+        val bottomPadding = 5.dp
+        val bottomPaddingPx = with(measureScope) { bottomPadding.roundToPx() }
+        val strategy =
+            TransformingLazyColumnContentPaddingMeasurementStrategy(
+                PaddingValues(bottom = bottomPadding),
+                measureScope
+            )
+
+        val result = strategy.measure(listOf(screenHeight / 2, screenHeight / 2))
+
+        assertThat(result.visibleItems.size).isEqualTo(2)
+
+        assertThat(result.visibleItems.map { it.offset }).isEqualTo(listOf(0, screenHeight / 2))
+        assertThat(result.afterContentPadding).isEqualTo(bottomPaddingPx)
     }
 
     @Test

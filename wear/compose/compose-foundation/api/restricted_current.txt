@@ -548,9 +548,13 @@ package androidx.wear.compose.foundation.lazy {
   }
 
   public sealed interface TransformingLazyColumnLayoutInfo {
+    method public int getAfterContentPadding();
+    method public int getBeforeContentPadding();
     method public int getTotalItemsCount();
     method public long getViewportSize();
     method public java.util.List<androidx.wear.compose.foundation.lazy.TransformingLazyColumnVisibleItemInfo> getVisibleItems();
+    property public abstract int afterContentPadding;
+    property public abstract int beforeContentPadding;
     property public abstract int totalItemsCount;
     property public abstract long viewportSize;
     property public abstract java.util.List<androidx.wear.compose.foundation.lazy.TransformingLazyColumnVisibleItemInfo> visibleItems;
