@@ -24,6 +24,7 @@ ext {
 }
 
 dependencies {
+    api(libs.jspecify)
     implementation(project(":emoji2:emoji2"))
     implementation(project(":emoji2:emoji2-bundled"))
     implementation(project(":emoji2:emoji2-views-helper"))

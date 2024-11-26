@@ -20,6 +20,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.jspecify)
     implementation(project(":wear:wear"))
     implementation(project(path: ":recyclerview:recyclerview"))
     implementation(project(path: ":core:core"))
