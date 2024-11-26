@@ -28,6 +28,7 @@ import com.google.common.truth.Truth.assertThat
  *
  * @param actual the actual [Vector3] to compare
  * @param expected the expected [Vector3] to compare
+ * @param EPSILON the maximum difference allowed between the two [Vector3]s
  */
 @JvmOverloads
 public fun assertVector3(actual: Vector3, expected: Vector3, EPSILON: Float = 1e-5f) {
@@ -41,6 +42,7 @@ public fun assertVector3(actual: Vector3, expected: Vector3, EPSILON: Float = 1e
  *
  * @param actual the actual [Quaternion] to compare
  * @param expected the expected [Quaternion] to compare
+ * @param EPSILON the maximum difference allowed between the two [Quaternion]s
  */
 @JvmOverloads
 public fun assertRotation(actual: Quaternion, expected: Quaternion, EPSILON: Float = 1e-5f) {
@@ -53,6 +55,7 @@ public fun assertRotation(actual: Quaternion, expected: Quaternion, EPSILON: Flo
  *
  * @param actual the actual [Pose] to compare
  * @param expected the expected [Pose] to compare
+ * @param EPSILON the maximum difference allowed between the two [Pose]s
  */
 @JvmOverloads
 public fun assertPose(actual: Pose, expected: Pose, EPSILON: Float = 1e-5f) {
