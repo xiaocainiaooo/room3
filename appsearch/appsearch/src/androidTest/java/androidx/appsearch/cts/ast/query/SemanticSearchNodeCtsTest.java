@@ -23,17 +23,17 @@ import static org.junit.Assert.assertThrows;
 import androidx.appsearch.app.SearchSpec;
 import androidx.appsearch.ast.query.SemanticSearchNode;
 import androidx.appsearch.flags.Flags;
-import androidx.appsearch.testutil.flags.CheckFlagsRule;
-import androidx.appsearch.testutil.flags.DeviceFlagsValueProvider;
+import androidx.appsearch.testutil.AppSearchTestUtils;
 import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 @RequiresFlagsEnabled(Flags.FLAG_ENABLE_ABSTRACT_SYNTAX_TREES)
 public class SemanticSearchNodeCtsTest {
     @Rule
-    public final CheckFlagsRule mCheckFlagsRule = DeviceFlagsValueProvider.createCheckFlagsRule();
+    public final RuleChain mRuleChain = AppSearchTestUtils.createCommonTestRules();
 
     @Test
     public void testEquals_identical() {

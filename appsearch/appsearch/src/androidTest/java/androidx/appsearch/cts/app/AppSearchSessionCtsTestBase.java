@@ -66,8 +66,7 @@ import androidx.appsearch.cts.app.customer.EmailDocument;
 import androidx.appsearch.exceptions.AppSearchException;
 import androidx.appsearch.flags.Flags;
 import androidx.appsearch.testutil.AppSearchEmail;
-import androidx.appsearch.testutil.flags.CheckFlagsRule;
-import androidx.appsearch.testutil.flags.DeviceFlagsValueProvider;
+import androidx.appsearch.testutil.AppSearchTestUtils;
 import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
 import androidx.appsearch.usagereporting.ClickAction;
 import androidx.appsearch.usagereporting.DismissAction;
@@ -87,6 +86,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -110,7 +110,7 @@ public abstract class AppSearchSessionCtsTestBase {
     private static final int ACTION_TYPE_DISMISS = 4;
 
     @Rule
-    public final CheckFlagsRule mCheckFlagsRule = DeviceFlagsValueProvider.createCheckFlagsRule();
+    public final RuleChain mRuleChain = AppSearchTestUtils.createCommonTestRules();
 
     private final Context mContext = ApplicationProvider.getApplicationContext();
 

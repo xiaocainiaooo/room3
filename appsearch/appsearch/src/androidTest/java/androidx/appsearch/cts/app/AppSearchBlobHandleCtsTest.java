@@ -25,17 +25,17 @@ import static org.junit.Assert.assertThrows;
 
 import androidx.appsearch.app.AppSearchBlobHandle;
 import androidx.appsearch.flags.Flags;
-import androidx.appsearch.testutil.flags.CheckFlagsRule;
-import androidx.appsearch.testutil.flags.DeviceFlagsValueProvider;
+import androidx.appsearch.testutil.AppSearchTestUtils;
 import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
 public class AppSearchBlobHandleCtsTest {
     @Rule
-    public final CheckFlagsRule mCheckFlagsRule = DeviceFlagsValueProvider.createCheckFlagsRule();
+    public final RuleChain mRuleChain = AppSearchTestUtils.createCommonTestRules();
 
     @Test
     public void testCreateBlobHandle() throws Exception {
