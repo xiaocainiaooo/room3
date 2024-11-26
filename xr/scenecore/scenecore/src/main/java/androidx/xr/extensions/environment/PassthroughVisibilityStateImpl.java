@@ -16,7 +16,6 @@
 
 package androidx.xr.extensions.environment;
 
-
 import androidx.annotation.NonNull;
 
 class PassthroughVisibilityStateImpl implements PassthroughVisibilityState {

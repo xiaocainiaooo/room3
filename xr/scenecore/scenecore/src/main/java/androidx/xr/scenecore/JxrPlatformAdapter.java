@@ -49,7 +49,7 @@ import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
-/** Interface for JXRCore Platform operations. This is not intended to be used by Applications. */
+/** Interface for SceneCore Platform operations. This is not intended to be used by Applications. */
 // TODO Add API versioning
 // TODO: b/322549913 - Move subclasses into separate files
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
@@ -59,7 +59,7 @@ public interface JxrPlatformAdapter {
     @NonNull
     SpatialEnvironment getSpatialEnvironment();
 
-    /** A function to create a JXRCore Entity */
+    /** A function to create a SceneCore Entity */
     @NonNull
     LoggingEntity createLoggingEntity(@NonNull Pose pose);
 
@@ -114,7 +114,7 @@ public interface JxrPlatformAdapter {
     ListenableFuture<ExrImageResource> loadExrImageByAssetName(@NonNull String assetName);
 
     /**
-     * A factory function to create a JXRCore GltfEntity. The parent may be the activity space or
+     * A factory function to create a SceneCore GltfEntity. The parent may be the activity space or
      * GltfEntity in the scene.
      */
     @NonNull
@@ -407,10 +407,10 @@ public interface JxrPlatformAdapter {
      */
     void setPreferredAspectRatio(@NonNull Activity activity, float preferredRatio);
 
-    /** Starts the JXRC renderer. */
+    /** Starts the SceneCore renderer. */
     void startRenderer();
 
-    /** Stops the JXRC renderer. */
+    /** Stops the SceneCore renderer. */
     void stopRenderer();
 
     /** Disposes of the resources used by the platform adapter. */
@@ -620,7 +620,7 @@ public interface JxrPlatformAdapter {
         }
     }
 
-    /** Interface for a JXRCore resource. A resource represents a loadable resource. */
+    /** Interface for a SceneCore resource. A resource represents a loadable resource. */
     interface Resource {}
 
     /**
@@ -653,7 +653,7 @@ public interface JxrPlatformAdapter {
         void onResizeEvent(@NonNull final ResizeEvent event);
     }
 
-    /** Interface for a JXRCore ActivityPose */
+    /** Interface for a SceneCore ActivityPose */
     interface ActivityPose {
         /** Returns the pose for this entity, relative to the activity space root. */
         @NonNull
@@ -693,11 +693,11 @@ public interface JxrPlatformAdapter {
         Pose transformPoseTo(@NonNull Pose pose, @NonNull ActivityPose destination);
     }
 
-    /** Interface for a JXRCore head ActivityPose. This is the position of the user's head. */
+    /** Interface for a SceneCore head ActivityPose. This is the position of the user's head. */
     interface HeadActivityPose extends ActivityPose {}
 
     /**
-     * Interface for a JXRCore camera view ActivityPose. This is the position of a user's camera.
+     * Interface for a SceneCore camera view ActivityPose. This is the position of a user's camera.
      *
      * <p>The camera's field of view can be retrieved from this CameraViewActivityPose.
      */
@@ -746,11 +746,11 @@ public interface JxrPlatformAdapter {
 
     /**
      * Interface for the perception space ActivityPose. This is the origin of the space used by
-     * JXRPerception.
+     * ARCore for XR.
      */
     interface PerceptionSpaceActivityPose extends ActivityPose {}
 
-    /** Interface for a JXRCore Entity */
+    /** Interface for a SceneCore Entity */
     interface Entity extends ActivityPose {
 
         /** Returns the pose for this entity, relative to its parent. */
@@ -886,7 +886,7 @@ public interface JxrPlatformAdapter {
     /**
      * Interface for updating the background image/geometry and passthrough settings.
      *
-     * <p>The application can set either / both a skybox and a GLTF for geometry, then toggle their
+     * <p>The application can set either / both a skybox and a glTF for geometry, then toggle their
      * visibility by enabling or disabling passthrough. The skybox and geometry will be remembered
      * across passthrough mode changes.
      */
@@ -895,7 +895,7 @@ public interface JxrPlatformAdapter {
         /** A class that represents the user's preferred spatial environment. */
         class SpatialEnvironmentPreference {
             /**
-             * The preferred geometry for the environment based on a pre-loaded GLTF model. If null,
+             * The preferred geometry for the environment based on a pre-loaded glTF model. If null,
              * there will be no geometry
              */
             @Nullable public final GltfModelResource geometry;
@@ -1095,16 +1095,16 @@ public interface JxrPlatformAdapter {
         }
     }
 
-    /** Interface for a JXRCore Entity that only logs the pose. */
+    /** Interface for a SceneCore Entity that only logs the pose. */
     interface LoggingEntity extends Entity {}
 
-    /** Interface for a system-controlled JXRCore Entity that defines its own coordinate space. */
+    /** Interface for a system-controlled SceneCore Entity that defines its own coordinate space. */
     interface SystemSpaceEntity extends Entity {
         /**
          * Registers a listener to be called when the underlying space has moved or changed.
          *
          * @param listener The listener to register if non-null, else stops listening if null.
-         * @param executor The executor to run the listener on. Defaults to JXRCore executor if
+         * @param executor The executor to run the listener on. Defaults to SceneCore executor if
          *     null.
          */
         void setOnSpaceUpdatedListener(
@@ -1119,7 +1119,7 @@ public interface JxrPlatformAdapter {
     }
 
     /**
-     * Interface for a JXRCore activity space. There is one activity space and it is the ancestor
+     * Interface for a SceneCore activity space. There is one activity space and it is the ancestor
      * for all elements in the scene. The activity space does not have a parent.
      */
     interface ActivitySpace extends SystemSpaceEntity {
@@ -1158,12 +1158,12 @@ public interface JxrPlatformAdapter {
         }
     }
 
-    /** Interface for a JXRCore Gltf entity. */
+    /** Interface for a SceneCore [GltfEntity]. */
     interface GltfEntity extends Entity {
         // TODO: b/362368652 - Add an OnAnimationFinished() Listener interface
         //                     Add a getAnimationTimeRemaining() interface
 
-        /** Specifies the current animation state of the glTF entity. */
+        /** Specifies the current animation state of the [GltfEntity]. */
         @Retention(RetentionPolicy.SOURCE)
         @IntDef({AnimationState.PLAYING, AnimationState.STOPPED})
         public @interface AnimationState {
@@ -1175,7 +1175,7 @@ public interface JxrPlatformAdapter {
          * Starts the animation with the given name.
          *
          * @param animationName The name of the animation to start. If null is supplied, will play
-         *     the first animation found in the GLTF.
+         *     the first animation found in the glTF.
          * @param loop Whether the animation should loop.
          */
         void startAnimation(boolean loop, @Nullable String animationName);
@@ -1188,7 +1188,7 @@ public interface JxrPlatformAdapter {
         int getAnimationState();
     }
 
-    /** Interface for a JXRCore Panel entity */
+    /** Interface for a SceneCore Panel entity */
     interface PanelEntity extends Entity {
         /**
          * Returns the dimensions of the view underlying this PanelEntity.
@@ -1237,7 +1237,7 @@ public interface JxrPlatformAdapter {
         Dimensions getSize();
     }
 
-    /** Interface for a JXRCore ActivityPanel entity. */
+    /** Interface for a SceneCore ActivityPanel entity. */
     interface ActivityPanelEntity extends PanelEntity {
         /**
          * Launches the given activity into the panel.
@@ -1339,7 +1339,7 @@ public interface JxrPlatformAdapter {
         PersistState getPersistState();
 
         /** Returns the native pointer of the anchor. */
-        // TODO(b/373711152) : Remove this method once the JXR Runtime API migration is done.
+        // TODO(b/373711152) : Remove this method once the Jetpack XR Runtime API migration is done.
         long nativePointer();
 
         /** Registers a listener to be called when the persist state of the anchor changes. */
@@ -1438,7 +1438,7 @@ public interface JxrPlatformAdapter {
         }
     }
 
-    /** MoveEvent for JXRCore Platform. */
+    /** MoveEvent for SceneCore Platform. */
     class MoveEvent {
         // TODO: b/350370142 - Use public getter/setter interfaces instead of public fields.
         public static final int MOVE_STATE_START = 1;
@@ -1511,7 +1511,7 @@ public interface JxrPlatformAdapter {
         public @interface MoveState {}
     }
 
-    /** ResizeEvent for JXRCore Platform. */
+    /** ResizeEvent for SceneCore Platform. */
     class ResizeEvent {
         public static final int RESIZE_STATE_UNKNOWN = 0;
         public static final int RESIZE_STATE_START = 1;
@@ -1544,7 +1544,7 @@ public interface JxrPlatformAdapter {
         public @interface ResizeState {}
     }
 
-    /** InputEvent for JXRCore Platform. */
+    /** InputEvent for SceneCore Platform. */
     class InputEvent {
         /**
          * There's a possibility of ABI mismatch here when the concrete platformAdapter starts
@@ -1808,7 +1808,7 @@ public interface JxrPlatformAdapter {
         public @interface Action {}
     }
 
-    /** Spatial Capabilities for JXRCore Platform. */
+    /** Spatial Capabilities for SceneCore Platform. */
     class SpatialCapabilities {
 
         /** The activity can spatialize itself by e.g. adding a spatial panel. */
@@ -1829,7 +1829,7 @@ public interface JxrPlatformAdapter {
         /** The activity can spatially embed another activity. */
         public static final int SPATIAL_CAPABILITY_EMBED_ACTIVITY = 1 << 5;
 
-        /** Spatial Capabilities for JXRCore Platform. */
+        /** Spatial Capabilities for SceneCore Platform. */
         @Retention(RetentionPolicy.SOURCE)
         @IntDef(
                 flag = true,
@@ -1854,7 +1854,7 @@ public interface JxrPlatformAdapter {
         }
     }
 
-    /** Interface for a JXRCore SoundPoolExtensionsWrapper. */
+    /** Interface for a SceneCore SoundPoolExtensionsWrapper. */
     interface SoundPoolExtensionsWrapper {
 
         int play(
@@ -1879,7 +1879,7 @@ public interface JxrPlatformAdapter {
         int getSpatialSourceType(@NonNull SoundPool soundPool, int streamId);
     }
 
-    /** Interface for a JXRCore AudioTrackExtensionsWrapper */
+    /** Interface for a SceneCore AudioTrackExtensionsWrapper */
     interface AudioTrackExtensionsWrapper {
 
         @Nullable
@@ -1899,7 +1899,7 @@ public interface JxrPlatformAdapter {
                 @NonNull AudioTrack.Builder builder, @NonNull SoundFieldAttributes attributes);
     }
 
-    /** Interface for a JXRCore MediaPlayerExtensionsWrapper */
+    /** Interface for a SceneCore MediaPlayerExtensionsWrapper */
     interface MediaPlayerExtensionsWrapper {
 
         void setPointSourceAttributes(
@@ -1909,7 +1909,7 @@ public interface JxrPlatformAdapter {
                 @NonNull MediaPlayer mediaPlayer, @NonNull SoundFieldAttributes attributes);
     }
 
-    /** Represents a JXRCore PointSourceAttributes */
+    /** Represents a SceneCore PointSourceAttributes */
     class PointSourceAttributes {
         private final Entity entity;
 
@@ -1917,14 +1917,14 @@ public interface JxrPlatformAdapter {
             this.entity = entity;
         }
 
-        /** Gets the JXRCore {@link Entity} for this instance. */
+        /** Gets the SceneCore {@link Entity} for this instance. */
         @NonNull
         public Entity getEntity() {
             return this.entity;
         }
     }
 
-    /** Represents a JXRCore SoundFieldAttributes */
+    /** Represents a SceneCore SoundFieldAttributes */
     class SoundFieldAttributes {
 
         @SpatializerConstants.AmbisonicsOrder private final int ambisonicsOrder;
@@ -1938,7 +1938,7 @@ public interface JxrPlatformAdapter {
         }
     }
 
-    /** Contains the constants used to spatialize audio in JXRCore. */
+    /** Contains the constants used to spatialize audio in SceneCore. */
     final class SpatializerConstants {
 
         private SpatializerConstants() {}

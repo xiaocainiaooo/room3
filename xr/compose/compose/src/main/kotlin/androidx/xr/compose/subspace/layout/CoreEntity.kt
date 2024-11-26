@@ -42,8 +42,8 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
 /**
- * Wrapper class for Entities from JXR Core to provide convenience methods for working with Entities
- * from JXR Core.
+ * Wrapper class for Entities from SceneCore to provide convenience methods for working with
+ * Entities from SceneCore.
  */
 internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoordinates {
 
@@ -57,7 +57,7 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
         }
 
     internal fun applyLayoutChanges() {
-        // JXR Compose uses pixels, JXR Core uses meters.
+        // Compose XR uses pixels, SceneCore uses meters.
         val corePose =
             (layout?.poseInParentEntity ?: Pose.Identity).convertPixelsToMeters(DEFAULT_DENSITY)
         if (entity.getPose() != corePose) {
@@ -123,7 +123,8 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
         set(value) {
             field = value
 
-            // Leave JXR Core's parent as-is if we're trying to clear it out. JXR Core parents all
+            // Leave SceneCore's parent as-is if we're trying to clear it out. SceneCore
+            // parents all
             // newly-created non-Anchor entities under a world space point of reference for the
             // activity
             // space, but we don't have access to it. To maintain this parent-is-not-null property,
@@ -192,7 +193,7 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
          */
         public var isEnabled: Boolean = true
 
-        /** Pose based on user adjustments from MoveEvents from JXR Core. */
+        /** Pose based on user adjustments from MoveEvents from SceneCore. */
         public var userPose: Pose? = null
             set(value) {
                 field = value
@@ -218,7 +219,7 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
             }
         }
 
-        /** All JXR Compose params for the Movable modifier for this CoreEntity. */
+        /** All Compose XR params for the Movable modifier for this CoreEntity. */
         private var movableNode: MovableNode? = null
 
         /** Whether the movableComponent is attached to the entity. */
@@ -306,7 +307,7 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
 
         /**
          * Disables the MovableComponent for this CoreEntity. Takes care of life cycle tasks for the
-         * underlying component in JXR Core.
+         * underlying component in SceneCore.
          */
         private fun disableComponent() {
             if (isAttached) {
@@ -318,14 +319,14 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
             }
         }
 
-        /** Called every time there is a MoveEvent in JXR Core, if this CoreEntity is movable. */
+        /** Called every time there is a MoveEvent in SceneCore, if this CoreEntity is movable. */
         private fun updatePoseOnMove(pose: Pose) {
             if (movableNode?.enabled == false) {
                 return
             }
             val node = movableNode ?: return
 
-            // JXR Core uses meters, JXR Compose uses pixels.
+            // SceneCore uses meters, Compose XR uses pixels.
             val corePose = pose.convertMetersToPixels(DEFAULT_DENSITY)
 
             // Find the delta from when the move event started.
@@ -368,7 +369,7 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
          */
         public var isEnabled: Boolean = true
 
-        /** Size based on user adjustments from ResizeEvents from JXR Core. */
+        /** Size based on user adjustments from ResizeEvents from SceneCore. */
         public var userSize: IntVolumeSize? = null
             private set(value) {
                 field = value
@@ -395,7 +396,7 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
             }
         }
 
-        /** All JXR Compose params for the Resizable modifier for this CoreEntity. */
+        /** All Compose XR params for the Resizable modifier for this CoreEntity. */
         private var resizableNode: ResizableNode? = null
 
         /** Whether the resizableComponent is attached to the entity. */
@@ -487,7 +488,7 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
 
         /**
          * Disables the ResizableComponent for this CoreEntity. Takes care of life cycle tasks for
-         * the underlying component in JXR Core.
+         * the underlying component in SceneCore.
          */
         private fun disableComponent() {
             if (isAttached) {
@@ -497,7 +498,7 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
         }
 
         /**
-         * Called every time there is an onResizeEnd event in JXR Core, if this CoreEntity is
+         * Called every time there is an onResizeEnd event in SceneCore, if this CoreEntity is
          * resizable.
          */
         private fun resizeListener(newSize: Dimensions) {
@@ -521,7 +522,7 @@ internal interface CoreEntityNode {
     public fun modifyCoreEntity(coreEntity: CoreEntity)
 }
 
-/** Wrapper class for contentless entities from JXR Core. */
+/** Wrapper class for contentless entities from SceneCore. */
 internal class CoreContentlessEntity(entity: Entity) : CoreEntity(entity) {
     init {
         require(entity is ContentlessEntity) {
@@ -532,7 +533,7 @@ internal class CoreContentlessEntity(entity: Entity) : CoreEntity(entity) {
 
 /**
  * Wrapper class for [BasePanelEntity] to provide convenience methods for working with panel
- * entities from JXR Core.
+ * entities from SceneCore.
  */
 internal class CorePanelEntity(session: Session, private val panelEntity: BasePanelEntity<*>) :
     CoreEntity(panelEntity) {

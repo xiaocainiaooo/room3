@@ -26,7 +26,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 /**
- * Utility class for handling Android permissions. JxrCore applications should use this before
+ * Utility class for handling Android permissions. SceneCore applications should use this before
  * creating Anchors.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)

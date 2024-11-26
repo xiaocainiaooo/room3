@@ -202,7 +202,7 @@ private fun IntSize.toMeterSize(density: Density) =
 
 private fun MeterSize.toCoreMeterDimensions() = Dimensions(width.toM(), height.toM(), depth.toM())
 
-// TODO(b/355735174) Update to PixelDimensions when JXR Core provides a proper API surface.
+// TODO(b/355735174) Update to PixelDimensions when SceneCore provides a proper API surface.
 private fun MeterSize.toCorePixelDimensions(density: Density) =
     Dimensions(width.toPx(density), height.toPx(density), depth.toPx(density))
 

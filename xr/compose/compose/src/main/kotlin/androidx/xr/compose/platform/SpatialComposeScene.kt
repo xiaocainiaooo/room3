@@ -27,15 +27,15 @@ import androidx.xr.compose.subspace.layout.CoreEntity
 import androidx.xr.scenecore.Session
 
 /**
- * A 3D scene represented via compose elements and coordinated with the JXR Core.
+ * A 3D scene represented via Compose elements and coordinated with SceneCore.
  *
  * This class manages the lifecycle and root element of the spatial scene. It also provides access
- * to the JXR Core session and environment.
+ * to the SceneCore session and environment.
  *
  * @param parentCompositionContext the optional composition context when this is a sub-composition
  * @param rootEntity the optional [CoreEntity] to associate with the root of this composition
  * @property ownerActivity the [ComponentActivity] that owns this scene.
- * @property jxrSession the [Session] used to interact with the JXR Core.
+ * @property jxrSession the [Session] used to interact with SceneCore.
  */
 internal class SpatialComposeScene(
     /** Context of the activity that this scene is rooted on. */

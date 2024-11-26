@@ -346,7 +346,7 @@ private constructor(
      * Registers a listener to be called when the underlying space has moved or changed.
      *
      * @param listener The listener to register if non-null, else stops listening if null.
-     * @param executor The executor to run the listener on. Defaults to JXRCore executor if null.
+     * @param executor The executor to run the listener on. Defaults to SceneCore executor if null.
      */
     @JvmOverloads
     @Suppress("ExecutorRegistration")
@@ -480,7 +480,7 @@ public sealed class BaseEntity<out RtEntityType : RtEntity>(
 
 /**
  * An Entity that itself has no content. ContentlessEntity is useful for organizing the placement,
- * movement of a group of JXR Entities.
+ * movement of a group of SceneCore Entities.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class ContentlessEntity
@@ -564,14 +564,14 @@ public sealed class BasePanelEntity<out RtPanelEntityType : RtPanelEntity>(
     }
 }
 
-/** GltfModelEntity is a concrete implementation of Entity that hosts a GLTF model. */
+/** GltfModelEntity is a concrete implementation of Entity that hosts a glTF model. */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class GltfModelEntity
 private constructor(rtEntity: JxrPlatformAdapter.GltfEntity, entityManager: EntityManager) :
     BaseEntity<JxrPlatformAdapter.GltfEntity>(rtEntity, entityManager) {
     // TODO: b/362368652 - Add an OnAnimationEvent() Listener interface
 
-    /** Specifies the current animation state of the glTF entity. */
+    /** Specifies the current animation state of the GltfModelEntity. */
     @IntDef(AnimationState.PLAYING, AnimationState.STOPPED)
     @Retention(AnnotationRetention.SOURCE)
     public annotation class AnimationState {
@@ -585,9 +585,9 @@ private constructor(rtEntity: JxrPlatformAdapter.GltfEntity, entityManager: Enti
         /**
          * Factory method for GltfModelEntity.
          *
-         * @param adapter JXR platform adapter.
-         * @param model GLTF model for this entity.
-         * @param pose Pose for this Gltf model entity, relative to its parent.
+         * @param adapter Jetpack XR platform adapter.
+         * @param model [GltfModel] which this entity will display.
+         * @param pose Pose for this [GltfModelEntity], relative to its parent.
          */
         internal fun create(
             adapter: JxrPlatformAdapter,
@@ -618,7 +618,7 @@ private constructor(rtEntity: JxrPlatformAdapter.GltfEntity, entityManager: Enti
      * https://developer.android.com/guide/components/processes-and-threads
      *
      * @param animationName The name of the animation to start. If null, the first animation found
-     *   in the GLTF will be played.
+     *   in the glTF will be played.
      * @param loop Whether the animation should loop.
      */
     @MainThread
@@ -681,7 +681,7 @@ private constructor(
          * Factory method for StereoSurfaceEntity.
          *
          * @param adapter JxrPlatformAdapter to use.
-         * @param entityManager A JXRCore EntityManager
+         * @param entityManager A SceneCore EntityManager
          * @param stereoMode An [Int] which defines how surface subregions map to eyes
          * @param dimensions A [Dimensions] which specifies the size of the canvas relative to
          *   parent
@@ -960,12 +960,12 @@ private constructor(rtEntity: JxrPlatformAdapter.AnchorEntity, entityManager: En
     }
 
     /**
-     * Loads the ARCore for Android XR Anchor using a Jetpack XR Runtime session.
+     * Loads the ARCore for XR Anchor using a Jetpack XR Runtime session.
      *
-     * @param session the JXR Runtime session to load the Anchor from.
-     * @return the ARCore for Android XR Anchor corresponding to the native pointer.
+     * @param session the Jetpack XR Runtime session to load the Anchor from.
+     * @return the ARCore for XR Anchor corresponding to the native pointer.
      */
-    // TODO(b/373711152) : Remove this method once the JXR Perception API migration is done.
+    // TODO(b/373711152) : Remove this method once the ARCore for XR API migration is done.
     public fun getAnchor(session: PerceptionSession): Anchor {
         return Anchor.loadFromNativePointer(session, rtEntity.nativePointer())
     }
@@ -1106,7 +1106,7 @@ private constructor(rtEntity: JxrPlatformAdapter.AnchorEntity, entityManager: En
      * is triggered.
      *
      * @param listener The listener to register if non-null, else stops listening if null.
-     * @param executor The executor to run the listener on. Defaults to JXRCore executor if null.
+     * @param executor The executor to run the listener on. Defaults to SceneCore executor if null.
      */
     @JvmOverloads
     @Suppress("ExecutorRegistration")

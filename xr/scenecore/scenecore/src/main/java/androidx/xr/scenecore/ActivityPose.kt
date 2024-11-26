@@ -139,7 +139,7 @@ public class Head private constructor(rtActivityPose: JxrPlatformAdapter.HeadAct
 }
 
 /**
- * PerceptionSpace is ActivityPose used to track the origin of the space used by JXRPerception APIs.
+ * PerceptionSpace is ActivityPose used to track the origin of the space used by ARCore for XR APIs.
  */
 // TODO: b/360870690 - Remove suppression annotation when API council review is complete.
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)

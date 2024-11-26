@@ -32,7 +32,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 /**
  * An anchor describes a fixed location and orientation in the real world. To stay at a fixed
  * location in physical space, the numerical description of this position may update as ARCore for
- * Jetpack XR updates its understanding of the physical world.
+ * XR updates its understanding of the physical world.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class Anchor
@@ -76,7 +76,7 @@ internal constructor(
         }
 
         /** Loads an [Anchor] of the given native pointer. */
-        // TODO(b/373711152) : Remove this method once the JXR Runtime API migration is done.
+        // TODO(b/373711152) : Remove this method once the Jetpack XR Runtime API migration is done.
         public fun loadFromNativePointer(session: Session, nativePointer: Long): Anchor {
             val perceptionStateExtender = getPerceptionStateExtender(session)
             val runtimeAnchor =

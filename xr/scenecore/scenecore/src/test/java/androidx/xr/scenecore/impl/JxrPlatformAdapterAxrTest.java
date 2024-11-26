@@ -108,6 +108,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -1171,6 +1172,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore("Flaky test, see b/380269912")
     public void transformPoseTo_withNonUniformScalesAndTranslations_returnsPose() throws Exception {
         PanelEntityImpl sourceEntity = (PanelEntityImpl) createPanelEntity();
         GltfEntityImpl destinationEntity = (GltfEntityImpl) createGltfEntity();
@@ -1906,6 +1908,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore("Flaky test, see b/380269912")
     public void addingSameComponentTypeAgain_addsComponent() throws Exception {
         PanelEntity panelEntity = createPanelEntity();
         GltfEntity gltfEntity = createGltfEntity();

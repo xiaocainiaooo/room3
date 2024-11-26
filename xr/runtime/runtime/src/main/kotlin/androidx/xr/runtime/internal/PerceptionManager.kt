@@ -42,7 +42,7 @@ public interface PerceptionManager {
     public fun loadAnchor(uuid: UUID): Anchor
 
     /** Loads an [Anchor] from a native pointer. */
-    // TODO(b/373711152) : Remove this method once the JXR Runtime API migration is done.
+    // TODO(b/373711152) : Remove this method once the Jetpack XR Runtime API migration is done.
     public fun loadAnchorFromNativePointer(nativePointer: Long): Anchor
 
     /** Deletes a persisted [Anchor] from local storage. */

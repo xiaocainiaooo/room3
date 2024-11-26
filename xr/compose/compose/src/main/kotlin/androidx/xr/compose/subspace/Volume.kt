@@ -28,7 +28,7 @@ import androidx.xr.scenecore.Entity
  * A composable that represents a 3D volume of space within which an application can fill content.
  *
  * This composable provides a [Entity] through the [onVolumeEntity] lambda, allowing the caller to
- * attach child JXR Entities to it.
+ * attach child Jetpack XR Entities to it.
  *
  * @param modifier SubspaceModifiers to apply to the Volume.
  * @param name A name associated with this Volume entity, useful for debugging.

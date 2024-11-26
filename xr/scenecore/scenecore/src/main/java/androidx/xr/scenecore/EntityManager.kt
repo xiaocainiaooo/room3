@@ -21,7 +21,7 @@ package androidx.xr.scenecore
 import androidx.xr.scenecore.JxrPlatformAdapter.Entity as RuntimeEntity
 import java.util.concurrent.ConcurrentHashMap
 
-/** Manages the mapping between [RuntimeEntity] and [Entity] for a given JXRCore [Session]. */
+/** Manages the mapping between [RuntimeEntity] and [Entity] for a given SceneCore [Session]. */
 internal class EntityManager {
     private val rtEntityEntityMap = ConcurrentHashMap<RuntimeEntity, Entity>()
 

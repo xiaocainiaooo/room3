@@ -31,7 +31,7 @@ public class SpatialMediaPlayer {
          * MediaPlayer#create(). Only the attributes from the most recent call to
          * setPointSourceAttributes or [setSoundFieldAttributes] will apply.
          *
-         * @param session The current JXRCore [Session] instance.
+         * @param session The current SceneCore [Session] instance.
          * @param mediaPlayer The [MediaPlayer] instance on which to set the attributes
          * @param attributes The source attributes to be set.
          */
@@ -54,7 +54,7 @@ public class SpatialMediaPlayer {
          * MediaPlayer#create(). Only the attributes from the most recent call to
          * setSoundFieldAttributes or [setPointSourceAttributes] will apply.
          *
-         * @param session The current JXRCore [Session] instance.
+         * @param session The current SceneCore [Session] instance.
          * @param mediaPlayer The [MediaPlayer] instance on which to set the attributes
          * @param attributes The source attributes to be set.
          */

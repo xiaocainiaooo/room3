@@ -31,14 +31,14 @@ import java.util.function.Consumer
 
 /**
  * The SpatialEnvironment is used to manage the XR background and passthrough. There is a single
- * instance of this class managed by each JXRCoreSession (which is bound to an [Activity].)
+ * instance of this class managed by each SceneCore Session (which is bound to an [Activity].)
  *
- * The SpatialEnvironment is a composite of a stand-alone skybox, and GLTF-specified geometry. A
- * single skybox and a single GLTF can be set at the same time. Applications are encouraged to
- * supply GLTFs for ground and horizon visibility.
+ * The SpatialEnvironment is a composite of a stand-alone skybox, and glTF-specified geometry. A
+ * single skybox and a single glTF can be set at the same time. Applications are encouraged to
+ * supply glTFs for ground and horizon visibility.
  *
  * The XR background can be set to display one of three configurations:
- * 1) A combination of a skybox and GLTF geometry.
+ * 1) A combination of a skybox and glTF geometry.
  * 2) A Passthrough surface, where the XR background is a live feed from the device's outward facing
  *    cameras. At full opacity, this surface completely occludes the skybox and geometry.
  * 3) A mixed configuration where the passthrough surface is not at full opacity nor is it at zero
@@ -83,7 +83,7 @@ public class SpatialEnvironment(runtime: JxrPlatformAdapter) {
      *
      * @param skybox The preferred skybox for the environment based on a pre-loaded EXR Image. If
      *   null, it will be all black.
-     * @param geometry The preferred geometry for the environment based on a pre-loaded GLTF model.
+     * @param geometry The preferred geometry for the environment based on a pre-loaded [GltfModel].
      *   If null, there will be no geometry.
      */
     public class SpatialEnvironmentPreference(
@@ -267,7 +267,7 @@ public class SpatialEnvironment(runtime: JxrPlatformAdapter) {
 
     // TODO: b/370015943 - Remove this once all clients migrate to the SpatialEnvironment APIs.
     /**
-     * Sets the preferred environmental geometry based on a pre-loaded GLTF model.
+     * Sets the preferred environmental geometry based on a pre-loaded [GltfModel].
      *
      * Note that this method does not necessarily cause an immediate change, it only sets a
      * preference. Once the device enters a state where the XR background can be changed, the
