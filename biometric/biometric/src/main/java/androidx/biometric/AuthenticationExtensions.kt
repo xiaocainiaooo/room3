@@ -39,6 +39,7 @@ import java.util.concurrent.Executor
  * @param resultCallback the callback to be called on the main thread when authentication result is
  *   available
  * @return the launcher that can be used to start the authentication.
+ * @sample androidx.biometric.samples.activitySample
  */
 @SuppressWarnings("ExecutorRegistration")
 @JvmOverloads
@@ -62,6 +63,7 @@ public fun FragmentActivity.registerForAuthenticationResult(
  * @param resultCallback the callback to be called on the main thread when authentication result is
  *   available
  * @return the launcher that can be used to start the authentication.
+ * @sample androidx.biometric.samples.fragmentSample
  */
 @SuppressWarnings("ExecutorRegistration")
 @JvmOverloads
