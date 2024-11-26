@@ -95,8 +95,8 @@ public final class SearchResult extends AbstractSafeParcelable {
      * <p>All schema names in this map are un-prefixed, for both keys and values.
      */
     @NonNull
-    @Field(id = 8, getter = "getParentTypeMap")
-    private final Bundle mParentTypeMap;
+    @Field(id = 8)
+    final Bundle mParentTypeMap;
 
 
     /** Cache of the {@link GenericDocument}. Comes from mDocument at first use. */
@@ -454,14 +454,18 @@ public final class SearchResult extends AbstractSafeParcelable {
          * <p>The map should include entries for the {@link GenericDocument}'s own type and all
          * of the nested documents' types.
          *
-         * <p>Child types must appear before parent types in each list. Otherwise, the
          *  <!--@exportToFramework:ifJetpack()-->
-         *  {@link GenericDocument#toDocumentClass(java.lang.Class, DocumentClassMappingContext)}
-         *  <!--@exportToFramework:else()
-         *  GenericDocument's toDocumentClass
-         *  -->
+         * <p>Child types must appear before parent types in each list. Otherwise, the
+         * {@link GenericDocument#toDocumentClass(java.lang.Class, DocumentClassMappingContext)}
          * method may not correctly identify the most concrete type. This could lead to unintended
          * deserialization into a more general type instead of a more specific type.
+         *  <!--@exportToFramework:else()
+         * <p>Child types must appear before parent types in each list. Otherwise, the
+         * GenericDocument's toDocumentClass method (an AndroidX-only API) may not correctly
+         * identify the most concrete type. This could lead to unintended deserialization into a
+         * more general type instead of a
+         * more specific type.
+         *  -->
          *
          * <p>Parent types should include transitive parents.
          */

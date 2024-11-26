@@ -483,8 +483,7 @@ public final class PropertyConfigParcel extends AbstractSafeParcelable {
             }
             JoinableConfigParcel otherObject = (JoinableConfigParcel) other;
             return ObjectsCompat.equals(mJoinableValueType, otherObject.mJoinableValueType)
-                    && ObjectsCompat.equals(
-                            mDeletePropagationType, otherObject.mDeletePropagationType);
+                    && mDeletePropagationType == otherObject.mDeletePropagationType;
         }
 
         @Override
