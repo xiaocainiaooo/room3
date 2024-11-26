@@ -35,9 +35,10 @@ internal interface Camera2DeviceCloser {
     fun closeCamera(
         cameraDeviceWrapper: CameraDeviceWrapper? = null,
         cameraDevice: CameraDevice? = null,
-        closeUnderError: Boolean = false,
         androidCameraState: AndroidCameraState,
-        audioRestrictionController: AudioRestrictionController
+        audioRestrictionController: AudioRestrictionController,
+        shouldReopenCamera: Boolean = false,
+        shouldCreateEmptyCaptureSession: Boolean = false,
     )
 }
 
@@ -47,13 +48,16 @@ internal class Camera2DeviceCloserImpl
 constructor(
     val threads: Threads,
     private val camera2Quirks: Camera2Quirks,
+    private val retryingCameraStateOpener: RetryingCameraStateOpener,
 ) : Camera2DeviceCloser {
+
     override fun closeCamera(
         cameraDeviceWrapper: CameraDeviceWrapper?,
         cameraDevice: CameraDevice?,
-        closeUnderError: Boolean,
         androidCameraState: AndroidCameraState,
-        audioRestrictionController: AudioRestrictionController
+        audioRestrictionController: AudioRestrictionController,
+        shouldReopenCamera: Boolean,
+        shouldCreateEmptyCaptureSession: Boolean,
     ) {
         val unwrappedCameraDevice = cameraDeviceWrapper?.unwrapAs(CameraDevice::class)
         if (unwrappedCameraDevice != null) {
@@ -65,20 +69,31 @@ constructor(
                 }
             }
 
-            if (
-                camera2Quirks.shouldCreateCaptureSessionBeforeClosing(cameraId) && !closeUnderError
-            ) {
-                Debug.trace("Camera2DeviceCloserImpl#createCaptureSession") {
-                    Log.debug {
-                        "Creating an empty capture session before closing camera $cameraId"
-                    }
-                    createCaptureSession(cameraDeviceWrapper)
-                    Log.debug { "Empty capture session quirk completed" }
-                }
+            val currentCameras =
+                handleQuirksBeforeClosing(
+                    cameraDeviceWrapper,
+                    unwrappedCameraDevice,
+                    androidCameraState,
+                    shouldReopenCamera,
+                    shouldCreateEmptyCaptureSession,
+                )
+            if (currentCameras == null) {
+                Log.error { "Failed to handle quirks before closing the camera device!" }
+                androidCameraState.onFinalized(unwrappedCameraDevice)
+                return
             }
 
-            closeCameraDevice(unwrappedCameraDevice, androidCameraState)
-            cameraDeviceWrapper.onDeviceClosed()
+            val (currentCameraDeviceWrapper, currentAndroidCameraState) = currentCameras
+            val currentCameraDevice =
+                checkNotNull(currentCameraDeviceWrapper.unwrapAs(CameraDevice::class))
+
+            closeCameraDevice(currentCameraDevice, currentAndroidCameraState)
+            currentCameraDeviceWrapper.onDeviceClosed()
+
+            // If the camera was reopened, make sure to finalize the camera state to finish closing.
+            if (shouldReopenCamera) {
+                androidCameraState.onFinalized(unwrappedCameraDevice)
+            }
 
             /**
              * Only remove the audio restriction when CameraDeviceWrapper is present. When
@@ -94,6 +109,58 @@ constructor(
             return
         }
         cameraDevice?.let { closeCameraDevice(it, androidCameraState) }
+    }
+
+    /**
+     * Handle quirks before closing the camera device.
+     *
+     * [shouldReopenCamera] and [shouldCreateEmptyCaptureSession] determines what actions to do:
+     * - ([shouldReopenCamera],[shouldCreateEmptyCaptureSession]) = (false, false) - No quirk
+     *   handling necessary. Returns the existing camera device and state.
+     * - ([shouldReopenCamera],[shouldCreateEmptyCaptureSession]) = (false, true) - Creates an empty
+     *   capture session. Returns the existing camera device and state.
+     * - ([shouldReopenCamera],[shouldCreateEmptyCaptureSession]) = (true, true) - Closes and
+     *   reopens the camera device before creating an empty capture session. Returns the new camera
+     *   device and state.
+     *
+     * For more details, please refer to
+     * [Camera2Quirks.shouldCloseCameraBeforeCreatingCaptureSession] and
+     * [Camera2Quirks.shouldCreateEmptyCaptureSessionBeforeClosing].
+     */
+    private fun handleQuirksBeforeClosing(
+        cameraDeviceWrapper: CameraDeviceWrapper,
+        cameraDevice: CameraDevice,
+        androidCameraState: AndroidCameraState,
+        shouldReopenCamera: Boolean,
+        shouldCreateEmptyCaptureSession: Boolean,
+    ): Pair<CameraDeviceWrapper, AndroidCameraState>? {
+        Log.debug { "$this#handleQuirksBeforeClosing($cameraDevice)" }
+        val cameraId = cameraDeviceWrapper.cameraId
+        val cameras =
+            if (shouldReopenCamera) {
+                Debug.trace("Camera2DeviceCloserImpl#reopenCameraDevice") {
+                    Log.debug { "Reopening camera device" }
+                    closeCameraDevice(cameraDevice, androidCameraState)
+                    cameraDeviceWrapper.onDeviceClosed()
+                    retryingCameraStateOpener.openAndAwaitCameraWithRetry(cameraId, this)
+                }
+            } else {
+                AwaitOpenCameraResult(cameraDeviceWrapper, androidCameraState)
+            }
+        if (cameras.cameraDeviceWrapper == null || cameras.androidCameraState == null) {
+            Log.error { "Failed to retain an opened camera device!" }
+            return null
+        }
+
+        if (shouldCreateEmptyCaptureSession) {
+            Debug.trace("Camera2DeviceCloserImpl#createCaptureSession") {
+                Log.debug { "Creating an empty capture session before closing $cameraId" }
+                createCaptureSession(cameras.cameraDeviceWrapper)
+                Log.debug { "Created an empty capture session." }
+            }
+        }
+
+        return Pair(cameras.cameraDeviceWrapper, cameras.androidCameraState)
     }
 
     private fun closeCameraDevice(
@@ -116,7 +183,7 @@ constructor(
             if (androidCameraState.awaitCameraDeviceClosed(timeoutMillis = 5000)) {
                 Log.debug { "Received OnClosed for $cameraId" }
             } else {
-                Log.warn { "Failed to close $cameraId after 500ms" }
+                Log.warn { "Failed to close $cameraId after 5000ms!" }
             }
         }
     }
