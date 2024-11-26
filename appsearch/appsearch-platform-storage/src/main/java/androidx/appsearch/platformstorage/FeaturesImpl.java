@@ -117,6 +117,7 @@ final class FeaturesImpl implements Features {
                 return Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM
                         || tSdkExtensionVersion >= AppSearchVersionUtil.TExtensionVersions.V_BASE;
 
+
             // Beyond Android V Features
             case Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG:
                 // TODO(b/326656531) : Update when feature is ready in service-appsearch.
@@ -148,6 +149,15 @@ final class FeaturesImpl implements Features {
             case Features.SCHEMA_STRING_PROPERTY_CONFIG_DELETE_PROPAGATION_TYPE_PROPAGATE_FROM:
                 // TODO(b/376913014) : Update when feature is ready in service-appsearch.
                 // fall through
+                return false;
+
+            // Android B Features
+            case Features.INDEXER_MOBILE_APPLICATIONS:
+                // TODO(b/275592563) : Update when B version code is available
+                return Build.VERSION.SDK_INT > Build.VERSION_CODES.VANILLA_ICE_CREAM
+                        || AppSearchVersionUtil.getAppSearchVersionCode(mContext)
+                        >= AppSearchVersionUtil.MainlineVersions.M2024_11;
+
             default:
                 return false;
         }

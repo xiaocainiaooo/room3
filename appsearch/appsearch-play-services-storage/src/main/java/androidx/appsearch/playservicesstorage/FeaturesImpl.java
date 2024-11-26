@@ -97,6 +97,9 @@ final class FeaturesImpl implements Features {
                 // fall through
             case Features.SCHEMA_STRING_PROPERTY_CONFIG_DELETE_PROPAGATION_TYPE_PROPAGATE_FROM:
                 // fall through
+            case Features.INDEXER_MOBILE_APPLICATIONS:
+                // TODO(b/275592563) : Update once this features is supported.
+                // fall through
             default:
                 return false; // AppSearch features absent in GMSCore AppSearch.
         }
