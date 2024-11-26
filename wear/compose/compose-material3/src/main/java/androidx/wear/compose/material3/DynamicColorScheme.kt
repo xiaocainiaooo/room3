@@ -94,15 +94,9 @@ fun dynamicColorScheme(
     }
 
 /** Returns whether dynamic color is currently enabled on this device. */
-private fun isDynamicColorSchemeEnabled(context: Context): Boolean {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        val overlaySetting =
-            Settings.Secure.getString(context.contentResolver, THEME_CUSTOMIZATION_OVERLAY_PACKAGES)
-        return overlaySetting != null && overlaySetting.isNotEmpty() && overlaySetting != "{}"
-    }
-
-    return false
-}
+private fun isDynamicColorSchemeEnabled(context: Context): Boolean =
+    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) &&
+        (Settings.Global.getInt(context.contentResolver, DYNAMIC_THEMING_SETTING_NAME, 0) == 1)
 
 private object ResourceHelper {
     fun getColor(context: Context, @ColorRes id: Int): Color {
@@ -110,4 +104,4 @@ private object ResourceHelper {
     }
 }
 
-private const val THEME_CUSTOMIZATION_OVERLAY_PACKAGES = "theme_customization_overlay_packages"
+private const val DYNAMIC_THEMING_SETTING_NAME = "dynamic_color_theme_enabled"
