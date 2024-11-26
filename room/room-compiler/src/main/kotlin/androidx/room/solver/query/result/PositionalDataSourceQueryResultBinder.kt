@@ -41,8 +41,6 @@ class PositionalDataSourceQueryResultBinder(
 
     override val usesCompatQueryWriter = true
 
-    override fun isMigratedToDriver(): Boolean = true
-
     override fun convertAndReturn(
         sqlQueryVar: String,
         dbProperty: XPropertySpec,
@@ -89,19 +87,6 @@ class PositionalDataSourceQueryResultBinder(
             }
         }
         scope.builder.addStatement("return %L", spec)
-    }
-
-    override fun convertAndReturn(
-        roomSQLiteQueryVar: String,
-        canReleaseQuery: Boolean,
-        dbProperty: XPropertySpec,
-        inTransaction: Boolean,
-        scope: CodeGenScope
-    ) {
-        error(
-            "This convertAndReturn() should never be invoked, it will be removed once " +
-                "migration to drivers is completed."
-        )
     }
 
     private fun XTypeSpec.Builder.addConvertRowsMethod(scope: CodeGenScope) {

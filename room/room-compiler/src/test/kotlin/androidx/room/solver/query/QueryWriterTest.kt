@@ -86,7 +86,7 @@ class QueryWriterTest {
                 if (name == null) {
                   _stmt.bindNull(_argIndex);
                 } else {
-                  _stmt.bindString(_argIndex, name);
+                  _stmt.bindText(_argIndex, name);
                 }
                 """
                     .trimIndent()

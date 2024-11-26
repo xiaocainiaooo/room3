@@ -34,8 +34,7 @@ class MapQueryResultAdapter(
                 typeName = mapValueResultAdapter.getDeclarationTypeName(),
                 assignExpr = mapValueResultAdapter.getInstantiationCodeBlock()
             )
-            val stepName = if (scope.useDriverApi) "step" else "moveToNext"
-            beginControlFlow("while (%L.$stepName())", cursorVarName)
+            beginControlFlow("while (%L.step())", cursorVarName)
                 .apply {
                     mapValueResultAdapter.convert(
                         scope,
@@ -67,6 +66,4 @@ class MapQueryResultAdapter(
             rowAdapters.forEach { it.onCursorReady(cursorVarName = cursorVarName, scope = scope) }
         }
     }
-
-    override fun isMigratedToDriver(): Boolean = mapValueResultAdapter.isMigratedToDriver()
 }

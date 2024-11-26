@@ -19,7 +19,6 @@ package androidx.room.solver.query.result
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XMemberName.Companion.packageMember
 import androidx.room.compiler.codegen.XTypeName
-import androidx.room.ext.RoomMemberNames
 import androidx.room.ext.RoomTypeNames
 import androidx.room.ext.capitalize
 import androidx.room.ext.stripNonJava
@@ -34,8 +33,6 @@ class SingleNamedColumnRowAdapter(
     val columnName: String,
 ) : QueryMappedRowAdapter(reader.typeMirror()) {
     override val mapping = SingleNamedColumnRowMapping(columnName)
-
-    override fun isMigratedToDriver(): Boolean = true
 
     private val indexAdapter =
         object : IndexAdapter {
@@ -53,11 +50,7 @@ class SingleNamedColumnRowAdapter(
                     assignExpr =
                         XCodeBlock.of(
                             "%M(%L, %S)",
-                            if (scope.useDriverApi) {
-                                RoomTypeNames.STATEMENT_UTIL.packageMember("getColumnIndexOrThrow")
-                            } else {
-                                RoomMemberNames.CURSOR_UTIL_GET_COLUMN_INDEX_OR_THROW
-                            },
+                            RoomTypeNames.STATEMENT_UTIL.packageMember("getColumnIndexOrThrow"),
                             cursorVarName,
                             columnName
                         )

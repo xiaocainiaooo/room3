@@ -45,6 +45,4 @@ class GuavaOptionalQueryResultAdapter(
             )
         }
     }
-
-    override fun isMigratedToDriver() = true
 }

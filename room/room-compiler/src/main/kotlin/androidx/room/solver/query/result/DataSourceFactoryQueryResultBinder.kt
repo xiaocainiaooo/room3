@@ -32,8 +32,6 @@ class DataSourceFactoryQueryResultBinder(
 
     override val usesCompatQueryWriter = true
 
-    override fun isMigratedToDriver(): Boolean = true
-
     override fun convertAndReturn(
         sqlQueryVar: String,
         dbProperty: XPropertySpec,
@@ -64,19 +62,6 @@ class DataSourceFactoryQueryResultBinder(
                     .build()
             addStatement("return %L", pagedListProvider)
         }
-    }
-
-    override fun convertAndReturn(
-        roomSQLiteQueryVar: String,
-        canReleaseQuery: Boolean,
-        dbProperty: XPropertySpec,
-        inTransaction: Boolean,
-        scope: CodeGenScope
-    ) {
-        error(
-            "This convertAndReturn() should never be invoked, it will be removed once " +
-                "migration to drivers is completed."
-        )
     }
 
     private fun XTypeSpec.Builder.addCreateMethod(

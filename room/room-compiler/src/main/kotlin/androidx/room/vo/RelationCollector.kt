@@ -79,9 +79,6 @@ data class RelationCollector(
     // true if `relationTypeName` is a Collection, when it is `relationTypeName` is always non null.
     val relationTypeIsCollection: Boolean
 ) {
-    // TODO(b/319660042): Remove once migration to driver API is done.
-    fun isMigratedToDriver(): Boolean = rowAdapter.isMigratedToDriver()
-
     // variable name of map containing keys to relation collections, set when writing the code
     // generator in writeInitCode
     private lateinit var varName: String
@@ -251,16 +248,9 @@ data class RelationCollector(
 
     // called to write the invocation to the fetch relationship method
     fun writeFetchRelationCall(scope: CodeGenScope) {
-        val method =
-            scope.writer.getOrCreateFunction(
-                RelationCollectorFunctionWriter(this, scope.useDriverApi)
-            )
+        val method = scope.writer.getOrCreateFunction(RelationCollectorFunctionWriter(this))
         scope.builder.apply {
-            if (scope.useDriverApi) {
-                addStatement("%L(%L, %L)", method.name, PARAM_CONNECTION_VARIABLE, varName)
-            } else {
-                addStatement("%L(%L)", method.name, varName)
-            }
+            addStatement("%L(%L, %L)", method.name, PARAM_CONNECTION_VARIABLE, varName)
         }
     }
 

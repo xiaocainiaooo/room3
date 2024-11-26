@@ -80,20 +80,4 @@ class InstantDeleteOrUpdateMethodBinder(adapter: DeleteOrUpdateMethodAdapter?) :
             }
         scope.builder.add("$returnPrefix%L", performBlock)
     }
-
-    override fun convertAndReturnCompat(
-        parameters: List<ShortcutQueryParameter>,
-        adapters: Map<String, Pair<XPropertySpec, XTypeSpec>>,
-        dbProperty: XPropertySpec,
-        scope: CodeGenScope
-    ) {
-        adapter?.generateMethodBodyCompat(
-            parameters = parameters,
-            adapters = adapters,
-            dbProperty = dbProperty,
-            scope = scope
-        )
-    }
-
-    override fun isMigratedToDriver() = true
 }

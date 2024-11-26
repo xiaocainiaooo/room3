@@ -75,15 +75,4 @@ class LambdaInsertOrUpsertMethodBinder(
             )
         scope.builder.add("return %L", performBlock)
     }
-
-    override fun convertAndReturnCompat(
-        parameters: List<ShortcutQueryParameter>,
-        adapters: Map<String, Pair<XPropertySpec, Any>>,
-        dbProperty: XPropertySpec,
-        scope: CodeGenScope
-    ) {
-        error("Wrong executeAndReturn invoked")
-    }
-
-    override fun isMigratedToDriver() = true
 }

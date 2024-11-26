@@ -47,6 +47,4 @@ class OptionalQueryResultAdapter(
             )
         }
     }
-
-    override fun isMigratedToDriver() = true
 }

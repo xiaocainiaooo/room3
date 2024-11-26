@@ -107,6 +107,4 @@ class ArrayQueryResultAdapter(
             addLocalVariable(name = outVarName, typeName = arrayTypeName, assignExpr = assignCode)
         }
     }
-
-    override fun isMigratedToDriver(): Boolean = true
 }
