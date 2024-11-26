@@ -62,7 +62,13 @@ internal class TransformingLazyColumnCenterBoundsMeasurementStrategy :
         layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
     ): TransformingLazyColumnMeasureResult {
         if (itemsCount == 0) {
-            return emptyMeasureResult(containerConstraints, layout)
+            return emptyMeasureResult(
+                containerConstraints = containerConstraints,
+                // We don't report content padding correctly with center bounds strategy.
+                beforeContentPadding = 0,
+                afterContentPadding = 0,
+                layout = layout
+            )
         }
         val visibleItems = ArrayDeque<TransformingLazyColumnMeasuredItem>()
         var canScrollForward = true
@@ -138,7 +144,13 @@ internal class TransformingLazyColumnCenterBoundsMeasurementStrategy :
         }
 
         if (visibleItems.isEmpty()) {
-            return emptyMeasureResult(containerConstraints, layout)
+            return emptyMeasureResult(
+                containerConstraints = containerConstraints,
+                // We don't report content padding correctly with center bounds strategy.
+                beforeContentPadding = 0,
+                afterContentPadding = 0,
+                layout = layout
+            )
         }
 
         val anchorItem =
@@ -160,6 +172,7 @@ internal class TransformingLazyColumnCenterBoundsMeasurementStrategy :
             coroutineScope = coroutineScope,
             density = density,
             itemSpacing = itemSpacing,
+            // We don't report content padding correctly with center bounds strategy.
             beforeContentPadding = 0,
             afterContentPadding = 0,
             measureResult =
