@@ -127,4 +127,12 @@ sealed interface TransformingLazyColumnLayoutInfo {
 
     /** The size of the viewport in pixels. */
     val viewportSize: IntSize
+
+    /**
+     * The content padding in pixels applied before the first item in the direction of scrolling.
+     */
+    val beforeContentPadding: Int
+
+    /** The content padding in pixels applied after the last item in the direction of scrolling. */
+    val afterContentPadding: Int
 }
