@@ -73,12 +73,22 @@ androidXMultiplatform {
             }
         }
 
+        jvmMain {
+            dependsOn(commonMain)
+        }
+
+        jvmTest {
+            dependsOn(commonTest)
+        }
+
         androidMain {
             dependsOn(commonMain)
+            dependsOn(jvmMain)
         }
 
         androidInstrumentedTest {
             dependsOn(commonTest)
+            dependsOn(jvmTest)
             dependencies {
                 implementation("androidx.core:core-ktx:1.2.0")
                 implementation(libs.testExtJunit)
@@ -87,10 +97,49 @@ androidXMultiplatform {
             }
         }
 
-        nonJvmCommonMain.dependsOn(commonMain)
-        nativeMain.dependsOn(nonJvmCommonMain)
-        darwinMain.dependsOn(nativeMain)
-        linuxMain.dependsOn(nativeMain)
+        nonAndroidMain {
+            dependsOn(commonMain)
+        }
+
+        nonAndroidTest {
+            dependsOn(commonTest)
+        }
+
+        desktopMain {
+            dependsOn(jvmMain)
+            dependsOn(nonAndroidMain)
+        }
+
+        desktopTest {
+            dependsOn(jvmTest)
+            dependsOn(nonAndroidTest)
+        }
+
+        nativeMain {
+            dependsOn(commonMain)
+            dependsOn(nonAndroidMain)
+        }
+
+        nativeTest {
+            dependsOn(commonTest)
+            dependsOn(nonAndroidTest)
+        }
+
+        darwinMain {
+            dependsOn(nativeMain)
+        }
+
+        darwinTest {
+            dependsOn(nativeTest)
+        }
+
+        linuxMain {
+            dependsOn(nativeMain)
+        }
+
+        linuxTest {
+            dependsOn(nativeTest)
+        }
 
         targets.configureEach { target ->
             if (target.platformType == KotlinPlatformType.native) {
