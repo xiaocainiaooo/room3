@@ -1794,7 +1794,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
     override fun onLayoutChange(layoutNode: LayoutNode) {
         composeAccessibilityDelegate.onLayoutChange(layoutNode)
-        contentCaptureManager.onLayoutChange(layoutNode)
+        contentCaptureManager.onLayoutChange()
     }
 
     override fun onLayoutNodeDeactivated(layoutNode: LayoutNode) {
