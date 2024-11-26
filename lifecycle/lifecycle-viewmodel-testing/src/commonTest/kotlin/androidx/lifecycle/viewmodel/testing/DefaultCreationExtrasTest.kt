@@ -27,7 +27,7 @@ import androidx.savedstate.read
 import androidx.savedstate.savedState
 import kotlin.test.Test
 
-internal class DefaultCreationExtrasTest {
+internal class DefaultCreationExtrasTest : RobolectricTest() {
 
     @Test
     fun creationExtras_hasAllExtras() {

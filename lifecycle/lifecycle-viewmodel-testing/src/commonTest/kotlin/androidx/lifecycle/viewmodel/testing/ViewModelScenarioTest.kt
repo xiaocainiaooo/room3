@@ -25,7 +25,7 @@ import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.savedstate.savedState
 import kotlin.test.Test
 
-class ViewModelScenarioTest {
+internal class ViewModelScenarioTest : RobolectricTest() {
 
     @Test
     fun viewModel_createsInstance() {
