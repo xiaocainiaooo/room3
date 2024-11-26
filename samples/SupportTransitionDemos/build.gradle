@@ -11,6 +11,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.jspecify)
     implementation(project(":transition:transition"))
     implementation(project(":appcompat:appcompat"))
     implementation(project(":recyclerview:recyclerview"))

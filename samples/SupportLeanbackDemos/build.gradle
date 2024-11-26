@@ -11,6 +11,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.jspecify)
     implementation(project(":leanback:leanback"))
     implementation(project(":leanback:leanback-preference"))
     implementation(project(":leanback:leanback-paging"))
