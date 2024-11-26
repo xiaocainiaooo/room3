@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The local storage implementation of {@link AppSearchRevocableFileDescriptorStore}.
+ * The local storage implementation of {@link RevocableFileDescriptorStore}.
  *
  * <p> The {@link ParcelFileDescriptor} sent to the client side from the local storage won't cross
  * the binder, we could revoke the {@link ParcelFileDescriptor} in the client side by directly close
@@ -46,7 +46,7 @@ import java.util.Map;
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public class JetpackRevocableFileDescriptorStore implements
-        AppSearchRevocableFileDescriptorStore {
+        RevocableFileDescriptorStore {
 
     private final Object mLock  = new Object();
     private final AppSearchConfig mConfig;

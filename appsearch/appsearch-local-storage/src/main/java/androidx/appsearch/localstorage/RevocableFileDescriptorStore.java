@@ -38,7 +38,7 @@ import java.io.IOException;
  * @exportToFramework:hide
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-public interface AppSearchRevocableFileDescriptorStore {
+public interface RevocableFileDescriptorStore {
 
     /**
      * Wraps the provided ParcelFileDescriptor into a revocable file descriptor.

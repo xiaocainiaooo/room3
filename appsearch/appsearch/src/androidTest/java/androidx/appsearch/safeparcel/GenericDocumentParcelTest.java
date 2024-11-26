@@ -28,7 +28,7 @@ import android.os.Parcel;
 import androidx.appsearch.app.AppSearchBlobHandle;
 import androidx.appsearch.app.EmbeddingVector;
 import androidx.appsearch.flags.Flags;
-import androidx.appsearch.flags.RequiresFlagsEnabled;
+import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
 
 import org.junit.Test;
 

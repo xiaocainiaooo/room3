@@ -45,10 +45,10 @@ import androidx.appsearch.app.OpenBlobForReadResponse;
 import androidx.appsearch.app.OpenBlobForWriteResponse;
 import androidx.appsearch.app.PutDocumentsRequest;
 import androidx.appsearch.app.SetSchemaRequest;
-import androidx.appsearch.flags.CheckFlagsRule;
-import androidx.appsearch.flags.DeviceFlagsValueProvider;
 import androidx.appsearch.flags.Flags;
-import androidx.appsearch.flags.RequiresFlagsEnabled;
+import androidx.appsearch.testutil.flags.CheckFlagsRule;
+import androidx.appsearch.testutil.flags.DeviceFlagsValueProvider;
+import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.collect.ImmutableSet;
@@ -63,7 +63,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-@RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
 public abstract class AppSearchSessionBlobCtsTestBase {
     static final String DB_NAME_1 = "";
 
@@ -97,6 +96,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testWriteAndReadBlob() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
         mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
@@ -159,6 +159,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testWriteAndReadBlob_withoutCommit() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
         mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
@@ -197,6 +198,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testRewrite_notAllowed() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
         mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
@@ -249,6 +251,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testOpenWriteForRead_allowed() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
         mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
@@ -274,6 +277,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testOpenReadForWrite_notAllowed() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
         mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
@@ -316,6 +320,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testCommitBlobWithWrongDigest() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
         mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
@@ -353,6 +358,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testCloseWriteResponse() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
         mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
@@ -389,6 +395,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testCloseReadResponse() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
         mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
@@ -452,6 +459,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testSetBlobSchema() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
         AppSearchSchema schema = new AppSearchSchema.Builder("Type")
@@ -467,6 +475,7 @@ public abstract class AppSearchSessionBlobCtsTestBase {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testPutDocumentWithBlobProperty() throws Exception {
         assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
         AppSearchSchema schema = new AppSearchSchema.Builder("Type")

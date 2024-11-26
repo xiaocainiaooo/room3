@@ -28,10 +28,10 @@ import androidx.appsearch.app.EmbeddingVector;
 import androidx.appsearch.app.JoinSpec;
 import androidx.appsearch.app.PropertyPath;
 import androidx.appsearch.app.SearchSpec;
-import androidx.appsearch.flags.CheckFlagsRule;
-import androidx.appsearch.flags.DeviceFlagsValueProvider;
 import androidx.appsearch.flags.Flags;
-import androidx.appsearch.flags.RequiresFlagsEnabled;
+import androidx.appsearch.testutil.flags.CheckFlagsRule;
+import androidx.appsearch.testutil.flags.DeviceFlagsValueProvider;
+import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
