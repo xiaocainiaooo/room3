@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package androidx.compose.integration.hero.jetsnack
+package androidx.compose.integration.hero.common.macrobenchmark
 
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-
-const val ITERATIONS = 10
 
 private const val COMPOSE_IDLE = "COMPOSE-IDLE"
 

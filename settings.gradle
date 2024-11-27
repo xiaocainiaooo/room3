@@ -502,9 +502,13 @@ includeProject(":compose:integration-tests:hero:jetsnack:jetsnack-implementation
 includeProject(":compose:integration-tests:hero:jetsnack:jetsnack-macrobenchmark-target", [BuildType.COMPOSE])
 includeProject(":compose:integration-tests:hero:jetsnack:jetsnack-macrobenchmark", [BuildType.COMPOSE])
 includeProject(":compose:integration-tests:hero:jetsnack:jetsnack-microbenchmark", [BuildType.COMPOSE])
+includeProject(":compose:integration-tests:hero:pokedex:pokedex-macrobenchmark-target", [BuildType.COMPOSE])
+includeProject(":compose:integration-tests:hero:pokedex:pokedex-macrobenchmark", [BuildType.COMPOSE])
 includeProject(":compose:integration-tests:macrobenchmark", [BuildType.COMPOSE])
 includeProject(":compose:integration-tests:macrobenchmark-target", [BuildType.COMPOSE])
 includeProject(":compose:integration-tests:material-catalog", [BuildType.COMPOSE])
+includeProject(":compose:integration-tests:hero:hero-common:hero-common-implementation", [BuildType.COMPOSE])
+includeProject(":compose:integration-tests:hero:hero-common:hero-common-macrobenchmark", [BuildType.COMPOSE])
 includeProject(":compose:lint", [BuildType.COMPOSE])
 includeProject(":compose:lint:internal-lint-checks", [BuildType.COMPOSE])
 includeProject(":compose:lint:common", [BuildType.COMPOSE])
@@ -1222,6 +1226,9 @@ includeProject(":icing:nativeLib", new File(externalRoot, "icing/nativeLib"), [B
 includeProject(":external:libyuv", [BuildType.CAMERA])
 includeProject(":noto-emoji-compat-font", new File(externalRoot, "noto-fonts/emoji-compat"), [BuildType.MAIN])
 includeProject(":noto-emoji-compat-flatbuffers", new File(externalRoot, "noto-fonts/emoji-compat-flatbuffers"), [BuildType.MAIN, BuildType.COMPOSE])
+
+includeProject(":compose-hero-benchmarks:poxedex-compose:app", new File(externalRoot, "compose-hero-benchmarks/poxedex-compose/app"), [BuildType.COMPOSE])
+includeProject(":compose-hero-benchmarks:poxedex-compose:baselineprofile", new File(externalRoot, "compose-hero-benchmarks/poxedex-compose/baselineprofile"), [BuildType.COMPOSE])
 
 if (isAllProjects()) {
     includeProject(":docs-tip-of-tree")

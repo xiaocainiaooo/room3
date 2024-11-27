@@ -24,8 +24,8 @@ android {
     defaultConfig {
         minSdkVersion 23
     }
-    namespace "androidx.compose.integration.hero.jetsnack.macrobenchmark"
-    targetProjectPath = ":compose:integration-tests:hero:jetsnack:jetsnack-macrobenchmark-target"
+    namespace "androidx.compose.integration.hero.pokedex.macrobenchmark"
+    targetProjectPath = ":compose:integration-tests:hero:pokedex:pokedex-macrobenchmark-target"
     experimentalProperties["android.experimental.self-instrumenting"] = true
 }
 
@@ -37,8 +37,8 @@ androidComponents { beforeVariants(selector().all()) { enabled = buildType == 'r
 dependencies {
     implementation(project(":benchmark:benchmark-junit4"))
     implementation(project(":benchmark:benchmark-macro-junit4"))
-    implementation(project(":internal-testutils-macrobenchmark"))
     implementation(project(":compose:integration-tests:hero:hero-common:hero-common-macrobenchmark"))
+    implementation(project(":internal-testutils-macrobenchmark"))
     implementation(libs.testRules)
     implementation(libs.testExtJunit)
     implementation(libs.testCore)
