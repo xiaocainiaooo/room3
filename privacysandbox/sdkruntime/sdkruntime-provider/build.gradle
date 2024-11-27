@@ -44,8 +44,8 @@ dependencies {
 
 android {
     namespace "androidx.privacysandbox.sdkruntime.provider"
-    compileSdk = 34
-    compileSdkExtension = 10
+    compileSdk = 35
+    compileSdkExtension = 14
 }
 
 androidx {

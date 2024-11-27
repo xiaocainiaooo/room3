@@ -139,8 +139,8 @@ android {
     }
 
     namespace "androidx.privacysandbox.sdkruntime.client"
-    compileSdk = 34
-    compileSdkExtension = 10
+    compileSdk = 35
+    compileSdkExtension = 14
 }
 
 androidx {
