@@ -3116,18 +3116,23 @@ package androidx.compose.material3 {
   @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public interface WideNavigationRailState {
     method public suspend Object? collapse(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public suspend Object? expand(kotlin.coroutines.Continuation<? super kotlin.Unit>);
-    method public boolean getCurrentValue();
-    method public boolean getTargetValue();
+    method public androidx.compose.material3.WideNavigationRailValue getCurrentValue();
+    method public androidx.compose.material3.WideNavigationRailValue getTargetValue();
     method public boolean isAnimating();
-    method public suspend Object? snapTo(boolean targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? snapTo(androidx.compose.material3.WideNavigationRailValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public suspend Object? toggle(kotlin.coroutines.Continuation<? super kotlin.Unit>);
-    property public abstract boolean currentValue;
+    property public abstract androidx.compose.material3.WideNavigationRailValue currentValue;
     property public abstract boolean isAnimating;
-    property public abstract boolean targetValue;
+    property public abstract androidx.compose.material3.WideNavigationRailValue targetValue;
   }
 
   public final class WideNavigationRailStateKt {
-    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static androidx.compose.material3.WideNavigationRailState rememberWideNavigationRailState(optional boolean initialValue);
+    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static androidx.compose.material3.WideNavigationRailState rememberWideNavigationRailState(optional androidx.compose.material3.WideNavigationRailValue initialValue);
+  }
+
+  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public enum WideNavigationRailValue {
+    enum_constant public static final androidx.compose.material3.WideNavigationRailValue Collapsed;
+    enum_constant public static final androidx.compose.material3.WideNavigationRailValue Expanded;
   }
 
 }
