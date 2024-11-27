@@ -56,8 +56,8 @@ android {
     }
 
     namespace "androidx.privacysandbox.sdkruntime.core"
-    compileSdk = 34
-    compileSdkExtension = 10
+    compileSdk = 35
+    compileSdkExtension = 14
 }
 
 androidx {
