@@ -17,6 +17,7 @@
 package androidx.build.kythe
 
 import androidx.build.AndroidXExtension
+import androidx.build.ProjectLayoutType
 import androidx.build.checkapi.ApiTaskConfig
 import androidx.build.checkapi.configureJavaInputsAndManifest
 import androidx.build.checkapi.createReleaseApiConfiguration
@@ -24,7 +25,12 @@ import androidx.build.getDefaultTargetJavaVersion
 import org.gradle.api.Project
 
 /** Sets up tasks for generating kzip files that are used for generating xref support on website. */
-fun Project.configureProjectForKzipTasks(config: ApiTaskConfig, extension: AndroidXExtension) =
+fun Project.configureProjectForKzipTasks(config: ApiTaskConfig, extension: AndroidXExtension) {
+    // We use the output of kzip tasks for the Kythe pipeline to generate xrefs in cs.android.com
+    // This is not supported, nor needed in GitHub
+    if (ProjectLayoutType.isPlayground(this)) {
+        return
+    }
     // afterEvaluate required to read extension properties
     afterEvaluate {
         val (javaInputs, _) = configureJavaInputsAndManifest(config) ?: return@afterEvaluate
@@ -38,3 +44,4 @@ fun Project.configureProjectForKzipTasks(config: ApiTaskConfig, extension: Andro
             getDefaultTargetJavaVersion(extension.type, project.name)
         )
     }
+}
