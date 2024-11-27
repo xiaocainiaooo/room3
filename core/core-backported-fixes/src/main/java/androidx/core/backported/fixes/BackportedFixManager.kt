@@ -27,8 +27,7 @@ internal class BackportedFixManager(private val resolver: StatusResolver) {
     public constructor() :
         this(
             // TODO b/381267367 - Use Build.getBackportedFixStatus in when available.
-            // TODO b/381266031 - implement SystemPropertyResolver
-            resolver = { _: KnownIssue -> Status.Unknown }
+            resolver = SystemPropertyResolver()
         )
 
     /**

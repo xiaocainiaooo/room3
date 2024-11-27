@@ -21,15 +21,28 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.shadows.ShadowBuild
+import org.robolectric.shadows.ShadowSystemProperties
 
 /** Unit tests for [BackportedFixManager]. */
 @RunWith(RobolectricTestRunner::class)
 class BackportedFixManagerTest {
 
     @Test
-    fun isFixed_ki350037023() {
+    fun isFixed_ki350037023_empty() {
+        ShadowSystemProperties.override(ALIAS_BITSET_PROP_NAME, "")
+        ShadowBuild.reset()
         val fixManager = BackportedFixManager()
         val result = fixManager.isFixed(KI_350037023)
         assertThat(result).isFalse()
+    }
+
+    @Test
+    fun isFixed_ki350037023_2() {
+        ShadowSystemProperties.override(ALIAS_BITSET_PROP_NAME, "2")
+        ShadowBuild.reset()
+        val fixManager = BackportedFixManager()
+        val result = fixManager.isFixed(KI_350037023)
+        assertThat(result).isTrue()
     }
 }
