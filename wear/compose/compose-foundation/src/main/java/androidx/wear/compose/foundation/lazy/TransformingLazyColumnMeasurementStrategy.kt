@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress.Companion.bottomItemScrollProgress
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress.Companion.topItemScrollProgress
+import androidx.wear.compose.foundation.lazy.layout.LazyLayoutKeyIndexMap
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.CoroutineScope
 
@@ -46,6 +47,7 @@ internal interface TransformingLazyColumnMeasurementStrategy {
     fun measure(
         itemsCount: Int,
         measuredItemProvider: MeasuredItemProvider,
+        keyIndexMap: LazyLayoutKeyIndexMap,
         itemSpacing: Int,
         containerConstraints: Constraints,
         anchorItemIndex: Int,

@@ -34,6 +34,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.unit.Density
+import androidx.wear.compose.foundation.lazy.layout.LazyLayoutItemAnimator
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.abs
 import kotlinx.coroutines.CoroutineScope
@@ -118,6 +119,8 @@ class TransformingLazyColumnState() : ScrollableState {
                 this@TransformingLazyColumnState.remeasurement = remeasurement
             }
         }
+
+    internal val animator = LazyLayoutItemAnimator<TransformingLazyColumnMeasuredItem>()
 
     internal fun applyMeasureResult(measureResult: TransformingLazyColumnMeasureResult) {
         // TODO(artemiy): Don't consume all scroll.
