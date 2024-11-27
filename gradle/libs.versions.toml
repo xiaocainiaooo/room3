@@ -18,6 +18,7 @@ androidLintPrevAnalysis = "31.7.0-alpha02"
 # Lint version that uses an older version of Kotlin (pre 2.1). Updating projects using this version
 # would require bumping their Kotlin target to 2.1
 androidLintPrevKotlin = "31.8.0-alpha06"
+androidxActivity = "1.9.3"
 androidxTestRunner = "1.6.1"
 androidxTestRules = "1.6.1"
 androidxTestMonitor = "1.7.1"
@@ -103,6 +104,7 @@ androidToolsSdkCommon = { module = "com.android.tools:sdk-common", version.ref =
 androidToolsAnalyticsProtos = { module = "com.android.tools.analytics-library:protos", version.ref = "androidLint" }
 androidKotlinMultiplatform = { module = "com.android.kotlin.multiplatform.library:com.android.kotlin.multiplatform.library.gradle.plugin", version.ref = "androidGradlePlugin" }
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "annotationVersion" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
 autoCommon = { module = "com.google.auto:auto-common", version = "1.2.1" }
 atomicFu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicFu" }
 autoServiceAnnotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoService" }
