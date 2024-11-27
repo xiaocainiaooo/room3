@@ -76,6 +76,8 @@ internal fun MeasuredItemProvider.upwardMeasuredItem(index: Int, offset: Int, ma
 
 internal fun emptyMeasureResult(
     containerConstraints: Constraints,
+    beforeContentPadding: Int,
+    afterContentPadding: Int,
     layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
 ): TransformingLazyColumnMeasureResult =
     TransformingLazyColumnMeasureResult(
@@ -88,8 +90,8 @@ internal fun emptyMeasureResult(
         canScrollBackward = false,
         coroutineScope = CoroutineScope(EmptyCoroutineContext),
         density = Density(1f),
-        beforeContentPadding = 0,
-        afterContentPadding = 0,
+        beforeContentPadding = beforeContentPadding,
+        afterContentPadding = afterContentPadding,
         itemSpacing = 0,
         measureResult = layout(containerConstraints.maxWidth, containerConstraints.maxHeight) {}
     )

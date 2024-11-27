@@ -68,7 +68,12 @@ internal class TransformingLazyColumnContentPaddingMeasurementStrategy(
         layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
     ): TransformingLazyColumnMeasureResult {
         if (itemsCount == 0) {
-            return emptyMeasureResult(containerConstraints, layout)
+            return emptyMeasureResult(
+                containerConstraints = containerConstraints,
+                beforeContentPadding = beforeContentPadding,
+                afterContentPadding = afterContentPadding,
+                layout = layout
+            )
         }
 
         // Place the center item
@@ -128,7 +133,12 @@ internal class TransformingLazyColumnContentPaddingMeasurementStrategy(
             )
 
             if (visibleItems.isEmpty()) {
-                return emptyMeasureResult(containerConstraints, layout)
+                return emptyMeasureResult(
+                    containerConstraints = containerConstraints,
+                    beforeContentPadding = beforeContentPadding,
+                    afterContentPadding = afterContentPadding,
+                    layout = layout
+                )
             }
 
             val totalHeight =

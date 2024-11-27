@@ -386,6 +386,49 @@ class TransformingLazyColumnContentPaddingMeasurementStrategyTest {
             .isEqualTo(listOf(0, screenHeight / 4, screenHeight / 2, screenHeight * 3 / 4))
     }
 
+    @Test
+    fun fullSizeBottomContentPadding_doesNotCrash() {
+        val strategy =
+            TransformingLazyColumnContentPaddingMeasurementStrategy(
+                // Padding takes the full size.
+                PaddingValues(bottom = with(Density(density)) { screenHeight.toDp() }),
+                measureScope,
+                mockGraphicContext,
+                mockItemAnimator
+            )
+
+        val itemSize = screenHeight / 4
+
+        val result =
+            strategy.measure(
+                listOf(itemSize, itemSize),
+            )
+        assertThat(result.visibleItems.size).isEqualTo(2)
+    }
+
+    @Test
+    fun fullSizeTopContentPadding_doesNotCrash() {
+        val strategy =
+            TransformingLazyColumnContentPaddingMeasurementStrategy(
+                // Padding takes the full size.
+                PaddingValues(top = with(Density(density)) { screenHeight.toDp() }),
+                measureScope,
+                mockGraphicContext,
+                mockItemAnimator
+            )
+
+        val itemSize = screenHeight / 4
+
+        val result =
+            strategy.measure(
+                listOf(
+                    itemSize,
+                    itemSize,
+                ),
+            )
+        assertThat(result.visibleItems.size).isEqualTo(2)
+    }
+
     private val measureScope: IntrinsicMeasureScope =
         object : IntrinsicMeasureScope {
             override val fontScale: Float
