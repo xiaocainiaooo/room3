@@ -22,6 +22,7 @@ import androidx.fragment.lint.UnsafeFragmentLifecycleObserverDetector.Issues.ADD
 import androidx.fragment.lint.UnsafeFragmentLifecycleObserverDetector.Issues.BACK_PRESSED_ISSUE
 import androidx.fragment.lint.UnsafeFragmentLifecycleObserverDetector.Issues.LIVEDATA_ISSUE
 import com.android.tools.lint.detector.api.Category
+import com.android.tools.lint.detector.api.Context
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
 import com.android.tools.lint.detector.api.Issue
@@ -35,6 +36,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.util.PsiTypesUtil
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UExpression
 import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.UastFacade
 import org.jetbrains.uast.getContainingUClass
@@ -128,10 +130,17 @@ class UnsafeFragmentLifecycleObserverDetector : Detector(), SourceCodeScanner {
 
     override fun applicableSuperClasses(): List<String>? = listOf(FRAGMENT_CLASS)
 
+    private val reportedLocation: MutableSet<UExpression> = mutableSetOf()
+
+    override fun afterCheckFile(context: Context) {
+        reportedLocation.clear()
+    }
+
     override fun visitClass(context: JavaContext, declaration: UClass) {
         declaration.methods.forEach {
             if (lifecycleMethods.contains(it.name)) {
-                val visitor = RecursiveMethodVisitor(context, declaration.name, it.name)
+                val visitor =
+                    RecursiveMethodVisitor(context, declaration.name, it.name, reportedLocation)
                 it.uastBody?.accept(visitor)
             }
         }
@@ -150,7 +159,8 @@ class UnsafeFragmentLifecycleObserverDetector : Detector(), SourceCodeScanner {
 private class RecursiveMethodVisitor(
     private val context: JavaContext,
     private val originFragmentName: String?,
-    private val lifecycleMethod: String
+    private val lifecycleMethod: String,
+    private val reportedLocation: MutableSet<UExpression>,
 ) : AbstractUastVisitor() {
     private val visitedMethods = mutableSetOf<UCallExpression>()
 
@@ -190,6 +200,9 @@ private class RecursiveMethodVisitor(
             ) {
                 val argType = PsiTypesUtil.getPsiClass(arg.getExpressionType())
                 if (argType == call.getContainingUClass()?.javaPsi) {
+                    if (!reportedLocation.add(arg)) {
+                        return false
+                    }
                     val methodFix =
                         if (isKotlin(call.lang)) {
                             "viewLifecycleOwner"
@@ -203,6 +216,9 @@ private class RecursiveMethodVisitor(
                         LintFix.create().replace().with(methodFix).build()
                     )
                 } else {
+                    if (!reportedLocation.add(call)) {
+                        return false
+                    }
                     context.report(
                         issue,
                         context.getLocation(call),

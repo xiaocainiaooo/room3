@@ -351,6 +351,62 @@ src/com/example/test/Foo.kt:10: Error: Unsafe call to observe with Fragment inst
     }
 
     @Test
+    fun externalCallFails_recursionViaInline() {
+        check(
+                kotlin(
+                    """
+package com.example
+
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
+import com.example.test.Foo
+
+class TestFragment : Fragment {
+
+    override fun onCreateView() {
+        test()
+    }
+
+    private fun test() {
+        val foo = Foo()
+        foo.observeData(false, this)
+    }
+}
+            """
+                ),
+                kotlin(
+                    """
+package com.example.test
+
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
+
+class Foo {
+    inline fun <reified T> observeData(flag: T, fragment: Fragment) {
+        if (flag is Boolean)
+            anotherObserveData(flag, fragment)
+        val liveData = MutableLiveData<String>()
+        liveData.observe(fragment, Observer<String> {})
+    }
+
+    inline fun <reified T> anotherObserveData(flag: T, fragment: Fragment) {
+        observeData(flag, fragment)
+    }
+}
+            """
+                )
+            )
+            .expect(
+                """
+src/com/example/test/Foo.kt:12: Error: Unsafe call to observe with Fragment instance as LifecycleOwner from TestFragment.onCreateView. [FragmentLiveDataObserve]
+        liveData.observe(fragment, Observer<String> {})
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 errors, 0 warnings
+            """
+            )
+    }
+
+    @Test
     fun externalHelperMethodFails() {
         check(
                 kotlin(
