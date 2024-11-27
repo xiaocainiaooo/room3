@@ -17,6 +17,7 @@
 package androidx.core.backported.fixes
 
 import androidx.core.backported.fixes.KnownIssue.KI_350037023
+import androidx.core.backported.fixes.KnownIssue.KI_372917199
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,20 +30,48 @@ import org.robolectric.shadows.ShadowSystemProperties
 class BackportedFixManagerTest {
 
     @Test
-    fun isFixed_ki350037023_empty() {
+    fun ki350037023_empty() {
         ShadowSystemProperties.override(ALIAS_BITSET_PROP_NAME, "")
         ShadowBuild.reset()
         val fixManager = BackportedFixManager()
-        val result = fixManager.isFixed(KI_350037023)
-        assertThat(result).isFalse()
+        assertThat(fixManager.getStatus(KI_350037023)).isEqualTo(Status.Unknown)
+        assertThat(fixManager.isFixed(KI_350037023)).isFalse()
     }
 
     @Test
-    fun isFixed_ki350037023_2() {
+    fun ki350037023_2() {
         ShadowSystemProperties.override(ALIAS_BITSET_PROP_NAME, "2")
         ShadowBuild.reset()
         val fixManager = BackportedFixManager()
-        val result = fixManager.isFixed(KI_350037023)
-        assertThat(result).isTrue()
+        assertThat(fixManager.getStatus(KI_350037023)).isEqualTo(Status.Fixed)
+        assertThat(fixManager.isFixed(KI_350037023)).isTrue()
+    }
+
+    @Test
+    fun ki372917199_empty() {
+        ShadowSystemProperties.override(ALIAS_BITSET_PROP_NAME, "")
+        ShadowBuild.reset()
+        val fixManager = BackportedFixManager()
+        assertThat(fixManager.getStatus(KI_372917199)).isEqualTo(Status.Unknown)
+        assertThat(fixManager.isFixed(KI_372917199)).isFalse()
+    }
+
+    @Test
+    fun ki372917199_4() {
+        ShadowSystemProperties.override(ALIAS_BITSET_PROP_NAME, "4")
+        ShadowBuild.reset()
+        val fixManager = BackportedFixManager()
+        assertThat(fixManager.getStatus(KI_372917199)).isEqualTo(Status.Fixed)
+        assertThat(fixManager.isFixed(KI_372917199)).isTrue()
+    }
+
+    @Test
+    fun ki372917199_notRobo_empty() {
+        ShadowSystemProperties.override(ALIAS_BITSET_PROP_NAME, "")
+        ShadowBuild.reset()
+        ShadowBuild.setBrand("notRobo")
+        val fixManager = BackportedFixManager()
+        assertThat(fixManager.getStatus(KI_372917199)).isEqualTo(Status.NotApplicable)
+        assertThat(fixManager.isFixed(KI_372917199)).isTrue()
     }
 }

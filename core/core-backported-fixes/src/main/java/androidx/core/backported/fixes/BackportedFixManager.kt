@@ -16,6 +16,8 @@
 
 package androidx.core.backported.fixes
 
+import android.os.Build
+
 /**
  * Reports the status of a known issue on this device.
  *
@@ -45,7 +47,7 @@ internal class BackportedFixManager(private val resolver: StatusResolver) {
     }
 
     /** The status of a critical issue on this device. */
-    private fun getStatus(ki: KnownIssue): Status {
+    internal fun getStatus(ki: KnownIssue): Status {
         return when (ki) {
             // If the known issue needs special handling,
             // like when an issue only applies
@@ -76,8 +78,7 @@ internal class BackportedFixManager(private val resolver: StatusResolver) {
     }
 
     private fun pre372917199(): Boolean {
-        // TODO b/381266031 - implement precondition for known issue 372917199
-        return false
+        return (Build.BRAND.equals("robolectric"))
     }
 }
 
