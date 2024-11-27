@@ -33,7 +33,7 @@ import androidx.wear.compose.material3.dynamicColorScheme
 @Composable
 fun DynamicColorSchemeDemos() {
     val dynamicColorScheme = dynamicColorScheme(LocalContext.current)
-    MaterialTheme(colorScheme = dynamicColorScheme(LocalContext.current) ?: ColorScheme()) {
+    MaterialTheme(colorScheme = dynamicColorScheme ?: ColorScheme()) {
         val hasDynamicColors = dynamicColorScheme != null
         ScalingLazyDemo {
             if (!hasDynamicColors) {
