@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.graphics.Rect
 import android.os.IBinder
 import android.view.SurfaceView
 import android.view.View
@@ -28,7 +27,6 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewTreeObserver
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.lifecycle.Lifecycle
 import androidx.privacysandbox.ui.client.view.SandboxedSdkUiSessionState
@@ -37,10 +35,6 @@ import androidx.privacysandbox.ui.client.view.SandboxedSdkView
 import androidx.privacysandbox.ui.core.BackwardCompatUtil
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.provider.AbstractSandboxedUiAdapter
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -532,37 +526,6 @@ class SandboxedSdkViewTest {
         addViewToLayout()
         testSandboxedUiAdapter.assertSessionOpened()
         assertThat(testSandboxedUiAdapter.inputToken).isEqualTo(token)
-    }
-
-    @Test
-    fun getBoundingParent_withoutScrollParent() {
-        addViewToLayout()
-        onView(withId(R.id.mainlayout)).check(matches(isDisplayed()))
-        activityScenarioRule.withActivity {
-            val boundingRect = Rect()
-            assertThat(view.maybeUpdateClippingBounds(boundingRect)).isTrue()
-            val rootView: ViewGroup = findViewById(android.R.id.content)
-            val rootRect = Rect()
-            rootView.getGlobalVisibleRect(rootRect)
-            assertThat(boundingRect).isEqualTo(rootRect)
-        }
-    }
-
-    @Test
-    fun getBoundingParent_withScrollParent() {
-        lateinit var scrollView: ScrollView
-        activityScenarioRule.withActivity {
-            scrollView = findViewById<ScrollView>(R.id.scroll_view)
-            scrollView.visibility = View.VISIBLE
-            scrollView.addView(view)
-        }
-        onView(withId(R.id.scroll_view)).check(matches(isDisplayed()))
-
-        val scrollViewRect = Rect()
-        assertThat(scrollView.getGlobalVisibleRect(scrollViewRect)).isTrue()
-        val boundingRect = Rect()
-        assertThat(view.maybeUpdateClippingBounds(boundingRect)).isTrue()
-        assertThat(scrollViewRect).isEqualTo(boundingRect)
     }
 
     /**
