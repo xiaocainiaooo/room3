@@ -36,11 +36,11 @@ import androidx.savedstate.serialization.serializers.CharSequenceArrayListSerial
 import androidx.savedstate.serialization.serializers.CharSequenceArraySerializer
 import androidx.savedstate.serialization.serializers.CharSequenceSerializer
 import androidx.savedstate.serialization.serializers.IBinderSerializer
+import androidx.savedstate.serialization.serializers.JavaSerializableSerializer
 import androidx.savedstate.serialization.serializers.ParcelableArrayListSerializer
 import androidx.savedstate.serialization.serializers.ParcelableArraySerializer
 import androidx.savedstate.serialization.serializers.ParcelableSerializer
 import androidx.savedstate.serialization.serializers.SavedStateSerializer
-import androidx.savedstate.serialization.serializers.SerializableSerializer
 import androidx.savedstate.serialization.serializers.SizeFSerializer
 import androidx.savedstate.serialization.serializers.SizeSerializer
 import androidx.savedstate.serialization.serializers.SparseParcelableArraySerializer
@@ -180,7 +180,7 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
 
         @Serializable
         data class SerializableContainer(
-            @Serializable(with = SerializableSerializer::class) val value: java.io.Serializable
+            @Serializable(with = JavaSerializableSerializer::class) val value: java.io.Serializable
         )
         val mySerializable = MySerializable(3, "foo", 3.14)
         SerializableContainer(mySerializable).encodeDecode {
@@ -293,7 +293,7 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
         @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
         @Serializable
         data class SerializableContainer(
-            @Serializable(with = SerializableSerializer::class) val value: MySerializable
+            @Serializable(with = JavaSerializableSerializer::class) val value: MySerializable
         )
         val mySerializable = MySerializable(3, "foo", 3.14)
         SerializableContainer(mySerializable).encodeDecode {

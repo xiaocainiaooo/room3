@@ -23,10 +23,10 @@ import androidx.savedstate.serialization.serializers.CharSequenceArrayListSerial
 import androidx.savedstate.serialization.serializers.CharSequenceArraySerializer
 import androidx.savedstate.serialization.serializers.CharSequenceSerializer
 import androidx.savedstate.serialization.serializers.IBinderSerializer
+import androidx.savedstate.serialization.serializers.JavaSerializableSerializer
 import androidx.savedstate.serialization.serializers.ParcelableArrayListSerializer
 import androidx.savedstate.serialization.serializers.ParcelableArraySerializer
 import androidx.savedstate.serialization.serializers.ParcelableSerializer
-import androidx.savedstate.serialization.serializers.SerializableSerializer
 import androidx.savedstate.serialization.serializers.SizeFSerializer
 import androidx.savedstate.serialization.serializers.SizeSerializer
 import androidx.savedstate.serialization.serializers.SparseParcelableArraySerializer
@@ -43,7 +43,7 @@ internal actual fun <T> platformSpecificDecodeSerializableValue(
             CharSequenceSerializer.descriptor -> getCharSequence(key)
             SizeSerializer.descriptor -> getSize(key)
             SizeFSerializer.descriptor -> getSizeF(key)
-            SerializableSerializer.descriptor -> getJavaSerializable(key)
+            JavaSerializableSerializer.descriptor -> getJavaSerializable(key)
             ParcelableSerializer.descriptor -> getParcelable(key)
             IBinderSerializer.descriptor -> getBinder(key)
             CharSequenceArraySerializer.descriptor -> getCharSequenceArray(key)
