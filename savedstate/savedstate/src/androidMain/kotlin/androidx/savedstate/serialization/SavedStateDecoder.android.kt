@@ -43,7 +43,7 @@ internal actual fun <T> platformSpecificDecodeSerializableValue(
             CharSequenceSerializer.descriptor -> getCharSequence(key)
             SizeSerializer.descriptor -> getSize(key)
             SizeFSerializer.descriptor -> getSizeF(key)
-            SerializableSerializer.descriptor -> getSerializable(key)
+            SerializableSerializer.descriptor -> getJavaSerializable(key)
             ParcelableSerializer.descriptor -> getParcelable(key)
             IBinderSerializer.descriptor -> getBinder(key)
             CharSequenceArraySerializer.descriptor -> getCharSequenceArray(key)
