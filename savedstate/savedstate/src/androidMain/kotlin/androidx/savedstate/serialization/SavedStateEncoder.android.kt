@@ -55,7 +55,7 @@ internal actual fun <T> platformSpecificEncodeSerializableValue(
                 putCharSequence(key, value as CharSequence)
             }
             SerializableSerializer.descriptor -> {
-                putSerializable(key, value as Serializable)
+                putJavaSerializable(key, value as Serializable)
             }
             ParcelableSerializer.descriptor -> {
                 putParcelable(key, value as Parcelable)

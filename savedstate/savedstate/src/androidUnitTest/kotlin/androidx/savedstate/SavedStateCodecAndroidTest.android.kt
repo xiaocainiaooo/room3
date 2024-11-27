@@ -185,7 +185,7 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
         val mySerializable = MySerializable(3, "foo", 3.14)
         SerializableContainer(mySerializable).encodeDecode {
             assertThat(size()).isEqualTo(1)
-            assertThat(getSerializable<MySerializable>("value")).isEqualTo(mySerializable)
+            assertThat(getJavaSerializable<MySerializable>("value")).isEqualTo(mySerializable)
         }
 
         @Serializable
@@ -298,7 +298,7 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
         val mySerializable = MySerializable(3, "foo", 3.14)
         SerializableContainer(mySerializable).encodeDecode {
             assertThat(size()).isEqualTo(1)
-            assertThat(getSerializable<MySerializable>("value")).isEqualTo(mySerializable)
+            assertThat(getJavaSerializable<MySerializable>("value")).isEqualTo(mySerializable)
         }
 
         @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
