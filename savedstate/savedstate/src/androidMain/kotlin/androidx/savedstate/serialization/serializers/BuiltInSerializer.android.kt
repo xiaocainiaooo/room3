@@ -85,7 +85,7 @@ object CharSequenceSerializer : KSerializer<CharSequence> by BuiltInSerializer("
  * @see androidx.savedstate.serialization.encodeToSavedState
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
-object SerializableSerializer :
+object JavaSerializableSerializer :
     KSerializer<java.io.Serializable> by BuiltInSerializer("Serializable")
 
 /**

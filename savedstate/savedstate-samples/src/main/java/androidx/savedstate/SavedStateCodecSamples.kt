@@ -25,11 +25,11 @@ import androidx.savedstate.serialization.serializers.CharSequenceArrayListSerial
 import androidx.savedstate.serialization.serializers.CharSequenceArraySerializer
 import androidx.savedstate.serialization.serializers.CharSequenceSerializer
 import androidx.savedstate.serialization.serializers.IBinderSerializer
+import androidx.savedstate.serialization.serializers.JavaSerializableSerializer
 import androidx.savedstate.serialization.serializers.ParcelableArrayListSerializer
 import androidx.savedstate.serialization.serializers.ParcelableArraySerializer
 import androidx.savedstate.serialization.serializers.ParcelableSerializer
 import androidx.savedstate.serialization.serializers.SavedStateSerializer
-import androidx.savedstate.serialization.serializers.SerializableSerializer
 import androidx.savedstate.serialization.serializers.SizeFSerializer
 import androidx.savedstate.serialization.serializers.SizeSerializer
 import androidx.savedstate.serialization.serializers.SparseParcelableArraySerializer
@@ -129,7 +129,8 @@ fun charSequenceSerializer() {
 fun serializableSerializer() {
     @Serializable
     data class MyModel(
-        @Serializable(with = SerializableSerializer::class) val serializable: java.io.Serializable
+        @Serializable(with = JavaSerializableSerializer::class)
+        val serializable: java.io.Serializable
     )
 }
 
