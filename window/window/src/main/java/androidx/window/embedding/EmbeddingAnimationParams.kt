@@ -17,6 +17,7 @@
 package androidx.window.embedding
 
 import androidx.annotation.IntRange
+import androidx.window.RequiresWindowSdkExtension
 import androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec.Companion.DEFAULT
 
 /**
@@ -143,10 +144,14 @@ constructor(
          *
          * The default is to use the current theme window background color.
          *
+         * This can be supported only if the Window Extensions version of the target device is
+         * equals or higher than required API level. Otherwise, it would be no-op.
+         *
          * @param background the animation background.
          * @return this `Builder`.
          * @see EmbeddingAnimationBackground
          */
+        @RequiresWindowSdkExtension(5)
         fun setAnimationBackground(background: EmbeddingAnimationBackground): Builder = apply {
             this.animationBackground = background
         }
@@ -156,9 +161,13 @@ constructor(
          *
          * The default is to use the system animation.
          *
+         * This can be supported only if the Window Extensions version of the target device is
+         * equals or higher than required API level. Otherwise, it would be no-op.
+         *
          * @param spec the animation transition spec
          * @return this `Builder`.
          */
+        @RequiresWindowSdkExtension(7)
         fun setOpenAnimation(spec: AnimationSpec): Builder = apply { this.openAnimation = spec }
 
         /**
@@ -166,9 +175,13 @@ constructor(
          *
          * The default is to use the system animation.
          *
+         * This can be supported only if the Window Extensions version of the target device is
+         * equals or higher than required API level. Otherwise, it would be no-op.
+         *
          * @param spec the animation transition spec
          * @return this `Builder`.
          */
+        @RequiresWindowSdkExtension(7)
         fun setCloseAnimation(spec: AnimationSpec): Builder = apply { this.closeAnimation = spec }
 
         /**
@@ -176,9 +189,13 @@ constructor(
          *
          * The default is to use the system animation.
          *
+         * This can be supported only if the Window Extensions version of the target device is
+         * equals or higher than required API level. Otherwise, it would be no-op.
+         *
          * @param spec the animation spec
          * @return this `Builder`.
          */
+        @RequiresWindowSdkExtension(7)
         fun setChangeAnimation(spec: AnimationSpec): Builder = apply { this.changeAnimation = spec }
 
         /**
