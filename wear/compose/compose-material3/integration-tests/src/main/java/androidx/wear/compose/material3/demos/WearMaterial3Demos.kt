@@ -208,7 +208,9 @@ val WearMaterial3Demos =
                         },
                         ComposableDemo("TLC Buttons") { TransformingLazyColumnButtons() },
                         ComposableDemo("TLC Cards") { TransformingLazyColumnCards() },
-                        ComposableDemo("TLC add/remove") { TransformingLazyColumnScrollingSample() }
+                        ComposableDemo("Animation Demo") {
+                            TransformingLazyColumnScrollingSample()
+                        },
                     )
                 )
             )
