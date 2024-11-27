@@ -76,8 +76,15 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.onSizeChanged
@@ -93,6 +100,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isFinite
 import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.util.fastFirst
+import androidx.compose.ui.util.fastMaxOfOrNull
+import androidx.compose.ui.util.fastSumBy
 import kotlin.jvm.JvmInline
 import kotlin.math.abs
 import kotlin.math.max
@@ -2689,8 +2698,38 @@ private fun TopAppBarLayout(
                 )
             }
         },
-        modifier = modifier
-    ) { measurables, constraints ->
+        modifier = modifier,
+        measurePolicy =
+            remember(
+                scrolledOffset,
+                titleVerticalArrangement,
+                titleHorizontalAlignment,
+                titleBottomPadding,
+                expandedHeight
+            ) {
+                TopAppBarMeasurePolicy(
+                    scrolledOffset,
+                    titleVerticalArrangement,
+                    titleHorizontalAlignment,
+                    titleBottomPadding,
+                    expandedHeight
+                )
+            }
+    )
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+private class TopAppBarMeasurePolicy(
+    val scrolledOffset: ScrolledOffset,
+    val titleVerticalArrangement: Arrangement.Vertical,
+    val titleHorizontalAlignment: TopAppBarTitleAlignment,
+    val titleBottomPadding: Int,
+    val expandedHeight: Dp
+) : MeasurePolicy {
+    override fun MeasureScope.measure(
+        measurables: List<Measurable>,
+        constraints: Constraints
+    ): MeasureResult {
         val navigationIconPlaceable =
             measurables
                 .fastFirst { it.layoutId == "navigationIcon" }
@@ -2733,6 +2772,56 @@ private fun TopAppBarLayout(
                 (maxLayoutHeight + heightOffset).coerceAtLeast(0)
             }
 
+        return placeTopAppBar(
+            constraints,
+            layoutHeight,
+            maxLayoutHeight,
+            navigationIconPlaceable,
+            titlePlaceable,
+            actionIconsPlaceable,
+            titleBaseline
+        )
+    }
+
+    override fun IntrinsicMeasureScope.minIntrinsicWidth(
+        measurables: List<IntrinsicMeasurable>,
+        height: Int
+    ) = measurables.fastSumBy { it.minIntrinsicWidth(height) }
+
+    override fun IntrinsicMeasureScope.minIntrinsicHeight(
+        measurables: List<IntrinsicMeasurable>,
+        width: Int
+    ): Int {
+        return max(
+            expandedHeight.roundToPx(),
+            measurables.fastMaxOfOrNull { it.minIntrinsicHeight(width) } ?: 0
+        )
+    }
+
+    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+        measurables: List<IntrinsicMeasurable>,
+        height: Int
+    ) = measurables.fastSumBy { it.maxIntrinsicWidth(height) }
+
+    override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+        measurables: List<IntrinsicMeasurable>,
+        width: Int
+    ): Int {
+        return max(
+            expandedHeight.roundToPx(),
+            measurables.fastMaxOfOrNull { it.maxIntrinsicHeight(width) } ?: 0
+        )
+    }
+
+    private fun MeasureScope.placeTopAppBar(
+        constraints: Constraints,
+        layoutHeight: Int,
+        maxLayoutHeight: Int,
+        navigationIconPlaceable: Placeable,
+        titlePlaceable: Placeable,
+        actionIconsPlaceable: Placeable,
+        titleBaseline: Int
+    ): MeasureResult =
         layout(constraints.maxWidth, layoutHeight) {
             // Navigation icon
             navigationIconPlaceable.placeRelative(
@@ -2806,7 +2895,6 @@ private fun TopAppBarLayout(
                 y = (layoutHeight - actionIconsPlaceable.height) / 2
             )
         }
-    }
 }
 
 /** A functional interface for providing an app-bar scroll offset. */
