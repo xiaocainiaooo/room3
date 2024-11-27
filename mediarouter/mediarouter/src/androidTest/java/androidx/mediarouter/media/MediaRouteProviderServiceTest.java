@@ -388,6 +388,12 @@ public class MediaRouteProviderServiceTest {
         @Override
         public void onCreate() {
             super.onCreate();
+            if (sClientInfoListenerAdditionCountDownLatch == null
+                    || sClientInfoListenerRemovalCountDownLatch == null) {
+                // This test resets both CountDownLatches to non-null at the test setup. If they are
+                // null, then the onCreate comes from other tests.
+                return;
+            }
             sLatestClientInfo.clear();
             addClientInfoListener(
                     Executors.newSingleThreadExecutor(),
@@ -417,6 +423,11 @@ public class MediaRouteProviderServiceTest {
 
         @Override
         public void onDiscoveryRequestChanged(MediaRouteDiscoveryRequest discoveryRequest) {
+            if (sActiveScanCountDownLatch == null || sPassiveScanCountDownLatch == null) {
+                // This test resets both active and passive scan CountDownLatch to non-null at the
+                // test setup. If they are null, then the discovery request comes from other tests.
+                return;
+            }
             boolean wasActiveScan =
                     (sLastDiscoveryRequest != null) ? sLastDiscoveryRequest.isActiveScan() : false;
             boolean isActiveScan =
