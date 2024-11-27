@@ -31,6 +31,9 @@ plugins {
 
 android {
     namespace "androidx.privacysandbox.sdkruntime.testsdk.current"
+
+    compileSdk = 35
+    compileSdkExtension = 14
 }
 
 dependencies {
