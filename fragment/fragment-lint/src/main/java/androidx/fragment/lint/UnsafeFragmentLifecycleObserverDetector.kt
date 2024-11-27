@@ -21,6 +21,7 @@ package androidx.fragment.lint
 import androidx.fragment.lint.UnsafeFragmentLifecycleObserverDetector.Issues.ADD_MENU_PROVIDER_ISSUE
 import androidx.fragment.lint.UnsafeFragmentLifecycleObserverDetector.Issues.BACK_PRESSED_ISSUE
 import androidx.fragment.lint.UnsafeFragmentLifecycleObserverDetector.Issues.LIVEDATA_ISSUE
+import com.android.tools.lint.client.api.LintClient
 import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Context
 import com.android.tools.lint.detector.api.Detector
@@ -128,7 +129,7 @@ class UnsafeFragmentLifecycleObserverDetector : Detector(), SourceCodeScanner {
     private val lifecycleMethods =
         setOf("onCreateView", "onViewCreated", "onActivityCreated", "onViewStateRestored")
 
-    override fun applicableSuperClasses(): List<String>? = listOf(FRAGMENT_CLASS)
+    override fun applicableSuperClasses(): List<String> = listOf(FRAGMENT_CLASS)
 
     private val reportedLocation: MutableSet<UExpression> = mutableSetOf()
 
@@ -162,10 +163,13 @@ private class RecursiveMethodVisitor(
     private val lifecycleMethod: String,
     private val reportedLocation: MutableSet<UExpression>,
 ) : AbstractUastVisitor() {
+    /** Maximum depth of the call chain this visitor will search */
+    private val MAX_RECURSION_DEPTH = if (LintClient.isStudio) 10 else 20
+
     private val visitedMethods = mutableSetOf<UCallExpression>()
 
     override fun visitCallExpression(node: UCallExpression): Boolean {
-        if (visitedMethods.contains(node)) {
+        if (visitedMethods.contains(node) || visitedMethods.size > MAX_RECURSION_DEPTH) {
             return super.visitCallExpression(node)
         }
         val psiMethod = node.resolve() ?: return super.visitCallExpression(node)
