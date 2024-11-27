@@ -595,7 +595,12 @@ private fun MeasureScope.placeIcon(
     indicatorPlaceable: Placeable?,
     constraints: Constraints
 ): MeasureResult {
-    val width = constraints.maxWidth
+    val width =
+        if (constraints.maxWidth == Constraints.Infinity) {
+            iconPlaceable.width + NavigationBarItemToIconMinimumPadding.roundToPx() * 2
+        } else {
+            constraints.maxWidth
+        }
     val height = constraints.constrainHeight(NavigationBarHeight.roundToPx())
 
     val iconX = (width - iconPlaceable.width) / 2
@@ -684,7 +689,12 @@ private fun MeasureScope.placeLabelAndIcon(
             IndicatorVerticalPadding.toPx() +
             NavigationBarIndicatorToLabelPadding.toPx()
 
-    val containerWidth = constraints.maxWidth
+    val containerWidth =
+        if (constraints.maxWidth == Constraints.Infinity) {
+            iconPlaceable.width + NavigationBarItemToIconMinimumPadding.roundToPx() * 2
+        } else {
+            constraints.maxWidth
+        }
 
     val labelX = (containerWidth - labelPlaceable.width) / 2
     val iconX = (containerWidth - iconPlaceable.width) / 2
@@ -732,6 +742,9 @@ internal val IndicatorVerticalPadding: Dp =
         NavigationBarVerticalItemTokens.IconSize) / 2
 
 private val IndicatorVerticalOffset: Dp = 12.dp
+
+/*@VisibleForTesting*/
+internal val NavigationBarItemToIconMinimumPadding: Dp = 44.dp
 
 /** Interface that allows libraries to override the behavior of the [NavigationBar] component. */
 @ExperimentalMaterial3Api
