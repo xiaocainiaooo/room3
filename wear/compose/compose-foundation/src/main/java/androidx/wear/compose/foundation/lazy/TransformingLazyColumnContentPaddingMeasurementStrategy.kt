@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress.Companion.bottomItemScrollProgress
@@ -77,7 +78,7 @@ internal class TransformingLazyColumnContentPaddingMeasurementStrategy(
         }
 
         // Place the center item
-        var centerItem =
+        val centerItem =
             if (lastMeasuredAnchorItemHeight > 0) {
                 measuredItemProvider.downwardMeasuredItem(
                     anchorItemIndex,
@@ -106,8 +107,8 @@ internal class TransformingLazyColumnContentPaddingMeasurementStrategy(
         fun TransformingLazyColumnMeasuredItem.isVisible(): Boolean =
             offset + transformedHeight > 0 && offset < containerConstraints.maxHeight
 
-        var minIndex = Array(MEASURE_PASSES) { Int.MAX_VALUE }
-        var maxIndex = Array(MEASURE_PASSES) { Int.MIN_VALUE }
+        val minIndex = Array(MEASURE_PASSES) { Int.MAX_VALUE }
+        val maxIndex = Array(MEASURE_PASSES) { Int.MIN_VALUE }
 
         repeat(MEASURE_PASSES) { measurePass ->
             canScrollForward = true
@@ -188,7 +189,7 @@ internal class TransformingLazyColumnContentPaddingMeasurementStrategy(
                 centerItem.offset += scrollToBeConsumed.roundToInt()
             }
 
-            visibleItems.forEach {
+            visibleItems.fastForEach {
                 if (it.isVisible()) {
                     maxIndex[measurePass] = max(maxIndex[measurePass], it.index)
                     minIndex[measurePass] = min(minIndex[measurePass], it.index)
@@ -222,20 +223,24 @@ internal class TransformingLazyColumnContentPaddingMeasurementStrategy(
         }
 
         val firstPassOffsets = mutableObjectIntMapOf<Any>()
-        visibleItemsArr[0].forEach { firstPassOffsets[it.key] = it.offset }
+        visibleItemsArr[0].fastForEach { firstPassOffsets[it.key] = it.offset }
 
         // We don't need the first pass results anymore.
         visibleItemsArr[0].clear()
 
         val actuallyVisibleItems =
-            visibleItemsArr[1].filter { it.isVisible() || it.hasAnimations() }
+            visibleItemsArr[1].fastFilter { it.isVisible() || it.hasAnimations() }
 
         val anchorItem =
-            actuallyVisibleItems.minBy {
-                abs(it.offset + it.transformedHeight / 2 - containerConstraints.maxHeight / 2)
-            }
+            actuallyVisibleItems.anchorItem(containerConstraints.maxHeight)
+                ?: return emptyMeasureResult(
+                    containerConstraints = containerConstraints,
+                    beforeContentPadding = beforeContentPadding,
+                    afterContentPadding = afterContentPadding,
+                    layout = layout
+                )
 
-        actuallyVisibleItems.forEach { item ->
+        actuallyVisibleItems.fastForEach { item ->
             itemAnimator.getAnimation(item.key, 0)?.let {
                 it.transformedHeight = item.transformedHeight
             }
@@ -328,6 +333,20 @@ internal class TransformingLazyColumnContentPaddingMeasurementStrategy(
             visibleItems.add(additionalItem)
             bottomPassIndex += 1
         }
+    }
+
+    private fun List<TransformingLazyColumnMeasuredItem>.anchorItem(
+        maxHeight: Int
+    ): TransformingLazyColumnMeasuredItem? {
+        if (isEmpty()) return null
+
+        fastForEach {
+            // Item covers the center of the container.
+            if (it.offset < maxHeight / 2 && it.offset + it.transformedHeight > maxHeight / 2)
+                return it
+        }
+
+        return minBy { abs(it.offset + it.transformedHeight / 2 - maxHeight / 2) }
     }
 
     private val beforeContentPadding: Int =
