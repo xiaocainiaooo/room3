@@ -18,6 +18,9 @@ package androidx.webkit.internal;
 
 import android.webkit.WebView;
 
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewStartUpConfig;
+
 import org.chromium.support_lib_boundary.DropDataContentProviderBoundaryInterface;
 import org.chromium.support_lib_boundary.ProfileStoreBoundaryInterface;
 import org.chromium.support_lib_boundary.ProxyControllerBoundaryInterface;
@@ -126,5 +129,16 @@ public class WebViewProviderFactoryAdapter implements WebViewProviderFactory {
     public @NonNull ProfileStoreBoundaryInterface getProfileStore() {
         return BoundaryInterfaceReflectionUtil.castToSuppLibClass(
                 ProfileStoreBoundaryInterface.class, mImpl.getProfileStore());
+    }
+
+    @Override
+    public void startUpWebView(
+            @NonNull WebViewStartUpConfig config,
+            WebViewCompat.@NonNull WebViewStartUpCallback callback) {
+        mImpl.startUpWebView(
+                BoundaryInterfaceReflectionUtil.createInvocationHandlerFor(
+                        new WebViewStartUpConfigAdapter(config)),
+                BoundaryInterfaceReflectionUtil.createInvocationHandlerFor(
+                        new WebViewStartUpCallbackAdapter(callback)));
     }
 }
