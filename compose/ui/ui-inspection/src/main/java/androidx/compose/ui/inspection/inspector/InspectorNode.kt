@@ -148,6 +148,25 @@ internal class MutableInspectorNode {
     var viewId = UNDEFINED_ID
     val children = mutableListOf<InspectorNode>()
 
+    fun shallowCopy(node: MutableInspectorNode): MutableInspectorNode = apply {
+        id = node.id
+        key = node.key
+        anchorId = node.anchorId
+        mergedSemantics.addAll(node.mergedSemantics)
+        unmergedSemantics.addAll(node.unmergedSemantics)
+        name = node.name
+        fileName = node.fileName
+        packageHash = node.packageHash
+        lineNumber = node.lineNumber
+        offset = node.offset
+        box = node.box
+        bounds = node.bounds
+        inlined = node.inlined
+        parameters.addAll(node.parameters)
+        viewId = node.viewId
+        children.addAll(node.children)
+    }
+
     fun reset() {
         markUnwanted()
         id = UNDEFINED_ID

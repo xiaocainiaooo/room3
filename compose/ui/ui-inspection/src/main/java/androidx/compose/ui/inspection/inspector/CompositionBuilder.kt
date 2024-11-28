@@ -70,9 +70,9 @@ internal class CompositionBuilder(
 ) : SharedBuilderData by info {
     private var ownerView: View? = null
     private var subCompositionsFound = 0
-    private val subCompositions = mutableMapOf<Any?, SubCompositionResult>()
+    private val subCompositions = mutableMapOf<Any?, MutableList<SubCompositionResult>>()
     private var capturingSubCompositions =
-        mutableMapOf<MutableInspectorNode, SubCompositionResult>()
+        mutableMapOf<MutableInspectorNode, MutableList<SubCompositionResult>>()
 
     /**
      * Build a list of [InspectorNode] trees from a single [root] composition, and insert the
@@ -98,7 +98,9 @@ internal class CompositionBuilder(
         subCompositions.clear()
         childCompositions
             .filter { it.group != null && it.nodes.isNotEmpty() }
-            .associateByTo(subCompositions) { it.group }
+            .forEach { result ->
+                subCompositions.getOrPut(result.group) { mutableListOf() }.add(result)
+            }
         capturingSubCompositions.clear()
     }
 
@@ -186,19 +188,21 @@ internal class CompositionBuilder(
         // Note: Minimize the number of calls to identity by only looking for a fixed number of
         // sub-composition parents. Calling identity may create an anchor for the group.
         if (subCompositions.size > subCompositionsFound) {
-            subCompositions[group.identity]?.let { subComposition ->
+            subCompositions[group.identity]?.let { subCompositions ->
                 subCompositionsFound++
 
-                // Steal all the nodes from the sub-composition and add them to the parent.
-                parent.children.addAll(subComposition.nodes)
-                subComposition.nodes = emptyList()
-
-                if (subComposition.ownerView != ownerView) {
-                    // If the sub-composition belongs to a different view we may later
-                    // move the compositions back to the sub-composition with a few extra
-                    // parent nodes.
-                    parent.box = subComposition.ownerViewBox ?: emptyBox
-                    capturingSubCompositions[parent] = subComposition
+                subCompositions.forEach { subComposition ->
+                    if (subComposition.ownerView == ownerView || subComposition.ownerView == null) {
+                        // Steal all the nodes from the sub-compositions and add them to the parent.
+                        parent.children.addAll(subComposition.nodes)
+                        subComposition.nodes = emptyList()
+                    } else {
+                        // If the sub-composition belongs to a different view prepare to copy the
+                        // parent node to the sub-composition. See: checkCapturingSubCompositions.
+                        capturingSubCompositions
+                            .getOrPut(parent) { mutableListOf() }
+                            .add(subComposition)
+                    }
                 }
             }
         }
@@ -230,7 +234,12 @@ internal class CompositionBuilder(
         if (layoutInfo != null) {
             return parseLayoutInfo(layoutInfo, context, node)
         }
-        if (node.box == emptyBox || unwantedName(node.name)) {
+        // Keep an empty node if we are capturing nodes into sub-compositions.
+        // Mark it unwanted after copying the node to the sub-compositions.
+        if (
+            (node.box == emptyBox && !capturingSubCompositions.contains(node)) ||
+                unwantedName(node.name)
+        ) {
             return node.markUnwanted()
         }
         parseCallLocation(context.location, node)
@@ -254,26 +263,39 @@ internal class CompositionBuilder(
         }
         val subCompositionChildren = children.intersect(capturingSubCompositions.keys)
         val child = subCompositionChildren.singleOrNull() ?: return
-        val subComposition = capturingSubCompositions.remove(child)!!
-        if (node.box == emptyBox) {
-            node.box = subComposition.ownerViewBox ?: emptyBox
-            children.forEach {
-                if (it !== child) {
-                    it.markUnwanted()
-                }
+        val subCompositions = capturingSubCompositions.remove(child)!!
+        if (!child.isUnwanted) {
+            copyNodeToAllSubCompositions(child, subCompositions)
+            if (child.box == emptyBox) {
+                child.markUnwanted()
             }
-            capturingSubCompositions[node] = subComposition
-        } else {
-            subComposition.nodes = listOf(child.build(withSemantics = true))
-            child.markUnwanted()
-            child.children.clear()
+        }
+        if (node.box == emptyBox) {
+            // Prepare to copy the current
+            capturingSubCompositions[node] = subCompositions
+        }
+    }
+
+    private fun copyNodeToAllSubCompositions(
+        node: MutableInspectorNode,
+        subCompositions: List<SubCompositionResult>
+    ) {
+        subCompositions.forEach { subComposition ->
+            val copy = newNode(node)
+            copy.box = subComposition.ownerViewBox ?: emptyBox
+            copy.children.addAll(subComposition.nodes)
+            subComposition.nodes = listOf(copy.build())
         }
     }
 
     private fun updateSubCompositionsAtEnd(node: MutableInspectorNode?) {
-        val subComposition = node?.let { capturingSubCompositions.remove(node) } ?: return
-        subComposition.nodes = node.children.toList()
-        node.children.clear()
+        val subCompositions = node?.let { capturingSubCompositions.remove(node) } ?: return
+        if (!node.isUnwanted) {
+            copyNodeToAllSubCompositions(node, subCompositions)
+            if (node.box == emptyBox) {
+                node.markUnwanted()
+            }
+        }
     }
 
     private fun parseLayoutInfo(
@@ -380,6 +402,9 @@ internal class CompositionBuilder(
 
     private fun newNode(): MutableInspectorNode =
         if (cache.isNotEmpty()) cache.pop() else MutableInspectorNode()
+
+    private fun newNode(copyFrom: MutableInspectorNode): MutableInspectorNode =
+        newNode().shallowCopy(copyFrom)
 
     private fun release(node: MutableInspectorNode) {
         node.reset()
