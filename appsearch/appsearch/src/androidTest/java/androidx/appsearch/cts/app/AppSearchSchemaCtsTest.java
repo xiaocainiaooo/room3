@@ -1351,6 +1351,7 @@ public class AppSearchSchemaCtsTest {
         assertThat(schema.getParentTypes()).isEmpty();
     }
 
+    @Test
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testBlobHandlePropertyConfig() {
         AppSearchSchema schema = new AppSearchSchema.Builder("Test")

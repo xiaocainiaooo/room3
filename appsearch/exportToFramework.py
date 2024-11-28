@@ -209,13 +209,13 @@ class ExportToFramework:
     def _TransformTestCode(self, contents):
         contents = (contents
             .replace(
-                    'androidx.appsearch.testutil.CheckFlagsRule',
+                    'androidx.appsearch.testutil.flags.CheckFlagsRule',
                     'android.platform.test.flag.junit.CheckFlagsRule')
             .replace(
-                    'androidx.appsearch.testutil.DeviceFlagsValueProvider',
+                    'androidx.appsearch.testutil.flags.DeviceFlagsValueProvider',
                     'android.platform.test.flag.junit.DeviceFlagsValueProvider')
             .replace(
-                    'androidx.appsearch.testutil.RequiresFlagsEnabled',
+                    'androidx.appsearch.testutil.flags.RequiresFlagsEnabled',
                     'android.platform.test.annotations.RequiresFlagsEnabled')
             .replace('androidx.appsearch.testutil.', 'android.app.appsearch.testutil.')
             .replace(

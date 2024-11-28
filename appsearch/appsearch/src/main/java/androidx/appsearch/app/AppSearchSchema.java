@@ -893,6 +893,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
 
         /** Does not propagate deletion. */
         @ExperimentalAppSearchApi
+        @FlaggedApi(Flags.FLAG_ENABLE_DELETE_PROPAGATION_TYPE)
         public static final int DELETE_PROPAGATION_TYPE_NONE = 0;
 
         /**
@@ -915,6 +916,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                 name = Features
                         .SCHEMA_STRING_PROPERTY_CONFIG_DELETE_PROPAGATION_TYPE_PROPAGATE_FROM)
         @ExperimentalAppSearchApi
+        @FlaggedApi(Flags.FLAG_ENABLE_DELETE_PROPAGATION_TYPE)
         public static final int DELETE_PROPAGATION_TYPE_PROPAGATE_FROM = 1;
 
         StringPropertyConfig(@NonNull PropertyConfigParcel propertyConfigParcel) {
