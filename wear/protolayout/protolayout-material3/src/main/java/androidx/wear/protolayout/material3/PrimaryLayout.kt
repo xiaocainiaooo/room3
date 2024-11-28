@@ -375,7 +375,7 @@ private fun MaterialScope.getMarginForHeader(): Padding {
 /** Contains the default values used by Material layout. */
 internal object PrimaryLayoutDefaults {
     /** Tool tag for Metadata in Modifiers, so we know that Row is actually a PrimaryLayout. */
-    @VisibleForTesting const val METADATA_TAG: String = "PL"
+    @VisibleForTesting const val METADATA_TAG: String = "M3_PL"
 
     @Dimension(unit = DP) const val HEADER_MARGIN_TOP_DP: Int = 3
 
