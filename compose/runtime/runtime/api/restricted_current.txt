@@ -22,7 +22,7 @@ package androidx.compose.runtime {
   }
 
   public final class ActualJvm_jvmKt {
-    method @kotlin.PublishedApi internal static inline <R> R synchronized(Object lock, kotlin.jvm.functions.Function0<? extends R> block);
+    method @Deprecated @kotlin.PublishedApi internal static inline <R> R synchronized(Object lock, kotlin.jvm.functions.Function0<? extends R> block);
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface Applier<N> {
@@ -898,6 +898,14 @@ package androidx.compose.runtime.internal {
   @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface StabilityInferred {
     method public abstract int parameters();
     property public abstract int parameters;
+  }
+
+}
+
+package androidx.compose.runtime.platform {
+
+  public final class Synchronization_androidKt {
+    method @kotlin.PublishedApi internal static inline <R> R synchronized(Object lock, kotlin.jvm.functions.Function0<? extends R> block);
   }
 
 }

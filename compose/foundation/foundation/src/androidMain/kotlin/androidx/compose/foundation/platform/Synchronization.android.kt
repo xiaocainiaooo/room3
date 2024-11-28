@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.text.platform
+package androidx.compose.foundation.platform
 
-@PublishedApi internal actual class SynchronizedObject
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
-internal actual fun createSynchronizedObject() = SynchronizedObject()
+@Suppress("ACTUAL_WITHOUT_EXPECT") // https://youtrack.jetbrains.com/issue/KT-37316
+internal actual typealias SynchronizedObject = Any
 
-@PublishedApi
+@Suppress("NOTHING_TO_INLINE")
+internal actual inline fun makeSynchronizedObject(ref: Any?) = ref ?: SynchronizedObject()
+
+@Suppress("BanInlineOptIn")
+@OptIn(ExperimentalContracts::class)
 internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R {
+    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
     return kotlin.synchronized(lock, block)
 }

@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime
+package androidx.compose.runtime.platform
 
-internal expect class SynchronizedObject
+internal actual class SynchronizedObject
 
-/**
- * Returns [ref] as a [SynchronizedObject] on platforms where [Any] is a valid [SynchronizedObject],
- * or a new [SynchronizedObject] instance if [ref] is null or this is not supported on the current
- * platform.
- */
-internal expect inline fun makeSynchronizedObject(ref: Any? = null): SynchronizedObject
+@Suppress("NOTHING_TO_INLINE")
+internal actual inline fun makeSynchronizedObject(ref: Any?) = SynchronizedObject()
 
 @PublishedApi
-internal expect inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R
+internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R = block()

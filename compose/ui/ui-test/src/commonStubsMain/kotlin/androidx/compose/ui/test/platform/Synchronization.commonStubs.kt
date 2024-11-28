@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.internal
+package androidx.compose.ui.test.platform
 
-@Suppress("ACTUAL_WITHOUT_EXPECT") // https://youtrack.jetbrains.com/issue/KT-37316
-internal actual typealias JvmSynchronized = kotlin.jvm.Synchronized
+internal actual class SynchronizedObject
+
+@Suppress("NOTHING_TO_INLINE")
+internal actual inline fun makeSynchronizedObject(ref: Any?) = SynchronizedObject()
+
+@PublishedApi
+internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R = block()
