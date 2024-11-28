@@ -23,7 +23,7 @@ import org.jspecify.annotations.NonNull;
  * {@link Profile} prefetch operations.
  */
 @Profile.ExperimentalUrlPrefetch
-public final class PrefetchException extends RuntimeException {
+public class PrefetchException extends Exception {
     public PrefetchException(@NonNull String error) {
         super(error);
     }

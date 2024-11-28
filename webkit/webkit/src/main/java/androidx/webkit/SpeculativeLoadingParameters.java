@@ -31,15 +31,15 @@ import java.util.Map;
 @RequiresFeature(name = WebViewFeature.PROFILE_URL_PREFETCH,
         enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
 @Profile.ExperimentalUrlPrefetch
-public final class PrefetchParameters {
+public final class SpeculativeLoadingParameters {
     private final @NonNull Map<String, String> mAdditionalHeaders;
-    private final @Nullable NoVarySearchData mExpectedNoVarySearchData;
+    private final @Nullable NoVarySearchHeader mExpectedNoVarySearchHeader;
     private final boolean mIsJavaScriptEnabled;
 
-    private PrefetchParameters(@NonNull Map<String, String> additionalHeaders,
-            @Nullable NoVarySearchData noVarySearchData, boolean isJavaScriptEnabled) {
+    private SpeculativeLoadingParameters(@NonNull Map<String, String> additionalHeaders,
+            @Nullable NoVarySearchHeader noVarySearchHeader, boolean isJavaScriptEnabled) {
         mAdditionalHeaders = additionalHeaders;
-        mExpectedNoVarySearchData = noVarySearchData;
+        mExpectedNoVarySearchHeader = noVarySearchHeader;
         mIsJavaScriptEnabled = isJavaScriptEnabled;
     }
 
@@ -53,8 +53,8 @@ public final class PrefetchParameters {
     /**
      * @return The noVarySearch model built using {@link Builder}.
      */
-    public @Nullable NoVarySearchData getExpectedNoVarySearchData() {
-        return mExpectedNoVarySearchData;
+    public @Nullable NoVarySearchHeader getExpectedNoVarySearchData() {
+        return mExpectedNoVarySearchHeader;
     }
 
     /**
@@ -65,16 +65,16 @@ public final class PrefetchParameters {
     }
 
     /**
-     * A builder class to use to construct the {@link PrefetchParameters}.
+     * A builder class to use to construct the {@link SpeculativeLoadingParameters}.
      */
     public static final class Builder {
         private final @NonNull Map<String, String> mAdditionalHeaders;
-        private @Nullable NoVarySearchData mExpectedNoVarySearchData;
+        private @Nullable NoVarySearchHeader mExpectedNoVarySearchHeader;
         private boolean mIsJavaScriptEnabled;
 
         public Builder() {
             mAdditionalHeaders = new HashMap<>();
-            mExpectedNoVarySearchData = null;
+            mExpectedNoVarySearchHeader = null;
             mIsJavaScriptEnabled = false;
         }
 
@@ -86,8 +86,8 @@ public final class PrefetchParameters {
         @RequiresFeature(name = WebViewFeature.PROFILE_URL_PREFETCH,
                 enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
         @Profile.ExperimentalUrlPrefetch
-        public @NonNull PrefetchParameters build() {
-            return new PrefetchParameters(mAdditionalHeaders, mExpectedNoVarySearchData,
+        public @NonNull SpeculativeLoadingParameters build() {
+            return new SpeculativeLoadingParameters(mAdditionalHeaders, mExpectedNoVarySearchHeader,
                     mIsJavaScriptEnabled);
         }
 
@@ -104,6 +104,20 @@ public final class PrefetchParameters {
         }
 
         /**
+         * Sets multiple headers at once. The headers passed in here will
+         * be merged with any that have been previously set (duplicate keys
+         * will be overridden).
+         * <p>
+         * Header keys must be RFC 2616-compliant.
+         */
+        @Profile.ExperimentalUrlPrefetch
+        public @NonNull Builder addAdditionalHeaders(@NonNull Map<String, String>
+                additionalHeaders) {
+            mAdditionalHeaders.putAll(additionalHeaders);
+            return this;
+        }
+
+        /**
          * Sets the "No-Vary-Search data that's expected to be returned via. the
          * header in the prefetch's response. This is used to help determine if
          * WebView#loadUrl should either use an in-flight prefetch response to
@@ -112,8 +126,8 @@ public final class PrefetchParameters {
          */
         @Profile.ExperimentalUrlPrefetch
         public @NonNull Builder setExpectedNoVarySearchData(
-                @NonNull NoVarySearchData expectedNoVarySearchData) {
-            mExpectedNoVarySearchData = expectedNoVarySearchData;
+                @NonNull NoVarySearchHeader expectedNoVarySearchHeader) {
+            mExpectedNoVarySearchHeader = expectedNoVarySearchHeader;
             return this;
         }
 

@@ -29,13 +29,15 @@ import android.webkit.WebView;
 
 import androidx.annotation.RestrictTo;
 import androidx.annotation.VisibleForTesting;
-import androidx.webkit.PrefetchParameters;
+import androidx.core.os.CancellationSignal;
+import androidx.webkit.OutcomeReceiverCompat;
 import androidx.webkit.Profile;
 import androidx.webkit.ProfileStore;
 import androidx.webkit.ProxyConfig;
 import androidx.webkit.ProxyController;
 import androidx.webkit.SafeBrowsingResponseCompat;
 import androidx.webkit.ServiceWorkerClientCompat;
+import androidx.webkit.SpeculativeLoadingParameters;
 import androidx.webkit.TracingConfig;
 import androidx.webkit.TracingController;
 import androidx.webkit.WebMessageCompat;
@@ -406,10 +408,10 @@ public class WebViewFeatureInternal {
      * {@link androidx.webkit.ProcessGlobalConfig#setPartitionedCookiesEnabled(Context, boolean)}.
      */
     public static final StartupApiFeature.NoFramework
-                STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES =
-                        new StartupApiFeature.NoFramework(
-                                WebViewFeature.STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES,
-                                StartupFeatures.STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES);
+            STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES =
+            new StartupApiFeature.NoFramework(
+                    WebViewFeature.STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES,
+                    StartupFeatures.STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES);
 
     /**
      * This feature covers
@@ -443,7 +445,7 @@ public class WebViewFeatureInternal {
                     if (info == null) return false;
                     Matcher m = mVersionPattern.matcher(info.versionName);
                     return m.find() && Integer.parseInt(info.versionName.substring(m.start(),
-                                m.end())) >= 105;
+                            m.end())) >= 105;
                 }
             };
 
@@ -643,8 +645,8 @@ public class WebViewFeatureInternal {
     /**
      * Feature for {@link WebViewFeature#isFeatureSupported(String)}.
      * This feature covers
-     * {@link androidx.webkit.Profile#prefetchUrlAsync(String, PrefetchParameters)}
-     * {@link androidx.webkit.Profile#clearPrefetchAsync(String)}
+     * {@link androidx.webkit.Profile#prefetchUrlAsync(String, CancellationSignal, SpeculativeLoadingParameters, OutcomeReceiverCompat)}
+     * {@link androidx.webkit.Profile#clearPrefetchAsync(String, OutcomeReceiverCompat)}
      */
     public static final ApiFeature.NoFramework PROFILE_URL_PREFETCH =
             new ApiFeature.NoFramework(WebViewFeature.PROFILE_URL_PREFETCH,
