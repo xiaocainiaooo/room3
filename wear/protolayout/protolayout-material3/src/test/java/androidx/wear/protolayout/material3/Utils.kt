@@ -22,9 +22,9 @@ import androidx.test.core.app.ApplicationProvider
 
 // TODO: b/373336064 - Move this to protolayout-material3-testing
 internal fun enableDynamicTheme() {
-    Settings.Secure.putString(
+    Settings.Global.putInt(
         ApplicationProvider.getApplicationContext<Context>().contentResolver,
-        THEME_CUSTOMIZATION_OVERLAY_PACKAGES,
-        "Placeholder text that enables theming"
+        DYNAMIC_THEMING_SETTING_NAME,
+        /* dynamic theming is enabled */ 1
     )
 }
