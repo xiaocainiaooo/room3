@@ -1042,7 +1042,7 @@ public class GenericDocument {
      */
     @SuppressLint({"ArrayReturn", "NullableCollection"})
     @Nullable
-    @OptIn(markerClass = ExperimentalAppSearchApi.class)
+    @ExperimentalAppSearchApi
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     public AppSearchBlobHandle[] getPropertyBlobHandleArray(@NonNull String path) {
         Preconditions.checkNotNull(path);
