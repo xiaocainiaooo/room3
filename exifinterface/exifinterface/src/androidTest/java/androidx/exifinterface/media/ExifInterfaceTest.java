@@ -1795,6 +1795,8 @@ public class ExifInterfaceTest {
                 exifInterface, ExifInterface.TAG_PHOTOGRAPHIC_SENSITIVITY, expectedAttributes.iso);
         expect.that(exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0))
                 .isEqualTo(expectedAttributes.orientation);
+        expect.that(exifInterface.getAttributeInt(ExifInterface.TAG_PIXEL_Y_DIMENSION, 0))
+                .isEqualTo(expectedAttributes.pixelYDimension);
 
         // ExifInterface.TAG_XMP is documented as type byte[], so we access it using
         // getAttributeBytes instead of getAttribute, which would unavoidably convert it to an
