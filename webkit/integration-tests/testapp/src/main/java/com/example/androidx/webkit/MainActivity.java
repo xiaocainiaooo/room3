@@ -103,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
                 new MenuListView.MenuItem(
                         getResources().getString(R.string.async_startup_activity_title),
                         new Intent(activityContext, AsyncStartUpActivity.class)),
+                new MenuListView.MenuItem(
+                        getResources().getString(R.string.default_trafficstats_tagging_activity),
+                        new Intent(activityContext, DefaultTrafficStatsTaggingActivity.class)),
         };
         listView.setItems(menuItems);
     }
