@@ -14,12 +14,22 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.text.platform
+package androidx.compose.runtime.platform
 
-internal actual class SynchronizedObject
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+
+@Suppress("ACTUAL_WITHOUT_EXPECT") // https://youtrack.jetbrains.com/issue/KT-37316
+internal actual typealias SynchronizedObject = Any
 
 @Suppress("NOTHING_TO_INLINE")
-internal actual inline fun makeSynchronizedObject(ref: Any?) = SynchronizedObject()
+internal actual inline fun makeSynchronizedObject(ref: Any?) = ref ?: SynchronizedObject()
 
+@Suppress("BanInlineOptIn")
+@OptIn(ExperimentalContracts::class)
 @PublishedApi
-internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R = block()
+internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R {
+    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+    return kotlin.synchronized(lock, block)
+}
