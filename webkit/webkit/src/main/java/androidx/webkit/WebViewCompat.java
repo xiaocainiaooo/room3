@@ -1247,11 +1247,6 @@ public class WebViewCompat {
         config.getBackgroundExecutor().execute(() -> {
             // Invoke provider init.
             WebViewGlueCommunicator.getWebViewClassLoader();
-            if (!config.shouldRunUiThreadStartUpTasks()) {
-                new Handler(Looper.getMainLooper()).post(
-                        () -> callback.onSuccess(new NullReturningWebViewStartUpResult()));
-                return;
-            }
             if (WebViewFeatureInternal.ASYNC_WEBVIEW_STARTUP.isSupportedByWebView()) {
                 // We want to ensure that the callback is run on the Android main looper. The callee
                 // doesn't guarantee this. It's also desirable to post it to make sure that we don't
@@ -1265,11 +1260,17 @@ public class WebViewCompat {
                 });
                 return;
             }
-            // We never access the context in Chromium-based WebView and `startUpWebView` will
-            // only be called on Android API versions where the WebView is Chromium-based, so
-            // passing `null`.
-            // This method implicitly does WebView startup.
-            WebSettings.getDefaultUserAgent(null);
+            if (config.shouldRunUiThreadStartUpTasks()) {
+                // We never access the context in Chromium-based WebView and `startUpWebView` will
+                // only be called on Android API versions where the WebView is Chromium-based, so
+                // passing `null`.
+                // This method implicitly does WebView startup.
+                WebSettings.getDefaultUserAgent(null);
+            } else {
+                // On versions of WebView without the underlying support for the API the only part
+                // of startup we can do without blocking the UI thread already happened during
+                // `getWebViewClassLoader` above and so there's nothing more to do.
+            }
             // Trigger the callback from the main looper.
             // The framework doesn't support providing any diagnostic information, therefore,
             // returning `null` for every method.

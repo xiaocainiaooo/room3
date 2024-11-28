@@ -43,4 +43,12 @@ public class WebViewStartUpConfigAdapter implements WebViewStartUpConfigBoundary
     public Executor getBackgroundExecutor() {
         return mWebViewStartUpConfig.getBackgroundExecutor();
     }
+
+    /**
+     * Adapter method for {@link WebViewStartUpConfig#shouldRunUiThreadStartUpTasks()}.
+     */
+    @SuppressWarnings("MissingOverride")
+    public boolean shouldRunUiThreadStartUpTasks() {
+        return mWebViewStartUpConfig.shouldRunUiThreadStartUpTasks();
+    }
 }
