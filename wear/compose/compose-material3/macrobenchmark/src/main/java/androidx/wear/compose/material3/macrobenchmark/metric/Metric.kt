@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
+@file:OptIn(androidx.benchmark.perfetto.ExperimentalPerfettoTraceProcessorApi::class)
+
 package androidx.wear.compose.material3.macrobenchmark.metric
 
 import androidx.benchmark.macro.ExperimentalMetricApi
-import androidx.benchmark.macro.Metric
+import androidx.benchmark.macro.TraceMetric
 import androidx.benchmark.perfetto.PerfettoTraceProcessor
 
 /** A copy from aosp/3328563 */
 @ExperimentalMetricApi
-@Suppress(
-    "SEALED_INHERITOR_IN_DIFFERENT_MODULE",
-    "SEALED_INHERITOR_IN_DIFFERENT_PACKAGE",
-    "CANNOT_OVERRIDE_INVISIBLE_MEMBER",
-    "OPT_IN_USAGE_ERROR"
-)
-class FrameCostMetric : Metric() {
+class FrameCostMetric : TraceMetric() {
     override fun getMeasurements(
         captureInfo: CaptureInfo,
         traceSession: PerfettoTraceProcessor.Session
