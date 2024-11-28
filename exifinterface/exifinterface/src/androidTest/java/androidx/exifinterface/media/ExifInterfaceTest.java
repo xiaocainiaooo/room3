@@ -176,6 +176,21 @@ public class ExifInterfaceTest {
         testWritingExif(imageFile, ExpectedAttributes.JPEG_WITH_EXIF_WITH_XMP);
     }
 
+    /**
+     * {@link R.raw#jpeg_with_app1_after_dqt} is the same as {@link
+     * R.raw#jpeg_with_exif_byte_order_ii} but with the APP1 Exif segment moved after the DQT
+     * segment.
+     */
+    @Test
+    @LargeTest
+    public void testJpegWithApp1AfterDqt() throws Throwable {
+        File imageFile =
+                copyFromResourceToFile(
+                        R.raw.jpeg_with_app1_after_dqt, "jpeg_with_app1_after_dqt.jpg");
+        readFromFilesWithExif(imageFile, ExpectedAttributes.JPEG_WITH_APP1_AFTER_DQT);
+        testWritingExif(imageFile, ExpectedAttributes.JPEG_WITH_APP1_AFTER_DQT);
+    }
+
     // https://issuetracker.google.com/309843390
     @Test
     @LargeTest
@@ -2006,6 +2021,17 @@ public class ExifInterfaceTest {
         ExifInterface exifInterface = exifInterfaceFactory.create(imageFile);
         exifInterface.setAttribute(ExifInterface.TAG_MAKE, "abc");
         exifInterface.setAttribute(ExifInterface.TAG_XMP, TEST_XMP);
+        // Check expected modifications are visible without saving to disk (but offsets are now
+        // unknown).
+        expect.that(exifInterface.getAttribute(ExifInterface.TAG_MAKE)).isEqualTo("abc");
+        expect.that(exifInterface.getAttributeRange(ExifInterface.TAG_MAKE))
+                .isEqualTo(new long[] {-1, 4});
+        byte[] expectedXmpBytes = TEST_XMP.getBytes(Charsets.UTF_8);
+        expect.that(exifInterface.getAttributeBytes(ExifInterface.TAG_XMP))
+                .isEqualTo(expectedXmpBytes);
+        expect.that(exifInterface.getAttributeRange(ExifInterface.TAG_XMP))
+                .isEqualTo(new long[] {-1, expectedXmpBytes.length});
+
         exifInterface.saveAttributes();
 
         ExpectedAttributes.Builder expectedAttributesBuilder =
