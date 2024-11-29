@@ -56,7 +56,7 @@ internal suspend fun HealthConnectClient.aggregateBloodPressure(
 }
 
 private class BloodPressureAggregator(val bloodPressureMetrics: Set<AggregateMetric<*>>) :
-    Aggregator<BloodPressureRecord> {
+    SingeResultAggregator<BloodPressureRecord>() {
     val avgDataMap = mutableMapOf<AggregateMetric<Pressure>, AvgData>()
     val minMaxMap = mutableMapOf<AggregateMetric<Pressure>, Double?>()
 
