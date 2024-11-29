@@ -6433,9 +6433,9 @@ public class ExifInterface {
                     // Exif data in WebP images (e.g.
                     // https://github.com/ImageMagick/ImageMagick/issues/3140)
                     if (startsWith(payload, IDENTIFIER_EXIF_APP1)) {
-                        int adjustedChunkSize = chunkSize - IDENTIFIER_EXIF_APP1.length;
-                        payload = Arrays.copyOfRange(payload, IDENTIFIER_EXIF_APP1.length,
-                                adjustedChunkSize);
+                        payload =
+                                Arrays.copyOfRange(
+                                        payload, IDENTIFIER_EXIF_APP1.length, payload.length);
                     }
 
                     // Save offset to EXIF data for handling thumbnail and attribute offsets.
