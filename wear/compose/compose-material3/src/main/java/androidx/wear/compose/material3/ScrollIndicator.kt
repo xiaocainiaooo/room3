@@ -722,23 +722,40 @@ internal class TransformingLazyColumnStateAdapter(private val state: Transformin
     }
 
     private fun TransformingLazyColumnLayoutInfo.decimalLastItemIndex(): Float =
-        visibleItems.lastOrNull()?.let { lastItem ->
-            // Coerce item sizes to at least 1 to avoid divide by zero for zero height items.
-            val lastItemVisibleSize =
-                (viewportSize.height - lastItem.offset)
-                    .coerceAtMost(lastItem.transformedHeight)
-                    .coerceAtLeast(0)
-            return lastItem.index.toFloat() +
-                lastItemVisibleSize.toFloat() /
-                    lastItem.transformedHeight.coerceAtLeast(1).toFloat()
+        visibleItems.lastOrNull()?.let { lastVisibleItem ->
+            val isLastItem = lastVisibleItem.index == state.layoutInfo.totalItemsCount - 1
+            val extraPadding = if (isLastItem) state.layoutInfo.afterContentPadding else 0
+
+            // If our visible item is last in the list, we add afterContentPadding to its size
+            val lastVisibleItemSize =
+                (viewportSize.height - lastVisibleItem.offset).coerceIn(
+                    0,
+                    lastVisibleItem.transformedHeight + extraPadding
+                )
+
+            // Coerce item size to at least 1 to avoid divide by zero for zero height items
+            val lastVisibleItemFraction =
+                lastVisibleItemSize.toFloat() /
+                    (lastVisibleItem.transformedHeight + extraPadding).coerceAtLeast(1).toFloat()
+
+            return lastVisibleItem.index.toFloat() + lastVisibleItemFraction
         } ?: 0f
 
     private fun TransformingLazyColumnLayoutInfo.decimalFirstItemIndex(): Float =
-        visibleItems.firstOrNull()?.let { firstItem ->
-            // Coerce item size to at least 1 to avoid divide by zero for zero height items.
-            return firstItem.index.toFloat() -
-                firstItem.offset.coerceAtMost(0).toFloat() /
-                    firstItem.transformedHeight.coerceAtLeast(1).toFloat()
+        visibleItems.firstOrNull()?.let { firstVisibleItem ->
+            val isFirstItem = firstVisibleItem.index == 0
+            val extraPadding = if (isFirstItem) state.layoutInfo.beforeContentPadding else 0
+
+            // If our visible item is first in the list, we subtract beforeFirstItemPadding from its
+            // offset.
+            val firstVisibleItemSize =
+                (firstVisibleItem.offset - extraPadding).coerceAtMost(0).toFloat()
+
+            // Coerce item size to at least 1 to avoid divide by zero for zero height items
+            val firstVisibleItemFraction =
+                firstVisibleItemSize.toFloat() /
+                    (firstVisibleItem.transformedHeight + extraPadding).coerceAtLeast(1).toFloat()
+            return firstVisibleItem.index.toFloat() - firstVisibleItemFraction
         } ?: 0f
 }
 
