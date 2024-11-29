@@ -32,6 +32,7 @@ import org.robolectric.annotation.internal.DoNotInstrument
 @DoNotInstrument
 class MaterialScopeTest {
     @Test
+    @Config(minSdk = VERSION_CODES.VANILLA_ICE_CREAM)
     fun testDynamicThemeEnabled_returnsTrue() {
         enableDynamicTheme()
 
@@ -39,8 +40,8 @@ class MaterialScopeTest {
     }
 
     @Test
-    @Config(minSdk = VERSION_CODES.UPSIDE_DOWN_CAKE)
-    fun scopeWithDefaultTheme_defaultOptInDynamicColor_dynamicThemeEnabled_api34() {
+    @Config(minSdk = VERSION_CODES.VANILLA_ICE_CREAM)
+    fun scopeWithDefaultTheme_defaultOptInDynamicColor_dynamicThemeEnabled_api35() {
         enableDynamicTheme()
 
         val scopeWithDefaultTheme =
