@@ -80,7 +80,7 @@ abstract class BaseFragment : Fragment() {
      * This will be called when the drawer is opened or closed, to automatically flip the Z-ordering
      * of any remote views.
      */
-    abstract fun getSandboxedSdkViews(): List<SandboxedSdkView>
+    open fun getSandboxedSdkViews(): List<SandboxedSdkView> = emptyList()
 
     /**
      * Called when the @AdType or @MediationOption of any [SandboxedSdkView] inside the fragment is
@@ -92,11 +92,11 @@ abstract class BaseFragment : Fragment() {
      */
     // TODO(b/343436839) : Handle this automatically
     // TODO(b/348194843): Clean up the options
-    abstract fun handleLoadAdFromDrawer(
+    open fun handleLoadAdFromDrawer(
         adType: Int,
         mediationOption: Int,
         drawViewabilityLayer: Boolean
-    )
+    ) {}
 
     fun loadBannerAd(
         @AdType adType: Int,

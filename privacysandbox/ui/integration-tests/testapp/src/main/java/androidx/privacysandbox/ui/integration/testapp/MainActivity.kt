@@ -272,6 +272,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.item_scroll -> switchContentFragment(ScrollFragment(), it.title)
                 R.id.item_pooling_container ->
                     switchContentFragment(PoolingContainerFragment(), it.title)
+                R.id.item_fullscreen -> switchContentFragment(FullscreenSetupFragment(), it.title)
                 else -> {
                     Log.e(TAG, "Invalid fragment option")
                     true
