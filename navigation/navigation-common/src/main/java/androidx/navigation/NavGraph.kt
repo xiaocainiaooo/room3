@@ -474,6 +474,7 @@ public open class NavGraph(navGraphNavigator: Navigator<out NavGraph>) :
      * @param startDestRoute The route of the destination as an object to be shown when navigating
      *   to this NavGraph.
      */
+    @JvmSynthetic
     @OptIn(InternalSerializationApi::class)
     public fun <T : Any> setStartDestination(startDestRoute: T) {
         setStartDestination(startDestRoute::class.serializer()) { startDestination ->
