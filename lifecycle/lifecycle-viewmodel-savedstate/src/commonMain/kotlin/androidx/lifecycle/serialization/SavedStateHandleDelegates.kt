@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.lifecycle
+package androidx.lifecycle.serialization
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.savedstate.SavedState
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
@@ -67,7 +68,7 @@ fun <T : Any> SavedStateHandle.saved(
     serializer: KSerializer<T>,
     init: () -> T,
 ): ReadWriteProperty<Any?, T> {
-    return SerializablePropertyDelegate(
+    return SavedStateHandleDelegate(
         savedStateHandle = this,
         key = null,
         serializer = serializer,
@@ -89,7 +90,7 @@ fun <T : Any> SavedStateHandle.saved(
     serializer: KSerializer<T>,
     init: () -> T,
 ): ReadWriteProperty<Any?, T> {
-    return SerializablePropertyDelegate(
+    return SavedStateHandleDelegate(
         savedStateHandle = this,
         key = key,
         serializer = serializer,
@@ -97,7 +98,7 @@ fun <T : Any> SavedStateHandle.saved(
     )
 }
 
-private class SerializablePropertyDelegate<T : Any>(
+private class SavedStateHandleDelegate<T : Any>(
     private val savedStateHandle: SavedStateHandle,
     private val key: String?,
     private val serializer: KSerializer<T>,
