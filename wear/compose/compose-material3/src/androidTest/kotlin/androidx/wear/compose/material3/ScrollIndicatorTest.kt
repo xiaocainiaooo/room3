@@ -42,7 +42,10 @@ import androidx.test.filters.MediumTest
 import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
+import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
+import androidx.wear.compose.foundation.lazy.TransformingLazyColumnState
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import com.google.common.truth.Truth
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -269,6 +272,30 @@ class ScrollIndicatorTest {
             expectedIndicatorPosition = 0f,
             expectedIndicatorSize = 0.5f,
             itemsCount = 6
+        )
+    }
+
+    @Test
+    fun transformingLazyColumnStateAdapter_mediumContent_withContentPadding() {
+        val itemsCount = 6
+        val contentPadding = itemSizeDp + itemSpacingDp
+
+        // As TLC is centered at the centre of 0th item, we expect the list to have the top at
+        // position 0f, and the bottom at position 2f. To calculate the indicator size we need to
+        // divide their difference by the size of the list.
+        val expectedIndicatorSize = 2f / itemsCount
+
+        verifyTransformingLazyColumnPositionAndSize(
+            expectedIndicatorPosition = {
+                // By default TLC is centered around the 0th item, and content padding is equal to
+                // exactly 1 item in height. That means that our TLC is at the very top of the list.
+                Truth.assertThat(it).isEqualTo(0.0f)
+            },
+            expectedIndicatorSize = {
+                Truth.assertThat(it).isWithin(0.05f).of(expectedIndicatorSize)
+            },
+            itemsCount = itemsCount,
+            contentPaddingDp = contentPadding
         )
     }
 
@@ -519,18 +546,36 @@ class ScrollIndicatorTest {
     private fun verifyTransformingLazyColumnPositionAndSize(
         expectedIndicatorPosition: Float,
         expectedIndicatorSize: Float,
+        itemsCount: Int = 0,
+    ) {
+        verifyTransformingLazyColumnPositionAndSize(
+            expectedIndicatorPosition = {
+                Truth.assertThat(it).isWithin(0.05f).of(expectedIndicatorPosition)
+            },
+            expectedIndicatorSize = {
+                Truth.assertThat(it).isWithin(0.05f).of(expectedIndicatorSize)
+            },
+            itemsCount = itemsCount
+        )
+    }
+
+    private fun verifyTransformingLazyColumnPositionAndSize(
+        expectedIndicatorPosition: (actual: Float) -> Unit,
+        expectedIndicatorSize: (actual: Float) -> Unit,
         verticalArrangement: Arrangement.Vertical =
             Arrangement.spacedBy(space = itemSpacingDp, alignment = Alignment.Bottom),
+        contentPaddingDp: Dp = 0.dp,
         scrollByItems: Float = 0f,
         itemsCount: Int = 0,
     ) {
-        lateinit var state: LazyListState
+        lateinit var state: TransformingLazyColumnState
         lateinit var indicatorState: IndicatorState
         rule.setContent {
-            state = rememberLazyListState()
-            indicatorState = LazyColumnStateAdapter(state)
-            LazyColumn(
+            state = rememberTransformingLazyColumnState()
+            indicatorState = TransformingLazyColumnStateAdapter(state)
+            TransformingLazyColumn(
                 state = state,
+                contentPadding = PaddingValues(contentPaddingDp),
                 verticalArrangement = verticalArrangement,
                 modifier = Modifier.requiredSize(viewportSizeDp),
             ) {
@@ -549,10 +594,8 @@ class ScrollIndicatorTest {
         }
 
         rule.runOnIdle {
-            Truth.assertThat(indicatorState.positionFraction)
-                .isWithin(0.05f)
-                .of(expectedIndicatorPosition)
-            Truth.assertThat(indicatorState.sizeFraction).isWithin(0.05f).of(expectedIndicatorSize)
+            expectedIndicatorPosition(indicatorState.positionFraction)
+            expectedIndicatorSize(indicatorState.sizeFraction)
         }
     }
 }
