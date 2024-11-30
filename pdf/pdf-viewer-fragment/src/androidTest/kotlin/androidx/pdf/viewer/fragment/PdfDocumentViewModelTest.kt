@@ -16,8 +16,10 @@
 
 package androidx.pdf.viewer.fragment
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.pdf.SandboxedPdfLoader
+import androidx.pdf.viewer.coroutines.collectTill
 import androidx.pdf.viewer.coroutines.toListDuring
 import androidx.pdf.viewer.fragment.TestUtils.openFileAsUri
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState
@@ -110,6 +112,92 @@ class PdfDocumentViewModelTest {
         assertTrue(pdfViewModel.fragmentUiScreenState.value !is PdfFragmentUiState.Loading)
     }
 
-    // TODO: Add tests for password-protected pdf and corrupted pdf after test-artifact b/379743760
+    @Test
+    fun test_pdfDocumentViewModel_loadDocumentFailure_corruptedPdf() = runTest {
+        val documentUri = openFileAsUri(appContext, CORRUPTED_PDF)
 
+        val uiStates = mutableListOf<PdfFragmentUiState>()
+        // start collecting Ui states
+        val collectJob = launch {
+            pdfDocumentViewModel.fragmentUiScreenState.collectTill(uiStates) { state ->
+                state is PdfFragmentUiState.DocumentError
+            }
+        }
+        // load pdf document
+        pdfDocumentViewModel.loadDocument(documentUri, null)
+
+        // wait till collection is completed
+        collectJob.join()
+
+        // Since we've selected a corrupted unprotected pdf,
+        // ideally there should only 2 states transitions.
+        assertTrue(uiStates.size == 2)
+        // Assert the first state emitted was loading
+        assertTrue(uiStates.first() is PdfFragmentUiState.Loading)
+        // Assert the last state emitted was Document error
+        assertTrue(
+            pdfDocumentViewModel.fragmentUiScreenState.value is PdfFragmentUiState.DocumentError
+        )
+    }
+
+    @Test
+    fun test_pdfDocumentViewModel_loadDocumentFailure_invalidUriPath() = runTest {
+        val documentUri =
+            Uri.parse("file:///data/data/com.example.app/invalid/path/to/nonexistent/file.pdf")
+
+        val uiStates = mutableListOf<PdfFragmentUiState>()
+        // start collecting Ui states
+        val collectJob = launch {
+            pdfDocumentViewModel.fragmentUiScreenState.collectTill(uiStates) { state ->
+                state is PdfFragmentUiState.DocumentError
+            }
+        }
+        // load pdf document
+        pdfDocumentViewModel.loadDocument(documentUri, null)
+
+        // wait till collection is completed
+        collectJob.join()
+
+        // Since we've selected a invalid Uri Path,
+        // ideally there should only 2 states transitions.
+        assertTrue(uiStates.size == 2)
+        // Assert the first state emitted was loading
+        assertTrue(uiStates.first() is PdfFragmentUiState.Loading)
+        // Assert the last state emitted was Document error
+        assertTrue(
+            pdfDocumentViewModel.fragmentUiScreenState.value is PdfFragmentUiState.DocumentError
+        )
+    }
+
+    @Test
+    fun test_pdfDocumentViewModel_loadDocumentFailure_invalidUriScheme() = runTest {
+        val documentUri = Uri.parse("xyz://path/to/sample.pdf")
+
+        val uiStates = mutableListOf<PdfFragmentUiState>()
+        // start collecting Ui states
+        val collectJob = launch {
+            pdfDocumentViewModel.fragmentUiScreenState.collectTill(uiStates) { state ->
+                state is PdfFragmentUiState.DocumentError
+            }
+        }
+        // load pdf document
+        pdfDocumentViewModel.loadDocument(documentUri, null)
+
+        // wait till collection is completed
+        collectJob.join()
+
+        // Since we've selected a invalid Uri Scheme,
+        // ideally there should only 2 states transitions.
+        assertTrue(uiStates.size == 2)
+        // Assert the first state emitted was loading
+        assertTrue(uiStates.first() is PdfFragmentUiState.Loading)
+        // Assert the last state emitted was Document error
+        assertTrue(
+            pdfDocumentViewModel.fragmentUiScreenState.value is PdfFragmentUiState.DocumentError
+        )
+    }
+
+    companion object {
+        private const val CORRUPTED_PDF = "corrupted.pdf"
+    }
 }

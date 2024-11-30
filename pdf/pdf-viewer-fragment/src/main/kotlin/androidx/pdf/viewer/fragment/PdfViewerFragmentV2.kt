@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout.GONE
 import android.widget.LinearLayout.VISIBLE
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
 import androidx.fragment.app.Fragment
@@ -131,6 +132,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
     }
 
     private lateinit var pdfView: PdfView
+    private lateinit var errorView: TextView
     private lateinit var loadingView: ProgressBar
 
     override fun onCreateView(
@@ -141,6 +143,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         val root = inflater.inflate(R.layout.pdf_viewer_fragment, container, false)
         pdfView = root.findViewById(R.id.pdfView)
+        errorView = root.findViewById(R.id.errorTextView)
         loadingView = root.findViewById(R.id.pdfLoadingProgressBar)
 
         return root
@@ -177,27 +180,28 @@ public open class PdfViewerFragmentV2 : Fragment() {
     }
 
     private fun handleLoading() {
-        setViewVisibility(pdfView = GONE, loadingView = VISIBLE)
+        setViewVisibility(pdfView = GONE, loadingView = VISIBLE, errorView = GONE)
     }
 
     private fun handlePasswordRequested() {
-        setViewVisibility(pdfView = GONE, loadingView = GONE)
+        setViewVisibility(pdfView = GONE, loadingView = GONE, errorView = GONE)
         // Utilize retry param to show incorrect password on PasswordDialog
     }
 
     private fun handleDocumentLoaded(uiState: DocumentLoaded) {
         onLoadDocumentSuccess()
         pdfView.pdfDocument = uiState.pdfDocument
-        setViewVisibility(pdfView = VISIBLE, loadingView = GONE)
+        setViewVisibility(pdfView = VISIBLE, loadingView = GONE, errorView = GONE)
     }
 
     private fun handleDocumentError(uiState: DocumentError) {
         onLoadDocumentError(uiState.exception)
-        setViewVisibility(pdfView = GONE, loadingView = GONE)
+        setViewVisibility(pdfView = GONE, loadingView = GONE, errorView = VISIBLE)
     }
 
-    private fun setViewVisibility(pdfView: Int, loadingView: Int) {
+    private fun setViewVisibility(pdfView: Int, loadingView: Int, errorView: Int) {
         this.pdfView.visibility = pdfView
         this.loadingView.visibility = loadingView
+        this.errorView.visibility = errorView
     }
 }
