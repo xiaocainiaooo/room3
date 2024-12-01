@@ -30,6 +30,7 @@ import androidx.appsearch.app.GetSchemaResponse;
 import androidx.appsearch.app.OpenBlobForReadResponse;
 import androidx.appsearch.app.OpenBlobForWriteResponse;
 import androidx.appsearch.app.PutDocumentsRequest;
+import androidx.appsearch.app.RemoveBlobResponse;
 import androidx.appsearch.app.RemoveByDocumentIdRequest;
 import androidx.appsearch.app.ReportUsageRequest;
 import androidx.appsearch.app.SearchResults;
@@ -145,6 +146,18 @@ class SearchSessionImpl implements AppSearchSession, Closeable {
         throw new UnsupportedOperationException(Features.BLOB_STORAGE
                 + " is not available on this AppSearch implementation.");
     }
+
+    @NonNull
+    @Override
+    @ExperimentalAppSearchApi
+    public ListenableFuture<RemoveBlobResponse> removeBlobAsync(
+            @NonNull Set<AppSearchBlobHandle> handles) {
+        // TODO(b/273591938) Implement this method when blob implementation is synced to the
+        //  GmsCore.
+        throw new UnsupportedOperationException(Features.BLOB_STORAGE
+                + " is not available on this AppSearch implementation.");
+    }
+
 
     @NonNull
     @Override
