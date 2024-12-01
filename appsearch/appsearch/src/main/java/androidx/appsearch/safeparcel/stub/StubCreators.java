@@ -27,6 +27,7 @@ import androidx.appsearch.app.InternalVisibilityConfig;
 import androidx.appsearch.app.JoinSpec;
 import androidx.appsearch.app.OpenBlobForReadResponse;
 import androidx.appsearch.app.OpenBlobForWriteResponse;
+import androidx.appsearch.app.RemoveBlobResponse;
 import androidx.appsearch.app.RemoveByDocumentIdRequest;
 import androidx.appsearch.app.ReportUsageRequest;
 import androidx.appsearch.app.SchemaVisibilityConfig;
@@ -218,5 +219,10 @@ public class StubCreators {
     /** Stub creator for {@link OpenBlobForReadResponse}. */
     public static class OpenBlobForReadResponseCreator extends
             AbstractCreator<OpenBlobForReadResponse> {
+    }
+
+    /** Stub creator for {@link RemoveBlobResponse}. */
+    public static class RemoveBlobResponseCreator extends
+            AbstractCreator<RemoveBlobResponse> {
     }
 }

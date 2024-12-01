@@ -101,6 +101,7 @@ import com.google.android.icing.proto.GetSchemaResultProto;
 import com.google.android.icing.proto.IcingSearchEngineOptions;
 import com.google.android.icing.proto.InitializeResultProto;
 import com.google.android.icing.proto.LogSeverity;
+import com.google.android.icing.proto.NamespaceBlobStorageInfoProto;
 import com.google.android.icing.proto.NamespaceStorageInfoProto;
 import com.google.android.icing.proto.OptimizeResultProto;
 import com.google.android.icing.proto.PersistToDiskResultProto;
@@ -1133,7 +1134,6 @@ public final class AppSearchImpl implements Closeable {
         }
     }
 
-
     /**
      * Gets the {@link ParcelFileDescriptor} for write purpose of the given
      * {@link AppSearchBlobHandle}.
@@ -1163,9 +1163,43 @@ public final class AppSearchImpl implements Closeable {
 
             checkSuccess(result.getStatus());
             ParcelFileDescriptor pfd = ParcelFileDescriptor.adoptFd(result.getFileDescriptor());
-
             return mRevocableFileDescriptorStore
                     .wrapToRevocableFileDescriptor(handle.getPackageName(), pfd);
+        } finally {
+            mReadWriteLock.writeLock().unlock();
+        }
+    }
+
+    /**
+     * Remove and delete the blob file of given {@link AppSearchBlobHandle} from AppSearch
+     * storage.
+     *
+     * <p> This method will delete pending blob or committed blobs. Remove blobs that have reference
+     * documents linked to it will make those reference document has nothing to read.
+     *
+     * @param packageName    The package name that owns this blob.
+     * @param databaseName   The databaseName this blob resides in.
+     * @param handle         The {@link AppSearchBlobHandle} represent the blob.
+     */
+    @ExperimentalAppSearchApi
+    public void removeBlob(
+            @NonNull String packageName,
+            @NonNull String databaseName,
+            @NonNull AppSearchBlobHandle handle)
+            throws AppSearchException, IOException {
+        if (mRevocableFileDescriptorStore == null) {
+            throw new UnsupportedOperationException(
+                    "BLOB_STORAGE is not available on this AppSearch implementation.");
+        }
+        mReadWriteLock.writeLock().lock();
+        try {
+            throwIfClosedLocked();
+            verifyCallingBlobHandle(packageName, databaseName, handle);
+
+            BlobProto result = mIcingSearchEngineLocked.removeBlob(
+                    BlobHandleToProtoConverter.toBlobHandleProto(handle));
+
+            checkSuccess(result.getStatus());
         } finally {
             mReadWriteLock.writeLock().unlock();
         }
@@ -2163,34 +2197,38 @@ public final class AppSearchImpl implements Closeable {
 
     /** Estimates the storage usage info for a specific package. */
     @NonNull
+    @ExperimentalAppSearchApi
     public StorageInfo getStorageInfoForPackage(@NonNull String packageName)
             throws AppSearchException {
         mReadWriteLock.readLock().lock();
         try {
             throwIfClosedLocked();
 
-            Map<String, Set<String>> packageToDatabases = getPackageToDatabases();
-            Set<String> databases = packageToDatabases.get(packageName);
-            if (databases == null) {
-                // Package doesn't exist, no storage info to report
-                return new StorageInfo.Builder().build();
-            }
+            StorageInfo.Builder storageInfoBuilder = new StorageInfo.Builder();
+            if (Flags.enableBlobStore()) {
+                StorageInfoProto storageInfoProto = getRawStorageInfoProto();
+                // read blob storage info and set to storageInfoBuilder
+                getBlobStorageInfoForPrefix(storageInfoProto, packageName, storageInfoBuilder);
 
-            // Accumulate all the namespaces we're interested in.
-            Set<String> wantedPrefixedNamespaces = new ArraySet<>();
-            for (String database : databases) {
-                Set<String> prefixedNamespaces = mNamespaceMapLocked.get(createPrefix(packageName,
-                        database));
-                if (prefixedNamespaces != null) {
-                    wantedPrefixedNamespaces.addAll(prefixedNamespaces);
+                // read document storage info and set to storageInfoBuilder
+                Set<String> wantedPrefixedNamespaces =
+                        getAllPrefixedNamespaceForPackageLocked(packageName);
+                if (!wantedPrefixedNamespaces.isEmpty()) {
+                    getDocumentStorageInfoForNamespaces(storageInfoProto,
+                            wantedPrefixedNamespaces, storageInfoBuilder);
+                }
+            } else {
+                // blob flag off, only read document storage info and set to storageInfoBuilder if
+                // the database exists.
+                Set<String> wantedPrefixedNamespaces =
+                        getAllPrefixedNamespaceForPackageLocked(packageName);
+                if (!wantedPrefixedNamespaces.isEmpty()) {
+                    getDocumentStorageInfoForNamespaces(getRawStorageInfoProto(),
+                            wantedPrefixedNamespaces, storageInfoBuilder);
                 }
             }
-            if (wantedPrefixedNamespaces.isEmpty()) {
-                return new StorageInfo.Builder().build();
-            }
 
-            return getStorageInfoForNamespaces(getRawStorageInfoProto(),
-                    wantedPrefixedNamespaces);
+            return storageInfoBuilder.build();
         } finally {
             mReadWriteLock.readLock().unlock();
         }
@@ -2198,6 +2236,7 @@ public final class AppSearchImpl implements Closeable {
 
     /** Estimates the storage usage info for a specific database in a package. */
     @NonNull
+    @ExperimentalAppSearchApi
     public StorageInfo getStorageInfoForDatabase(@NonNull String packageName,
             @NonNull String databaseName)
             throws AppSearchException {
@@ -2205,25 +2244,39 @@ public final class AppSearchImpl implements Closeable {
         try {
             throwIfClosedLocked();
 
-            Map<String, Set<String>> packageToDatabases = getPackageToDatabases();
-            Set<String> databases = packageToDatabases.get(packageName);
-            if (databases == null) {
-                // Package doesn't exist, no storage info to report
-                return new StorageInfo.Builder().build();
-            }
-            if (!databases.contains(databaseName)) {
-                // Database doesn't exist, no storage info to report
-                return new StorageInfo.Builder().build();
-            }
+            StorageInfo.Builder storageInfoBuilder = new StorageInfo.Builder();
+            if (Flags.enableBlobStore()) {
+                StorageInfoProto storageInfoProto = getRawStorageInfoProto();
+                String prefix = createPrefix(packageName, databaseName);
+                getBlobStorageInfoForPrefix(storageInfoProto, prefix, storageInfoBuilder);
 
-            Set<String> wantedPrefixedNamespaces =
-                    mNamespaceMapLocked.get(createPrefix(packageName, databaseName));
-            if (wantedPrefixedNamespaces == null || wantedPrefixedNamespaces.isEmpty()) {
-                return new StorageInfo.Builder().build();
-            }
+                Set<String> wantedPrefixedNamespaces = mNamespaceMapLocked.get(prefix);
+                if (wantedPrefixedNamespaces == null || wantedPrefixedNamespaces.isEmpty()) {
+                    return storageInfoBuilder.build();
+                }
+                getDocumentStorageInfoForNamespaces(storageInfoProto, wantedPrefixedNamespaces,
+                        storageInfoBuilder);
+            } else {
+                Map<String, Set<String>> packageToDatabases = getPackageToDatabases();
+                Set<String> databases = packageToDatabases.get(packageName);
+                if (databases == null) {
+                    // Package doesn't exist, no storage info to report
+                    return storageInfoBuilder.build();
+                }
+                if (!databases.contains(databaseName)) {
+                    // Database doesn't exist, no storage info to report
+                    return storageInfoBuilder.build();
+                }
 
-            return getStorageInfoForNamespaces(getRawStorageInfoProto(),
-                    wantedPrefixedNamespaces);
+                Set<String> wantedPrefixedNamespaces =
+                        mNamespaceMapLocked.get(createPrefix(packageName, databaseName));
+                if (wantedPrefixedNamespaces == null || wantedPrefixedNamespaces.isEmpty()) {
+                    return storageInfoBuilder.build();
+                }
+                getDocumentStorageInfoForNamespaces(getRawStorageInfoProto(),
+                        wantedPrefixedNamespaces, storageInfoBuilder);
+            }
+            return storageInfoBuilder.build();
         } finally {
             mReadWriteLock.readLock().unlock();
         }
@@ -2253,13 +2306,22 @@ public final class AppSearchImpl implements Closeable {
     /**
      * Extracts and returns {@link StorageInfo} from {@link StorageInfoProto} based on
      * prefixed namespaces.
+     *
+     * @param storageInfoProto   The source {@link StorageInfoProto} containing storage information
+     *                           to be analyzed.
+     * @param prefixedNamespaces A set of prefixed namespaces that the storage information will be
+     *                           filtered against. Only namespaces in this set will be included
+     *                           in the analysis.
+     * @param storageInfoBuilder The {@link StorageInfo.Builder} used to and build the resulting
+     *                           {@link StorageInfo}. This builder will be modified with calculated
+     *                           values.
      */
-    @NonNull
-    private static StorageInfo getStorageInfoForNamespaces(
+    private static void getDocumentStorageInfoForNamespaces(
             @NonNull StorageInfoProto storageInfoProto,
-            @NonNull Set<String> prefixedNamespaces) {
+            @NonNull Set<String> prefixedNamespaces,
+            @NonNull StorageInfo.Builder storageInfoBuilder) {
         if (!storageInfoProto.hasDocumentStorageInfo()) {
-            return new StorageInfo.Builder().build();
+            return;
         }
 
         long totalStorageSize = storageInfoProto.getTotalStorageSize();
@@ -2271,7 +2333,7 @@ public final class AppSearchImpl implements Closeable {
 
         if (totalStorageSize == 0 || totalDocuments == 0) {
             // Maybe we can exit early and also avoid a divide by 0 error.
-            return new StorageInfo.Builder().build();
+            return;
         }
 
         // Accumulate stats across the package's namespaces.
@@ -2297,11 +2359,45 @@ public final class AppSearchImpl implements Closeable {
         // that while the total storage takes into account schema, index, etc. in addition to
         // documents, we'll only calculate the percentage based on number of documents a
         // client has.
-        return new StorageInfo.Builder()
+        storageInfoBuilder
                 .setSizeBytes((long) (namespaceDocuments * 1.0 / totalDocuments * totalStorageSize))
                 .setAliveDocumentsCount(aliveDocuments)
-                .setAliveNamespacesCount(aliveNamespaces)
-                .build();
+                .setAliveNamespacesCount(aliveNamespaces);
+    }
+
+    /**
+     * Extracts and returns blob storage information from {@link StorageInfoProto} based on
+     * a namespace prefix.
+     *
+     * @param storageInfoProto   The source {@link StorageInfoProto} containing blob storage
+     *                           information to be analyzed.
+     * @param prefix             The prefix to match namespaces against. Only blob storage for
+     *                           namespaces starting with this prefix will be included.
+     * @param storageInfoBuilder The {@link StorageInfo.Builder} used to and build the resulting
+     *                           {@link StorageInfo}. This builder will be modified with calculated
+     *                           values.
+     */
+    @ExperimentalAppSearchApi
+    private static void getBlobStorageInfoForPrefix(
+            @NonNull StorageInfoProto storageInfoProto,
+            @NonNull String prefix,
+            @NonNull StorageInfo.Builder storageInfoBuilder) {
+        if (storageInfoProto.getNamespaceBlobStorageInfoCount() == 0) {
+            return;
+        }
+        List<NamespaceBlobStorageInfoProto> blobStorageInfoProtos =
+                storageInfoProto.getNamespaceBlobStorageInfoList();
+        long blobSizeBytes = 0;
+        int blobCount = 0;
+        for (int i = 0; i < blobStorageInfoProtos.size(); i++) {
+            NamespaceBlobStorageInfoProto blobStorageInfoProto = blobStorageInfoProtos.get(i);
+            if (blobStorageInfoProto.getNamespace().startsWith(prefix)) {
+                blobSizeBytes += blobStorageInfoProto.getBlobSize();
+                blobCount += blobStorageInfoProto.getNumBlobs();
+            }
+        }
+        storageInfoBuilder.setBlobCount(blobCount)
+                .setBlobSizeBytes(blobSizeBytes);
     }
 
     /**
@@ -2895,6 +2991,20 @@ public final class AppSearchImpl implements Closeable {
         } finally {
             mReadWriteLock.readLock().unlock();
         }
+    }
+
+    @GuardedBy("mReadWriteLock")
+    @NonNull
+    private Set<String> getAllPrefixedNamespaceForPackageLocked(@NonNull String packageName) {
+        Set<String> wantedPrefixedNamespaces = new ArraySet<>();
+
+        // Accumulate all the namespaces we're interested in.
+        for (String prefix : mNamespaceMapLocked.keySet()) {
+            if (PrefixUtil.getPackageName(prefix).equals(packageName)) {
+                wantedPrefixedNamespaces.addAll(mNamespaceMapLocked.get(prefix));
+            }
+        }
+        return wantedPrefixedNamespaces;
     }
 
     /**

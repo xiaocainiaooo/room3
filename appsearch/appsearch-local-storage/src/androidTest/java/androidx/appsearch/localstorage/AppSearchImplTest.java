@@ -17,6 +17,7 @@
 package androidx.appsearch.localstorage;
 
 import static androidx.appsearch.app.AppSearchResult.RESULT_INVALID_ARGUMENT;
+import static androidx.appsearch.app.AppSearchResult.RESULT_NOT_FOUND;
 import static androidx.appsearch.app.AppSearchResult.RESULT_OUT_OF_SPACE;
 import static androidx.appsearch.localstorage.util.PrefixUtil.addPrefixToDocument;
 import static androidx.appsearch.localstorage.util.PrefixUtil.createPrefix;
@@ -2294,6 +2295,117 @@ public class AppSearchImplTest {
 
     @Test
     @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testRemovePendingBlob() throws Exception {
+        mAppSearchImpl = AppSearchImpl.create(
+                mAppSearchDir,
+                new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new LocalStorageIcingOptionsConfig()),
+                /*initStatsBuilder=*/ null,
+                /*visibilityChecker=*/ null,
+                new JetpackRevocableFileDescriptorStore(mUnlimitedConfig),
+                ALWAYS_OPTIMIZE);
+        byte[] data = generateRandomBytes(20 * 1024); // 20 KiB
+        byte[] digest = calculateDigest(data);
+        AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
+                digest, "package", "db1", "ns");
+        try (ParcelFileDescriptor writePfd = mAppSearchImpl.openWriteBlob("package", "db1", handle);
+                    OutputStream outputStream = new ParcelFileDescriptor
+                        .AutoCloseOutputStream(writePfd)) {
+            outputStream.write(data);
+            outputStream.flush();
+        }
+
+        mAppSearchImpl.commitBlob("package", "db1", handle);
+
+        // Remove the committed blob
+        mAppSearchImpl.removeBlob("package", "db1", handle);
+
+        // Read will get NOT_FOUND
+        AppSearchException e = assertThrows(AppSearchException.class,
+                () -> mAppSearchImpl.openReadBlob("package", "db1", handle));
+        assertThat(e.getResultCode()).isEqualTo(RESULT_NOT_FOUND);
+        assertThat(e.getMessage()).contains("Cannot find the blob for handle");
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testRemoveCommittedBlob() throws Exception {
+        mAppSearchImpl = AppSearchImpl.create(
+                mAppSearchDir,
+                new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new LocalStorageIcingOptionsConfig()),
+                /*initStatsBuilder=*/ null,
+                /*visibilityChecker=*/ null,
+                new JetpackRevocableFileDescriptorStore(mUnlimitedConfig),
+                ALWAYS_OPTIMIZE);
+        byte[] data = generateRandomBytes(20 * 1024); // 20 KiB
+        byte[] digest = calculateDigest(data);
+        AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
+                digest, "package", "db1", "ns");
+        try (ParcelFileDescriptor writePfd = mAppSearchImpl.openWriteBlob("package", "db1", handle);
+                OutputStream outputStream = new ParcelFileDescriptor
+                        .AutoCloseOutputStream(writePfd)) {
+            outputStream.write(data);
+            outputStream.flush();
+        }
+
+        // Remove the blob
+        mAppSearchImpl.removeBlob("package", "db1", handle);
+
+        // Commit will get NOT_FOUND
+        AppSearchException e = assertThrows(AppSearchException.class,
+                () -> mAppSearchImpl.commitBlob("package", "db1", handle));
+        assertThat(e.getResultCode()).isEqualTo(RESULT_NOT_FOUND);
+        assertThat(e.getMessage()).contains("Cannot find the blob for handle");
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testRemoveAndReWriteBlob() throws Exception {
+        mAppSearchImpl = AppSearchImpl.create(
+                mAppSearchDir,
+                new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new LocalStorageIcingOptionsConfig()),
+                /*initStatsBuilder=*/ null,
+                /*visibilityChecker=*/ null,
+                new JetpackRevocableFileDescriptorStore(mUnlimitedConfig),
+                ALWAYS_OPTIMIZE);
+        byte[] data = generateRandomBytes(20 * 1024); // 20 KiB
+        byte[] wrongData = generateRandomBytes(10 * 1024); // 10 KiB
+        byte[] digest = calculateDigest(data);
+        AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
+                digest, "package", "db1", "ns");
+        try (ParcelFileDescriptor writePfd = mAppSearchImpl.openWriteBlob("package", "db1", handle);
+                    OutputStream outputStream = new ParcelFileDescriptor
+                        .AutoCloseOutputStream(writePfd)) {
+            // write wrong data
+            outputStream.write(wrongData);
+            outputStream.flush();
+        }
+
+        // Remove the blob
+        mAppSearchImpl.removeBlob("package", "db1", handle);
+
+        // reopen and rewrite
+        try (ParcelFileDescriptor writePfd = mAppSearchImpl.openWriteBlob("package", "db1", handle);
+                OutputStream outputStream = new ParcelFileDescriptor
+                        .AutoCloseOutputStream(writePfd)) {
+            outputStream.write(data);
+            outputStream.flush();
+        }
+
+        // commit the change and read the blob.
+        mAppSearchImpl.commitBlob("package", "db1", handle);
+        byte[] readBytes = new byte[20 * 1024];
+        try (ParcelFileDescriptor readPfd =  mAppSearchImpl.openReadBlob("package", "db1", handle);
+                InputStream inputStream = new ParcelFileDescriptor.AutoCloseInputStream(readPfd)) {
+            inputStream.read(readBytes);
+        }
+        assertThat(readBytes).isEqualTo(data);
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testOpenReadForWrite_notAllowed() throws Exception {
         mAppSearchImpl = AppSearchImpl.create(
                 mAppSearchDir,
@@ -2308,8 +2420,8 @@ public class AppSearchImplTest {
         AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
                 digest, "package", "db1", "ns");
         try (ParcelFileDescriptor writePfd = mAppSearchImpl.openWriteBlob("package", "db1", handle);
-                OutputStream outputStream = new ParcelFileDescriptor
-                        .AutoCloseOutputStream(writePfd)) {
+                    OutputStream outputStream = new ParcelFileDescriptor
+                            .AutoCloseOutputStream(writePfd)) {
             outputStream.write(data);
             outputStream.flush();
         }
@@ -3098,6 +3210,112 @@ public class AppSearchImplTest {
         // Size is proportional to number of documents. Since "database2" has twice as many
         // documents as "database1", its size is twice as much too.
         assertThat(size2).isAtLeast(2 * size1);
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testGetStorageInfoForPackage_withBlob() throws Exception {
+        mAppSearchImpl = AppSearchImpl.create(
+                mAppSearchDir,
+                new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new LocalStorageIcingOptionsConfig()),
+                /*initStatsBuilder=*/ null,
+                /*visibilityChecker=*/ null,
+                new JetpackRevocableFileDescriptorStore(mUnlimitedConfig),
+                ALWAYS_OPTIMIZE);
+
+        byte[] data1 = generateRandomBytes(5 * 1024); // 5 KiB
+        byte[] digest1 = calculateDigest(data1);
+        AppSearchBlobHandle handle1 = AppSearchBlobHandle.createWithSha256(
+                digest1, "package1", "db1", "ns");
+        ParcelFileDescriptor writePfd1 = mAppSearchImpl.openWriteBlob("package1", "db1", handle1);
+        try (OutputStream outputStream = new ParcelFileDescriptor
+                .AutoCloseOutputStream(writePfd1)) {
+            outputStream.write(data1);
+            outputStream.flush();
+        }
+
+        byte[] data2 = generateRandomBytes(10 * 1024); // 10 KiB
+        byte[] digest2 = calculateDigest(data2);
+        AppSearchBlobHandle handle2 = AppSearchBlobHandle.createWithSha256(
+                digest2, "package1", "db1", "ns");
+        ParcelFileDescriptor writePfd2 = mAppSearchImpl.openWriteBlob("package1", "db1", handle2);
+        try (OutputStream outputStream = new ParcelFileDescriptor
+                .AutoCloseOutputStream(writePfd2)) {
+            outputStream.write(data2);
+            outputStream.flush();
+        }
+
+        byte[] data3 = generateRandomBytes(20 * 1024); // 20 KiB
+        byte[] digest3 = calculateDigest(data3);
+        AppSearchBlobHandle handle3 = AppSearchBlobHandle.createWithSha256(
+                digest3, "package2", "db1", "ns");
+        ParcelFileDescriptor writePfd3 = mAppSearchImpl.openWriteBlob("package2", "db1", handle3);
+        try (OutputStream outputStream = new ParcelFileDescriptor
+                .AutoCloseOutputStream(writePfd3)) {
+            outputStream.write(data3);
+            outputStream.flush();
+        }
+
+        StorageInfo storageInfo1 = mAppSearchImpl.getStorageInfoForPackage("package1");
+        assertThat(storageInfo1.getBlobSizeBytes()).isEqualTo(15 * 1024);
+        assertThat(storageInfo1.getBlobCount()).isEqualTo(2);
+        StorageInfo storageInfo2 = mAppSearchImpl.getStorageInfoForPackage("package2");
+        assertThat(storageInfo2.getBlobSizeBytes()).isEqualTo(20 * 1024);
+        assertThat(storageInfo2.getBlobCount()).isEqualTo(1);
+    }
+
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testGetStorageInfoForDatabase_withBlob() throws Exception {
+        mAppSearchImpl = AppSearchImpl.create(
+                mAppSearchDir,
+                new AppSearchConfigImpl(new UnlimitedLimitConfig(),
+                        new LocalStorageIcingOptionsConfig()),
+                /*initStatsBuilder=*/ null,
+                /*visibilityChecker=*/ null,
+                new JetpackRevocableFileDescriptorStore(mUnlimitedConfig),
+                ALWAYS_OPTIMIZE);
+        byte[] data1 = generateRandomBytes(5 * 1024); // 5 KiB
+        byte[] digest1 = calculateDigest(data1);
+        AppSearchBlobHandle handle1 = AppSearchBlobHandle.createWithSha256(
+                digest1, "package", "db1", "ns");
+        ParcelFileDescriptor writePfd1 = mAppSearchImpl.openWriteBlob("package", "db1", handle1);
+        try (OutputStream outputStream = new ParcelFileDescriptor
+                .AutoCloseOutputStream(writePfd1)) {
+            outputStream.write(data1);
+            outputStream.flush();
+        }
+
+        byte[] data2 = generateRandomBytes(10 * 1024); // 10 KiB
+        byte[] digest2 = calculateDigest(data2);
+        AppSearchBlobHandle handle2 = AppSearchBlobHandle.createWithSha256(
+                digest2, "package", "db1", "ns");
+        ParcelFileDescriptor writePfd2 = mAppSearchImpl.openWriteBlob("package", "db1", handle2);
+        try (OutputStream outputStream = new ParcelFileDescriptor
+                .AutoCloseOutputStream(writePfd2)) {
+            outputStream.write(data2);
+            outputStream.flush();
+        }
+
+        byte[] data3 = generateRandomBytes(20 * 1024); // 20 KiB
+        byte[] digest3 = calculateDigest(data3);
+        AppSearchBlobHandle handle3 = AppSearchBlobHandle.createWithSha256(
+                digest3, "package", "db2", "ns");
+        ParcelFileDescriptor writePfd3 = mAppSearchImpl.openWriteBlob("package", "db2", handle3);
+        try (OutputStream outputStream = new ParcelFileDescriptor
+                .AutoCloseOutputStream(writePfd3)) {
+            outputStream.write(data3);
+            outputStream.flush();
+        }
+
+        StorageInfo storageInfo1 = mAppSearchImpl.getStorageInfoForDatabase("package", "db1");
+        assertThat(storageInfo1.getBlobSizeBytes()).isEqualTo(15 * 1024);
+        assertThat(storageInfo1.getBlobCount()).isEqualTo(2);
+        StorageInfo storageInfo2 = mAppSearchImpl.getStorageInfoForDatabase("package", "db2");
+        assertThat(storageInfo2.getBlobSizeBytes()).isEqualTo(20 * 1024);
+        assertThat(storageInfo2.getBlobCount()).isEqualTo(1);
     }
 
     @Test

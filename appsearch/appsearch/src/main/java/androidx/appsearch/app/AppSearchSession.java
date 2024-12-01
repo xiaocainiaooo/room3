@@ -145,6 +145,9 @@ public interface AppSearchSession extends Closeable {
      * references it. Uncommitted pending blob files and orphan blobs files will be cleaned up if
      * they has been created for an extended period (default is 1 week).
      *
+     * <p> Both pending blob files and committed blob files can be manually removed via
+     * {@link #removeBlobAsync}.
+     *
      * <p class="caution">
      * The returned {@link OpenBlobForWriteResponse} must be closed after use to avoid
      * resource leaks. Failing to close it will result in system file descriptor exhaustion.
@@ -160,11 +163,38 @@ public interface AppSearchSession extends Closeable {
             name = Features.BLOB_STORAGE)
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     @ExperimentalAppSearchApi
-    // TODO(b/273591938) improve the java doc when we support abandon pending blobs.
     @NonNull
     ListenableFuture<OpenBlobForWriteResponse> openBlobForWriteAsync(
             @NonNull Set<AppSearchBlobHandle> handles);
 
+    /**
+     * Removes the blob data from AppSearch.
+     *
+     * <p> After this call, the blob data is removed immediately and cannot be recovered. It will
+     * not accessible via {@link #openBlobForReadAsync}. {@link #openBlobForWriteAsync} could reopen
+     * and rewrite it.
+     *
+     * <p> This API can be used to remove pending blob data and committed blob data.
+     *
+     * <p class="caution">
+     * Removing a committed blob data that is still referenced by documents will leave those
+     * documents with no readable blob content. It is highly recommended to let AppSearch control
+     * the blob data's life cycle. AppSearch automatically recycles orphaned and pending blob data.
+     * The default time to recycle pending and orphan blob file is 1 week. A blob file will be
+     * considered as an orphan if no {@link GenericDocument} references it. If you want to remove a
+     * committed blob data, you should remove the reference documents first.
+     * </p>
+     *
+     * @param handles The {@link AppSearchBlobHandle}s that identifies the blob data.
+     * @return a response containing the remove results.
+     */
+    @RequiresFeature(
+            enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
+            name = Features.BLOB_STORAGE)
+    @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
+    @ExperimentalAppSearchApi
+    @NonNull
+    ListenableFuture<RemoveBlobResponse> removeBlobAsync(@NonNull Set<AppSearchBlobHandle> handles);
 
     /**
      * Commits the blobs to make it retrievable and immutable.
@@ -188,6 +218,9 @@ public interface AppSearchSession extends Closeable {
      * <p> The default time to recycle pending and orphan blobs is 1 week. A blob will be considered
      * as an orphan if no {@link GenericDocument} references it.
      *
+     * <p> Both pending blob files and committed blob files can be manually removed via
+     * {@link #removeBlobAsync}.
+     *
      * @param handles The {@link AppSearchBlobHandle}s that identifies the blobs.
      * @return a response containing the commit results.
      *
@@ -199,8 +232,7 @@ public interface AppSearchSession extends Closeable {
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     @ExperimentalAppSearchApi
     @NonNull
-    ListenableFuture<CommitBlobResponse> commitBlobAsync(
-            @NonNull Set<AppSearchBlobHandle> handles);
+    ListenableFuture<CommitBlobResponse> commitBlobAsync(@NonNull Set<AppSearchBlobHandle> handles);
 
     /**
      * Opens a batch of AppSearch Blobs for reading.
