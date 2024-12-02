@@ -21,7 +21,12 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
 import org.junit.Rule
 import org.junit.Test
@@ -154,6 +159,54 @@ class SerializationTest {
             assertThat(serializable).isEqualTo(emptyList<Double>())
         }
     }
+
+    @Test
+    fun setBeforeGetShouldNotCallInit() {
+        activityTestRuleScenario.scenario.onActivity { activity ->
+            val viewModel: MyViewModel = ViewModelProvider(activity)[MyViewModel::class]
+            var serializable: Int by
+                viewModel.savedStateHandle.saved(serializer = noDeserializeSerializer()) {
+                    error("Unexpected initializer call")
+                }
+            serializable = 2
+            assertThat(serializable).isEqualTo(2)
+        }
+    }
+
+    @Test
+    fun setBeforeGetShouldNotLoadFromSavedState() {
+        activityTestRuleScenario.scenario.onActivity { activity ->
+            val viewModel: MyViewModel = ViewModelProvider(activity)[MyViewModel::class]
+            var serializable: Int by
+                viewModel.savedStateHandle.saved(serializer = noDeserializeSerializer()) {
+                    error("Unexpected initializer call")
+                }
+            serializable = 2
+        }
+        activityTestRuleScenario.scenario.recreate()
+        activityTestRuleScenario.scenario.onActivity { activity ->
+            val viewModel: MyViewModel = ViewModelProvider(activity)[MyViewModel::class]
+            var serializable: Int by
+                viewModel.savedStateHandle.saved(serializer = noDeserializeSerializer()) {
+                    error("Unexpected initializer call")
+                }
+            serializable = 3
+            assertThat(serializable).isEqualTo(3)
+        }
+    }
 }
 
 class MyViewModel(val savedStateHandle: SavedStateHandle) : ViewModel()
+
+private inline fun <reified T> noDeserializeSerializer(): KSerializer<T> =
+    object : KSerializer<T> {
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("NoDeserialize")
+
+        override fun serialize(encoder: Encoder, value: T) {
+            serializer<T>().serialize(encoder, value)
+        }
+
+        override fun deserialize(decoder: Decoder): T {
+            error("Unexpected deserialize call")
+        }
+    }
