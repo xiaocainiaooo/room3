@@ -145,7 +145,7 @@ class SandboxedSdkViewTest {
     }
 
     @Test
-    fun secondEventListenersAttachedTest() {
+    fun newEventListenerOverridesOldListenerTest() {
         val eventListener1 = TestEventListener()
         val eventListener2 = TestEventListener()
         view.setEventListener(eventListener1)
