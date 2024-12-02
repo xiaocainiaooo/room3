@@ -2479,6 +2479,10 @@ package androidx.compose.ui.layout {
     property public abstract int width;
   }
 
+  public final class LayoutInfo_androidKt {
+    method public static android.view.View? getView(androidx.compose.ui.layout.LayoutInfo);
+  }
+
   public final class LayoutKt {
     method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static inline void Layout(optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
     method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static inline void Layout(java.util.List<? extends kotlin.jvm.functions.Function0<kotlin.Unit>> contents, optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.MultiContentMeasurePolicy measurePolicy);
