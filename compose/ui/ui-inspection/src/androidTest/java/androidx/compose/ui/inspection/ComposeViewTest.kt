@@ -57,11 +57,7 @@ class ComposeViewTest {
 
         val thirdRoot = roots[2].nodesList.single()
         assertThat(strings[thirdRoot.name]).isEqualTo("createAndroidViewNodeFactory")
-        assertThat(thirdRoot.flags)
-            .isEqualTo(
-                ComposableNode.Flags.NESTED_SINGLE_CHILDREN_VALUE or
-                    ComposableNode.Flags.SYSTEM_CREATED_VALUE
-            )
+        assertThat(thirdRoot.flags).isEqualTo(ComposableNode.Flags.NESTED_SINGLE_CHILDREN_VALUE)
         assertThat(thirdRoot.childrenList.size).isAtLeast(4)
         val nested1 = thirdRoot.childrenList[0]
         assertThat(strings[nested1.name]).isEqualTo("Nested")
