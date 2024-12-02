@@ -296,19 +296,29 @@ private fun Project.configureLint(lint: Lint, isLibrary: Boolean) {
         fatal.add("UastImplementation") // go/hide-uast-impl
         fatal.add("KotlincFE10") // b/239982263
 
-        // If the project has not overridden the lint config, set the default one.
-        if (lintConfig == null) {
-            val lintXmlPath =
-                if (extension.type == LibraryType.SAMPLES) {
-                    "buildSrc/lint_samples.xml"
-                } else {
-                    "buildSrc/lint.xml"
-                }
-            // suppress warnings more specifically than issue-wide severity (regexes)
-            // Currently suppresses warnings from baseline files working as intended
-            lintConfig = File(project.getSupportRootFolder(), lintXmlPath)
+        val lintXmlPath =
+            if (extension.type == LibraryType.SAMPLES) {
+                "buildSrc/lint_samples.xml"
+            } else {
+                "buildSrc/lint.xml"
+            }
+
+        // Prevent libraries from fully overriding the config from buildSrc. Projects can create a
+        // custom lint.xml that will also be picked up by lint (which searches for one starting from
+        // the project dir and then moving up directories). The order of precedence for config rules
+        // is here: https://googlesamples.github.io/android-custom-lint-rules/usage/lintxml.md.html
+        if (lintConfig != null) {
+            throw IllegalStateException(
+                "Project should not override the lint configuration from `$lintXmlPath`.\n" +
+                    "To add additional lint configuration for this project, create a `lint.xml` " +
+                    "file in the project directory but do not set it as the `lintConfig` in the " +
+                    "project's build file."
+            )
         }
 
+        // suppress warnings more specifically than issue-wide severity (regexes)
+        // Currently suppresses warnings from baseline files working as intended
+        lintConfig = File(project.getSupportRootFolder(), lintXmlPath)
         baseline = lintBaseline.get().asFile
     }
 }
