@@ -168,8 +168,8 @@ final class ExpectedAttributes {
                     .setThumbnailOffset(212271)
                     .setMakeOffset(211525)
                     .setFocalLength("41/10")
-                    // TODO: b/332793608 - Add expected XMP values and offset/length when
-                    //  ExifInterface can parse the iTXt chunk.
+                    .setXmpResourceId(R.raw.png_xmp)
+                    .setXmpOffsetAndLength(352, 1409)
                     .build();
 
     /** Expected attributes for {@link R.raw#webp_with_exif}. */
