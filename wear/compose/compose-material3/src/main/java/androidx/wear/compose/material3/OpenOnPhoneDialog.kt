@@ -287,7 +287,7 @@ object OpenOnPhoneDialogDefaults {
         get() {
             return mDefaultOpenOnPhoneDialogColorsCached
                 ?: OpenOnPhoneDialogColors(
-                        iconColor = fromToken(ColorSchemeKeyTokens.Primary),
+                        iconColor = fromToken(ColorSchemeKeyTokens.OnPrimaryContainer),
                         iconContainerColor = fromToken(ColorSchemeKeyTokens.PrimaryContainer),
                         progressIndicatorColor = fromToken(ColorSchemeKeyTokens.Primary),
                         progressTrackColor = fromToken(ColorSchemeKeyTokens.OnPrimary),
