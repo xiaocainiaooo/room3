@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package androidx.ink.geometry
+package androidx.ink.geometry.internal
 
+import androidx.ink.geometry.ImmutableVec
+import androidx.ink.geometry.MutableVec
 import androidx.ink.nativeloader.NativeLoader
 import androidx.ink.nativeloader.UsedByNative
 
