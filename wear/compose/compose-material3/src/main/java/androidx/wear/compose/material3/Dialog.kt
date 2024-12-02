@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,6 +73,9 @@ fun Dialog(
     var transitionState by remember {
         mutableStateOf(MutableTransitionState(DialogVisibility.Hide))
     }
+    val shouldShow by remember {
+        derivedStateOf { showState || transitionState.currentState == DialogVisibility.Display }
+    }
     val transition = rememberTransition(transitionState)
 
     val scaffoldState = LocalScaffoldState.current
@@ -94,7 +98,7 @@ fun Dialog(
             }
     }
 
-    if (show || transition.currentState == DialogVisibility.Display) {
+    if (shouldShow) {
         androidx.compose.ui.window.Dialog(
             onDismissRequest = onDismissRequest,
             properties = properties,
