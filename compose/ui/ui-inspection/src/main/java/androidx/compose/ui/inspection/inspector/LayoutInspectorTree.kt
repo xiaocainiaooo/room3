@@ -77,6 +77,7 @@ private val unwantedCalls =
         "Inspectable",
         "ProvideAndroidCompositionLocals",
         "ProvideCommonCompositionLocals",
+        "<get-current>",
     )
 
 /** Generator of a tree for the Layout Inspector. */
