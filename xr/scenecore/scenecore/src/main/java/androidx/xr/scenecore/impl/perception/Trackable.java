@@ -38,7 +38,7 @@ public interface Trackable {
      *     current time will be used.
      */
     @Nullable
-    Anchor createAnchor(@NonNull Pose pose, @Nullable Long timeNs);
+    Anchor createAnchor(@NonNull Pose pose, @SuppressWarnings("AutoBoxing") @Nullable Long timeNs);
 
     /** Returns all anchors attached to this trackable. */
     @NonNull

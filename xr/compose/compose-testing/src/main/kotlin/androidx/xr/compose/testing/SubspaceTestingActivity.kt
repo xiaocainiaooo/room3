@@ -38,6 +38,7 @@ import org.mockito.Mockito.mock
 import org.robolectric.shadows.ShadowDisplay
 
 /** Custom test class that should be used for testing [SubspaceComposable] content. */
+@Suppress("ForbiddenSuperClass")
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class SubspaceTestingActivity : ComponentActivity() {
     public val extensions: FakeXrExtensions = FakeXrExtensions()

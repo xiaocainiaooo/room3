@@ -3,7 +3,7 @@ package androidx.xr.scenecore.testing {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public class FakeImpressApi implements com.google.ar.imp.apibindings.ImpressApi {
     ctor public FakeImpressApi();
-    method public com.google.common.util.concurrent.ListenableFuture<java.lang.Void!> animateGltfModel(int, String, boolean);
+    method public com.google.common.util.concurrent.ListenableFuture<java.lang.Void!> animateGltfModel(int, String?, boolean);
     method public int createImpressNode();
     method public int createStereoSurface(@com.google.ar.imp.apibindings.ImpressApi.StereoMode int);
     method public void destroyImpressNode(int);
@@ -28,19 +28,19 @@ package androidx.xr.scenecore.testing {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public class FakeScheduledExecutorService extends java.util.concurrent.AbstractExecutorService implements java.lang.AutoCloseable java.util.concurrent.ScheduledExecutorService {
     ctor public FakeScheduledExecutorService();
-    method public boolean awaitTermination(long, java.util.concurrent.TimeUnit);
+    method public boolean awaitTermination(long, java.util.concurrent.TimeUnit?);
     method public void close();
-    method public void execute(Runnable);
+    method public void execute(Runnable?);
     method public boolean hasNext();
     method @com.google.errorprone.annotations.CheckReturnValue public boolean isEmpty();
     method public boolean isShutdown();
     method public boolean isTerminated();
     method public void runAll();
     method public void runNext();
-    method public java.util.concurrent.ScheduledFuture<? extends java.lang.Object!> schedule(Runnable, long, java.util.concurrent.TimeUnit);
-    method public <V> java.util.concurrent.ScheduledFuture<V!> schedule(java.util.concurrent.Callable<V!>, long, java.util.concurrent.TimeUnit);
-    method public java.util.concurrent.ScheduledFuture<? extends java.lang.Object!> scheduleAtFixedRate(Runnable, long, long, java.util.concurrent.TimeUnit);
-    method public java.util.concurrent.ScheduledFuture<? extends java.lang.Object!> scheduleWithFixedDelay(Runnable, long, long, java.util.concurrent.TimeUnit);
+    method public java.util.concurrent.ScheduledFuture<? extends java.lang.Object!> schedule(Runnable?, long, java.util.concurrent.TimeUnit?);
+    method public <V> java.util.concurrent.ScheduledFuture<V!> schedule(java.util.concurrent.Callable<V!>?, long, java.util.concurrent.TimeUnit?);
+    method public java.util.concurrent.ScheduledFuture<? extends java.lang.Object!> scheduleAtFixedRate(Runnable?, long, long, java.util.concurrent.TimeUnit?);
+    method public java.util.concurrent.ScheduledFuture<? extends java.lang.Object!> scheduleWithFixedDelay(Runnable?, long, long, java.util.concurrent.TimeUnit?);
     method public void shutdown();
     method public java.util.List<java.lang.Runnable!> shutdownNow();
     method public void simulateSleepExecutingAllTasks(java.time.Duration);
@@ -86,9 +86,9 @@ package androidx.xr.scenecore.testing {
     method public androidx.xr.extensions.node.Node? getSurfaceTrackingNode(android.view.View);
     method public androidx.xr.extensions.media.XrSpatialAudioExtensions getXrSpatialAudioExtensions();
     method public void hitTest(android.app.Activity, androidx.xr.extensions.node.Vec3, androidx.xr.extensions.node.Vec3, androidx.xr.extensions.Consumer<androidx.xr.extensions.space.HitTestResult!>, java.util.concurrent.Executor);
-    method public java.util.concurrent.CompletableFuture<androidx.xr.extensions.asset.EnvironmentToken!> loadEnvironment(java.io.InputStream, int, int, String);
+    method @Deprecated public java.util.concurrent.CompletableFuture<androidx.xr.extensions.asset.EnvironmentToken!> loadEnvironment(java.io.InputStream?, int, int, String?);
     method @Deprecated public java.util.concurrent.CompletableFuture<androidx.xr.extensions.asset.EnvironmentToken!> loadEnvironment(java.io.InputStream!, int, int, String!, int, int);
-    method public java.util.concurrent.CompletableFuture<androidx.xr.extensions.asset.GltfModelToken!> loadGltfModel(java.io.InputStream, int, int, String);
+    method @Deprecated public java.util.concurrent.CompletableFuture<androidx.xr.extensions.asset.GltfModelToken!> loadGltfModel(java.io.InputStream?, int, int, String?);
     method @Deprecated public java.util.concurrent.CompletableFuture<androidx.xr.extensions.asset.SceneToken!> loadImpressScene(java.io.InputStream!, int, int);
     method public void registerSpatialStateCallback(android.app.Activity, androidx.xr.extensions.Consumer<androidx.xr.extensions.space.SpatialState!>, java.util.concurrent.Executor);
     method public void removeFindableView(android.view.View, android.view.ViewGroup);
@@ -106,12 +106,12 @@ package androidx.xr.scenecore.testing {
     method public void setPreferredAspectRatio(android.app.Activity, float);
     method public void setPreferredAspectRatio(android.app.Activity, float, androidx.xr.extensions.Consumer<androidx.xr.extensions.XrExtensionResult!>, java.util.concurrent.Executor);
     method @Deprecated public void setSpatialStateCallback(android.app.Activity, androidx.xr.extensions.Consumer<androidx.xr.extensions.space.SpatialStateEvent!>, java.util.concurrent.Executor);
-    method public androidx.xr.scenecore.testing.FakeXrExtensions.FakeNode testGetNodeWithEnvironmentToken(androidx.xr.extensions.asset.EnvironmentToken);
-    method public androidx.xr.scenecore.testing.FakeXrExtensions.FakeNode testGetNodeWithGltfToken(androidx.xr.extensions.asset.GltfModelToken);
-    field public final java.util.HashMap<android.app.Activity!,androidx.xr.scenecore.testing.FakeXrExtensions.FakeActivityPanel!> activityPanelMap;
-    field public final java.util.ArrayList<androidx.xr.scenecore.testing.FakeXrExtensions.FakeEnvironmentToken!> createdEnvironmentTokens;
-    field public final java.util.ArrayList<androidx.xr.scenecore.testing.FakeXrExtensions.FakeGltfModelToken!> createdGltfModelTokens;
-    field public final java.util.ArrayList<androidx.xr.scenecore.testing.FakeXrExtensions.FakeNode!> createdNodes;
+    method @Deprecated public androidx.xr.scenecore.testing.FakeXrExtensions.FakeNode testGetNodeWithEnvironmentToken(androidx.xr.extensions.asset.EnvironmentToken);
+    method @Deprecated public androidx.xr.scenecore.testing.FakeXrExtensions.FakeNode testGetNodeWithGltfToken(androidx.xr.extensions.asset.GltfModelToken);
+    field public final java.util.Map<android.app.Activity!,androidx.xr.scenecore.testing.FakeXrExtensions.FakeActivityPanel!> activityPanelMap;
+    field public final java.util.List<androidx.xr.scenecore.testing.FakeXrExtensions.FakeEnvironmentToken!> createdEnvironmentTokens;
+    field public final java.util.List<androidx.xr.scenecore.testing.FakeXrExtensions.FakeGltfModelToken!> createdGltfModelTokens;
+    field public final java.util.List<androidx.xr.scenecore.testing.FakeXrExtensions.FakeNode!> createdNodes;
     field public final androidx.xr.scenecore.testing.FakeXrExtensions.FakeSpatialAudioExtensions fakeSpatialAudioExtensions;
     field public final androidx.xr.scenecore.testing.FakeXrExtensions.FakeSpatialState fakeSpatialState;
   }
@@ -120,7 +120,7 @@ package androidx.xr.scenecore.testing {
     method public void delete();
     method public android.app.Activity? getActivity();
     method public android.graphics.Rect? getBounds();
-    method public android.os.Bundle? getBundle();
+    method public android.os.Bundle getBundle();
     method public android.content.Intent? getLaunchIntent();
     method public androidx.xr.extensions.node.Node getNode();
     method public boolean isDeleted();
@@ -199,13 +199,13 @@ package androidx.xr.scenecore.testing {
     method public androidx.xr.extensions.media.SoundFieldAttributes? getSoundFieldAttributes();
   }
 
-  public static class FakeXrExtensions.FakeNode implements androidx.xr.extensions.node.Node {
+  public static final class FakeXrExtensions.FakeNode implements androidx.xr.extensions.node.Node {
     method public int describeContents();
     method public float getAlpha();
     method public android.os.IBinder? getAnchorId();
-    method public androidx.xr.extensions.asset.EnvironmentToken? getEnvironment();
+    method @Deprecated public androidx.xr.extensions.asset.EnvironmentToken? getEnvironment();
     method public java.util.concurrent.Executor? getExecutor();
-    method public androidx.xr.extensions.asset.GltfModelToken? getGltfModel();
+    method @Deprecated public androidx.xr.extensions.asset.GltfModelToken? getGltfModel();
     method public androidx.xr.extensions.Consumer<androidx.xr.extensions.node.InputEvent!>? getListener();
     method public String? getName();
     method public androidx.xr.scenecore.testing.FakeXrExtensions.FakeNode? getParent();
@@ -234,8 +234,6 @@ package androidx.xr.scenecore.testing {
   }
 
   public static class FakeXrExtensions.FakeNodeTransaction implements androidx.xr.extensions.node.NodeTransaction {
-    method public androidx.xr.extensions.node.NodeTransaction setEnvironment(androidx.xr.extensions.node.Node, androidx.xr.extensions.asset.EnvironmentToken?);
-    method public androidx.xr.extensions.node.NodeTransaction setGltfModel(androidx.xr.extensions.node.Node, androidx.xr.extensions.asset.GltfModelToken);
   }
 
   public static class FakeXrExtensions.FakeNodeTransform implements androidx.xr.extensions.node.NodeTransform {

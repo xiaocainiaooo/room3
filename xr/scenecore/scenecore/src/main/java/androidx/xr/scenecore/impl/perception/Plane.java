@@ -37,7 +37,7 @@ public class Plane implements Trackable {
     @PerceptionLibraryConstants.OpenXrSpaceType int referenceSpaceType = 0;
 
     public Plane(
-            @NonNull Long planeId,
+            @SuppressWarnings("AutoBoxing") @NonNull Long planeId,
             @PerceptionLibraryConstants.OpenXrSpaceType int referenceSpaceType) {
         this.planeId = planeId;
         this.referenceSpaceType = referenceSpaceType;
@@ -53,7 +53,8 @@ public class Plane implements Trackable {
      */
     @Override
     @Nullable
-    public Anchor createAnchor(@NonNull Pose pose, @Nullable Long timeNs) {
+    public Anchor createAnchor(
+            @NonNull Pose pose, @SuppressWarnings("AutoBoxing") @Nullable Long timeNs) {
         Anchor.AnchorData anchorData =
                 createAnchorOnPlane(planeId, pose, timeNs == null ? -1 : timeNs);
         if (anchorData == null) {
@@ -74,7 +75,7 @@ public class Plane implements Trackable {
      *     current time will be used.
      */
     @Nullable
-    public PlaneData getData(@Nullable Long timeNs) {
+    public PlaneData getData(@SuppressWarnings("AutoBoxing") @Nullable Long timeNs) {
         return getPlaneData(planeId, referenceSpaceType, timeNs == null ? -1 : timeNs);
     }
 

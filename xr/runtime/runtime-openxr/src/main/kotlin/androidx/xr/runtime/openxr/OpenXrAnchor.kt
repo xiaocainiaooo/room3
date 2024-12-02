@@ -24,13 +24,7 @@ import androidx.xr.runtime.math.Pose
 import java.nio.ByteBuffer
 import java.util.UUID
 
-/**
- * Wraps the native [XrSpace] with the [Anchor] interface.
- *
- * @property nativePointer to the [XrSpace] instance that backs this anchor.
- * @property xrResources the [XrResources] that holds the resources that are used in the XR session.
- * @property loadedUuid the UUID of the anchor if it was loaded from persistence.
- */
+/** Wraps the native [XrSpace] with the [Anchor] interface. */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class OpenXrAnchor
 internal constructor(

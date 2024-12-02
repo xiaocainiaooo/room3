@@ -95,7 +95,7 @@ public interface JxrPlatformAdapter {
 
     /** Loads glTF Asset for the given asset name from the assets folder. */
     // Suppressed to allow CompletableFuture.
-    @SuppressWarnings("AndroidJdkLibsChecker")
+    @SuppressWarnings({"AndroidJdkLibsChecker", "AsyncSuffixFuture"})
     @Nullable
     ListenableFuture<GltfModelResource> loadGltfByAssetName(@NonNull String assetName);
 
@@ -104,12 +104,13 @@ public interface JxrPlatformAdapter {
      * route. The future returned by this method will fire listeners on the UI thread if
      * Runnable::run is supplied.
      */
+    @SuppressWarnings("AsyncSuffixFuture")
     @Nullable
     ListenableFuture<GltfModelResource> loadGltfByAssetNameSplitEngine(@NonNull String assetName);
 
     /** Loads an ExrImage for the given asset name from the assets folder. */
     // Suppressed to allow CompletableFuture.
-    @SuppressWarnings("AndroidJdkLibsChecker")
+    @SuppressWarnings({"AndroidJdkLibsChecker", "AsyncSuffixFuture"})
     @Nullable
     ListenableFuture<ExrImageResource> loadExrImageByAssetName(@NonNull String assetName);
 
@@ -179,7 +180,7 @@ public interface JxrPlatformAdapter {
             @NonNull PixelDimensions surfaceDimensionsPx,
             @NonNull Dimensions dimensions,
             @NonNull String name,
-            @NonNull Context context,
+            @SuppressWarnings("ContextFirst") @NonNull Context context,
             @NonNull Entity parent);
 
     /** Get the PanelEntity associated with the main window for the Activity. */
@@ -462,6 +463,7 @@ public interface JxrPlatformAdapter {
          *
          * <p>DMM: The panel scales in a way that the user-perceived panel size never changes.
          */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef(
                 value = {
@@ -605,6 +607,7 @@ public interface JxrPlatformAdapter {
         public static final int POINTER_CAPTURE_STATE_STOPPED = 2;
 
         /** The possible states of pointer capture. */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef(
                 value = {
@@ -734,6 +737,7 @@ public interface JxrPlatformAdapter {
         Fov getFov();
 
         /** Describes the type of camera that this space represents. */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef(
                 value = {
@@ -963,7 +967,7 @@ public interface JxrPlatformAdapter {
         @CanIgnoreReturnValue
         @NonNull
         public SetPassthroughOpacityPreferenceResult setPassthroughOpacityPreference(
-                @Nullable Float passthroughOpacityPreference);
+                @SuppressWarnings("AutoBoxing") @Nullable Float passthroughOpacityPreference);
 
         /**
          * Gets the current passthrough opacity value between 0 and 1 where 0.0f means no
@@ -985,6 +989,7 @@ public interface JxrPlatformAdapter {
          * <p>If set to null, the passthrough opacity will default to the user preference managed
          * through the system.
          */
+        @SuppressWarnings("AutoBoxing")
         @Nullable
         public Float getPassthroughOpacityPreference();
 
@@ -1134,6 +1139,7 @@ public interface JxrPlatformAdapter {
          *
          * @param listener The listener to register.
          */
+        @SuppressWarnings("ExecutorRegistration")
         void addOnBoundsChangedListener(@NonNull OnBoundsChangedListener listener);
 
         /**
@@ -1164,6 +1170,7 @@ public interface JxrPlatformAdapter {
         //                     Add a getAnimationTimeRemaining() interface
 
         /** Specifies the current animation state of the [GltfEntity]. */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef({AnimationState.PLAYING, AnimationState.STOPPED})
         public @interface AnimationState {
@@ -1262,6 +1269,7 @@ public interface JxrPlatformAdapter {
          * view. SIDE_BY_SIDE means the surface is split in half with two views. The first half of
          * the surface maps to the left eye and the second half mapping to the right eye.
          */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef({StereoMode.MONO, StereoMode.TOP_BOTTOM, StereoMode.SIDE_BY_SIDE})
         public @interface StereoMode {
@@ -1325,6 +1333,7 @@ public interface JxrPlatformAdapter {
         State getState();
 
         /** Registers a listener to be called when the state of the anchor changes. */
+        @SuppressWarnings("ExecutorRegistration")
         void setOnStateChangedListener(@Nullable OnStateChangedListener onStateChangedListener);
 
         /**
@@ -1343,6 +1352,7 @@ public interface JxrPlatformAdapter {
         long nativePointer();
 
         /** Registers a listener to be called when the persist state of the anchor changes. */
+        @SuppressWarnings({"ExecutorRegistration", "PairedRegistration"})
         void registerPersistStateChangeListener(
                 @NonNull PersistStateChangeListener persistStateChangeListener);
 
@@ -1411,8 +1421,13 @@ public interface JxrPlatformAdapter {
     /** The dimensions of a UI element in meters. */
     class Dimensions {
         // TODO: b/332588978 - Add a TypeAlias for Meters here.
+        @SuppressWarnings("MutableBareField")
         public float width;
+
+        @SuppressWarnings("MutableBareField")
         public float height;
+
+        @SuppressWarnings("MutableBareField")
         public float depth;
 
         public Dimensions(float width, float height, float depth) {
@@ -1429,8 +1444,8 @@ public interface JxrPlatformAdapter {
 
     /** Ray in 3D Cartesian space. */
     class Ray {
-        public final Vector3 origin;
-        public final Vector3 direction;
+        @NonNull public final Vector3 origin;
+        @NonNull public final Vector3 direction;
 
         public Ray(@NonNull Vector3 origin, @NonNull Vector3 direction) {
             this.origin = origin;
@@ -1501,6 +1516,7 @@ public interface JxrPlatformAdapter {
         }
 
         /** States of the Move action. */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef(
                 value = {
@@ -1533,6 +1549,7 @@ public interface JxrPlatformAdapter {
         }
 
         /** States of the Resize action. */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef(
                 value = {
@@ -1673,25 +1690,37 @@ public interface JxrPlatformAdapter {
          */
         public static final int ACTION_HOVER_EXIT = 6;
 
-        @Source public int source;
-        @PointerType public int pointerType;
+        @SuppressWarnings("MutableBareField")
+        @Source
+        public int source;
+
+        @SuppressWarnings("MutableBareField")
+        @PointerType
+        public int pointerType;
 
         /** The time this event occurred, in the android.os.SystemClock#uptimeMillis time base. */
-        @SuppressWarnings("GoodTime") // This field mirrors the XR Extensions InputEvent.
+        @SuppressWarnings({
+            "GoodTime",
+            "MutableBareField"
+        }) // This field mirrors the XR Extensions InputEvent.
         public long timestamp;
 
         /**
          * The origin of the ray, in the receiver's activity space. Will be zero if the source is
          * not ray-based (eg, direct touch).
          */
-        @NonNull public Vector3 origin;
+        @SuppressWarnings("MutableBareField")
+        @NonNull
+        public Vector3 origin;
 
         /**
          * A point indicating the direction the ray is pointing in, in the receiver's activity
          * space. The ray is a vector starting at the origin point and passing through the direction
          * point.
          */
-        @NonNull public Vector3 direction;
+        @SuppressWarnings("MutableBareField")
+        @NonNull
+        public Vector3 direction;
 
         /** Info about the hit result of the ray. */
         public static class HitInfo {
@@ -1734,16 +1763,21 @@ public interface JxrPlatformAdapter {
         }
 
         /** Returns the current action associated with this input event. */
+        @SuppressWarnings("MutableBareField")
         public int action;
 
         /**
          * Info on the first entity (closest to the ray origin) that was hit by the input ray, if
          * any. This info will be null if no Entity was hit.
          */
-        @Nullable public HitInfo hitInfo;
+        @SuppressWarnings("MutableBareField")
+        @Nullable
+        public HitInfo hitInfo;
 
         /** Info on the second entity for the same task that was hit by the input ray, if any. */
-        @Nullable public HitInfo secondaryHitInfo;
+        @SuppressWarnings("MutableBareField")
+        @Nullable
+        public HitInfo secondaryHitInfo;
 
         @SuppressWarnings("GoodTime")
         public InputEvent(
@@ -1766,6 +1800,7 @@ public interface JxrPlatformAdapter {
         }
 
         /** Describes the hardware source of the event. */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef(
                 value = {
@@ -1779,6 +1814,7 @@ public interface JxrPlatformAdapter {
         public @interface Source {}
 
         /** The type of the individual pointer. */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef(
                 value = {
@@ -1794,6 +1830,7 @@ public interface JxrPlatformAdapter {
          * track of a sequence of events on the same target, e.g., * HOVER_ENTER -> HOVER_MOVE ->
          * HOVER_EXIT * DOWN -> MOVE -> UP
          */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef(
                 value = {
@@ -1830,6 +1867,7 @@ public interface JxrPlatformAdapter {
         public static final int SPATIAL_CAPABILITY_EMBED_ACTIVITY = 1 << 5;
 
         /** Spatial Capabilities for SceneCore Platform. */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef(
                 flag = true,
@@ -1843,7 +1881,9 @@ public interface JxrPlatformAdapter {
                 })
         public @interface SpatialCapability {}
 
-        @SpatialCapability public int capabilities;
+        @SuppressWarnings("MutableBareField")
+        @SpatialCapability
+        public int capabilities;
 
         public SpatialCapabilities(@SpatialCapability int capabilities) {
             this.capabilities = capabilities;
@@ -1944,6 +1984,7 @@ public interface JxrPlatformAdapter {
         private SpatializerConstants() {}
 
         /** Used to set the Ambisonics order of a [SoundFieldAttributes]. */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef(
                 value = {
@@ -1963,6 +2004,7 @@ public interface JxrPlatformAdapter {
         public static final int AMBISONICS_ORDER_THIRD_ORDER = 2;
 
         /** Represents the type of spatialization for an audio source. */
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef(
                 value = {

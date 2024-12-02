@@ -33,6 +33,7 @@ import kotlinx.coroutines.guava.future
  * @param session the [Session] that originated the [coroutine].
  * @param coroutine the coroutine to convert to a [ListenableFuture].
  */
+@Suppress("AsyncSuffixFuture")
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun <T> toFuture(
     session: Session,

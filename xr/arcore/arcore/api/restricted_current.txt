@@ -3,10 +3,15 @@ package androidx.xr.arcore {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class Anchor {
     ctor public Anchor(androidx.xr.runtime.internal.Anchor runtimeAnchor);
+    method public static androidx.xr.arcore.AnchorCreateResult create(androidx.xr.runtime.Session session, androidx.xr.runtime.math.Pose pose);
     method public void detach();
+    method public static java.util.List<java.util.UUID> getPersistedAnchorUuids(androidx.xr.runtime.Session session);
     method public androidx.xr.runtime.internal.Anchor getRuntimeAnchor();
     method public kotlinx.coroutines.flow.StateFlow<androidx.xr.arcore.Anchor.State> getState();
+    method public static androidx.xr.arcore.AnchorCreateResult load(androidx.xr.runtime.Session session, java.util.UUID uuid);
+    method public static androidx.xr.arcore.Anchor loadFromNativePointer(androidx.xr.runtime.Session session, long nativePointer);
     method public suspend Object? persist(kotlin.coroutines.Continuation<? super java.util.UUID>);
+    method public static void unpersist(androidx.xr.runtime.Session session, java.util.UUID uuid);
     method public suspend Object? update(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final androidx.xr.runtime.internal.Anchor runtimeAnchor;
     property public final kotlinx.coroutines.flow.StateFlow<androidx.xr.arcore.Anchor.State> state;
@@ -71,6 +76,7 @@ package androidx.xr.arcore {
     method public androidx.xr.arcore.Anchor createAnchor(androidx.xr.runtime.math.Pose pose);
     method public kotlinx.coroutines.flow.StateFlow<androidx.xr.arcore.Plane.State> getState();
     method public androidx.xr.arcore.Plane.Type getType();
+    method public static kotlinx.coroutines.flow.StateFlow<java.util.Collection<androidx.xr.arcore.Plane>> subscribe(androidx.xr.runtime.Session session);
     method public suspend Object? update(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public kotlinx.coroutines.flow.StateFlow<androidx.xr.arcore.Plane.State> state;
     property public final androidx.xr.arcore.Plane.Type type;

@@ -22,6 +22,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
 import com.google.common.collect.Lists;
@@ -110,7 +111,7 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
     }
 
     @Override
-    public boolean awaitTermination(long timeout, @NonNull TimeUnit unit) {
+    public boolean awaitTermination(long timeout, @Nullable TimeUnit unit) {
         checkState(!running);
         while (!executeQueue.isEmpty()) {
             runNext();
@@ -120,7 +121,7 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
     }
 
     @Override
-    public void execute(@NonNull Runnable command) {
+    public void execute(@Nullable Runnable command) {
         assertRunning();
         executeQueue.add(command);
     }
@@ -134,7 +135,7 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
     @Override
     @NonNull
     public ScheduledFuture<?> schedule(
-            @NonNull Runnable command, long delay, @NonNull TimeUnit unit) {
+            @Nullable Runnable command, long delay, @Nullable TimeUnit unit) {
         assertRunning();
         DelayedFuture<?> future = new DelayedFuture<>(command, delay, unit);
         scheduledQueue.add(future);
@@ -144,7 +145,7 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
     @Override
     @NonNull
     public <V> ScheduledFuture<V> schedule(
-            @NonNull Callable<V> callable, long delay, @NonNull TimeUnit unit) {
+            @Nullable Callable<V> callable, long delay, @Nullable TimeUnit unit) {
         assertRunning();
         DelayedFuture<V> future = new DelayedCallable<V>(callable, delay, unit);
         scheduledQueue.add(future);
@@ -154,14 +155,14 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
     @Override
     @NonNull
     public ScheduledFuture<?> scheduleAtFixedRate(
-            @NonNull Runnable command, long initialDelay, long period, @NonNull TimeUnit unit) {
+            @Nullable Runnable command, long initialDelay, long period, @Nullable TimeUnit unit) {
         throw new UnsupportedOperationException("not implemented");
     }
 
     @Override
     @NonNull
     public ScheduledFuture<?> scheduleWithFixedDelay(
-            @NonNull Runnable command, long initialDelay, long delay, @NonNull TimeUnit unit) {
+            @Nullable Runnable command, long initialDelay, long delay, @Nullable TimeUnit unit) {
         throw new UnsupportedOperationException("not implemented");
     }
 

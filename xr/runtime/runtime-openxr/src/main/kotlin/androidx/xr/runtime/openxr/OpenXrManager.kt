@@ -23,12 +23,7 @@ import kotlin.time.ComparableTimeMark
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 
-/**
- * Manages the lifecycle of an OpenXR session.
- *
- * @property activity that represents the Android XR activity that is executing this runtime.
- * @property perceptionManager that is used to update the perception state of the runtime.
- */
+/** Manages the lifecycle of an OpenXR session. */
 @Suppress("NotCloseable")
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class OpenXrManager

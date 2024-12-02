@@ -574,11 +574,11 @@ private constructor(rtEntity: JxrPlatformAdapter.GltfEntity, entityManager: Enti
     /** Specifies the current animation state of the GltfModelEntity. */
     @IntDef(AnimationState.PLAYING, AnimationState.STOPPED)
     @Retention(AnnotationRetention.SOURCE)
-    public annotation class AnimationState {
-        public companion object {
-            public const val PLAYING: Int = 0
-            public const val STOPPED: Int = 1
-        }
+    internal annotation class AnimationStateValue
+
+    public object AnimationState {
+        public const val PLAYING: Int = 0
+        public const val STOPPED: Int = 1
     }
 
     internal companion object {
@@ -602,7 +602,7 @@ private constructor(rtEntity: JxrPlatformAdapter.GltfEntity, entityManager: Enti
     }
 
     /** Returns the current animation state of this glTF entity. */
-    @AnimationState
+    @AnimationStateValue
     public fun getAnimationState(): Int {
         return when (rtEntity.animationState) {
             JxrPlatformAdapter.GltfEntity.AnimationState.PLAYING -> return AnimationState.PLAYING
@@ -622,6 +622,7 @@ private constructor(rtEntity: JxrPlatformAdapter.GltfEntity, entityManager: Enti
      * @param loop Whether the animation should loop.
      */
     @MainThread
+    @JvmOverloads
     public fun startAnimation(loop: Boolean, animationName: String? = null) {
         rtEntity.startAnimation(loop, animationName)
     }
@@ -656,15 +657,15 @@ private constructor(
      */
     @IntDef(StereoMode.MONO, StereoMode.TOP_BOTTOM, StereoMode.SIDE_BY_SIDE)
     @Retention(AnnotationRetention.SOURCE)
-    public annotation class StereoMode {
-        public companion object {
-            // Each eye will see the entire surface (no separation)
-            public const val MONO: Int = 0
-            // The [bottom, top] halves of the surface will map to [left, right] eyes
-            public const val TOP_BOTTOM: Int = 1
-            // The [left, right] halves of the surface will map to [left, right] eyes
-            public const val SIDE_BY_SIDE: Int = 2
-        }
+    internal annotation class StereoModeValue
+
+    public object StereoMode {
+        // Each eye will see the entire surface (no separation)
+        public const val MONO: Int = 0
+        // The [bottom, top] halves of the surface will map to [left, right] eyes
+        public const val TOP_BOTTOM: Int = 1
+        // The [left, right] halves of the surface will map to [left, right] eyes
+        public const val SIDE_BY_SIDE: Int = 2
     }
 
     internal companion object {

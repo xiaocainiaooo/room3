@@ -38,6 +38,7 @@ internal constructor(
 
     public companion object {
         /** Emits the planes that are currently being tracked in the [session]. */
+        @JvmStatic
         public fun subscribe(session: Session): StateFlow<Collection<Plane>> =
             session.state
                 .transform { state ->

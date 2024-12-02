@@ -184,7 +184,7 @@ public class SpatialEnvironment(runtime: JxrPlatformAdapter) {
      */
     @CanIgnoreReturnValue
     public fun setPassthroughOpacityPreference(
-        passthroughOpacityPreference: Float?
+        @SuppressWarnings("AutoBoxing") passthroughOpacityPreference: Float?
     ): SetPassthroughOpacityPreferenceResult {
         return rtEnvironment
             .setPassthroughOpacityPreference(passthroughOpacityPreference)
@@ -219,6 +219,7 @@ public class SpatialEnvironment(runtime: JxrPlatformAdapter) {
      *   [setPassthroughOpacityPreference]. If null, no application preference is set and the
      *   passthrough opacity will be fully managed through the system.
      */
+    @SuppressWarnings("AutoBoxing")
     public fun getPassthroughOpacityPreference(): Float? {
         return rtEnvironment.passthroughOpacityPreference
     }

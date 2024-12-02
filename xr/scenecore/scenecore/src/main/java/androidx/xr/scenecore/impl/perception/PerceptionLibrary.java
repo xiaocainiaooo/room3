@@ -51,6 +51,7 @@ public class PerceptionLibrary {
 
     public PerceptionLibrary() {}
 
+    @SuppressWarnings("VisiblySynchronized")
     protected static synchronized void loadLibraryAsync(@NonNull String nativeLibraryName) {
         if (libraryLoaded) {
             return;
@@ -70,17 +71,19 @@ public class PerceptionLibrary {
      * associated with the activity.
      *
      * @param activity This activity to associate with the OpenXR session.
+     * @param referenceSpaceType The base space type of the session.
      * @param executor This executor is used to poll the OpenXR event loop.
      * @return a new Session or null if there was an error creating the session.
-     * @throws ExecutionException if there was an error to initialize the session. The cause of the
-     *     ExecutionException will be an IllegalStateException if a valid session already exists,
-     *     LibraryLoadingException if the internal native library failed to load, and a
-     *     FailedToInitializeException if there was a failure to initialize the session internally.
+     * @throws java.util.concurrent.ExecutionException if there was an error to initialize the
+     *     session. The cause of the ExecutionException will be an IllegalStateException if a valid
+     *     session already exists, LibraryLoadingException if the internal native library failed to
+     *     load, and a FailedToInitializeException if there was a failure to initialize the session
+     *     internally.
      */
     // ResolvableFuture is marked as RestrictTo(LIBRARY_GROUP_PREFIX), which is intended for classes
     // within AndroidX. We're in the process of migrating to AndroidX. Without suppressing this
     // warning, however, we get a build error - go/bugpattern/RestrictTo.
-    @SuppressWarnings("RestrictTo")
+    @SuppressWarnings({"RestrictTo", "AsyncSuffixFuture"})
     @Nullable
     public ListenableFuture<Session> initSession(
             @NonNull Activity activity,
@@ -136,6 +139,7 @@ public class PerceptionLibrary {
     }
 
     /** Returns the previously created session or null. */
+    @SuppressWarnings("VisiblySynchronized")
     @Nullable
     public synchronized Session getSession() {
         return session;

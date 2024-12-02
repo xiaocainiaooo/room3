@@ -28,13 +28,13 @@ import com.google.common.truth.Truth.assertThat
  *
  * @param actual the actual [Vector3] to compare
  * @param expected the expected [Vector3] to compare
- * @param EPSILON the maximum difference allowed between the two [Vector3]s
+ * @param epsilon the maximum difference allowed between the two [Vector3] objects
  */
 @JvmOverloads
-public fun assertVector3(actual: Vector3, expected: Vector3, EPSILON: Float = 1e-5f) {
-    assertThat(actual.x).isWithin(EPSILON).of(expected.x)
-    assertThat(actual.y).isWithin(EPSILON).of(expected.y)
-    assertThat(actual.z).isWithin(EPSILON).of(expected.z)
+public fun assertVector3(actual: Vector3, expected: Vector3, epsilon: Float = 1e-5f) {
+    assertThat(actual.x).isWithin(epsilon).of(expected.x)
+    assertThat(actual.y).isWithin(epsilon).of(expected.y)
+    assertThat(actual.z).isWithin(epsilon).of(expected.z)
 }
 
 /**
@@ -42,12 +42,12 @@ public fun assertVector3(actual: Vector3, expected: Vector3, EPSILON: Float = 1e
  *
  * @param actual the actual [Quaternion] to compare
  * @param expected the expected [Quaternion] to compare
- * @param EPSILON the maximum difference allowed between the two [Quaternion]s
+ * @param epsilon the maximum difference allowed between the two [Quaternion] objects
  */
 @JvmOverloads
-public fun assertRotation(actual: Quaternion, expected: Quaternion, EPSILON: Float = 1e-5f) {
+public fun assertRotation(actual: Quaternion, expected: Quaternion, epsilon: Float = 1e-5f) {
     val dot = Math.abs(actual.toNormalized().dot(expected.toNormalized()))
-    assertThat(dot).isWithin(EPSILON).of(1.0f)
+    assertThat(dot).isWithin(epsilon).of(1.0f)
 }
 
 /**
@@ -55,10 +55,10 @@ public fun assertRotation(actual: Quaternion, expected: Quaternion, EPSILON: Flo
  *
  * @param actual the actual [Pose] to compare
  * @param expected the expected [Pose] to compare
- * @param EPSILON the maximum difference allowed between the two [Pose]s
+ * @param epsilon the maximum difference allowed between the two [Pose] objects
  */
 @JvmOverloads
-public fun assertPose(actual: Pose, expected: Pose, EPSILON: Float = 1e-5f) {
-    assertVector3(actual.translation, expected.translation, EPSILON)
-    assertRotation(actual.rotation, expected.rotation, EPSILON)
+public fun assertPose(actual: Pose, expected: Pose, epsilon: Float = 1e-5f) {
+    assertVector3(actual.translation, expected.translation, epsilon)
+    assertRotation(actual.rotation, expected.rotation, epsilon)
 }
