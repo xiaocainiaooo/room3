@@ -55,7 +55,4 @@ android {
     namespace "androidx.core.i18n"
     defaultConfig {
     }
-    lintOptions {
-        lintConfig = file("lint.xml")
-    }
 }
