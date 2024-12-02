@@ -282,6 +282,35 @@ internal class LocalSdkProviderTest(
         assertThat(result).isEqualTo(clientPackageName)
     }
 
+    @Test
+    fun registerSdkSandboxClientImportanceListener_delegateToSdkController() {
+        assumeFeatureAvailable(ClientFeature.CLIENT_IMPORTANCE_LISTENER)
+
+        val catchingListener = CatchingClientImportanceListener()
+
+        val testSdk = loadedSdk.loadTestSdk()
+        testSdk.registerSdkSandboxClientImportanceListener(catchingListener)
+        val localListener = controller.clientImportanceListeners.keys.first()
+
+        localListener.onForegroundImportanceChanged(false)
+        localListener.onForegroundImportanceChanged(true)
+
+        assertThat(catchingListener.events).containsExactly(false, true).inOrder()
+    }
+
+    @Test
+    fun unregisterSdkSandboxClientImportanceListener_delegateToSdkController() {
+        assumeFeatureAvailable(ClientFeature.CLIENT_IMPORTANCE_LISTENER)
+
+        val catchingListener = CatchingClientImportanceListener()
+
+        val testSdk = loadedSdk.loadTestSdk()
+        testSdk.registerSdkSandboxClientImportanceListener(catchingListener)
+        testSdk.unregisterSdkSandboxClientImportanceListener(catchingListener)
+
+        assertThat(controller.clientImportanceListeners).isEmpty()
+    }
+
     internal class TestClassLoaderFactory(private val testStorage: TestLocalSdkStorage) :
         SdkLoader.ClassLoaderFactory {
         override fun createClassLoaderFor(
@@ -379,7 +408,10 @@ internal class LocalSdkProviderTest(
 
         var sandboxedSdksResult: List<SandboxedSdkCompat> = emptyList()
         var appOwnedSdksResult: List<AppOwnedSdkSandboxInterfaceCompat> = emptyList()
-        var sdkActivityHandlers: MutableMap<IBinder, SdkSandboxActivityHandlerCompat> =
+        val sdkActivityHandlers: MutableMap<IBinder, SdkSandboxActivityHandlerCompat> =
+            mutableMapOf()
+        val clientImportanceListeners:
+            MutableMap<SdkSandboxClientImportanceListenerCompat, Executor> =
             mutableMapOf()
 
         var lastLoadSdkName: String? = null
@@ -439,13 +471,13 @@ internal class LocalSdkProviderTest(
             executor: Executor,
             listenerCompat: SdkSandboxClientImportanceListenerCompat
         ) {
-            throw UnsupportedOperationException("Not supported yet")
+            clientImportanceListeners[listenerCompat] = executor
         }
 
         override fun unregisterSdkSandboxClientImportanceListener(
             listenerCompat: SdkSandboxClientImportanceListenerCompat
         ) {
-            throw UnsupportedOperationException("Not supported yet")
+            clientImportanceListeners.remove(listenerCompat)
         }
     }
 }
