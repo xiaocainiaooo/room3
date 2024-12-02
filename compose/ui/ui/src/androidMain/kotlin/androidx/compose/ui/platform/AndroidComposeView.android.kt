@@ -66,7 +66,7 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import androidx.collection.MutableIntObjectMap
 import androidx.collection.mutableIntObjectMapOf
-import androidx.compose.runtime.collection.mutableVectorOf
+import androidx.collection.mutableObjectListOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -731,7 +731,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
     private val layerCache = WeakCache<OwnedLayer>()
 
     /** List of lambdas to be called when [onEndApplyChanges] is called. */
-    private val endApplyChangesListeners = mutableVectorOf<(() -> Unit)?>()
+    private val endApplyChangesListeners = mutableObjectListOf<(() -> Unit)?>()
 
     /**
      * Runnable used to update the pointer position after layout. If another pointer event comes in
@@ -1080,7 +1080,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         }
         // Listeners can add more items to the list and we want to ensure that they
         // are executed after being added, so loop until the list is empty
-        while (endApplyChangesListeners.isNotEmpty()) {
+        while (endApplyChangesListeners.isNotEmpty() && endApplyChangesListeners[0] != null) {
             val size = endApplyChangesListeners.size
             for (i in 0 until size) {
                 val listener = endApplyChangesListeners[i]
