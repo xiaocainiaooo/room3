@@ -252,8 +252,8 @@ class TextFieldTest {
 
         rule.runOnIdle { assertThat(interactions).isEmpty() }
 
-        // Click on (2, 2) which is Surface area and outside input area
-        rule.onNodeWithTag(TextFieldTag).performTouchInput { click(Offset(2f, 2f)) }
+        // Click on point which is Surface area and outside input area
+        rule.onNodeWithTag(TextFieldTag).performTouchInput { click(Offset(centerX, 2f)) }
 
         rule.runOnIdle {
             // Not asserting total size as we have other interactions here too

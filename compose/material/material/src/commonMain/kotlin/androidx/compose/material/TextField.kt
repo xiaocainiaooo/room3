@@ -44,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shape
@@ -204,6 +205,7 @@ fun TextField(
         state = state,
         modifier =
             modifier
+                .clip(shape)
                 .indicatorLine(enabled, isError, interactionSource, colors)
                 .defaultErrorSemantics(isError, getString(Strings.DefaultErrorMessage))
                 .defaultMinSize(
@@ -352,6 +354,7 @@ fun TextField(
         value = value,
         modifier =
             modifier
+                .clip(shape)
                 .indicatorLine(enabled, isError, interactionSource, colors)
                 .defaultErrorSemantics(isError, getString(Strings.DefaultErrorMessage))
                 .defaultMinSize(
@@ -543,6 +546,7 @@ fun TextField(
         value = value,
         modifier =
             modifier
+                .clip(shape)
                 .indicatorLine(enabled, isError, interactionSource, colors)
                 .defaultErrorSemantics(isError, getString(Strings.DefaultErrorMessage))
                 .defaultMinSize(
