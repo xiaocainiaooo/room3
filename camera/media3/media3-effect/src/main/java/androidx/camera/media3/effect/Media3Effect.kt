@@ -50,7 +50,7 @@ import java.util.concurrent.Executor
 @SuppressLint("UnsafeOptInUsageError", "RestrictedApiAndroidX")
 public class Media3Effect(
     context: Context,
-    targets: Int,
+    @Targets targets: Int,
     executor: Executor,
     errorListener: Consumer<Throwable>,
 ) :
