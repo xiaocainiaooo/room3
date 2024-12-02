@@ -42,6 +42,7 @@ import org.gradle.api.artifacts.ModuleVersionIdentifier
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.component.ComponentWithCoordinates
 import org.gradle.api.component.ComponentWithVariants
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependencyConstraint
 import org.gradle.api.internal.artifacts.ivyservice.projectmodule.ProjectComponentPublication
@@ -82,7 +83,7 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
         description = "Generates a file containing library build information serialized to json"
     }
 
-    @get:OutputFile abstract val outputFile: Property<File>
+    @get:OutputFile abstract val outputFile: RegularFileProperty
 
     @get:Input abstract val artifactId: Property<String>
 
@@ -126,7 +127,7 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
     abstract val kmpChildren: SetProperty<String>
 
     private fun writeJsonToFile(info: LibraryBuildInfoFile) {
-        val resolvedOutputFile: File = outputFile.get()
+        val resolvedOutputFile: File = outputFile.get().asFile
         val outputDir = resolvedOutputFile.parentFile
         if (!outputDir.exists()) {
             if (!outputDir.mkdirs()) {
