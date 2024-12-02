@@ -28,6 +28,7 @@ import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -1159,6 +1160,44 @@ class DraggableTest {
                         parentDeltas.absoluteValue
                 )
         }
+    }
+
+    @Test
+    fun onGesturePickUp_doesNotNeedToWaitForCompleteTouchSlop() {
+        var dragStarted = false
+        var composeNestedScrollable by mutableStateOf(true)
+        var touchSlop = 0f
+        rule.setContent {
+            touchSlop = LocalViewConfiguration.current.touchSlop
+            Box(
+                Modifier.fillMaxSize()
+                    .draggable(
+                        orientation = Orientation.Vertical,
+                        onDragStarted = { dragStarted = true },
+                        state = rememberDraggableState {},
+                    )
+                    .then(
+                        if (composeNestedScrollable) Modifier.verticalScroll(rememberScrollState())
+                        else Modifier
+                    )
+            )
+        }
+
+        rule.onRoot().performTouchInput {
+            down(center)
+            moveBy(Offset(x = 0f, y = touchSlop + 10f))
+        }
+
+        assertThat(dragStarted).isFalse()
+
+        composeNestedScrollable = false
+
+        // one event for entering pick up.
+        rule.onRoot().performTouchInput { moveBy(Offset(x = 0f, y = touchSlop / 2)) }
+
+        // one event for triggering touch slop
+        rule.onRoot().performTouchInput { moveBy(Offset(x = 0f, y = touchSlop / 2)) }
+        assertThat(dragStarted).isTrue()
     }
 
     // On tests this wouldn't fail due to usage of a UnconfinedTestDispatcher. Using a
