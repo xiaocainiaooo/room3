@@ -20,6 +20,7 @@ import android.content.Context
 import android.os.Bundle
 import android.os.IBinder
 import androidx.privacysandbox.sdkruntime.client.activity.LocalSdkActivityHandlerRegistry
+import androidx.privacysandbox.sdkruntime.client.controller.impl.LocalClientImportanceListenerRegistry
 import androidx.privacysandbox.sdkruntime.core.AppOwnedSdkSandboxInterfaceCompat
 import androidx.privacysandbox.sdkruntime.core.LoadSdkCompatException
 import androidx.privacysandbox.sdkruntime.core.SandboxedSdkCompat
@@ -76,12 +77,12 @@ internal class LocalController(
         executor: Executor,
         listenerCompat: SdkSandboxClientImportanceListenerCompat
     ) {
-        throw UnsupportedOperationException("Not supported yet")
+        LocalClientImportanceListenerRegistry.register(sdkPackageName, executor, listenerCompat)
     }
 
     override fun unregisterSdkSandboxClientImportanceListener(
         listenerCompat: SdkSandboxClientImportanceListenerCompat
     ) {
-        throw UnsupportedOperationException("Not supported yet")
+        LocalClientImportanceListenerRegistry.unregister(listenerCompat)
     }
 }
