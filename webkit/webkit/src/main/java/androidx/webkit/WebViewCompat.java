@@ -1302,7 +1302,6 @@ public class WebViewCompat {
     @AnyThread
     @RequiresFeature(name = WebViewFeature.DEFAULT_TRAFFICSTATS_TAGGING,
             enforcement = "androidx.webkit.WebViewFeature#isFeatureSupported")
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public static void setDefaultTrafficStatsTag(int tag) {
         final ApiFeature.NoFramework feature = WebViewFeatureInternal.DEFAULT_TRAFFICSTATS_TAGGING;
         if (feature.isSupportedByWebView()) {
