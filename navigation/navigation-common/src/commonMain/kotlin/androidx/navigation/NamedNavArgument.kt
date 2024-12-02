@@ -19,6 +19,9 @@
 
 package androidx.navigation
 
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
+
 /** Construct a new [NavArgument] */
 public fun navArgument(name: String, builder: NavArgumentBuilder.() -> Unit): NamedNavArgument =
     NamedNavArgument(name, NavArgumentBuilder().apply(builder).build())

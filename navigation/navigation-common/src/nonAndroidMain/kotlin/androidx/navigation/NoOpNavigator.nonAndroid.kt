@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package androidx.navigation
 
 import androidx.annotation.RestrictTo
 import androidx.savedstate.SavedState
 
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-@Navigator.Name("NoOp")
 public actual class NoOpNavigator actual constructor() : Navigator<NavDestination>() {
-    actual override fun createDestination(): NavDestination = NavDestination(this)
+    public actual override fun createDestination(): NavDestination {
+        implementedInJetBrainsFork()
+    }
 
-    actual override fun navigate(
+    public actual override fun navigate(
         destination: NavDestination,
         args: SavedState?,
         navOptions: NavOptions?,
         navigatorExtras: Extras?
-    ): NavDestination = destination
+    ): NavDestination {
+        implementedInJetBrainsFork()
+    }
 
-    actual override fun popBackStack(): Boolean = true
+    public actual override fun popBackStack(): Boolean {
+        implementedInJetBrainsFork()
+    }
 }

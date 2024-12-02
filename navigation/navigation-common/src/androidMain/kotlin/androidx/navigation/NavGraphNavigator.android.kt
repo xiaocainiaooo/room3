@@ -19,37 +19,18 @@ import androidx.savedstate.read
 import androidx.savedstate.savedState
 import kotlinx.coroutines.flow.StateFlow
 
-/**
- * A Navigator built specifically for [NavGraph] elements. Handles navigating to the correct
- * destination when the NavGraph is the target of navigation actions.
- *
- * Construct a Navigator capable of routing incoming navigation requests to the proper destination
- * within a [NavGraph].
- *
- * @param navigatorProvider NavigatorProvider used to retrieve the correct [Navigator] to navigate
- *   to the start destination
- */
 @Navigator.Name("navigation")
-public open class NavGraphNavigator(private val navigatorProvider: NavigatorProvider) :
-    Navigator<NavGraph>() {
+public actual open class NavGraphNavigator
+actual constructor(private val navigatorProvider: NavigatorProvider) : Navigator<NavGraph>() {
 
-    /** Gets the backstack of [NavBackStackEntry] associated with this Navigator */
-    public val backStack: StateFlow<List<NavBackStackEntry>>
+    public actual val backStack: StateFlow<List<NavBackStackEntry>>
         get() = state.backStack
 
-    /**
-     * Creates a new [NavGraph] associated with this navigator.
-     *
-     * @return The created [NavGraph].
-     */
-    override fun createDestination(): NavGraph {
+    actual override fun createDestination(): NavGraph {
         return NavGraph(this)
     }
 
-    /**
-     * @throws IllegalArgumentException if given destination is not a child of the current navgraph
-     */
-    override fun navigate(
+    actual override fun navigate(
         entries: List<NavBackStackEntry>,
         navOptions: NavOptions?,
         navigatorExtras: Extras?
@@ -92,8 +73,8 @@ public open class NavGraphNavigator(private val navigatorProvider: NavigatorProv
                 val matchingArgs = startDestination.matchRoute(startRoute)?.matchingArgs
                 if (matchingArgs != null && !matchingArgs.read { isEmpty() }) {
                     args = savedState {
-                        // we need to add args from startRoute, but it should not override existing
-                        // args
+                        // we need to add args from startRoute,
+                        // but it should not override existing args
                         putAll(matchingArgs)
                         args?.let { putAll(it) }
                     }

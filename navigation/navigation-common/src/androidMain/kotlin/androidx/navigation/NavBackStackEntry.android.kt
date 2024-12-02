@@ -42,42 +42,22 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import androidx.navigation.serialization.decodeArguments
 import androidx.savedstate.SavedState
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.savedState
 import java.util.UUID
-import kotlin.reflect.KClass
-import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.serializer
 
-/**
- * Representation of an entry in the back stack of a [androidx.navigation.NavController]. The
- * [Lifecycle], [ViewModelStore], and [SavedStateRegistry] provided via this object are valid for
- * the lifetime of this destination on the back stack: when this destination is popped off the back
- * stack, the lifecycle will be destroyed, state will no longer be saved, and ViewModels will be
- * cleared.
- */
-public class NavBackStackEntry
+public actual class NavBackStackEntry
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 private constructor(
     private val context: Context?,
-    /**
-     * The destination associated with this entry
-     *
-     * @return The destination that is currently visible to users
-     */
-    @set:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public var destination: NavDestination,
+    @set:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public actual var destination: NavDestination,
     private val immutableArgs: SavedState? = null,
     private var hostLifecycleState: Lifecycle.State = Lifecycle.State.CREATED,
     private val viewModelStoreProvider: NavViewModelStoreProvider? = null,
-    /**
-     * The unique ID that serves as the identity of this entry
-     *
-     * @return the unique ID of this entry
-     */
-    public val id: String = UUID.randomUUID().toString(),
+    public actual val id: String = UUID.randomUUID().toString(),
     private val savedState: SavedState? = null
 ) :
     LifecycleOwner,
@@ -86,9 +66,9 @@ private constructor(
     SavedStateRegistryOwner {
 
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public constructor(
+    public actual constructor(
         entry: NavBackStackEntry,
-        arguments: SavedState? = entry.arguments
+        arguments: SavedState?
     ) : this(
         entry.context,
         entry.destination,
@@ -131,14 +111,7 @@ private constructor(
         SavedStateViewModelFactory((context?.applicationContext as? Application), this, arguments)
     }
 
-    /**
-     * The arguments used for this entry. Note that the arguments of a NavBackStackEntry are
-     * immutable and defined when you `navigate()` to the destination - changes you make to this
-     * SavedState will not be reflected in future calls to this property.
-     *
-     * @return The arguments used when this entry was created
-     */
-    public val arguments: SavedState?
+    public actual val arguments: SavedState?
         get() =
             if (immutableArgs == null) {
                 null
@@ -146,9 +119,8 @@ private constructor(
                 savedState { putAll(immutableArgs) }
             }
 
-    /** The [SavedStateHandle] for this entry. */
     @get:MainThread
-    public val savedStateHandle: SavedStateHandle by lazy {
+    public actual val savedStateHandle: SavedStateHandle by lazy {
         check(savedStateRegistryAttached) {
             "You cannot access the NavBackStackEntry's SavedStateHandle until it is added to " +
                 "the NavController's back stack (i.e., the Lifecycle of the NavBackStackEntry " +
@@ -163,33 +135,25 @@ private constructor(
             .handle
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * If the [androidx.navigation.NavHost] has not called
-     * [androidx.navigation.NavHostController.setLifecycleOwner], the Lifecycle will be capped at
-     * [Lifecycle.State.CREATED].
-     */
-    override val lifecycle: Lifecycle
+    actual override val lifecycle: Lifecycle
         get() = _lifecycle
 
     @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @set:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public var maxLifecycle: Lifecycle.State = Lifecycle.State.INITIALIZED
+    public actual var maxLifecycle: Lifecycle.State = Lifecycle.State.INITIALIZED
         set(maxState) {
             field = maxState
             updateState()
         }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public fun handleLifecycleEvent(event: Lifecycle.Event) {
+    public actual fun handleLifecycleEvent(event: Lifecycle.Event) {
         hostLifecycleState = event.targetState
         updateState()
     }
 
-    /** Update the state to be the lower of the two constraints: */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public fun updateState() {
+    public actual fun updateState() {
         if (!savedStateRegistryAttached) {
             savedStateRegistryController.performAttach()
             savedStateRegistryAttached = true
@@ -207,14 +171,7 @@ private constructor(
         }
     }
 
-    public override val viewModelStore: ViewModelStore
-        /**
-         * {@inheritDoc}
-         *
-         * @throws IllegalStateException if called before the [lifecycle] has moved to
-         *   [Lifecycle.State.CREATED] or before the [androidx.navigation.NavHost] has called
-         *   [androidx.navigation.NavHostController.setViewModelStore].
-         */
+    public actual override val viewModelStore: ViewModelStore
         get() {
             check(savedStateRegistryAttached) {
                 "You cannot access the NavBackStackEntry's ViewModels until it is added to " +
@@ -232,9 +189,9 @@ private constructor(
             return viewModelStoreProvider.getViewModelStore(id)
         }
 
-    override val defaultViewModelProviderFactory: ViewModelProvider.Factory = defaultFactory
+    override actual val defaultViewModelProviderFactory: ViewModelProvider.Factory = defaultFactory
 
-    override val defaultViewModelCreationExtras: CreationExtras
+    override actual val defaultViewModelCreationExtras: CreationExtras
         get() {
             val extras = MutableCreationExtras()
             (context?.applicationContext as? Application)?.let { application ->
@@ -246,11 +203,11 @@ private constructor(
             return extras
         }
 
-    override val savedStateRegistry: SavedStateRegistry
+    override actual val savedStateRegistry: SavedStateRegistry
         get() = savedStateRegistryController.savedStateRegistry
 
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public fun saveState(outBundle: SavedState) {
+    public actual fun saveState(outBundle: SavedState) {
         savedStateRegistryController.performSave(outBundle)
     }
 
@@ -292,30 +249,4 @@ private constructor(
     }
 
     private class SavedStateViewModel(val handle: SavedStateHandle) : ViewModel()
-}
-
-/**
- * Returns route as an object of type [T]
- *
- * Extrapolates arguments from [NavBackStackEntry.arguments] and recreates object [T]
- *
- * @param [T] the entry's [NavDestination.route] as a [KClass]
- * @return A new instance of this entry's [NavDestination.route] as an object of type [T]
- */
-public inline fun <reified T> NavBackStackEntry.toRoute(): T = toRoute(T::class)
-
-/**
- * Returns route as an object of type [T]
- *
- * Extrapolates arguments from [NavBackStackEntry.arguments] and recreates object [T]
- *
- * @param [route] the entry's [NavDestination.route] as a [KClass]
- * @return A new instance of this entry's [NavDestination.route] as an object of type [T]
- */
-@OptIn(InternalSerializationApi::class)
-@Suppress("UNCHECKED_CAST")
-public fun <T> NavBackStackEntry.toRoute(route: KClass<*>): T {
-    val savedState = arguments ?: savedState()
-    val typeMap = destination.arguments.mapValues { it.value.type }
-    return route.serializer().decodeArguments(savedState, typeMap) as T
 }

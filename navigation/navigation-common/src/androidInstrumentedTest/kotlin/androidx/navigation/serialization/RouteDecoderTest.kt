@@ -220,7 +220,9 @@ abstract class RouteDecoderTest(val source: ArgumentSource) {
             decode<TestClass>(
                 map,
                 listOf(
-                    navArgument("arg") { type = InternalNavType.EnumListType(TestEnum::class.java) }
+                    navArgument("arg") {
+                        type = InternalAndroidNavType.EnumListType(TestEnum::class.java)
+                    }
                 )
             )
         assertThat(result.arg).isEqualTo(listOf(TestEnum.TWO, TestEnum.TWO))
@@ -235,7 +237,9 @@ abstract class RouteDecoderTest(val source: ArgumentSource) {
             decode<TestClass>(
                 values,
                 listOf(
-                    navArgument("arg") { type = InternalNavType.EnumListType(TestEnum::class.java) }
+                    navArgument("arg") {
+                        type = InternalAndroidNavType.EnumListType(TestEnum::class.java)
+                    }
                 )
             )
         assertThat(result.arg).isEqualTo(listOf(TestEnum.TWO, TestEnum.TWO))
@@ -245,7 +249,9 @@ abstract class RouteDecoderTest(val source: ArgumentSource) {
             decode<TestClass>(
                 values2,
                 listOf(
-                    navArgument("arg") { type = InternalNavType.EnumListType(TestEnum::class.java) }
+                    navArgument("arg") {
+                        type = InternalAndroidNavType.EnumListType(TestEnum::class.java)
+                    }
                 )
             )
         assertThat(result2.arg).isNull()
