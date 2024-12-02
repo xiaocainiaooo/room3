@@ -134,7 +134,7 @@ private object XrNavigationRailTokens {
      */
     val VerticalPadding: Dp = 20.dp
 
-    val ContainerWidth = 80.0.dp
+    val ContainerWidth = 96.0.dp
 }
 
 /** [NavigationRailComponentOverride] that uses the XR-specific [NavigationRail]. */
