@@ -65,9 +65,8 @@ import androidx.appsearch.localstorage.visibilitystore.VisibilityToDocumentConve
 import androidx.appsearch.observer.DocumentChangeInfo;
 import androidx.appsearch.observer.ObserverSpec;
 import androidx.appsearch.observer.SchemaChangeInfo;
+import androidx.appsearch.testutil.AppSearchTestUtils;
 import androidx.appsearch.testutil.TestObserverCallback;
-import androidx.appsearch.testutil.flags.CheckFlagsRule;
-import androidx.appsearch.testutil.flags.DeviceFlagsValueProvider;
 import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
 import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
@@ -102,6 +101,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
@@ -122,7 +122,7 @@ public class AppSearchImplTest {
     private static final OptimizeStrategy ALWAYS_OPTIMIZE = optimizeInfo -> true;
 
     @Rule
-    public final CheckFlagsRule mCheckFlagsRule = DeviceFlagsValueProvider.createCheckFlagsRule();
+    public final RuleChain mRuleChain = AppSearchTestUtils.createCommonTestRules();
 
     @Rule
     public TemporaryFolder mTemporaryFolder = new TemporaryFolder();
@@ -5162,6 +5162,7 @@ public class AppSearchImplTest {
     }
 
     @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
     public void testLimitConfig_activeFds() throws Exception {
         mAppSearchImpl.close();
         File tempFolder = mTemporaryFolder.newFolder();

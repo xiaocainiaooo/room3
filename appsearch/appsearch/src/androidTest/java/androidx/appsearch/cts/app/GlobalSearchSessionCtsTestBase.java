@@ -2118,5 +2118,5 @@ public abstract class GlobalSearchSessionCtsTestBase {
         List<SearchResult> resultList = results.getNextPageAsync().get();
         assertThat(resultList).isEmpty();
     }
-// @exportToFramework:startStrip()
+// @exportToFramework:endStrip()
 }
