@@ -26,6 +26,8 @@ import androidx.compose.ui.inspection.framework.ancestors
 import androidx.compose.ui.inspection.framework.getChildren
 import androidx.compose.ui.inspection.framework.isAndroidComposeView
 import androidx.compose.ui.inspection.framework.isRoot
+import androidx.compose.ui.inspection.inspector.InspectorNode
+import androidx.compose.ui.inspection.inspector.LayoutInspectorTree
 import androidx.compose.ui.inspection.util.ThreadUtils
 
 /**
@@ -61,18 +63,25 @@ private fun View.isSystemView(): Boolean {
  * UI thread.
  */
 class AndroidComposeViewWrapper(
+    private val layoutInspectorTree: LayoutInspectorTree,
     val rootView: View,
-    val composeView: ViewGroup,
+    private val composeView: ViewGroup,
     skipSystemComposables: Boolean
 ) {
     companion object {
         fun tryCreateFor(
+            layoutInspectorTree: LayoutInspectorTree,
             rootView: View,
             composeView: View,
             skipSystemComposables: Boolean
         ): AndroidComposeViewWrapper? {
             return if (composeView.isAndroidComposeView()) {
-                AndroidComposeViewWrapper(rootView, composeView as ViewGroup, skipSystemComposables)
+                AndroidComposeViewWrapper(
+                    layoutInspectorTree,
+                    rootView,
+                    composeView as ViewGroup,
+                    skipSystemComposables
+                )
             } else {
                 null
             }
@@ -89,6 +98,17 @@ class AndroidComposeViewWrapper(
         else composeView.ancestors().first { !it.isSystemView() || it.isRoot() }
 
     val viewsToSkip: LongList = createViewsToSkip(composeView)
+
+    private val inspectorNodes =
+        layoutInspectorTree
+            .apply { this.hideSystemNodes = skipSystemComposables }
+            .convert(composeView)
+
+    fun createNodes(): List<InspectorNode> =
+        layoutInspectorTree.addSubCompositionRoots(composeView, inspectorNodes)
+
+    fun findParameters(anchorId: Int): InspectorNode? =
+        layoutInspectorTree.findParameters(composeView, anchorId)
 
     private fun createViewsToSkip(viewGroup: ViewGroup): LongList {
         val result = mutableLongListOf()
