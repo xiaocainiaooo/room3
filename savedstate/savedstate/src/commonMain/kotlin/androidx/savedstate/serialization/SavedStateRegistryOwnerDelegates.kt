@@ -40,7 +40,7 @@ public fun <T : Any> SavedStateRegistryOwner.saved(
     serializer: KSerializer<T>,
     init: () -> T,
 ): ReadWriteProperty<Any?, T> {
-    return SavedStateReadWriteProperty(
+    return SavedStateRegistryOwnerDelegate(
         registry = savedStateRegistry,
         key = key,
         serializer = serializer,
@@ -66,7 +66,7 @@ public fun <T : Any> SavedStateRegistryOwner.saved(
     serializer: KSerializer<T>,
     init: () -> T,
 ): ReadWriteProperty<Any?, T> {
-    return SavedStateReadWriteProperty(
+    return SavedStateRegistryOwnerDelegate(
         registry = savedStateRegistry,
         key = null,
         serializer = serializer,
@@ -112,7 +112,7 @@ public inline fun <reified T : Any> SavedStateRegistryOwner.saved(
     noinline init: () -> T,
 ): ReadWriteProperty<Any?, T> = saved(serializer = serializer(), init = init)
 
-private class SavedStateReadWriteProperty<T : Any>(
+private class SavedStateRegistryOwnerDelegate<T : Any>(
     private val registry: SavedStateRegistry,
     private val key: String?,
     private val serializer: KSerializer<T>,
