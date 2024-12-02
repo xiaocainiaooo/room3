@@ -51,7 +51,6 @@ dependencies {
     docs(project(":camera:camera-feature-combination-query"))
     docs(project(":camera:camera-feature-combination-query-play-services"))
     docs(project(":camera:camera-lifecycle"))
-    docs(project(":camera:camera-media3-effect"))
     docs(project(":camera:camera-mlkit-vision"))
     docs(project(":camera:camera-testing"))
     docs(project(":camera:camera-video"))
