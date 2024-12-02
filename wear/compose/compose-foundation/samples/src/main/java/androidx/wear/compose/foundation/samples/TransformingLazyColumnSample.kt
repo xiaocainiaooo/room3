@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.LocalTransformingLazyColumnItemScope
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
+import androidx.wear.compose.foundation.lazy.TransformingLazyColumnState
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material.Text
 import kotlin.math.max
@@ -206,5 +208,23 @@ fun TransformingLazyColumnImplicitSample() {
         // The middle 3 boxes will not auto-transform
         items(count = 3) { TransformExclusion { implicitTransformingBox("Middle #$it") } }
         items(count = 10) { implicitTransformingBox("After #$it") }
+    }
+}
+
+@Sampled
+@Composable
+fun UsingListAnchorItemPositionInCompositionSample() {
+    val columnState = rememberTransformingLazyColumnState()
+    val isAtCenter by remember {
+        derivedStateOf {
+            columnState.anchorItemIndex == 0 && columnState.anchorItemScrollOffset == 0
+        }
+    }
+
+    @Composable
+    fun ScrollToTopButton(@Suppress("UNUSED_PARAMETER") columnState: TransformingLazyColumnState) {}
+
+    if (!isAtCenter) {
+        ScrollToTopButton(columnState)
     }
 }
