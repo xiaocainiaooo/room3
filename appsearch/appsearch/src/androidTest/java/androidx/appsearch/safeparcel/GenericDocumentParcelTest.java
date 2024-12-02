@@ -28,9 +28,12 @@ import android.os.Parcel;
 import androidx.appsearch.app.AppSearchBlobHandle;
 import androidx.appsearch.app.EmbeddingVector;
 import androidx.appsearch.flags.Flags;
+import androidx.appsearch.testutil.AppSearchTestUtils;
 import androidx.appsearch.testutil.flags.RequiresFlagsEnabled;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +42,10 @@ import java.util.Map;
 
 /** Tests for {@link androidx.appsearch.app.GenericDocument} related SafeParcels. */
 public class GenericDocumentParcelTest {
+
+    @Rule
+    public final RuleChain mRuleChain = AppSearchTestUtils.createCommonTestRules();
+
     @Test
     public void testPropertyParcel_onePropertySet_success() {
         String[] stringValues = {"a", "b"};
