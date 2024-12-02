@@ -17,6 +17,11 @@
 package androidx.savedstate.serialization.serializers
 
 import androidx.savedstate.SavedState
+import androidx.savedstate.read
+import androidx.savedstate.serialization.SavedStateDecoder
+import androidx.savedstate.serialization.SavedStateEncoder
+import androidx.savedstate.write
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -24,44 +29,57 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 /**
- * A built-in serializer. This serializer is used as a marker to instruct
- * [androidx.savedstate.serialization.SavedStateEncoder] and
- * [androidx.savedstate.serialization.SavedStateDecoder] to use [SavedState]'s API to save/load a
- * serializable data of type [T].
- */
-internal class BuiltInSerializer<T>(private val serialName: String) : KSerializer<T> {
-    override val descriptor: SerialDescriptor = buildClassSerialDescriptor(serialName)
-
-    override fun deserialize(decoder: Decoder): T {
-        error(
-            "Cannot deserialize $serialName with '${decoder::class.simpleName}'." +
-                " This serializer can only be used with SavedStateDecoder." +
-                " Use 'decodeFromSavedState' instead."
-        )
-    }
-
-    override fun serialize(encoder: Encoder, value: T) {
-        error(
-            "Cannot serialize $serialName with '${encoder::class.simpleName}'." +
-                " This serializer can only be used with SavedStateEncoder." +
-                " Use 'encodeToSavedState' instead."
-        )
-    }
-}
-
-/**
- * A serializer for [SavedState]. This serializer is used as a marker to instruct
- * [androidx.savedstate.serialization.SavedStateEncoder] and
- * [androidx.savedstate.serialization.SavedStateDecoder] to use [SavedState]'s API to save/load a
+ * A serializer for [SavedState]. This serializer uses [SavedState]'s API to save/load a
  * [SavedState].
  *
  * Note that this serializer should be used with
  * [androidx.savedstate.serialization.SavedStateEncoder] or
  * [androidx.savedstate.serialization.SavedStateDecoder] only. Using it with other Encoders/Decoders
- * may throw [IllegalStateException].
+ * may throw [IllegalArgumentException].
  *
  * @sample androidx.savedstate.savedStateSerializer
  * @see androidx.savedstate.serialization.encodeToSavedState
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
-object SavedStateSerializer : KSerializer<SavedState> by BuiltInSerializer("SavedState")
+@OptIn(ExperimentalSerializationApi::class)
+class SavedStateSerializer : KSerializer<SavedState> {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("SavedState")
+
+    override fun serialize(encoder: Encoder, value: SavedState) {
+        require(encoder is SavedStateEncoder) {
+            encoderErrorMessage(descriptor.serialName, encoder)
+        }
+        encoder.run {
+            if (key == "") { // root
+                savedState.write { putAll(value) }
+            } else {
+                savedState.write { putSavedState(key, value) }
+            }
+        }
+    }
+
+    override fun deserialize(decoder: Decoder): SavedState {
+        require(decoder is SavedStateDecoder) {
+            decoderErrorMessage(descriptor.serialName, decoder)
+        }
+        return decoder.run {
+            if (key == "") { // root
+                savedState
+            } else {
+                savedState.read { getSavedState(key) }
+            }
+        }
+    }
+}
+
+internal fun encoderErrorMessage(serialName: String, encoder: Encoder): String {
+    return "Cannot serialize $serialName with '${encoder::class.simpleName}'." +
+        " This serializer can only be used with SavedStateEncoder." +
+        " Use 'encodeToSavedState' instead."
+}
+
+internal fun decoderErrorMessage(serialName: String, decoder: Decoder): String {
+    return "Cannot deserialize $serialName with '${decoder::class.simpleName}'." +
+        " This serializer can only be used with SavedStateDecoder." +
+        " Use 'decodeFromSavedState' instead."
+}

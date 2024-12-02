@@ -179,52 +179,100 @@ package androidx.savedstate.serialization {
 
 package androidx.savedstate.serialization.serializers {
 
-  public final class CharSequenceArrayListSerializer implements kotlinx.serialization.KSerializer<java.util.ArrayList<? extends java.lang.CharSequence>> {
-    field public static final androidx.savedstate.serialization.serializers.CharSequenceArrayListSerializer INSTANCE;
-  }
-
   public final class CharSequenceArraySerializer implements kotlinx.serialization.KSerializer<java.lang.CharSequence[]> {
-    field public static final androidx.savedstate.serialization.serializers.CharSequenceArraySerializer INSTANCE;
+    ctor public CharSequenceArraySerializer();
+    method public CharSequence[] deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, CharSequence[] value);
+    property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
-  public final class CharSequenceSerializer implements kotlinx.serialization.KSerializer<java.lang.CharSequence> {
-    field public static final androidx.savedstate.serialization.serializers.CharSequenceSerializer INSTANCE;
+  public final class CharSequenceListSerializer implements kotlinx.serialization.KSerializer<java.util.List<? extends java.lang.CharSequence>> {
+    ctor public CharSequenceListSerializer();
+    method public java.util.List<java.lang.CharSequence> deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, java.util.List<? extends java.lang.CharSequence> value);
+    property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
+  }
+
+  public class CharSequenceSerializer<T extends java.lang.CharSequence> implements kotlinx.serialization.KSerializer<T> {
+    ctor public CharSequenceSerializer();
+    method public final T deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public final kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public final void serialize(kotlinx.serialization.encoding.Encoder encoder, T value);
+    property public final kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
   public final class IBinderSerializer implements kotlinx.serialization.KSerializer<android.os.IBinder> {
-    field public static final androidx.savedstate.serialization.serializers.IBinderSerializer INSTANCE;
+    ctor public IBinderSerializer();
+    method public android.os.IBinder deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, android.os.IBinder value);
+    property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
-  public final class JavaSerializableSerializer implements kotlinx.serialization.KSerializer<java.io.Serializable> {
-    field public static final androidx.savedstate.serialization.serializers.JavaSerializableSerializer INSTANCE;
-  }
-
-  public final class ParcelableArrayListSerializer implements kotlinx.serialization.KSerializer<java.util.ArrayList<? extends android.os.Parcelable>> {
-    field public static final androidx.savedstate.serialization.serializers.ParcelableArrayListSerializer INSTANCE;
+  public class JavaSerializableSerializer<T extends java.io.Serializable> implements kotlinx.serialization.KSerializer<T> {
+    ctor public JavaSerializableSerializer();
+    method public final T deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public final kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public final void serialize(kotlinx.serialization.encoding.Encoder encoder, T value);
+    property public final kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
   public final class ParcelableArraySerializer implements kotlinx.serialization.KSerializer<android.os.Parcelable[]> {
-    field public static final androidx.savedstate.serialization.serializers.ParcelableArraySerializer INSTANCE;
+    ctor public ParcelableArraySerializer();
+    method public android.os.Parcelable[] deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, android.os.Parcelable[] value);
+    property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
-  public final class ParcelableSerializer implements kotlinx.serialization.KSerializer<android.os.Parcelable> {
-    field public static final androidx.savedstate.serialization.serializers.ParcelableSerializer INSTANCE;
+  public final class ParcelableListSerializer implements kotlinx.serialization.KSerializer<java.util.List<? extends android.os.Parcelable>> {
+    ctor public ParcelableListSerializer();
+    method public java.util.List<android.os.Parcelable> deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, java.util.List<? extends android.os.Parcelable> value);
+    property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
+  }
+
+  public class ParcelableSerializer<T extends android.os.Parcelable> implements kotlinx.serialization.KSerializer<T> {
+    ctor public ParcelableSerializer();
+    method public final T deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public final kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public final void serialize(kotlinx.serialization.encoding.Encoder encoder, T value);
+    property public final kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
   public final class SavedStateSerializer implements kotlinx.serialization.KSerializer<android.os.Bundle> {
-    field public static final androidx.savedstate.serialization.serializers.SavedStateSerializer INSTANCE;
+    ctor public SavedStateSerializer();
+    method public android.os.Bundle deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, android.os.Bundle value);
+    property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
   public final class SizeFSerializer implements kotlinx.serialization.KSerializer<android.util.SizeF> {
-    field public static final androidx.savedstate.serialization.serializers.SizeFSerializer INSTANCE;
+    ctor public SizeFSerializer();
+    method public android.util.SizeF deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, android.util.SizeF value);
+    property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
   public final class SizeSerializer implements kotlinx.serialization.KSerializer<android.util.Size> {
-    field public static final androidx.savedstate.serialization.serializers.SizeSerializer INSTANCE;
+    ctor public SizeSerializer();
+    method public android.util.Size deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, android.util.Size value);
+    property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
-  public final class SparseParcelableArraySerializer implements kotlinx.serialization.KSerializer<android.util.SparseArray<? extends android.os.Parcelable>> {
-    field public static final androidx.savedstate.serialization.serializers.SparseParcelableArraySerializer INSTANCE;
+  public final class SparseParcelableArraySerializer implements kotlinx.serialization.KSerializer<android.util.SparseArray<android.os.Parcelable>> {
+    ctor public SparseParcelableArraySerializer();
+    method public android.util.SparseArray<android.os.Parcelable> deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, android.util.SparseArray<android.os.Parcelable> value);
+    property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
 }

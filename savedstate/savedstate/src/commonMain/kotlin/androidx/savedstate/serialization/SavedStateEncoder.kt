@@ -18,7 +18,6 @@ package androidx.savedstate.serialization
 
 import androidx.savedstate.SavedState
 import androidx.savedstate.savedState
-import androidx.savedstate.serialization.serializers.SavedStateSerializer
 import androidx.savedstate.write
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
@@ -62,9 +61,10 @@ inline fun <reified T : Any> encodeToSavedState(serializable: T): SavedState {
  * @property savedState The [SavedState] to encode to. Has to be empty before encoding.
  */
 @OptIn(ExperimentalSerializationApi::class)
-private class SavedStateEncoder(private val savedState: SavedState) : AbstractEncoder() {
+internal class SavedStateEncoder(internal val savedState: SavedState) : AbstractEncoder() {
     override val serializersModule: SerializersModule = EmptySerializersModule()
-    private var key: String = ""
+    internal var key: String = ""
+        private set
 
     override fun shouldEncodeElementDefault(descriptor: SerialDescriptor, index: Int): Boolean =
         false
@@ -157,14 +157,6 @@ private class SavedStateEncoder(private val savedState: SavedState) : AbstractEn
         savedState.write { putStringArray(key, value) }
     }
 
-    private fun encodeSavedState(value: SavedState) {
-        if (key == "") { // root
-            savedState.write { putAll(value) }
-        } else {
-            savedState.write { putSavedState(key, value) }
-        }
-    }
-
     override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
         // We flatten single structured object at root to prevent encoding to a
         // SavedState containing only one SavedState inside. For example, a
@@ -182,7 +174,6 @@ private class SavedStateEncoder(private val savedState: SavedState) : AbstractEn
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
-        if (platformSpecificEncodeSerializableValue(savedState, serializer, key, value)) return
         when (serializer.descriptor) {
             intListDescriptor -> encodeIntList(value as List<Int>)
             stringListDescriptor -> encodeStringList(value as List<String>)
@@ -193,15 +184,7 @@ private class SavedStateEncoder(private val savedState: SavedState) : AbstractEn
             intArrayDescriptor -> encodeIntArray(value as IntArray)
             longArrayDescriptor -> encodeLongArray(value as LongArray)
             stringArrayDescriptor -> encodeStringArray(value as Array<String>)
-            SavedStateSerializer.descriptor -> encodeSavedState(value as SavedState)
             else -> super.encodeSerializableValue(serializer, value)
         }
     }
 }
-
-internal expect fun <T> platformSpecificEncodeSerializableValue(
-    savedState: SavedState,
-    serializer: SerializationStrategy<T>,
-    key: String,
-    value: T
-): Boolean

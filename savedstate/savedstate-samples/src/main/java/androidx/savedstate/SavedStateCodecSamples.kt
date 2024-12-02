@@ -21,13 +21,13 @@ package androidx.savedstate
 import androidx.annotation.Sampled
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
-import androidx.savedstate.serialization.serializers.CharSequenceArrayListSerializer
 import androidx.savedstate.serialization.serializers.CharSequenceArraySerializer
+import androidx.savedstate.serialization.serializers.CharSequenceListSerializer
 import androidx.savedstate.serialization.serializers.CharSequenceSerializer
 import androidx.savedstate.serialization.serializers.IBinderSerializer
 import androidx.savedstate.serialization.serializers.JavaSerializableSerializer
-import androidx.savedstate.serialization.serializers.ParcelableArrayListSerializer
 import androidx.savedstate.serialization.serializers.ParcelableArraySerializer
+import androidx.savedstate.serialization.serializers.ParcelableListSerializer
 import androidx.savedstate.serialization.serializers.ParcelableSerializer
 import androidx.savedstate.serialization.serializers.SavedStateSerializer
 import androidx.savedstate.serialization.serializers.SizeFSerializer
@@ -169,20 +169,22 @@ fun parcelableArraySerializer() {
 }
 
 @Sampled
-fun charSequenceArrayListSerializer() {
+fun charSequenceListSerializer() {
     @Serializable
     class MyModel(
-        @Serializable(with = CharSequenceArrayListSerializer::class)
-        val charSequenceList: ArrayList<CharSequence>
+        @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
+        @Serializable(with = CharSequenceListSerializer::class)
+        val charSequenceList: List<CharSequence>
     )
 }
 
+@Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
 @Sampled
-fun parcelableArrayListSerializer() {
+fun parcelableListSerializer() {
     @Serializable
     class MyModel(
-        @Serializable(with = ParcelableArrayListSerializer::class)
-        val parcelableList: ArrayList<android.os.Parcelable>
+        @Serializable(with = ParcelableListSerializer::class)
+        val parcelableList: List<android.os.Parcelable>
     )
 }
 
