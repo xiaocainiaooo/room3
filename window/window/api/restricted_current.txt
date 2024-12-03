@@ -305,10 +305,10 @@ package androidx.window.embedding {
   public static final class EmbeddingAnimationParams.Builder {
     ctor public EmbeddingAnimationParams.Builder();
     method public androidx.window.embedding.EmbeddingAnimationParams build();
-    method public androidx.window.embedding.EmbeddingAnimationParams.Builder setAnimationBackground(androidx.window.embedding.EmbeddingAnimationBackground background);
-    method public androidx.window.embedding.EmbeddingAnimationParams.Builder setChangeAnimation(androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec spec);
-    method public androidx.window.embedding.EmbeddingAnimationParams.Builder setCloseAnimation(androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec spec);
-    method public androidx.window.embedding.EmbeddingAnimationParams.Builder setOpenAnimation(androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec spec);
+    method @androidx.window.RequiresWindowSdkExtension(version=5) public androidx.window.embedding.EmbeddingAnimationParams.Builder setAnimationBackground(androidx.window.embedding.EmbeddingAnimationBackground background);
+    method @androidx.window.RequiresWindowSdkExtension(version=7) public androidx.window.embedding.EmbeddingAnimationParams.Builder setChangeAnimation(androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec spec);
+    method @androidx.window.RequiresWindowSdkExtension(version=7) public androidx.window.embedding.EmbeddingAnimationParams.Builder setCloseAnimation(androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec spec);
+    method @androidx.window.RequiresWindowSdkExtension(version=7) public androidx.window.embedding.EmbeddingAnimationParams.Builder setOpenAnimation(androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec spec);
   }
 
   public final class EmbeddingAspectRatio {
@@ -505,16 +505,12 @@ package androidx.window.embedding {
     ctor public SplitAttributes();
     ctor public SplitAttributes(optional androidx.window.embedding.SplitAttributes.SplitType splitType);
     ctor public SplitAttributes(optional androidx.window.embedding.SplitAttributes.SplitType splitType, optional androidx.window.embedding.SplitAttributes.LayoutDirection layoutDirection);
-    ctor @Deprecated public SplitAttributes(androidx.window.embedding.SplitAttributes.SplitType splitType, androidx.window.embedding.SplitAttributes.LayoutDirection layoutDirection, androidx.window.embedding.EmbeddingAnimationBackground animationBackground);
-    ctor @Deprecated public SplitAttributes(androidx.window.embedding.SplitAttributes.SplitType splitType, androidx.window.embedding.SplitAttributes.LayoutDirection layoutDirection, androidx.window.embedding.EmbeddingAnimationBackground animationBackground, androidx.window.embedding.DividerAttributes dividerAttributes);
     ctor public SplitAttributes(optional androidx.window.embedding.SplitAttributes.SplitType splitType, optional androidx.window.embedding.SplitAttributes.LayoutDirection layoutDirection, optional androidx.window.embedding.EmbeddingAnimationParams animationParams);
     ctor public SplitAttributes(optional androidx.window.embedding.SplitAttributes.SplitType splitType, optional androidx.window.embedding.SplitAttributes.LayoutDirection layoutDirection, optional androidx.window.embedding.EmbeddingAnimationParams animationParams, optional androidx.window.embedding.DividerAttributes dividerAttributes);
-    method @Deprecated public androidx.window.embedding.EmbeddingAnimationBackground getAnimationBackground();
     method public androidx.window.embedding.EmbeddingAnimationParams getAnimationParams();
     method public androidx.window.embedding.DividerAttributes getDividerAttributes();
     method public androidx.window.embedding.SplitAttributes.LayoutDirection getLayoutDirection();
     method public androidx.window.embedding.SplitAttributes.SplitType getSplitType();
-    property @Deprecated public final androidx.window.embedding.EmbeddingAnimationBackground animationBackground;
     property public final androidx.window.embedding.EmbeddingAnimationParams animationParams;
     property public final androidx.window.embedding.DividerAttributes dividerAttributes;
     property public final androidx.window.embedding.SplitAttributes.LayoutDirection layoutDirection;
@@ -525,8 +521,7 @@ package androidx.window.embedding {
   public static final class SplitAttributes.Builder {
     ctor public SplitAttributes.Builder();
     method public androidx.window.embedding.SplitAttributes build();
-    method @Deprecated @androidx.window.RequiresWindowSdkExtension(version=5) public androidx.window.embedding.SplitAttributes.Builder setAnimationBackground(androidx.window.embedding.EmbeddingAnimationBackground background);
-    method @androidx.window.RequiresWindowSdkExtension(version=7) public androidx.window.embedding.SplitAttributes.Builder setAnimationParams(androidx.window.embedding.EmbeddingAnimationParams params);
+    method @androidx.window.RequiresWindowSdkExtension(version=5) public androidx.window.embedding.SplitAttributes.Builder setAnimationParams(androidx.window.embedding.EmbeddingAnimationParams params);
     method @androidx.window.RequiresWindowSdkExtension(version=6) public androidx.window.embedding.SplitAttributes.Builder setDividerAttributes(androidx.window.embedding.DividerAttributes dividerAttributes);
     method public androidx.window.embedding.SplitAttributes.Builder setLayoutDirection(androidx.window.embedding.SplitAttributes.LayoutDirection layoutDirection);
     method public androidx.window.embedding.SplitAttributes.Builder setSplitType(androidx.window.embedding.SplitAttributes.SplitType type);

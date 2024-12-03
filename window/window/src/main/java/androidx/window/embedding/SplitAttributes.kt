@@ -68,43 +68,9 @@ class SplitAttributes
 constructor(
     val splitType: SplitType = SPLIT_TYPE_EQUAL,
     val layoutDirection: LayoutDirection = LOCALE,
-    val animationParams: EmbeddingAnimationParams = EmbeddingAnimationParams.Builder().build(),
+    val animationParams: EmbeddingAnimationParams = EmbeddingAnimationParams(),
     val dividerAttributes: DividerAttributes = DividerAttributes.NO_DIVIDER,
 ) {
-    @Deprecated(
-        message = "Use default constructor with [animationParams] instead",
-    )
-    constructor(
-        splitType: SplitType,
-        layoutDirection: LayoutDirection,
-        animationBackground: EmbeddingAnimationBackground,
-        dividerAttributes: DividerAttributes,
-    ) : this(
-        splitType,
-        layoutDirection,
-        EmbeddingAnimationParams.Builder().setAnimationBackground(animationBackground).build(),
-        dividerAttributes
-    ) {}
-
-    @Deprecated(
-        message = "Use default constructor with [animationParams] instead",
-    )
-    constructor(
-        splitType: SplitType,
-        layoutDirection: LayoutDirection,
-        animationBackground: EmbeddingAnimationBackground
-    ) : this(
-        splitType,
-        layoutDirection,
-        EmbeddingAnimationParams.Builder().setAnimationBackground(animationBackground).build()
-    ) {}
-
-    @Deprecated(
-        message = "Use [animationParams] instead",
-        replaceWith = ReplaceWith("this.animationParams.animationBackground")
-    )
-    val animationBackground: EmbeddingAnimationBackground
-        get() = this.animationParams.animationBackground
 
     /**
      * The type of parent window split, which defines the proportion of the parent window occupied
@@ -425,7 +391,7 @@ constructor(
     class Builder() {
         private var splitType = SPLIT_TYPE_EQUAL
         private var layoutDirection = LOCALE
-        private var animationParams = EmbeddingAnimationParams.Builder().build()
+        private var animationParams = EmbeddingAnimationParams()
         private var dividerAttributes: DividerAttributes = DividerAttributes.NO_DIVIDER
 
         /** Creates a Builder with values initialized from the original [SplitAttributes] */
@@ -460,14 +426,6 @@ constructor(
             this.layoutDirection = layoutDirection
         }
 
-        /** @deprecated Use [setAnimationParams] instead. */
-        @Deprecated(message = "Use [setAnimationParams] instead")
-        @RequiresWindowSdkExtension(5)
-        fun setAnimationBackground(background: EmbeddingAnimationBackground): Builder = apply {
-            this.animationParams =
-                EmbeddingAnimationParams.Builder().setAnimationBackground(background).build()
-        }
-
         /**
          * Sets the animation params to use during animation of the split involving this
          * `SplitAttributes` object if the animation requires a background color or non-default
@@ -480,7 +438,7 @@ constructor(
          * @param params the animation params.
          * @return this `Builder`.
          */
-        @RequiresWindowSdkExtension(7)
+        @RequiresWindowSdkExtension(5)
         fun setAnimationParams(params: EmbeddingAnimationParams): Builder = apply {
             this.animationParams = params
         }
