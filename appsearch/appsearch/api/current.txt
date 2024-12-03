@@ -1021,7 +1021,8 @@ package androidx.appsearch.ast.operators {
     ctor public AndNode(androidx.appsearch.ast.Node, androidx.appsearch.ast.Node, androidx.appsearch.ast.Node!...);
     ctor public AndNode(java.util.List<androidx.appsearch.ast.Node!>);
     method public void addChild(androidx.appsearch.ast.Node);
-    method public void removeChild(int);
+    method public int getIndexOfChild(androidx.appsearch.ast.Node);
+    method public boolean removeChild(androidx.appsearch.ast.Node);
     method public void setChild(int, androidx.appsearch.ast.Node);
     method public void setChildren(java.util.List<androidx.appsearch.ast.Node!>);
   }
@@ -1045,7 +1046,8 @@ package androidx.appsearch.ast.operators {
     ctor public OrNode(androidx.appsearch.ast.Node, androidx.appsearch.ast.Node, androidx.appsearch.ast.Node!...);
     ctor public OrNode(java.util.List<androidx.appsearch.ast.Node!>);
     method public void addChild(androidx.appsearch.ast.Node);
-    method public void removeChild(int);
+    method public int getIndexOfChild(androidx.appsearch.ast.Node);
+    method public boolean removeChild(androidx.appsearch.ast.Node);
     method public void setChild(int, androidx.appsearch.ast.Node);
     method public void setChildren(java.util.List<androidx.appsearch.ast.Node!>);
   }
