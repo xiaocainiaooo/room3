@@ -548,10 +548,32 @@ public open class NavController(
     public inline fun <reified T : Any> popBackStack(
         inclusive: Boolean,
         saveState: Boolean = false
+    ): Boolean = popBackStack(T::class, inclusive, saveState)
+
+    /**
+     * Attempts to pop the controller's back stack back to a specific destination.
+     *
+     * @param route The topmost destination to retain with route from a [KClass]. The target
+     *   NavDestination must have been created with route from [KClass].
+     * @param inclusive Whether the given destination should also be popped.
+     * @param saveState Whether the back stack and the state of all destinations between the current
+     *   destination and [route] should be saved for later restoration via
+     *   [NavOptions.Builder.setRestoreState] or the `restoreState` attribute using the same [T]
+     *   (note: this matching ID is true whether [inclusive] is true or false).
+     * @return true if the stack was popped at least once and the user has been navigated to another
+     *   destination, false otherwise
+     */
+    @MainThread
+    @JvmOverloads
+    @OptIn(InternalSerializationApi::class)
+    public fun popBackStack(
+        route: KClass<*>,
+        inclusive: Boolean,
+        saveState: Boolean = false
     ): Boolean {
-        val id = serializer<T>().generateHashCode()
+        val id = route.serializer().generateHashCode().also { println("pop hashcode:$it") }
         requireNotNull(graph.findDestinationComprehensive(id, true)) {
-            "Destination with route ${T::class.simpleName} cannot be found in navigation " +
+            "Destination with route ${route.simpleName} cannot be found in navigation " +
                 "graph $graph"
         }
         return popBackStack(id, inclusive, saveState)
