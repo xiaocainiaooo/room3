@@ -162,5 +162,6 @@ Calculating task graph as configuration cache cannot be reused because the set o
 Calculating task graph as configuration cache cannot be reused because properties file .*local\.properties has changed\.
 # https://youtrack.jetbrains.com/issue/KT-73311
 Unable to release compile session, maybe daemon is already down.*
+java\.net\.ConnectException: Connection refused
 java\.net\.SocketException: Connection reset
 java\.io\.EOFException
