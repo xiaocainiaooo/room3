@@ -138,8 +138,8 @@ public class NestedScrollView extends FrameLayout implements NestedScrollingPare
     public EdgeEffect mEdgeGlowBottom;
 
     @VisibleForTesting
-    ScrollFeedbackProviderCompat mScrollFeedbackProvider =
-            ScrollFeedbackProviderCompat.createProvider(this);
+    @Nullable
+    ScrollFeedbackProviderCompat mScrollFeedbackProvider;
 
     /**
      * Position of the last motion event; only used with touch related events (usually to assist
@@ -1162,7 +1162,7 @@ public class NestedScrollView extends FrameLayout implements NestedScrollingPare
         // The position may have been adjusted in the previous call, so we must revise our values.
         final int scrollYDelta = getScrollY() - initialScrollY;
         if (ev != null && scrollYDelta != 0) {
-            mScrollFeedbackProvider.onScrollProgress(
+            getScrollFeedbackProvider().onScrollProgress(
                     ev.getDeviceId(),  ev.getSource(), verticalScrollAxis, scrollYDelta);
         }
         final int unconsumedY = verticalScrollDistance - scrollYDelta;
@@ -1195,7 +1195,7 @@ public class NestedScrollView extends FrameLayout implements NestedScrollingPare
                         (float) x / getWidth()
                 );
                 if (ev != null) {
-                    mScrollFeedbackProvider.onScrollLimit(
+                    getScrollFeedbackProvider().onScrollLimit(
                             ev.getDeviceId(), ev.getSource(), verticalScrollAxis,
                             /* isStart= */ true);
                 }
@@ -1213,7 +1213,7 @@ public class NestedScrollView extends FrameLayout implements NestedScrollingPare
                         1.f - ((float) x / getWidth())
                 );
                 if (ev != null) {
-                    mScrollFeedbackProvider.onScrollLimit(
+                    getScrollFeedbackProvider().onScrollLimit(
                             ev.getDeviceId(), ev.getSource(), verticalScrollAxis,
                             /* isStart= */ false);
                 }
@@ -2634,6 +2634,13 @@ public class NestedScrollView extends FrameLayout implements NestedScrollingPare
             AccessibilityRecordCompat.setMaxScrollX(event, nsvHost.getScrollX());
             AccessibilityRecordCompat.setMaxScrollY(event, nsvHost.getScrollRange());
         }
+    }
+
+    private ScrollFeedbackProviderCompat getScrollFeedbackProvider() {
+        if (mScrollFeedbackProvider == null) {
+            mScrollFeedbackProvider = ScrollFeedbackProviderCompat.createProvider(this);
+        }
+        return mScrollFeedbackProvider;
     }
 
     class DifferentialMotionFlingTargetImpl implements DifferentialMotionFlingTarget {
