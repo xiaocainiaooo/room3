@@ -147,13 +147,15 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
             val animationBackground = splitAttributes.animationBackground
             builder.setAnimationParams(
                 if (animationBackground is OEMEmbeddingAnimationBackground.ColorBackground) {
-                    EmbeddingAnimationParams(
-                        EmbeddingAnimationBackground.createColorBackground(
-                            animationBackground.color
+                    EmbeddingAnimationParams.Builder()
+                        .setAnimationBackground(
+                            EmbeddingAnimationBackground.createColorBackground(
+                                animationBackground.color
+                            )
                         )
-                    )
+                        .build()
                 } else {
-                    EmbeddingAnimationParams()
+                    EmbeddingAnimationParams.Builder().build()
                 }
             )
         }
