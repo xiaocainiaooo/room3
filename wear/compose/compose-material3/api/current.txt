@@ -447,10 +447,11 @@ package androidx.wear.compose.material3 {
   }
 
   @androidx.compose.runtime.Immutable public final class DatePickerColors {
-    ctor public DatePickerColors(long selectedPickerContentColor, long unselectedPickerContentColor, long pickerLabelColor, long nextButtonContentColor, long nextButtonContainerColor, long confirmButtonContentColor, long confirmButtonContainerColor);
-    method public androidx.wear.compose.material3.DatePickerColors copy(optional long selectedPickerContentColor, optional long unselectedPickerContentColor, optional long pickerLabelColor, optional long nextButtonContentColor, optional long nextButtonContainerColor, optional long confirmButtonContentColor, optional long confirmButtonContainerColor);
+    ctor public DatePickerColors(long selectedPickerContentColor, long unselectedPickerContentColor, long invalidPickerContentColor, long pickerLabelColor, long nextButtonContentColor, long nextButtonContainerColor, long confirmButtonContentColor, long confirmButtonContainerColor);
+    method public androidx.wear.compose.material3.DatePickerColors copy(optional long selectedPickerContentColor, optional long unselectedPickerContentColor, optional long invalidPickerContentColor, optional long pickerLabelColor, optional long nextButtonContentColor, optional long nextButtonContainerColor, optional long confirmButtonContentColor, optional long confirmButtonContainerColor);
     method public long getConfirmButtonContainerColor();
     method public long getConfirmButtonContentColor();
+    method public long getInvalidPickerContentColor();
     method public long getNextButtonContainerColor();
     method public long getNextButtonContentColor();
     method public long getPickerLabelColor();
@@ -458,6 +459,7 @@ package androidx.wear.compose.material3 {
     method public long getUnselectedPickerContentColor();
     property public final long confirmButtonContainerColor;
     property public final long confirmButtonContentColor;
+    property public final long invalidPickerContentColor;
     property public final long nextButtonContainerColor;
     property public final long nextButtonContentColor;
     property public final long pickerLabelColor;
@@ -467,7 +469,7 @@ package androidx.wear.compose.material3 {
 
   public final class DatePickerDefaults {
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.DatePickerColors datePickerColors();
-    method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.DatePickerColors datePickerColors(optional long selectedPickerContentColor, optional long unselectedPickerContentColor, optional long pickerLabelColor, optional long nextButtonContentColor, optional long nextButtonContainerColor, optional long confirmButtonContentColor, optional long confirmButtonContainerColor);
+    method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.DatePickerColors datePickerColors(optional long selectedPickerContentColor, optional long unselectedPickerContentColor, optional long invalidPickerContentColor, optional long pickerLabelColor, optional long nextButtonContentColor, optional long nextButtonContainerColor, optional long confirmButtonContentColor, optional long confirmButtonContainerColor);
     method @androidx.compose.runtime.Composable public int getDatePickerType();
     property @androidx.compose.runtime.Composable public final int datePickerType;
     field public static final androidx.wear.compose.material3.DatePickerDefaults INSTANCE;
