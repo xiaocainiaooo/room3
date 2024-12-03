@@ -102,7 +102,7 @@ public class SpatialSoundPool private constructor() {
         /**
          * @param session The current SceneCore [Session] instance.
          * @param soundPool The [SoundPool] to use to get its SourceType.
-         * @param streamID a streamID returned by the play(), playAsPointSource(), or
+         * @param streamId a streamID returned by the play(), playAsPointSource(), or
          *   playAsSoundField().
          * @return The [SpatializerConstants.SourceType] for the given streamID.
          */

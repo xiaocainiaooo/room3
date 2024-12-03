@@ -50,6 +50,7 @@ internal constructor(
          *   created [Anchor], or [AnchorCreateResourcesExhausted] if the resources allocated for
          *   anchors have been exhausted.
          */
+        @JvmStatic
         public fun create(session: Session, pose: Pose): AnchorCreateResult {
             val perceptionStateExtender = getPerceptionStateExtender(session)
             val runtimeAnchor = session.runtime.perceptionManager.createAnchor(pose)
@@ -60,6 +61,7 @@ internal constructor(
          * Retrieves all the [UUID] instances from [Anchor] objects that have been persisted by
          * [persist] that are still present in the local storage.
          */
+        @JvmStatic
         public fun getPersistedAnchorUuids(session: Session): List<UUID> {
             return session.runtime.perceptionManager.getPersistedAnchorUuids()
         }
@@ -69,6 +71,7 @@ internal constructor(
          * be in the same physical location as the anchor that was previously persisted. The [uuid]
          * should be the return value of a previous call to [persist].
          */
+        @JvmStatic
         public fun load(session: Session, uuid: UUID): AnchorCreateResult {
             val perceptionStateExtender = getPerceptionStateExtender(session)
             val runtimeAnchor = session.runtime.perceptionManager.loadAnchor(uuid)
@@ -77,6 +80,7 @@ internal constructor(
 
         /** Loads an [Anchor] of the given native pointer. */
         // TODO(b/373711152) : Remove this method once the Jetpack XR Runtime API migration is done.
+        @JvmStatic
         public fun loadFromNativePointer(session: Session, nativePointer: Long): Anchor {
             val perceptionStateExtender = getPerceptionStateExtender(session)
             val runtimeAnchor =
@@ -85,6 +89,7 @@ internal constructor(
         }
 
         /** Deletes a persisted Anchor denoted by [uuid] from local storage. */
+        @JvmStatic
         public fun unpersist(session: Session, uuid: UUID) {
             session.runtime.perceptionManager.unpersistAnchor(uuid)
         }

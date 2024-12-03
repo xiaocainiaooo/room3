@@ -72,6 +72,8 @@ import java.io.Closeable;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -88,14 +90,13 @@ public class FakeXrExtensions implements XrExtensions {
             "This function is not implemented yet in FakeXrExtensions.  Please add an"
                 + " implementation if support is desired for testing.";
 
-    @NonNull public final ArrayList<FakeNode> createdNodes = new ArrayList<>();
+    @NonNull public final List<FakeNode> createdNodes = new ArrayList<>();
 
-    @NonNull public final ArrayList<FakeGltfModelToken> createdGltfModelTokens = new ArrayList<>();
+    @NonNull public final List<FakeGltfModelToken> createdGltfModelTokens = new ArrayList<>();
 
-    @NonNull
-    public final ArrayList<FakeEnvironmentToken> createdEnvironmentTokens = new ArrayList<>();
+    @NonNull public final List<FakeEnvironmentToken> createdEnvironmentTokens = new ArrayList<>();
 
-    @NonNull public final HashMap<Activity, FakeActivityPanel> activityPanelMap = new HashMap<>();
+    @NonNull public final Map<Activity, FakeActivityPanel> activityPanelMap = new HashMap<>();
 
     FakeNode fakeTaskNode = null;
     FakeNode fakeEnvironmentNode = null;
@@ -160,6 +161,9 @@ public class FakeXrExtensions implements XrExtensions {
         throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_FAKE);
     }
 
+    /**
+     * @deprecated This method is no longer supported.
+     */
     @Override
     @NonNull
     @Deprecated
@@ -178,6 +182,9 @@ public class FakeXrExtensions implements XrExtensions {
         return spaceMode;
     }
 
+    /**
+     * @deprecated This method is no longer supported.
+     */
     @Override
     @Deprecated
     public void setMainWindowSize(@NonNull Activity activity, int width, int height) {
@@ -187,15 +194,18 @@ public class FakeXrExtensions implements XrExtensions {
     @Override
     public void setMainWindowSize(
             @NonNull Activity activity,
-            int widthPx,
-            int heightPx,
+            int width,
+            int height,
             @NonNull Consumer<XrExtensionResult> callback,
             @NonNull Executor executor) {
-        mainWindowWidth = widthPx;
-        mainWindowHeight = heightPx;
+        mainWindowWidth = width;
+        mainWindowHeight = height;
         executor.execute(() -> callback.accept(createAsyncResult()));
     }
 
+    /**
+     * @deprecated This method is no longer supported.
+     */
     @Override
     @Deprecated
     public void setMainWindowCurvatureRadius(@NonNull Activity activity, float curvatureRadius) {
@@ -247,12 +257,18 @@ public class FakeXrExtensions implements XrExtensions {
         return fakeSpatialState;
     }
 
+    /**
+     * @deprecated This method is no longer supported.
+     */
     @Override
     @Deprecated
     public boolean canEmbedActivityPanel(@NonNull Activity activity) {
         throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_FAKE);
     }
 
+    /**
+     * @deprecated This method is no longer supported.
+     */
     @Override
     @Deprecated
     public boolean requestFullSpaceMode(@NonNull Activity activity) {
@@ -280,12 +296,18 @@ public class FakeXrExtensions implements XrExtensions {
         executor.execute(() -> callback.accept(createAsyncResult()));
     }
 
+    /**
+     * @deprecated This method is no longer supported.
+     */
     @Override
     @Deprecated
     public boolean requestHomeSpaceMode(@NonNull Activity activity) {
         throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_FAKE);
     }
 
+    /**
+     * @deprecated This method is no longer supported.
+     */
     @Override
     @Deprecated
     public void setSpatialStateCallback(
@@ -333,6 +355,9 @@ public class FakeXrExtensions implements XrExtensions {
         };
     }
 
+    /**
+     * @deprecated This method is no longer supported.
+     */
     @Override
     @Deprecated
     public void attachSpatialScene(
@@ -356,6 +381,9 @@ public class FakeXrExtensions implements XrExtensions {
         executor.execute(() -> callback.accept(createAsyncResult()));
     }
 
+    /**
+     * @deprecated This method is no longer supported.
+     */
     @Override
     @Deprecated
     public void detachSpatialScene(@NonNull Activity activity) {
@@ -378,6 +406,9 @@ public class FakeXrExtensions implements XrExtensions {
         return fakeTaskNode;
     }
 
+    /**
+     * @deprecated This method is no longer supported.
+     */
     @Override
     @Deprecated
     public void attachSpatialEnvironment(
@@ -397,6 +428,9 @@ public class FakeXrExtensions implements XrExtensions {
         executor.execute(() -> callback.accept(createAsyncResult()));
     }
 
+    /**
+     * @deprecated This method is no longer supported.
+     */
     @Override
     @Deprecated
     public void detachSpatialEnvironment(@NonNull Activity activity) {
@@ -413,22 +447,31 @@ public class FakeXrExtensions implements XrExtensions {
         executor.execute(() -> callback.accept(createAsyncResult()));
     }
 
-    // Suppressed to allow CompletableFuture.
-    @SuppressWarnings("AndroidJdkLibsChecker")
+    /**
+     * Suppressed to allow CompletableFuture.
+     *
+     * @deprecated This method is no longer supported.
+     */
+    @SuppressWarnings({"AndroidJdkLibsChecker", "BadFuture"})
     @Override
     @NonNull
+    @Deprecated
     public CompletableFuture</* @Nullable */ androidx.xr.extensions.asset.GltfModelToken>
             loadGltfModel(
-                    @NonNull InputStream asset,
+                    @Nullable InputStream asset,
                     int regionSizeBytes,
                     int regionOffsetBytes,
-                    @NonNull String url) {
+                    @Nullable String url) {
         FakeGltfModelToken modelToken = new FakeGltfModelToken(url);
         createdGltfModelTokens.add(modelToken);
         return CompletableFuture.completedFuture(modelToken);
     }
 
-    // Suppressed to allow CompletableFuture.
+    /**
+     * Suppressed to allow CompletableFuture.
+     *
+     * @deprecated This method is no longer supported.
+     */
     @SuppressWarnings("AndroidJdkLibsChecker")
     @Override
     @NonNull
@@ -438,25 +481,34 @@ public class FakeXrExtensions implements XrExtensions {
         throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_FAKE);
     }
 
-    // Suppressed to allow CompletableFuture.
-    @SuppressWarnings("AndroidJdkLibsChecker")
+    /**
+     * Suppressed to allow CompletableFuture.
+     *
+     * @deprecated This method is no longer supported.
+     */
+    @SuppressWarnings({"AndroidJdkLibsChecker", "BadFuture"})
     @Override
     @NonNull
+    @Deprecated
     //  public ListenableFuture</* @Nullable */ androidx.xr.extensions.asset.EnvironmentToken>
     // loadEnvironment(
     public CompletableFuture</* @Nullable */ androidx.xr.extensions.asset.EnvironmentToken>
             loadEnvironment(
-                    @NonNull InputStream asset,
+                    @Nullable InputStream asset,
                     int regionSizeBytes,
                     int regionOffsetBytes,
-                    @NonNull String url) {
+                    @Nullable String url) {
         FakeEnvironmentToken imageToken = new FakeEnvironmentToken(url);
         createdEnvironmentTokens.add(imageToken);
         //    return immediateFuture(imageToken);
         return CompletableFuture.completedFuture(imageToken);
     }
 
-    // Suppressed to allow CompletableFuture.
+    /**
+     * Suppressed to allow CompletableFuture.
+     *
+     * @deprecated This method is no longer supported.
+     */
     @SuppressWarnings("AndroidJdkLibsChecker")
     @Override
     @NonNull
@@ -472,7 +524,11 @@ public class FakeXrExtensions implements XrExtensions {
         throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_FAKE);
     }
 
-    // Suppressed to allow CompletableFuture.
+    /**
+     * Suppressed to allow CompletableFuture.
+     *
+     * @deprecated This method is no longer supported.
+     */
     @SuppressWarnings("AndroidJdkLibsChecker")
     @Override
     @Deprecated
@@ -488,8 +544,13 @@ public class FakeXrExtensions implements XrExtensions {
         throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_FAKE);
     }
 
-    // Returns a FakeNode with corresponding gltfModelToken if it was created and found
+    /**
+     * Returns a FakeNode with corresponding gltfModelToken if it was created and found
+     *
+     * @deprecated This method is no longer supported.
+     */
     @NonNull
+    @Deprecated
     public FakeNode testGetNodeWithGltfToken(
             @NonNull androidx.xr.extensions.asset.GltfModelToken token) {
         for (FakeNode node : createdNodes) {
@@ -500,8 +561,13 @@ public class FakeXrExtensions implements XrExtensions {
         return null;
     }
 
-    // Returns a FakeNode with corresponding environmentToken if it was created and found
+    /**
+     * Returns a FakeNode with corresponding environmentToken if it was created and found
+     *
+     * @deprecated This method is no longer supported.
+     */
     @NonNull
+    @Deprecated
     public FakeNode testGetNodeWithEnvironmentToken(
             @NonNull androidx.xr.extensions.asset.EnvironmentToken token) {
         for (FakeNode node : createdNodes) {
@@ -618,7 +684,7 @@ public class FakeXrExtensions implements XrExtensions {
         public static final float DEFAULT_PIXELS_PER_METER = 1f;
 
         @Override
-        public float defaultPixelsPerMeter(float v) {
+        public float defaultPixelsPerMeter(float density) {
             return DEFAULT_PIXELS_PER_METER;
         }
     }
@@ -640,7 +706,7 @@ public class FakeXrExtensions implements XrExtensions {
 
     /** A fake implementation of the XR extensions Node. */
     @SuppressWarnings("ParcelCreator")
-    public static class FakeNode implements Node {
+    public static final class FakeNode implements Node {
         FakeNode parent = null;
         float xPosition = 0.0f;
         float yPosition = 0.0f;
@@ -710,8 +776,8 @@ public class FakeXrExtensions implements XrExtensions {
         @Override
         @NonNull
         public Closeable subscribeToTransform(
-                @NonNull Consumer<NodeTransform> listener, @NonNull Executor executor) {
-            this.transformListener = listener;
+                @NonNull Consumer<NodeTransform> transformCallback, @NonNull Executor executor) {
+            this.transformListener = transformCallback;
             this.transformExecutor = executor;
             return new FakeCloseable();
         }
@@ -775,7 +841,11 @@ public class FakeXrExtensions implements XrExtensions {
             return alpha;
         }
 
+        /**
+         * @deprecated This method is no longer supported.
+         */
         @Nullable
+        @Deprecated
         public androidx.xr.extensions.asset.GltfModelToken getGltfModel() {
             return gltfModel;
         }
@@ -795,7 +865,11 @@ public class FakeXrExtensions implements XrExtensions {
             return surfacePackage;
         }
 
+        /**
+         * @deprecated This method is no longer supported.
+         */
         @Nullable
+        @Deprecated
         public androidx.xr.extensions.asset.EnvironmentToken getEnvironment() {
             return environment;
         }
@@ -841,8 +915,12 @@ public class FakeXrExtensions implements XrExtensions {
             return this;
         }
 
+        /**
+         * @deprecated This method is no longer supported.
+         */
         @Override
         @NonNull
+        @Deprecated
         public NodeTransaction setEnvironment(
                 @NonNull Node node, @Nullable androidx.xr.extensions.asset.EnvironmentToken token) {
             lastFakeNode = (FakeNode) node;
@@ -893,14 +971,18 @@ public class FakeXrExtensions implements XrExtensions {
 
         @Override
         @NonNull
-        public NodeTransaction setAlpha(@NonNull Node node, float alpha) {
+        public NodeTransaction setAlpha(@NonNull Node node, float value) {
             lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).alpha = alpha;
+            ((FakeNode) node).alpha = value;
             return this;
         }
 
+        /**
+         * @deprecated This method is no longer supported.
+         */
         @Override
         @NonNull
+        @Deprecated
         public NodeTransaction setGltfModel(
                 @NonNull Node node,
                 @NonNull androidx.xr.extensions.asset.GltfModelToken gltfModelToken) {
@@ -1099,9 +1181,9 @@ public class FakeXrExtensions implements XrExtensions {
         }
 
         @Override
-        public void launchActivity(@NonNull Intent intent, @Nullable Bundle bundle) {
+        public void launchActivity(@NonNull Intent intent, @Nullable Bundle options) {
             launchIntent = intent;
-            this.bundle = bundle;
+            this.bundle = options;
         }
 
         @Nullable
@@ -1109,7 +1191,7 @@ public class FakeXrExtensions implements XrExtensions {
             return launchIntent;
         }
 
-        @Nullable
+        @NonNull
         public Bundle getBundle() {
             return bundle;
         }
@@ -1131,8 +1213,8 @@ public class FakeXrExtensions implements XrExtensions {
         }
 
         @Override
-        public void setWindowBounds(@NonNull Rect rect) {
-            bounds = rect;
+        public void setWindowBounds(@NonNull Rect windowBounds) {
+            bounds = windowBounds;
         }
 
         @Nullable

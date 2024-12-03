@@ -19,12 +19,11 @@ package androidx.xr.scenecore.impl.perception;
 import android.os.IBinder;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;
-
-import javax.annotation.Nullable;
 
 /**
  * An Anchor keeps track of a position in the real world. This can be an arbitrary position or a

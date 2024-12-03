@@ -1908,7 +1908,6 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
-    @Ignore("Flaky test, see b/380269912")
     public void addingSameComponentTypeAgain_addsComponent() throws Exception {
         PanelEntity panelEntity = createPanelEntity();
         GltfEntity gltfEntity = createGltfEntity();

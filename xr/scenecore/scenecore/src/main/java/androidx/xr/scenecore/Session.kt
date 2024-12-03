@@ -309,12 +309,15 @@ public class Session(
      * This method must be called from the main thread.
      * https://developer.android.com/guide/components/processes-and-threads
      *
+     * @param stereoMode Stereo mode for the surface.
+     * @param dimensions Dimensions for the surface.
      * @param pose Pose of this entity relative to its parent, default value is Identity.
      * @return a StereoSurfaceEntity instance
      */
     @MainThread
+    @JvmOverloads
     public fun createStereoSurfaceEntity(
-        @StereoSurfaceEntity.StereoMode
+        @StereoSurfaceEntity.StereoModeValue
         stereoMode: Int = StereoSurfaceEntity.StereoMode.SIDE_BY_SIDE,
         dimensions: Dimensions = Dimensions(1.0f, 1.0f, 1.0f),
         pose: Pose = Pose.Identity,
@@ -395,26 +398,6 @@ public class Session(
      * @param bounds Bounds for this AnchorEntity.
      * @param planeType Orientation of plane to which this Anchor should attach.
      * @param planeSemantic Semantics of the plane to which this Anchor should attach.
-     */
-    public fun createAnchorEntity(
-        bounds: Dimensions,
-        planeType: @PlaneTypeValue Int,
-        planeSemantic: @PlaneSemanticValue Int,
-    ): AnchorEntity {
-        return AnchorEntity.create(runtime, entityManager, bounds, planeType, planeSemantic)
-    }
-
-    /**
-     * Public factory function for an AnchorEntity which searches for a location to create an Anchor
-     * among the tracked planes available to the perception system.
-     *
-     * Note that this function will fail if the application has not been granted the
-     * "android.permission.SCENE_UNDERSTANDING" permission. Consider using PermissionHelper to help
-     * request permission from the User.
-     *
-     * @param bounds Bounds for this AnchorEntity.
-     * @param planeType Orientation of plane to which this Anchor should attach.
-     * @param planeSemantic Semantics of the plane to which this Anchor should attach.
      * @param timeout The amount of time to search for the a suitable plane to attach to. If a plane
      *   is not found within the timeout, the returned AnchorEntity state will be set to
      *   AnchorEntity.State.TIMEDOUT. It may take longer than the timeout period before the anchor
@@ -464,6 +447,7 @@ public class Session(
      * @param name Name of the entity.
      * @param pose Initial pose of the entity.
      */
+    @JvmOverloads
     public fun createEntity(name: String, pose: Pose = Pose.Identity): Entity =
         ContentlessEntity.create(runtime, entityManager, name, pose)
 
@@ -506,8 +490,6 @@ public class Session(
      * @param scaleInZ A [Boolean] which tells the system to update the scale of the Entity as the
      *   user moves it closer and further away. This is mostly useful for Panel auto-rescaling with
      *   Distance
-     * @param userAnchorable A [Boolean] which allows the user to Anchor the Entity to a nearby
-     *   perception plane when releasing a nearby drag.
      * @param anchorPlacement A Set containing different [AnchorPlacement] for how to anchor the
      *   [Entity] movable component. If this is not empty the movement semantics will be slightly
      *   different from the system as it will add the ability to anchor to nearby planes.

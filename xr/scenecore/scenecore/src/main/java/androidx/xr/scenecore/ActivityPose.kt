@@ -50,8 +50,6 @@ public interface ActivityPose {
 /**
  * The BaseActivityPose is an implementation of ActivityPose interface that wraps a platformAdapter
  * ActivityPose.
- *
- * @property rtActivityPose The JxrPlatformAdapter ActivityPose.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public sealed class BaseActivityPose<out RtActivityPoseType : JxrPlatformAdapter.ActivityPose>(

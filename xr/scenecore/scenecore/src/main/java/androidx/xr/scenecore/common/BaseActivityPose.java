@@ -58,7 +58,7 @@ public abstract class BaseActivityPose implements ActivityPose {
 
     @Override
     @NonNull
-    public Pose transformPoseTo(@NonNull Pose localToPose, @NonNull ActivityPose destination) {
+    public Pose transformPoseTo(@NonNull Pose pose, @NonNull ActivityPose destination) {
 
         // TODO: b/355680575 - Revisit if we need to account for parent rotation when calculating
         // the
@@ -97,9 +97,8 @@ public abstract class BaseActivityPose implements ActivityPose {
         // Apply the transformation to the destination entity, from this entity, on the local pose.
         return destinationToLocal.compose(
                 new Pose(
-                        localToPose
-                                .getTranslation()
+                        pose.getTranslation()
                                 .times(this.getWorldSpaceScale().times(inverseDestinationScale)),
-                        localToPose.getRotation()));
+                        pose.getRotation()));
     }
 }

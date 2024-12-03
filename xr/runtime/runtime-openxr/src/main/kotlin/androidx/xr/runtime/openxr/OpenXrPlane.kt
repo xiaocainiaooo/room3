@@ -23,14 +23,7 @@ import androidx.xr.runtime.internal.TrackingState
 import androidx.xr.runtime.math.Pose
 import androidx.xr.runtime.math.Vector2
 
-/**
- * Wraps the native [XrTrackableANDROID] with the [Plane] interface.
- *
- * @property planeId that identifies the [XrTrackableANDROID] instance that backs this plane.
- * @property type the [Plane.Type] that summarizes the normal vector of this plane.
- * @property timeSource the [OpenXrTimeSource] used to convert between XR time and Java time.
- * @property xrResources the [XrResources] that holds the resources that are used in the XR session.
- */
+/** Wraps the native [XrTrackableANDROID] with the [Plane] interface. */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class OpenXrPlane
 internal constructor(

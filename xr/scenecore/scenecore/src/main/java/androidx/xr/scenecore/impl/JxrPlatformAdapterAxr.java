@@ -262,6 +262,7 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
     }
 
     @NonNull
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
     public static JxrPlatformAdapterAxr create(
             @NonNull Activity activity,
             @NonNull ScheduledExecutorService executor,
@@ -282,6 +283,7 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
     }
 
     @NonNull
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
     public static JxrPlatformAdapterAxr create(
             @NonNull Activity activity,
             @NonNull ScheduledExecutorService executor,
@@ -591,7 +593,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
     }
 
     // TODO: b/374345896 - Delete this method once we've finalized the SplitEngine migration.
-    @SuppressWarnings({"AndroidJdkLibsChecker", "RestrictTo", "FutureReturnValueIgnored"})
+    @SuppressWarnings({
+        "AndroidJdkLibsChecker",
+        "RestrictTo",
+        "FutureReturnValueIgnored",
+        "AsyncSuffixFuture"
+    })
     @Override
     @Nullable
     public ListenableFuture<GltfModelResource> loadGltfByAssetName(@NonNull String assetName) {
@@ -624,7 +631,7 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
     // ResolvableFuture is marked as RestrictTo(LIBRARY_GROUP_PREFIX), which is intended for classes
     // within AndroidX. We're in the process of migrating to AndroidX. Without suppressing this
     // warning, however, we get a build error - go/bugpattern/RestrictTo.
-    @SuppressWarnings("RestrictTo")
+    @SuppressWarnings({"RestrictTo", "AsyncSuffixFuture"})
     @Override
     @Nullable
     public ListenableFuture<GltfModelResource> loadGltfByAssetNameSplitEngine(
@@ -678,7 +685,12 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
     }
 
     // TODO: b/376504646 - Delete this method once we've migrated to a SplitEngine backed skybox.
-    @SuppressWarnings({"AndroidJdkLibsChecker", "RestrictTo", "FutureReturnValueIgnored"})
+    @SuppressWarnings({
+        "AndroidJdkLibsChecker",
+        "RestrictTo",
+        "FutureReturnValueIgnored",
+        "AsyncSuffixFuture"
+    })
     @Override
     @Nullable
     public ListenableFuture<ExrImageResource> loadExrImageByAssetName(@NonNull String assetName) {
@@ -762,7 +774,7 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
             @NonNull PixelDimensions surfaceDimensionsPx,
             @NonNull Dimensions dimensions,
             @NonNull String name,
-            @NonNull Context context,
+            @SuppressWarnings("ContextFirst") @NonNull Context context,
             @NonNull Entity parent) {
 
         // TODO(b/352630140):  Move this into a static factory method of PanelEntityImpl.
@@ -815,8 +827,8 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
     @SuppressLint("ExecutorRegistration")
     @NonNull
     public InteractableComponent createInteractableComponent(
-            @NonNull Executor executor, @NonNull InputEventListener consumer) {
-        return new InteractableComponentImpl(executor, consumer);
+            @NonNull Executor executor, @NonNull InputEventListener listener) {
+        return new InteractableComponentImpl(executor, listener);
     }
 
     @Override
@@ -845,10 +857,11 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
     @Override
     @NonNull
     public AnchorPlacement createAnchorPlacementForPlanes(
-            @NonNull Set<PlaneType> planeTypes, @NonNull Set<PlaneSemantic> planeSemantics) {
+            @NonNull Set<PlaneType> planeTypeFilter,
+            @NonNull Set<PlaneSemantic> planeSemanticFilter) {
         AnchorPlacementImpl anchorPlacement = new AnchorPlacementImpl();
-        anchorPlacement.planeTypeFilter.addAll(planeTypes);
-        anchorPlacement.planeSemanticFilter.addAll(planeSemantics);
+        anchorPlacement.planeTypeFilter.addAll(planeTypeFilter);
+        anchorPlacement.planeSemanticFilter.addAll(planeSemanticFilter);
         return anchorPlacement;
     }
 
@@ -910,14 +923,14 @@ public class JxrPlatformAdapterAxr implements JxrPlatformAdapter {
     @Override
     @NonNull
     public AnchorEntity createAnchorEntity(
-            @NonNull Dimensions dimensions,
+            @NonNull Dimensions bounds,
             @NonNull PlaneType planeType,
             @NonNull PlaneSemantic planeSemantic,
             @NonNull Duration searchTimeout) {
         Node node = extensions.createNode();
         return AnchorEntityImpl.createSemanticAnchor(
                 node,
-                dimensions,
+                bounds,
                 planeType,
                 planeSemantic,
                 searchTimeout,

@@ -19,6 +19,7 @@ package androidx.xr.scenecore.testing;
 import android.view.Surface;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.concurrent.futures.ResolvableFuture;
 
@@ -72,7 +73,7 @@ public class FakeImpressApi implements ImpressApi {
 
     @Override
     @NonNull
-    @SuppressWarnings("RestrictTo")
+    @SuppressWarnings({"RestrictTo", "AsyncSuffixFuture"})
     public ListenableFuture<Long> loadGltfModel(@NonNull String name) {
         long modelToken = nextModelId++;
         gltfModels.put(modelToken, new ArrayList<>());
@@ -114,9 +115,9 @@ public class FakeImpressApi implements ImpressApi {
 
     @Override
     @NonNull
-    @SuppressWarnings("RestrictTo")
+    @SuppressWarnings({"RestrictTo", "AsyncSuffixFuture"})
     public ListenableFuture<Void> animateGltfModel(
-            int impressNode, @NonNull String animationName, boolean loop) {
+            int impressNode, @Nullable String animationName, boolean loop) {
         ResolvableFuture<Void> future = ResolvableFuture.create();
         if (impressNodes.get(impressNode) == null) {
             future.setException(new IllegalArgumentException("Impress node not found"));
