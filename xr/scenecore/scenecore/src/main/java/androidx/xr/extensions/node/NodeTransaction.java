@@ -94,6 +94,10 @@ public interface NodeTransaction extends Closeable {
      * coordinate space.
      *
      * @param node The node to be updated.
+     * @param x The x component of the quaternion.
+     * @param y The y component of the quaternion.
+     * @param z The z component of the quaternion.
+     * @param w The w component of the quaternion.
      * @return The reference to this {@link NodeTransaction} object that is currently being updated.
      */
     default @NonNull NodeTransaction setOrientation(
@@ -121,6 +125,7 @@ public interface NodeTransaction extends Closeable {
     /**
      * Sets the opacity of the node's content to a value between [0..1].
      *
+     * @param node The node to be updated.
      * @param value The new opacity amount in range of [0..1].
      * @return The reference to this {@link NodeTransaction} object that is currently being updated.
      */
@@ -131,6 +136,7 @@ public interface NodeTransaction extends Closeable {
     /**
      * Changes the visibility of the node and its content.
      *
+     * @param node The node to be updated.
      * @param isVisible Whether the node is visible.
      * @return The reference to this {@link NodeTransaction} object that is currently being updated.
      */
@@ -401,7 +407,7 @@ public interface NodeTransaction extends Closeable {
      * Enables reform UX for a node.
      *
      * @param node The node to be updated.
-     * @param reformOptions Configuration options for the reform UX.
+     * @param options Configuration options for the reform UX.
      * @return The reference to this {@link NodeTransaction} object that is currently being updated.
      */
     default @NonNull NodeTransaction enableReform(

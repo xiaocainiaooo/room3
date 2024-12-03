@@ -19,7 +19,6 @@
 package androidx.xr.scenecore
 
 import android.util.Log
-import androidx.annotation.RestrictTo
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 
@@ -27,7 +26,6 @@ import java.util.concurrent.Executor
  * Allows users to interactively move the Entity. This component can be attached to a single
  * instance of any non-Anchor Entity.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class MovableComponent
 private constructor(
     private val runtime: JxrPlatformAdapter,

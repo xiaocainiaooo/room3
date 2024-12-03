@@ -16,7 +16,6 @@
 
 package androidx.xr.compose.subspace.layout
 
-import androidx.annotation.RestrictTo
 import androidx.xr.compose.subspace.node.SubspaceModifierElement
 import androidx.xr.runtime.math.Pose
 
@@ -37,7 +36,6 @@ import androidx.xr.runtime.math.Pose
  *   default behavior of moving this composable's subspace hierarchy will be executed. If it returns
  *   true, it is the responsibility of the callback to process the event.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun SubspaceModifier.movable(
     enabled: Boolean = true,
     stickyPose: Boolean = false,

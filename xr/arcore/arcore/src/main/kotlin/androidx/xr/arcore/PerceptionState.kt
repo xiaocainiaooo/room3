@@ -16,7 +16,6 @@
 
 package androidx.xr.arcore
 
-import androidx.annotation.RestrictTo
 import kotlin.time.ComparableTimeMark
 
 /**
@@ -27,7 +26,6 @@ import kotlin.time.ComparableTimeMark
  * @property timeMark the time at which the state was computed.
  * @property trackables the trackables that are currently being tracked.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class PerceptionState
 internal constructor(
     public val timeMark: ComparableTimeMark,
