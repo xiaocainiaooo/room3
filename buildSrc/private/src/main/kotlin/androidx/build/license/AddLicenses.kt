@@ -24,6 +24,7 @@ import androidx.build.multiplatformExtension
 import com.android.build.gradle.tasks.BundleAar
 import java.io.File
 import java.nio.file.Files
+import kotlin.io.path.readBytes
 import org.gradle.api.Project
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.withType
@@ -63,7 +64,7 @@ internal fun Project.addLicensesToPublishedArtifacts(license: License) {
         task.doLast {
             val licenseDir = File(task.outputFileProvider.get(), kmpSubdir).toPath()
             Files.createDirectories(licenseDir)
-            Files.writeString(licenseDir.resolve("LICENSE.txt"), licenseFile.readText())
+            Files.write(licenseDir.resolve("LICENSE.txt"), licenseFile.readBytes())
         }
     }
 
@@ -78,7 +79,7 @@ internal fun Project.addLicensesToPublishedArtifacts(license: License) {
                 task.doLast {
                     val licenseDir = File(compileTaskOutputFileProvider.get(), kmpSubdir).toPath()
                     Files.createDirectories(licenseDir)
-                    Files.writeString(licenseDir.resolve("LICENSE.txt"), licenseFile.readText())
+                    Files.write(licenseDir.resolve("LICENSE.txt"), licenseFile.readBytes())
                 }
             }
         }
