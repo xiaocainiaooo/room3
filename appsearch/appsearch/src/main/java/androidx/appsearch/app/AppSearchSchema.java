@@ -244,6 +244,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
         /**
          * Creates a new {@link AppSearchSchema.Builder} from the given {@link AppSearchSchema}.
          */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @OptIn(markerClass = ExperimentalAppSearchApi.class)
         public Builder(@NonNull AppSearchSchema schema) {
@@ -257,6 +258,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
         }
 
         /** Sets the schema type name. */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
@@ -305,6 +307,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
          * Clears all properties added through {@link #addProperty(PropertyConfig)} from the schema
          * type.
          */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
@@ -390,6 +393,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
          * Clears all parent types added through {@link #addParentType(String)} from the schema
          * type.
          */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
