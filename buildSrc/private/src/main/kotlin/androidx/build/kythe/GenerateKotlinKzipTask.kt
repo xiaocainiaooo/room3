@@ -201,11 +201,6 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                         // Uses Java 9+ APIs, which are not part of any dependency in the classpath
                         ":room:room-compiler-processing",
                         ":room:room-compiler-processing-testing",
-                        // Conflicts arise as Kythe adds all dependencies to friend paths, affecting
-                        // visibility and inheritance
-                        ":glance:glance-appwidget",
-                        ":glance:glance-appwidget-multiprocess",
-                        ":security:security-state",
                         // KSP generated folders not visible to AGP variant api (b/380363756)
                         ":privacysandbox:tools:integration-tests:testsdk",
                         ":room:room-runtime"
