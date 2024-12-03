@@ -86,6 +86,9 @@ androidXMultiplatform {
 }
 
 android {
+    buildTypes.configureEach {
+        consumerProguardFiles("proguard-rules.pro")
+    }
     namespace "androidx.savedstate.compose"
     experimentalProperties["android.lint.useK2Uast"] = false // TODO(b/345531033)
 }
