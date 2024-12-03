@@ -52,12 +52,16 @@ internal object SandboxControllerInjector {
         controller: SdkSandboxControllerCompat.SandboxControllerImpl
     ) {
         val controllerClass =
-            Class.forName(SdkSandboxControllerCompat::class.java.name, false, sdkClassLoader)
+            Class.forName(
+                "androidx.privacysandbox.sdkruntime.core.controller.SdkSandboxControllerCompat",
+                /* initialize = */ false,
+                sdkClassLoader
+            )
 
         val controllerImplClass =
             Class.forName(
-                SdkSandboxControllerCompat.SandboxControllerImpl::class.java.name,
-                false,
+                "androidx.privacysandbox.sdkruntime.core.controller.SdkSandboxControllerCompat\$SandboxControllerImpl",
+                /* initialize = */ false,
                 sdkClassLoader
             )
 
