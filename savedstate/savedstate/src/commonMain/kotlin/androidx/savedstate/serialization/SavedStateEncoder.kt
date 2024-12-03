@@ -46,12 +46,12 @@ fun <T : Any> encodeToSavedState(serializer: SerializationStrategy<T>, value: T)
  * Encode a serializable object to a [SavedState] with the default serializer.
  *
  * @sample androidx.savedstate.encodeWithExplicitSerializer
- * @param serializable The serializable object to encode.
+ * @param value The serializable object to encode.
  * @return The encoded [SavedState].
- * @throws SerializationException if [serializable] cannot be serialized.
+ * @throws SerializationException if [value] cannot be serialized.
  */
-inline fun <reified T : Any> encodeToSavedState(serializable: T): SavedState {
-    return encodeToSavedState(serializer<T>(), serializable)
+inline fun <reified T : Any> encodeToSavedState(value: T): SavedState {
+    return encodeToSavedState(serializer<T>(), value)
 }
 
 /**
