@@ -33,7 +33,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RestrictTo;
 import androidx.xr.extensions.Config;
 import androidx.xr.extensions.Consumer;
 import androidx.xr.extensions.XrExtensionResult;
@@ -84,11 +83,10 @@ import java.util.concurrent.Executor;
  * JXRCore runtime for AndroidXR.
  */
 @SuppressWarnings("deprecation")
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class FakeXrExtensions implements XrExtensions {
     private static final String NOT_IMPLEMENTED_IN_FAKE =
             "This function is not implemented yet in FakeXrExtensions.  Please add an"
-                + " implementation if support is desired for testing.";
+                    + " implementation if support is desired for testing.";
 
     @NonNull public final List<FakeNode> createdNodes = new ArrayList<>();
 
@@ -953,11 +951,11 @@ public class FakeXrExtensions implements XrExtensions {
         @Override
         @NonNull
         // TODO(b/354731545): Cover this with an AndroidXREntity test
-        public NodeTransaction setScale(@NonNull Node node, float x, float y, float z) {
+        public NodeTransaction setScale(@NonNull Node node, float sx, float sy, float sz) {
             lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).xScale = x;
-            ((FakeNode) node).yScale = y;
-            ((FakeNode) node).zScale = z;
+            ((FakeNode) node).xScale = sx;
+            ((FakeNode) node).yScale = sy;
+            ((FakeNode) node).zScale = sz;
             return this;
         }
 

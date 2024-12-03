@@ -47,7 +47,6 @@ import kotlinx.coroutines.launch
  * See [create], [resume], [pause], and [destroy] for more details.
  */
 @Suppress("NotCloseable")
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class Session
 internal constructor(
     @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public val runtime: Runtime,

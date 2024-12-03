@@ -235,7 +235,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
             Log.e(
                     TAG,
                     "ActivitySpace is not an instance of ActivitySpaceImpl.Anchor is in Error"
-                        + " state.");
+                            + " state.");
             this.state = State.ERROR;
             this.activitySpace = null;
         }
@@ -246,7 +246,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
             Log.e(
                     TAG,
                     "ActivitySpaceRoot is not an instance of AndroidXrEntity. Anchor is in Error"
-                        + " state.");
+                            + " state.");
             this.state = State.ERROR;
             this.activitySpaceRoot = null;
         }
@@ -506,7 +506,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
                 Log.i(
                         TAG,
                         "Anchor is disposed before becoming persisted, stop checking its persist"
-                            + " state.");
+                                + " state.");
                 return;
             }
             if (anchor.getPersistState() == Anchor.PersistState.PERSISTED) {
@@ -573,7 +573,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
                 Log.w(
                         TAG,
                         "Cannot retrieve pose in underlying space. Ensure that the anchor is"
-                            + " anchored before calling this method. Returning identity pose.");
+                                + " anchored before calling this method. Returning identity pose.");
                 return new Pose();
             }
 
@@ -586,7 +586,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
                 Log.e(
                         TAG,
                         "Cannot retrieve pose in underlying space despite anchor being anchored."
-                            + " Returning identity pose.");
+                                + " Returning identity pose.");
                 return new Pose();
             }
 

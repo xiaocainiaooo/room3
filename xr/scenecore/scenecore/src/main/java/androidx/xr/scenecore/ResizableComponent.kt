@@ -19,12 +19,10 @@
 package androidx.xr.scenecore
 
 import android.util.Log
-import androidx.annotation.RestrictTo
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 
 /** A [Component] which when attached to an [Entity] provides a user-resize affordance. */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class ResizableComponent
 private constructor(
     private val runtime: JxrPlatformAdapter,
