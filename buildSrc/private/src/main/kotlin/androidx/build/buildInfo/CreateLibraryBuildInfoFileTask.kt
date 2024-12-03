@@ -279,7 +279,8 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
             this != null &&
                 startsWith("androidx.") &&
                 !startsWith("androidx.test") &&
-                !startsWith("androidx.databinding")
+                !startsWith("androidx.databinding") &&
+                !startsWith("androidx.media3")
     }
 }
 
