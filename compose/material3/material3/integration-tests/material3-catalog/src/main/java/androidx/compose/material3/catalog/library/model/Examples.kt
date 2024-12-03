@@ -203,6 +203,7 @@ import androidx.compose.material3.samples.SingleSelectConnectedButtonGroupSample
 import androidx.compose.material3.samples.SliderSample
 import androidx.compose.material3.samples.SliderWithCustomThumbSample
 import androidx.compose.material3.samples.SliderWithCustomTrackAndThumb
+import androidx.compose.material3.samples.SliderWithTrackIcons
 import androidx.compose.material3.samples.SmallAnimatedExtendedFloatingActionButtonSample
 import androidx.compose.material3.samples.SmallButtonSample
 import androidx.compose.material3.samples.SmallExtendedFloatingActionButtonSample
@@ -1682,6 +1683,13 @@ val SlidersExamples =
             sourceUrl = SlidersExampleSourceUrl
         ) {
             SliderWithCustomTrackAndThumb()
+        },
+        Example(
+            name = "SliderWithTrackIcons",
+            description = SlidersExampleDescription,
+            sourceUrl = SlidersExampleSourceUrl
+        ) {
+            SliderWithTrackIcons()
         },
         Example(
             name = "RangeSliderSample",

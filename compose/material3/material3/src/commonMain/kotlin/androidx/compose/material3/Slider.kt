@@ -62,6 +62,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -226,6 +227,10 @@ fun Slider(
  * Slider using custom track and thumb:
  *
  * @sample androidx.compose.material3.samples.SliderWithCustomTrackAndThumb
+ *
+ * Slider using track icons:
+ *
+ * @sample androidx.compose.material3.samples.SliderWithTrackIcons
  * @param value current value of the slider. If outside of [valueRange] provided, value will be
  *   coerced to this range.
  * @param onValueChange callback in which value should be updated
@@ -321,6 +326,10 @@ fun Slider(
  * Slider using custom track and thumb:
  *
  * @sample androidx.compose.material3.samples.SliderWithCustomTrackAndThumb
+ *
+ * Slider using track icons:
+ *
+ * @sample androidx.compose.material3.samples.SliderWithTrackIcons
  * @param state [SliderState] which contains the slider's current value.
  * @param modifier the [Modifier] to be applied to this slider
  * @param enabled controls the enabled state of this slider. When `false`, this component will not
@@ -685,7 +694,7 @@ private fun SliderImpl(
             Box(
                 modifier =
                     Modifier.layoutId(SliderComponents.THUMB).wrapContentWidth().onSizeChanged {
-                        state.thumbWidth = it.width.toFloat()
+                        state.thumbWidth = it.width
                     }
             ) {
                 thumb(state)
@@ -721,7 +730,7 @@ private fun SliderImpl(
         val sliderWidth = thumbPlaceable.width + trackPlaceable.width
         val sliderHeight = max(trackPlaceable.height, thumbPlaceable.height)
 
-        state.updateDimensions(trackPlaceable.height.toFloat(), sliderWidth)
+        state.updateDimensions(trackPlaceable.height, sliderWidth)
 
         val trackOffsetX = thumbPlaceable.width / 2
         val thumbOffsetX = ((trackPlaceable.width) * state.coercedValueAsFraction).roundToInt()
@@ -1211,44 +1220,128 @@ object SliderDefaults {
         colors: SliderColors = colors(),
         drawStopIndicator: (DrawScope.(Offset) -> Unit)? = {
             drawStopIndicator(
-                drawScope = this,
                 offset = it,
                 color = colors.trackColor(enabled, active = true),
                 size = TrackStopIndicatorSize
             )
         },
         drawTick: DrawScope.(Offset, Color) -> Unit = { offset, color ->
-            drawStopIndicator(drawScope = this, offset = offset, color = color, size = TickSize)
+            drawStopIndicator(offset = offset, color = color, size = TickSize)
         },
         thumbTrackGapSize: Dp = ThumbTrackGapSize,
         trackInsideCornerSize: Dp = TrackInsideCornerSize
     ) {
-        val inactiveTrackColor = colors.trackColor(enabled, active = false)
-        val activeTrackColor = colors.trackColor(enabled, active = true)
-        val inactiveTickColor = colors.tickColor(enabled, active = false)
-        val activeTickColor = colors.tickColor(enabled, active = true)
+        drawTrack(
+            sliderState = sliderState,
+            trackCornerSize = TrackHeight / 2,
+            modifier = modifier,
+            enabled = enabled,
+            colors = colors,
+            drawStopIndicator = drawStopIndicator,
+            drawTick = drawTick,
+            thumbTrackGapSize = thumbTrackGapSize,
+            trackInsideCornerSize = trackInsideCornerSize,
+            enableCornerShrinking = false
+        )
+    }
+
+    /**
+     * The Default track for [Slider]
+     *
+     * This track has a different corner treatment where the corner size decreases as the thumb gets
+     * closer.
+     *
+     * @param sliderState [SliderState] which is used to obtain the current active track.
+     * @param trackCornerSize size of the external corners.
+     * @param modifier the [Modifier] to be applied to the track.
+     * @param enabled controls the enabled state of this slider. When `false`, this component will
+     *   not respond to user input, and it will appear visually disabled and disabled to
+     *   accessibility services.
+     * @param colors [SliderColors] that will be used to resolve the colors used for this track in
+     *   different states. See [SliderDefaults.colors].
+     * @param drawStopIndicator lambda that will be called to draw the stop indicator at the end of
+     *   the track.
+     * @param drawTick lambda that will be called to draw the ticks if steps are greater than 0.
+     * @param thumbTrackGapSize size of the gap between the thumb and the track.
+     * @param trackInsideCornerSize size of the corners towards the thumb when a gap is set.
+     */
+    @OptIn(ExperimentalMaterial3Api::class)
+    @ExperimentalMaterial3ExpressiveApi
+    @Composable
+    fun Track(
+        sliderState: SliderState,
+        trackCornerSize: Dp,
+        modifier: Modifier = Modifier,
+        enabled: Boolean = true,
+        colors: SliderColors = colors(),
+        drawStopIndicator: (DrawScope.(Offset) -> Unit)? = {
+            drawStopIndicator(
+                offset = it,
+                color = colors.trackColor(enabled, active = true),
+                size = TrackStopIndicatorSize
+            )
+        },
+        drawTick: DrawScope.(Offset, Color) -> Unit = { offset, color ->
+            drawStopIndicator(offset = offset, color = color, size = TickSize)
+        },
+        thumbTrackGapSize: Dp = ThumbTrackGapSize,
+        trackInsideCornerSize: Dp = TrackInsideCornerSize
+    ) {
+        drawTrack(
+            sliderState = sliderState,
+            trackCornerSize = trackCornerSize,
+            modifier = modifier,
+            enabled = enabled,
+            colors = colors,
+            drawStopIndicator = drawStopIndicator,
+            drawTick = drawTick,
+            thumbTrackGapSize = thumbTrackGapSize,
+            trackInsideCornerSize = trackInsideCornerSize,
+            enableCornerShrinking = true
+        )
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun drawTrack(
+        sliderState: SliderState,
+        trackCornerSize: Dp,
+        modifier: Modifier,
+        enabled: Boolean,
+        colors: SliderColors,
+        drawStopIndicator: (DrawScope.(Offset) -> Unit)?,
+        drawTick: DrawScope.(Offset, Color) -> Unit,
+        thumbTrackGapSize: Dp,
+        trackInsideCornerSize: Dp,
+        enableCornerShrinking: Boolean
+    ) {
+        val inactiveTrackColor = colors.trackColor(enabled = enabled, active = false)
+        val activeTrackColor = colors.trackColor(enabled = enabled, active = true)
+        val inactiveTickColor = colors.tickColor(enabled = enabled, active = false)
+        val activeTickColor = colors.tickColor(enabled = enabled, active = true)
         Canvas(
-            modifier
-                .fillMaxWidth()
-                .height(TrackHeight)
-                .rotate(if (LocalLayoutDirection.current == LayoutDirection.Rtl) 180f else 0f)
+            modifier.fillMaxWidth().height(TrackHeight).let {
+                if (sliderState.isRtl) it.scale(-1f, 1f) else it
+            }
         ) {
             drawTrack(
-                sliderState.tickFractions,
-                0f,
-                sliderState.coercedValueAsFraction,
-                inactiveTrackColor,
-                activeTrackColor,
-                inactiveTickColor,
-                activeTickColor,
-                sliderState.trackHeight.toDp(),
-                0.toDp(),
-                sliderState.thumbWidth.toDp(),
-                thumbTrackGapSize,
-                trackInsideCornerSize,
-                drawStopIndicator,
-                drawTick,
-                isRangeSlider = false
+                tickFractions = sliderState.tickFractions,
+                activeRangeStart = 0f,
+                activeRangeEnd = sliderState.coercedValueAsFraction,
+                inactiveTrackColor = inactiveTrackColor,
+                activeTrackColor = activeTrackColor,
+                inactiveTickColor = inactiveTickColor,
+                activeTickColor = activeTickColor,
+                height = sliderState.trackHeight.toDp(),
+                startThumbWidth = 0.toDp(),
+                endThumbWidth = sliderState.thumbWidth.toDp(),
+                thumbTrackGapSize = thumbTrackGapSize,
+                trackInsideCornerSize = trackInsideCornerSize,
+                trackCornerSize = trackCornerSize,
+                drawStopIndicator = drawStopIndicator,
+                drawTick = drawTick,
+                isRangeSlider = false,
+                enableCornerShrinking = enableCornerShrinking
             )
         }
     }
@@ -1319,14 +1412,13 @@ object SliderDefaults {
         colors: SliderColors = colors(),
         drawStopIndicator: (DrawScope.(Offset) -> Unit)? = {
             drawStopIndicator(
-                drawScope = this,
                 offset = it,
                 color = colors.trackColor(enabled, active = true),
                 size = TrackStopIndicatorSize
             )
         },
         drawTick: DrawScope.(Offset, Color) -> Unit = { offset, color ->
-            drawStopIndicator(drawScope = this, offset = offset, color = color, size = TickSize)
+            drawStopIndicator(offset = offset, color = color, size = TickSize)
         },
         thumbTrackGapSize: Dp = ThumbTrackGapSize,
         trackInsideCornerSize: Dp = TrackInsideCornerSize
@@ -1339,7 +1431,7 @@ object SliderDefaults {
             modifier
                 .fillMaxWidth()
                 .height(TrackHeight)
-                .rotate(if (LocalLayoutDirection.current == LayoutDirection.Rtl) 180f else 0f)
+                .rotate(if (rangeSliderState.isRtl) 180f else 0f)
         ) {
             drawTrack(
                 rangeSliderState.tickFractions,
@@ -1354,6 +1446,7 @@ object SliderDefaults {
                 rangeSliderState.endThumbWidth.toDp(),
                 thumbTrackGapSize,
                 trackInsideCornerSize,
+                rangeSliderState.trackHeight.toDp() / 2,
                 drawStopIndicator,
                 drawTick,
                 isRangeSlider = true,
@@ -1374,9 +1467,11 @@ object SliderDefaults {
         endThumbWidth: Dp,
         thumbTrackGapSize: Dp,
         trackInsideCornerSize: Dp,
+        trackCornerSize: Dp,
         drawStopIndicator: (DrawScope.(Offset) -> Unit)?,
         drawTick: DrawScope.(Offset, Color) -> Unit,
-        isRangeSlider: Boolean
+        isRangeSlider: Boolean,
+        enableCornerShrinking: Boolean = false
     ) {
         val sliderStart = Offset(0f, center.y)
         val sliderEnd = Offset(size.width, center.y)
@@ -1388,7 +1483,7 @@ object SliderDefaults {
         val sliderValueStart =
             Offset(sliderStart.x + (sliderEnd.x - sliderStart.x) * activeRangeStart, center.y)
 
-        val cornerSize = trackStrokeWidth / 2
+        val cornerSize = trackCornerSize.toPx()
         val insideCornerSize = trackInsideCornerSize.toPx()
         var startGap = 0f
         var endGap = 0f
@@ -1398,7 +1493,11 @@ object SliderDefaults {
         }
 
         // inactive track (range slider)
-        if (isRangeSlider && sliderValueStart.x > sliderStart.x + startGap + cornerSize) {
+        var rangeInactiveTrackThreshold = sliderStart.x + startGap
+        if (!enableCornerShrinking) {
+            rangeInactiveTrackThreshold += cornerSize
+        }
+        if (isRangeSlider && sliderValueStart.x > rangeInactiveTrackThreshold) {
             val start = sliderStart.x
             val end = sliderValueStart.x - startGap
             drawTrackPath(
@@ -1411,12 +1510,17 @@ object SliderDefaults {
             drawStopIndicator?.invoke(this, Offset(start + cornerSize, center.y))
         }
         // inactive track
-        if (sliderValueEnd.x < sliderEnd.x - endGap - cornerSize) {
+        var inactiveTrackThreshold = sliderEnd.x - endGap
+        if (!enableCornerShrinking) {
+            inactiveTrackThreshold -= cornerSize
+        }
+        if (sliderValueEnd.x < inactiveTrackThreshold) {
             val start = sliderValueEnd.x + endGap
             val end = sliderEnd.x
+            val inactiveTrackWidth = end - start
             drawTrackPath(
                 Offset(start, 0f),
-                Size(end - start, trackStrokeWidth),
+                Size(inactiveTrackWidth, trackStrokeWidth),
                 inactiveTrackColor,
                 insideCornerSize,
                 cornerSize
@@ -1427,10 +1531,12 @@ object SliderDefaults {
         val activeTrackStart = if (isRangeSlider) sliderValueStart.x + startGap else 0f
         val activeTrackEnd = sliderValueEnd.x - endGap
         val startCornerRadius = if (isRangeSlider) insideCornerSize else cornerSize
-        if (activeTrackEnd - activeTrackStart > startCornerRadius) {
+        val activeTrackWidth = activeTrackEnd - activeTrackStart
+        val activeTrackThreshold = if (enableCornerShrinking) 0f else startCornerRadius
+        if (activeTrackWidth > activeTrackThreshold) {
             drawTrackPath(
                 Offset(activeTrackStart, 0f),
-                Size(activeTrackEnd - activeTrackStart, trackStrokeWidth),
+                Size(activeTrackWidth, trackStrokeWidth),
                 activeTrackColor,
                 startCornerRadius,
                 insideCornerSize
@@ -1485,8 +1591,15 @@ object SliderDefaults {
         trackPath.rewind()
     }
 
-    private fun drawStopIndicator(drawScope: DrawScope, offset: Offset, size: Dp, color: Color) {
-        with(drawScope) { drawCircle(color = color, center = offset, radius = size.toPx() / 2f) }
+    /**
+     * The Default stop indicator.
+     *
+     * @param offset the coordinate where the indicator is to be drawn.
+     * @param size the size of the indicator.
+     * @param color the color of the indicator.
+     */
+    fun DrawScope.drawStopIndicator(offset: Offset, size: Dp, color: Color) {
+        drawCircle(color = color, center = offset, radius = size.toPx() / 2f)
     }
 
     /** The default size for the stop indicator at the end of the track. */
@@ -2071,8 +2184,8 @@ class SliderState(
     }
 
     override fun dispatchRawDelta(delta: Float) {
-        val maxPx = max(totalWidth - thumbWidth / 2, 0f)
-        val minPx = min(thumbWidth / 2, maxPx)
+        val maxPx = max(totalWidth - thumbWidth / 2f, 0f)
+        val minPx = min(thumbWidth / 2f, maxPx)
         rawOffset = (rawOffset + delta + pressOffset)
         pressOffset = 0f
         val offsetInTrack = snapValueToTick(rawOffset, tickFractions, minPx, maxPx)
@@ -2092,10 +2205,11 @@ class SliderState(
     internal val tickFractions = stepsToTickFractions(steps)
     private var totalWidth by mutableIntStateOf(0)
     internal var isRtl = false
-    internal var trackHeight by mutableFloatStateOf(0f)
-    internal var thumbWidth by mutableFloatStateOf(0f)
+    internal var thumbWidth by mutableIntStateOf(0)
+    internal var trackHeight by mutableIntStateOf(0)
 
-    internal val coercedValueAsFraction
+    /** The fraction of the track that the thumb currently is in. */
+    val coercedValueAsFraction: Float
         get() =
             calcFraction(
                 valueRange.start,
@@ -2106,7 +2220,7 @@ class SliderState(
     internal var isDragging by mutableStateOf(false)
         private set
 
-    internal fun updateDimensions(newTrackHeight: Float, newTotalWidth: Int) {
+    internal fun updateDimensions(newTrackHeight: Int, newTotalWidth: Int) {
         trackHeight = newTrackHeight
         totalWidth = newTotalWidth
     }
