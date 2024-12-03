@@ -96,6 +96,7 @@ package androidx.navigation {
     method @MainThread public inline <reified T> boolean clearBackStack();
     method @MainThread public final boolean clearBackStack(@IdRes int destinationId);
     method @MainThread public final boolean clearBackStack(String route);
+    method @MainThread public final boolean clearBackStack(kotlin.reflect.KClass<? extends java.lang.Object?> route);
     method @MainThread public final <T> boolean clearBackStack(T route);
     method public androidx.navigation.NavDeepLinkBuilder createDeepLink();
     method @SuppressCompatibility @androidx.navigation.NavDeepLinkSaveStateControl public static final void enableDeepLinkSaveState(boolean saveState);
