@@ -26,12 +26,13 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.annotation.VisibleForTesting;
 
 import com.google.android.wearable.input.WearableInputDevice;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -234,8 +235,7 @@ public final class WearableButtons {
      *     information is not available
      */
     @SuppressWarnings("deprecation")
-    @Nullable
-    public static ButtonInfo getButtonInfo(@NonNull Context context, int keycode) {
+    public static @Nullable ButtonInfo getButtonInfo(@NonNull Context context, int keycode) {
         Bundle bundle = sButtonsProvider.getButtonInfo(context, keycode);
 
         if (bundle == null) {
@@ -311,8 +311,7 @@ public final class WearableButtons {
      * @param keycode The keycode associated with the hardware button of interest
      * @return A drawable representing the location of a button, or null if unavailable
      */
-    @Nullable
-    public static Drawable getButtonIcon(@NonNull Context context, int keycode) {
+    public static @Nullable Drawable getButtonIcon(@NonNull Context context, int keycode) {
         ButtonInfo info = getButtonInfo(context, keycode);
         if (info == null) {
             return null;
@@ -443,8 +442,7 @@ public final class WearableButtons {
      * @return A CharSequence describing the placement location of the button, or null if no
      * location is available for that button.
      */
-    @Nullable
-    public static CharSequence getButtonLabel(@NonNull Context context, int keycode) {
+    public static @Nullable CharSequence getButtonLabel(@NonNull Context context, int keycode) {
         // 4 length array where the index uses the standard quadrant counting system (minus 1 for
         // 0 index)
         int[] buttonsInQuadrantCount = new int[4];
