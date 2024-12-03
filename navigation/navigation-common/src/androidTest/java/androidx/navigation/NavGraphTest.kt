@@ -207,6 +207,21 @@ class NavGraphTest {
     }
 
     @Test
+    fun findNodeKClassNonReified() {
+        @Serializable class TestClass(val arg: Int)
+
+        val graph =
+            NavGraph(navGraphNavigator).apply {
+                addDestination(
+                    NavDestinationBuilder(navGraphNavigator, TestClass::class, emptyMap()).build()
+                )
+            }
+
+        val dest = graph.findNode(TestClass::class)
+        assertThat(dest).isNotNull()
+    }
+
+    @Test
     fun getNodeKClass() {
         @Serializable class TestClass(val arg: Int)
 

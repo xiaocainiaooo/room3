@@ -309,6 +309,7 @@ package androidx.navigation {
     method public inline <reified T> androidx.navigation.NavDestination? findNode();
     method public final androidx.navigation.NavDestination? findNode(@IdRes int resId);
     method public final androidx.navigation.NavDestination? findNode(String? route);
+    method public final androidx.navigation.NavDestination? findNode(kotlin.reflect.KClass<? extends java.lang.Object?> route);
     method public final <T> androidx.navigation.NavDestination? findNode(T? route);
     method public static final androidx.navigation.NavDestination findStartDestination(androidx.navigation.NavGraph);
     method @Deprecated @IdRes public final int getStartDestination();
