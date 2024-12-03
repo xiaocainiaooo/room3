@@ -31,6 +31,7 @@ import androidx.compose.ui.inspection.util.AnchorMap
 import androidx.compose.ui.inspection.util.NO_ANCHOR_ID
 import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.layout.LayoutInfo
+import androidx.compose.ui.layout.view
 import androidx.compose.ui.node.InteroperableComposeUiNode
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.node.RootForTest
@@ -587,14 +588,7 @@ class LayoutInspectorTree {
 
     private fun ownerViews(layoutNodes: List<LayoutInfo>): LongList {
         val ownerViewIds = mutableLongListOf()
-        layoutNodes.forEach { node ->
-            node.getModifierInfo().forEach { info ->
-                val extra = info.extra
-                if (extra is GraphicLayerInfo) {
-                    ownerViewIds.add(extra.ownerViewId)
-                }
-            }
-        }
+        layoutNodes.forEach { node -> node.view?.uniqueDrawingId?.let { ownerViewIds.add(it) } }
         return ownerViewIds
     }
 
