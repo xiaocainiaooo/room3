@@ -353,6 +353,12 @@ object SwipeToRevealDefaults {
 
     internal val ActionButtonContentPadding = 4.dp
 
+    // Swipe required to start displaying the action buttons.
+    internal const val BUTTON_VISIBLE_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE = 0.06f
+
+    // End threshold for the fade in progression of the action buttons.
+    internal const val BUTTON_FADE_IN_END_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE = 0.12f
+
     internal val FullScreenPaddingFraction = 0.0625f
 }
 
@@ -409,12 +415,37 @@ internal fun ActionButton(
             RevealActionType.UndoAction -> fullScreenPaddingDp
             else -> 0.dp
         }
+    val screenWidthPx = with(LocalDensity.current) { screenWidthDp().dp.toPx() }
+    val fadeInStart =
+        screenWidthPx * SwipeToRevealDefaults.BUTTON_VISIBLE_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE
+    val fadeInEnd =
+        screenWidthPx *
+            SwipeToRevealDefaults.BUTTON_FADE_IN_END_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE
     val coroutineScope = rememberCoroutineScope()
     Button(
         modifier =
             Modifier.height(buttonHeight)
                 .padding(startPadding, 0.dp, endPadding, 0.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .graphicsLayer {
+                    val offset = abs(revealState.offset)
+                    val shouldDisplayButton =
+                        offset >
+                            screenWidthPx *
+                                SwipeToRevealDefaults
+                                    .BUTTON_VISIBLE_THRESHOLD_AS_SCREEN_WIDTH_PERCENTAGE
+                    alpha =
+                        if (shouldDisplayButton) {
+                            val coercedOffset =
+                                offset.coerceIn(
+                                    minimumValue = fadeInStart,
+                                    maximumValue = fadeInEnd
+                                )
+                            (coercedOffset - fadeInStart) / (fadeInEnd - fadeInStart)
+                        } else {
+                            0f
+                        }
+                },
         onClick = {
             coroutineScope.launch {
                 try {
