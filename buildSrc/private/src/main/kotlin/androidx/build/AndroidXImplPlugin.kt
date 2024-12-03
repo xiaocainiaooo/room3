@@ -241,6 +241,8 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
         project.configureSamplesProject()
         project.configureMaxDepVersions(androidXExtension)
         project.configureUnzipChromeBuildService()
+
+        project.plugins.apply("com.autonomousapps.dependency-analysis")
     }
 
     private fun initializeAndroidXExtension(project: Project): AndroidXExtension {
