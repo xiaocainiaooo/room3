@@ -287,10 +287,11 @@ private fun Project.configureLint(lint: Lint, isLibrary: Boolean) {
             disable.add("IllegalExperimentalApiUsage")
         }
 
-        // Only allow the JSpecifyNullness check to be run when opted-in, while migrating projects
-        // to use JSpecify annotations.
-        if (!project.useJSpecifyAnnotations()) {
+        // Run the JSpecifyNullness check unless opted-out (for projects that haven't migrated yet).
+        if (extension.optOutJSpecify) {
             disable.add("JSpecifyNullness")
+        } else {
+            fatal.add("JSpecifyNullness")
         }
 
         fatal.add("UastImplementation") // go/hide-uast-impl
