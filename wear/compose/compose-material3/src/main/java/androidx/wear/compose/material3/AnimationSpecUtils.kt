@@ -28,6 +28,7 @@ import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.animation.core.VectorizedAnimationSpec
 import androidx.compose.runtime.withFrameMillis
+import kotlinx.coroutines.delay
 
 /**
  * Returns a new [AnimationSpec] that is a faster version of this one.
@@ -167,6 +168,13 @@ internal suspend fun waitUntil(condition: () -> Boolean) {
         if (timeMillis - initialTimeMillis > MAX_WAIT_TIME_MILLIS) return
     }
     return
+}
+
+/** Delay to be used for animations. Will enable delay only when ReducedMotion is disabled. */
+internal suspend fun animatedDelay(duration: Long, reduceMotionEnabled: Boolean) {
+    if (!reduceMotionEnabled) {
+        delay(duration)
+    }
 }
 
 private const val MAX_WAIT_TIME_MILLIS = 1_000L

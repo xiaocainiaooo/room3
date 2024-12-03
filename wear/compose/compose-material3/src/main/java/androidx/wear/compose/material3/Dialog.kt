@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
+import androidx.wear.compose.foundation.LocalReduceMotion
 import androidx.wear.compose.foundation.rememberSwipeToDismissBoxState
 import androidx.wear.compose.material3.MotionScheme.Companion.standard
 import kotlinx.coroutines.flow.collectLatest
@@ -83,19 +84,23 @@ fun Dialog(
 
     val backgroundAnimationSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>().faster(50f)
 
-    LaunchedEffect(Unit) {
-        snapshotFlow { showState }
-            .collectLatest {
-                if (it) {
-                    backgroundAnimatable.animateTo(0.85f, backgroundAnimationSpec) {
-                        scaffoldState.parentScale.floatValue = value
-                    }
-                } else {
-                    backgroundAnimatable.animateTo(1f, backgroundAnimationSpec) {
-                        scaffoldState.parentScale.floatValue = value
+    val isReduceMotionEnabled = LocalReduceMotion.current.enabled()
+
+    if (!isReduceMotionEnabled) {
+        LaunchedEffect(Unit) {
+            snapshotFlow { showState }
+                .collectLatest {
+                    if (it) {
+                        backgroundAnimatable.animateTo(0.85f, backgroundAnimationSpec) {
+                            scaffoldState.parentScale.floatValue = value
+                        }
+                    } else {
+                        backgroundAnimatable.animateTo(1f, backgroundAnimationSpec) {
+                            scaffoldState.parentScale.floatValue = value
+                        }
                     }
                 }
-            }
+        }
     }
 
     if (shouldShow) {
