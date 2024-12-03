@@ -88,7 +88,7 @@ constructor(
                 checkNotNull(currentCameraDeviceWrapper.unwrapAs(CameraDevice::class))
 
             closeCameraDevice(currentCameraDevice, currentAndroidCameraState)
-            currentCameraDeviceWrapper.onDeviceClosed()
+            cameraDeviceWrapper.onDeviceClosed()
 
             // If the camera was reopened, make sure to finalize the camera state to finish closing.
             if (shouldReopenCamera) {
@@ -141,7 +141,6 @@ constructor(
                 Debug.trace("Camera2DeviceCloserImpl#reopenCameraDevice") {
                     Log.debug { "Reopening camera device" }
                     closeCameraDevice(cameraDevice, androidCameraState)
-                    cameraDeviceWrapper.onDeviceClosed()
                     retryingCameraStateOpener.openAndAwaitCameraWithRetry(cameraId, this)
                 }
             } else {
