@@ -28,7 +28,9 @@ import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.integration.sdkproviderutils.PlayerViewProvider
 import androidx.privacysandbox.ui.integration.sdkproviderutils.PlayerViewabilityHandler
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdType
+import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.BackNavigation
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.MediationOption
+import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.ScreenOrientation
 import androidx.privacysandbox.ui.integration.sdkproviderutils.TestAdapters
 import androidx.privacysandbox.ui.integration.sdkproviderutils.ViewabilityHandler
 import androidx.privacysandbox.ui.integration.sdkproviderutils.fullscreen.FullscreenAd
@@ -115,8 +117,8 @@ class SdkApi(private val sdkContext: Context) : ISdkApi.Stub() {
 
     override fun launchFullscreenAd(
         launcherInfo: Bundle,
-        screenOrientation: Int,
-        backButtonNavigation: Int
+        @ScreenOrientation screenOrientation: Int,
+        @BackNavigation backButtonNavigation: Int
     ) {
         val coroutineScope = MainScope()
         coroutineScope.launch {

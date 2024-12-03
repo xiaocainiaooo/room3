@@ -18,6 +18,7 @@ package androidx.privacysandbox.ui.integration.sdkproviderutils.fullscreen
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
@@ -34,6 +35,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.privacysandbox.sdkruntime.core.activity.ActivityHolder
 import androidx.privacysandbox.ui.integration.sdkproviderutils.R
+import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.BackNavigation
+import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.ScreenOrientation
 
 class FullscreenActivityHandler(
     private val sdkContext: Context,
@@ -56,7 +59,10 @@ class FullscreenActivityHandler(
     private lateinit var destroyActivityButton: Button
     private lateinit var openLandingPage: Button
 
-    fun buildLayout(screenOrientation: Int, @BackNavigation backNavigation: Int) {
+    fun buildLayout(
+        @ScreenOrientation screenOrientation: Int,
+        @BackNavigation backNavigation: Int
+    ) {
         initUI(screenOrientation)
         registerDestroyActivityButton(backNavigation)
         registerOpenLandingPageButton()
@@ -83,7 +89,8 @@ class FullscreenActivityHandler(
             }
         webView.loadUrl(WEB_VIEW_LINK)
 
-        activity.requestedOrientation = screenOrientation
+        activity.requestedOrientation =
+            convertOrientationToActivityInfoOrientation(screenOrientation)
         activity.setContentView(mainLayout)
     }
 
@@ -98,6 +105,17 @@ class FullscreenActivityHandler(
                 activityHolder.getOnBackPressedDispatcher().addCallback(backPressDispatcherCallback)
                 handler.postDelayed(handlerCallback, BACK_CONTROL_DISABLE_TIME)
             }
+        }
+    }
+
+    private fun convertOrientationToActivityInfoOrientation(
+        @ScreenOrientation screenOrientation: Int
+    ): Int {
+        return when (screenOrientation) {
+            ScreenOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            ScreenOrientation.LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            ScreenOrientation.USER -> ActivityInfo.SCREEN_ORIENTATION_USER
+            else -> ActivityInfo.SCREEN_ORIENTATION_USER
         }
     }
 
@@ -143,12 +161,5 @@ class FullscreenActivityHandler(
         private const val BACK_CONTROL_DISABLE_TIME = 5000L
         private const val LANDING_PAGE_URL = "https://www.google.com"
         private const val WEB_VIEW_LINK = "https://developer.android.com/"
-    }
-}
-
-annotation class BackNavigation {
-    companion object {
-        const val ENABLED = 0
-        const val ENABLED_AFTER_5_SECONDS = 1
     }
 }
