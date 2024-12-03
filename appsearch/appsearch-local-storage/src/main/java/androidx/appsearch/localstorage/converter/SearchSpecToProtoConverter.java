@@ -35,6 +35,7 @@ import androidx.appsearch.app.SearchResult;
 import androidx.appsearch.app.SearchSpec;
 import androidx.appsearch.exceptions.AppSearchException;
 import androidx.appsearch.localstorage.IcingOptionsConfig;
+import androidx.appsearch.localstorage.NamespaceCache;
 import androidx.appsearch.localstorage.SchemaCache;
 import androidx.appsearch.localstorage.visibilitystore.CallerAccess;
 import androidx.appsearch.localstorage.visibilitystore.VisibilityChecker;
@@ -94,10 +95,9 @@ public final class SearchSpecToProtoConverter {
     private final Set<String> mTargetPrefixedSchemaFilters;
 
     /**
-     * The cached Map of {@code <Prefix, Set<PrefixedNamespace>>} stores all prefixed namespace
-     * filters which are stored in AppSearch. This is a field so that we can generate nested protos.
+     * The NamespaceCache instance held in AppSearch.
      */
-    private final Map<String, Set<String>> mNamespaceMap;
+    private final NamespaceCache mNamespaceCache;
 
     /**
      * The SchemaCache instance held in AppSearch.
@@ -124,21 +124,20 @@ public final class SearchSpecToProtoConverter {
      * @param allAllowedPrefixes Superset of database prefixes which the {@link SearchSpec} and all
      *                           nested SearchSpecs are allowed to access. An empty set means no
      *                           database prefixes are allowed, so nothing will be searched.
-     * @param namespaceMap  The cached Map of {@code <Prefix, Set<PrefixedNamespace>>} stores
-     *                      all prefixed namespace filters which are stored in AppSearch.
-     * @param schemaCache   The SchemaCache instance held in AppSearch.
+     * @param namespaceCache  The NamespaceCache instance held in AppSearch.
+     * @param schemaCache     The SchemaCache instance held in AppSearch.
      */
     public SearchSpecToProtoConverter(
             @NonNull String queryExpression,
             @NonNull SearchSpec searchSpec,
             @NonNull Set<String> allAllowedPrefixes,
-            @NonNull Map<String, Set<String>> namespaceMap,
+            @NonNull NamespaceCache namespaceCache,
             @NonNull SchemaCache schemaCache,
             @NonNull IcingOptionsConfig icingOptionsConfig) {
         mQueryExpression = Preconditions.checkNotNull(queryExpression);
         mSearchSpec = Preconditions.checkNotNull(searchSpec);
         mAllAllowedPrefixes = Preconditions.checkNotNull(allAllowedPrefixes);
-        mNamespaceMap = Preconditions.checkNotNull(namespaceMap);
+        mNamespaceCache = Preconditions.checkNotNull(namespaceCache);
         mSchemaCache = Preconditions.checkNotNull(schemaCache);
         mIcingOptionsConfig = Preconditions.checkNotNull(icingOptionsConfig);
 
@@ -166,7 +165,7 @@ public final class SearchSpecToProtoConverter {
 
         mTargetPrefixedNamespaceFilters =
                 SearchSpecToProtoConverterUtil.generateTargetNamespaceFilters(
-                        mCurrentSearchSpecPrefixFilters, namespaceMap,
+                        mCurrentSearchSpecPrefixFilters, namespaceCache,
                         searchSpec.getFilterNamespaces());
 
         // If the target namespace filter is empty, the user has nothing to search for. We can skip
@@ -189,7 +188,7 @@ public final class SearchSpecToProtoConverter {
                 joinSpec.getNestedQuery(),
                 joinSpec.getNestedSearchSpec(),
                 mAllAllowedPrefixes,
-                namespaceMap,
+                namespaceCache,
                 schemaCache,
                 mIcingOptionsConfig);
     }
@@ -359,7 +358,7 @@ public final class SearchSpecToProtoConverter {
             JoinSpecProto.NestedSpecProto nestedSpec =
                     JoinSpecProto.NestedSpecProto.newBuilder()
                             .setResultSpec(mNestedConverter.toResultSpecProto(
-                                    mNamespaceMap, mSchemaCache))
+                                    mNamespaceCache, mSchemaCache))
                             .setScoringSpec(mNestedConverter.toScoringSpecProto())
                             .setSearchSpec(mNestedConverter.toSearchSpecProto())
                             .build();
@@ -425,13 +424,12 @@ public final class SearchSpecToProtoConverter {
     /**
      * Extracts {@link ResultSpecProto} information from a {@link SearchSpec}.
      *
-     * @param namespaceMap    The cached Map of {@code <Prefix, Set<PrefixedNamespace>>} stores
-     *                        all existing prefixed namespace.
+     * @param namespaceCache  The NamespaceCache instance held in AppSearch.
      * @param schemaCache     The SchemaCache instance held in AppSearch.
      */
     @NonNull
     public ResultSpecProto toResultSpecProto(
-            @NonNull Map<String, Set<String>> namespaceMap,
+            @NonNull NamespaceCache namespaceCache,
             @NonNull SchemaCache schemaCache) {
         ResultSpecProto.Builder resultSpecBuilder = ResultSpecProto.newBuilder()
                 .setNumPerPage(mSearchSpec.getResultCountPerPage())
@@ -454,12 +452,12 @@ public final class SearchSpecToProtoConverter {
         switch (groupingType) {
             case SearchSpec.GROUPING_TYPE_PER_PACKAGE :
                 addPerPackageResultGroupings(mCurrentSearchSpecPrefixFilters,
-                        mSearchSpec.getResultGroupingLimit(), namespaceMap, resultSpecBuilder);
+                        mSearchSpec.getResultGroupingLimit(), namespaceCache, resultSpecBuilder);
                 resultGroupingType = ResultSpecProto.ResultGroupingType.NAMESPACE;
                 break;
             case SearchSpec.GROUPING_TYPE_PER_NAMESPACE:
                 addPerNamespaceResultGroupings(mCurrentSearchSpecPrefixFilters,
-                        mSearchSpec.getResultGroupingLimit(), namespaceMap, resultSpecBuilder);
+                        mSearchSpec.getResultGroupingLimit(), namespaceCache, resultSpecBuilder);
                 resultGroupingType = ResultSpecProto.ResultGroupingType.NAMESPACE;
                 break;
             case SearchSpec.GROUPING_TYPE_PER_SCHEMA:
@@ -470,7 +468,7 @@ public final class SearchSpecToProtoConverter {
             case SearchSpec.GROUPING_TYPE_PER_PACKAGE | SearchSpec.GROUPING_TYPE_PER_NAMESPACE:
                 addPerPackagePerNamespaceResultGroupings(mCurrentSearchSpecPrefixFilters,
                         mSearchSpec.getResultGroupingLimit(),
-                        namespaceMap, resultSpecBuilder);
+                        namespaceCache, resultSpecBuilder);
                 resultGroupingType = ResultSpecProto.ResultGroupingType.NAMESPACE;
                 break;
             case SearchSpec.GROUPING_TYPE_PER_PACKAGE | SearchSpec.GROUPING_TYPE_PER_SCHEMA:
@@ -482,14 +480,14 @@ public final class SearchSpecToProtoConverter {
             case SearchSpec.GROUPING_TYPE_PER_NAMESPACE | SearchSpec.GROUPING_TYPE_PER_SCHEMA:
                 addPerNamespaceAndSchemaResultGrouping(mCurrentSearchSpecPrefixFilters,
                         mSearchSpec.getResultGroupingLimit(),
-                        namespaceMap, schemaCache, resultSpecBuilder);
+                        namespaceCache, schemaCache, resultSpecBuilder);
                 resultGroupingType = ResultSpecProto.ResultGroupingType.NAMESPACE_AND_SCHEMA_TYPE;
                 break;
             case SearchSpec.GROUPING_TYPE_PER_PACKAGE | SearchSpec.GROUPING_TYPE_PER_NAMESPACE
                 | SearchSpec.GROUPING_TYPE_PER_SCHEMA:
                 addPerPackagePerNamespacePerSchemaResultGrouping(mCurrentSearchSpecPrefixFilters,
                         mSearchSpec.getResultGroupingLimit(),
-                        namespaceMap, schemaCache, resultSpecBuilder);
+                        namespaceCache, schemaCache, resultSpecBuilder);
                 resultGroupingType = ResultSpecProto.ResultGroupingType.NAMESPACE_AND_SCHEMA_TYPE;
                 break;
             default:
@@ -618,14 +616,14 @@ public final class SearchSpecToProtoConverter {
      * different databases, they should still be grouped together.
      *
      * @param prefixes          Prefixes that we should prepend to all our filters.
-     * @param namespaceMap      The namespace map contains all prefixed existing namespaces.
+     * @param namespaceCache    The NamespaceCache instance held in AppSearch.
      */
     private static Map<String, List<String>> getNamespaceToPrefixedNamespaces(
             @NonNull Set<String> prefixes,
-            @NonNull Map<String, Set<String>> namespaceMap) {
+            @NonNull NamespaceCache namespaceCache) {
         Map<String, List<String>> namespaceToPrefixedNamespaces = new ArrayMap<>();
         for (String prefix : prefixes) {
-            Set<String> prefixedNamespaces = namespaceMap.get(prefix);
+            Set<String> prefixedNamespaces = namespaceCache.getPrefixedDocumentNamespaces(prefix);
             if (prefixedNamespaces == null) {
                 continue;
             }
@@ -656,14 +654,14 @@ public final class SearchSpecToProtoConverter {
      * namespace, then those should be grouped together.
      *
      * @param prefixes          Prefixes that we should prepend to all our filters.
-     * @param namespaceMap      The namespace map contains all prefixed existing namespaces.
+     * @param namespaceCache    The NamespaceCache instance held in AppSearch.
      */
     private static Map<String, List<String>> getPackageAndNamespaceToPrefixedNamespaces(
             @NonNull Set<String> prefixes,
-            @NonNull Map<String, Set<String>> namespaceMap) {
+            @NonNull NamespaceCache namespaceCache) {
         Map<String, List<String>> packageAndNamespaceToNamespaces = new ArrayMap<>();
         for (String prefix : prefixes) {
-            Set<String> prefixedNamespaces = namespaceMap.get(prefix);
+            Set<String> prefixedNamespaces = namespaceCache.getPrefixedDocumentNamespaces(prefix);
             if (prefixedNamespaces == null) {
                 continue;
             }
@@ -812,16 +810,16 @@ public final class SearchSpecToProtoConverter {
      *
      * @param prefixes          Prefixes that we should prepend to all our filters
      * @param maxNumResults     The maximum number of results for each grouping to support.
-     * @param namespaceMap      The namespace map contains all prefixed existing namespaces.
+     * @param namespaceCache    The NamespaceCache instance held in AppSearch.
      * @param resultSpecBuilder ResultSpecs as specified by client
      */
     private static void addPerPackagePerNamespaceResultGroupings(
             @NonNull Set<String> prefixes,
             int maxNumResults,
-            @NonNull Map<String, Set<String>> namespaceMap,
+            @NonNull NamespaceCache namespaceCache,
             @NonNull ResultSpecProto.Builder resultSpecBuilder) {
         Map<String, List<String>> packageAndNamespaceToNamespaces =
-                getPackageAndNamespaceToPrefixedNamespaces(prefixes, namespaceMap);
+                getPackageAndNamespaceToPrefixedNamespaces(prefixes, namespaceCache);
 
         for (List<String> prefixedNamespaces : packageAndNamespaceToNamespaces.values()) {
             List<ResultSpecProto.ResultGrouping.Entry> entries =
@@ -872,18 +870,18 @@ public final class SearchSpecToProtoConverter {
      *
      * @param prefixes          Prefixes that we should prepend to all our filters.
      * @param maxNumResults     The maximum number of results for each grouping to support.
-     * @param namespaceMap      The namespace map contains all prefixed existing namespaces.
-     * @param schemaCache   The SchemaCache instance held in AppSearch.
+     * @param namespaceCache    The NamespaceCache instance held in AppSearch.
+     * @param schemaCache       The SchemaCache instance held in AppSearch.
      * @param resultSpecBuilder ResultSpec as specified by client.
      */
     private static void addPerPackagePerNamespacePerSchemaResultGrouping(
             @NonNull Set<String> prefixes,
             int maxNumResults,
-            @NonNull Map<String, Set<String>> namespaceMap,
+            @NonNull NamespaceCache namespaceCache,
             @NonNull SchemaCache schemaCache,
             @NonNull ResultSpecProto.Builder resultSpecBuilder) {
         Map<String, List<String>> packageAndNamespaceToNamespaces =
-                getPackageAndNamespaceToPrefixedNamespaces(prefixes, namespaceMap);
+                getPackageAndNamespaceToPrefixedNamespaces(prefixes, namespaceCache);
         Map<String, List<String>> packageAndSchemaToSchemas =
                 getPackageAndSchemaToPrefixedSchemas(prefixes, schemaCache);
 
@@ -920,18 +918,18 @@ public final class SearchSpecToProtoConverter {
      *
      * @param prefixes          Prefixes that we should prepend to all our filters
      * @param maxNumResults     The maximum number of results for each grouping to support.
-     * @param namespaceMap      The namespace map contains all prefixed existing namespaces.
+     * @param namespaceCache    The NamespaceCache instance held in AppSearch.
      * @param resultSpecBuilder ResultSpecs as specified by client
      */
     private static void addPerPackageResultGroupings(
             @NonNull Set<String> prefixes,
             int maxNumResults,
-            @NonNull Map<String, Set<String>> namespaceMap,
+            @NonNull NamespaceCache namespaceCache,
             @NonNull ResultSpecProto.Builder resultSpecBuilder) {
         // Build up a map of package to namespaces.
         Map<String, List<String>> packageToNamespacesMap = new ArrayMap<>();
         for (String prefix : prefixes) {
-            Set<String> prefixedNamespaces = namespaceMap.get(prefix);
+            Set<String> prefixedNamespaces = namespaceCache.getPrefixedDocumentNamespaces(prefix);
             if (prefixedNamespaces == null) {
                 continue;
             }
@@ -963,16 +961,16 @@ public final class SearchSpecToProtoConverter {
      *
      * @param prefixes          Prefixes that we should prepend to all our filters
      * @param maxNumResults     The maximum number of results for each grouping to support.
-     * @param namespaceMap      The namespace map contains all prefixed existing namespaces.
+     * @param namespaceCache    The NamespaceCache instance held in AppSearch.
      * @param resultSpecBuilder ResultSpecs as specified by client
      */
     private static void addPerNamespaceResultGroupings(
             @NonNull Set<String> prefixes,
             int maxNumResults,
-            @NonNull Map<String, Set<String>> namespaceMap,
+            @NonNull NamespaceCache namespaceCache,
             @NonNull ResultSpecProto.Builder resultSpecBuilder) {
         Map<String, List<String>> namespaceToPrefixedNamespaces =
-                getNamespaceToPrefixedNamespaces(prefixes, namespaceMap);
+                getNamespaceToPrefixedNamespaces(prefixes, namespaceCache);
 
         for (List<String> prefixedNamespaces : namespaceToPrefixedNamespaces.values()) {
             List<ResultSpecProto.ResultGrouping.Entry> entries =
@@ -1023,18 +1021,18 @@ public final class SearchSpecToProtoConverter {
      *
      * @param prefixes          Prefixes that we should prepend to all our filters.
      * @param maxNumResults     The maximum number of results for each grouping to support.
-     * @param namespaceMap      The namespace map contains all prefixed existing namespaces.
+     * @param namespaceCache    The NamespaceCache instance held in AppSearch.
      * @param schemaCache       The SchemaCache instance held in AppSearch.
      * @param resultSpecBuilder ResultSpec as specified by client.
      */
     private static void addPerNamespaceAndSchemaResultGrouping(
             @NonNull Set<String> prefixes,
             int maxNumResults,
-            @NonNull Map<String, Set<String>> namespaceMap,
+            @NonNull NamespaceCache namespaceCache,
             @NonNull SchemaCache schemaCache,
             @NonNull ResultSpecProto.Builder resultSpecBuilder) {
         Map<String, List<String>> namespaceToPrefixedNamespaces =
-                getNamespaceToPrefixedNamespaces(prefixes, namespaceMap);
+                getNamespaceToPrefixedNamespaces(prefixes, namespaceCache);
         Map<String, List<String>> schemaToPrefixedSchemas =
                 getSchemaToPrefixedSchemas(prefixes, schemaCache);
 

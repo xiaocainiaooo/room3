@@ -22,14 +22,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Shim for real RequiresFlagsEnabled defined in Framework.
+ * Shim for real RequiresFlagsDisabled defined in Framework.
  *
  * <p>In Jetpack, this shim does nothing and exists only for code sync purpose.
  *
  * <p>In Framework, indicates that a specific test or class should be run only if all of the given
- * feature flags are enabled in the device's current state. Enforced by the {@code CheckFlagsRule}.
+ * feature flags are disabled in the device's current state. Enforced by the {@code CheckFlagsRule}.
  *
- * <p>This annotation works together with {@link RequiresFlagsDisabled} to define the value that is
+ * <p>This annotation works together with {@link RequiresFlagsEnabled} to define the value that is
  * required of the flag by the test for the test to run. It is an error for either a method or class
  * to require that a particular flag be both enabled and disabled.
  *
@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
  * different flag is required by an annotation of the method, then both requirements apply.
  *
  * <p>With {@code CheckFlagsRule}, test(s) will be skipped with 'assumption failed' when any of the
- * required flag on the target Android platform is disabled.
+ * required flag on the target Android platform is enabled.
  *
  * <p>Both {@code SetFlagsRule} and {@code CheckFlagsRule} will fail the test if a particular flag
  * is both set (with {@code EnableFlags} or {@code DisableFlags}) and required (with {@code
@@ -49,9 +49,9 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
-public @interface RequiresFlagsEnabled {
+public @interface RequiresFlagsDisabled {
     /**
-     * The list of the feature flags that require to be enabled. Each item is the full flag name
+     * The list of the feature flags that require to be disabled. Each item is the full flag name
      * with the format {package_name}.{flag_name}.
      */
     String[] value();

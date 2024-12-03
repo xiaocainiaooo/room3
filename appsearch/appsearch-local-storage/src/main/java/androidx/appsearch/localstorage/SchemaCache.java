@@ -18,6 +18,7 @@ package androidx.appsearch.localstorage;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
+import androidx.annotation.VisibleForTesting;
 import androidx.appsearch.exceptions.AppSearchException;
 import androidx.appsearch.flags.Flags;
 import androidx.appsearch.localstorage.util.PrefixUtil;
@@ -70,6 +71,7 @@ public class SchemaCache {
     public SchemaCache() {
     }
 
+    @VisibleForTesting
     public SchemaCache(@NonNull Map<String, Map<String, SchemaTypeConfigProto>> schemaMap)
             throws AppSearchException {
         mSchemaMap.putAll(Preconditions.checkNotNull(schemaMap));
