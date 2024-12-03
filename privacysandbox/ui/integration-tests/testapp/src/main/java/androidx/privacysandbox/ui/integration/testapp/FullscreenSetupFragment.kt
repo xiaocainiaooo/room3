@@ -16,7 +16,6 @@
 
 package androidx.privacysandbox.ui.integration.testapp
 
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +24,8 @@ import android.widget.Button
 import android.widget.RadioButton
 import androidx.privacysandbox.activity.client.createSdkActivityLauncher
 import androidx.privacysandbox.activity.client.toLauncherInfo
-import androidx.privacysandbox.ui.integration.sdkproviderutils.fullscreen.BackNavigation
+import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.BackNavigation
+import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.ScreenOrientation
 
 class FullscreenSetupFragment : BaseFragment() {
 
@@ -47,10 +47,10 @@ class FullscreenSetupFragment : BaseFragment() {
         launchButton.setOnClickListener {
             val screenOrientation =
                 when {
-                    radioLandscape.isChecked -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    radioPortrait.isChecked -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    radioNonBlocking.isChecked -> ActivityInfo.SCREEN_ORIENTATION_USER
-                    else -> ActivityInfo.SCREEN_ORIENTATION_USER
+                    radioLandscape.isChecked -> ScreenOrientation.LANDSCAPE
+                    radioPortrait.isChecked -> ScreenOrientation.PORTRAIT
+                    radioNonBlocking.isChecked -> ScreenOrientation.USER
+                    else -> ScreenOrientation.USER
                 }
 
             val backNavigation =

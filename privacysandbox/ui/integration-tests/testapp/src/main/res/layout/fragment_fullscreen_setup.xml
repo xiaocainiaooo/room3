@@ -81,13 +81,13 @@
             android:id="@+id/radio_portrait"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/option_landscape" />
+            android:text="@string/option_portrait" />
 
         <RadioButton
             android:id="@+id/radio_landscape"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/option_portrait" />
+            android:text="@string/option_landscape" />
 
         <TextView
             android:layout_width="wrap_content"
