@@ -19,8 +19,9 @@ package androidx.window.extensions.embedding;
 import android.content.res.Resources;
 
 import androidx.annotation.AnimRes;
-import androidx.annotation.NonNull;
 import androidx.window.extensions.RequiresVendorApiLevel;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
@@ -41,8 +42,7 @@ public final class AnimationParams {
     @AnimRes
     public static final int DEFAULT_ANIMATION_RESOURCES_ID = 0xFFFFFFFF;
 
-    @NonNull
-    private final AnimationBackground mAnimationBackground;
+    private final @NonNull AnimationBackground mAnimationBackground;
 
     @AnimRes
     private final int mOpenAnimationResId;
@@ -78,8 +78,7 @@ public final class AnimationParams {
      * Returns the {@link AnimationBackground} to use for the background during the animation.
      */
     @RequiresVendorApiLevel(level = 7)
-    @NonNull
-    public AnimationBackground getAnimationBackground() {
+    public @NonNull AnimationBackground getAnimationBackground() {
         return mAnimationBackground;
     }
 
@@ -124,8 +123,7 @@ public final class AnimationParams {
      * - The default animation resources ID's for transitions is the system default.
      */
     public static final class Builder {
-        @NonNull
-        private AnimationBackground mAnimationBackground =
+        private @NonNull AnimationBackground mAnimationBackground =
                 AnimationBackground.ANIMATION_BACKGROUND_DEFAULT;
 
         @AnimRes
@@ -151,8 +149,7 @@ public final class AnimationParams {
          * @return this {@code Builder}.
          */
         @RequiresVendorApiLevel(level = 7)
-        @NonNull
-        public AnimationParams.Builder setAnimationBackground(
+        public AnimationParams.@NonNull Builder setAnimationBackground(
                 @NonNull AnimationBackground background) {
             mAnimationBackground = background;
             return this;
@@ -167,8 +164,7 @@ public final class AnimationParams {
          * @return this {@code Builder}.
          */
         @RequiresVendorApiLevel(level = 7)
-        @NonNull
-        public AnimationParams.Builder setOpenAnimationResId(@AnimRes int resId) {
+        public AnimationParams.@NonNull Builder setOpenAnimationResId(@AnimRes int resId) {
             mOpenAnimationResId = resId;
             return this;
         }
@@ -182,8 +178,7 @@ public final class AnimationParams {
          * @return this {@code Builder}.
          */
         @RequiresVendorApiLevel(level = 7)
-        @NonNull
-        public AnimationParams.Builder setCloseAnimationResId(@AnimRes int resId) {
+        public AnimationParams.@NonNull Builder setCloseAnimationResId(@AnimRes int resId) {
             mCloseAnimationResId = resId;
             return this;
         }
@@ -197,8 +192,7 @@ public final class AnimationParams {
          * @return this {@code Builder}.
          */
         @RequiresVendorApiLevel(level = 7)
-        @NonNull
-        public AnimationParams.Builder setChangeAnimationResId(@AnimRes int resId) {
+        public AnimationParams.@NonNull Builder setChangeAnimationResId(@AnimRes int resId) {
             mChangeAnimationResId = resId;
             return this;
         }
@@ -212,8 +206,7 @@ public final class AnimationParams {
          * @return the new {@code AnimationParams} instance.
          */
         @RequiresVendorApiLevel(level = 7)
-        @NonNull
-        public AnimationParams build() {
+        public @NonNull AnimationParams build() {
             return new AnimationParams(mAnimationBackground, mOpenAnimationResId,
                     mCloseAnimationResId, mChangeAnimationResId);
         }
@@ -236,9 +229,8 @@ public final class AnimationParams {
                 mChangeAnimationResId);
     }
 
-    @NonNull
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return AnimationParams.class.getSimpleName() + "{"
                 + "animationBackground=" + mAnimationBackground
                 + ", openAnimation=" + mOpenAnimationResId

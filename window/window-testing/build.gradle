@@ -36,6 +36,7 @@ android {
 }
 
 dependencies {
+    api(libs.jspecify)
     api(libs.kotlinStdlib)
     api(project(":window:window"))
     api(libs.junit)

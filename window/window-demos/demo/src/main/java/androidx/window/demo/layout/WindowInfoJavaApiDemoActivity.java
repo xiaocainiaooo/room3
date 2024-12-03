@@ -20,8 +20,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Consumer;
 import androidx.window.WindowSdkExtensions;
@@ -31,17 +29,17 @@ import androidx.window.java.layout.WindowInfoTrackerCallbackAdapter;
 import androidx.window.layout.WindowInfoTracker;
 import androidx.window.layout.WindowLayoutInfo;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /** Activity to show how to get WindowLayoutInfo with the Java-supported API. */
 public class WindowInfoJavaApiDemoActivity extends EdgeToEdgeActivity {
     // Logcat tag length must be <= 23 characters.
     private static final String TAG = "WinInfoJavaApiDemo";
 
-    @NonNull
-    private WindowInfoTrackerCallbackAdapter mWindowInfoTrackerCallbackAdapter;
-    @NonNull
-    private TextView mWindowLayoutInfoGetterValue;
-    @NonNull
-    private TextView mWindowLayoutInfoFlowValue;
+    private @NonNull WindowInfoTrackerCallbackAdapter mWindowInfoTrackerCallbackAdapter;
+    private @NonNull TextView mWindowLayoutInfoGetterValue;
+    private @NonNull TextView mWindowLayoutInfoFlowValue;
 
     /** The Window Manager extension version available on this device. */
     private final int mExtensionVersion = WindowSdkExtensions.getInstance().getExtensionVersion();
