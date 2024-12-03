@@ -411,6 +411,9 @@ internal class LayoutNode(
     private var _collapsedSemantics: SemanticsConfiguration? = null
 
     internal fun invalidateSemantics() {
+        // Ignore calls to invalidate Semantics while semantics are being applied (b/378114177).
+        if (isCurrentlyCalculatingSemanticsConfiguration) return
+
         _collapsedSemantics = null
         // TODO(lmr): this ends up scheduling work that diffs the entire tree, but we should
         //  eventually move to marking just this node as invalidated since we are invalidating
@@ -422,28 +425,38 @@ internal class LayoutNode(
         get() {
             // TODO: investigate if there's a better way to approach "half attached" state and
             // whether or not deactivated nodes should be considered removed or not.
-            if (!isAttached || isDeactivated) return null
+            if (!isAttached || isDeactivated || !nodes.has(Nodes.Semantics)) return null
 
-            if (!nodes.has(Nodes.Semantics) || _collapsedSemantics != null) {
-                return _collapsedSemantics
+            if (_collapsedSemantics == null) {
+                _collapsedSemantics = calculateSemanticsConfiguration()
             }
-
-            var config = SemanticsConfiguration()
-            requireOwner().snapshotObserver.observeSemanticsReads(this) {
-                nodes.tailToHead(Nodes.Semantics) {
-                    if (it.shouldClearDescendantSemantics) {
-                        config = SemanticsConfiguration()
-                        config.isClearingSemantics = true
-                    }
-                    if (it.shouldMergeDescendantSemantics) {
-                        config.isMergingSemanticsOfDescendants = true
-                    }
-                    with(config) { with(it) { applySemantics() } }
-                }
-            }
-            _collapsedSemantics = config
-            return config
+            return _collapsedSemantics
         }
+
+    private var isCurrentlyCalculatingSemanticsConfiguration = false
+
+    private fun calculateSemanticsConfiguration(): SemanticsConfiguration {
+        // Ignore calls to invalidate Semantics while semantics are being calculated.
+        isCurrentlyCalculatingSemanticsConfiguration = true
+
+        var config = SemanticsConfiguration()
+        requireOwner().snapshotObserver.observeSemanticsReads(this) {
+            nodes.tailToHead(Nodes.Semantics) {
+                if (it.shouldClearDescendantSemantics) {
+                    config = SemanticsConfiguration()
+                    config.isClearingSemantics = true
+                }
+                if (it.shouldMergeDescendantSemantics) {
+                    config.isMergingSemanticsOfDescendants = true
+                }
+                with(it) { config.applySemantics() }
+            }
+        }
+
+        isCurrentlyCalculatingSemanticsConfiguration = false
+
+        return config
+    }
 
     /**
      * Set the [Owner] of this LayoutNode. This LayoutNode must not already be attached. [owner]
@@ -1292,6 +1305,7 @@ internal class LayoutNode(
         requirePrecondition(isAttached) { "onReuse is only expected on attached node" }
         interopViewFactoryHolder?.onReuse()
         subcompositionsState?.onReuse()
+        isCurrentlyCalculatingSemanticsConfiguration = false
         if (isDeactivated) {
             isDeactivated = false
             invalidateSemantics()
