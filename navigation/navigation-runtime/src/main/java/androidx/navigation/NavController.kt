@@ -906,8 +906,21 @@ public open class NavController(
      * @return true if the saved state of the stack associated with [T] was cleared.
      */
     @MainThread
-    public inline fun <reified T : Any> clearBackStack(): Boolean =
-        clearBackStack(serializer<T>().generateHashCode())
+    public inline fun <reified T : Any> clearBackStack(): Boolean = clearBackStack(T::class)
+
+    /**
+     * Clears any saved state associated with KClass [route] that was previously saved via
+     * [popBackStack] when using a `saveState` value of `true`.
+     *
+     * @param route The route from the [KClass] of the destination previously used with
+     *   [popBackStack] with a `saveState`value of `true`. The target NavDestination must have been
+     *   created with route from [KClass].
+     * @return true if the saved state of the stack associated with [route] was cleared.
+     */
+    @OptIn(InternalSerializationApi::class)
+    @MainThread
+    public fun clearBackStack(route: KClass<*>): Boolean =
+        clearBackStack(route.serializer().generateHashCode())
 
     /**
      * Clears any saved state associated with KClass [T] that was previously saved via
