@@ -2836,6 +2836,25 @@ class NavControllerRouteTest {
 
     @UiThreadTest
     @Test
+    fun testPopBackStackWithKClassReified() {
+        val navController = createNavController()
+        navController.graph =
+            navController.createGraph(startDestination = "start") {
+                test("start")
+                test<TestClass>()
+            }
+        navController.navigate(TestClass())
+
+        val navigator = navController.navigatorProvider.getNavigator(TestNavigator::class.java)
+        assertThat(navigator.backStack.size).isEqualTo(2)
+
+        val popped = navController.popBackStack(TestClass::class, true)
+        assertThat(popped).isTrue()
+        assertThat(navigator.backStack.size).isEqualTo(1)
+    }
+
+    @UiThreadTest
+    @Test
     fun testPopBackStackGraphWithKClass() {
         val navController = createNavController()
         navController.graph =
