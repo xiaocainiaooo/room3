@@ -163,6 +163,8 @@ package androidx.navigation {
     method public androidx.navigation.NavDeepLink.Builder setMimeType(String mimeType);
     method public androidx.navigation.NavDeepLink.Builder setUriPattern(String uriPattern);
     method public inline <reified T> androidx.navigation.NavDeepLink.Builder setUriPattern(String basePath, optional java.util.Map<kotlin.reflect.KType,androidx.navigation.NavType<? extends java.lang.Object?>> typeMap);
+    method public <T> androidx.navigation.NavDeepLink.Builder setUriPattern(kotlin.reflect.KClass<T> route, String basePath);
+    method public <T> androidx.navigation.NavDeepLink.Builder setUriPattern(kotlin.reflect.KClass<T> route, String basePath, optional java.util.Map<kotlin.reflect.KType,androidx.navigation.NavType<? extends java.lang.Object?>> typeMap);
   }
 
   @kotlin.DslMarker public @interface NavDeepLinkDsl {
