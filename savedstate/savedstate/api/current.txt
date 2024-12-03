@@ -165,7 +165,7 @@ package androidx.savedstate.serialization {
 
   public final class SavedStateEncoderKt {
     method public static <T> android.os.Bundle encodeToSavedState(kotlinx.serialization.SerializationStrategy<? super T> serializer, T value);
-    method public static inline <reified T> android.os.Bundle encodeToSavedState(T serializable);
+    method public static inline <reified T> android.os.Bundle encodeToSavedState(T value);
   }
 
   public final class SavedStateRegistryOwnerDelegatesKt {
