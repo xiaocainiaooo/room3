@@ -35,4 +35,6 @@ androidx {
     runApiTasks = new RunApiTasks.Yes()
     description = "A post-processing effect that works with CameraX Library, providing a portrait" +
             " mode effect that applies to still image captures."
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

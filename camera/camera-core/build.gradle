@@ -139,4 +139,6 @@ androidx {
         name = "BSD License"
         url = "https://chromium.googlesource.com/libyuv/libyuv/+/refs/heads/main/README.chromium"
     }
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

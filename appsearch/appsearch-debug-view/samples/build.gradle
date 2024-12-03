@@ -48,3 +48,7 @@ dependencies {
     implementation(libs.constraintLayout)
     implementation(libs.guavaAndroid)
 }
+
+androidx {
+    optOutJSpecify = true
+}

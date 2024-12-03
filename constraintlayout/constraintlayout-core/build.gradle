@@ -40,4 +40,6 @@ androidx {
     mavenVersion = LibraryVersions.CONSTRAINTLAYOUT_CORE
     inceptionYear = "2022"
     description = "This library contains engines and algorithms for constraint based layout and complex animations (it is used by the ConstraintLayout library)"
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

@@ -133,3 +133,8 @@ dependencies {
     testImplementation(libs.truth)
     testImplementation(project(":internal-testutils-ktx"))
 }
+
+androidx {
+    // TODO: b/326456246
+    optOutJSpecify = true
+}

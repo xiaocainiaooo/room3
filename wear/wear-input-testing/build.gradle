@@ -46,4 +46,6 @@ androidx {
     mavenVersion = LibraryVersions.WEAR_INPUT_TESTING
     inceptionYear = "2020"
     description = "Android Wear Support Input Testing Helpers"
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

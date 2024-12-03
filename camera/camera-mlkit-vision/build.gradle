@@ -59,4 +59,6 @@ androidx {
     description = "MLKit vision components for the Jetpack Camera Library, a library providing a " +
             "seamless integration that enables camera driven computer vision features " +
             "across all of Android."
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

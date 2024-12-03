@@ -50,4 +50,6 @@ androidx {
     inceptionYear = "2018"
     description = "Wraps PendingIntents in a friendly and easier way to handle remote callbacks"
     failOnDeprecationWarnings = false
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

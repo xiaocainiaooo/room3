@@ -52,4 +52,6 @@ androidx {
     inceptionYear = "2024"
     description = "Low-level utilities for building apps and libraries for Wear OS."
     legacyDisableKotlinStrictApiMode = true
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

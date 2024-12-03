@@ -60,6 +60,8 @@ androidx {
         // Pending removal, don't run tests.
         enabled = false
     }
+    // TODO: b/326456246
+    optOutJSpecify = true
 }
 
 android {
