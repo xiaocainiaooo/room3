@@ -16,20 +16,26 @@
 
 package androidx.appsearch.cts.app;
 
+import static androidx.appsearch.testutil.AppSearchTestUtils.calculateDigest;
 import static androidx.appsearch.testutil.AppSearchTestUtils.checkIsBatchResultSuccess;
 import static androidx.appsearch.testutil.AppSearchTestUtils.convertSearchResultsToDocuments;
+import static androidx.appsearch.testutil.AppSearchTestUtils.generateRandomBytes;
 import static androidx.appsearch.testutil.AppSearchTestUtils.retrieveAllSearchResults;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import android.content.Context;
+import android.os.ParcelFileDescriptor;
 
 import androidx.annotation.NonNull;
 import androidx.appsearch.app.AppSearchBatchResult;
+import androidx.appsearch.app.AppSearchBlobHandle;
 import androidx.appsearch.app.AppSearchResult;
 import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.AppSearchSchema.PropertyConfig;
@@ -40,6 +46,8 @@ import androidx.appsearch.app.GetByDocumentIdRequest;
 import androidx.appsearch.app.GetSchemaResponse;
 import androidx.appsearch.app.GlobalSearchSession;
 import androidx.appsearch.app.Migrator;
+import androidx.appsearch.app.OpenBlobForReadResponse;
+import androidx.appsearch.app.OpenBlobForWriteResponse;
 import androidx.appsearch.app.PutDocumentsRequest;
 import androidx.appsearch.app.RemoveByDocumentIdRequest;
 import androidx.appsearch.app.ReportSystemUsageRequest;
@@ -69,6 +77,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -101,7 +111,6 @@ public abstract class GlobalSearchSessionCtsTestBase {
     public void setUp() throws Exception {
         mDb1 = createSearchSessionAsync(DB_NAME_1).get();
         mDb2 = createSearchSessionAsync(DB_NAME_2).get();
-
         // Cleanup whatever documents may still exist in these databases. This is needed in
         // addition to tearDown in case a test exited without completing properly.
         cleanup();
@@ -2119,4 +2128,128 @@ public abstract class GlobalSearchSessionCtsTestBase {
         assertThat(resultList).isEmpty();
     }
 // @exportToFramework:endStrip()
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testWriteAndReadBlob() throws Exception {
+        assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
+        byte[] data1 = generateRandomBytes(10); // 10 Bytes
+        byte[] data2 = generateRandomBytes(20); // 20 Bytes
+        byte[] digest1 = calculateDigest(data1);
+        byte[] digest2 = calculateDigest(data2);
+        AppSearchBlobHandle handle1 = AppSearchBlobHandle.createWithSha256(
+                digest1, mContext.getPackageName(), DB_NAME_1, "ns");
+        AppSearchBlobHandle handle2 = AppSearchBlobHandle.createWithSha256(
+                digest2, mContext.getPackageName(), DB_NAME_1, "ns");
+
+        try {
+            try (OpenBlobForWriteResponse writeResponse =
+                         mDb1.openBlobForWriteAsync(ImmutableSet.of(handle1, handle2)).get()) {
+                AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
+                        writeResponse.getResult();
+                assertTrue(writeResult.isSuccess());
+
+                ParcelFileDescriptor writePfd1 = writeResult.getSuccesses().get(handle1);
+                try (OutputStream outputStream =
+                             new ParcelFileDescriptor.AutoCloseOutputStream(writePfd1)) {
+                    outputStream.write(data1);
+                    outputStream.flush();
+                }
+
+                ParcelFileDescriptor writePfd2 = writeResult.getSuccesses().get(handle2);
+                try (OutputStream outputStream =
+                             new ParcelFileDescriptor.AutoCloseOutputStream(writePfd2)) {
+                    outputStream.write(data2);
+                    outputStream.flush();
+                }
+            }
+
+            assertTrue(mDb1.commitBlobAsync(ImmutableSet.of(handle1, handle2)).get().getResult()
+                    .isSuccess());
+
+            byte[] readBytes1 = new byte[10]; // 10 Bytes
+            byte[] readBytes2 = new byte[20]; // 20 Bytes
+
+            try (OpenBlobForReadResponse readResponse = mGlobalSearchSession.openBlobForReadAsync(
+                    ImmutableSet.of(handle1, handle2)).get()) {
+                AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> readResult =
+                        readResponse.getResult();
+                assertTrue(readResult.isSuccess());
+
+                ParcelFileDescriptor readPfd1 = readResult.getSuccesses().get(handle1);
+                try (InputStream inputStream = new ParcelFileDescriptor.AutoCloseInputStream(
+                        readPfd1)) {
+                    inputStream.read(readBytes1);
+                }
+                assertThat(readBytes1).isEqualTo(data1);
+
+                ParcelFileDescriptor readPfd2 = readResult.getSuccesses().get(handle2);
+                try (InputStream inputStream = new ParcelFileDescriptor.AutoCloseInputStream(
+                        readPfd2)) {
+                    inputStream.read(readBytes2);
+                }
+                assertThat(readBytes2).isEqualTo(data2);
+            }
+        } finally {
+            mDb1.removeBlobAsync(ImmutableSet.of(handle1, handle2)).get();
+        }
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testWriteAndReadBlob_withoutCommit() throws Exception {
+        assumeTrue(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
+        byte[] data = generateRandomBytes(10); // 10 Bytes
+        byte[] digest = calculateDigest(data);
+        AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
+                digest, mContext.getPackageName(), DB_NAME_1, "ns");
+
+        try {
+            try (OpenBlobForWriteResponse writeResponse =
+                         mDb1.openBlobForWriteAsync(ImmutableSet.of(handle)).get()) {
+                AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> writeResult =
+                        writeResponse.getResult();
+                assertTrue(writeResult.isSuccess());
+
+                ParcelFileDescriptor writePfd = writeResult.getSuccesses().get(handle);
+                try (OutputStream outputStream =
+                             new ParcelFileDescriptor.AutoCloseOutputStream(writePfd)) {
+                    outputStream.write(data);
+                    outputStream.flush();
+                }
+            }
+
+            // Read blob without commit the blob first.
+            try (OpenBlobForReadResponse readResponse =
+                         mGlobalSearchSession.openBlobForReadAsync(ImmutableSet.of(handle)).get()) {
+                AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> readResult =
+                        readResponse.getResult();
+                assertFalse(readResult.isSuccess());
+
+                assertThat(readResult.getFailures().keySet()).containsExactly(handle);
+                assertThat(readResult.getFailures().get(handle).getResultCode())
+                        .isEqualTo(AppSearchResult.RESULT_NOT_FOUND);
+                assertThat(readResult.getFailures().get(handle).getErrorMessage())
+                        .contains("Cannot find the blob for handle");
+            }
+        } finally {
+            mDb1.removeBlobAsync(ImmutableSet.of(handle)).get();
+        }
+    }
+
+    @Test
+    @RequiresFlagsEnabled(Flags.FLAG_ENABLE_BLOB_STORE)
+    public void testReadBlob_notSupported() throws Exception {
+        assumeFalse(mDb1.getFeatures().isFeatureSupported(Features.BLOB_STORAGE));
+        mDb1.setSchemaAsync(new SetSchemaRequest.Builder().setForceOverride(true).build()).get();
+        byte[] data = generateRandomBytes(10); // 10 Bytes
+        byte[] digest = calculateDigest(data);
+        AppSearchBlobHandle handle = AppSearchBlobHandle.createWithSha256(
+                digest, mContext.getPackageName(), DB_NAME_1, "ns");
+
+        UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class,
+                () -> mGlobalSearchSession.openBlobForReadAsync(ImmutableSet.of(handle)));
+        assertThat(exception).hasMessageThat().contains(
+                Features.BLOB_STORAGE + " is not available on this AppSearch implementation.");
+    }
 }
