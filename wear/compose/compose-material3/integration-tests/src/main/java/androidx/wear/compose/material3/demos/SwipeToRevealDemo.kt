@@ -298,3 +298,45 @@ fun SwipeToRevealSingleButtonWithAnchoring() {
         }
     }
 }
+
+@Composable
+fun SwipeToRevealWithLongLabels() {
+    ScalingLazyDemo {
+        item {
+            SwipeToReveal(
+                // Use the double action anchor width when revealing two actions
+                revealState =
+                    rememberRevealState(
+                        anchorWidth = SwipeToRevealDefaults.DoubleActionAnchorWidth,
+                    ),
+                actions = {
+                    primaryAction(
+                        onClick = { /* This block is called when the primary action is executed. */
+                        },
+                        icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
+                        label = "Delete action with an extremely long label that should truncate."
+                    )
+                    secondaryAction(
+                        onClick = { /* This block is called when the secondary action is executed. */
+                        },
+                        icon = { Icon(Icons.Outlined.MoreVert, contentDescription = "Options") },
+                        label = "Options"
+                    )
+                    undoPrimaryAction(
+                        onClick = { /* This block is called when the undo primary action is executed. */
+                        },
+                        label =
+                            "Undo Delete action with an extremely long label that should truncate."
+                    )
+                }
+            ) {
+                Button(modifier = Modifier.fillMaxWidth(), onClick = {}) {
+                    Text(
+                        "This Button has actions with extremely long labels that should truncate.",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+        }
+    }
+}
