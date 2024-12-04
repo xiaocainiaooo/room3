@@ -566,8 +566,8 @@ public open class NavController(
     @MainThread
     @JvmOverloads
     @OptIn(InternalSerializationApi::class)
-    public fun popBackStack(
-        route: KClass<*>,
+    public fun <T : Any> popBackStack(
+        route: KClass<T>,
         inclusive: Boolean,
         saveState: Boolean = false
     ): Boolean {
@@ -919,7 +919,7 @@ public open class NavController(
      */
     @OptIn(InternalSerializationApi::class)
     @MainThread
-    public fun clearBackStack(route: KClass<*>): Boolean =
+    public fun <T : Any> clearBackStack(route: KClass<T>): Boolean =
         clearBackStack(route.serializer().generateHashCode())
 
     /**
