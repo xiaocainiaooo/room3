@@ -14,20 +14,32 @@
  * limitations under the License.
  */
 
-package androidx.ink.geometry
+package androidx.ink.geometry.internal
 
+import androidx.ink.geometry.ImmutableVec
+import androidx.ink.geometry.MutableVec
 import androidx.ink.nativeloader.NativeLoader
 import androidx.ink.nativeloader.UsedByNative
 
 /** Helper functions for MutableBox and ImmutableBox. */
-internal object BoxHelper {
+@UsedByNative
+internal object BoxNative {
 
     init {
         NativeLoader.load()
     }
 
     @UsedByNative
-    external fun nativeCenter(
+    external fun createCenter(
+        rectXMin: Float,
+        rectYMin: Float,
+        rectXMax: Float,
+        rectYMax: Float,
+        immutableVecClass: Class<ImmutableVec>,
+    ): ImmutableVec
+
+    @UsedByNative
+    external fun populateCenter(
         rectXMin: Float,
         rectYMin: Float,
         rectXMax: Float,
@@ -36,7 +48,7 @@ internal object BoxHelper {
     )
 
     @UsedByNative
-    external fun nativeContainsPoint(
+    external fun containsPoint(
         rectXMin: Float,
         rectYMin: Float,
         rectXMax: Float,
@@ -46,7 +58,7 @@ internal object BoxHelper {
     ): Boolean
 
     @UsedByNative
-    external fun nativeContainsBox(
+    external fun containsBox(
         rectXMin: Float,
         rectYMin: Float,
         rectXMax: Float,
