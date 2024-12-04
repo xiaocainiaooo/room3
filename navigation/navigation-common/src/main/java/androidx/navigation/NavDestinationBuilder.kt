@@ -262,7 +262,7 @@ internal constructor(
                     "route from KClass"
             }
         }
-        deepLink(navDeepLink(basePath, route, typeMap, navDeepLink))
+        deepLink(navDeepLink(route, basePath, typeMap, navDeepLink))
     }
 
     /**
