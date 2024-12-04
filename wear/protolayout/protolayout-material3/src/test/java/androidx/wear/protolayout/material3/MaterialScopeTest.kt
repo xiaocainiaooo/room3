@@ -54,7 +54,8 @@ class MaterialScopeTest {
                         colorScheme = dynamicColorScheme(context = getApplicationContext())
                     ),
                 defaultTextElementStyle = TextElementStyle(),
-                defaultIconStyle = IconStyle()
+                defaultIconStyle = IconStyle(),
+                defaultBackgroundImageStyle = BackgroundImageStyle()
             )
 
         assertThat(scopeWithDefaultTheme.deviceConfiguration).isEqualTo(DEVICE_PARAMETERS)
@@ -84,7 +85,8 @@ class MaterialScopeTest {
                     ),
                 allowDynamicTheme = false,
                 defaultTextElementStyle = TextElementStyle(),
-                defaultIconStyle = IconStyle()
+                defaultIconStyle = IconStyle(),
+                defaultBackgroundImageStyle = BackgroundImageStyle()
             )
 
         assertThat(materialScope.deviceConfiguration).isEqualTo(DEVICE_PARAMETERS)
@@ -116,7 +118,8 @@ class MaterialScopeTest {
                             )
                     ),
                 defaultTextElementStyle = TextElementStyle(),
-                defaultIconStyle = IconStyle()
+                defaultIconStyle = IconStyle(),
+                defaultBackgroundImageStyle = BackgroundImageStyle()
             )
 
         assertThat(isDynamicColorSchemeEnabled(materialScope.context)).isFalse()
