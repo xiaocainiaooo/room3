@@ -102,6 +102,7 @@ androidx {
     deviceTests {
         enableAlsoRunningOnPhysicalDevices = true
     }
+    samples(project(":benchmark:benchmark-samples"))
 }
 
 tasks.withType(KotlinCompile).configureEach {
