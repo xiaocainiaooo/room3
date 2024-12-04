@@ -233,8 +233,8 @@ public inline fun <reified T : Any> NavGraphBuilder.composable(
  * @param sizeTransform callback to determine the destination's sizeTransform.
  * @param content composable for the destination
  */
-public fun NavGraphBuilder.composable(
-    route: KClass<*>,
+public fun <T : Any> NavGraphBuilder.composable(
+    route: KClass<T>,
     typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
     deepLinks: List<NavDeepLink> = emptyList(),
     enterTransition:
@@ -485,9 +485,9 @@ public inline fun <reified T : Any> NavGraphBuilder.navigation(
  * @param builder the builder used to construct the graph
  * @return the newly constructed nested NavGraph
  */
-public fun NavGraphBuilder.navigation(
+public fun <T : Any> NavGraphBuilder.navigation(
     startDestination: KClass<*>,
-    route: KClass<*>,
+    route: KClass<T>,
     typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
     deepLinks: List<NavDeepLink> = emptyList(),
     enterTransition:
@@ -602,9 +602,9 @@ public inline fun <reified T : Any> NavGraphBuilder.navigation(
  * @param builder the builder used to construct the graph
  * @return the newly constructed nested NavGraph
  */
-public fun NavGraphBuilder.navigation(
+public fun <T : Any> NavGraphBuilder.navigation(
     startDestination: Any,
-    route: KClass<*>,
+    route: KClass<T>,
     typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
     deepLinks: List<NavDeepLink> = emptyList(),
     enterTransition:
