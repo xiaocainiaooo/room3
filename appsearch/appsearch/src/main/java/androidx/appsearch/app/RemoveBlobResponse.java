@@ -25,7 +25,7 @@ import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
 import androidx.appsearch.safeparcel.AbstractSafeParcelable;
 import androidx.appsearch.safeparcel.SafeParcelable;
-import androidx.appsearch.safeparcel.stub.StubCreators;
+import androidx.appsearch.safeparcel.stub.StubCreators.RemoveBlobResponseCreator;
 import androidx.core.util.Preconditions;
 
 /**
@@ -43,7 +43,7 @@ public final class RemoveBlobResponse extends AbstractSafeParcelable {
 
     @NonNull
     public static final Parcelable.Creator<RemoveBlobResponse> CREATOR =
-            new StubCreators.RemoveBlobResponseCreator();
+            new RemoveBlobResponseCreator();
 
     @Field(id = 1, getter = "getResponseParcel")
     private final AppSearchBatchResultParcelV2<AppSearchBlobHandle, Void> mResultParcel;
@@ -89,6 +89,6 @@ public final class RemoveBlobResponse extends AbstractSafeParcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
-        StubCreators.RemoveBlobResponseCreator.writeToParcel(this, dest, flags);
+        RemoveBlobResponseCreator.writeToParcel(this, dest, flags);
     }
 }
