@@ -85,6 +85,13 @@ abstract class BaseFragment : Fragment() {
         setEventListener(TestEventListener(this))
     }
 
+    fun handleOptionsFromIntent(options: FragmentOptions) {
+        currentMediationOption = options.mediation
+        currentAdType = options.adType
+        shouldDrawViewabilityLayer = options.drawViewability
+        providerUiOnTop = options.isZOrderOnTop
+    }
+
     /**
      * Returns the list of [SandboxedSdkView]s that are currently displayed inside this fragment.
      *
@@ -120,6 +127,7 @@ abstract class BaseFragment : Fragment() {
             val sdkBundle =
                 sdkApi.loadBannerAd(adType, mediationOption, waitInsideOnDraw, drawViewabilityLayer)
             sandboxedSdkView.setAdapter(SandboxedUiAdapterFactory.createFromCoreLibInfo(sdkBundle))
+            sandboxedSdkView.orderProviderUiAboveClientUi(providerUiOnTop)
         }
     }
 
