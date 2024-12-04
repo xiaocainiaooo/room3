@@ -39,10 +39,8 @@ class TransformatioSpecTest {
             TransformVariableSpec(0.012f, 0.022f, 0.032f, 0.042f),
             TransformVariableSpec(0.013f, 0.023f, 0.033f, 0.043f),
             TransformVariableSpec(0.014f, 0.024f, 0.034f, 0.044f),
-            0.05f,
-            0.06f,
-            0.07f,
-            0.08f
+            0.95f,
+            0.86f,
         )
 
     private val SPEC2 =
@@ -56,10 +54,8 @@ class TransformatioSpecTest {
             TransformVariableSpec(0.12f, 0.22f, 0.32f, 0.42f),
             TransformVariableSpec(0.13f, 0.23f, 0.33f, 0.43f),
             TransformVariableSpec(0.14f, 0.24f, 0.34f, 0.44f),
-            0.5f,
-            0.6f,
-            0.7f,
-            0.8f
+            0.95f,
+            0.86f,
         )
 
     private val SPECS = listOf(200 to SPEC1, 220 to SPEC2)
