@@ -79,6 +79,7 @@ constructor(
                 )
             if (currentCameras == null) {
                 Log.error { "Failed to handle quirks before closing the camera device!" }
+                cameraDeviceWrapper.onDeviceClosed()
                 androidCameraState.onFinalized(unwrappedCameraDevice)
                 return
             }
