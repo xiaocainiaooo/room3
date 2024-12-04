@@ -103,6 +103,7 @@ package androidx.navigation {
     method public inline <reified T> androidx.navigation.NavBackStackEntry getBackStackEntry();
     method public androidx.navigation.NavBackStackEntry getBackStackEntry(@IdRes int destinationId);
     method public final androidx.navigation.NavBackStackEntry getBackStackEntry(String route);
+    method public final <T> androidx.navigation.NavBackStackEntry getBackStackEntry(kotlin.reflect.KClass<T> route);
     method public final <T> androidx.navigation.NavBackStackEntry getBackStackEntry(T route);
     method public androidx.navigation.NavBackStackEntry? getCurrentBackStackEntry();
     method public final kotlinx.coroutines.flow.Flow<androidx.navigation.NavBackStackEntry> getCurrentBackStackEntryFlow();
