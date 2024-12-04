@@ -18,6 +18,7 @@ package androidx.pdf.view
 
 import android.graphics.PointF
 import android.graphics.RectF
+import androidx.annotation.ColorInt
 import androidx.annotation.RestrictTo
 
 /**
@@ -46,6 +47,10 @@ public class PdfRect(public val pageNum: Int, public val pageRect: RectF) {
         result = 31 * result + pageRect.hashCode()
         return result
     }
+
+    override fun toString(): String {
+        return "PdfRect: page $pageNum pageRect $pageRect"
+    }
 }
 
 /**
@@ -73,5 +78,33 @@ public class PdfPoint(public val pageNum: Int, public val pagePoint: PointF) {
         var result = pageNum.hashCode()
         result = 31 * result + pagePoint.hashCode()
         return result
+    }
+
+    override fun toString(): String {
+        return "PdfPoint: page $pageNum pagePoint $pagePoint"
+    }
+}
+
+/** Represents an [area] that should be highlighted with [color]. */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public class Highlight(public val area: PdfRect, @ColorInt public val color: Int) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is Highlight) return false
+
+        if (other.area != this.area) return false
+        if (other.color != this.color) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = area.hashCode()
+        result = 31 * result + color.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "Highlight: area $area color $color"
     }
 }

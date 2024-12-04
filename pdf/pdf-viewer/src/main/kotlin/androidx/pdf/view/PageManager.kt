@@ -28,11 +28,10 @@ import androidx.pdf.PdfDocument
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Manages a collection of [Page]s, each representing a single PDF page. Receives events to update
- * pages' internal state, and produces events via a [StateFlow] of type [Unit] to signal the host
+ * pages' internal state, and produces events via a [SharedFlow] of type [Unit] to signal the host
  * [PdfView] to invalidate itself when any page needs to be redrawn. Operations like drawing pages
  * and handling touch events on pages may be delegated to this manager.
  *
@@ -43,12 +42,31 @@ internal class PageManager(
     private val backgroundScope: CoroutineScope,
     private val pagePrefetchRadius: Int,
 ) {
-    /** Replay at least 1 value in case of pages rendered while we're not collecting */
-    private val _updatedPagesFlow = MutableSharedFlow<Int>(replay = 1)
-    val updatedPagesFlow: SharedFlow<Int>
-        get() = _updatedPagesFlow
+    /**
+     * Replay at least 1 value in case of an invalidation signal issued while [PdfView] is not
+     * collecting
+     */
+    private val _invalidationSignalFlow = MutableSharedFlow<Unit>(replay = 1)
+
+    /**
+     * This [SharedFlow] serves as an event bus of sorts to signal our host [PdfView] to invalidate
+     * itself in a decoupled way. It is of type [Unit] because the reason for invalidation is
+     * inconsequential. The model is: we update the data that affects what will be drawn, we signal
+     * [PdfView] to invalidate itself, and the relevant changes in state will be reflected in the
+     * next call to [PdfView.onDraw]
+     */
+    val invalidationSignalFlow: SharedFlow<Unit>
+        get() = _invalidationSignalFlow
 
     @VisibleForTesting val pages = SparseArray<Page>()
+
+    /**
+     * [Highlight]s supplied by the developer to be drawn along with the pages they belong to
+     *
+     * We store these in a map keyed by page number for more efficient lookup at drawing time, even
+     * though each [Highlight] contains its own page number.
+     */
+    private val highlights: MutableMap<Int, MutableList<Highlight>> = mutableMapOf()
 
     /**
      * Updates the internal state of [Page]s owned by this manager in response to a viewport change
@@ -81,14 +99,26 @@ internal class PageManager(
     fun onPageSizeReceived(pageNum: Int, size: Point, isVisible: Boolean, currentZoomLevel: Float) {
         if (pages.contains(pageNum)) return
         val page =
-            Page(pageNum, size, pdfDocument, backgroundScope) { _updatedPagesFlow.tryEmit(pageNum) }
+            Page(pageNum, size, pdfDocument, backgroundScope) {
+                    _invalidationSignalFlow.tryEmit(Unit)
+                }
                 .apply { if (isVisible) setVisible(currentZoomLevel) }
         pages.put(pageNum, page)
     }
 
+    /** Adds [newHighlights]s to this manager to be drawn along with the pages they belong to */
+    fun setHighlights(newHighlights: List<Highlight>) {
+        highlights.clear()
+        for (highlight in newHighlights) {
+            highlights.getOrPut(highlight.area.pageNum) { mutableListOf() }.add(highlight)
+        }
+        _invalidationSignalFlow.tryEmit(Unit)
+    }
+
     /** Draws the [Page] at [pageNum] to the canvas at [locationInView] */
     fun drawPage(pageNum: Int, canvas: Canvas, locationInView: Rect) {
-        pages.get(pageNum)?.draw(canvas, locationInView)
+        val highlightsForPage = highlights.getOrDefault(pageNum, EMPTY_HIGHLIGHTS)
+        pages.get(pageNum)?.draw(canvas, locationInView, highlightsForPage)
     }
 
     /**
@@ -101,3 +131,6 @@ internal class PageManager(
         }
     }
 }
+
+/** Constant empty list to avoid allocations during drawing */
+private val EMPTY_HIGHLIGHTS = listOf<Highlight>()
