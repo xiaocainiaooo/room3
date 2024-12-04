@@ -192,6 +192,35 @@ public class ForwardingCameraInfo implements CameraInfoInternal {
         return mCameraInfoInternal.getSupportedDynamicRanges();
     }
 
+    @Override
+    public boolean isHighSpeedSupported() {
+        return mCameraInfoInternal.isHighSpeedSupported();
+    }
+
+    @NonNull
+    @Override
+    public Set<Range<Integer>> getSupportedHighSpeedFrameRateRanges() {
+        return mCameraInfoInternal.getSupportedHighSpeedFrameRateRanges();
+    }
+
+    @NonNull
+    @Override
+    public Set<Range<Integer>> getSupportedHighSpeedFrameRateRangesFor(@NonNull Size size) {
+        return mCameraInfoInternal.getSupportedHighSpeedFrameRateRangesFor(size);
+    }
+
+    @NonNull
+    @Override
+    public List<Size> getSupportedHighSpeedResolutions() {
+        return mCameraInfoInternal.getSupportedHighSpeedResolutions();
+    }
+
+    @NonNull
+    @Override
+    public List<Size> getSupportedHighSpeedResolutionsFor(@NonNull Range<Integer> fpsRange) {
+        return mCameraInfoInternal.getSupportedHighSpeedResolutionsFor(fpsRange);
+    }
+
     @NonNull
     @Override
     public Set<DynamicRange> querySupportedDynamicRanges(
