@@ -301,8 +301,18 @@ public open class NavGraph(navGraphNavigator: Navigator<out NavGraph>) :
      * @param T Route from a [KClass] to locate
      * @return the node with route - the node must have been created with a route from [KClass]
      */
-    public inline fun <reified T> findNode(): NavDestination? =
-        findNode(serializer<T>().generateHashCode())
+    public inline fun <reified T> findNode(): NavDestination? = findNode(T::class)
+
+    /**
+     * Finds a destination in the collection by route from [KClass]. This will recursively check the
+     * [parent][parent] of this navigation graph if node is not found in this navigation graph.
+     *
+     * @param route Route from a [KClass] to locate
+     * @return the node with route - the node must have been created with a route from [KClass]
+     */
+    @OptIn(InternalSerializationApi::class)
+    public fun findNode(route: KClass<*>): NavDestination? =
+        findNode(route.serializer().generateHashCode())
 
     /**
      * Finds a destination in the collection by route from Object. This will recursively check the
