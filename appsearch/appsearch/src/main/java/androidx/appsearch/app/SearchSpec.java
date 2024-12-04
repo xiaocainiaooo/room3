@@ -864,6 +864,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
         }
 
         /** Constructs a new {@link Builder} from the given {@link SearchSpec}. */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @OptIn(markerClass = ExperimentalAppSearchApi.class)
         public Builder(@NonNull SearchSpec searchSpec) {
@@ -1003,6 +1004,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
 // @exportToFramework:endStrip()
 
         /** Clears all schema type filters. */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
@@ -1146,6 +1148,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
 // @exportToFramework:endStrip()
 
         /** Clears the property filters for all schema types. */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
@@ -1183,6 +1186,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
         }
 
         /** Clears all namespace filters. */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
@@ -1226,6 +1230,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
         }
 
         /** Clears all package name filters. */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
@@ -1542,6 +1547,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
         }
 
         /** Clears all informational ranking expressions. */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
@@ -1586,6 +1592,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
         }
 
         /** Clears the log tag that indicates the source of this search. */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
@@ -1832,6 +1839,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
 // @exportToFramework:endStrip()
 
         /** Clears the projections for all schema types. */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
@@ -1872,6 +1880,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
         }
 
         /** Clears the result grouping and limit. */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
@@ -1938,6 +1947,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
         }
 
         /** Clears the property weights for all schema types. */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
@@ -1967,6 +1977,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
         }
 
         /** Clears the {@link JoinSpec}. */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
@@ -2164,6 +2175,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
         }
 
         /** Clears the embedding parameters. */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
@@ -2240,6 +2252,7 @@ public final class SearchSpec extends AbstractSafeParcelable {
          * Clears the list of String parameters that can be referenced in the query through the
          * "getSearchStringParameter({index})" function.
          */
+        @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
