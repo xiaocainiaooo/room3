@@ -218,7 +218,7 @@ class ExportToFramework:
                     'androidx.appsearch.testutil.flags.RequiresFlagsEnabled',
                     'android.platform.test.annotations.RequiresFlagsEnabled')
             .replace(
-                    'androidx.appsearch.testutil.RequiresFlagsDisabled',
+                    'androidx.appsearch.testutil.flags.RequiresFlagsDisabled',
                     'android.platform.test.annotations.RequiresFlagsDisabled')
             .replace('androidx.appsearch.testutil.', 'android.app.appsearch.testutil.')
             .replace(
