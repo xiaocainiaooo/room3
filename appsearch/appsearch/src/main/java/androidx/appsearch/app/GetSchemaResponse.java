@@ -533,8 +533,9 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
          */
         // TODO(b/237388235): add enterprise permissions to javadocs after they're unhidden
         // Getter getRequiredPermissionsForSchemaTypeVisibility returns a map for all schemaTypes.
+        // To use this API doesn't require permissions.
         @CanIgnoreReturnValue
-        @SuppressLint("MissingGetterMatchingBuilder")
+        @SuppressLint({"MissingGetterMatchingBuilder", "RequiresPermission"})
         // @SetSchemaRequest is an IntDef annotation applied to Set<Set<Integer>>.
         @SuppressWarnings("SupportAnnotationUsage")
         @NonNull
@@ -559,7 +560,9 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
          *
          * @see Builder#setRequiredPermissionsForSchemaTypeVisibility
          */
+        // To use this API doesn't require permissions.
         @ExperimentalAppSearchApi
+        @SuppressLint("RequiresPermission")
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
         @NonNull
