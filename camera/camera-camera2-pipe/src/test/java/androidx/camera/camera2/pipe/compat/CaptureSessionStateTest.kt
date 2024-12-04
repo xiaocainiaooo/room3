@@ -30,6 +30,7 @@ import androidx.camera.camera2.pipe.graph.GraphListener
 import androidx.camera.camera2.pipe.testing.FakeCaptureSequence
 import androidx.camera.camera2.pipe.testing.FakeCaptureSequenceProcessor
 import androidx.camera.camera2.pipe.testing.FakeCaptureSessionFactory
+import androidx.camera.camera2.pipe.testing.FakeThreads
 import androidx.camera.camera2.pipe.testing.RobolectricCameraPipeTestRunner
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -91,6 +92,7 @@ class CaptureSessionStateTest {
 
     @Test
     fun shutdownBeforeCameraDoesNotAcceptCamera() = runTest {
+        val fakeThreads = FakeThreads.fromTestScope(this)
         val state =
             CaptureSessionState(
                 fakeGraphListener,
@@ -99,6 +101,7 @@ class CaptureSessionStateTest {
                 cameraSurfaceManager,
                 timeSource,
                 cameraGraphFlags,
+                fakeThreads.backgroundDispatcher,
                 this
             )
         // When disconnect is called first
@@ -114,6 +117,7 @@ class CaptureSessionStateTest {
 
     @Test
     fun shutdownBeforeCameraCallsSurfaceListener() = runTest {
+        val fakeThreads = FakeThreads.fromTestScope(this)
         val state =
             CaptureSessionState(
                 fakeGraphListener,
@@ -122,6 +126,7 @@ class CaptureSessionStateTest {
                 cameraSurfaceManager,
                 timeSource,
                 cameraGraphFlags,
+                fakeThreads.backgroundDispatcher,
                 this
             )
 
@@ -142,6 +147,7 @@ class CaptureSessionStateTest {
 
     @Test
     fun shutdownAfterCaptureSessionDoesNotCallOnSurfaceInactive() = runTest {
+        val fakeThreads = FakeThreads.fromTestScope(this)
         val state =
             CaptureSessionState(
                 fakeGraphListener,
@@ -150,6 +156,7 @@ class CaptureSessionStateTest {
                 cameraSurfaceManager,
                 timeSource,
                 cameraGraphFlags,
+                fakeThreads.backgroundDispatcher,
                 this
             )
 
@@ -176,6 +183,7 @@ class CaptureSessionStateTest {
 
     @Test
     fun onSessionFinalizeCallsSurfaceListener() = runTest {
+        val fakeThreads = FakeThreads.fromTestScope(this)
         val state =
             CaptureSessionState(
                 fakeGraphListener,
@@ -184,6 +192,7 @@ class CaptureSessionStateTest {
                 cameraSurfaceManager,
                 timeSource,
                 cameraGraphFlags,
+                fakeThreads.backgroundDispatcher,
                 this
             )
         // When surfaces are configured
@@ -200,6 +209,7 @@ class CaptureSessionStateTest {
 
     @Test
     fun onConfigureFailedCallsSurfaceListener() = runTest {
+        val fakeThreads = FakeThreads.fromTestScope(this)
         val state =
             CaptureSessionState(
                 fakeGraphListener,
@@ -208,6 +218,7 @@ class CaptureSessionStateTest {
                 cameraSurfaceManager,
                 timeSource,
                 cameraGraphFlags,
+                fakeThreads.backgroundDispatcher,
                 this
             )
         // When surfaces are configured
@@ -224,6 +235,7 @@ class CaptureSessionStateTest {
 
     @Test
     fun onClosedCallsSurfaceListener() = runTest {
+        val fakeThreads = FakeThreads.fromTestScope(this)
         val state =
             CaptureSessionState(
                 fakeGraphListener,
@@ -232,6 +244,7 @@ class CaptureSessionStateTest {
                 cameraSurfaceManager,
                 timeSource,
                 cameraGraphFlags,
+                fakeThreads.backgroundDispatcher,
                 this
             )
         // When surfaces are configured
@@ -248,6 +261,7 @@ class CaptureSessionStateTest {
 
     @Test
     fun captureSessionStateClosesCaptureSessionWhenQuirkIsEnabled() = runTest {
+        val fakeThreads = FakeThreads.fromTestScope(this)
         val state =
             CaptureSessionState(
                 fakeGraphListener,
@@ -258,6 +272,7 @@ class CaptureSessionStateTest {
                 CameraGraph.Flags(
                     closeCaptureSessionOnDisconnect = true,
                 ),
+                fakeThreads.backgroundDispatcher,
                 this
             )
 
