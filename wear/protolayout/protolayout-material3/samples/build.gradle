@@ -24,7 +24,6 @@ plugins {
 
 dependencies {
     api(project(":wear:protolayout:protolayout-material3"))
-
     compileOnly(project(":annotation:annotation-sampled"))
 }
 

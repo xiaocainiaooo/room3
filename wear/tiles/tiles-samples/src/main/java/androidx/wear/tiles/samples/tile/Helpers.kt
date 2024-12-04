@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.wear.protolayout.material3
+package androidx.wear.tiles.samples.tile
 
-import android.content.Context
-import android.provider.Settings
-import androidx.test.core.app.ApplicationProvider
-import androidx.wear.protolayout.ActionBuilders.LaunchAction
+import androidx.wear.protolayout.ActionBuilders.LoadAction
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
+import androidx.wear.protolayout.TypeBuilders.StringProp
 
-// TODO: b/373336064 - Move this to protolayout-material3-testing
-internal fun enableDynamicTheme() {
-    Settings.Global.putInt(
-        ApplicationProvider.getApplicationContext<Context>().contentResolver,
-        DYNAMIC_THEMING_SETTING_NAME,
-        /* dynamic theming is enabled */ 1
-    )
-}
+internal val EMPTY_LOAD_CLICKABLE =
+    Clickable.Builder().setOnClick(LoadAction.Builder().build()).build()
 
-internal fun clickable(id: String) =
-    Clickable.Builder().setOnClick(LaunchAction.Builder().build()).setId(id).build()
+internal fun String.prop(): StringProp = StringProp.Builder(this).build()
