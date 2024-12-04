@@ -172,7 +172,8 @@ val WearMaterial3Demos =
                         ComposableDemo("In a list") { SwipeToRevealInList() },
                         ComposableDemo("Non-anchoring") {
                             ScalingLazyDemo { item { SwipeToRevealNonAnchoredSample() } }
-                        }
+                        },
+                        ComposableDemo("Long labels") { SwipeToRevealWithLongLabels() },
                     )
                 ),
                 Material3DemoCategory(
