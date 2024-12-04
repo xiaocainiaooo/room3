@@ -211,7 +211,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
                     if (layoutNode.isDeactivated) {
                         false
                     } else {
-                        if (layoutNode.isPlaced || layoutNode.measureAffectsPlacedParent) {
+                        if (layoutNode.isPlaced || layoutNode.canAffectParent) {
                             if (layoutNode.parent?.measurePending != true) {
                                 relayoutNodes.add(layoutNode, false)
                             }
@@ -736,20 +736,6 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         get() =
             (measuredByParent == InMeasureBlock ||
                 layoutDelegate.alignmentLinesOwner.alignmentLines.required)
-
-    /** Checks if there is a placed parent which size we can theoretically affect by remeasuring. */
-    private val LayoutNode.measureAffectsPlacedParent: Boolean
-        get() {
-            var node = this
-            while (node.measureAffectsParent) {
-                val parent = node.parent ?: return false
-                if (parent.isPlaced) {
-                    return true
-                }
-                node = parent
-            }
-            return false
-        }
 
     private val LayoutNode.canAffectParent
         get() = measurePending && measureAffectsParent
