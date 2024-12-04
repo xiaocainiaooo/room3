@@ -158,6 +158,8 @@ internal class TransformingLazyColumnCenterBoundsMeasurementStrategy :
                 abs(it.offset + it.transformedHeight / 2 - containerConstraints.maxHeight / 2)
             }
 
+        visibleItems.fastForEach { it.isInMeasure = false }
+
         return TransformingLazyColumnMeasureResult(
             anchorItemIndex = anchorItem.index,
             anchorItemScrollOffset =
