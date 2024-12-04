@@ -64,7 +64,9 @@ class TransformingLazyColumnState() : ScrollableState {
     override suspend fun scroll(
         scrollPriority: MutatePriority,
         block: suspend ScrollScope.() -> Unit
-    ) = scrollableState.scroll(scrollPriority, block)
+    ) {
+        scrollableState.scroll(scrollPriority, block)
+    }
 
     internal val layoutInfoState =
         mutableStateOf(EmptyTransformingLazyColumnMeasureResult, neverEqualPolicy())
@@ -291,8 +293,10 @@ class TransformingLazyColumnState() : ScrollableState {
         if (distance < 0 && !canScrollForward || distance > 0 && !canScrollBackward) {
             return 0f
         }
+
         scrollToBeConsumed += distance
         if (abs(scrollToBeConsumed) > 0.5f) {
+            animator.releaseAnimations()
             remeasurement?.forceRemeasure()
         }
 
@@ -302,6 +306,7 @@ class TransformingLazyColumnState() : ScrollableState {
             // that we consumed the whole thing
             return distance
         } else {
+
             val scrollConsumed = distance - scrollToBeConsumed
 
             // We did not consume all of it - return the rest to be consumed elsewhere (e.g.,

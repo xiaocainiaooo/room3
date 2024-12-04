@@ -227,7 +227,7 @@ internal class LazyLayoutItemAnimator<T : LazyLayoutMeasuredItem> {
         firstVisibleIndex = -1
     }
 
-    private fun releaseAnimations() {
+    fun releaseAnimations() {
         if (keyToItemInfoMap.isNotEmpty()) {
             keyToItemInfoMap.forEachValue {
                 it.animations.forEach { animation -> animation?.release() }
