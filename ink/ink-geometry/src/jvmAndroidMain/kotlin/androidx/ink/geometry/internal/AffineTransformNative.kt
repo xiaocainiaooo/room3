@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package androidx.ink.geometry
+package androidx.ink.geometry.internal
 
+import androidx.ink.geometry.ImmutableParallelogram
+import androidx.ink.geometry.ImmutableVec
+import androidx.ink.geometry.MutableParallelogram
 import androidx.ink.nativeloader.NativeLoader
 import androidx.ink.nativeloader.UsedByNative
 
 /** Helper functions for AffineTransform. */
-internal object AffineTransformHelper {
+internal object AffineTransformNative {
 
     init {
         NativeLoader.load()
     }
 
     @UsedByNative
-    external fun nativeApplyParallelogram(
+    external fun populateFromApplyParallelogram(
         affineTransformA: Float,
         affineTransformB: Float,
         affineTransformC: Float,
@@ -42,4 +45,22 @@ internal object AffineTransformHelper {
         parallelogramShearFactor: Float,
         out: MutableParallelogram,
     )
+
+    @UsedByNative
+    external fun createFromApplyParallelogram(
+        affineTransformA: Float,
+        affineTransformB: Float,
+        affineTransformC: Float,
+        affineTransformD: Float,
+        affineTransformE: Float,
+        affineTransformF: Float,
+        parallelogramCenterX: Float,
+        parallelogramCenterY: Float,
+        parallelogramWidth: Float,
+        parallelogramHeight: Float,
+        parallelogramRotation: Float,
+        parallelogramShearFactor: Float,
+        immutableParallelogramClass: Class<ImmutableParallelogram>,
+        immutableVecClass: Class<ImmutableVec>,
+    ): ImmutableParallelogram
 }
