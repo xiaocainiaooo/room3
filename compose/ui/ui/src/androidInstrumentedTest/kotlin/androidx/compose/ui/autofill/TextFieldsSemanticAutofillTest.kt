@@ -27,7 +27,6 @@ import androidx.compose.foundation.text.LocalAutofillHighlightColor
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -203,9 +202,7 @@ class TextFieldsSemanticAutofillTest {
                         modifier =
                             Modifier.testTag(usernameTag).semantics {
                                 contentType = ContentType.Username
-                            },
-                        colors =
-                            TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
+                            }
                     )
                 }
             }

@@ -44,7 +44,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shape
@@ -70,8 +69,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtLeast
-import androidx.compose.ui.unit.constrainHeight
-import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import androidx.compose.ui.util.fastFirst
@@ -207,7 +204,6 @@ fun TextField(
         state = state,
         modifier =
             modifier
-                .clip(shape)
                 .indicatorLine(enabled, isError, interactionSource, colors)
                 .defaultErrorSemantics(isError, getString(Strings.DefaultErrorMessage))
                 .defaultMinSize(
@@ -356,7 +352,6 @@ fun TextField(
         value = value,
         modifier =
             modifier
-                .clip(shape)
                 .indicatorLine(enabled, isError, interactionSource, colors)
                 .defaultErrorSemantics(isError, getString(Strings.DefaultErrorMessage))
                 .defaultMinSize(
@@ -548,7 +543,6 @@ fun TextField(
         value = value,
         modifier =
             modifier
-                .clip(shape)
                 .indicatorLine(enabled, isError, interactionSource, colors)
                 .defaultErrorSemantics(isError, getString(Strings.DefaultErrorMessage))
                 .defaultMinSize(
@@ -903,7 +897,7 @@ private class TextFieldMeasurePolicy(
             textFieldWidth = textFieldWidth,
             labelWidth = labelWidth,
             placeholderWidth = placeholderWidth,
-            constraints = Constraints()
+            constraints = ZeroConstraints
         )
     }
 
@@ -953,7 +947,7 @@ private class TextFieldMeasurePolicy(
             leadingHeight = leadingHeight,
             trailingHeight = trailingHeight,
             placeholderHeight = placeholderHeight,
-            constraints = Constraints(),
+            constraints = ZeroConstraints,
             density = density,
             paddingValues = paddingValues
         )
@@ -977,7 +971,7 @@ private fun calculateWidth(
 ): Int {
     val middleSection = maxOf(textFieldWidth, labelWidth, placeholderWidth)
     val wrappedWidth = leadingWidth + middleSection + trailingWidth
-    return constraints.constrainWidth(wrappedWidth)
+    return max(wrappedWidth, constraints.minWidth)
 }
 
 private fun calculateHeight(
@@ -1002,8 +996,10 @@ private fun calculateHeight(
         } else {
             topPaddingValue + inputFieldHeight + bottomPaddingValue
         }
-    return constraints.constrainHeight(
-        maxOf(middleSectionHeight.roundToInt(), leadingHeight, trailingHeight)
+    return maxOf(
+        middleSectionHeight.roundToInt(),
+        max(leadingHeight, trailingHeight),
+        constraints.minHeight
     )
 }
 
