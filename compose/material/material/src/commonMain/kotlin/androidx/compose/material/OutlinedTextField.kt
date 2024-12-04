@@ -69,8 +69,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.coerceAtLeast
-import androidx.compose.ui.unit.constrainHeight
-import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import androidx.compose.ui.unit.sp
@@ -949,7 +947,7 @@ private class OutlinedTextFieldMeasurePolicy(
             labelPlaceableWidth = labelWidth,
             placeholderPlaceableWidth = placeholderWidth,
             animationProgress = animationProgress,
-            constraints = Constraints(),
+            constraints = ZeroConstraints,
             density = density,
             paddingValues = paddingValues,
         )
@@ -1001,7 +999,7 @@ private class OutlinedTextFieldMeasurePolicy(
             labelPlaceableHeight = labelHeight,
             placeholderPlaceableHeight = placeholderHeight,
             animationProgress = animationProgress,
-            constraints = Constraints(),
+            constraints = ZeroConstraints,
             density = density,
             paddingValues = paddingValues
         )
@@ -1045,7 +1043,7 @@ private fun calculateWidth(
     val focusedLabelWidth =
         ((labelPlaceableWidth + labelHorizontalPadding) * animationProgress).roundToInt()
 
-    return constraints.constrainWidth(max(wrappedWidth, focusedLabelWidth))
+    return maxOf(wrappedWidth, focusedLabelWidth, constraints.minWidth)
 }
 
 /**
@@ -1078,7 +1076,8 @@ private fun calculateHeight(
     val bottomPadding = paddingValues.calculateBottomPadding().value * density
     val middleSectionHeight = actualTopPadding + inputFieldHeight + bottomPadding
 
-    return constraints.constrainHeight(
+    return max(
+        constraints.minHeight,
         maxOf(leadingPlaceableHeight, trailingPlaceableHeight, middleSectionHeight.roundToInt())
     )
 }

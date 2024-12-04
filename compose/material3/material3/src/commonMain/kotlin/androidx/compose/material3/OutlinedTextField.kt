@@ -100,8 +100,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.coerceAtLeast
-import androidx.compose.ui.unit.constrainHeight
-import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.offset
@@ -1191,7 +1189,7 @@ private class OutlinedTextFieldMeasurePolicy(
                 .toPx()
         val focusedLabelWidth =
             ((labelPlaceableWidth + labelHorizontalPadding) * labelProgress).roundToInt()
-        return constraints.constrainWidth(max(wrappedWidth, focusedLabelWidth))
+        return maxOf(wrappedWidth, focusedLabelWidth, constraints.minWidth)
     }
 
     /**
@@ -1229,7 +1227,8 @@ private class OutlinedTextFieldMeasurePolicy(
         val bottomPadding = paddingValues.calculateBottomPadding().toPx()
         val middleSectionHeight = actualTopPadding + inputFieldHeight + bottomPadding
 
-        return constraints.constrainHeight(
+        return max(
+            constraints.minHeight,
             (if (isLabelAbove) labelHeight else 0) +
                 maxOf(leadingHeight, trailingHeight, middleSectionHeight.roundToInt()) +
                 supportingHeight
