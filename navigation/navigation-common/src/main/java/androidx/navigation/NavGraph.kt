@@ -472,7 +472,22 @@ public open class NavGraph(navGraphNavigator: Navigator<out NavGraph>) :
      *   NavGraph.
      */
     public inline fun <reified T : Any> setStartDestination() {
-        setStartDestination(serializer<T>()) { startDestination -> startDestination.route!! }
+        setStartDestination(T::class)
+    }
+
+    /**
+     * Sets the starting destination for this NavGraph.
+     *
+     * This will override any previously set [startDestinationId]
+     *
+     * @param startDestRoute The [KClass] of route [T] to be shown when navigating to this NavGraph.
+     */
+    @JvmSynthetic
+    @OptIn(InternalSerializationApi::class)
+    public fun <T : Any> setStartDestination(startDestRoute: KClass<T>) {
+        setStartDestination(startDestRoute.serializer()) { startDestination ->
+            startDestination.route!!
+        }
     }
 
     /**
