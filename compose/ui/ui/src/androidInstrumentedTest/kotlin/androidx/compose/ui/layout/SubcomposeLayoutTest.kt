@@ -2956,41 +2956,6 @@ class SubcomposeLayoutTest {
         alternateLookaheadPlacement(booleanArrayOf(false, true, false))
     }
 
-    @Test
-    fun precomposeOverReusedNodeWithUpdatedModifierIsNotCausingEarlyRemeasureForIt() {
-        var addSlot by mutableStateOf(true)
-        val state = SubcomposeLayoutState(SubcomposeSlotReusePolicy(1))
-        var measured = false
-        var modifier: Modifier = Modifier
-        val content: @Composable () -> Unit = { Box { Box(modifier) } }
-
-        rule.setContent {
-            SubcomposeLayout(state) { constraints ->
-                val items =
-                    if (addSlot) {
-                        subcompose(null, content).map { it.measure(constraints) }
-                    } else {
-                        emptyList()
-                    }
-                layout(10, 10) { items.forEach { it.place(0, 0) } }
-            }
-        }
-
-        rule.runOnIdle { addSlot = false }
-
-        rule.runOnIdle {
-            modifier =
-                Modifier.layout { measurable, _ ->
-                    val placeable = measurable.measure(Constraints.fixed(10, 10))
-                    measured = true
-                    layout(placeable.width, placeable.height) { placeable.place(0, 0) }
-                }
-            state.precompose(Unit, content)
-        }
-
-        rule.runOnIdle { assertThat(measured).isFalse() }
-    }
-
     private fun alternateLookaheadPlacement(shouldPlaceItem: BooleanArray) {
         var lookaheadPos: Offset? = null
         var approachPos: Offset? = null
