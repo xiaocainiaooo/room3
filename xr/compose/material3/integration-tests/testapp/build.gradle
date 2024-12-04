@@ -55,3 +55,7 @@ android {
     namespace "androidx.xr.compose.material3.integration.testapp"
 }
 
+androidx {
+    // TODO: b/326456246
+    optOutJSpecify = true
+}
