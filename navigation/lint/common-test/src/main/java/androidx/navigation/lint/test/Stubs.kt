@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.navigation.lint.common
+package androidx.navigation.lint.test
 
 internal val NAV_CONTROLLER =
     bytecodeStub(
