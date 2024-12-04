@@ -670,6 +670,26 @@ class NavGraphBuilderTest {
     }
 
     @Test
+    fun testDialogKClassNonReified() {
+        lateinit var navController: TestNavHostController
+        composeTestRule.setContent {
+            navController = TestNavHostController(LocalContext.current)
+            navController.navigatorProvider.addNavigator(ComposeNavigator())
+            navController.navigatorProvider.addNavigator(DialogNavigator())
+
+            NavHost(navController, startDestination = firstRoute) {
+                composable(firstRoute) {}
+                dialog(TestClass::class) {}
+            }
+        }
+        composeTestRule.runOnIdle {
+            assertThat(firstRoute in navController.graph).isTrue()
+            assertThat(TestClass::class in navController.graph).isTrue()
+            assertThat(navController.graph[TestClass::class].route).isEqualTo(TEST_CLASS_ROUTE)
+        }
+    }
+
+    @Test
     fun testDialogKClassArgs() {
         lateinit var navController: TestNavHostController
         composeTestRule.setContent {
