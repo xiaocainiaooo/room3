@@ -124,11 +124,17 @@ class TestSessionManager(
         sessionObserverFactories?.forEach { delegate.addObserverFactory(it) }
         val delegatingAdapterProvider =
             DelegatingSandboxedUiAdapter(getCoreLibInfoFromAdapter(delegate))
+        val testEventListener = TestEventListener()
+        viewForSession.setEventListener(testEventListener)
         val delegatingAdapterClient =
             SandboxedUiAdapterFactory.createFromCoreLibInfo(
                 getCoreLibInfoFromAdapter(delegatingAdapterProvider)
             )
+
         viewForSession.setAdapter(delegatingAdapterClient)
+
+        assertThat(testEventListener.uiDisplayedLatch.await(TIMEOUT, TimeUnit.MILLISECONDS))
+            .isTrue()
         assertWithMessage("openSession is called on adapter")
             .that(delegate.isOpenSessionCalled)
             .isTrue()
