@@ -2887,16 +2887,32 @@ public open class NavController(
      *   NavBackStackEntry's [NavDestination] must have been created with route from [KClass].
      * @throws IllegalArgumentException if the destination is not on the back stack
      */
-    public inline fun <reified T : Any> getBackStackEntry(): NavBackStackEntry {
-        val id = serializer<T>().generateHashCode()
+    public inline fun <reified T : Any> getBackStackEntry(): NavBackStackEntry =
+        getBackStackEntry(T::class)
+
+    /**
+     * Gets the topmost [NavBackStackEntry] for a [route] from [KClass].
+     *
+     * This is always safe to use with [the current destination][currentDestination] or
+     * [its parent][NavDestination.parent] or grandparent navigation graphs as these destinations
+     * are guaranteed to be on the back stack.
+     *
+     * @param route route from the [KClass] of destination [T] that exists on the back stack. The
+     *   target NavBackStackEntry's [NavDestination] must have been created with route from
+     *   [KClass].
+     * @throws IllegalArgumentException if the destination is not on the back stack
+     */
+    @OptIn(InternalSerializationApi::class)
+    public fun <T : Any> getBackStackEntry(route: KClass<T>): NavBackStackEntry {
+        val id = route.serializer().generateHashCode()
         requireNotNull(graph.findDestinationComprehensive(id, true)) {
-            "Destination with route ${T::class.simpleName} cannot be found in navigation " +
+            "Destination with route ${route.simpleName} cannot be found in navigation " +
                 "graph $graph"
         }
         val lastFromBackStack =
             currentBackStack.value.lastOrNull { entry -> entry.destination.id == id }
         requireNotNull(lastFromBackStack) {
-            "No destination with route ${T::class.simpleName} is on the NavController's " +
+            "No destination with route ${route.simpleName} is on the NavController's " +
                 "back stack. The current destination is $currentDestination"
         }
         return lastFromBackStack
