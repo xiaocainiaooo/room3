@@ -27,6 +27,7 @@ import androidx.camera.camera2.pipe.CameraSurfaceManager
 import androidx.camera.camera2.pipe.StreamId
 import androidx.camera.camera2.pipe.core.Debug
 import androidx.camera.camera2.pipe.core.Log
+import androidx.camera.camera2.pipe.core.Threading
 import androidx.camera.camera2.pipe.core.TimeSource
 import androidx.camera.camera2.pipe.core.TimestampNs
 import androidx.camera.camera2.pipe.core.Timestamps
@@ -35,6 +36,7 @@ import androidx.camera.camera2.pipe.graph.GraphListener
 import androidx.camera.camera2.pipe.graph.GraphRequestProcessor
 import java.util.Collections.synchronizedMap
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -65,6 +67,7 @@ internal class CaptureSessionState(
     private val cameraSurfaceManager: CameraSurfaceManager,
     private val timeSource: TimeSource,
     private val cameraGraphFlags: CameraGraph.Flags,
+    private val backgroundDispatcher: CoroutineDispatcher,
     private val scope: CoroutineScope
 ) : CameraCaptureSessionWrapper.StateCallback {
     private val debugId = captureSessionDebugIds.incrementAndGet()
@@ -298,13 +301,22 @@ internal class CaptureSessionState(
             Debug.traceStart { "$graphListener#onGraphStopped" }
             graphListener.onGraphStopped(graphProcessor)
             Debug.traceStop()
+
+            // On newer API levels, aborting capture allows us to switch to a new capture session
+            // sooner [1]. However, it has been shown during field metrics, that faulty HAL
+            // implementations may block abortCaptures() indefinitely [2]. Hence here we wrap the
+            // framework calls with a timeout.
+            //
+            // [1] b/287020251
+            // [2] b/379855962
             if (cameraGraphFlags.abortCapturesOnStop) {
-                Debug.traceStart { "$this#stopRepeating" }
-                graphProcessor.stopRepeating()
-                Debug.traceStop()
-                Debug.traceStart { "$this#abortCaptures" }
-                graphProcessor.abortCaptures()
-                Debug.traceStop()
+                Threading.runBlockingCheckedOrNull(
+                    backgroundDispatcher,
+                    ABORT_CAPTURES_TIMEOUT_MS
+                ) {
+                    Debug.trace("$this stopRepeating") { graphProcessor.stopRepeating() }
+                    Debug.trace("$this abortCaptures") { graphProcessor.abortCaptures() }
+                } ?: Log.error { "Failed to abort captures in ${ABORT_CAPTURES_TIMEOUT_MS}ms" }
             }
 
             // Explicitly release ImageWriter resources for the edge case when two capture sessions
@@ -321,13 +333,23 @@ internal class CaptureSessionState(
             // on certain devices, we need to close the capture session, or else the camera device
             // close call might stall indefinitely [2].
             //
+            // Additional considerations: It seems that on certain devices,
+            // CameraCaptureSession.close() can block for an extended period of time [3]. Hence,
+            // here we wrap the close call with a timeout to prevent us from getting blocked.
+            //
             // [1] b/277310425
             // [2] b/277675483
+            // [3] b/307594946 - [ANR] at Camera2CameraController.disconnectSessionAndCamera
             if (cameraGraphFlags.closeCaptureSessionOnDisconnect) {
-                Debug.trace("$this CameraCaptureSessionWrapper#close") {
-                    Log.debug { "Closing capture session for $this" }
-                    captureSession.session.close()
+                Threading.runBlockingCheckedOrNull(backgroundDispatcher, CLOSE_SESSION_TIMEOUT_MS) {
+                    Debug.trace("$this CameraCaptureSessionWrapper#close") {
+                        Log.debug { "Closing capture session for $this" }
+                        captureSession.session.close()
+                    }
                 }
+                    ?: Log.error {
+                        "Failed to close the capture session in ${CLOSE_SESSION_TIMEOUT_MS}ms"
+                    }
             }
             Debug.traceStop()
         } else {
@@ -535,4 +557,9 @@ internal class CaptureSessionState(
         val processor: GraphRequestProcessor,
         val captureSequenceProcessor: Camera2CaptureSequenceProcessor?
     )
+
+    private companion object {
+        const val ABORT_CAPTURES_TIMEOUT_MS = 2_000L
+        const val CLOSE_SESSION_TIMEOUT_MS = 3_000L
+    }
 }

@@ -168,8 +168,10 @@ constructor(
         androidCameraState: AndroidCameraState,
     ) {
         Log.debug { "$this#closeCameraDevice($cameraDevice)" }
+        var cameraDeviceClosed = false
         Threading.runBlockingCheckedOrNull(threads.backgroundDispatcher, CAMERA_CLOSE_TIMEOUT_MS) {
             cameraDevice.closeWithTrace()
+            cameraDeviceClosed = true
         }
             ?: run {
                 Log.error {
@@ -177,13 +179,17 @@ constructor(
                         "The camera is likely in a bad state."
                 }
             }
+
         val cameraId = CameraId.fromCamera2Id(cameraDevice.id)
-        if (camera2Quirks.shouldWaitForCameraDeviceOnClosed(cameraId)) {
+        // The Android camera framework invokes onClosed() only after CameraDevice.close() is
+        // done. That means if CameraDevice.close() timed out, we wouldn't get onClosed(), so
+        // waiting for it is unnecessary at this point and should be avoided.
+        if (camera2Quirks.shouldWaitForCameraDeviceOnClosed(cameraId) && cameraDeviceClosed) {
             Log.debug { "Waiting for OnClosed from $cameraId" }
-            if (androidCameraState.awaitCameraDeviceClosed(timeoutMillis = 5000)) {
+            if (androidCameraState.awaitCameraDeviceClosed(timeoutMillis = 2000)) {
                 Log.debug { "Received OnClosed for $cameraId" }
             } else {
-                Log.warn { "Failed to close $cameraId after 5000ms!" }
+                Log.warn { "Failed to close $cameraId after 2000ms!" }
             }
         }
     }
@@ -244,6 +250,6 @@ constructor(
     }
 
     companion object {
-        const val CAMERA_CLOSE_TIMEOUT_MS = 8_000L // 8s
+        const val CAMERA_CLOSE_TIMEOUT_MS = 7_000L // 7s
     }
 }
