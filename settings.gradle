@@ -959,6 +959,7 @@ includeProject(":room:room-testing", [BuildType.MAIN, BuildType.KMP, BuildType.I
 includeProject(":safeparcel:safeparcel", [BuildType.MAIN])
 includeProject(":safeparcel:safeparcel-processor", [BuildType.MAIN])
 includeProject(":savedstate:savedstate", [BuildType.MAIN, BuildType.COMPOSE, BuildType.FLAN, BuildType.KMP])
+includeProject(":savedstate:savedstate-compose", [BuildType.MAIN, BuildType.COMPOSE, BuildType.FLAN, BuildType.KMP])
 includeProject(":savedstate:savedstate-ktx", [BuildType.MAIN, BuildType.COMPOSE, BuildType.FLAN])
 includeProject(":savedstate:savedstate-samples", [BuildType.MAIN, BuildType.COMPOSE, BuildType.FLAN, BuildType.KMP])
 includeProject(":security:security-app-authenticator", [BuildType.MAIN])

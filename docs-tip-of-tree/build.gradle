@@ -301,6 +301,7 @@ dependencies {
     kmpDocs(project(":room:room-testing"))
     docs(project(":safeparcel:safeparcel"))
     kmpDocs(project(":savedstate:savedstate"))
+    kmpDocs(project(":savedstate:savedstate-compose"))
     docs(project(":savedstate:savedstate-ktx"))
     docs(project(":security:security-app-authenticator"))
     docs(project(":security:security-app-authenticator-testing"))
