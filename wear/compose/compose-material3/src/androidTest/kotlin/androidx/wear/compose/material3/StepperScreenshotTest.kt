@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -186,6 +187,76 @@ class StepperScreenshotTest {
                 decreaseIcon = { DecreaseIcon() },
             ) {}
         }
+    }
+
+    @Test
+    fun stepper_increase_button_morphs_when_pressed(@TestParameter screenSize: ScreenSize) {
+        rule.setContentWithTheme {
+            ScreenConfiguration(screenSize.size) {
+                Box(
+                    modifier =
+                        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
+                ) {
+                    Stepper(
+                        modifier = Modifier.testTag(TEST_TAG),
+                        value = 2f,
+                        steps = 3,
+                        onValueChange = {},
+                        increaseIcon = {
+                            Icon(
+                                modifier = Modifier.testTag("increase_icon"),
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = "Increase"
+                            )
+                        },
+                        decreaseIcon = { DecreaseIcon() },
+                    ) {}
+                }
+            }
+        }
+
+        rule.onNodeWithTag("increase_icon", true).performTouchInput { down(center) }
+        rule.waitForIdle()
+
+        rule
+            .onNodeWithTag(TEST_TAG)
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, testName.goldenIdentifier())
+    }
+
+    @Test
+    fun stepper_decrease_button_morphs_when_pressed(@TestParameter screenSize: ScreenSize) {
+        rule.setContentWithTheme {
+            ScreenConfiguration(screenSize.size) {
+                Box(
+                    modifier =
+                        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
+                ) {
+                    Stepper(
+                        modifier = Modifier.testTag(TEST_TAG),
+                        value = 2f,
+                        steps = 3,
+                        onValueChange = {},
+                        increaseIcon = { IncreaseIcon() },
+                        decreaseIcon = {
+                            Icon(
+                                modifier = Modifier.testTag("decrease_icon"),
+                                imageVector = RangeIcons.Minus,
+                                contentDescription = "Decrease"
+                            )
+                        },
+                    ) {}
+                }
+            }
+        }
+
+        rule.onNodeWithTag("decrease_icon", true).performTouchInput { down(center) }
+        rule.waitForIdle()
+
+        rule
+            .onNodeWithTag(TEST_TAG)
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, testName.goldenIdentifier())
     }
 
     private fun verifyScreenshot(screenSize: ScreenSize, content: @Composable () -> Unit) {
