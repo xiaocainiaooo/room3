@@ -30,7 +30,6 @@ import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.takeOrElse
@@ -132,7 +131,6 @@ fun SecureTextField(
         state = state,
         modifier =
             modifier
-                .clip(shape)
                 .indicatorLine(enabled, isError, interactionSource, colors)
                 .defaultErrorSemantics(isError, getString(Strings.DefaultErrorMessage))
                 .defaultMinSize(
