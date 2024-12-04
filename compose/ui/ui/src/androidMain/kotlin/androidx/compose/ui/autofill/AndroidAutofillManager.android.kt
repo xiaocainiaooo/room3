@@ -219,37 +219,52 @@ internal class AndroidAutofillManager(
         if (semanticsInfo.semanticsConfiguration?.isRelatedToAutoCommit() == true) {
             currentlyDisplayedIDs.add(semanticsInfo.semanticsId)
             pendingChangesToDisplayedIds = true
-            // TODO(MNUZEN): Notify autofill manager that a node has been added.
-            // platformAutofillManager
-            //     .notifyViewVisibilityChanged(view, semanticsInfo.semanticsId, true)
+            // `notifyVisibilityChanged` is called when nodes appear onscreen (and become visible).
+            platformAutofillManager.notifyViewVisibilityChanged(
+                view,
+                semanticsInfo.semanticsId,
+                true
+            )
         }
     }
 
     internal fun onPostLayoutNodeReused(semanticsInfo: SemanticsInfo, previousSemanticsId: Int) {
         if (currentlyDisplayedIDs.remove(previousSemanticsId)) {
             pendingChangesToDisplayedIds = true
+            platformAutofillManager.notifyViewVisibilityChanged(view, previousSemanticsId, false)
         }
         if (semanticsInfo.semanticsConfiguration?.isRelatedToAutoCommit() == true) {
             currentlyDisplayedIDs.add(semanticsInfo.semanticsId)
             pendingChangesToDisplayedIds = true
+            platformAutofillManager.notifyViewVisibilityChanged(
+                view,
+                semanticsInfo.semanticsId,
+                true
+            )
         }
     }
 
     internal fun onLayoutNodeDeactivated(semanticsInfo: SemanticsInfo) {
         if (currentlyDisplayedIDs.remove(semanticsInfo.semanticsId)) {
             pendingChangesToDisplayedIds = true
-            // TODO(MNUZEN): Notify autofill manager that a node has been removed.
-            // platformAutofillManager
-            //     .notifyViewVisibilityChanged(view, semanticsInfo.semanticsId, false)
+            platformAutofillManager.notifyViewVisibilityChanged(
+                view,
+                semanticsInfo.semanticsId,
+                false
+            )
         }
     }
 
     internal fun onDetach(semanticsInfo: SemanticsInfo) {
         if (currentlyDisplayedIDs.remove(semanticsInfo.semanticsId)) {
             pendingChangesToDisplayedIds = true
-            // TODO(MNUZEN): Notify autofill manager that a node has been removed.
-            // platformAutofillManager
-            //     .notifyViewVisibilityChanged(view, semanticsInfo.semanticsId, false)
+            // `notifyVisibilityChanged` is called when nodes go offscreen (and become invisible
+            // to the user).
+            platformAutofillManager.notifyViewVisibilityChanged(
+                view,
+                semanticsInfo.semanticsId,
+                false
+            )
         }
     }
 

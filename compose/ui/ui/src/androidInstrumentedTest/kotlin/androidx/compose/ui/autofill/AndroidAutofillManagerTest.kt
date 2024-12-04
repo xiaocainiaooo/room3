@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -43,6 +44,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.platform.LocalAutofillManager
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDataType
@@ -71,6 +73,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
@@ -116,14 +119,16 @@ class AndroidAutofillManagerTest {
     @Test
     @SmallTest
     @SdkSuppress(minSdkVersion = 26)
-    fun autofillManager_empty() {
+    fun autofillManager_initialization() {
         val am: PlatformAutofillManager = mock()
         rule.setContent {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             Box(Modifier.semantics { contentType = ContentType.Username }.size(height, width))
         }
 
-        rule.runOnIdle { verifyNoMoreInteractions(am) }
+        // Upon initialization, we send `notifyViewVisibility` for all of the components that appear
+        // onscreen. For other tests, we'll call `clearInvocations(am)` to avoid testing this call.
+        rule.runOnIdle { verify(am, times(1)).notifyViewVisibilityChanged(any(), any(), eq(true)) }
     }
 
     @Test
@@ -491,6 +496,7 @@ class AndroidAutofillManagerTest {
                     .focusable()
             )
         }
+        clearInvocations(am)
 
         rule.onNodeWithTag("username").requestFocus()
 
@@ -557,6 +563,7 @@ class AndroidAutofillManagerTest {
             focusManager = LocalFocusManager.current
             Box(Modifier.semantics { testTag = "username" }.size(height, width).focusable())
         }
+        clearInvocations(am)
 
         rule.onNodeWithTag("username").requestFocus()
         rule.runOnIdle { focusManager.clearFocus() }
@@ -577,15 +584,20 @@ class AndroidAutofillManagerTest {
             Box(
                 modifier =
                     Modifier.then(if (isVisible) Modifier else Modifier.alpha(0f))
-                        .semantics { onAutofillText { true } }
+                        // visibility is related to commit, so we must have a contentType set
+                        .semantics { contentType = ContentType.Username }
                         .size(width, height)
                         .focusable()
             )
         }
 
+        clearInvocations(am)
+
         rule.runOnIdle { isVisible = false }
 
-        rule.runOnIdle { verify(am).notifyViewVisibilityChanged(any(), any(), any()) }
+        // After switching the flag, the autofill manager is then notified that the box has
+        // become transparent.
+        rule.runOnIdle { verify(am).notifyViewVisibilityChanged(any(), any(), eq(false)) }
     }
 
     @Ignore // TODO(b/383198004): Add support for notifyVisibilityChanged.
@@ -601,15 +613,55 @@ class AndroidAutofillManagerTest {
             Box(
                 modifier =
                     Modifier.then(if (isVisible) Modifier else Modifier.alpha(0f))
-                        .semantics { onAutofillText { true } }
+                        // visibility is related to commit, so we must have a contentType set
+                        .semantics { contentType = ContentType.Username }
                         .size(width, height)
                         .focusable()
             )
         }
 
+        clearInvocations(am)
+
         rule.runOnIdle { isVisible = true }
 
-        rule.runOnIdle { verify(am).notifyViewVisibilityChanged(any(), any(), any()) }
+        // After switching the flag, the autofill manager is then notified that the box has
+        // become opaque.
+        rule.runOnIdle { verify(am).notifyViewVisibilityChanged(any(), any(), eq(true)) }
+    }
+
+    @Test
+    @SmallTest
+    @SdkSuppress(minSdkVersion = 27)
+    fun autofillManager_notifyVisibilityChanged_lazyScroll() {
+        // Arrange.
+        val am: PlatformAutofillManager = mock()
+        lateinit var lazyListState: LazyListState
+
+        rule.setContent {
+            (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
+            lazyListState = rememberLazyListState()
+            with(LocalDensity.current) {
+                LazyRow(state = lazyListState, modifier = Modifier.size(10.toDp())) {
+                    items(2) {
+                        Box(
+                            Modifier.size(10.toDp())
+                                // visibility is related to commit, so we must have a contentType
+                                // set
+                                .semantics { contentType = ContentType.Username }
+                                .focusable()
+                        )
+                    }
+                }
+            }
+        }
+        clearInvocations(am)
+
+        // Act.
+        rule.runOnIdle { lazyListState.requestScrollToItem(1) }
+
+        // After scrolling, one element should be removed and one should be added.
+        rule.runOnIdle { verify(am).notifyViewVisibilityChanged(any(), any(), eq(false)) }
+        rule.runOnIdle { verify(am).notifyViewVisibilityChanged(any(), any(), eq(true)) }
     }
 
     @Test
@@ -710,6 +762,7 @@ class AndroidAutofillManagerTest {
                         .size(height, width)
             )
         }
+        clearInvocations(am)
 
         // `requestAutofill` is always called after an element is focused
         rule.onNodeWithTag(contextMenuTag).requestFocus()
@@ -733,9 +786,16 @@ class AndroidAutofillManagerTest {
             state = rememberLazyListState()
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
 
-            LazyColumn(Modifier.fillMaxWidth().height(50.dp), state) {
-                item { Box(Modifier.semantics { contentType = ContentType.Username }.size(10.dp)) }
-                items(count) { Box(Modifier.size(10.dp)) }
+            with(LocalDensity.current) {
+                LazyColumn(Modifier.fillMaxWidth().height(50.dp), state) {
+                    item {
+                        Box(
+                            Modifier.semantics { contentType = ContentType.Username }
+                                .size(10.toDp())
+                        )
+                    }
+                    items(count) { Box(Modifier.size(10.toDp())) }
+                }
             }
         }
 
@@ -756,9 +816,16 @@ class AndroidAutofillManagerTest {
             scrollState = rememberScrollState()
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
 
-            Column(Modifier.fillMaxWidth().height(50.dp).verticalScroll(scrollState)) {
-                Row { Box(Modifier.semantics { contentType = ContentType.Username }.size(10.dp)) }
-                repeat(50) { Box(Modifier.size(10.dp)) }
+            with(LocalDensity.current) {
+                Column(Modifier.fillMaxWidth().height(50.dp).verticalScroll(scrollState)) {
+                    Row {
+                        Box(
+                            Modifier.semantics { contentType = ContentType.Username }
+                                .size(10.toDp())
+                        )
+                    }
+                    repeat(50) { Box(Modifier.size(10.toDp())) }
+                }
             }
         }
 
@@ -779,13 +846,18 @@ class AndroidAutofillManagerTest {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             scrollState = rememberScrollState()
 
-            Column(Modifier.fillMaxWidth().height(50.dp).verticalScroll(scrollState)) {
-                if (autofillComponentsVisible) {
-                    Row {
-                        Box(Modifier.semantics { contentType = ContentType.Username }.size(10.dp))
+            with(LocalDensity.current) {
+                Column(Modifier.fillMaxWidth().height(50.dp).verticalScroll(scrollState)) {
+                    if (autofillComponentsVisible) {
+                        Row {
+                            Box(
+                                Modifier.semantics { contentType = ContentType.Username }
+                                    .size(10.toDp())
+                            )
+                        }
                     }
+                    repeat(50) { Box(Modifier.size(10.toDp())) }
                 }
-                repeat(50) { Box(Modifier.size(10.dp)) }
             }
         }
 
