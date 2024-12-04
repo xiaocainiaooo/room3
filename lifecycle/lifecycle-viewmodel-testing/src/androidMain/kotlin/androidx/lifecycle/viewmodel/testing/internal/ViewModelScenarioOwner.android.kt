@@ -25,6 +25,11 @@ internal actual fun platformEncodeDecode(savedState: SavedState): SavedState {
     savedState.writeToParcel(parcel, Parcelable.PARCELABLE_WRITE_RETURN_VALUE)
     parcel.setDataPosition(0)
     val restored = SavedState.CREATOR.createFromParcel(parcel)
+    val bytes = parcel.marshall()
     parcel.recycle()
+    // 1 MB = 1024 kilobytes, and 1 KB = 1024 bytes.
+    check(bytes.size <= 1024 * 1024) {
+        "SavedState exceeds maximum size (1 MB): ${bytes.size} bytes."
+    }
     return restored
 }
