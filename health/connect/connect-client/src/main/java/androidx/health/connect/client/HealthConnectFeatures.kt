@@ -49,6 +49,9 @@ interface HealthConnectFeatures {
         /** Feature constant for reading health data history. */
         const val FEATURE_READ_HEALTH_DATA_HISTORY = 4
 
+        /** Feature constant for Personal Health Records (PHR) APIs. */
+        @RestrictTo(RestrictTo.Scope.LIBRARY) const val FEATURE_PERSONAL_HEALTH_RECORD = 5
+
         @Retention(AnnotationRetention.SOURCE)
         @IntDef(
             value =
@@ -56,7 +59,8 @@ interface HealthConnectFeatures {
                     FEATURE_READ_HEALTH_DATA_IN_BACKGROUND,
                     FEATURE_SKIN_TEMPERATURE,
                     FEATURE_PLANNED_EXERCISE,
-                    FEATURE_READ_HEALTH_DATA_HISTORY
+                    FEATURE_READ_HEALTH_DATA_HISTORY,
+                    FEATURE_PERSONAL_HEALTH_RECORD
                 ]
         )
         @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -81,6 +85,10 @@ interface HealthConnectFeatures {
         private val SDK_EXT_13_PLATFORM_VERSION: HealthConnectPlatformVersion =
             HealthConnectPlatformVersion(buildVersionCode = 34, sdkExtensionVersion = 13)
 
+        // TODO(b/381533698): change this to 34 and ext ver 16
+        private val SDK_EXT_16_PLATFORM_VERSION: HealthConnectPlatformVersion =
+            HealthConnectPlatformVersion(buildVersionCode = 36)
+
         internal val FEATURE_TO_VERSION_INFO_MAP: Map<Int, HealthConnectVersionInfo> =
             mapOf(
                 FEATURE_READ_HEALTH_DATA_IN_BACKGROUND to
@@ -96,7 +104,9 @@ interface HealthConnectFeatures {
                         platformVersion = SDK_EXT_13_PLATFORM_VERSION
                     ),
                 FEATURE_PLANNED_EXERCISE to
-                    HealthConnectVersionInfo(platformVersion = SDK_EXT_13_PLATFORM_VERSION)
+                    HealthConnectVersionInfo(platformVersion = SDK_EXT_13_PLATFORM_VERSION),
+                FEATURE_PERSONAL_HEALTH_RECORD to
+                    HealthConnectVersionInfo(platformVersion = SDK_EXT_16_PLATFORM_VERSION),
             )
     }
 }
