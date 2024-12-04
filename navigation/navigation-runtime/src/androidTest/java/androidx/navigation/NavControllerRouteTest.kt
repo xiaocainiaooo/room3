@@ -2855,7 +2855,7 @@ class NavControllerRouteTest {
 
     @UiThreadTest
     @Test
-    fun testPopBackStackWithKClassReified() {
+    fun testPopBackStackWithKClassNonReified() {
         val navController = createNavController()
         navController.graph =
             navController.createGraph(startDestination = "start") {
