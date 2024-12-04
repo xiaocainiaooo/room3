@@ -258,6 +258,8 @@ internal class TransformingLazyColumnContentPaddingMeasurementStrategy(
             graphicsContext = graphicsContext,
         )
 
+        actuallyVisibleItems.fastForEach { it.isInMeasure = false }
+
         return TransformingLazyColumnMeasureResult(
             anchorItemIndex = anchorItem.index,
             anchorItemScrollOffset =

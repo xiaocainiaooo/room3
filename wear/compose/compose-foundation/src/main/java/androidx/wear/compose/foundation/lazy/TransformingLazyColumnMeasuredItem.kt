@@ -56,6 +56,11 @@ internal data class TransformingLazyColumnMeasuredItem(
     val animation: LazyLayoutItemAnimation? = null,
     override val key: Any,
     override val contentType: Any?,
+    /**
+     * Whether the item is currently being measured. Must be set to false before returning as a
+     * measured result.
+     */
+    var isInMeasure: Boolean = true,
 ) : TransformingLazyColumnVisibleItemInfo, LazyLayoutMeasuredItem {
     // This is the value of the ScrollProgress, either the one set at the end of the measure pass
     // if there are no animations configured or the one computed by the animation, updated each
@@ -88,14 +93,21 @@ internal data class TransformingLazyColumnMeasuredItem(
             }
         }
 
+    private var lastMeasuredTransformedHeight = placeable?.height ?: 0
+
     /** The height of the item after transformations applied. */
     override val transformedHeight: Int
-        get() =
-            placeable?.let { p ->
-                (p.parentData as? TransformingLazyColumnParentData)?.let {
-                    it.heightProvider?.invoke(p.height, measureScrollProgress)
-                } ?: p.height
-            } ?: 0
+        get() {
+            if (isInMeasure) {
+                lastMeasuredTransformedHeight =
+                    placeable?.let { p ->
+                        (p.parentData as? TransformingLazyColumnParentData)?.let {
+                            it.heightProvider?.invoke(p.height, measureScrollProgress)
+                        } ?: p.height
+                    } ?: 0
+            }
+            return lastMeasuredTransformedHeight
+        }
 
     override val measuredHeight = placeable?.height ?: 0
 
