@@ -18,7 +18,6 @@ package androidx.appsearch.app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.app.aidl.AppSearchBatchResultParcelV2;
 import androidx.appsearch.flags.FlaggedApi;
@@ -27,6 +26,8 @@ import androidx.appsearch.safeparcel.AbstractSafeParcelable;
 import androidx.appsearch.safeparcel.SafeParcelable;
 import androidx.appsearch.safeparcel.stub.StubCreators.RemoveBlobResponseCreator;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Results of {@link AppSearchSession#removeBlobAsync}, containing the outcome of the removal of
@@ -41,8 +42,7 @@ import androidx.core.util.Preconditions;
 @ExperimentalAppSearchApi
 public final class RemoveBlobResponse extends AbstractSafeParcelable {
 
-    @NonNull
-    public static final Parcelable.Creator<RemoveBlobResponse> CREATOR =
+    public static final Parcelable.@NonNull Creator<RemoveBlobResponse> CREATOR =
             new RemoveBlobResponseCreator();
 
     @Field(id = 1, getter = "getResponseParcel")
@@ -72,8 +72,7 @@ public final class RemoveBlobResponse extends AbstractSafeParcelable {
      * operation was successful, the result for that handle is {@code null}; if there was an error,
      * the result contains an {@link AppSearchResult} with details of the failure.
      */
-    @NonNull
-    public AppSearchBatchResult<AppSearchBlobHandle, Void> getResult() {
+    public @NonNull AppSearchBatchResult<AppSearchBlobHandle, Void> getResult() {
         return mResultParcel.getResult();
     }
 
@@ -82,8 +81,7 @@ public final class RemoveBlobResponse extends AbstractSafeParcelable {
      * @exportToFramework:hide
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    @NonNull
-    public AppSearchBatchResultParcelV2<AppSearchBlobHandle, Void> getResponseParcel() {
+    public @NonNull AppSearchBatchResultParcelV2<AppSearchBlobHandle, Void> getResponseParcel() {
         return mResultParcel;
     }
 

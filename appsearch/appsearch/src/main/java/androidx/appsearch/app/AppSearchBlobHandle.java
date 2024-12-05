@@ -19,8 +19,6 @@ package androidx.appsearch.app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
@@ -29,6 +27,9 @@ import androidx.appsearch.safeparcel.SafeParcelable;
 import androidx.appsearch.safeparcel.stub.StubCreators.AppSearchBlobHandleCreator;
 import androidx.appsearch.util.IndentingStringBuilder;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -63,27 +64,21 @@ public final class AppSearchBlobHandle extends AbstractSafeParcelable {
     private static final int SHA_256_DIGEST_BYTE_LENGTH = 32;
 
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    @NonNull
-    public static final Parcelable.Creator<AppSearchBlobHandle> CREATOR =
+    public static final Parcelable.@NonNull Creator<AppSearchBlobHandle> CREATOR =
             new AppSearchBlobHandleCreator();
-    @NonNull
     @Field(id = 1, getter = "getSha256Digest")
-    private final byte[] mSha256Digest;
+    private final byte @NonNull [] mSha256Digest;
 
-    @NonNull
     @Field(id = 2, getter = "getPackageName")
-    private final String mPackageName;
+    private final @NonNull String mPackageName;
 
-    @NonNull
     @Field(id = 3, getter = "getDatabaseName")
-    private final String mDatabaseName;
+    private final @NonNull String mDatabaseName;
 
-    @NonNull
     @Field(id = 4, getter = "getNamespace")
-    private final String mNamespace;
+    private final @NonNull String mNamespace;
 
-    @Nullable
-    private Integer mHashCode;
+    private @Nullable Integer mHashCode;
 
     /**
      * Build an {@link AppSearchBlobHandle}.
@@ -92,7 +87,7 @@ public final class AppSearchBlobHandle extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @Constructor
     AppSearchBlobHandle(
-            @Param(id = 1) @NonNull byte[] sha256Digest,
+            @Param(id = 1) byte @NonNull [] sha256Digest,
             @Param(id = 2) @NonNull String packageName,
             @Param(id = 3) @NonNull String databaseName,
             @Param(id = 4) @NonNull String namespace) {
@@ -110,8 +105,7 @@ public final class AppSearchBlobHandle extends AbstractSafeParcelable {
      * <p> For two objects of {@link AppSearchBlobHandle} to be considered equal, the
      * {@code packageName}, {@code database}, {@code namespace} and {@code digest} must be equal.
      */
-    @NonNull
-    public byte[] getSha256Digest() {
+    public byte @NonNull [] getSha256Digest() {
         return mSha256Digest;
     }
 
@@ -122,8 +116,7 @@ public final class AppSearchBlobHandle extends AbstractSafeParcelable {
      * <p> For two objects of {@link AppSearchBlobHandle} to be considered equal, the
      * {@code packageName}, {@code database}, {@code namespace} and {@code digest} must be equal.
      */
-    @NonNull
-    public String getPackageName() {
+    public @NonNull String getPackageName() {
         return mPackageName;
     }
 
@@ -133,8 +126,7 @@ public final class AppSearchBlobHandle extends AbstractSafeParcelable {
      * <p> For two objects of {@link AppSearchBlobHandle} to be considered equal, the
      * {@code packageName}, {@code database}, {@code namespace} and {@code digest} must be equal.
      */
-    @NonNull
-    public String getDatabaseName() {
+    public @NonNull String getDatabaseName() {
         return mDatabaseName;
     }
 
@@ -144,8 +136,7 @@ public final class AppSearchBlobHandle extends AbstractSafeParcelable {
      * <p> For two objects of {@link AppSearchBlobHandle} to be considered equal, the
      * {@code packageName}, {@code database}, {@code namespace} and {@code digest} must be equal.
      */
-    @NonNull
-    public String getNamespace() {
+    public @NonNull String getNamespace() {
         return mNamespace;
     }
 
@@ -169,9 +160,8 @@ public final class AppSearchBlobHandle extends AbstractSafeParcelable {
         return mHashCode;
     }
 
-    @NonNull
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         IndentingStringBuilder builder = new IndentingStringBuilder();
         builder.append("{\n");
         builder.increaseIndentLevel();
@@ -209,8 +199,7 @@ public final class AppSearchBlobHandle extends AbstractSafeParcelable {
      *
      * @return a new instance of {@link AppSearchBlobHandle} object.
      */
-    @NonNull
-    public static AppSearchBlobHandle createWithSha256(@NonNull byte[] digest,
+    public static @NonNull AppSearchBlobHandle createWithSha256(byte @NonNull [] digest,
             @NonNull String packageName, @NonNull String databaseName, @NonNull String namespace) {
         Preconditions.checkNotNull(digest);
         Preconditions.checkArgument(digest.length == SHA_256_DIGEST_BYTE_LENGTH,

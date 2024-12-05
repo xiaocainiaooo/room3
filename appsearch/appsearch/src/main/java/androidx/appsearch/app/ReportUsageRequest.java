@@ -19,7 +19,6 @@ package androidx.appsearch.app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.annotation.CurrentTimeMillisLong;
@@ -29,6 +28,8 @@ import androidx.appsearch.safeparcel.AbstractSafeParcelable;
 import androidx.appsearch.safeparcel.SafeParcelable;
 import androidx.appsearch.safeparcel.stub.StubCreators.ReportUsageRequestCreator;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
@@ -44,15 +45,13 @@ import java.util.Objects;
 public final class ReportUsageRequest extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    @NonNull public static final Parcelable.Creator<ReportUsageRequest> CREATOR =
+    public static final Parcelable.@NonNull Creator<ReportUsageRequest> CREATOR =
             new ReportUsageRequestCreator();
 
-    @NonNull
     @Field(id = 1, getter = "getNamespace")
-    private final String mNamespace;
-    @NonNull
+    private final @NonNull String mNamespace;
     @Field(id = 2, getter = "getDocumentId")
-    private final String mDocumentId;
+    private final @NonNull String mDocumentId;
     @Field(id = 3, getter = "getUsageTimestampMillis")
     private final  long mUsageTimestampMillis;
 
@@ -68,14 +67,12 @@ public final class ReportUsageRequest extends AbstractSafeParcelable {
 
 
     /** Returns the namespace of the document that was used. */
-    @NonNull
-    public String getNamespace() {
+    public @NonNull String getNamespace() {
         return mNamespace;
     }
 
     /** Returns the ID of document that was used. */
-    @NonNull
-    public String getDocumentId() {
+    public @NonNull String getDocumentId() {
         return mDocumentId;
     }
 
@@ -126,16 +123,14 @@ public final class ReportUsageRequest extends AbstractSafeParcelable {
          * {@link ReportUsageRequest} is constructed.
          */
         @CanIgnoreReturnValue
-        @NonNull
-        public ReportUsageRequest.Builder setUsageTimestampMillis(
+        public ReportUsageRequest.@NonNull Builder setUsageTimestampMillis(
                 @CurrentTimeMillisLong long usageTimestampMillis) {
             mUsageTimestampMillis = usageTimestampMillis;
             return this;
         }
 
         /** Builds a new {@link ReportUsageRequest}. */
-        @NonNull
-        public ReportUsageRequest build() {
+        public @NonNull ReportUsageRequest build() {
             if (mUsageTimestampMillis == null) {
                 mUsageTimestampMillis = System.currentTimeMillis();
             }

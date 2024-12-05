@@ -20,8 +20,6 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.flags.FlaggedApi;
@@ -33,6 +31,9 @@ import androidx.appsearch.util.BundleUtil;
 import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +55,7 @@ import java.util.Set;
 public final class GetByDocumentIdRequest extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    @NonNull public static final Parcelable.Creator<GetByDocumentIdRequest> CREATOR =
+    public static final Parcelable.@NonNull Creator<GetByDocumentIdRequest> CREATOR =
             new GetByDocumentIdRequestCreator();
     /**
      * Schema type to be used in
@@ -64,20 +65,17 @@ public final class GetByDocumentIdRequest extends AbstractSafeParcelable {
      */
     public static final String PROJECTION_SCHEMA_TYPE_WILDCARD = "*";
 
-    @NonNull
     @Field(id = 1, getter = "getNamespace")
-    private final String mNamespace;
-    @NonNull
+    private final @NonNull String mNamespace;
     @Field(id = 2)
-    final List<String> mIds;
-    @NonNull
+    final @NonNull List<String> mIds;
     @Field(id = 3)
-    final Bundle mTypePropertyPaths;
+    final @NonNull Bundle mTypePropertyPaths;
 
     /**
      * Cache of the ids. Comes from inflating mIds at first use.
      */
-    @Nullable private Set<String> mIdsCached;
+    private @Nullable Set<String> mIdsCached;
 
     @Constructor
     GetByDocumentIdRequest(
@@ -90,14 +88,12 @@ public final class GetByDocumentIdRequest extends AbstractSafeParcelable {
     }
 
     /** Returns the namespace attached to the request. */
-    @NonNull
-    public String getNamespace() {
+    public @NonNull String getNamespace() {
         return mNamespace;
     }
 
     /** Returns the set of document IDs attached to the request. */
-    @NonNull
-    public Set<String> getIds() {
+    public @NonNull Set<String> getIds() {
         if (mIdsCached == null) {
             mIdsCached = Collections.unmodifiableSet(new ArraySet<>(mIds));
         }
@@ -112,8 +108,7 @@ public final class GetByDocumentIdRequest extends AbstractSafeParcelable {
      * <p>Calling this function repeatedly is inefficient. Prefer to retain the Map returned
      * by this function, rather than calling it multiple times.
      */
-    @NonNull
-    public Map<String, List<String>> getProjections() {
+    public @NonNull Map<String, List<String>> getProjections() {
         Set<String> schemas = mTypePropertyPaths.keySet();
         Map<String, List<String>> typePropertyPathsMap = new ArrayMap<>(schemas.size());
         for (String schema : schemas) {
@@ -133,8 +128,7 @@ public final class GetByDocumentIdRequest extends AbstractSafeParcelable {
      * <p>Calling this function repeatedly is inefficient. Prefer to retain the Map returned
      * by this function, rather than calling it multiple times.
      */
-    @NonNull
-    public Map<String, List<PropertyPath>> getProjectionPaths() {
+    public @NonNull Map<String, List<PropertyPath>> getProjectionPaths() {
         Set<String> schemas = mTypePropertyPaths.keySet();
         Map<String, List<PropertyPath>> typePropertyPathsMap = new ArrayMap<>(schemas.size());
         for (String schema : schemas) {
@@ -172,8 +166,7 @@ public final class GetByDocumentIdRequest extends AbstractSafeParcelable {
 
         /** Adds one or more document IDs to the request. */
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder addIds(@NonNull String... ids) {
+        public @NonNull Builder addIds(String @NonNull ... ids) {
             Preconditions.checkNotNull(ids);
             resetIfBuilt();
             return addIds(Arrays.asList(ids));
@@ -181,8 +174,7 @@ public final class GetByDocumentIdRequest extends AbstractSafeParcelable {
 
         /** Adds a collection of IDs to the request. */
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder addIds(@NonNull Collection<String> ids) {
+        public @NonNull Builder addIds(@NonNull Collection<String> ids) {
             Preconditions.checkNotNull(ids);
             resetIfBuilt();
             mIds.addAll(ids);
@@ -206,8 +198,7 @@ public final class GetByDocumentIdRequest extends AbstractSafeParcelable {
          * @see SearchSpec.Builder#addProjectionPaths
          */
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder addProjection(
+        public @NonNull Builder addProjection(
                 @NonNull String schemaType, @NonNull Collection<String> propertyPaths) {
             Preconditions.checkNotNull(schemaType);
             Preconditions.checkNotNull(propertyPaths);
@@ -238,8 +229,7 @@ public final class GetByDocumentIdRequest extends AbstractSafeParcelable {
          * @see SearchSpec.Builder#addProjectionPaths
          */
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder addProjectionPaths(
+        public @NonNull Builder addProjectionPaths(
                 @NonNull String schemaType, @NonNull Collection<PropertyPath> propertyPaths) {
             Preconditions.checkNotNull(schemaType);
             Preconditions.checkNotNull(propertyPaths);
@@ -251,8 +241,7 @@ public final class GetByDocumentIdRequest extends AbstractSafeParcelable {
         }
 
         /** Builds a new {@link GetByDocumentIdRequest}. */
-        @NonNull
-        public GetByDocumentIdRequest build() {
+        public @NonNull GetByDocumentIdRequest build() {
             mBuilt = true;
             return new GetByDocumentIdRequest(mNamespace, mIds, mProjectionTypePropertyPaths);
         }

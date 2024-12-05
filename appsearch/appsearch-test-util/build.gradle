@@ -21,6 +21,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.jspecify)
     api('androidx.annotation:annotation:1.1.0')
 
     implementation(project(":appsearch:appsearch"))
@@ -39,8 +40,6 @@ androidx {
     type = LibraryType.INTERNAL_TEST_LIBRARY
     inceptionYear = '2021'
     description = 'Test Utilities to be used by any test module for AppSearch'
-    // TODO: b/326456246
-    optOutJSpecify = true
 }
 
 android {

@@ -19,7 +19,6 @@ import android.os.Parcel;
 import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
 import androidx.appsearch.app.aidl.AppSearchBatchResultParcelV2;
 import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
@@ -27,6 +26,8 @@ import androidx.appsearch.safeparcel.AbstractSafeParcelable;
 import androidx.appsearch.safeparcel.SafeParcelable;
 import androidx.appsearch.safeparcel.stub.StubCreators.OpenBlobForReadResponseCreator;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -51,8 +52,7 @@ import java.io.IOException;
 public final class OpenBlobForReadResponse extends AbstractSafeParcelable implements
         Closeable {
 
-    @NonNull
-    public static final Parcelable.Creator<OpenBlobForReadResponse> CREATOR =
+    public static final Parcelable.@NonNull Creator<OpenBlobForReadResponse> CREATOR =
             new OpenBlobForReadResponseCreator();
 
     @Field(id = 1)
@@ -85,8 +85,7 @@ public final class OpenBlobForReadResponse extends AbstractSafeParcelable implem
      * there was an error, the result contains an {@link AppSearchResult} with details of the
      * failure.
      */
-    @NonNull
-    public AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> getResult() {
+    public @NonNull AppSearchBatchResult<AppSearchBlobHandle, ParcelFileDescriptor> getResult() {
         return mResultParcel.getResult();
     }
 

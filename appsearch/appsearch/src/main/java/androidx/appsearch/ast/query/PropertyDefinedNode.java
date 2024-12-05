@@ -16,13 +16,14 @@
 
 package androidx.appsearch.ast.query;
 
-import androidx.annotation.NonNull;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.PropertyPath;
 import androidx.appsearch.ast.FunctionNode;
 import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
@@ -52,10 +53,9 @@ public final class PropertyDefinedNode implements FunctionNode {
     /**
      * Returns the name of the function represented by {@link PropertyDefinedNode}.
      */
-    @NonNull
     @Override
     @FunctionName
-    public String getFunctionName() {
+    public @NonNull String getFunctionName() {
         return FUNCTION_NAME_PROPERTY_DEFINED;
     }
 
@@ -63,8 +63,7 @@ public final class PropertyDefinedNode implements FunctionNode {
      * Returns the {@link PropertyDefinedNode} representing the property being checked for in the
      * document.
      */
-    @NonNull
-    public PropertyPath getProperty() {
+    public @NonNull PropertyPath getProperty() {
         return mProperty;
     }
 
@@ -82,9 +81,8 @@ public final class PropertyDefinedNode implements FunctionNode {
      * <p>The string representation of {@link PropertyDefinedNode} is the function name followed by
      * the property path in quotes surrounded by parentheses.
      */
-    @NonNull
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return FUNCTION_NAME_PROPERTY_DEFINED + "(\"" + mProperty + "\")";
     }
 
