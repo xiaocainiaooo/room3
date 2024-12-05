@@ -291,22 +291,28 @@ public class WebSettingsCompatTest {
         WebkitUtils.checkFeature(WebViewFeature.WEB_AUTHENTICATION);
         WebSettings settings = mWebViewOnUiThread.getSettings();
         mWebViewOnUiThread.setCleanupTask(
-                () -> WebSettingsCompat.setWebAuthenticationSupport(settings,
-                        WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_NONE));
+                () ->
+                        WebkitUtils.onMainThreadSync(() ->
+                                WebSettingsCompat.setWebAuthenticationSupport(settings,
+                                        WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_NONE)
+                        )
+        );
 
-        Assert.assertEquals("NONE is the expected default",
-                WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_NONE,
-                WebSettingsCompat.getWebAuthenticationSupport(settings));
+        WebkitUtils.onMainThreadSync(() -> {
+            Assert.assertEquals("NONE is the expected default",
+                    WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_NONE,
+                    WebSettingsCompat.getWebAuthenticationSupport(settings));
 
-        WebSettingsCompat.setWebAuthenticationSupport(settings,
-                WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP);
-        Assert.assertEquals(WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP,
-                WebSettingsCompat.getWebAuthenticationSupport(settings));
+            WebSettingsCompat.setWebAuthenticationSupport(settings,
+                    WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP);
+            Assert.assertEquals(WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP,
+                    WebSettingsCompat.getWebAuthenticationSupport(settings));
 
-        WebSettingsCompat.setWebAuthenticationSupport(settings,
-                WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER);
-        Assert.assertEquals(WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER,
-                WebSettingsCompat.getWebAuthenticationSupport(settings));
+            WebSettingsCompat.setWebAuthenticationSupport(settings,
+                    WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER);
+            Assert.assertEquals(WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER,
+                    WebSettingsCompat.getWebAuthenticationSupport(settings));
+        });
     }
 
     @Test
