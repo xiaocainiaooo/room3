@@ -1233,7 +1233,6 @@ includeProject(":noto-emoji-compat-font", new File(externalRoot, "noto-fonts/emo
 includeProject(":noto-emoji-compat-flatbuffers", new File(externalRoot, "noto-fonts/emoji-compat-flatbuffers"), [BuildType.MAIN, BuildType.COMPOSE])
 
 includeProject(":compose-hero-benchmarks:poxedex-compose:app", new File(externalRoot, "compose-hero-benchmarks/poxedex-compose/app"), [BuildType.COMPOSE])
-includeProject(":compose-hero-benchmarks:poxedex-compose:baselineprofile", new File(externalRoot, "compose-hero-benchmarks/poxedex-compose/baselineprofile"), [BuildType.COMPOSE])
 
 if (isAllProjects()) {
     includeProject(":docs-tip-of-tree")
