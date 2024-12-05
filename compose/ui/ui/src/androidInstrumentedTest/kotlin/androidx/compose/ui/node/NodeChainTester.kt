@@ -19,6 +19,7 @@
 package androidx.compose.ui.node
 
 import androidx.collection.IntObjectMap
+import androidx.collection.intObjectMapOf
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
@@ -49,6 +50,8 @@ import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.platform.invertTo
+import androidx.compose.ui.semantics.EmptySemanticsModifier
+import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.spatial.RectManager
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -389,6 +392,11 @@ private class MockOwner(
     override val layoutDirection: LayoutDirection
         get() = LayoutDirection.Ltr
 
+    override val rectManager: RectManager = RectManager()
+
+    override val semanticsOwner: SemanticsOwner =
+        SemanticsOwner(root, EmptySemanticsModifier(), intObjectMapOf())
+
     override val viewConfiguration: ViewConfiguration
         get() = TODO("Not yet implemented")
 
@@ -430,8 +438,6 @@ private class MockOwner(
 
     override val windowInfo: WindowInfo
         get() = TODO("Not yet implemented")
-
-    override val rectManager: RectManager = RectManager()
 
     override val fontFamilyResolver: FontFamily.Resolver
         get() = TODO("Not yet implemented")
