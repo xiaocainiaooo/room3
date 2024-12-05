@@ -36,16 +36,16 @@ import java.util.Objects;
 @ExperimentalAppSearchApi
 @FlaggedApi(Flags.FLAG_ENABLE_ABSTRACT_SYNTAX_TREES)
 public final class HasPropertyNode implements FunctionNode {
-    private PropertyPath mProperty;
+    private PropertyPath mPropertyPath;
 
     /**
      * Constructor for a {@link HasPropertyNode} representing the query function `hasProperty`.
      *
-     * @param property A {@link PropertyPath} representing the property to check whether or not
+     * @param propertyPath A {@link PropertyPath} representing the property to check whether or not
      *                 it contains a value in the document.
      */
-    public HasPropertyNode(@NonNull PropertyPath property) {
-        mProperty = Preconditions.checkNotNull(property);
+    public HasPropertyNode(@NonNull PropertyPath propertyPath) {
+        mPropertyPath = Preconditions.checkNotNull(propertyPath);
     }
 
     /**
@@ -62,16 +62,16 @@ public final class HasPropertyNode implements FunctionNode {
      * Gets the {@link PropertyPath} representing the property being checked for some value in the
      * document.
      */
-    public @NonNull PropertyPath getProperty() {
-        return mProperty;
+    public @NonNull PropertyPath getPropertyPath() {
+        return mPropertyPath;
     }
 
     /**
      * Sets the {@link PropertyPath} representing the property being checked for some value in the
      * document.
      */
-    public void setProperty(@NonNull PropertyPath property) {
-        mProperty = Preconditions.checkNotNull(property);
+    public void setPropertyPath(@NonNull PropertyPath property) {
+        mPropertyPath = Preconditions.checkNotNull(property);
     }
 
     /**
@@ -82,7 +82,7 @@ public final class HasPropertyNode implements FunctionNode {
      */
     @Override
     public @NonNull String toString() {
-        return FunctionNode.FUNCTION_NAME_HAS_PROPERTY + "(\"" + mProperty + "\")";
+        return FunctionNode.FUNCTION_NAME_HAS_PROPERTY + "(\"" + mPropertyPath + "\")";
     }
 
     @Override
@@ -90,11 +90,11 @@ public final class HasPropertyNode implements FunctionNode {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HasPropertyNode that = (HasPropertyNode) o;
-        return Objects.equals(mProperty, that.mProperty);
+        return Objects.equals(mPropertyPath, that.mPropertyPath);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mProperty);
+        return Objects.hashCode(mPropertyPath);
     }
 }

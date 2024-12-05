@@ -44,24 +44,24 @@ import java.util.Objects;
 @FlaggedApi(Flags.FLAG_ENABLE_ABSTRACT_SYNTAX_TREES)
 public final class SearchNode implements FunctionNode {
     private final List<Node> mChildren = new ArrayList<>(1);
-    private final List<PropertyPath> mProperties;
+    private final List<PropertyPath> mPropertyPaths;
 
     /**
      * Create a {@link SearchNode} representing the query function
      * `search(queryString, createList(listOfProperties)`.
      *
      * @param childNode The query to search for represented as a {@link Node}.
-     * @param properties A list of property paths to restrict results from the query. If the list is
-     *                   empty, all results from the query will be returned.
+     * @param propertyPaths A list of property paths to restrict results from the query. If the list
+     *                      is empty, all results from the query will be returned.
      */
-    public SearchNode(@NonNull Node childNode, @NonNull List<PropertyPath> properties) {
+    public SearchNode(@NonNull Node childNode, @NonNull List<PropertyPath> propertyPaths) {
         Preconditions.checkNotNull(childNode);
-        Preconditions.checkNotNull(properties);
-        for (int i = 0; i < properties.size(); i++) {
-            Preconditions.checkNotNull(properties.get(i));
+        Preconditions.checkNotNull(propertyPaths);
+        for (int i = 0; i < propertyPaths.size(); i++) {
+            Preconditions.checkNotNull(propertyPaths.get(i));
         }
         mChildren.add(childNode);
-        mProperties = new ArrayList<>(properties);
+        mPropertyPaths = new ArrayList<>(propertyPaths);
     }
 
     /**
@@ -105,8 +105,8 @@ public final class SearchNode implements FunctionNode {
      * Returns the list of property restricts applied to the query. If the list is empty, there are
      * no property restricts, which means that `search` will return all results from the query.
      */
-    public @NonNull List<PropertyPath> getProperties() {
-        return Collections.unmodifiableList(mProperties);
+    public @NonNull List<PropertyPath> getPropertyPaths() {
+        return Collections.unmodifiableList(mPropertyPaths);
     }
 
     /**
@@ -119,20 +119,20 @@ public final class SearchNode implements FunctionNode {
     /**
      * Sets what property restricts will be applied to the query.
      */
-    public void setProperties(@NonNull List<PropertyPath> properties) {
+    public void setPropertyPaths(@NonNull List<PropertyPath> properties) {
         Preconditions.checkNotNull(properties);
         for (int i = 0; i < properties.size(); i++) {
             Preconditions.checkNotNull(properties.get(i));
         }
-        mProperties.clear();
-        mProperties.addAll(properties);
+        mPropertyPaths.clear();
+        mPropertyPaths.addAll(properties);
     }
 
     /**
-     * Add a restrict to the end of the current list of restricts {@link #mProperties}.
+     * Add a restrict to the end of the current list of restricts {@link #mPropertyPaths}.
      */
-    public void addProperty(@NonNull PropertyPath propertyPath) {
-        mProperties.add(Preconditions.checkNotNull(propertyPath));
+    public void addPropertyPath(@NonNull PropertyPath propertyPath) {
+        mPropertyPaths.add(Preconditions.checkNotNull(propertyPath));
     }
 
     /**
@@ -149,7 +149,7 @@ public final class SearchNode implements FunctionNode {
      *
      * will be represented by the query string `search("(foo)")`.
      *
-     * <p>If there are property restricts, i.e. {@link #getProperties()} is not empty, then in
+     * <p>If there are property restricts, i.e. {@link #getPropertyPaths()} is not empty, then in
      * addition to the string representation of the child subquery, the property restricts will be
      * represented as inputs to the {@code createList} function, which itself will be an input.
      * So for the node represented by
@@ -181,15 +181,15 @@ public final class SearchNode implements FunctionNode {
         builder.append("(\"");
         builder.append(escapeQuery(getChild().toString()));
         builder.append("\"");
-        if (!mProperties.isEmpty()) {
+        if (!mPropertyPaths.isEmpty()) {
             builder.append(", createList(");
-            for (int i = 0; i < mProperties.size() - 1; i++) {
+            for (int i = 0; i < mPropertyPaths.size() - 1; i++) {
                 builder.append("\"");
-                builder.append(mProperties.get(i));
+                builder.append(mPropertyPaths.get(i));
                 builder.append("\", ");
             }
             builder.append("\"");
-            builder.append(mProperties.get(mProperties.size() - 1));
+            builder.append(mPropertyPaths.get(mPropertyPaths.size() - 1));
             builder.append("\")");
         }
         builder.append(")");
@@ -223,11 +223,11 @@ public final class SearchNode implements FunctionNode {
         if (o == null || getClass() != o.getClass()) return false;
         SearchNode that = (SearchNode) o;
         return Objects.equals(mChildren, that.mChildren) && Objects.equals(
-                mProperties, that.mProperties);
+                mPropertyPaths, that.mPropertyPaths);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mChildren, mProperties);
+        return Objects.hash(mChildren, mPropertyPaths);
     }
 }

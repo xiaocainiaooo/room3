@@ -45,7 +45,7 @@ import java.util.Objects;
 @ExperimentalAppSearchApi
 @FlaggedApi(Flags.FLAG_ENABLE_ABSTRACT_SYNTAX_TREES)
 public final class PropertyRestrictNode implements Node {
-    private PropertyPath mProperty;
+    private PropertyPath mPropertyPath;
     private final List<Node> mChildren = new ArrayList<>(1);
 
     /**
@@ -57,16 +57,16 @@ public final class PropertyRestrictNode implements Node {
      * @param childNode The subexpression to be restricted in the property restrict
      */
     public PropertyRestrictNode(@NonNull PropertyPath propertyPath, @NonNull Node childNode) {
-        mProperty = Preconditions.checkNotNull(propertyPath);
+        mPropertyPath = Preconditions.checkNotNull(propertyPath);
         mChildren.add(Preconditions.checkNotNull(childNode));
     }
 
     /**
-     * Get the property in the property restriction (i.e. the left hand side of the property
-     * restrict sign (":")).
+     * Get the {@link PropertyPath} in the property restriction (i.e. the left hand side of the
+     * property restrict sign (":")).
      */
-    public @NonNull PropertyPath getProperty() {
-        return mProperty;
+    public @NonNull PropertyPath getPropertyPath() {
+        return mPropertyPath;
     }
 
     /**
@@ -87,11 +87,11 @@ public final class PropertyRestrictNode implements Node {
     }
 
     /**
-     * Set the property in the property restriction (i.e. the left hand side of the property
-     * restrict sign (":")).
+     * Set the {@link PropertyPath} in the property restriction (i.e. the left hand side of the
+     * property restrict sign (":")).
      */
-    public void setProperty(@NonNull PropertyPath propertyPath) {
-        mProperty = Preconditions.checkNotNull(propertyPath);
+    public void setPropertyPath(@NonNull PropertyPath propertyPath) {
+        mPropertyPath = Preconditions.checkNotNull(propertyPath);
     }
 
     /**
@@ -111,7 +111,7 @@ public final class PropertyRestrictNode implements Node {
      */
     @Override
     public @NonNull String toString() {
-        return "(" + mProperty + ":" + getChild() + ")";
+        return "(" + mPropertyPath + ":" + getChild() + ")";
     }
 
     @Override
@@ -119,12 +119,12 @@ public final class PropertyRestrictNode implements Node {
         if (this == o) return true;
         if (!(o instanceof PropertyRestrictNode)) return false;
         PropertyRestrictNode that = (PropertyRestrictNode) o;
-        return Objects.equals(mProperty, that.mProperty) && Objects.equals(
+        return Objects.equals(mPropertyPath, that.mPropertyPath) && Objects.equals(
                 mChildren, that.mChildren);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mProperty, mChildren);
+        return Objects.hash(mPropertyPath, mChildren);
     }
 }
