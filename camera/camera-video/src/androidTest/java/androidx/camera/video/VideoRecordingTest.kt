@@ -60,6 +60,7 @@ import androidx.camera.testing.impl.AndroidUtil.skipVideoRecordingTestIfNotSuppo
 import androidx.camera.testing.impl.CameraPipeConfigTestRule
 import androidx.camera.testing.impl.CameraTaskTrackingExecutor
 import androidx.camera.testing.impl.CameraUtil
+import androidx.camera.testing.impl.InternalTestConvenience.ignoreTestForCameraPipe
 import androidx.camera.testing.impl.StreamSharingForceEnabledEffect
 import androidx.camera.testing.impl.SurfaceTextureProvider
 import androidx.camera.testing.impl.WakelockEmptyActivityRule
@@ -791,6 +792,12 @@ class VideoRecordingTest(
     @Test
     fun persistentRecording_canStopAfterUnbind() {
         assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
+
+        // TODO(b/353113961): Enable the test for camera pipe implementation.
+        implName.ignoreTestForCameraPipe(
+            "The test is temporarily ignored for camera pipe implementation.",
+            true
+        )
 
         // TODO(b/340406044): Enable the test for stream sharing use case.
         assumeFalse(
