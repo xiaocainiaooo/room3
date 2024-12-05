@@ -22,13 +22,17 @@ import androidx.annotation.RequiresApi
 import androidx.health.connect.client.aggregate.AggregationResult
 import androidx.health.connect.client.records.metadata.DataOrigin
 
-internal interface Aggregator<T> {
-    val doubleValues: Map<String, Double>
-    val dataOrigins: Set<DataOrigin>
-
+internal interface Aggregator<T, R> {
     operator fun plusAssign(value: T)
 
-    fun getResult(): AggregationResult {
+    fun getResult(): R
+}
+
+internal abstract class SingeResultAggregator<T> : Aggregator<T, AggregationResult> {
+    abstract val doubleValues: Map<String, Double>
+    abstract val dataOrigins: Set<DataOrigin>
+
+    override fun getResult(): AggregationResult {
         if (dataOrigins.isEmpty()) {
             return emptyAggregationResult()
         }

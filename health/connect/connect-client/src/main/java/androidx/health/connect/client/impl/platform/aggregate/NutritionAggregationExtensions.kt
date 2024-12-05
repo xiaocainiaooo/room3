@@ -76,7 +76,7 @@ internal fun IntervalRecord.sliceFactor(timeRangeFilter: TimeRangeFilter): Doubl
 }
 
 private class TransFatTotalAggregator(val timeRangeFilter: TimeRangeFilter) :
-    Aggregator<NutritionRecord> {
+    SingeResultAggregator<NutritionRecord>() {
     var total = 0.0
 
     override val dataOrigins = mutableSetOf<DataOrigin>()
