@@ -212,7 +212,8 @@ val WearMaterial3Demos =
                             TransformingLazyColumnScrollingSample()
                         },
                     )
-                )
+                ),
+                ComposableDemo("Text") { TextWeightDemo() }
             )
             .sortedBy { it.title }
     )
