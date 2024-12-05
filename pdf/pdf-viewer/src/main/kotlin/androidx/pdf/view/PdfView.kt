@@ -17,16 +17,19 @@
 package androidx.pdf.view
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Point
 import android.graphics.PointF
 import android.graphics.Rect
+import android.net.Uri
 import android.os.Looper
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.util.Range
 import android.view.KeyEvent
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.OverScroller
 import androidx.annotation.RestrictTo
@@ -34,7 +37,10 @@ import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
 import androidx.pdf.PdfDocument
 import androidx.pdf.util.ZoomUtils
+import java.util.LinkedList
+import java.util.Queue
 import java.util.concurrent.Executors
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.round
 import kotlin.math.roundToInt
@@ -118,6 +124,19 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     public val visiblePagesCount: Int
         get() = if (pdfDocument != null) visiblePages.upper - visiblePages.lower + 1 else 0
 
+    /** Listener interface for handling clicks on links in a PDF document. */
+    public interface LinkClickListener {
+        /**
+         * Called when a link in the PDF is clicked.
+         *
+         * @param uri The URI associated with the link.
+         */
+        public fun onLinkClicked(uri: Uri)
+    }
+
+    /** The listener that is notified when a link in the PDF is clicked. */
+    public var linkClickListener: LinkClickListener? = null
+
     /**
      * The [CoroutineScope] used to make suspending calls to [PdfDocument]. The size of the fixed
      * thread pool is arbitrary and subject to tuning.
@@ -140,8 +159,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private var scrollPositionToRestore: PointF? = null
     private var zoomToRestore: Float? = null
 
-    private val gestureHandler = ZoomScrollGestureHandler(this@PdfView)
-    private val gestureTracker = GestureTracker(context).apply { delegate = gestureHandler }
+    private val gestureTracker =
+        GestureTracker(context).apply { delegate = ZoomScrollGestureHandler() }
     private val scroller = OverScroller(context)
 
     // To avoid allocations during drawing
@@ -675,12 +694,218 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private val contentHeight: Int
         get() = pageLayoutManager?.paginationModel?.totalEstimatedHeight ?: 0
 
+    internal inner class ZoomScrollGestureHandler : GestureTracker.GestureHandler() {
+        internal var scrollInProgress = false
+        internal var scaleInProgress = false
+
+        /**
+         * The multiplier to convert from a scale gesture's delta span, in pixels, to scale factor.
+         *
+         * [ScaleGestureDetector] returns scale factors proportional to the ratio of `currentSpan /
+         * prevSpan`. This is problematic because it results in scale factors that are very large
+         * for small pixel spans, which is particularly problematic for quickScale gestures, where
+         * the span pixel values can be small, but the ratio can yield very large scale factors.
+         *
+         * Instead, we use this to ensure that pinching or quick scale dragging a certain number of
+         * pixels always corresponds to a certain change in zoom. The equation that we've found to
+         * work well is a delta span of the larger screen dimension should result in a zoom change
+         * of 2x.
+         */
+        private val linearScaleSpanMultiplier: Float =
+            2f / maxOf(resources.displayMetrics.heightPixels, resources.displayMetrics.widthPixels)
+
+        /** The maximum scroll distance used to determine if the direction is vertical. */
+        private val maxScrollWindow =
+            (resources.displayMetrics.density * MAX_SCROLL_WINDOW_DP).toInt()
+
+        /** The smallest scroll distance that can switch mode to "free scrolling". */
+        private val minScrollToSwitch =
+            (resources.displayMetrics.density * MIN_SCROLL_TO_SWITCH_DP).toInt()
+
+        /** Remember recent scroll events so we can examine the general direction. */
+        private val scrollQueue: Queue<PointF> = LinkedList()
+
+        /** Are we correcting vertical scroll for the current gesture? */
+        private var straightenCurrentVerticalScroll = true
+
+        private var totalX = 0f
+        private var totalY = 0f
+
+        private val totalScrollLength
+            // No need for accuracy of correct hypotenuse calculation
+            get() = abs(totalX) + abs(totalY)
+
+        override fun onScroll(
+            e1: MotionEvent?,
+            e2: MotionEvent,
+            distanceX: Float,
+            distanceY: Float,
+        ): Boolean {
+            scrollInProgress = true
+            var dx = Math.round(distanceX)
+            val dy = Math.round(distanceY)
+
+            if (straightenCurrentVerticalScroll) {
+                // Remember a window of recent scroll events.
+                scrollQueue.offer(PointF(distanceX, distanceY))
+                totalX += distanceX
+                totalY += distanceY
+
+                // Only consider scroll direction for a certain window of scroll events.
+                while (totalScrollLength > maxScrollWindow && scrollQueue.size > 1) {
+                    // Remove the oldest scroll event - it is too far away to determine scroll
+                    // direction.
+                    val oldest = scrollQueue.poll()
+                    oldest?.let {
+                        totalY -= oldest.y
+                        totalX -= oldest.x
+                    }
+                }
+
+                if (
+                    totalScrollLength > minScrollToSwitch &&
+                        abs((totalY / totalX).toDouble()) < SCROLL_CORRECTION_RATIO
+                ) {
+                    straightenCurrentVerticalScroll = false
+                } else {
+                    // Ignore the horizontal component of the scroll.
+                    dx = 0
+                }
+            }
+
+            scrollBy(dx, dy)
+            return true
+        }
+
+        override fun onFling(
+            e1: MotionEvent?,
+            e2: MotionEvent,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+            return super.onFling(e1, e2, velocityX, velocityY)
+            // TODO(b/376136621) Animate scroll position during a fling
+        }
+
+        override fun onDoubleTap(e: MotionEvent): Boolean {
+            return super.onDoubleTap(e)
+            // TODO(b/376136331) Toggle between fit-to-page and zoomed-in on double tap gestures
+        }
+
+        override fun onScale(detector: ScaleGestureDetector): Boolean {
+            scaleInProgress = true
+            val rawScaleFactor = detector.scaleFactor
+            val deltaSpan = abs(detector.currentSpan - detector.previousSpan)
+            val scaleDelta = deltaSpan * linearScaleSpanMultiplier
+            val linearScaleFactor = if (rawScaleFactor >= 1f) 1f + scaleDelta else 1f - scaleDelta
+            val newZoom = (zoom * linearScaleFactor).coerceIn(minZoom, maxZoom)
+
+            zoomTo(newZoom, detector.focusX, detector.focusY)
+            return true
+        }
+
+        override fun onGestureEnd(gesture: GestureTracker.Gesture?) {
+            when (gesture) {
+                GestureTracker.Gesture.ZOOM -> {
+                    scaleInProgress = false
+                    onZoomChanged()
+                }
+                GestureTracker.Gesture.DRAG,
+                GestureTracker.Gesture.DRAG_Y,
+                GestureTracker.Gesture.DRAG_X -> {
+                    scrollInProgress = false
+                    onZoomChanged()
+                }
+                else -> {
+                    /* no-op */
+                }
+            }
+            totalX = 0f
+            totalY = 0f
+            straightenCurrentVerticalScroll = true
+            scrollQueue.clear()
+        }
+
+        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+            val contentX = toContentX(e.x)
+            val contentY = toContentY(e.y)
+
+            val pageLayoutManager = pageLayoutManager ?: return super.onSingleTapConfirmed(e)
+            val pageNum =
+                pageLayoutManager.getPageNumberAt(
+                    PointF(contentX, contentY),
+                    getVisibleAreaInContentCoords()
+                )
+            if (pageNum == INVALID_ID) return super.onSingleTapConfirmed(e)
+
+            val pdfCoordinates =
+                pageLayoutManager.getPageCoordinatesRelativeToTappedPage(
+                    pageNum,
+                    getVisibleAreaInContentCoords(),
+                    PointF(contentX, contentY)
+                )
+
+            pageManager?.getLinkAtTapPoint(PdfPoint(pageNum, pdfCoordinates))?.let { links ->
+                if (handleGotoLinks(links, pdfCoordinates)) return true
+                if (handleExternalLinks(links, pdfCoordinates)) return true
+            }
+            return super.onSingleTapConfirmed(e)
+        }
+
+        private fun handleGotoLinks(
+            links: PdfDocument.PdfPageLinks,
+            pdfCoordinates: PointF
+        ): Boolean {
+            links.gotoLinks.forEach { gotoLink ->
+                if (gotoLink.bounds.any { it.contains(pdfCoordinates.x, pdfCoordinates.y) }) {
+                    val destination =
+                        PdfPoint(
+                            pageNum = gotoLink.destination.pageNumber,
+                            pagePoint =
+                                PointF(
+                                    gotoLink.destination.xCoordinate,
+                                    gotoLink.destination.yCoordinate
+                                )
+                        )
+                    gotoPoint(destination)
+                    return true
+                }
+            }
+            return false
+        }
+
+        private fun handleExternalLinks(
+            links: PdfDocument.PdfPageLinks,
+            pdfCoordinates: PointF
+        ): Boolean {
+            links.externalLinks.forEach { externalLink ->
+                if (externalLink.bounds.any { it.contains(pdfCoordinates.x, pdfCoordinates.y) }) {
+                    linkClickListener?.onLinkClicked(externalLink.uri)
+                        ?: run {
+                            val intent = Intent(Intent.ACTION_VIEW, externalLink.uri)
+                            context.startActivity(intent)
+                        }
+                    return true
+                }
+            }
+            return false
+        }
+    }
+
     public companion object {
         public const val DEFAULT_INIT_ZOOM: Float = 1.0f
         public const val DEFAULT_MAX_ZOOM: Float = 25.0f
         public const val DEFAULT_MIN_ZOOM: Float = 0.1f
 
+        /** The ratio of vertical to horizontal scroll that is assumed to be vertical only */
+        private const val SCROLL_CORRECTION_RATIO = 1.5f
+        /** The maximum scroll distance used to determine if the direction is vertical */
+        private const val MAX_SCROLL_WINDOW_DP = 70
+        /** The smallest scroll distance that can switch mode to "free scrolling" */
+        private const val MIN_SCROLL_TO_SWITCH_DP = 30
+
         private const val DEFAULT_PAGE_PREFETCH_RADIUS: Int = 2
+        private const val INVALID_ID = -1
 
         private fun checkMainThread() {
             check(Looper.myLooper() == Looper.getMainLooper()) {

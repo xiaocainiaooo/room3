@@ -72,10 +72,15 @@ internal class Page(
     private val tileLocationRect = RectF()
     internal var fetchPageTextJob: Job? = null
     internal var pageText: String? = null
+    internal var links: PdfDocument.PdfPageLinks? = null
+        private set
 
     fun setVisible(zoom: Float) {
         bitmapFetcher.isActive = true
         bitmapFetcher.onScaleChanged(zoom)
+        if (links == null) {
+            fetchLinks()
+        }
         fetchPageText()
     }
 
@@ -119,6 +124,10 @@ internal class Page(
             highlightPaint.color = highlight.color
             canvas.drawRect(highlightRect, highlightPaint)
         }
+    }
+
+    private fun fetchLinks() {
+        backgroundScope.launch { links = pdfDocument.getPageLinks(pageNum) }
     }
 
     private fun draw(fullPageBitmap: FullPageBitmap, canvas: Canvas, locationInView: Rect) {

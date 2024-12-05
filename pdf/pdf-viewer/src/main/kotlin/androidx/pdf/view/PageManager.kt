@@ -144,6 +144,10 @@ internal class PageManager(
             page.setInvisible()
         }
     }
+
+    fun getLinkAtTapPoint(pdfPoint: PdfPoint): PdfDocument.PdfPageLinks? {
+        return pages[pdfPoint.pageNum]?.links
+    }
 }
 
 /** Constant empty list to avoid allocations during drawing */
