@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-@file:JvmName("LocalLifecycleOwnerKt")
+@file:JvmName("LocalSavedStateRegistryOwnerKt")
 
 package androidx.savedstate.compose
 
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.lifecycle.LifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 
 /**
- * The CompositionLocal containing the current [LifecycleOwner].
+ * The CompositionLocal containing the current [LocalSavedStateRegistryOwner].
  *
  * **Important:** For backward compatibility with Compose <= 1.7, we will use reflection to access
  * the [SavedStateRegistryOwner] from the older `androidx.compose.ui.platform` package on Android
@@ -39,22 +38,22 @@ import androidx.savedstate.SavedStateRegistryOwner
  */
 actual val LocalSavedStateRegistryOwner: ProvidableCompositionLocal<SavedStateRegistryOwner> = run {
     val compositionLocalFromComposeUi = runCatching {
-        // Use the `LifecycleOwner` class to find the `classLoader` from the `Application`.
-        val classLoader = LifecycleOwner::class.java.classLoader!!
-        // Top-level class name from Compose UI 1.6.* that holds the old `LocalLifecycleOwner`.
+        // Use the CompositionLocal class to find the `classLoader` from the `Application`.
+        val classLoader = SavedStateRegistryOwner::class.java.classLoader!!
+        // Top-level class name from Compose UI 1.6.* that holds the old CompositionLocal.
         val className = "androidx.compose.ui.platform.AndroidCompositionLocals_androidKt"
-        // The Java getter used when accessing the `LocalLifecycleOwner` property in Kotlin.
+        // The Java getter used when accessing the CompositionLocal property in Kotlin.
         val methodName = "getLocalSavedStateRegistryOwner"
 
         val methodRef = classLoader.loadClass(className).getMethod(methodName)
         if (methodRef.annotations.none { it is Deprecated }) {
             // If the method IS NOT deprecated, we are running with Compose 1.6.*.
-            // We use reflection to access the older `LocalLifecycleOwner` from `compose-ui`.
+            // We use reflection to access the older CompositionLocal from `compose-ui`.
             @Suppress("UNCHECKED_CAST", "BanUncheckedReflection")
             methodRef.invoke(null) as? ProvidableCompositionLocal<SavedStateRegistryOwner>
         } else {
             // If the method IS deprecated, we are running with Compose 1.7.*.
-            // The new `LocalLifecycleOwner` is available, no reflection needed.
+            // The new CompositionLocal is available, no reflection needed.
             null
         }
     }
