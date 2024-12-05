@@ -147,7 +147,7 @@ private class ContextOnlySpatialConfiguration(private val context: Context) : Sp
             )
 }
 
-/** A [SpatialConfiguration] that is attached to the current Jetpack XR Core [Session]. */
+/** A [SpatialConfiguration] that is attached to the current [Session]. */
 private class SessionSpatialConfiguration(
     private val session: Session,
     override val hasXrSpatialFeature: Boolean,

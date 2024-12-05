@@ -19,7 +19,7 @@ package androidx.xr.runtime
 import kotlin.time.ComparableTimeMark
 
 /**
- * Represents the state of Jetpack XR Core at an specific point in time.
+ * Represents the state of the XR system at a specific point in time.
  *
  * @property timeMark at which the state was computed.
  */

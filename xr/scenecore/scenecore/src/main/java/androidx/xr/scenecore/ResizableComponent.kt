@@ -22,7 +22,11 @@ import android.util.Log
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 
-/** A [Component] which when attached to an [Entity] provides a user-resize affordance. */
+/**
+ * A [Component] which when attached to a [PanelEntity] provides a user-resize affordance.
+ *
+ * Note: This Component is currently unsupported on GltfModelEntity.
+ */
 public class ResizableComponent
 private constructor(
     private val runtime: JxrPlatformAdapter,
