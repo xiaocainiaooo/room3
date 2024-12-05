@@ -19,15 +19,19 @@ package androidx.room.gradle.integration
 import androidx.room.gradle.RoomArgumentProvider
 import androidx.room.gradle.RoomExtension
 import androidx.room.gradle.RoomExtension.SchemaConfiguration
-import androidx.room.gradle.RoomGradlePlugin.Companion.capitalize
-import androidx.room.gradle.RoomGradlePlugin.Companion.check
 import androidx.room.gradle.RoomSimpleCopyTask
 import androidx.room.gradle.toOptions
+import androidx.room.gradle.util.capitalize
+import androidx.room.gradle.util.check
+import androidx.room.gradle.util.kspOneTaskClass
+import androidx.room.gradle.util.kspTwoTaskClass
 import com.android.build.api.AndroidPluginVersion
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.ComponentIdentity
 import com.android.build.api.variant.HasUnitTest
+import com.google.devtools.ksp.gradle.KspAATask
 import com.google.devtools.ksp.gradle.KspTask
+import kotlin.reflect.KClass
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.compile.JavaCompile
@@ -205,11 +209,22 @@ internal class AndroidPluginIntegration(private val common: CommonIntegration) {
         argumentProviderFactory: (Task) -> RoomArgumentProvider
     ) =
         project.plugins.withId("com.google.devtools.ksp") {
-            project.tasks.withType(KspTask::class.java).configureEach { task ->
-                if (androidVariantsTaskNames.isKspTaskJvm(task.name)) {
-                    val argProvider = argumentProviderFactory.invoke(task)
-                    task.commandLineArgumentProviders.add(argProvider)
+            fun <T : Task> configureEach(
+                kclass: KClass<T>,
+                block: T.(RoomArgumentProvider) -> Unit
+            ) {
+                project.tasks.withType(kclass.java).configureEach { task ->
+                    if (androidVariantsTaskNames.isKspTaskJvm(task.name)) {
+                        val argProvider = argumentProviderFactory.invoke(task)
+                        task.block(argProvider)
+                    }
                 }
+            }
+            if (kspOneTaskClass != null) {
+                configureEach(KspTask::class) { commandLineArgumentProviders.add(it) }
+            }
+            if (kspTwoTaskClass != null) {
+                configureEach(KspAATask::class) { commandLineArgumentProviders.add(it) }
             }
         }
 
