@@ -47,7 +47,7 @@ fun collect(
     includeInStartupProfile: Boolean,
     filterPredicate: ((String) -> Boolean),
     profileBlock: MacrobenchmarkScope.() -> Unit
-) {
+): BaselineProfileResult {
     val scope = buildMacrobenchmarkScope(packageName)
     val uid = UserInfo.currentUserId
     val startTime = System.nanoTime()
@@ -133,7 +133,7 @@ fun collect(
                 sortRules = true,
                 filterPredicate = filterPredicate
             )
-        reportResults(
+        return reportResults(
             profile = profile,
             uniqueFilePrefix = uniqueName,
             startTime = startTime,
@@ -160,10 +160,7 @@ private fun reportResults(
     uniqueFilePrefix: String,
     startTime: Long,
     includeInStartupProfile: Boolean
-) {
-    // Write a file with a timestamp to be able to disambiguate between runs with the same
-    // unique name.
-
+): BaselineProfileResult {
     val (fileName, tsFileName) =
         if (includeInStartupProfile && Arguments.enableStartupProfiles) {
             arrayOf(
@@ -184,6 +181,13 @@ private fun reportResults(
             it.writeText(profile)
         }
 
+    val resultsContainer =
+        if (includeInStartupProfile && Arguments.enableStartupProfiles) {
+            BaselineProfileResult(startupProfiles = listOf(tsAbsolutePath))
+        } else {
+            BaselineProfileResult(baselineProfiles = listOf(tsAbsolutePath))
+        }
+
     val totalRunTime = System.nanoTime() - startTime
     val results =
         Summary(
@@ -200,6 +204,7 @@ private fun reportResults(
         )
         Log.d(TAG, "Total Run Time Ns: $totalRunTime")
     }
+    return resultsContainer
 }
 
 /**
@@ -371,4 +376,12 @@ private data class Summary(
     val totalRunTime: Long,
     val profilePath: String,
     val profileTsPath: String,
+)
+
+/** A container for the results of collecting Baseline Profiles using the [collect] API. */
+public class BaselineProfileResult(
+    /** A list of absolute file paths to the generated baseline profiles. */
+    val baselineProfiles: List<String> = emptyList(),
+    /** A list of absolute file paths to the generated startup profiles. */
+    val startupProfiles: List<String> = emptyList()
 )
