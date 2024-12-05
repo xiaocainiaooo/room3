@@ -32,6 +32,7 @@ import androidx.xr.scenecore.JxrPlatformAdapter.SpatialCapabilities as RtSpatial
 import androidx.xr.scenecore.SpatialCapabilities.SpatialCapability
 import androidx.xr.scenecore.impl.JxrPlatformAdapterAxr
 import com.google.common.util.concurrent.ListenableFuture
+import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
@@ -39,8 +40,6 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 import java.util.function.Consumer
-import kotlin.time.Duration
-import kotlin.time.toJavaDuration
 
 /**
  * The Session provides the primary interface to SceneCore functionality for the application. Each
@@ -396,13 +395,13 @@ public class Session(
      * @param bounds Bounds for this AnchorEntity.
      * @param planeType Orientation of plane to which this Anchor should attach.
      * @param planeSemantic Semantics of the plane to which this Anchor should attach.
-     * @param timeout The amount of time to search for the a suitable plane to attach to. If a plane
-     *   is not found within the timeout, the returned AnchorEntity state will be set to
-     *   AnchorEntity.State.TIMEDOUT. It may take longer than the timeout period before the anchor
-     *   state is updated. If the timeout duration is zero it will search for the anchor
+     * @param timeout The amount of time as a [Duration] to search for the a suitable plane to
+     *   attach to. If a plane is not found within the timeout, the returned AnchorEntity state will
+     *   be set to AnchorEntity.State.TIMEDOUT. It may take longer than the timeout period before
+     *   the anchor state is updated. If the timeout duration is zero it will search for the anchor
      *   indefinitely.
      */
-    @Suppress("MissingJvmstatic")
+    @JvmOverloads
     public fun createAnchorEntity(
         bounds: Dimensions,
         planeType: @PlaneTypeValue Int,
@@ -415,7 +414,7 @@ public class Session(
             bounds,
             planeType,
             planeSemantic,
-            timeout.toJavaDuration(),
+            timeout
         )
     }
 

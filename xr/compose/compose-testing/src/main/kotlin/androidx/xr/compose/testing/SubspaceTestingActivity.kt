@@ -104,7 +104,7 @@ public fun AndroidComposeTestRule<*, SubspaceTestingActivity>.onAllSubspaceNodes
 ): SubspaceSemanticsNodeInteractionCollection = onAllSubspaceNodes(hasTestTag(testTag))
 
 /**
- * Create a fake Jetpack XR Core [Session] for testing.
+ * Create a fake [Session] for testing.
  *
  * TODO(b/370856223) Update documentation to include params
  */

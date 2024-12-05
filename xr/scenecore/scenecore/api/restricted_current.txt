@@ -1391,7 +1391,8 @@ package androidx.xr.scenecore {
     method public androidx.xr.scenecore.ActivityPanelEntity createActivityPanelEntity(android.graphics.Rect windowBoundsPx, String name);
     method public androidx.xr.scenecore.ActivityPanelEntity createActivityPanelEntity(android.graphics.Rect windowBoundsPx, String name, optional androidx.xr.runtime.math.Pose pose);
     method public androidx.xr.scenecore.AnchorEntity createAnchorEntity(androidx.xr.arcore.Anchor anchor);
-    method public androidx.xr.scenecore.AnchorEntity createAnchorEntity(androidx.xr.scenecore.Dimensions bounds, int planeType, int planeSemantic, optional long timeout);
+    method public androidx.xr.scenecore.AnchorEntity createAnchorEntity(androidx.xr.scenecore.Dimensions bounds, int planeType, int planeSemantic);
+    method public androidx.xr.scenecore.AnchorEntity createAnchorEntity(androidx.xr.scenecore.Dimensions bounds, int planeType, int planeSemantic, optional java.time.Duration timeout);
     method public androidx.xr.scenecore.Entity createEntity(String name);
     method public androidx.xr.scenecore.Entity createEntity(String name, optional androidx.xr.runtime.math.Pose pose);
     method public androidx.xr.scenecore.ExrImage createExrImageResource(String name);

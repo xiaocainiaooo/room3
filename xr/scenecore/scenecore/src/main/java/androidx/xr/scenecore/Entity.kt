@@ -558,7 +558,12 @@ public sealed class BasePanelEntity<out RtPanelEntityType : RtPanelEntity>(
     }
 }
 
-/** GltfModelEntity is a concrete implementation of Entity that hosts a glTF model. */
+/**
+ * GltfModelEntity is a concrete implementation of Entity that hosts a glTF model.
+ *
+ * Note: The size property of this Entity is always reported as {0, 0, 0}, regardless of the actual
+ * size of the model.
+ */
 public class GltfModelEntity
 private constructor(rtEntity: JxrPlatformAdapter.GltfEntity, entityManager: EntityManager) :
     BaseEntity<JxrPlatformAdapter.GltfEntity>(rtEntity, entityManager) {

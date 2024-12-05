@@ -24,7 +24,9 @@ import java.util.concurrent.Executor
 
 /**
  * Allows users to interactively move the Entity. This component can be attached to a single
- * instance of any non-Anchor Entity.
+ * instance of any PanelEntity.
+ *
+ * NOTE: This Component is currently unsupported on GltfModelEntity.
  */
 public class MovableComponent
 private constructor(
