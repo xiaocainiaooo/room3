@@ -21,13 +21,13 @@ plugins {
 }
 
 android {
-    compileSdk 35
-    compileSdkExtension 14
-    namespace 'androidx.privacysandbox.ui.integration.testsdkprovider'
+    compileSdk = 35
+    compileSdkExtension = 14
+    namespace = "androidx.privacysandbox.ui.integration.testsdkprovider"
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
         }
     }
 }

@@ -62,10 +62,10 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled = true
         }
     }
-    namespace "com.example.androidx.webkit"
+    namespace = "com.example.androidx.webkit"
 }
 
 androidx {

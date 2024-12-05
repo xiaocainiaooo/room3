@@ -22,9 +22,9 @@ plugins {
 
 android {
     defaultConfig {
-        minSdkVersion 23
+        minSdk = 23
     }
-    namespace "androidx.compose.integration.hero.pokedex.macrobenchmark"
+    namespace = "androidx.compose.integration.hero.pokedex.macrobenchmark"
     targetProjectPath = ":compose:integration-tests:hero:pokedex:pokedex-macrobenchmark-target"
     experimentalProperties["android.experimental.self-instrumenting"] = true
 }

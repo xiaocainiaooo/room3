@@ -11,7 +11,7 @@ id("com.android.library")
 }
 
 android {
-    namespace "androidx.docs.publicdocs"
+    namespace = "androidx.docs.publicdocs"
 }
 
 dependencies {

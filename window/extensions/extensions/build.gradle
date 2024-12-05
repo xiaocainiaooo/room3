@@ -61,5 +61,5 @@ androidx {
 }
 
 android {
-    namespace "androidx.window.extensions"
+    namespace = "androidx.window.extensions"
 }

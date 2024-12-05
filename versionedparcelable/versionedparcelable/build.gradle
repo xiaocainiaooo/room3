@@ -51,10 +51,10 @@ android {
         consumerProguardFiles("proguard-rules.pro")
 
         stableAidl {
-            version 1
+            version = 1
         }
     }
-    namespace "androidx.versionedparcelable"
+    namespace = "androidx.versionedparcelable"
 }
 
 androidx {
