@@ -184,8 +184,8 @@ internal fun rememberResponsiveTransformationSpec(
 
 private fun lerp(start: TransformVariableSpec, stop: TransformVariableSpec, progress: Float) =
     TransformVariableSpec(
-        lerp(start.bottomValue, stop.bottomValue, progress),
         lerp(start.topValue, stop.topValue, progress),
+        lerp(start.bottomValue, stop.bottomValue, progress),
         lerp(start.transformationZoneEnterFraction, stop.transformationZoneEnterFraction, progress),
         lerp(start.transformationZoneExitFraction, stop.transformationZoneExitFraction, progress)
     )
@@ -213,17 +213,19 @@ private fun lerp(start: TransformationSpec, stop: TransformationSpec, progress: 
  * Computes the appropriate [TransformationSpec] for a given screen size, given one or more
  * [TransformationSpec]s for different screen sizes.
  */
-private fun responsiveTransformationSpec(
+internal fun responsiveTransformationSpec(
     screenSizeDp: Int,
     specs: List<Pair<Int, TransformationSpec>>
 ): TransformationSpec {
+    require(specs.isNotEmpty()) { "Must provide at least one TransformationSpec" }
+
     val sortedSpecs = specs.sortedBy { it.first }
 
-    var ix = 0
-    while (ix < sortedSpecs.size && screenSizeDp > sortedSpecs[ix].first) ix++
+    if (screenSizeDp <= sortedSpecs.first().first) return sortedSpecs.first().second
+    if (screenSizeDp >= sortedSpecs.last().first) return sortedSpecs.last().second
 
-    if (ix == 0) return sortedSpecs.first().second
-    if (ix == sortedSpecs.size) return sortedSpecs.last().second
+    var ix = 1 // We checked and it's greater than the first element's screen size.
+    while (ix < sortedSpecs.size && screenSizeDp > sortedSpecs[ix].first) ix++
 
     return lerp(
         sortedSpecs[ix - 1].second,
