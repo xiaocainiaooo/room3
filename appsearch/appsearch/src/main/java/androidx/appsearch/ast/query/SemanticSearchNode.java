@@ -32,7 +32,10 @@ import java.util.Objects;
  * <p>The semanticSearch function matches all documents that have at least one embedding vector with
  * a matching model signature
  * (see {@link androidx.appsearch.app.EmbeddingVector#getModelSignature()}) and a similarity score
- * within the range specified based on the provided metric.
+ * within the range specified. The similarity score is calculated by determining the distance
+ * between the document embedding vector with a matching model signature and the embedding vector
+ * indexed at the list of vectors returned by {@link SearchSpec#getEmbeddingParameters()}. How this
+ * distance is defined is based on what distance metric set.
  *
  * <p>This node can be used to build a query that contains the semanticSearch function. For example,
  * the node {@code SemanticSearchNode(0, -0.5, 0.5, DOT_PRODUCT)} is equivalent
@@ -149,7 +152,8 @@ public final class SemanticSearchNode implements FunctionNode {
     }
 
     /**
-     * Returns the index of the embedding vector used in semanticSearch.
+     * Returns the index of the embedding vector to be retrieved from the list of embedding vectors
+     * returned by {@link SearchSpec#getEmbeddingParameters()}.
      */
     public int getVectorIndex() {
         return mVectorIndex;
