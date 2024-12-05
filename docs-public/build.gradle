@@ -449,6 +449,15 @@ dependencies {
     docs("androidx.work:work-rxjava2:2.10.0")
     docs("androidx.work:work-rxjava3:2.10.0")
     docs("androidx.work:work-testing:2.10.0")
+    docs("androidx.xr.arcore:arcore:1.0.0-alpha01")
+    docs("androidx.xr.compose.material3:material3:1.0.0-alpha01")
+    docs("androidx.xr.compose:compose:1.0.0-alpha01")
+    docs("androidx.xr.compose:compose-testing:1.0.0-alpha01")
+    docs("androidx.xr.runtime:runtime:1.0.0-alpha01")
+    docs("androidx.xr.runtime:runtime-openxr:1.0.0-alpha01")
+    docs("androidx.xr.runtime:runtime-testing:1.0.0-alpha01")
+    docs("androidx.xr.scenecore:scenecore:1.0.0-alpha01")
+    docs("androidx.xr.scenecore:scenecore-testing:1.0.0-alpha01")
 }
 
 afterEvaluate {
