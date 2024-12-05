@@ -24,10 +24,11 @@ import android.os.Build;
 
 import androidx.annotation.ChecksSdkIntAtLeast;
 import androidx.annotation.DoNotInline;
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Utilities for retrieving platform AppSearch's module version code.
