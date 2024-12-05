@@ -86,6 +86,7 @@ import androidx.compose.ui.unit.LayoutDirection
  * @param modifier The modifier to be applied to the Row.
  * @param horizontalArrangement The horizontal arrangement of the layout's children.
  * @param verticalAlignment The vertical alignment of the layout's children.
+ * @param content The content of the Row
  * @see Column
  * @see [androidx.compose.foundation.lazy.LazyRow]
  */
