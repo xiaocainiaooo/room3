@@ -42,6 +42,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -109,7 +112,11 @@ fun AnimatedText(
         }
     // Update before composing Canvas to make sure size gets updated
     animatedTextState.updateText(text)
-    Canvas(modifier.size(animatedTextState.size)) {
+    Canvas(
+        modifier.size(animatedTextState.size).semantics {
+            apply { this.text = AnnotatedString(text) }
+        }
+    ) {
         animatedTextState.draw(
             drawContext.canvas.nativeCanvas,
             contentAlignment,
