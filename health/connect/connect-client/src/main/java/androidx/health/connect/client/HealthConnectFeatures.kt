@@ -91,7 +91,10 @@ interface HealthConnectFeatures {
                 FEATURE_SKIN_TEMPERATURE to
                     HealthConnectVersionInfo(platformVersion = SDK_EXT_13_PLATFORM_VERSION),
                 FEATURE_READ_HEALTH_DATA_HISTORY to
-                    HealthConnectVersionInfo(platformVersion = SDK_EXT_13_PLATFORM_VERSION),
+                    HealthConnectVersionInfo(
+                        apkVersionCode = 165072,
+                        platformVersion = SDK_EXT_13_PLATFORM_VERSION
+                    ),
                 FEATURE_PLANNED_EXERCISE to
                     HealthConnectVersionInfo(platformVersion = SDK_EXT_13_PLATFORM_VERSION)
             )
