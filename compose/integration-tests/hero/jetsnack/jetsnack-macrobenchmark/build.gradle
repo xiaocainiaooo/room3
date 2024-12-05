@@ -22,9 +22,9 @@ plugins {
 
 android {
     defaultConfig {
-        minSdkVersion 23
+        minSdk = 23
     }
-    namespace "androidx.compose.integration.hero.jetsnack.macrobenchmark"
+    namespace = "androidx.compose.integration.hero.jetsnack.macrobenchmark"
     targetProjectPath = ":compose:integration-tests:hero:jetsnack:jetsnack-macrobenchmark-target"
     experimentalProperties["android.experimental.self-instrumenting"] = true
 }

@@ -22,9 +22,9 @@ plugins {
 }
 
 android {
-    compileSdk 35
+    compileSdk = 35
     defaultConfig {
-        applicationId "androidx.camera.integration.view"
+        applicationId = "androidx.camera.integration.view"
     }
 
     sourceSets {
@@ -37,14 +37,14 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled = true
+            shrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),
                     "proguard-rules.pro")
         }
     }
 
-    namespace "androidx.camera.integration.view"
+    namespace = "androidx.camera.integration.view"
 }
 
 dependencies {

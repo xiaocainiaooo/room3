@@ -51,8 +51,8 @@ androidx {
 }
 
 android {
-    compileSdk 35
-    namespace "androidx.core.i18n"
+    compileSdk = 35
+    namespace = "androidx.core.i18n"
     defaultConfig {
     }
 }

@@ -66,10 +66,10 @@ dependencies {
 }
 
 android {
-    compileSdk 35
+    compileSdk = 35
 
     defaultConfig {
-        minSdkVersion 26
+        minSdk = 26
     }
 
     sourceSets {
@@ -80,7 +80,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    namespace "androidx.wear.protolayout.material3"
+    namespace = "androidx.wear.protolayout.material3"
     kotlinOptions {
         jvmTarget = '1.8'
     }

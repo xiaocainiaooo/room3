@@ -29,8 +29,8 @@ plugins {
 }
 
 android {
-    compileSdkPreview "Baklava"
-    namespace "androidx.appsearch.debugview.samples"
+    compileSdkPreview = "Baklava"
+    namespace = "androidx.appsearch.debugview.samples"
 }
 
 dependencies {

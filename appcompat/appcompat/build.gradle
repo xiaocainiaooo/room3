@@ -104,8 +104,8 @@ android {
     useLibrary "android.test.runner"
     useLibrary "android.test.base"
     useLibrary "android.test.mock"
-    namespace "androidx.appcompat"
-    testNamespace "androidx.appcompat.test"
+    namespace = "androidx.appcompat"
+    testNamespace = "androidx.appcompat.test"
 }
 
 androidx {

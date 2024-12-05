@@ -42,6 +42,6 @@ androidx {
 }
 
 android {
-    compileSdkPreview "Baklava"
-    namespace "androidx.appsearch.testutil"
+    compileSdkPreview = "Baklava"
+    namespace = "androidx.appsearch.testutil"
 }

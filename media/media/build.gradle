@@ -56,7 +56,7 @@ android {
     buildTypes.configureEach {
         consumerProguardFiles "proguard-rules.pro"
     }
-    namespace "androidx.media"
+    namespace = "androidx.media"
 }
 
 androidx {

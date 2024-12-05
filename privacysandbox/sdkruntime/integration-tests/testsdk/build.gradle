@@ -21,11 +21,11 @@ plugins {
 }
 
 android {
-    namespace 'androidx.privacysandbox.sdkruntime.integration.testsdk'
+    namespace = "androidx.privacysandbox.sdkruntime.integration.testsdk"
 
     defaultConfig {
-        compileSdk 35
-        compileSdkExtension 14
+        compileSdk = 35
+        compileSdkExtension = 14
     }
 }
 

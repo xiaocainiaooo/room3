@@ -68,5 +68,5 @@ androidx {
 }
 
 android {
-    namespace "androidx.lifecycle.extensions"
+    namespace = "androidx.lifecycle.extensions"
 }

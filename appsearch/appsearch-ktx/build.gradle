@@ -50,6 +50,6 @@ androidx {
 }
 
 android {
-    compileSdkPreview "Baklava"
-    namespace "androidx.appsearch.ktx"
+    compileSdkPreview = "Baklava"
+    namespace = "androidx.appsearch.ktx"
 }

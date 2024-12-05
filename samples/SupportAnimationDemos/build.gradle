@@ -16,6 +16,6 @@ dependencies {
 }
 
 android {
-    compileSdk 35
-    namespace "com.example.android.support.animation"
+    compileSdk = 35
+    namespace = "com.example.android.support.animation"
 }

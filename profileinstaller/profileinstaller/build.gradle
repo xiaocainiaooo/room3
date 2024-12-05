@@ -48,5 +48,5 @@ androidx {
 }
 
 android {
-    namespace "androidx.profileinstaller"
+    namespace = "androidx.profileinstaller"
 }

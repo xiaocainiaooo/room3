@@ -141,10 +141,10 @@ androidx {
 
 // Screenshot tests related setup
 android {
-    compileSdk 35
+    compileSdk = 35
     sourceSets.androidTest.assets.srcDirs +=
             project.rootDir.absolutePath + "/../../golden/compose/material3/material3"
-    namespace "androidx.compose.material3"
+    namespace = "androidx.compose.material3"
     // TODO(b/345531033)
     experimentalProperties["android.lint.useK2Uast"] = false
 }

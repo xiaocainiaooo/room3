@@ -64,5 +64,5 @@ androidx {
 }
 
 android {
-    namespace "androidx.lifecycle.livedata"
+    namespace = "androidx.lifecycle.livedata"
 }

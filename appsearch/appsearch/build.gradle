@@ -29,11 +29,11 @@ plugins {
 }
 
 android {
-    compileSdkPreview "Baklava"
+    compileSdkPreview = "Baklava"
     buildTypes.configureEach {
         consumerProguardFiles "proguard-rules.pro"
     }
-    namespace "androidx.appsearch"
+    namespace = "androidx.appsearch"
 }
 
 dependencies {

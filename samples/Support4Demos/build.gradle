@@ -31,6 +31,6 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 35
-    namespace "com.example.android.supportv4"
+    compileSdk = 35
+    namespace = "com.example.android.supportv4"
 }

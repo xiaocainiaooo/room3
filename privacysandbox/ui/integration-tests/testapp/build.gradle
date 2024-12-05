@@ -21,18 +21,18 @@ plugins {
 }
 
 android {
-    compileSdk 35
-    compileSdkExtension 14
-    namespace "androidx.privacysandbox.ui.integration.testapp"
+    compileSdk = 35
+    compileSdkExtension = 14
+    namespace = "androidx.privacysandbox.ui.integration.testapp"
 
     defaultConfig {
-        applicationId "androidx.privacysandbox.ui.integration.testapp"
-        targetSdk 35
+        applicationId = "androidx.privacysandbox.ui.integration.testapp"
+        targetSdk = 35
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
         }
     }
 

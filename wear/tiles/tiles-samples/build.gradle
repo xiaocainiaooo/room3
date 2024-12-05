@@ -24,26 +24,24 @@ plugins {
 }
 
 android {
-    namespace 'androidx.wear.tiles.samples'
-    compileSdk 35
+    namespace = "androidx.wear.tiles.samples"
+    compileSdk = 35
 
     defaultConfig {
-        applicationId "androidx.wear.tiles.samples"
-        minSdk 30
-        targetSdk 35
-        versionCode 1
-        versionName "1.0"
+        applicationId = "androidx.wear.tiles.samples"
+        minSdk = 30
+        targetSdk = 35
     }
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
     buildFeatures {
-        viewBinding true
+        viewBinding = true
     }
 }
 

@@ -51,6 +51,6 @@ androidx {
 }
 
 android {
-    compileSdkPreview "Baklava"
-    namespace "androidx.appsearch.platformstorage"
+    compileSdkPreview = "Baklava"
+    namespace = "androidx.appsearch.platformstorage"
 }

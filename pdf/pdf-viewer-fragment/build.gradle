@@ -47,12 +47,12 @@ dependencies {
 }
 
 android {
-    namespace "androidx.pdf.viewer.fragment"
+    namespace = "androidx.pdf.viewer.fragment"
 
     defaultConfig {
-        minSdk 31
-        compileSdk 35
-        targetSdk 31
+        minSdk = 31
+        compileSdk = 35
+        targetSdk = 31
     }
 }
 

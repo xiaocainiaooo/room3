@@ -61,7 +61,7 @@ dependencies {
 
 android {
     defaultConfig {
-        minSdkVersion 26
+        minSdk = 26
     }
 
     sourceSets {
@@ -72,7 +72,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    namespace "androidx.wear.tiles.material"
+    namespace = "androidx.wear.tiles.material"
 }
 
 androidx {

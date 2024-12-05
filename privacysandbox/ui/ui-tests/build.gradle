@@ -51,8 +51,8 @@ dependencies {
 }
 
 android {
-    compileSdk 35
-    namespace "androidx.privacysandbox.ui.tests"
+    compileSdk = 35
+    namespace = "androidx.privacysandbox.ui.tests"
 }
 
 androidx {

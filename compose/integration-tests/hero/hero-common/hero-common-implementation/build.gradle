@@ -48,7 +48,7 @@ dependencies {
 }
 
 android {
-    namespace "androidx.compose.integration.hero.common.implementation"
+    namespace = "androidx.compose.integration.hero.common.implementation"
     compileSdk = 35
 }
 

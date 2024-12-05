@@ -56,6 +56,6 @@ androidx {
 }
 
 android {
-    compileSdkPreview "Baklava"
-    namespace "androidx.appsearch.builtintypes"
+    compileSdkPreview = "Baklava"
+    namespace = "androidx.appsearch.builtintypes"
 }

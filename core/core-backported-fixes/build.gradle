@@ -35,7 +35,7 @@ dependencies {
 }
 
 android {
-    namespace "androidx.core.backported.fixes"
+    namespace = "androidx.core.backported.fixes"
 }
 
 androidx {
