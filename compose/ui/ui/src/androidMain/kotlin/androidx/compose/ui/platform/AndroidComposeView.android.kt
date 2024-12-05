@@ -1051,8 +1051,12 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         composeAccessibilityDelegate.SendRecurringAccessibilityEventsIntervalMillis = intervalMillis
     }
 
-    override fun onAttach(node: LayoutNode) {
+    override fun onPreAttach(node: LayoutNode) {
         layoutNodes[node.semanticsId] = node
+    }
+
+    override fun onPostAttach(node: LayoutNode) {
+        // TODO(MNUZEN): add autofill logic here
     }
 
     override fun onDetach(node: LayoutNode) {
@@ -1196,7 +1200,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
     }
 
     /**
-     * Called to inform the owner that a new Android [View] was [attached][Owner.onAttach] to the
+     * Called to inform the owner that a new Android [View] was [attached][Owner.onPreAttach] to the
      * hierarchy.
      */
     fun addAndroidView(view: AndroidViewHolder, layoutNode: LayoutNode) {

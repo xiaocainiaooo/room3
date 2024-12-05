@@ -194,7 +194,13 @@ internal interface Owner : PositionCalculator {
      * used by [Owner] to track which nodes are associated with it. It will only be called when
      * [node] is not already attached to an owner.
      */
-    fun onAttach(node: LayoutNode)
+    fun onPreAttach(node: LayoutNode)
+
+    /**
+     * Called by [LayoutNode] when all children have been attached, and the modifier node's attach
+     * lifecycles have been run. It will only be called after [onPreAttach].
+     */
+    fun onPostAttach(node: LayoutNode)
 
     /**
      * Called by [LayoutNode] when it is detached from the view system, such as during

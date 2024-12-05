@@ -2961,7 +2961,9 @@ private class TestOwner : Owner {
         TODO("Not yet implemented")
     }
 
-    override fun onAttach(node: LayoutNode) {}
+    override fun onPreAttach(node: LayoutNode) {}
+
+    override fun onPostAttach(node: LayoutNode) {}
 
     override fun onDetach(node: LayoutNode) {}
 

@@ -328,8 +328,10 @@ class ModifierLocalConsumerEntityTest {
             scheduleMeasureAndLayout: Boolean
         ) {}
 
-        override fun onAttach(node: LayoutNode) =
+        override fun onPreAttach(node: LayoutNode) =
             node.forEachNodeCoordinator { it.onLayoutNodeAttach() }
+
+        override fun onPostAttach(node: LayoutNode) {}
 
         override fun onDetach(node: LayoutNode) {}
 

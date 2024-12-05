@@ -158,7 +158,9 @@ private class FakeOwner(
 
     @OptIn(InternalCoreApi::class) override var showLayoutBounds: Boolean = false
 
-    override fun onAttach(node: LayoutNode) {}
+    override fun onPreAttach(node: LayoutNode) {}
+
+    override fun onPostAttach(node: LayoutNode) {}
 
     override fun onDetach(node: LayoutNode) {}
 

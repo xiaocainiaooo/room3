@@ -2421,9 +2421,11 @@ internal class MockOwner(
 
     override fun requestOnPositionedCallback(layoutNode: LayoutNode) {}
 
-    override fun onAttach(node: LayoutNode) {
+    override fun onPreAttach(node: LayoutNode) {
         onAttachParams += node
     }
+
+    override fun onPostAttach(node: LayoutNode) {}
 
     override fun onDetach(node: LayoutNode) {
         onDetachParams += node
