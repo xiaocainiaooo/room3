@@ -26,13 +26,23 @@ import org.gradle.api.Task
 internal fun String.capitalize(): String =
     this.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString() }
 
-internal fun Task.isKspTask(): Boolean =
+internal val kspOneTaskClass =
     try {
-        val kspTaskClass = Class.forName("com.google.devtools.ksp.gradle.KspTask")
-        kspTaskClass.isAssignableFrom(this::class.java)
+        Class.forName("com.google.devtools.ksp.gradle.KspTask")
     } catch (ex: ClassNotFoundException) {
-        false
+        null
     }
+
+internal val kspTwoTaskClass =
+    try {
+        Class.forName("com.google.devtools.ksp.gradle.KspAATask")
+    } catch (ex: ClassNotFoundException) {
+        null
+    }
+
+internal fun Task.isKspTask() =
+    kspOneTaskClass?.isAssignableFrom(this::class.java) == true ||
+        kspTwoTaskClass?.isAssignableFrom(this::class.java) == true
 
 @OptIn(ExperimentalContracts::class)
 internal fun Project.check(value: Boolean, isFatal: Boolean = false, lazyMessage: () -> String) {
