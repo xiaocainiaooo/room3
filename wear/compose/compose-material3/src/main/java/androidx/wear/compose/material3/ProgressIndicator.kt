@@ -282,6 +282,14 @@ class ProgressIndicatorColors(
     }
 }
 
+internal fun brushWithAlpha(brush: Brush, alpha: Float): Brush {
+    return if (brush is SolidColor && alpha < 1f) {
+        SolidColor(brush.value.copy(alpha = brush.value.alpha * alpha))
+    } else {
+        brush
+    }
+}
+
 /**
  * Draws an arc for indicator segment leaving half of the `gapSweep` before each visual end.
  *
@@ -300,14 +308,8 @@ internal fun DrawScope.drawIndicatorSegment(
         val radius = size.minDimension / 2 - stroke.width / 2
         val circleRadius = (stroke.width / 2) * sweep / gapSweep
         val alpha = (circleRadius / stroke.width * 2f).coerceAtMost(1f)
-        val brushWithAlpha =
-            if (brush is SolidColor && alpha < 1f) {
-                SolidColor(brush.value.copy(alpha = brush.value.alpha * alpha))
-            } else {
-                brush
-            }
         drawCircle(
-            brushWithAlpha,
+            brushWithAlpha(brush, alpha),
             circleRadius,
             center =
                 Offset(
@@ -394,8 +396,9 @@ internal fun DrawScope.drawIndicatorArc(
         val angle = (startAngle + sweep / 2f).toRadians()
         val radius = size.width / 2 - stroke.width / 2
         val circleRadius = (stroke.width / 2) * sweep.absoluteValue / gapSweep
+        val alpha = (circleRadius / stroke.width * 2f).coerceAtMost(1f)
         drawCircle(
-            brush = brush,
+            brush = brushWithAlpha(brush, alpha),
             radius = circleRadius,
             center =
                 Offset(radius * cos(angle) + size.width / 2, radius * sin(angle) + size.width / 2)
