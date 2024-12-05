@@ -41,8 +41,16 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
     public static final String ROUTE_NAME_GROUP = "Group route name";
     public static final String ROUTE_ID_1 = "route_id1";
     public static final String ROUTE_NAME_1 = "Sample Route 1";
+    public static final boolean ROUTE_GROUPABLE_1 = true;
+    public static final boolean ROUTE_TRANSFERABLE_1 = false;
     public static final String ROUTE_ID_2 = "route_id2";
     public static final String ROUTE_NAME_2 = "Sample Route 2";
+    public static final boolean ROUTE_GROUPABLE_2 = true;
+    public static final boolean ROUTE_TRANSFERABLE_2 = false;
+    public static final String ROUTE_ID_3 = "route_id3";
+    public static final String ROUTE_NAME_3 = "Sample Route 3";
+    public static final boolean ROUTE_GROUPABLE_3 = false;
+    public static final boolean ROUTE_TRANSFERABLE_3 = true;
     public static final List<IntentFilter> CONTROL_FILTERS_TEST = new ArrayList<>();
 
     static {
@@ -78,8 +86,13 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
                     new MediaRouteDescriptor.Builder(ROUTE_ID_2, ROUTE_NAME_2)
                             .addControlFilters(CONTROL_FILTERS_TEST)
                             .build();
+            MediaRouteDescriptor route3 =
+                    new MediaRouteDescriptor.Builder(ROUTE_ID_3, ROUTE_NAME_3)
+                            .addControlFilters(CONTROL_FILTERS_TEST)
+                            .build();
             mRoutes.put(route1.getId(), route1);
             mRoutes.put(route2.getId(), route2);
+            mRoutes.put(route3.getId(), route3);
         }
 
         // MediaRouteProvider implementation.
@@ -127,6 +140,7 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
                     "onCreateDynamicGroupRouteController with initialMemberRouteId = "
                             + initialMemberRouteId);
             mGroupController = new StubDynamicRouteController();
+            mCurrentSelectedRouteIds.add(initialMemberRouteId);
             return mGroupController;
         }
 
@@ -150,10 +164,39 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
                                         mCurrentSelectedRouteIds.contains(route.getId())
                                                 ? DynamicRouteDescriptor.SELECTED
                                                 : DynamicRouteDescriptor.UNSELECTED)
+                                .setIsGroupable(getIsGroupable(route.getId()))
+                                .setIsTransferable(getIsTransferable(route.getId()))
+                                .setIsUnselectable(mCurrentSelectedRouteIds.contains(route.getId()))
                                 .build();
                 result.add(dynamicDescriptor);
             }
             return result;
+        }
+
+        private boolean getIsGroupable(String routeId) {
+            switch (routeId) {
+                case ROUTE_ID_1:
+                    return ROUTE_GROUPABLE_1;
+                case ROUTE_ID_2:
+                    return ROUTE_GROUPABLE_2;
+                case ROUTE_ID_3:
+                    return ROUTE_GROUPABLE_3;
+                default:
+                    return false;
+            }
+        }
+
+        private boolean getIsTransferable(String routeId) {
+            switch (routeId) {
+                case ROUTE_ID_1:
+                    return ROUTE_TRANSFERABLE_1;
+                case ROUTE_ID_2:
+                    return ROUTE_TRANSFERABLE_2;
+                case ROUTE_ID_3:
+                    return ROUTE_TRANSFERABLE_3;
+                default:
+                    return false;
+            }
         }
 
         // Internal classes.
@@ -200,6 +243,9 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
 
             @Override
             public void onUpdateMemberRoutes(@Nullable List<String> routeIds) {
+                if (routeIds == null) {
+                    return;
+                }
                 Log.i(TAG, "StubDynamicRouteController.onUpdateMemberRoutes()");
                 mCurrentSelectedRouteIds.clear();
                 mCurrentSelectedRouteIds.addAll(routeIds);
@@ -223,8 +269,12 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
             }
 
             private void publishState() {
-                Log.i(TAG, "StubDynamicRouteController.publishState()");
-                notifyDynamicRoutesChanged(mGroupDescriptor, buildDynamicRouteDescriptors());
+                Collection<DynamicRouteDescriptor> dynamicRoutes = buildDynamicRouteDescriptors();
+                Log.i(
+                        TAG,
+                        "StubDynamicRouteController.publishState() with dynamicRoutes.size() = "
+                                + dynamicRoutes.size());
+                notifyDynamicRoutesChanged(mGroupDescriptor, dynamicRoutes);
             }
         }
     }
