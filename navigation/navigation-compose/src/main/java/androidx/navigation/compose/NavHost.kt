@@ -708,7 +708,26 @@ public fun NavHost(
         }
         LaunchedEffect(transition.currentState, transition.targetState) {
             if (transition.currentState == transition.targetState) {
-                visibleEntries.forEach { entry -> composeNavigator.onTransitionComplete(entry) }
+                visibleEntries.forEach { entry ->
+                    // TODO: remove the check once b/353294030 is fixed
+                    if (
+                        // immediately complete if this is a none interrupt case
+                        visibleEntries.size < 3 ||
+                            // complete if AnimatedContent already knows about this entry and the
+                            // entry
+                            // is not the target state. This would happen if we got a navigate call
+                            // right before this LaunchedEffect was triggered. The navigate call
+                            // will
+                            // do a pushWithTransition and add the current target and a new entry to
+                            // visibleEntries and we don't want to actually complete those until
+                            // AnimatedContent has had the chance to actually compose them.
+
+                            (zIndices.keys.contains(entry.id) &&
+                                entry.id != transition.targetState.id)
+                    ) {
+                        composeNavigator.onTransitionComplete(entry)
+                    }
+                }
                 zIndices
                     .filter { it.key != transition.targetState.id }
                     .forEach { zIndices.remove(it.key) }
