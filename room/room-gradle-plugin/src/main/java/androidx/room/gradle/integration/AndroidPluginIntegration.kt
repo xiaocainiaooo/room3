@@ -19,10 +19,10 @@ package androidx.room.gradle.integration
 import androidx.room.gradle.RoomArgumentProvider
 import androidx.room.gradle.RoomExtension
 import androidx.room.gradle.RoomExtension.SchemaConfiguration
-import androidx.room.gradle.RoomGradlePlugin.Companion.capitalize
-import androidx.room.gradle.RoomGradlePlugin.Companion.check
 import androidx.room.gradle.RoomSimpleCopyTask
 import androidx.room.gradle.toOptions
+import androidx.room.gradle.util.capitalize
+import androidx.room.gradle.util.check
 import com.android.build.api.AndroidPluginVersion
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.ComponentIdentity

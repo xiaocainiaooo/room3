@@ -19,8 +19,8 @@ package androidx.room.gradle.integration
 import androidx.room.gradle.RoomArgumentProvider
 import androidx.room.gradle.RoomExtension
 import androidx.room.gradle.RoomExtension.SchemaConfiguration
-import androidx.room.gradle.RoomGradlePlugin.Companion.check
 import androidx.room.gradle.toOptions
+import androidx.room.gradle.util.check
 import com.google.devtools.ksp.gradle.KspTask
 import org.gradle.api.Project
 import org.gradle.api.Task
