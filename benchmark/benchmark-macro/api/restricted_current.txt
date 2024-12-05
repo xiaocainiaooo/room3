@@ -11,6 +11,15 @@ package androidx.benchmark.macro {
     enum_constant public static final androidx.benchmark.macro.BaselineProfileMode UseIfAvailable;
   }
 
+  public final class BaselineProfileResult {
+    ctor public BaselineProfileResult();
+    ctor public BaselineProfileResult(optional java.util.List<java.lang.String> baselineProfiles, optional java.util.List<java.lang.String> startupProfiles);
+    method public java.util.List<java.lang.String> getBaselineProfiles();
+    method public java.util.List<java.lang.String> getStartupProfiles();
+    property public final java.util.List<java.lang.String> baselineProfiles;
+    property public final java.util.List<java.lang.String> startupProfiles;
+  }
+
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class BatteryCharge {
     method public boolean hasMinimumCharge(optional boolean throwOnMissingMetrics);
     field public static final androidx.benchmark.macro.BatteryCharge INSTANCE;
