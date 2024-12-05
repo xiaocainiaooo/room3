@@ -211,7 +211,8 @@ val WearMaterial3Demos =
                         ComposableDemo("TLC Cards") { TransformingLazyColumnCards() },
                         ComposableDemo("Animation Demo") { TransformingLazyColumnScrollingSample() }
                     )
-                )
+                ),
+                ComposableDemo("Text") { TextWeightDemo() }
             )
             .sortedBy { it.title }
     )
