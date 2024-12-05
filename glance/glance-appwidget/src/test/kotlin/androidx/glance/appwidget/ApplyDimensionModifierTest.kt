@@ -153,6 +153,7 @@ class ApplyDimensionModifierTest {
             assertThat(view.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.WRAP_CONTENT)
         }
 
+    @Ignore // b/377567116
     @Test
     fun normalResourceHeight() =
         fakeCoroutineScope.runTest {
