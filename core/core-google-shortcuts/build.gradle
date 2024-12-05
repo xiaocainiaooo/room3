@@ -54,4 +54,6 @@ androidx {
     mavenVersion = LibraryVersions.CORE_GOOGLE_SHORTCUTS
     inceptionYear = "2021"
     description = "Library for powering Google features with Android app shortcuts"
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

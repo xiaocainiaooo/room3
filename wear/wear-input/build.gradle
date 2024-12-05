@@ -63,4 +63,6 @@ androidx {
     description = "Android Wear Support Input"
     legacyDisableKotlinStrictApiMode = true
     samples(project(":wear:wear-input-samples"))
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

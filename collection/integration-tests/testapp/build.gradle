@@ -39,4 +39,6 @@ androidx {
     publish = Publish.NONE
     inceptionYear = "2021"
     description = "AndroidX Collection Integration Tests"
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

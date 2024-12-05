@@ -107,3 +107,8 @@ dependencies {
         exclude(group:"androidx.test")
     }
 }
+
+androidx {
+    // TODO: b/326456246
+    optOutJSpecify = true
+}

@@ -53,6 +53,8 @@ androidx {
             'objects based on http://schema.org. Data interchange with the system, and other ' +
             'apps, as well as structured parameters for semantic intents should use these ' +
             'built-in types as appropriate.'
+    // TODO: b/326456246
+    optOutJSpecify = true
 }
 
 android {

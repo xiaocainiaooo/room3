@@ -51,6 +51,8 @@ androidx {
     description =
             "An implementation of AppSearchSession and GlobalSearchSession on pre-S devices using " +
                     "play-services-appsearch SDK with Gogle Play Services as storage backend."
+    // TODO: b/326456246
+    optOutJSpecify = true
 }
 
 android {

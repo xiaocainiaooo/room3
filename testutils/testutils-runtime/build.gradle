@@ -50,4 +50,6 @@ android {
 
 androidx {
     type = LibraryType.INTERNAL_TEST_LIBRARY
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

@@ -28,6 +28,8 @@ androidx {
     type = LibraryType.PUBLISHED_LIBRARY
     inceptionYear = "2014"
     description = "Android Support Palette"
+    // TODO: b/326456246
+    optOutJSpecify = true
 }
 
 android {

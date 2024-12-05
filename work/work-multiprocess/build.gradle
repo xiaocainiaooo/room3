@@ -60,4 +60,6 @@ androidx {
     description = "Android WorkManager runtime library"
     failOnDeprecationWarnings = false
     legacyDisableKotlinStrictApiMode = true
+    // TODO: b/326456246
+    optOutJSpecify = true
 }
