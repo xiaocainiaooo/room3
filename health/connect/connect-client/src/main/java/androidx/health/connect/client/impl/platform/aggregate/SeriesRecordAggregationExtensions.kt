@@ -101,7 +101,7 @@ internal suspend fun <T : SeriesRecord<*>> HealthConnectClient.aggregateSeriesRe
 private class SeriesAggregator<T : SeriesRecord<*>>(
     recordType: KClass<T>,
     val aggregateMetrics: Set<AggregateMetric<*>>
-) : Aggregator<RecordInfo> {
+) : SingeResultAggregator<RecordInfo>() {
 
     val avgData = AvgData()
     var min: Double? = null
