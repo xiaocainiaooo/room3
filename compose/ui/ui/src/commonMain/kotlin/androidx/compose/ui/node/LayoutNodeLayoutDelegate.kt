@@ -71,15 +71,7 @@ internal class LayoutNodeLayoutDelegate(
      * detached from both parent's lookahead measurement and placement.
      */
     internal var detachedFromParentLookaheadPass: Boolean = false
-        private set(value) {
-            if (value) {
-                requirePrecondition(layoutNode.isPermittedToDetachFromParentLookahead) {
-                    "Error: LayoutNode is not permitted to be detached from parent's lookahead" +
-                        " pass"
-                }
-            }
-            field = value
-        }
+        private set
 
     /**
      * This is a flag indicating the node is not going to be placed in the parent's lookahead, but
@@ -101,15 +93,7 @@ internal class LayoutNodeLayoutDelegate(
      * from parent's lookahead.
      */
     internal var detachedFromParentLookaheadPlacement: Boolean = false
-        private set(value) {
-            if (value) {
-                requirePrecondition(layoutNode.isPermittedToDetachFromParentLookahead) {
-                    "Error: LayoutNode is not permitted to be detached from parent's lookahead" +
-                        " placement"
-                }
-            }
-            field = value
-        }
+        private set
 
     /**
      * The layout state the node is currently in.
