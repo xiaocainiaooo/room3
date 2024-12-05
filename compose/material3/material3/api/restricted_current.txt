@@ -3109,19 +3109,6 @@ package androidx.compose.material3 {
     method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static void LinearWavyProgressIndicator(kotlin.jvm.functions.Function0<java.lang.Float> progress, optional androidx.compose.ui.Modifier modifier, optional long color, optional long trackColor, optional androidx.compose.ui.graphics.drawscope.Stroke stroke, optional androidx.compose.ui.graphics.drawscope.Stroke trackStroke, optional float gapSize, optional float stopSize, optional kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> amplitude, optional float wavelength, optional float waveSpeed);
   }
 
-  @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @kotlin.jvm.JvmInline public final value class WideNavigationRailArrangement {
-    field public static final androidx.compose.material3.WideNavigationRailArrangement.Companion Companion;
-  }
-
-  public static final class WideNavigationRailArrangement.Companion {
-    method public int getBottom();
-    method public int getCenter();
-    method public int getTop();
-    property public final int Bottom;
-    property public final int Center;
-    property public final int Top;
-  }
-
   @androidx.compose.runtime.Immutable public final class WideNavigationRailColors {
     ctor public WideNavigationRailColors(long containerColor, long contentColor, long modalContainerColor, long modalScrimColor);
     method public androidx.compose.material3.WideNavigationRailColors copy(optional long containerColor, optional long contentColor, optional long modalContainerColor, optional long modalScrimColor);
@@ -3138,11 +3125,11 @@ package androidx.compose.material3 {
   @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public final class WideNavigationRailDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.material3.WideNavigationRailColors colors();
     method @androidx.compose.runtime.Composable public androidx.compose.material3.WideNavigationRailColors colors(optional long containerColor, optional long contentColor, optional long modalContainerColor, optional long modalScrimColor);
-    method public int getArrangement();
+    method public androidx.compose.foundation.layout.Arrangement.Vertical getArrangement();
     method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getContainerShape();
     method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getModalContainerShape();
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.layout.WindowInsets getWindowInsets();
-    property public final int Arrangement;
+    property public final androidx.compose.foundation.layout.Arrangement.Vertical arrangement;
     property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape containerShape;
     property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape modalContainerShape;
     property @androidx.compose.runtime.Composable public final androidx.compose.foundation.layout.WindowInsets windowInsets;
@@ -3157,8 +3144,8 @@ package androidx.compose.material3 {
   }
 
   public final class WideNavigationRailKt {
-    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static void ModalWideNavigationRail(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.material3.WideNavigationRailState state, optional boolean hideOnCollapse, optional androidx.compose.ui.graphics.Shape collapsedShape, optional androidx.compose.ui.graphics.Shape expandedShape, optional androidx.compose.material3.WideNavigationRailColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? header, optional float expandedHeaderTopPadding, optional androidx.compose.foundation.layout.WindowInsets windowInsets, optional int arrangement, optional androidx.compose.material3.ModalWideNavigationRailProperties expandedProperties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static void WideNavigationRail(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.material3.WideNavigationRailState state, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.WideNavigationRailColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? header, optional androidx.compose.foundation.layout.WindowInsets windowInsets, optional int arrangement, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static void ModalWideNavigationRail(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.material3.WideNavigationRailState state, optional boolean hideOnCollapse, optional androidx.compose.ui.graphics.Shape collapsedShape, optional androidx.compose.ui.graphics.Shape expandedShape, optional androidx.compose.material3.WideNavigationRailColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? header, optional float expandedHeaderTopPadding, optional androidx.compose.foundation.layout.WindowInsets windowInsets, optional androidx.compose.foundation.layout.Arrangement.Vertical arrangement, optional androidx.compose.material3.ModalWideNavigationRailProperties expandedProperties, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static void WideNavigationRail(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.material3.WideNavigationRailState state, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.WideNavigationRailColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? header, optional androidx.compose.foundation.layout.WindowInsets windowInsets, optional androidx.compose.foundation.layout.Arrangement.Vertical arrangement, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi @androidx.compose.runtime.Composable public static void WideNavigationRailItem(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> icon, kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional boolean railExpanded, optional int iconPosition, optional androidx.compose.material3.NavigationItemColors colors, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
   }
 
