@@ -19,11 +19,12 @@ package androidx.appsearch.platformstorage.converter;
 import android.annotation.SuppressLint;
 import android.os.Build;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.app.JoinSpec;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Translates between Platform and Jetpack versions of {@link JoinSpec}.
@@ -37,8 +38,8 @@ public class JoinSpecToPlatformConverter {
      * Translates a Jetpack {@link JoinSpec} into a platform {@link android.app.appsearch.JoinSpec}.
      */
     @SuppressLint("WrongConstant")
-    @NonNull
-    public static android.app.appsearch.JoinSpec toPlatformJoinSpec(@NonNull JoinSpec jetpackSpec) {
+    public static android.app.appsearch.@NonNull JoinSpec toPlatformJoinSpec(
+            @NonNull JoinSpec jetpackSpec) {
         Preconditions.checkNotNull(jetpackSpec);
         return new android.app.appsearch.JoinSpec.Builder(jetpackSpec.getChildPropertyExpression())
                 .setNestedSearch(

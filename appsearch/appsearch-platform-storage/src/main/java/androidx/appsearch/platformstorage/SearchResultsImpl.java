@@ -18,7 +18,6 @@ package androidx.appsearch.platformstorage;
 import android.annotation.SuppressLint;
 import android.os.Build;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.app.SearchResult;
@@ -30,6 +29,8 @@ import androidx.concurrent.futures.ResolvableFuture;
 import androidx.core.util.Preconditions;
 
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +50,7 @@ class SearchResultsImpl implements SearchResults {
     private final Executor mExecutor;
 
     SearchResultsImpl(
-            @NonNull android.app.appsearch.SearchResults platformResults,
+            android.app.appsearch.@NonNull SearchResults platformResults,
             @NonNull SearchSpec searchSpec,
             @NonNull Executor executor) {
         mPlatformResults = Preconditions.checkNotNull(platformResults);
@@ -59,8 +60,7 @@ class SearchResultsImpl implements SearchResults {
 
     @SuppressLint("WrongConstant")
     @Override
-    @NonNull
-    public ListenableFuture<List<SearchResult>> getNextPageAsync() {
+    public @NonNull ListenableFuture<List<SearchResult>> getNextPageAsync() {
         ResolvableFuture<List<SearchResult>> future = ResolvableFuture.create();
         mPlatformResults.getNextPage(mExecutor, result -> {
             if (result.isSuccess()) {
