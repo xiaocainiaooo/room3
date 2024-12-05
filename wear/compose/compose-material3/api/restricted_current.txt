@@ -1343,10 +1343,10 @@ package androidx.wear.compose.material3 {
 
   public final class SwipeToRevealScope {
     ctor public SwipeToRevealScope();
-    method public void primaryAction(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> icon, String label, optional long containerColor, optional long contentColor);
+    method public void primaryAction(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> icon, kotlin.jvm.functions.Function0<kotlin.Unit> text, String label, optional long containerColor, optional long contentColor);
     method public void secondaryAction(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> icon, String label, optional long containerColor, optional long contentColor);
-    method public void undoPrimaryAction(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, String label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? icon, optional long containerColor, optional long contentColor);
-    method public void undoSecondaryAction(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, String label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? icon, optional long containerColor, optional long contentColor);
+    method public void undoPrimaryAction(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> text, optional kotlin.jvm.functions.Function0<kotlin.Unit>? icon, optional long containerColor, optional long contentColor);
+    method public void undoSecondaryAction(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> text, optional kotlin.jvm.functions.Function0<kotlin.Unit>? icon, optional long containerColor, optional long contentColor);
   }
 
   @androidx.compose.runtime.Immutable public final class SwitchButtonColors {

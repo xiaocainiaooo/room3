@@ -65,12 +65,13 @@ fun SwipeToRevealBothDirectionsNonAnchoring() {
                         onClick = { /* This block is called when the primary action is executed. */
                         },
                         icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
+                        text = { Text("Delete") },
                         label = "Delete"
                     )
                     undoPrimaryAction(
                         onClick = { /* This block is called when the undo primary action is executed. */
                         },
-                        label = "Undo Delete"
+                        text = { Text("Undo Delete") },
                     )
                 }
             ) {
@@ -98,6 +99,7 @@ fun SwipeToRevealBothDirections() {
                         onClick = { /* This block is called when the primary action is executed. */
                         },
                         icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
+                        text = { Text("Delete") },
                         label = "Delete"
                     )
                     secondaryAction(
@@ -109,12 +111,12 @@ fun SwipeToRevealBothDirections() {
                     undoPrimaryAction(
                         onClick = { /* This block is called when the undo primary action is executed. */
                         },
-                        label = "Undo Delete"
+                        text = { Text("Undo Delete") },
                     )
                     undoSecondaryAction(
                         onClick = { /* This block is called when the undo secondary action is executed. */
                         },
-                        label = "Undo Secondary"
+                        text = { Text("Undo Secondary") },
                     )
                 }
             ) {
@@ -154,6 +156,7 @@ fun SwipeToRevealTwoActionsWithUndo() {
                             }
                         },
                         icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
+                        text = { Text("Delete") },
                         label = "Delete"
                     )
                     secondaryAction(
@@ -181,7 +184,7 @@ fun SwipeToRevealTwoActionsWithUndo() {
                                     .show()
                             }
                         },
-                        label = "Undo Delete"
+                        text = { Text("Undo Delete") },
                     )
                     undoSecondaryAction(
                         onClick = {
@@ -194,7 +197,7 @@ fun SwipeToRevealTwoActionsWithUndo() {
                                     .show()
                             }
                         },
-                        label = "Undo Lock"
+                        text = { Text("Undo Lock") },
                     )
                 }
             ) {
@@ -244,6 +247,7 @@ fun SwipeToRevealInList() {
                             }
                         },
                         icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
+                        text = { Text("Delete") },
                         label = "Delete"
                     )
                     secondaryAction(
@@ -258,7 +262,7 @@ fun SwipeToRevealInList() {
                         icon = { Icon(Icons.Filled.Add, contentDescription = "Duplicate") },
                         label = "Duplicate"
                     )
-                    undoPrimaryAction(onClick = {}, label = "Undo Delete")
+                    undoPrimaryAction(onClick = {}, text = { Text("Undo Delete") })
                 }
             ) {
                 Button({}, Modifier.fillMaxWidth().padding(horizontal = 4.dp)) { Text(name) }
@@ -282,12 +286,13 @@ fun SwipeToRevealSingleButtonWithAnchoring() {
                         onClick = { /* This block is called when the primary action is executed. */
                         },
                         icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
+                        text = { Text("Delete") },
                         label = "Delete"
                     )
                     undoPrimaryAction(
                         onClick = { /* This block is called when the undo primary action is executed. */
                         },
-                        label = "Undo Delete"
+                        text = { Text("Undo Delete") },
                     )
                 }
             ) {
@@ -314,7 +319,10 @@ fun SwipeToRevealWithLongLabels() {
                         onClick = { /* This block is called when the primary action is executed. */
                         },
                         icon = { Icon(Icons.Outlined.Delete, contentDescription = "Delete") },
-                        label = "Delete action with an extremely long label that should truncate."
+                        text = {
+                            Text("Delete action with an extremely long label that should truncate.")
+                        },
+                        label = "Delete"
                     )
                     secondaryAction(
                         onClick = { /* This block is called when the secondary action is executed. */
@@ -325,8 +333,11 @@ fun SwipeToRevealWithLongLabels() {
                     undoPrimaryAction(
                         onClick = { /* This block is called when the undo primary action is executed. */
                         },
-                        label =
-                            "Undo Delete action with an extremely long label that should truncate."
+                        text = {
+                            Text(
+                                "Undo Delete action with an extremely long label that should truncate."
+                            )
+                        },
                     )
                 }
             ) {
