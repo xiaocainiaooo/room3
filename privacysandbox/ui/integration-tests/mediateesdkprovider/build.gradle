@@ -21,13 +21,13 @@ plugins {
 }
 
 android {
-    namespace "androidx.privacysandbox.ui.integration.mediateesdkprovider"
-    compileSdk 35
-    compileSdkExtension 14
+    namespace = "androidx.privacysandbox.ui.integration.mediateesdkprovider"
+    compileSdk = 35
+    compileSdkExtension = 14
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
         }
     }
 }

@@ -54,7 +54,7 @@ dependencies {
 
 android {
     defaultConfig {
-        minSdkVersion 23
+        minSdk = 23
     }
 
     sourceSets {
@@ -68,7 +68,7 @@ android {
 
     // Use Robolectric 4.+
     testOptions.unitTests.includeAndroidResources = true
-    namespace "androidx.wear"
+    namespace = "androidx.wear"
 }
 
 androidx {

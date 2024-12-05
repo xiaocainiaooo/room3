@@ -13,7 +13,7 @@ def docsForOptionalProject(path) {
 }
 
 android {
-    namespace "androidx.docs.tipoftree"
+    namespace = "androidx.docs.tipoftree"
 }
 
 // The dependency list should only be changed when a new project is registered or a project's source is removed. Samples should never be added.

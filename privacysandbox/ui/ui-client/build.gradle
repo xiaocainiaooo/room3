@@ -58,8 +58,8 @@ dependencies {
 }
 
 android {
-    compileSdk 35
-    namespace "androidx.privacysandbox.ui.client"
+    compileSdk = 35
+    namespace = "androidx.privacysandbox.ui.client"
 }
 
 androidx {

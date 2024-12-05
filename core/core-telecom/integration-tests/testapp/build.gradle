@@ -21,21 +21,20 @@ plugins {
 }
 
 android {
-    namespace 'androidx.core.telecom.test'
+    namespace = "androidx.core.telecom.test"
 
     defaultConfig {
-        applicationId "androidx.core.telecom.test"
-        minSdk 21
+        applicationId = "androidx.core.telecom.test"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     buildFeatures {
-        viewBinding true
+        viewBinding = true
     }
 }
 

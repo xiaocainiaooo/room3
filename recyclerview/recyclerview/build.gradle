@@ -59,7 +59,7 @@ android {
         compileSdk = 35
         testInstrumentationRunner "androidx.recyclerview.test.TestRunner"
     }
-    namespace "androidx.recyclerview"
+    namespace = "androidx.recyclerview"
 }
 
 androidx {

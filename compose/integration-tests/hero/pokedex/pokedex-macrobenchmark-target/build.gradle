@@ -22,13 +22,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 35
-    namespace "androidx.compose.integration.hero.pokedex.macrobenchmark.target"
+    compileSdk = 35
+    namespace = "androidx.compose.integration.hero.pokedex.macrobenchmark.target"
 
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled = true
+            shrinkResources = true
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt")
         }
     }
