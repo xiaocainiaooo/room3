@@ -15,9 +15,9 @@
  */
 
 plugins {
-    id 'AndroidXPlugin'
-    id 'com.android.application'
-    id 'kotlin-android'
+    id("AndroidXPlugin")
+    id("com.android.application")
+    id("kotlin-android")
 }
 
 android {
