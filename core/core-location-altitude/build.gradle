@@ -64,4 +64,6 @@ androidx {
     mavenVersion = LibraryVersions.CORE_LOCATION_ALTITUDE
     inceptionYear = "2022"
     description = "Provides compatibility APIs concerning location altitudes."
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

@@ -225,4 +225,6 @@ androidx {
     description = "Android Room-Runtime"
     legacyDisableKotlinStrictApiMode = true
     metalavaK2UastEnabled = false
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

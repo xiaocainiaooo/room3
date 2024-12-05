@@ -364,7 +364,7 @@ abstract class AndroidXExtension(
     var metalavaK2UastEnabled = true
 
     /** Whether the project has not yet been migrated to use JSpecify annotations. */
-    var optOutJSpecify = true
+    var optOutJSpecify = false
 
     val additionalDeviceTestApkKeys = mutableListOf<String>()
 

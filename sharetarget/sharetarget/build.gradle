@@ -47,6 +47,8 @@ androidx {
     type = LibraryType.PUBLISHED_LIBRARY
     inceptionYear = "2018"
     description = "ShareTarget"
+    // TODO: b/326456246
+    optOutJSpecify = true
 }
 
 android {

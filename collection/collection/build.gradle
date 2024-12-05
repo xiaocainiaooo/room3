@@ -187,4 +187,6 @@ androidx {
     description = "Standalone efficient collections."
     metalavaK2UastEnabled = false
     kotlinTarget = KotlinTarget.KOTLIN_1_9
+    // TODO: b/326456246
+    optOutJSpecify = true
 }

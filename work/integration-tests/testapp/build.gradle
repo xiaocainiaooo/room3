@@ -65,3 +65,8 @@ dependencies {
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-parameters"
 }
+
+androidx {
+    // TODO: b/326456246
+    optOutJSpecify = true
+}
