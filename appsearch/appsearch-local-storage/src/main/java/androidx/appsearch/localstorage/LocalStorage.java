@@ -20,12 +20,14 @@ import android.content.Context;
 import android.os.SystemClock;
 import android.util.Log;
 
+import androidx.annotation.OptIn;
 import androidx.annotation.RestrictTo;
 import androidx.annotation.VisibleForTesting;
 import androidx.annotation.WorkerThread;
 import androidx.appsearch.annotation.Document;
 import androidx.appsearch.app.AppSearchEnvironmentFactory;
 import androidx.appsearch.app.AppSearchSession;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.GlobalSearchSession;
 import androidx.appsearch.exceptions.AppSearchException;
 import androidx.appsearch.flags.Flags;
@@ -320,6 +322,7 @@ public class LocalStorage {
     }
 
     @WorkerThread
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     private LocalStorage(
             @NonNull Context context,
             @NonNull Executor executor,
