@@ -18,8 +18,6 @@ package androidx.appsearch.builtintypes;
 
 import android.net.Uri;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appsearch.annotation.CurrentTimeMillisLong;
 import androidx.appsearch.annotation.Document;
 import androidx.appsearch.app.AppSearchSchema.LongPropertyConfig;
@@ -27,6 +25,9 @@ import androidx.appsearch.app.AppSearchSchema.StringPropertyConfig;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.StringSerializer;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +78,7 @@ public class MobileApplication extends Thing {
             @NonNull String packageName,
             @Nullable String displayName,
             @Nullable Uri iconUri,
-            @NonNull byte[] sha256Certificate,
+            byte @NonNull [] sha256Certificate,
             long updatedTimestamp,
             @Nullable String className) {
         super(namespace, id, documentScore, creationTimestampMillis, documentTtlMillis, name,
@@ -95,8 +96,7 @@ public class MobileApplication extends Thing {
      * Returns the package name this {@link MobileApplication} represents. For example,
      * "com.android.vending".
      */
-    @NonNull
-    public String getPackageName() {
+    public @NonNull String getPackageName() {
         return mPackageName;
     }
 
@@ -104,8 +104,7 @@ public class MobileApplication extends Thing {
      * Returns the display name of the app. This is indexed. This is what is displayed in the
      * launcher. This might look like "Play Store".
      */
-    @Nullable
-    public String getDisplayName() {
+    public @Nullable String getDisplayName() {
         return mDisplayName;
     }
 
@@ -114,8 +113,7 @@ public class MobileApplication extends Thing {
      * the alternative name "pay" for a wallet app.
      */
     @Override
-    @NonNull
-    public List<String> getAlternateNames() {
+    public @NonNull List<String> getAlternateNames() {
         return mAlternateNames;
     }
 
@@ -124,14 +122,12 @@ public class MobileApplication extends Thing {
      * displaying results. The Uri could be
      * "android.resource://com.example.vending/drawable/2131230871", for example.
      */
-    @Nullable
-    public Uri getIconUri() {
+    public @Nullable Uri getIconUri() {
         return mIconUri;
     }
 
     /** Returns the SHA-256 certificate of the application. */
-    @NonNull
-    public byte[] getSha256Certificate() {
+    public byte @NonNull [] getSha256Certificate() {
         return mSha256Certificate;
     }
 
@@ -153,8 +149,7 @@ public class MobileApplication extends Thing {
      *     appListFragment.getActivity().startActivity(launcher);
      *  </code>
      */
-    @Nullable
-    public String getClassName() {
+    public @Nullable String getClassName() {
         return mClassName;
     }
 
@@ -169,7 +164,7 @@ public class MobileApplication extends Thing {
          * @param sha256Certificate The SHA-256 certificate of the application.
          */
         public Builder(@NonNull String id, @NonNull String namespace, @NonNull String packageName,
-                @NonNull byte[] sha256Certificate) {
+                byte @NonNull [] sha256Certificate) {
             super(Preconditions.checkNotNull(id), Preconditions.checkNotNull(namespace),
                     Preconditions.checkNotNull(packageName),
                     Preconditions.checkNotNull(sha256Certificate));
@@ -195,7 +190,7 @@ public class MobileApplication extends Thing {
         private boolean mBuilt = false;
 
         BuilderImpl(@NonNull String id, @NonNull String namespace, @NonNull String packageName,
-                @NonNull byte[] sha256Certificate) {
+                byte @NonNull [] sha256Certificate) {
             super(namespace, id);
             mPackageName = Preconditions.checkNotNull(packageName);
             mSha256Certificate = Preconditions.checkNotNull(sha256Certificate);
@@ -213,32 +208,28 @@ public class MobileApplication extends Thing {
         }
 
         /** Sets the display name. */
-        @NonNull
-        public T setDisplayName(@NonNull String displayName) {
+        public @NonNull T setDisplayName(@NonNull String displayName) {
             resetIfBuilt();
             mDisplayName = Preconditions.checkNotNull(displayName);
             return (T) this;
         }
 
         /** Sets the icon uri. */
-        @NonNull
-        public T setIconUri(@NonNull Uri iconUri) {
+        public @NonNull T setIconUri(@NonNull Uri iconUri) {
             resetIfBuilt();
             mIconUri = Preconditions.checkNotNull(iconUri);
             return (T) this;
         }
 
         /** Sets the last time the app was installed or updated on the device. */
-        @NonNull
-        public T setUpdatedTimestamp(@CurrentTimeMillisLong long updatedTimestamp) {
+        public @NonNull T setUpdatedTimestamp(@CurrentTimeMillisLong long updatedTimestamp) {
             resetIfBuilt();
             mUpdatedTimestamp = updatedTimestamp;
             return (T) this;
         }
 
         /** Sets the class name. */
-        @NonNull
-        public T setClassName(@NonNull String className) {
+        public @NonNull T setClassName(@NonNull String className) {
             resetIfBuilt();
             mClassName = Preconditions.checkNotNull(className);
             return (T) this;
@@ -255,9 +246,8 @@ public class MobileApplication extends Thing {
         }
 
         /** Builds the {@link MobileApplication}. */
-        @NonNull
         @Override
-        public MobileApplication build() {
+        public @NonNull MobileApplication build() {
             mBuilt = true;
             return new MobileApplication(
                     mNamespace,
@@ -282,15 +272,13 @@ public class MobileApplication extends Thing {
 
     /** Allows MobileApplication to store iconUri as a Uri instead of a String. */
     static class IconUriAsUri implements StringSerializer<Uri> {
-        @NonNull
         @Override
-        public String serialize(@NonNull Uri iconUri) {
+        public @NonNull String serialize(@NonNull Uri iconUri) {
             return iconUri.toString();
         }
 
-        @Nullable
         @Override
-        public Uri deserialize(@Nullable String value) {
+        public @Nullable Uri deserialize(@Nullable String value) {
             if (value == null) {
                 return null;
             }
