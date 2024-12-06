@@ -21,8 +21,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresFeature;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
@@ -34,6 +32,9 @@ import androidx.appsearch.safeparcel.stub.StubCreators.GetSchemaResponseCreator;
 import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,8 +48,7 @@ import java.util.Set;
 public final class GetSchemaResponse extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    @NonNull
-    public static final Parcelable.Creator<GetSchemaResponse> CREATOR =
+    public static final Parcelable.@NonNull Creator<GetSchemaResponse> CREATOR =
             new GetSchemaResponseCreator();
 
     @Field(id = 1, getter = "getVersion")
@@ -62,32 +62,28 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
      * visibility settings is not possible on the current backend.
      */
     @Field(id = 3)
-    @Nullable
-    final List<InternalVisibilityConfig> mVisibilityConfigs;
+    final @Nullable List<InternalVisibilityConfig> mVisibilityConfigs;
 
     /**
      * This set contains all schemas most recently successfully provided to
      * {@link AppSearchSession#setSchemaAsync}. We do lazy fetch, the object will be created when
      * you first time fetch it.
      */
-    @Nullable
-    private Set<AppSearchSchema> mSchemasCached;
+    private @Nullable Set<AppSearchSchema> mSchemasCached;
 
     /**
      * This Set contains all schemas that are not displayed by the system. All values in the set are
      * prefixed with the package-database prefix. We do lazy fetch, the object will be created
      * when you first time fetch it.
      */
-    @Nullable
-    private Set<String> mSchemasNotDisplayedBySystemCached;
+    private @Nullable Set<String> mSchemasNotDisplayedBySystemCached;
 
     /**
      * This map contains all schemas and {@link PackageIdentifier} that has access to the schema.
      * All keys in the map are prefixed with the package-database prefix. We do lazy fetch, the
      * object will be created when you first time fetch it.
      */
-    @Nullable
-    private Map<String, Set<PackageIdentifier>> mSchemasVisibleToPackagesCached;
+    private @Nullable Map<String, Set<PackageIdentifier>> mSchemasVisibleToPackagesCached;
 
     /**
      * This map contains all schemas and Android Permissions combinations that are required to
@@ -98,23 +94,20 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
      * combinations.
      * @see SetSchemaRequest.Builder#addRequiredPermissionsForSchemaTypeVisibility(String, Set)
      */
-    @Nullable
-    private Map<String, Set<Set<Integer>>> mSchemasVisibleToPermissionsCached;
+    private @Nullable Map<String, Set<Set<Integer>>> mSchemasVisibleToPermissionsCached;
 
     /**
      * This map contains all publicly visible schemas and the {@link PackageIdentifier} specifying
      * the package that the schemas are from.
      */
-    @Nullable
-    private Map<String, PackageIdentifier> mPubliclyVisibleSchemasCached;
+    private @Nullable Map<String, PackageIdentifier> mPubliclyVisibleSchemasCached;
 
     /**
      * This map contains all {@link SchemaVisibilityConfig}s that has access to the schema.
      * All keys in the map are prefixed with the package-database prefix. We do lazy fetch, the
      * object will be created when you first time fetch it.
      */
-    @Nullable
-    private Map<String, Set<SchemaVisibilityConfig>> mSchemasVisibleToConfigsCached;
+    private @Nullable Map<String, Set<SchemaVisibilityConfig>> mSchemasVisibleToConfigsCached;
 
     @Constructor
     GetSchemaResponse(
@@ -140,8 +133,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
      * Return the schemas most recently successfully provided to
      * {@link AppSearchSession#setSchemaAsync}.
      */
-    @NonNull
-    public Set<AppSearchSchema> getSchemas() {
+    public @NonNull Set<AppSearchSchema> getSchemas() {
         if (mSchemasCached == null) {
             mSchemasCached = Collections.unmodifiableSet(new ArraySet<>(mSchemas));
         }
@@ -159,8 +151,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
     @RequiresFeature(
             enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
             name = Features.ADD_PERMISSIONS_AND_GET_VISIBILITY)
-    @NonNull
-    public Set<String> getSchemaTypesNotDisplayedBySystem() {
+    public @NonNull Set<String> getSchemaTypesNotDisplayedBySystem() {
         List<InternalVisibilityConfig> visibilityConfigs = getVisibilityConfigsOrThrow();
         if (mSchemasNotDisplayedBySystemCached == null) {
             Set<String> copy = new ArraySet<>();
@@ -185,8 +176,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
     @RequiresFeature(
             enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
             name = Features.ADD_PERMISSIONS_AND_GET_VISIBILITY)
-    @NonNull
-    public Map<String, Set<PackageIdentifier>> getSchemaTypesVisibleToPackages() {
+    public @NonNull Map<String, Set<PackageIdentifier>> getSchemaTypesVisibleToPackages() {
         List<InternalVisibilityConfig> visibilityConfigs = getVisibilityConfigsOrThrow();
         if (mSchemasVisibleToPackagesCached == null) {
             Map<String, Set<PackageIdentifier>> copy = new ArrayMap<>();
@@ -238,8 +228,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
     @RequiresFeature(
             enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
             name = Features.ADD_PERMISSIONS_AND_GET_VISIBILITY)
-    @NonNull
-    public Map<String, Set<Set<Integer>>> getRequiredPermissionsForSchemaTypeVisibility() {
+    public @NonNull Map<String, Set<Set<Integer>>> getRequiredPermissionsForSchemaTypeVisibility() {
         List<InternalVisibilityConfig> visibilityConfigs = getVisibilityConfigsOrThrow();
         if (mSchemasVisibleToPermissionsCached == null) {
             Map<String, Set<Set<Integer>>> copy = new ArrayMap<>();
@@ -272,8 +261,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
     @RequiresFeature(
             enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
             name = Features.ADD_PERMISSIONS_AND_GET_VISIBILITY)
-    @NonNull
-    public Map<String, PackageIdentifier> getPubliclyVisibleSchemas() {
+    public @NonNull Map<String, PackageIdentifier> getPubliclyVisibleSchemas() {
         List<InternalVisibilityConfig> visibilityConfigs = getVisibilityConfigsOrThrow();
         if (mPubliclyVisibleSchemasCached == null) {
             Map<String, PackageIdentifier> copy = new ArrayMap<>();
@@ -300,8 +288,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
     @RequiresFeature(
             enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
             name = Features.ADD_PERMISSIONS_AND_GET_VISIBILITY)
-    @NonNull
-    public Map<String, Set<SchemaVisibilityConfig>> getSchemaTypesVisibleToConfigs() {
+    public @NonNull Map<String, Set<SchemaVisibilityConfig>> getSchemaTypesVisibleToConfigs() {
         List<InternalVisibilityConfig> visibilityConfigs = getVisibilityConfigsOrThrow();
         if (mSchemasVisibleToConfigsCached == null) {
             Map<String, Set<SchemaVisibilityConfig>> copy = new ArrayMap<>();
@@ -319,8 +306,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
         return mSchemasVisibleToConfigsCached;
     }
 
-    @NonNull
-    private List<InternalVisibilityConfig> getVisibilityConfigsOrThrow() {
+    private @NonNull List<InternalVisibilityConfig> getVisibilityConfigsOrThrow() {
         List<InternalVisibilityConfig> visibilityConfigs = mVisibilityConfigs;
         if (visibilityConfigs == null) {
             throw new UnsupportedOperationException("Get visibility setting is not supported with "
@@ -344,8 +330,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
          * Creates the object when we actually set them. If we never set visibility settings, we
          * should throw {@link UnsupportedOperationException} in the visibility getters.
          */
-        @Nullable
-        private Map<String, InternalVisibilityConfig.Builder> mVisibilityConfigBuilders;
+        private @Nullable Map<String, InternalVisibilityConfig.Builder> mVisibilityConfigBuilders;
         private boolean mBuilt = false;
 
         /** Creates a new {@link Builder} */
@@ -376,8 +361,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
          * <p>Default version is 0
          */
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder setVersion(@IntRange(from = 0) int version) {
+        public @NonNull Builder setVersion(@IntRange(from = 0) int version) {
             Preconditions.checkArgument(version >= 0, "Version must be a non-negative number.");
             resetIfBuilt();
             mVersion = version;
@@ -386,8 +370,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
 
         /** Adds one {@link AppSearchSchema} to the schema list. */
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder addSchema(@NonNull AppSearchSchema schema) {
+        public @NonNull Builder addSchema(@NonNull AppSearchSchema schema) {
             Preconditions.checkNotNull(schema);
             resetIfBuilt();
             mSchemas.add(schema);
@@ -398,8 +381,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
         @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder clearSchemas() {
+        public @NonNull Builder clearSchemas() {
             resetIfBuilt();
             mSchemas.clear();
             return this;
@@ -415,8 +397,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
         // Getter getSchemaTypesNotDisplayedBySystem returns plural objects.
         @CanIgnoreReturnValue
         @SuppressLint("MissingGetterMatchingBuilder")
-        @NonNull
-        public Builder addSchemaTypeNotDisplayedBySystem(@NonNull String schemaType) {
+        public @NonNull Builder addSchemaTypeNotDisplayedBySystem(@NonNull String schemaType) {
             Preconditions.checkNotNull(schemaType);
             resetIfBuilt();
             InternalVisibilityConfig.Builder visibilityConfigBuilder =
@@ -434,8 +415,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
         @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder clearSchemaTypeNotDisplayedBySystem(@NonNull String schemaType) {
+        public @NonNull Builder clearSchemaTypeNotDisplayedBySystem(@NonNull String schemaType) {
             Preconditions.checkNotNull(schemaType);
             resetIfBuilt();
             InternalVisibilityConfig.Builder visibilityConfigBuilder =
@@ -467,8 +447,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
         // Getter getSchemaTypesVisibleToPackages returns a map contains all schema types.
         @CanIgnoreReturnValue
         @SuppressLint("MissingGetterMatchingBuilder")
-        @NonNull
-        public Builder setSchemaTypeVisibleToPackages(
+        public @NonNull Builder setSchemaTypeVisibleToPackages(
                 @NonNull String schemaType,
                 @NonNull Set<PackageIdentifier> packageIdentifiers) {
             Preconditions.checkNotNull(schemaType);
@@ -490,8 +469,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
         @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder clearSchemaTypeVisibleToPackages(@NonNull String schemaType) {
+        public @NonNull Builder clearSchemaTypeVisibleToPackages(@NonNull String schemaType) {
             Preconditions.checkNotNull(schemaType);
             resetIfBuilt();
             InternalVisibilityConfig.Builder visibilityConfigBuilder =
@@ -538,11 +516,10 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
         @SuppressLint({"MissingGetterMatchingBuilder", "RequiresPermission"})
         // @SetSchemaRequest is an IntDef annotation applied to Set<Set<Integer>>.
         @SuppressWarnings("SupportAnnotationUsage")
-        @NonNull
-        public Builder setRequiredPermissionsForSchemaTypeVisibility(
+        public @NonNull Builder setRequiredPermissionsForSchemaTypeVisibility(
                 @NonNull String schemaType,
-                @SetSchemaRequest.AppSearchSupportedPermission @NonNull
-                        Set<Set<Integer>> visibleToPermissionSets) {
+                @SetSchemaRequest.AppSearchSupportedPermission
+                @NonNull Set<Set<Integer>> visibleToPermissionSets) {
             Preconditions.checkNotNull(schemaType);
             Preconditions.checkNotNull(visibleToPermissionSets);
             resetIfBuilt();
@@ -565,8 +542,8 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
         @SuppressLint("RequiresPermission")
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder clearRequiredPermissionsForSchemaTypeVisibility(@NonNull String schemaType) {
+        public @NonNull Builder clearRequiredPermissionsForSchemaTypeVisibility(
+                @NonNull String schemaType) {
             Preconditions.checkNotNull(schemaType);
             resetIfBuilt();
             InternalVisibilityConfig.Builder visibilityConfigBuilder =
@@ -589,8 +566,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
         @CanIgnoreReturnValue
         @SuppressLint("MissingGetterMatchingBuilder")
         @FlaggedApi(Flags.FLAG_ENABLE_SET_PUBLICLY_VISIBLE_SCHEMA)
-        @NonNull
-        public Builder setPubliclyVisibleSchema(
+        public @NonNull Builder setPubliclyVisibleSchema(
                 @NonNull String schemaType, @NonNull PackageIdentifier packageIdentifier) {
             Preconditions.checkNotNull(schemaType);
             Preconditions.checkNotNull(packageIdentifier);
@@ -610,8 +586,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
         @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder clearPubliclyVisibleSchema(@NonNull String schemaType) {
+        public @NonNull Builder clearPubliclyVisibleSchema(@NonNull String schemaType) {
             Preconditions.checkNotNull(schemaType);
             resetIfBuilt();
             InternalVisibilityConfig.Builder visibilityConfigBuilder =
@@ -652,8 +627,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
         @CanIgnoreReturnValue
         @SuppressLint("MissingGetterMatchingBuilder")
         @FlaggedApi(Flags.FLAG_ENABLE_SET_SCHEMA_VISIBLE_TO_CONFIGS)
-        @NonNull
-        public Builder setSchemaTypeVisibleToConfigs(@NonNull String schemaType,
+        public @NonNull Builder setSchemaTypeVisibleToConfigs(@NonNull String schemaType,
                 @NonNull Set<SchemaVisibilityConfig> visibleToConfigs) {
             Preconditions.checkNotNull(schemaType);
             Preconditions.checkNotNull(visibleToConfigs);
@@ -676,8 +650,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
         @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder clearSchemaTypeVisibleToConfigs(@NonNull String schemaType) {
+        public @NonNull Builder clearSchemaTypeVisibleToConfigs(@NonNull String schemaType) {
             Preconditions.checkNotNull(schemaType);
             resetIfBuilt();
             InternalVisibilityConfig.Builder visibilityConfigBuilder =
@@ -704,8 +677,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
          // Visibility setting is determined by SDK version, so it won't be needed in framework
         @CanIgnoreReturnValue
         @SuppressLint("MissingGetterMatchingBuilder")
-        @NonNull
-        public Builder setVisibilitySettingSupported(boolean visibilitySettingSupported) {
+        public @NonNull Builder setVisibilitySettingSupported(boolean visibilitySettingSupported) {
             if (visibilitySettingSupported) {
                 mVisibilityConfigBuilders = new ArrayMap<>();
             } else {
@@ -715,8 +687,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
         }
 
         /** Builds a {@link GetSchemaResponse} object. */
-        @NonNull
-        public GetSchemaResponse build() {
+        public @NonNull GetSchemaResponse build() {
             List<InternalVisibilityConfig> visibilityConfigs = null;
             if (mVisibilityConfigBuilders != null) {
                 visibilityConfigs = new ArrayList<>();
@@ -729,8 +700,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
             return new GetSchemaResponse(mVersion, mSchemas, visibilityConfigs);
         }
 
-        @NonNull
-        private InternalVisibilityConfig.Builder getOrCreateVisibilityConfigBuilder(
+        private InternalVisibilityConfig.@NonNull Builder getOrCreateVisibilityConfigBuilder(
                 @NonNull String schemaType) {
             if (mVisibilityConfigBuilders == null) {
                 throw new IllegalStateException("GetSchemaResponse is not configured with"
@@ -744,8 +714,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
             return builder;
         }
 
-        @Nullable
-        private InternalVisibilityConfig.Builder getVisibilityConfigBuilder(
+        private InternalVisibilityConfig.@Nullable Builder getVisibilityConfigBuilder(
                 @NonNull String schemaType) {
             if (mVisibilityConfigBuilders == null) {
                 throw new IllegalStateException("GetSchemaResponse is not configured with"

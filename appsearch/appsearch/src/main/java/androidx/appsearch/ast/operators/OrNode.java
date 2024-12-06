@@ -18,12 +18,13 @@ package androidx.appsearch.ast.operators;
 
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.ast.Node;
 import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,7 +60,7 @@ public final class OrNode implements Node{
      * @param additionalChildren Additional nodes to be ORed over, which are optional.
      */
     public OrNode(@NonNull Node firstChild, @NonNull Node secondChild,
-            @NonNull Node... additionalChildren) {
+            Node @NonNull ... additionalChildren) {
         ArrayList<Node> childNodes = new ArrayList<Node>();
         childNodes.add(Preconditions.checkNotNull(firstChild));
         childNodes.add(Preconditions.checkNotNull(secondChild));
@@ -71,8 +72,7 @@ public final class OrNode implements Node{
      * Get the list of nodes being logically ORed over by this node.
      */
     @Override
-    @NonNull
-    public List<Node> getChildren() {
+    public @NonNull List<Node> getChildren() {
         return Collections.unmodifiableList(mChildren);
     }
 
@@ -142,9 +142,8 @@ public final class OrNode implements Node{
      * <p>The string representation of {@link OrNode} is the string representation of
      * {@link OrNode}'s child nodes joined with "OR", all surrounded by parentheses.
      */
-    @NonNull
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "(" + TextUtils.join(" OR ", mChildren) + ")";
     }
 

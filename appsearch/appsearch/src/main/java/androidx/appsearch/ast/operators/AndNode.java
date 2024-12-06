@@ -18,12 +18,13 @@ package androidx.appsearch.ast.operators;
 
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.ast.Node;
 import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,7 +61,7 @@ public final class AndNode implements Node {
      * @param additionalChildren Additional nodes to be ANDed over, which are optional.
      */
     public AndNode(@NonNull Node firstChild, @NonNull Node secondChild,
-            @NonNull Node... additionalChildren) {
+            Node @NonNull ... additionalChildren) {
         ArrayList<Node> childNodes = new ArrayList<>();
         childNodes.add(Preconditions.checkNotNull(firstChild));
         childNodes.add(Preconditions.checkNotNull(secondChild));
@@ -72,8 +73,7 @@ public final class AndNode implements Node {
      * Get the list of nodes being logically ANDed over by this node.
      */
     @Override
-    @NonNull
-    public List<Node> getChildren() {
+    public @NonNull List<Node> getChildren() {
         return Collections.unmodifiableList(mChildren);
     }
 
@@ -143,9 +143,8 @@ public final class AndNode implements Node {
      * <p>The string representation of {@link AndNode} is the string representation of
      * {@link AndNode}'s child nodes joined with "AND", all surrounded by parentheses.
      */
-    @NonNull
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "(" + TextUtils.join(" AND ", mChildren) + ")";
     }
 

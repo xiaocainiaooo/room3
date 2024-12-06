@@ -16,11 +16,12 @@
 // @exportToFramework:skipFile()
 package androidx.appsearch.annotation;
 
-import androidx.annotation.NonNull;
 import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.EmbeddingVector;
 import androidx.appsearch.app.LongSerializer;
 import androidx.appsearch.app.StringSerializer;
+
+import org.jspecify.annotations.NonNull;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -302,14 +303,12 @@ public @interface Document {
 
         final class DefaultSerializer implements StringSerializer<String> {
             @Override
-            @NonNull
-            public String serialize(@NonNull String instance) {
+            public @NonNull String serialize(@NonNull String instance) {
                 return instance;
             }
 
             @Override
-            @NonNull
-            public String deserialize(@NonNull String string) {
+            public @NonNull String deserialize(@NonNull String string) {
                 return string;
             }
         }
@@ -451,14 +450,13 @@ public @interface Document {
 
         final class DefaultSerializer implements LongSerializer<Long> {
             @Override
-            public long serialize(@NonNull @SuppressWarnings("AutoBoxing") Long value) {
+            public long serialize(@SuppressWarnings("AutoBoxing") @NonNull Long value) {
                 return value;
             }
 
             @Override
-            @NonNull
             @SuppressWarnings("AutoBoxing")
-            public Long deserialize(long value) {
+            public @NonNull Long deserialize(long value) {
                 return value;
             }
         }

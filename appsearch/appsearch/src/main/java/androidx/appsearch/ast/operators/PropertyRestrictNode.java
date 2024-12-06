@@ -16,13 +16,14 @@
 
 package androidx.appsearch.ast.operators;
 
-import androidx.annotation.NonNull;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.PropertyPath;
 import androidx.appsearch.ast.Node;
 import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,8 +65,7 @@ public final class PropertyRestrictNode implements Node {
      * Get the property in the property restriction (i.e. the left hand side of the property
      * restrict sign (":")).
      */
-    @NonNull
-    public PropertyPath getProperty() {
+    public @NonNull PropertyPath getProperty() {
         return mProperty;
     }
 
@@ -73,9 +73,8 @@ public final class PropertyRestrictNode implements Node {
      * Get the child {@link Node} of {@link PropertyRestrictNode} as a list containing the only
      * child {@link Node}.
      */
-    @NonNull
     @Override
-    public List<Node> getChildren() {
+    public @NonNull List<Node> getChildren() {
         return Collections.unmodifiableList(mChildren);
     }
 
@@ -83,8 +82,7 @@ public final class PropertyRestrictNode implements Node {
      * Get the subexpression in the property restriction as a {@link Node} (i.e. the right hand side
      * of the property restrict sign (":")).
      */
-    @NonNull
-    public Node getChild() {
+    public @NonNull Node getChild() {
         return mChildren.get(0);
     }
 
@@ -111,9 +109,8 @@ public final class PropertyRestrictNode implements Node {
      * the left to the query sub expression surrounded in parentheses with the property restrict
      * symbol (":").
      */
-    @NonNull
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "(" + mProperty + ":" + getChild() + ")";
     }
 

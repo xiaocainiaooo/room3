@@ -74,6 +74,7 @@ BundleInsideHelper.forInsideAar(
 )
 
 dependencies {
+    api(libs.jspecify)
     api("androidx.annotation:annotation:1.8.1")
 
     // icing project brings in repackaged protos only (not the runtime lib)
@@ -102,6 +103,4 @@ androidx {
     description =
         "An implementation of AppSearchSession which uses local app storage and a local copy of " +
                 "the search library"
-    // TODO: b/326456246
-    optOutJSpecify = true
 }

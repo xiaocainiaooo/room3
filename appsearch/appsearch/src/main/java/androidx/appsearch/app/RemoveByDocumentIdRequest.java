@@ -19,8 +19,6 @@ package androidx.appsearch.app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.flags.FlaggedApi;
@@ -30,6 +28,9 @@ import androidx.appsearch.safeparcel.SafeParcelable;
 import androidx.appsearch.safeparcel.stub.StubCreators.RemoveByDocumentIdRequestCreator;
 import androidx.collection.ArraySet;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,18 +52,14 @@ public final class RemoveByDocumentIdRequest extends AbstractSafeParcelable {
     /** Creator class for {@link android.app.appsearch.RemoveByDocumentIdRequest}. */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    @NonNull
-    public static final Parcelable.Creator<RemoveByDocumentIdRequest> CREATOR =
+    public static final Parcelable.@NonNull Creator<RemoveByDocumentIdRequest> CREATOR =
             new RemoveByDocumentIdRequestCreator();
 
-    @NonNull
     @Field(id = 1, getter = "getNamespace")
-    private final String mNamespace;
-    @NonNull
+    private final @NonNull String mNamespace;
     @Field(id = 2)
-    final List<String> mIds;
-    @Nullable
-    private Set<String> mIdsCached;
+    final @NonNull List<String> mIds;
+    private @Nullable Set<String> mIdsCached;
 
     /**
      * Removes documents by ID.
@@ -79,14 +76,12 @@ public final class RemoveByDocumentIdRequest extends AbstractSafeParcelable {
     }
 
     /** Returns the namespace to remove documents from. */
-    @NonNull
-    public String getNamespace() {
+    public @NonNull String getNamespace() {
         return mNamespace;
     }
 
     /** Returns the set of document IDs attached to the request. */
-    @NonNull
-    public Set<String> getIds() {
+    public @NonNull Set<String> getIds() {
         if (mIdsCached == null) {
             mIdsCached = Collections.unmodifiableSet(new ArraySet<>(mIds));
         }
@@ -113,8 +108,7 @@ public final class RemoveByDocumentIdRequest extends AbstractSafeParcelable {
 
         /** Adds one or more document IDs to the request. */
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder addIds(@NonNull String... ids) {
+        public @NonNull Builder addIds(String @NonNull ... ids) {
             Preconditions.checkNotNull(ids);
             resetIfBuilt();
             return addIds(Arrays.asList(ids));
@@ -122,8 +116,7 @@ public final class RemoveByDocumentIdRequest extends AbstractSafeParcelable {
 
         /** Adds a collection of IDs to the request. */
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder addIds(@NonNull Collection<String> ids) {
+        public @NonNull Builder addIds(@NonNull Collection<String> ids) {
             Preconditions.checkNotNull(ids);
             resetIfBuilt();
             mIds.addAll(ids);
@@ -131,8 +124,7 @@ public final class RemoveByDocumentIdRequest extends AbstractSafeParcelable {
         }
 
         /** Builds a new {@link RemoveByDocumentIdRequest}. */
-        @NonNull
-        public RemoveByDocumentIdRequest build() {
+        public @NonNull RemoveByDocumentIdRequest build() {
             mBuilt = true;
             return new RemoveByDocumentIdRequest(mNamespace, new ArrayList<>(mIds));
         }

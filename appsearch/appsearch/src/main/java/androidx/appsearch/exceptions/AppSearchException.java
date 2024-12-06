@@ -16,9 +16,10 @@
 
 package androidx.appsearch.exceptions;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appsearch.app.AppSearchResult;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An exception thrown by {@link androidx.appsearch.app.AppSearchSession} or a subcomponent.
@@ -79,8 +80,7 @@ public class AppSearchException extends Exception {
     }
 
     /** Converts this {@link java.lang.Exception} into a failed {@link AppSearchResult}. */
-    @NonNull
-    public <T> AppSearchResult<T> toAppSearchResult() {
+    public <T> @NonNull AppSearchResult<T> toAppSearchResult() {
         return AppSearchResult.newFailedResult(mResultCode, getMessage());
     }
 }

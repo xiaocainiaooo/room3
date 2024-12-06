@@ -16,11 +16,12 @@
 // @exportToFramework:copyToPath(../../../cts/tests/appsearch/testutils/src/android/app/appsearch/testutil/external/FeaturesImpl.java)
 package androidx.appsearch.localstorage;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.Features;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * An implementation of {@link Features} available on the local backend.
