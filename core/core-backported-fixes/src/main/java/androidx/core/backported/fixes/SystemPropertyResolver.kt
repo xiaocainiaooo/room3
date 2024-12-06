@@ -32,7 +32,9 @@ internal class SystemPropertyResolver : StatusResolver {
         return if (aliases.contains(ki.alias)) {
             Status.Fixed
         } else {
-            Status.Unknown
+            // Because only Approved issues are included in the enum aliases
+            // if the alias is not found return "NOT FIXED"
+            Status.NotFixed
         }
     }
 
