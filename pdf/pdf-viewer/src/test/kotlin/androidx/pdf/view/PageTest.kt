@@ -22,6 +22,8 @@ import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.RectF
 import androidx.pdf.PdfDocument
+import androidx.pdf.content.PdfPageTextContent
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -31,6 +33,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
@@ -42,18 +45,29 @@ import org.robolectric.RobolectricTestRunner
 class PageTest {
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
+    private val pageContent =
+        PdfDocument.PdfPageContent(
+            listOf(PdfPageTextContent(listOf(RectF(10f, 10f, 50f, 20f)), "SampleText")),
+            emptyList() // No images in this test case
+        )
+
     private val pdfDocument =
         mock<PdfDocument> {
             on { getPageBitmapSource(any()) } doAnswer
                 { invocation ->
                     FakeBitmapSource(invocation.getArgument(0))
                 }
+            onBlocking { getPageContent(pageNumber = 0) } doReturn pageContent
         }
 
     private val canvasSpy = spy(Canvas())
 
     private var invalidationCounter = 0
     private val invalidationTracker: () -> Unit = { invalidationCounter++ }
+
+    private var pageTextReadyCounter = 0
+    private val onPageTextReady: ((Int) -> Unit) = { _ -> pageTextReadyCounter++ }
+
     private lateinit var page: Page
 
     @Before
@@ -61,6 +75,7 @@ class PageTest {
         // Cancel any work from previous tests, and reset tracking variables
         testDispatcher.cancelChildren()
         invalidationCounter = 0
+        pageTextReadyCounter = 0
 
         page =
             Page(
@@ -69,7 +84,8 @@ class PageTest {
                 pdfDocument,
                 testScope,
                 MAX_BITMAP_SIZE,
-                invalidationTracker
+                invalidationTracker,
+                onPageTextReady
             )
     }
 
@@ -134,6 +150,36 @@ class PageTest {
         // Foot note: It's impossible to verify the behavior when drawing multiple highlights using
         // Mockito's Spy functionality, as it captures arguments by reference, and we re-use
         // Rect and Paint arguments to canvas.drawRect() to avoid allocations on the drawing path
+    }
+
+    @Test
+    fun setVisible_fetchesPageText() {
+        page.setVisible(zoom = 1.0f)
+        testDispatcher.scheduler.runCurrent()
+        assertThat(page.pageText).isEqualTo("SampleText")
+        assertThat(pageTextReadyCounter).isEqualTo(1)
+    }
+
+    @Test
+    fun setVisible_doesNotFetchPageTextIfAlreadyFetched() {
+        page.setVisible(zoom = 1.0f)
+        testDispatcher.scheduler.runCurrent()
+        assertThat(page.pageText).isEqualTo("SampleText")
+        assertThat(pageTextReadyCounter).isEqualTo(1)
+
+        page.setVisible(zoom = 1.0f)
+        testDispatcher.scheduler.runCurrent()
+        assertThat(page.pageText).isEqualTo("SampleText")
+        assertThat(pageTextReadyCounter).isEqualTo(1)
+    }
+
+    @Test
+    fun setInvisible_cancelsPageTextFetch() {
+        page.setVisible(zoom = 1.0f)
+        page.setInvisible()
+        testDispatcher.scheduler.runCurrent()
+        assertThat(page.pageText).isNull()
+        assertThat(pageTextReadyCounter).isEqualTo(0)
     }
 }
 
