@@ -972,6 +972,8 @@ private fun Project.getExtraCommonDependencies(): FileCollection =
     )
 
 private fun FileTree.rewriteImageTagsAndCopy(destinationDir: File) {
+    // Get rid of stale files in the directory
+    destinationDir.deleteRecursively()
     visit { fileDetails ->
         if (!fileDetails.isDirectory) {
             val targetFile = File(destinationDir, fileDetails.relativePath.pathString)
