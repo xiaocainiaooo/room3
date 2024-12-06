@@ -20,7 +20,6 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 
 import androidx.annotation.DoNotInline;
-import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
@@ -29,6 +28,8 @@ import androidx.appsearch.app.Features;
 import androidx.appsearch.app.JoinSpec;
 import androidx.appsearch.app.SearchSpec;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Map;
@@ -48,9 +49,8 @@ public final class SearchSpecToPlatformConverter {
     // Most jetpackSearchSpec.get calls cause WrongConstant lint errors because the methods are not
     // defined as returning the same constants as the corresponding setter expects, but they do
     @SuppressLint("WrongConstant")
-    @NonNull
     @OptIn(markerClass = ExperimentalAppSearchApi.class)
-    public static android.app.appsearch.SearchSpec toPlatformSearchSpec(
+    public static android.app.appsearch.@NonNull SearchSpec toPlatformSearchSpec(
             @NonNull SearchSpec jetpackSearchSpec) {
         Preconditions.checkNotNull(jetpackSearchSpec);
 
@@ -204,19 +204,19 @@ public final class SearchSpecToPlatformConverter {
         }
 
         @DoNotInline
-        static void setJoinSpec(@NonNull android.app.appsearch.SearchSpec.Builder builder,
+        static void setJoinSpec(android.app.appsearch.SearchSpec.@NonNull Builder builder,
                 JoinSpec jetpackJoinSpec) {
             builder.setJoinSpec(JoinSpecToPlatformConverter.toPlatformJoinSpec(jetpackJoinSpec));
         }
 
         @DoNotInline
-        static void setRankingStrategy(@NonNull android.app.appsearch.SearchSpec.Builder builder,
+        static void setRankingStrategy(android.app.appsearch.SearchSpec.@NonNull Builder builder,
                 @NonNull String rankingExpression) {
             builder.setRankingStrategy(rankingExpression);
         }
 
         @DoNotInline
-        static void copyEnabledFeatures(@NonNull android.app.appsearch.SearchSpec.Builder builder,
+        static void copyEnabledFeatures(android.app.appsearch.SearchSpec.@NonNull Builder builder,
                 @NonNull SearchSpec jetpackSpec) {
             if (jetpackSpec.isNumericSearchEnabled()) {
                 builder.setNumericSearchEnabled(true);
@@ -230,7 +230,7 @@ public final class SearchSpecToPlatformConverter {
         }
 
         @DoNotInline
-        static void setPropertyWeights(@NonNull android.app.appsearch.SearchSpec.Builder builder,
+        static void setPropertyWeights(android.app.appsearch.SearchSpec.@NonNull Builder builder,
                 @NonNull Map<String, Map<String, Double>> propertyWeightsMap) {
             for (Map.Entry<String, Map<String, Double>> entry : propertyWeightsMap.entrySet()) {
                 builder.setPropertyWeights(entry.getKey(), entry.getValue());
@@ -244,7 +244,7 @@ public final class SearchSpecToPlatformConverter {
 
         @DoNotInline
         static void addFilterProperties(
-                @NonNull android.app.appsearch.SearchSpec.Builder platformBuilder,
+                android.app.appsearch.SearchSpec.@NonNull Builder platformBuilder,
                 Map<String, List<String>> properties) {
             for (Map.Entry<String, List<String>> entry : properties.entrySet()) {
                 platformBuilder.addFilterProperties(entry.getKey(), entry.getValue());
@@ -253,7 +253,7 @@ public final class SearchSpecToPlatformConverter {
 
         @DoNotInline
         static void copyEnabledFeatures(
-                @NonNull android.app.appsearch.SearchSpec.Builder platformBuilder,
+                android.app.appsearch.SearchSpec.@NonNull Builder platformBuilder,
                 @NonNull SearchSpec jetpackSpec) {
             if (jetpackSpec.isListFilterHasPropertyFunctionEnabled()) {
                 platformBuilder.setListFilterHasPropertyFunctionEnabled(true);

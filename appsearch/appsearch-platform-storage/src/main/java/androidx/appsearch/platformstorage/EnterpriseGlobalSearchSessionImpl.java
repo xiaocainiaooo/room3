@@ -20,7 +20,6 @@ import static androidx.appsearch.app.AppSearchResult.RESULT_NOT_FOUND;
 
 import android.os.Build;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.app.AppSearchBatchResult;
@@ -42,6 +41,8 @@ import androidx.core.util.Preconditions;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import org.jspecify.annotations.NonNull;
+
 import java.util.concurrent.Executor;
 
 /**
@@ -58,7 +59,7 @@ class EnterpriseGlobalSearchSessionImpl implements EnterpriseGlobalSearchSession
     private final Features mFeatures;
 
     EnterpriseGlobalSearchSessionImpl(
-            @NonNull android.app.appsearch.EnterpriseGlobalSearchSession platformSession,
+            android.app.appsearch.@NonNull EnterpriseGlobalSearchSession platformSession,
             @NonNull Executor executor,
             @NonNull Features features) {
         mPlatformSession = Preconditions.checkNotNull(platformSession);
@@ -66,11 +67,11 @@ class EnterpriseGlobalSearchSessionImpl implements EnterpriseGlobalSearchSession
         mFeatures = Preconditions.checkNotNull(features);
     }
 
-    @NonNull
     @Override
-    public ListenableFuture<AppSearchBatchResult<String, GenericDocument>> getByDocumentIdAsync(
-            @NonNull String packageName, @NonNull String databaseName,
-            @NonNull GetByDocumentIdRequest request) {
+    public @NonNull ListenableFuture<AppSearchBatchResult<String, GenericDocument>>
+            getByDocumentIdAsync(
+                    @NonNull String packageName, @NonNull String databaseName,
+                    @NonNull GetByDocumentIdRequest request) {
         Preconditions.checkNotNull(packageName);
         Preconditions.checkNotNull(databaseName);
         Preconditions.checkNotNull(request);
@@ -102,8 +103,7 @@ class EnterpriseGlobalSearchSessionImpl implements EnterpriseGlobalSearchSession
     }
 
     @Override
-    @NonNull
-    public SearchResults search(
+    public @NonNull SearchResults search(
             @NonNull String queryExpression,
             @NonNull SearchSpec searchSpec) {
         Preconditions.checkNotNull(queryExpression);
@@ -115,9 +115,8 @@ class EnterpriseGlobalSearchSessionImpl implements EnterpriseGlobalSearchSession
         return new SearchResultsImpl(platformSearchResults, searchSpec, mExecutor);
     }
 
-    @NonNull
     @Override
-    public ListenableFuture<GetSchemaResponse> getSchemaAsync(@NonNull String packageName,
+    public @NonNull ListenableFuture<GetSchemaResponse> getSchemaAsync(@NonNull String packageName,
             @NonNull String databaseName) {
         Preconditions.checkNotNull(packageName);
         Preconditions.checkNotNull(databaseName);
@@ -128,9 +127,8 @@ class EnterpriseGlobalSearchSessionImpl implements EnterpriseGlobalSearchSession
         return future;
     }
 
-    @NonNull
     @Override
-    public Features getFeatures() {
+    public @NonNull Features getFeatures() {
         return mFeatures;
     }
 }
