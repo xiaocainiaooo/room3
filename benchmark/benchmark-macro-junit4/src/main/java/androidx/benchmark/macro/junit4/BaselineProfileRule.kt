@@ -34,48 +34,14 @@ import org.junit.runners.model.Statement
  * `BaselineProfileRule` is only supported on Android 13 (API 33) and above, or if using a rooted
  * device, Android P (API 28) and above.
  *
- * ```
- * @RunWith(AndroidJUnit4::class)
- * class BaselineProfileGenerator {
- *     @get:Rule
- *     val baselineProfileRule = BaselineProfileRule()
- *
- *     @Test
- *     fun startup() = baselineProfileRule.collect(
- *         packageName = "com.example.my.application.id"
- *     ) {
- *         pressHome()
- *         // This block defines the app's critical user journey. Here we are
- *         // interested in optimizing for app startup, but you can also navigate
- *         // and scroll through your most important UI.
- *         startActivityAndWait()
- *     }
- * }
- * ```
- *
- * Note that you can filter captured rules, for example, if you're generating rules for a library,
- * and don't want to record profiles from outside that library:
- * ```
- *     @Test
- *     fun generateLibraryRules() = baselineProfileRule.collect(
- *         // Target app is an integration test app which uses the library, but any
- *         // app code isn't relevant to store in library's Baseline Profile
- *         packageName = "com.example.testapp.id"
- *         filterPredicate = {
- *             // Only capture rules in the library's package, excluding test app code
- *             // Rules are prefixed by tag characters, followed by JVM method signature,
- *             // e.g. `HSPLcom/mylibrary/LibraryClass;-><init>()V`, where `L`
- *             // signifies the start of the package/class, and '/' is divider instead of '.'
- *             val libPackage = "com.mylibrary"
- *             it.contains("^.*L${libPackage.replace(".", "/")}".toRegex())
- *         },
- *     ) {
- *         // ...
- *     }
- * ```
+ * Note that you can specify a `filterPredicate` to filter captured rules, for example, if you're
+ * generating rules for a library, and don't want to record profiles from outside that library.
  *
  * See the [Baseline Profile Guide](https://d.android.com/baseline-profiles) for more information on
  * creating Baseline Profiles.
+ *
+ * @sample androidx.benchmark.samples.baselineProfileRuleSample
+ * @sample androidx.benchmark.samples.baselineProfileRuleLibrarySample
  */
 @RequiresApi(28)
 class BaselineProfileRule : TestRule {
@@ -114,7 +80,7 @@ class BaselineProfileRule : TestRule {
      * @param [profileBlock] defines the critical user journey.
      */
     @JvmOverloads
-    public fun collect(
+    fun collect(
         packageName: String,
         maxIterations: Int = 15,
         stableIterations: Int = 3,

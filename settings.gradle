@@ -394,6 +394,7 @@ includeProject(":benchmark:benchmark-baseline-profile-gradle-plugin", "benchmark
 includeProject(":benchmark:benchmark-junit4")
 includeProject(":benchmark:benchmark-macro", [BuildType.MAIN, BuildType.COMPOSE])
 includeProject(":benchmark:benchmark-macro-junit4", [BuildType.MAIN, BuildType.COMPOSE])
+includeProject(":benchmark:benchmark-samples", "benchmark/samples", [BuildType.MAIN, BuildType.COMPOSE])
 includeProject(":benchmark:integration-tests:baselineprofile-producer", [BuildType.MAIN])
 includeProject(":benchmark:integration-tests:baselineprofile-consumer", [BuildType.MAIN])
 includeProject(":benchmark:integration-tests:baselineprofile-flavors-producer", [BuildType.MAIN])
