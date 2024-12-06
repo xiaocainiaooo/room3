@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+@file:JvmName("TraceKt")
+
 package androidx.tracing
 
 import android.os.Build
