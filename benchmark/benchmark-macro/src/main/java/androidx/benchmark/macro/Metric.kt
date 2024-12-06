@@ -55,20 +55,22 @@ sealed class Metric {
     /**
      * Contextual information about the environment where metrics are captured, such as [apiLevel]
      * and [targetPackageName].
+     *
+     * @property apiLevel `Build.VERSION.SDK_INT` at time of capture.
+     * @property targetPackageName Package name of the app process being measured.
+     * @property testPackageName Package name of the test/benchmarking process.
+     * @property startupMode StartupMode for the target application, if the app was forced to launch
+     *   in a specific state, `null` otherwise.
+     * @property artMainlineVersion ART mainline version, or `-1` if on a OS version without ART
+     *   mainline (<30). `null` if captured from a fixed trace, where mainline version is unknown.
      */
     @ExperimentalMetricApi
     class CaptureInfo(
-        /** Build.VERSION.SDK_INT at time of capture */
         val apiLevel: Int,
         val targetPackageName: String,
         val testPackageName: String,
         val startupMode: StartupMode?,
-        /**
-         * ART mainline version, or -1 if on a OS version without ART mainline (<30)
-         *
-         * If `null`, ART version is unknown. This should only occur if capturing metrics from a
-         * fixed trace, where the ART version is unknown.
-         */
+
         // allocations for tests not relevant, not in critical path
         @Suppress("AutoBoxing")
         @get:Suppress("AutoBoxing")
@@ -97,6 +99,10 @@ sealed class Metric {
             /**
              * Constructs a CaptureInfo for a local run on the current device, from the current
              * process.
+             *
+             * @param targetPackageName Package name of the app being measured.
+             * @param startupMode StartupMode for the target application, if the app was forced to
+             *   launch in a specific state, `null` otherwise.
              */
             @JvmStatic
             fun forLocalCapture(targetPackageName: String, startupMode: StartupMode?) =
