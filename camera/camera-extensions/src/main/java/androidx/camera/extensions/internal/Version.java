@@ -18,10 +18,10 @@ package androidx.camera.extensions.internal;
 
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.google.auto.value.AutoValue;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.math.BigInteger;
 import java.util.Objects;
@@ -49,8 +49,7 @@ public abstract class Version implements Comparable<Version> {
      *                      (major.minor.patch[-description])
      * @return the parsed Version object or <tt>null</tt> if the versionString format is invalid.
      */
-    @Nullable
-    public static Version parse(@NonNull String versionString) {
+    public static @Nullable Version parse(@NonNull String versionString) {
         if (TextUtils.isEmpty(versionString)) {
             return null;
         }
@@ -70,8 +69,8 @@ public abstract class Version implements Comparable<Version> {
     /**
      * Creates a new instance of the Version object with the given parameters.
      */
-    @NonNull
-    public static Version create(int major, int minor, int patch, @NonNull String description) {
+    public static @NonNull Version create(int major, int minor, int patch,
+            @NonNull String description) {
         return new AutoValue_Version(major, minor, patch, description);
     }
 
@@ -90,9 +89,8 @@ public abstract class Version implements Comparable<Version> {
 
     abstract String getDescription();
 
-    @NonNull
     @Override
-    public final String toString() {
+    public final @NonNull String toString() {
         StringBuilder sb = new StringBuilder(getMajor() + "." + getMinor() + "." + getPatch());
         if (!TextUtils.isEmpty(getDescription())) {
             sb.append("-" + getDescription());
