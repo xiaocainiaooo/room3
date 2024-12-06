@@ -20,7 +20,7 @@ import androidx.compose.ui.text.AnnotatedString
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
-class ClipboardManagerTest {
+class ClipboardTest {
 
     @Test
     fun clipboardManagerWithoutHasText_returnsTrue_withNonEmptyGetText() {
@@ -41,7 +41,8 @@ class ClipboardManagerTest {
     }
 }
 
-fun FakeClipboardManager(initialText: String? = null) =
+@Suppress("DEPRECATION")
+private fun FakeClipboardManager(initialText: String? = null) =
     object : ClipboardManager {
         private var currentText: AnnotatedString? = initialText?.let { AnnotatedString(it) }
 

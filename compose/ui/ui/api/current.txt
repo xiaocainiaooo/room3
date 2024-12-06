@@ -3161,18 +3161,25 @@ package androidx.compose.ui.platform {
     property public final android.content.ClipDescription clipDescription;
   }
 
+  public interface Clipboard {
+    method public suspend Object? getClipEntry(kotlin.coroutines.Continuation<? super androidx.compose.ui.platform.ClipEntry?>);
+    method public android.content.ClipboardManager getNativeClipboard();
+    method public suspend Object? setClipEntry(androidx.compose.ui.platform.ClipEntry? clipEntry, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public abstract android.content.ClipboardManager nativeClipboard;
+  }
+
   public final class ClipboardExtensions_androidKt {
     method @SuppressCompatibility @androidx.compose.ui.ExperimentalComposeUiApi public static android.net.Uri? firstUriOrNull(androidx.compose.ui.platform.ClipEntry);
   }
 
-  public interface ClipboardManager {
-    method public default androidx.compose.ui.platform.ClipEntry? getClip();
-    method public default android.content.ClipboardManager getNativeClipboard();
-    method public androidx.compose.ui.text.AnnotatedString? getText();
-    method public default boolean hasText();
-    method public default void setClip(androidx.compose.ui.platform.ClipEntry? clipEntry);
-    method public void setText(androidx.compose.ui.text.AnnotatedString annotatedString);
-    property public default android.content.ClipboardManager nativeClipboard;
+  @Deprecated public interface ClipboardManager {
+    method @Deprecated public default androidx.compose.ui.platform.ClipEntry? getClip();
+    method @Deprecated public default android.content.ClipboardManager getNativeClipboard();
+    method @Deprecated public androidx.compose.ui.text.AnnotatedString? getText();
+    method @Deprecated public default boolean hasText();
+    method @Deprecated public default void setClip(androidx.compose.ui.platform.ClipEntry? clipEntry);
+    method @Deprecated public void setText(androidx.compose.ui.text.AnnotatedString annotatedString);
+    property @Deprecated public default android.content.ClipboardManager nativeClipboard;
   }
 
   public final class ComposeView extends androidx.compose.ui.platform.AbstractComposeView {
@@ -3189,7 +3196,8 @@ package androidx.compose.ui.platform {
     method @SuppressCompatibility @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill?> getLocalAutofill();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillManager?> getLocalAutofillManager();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree> getLocalAutofillTree();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager> getLocalClipboardManager();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.Clipboard> getLocalClipboard();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager> getLocalClipboardManager();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> getLocalCursorBlinkEnabled();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.Density> getLocalDensity();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.focus.FocusManager> getLocalFocusManager();
@@ -3209,7 +3217,8 @@ package androidx.compose.ui.platform {
     property @SuppressCompatibility @androidx.compose.ui.ExperimentalComposeUiApi public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill?> LocalAutofill;
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillManager?> LocalAutofillManager;
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree> LocalAutofillTree;
-    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager> LocalClipboardManager;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.Clipboard> LocalClipboard;
+    property @Deprecated public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager> LocalClipboardManager;
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> LocalCursorBlinkEnabled;
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.Density> LocalDensity;
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.focus.FocusManager> LocalFocusManager;

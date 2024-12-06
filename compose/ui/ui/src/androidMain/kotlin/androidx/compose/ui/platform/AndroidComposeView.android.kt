@@ -520,6 +520,8 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
     /** Provide clipboard manager to the user. Use the Android version of clipboard manager. */
     override val clipboardManager = AndroidClipboardManager(context)
 
+    override val clipboard = AndroidClipboard(clipboardManager)
+
     override val snapshotObserver = OwnerSnapshotObserver { command ->
         if (handler?.looper === Looper.myLooper()) {
             command()
