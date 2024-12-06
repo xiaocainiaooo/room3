@@ -94,8 +94,6 @@ import android.widget.ToggleButton;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.MainThread;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.UiThread;
@@ -161,6 +159,9 @@ import androidx.test.espresso.idling.CountingIdlingResource;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.text.Format;
@@ -480,15 +481,13 @@ public class CameraXActivity extends AppCompatActivity {
      * Saves the error message of the last take picture action if any error occurs. This will be
      * null which means no error occurs.
      */
-    @Nullable
-    private String mLastTakePictureErrorMessage = null;
+    private @Nullable String mLastTakePictureErrorMessage = null;
 
     /**
      * Retrieve idling resource that waits for image received by analyzer).
      */
     @VisibleForTesting
-    @NonNull
-    public IdlingResource getAnalysisIdlingResource() {
+    public @NonNull IdlingResource getAnalysisIdlingResource() {
         return mAnalysisIdlingResource;
     }
 
@@ -496,8 +495,7 @@ public class CameraXActivity extends AppCompatActivity {
      * Retrieve idling resource that waits view to get texture update.
      */
     @VisibleForTesting
-    @NonNull
-    public IdlingResource getViewIdlingResource() {
+    public @NonNull IdlingResource getViewIdlingResource() {
         return mViewIdlingResource;
     }
 
@@ -505,8 +503,7 @@ public class CameraXActivity extends AppCompatActivity {
      * Retrieve idling resource that waits for capture to complete (save or error).
      */
     @VisibleForTesting
-    @NonNull
-    public IdlingResource getImageSavedIdlingResource() {
+    public @NonNull IdlingResource getImageSavedIdlingResource() {
         return mImageSavedIdlingResource;
     }
 
@@ -514,8 +511,7 @@ public class CameraXActivity extends AppCompatActivity {
      * Retrieve idling resource that waits for a video being recorded and saved.
      */
     @VisibleForTesting
-    @NonNull
-    public IdlingResource getVideoSavedIdlingResource() {
+    public @NonNull IdlingResource getVideoSavedIdlingResource() {
         return mVideoSavedIdlingResource;
     }
 
@@ -523,8 +519,7 @@ public class CameraXActivity extends AppCompatActivity {
      * Retrieve idling resource that waits for initialization to finish.
      */
     @VisibleForTesting
-    @NonNull
-    public IdlingResource getInitializationIdlingResource() {
+    public @NonNull IdlingResource getInitializationIdlingResource() {
         return mInitializationIdlingResource;
     }
 
@@ -538,8 +533,7 @@ public class CameraXActivity extends AppCompatActivity {
      */
     @VisibleForTesting
     @MainThread
-    @Nullable
-    public CameraXViewModel.CameraProviderResult getCameraProviderResult() {
+    public CameraXViewModel.@Nullable CameraProviderResult getCameraProviderResult() {
         return mCameraProviderResult;
     }
 
@@ -1015,7 +1009,7 @@ public class CameraXActivity extends AppCompatActivity {
                                 .OnImageSavedCallback() {
                             @Override
                             public void onImageSaved(
-                                    @NonNull ImageCapture.OutputFileResults
+                                    ImageCapture.@NonNull OutputFileResults
                                             outputFileResults) {
                                 Log.d(TAG, "Saved image to "
                                         + outputFileResults.getSavedUri());
@@ -1075,8 +1069,7 @@ public class CameraXActivity extends AppCompatActivity {
     }
 
     @SuppressLint("RestrictedApiAndroidX")
-    @NonNull
-    private ImageCapture.OutputFileOptions createOutputFileOptions(
+    private ImageCapture.@NonNull OutputFileOptions createOutputFileOptions(
             @ImageCapture.OutputFormat int imageOutputFormat) {
         createDefaultPictureFolderIfNotExist();
         Format formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS",
@@ -1160,8 +1153,7 @@ public class CameraXActivity extends AppCompatActivity {
         });
     }
 
-    @NonNull
-    private CameraSelector getSwitchedCameraSelector(
+    private @NonNull CameraSelector getSwitchedCameraSelector(
             @NonNull CameraSelector currentCameraSelector) {
         CameraSelector switchedCameraSelector;
         // When the activity is launched with a specific camera id, camera switch function
@@ -1940,8 +1932,7 @@ public class CameraXActivity extends AppCompatActivity {
         updateButtonsUi();
     }
 
-    @NonNull
-    private String getBindFailedErrorMessage() {
+    private @NonNull String getBindFailedErrorMessage() {
         if (mVideoQuality != QUALITY_AUTO) {
             return "Bind too many use cases or video quality is too large.";
         } else if (mImageOutputFormat == OUTPUT_FORMAT_JPEG_ULTRA_HDR
@@ -2451,8 +2442,7 @@ public class CameraXActivity extends AppCompatActivity {
             }
         }
 
-        @NonNull
-        Button getButton() {
+        @NonNull Button getButton() {
             return mButtonDynamicRange;
         }
 
@@ -2526,8 +2516,7 @@ public class CameraXActivity extends AppCompatActivity {
             }
         }
 
-        @NonNull
-        State getState() {
+        @NonNull State getState() {
             return mState;
         }
 
@@ -2595,8 +2584,7 @@ public class CameraXActivity extends AppCompatActivity {
             return mTextStats;
         }
 
-        @NonNull
-        Button getButtonQuality() {
+        @NonNull Button getButtonQuality() {
             return mButtonQuality;
         }
 
@@ -2621,8 +2609,7 @@ public class CameraXActivity extends AppCompatActivity {
         return findUseCase(ImageCapture.class);
     }
 
-    @Nullable
-    View getViewFinder() {
+    @Nullable View getViewFinder() {
         return mViewFinder;
     }
 
@@ -2631,8 +2618,7 @@ public class CameraXActivity extends AppCompatActivity {
      * null if no error occurs.
      */
     @VisibleForTesting
-    @Nullable
-    String getLastTakePictureErrorMessage() {
+    @Nullable String getLastTakePictureErrorMessage() {
         return mLastTakePictureErrorMessage;
     }
 
@@ -2654,8 +2640,7 @@ public class CameraXActivity extends AppCompatActivity {
     /**
      * Finds the use case by the given class.
      */
-    @Nullable
-    private <T extends UseCase> T findUseCase(Class<T> useCaseSubclass) {
+    private <T extends UseCase> @Nullable T findUseCase(Class<T> useCaseSubclass) {
         if (mUseCases != null) {
             for (UseCase useCase : mUseCases) {
                 if (useCaseSubclass.isInstance(useCase)) {
@@ -2667,25 +2652,21 @@ public class CameraXActivity extends AppCompatActivity {
     }
 
     @VisibleForTesting
-    @Nullable
-    public Camera getCamera() {
+    public @Nullable Camera getCamera() {
         return mCamera;
     }
 
     @VisibleForTesting
-    @Nullable
-    CameraInfo getCameraInfo() {
+    @Nullable CameraInfo getCameraInfo() {
         return mCamera != null ? mCamera.getCameraInfo() : null;
     }
 
     @VisibleForTesting
-    @Nullable
-    CameraControl getCameraControl() {
+    @Nullable CameraControl getCameraControl() {
         return mCamera != null ? mCamera.getCameraControl() : null;
     }
 
-    @NonNull
-    private static String getQualityIconName(@Nullable Quality quality) {
+    private static @NonNull String getQualityIconName(@Nullable Quality quality) {
         if (quality == QUALITY_AUTO) {
             return "Auto";
         } else if (quality == Quality.UHD) {
@@ -2700,8 +2681,7 @@ public class CameraXActivity extends AppCompatActivity {
         return "?";
     }
 
-    @NonNull
-    private static String getQualityMenuItemName(@Nullable Quality quality) {
+    private static @NonNull String getQualityMenuItemName(@Nullable Quality quality) {
         if (quality == QUALITY_AUTO) {
             return "Auto";
         } else if (quality == Quality.UHD) {
@@ -2732,8 +2712,7 @@ public class CameraXActivity extends AppCompatActivity {
         }
     }
 
-    @Nullable
-    private static Quality itemIdToQuality(int itemId) {
+    private static @Nullable Quality itemIdToQuality(int itemId) {
         switch (itemId) {
             case 0:
                 return QUALITY_AUTO;
@@ -2750,8 +2729,7 @@ public class CameraXActivity extends AppCompatActivity {
         }
     }
 
-    @NonNull
-    private static String getDynamicRangeMenuItemName(@NonNull DynamicRange dynamicRange) {
+    private static @NonNull String getDynamicRangeMenuItemName(@NonNull DynamicRange dynamicRange) {
         String menuItemName = dynamicRange.toString();
         for (DynamicRangeUiData uiData : DYNAMIC_RANGE_UI_DATA) {
             if (Objects.equals(dynamicRange, uiData.mDynamicRange)) {
@@ -2777,8 +2755,7 @@ public class CameraXActivity extends AppCompatActivity {
         return itemId;
     }
 
-    @NonNull
-    private static DynamicRange itemIdToDynamicRange(int itemId) {
+    private static @NonNull DynamicRange itemIdToDynamicRange(int itemId) {
         if (itemId < 0 || itemId >= DYNAMIC_RANGE_UI_DATA.size()) {
             throw new IllegalArgumentException("Undefined item id: " + itemId);
         }
@@ -2786,8 +2763,8 @@ public class CameraXActivity extends AppCompatActivity {
     }
 
     @SuppressLint("RestrictedApiAndroidX")
-    @NonNull
-    private static String getImageOutputFormatIconName(@ImageCapture.OutputFormat int format) {
+    private static @NonNull String getImageOutputFormatIconName(
+            @ImageCapture.OutputFormat int format) {
         if (format == OUTPUT_FORMAT_JPEG) {
             return "Jpeg";
         } else if (format == OUTPUT_FORMAT_JPEG_ULTRA_HDR) {
@@ -2801,8 +2778,8 @@ public class CameraXActivity extends AppCompatActivity {
     }
 
     @SuppressLint("RestrictedApiAndroidX")
-    @NonNull
-    private static String getImageOutputFormatMenuItemName(@ImageCapture.OutputFormat int format) {
+    private static @NonNull String getImageOutputFormatMenuItemName(
+            @ImageCapture.OutputFormat int format) {
         if (format == OUTPUT_FORMAT_JPEG) {
             return "Jpeg";
         } else if (format == OUTPUT_FORMAT_JPEG_ULTRA_HDR) {
@@ -2918,8 +2895,7 @@ public class CameraXActivity extends AppCompatActivity {
                 ) == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY;
     }
 
-    @NonNull
-    private static String getCameraId(@NonNull CameraInfo cameraInfo) {
+    private static @NonNull String getCameraId(@NonNull CameraInfo cameraInfo) {
         try {
             return getCamera2CameraId(cameraInfo);
         } catch (IllegalArgumentException e) {
@@ -2929,16 +2905,14 @@ public class CameraXActivity extends AppCompatActivity {
 
     @SuppressLint("NullAnnotationGroup")
     @OptIn(markerClass = ExperimentalCamera2Interop.class)
-    @NonNull
-    private static String getCamera2CameraId(@NonNull CameraInfo cameraInfo) {
+    private static @NonNull String getCamera2CameraId(@NonNull CameraInfo cameraInfo) {
         return Camera2CameraInfo.from(cameraInfo).getCameraId();
     }
 
     @SuppressLint("NullAnnotationGroup")
     @OptIn(markerClass =
             androidx.camera.camera2.pipe.integration.interop.ExperimentalCamera2Interop.class)
-    @NonNull
-    private static String getCameraPipeCameraId(@NonNull CameraInfo cameraInfo) {
+    private static @NonNull String getCameraPipeCameraId(@NonNull CameraInfo cameraInfo) {
         return androidx.camera.camera2.pipe.integration.interop.Camera2CameraInfo.from(
                 cameraInfo).getCameraId();
     }
