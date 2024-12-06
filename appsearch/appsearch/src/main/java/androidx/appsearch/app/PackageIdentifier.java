@@ -16,18 +16,18 @@
 
 package androidx.appsearch.app;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.safeparcel.PackageIdentifierParcel;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class represents a uniquely identifiable package.
  */
 public class PackageIdentifier {
-    @NonNull
-    private final PackageIdentifierParcel mPackageIdentifierParcel;
+    private final @NonNull PackageIdentifierParcel mPackageIdentifierParcel;
 
     /**
      * Creates a unique identifier for a package.
@@ -44,7 +44,7 @@ public class PackageIdentifier {
      * @param packageName       Name of the package.
      * @param sha256Certificate SHA-256 certificate digest of the package.
      */
-    public PackageIdentifier(@NonNull String packageName, @NonNull byte[] sha256Certificate) {
+    public PackageIdentifier(@NonNull String packageName, byte @NonNull [] sha256Certificate) {
         Preconditions.checkNotNull(packageName);
         Preconditions.checkNotNull(sha256Certificate);
         mPackageIdentifierParcel = new PackageIdentifierParcel(packageName, sha256Certificate);
@@ -63,20 +63,17 @@ public class PackageIdentifier {
      * @exportToFramework:hide
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    @NonNull
-    public PackageIdentifierParcel getPackageIdentifierParcel() {
+    public @NonNull PackageIdentifierParcel getPackageIdentifierParcel() {
         return mPackageIdentifierParcel;
     }
 
     /** Returns the name for a package. */
-    @NonNull
-    public String getPackageName() {
+    public @NonNull String getPackageName() {
         return mPackageIdentifierParcel.getPackageName();
     }
 
     /** Returns the SHA-256 certificate for a package. */
-    @NonNull
-    public byte[] getSha256Certificate() {
+    public byte @NonNull [] getSha256Certificate() {
         return mPackageIdentifierParcel.getSha256Certificate();
     }
 

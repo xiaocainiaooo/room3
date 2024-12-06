@@ -16,7 +16,6 @@
 
 package androidx.appsearch.ast.query;
 
-import androidx.annotation.NonNull;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.PropertyPath;
 import androidx.appsearch.ast.FunctionNode;
@@ -24,6 +23,8 @@ import androidx.appsearch.ast.Node;
 import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,10 +79,9 @@ public final class SearchNode implements FunctionNode {
     /**
      * Returns the name of the function represented by {@link SearchNode}.
      */
-    @NonNull
     @Override
     @FunctionName
-    public String getFunctionName() {
+    public @NonNull String getFunctionName() {
         return FUNCTION_NAME_SEARCH;
     }
 
@@ -89,17 +89,15 @@ public final class SearchNode implements FunctionNode {
      * Returns the child {@link Node} of {@link SearchNode} as a list containing
      * the only child {@link Node}.
      */
-    @NonNull
     @Override
-    public List<Node> getChildren() {
+    public @NonNull List<Node> getChildren() {
         return Collections.unmodifiableList(mChildren);
     }
 
     /**
      * Returns the child query searched for in the function.
      */
-    @NonNull
-    public Node getChild() {
+    public @NonNull Node getChild() {
         return mChildren.get(0);
     }
 
@@ -107,8 +105,7 @@ public final class SearchNode implements FunctionNode {
      * Returns the list of property restricts applied to the query. If the list is empty, there are
      * no property restricts, which means that `search` will return all results from the query.
      */
-    @NonNull
-    public List<PropertyPath> getProperties() {
+    public @NonNull List<PropertyPath> getProperties() {
         return Collections.unmodifiableList(mProperties);
     }
 
@@ -178,9 +175,8 @@ public final class SearchNode implements FunctionNode {
      *
      * the query string of {@code searchNode} will be `search("search(\"(\\\"foo\\\")\")")`
      */
-    @NonNull
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         StringBuilder builder = new StringBuilder(FunctionNode.FUNCTION_NAME_SEARCH);
         builder.append("(\"");
         builder.append(escapeQuery(getChild().toString()));

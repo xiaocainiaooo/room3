@@ -16,10 +16,11 @@
 
 package androidx.appsearch.app;
 
-import androidx.annotation.NonNull;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.annotation.CurrentTimeMillisLong;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A request to report usage of a document owned by another app from a system UI surface.
@@ -51,26 +52,22 @@ public final class ReportSystemUsageRequest {
     }
 
     /** Returns the package name of the app which owns the document that was used. */
-    @NonNull
-    public String getPackageName() {
+    public @NonNull String getPackageName() {
         return mPackageName;
     }
 
     /** Returns the database in which the document that was used resides. */
-    @NonNull
-    public String getDatabaseName() {
+    public @NonNull String getDatabaseName() {
         return mDatabase;
     }
 
     /** Returns the namespace of the document that was used. */
-    @NonNull
-    public String getNamespace() {
+    public @NonNull String getNamespace() {
         return mNamespace;
     }
 
     /** Returns the ID of document that was used. */
-    @NonNull
-    public String getDocumentId() {
+    public @NonNull String getDocumentId() {
         return mDocumentId;
     }
 
@@ -126,16 +123,14 @@ public final class ReportSystemUsageRequest {
          * {@link ReportSystemUsageRequest} is constructed.
          */
         @CanIgnoreReturnValue
-        @NonNull
-        public ReportSystemUsageRequest.Builder setUsageTimestampMillis(
+        public ReportSystemUsageRequest.@NonNull Builder setUsageTimestampMillis(
                 @CurrentTimeMillisLong long usageTimestampMillis) {
             mUsageTimestampMillis = usageTimestampMillis;
             return this;
         }
 
         /** Builds a new {@link ReportSystemUsageRequest}. */
-        @NonNull
-        public ReportSystemUsageRequest build() {
+        public @NonNull ReportSystemUsageRequest build() {
             if (mUsageTimestampMillis == null) {
                 mUsageTimestampMillis = System.currentTimeMillis();
             }

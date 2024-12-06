@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    api(libs.jspecify)
     implementation project(':appsearch:appsearch')
     implementation project(':appsearch:appsearch-local-storage')
     implementation project(':appsearch:appsearch-platform-storage')
@@ -54,6 +55,4 @@ androidx {
     description = "A support library for AndroidX AppSearch that contains activities and views " +
             "for debugging an application's integration with AppSearch."
     doNotDocumentReason = "No public API"
-    // TODO: b/326456246
-    optOutJSpecify = true
 }

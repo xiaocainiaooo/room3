@@ -18,7 +18,6 @@ package androidx.appsearch.app;
 
 import android.annotation.SuppressLint;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.exceptions.AppSearchException;
@@ -27,6 +26,8 @@ import androidx.appsearch.flags.Flags;
 import androidx.appsearch.usagereporting.TakenAction;
 import androidx.collection.ArraySet;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,8 +58,7 @@ public final class PutDocumentsRequest {
     }
 
     /** Returns a list of {@link GenericDocument} objects that are part of this request. */
-    @NonNull
-    public List<GenericDocument> getGenericDocuments() {
+    public @NonNull List<GenericDocument> getGenericDocuments() {
         return Collections.unmodifiableList(mDocuments);
     }
 
@@ -72,9 +72,8 @@ public final class PutDocumentsRequest {
      * <p>See {@link Builder#addTakenActionGenericDocuments(GenericDocument...)}.
      * -->
      */
-    @NonNull
     @FlaggedApi(Flags.FLAG_ENABLE_PUT_DOCUMENTS_REQUEST_ADD_TAKEN_ACTIONS)
-    public List<GenericDocument> getTakenActionGenericDocuments() {
+    public @NonNull List<GenericDocument> getTakenActionGenericDocuments() {
         return Collections.unmodifiableList(mTakenActions);
     }
 
@@ -87,8 +86,7 @@ public final class PutDocumentsRequest {
 
         /** Adds one or more {@link GenericDocument} objects to the request. */
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder addGenericDocuments(@NonNull GenericDocument... documents) {
+        public @NonNull Builder addGenericDocuments(GenericDocument @NonNull ... documents) {
             Preconditions.checkNotNull(documents);
             resetIfBuilt();
             return addGenericDocuments(Arrays.asList(documents));
@@ -96,8 +94,7 @@ public final class PutDocumentsRequest {
 
         /** Adds a collection of {@link GenericDocument} objects to the request. */
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder addGenericDocuments(
+        public @NonNull Builder addGenericDocuments(
                 @NonNull Collection<? extends GenericDocument> documents) {
             Preconditions.checkNotNull(documents);
             resetIfBuilt();
@@ -118,8 +115,8 @@ public final class PutDocumentsRequest {
         // Merged list available from getGenericDocuments()
         @SuppressLint("MissingGetterMatchingBuilder")
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder addDocuments(@NonNull Object... documents) throws AppSearchException {
+        public @NonNull Builder addDocuments(Object @NonNull ... documents)
+                throws AppSearchException {
             Preconditions.checkNotNull(documents);
             resetIfBuilt();
             return addDocuments(Arrays.asList(documents));
@@ -137,8 +134,8 @@ public final class PutDocumentsRequest {
         // Merged list available from getGenericDocuments()
         @SuppressLint("MissingGetterMatchingBuilder")
         @CanIgnoreReturnValue
-        @NonNull
-        public Builder addDocuments(@NonNull Collection<?> documents) throws AppSearchException {
+        public @NonNull Builder addDocuments(@NonNull Collection<?> documents)
+                throws AppSearchException {
             Preconditions.checkNotNull(documents);
             resetIfBuilt();
             List<GenericDocument> genericDocuments = new ArrayList<>(documents.size());
@@ -179,10 +176,9 @@ public final class PutDocumentsRequest {
         // Merged list available from getTakenActionGenericDocuments()
         @SuppressWarnings("MissingGetterMatchingBuilder")
         @CanIgnoreReturnValue
-        @NonNull
         @ExperimentalAppSearchApi
-        public Builder addTakenActions(
-                @NonNull TakenAction... takenActions) throws AppSearchException {
+        public @NonNull Builder addTakenActions(
+                TakenAction @NonNull ... takenActions) throws AppSearchException {
             Preconditions.checkNotNull(takenActions);
             resetIfBuilt();
             return addTakenActions(Arrays.asList(takenActions));
@@ -198,9 +194,9 @@ public final class PutDocumentsRequest {
         // Merged list available from getTakenActionGenericDocuments()
         @SuppressWarnings("MissingGetterMatchingBuilder")
         @CanIgnoreReturnValue
-        @NonNull
         @ExperimentalAppSearchApi
-        public Builder addTakenActions(@NonNull Collection<? extends TakenAction> takenActions)
+        public @NonNull Builder addTakenActions(
+                @NonNull Collection<? extends TakenAction> takenActions)
                 throws AppSearchException {
             Preconditions.checkNotNull(takenActions);
             resetIfBuilt();
@@ -303,10 +299,10 @@ public final class PutDocumentsRequest {
          */
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
         @CanIgnoreReturnValue
-        @NonNull
         @FlaggedApi(Flags.FLAG_ENABLE_PUT_DOCUMENTS_REQUEST_ADD_TAKEN_ACTIONS)
-        public Builder addTakenActionGenericDocuments(
-                @NonNull GenericDocument... takenActionGenericDocuments) throws AppSearchException {
+        public @NonNull Builder addTakenActionGenericDocuments(
+                GenericDocument @NonNull ... takenActionGenericDocuments)
+                throws AppSearchException {
             Preconditions.checkNotNull(takenActionGenericDocuments);
             resetIfBuilt();
             return addTakenActionGenericDocuments(Arrays.asList(takenActionGenericDocuments));
@@ -323,9 +319,8 @@ public final class PutDocumentsRequest {
          */
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
         @CanIgnoreReturnValue
-        @NonNull
         @FlaggedApi(Flags.FLAG_ENABLE_PUT_DOCUMENTS_REQUEST_ADD_TAKEN_ACTIONS)
-        public Builder addTakenActionGenericDocuments(@NonNull Collection<?
+        public @NonNull Builder addTakenActionGenericDocuments(@NonNull Collection<?
                 extends GenericDocument> takenActionGenericDocuments) throws AppSearchException {
             Preconditions.checkNotNull(takenActionGenericDocuments);
             resetIfBuilt();
@@ -339,8 +334,7 @@ public final class PutDocumentsRequest {
          * @throws IllegalArgumentException if there is any id collision between normal and action
          *                                  documents.
          */
-        @NonNull
-        public PutDocumentsRequest build() {
+        public @NonNull PutDocumentsRequest build() {
             mBuilt = true;
 
             // Verify there is no id collision between normal documents and action documents.

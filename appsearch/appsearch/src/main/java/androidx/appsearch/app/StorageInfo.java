@@ -19,7 +19,6 @@ package androidx.appsearch.app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.flags.FlaggedApi;
@@ -28,14 +27,15 @@ import androidx.appsearch.safeparcel.AbstractSafeParcelable;
 import androidx.appsearch.safeparcel.SafeParcelable;
 import androidx.appsearch.safeparcel.stub.StubCreators.StorageInfoCreator;
 
+import org.jspecify.annotations.NonNull;
+
 /** The response class of {@code AppSearchSession#getStorageInfo}. */
 @SafeParcelable.Class(creator = "StorageInfoCreator")
 @SuppressWarnings("HiddenSuperclass")
 public final class StorageInfo extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    @NonNull
-    public static final Parcelable.Creator<StorageInfo> CREATOR = new StorageInfoCreator();
+    public static final Parcelable.@NonNull Creator<StorageInfo> CREATOR = new StorageInfoCreator();
 
     @Field(id = 1, getter = "getSizeBytes")
     private long mSizeBytes;
@@ -128,51 +128,45 @@ public final class StorageInfo extends AbstractSafeParcelable {
 
         /** Sets the size in bytes. */
         @CanIgnoreReturnValue
-        @NonNull
-        public StorageInfo.Builder setSizeBytes(long sizeBytes) {
+        public StorageInfo.@NonNull Builder setSizeBytes(long sizeBytes) {
             mSizeBytes = sizeBytes;
             return this;
         }
 
         /** Sets the number of alive documents. */
         @CanIgnoreReturnValue
-        @NonNull
-        public StorageInfo.Builder setAliveDocumentsCount(int aliveDocumentsCount) {
+        public StorageInfo.@NonNull Builder setAliveDocumentsCount(int aliveDocumentsCount) {
             mAliveDocumentsCount = aliveDocumentsCount;
             return this;
         }
 
         /** Sets the number of alive namespaces. */
         @CanIgnoreReturnValue
-        @NonNull
-        public StorageInfo.Builder setAliveNamespacesCount(int aliveNamespacesCount) {
+        public StorageInfo.@NonNull Builder setAliveNamespacesCount(int aliveNamespacesCount) {
             mAliveNamespacesCount = aliveNamespacesCount;
             return this;
         }
 
         /** Sets the size of stored blobs in bytes. */
         @CanIgnoreReturnValue
-        @NonNull
         @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
         @ExperimentalAppSearchApi
-        public StorageInfo.Builder setBlobSizeBytes(long blobSizeBytes) {
+        public StorageInfo.@NonNull Builder setBlobSizeBytes(long blobSizeBytes) {
             mBlobSizeBytes = blobSizeBytes;
             return this;
         }
 
         /** Sets the number of stored blobs. */
         @CanIgnoreReturnValue
-        @NonNull
         @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
         @ExperimentalAppSearchApi
-        public StorageInfo.Builder setBlobCount(int blobCount) {
+        public StorageInfo.@NonNull Builder setBlobCount(int blobCount) {
             mBlobCount = blobCount;
             return this;
         }
 
         /** Builds a {@link StorageInfo} object. */
-        @NonNull
-        public StorageInfo build() {
+        public @NonNull StorageInfo build() {
             return new StorageInfo(mSizeBytes, mAliveDocumentsCount, mAliveNamespacesCount,
                     mBlobSizeBytes,  mBlobCount);
         }

@@ -16,13 +16,14 @@
 
 package androidx.appsearch.ast.query;
 
-import androidx.annotation.NonNull;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.SearchSpec;
 import androidx.appsearch.ast.FunctionNode;
 import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
@@ -141,10 +142,9 @@ public final class SemanticSearchNode implements FunctionNode {
     /**
      * Returns the name of the function represented by {@link SemanticSearchNode}.
      */
-    @NonNull
     @Override
     @FunctionName
-    public String getFunctionName() {
+    public @NonNull String getFunctionName() {
         return FUNCTION_NAME_SEMANTIC_SEARCH;
     }
 
@@ -243,9 +243,8 @@ public final class SemanticSearchNode implements FunctionNode {
      * `semanticSearch(getEmbeddingParameter(0), -Float.MAX_VALUE, 1)` where
      * {@code Float.MAX_VALUE} is the max value of float.
      */
-    @NonNull
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         StringBuilder builder = new StringBuilder(FunctionNode.FUNCTION_NAME_SEMANTIC_SEARCH);
         builder.append("(getEmbeddingParameter(");
         builder.append(mVectorIndex);

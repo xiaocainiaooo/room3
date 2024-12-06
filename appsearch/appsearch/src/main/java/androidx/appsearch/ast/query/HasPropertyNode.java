@@ -16,13 +16,14 @@
 
 package androidx.appsearch.ast.query;
 
-import androidx.annotation.NonNull;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.PropertyPath;
 import androidx.appsearch.ast.FunctionNode;
 import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
@@ -51,10 +52,9 @@ public final class HasPropertyNode implements FunctionNode {
      * Returns the name of the function represented by {@link HasPropertyNode},
      * stored in the enum {@link FunctionNode#FUNCTION_NAME_HAS_PROPERTY}.
      */
-    @NonNull
     @Override
     @FunctionName
-    public String getFunctionName() {
+    public @NonNull String getFunctionName() {
         return FunctionNode.FUNCTION_NAME_HAS_PROPERTY;
     }
 
@@ -62,8 +62,7 @@ public final class HasPropertyNode implements FunctionNode {
      * Gets the {@link PropertyPath} representing the property being checked for some value in the
      * document.
      */
-    @NonNull
-    public PropertyPath getProperty() {
+    public @NonNull PropertyPath getProperty() {
         return mProperty;
     }
 
@@ -81,9 +80,8 @@ public final class HasPropertyNode implements FunctionNode {
      * <p>The string representation of {@link HasPropertyNode} is the function name followed by
      * the property path in quotes.
      */
-    @NonNull
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return FunctionNode.FUNCTION_NAME_HAS_PROPERTY + "(\"" + mProperty + "\")";
     }
 
