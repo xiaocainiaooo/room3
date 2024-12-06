@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Checkbox
 import androidx.compose.material.RadioButton
@@ -50,7 +51,6 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.text.style.TextOverflow
@@ -443,11 +443,10 @@ private fun TextWithLineHeight(
         Spacer(Modifier.padding(16.dp))
 
         Column(Modifier.width(width)) {
-            var textFieldValue by remember(text) { mutableStateOf(TextFieldValue(text)) }
+            val state = remember(text) { TextFieldState(text.text) }
 
             TextFieldWithMetrics(
-                value = textFieldValue,
-                onValueChange = { textFieldValue = it },
+                state = state,
                 style = style,
                 maxLines = maxLines,
                 softWrap = !singleLine

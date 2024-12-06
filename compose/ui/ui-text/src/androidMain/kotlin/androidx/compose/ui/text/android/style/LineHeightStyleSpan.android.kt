@@ -45,24 +45,16 @@ internal class LineHeightStyleSpan(
     val lineHeight: Float,
     private val startIndex: Int,
     private val endIndex: Int,
-    private val trimFirstLineTop: Boolean,
+    val trimFirstLineTop: Boolean,
     val trimLastLineBottom: Boolean,
     @FloatRange(from = -1.0, to = 1.0) private val topRatio: Float,
-    private val preserveMinimumHeight: Boolean,
+    val preserveMinimumHeight: Boolean,
 ) : android.text.style.LineHeightSpan {
 
     private var firstAscent: Int = Int.MIN_VALUE
     private var ascent: Int = Int.MIN_VALUE
     private var descent: Int = Int.MIN_VALUE
     private var lastDescent: Int = Int.MIN_VALUE
-
-    /** Holds the firstAscent - fontMetricsInt.ascent */
-    var firstAscentDiff = 0
-        private set
-
-    /** Holds the last lastDescent - fontMetricsInt.descent */
-    var lastDescentDiff = 0
-        private set
 
     init {
         checkPrecondition(topRatio in 0f..1f || topRatio == -1f) {
@@ -85,9 +77,6 @@ internal class LineHeightStyleSpan(
         val isFirstLine = (start == startIndex)
         val isLastLine = (end == endIndex)
 
-        // if single line and should not apply, return
-        if (isFirstLine && isLastLine && trimFirstLineTop && trimLastLineBottom) return
-
         if (firstAscent == Int.MIN_VALUE) {
             calculateTargetMetrics(fontMetricsInt)
         }
@@ -107,8 +96,6 @@ internal class LineHeightStyleSpan(
             descent = fontMetricsInt.descent
             firstAscent = ascent
             lastDescent = descent
-            firstAscentDiff = 0
-            lastDescentDiff = 0
             return
         }
 
@@ -131,10 +118,21 @@ internal class LineHeightStyleSpan(
         descent = fontMetricsInt.descent + descentDiff
         ascent = descent - ceiledLineHeight
 
-        firstAscent = if (trimFirstLineTop) fontMetricsInt.ascent else ascent
-        lastDescent = if (trimLastLineBottom) fontMetricsInt.descent else descent
-        firstAscentDiff = fontMetricsInt.ascent - firstAscent
-        lastDescentDiff = lastDescent - fontMetricsInt.descent
+        // when trimming the first line, smaller ascent value means a larger line height.
+        firstAscent =
+            if (trimFirstLineTop) {
+                maxOf(fontMetricsInt.ascent, ascent)
+            } else {
+                minOf(fontMetricsInt.ascent, ascent)
+            }
+
+        // when trimming the last line, larger descent value means a larger line height.
+        lastDescent =
+            if (trimLastLineBottom) {
+                minOf(fontMetricsInt.descent, descent)
+            } else {
+                maxOf(fontMetricsInt.descent, descent)
+            }
     }
 
     internal fun copy(

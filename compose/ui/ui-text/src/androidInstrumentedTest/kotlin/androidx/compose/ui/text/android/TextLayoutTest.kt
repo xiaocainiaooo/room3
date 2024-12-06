@@ -35,7 +35,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(InternalPlatformTextApi::class)
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class TextLayoutTest {
@@ -373,18 +372,107 @@ class TextLayoutTest {
                 text = "aA",
                 fontSize = fontSize,
                 lineHeight = lineHeight,
-                preserveMinimumHeight = false
+                preserveMinimumHeight = false,
+                trimFirstLineTop = false,
+                trimLastLineBottom = false
             )
 
         val defaultFontMetrics = createTextPaint(fontSize).fontMetricsInt
-        val expectedPadding = ((fontSize - lineHeight) / 2).toInt()
 
-        assertThat(layout.topPadding).isEqualTo(expectedPadding)
-        assertThat(layout.bottomPadding).isEqualTo(expectedPadding)
+        assertThat(layout.topPadding).isEqualTo(0)
+        assertThat(layout.bottomPadding).isEqualTo(0)
         assertThat(layout.height).isEqualTo(fontSize.toInt())
         assertThat(layout.getLineTop(0)).isEqualTo(0)
-        assertThat(layout.getLineBottom(0)).isEqualTo(layout.height)
+        assertThat(layout.getLineBottom(0)).isEqualTo(fontSize.toInt())
         assertThat(layout.getLineBaseline(0)).isEqualTo(-defaultFontMetrics.ascent.toFloat())
+        assertThat(layout.getLineForVertical(0)).isEqualTo(0)
+        assertThat(layout.getLineForVertical(layout.height)).isEqualTo(0)
+    }
+
+    @Test
+    fun small_lineheight_allows_clip_when_trimFirstLine_single_line() {
+        val fontSize = 120f
+        val lineHeight = 60f
+
+        val layout =
+            TextLayoutWithSmallLineHeight(
+                text = "aA",
+                fontSize = fontSize,
+                lineHeight = lineHeight,
+                preserveMinimumHeight = false,
+                trimFirstLineTop = true,
+                trimLastLineBottom = false
+            )
+
+        val defaultFontMetrics = createTextPaint(fontSize).fontMetricsInt
+        // We divide by 2 because the default topRatio is 0.5f in TextLayoutWithSmallLineHeight
+        val diff = (fontSize - lineHeight) / 2
+
+        assertThat(layout.topPadding).isEqualTo(0)
+        assertThat(layout.bottomPadding).isEqualTo(0)
+        assertThat(layout.height).isEqualTo((fontSize - diff).toInt())
+        assertThat(layout.getLineTop(0)).isEqualTo(0)
+        assertThat(layout.getLineBottom(0)).isEqualTo((fontSize - diff).toInt())
+        assertThat(layout.getLineBaseline(0))
+            .isEqualTo(-(defaultFontMetrics.descent - diff - lineHeight))
+        assertThat(layout.getLineForVertical(0)).isEqualTo(0)
+        assertThat(layout.getLineForVertical(layout.height)).isEqualTo(0)
+    }
+
+    @Test
+    fun small_lineheight_allows_clip_when_trimLastLine_single_line() {
+        val fontSize = 120f
+        val lineHeight = 60f
+
+        val layout =
+            TextLayoutWithSmallLineHeight(
+                text = "aA",
+                fontSize = fontSize,
+                lineHeight = lineHeight,
+                preserveMinimumHeight = false,
+                trimFirstLineTop = false,
+                trimLastLineBottom = true
+            )
+
+        val defaultFontMetrics = createTextPaint(fontSize).fontMetricsInt
+        // We divide by 2 because the default topRatio is 0.5f in TextLayoutWithSmallLineHeight
+        val diff = (fontSize - lineHeight) / 2
+
+        assertThat(layout.topPadding).isEqualTo(0)
+        assertThat(layout.bottomPadding).isEqualTo(0)
+        assertThat(layout.height).isEqualTo((fontSize - diff).toInt())
+        assertThat(layout.getLineTop(0)).isEqualTo(0)
+        assertThat(layout.getLineBottom(0)).isEqualTo((fontSize - diff).toInt())
+        assertThat(layout.getLineBaseline(0)).isEqualTo(-defaultFontMetrics.ascent)
+        assertThat(layout.getLineForVertical(0)).isEqualTo(0)
+        assertThat(layout.getLineForVertical(layout.height)).isEqualTo(0)
+    }
+
+    @Test
+    fun small_lineheight_allows_clip_when_trimFirstLine_trimLastLine_single_line() {
+        val fontSize = 120f
+        val lineHeight = 60f
+
+        val layout =
+            TextLayoutWithSmallLineHeight(
+                text = "aA",
+                fontSize = fontSize,
+                lineHeight = lineHeight,
+                preserveMinimumHeight = false,
+                trimFirstLineTop = true,
+                trimLastLineBottom = true
+            )
+
+        val defaultFontMetrics = createTextPaint(fontSize).fontMetricsInt
+        // We divide by 2 because the default topRatio is 0.5f in TextLayoutWithSmallLineHeight
+        val diff = (fontSize - lineHeight) / 2
+
+        assertThat(layout.topPadding).isEqualTo(0)
+        assertThat(layout.bottomPadding).isEqualTo(0)
+        assertThat(layout.height).isEqualTo(lineHeight.toInt())
+        assertThat(layout.getLineTop(0)).isEqualTo(0)
+        assertThat(layout.getLineBottom(0)).isEqualTo(lineHeight.toInt())
+        assertThat(layout.getLineBaseline(0)).isEqualTo(-(defaultFontMetrics.ascent + diff))
         assertThat(layout.getLineForVertical(0)).isEqualTo(0)
         assertThat(layout.getLineForVertical(layout.height)).isEqualTo(0)
     }
@@ -398,17 +486,103 @@ class TextLayoutTest {
                 text = "aA\naA\naA",
                 fontSize = fontSize,
                 lineHeight = lineHeight,
-                preserveMinimumHeight = false
+                preserveMinimumHeight = false,
+                trimFirstLineTop = false,
+                trimLastLineBottom = false
             )
 
         val defaultFontMetrics = createTextPaint(fontSize).fontMetricsInt
         val expectedPadding = ((fontSize - lineHeight) / 2).toInt()
 
-        assertThat(layout.topPadding).isEqualTo(expectedPadding)
-        assertThat(layout.bottomPadding).isEqualTo(expectedPadding)
+        assertThat(layout.topPadding).isEqualTo(0)
+        assertThat(layout.bottomPadding).isEqualTo(0)
         assertThat(layout.height).isEqualTo((3 * lineHeight + 2 * expectedPadding).toInt())
         assertThat(layout.getLineTop(0)).isEqualTo(0)
         assertThat(layout.getLineBaseline(0)).isEqualTo(-defaultFontMetrics.ascent)
+        assertThat(layout.getLineForVertical(0)).isEqualTo(0)
+        assertThat(layout.getLineBottom(2)).isEqualTo(layout.height)
+        assertThat(layout.getLineForVertical(layout.height)).isEqualTo(2)
+    }
+
+    @Test
+    fun small_lineheight_allows_clip_when_trimFirstLine_multi_line() {
+        val fontSize = 120f
+        val lineHeight = 60f
+        val layout =
+            TextLayoutWithSmallLineHeight(
+                text = "aA\naA\naA",
+                fontSize = fontSize,
+                lineHeight = lineHeight,
+                preserveMinimumHeight = false,
+                trimFirstLineTop = true,
+                trimLastLineBottom = false
+            )
+
+        val defaultFontMetrics = createTextPaint(fontSize).fontMetricsInt
+        val expectedPadding = ((fontSize - lineHeight) / 2).toInt()
+
+        assertThat(layout.topPadding).isEqualTo(0)
+        assertThat(layout.bottomPadding).isEqualTo(0)
+        assertThat(layout.height).isEqualTo((2 * lineHeight + fontSize - expectedPadding).toInt())
+        assertThat(layout.getLineTop(0)).isEqualTo(0)
+        assertThat(layout.getLineBaseline(0))
+            .isEqualTo(-(defaultFontMetrics.ascent + expectedPadding))
+        assertThat(layout.getLineForVertical(0)).isEqualTo(0)
+        assertThat(layout.getLineBottom(2)).isEqualTo(layout.height)
+        assertThat(layout.getLineBaseline(2)).isEqualTo(layout.height - defaultFontMetrics.descent)
+        assertThat(layout.getLineForVertical(layout.height)).isEqualTo(2)
+    }
+
+    @Test
+    fun small_lineheight_allows_clip_when_trimLastLine_multi_line() {
+        val fontSize = 120f
+        val lineHeight = 60f
+        val layout =
+            TextLayoutWithSmallLineHeight(
+                text = "aA\naA\naA",
+                fontSize = fontSize,
+                lineHeight = lineHeight,
+                preserveMinimumHeight = false,
+                trimFirstLineTop = false,
+                trimLastLineBottom = true
+            )
+
+        val defaultFontMetrics = createTextPaint(fontSize).fontMetricsInt
+        val expectedPadding = ((fontSize - lineHeight) / 2).toInt()
+
+        assertThat(layout.topPadding).isEqualTo(0)
+        assertThat(layout.bottomPadding).isEqualTo(0)
+        assertThat(layout.height).isEqualTo((2 * lineHeight + fontSize - expectedPadding).toInt())
+        assertThat(layout.getLineTop(0)).isEqualTo(0)
+        assertThat(layout.getLineBaseline(0)).isEqualTo(-defaultFontMetrics.ascent)
+        assertThat(layout.getLineForVertical(0)).isEqualTo(0)
+        assertThat(layout.getLineBottom(2)).isEqualTo(layout.height)
+        assertThat(layout.getLineForVertical(layout.height)).isEqualTo(2)
+    }
+
+    @Test
+    fun small_lineheight_allows_clip_when_trimFirstLine_trimLastLine_multi_line() {
+        val fontSize = 120f
+        val lineHeight = 60f
+        val layout =
+            TextLayoutWithSmallLineHeight(
+                text = "aA\naA\naA",
+                fontSize = fontSize,
+                lineHeight = lineHeight,
+                preserveMinimumHeight = false,
+                trimFirstLineTop = true,
+                trimLastLineBottom = true
+            )
+
+        val defaultFontMetrics = createTextPaint(fontSize).fontMetricsInt
+        val expectedPadding = ((fontSize - lineHeight) / 2).toInt()
+
+        assertThat(layout.topPadding).isEqualTo(0)
+        assertThat(layout.bottomPadding).isEqualTo(0)
+        assertThat(layout.height).isEqualTo((3 * lineHeight).toInt())
+        assertThat(layout.getLineTop(0)).isEqualTo(0)
+        assertThat(layout.getLineBaseline(0))
+            .isEqualTo(-(defaultFontMetrics.ascent + expectedPadding))
         assertThat(layout.getLineForVertical(0)).isEqualTo(0)
         assertThat(layout.getLineBottom(2)).isEqualTo(layout.height)
         assertThat(layout.getLineForVertical(layout.height)).isEqualTo(2)
@@ -424,7 +598,9 @@ class TextLayoutTest {
                 text = "aA\naA\naA",
                 fontSize = fontSize,
                 lineHeight = specifyLineHeight,
-                preserveMinimumHeight = true
+                preserveMinimumHeight = true,
+                trimFirstLineTop = false,
+                trimLastLineBottom = false
             )
         val defaultFontMetrics = createTextPaint(fontSize).fontMetricsInt
         val expectedPadding = ((fontSize - systemPreferredLineHeight) / 2).toInt()
@@ -444,7 +620,9 @@ class TextLayoutTest {
         text: CharSequence,
         fontSize: Float,
         lineHeight: Float,
-        preserveMinimumHeight: Boolean
+        preserveMinimumHeight: Boolean,
+        trimFirstLineTop: Boolean,
+        trimLastLineBottom: Boolean,
     ): TextLayout {
         val textPaint = createTextPaint(fontSize)
         val spannable = SpannableString(text)
@@ -453,8 +631,8 @@ class TextLayoutTest {
                 lineHeight = lineHeight,
                 startIndex = 0,
                 endIndex = text.length,
-                trimFirstLineTop = false,
-                trimLastLineBottom = false,
+                trimFirstLineTop = trimFirstLineTop,
+                trimLastLineBottom = trimLastLineBottom,
                 topRatio = 0.5f,
                 preserveMinimumHeight = preserveMinimumHeight,
             ),
