@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.internal.readText
+import androidx.compose.foundation.internal.toClipEntry
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
@@ -47,7 +52,9 @@ import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -92,6 +99,9 @@ import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.max
 import kotlin.math.sign
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -99,6 +109,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
+@Suppress("DEPRECATION")
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class SelectionContainerTest {
@@ -402,10 +413,14 @@ class SelectionContainerTest {
 
     @Test
     fun selectionIncludes_noHeightText() {
-        lateinit var clipboardManager: ClipboardManager
+        lateinit var clipboard: Clipboard
         createSelectionContainer {
-            clipboardManager = LocalClipboardManager.current
-            clipboardManager.setText(AnnotatedString("Clipboard content at start of test."))
+            clipboard = LocalClipboard.current
+            rememberCoroutineScope().launch(start = CoroutineStart.UNDISPATCHED) {
+                clipboard.setClipEntry(
+                    AnnotatedString("Clipboard content at start of test.").toClipEntry()
+                )
+            }
             Column {
                 BasicText(
                     text = "Hello",
@@ -428,10 +443,14 @@ class SelectionContainerTest {
 
     @Test
     fun selectionIncludes_noWidthText() {
-        lateinit var clipboardManager: ClipboardManager
+        lateinit var clipboard: Clipboard
         createSelectionContainer {
-            clipboardManager = LocalClipboardManager.current
-            clipboardManager.setText(AnnotatedString("Clipboard content at start of test."))
+            clipboard = LocalClipboard.current
+            rememberCoroutineScope().launch(start = CoroutineStart.UNDISPATCHED) {
+                clipboard.setClipEntry(
+                    AnnotatedString("Clipboard content at start of test.").toClipEntry()
+                )
+            }
             Column {
                 BasicText(
                     text = "Hello",
@@ -509,10 +528,12 @@ class SelectionContainerTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class)
-    fun selection_doesCopy_whenCopyKeyEventSent() {
+    fun selection_doesCopy_whenCopyKeyEventSent() = runTest {
         lateinit var clipboardManager: ClipboardManager
+        lateinit var clipboard: Clipboard
         createSelectionContainer {
             clipboardManager = LocalClipboardManager.current
+            clipboard = LocalClipboard.current
             clipboardManager.setText(AnnotatedString("Clipboard content at start of test."))
             Column {
                 BasicText(
@@ -532,6 +553,7 @@ class SelectionContainerTest {
         }
 
         rule.runOnIdle { assertThat(clipboardManager.getText()?.text).isEqualTo("ExpectedText") }
+        assertThat(clipboard.getClipEntry()?.readText()).isEqualTo("ExpectedText")
     }
 
     private fun startSelection(tag: String, offset: Int = 0) {

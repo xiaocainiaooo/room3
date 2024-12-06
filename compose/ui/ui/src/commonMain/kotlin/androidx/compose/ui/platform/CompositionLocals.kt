@@ -75,8 +75,15 @@ val LocalAutofillManager =
     staticCompositionLocalOf<AutofillManager?> { noLocalProvidedFor("LocalAutofillManager") }
 
 /** The CompositionLocal to provide communication with platform clipboard service. */
+@Deprecated(
+    "Use LocalClipboard instead which supports suspend functions",
+    ReplaceWith("LocalClipboard", "androidx.compose.ui.platform.LocalClipboard")
+)
 val LocalClipboardManager =
     staticCompositionLocalOf<ClipboardManager> { noLocalProvidedFor("LocalClipboardManager") }
+
+/** The CompositionLocal to provide communication with platform clipboard service. */
+val LocalClipboard = staticCompositionLocalOf<Clipboard> { noLocalProvidedFor("LocalClipboard") }
 
 /**
  * The CompositionLocal to provide access to a [GraphicsContext] instance for creation of
@@ -205,6 +212,7 @@ internal fun ProvideCommonCompositionLocals(
         LocalAutofillManager provides owner.autofillManager,
         LocalAutofillTree provides owner.autofillTree,
         LocalClipboardManager provides owner.clipboardManager,
+        LocalClipboard provides owner.clipboard,
         LocalDensity provides owner.density,
         LocalFocusManager provides owner.focusOwner,
         @Suppress("DEPRECATION") LocalFontLoader providesDefault

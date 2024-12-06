@@ -44,6 +44,7 @@ import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.platform.AccessibilityManager
+import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.PlatformTextInputSessionScope
 import androidx.compose.ui.platform.SoftwareKeyboardController
@@ -352,6 +353,9 @@ class ModifierLocalConsumerEntityTest {
             get() = TODO("Not yet implemented")
 
         override val clipboardManager: ClipboardManager
+            get() = TODO("Not yet implemented")
+
+        override val clipboard: Clipboard
             get() = TODO("Not yet implemented")
 
         override val accessibilityManager: AccessibilityManager

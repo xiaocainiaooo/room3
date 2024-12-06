@@ -50,7 +50,7 @@ import org.mockito.kotlin.whenever
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-class AndroidClipboardManagerTest {
+class AndroidClipboardTest {
 
     @Test
     fun annotatedString_singleSpanStyle_convertToCharSequenceAndRecover() {
