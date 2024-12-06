@@ -169,6 +169,63 @@ fun Modifier.scrollTransform(
  * @sample androidx.wear.compose.material3.samples.TransformingLazyColumnScalingMorphingEffectSample
  * @param scope The [TransformingLazyColumnItemScope] provides access to the item's index and key.
  * @param spec [TransformationSpec] to specify all needed parameters for the transformations.
+ */
+@Composable
+internal fun Modifier.scrollTransform(
+    scope: TransformingLazyColumnItemScope,
+    spec: TransformationSpec,
+): Modifier =
+    with(scope) {
+        val minMorphingHeight = remember(scope) { mutableStateOf<Float?>(null) }
+        val transformation = remember { mutableStateOf<TransformationState?>(null) }
+        val updatedSpec by rememberUpdatedState(spec)
+
+        this@scrollTransform then
+            TargetMorphingHeightConsumerModifierElement { minMorphingHeight.value = it?.toFloat() }
+                .transformedHeight { height, scrollProgress ->
+                    // TODO: may be better to create once and update. Still need to ensure readers
+                    // are reading a state so they register to updates.
+                    val transformProgress = transformProgress(scrollProgress, updatedSpec)
+                    val scale = transformProgress.compute(updatedSpec.scale, updatedSpec.easing)
+                    val morphedHeight = height.toFloat() // TODO: Implement morphing
+                    transformation.value =
+                        TransformationState(
+                            scale = scale,
+                            containerAlpha =
+                                transformProgress.compute(
+                                    updatedSpec.containerAlpha,
+                                    updatedSpec.easing
+                                ),
+                            contentAlpha =
+                                transformProgress.compute(
+                                    updatedSpec.contentAlpha,
+                                    updatedSpec.easing
+                                ),
+                            morphWidth =
+                                transformProgress.compute(
+                                    updatedSpec.containerWidth,
+                                    updatedSpec.easing
+                                ),
+                            minMorphingHeight = minMorphingHeight,
+                            morphedHeight = morphedHeight
+                        )
+                    (morphedHeight * scale).fastRoundToInt()
+                }
+                .graphicsLayer { contentTransformation(transformation) }
+    }
+
+/**
+ * A modifier that enables Material3 Motion transformations for content within a
+ * [TransformingLazyColumn] item.
+ *
+ * This modifier calculates and applies transformations to the content and background based on the
+ * [TransformingLazyColumnItemScrollProgress] of the item inside the
+ * [TransformingLazyColumnItemScope]. It adjusts the height, position, applies scaling and morphing
+ * effects as the item scrolls.
+ *
+ * @sample androidx.wear.compose.material3.samples.TransformingLazyColumnScalingMorphingEffectSample
+ * @param scope The [TransformingLazyColumnItemScope] provides access to the item's index and key.
+ * @param spec [TransformationSpec] to specify all needed parameters for the transformations.
  * @param shape [Shape] of the background.
  * @param painter [Painter] to use for the background.
  * @param border Border to draw around the background, or null if no border is needed.
@@ -193,9 +250,6 @@ internal fun Modifier.scrollTransform(
         this@scrollTransform then
             TargetMorphingHeightConsumerModifierElement { minMorphingHeight.value = it?.toFloat() }
                 .paint(morphingPainter)
-                // TODO: We need to ensure that `transformedHeight` is only called during the
-                //  measure phase by TLC, so when this is done, the graphics layer and draw
-                //  modifiers can work properly without triggering an invalidation.
                 .transformedHeight { height, scrollProgress ->
                     // TODO: may be better to create once and update. Still need to ensure readers
                     // are reading a state so they register to updates.
