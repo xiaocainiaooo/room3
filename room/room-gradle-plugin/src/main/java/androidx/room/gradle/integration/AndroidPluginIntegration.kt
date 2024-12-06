@@ -114,13 +114,14 @@ internal class AndroidPluginIntegration(private val common: CommonIntegration) {
                 project.tasks.register(
                     "copyRoomSchemasToAndroidTestAssets${variant.name.capitalize()}",
                     RoomSimpleCopyTask::class.java
-                )
-            ) {
-                val config = configuredVariants[variant.name]
-                project.check(config != null, isFatal = true) {
-                    "No matching Room schema directory for Android variant '${variant.name}'."
+                ) { task ->
+                    val config = configuredVariants[variant.name]
+                    project.check(config != null, isFatal = true) {
+                        "No matching Room schema directory for Android variant '${variant.name}'."
+                    }
+                    task.inputDirectory.set(config.copyTask.flatMap { it.schemaDirectory })
                 }
-                it.inputDirectory.set(config.copyTask.flatMap { it.schemaDirectory })
+            ) {
                 // Return the directory property AGP will set for the task to copy the schemas to
                 // so that they are included as assets of the Android test app.
                 return@addGeneratedSourceDirectory it.outputDirectory
