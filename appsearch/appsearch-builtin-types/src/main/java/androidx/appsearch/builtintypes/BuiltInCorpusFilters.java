@@ -17,10 +17,11 @@ package androidx.appsearch.builtintypes;
 
 import android.content.pm.PackageManager;
 
-import androidx.annotation.NonNull;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.SearchSpec;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Methods to add filters to {@link SearchSpec.Builder}s to search over on-device corpora for
@@ -47,9 +48,8 @@ public class BuiltInCorpusFilters {
      * @param builder The {@link SearchSpec.Builder} to add the filter to.
      * @return The modified {@link SearchSpec.Builder}.
      */
-    @NonNull
-    public static SearchSpec.Builder searchMobileApplicationCorpus(
-            @NonNull SearchSpec.Builder builder) {
+    public static SearchSpec.@NonNull Builder searchMobileApplicationCorpus(
+            SearchSpec.@NonNull Builder builder) {
         return Preconditions.checkNotNull(builder)
                 .addFilterPackageNames("android")
                 .addFilterNamespaces("apps");
@@ -74,8 +74,8 @@ public class BuiltInCorpusFilters {
      * @param builder The {@link SearchSpec.Builder} to add the filter to.
      * @return The modified {@link SearchSpec.Builder}.
      */
-    @NonNull
-    public static SearchSpec.Builder searchPersonCorpus(@NonNull SearchSpec.Builder builder) {
+    public static SearchSpec.@NonNull Builder searchPersonCorpus(
+            SearchSpec.@NonNull Builder builder) {
         return Preconditions.checkNotNull(builder)
                 .addFilterPackageNames("android")
                 .addFilterSchemas("builtin:Person");
