@@ -34,7 +34,7 @@ class BackportedFixManagerTest {
         ShadowSystemProperties.override(ALIAS_BITSET_PROP_NAME, "")
         ShadowBuild.reset()
         val fixManager = BackportedFixManager()
-        assertThat(fixManager.getStatus(KI_350037023)).isEqualTo(Status.Unknown)
+        assertThat(fixManager.getStatus(KI_350037023)).isEqualTo(Status.NotFixed)
         assertThat(fixManager.isFixed(KI_350037023)).isFalse()
     }
 
@@ -52,7 +52,7 @@ class BackportedFixManagerTest {
         ShadowSystemProperties.override(ALIAS_BITSET_PROP_NAME, "")
         ShadowBuild.reset()
         val fixManager = BackportedFixManager()
-        assertThat(fixManager.getStatus(KI_372917199)).isEqualTo(Status.Unknown)
+        assertThat(fixManager.getStatus(KI_372917199)).isEqualTo(Status.NotFixed)
         assertThat(fixManager.isFixed(KI_372917199)).isFalse()
     }
 
