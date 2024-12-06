@@ -28,10 +28,6 @@ plugins {
     id('java-library')
 }
 
-ext {
-    kotlin = "2.0.21"
-}
-
 androidx.configureAarAsJarForConfiguration("testImplementation")
 
 dependencies {
@@ -51,8 +47,8 @@ dependencies {
     // For testing, add in the compiled classes from appsearch to get access to annotations.
     testImplementationAarAsJar(project(":appsearch:appsearch"))
     testImplementation(libs.googleCompileTesting)
-    testImplementation project(':room:room-compiler-processing-testing')
-    testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlin")
+    testImplementation(project(":room:room-compiler-processing-testing"))
+    testImplementation(libs.kotlinCompilerEmbeddable)
     testImplementation(libs.kotlinCompileTestingKsp)
 }
 
