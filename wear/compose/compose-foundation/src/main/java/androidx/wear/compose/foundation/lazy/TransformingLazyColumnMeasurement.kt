@@ -99,11 +99,13 @@ internal fun rememberTransformingLazyColumnMeasurePolicy(
             val anchorItemIndex: Int
             val anchorItemScrollOffset: Int
             val lastMeasuredAnchorItemHeight: Int
+            val scrollToBeConsumed: Float
             Snapshot.withoutReadObservation {
                 anchorItemIndex =
                     if (itemsCount == 0) 0 else state.anchorItemIndex.coerceIn(0 until itemsCount)
                 anchorItemScrollOffset = state.anchorItemScrollOffset
                 lastMeasuredAnchorItemHeight = state.lastMeasuredAnchorItemHeight
+                scrollToBeConsumed = state.scrollToBeConsumed
             }
 
             Snapshot.withMutableSnapshot {
@@ -113,7 +115,7 @@ internal fun rememberTransformingLazyColumnMeasurePolicy(
                         measuredItemProvider = measuredItemProvider,
                         itemSpacing = verticalArrangement.spacing.roundToPx(),
                         containerConstraints = containerConstraints,
-                        scrollToBeConsumed = state.scrollToBeConsumed,
+                        scrollToBeConsumed = scrollToBeConsumed,
                         anchorItemIndex = anchorItemIndex,
                         anchorItemScrollOffset = anchorItemScrollOffset,
                         lastMeasuredAnchorItemHeight = lastMeasuredAnchorItemHeight,
