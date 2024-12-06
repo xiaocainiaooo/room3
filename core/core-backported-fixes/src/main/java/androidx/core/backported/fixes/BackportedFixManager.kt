@@ -21,8 +21,8 @@ import android.os.Build
 /**
  * Reports the status of a known issue on this device.
  *
- * @param resolver a Function that takes a KnownIssue and returns it status on this device. This
- *   parameter is only used for testing. In normal flows, the empty constructor should be used.
+ * @param resolver a function that takes a [KnownIssue] and returns its [Status] on this device.
+ *   This parameter is only used for testing. In normal flows, the empty constructor should be used.
  */
 internal class BackportedFixManager(private val resolver: StatusResolver) {
     /** Creates a BackportedFixManager object using the default lookup strategy. */
@@ -35,7 +35,7 @@ internal class BackportedFixManager(private val resolver: StatusResolver) {
     /**
      * Is the known issue fixed on this device.
      *
-     * @param ki The critical issue to check.
+     * @param ki The known issue to check.
      */
     internal fun isFixed(ki: KnownIssue): Boolean {
         return when (getStatus(ki)) {
@@ -46,7 +46,11 @@ internal class BackportedFixManager(private val resolver: StatusResolver) {
         }
     }
 
-    /** The status of a critical issue on this device. */
+    /**
+     * The status of a known issue on this device.
+     *
+     * @param ki The known issue to check.
+     */
     internal fun getStatus(ki: KnownIssue): Status {
         return when (ki) {
             // If the known issue needs special handling,
@@ -82,5 +86,5 @@ internal class BackportedFixManager(private val resolver: StatusResolver) {
     }
 }
 
-/** Function that takes a KnownIssue and returns it status on this device. */
+/** Function that takes a [KnownIssue] and returns its [Status] on this device. */
 internal typealias StatusResolver = (KnownIssue) -> Status
