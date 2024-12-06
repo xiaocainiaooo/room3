@@ -47,14 +47,12 @@ import java.util.Map;
  * @see AppSearchSession#removeAsync
  */
 public final class AppSearchBatchResult<KeyType, ValueType> {
-    private final @NonNull Map<KeyType,
-            @androidx.appsearch.checker.nullness.qual.Nullable ValueType> mSuccesses;
+    private final @NonNull Map<KeyType, @Nullable ValueType> mSuccesses;
     private final @NonNull Map<KeyType, AppSearchResult<ValueType>> mFailures;
     private final @NonNull Map<KeyType, AppSearchResult<ValueType>> mAll;
 
     AppSearchBatchResult(
-            @NonNull Map<KeyType, @androidx.appsearch.checker.nullness.qual.Nullable ValueType>
-                    successes,
+            @NonNull Map<KeyType, @Nullable ValueType> successes,
             @NonNull Map<KeyType, AppSearchResult<ValueType>> failures,
             @NonNull Map<KeyType, AppSearchResult<ValueType>> all) {
         mSuccesses = Preconditions.checkNotNull(successes);
@@ -124,8 +122,7 @@ public final class AppSearchBatchResult<KeyType, ValueType> {
      * @param <ValueType> The type of the result objects for successful results.
      */
     public static final class Builder<KeyType, ValueType> {
-        private ArrayMap<KeyType, @androidx.appsearch.checker.nullness.qual.Nullable ValueType>
-                mSuccesses = new ArrayMap<>();
+        private ArrayMap<KeyType, @Nullable ValueType> mSuccesses = new ArrayMap<>();
         private ArrayMap<KeyType, AppSearchResult<ValueType>> mFailures = new ArrayMap<>();
         private ArrayMap<KeyType, AppSearchResult<ValueType>> mAll = new ArrayMap<>();
         private boolean mBuilt = false;
