@@ -21,7 +21,6 @@ import android.os.Build;
 
 import androidx.annotation.DoNotInline;
 import androidx.annotation.GuardedBy;
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.app.AppSearchBatchResult;
@@ -51,6 +50,8 @@ import androidx.core.util.Preconditions;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import org.jspecify.annotations.NonNull;
+
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
@@ -74,7 +75,7 @@ class GlobalSearchSessionImpl implements GlobalSearchSession {
             mObserverCallbacksLocked = new ArrayMap<>();
 
     GlobalSearchSessionImpl(
-            @NonNull android.app.appsearch.GlobalSearchSession platformSession,
+            android.app.appsearch.@NonNull GlobalSearchSession platformSession,
             @NonNull Executor executor,
             @NonNull Features features) {
         mPlatformSession = Preconditions.checkNotNull(platformSession);
@@ -82,11 +83,11 @@ class GlobalSearchSessionImpl implements GlobalSearchSession {
         mFeatures = Preconditions.checkNotNull(features);
     }
 
-    @NonNull
     @Override
-    public ListenableFuture<AppSearchBatchResult<String, GenericDocument>> getByDocumentIdAsync(
-            @NonNull String packageName, @NonNull String databaseName,
-            @NonNull GetByDocumentIdRequest request) {
+    public @NonNull ListenableFuture<AppSearchBatchResult<String, GenericDocument>>
+            getByDocumentIdAsync(
+                    @NonNull String packageName, @NonNull String databaseName,
+                    @NonNull GetByDocumentIdRequest request) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             throw new UnsupportedOperationException(Features.GLOBAL_SEARCH_SESSION_GET_BY_ID
                     + " is not supported on this AppSearch implementation.");
@@ -104,8 +105,7 @@ class GlobalSearchSessionImpl implements GlobalSearchSession {
     }
 
     @Override
-    @NonNull
-    public SearchResults search(
+    public @NonNull SearchResults search(
             @NonNull String queryExpression,
             @NonNull SearchSpec searchSpec) {
         Preconditions.checkNotNull(queryExpression);
@@ -117,9 +117,8 @@ class GlobalSearchSessionImpl implements GlobalSearchSession {
         return new SearchResultsImpl(platformSearchResults, searchSpec, mExecutor);
     }
 
-    @NonNull
     @Override
-    public ListenableFuture<Void> reportSystemUsageAsync(
+    public @NonNull ListenableFuture<Void> reportSystemUsageAsync(
             @NonNull ReportSystemUsageRequest request) {
         Preconditions.checkNotNull(request);
         ResolvableFuture<Void> future = ResolvableFuture.create();
@@ -131,9 +130,8 @@ class GlobalSearchSessionImpl implements GlobalSearchSession {
         return future;
     }
 
-    @NonNull
     @Override
-    public ListenableFuture<GetSchemaResponse> getSchemaAsync(@NonNull String packageName,
+    public @NonNull ListenableFuture<GetSchemaResponse> getSchemaAsync(@NonNull String packageName,
             @NonNull String databaseName) {
         // Superclass is annotated with @RequiresFeature, so we shouldn't get here on an
         // unsupported build.
@@ -151,9 +149,8 @@ class GlobalSearchSessionImpl implements GlobalSearchSession {
         return future;
     }
 
-    @NonNull
     @Override
-    public Features getFeatures() {
+    public @NonNull Features getFeatures() {
         return mFeatures;
     }
 
@@ -183,7 +180,7 @@ class GlobalSearchSessionImpl implements GlobalSearchSession {
                 frameworkCallback = new android.app.appsearch.observer.ObserverCallback() {
                     @Override
                     public void onSchemaChanged(
-                            @NonNull android.app.appsearch.observer.SchemaChangeInfo
+                            android.app.appsearch.observer.@NonNull SchemaChangeInfo
                                     platformSchemaChangeInfo) {
                         SchemaChangeInfo jetpackSchemaChangeInfo =
                                 ObserverSpecToPlatformConverter.toJetpackSchemaChangeInfo(
@@ -193,7 +190,7 @@ class GlobalSearchSessionImpl implements GlobalSearchSession {
 
                     @Override
                     public void onDocumentChanged(
-                            @NonNull android.app.appsearch.observer.DocumentChangeInfo
+                            android.app.appsearch.observer.@NonNull DocumentChangeInfo
                                     platformDocumentChangeInfo) {
                         DocumentChangeInfo jetpackDocumentChangeInfo =
                                 ObserverSpecToPlatformConverter.toJetpackDocumentChangeInfo(
