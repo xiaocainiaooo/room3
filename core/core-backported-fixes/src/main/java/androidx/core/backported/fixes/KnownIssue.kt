@@ -20,10 +20,14 @@ package androidx.core.backported.fixes
 internal enum class KnownIssue(public val id: Long, public val alias: Int) {
     // TODO b/381267367 - Add link to public list issues
 
-    // keep-sorted start
-
+    // keep-sorted start newline_separated=yes sticky_prefixes=/*
+    /** Sample known issue that is always fixed on a device. */
     KI_350037023(350037023L, 1),
+
+    /** Sample known issue that is never fixed on a device. */
     KI_350037348(350037348L, 3),
+
+    /** Sample known issue that is only applies to robolectric devices */
     KI_372917199(372917199L, 2),
 
     // keep-sorted end
