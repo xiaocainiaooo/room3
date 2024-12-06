@@ -818,6 +818,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
     init {
         addOnAttachStateChangeListener(contentCaptureManager)
+        _autofillManager?.let { addOnAttachStateChangeListener(it) }
         setWillNotDraw(false)
         isFocusable = true
         if (SDK_INT >= O) {
