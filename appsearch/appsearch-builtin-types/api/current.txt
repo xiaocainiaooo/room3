@@ -92,6 +92,11 @@ package androidx.appsearch.builtintypes {
     method public androidx.appsearch.builtintypes.AlarmInstance.Builder setUrl(String?);
   }
 
+  @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public class BuiltInCorpusFilters {
+    method public static androidx.appsearch.app.SearchSpec.Builder searchMobileApplicationCorpus(androidx.appsearch.app.SearchSpec.Builder);
+    method public static androidx.appsearch.app.SearchSpec.Builder searchPersonCorpus(androidx.appsearch.app.SearchSpec.Builder);
+  }
+
   @androidx.appsearch.annotation.Document(name="builtin:ContactPoint") public class ContactPoint extends androidx.appsearch.builtintypes.Thing {
     method public java.util.List<java.lang.String!> getAddresses();
     method public java.util.List<java.lang.String!> getEmails();
