@@ -36,6 +36,7 @@ import android.os.ConditionVariable;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.mediarouter.testing.MediaRouterTestHelper;
 import androidx.test.filters.SdkSuppress;
 import androidx.test.filters.SmallTest;
@@ -74,6 +75,7 @@ public final class MediaRouterDynamicProviderTest {
     private MediaRouter.RouteInfo mRoute2;
     private RouteConnectionState mRouteConnectionState;
     private MediaRouter.RouteInfo mConnectedRoute;
+    private MediaRouter.RouteInfo mDisconnectedRoute;
     private MediaRouter.RouteInfo mRequestedRoute;
     private int mRouteDisconnectedReason;
 
@@ -159,7 +161,8 @@ public final class MediaRouterDynamicProviderTest {
 
         connectedRoutes = mCallback.disconnectAndWaitForOnDisconnected(mRoute2);
 
-        assertNull(mConnectedRoute);
+        assertNotNull(mConnectedRoute);
+        assertNotNull(mDisconnectedRoute);
         assertEquals(0, connectedRoutes.size());
 
         assertNotNull(mRequestedRoute);
@@ -182,6 +185,7 @@ public final class MediaRouterDynamicProviderTest {
                 mCallback.connectAndWaitForOnConnected(selectedRoute);
 
         assertNull(mConnectedRoute);
+        assertNull(mDisconnectedRoute);
         assertEquals(0, connectedRoutes.size());
 
         assertNotNull(mRequestedRoute);
@@ -305,10 +309,13 @@ public final class MediaRouterDynamicProviderTest {
 
         @Override
         public void onRouteDisconnected(
-                @NonNull MediaRouter router, @NonNull MediaRouter.RouteInfo route, int reason) {
+                @NonNull MediaRouter router,
+                @Nullable MediaRouter.RouteInfo disconnectedRoute,
+                @NonNull MediaRouter.RouteInfo requestedRoute,
+                int reason) {
             mRouteConnectionState = RouteConnectionState.STATE_DISCONNECTED;
-            mConnectedRoute = null;
-            mRequestedRoute = route;
+            mDisconnectedRoute = disconnectedRoute;
+            mRequestedRoute = requestedRoute;
             mRouteDisconnectedReason = reason;
             mRouteConnectionConditionVariable.open();
         }

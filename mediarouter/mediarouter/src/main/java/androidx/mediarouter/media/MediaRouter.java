@@ -2651,6 +2651,9 @@ public final class MediaRouter {
          * <p>Route connection doesn't affect the selected route. Apps can keep their selected
          * routes while connecting to other routes.
          *
+         * <p>The connected route could be different from the route requested by {@link
+         * RouteInfo#connect()}.
+         *
          * @param router the media router reporting the event.
          * @param connectedRoute the route that has been connected.
          * @param requestedRoute the route that was requested to be connected.
@@ -2666,13 +2669,21 @@ public final class MediaRouter {
          * <p>Route disconnection doesn't affect the selected route. Apps can keep their selected
          * route while disconnecting other connected routes.
          *
+         * <p>The disconnected route could be different from the route requested by {@link
+         * RouteInfo#connect()} or {@link RouteInfo#disconnect()}.
+         *
          * @param router the media router reporting the event.
-         * @param route the route that has been disconnected.
+         * @param disconnectedRoute the route that has been disconnected if the route has an
+         *     established connection, or {@code null} if the connection hasn't been completed.
+         * @param requestedRoute the route that originated the connection request through {@link
+         *     RouteInfo#connect()} or originated the disconnection request through {@link
+         *     RouteInfo#disconnect()}.
          * @param reason the reason for disconnecting the route.
          */
         public void onRouteDisconnected(
                 @NonNull MediaRouter router,
-                @NonNull RouteInfo route,
+                @Nullable RouteInfo disconnectedRoute,
+                @NonNull RouteInfo requestedRoute,
                 @DisconnectReason int reason) {}
 
         /**

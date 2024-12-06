@@ -524,7 +524,7 @@ import java.util.Set;
 
     private void notifyRouteConnectionFailed(
             @NonNull MediaRouter.RouteInfo route, @MediaRouter.DisconnectReason int reason) {
-        mCallbackHandler.postRouteDisconnectedMessage(route, reason);
+        mCallbackHandler.postRouteDisconnectedMessage(route, /* disconnectedRoute= */ null, reason);
     }
 
     /* package */ boolean isRouteAvailable(MediaRouteSelector selector, int flags) {
@@ -1589,7 +1589,7 @@ import java.util.Set;
 
         private void notifyRouteDisconnected(@MediaRouter.DisconnectReason int reason) {
             cancelRouteConnectionTimeoutRunnable();
-            mCallbackHandler.postRouteDisconnectedMessage(mRequestedRoute, reason);
+            mCallbackHandler.postRouteDisconnectedMessage(mRequestedRoute, mGroupRoute, reason);
         }
 
         private void scheduleRouteConnectionTimeoutRunnable() {
@@ -1770,18 +1770,20 @@ import java.util.Set;
 
         /* package */ void postRouteConnectedMessage(
                 @NonNull MediaRouter.RouteInfo requestedRoute,
-                @NonNull MediaRouter.RouteInfo targetRoute) {
-            RouteSelectedMessageParams params =
-                    new RouteSelectedMessageParams(
-                            requestedRoute, targetRoute, /* syncMediaRoute1Provider= */ false);
+                @NonNull MediaRouter.RouteInfo connectedRoute) {
+            RouteConnectionMessageParams params =
+                    new RouteConnectionMessageParams(requestedRoute, connectedRoute);
             Message message = obtainMessage(MSG_ROUTE_CONNECTED, params);
             message.sendToTarget();
         }
 
         /* package */ void postRouteDisconnectedMessage(
-                @NonNull MediaRouter.RouteInfo disconnectedRoute,
+                @NonNull MediaRouter.RouteInfo requestedRoute,
+                @Nullable MediaRouter.RouteInfo disconnectedRoute,
                 @MediaRouter.DisconnectReason int reason) {
-            Message message = obtainMessage(MSG_ROUTE_DISCONNECTED, disconnectedRoute);
+            RouteConnectionMessageParams params =
+                    new RouteConnectionMessageParams(requestedRoute, disconnectedRoute);
+            Message message = obtainMessage(MSG_ROUTE_DISCONNECTED, params);
             message.arg1 = reason;
             message.sendToTarget();
         }
@@ -1880,20 +1882,22 @@ import java.util.Set;
             final MediaRouter.Callback callback = record.mCallback;
             switch (what & MSG_TYPE_MASK) {
                 case MSG_TYPE_ROUTE:
-                    RouteSelectedMessageParams selectedMessageParams =
-                            what == MSG_ROUTE_ANOTHER_SELECTED
-                                            || what == MSG_ROUTE_SELECTED
-                                            || what == MSG_ROUTE_CONNECTED
-                                    ? ((RouteSelectedMessageParams) obj)
-                                    : null;
-                    final MediaRouter.RouteInfo route =
-                            selectedMessageParams != null
-                                    ? selectedMessageParams.mTargetRoute
-                                    : (MediaRouter.RouteInfo) obj;
-                    final MediaRouter.RouteInfo optionalRoute =
-                            selectedMessageParams != null
-                                    ? selectedMessageParams.mFromOrRequestedRoute
-                                    : null;
+                    MediaRouter.RouteInfo route = null;
+                    MediaRouter.RouteInfo optionalRoute = null;
+                    if (what == MSG_ROUTE_ANOTHER_SELECTED || what == MSG_ROUTE_SELECTED) {
+                        RouteSelectedMessageParams selectedMessageParams =
+                                (RouteSelectedMessageParams) obj;
+                        route = selectedMessageParams.mTargetRoute;
+                        optionalRoute = selectedMessageParams.mFromOrRequestedRoute;
+                    } else if (what == MSG_ROUTE_CONNECTED || what == MSG_ROUTE_DISCONNECTED) {
+                        RouteConnectionMessageParams connectionMessageParams =
+                                (RouteConnectionMessageParams) obj;
+                        route = connectionMessageParams.mRequestedRoute;
+                        optionalRoute = connectionMessageParams.mTargetRoute;
+                    } else {
+                        route = (MediaRouter.RouteInfo) obj;
+                    }
+
                     if (route == null
                             || !record.filterRouteEvent(route, what, optionalRoute, arg)) {
                         break;
@@ -1924,10 +1928,10 @@ import java.util.Set;
                             callback.onRouteSelected(router, route, arg, optionalRoute);
                             break;
                         case MSG_ROUTE_CONNECTED:
-                            callback.onRouteConnected(router, route, optionalRoute);
+                            callback.onRouteConnected(router, optionalRoute, route);
                             break;
                         case MSG_ROUTE_DISCONNECTED:
-                            callback.onRouteDisconnected(router, route, arg);
+                            callback.onRouteDisconnected(router, optionalRoute, route, arg);
                             break;
                     }
                     break;
@@ -1979,6 +1983,22 @@ import java.util.Set;
             mFromOrRequestedRoute = fromOrRequestedRoute;
             mTargetRoute = targetRoute;
             mSyncMediaRoute1Provider = syncMediaRoute1Provider;
+        }
+    }
+
+    /**
+     * Holds the parameters of {@link CallbackHandler#MSG_ROUTE_CONNECTED} and {@link
+     * CallbackHandler#MSG_ROUTE_DISCONNECTED}.
+     */
+    private static final class RouteConnectionMessageParams {
+        @NonNull public final MediaRouter.RouteInfo mRequestedRoute;
+        @Nullable public final MediaRouter.RouteInfo mTargetRoute;
+
+        private RouteConnectionMessageParams(
+                @NonNull MediaRouter.RouteInfo requestedRoute,
+                @Nullable MediaRouter.RouteInfo targetRoute) {
+            mRequestedRoute = requestedRoute;
+            mTargetRoute = targetRoute;
         }
     }
 }
