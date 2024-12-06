@@ -21,6 +21,8 @@ import androidx.compose.foundation.demos.text.TextMetricHelper.Alignment.Center
 import androidx.compose.foundation.demos.text.TextMetricHelper.Alignment.Left
 import androidx.compose.foundation.demos.text.TextMetricHelper.Alignment.Right
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,7 +43,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,8 +71,7 @@ internal fun TextWithMetrics(
 
 @Composable
 internal fun TextFieldWithMetrics(
-    value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
+    state: TextFieldState,
     style: TextStyle,
     maxLines: Int,
     softWrap: Boolean = true,
@@ -80,13 +80,16 @@ internal fun TextFieldWithMetrics(
     var textLayout by remember { mutableStateOf<TextLayoutResult?>(null) }
 
     BasicTextField(
-        value = value,
-        onValueChange = onValueChange,
+        state = state,
         modifier = Modifier.drawTextMetrics(textLayout, colors).background(Color.White),
         textStyle = style,
-        singleLine = !softWrap,
-        maxLines = maxLines,
-        onTextLayout = { textLayout = it }
+        lineLimits =
+            if (!softWrap) {
+                TextFieldLineLimits.SingleLine
+            } else {
+                TextFieldLineLimits.MultiLine(maxHeightInLines = maxLines)
+            },
+        onTextLayout = { textLayout = it.invoke() }
     )
 }
 
