@@ -160,6 +160,38 @@ package androidx.appsearch.builtintypes {
     method public androidx.appsearch.builtintypes.ImageObject.Builder setUrl(String?);
   }
 
+  @SuppressCompatibility @androidx.appsearch.annotation.Document(name="builtin:MobileApplication") @androidx.appsearch.app.ExperimentalAppSearchApi public class MobileApplication extends androidx.appsearch.builtintypes.Thing {
+    method public String? getClassName();
+    method public String? getDisplayName();
+    method public android.net.Uri? getIconUri();
+    method public String getPackageName();
+    method public byte[] getSha256Certificate();
+    method public long getUpdatedTimestamp();
+  }
+
+  public static final class MobileApplication.Builder {
+    ctor public MobileApplication.Builder(androidx.appsearch.builtintypes.MobileApplication);
+    ctor public MobileApplication.Builder(String, String, String, byte[]);
+    method public androidx.appsearch.builtintypes.MobileApplication.Builder addAlternateName(String);
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public androidx.appsearch.builtintypes.MobileApplication.Builder addPotentialAction(androidx.appsearch.builtintypes.PotentialAction);
+    method public androidx.appsearch.builtintypes.MobileApplication build();
+    method public androidx.appsearch.builtintypes.MobileApplication.Builder clearAlternateNames();
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public androidx.appsearch.builtintypes.MobileApplication.Builder clearPotentialActions();
+    method public androidx.appsearch.builtintypes.MobileApplication.Builder setAlternateNames(java.util.List<java.lang.String!>?);
+    method public androidx.appsearch.builtintypes.MobileApplication.Builder setClassName(String);
+    method public androidx.appsearch.builtintypes.MobileApplication.Builder setCreationTimestampMillis(long);
+    method public androidx.appsearch.builtintypes.MobileApplication.Builder setDescription(String?);
+    method public androidx.appsearch.builtintypes.MobileApplication.Builder setDisplayName(String);
+    method public androidx.appsearch.builtintypes.MobileApplication.Builder setDocumentScore(int);
+    method public androidx.appsearch.builtintypes.MobileApplication.Builder setDocumentTtlMillis(long);
+    method public androidx.appsearch.builtintypes.MobileApplication.Builder setIconUri(android.net.Uri);
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public androidx.appsearch.builtintypes.MobileApplication.Builder setImage(String?);
+    method public androidx.appsearch.builtintypes.MobileApplication.Builder setName(String?);
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public androidx.appsearch.builtintypes.MobileApplication.Builder setPotentialActions(java.util.List<androidx.appsearch.builtintypes.PotentialAction!>?);
+    method public androidx.appsearch.builtintypes.MobileApplication.Builder setUpdatedTimestamp(long);
+    method public androidx.appsearch.builtintypes.MobileApplication.Builder setUrl(String?);
+  }
+
   @androidx.appsearch.annotation.Document(name="builtin:Person") public class Person extends androidx.appsearch.builtintypes.Thing {
     method public java.util.List<java.lang.String!> getAdditionalNames();
     method public java.util.List<java.lang.String!> getAffiliations();
