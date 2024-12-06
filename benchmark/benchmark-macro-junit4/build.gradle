@@ -93,4 +93,5 @@ androidx {
         targetAppVariant = "release"
     }
     kotlinTarget = KotlinTarget.KOTLIN_1_9
+    samples(project(":benchmark:benchmark-samples"))
 }
