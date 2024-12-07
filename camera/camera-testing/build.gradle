@@ -30,6 +30,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.jspecify)
     // ensuring implementation versions stay consistent with androidTestImplementation
     def testCoreVersion = "1.5.0"
     def testRunnerVersion = "1.5.2"
@@ -110,6 +111,4 @@ androidx {
     description = "Testing components for the Jetpack Camera Library, a library providing a " +
             "consistent and reliable camera foundation that enables great camera driven " +"" +
             "experiences across all of Android."
-    // TODO: b/326456246
-    optOutJSpecify = true
 }
