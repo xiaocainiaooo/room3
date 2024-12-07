@@ -20,9 +20,10 @@ import android.media.ImageReader;
 import android.util.Pair;
 import android.util.Size;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.camera.core.CameraInfo;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -59,8 +60,7 @@ public interface SessionProcessor {
      * @return a {@link SessionConfig} that contains the surfaces and the session parameters and
      * should be used to configure the camera session.
      */
-    @NonNull
-    SessionConfig initSession(@NonNull CameraInfo cameraInfo,
+    @NonNull SessionConfig initSession(@NonNull CameraInfo cameraInfo,
             @NonNull OutputSurfaceConfiguration outputSurfaceConfig);
 
     /**
@@ -138,16 +138,15 @@ public interface SessionProcessor {
      * Returns supported output format/size map for postview image. The API is provided
      * for camera-core to query the supported postview sizes from SessionProcessor.
      */
-    @NonNull
-    default Map<Integer, List<Size>> getSupportedPostviewSize(@NonNull Size captureSize) {
+    default @NonNull Map<Integer, List<Size>> getSupportedPostviewSize(@NonNull Size captureSize) {
         return Collections.emptyMap();
     }
 
     /**
      * Returns the supported camera operations when the SessionProcessor is enabled.
      */
-    @NonNull
-    default @AdapterCameraInfo.CameraOperation Set<Integer> getSupportedCameraOperations() {
+    default @AdapterCameraInfo.CameraOperation @NonNull Set<Integer>
+            getSupportedCameraOperations() {
         return Collections.emptySet();
     }
 
@@ -170,8 +169,7 @@ public interface SessionProcessor {
      * If clients have not configured a still capture output, then this method can also return a
      * null pair.
      */
-    @Nullable
-    default Pair<Long, Long> getRealtimeCaptureLatency() {
+    default @Nullable Pair<Long, Long> getRealtimeCaptureLatency() {
         return null;
     }
 

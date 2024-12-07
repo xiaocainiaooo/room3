@@ -30,6 +30,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.jspecify)
     api("androidx.annotation:annotation:1.8.1")
     api("androidx.lifecycle:lifecycle-livedata:2.1.0")
     api(libs.guavaListenableFuture)
@@ -139,6 +140,4 @@ androidx {
         name = "BSD License"
         url = "https://chromium.googlesource.com/libyuv/libyuv/+/refs/heads/main/README.chromium"
     }
-    // TODO: b/326456246
-    optOutJSpecify = true
 }

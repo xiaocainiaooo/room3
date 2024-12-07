@@ -17,10 +17,11 @@
 package androidx.camera.core;
 
 import androidx.annotation.FloatRange;
-import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
@@ -59,8 +60,7 @@ public interface CameraControl {
      * value specified. It fails when it is unable to change the torch state. Cancellation of
      * this future is a no-op.
      */
-    @NonNull
-    ListenableFuture<Void> enableTorch(boolean torch);
+    @NonNull ListenableFuture<Void> enableTorch(boolean torch);
 
     /**
      * Starts a focus and metering action configured by the {@link FocusMeteringAction}.
@@ -93,8 +93,7 @@ public interface CameraControl {
      * {@link MeteringPoint} is supported, it fails with {@link IllegalArgumentException}.
      * Cancellation of this future is a no-op.
      */
-    @NonNull
-    ListenableFuture<FocusMeteringResult> startFocusAndMetering(
+    @NonNull ListenableFuture<FocusMeteringResult> startFocusAndMetering(
             @NonNull FocusMeteringAction action);
 
     /**
@@ -108,8 +107,7 @@ public interface CameraControl {
      * @return A {@link ListenableFuture} which completes when the AF/AE/AWB regions is clear and AF
      * mode is set to continuous focus (if supported). Cancellation of this future is a no-op.
      */
-    @NonNull
-    ListenableFuture<Void> cancelFocusAndMetering();
+    @NonNull ListenableFuture<Void> cancelFocusAndMetering();
 
     /**
      * Sets current zoom by ratio.
@@ -127,8 +125,7 @@ public interface CameraControl {
      * the ratio is out of range, it fails with {@link IllegalArgumentException}. Cancellation of
      * this future is a no-op.
      */
-    @NonNull
-    ListenableFuture<Void> setZoomRatio(float ratio);
+    @NonNull ListenableFuture<Void> setZoomRatio(float ratio);
 
     /**
      * Sets current zoom by a linear zoom value ranging from 0f to 1.0f. LinearZoom 0f represents
@@ -149,8 +146,7 @@ public interface CameraControl {
      * If linearZoom is not in range [0..1], it fails with {@link IllegalArgumentException}.
      * Cancellation of this future is a no-op.
      */
-    @NonNull
-    ListenableFuture<Void> setLinearZoom(@FloatRange(from = 0f, to = 1f) float linearZoom);
+    @NonNull ListenableFuture<Void> setLinearZoom(@FloatRange(from = 0f, to = 1f) float linearZoom);
 
     /**
      * Set the exposure compensation value for the camera.
@@ -178,8 +174,7 @@ public interface CameraControl {
      * within {@link ExposureState#getExposureCompensationRange}.
      * </ul>
      */
-    @NonNull
-    ListenableFuture<Integer> setExposureCompensationIndex(int value);
+    @NonNull ListenableFuture<Integer> setExposureCompensationIndex(int value);
 
     /**
      * An exception representing a failure that the operation is canceled which might be caused by
