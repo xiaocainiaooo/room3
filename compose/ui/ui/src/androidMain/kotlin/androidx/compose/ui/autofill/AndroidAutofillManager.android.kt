@@ -69,7 +69,8 @@ import androidx.compose.ui.util.fastForEach
  * @param view The parent compose view.
  */
 @RequiresApi(Build.VERSION_CODES.O)
-internal class AndroidAutofillManager(val view: AndroidComposeView) : AutofillManager {
+internal class AndroidAutofillManager(val view: AndroidComposeView) :
+    AutofillManager, View.OnAttachStateChangeListener {
     internal var autofillManager: AutofillManagerWrapper = AutofillManagerWrapperImpl(view)
 
     init {
@@ -280,6 +281,12 @@ internal class AndroidAutofillManager(val view: AndroidComposeView) : AutofillMa
                 androidAutofillManager.autofillManager.autofillManager.unregisterCallback(this)
             }
         }
+    }
+
+    override fun onViewAttachedToWindow(v: View) {}
+
+    override fun onViewDetachedFromWindow(v: View) {
+        handler.removeCallbacks(autofillChangeChecker)
     }
 }
 
