@@ -24,6 +24,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.jspecify)
     api("androidx.annotation:annotation:1.8.1")
     api(project(":camera:camera-core"))
     implementation("androidx.core:core:1.1.0")
@@ -90,6 +91,4 @@ androidx {
     description = "Video components for the Jetpack Camera Library, a library providing a " +
             "consistent and reliable camera foundation that enables great camera driven " +
             "experiences across all of Android."
-    // TODO: b/326456246
-    optOutJSpecify = true
 }
