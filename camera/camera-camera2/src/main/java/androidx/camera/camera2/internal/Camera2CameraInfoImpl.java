@@ -38,8 +38,6 @@ import android.view.Surface;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.GuardedBy;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.camera.camera2.internal.compat.CameraAccessExceptionCompat;
 import androidx.camera.camera2.internal.compat.CameraCharacteristicsCompat;
@@ -72,6 +70,9 @@ import androidx.core.util.Preconditions;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Observer;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,29 +107,20 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
 
     private final Object mLock = new Object();
     @GuardedBy("mLock")
-    @Nullable
-    private Camera2CameraControlImpl mCamera2CameraControlImpl;
+    private @Nullable Camera2CameraControlImpl mCamera2CameraControlImpl;
     @GuardedBy("mLock")
-    @Nullable
-    private RedirectableLiveData<Integer> mRedirectTorchStateLiveData = null;
+    private @Nullable RedirectableLiveData<Integer> mRedirectTorchStateLiveData = null;
     @GuardedBy("mLock")
-    @Nullable
-    private RedirectableLiveData<ZoomState> mRedirectZoomStateLiveData = null;
-    @NonNull
-    private final RedirectableLiveData<CameraState> mCameraStateLiveData;
+    private @Nullable RedirectableLiveData<ZoomState> mRedirectZoomStateLiveData = null;
+    private final @NonNull RedirectableLiveData<CameraState> mCameraStateLiveData;
     @GuardedBy("mLock")
-    @Nullable
-    private List<Pair<CameraCaptureCallback, Executor>> mCameraCaptureCallbacks = null;
+    private @Nullable List<Pair<CameraCaptureCallback, Executor>> mCameraCaptureCallbacks = null;
 
-    @NonNull
-    private final Quirks mCameraQuirks;
-    @NonNull
-    private final EncoderProfilesProvider mCamera2EncoderProfilesProvider;
-    @NonNull
-    private final CameraManagerCompat mCameraManager;
+    private final @NonNull Quirks mCameraQuirks;
+    private final @NonNull EncoderProfilesProvider mCamera2EncoderProfilesProvider;
+    private final @NonNull CameraManagerCompat mCameraManager;
 
-    @Nullable
-    private Set<CameraInfo> mPhysicalCameraInfos;
+    private @Nullable Set<CameraInfo> mPhysicalCameraInfos;
 
     /**
      * Constructs an instance. Before {@link #linkWithCameraControl(Camera2CameraControlImpl)} is
@@ -188,14 +180,12 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
         mCameraStateLiveData.redirectTo(cameraStateSource);
     }
 
-    @NonNull
     @Override
-    public String getCameraId() {
+    public @NonNull String getCameraId() {
         return mCameraId;
     }
 
-    @NonNull
-    public CameraCharacteristicsCompat getCameraCharacteristicsCompat() {
+    public @NonNull CameraCharacteristicsCompat getCameraCharacteristicsCompat() {
         return mCameraCharacteristicsCompat;
     }
 
@@ -281,9 +271,8 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
         return FlashAvailabilityChecker.isFlashAvailable(mCameraCharacteristicsCompat::get);
     }
 
-    @NonNull
     @Override
-    public LiveData<Integer> getTorchState() {
+    public @NonNull LiveData<Integer> getTorchState() {
         synchronized (mLock) {
             if (mCamera2CameraControlImpl == null) {
                 if (mRedirectTorchStateLiveData == null) {
@@ -302,9 +291,8 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
         }
     }
 
-    @NonNull
     @Override
-    public LiveData<ZoomState> getZoomState() {
+    public @NonNull LiveData<ZoomState> getZoomState() {
         synchronized (mLock) {
             if (mCamera2CameraControlImpl == null) {
                 if (mRedirectZoomStateLiveData == null) {
@@ -323,9 +311,8 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
         }
     }
 
-    @NonNull
     @Override
-    public ExposureState getExposureState() {
+    public @NonNull ExposureState getExposureState() {
         synchronized (mLock) {
             if (mCamera2CameraControlImpl == null) {
                 return ExposureControl.getDefaultExposureState(mCameraCharacteristicsCompat);
@@ -334,9 +321,8 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
         }
     }
 
-    @NonNull
     @Override
-    public LiveData<CameraState> getCameraState() {
+    public @NonNull LiveData<CameraState> getCameraState() {
         return mCameraStateLiveData;
     }
 
@@ -351,9 +337,8 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
      * @return {@link #IMPLEMENTATION_TYPE_CAMERA2_LEGACY} if the device is legacy, otherwise
      * {@link #IMPLEMENTATION_TYPE_CAMERA2}.
      */
-    @NonNull
     @Override
-    public String getImplementationType() {
+    public @NonNull String getImplementationType() {
         final int hardwareLevel = getSupportedHardwareLevel();
         return hardwareLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY
                 ? IMPLEMENTATION_TYPE_CAMERA2_LEGACY : IMPLEMENTATION_TYPE_CAMERA2;
@@ -418,15 +403,13 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
     }
 
     /** {@inheritDoc} */
-    @NonNull
     @Override
-    public EncoderProfilesProvider getEncoderProfilesProvider() {
+    public @NonNull EncoderProfilesProvider getEncoderProfilesProvider() {
         return mCamera2EncoderProfilesProvider;
     }
 
-    @NonNull
     @Override
-    public Timebase getTimebase() {
+    public @NonNull Timebase getTimebase() {
         Integer timeSource = mCameraCharacteristicsCompat.get(
                 CameraCharacteristics.SENSOR_INFO_TIMESTAMP_SOURCE);
         Preconditions.checkNotNull(timeSource);
@@ -439,9 +422,8 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
         }
     }
 
-    @NonNull
     @Override
-    public Set<Integer> getSupportedOutputFormats() {
+    public @NonNull Set<Integer> getSupportedOutputFormats() {
         StreamConfigurationMapCompat mapCompat =
                 mCameraCharacteristicsCompat.getStreamConfigurationMapCompat();
         int[] formats = mapCompat.getOutputFormats();
@@ -456,27 +438,24 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
         return result;
     }
 
-    @NonNull
     @Override
-    public List<Size> getSupportedResolutions(int format) {
+    public @NonNull List<Size> getSupportedResolutions(int format) {
         StreamConfigurationMapCompat mapCompat =
                 mCameraCharacteristicsCompat.getStreamConfigurationMapCompat();
         Size[] size = mapCompat.getOutputSizes(format);
         return size != null ? Arrays.asList(size) : Collections.emptyList();
     }
 
-    @NonNull
     @Override
-    public List<Size> getSupportedHighResolutions(int format) {
+    public @NonNull List<Size> getSupportedHighResolutions(int format) {
         StreamConfigurationMapCompat mapCompat =
                 mCameraCharacteristicsCompat.getStreamConfigurationMapCompat();
         Size[] size = mapCompat.getHighResolutionOutputSizes(format);
         return size != null ? Arrays.asList(size) : Collections.emptyList();
     }
 
-    @NonNull
     @Override
-    public Set<DynamicRange> getSupportedDynamicRanges() {
+    public @NonNull Set<DynamicRange> getSupportedDynamicRanges() {
         DynamicRangesCompat dynamicRangesCompat = DynamicRangesCompat.fromCameraCharacteristics(
                 mCameraCharacteristicsCompat);
 
@@ -489,17 +468,16 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
                 REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO);
     }
 
-    @NonNull
     @Override
-    public Set<Range<Integer>> getSupportedHighSpeedFrameRateRanges() {
+    public @NonNull Set<Range<Integer>> getSupportedHighSpeedFrameRateRanges() {
         Range<Integer>[] ranges = mCameraCharacteristicsCompat.getStreamConfigurationMapCompat()
                 .getHighSpeedVideoFpsRanges();
         return ranges != null ? new HashSet<>(Arrays.asList(ranges)) : Collections.emptySet();
     }
 
-    @NonNull
     @Override
-    public Set<Range<Integer>> getSupportedHighSpeedFrameRateRangesFor(@NonNull Size size) {
+    public @NonNull Set<Range<Integer>> getSupportedHighSpeedFrameRateRangesFor(
+            @NonNull Size size) {
         Range<Integer>[] ranges = null;
         try {
             ranges = mCameraCharacteristicsCompat.getStreamConfigurationMapCompat()
@@ -510,17 +488,16 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
         return ranges != null ? new HashSet<>(Arrays.asList(ranges)) : Collections.emptySet();
     }
 
-    @NonNull
     @Override
-    public List<Size> getSupportedHighSpeedResolutions() {
+    public @NonNull List<Size> getSupportedHighSpeedResolutions() {
         Size[] sizes = mCameraCharacteristicsCompat.getStreamConfigurationMapCompat()
                 .getHighSpeedVideoSizes();
         return sizes != null ? Arrays.asList(sizes) : Collections.emptyList();
     }
 
-    @NonNull
     @Override
-    public List<Size> getSupportedHighSpeedResolutionsFor(@NonNull Range<Integer> fpsRange) {
+    public @NonNull List<Size> getSupportedHighSpeedResolutionsFor(
+            @NonNull Range<Integer> fpsRange) {
         Size[] sizes = null;
         try {
             sizes = mCameraCharacteristicsCompat.getStreamConfigurationMapCompat()
@@ -531,9 +508,8 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
         return sizes != null ? Arrays.asList(sizes) : Collections.emptyList();
     }
 
-    @NonNull
     @Override
-    public Set<DynamicRange> querySupportedDynamicRanges(
+    public @NonNull Set<DynamicRange> querySupportedDynamicRanges(
             @NonNull Set<DynamicRange> candidateDynamicRanges) {
         return DynamicRanges.findAllPossibleMatches(candidateDynamicRanges,
                 getSupportedDynamicRanges());
@@ -577,15 +553,13 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
     }
 
     /** {@inheritDoc} */
-    @NonNull
     @Override
-    public Quirks getCameraQuirks() {
+    public @NonNull Quirks getCameraQuirks() {
         return mCameraQuirks;
     }
 
-    @NonNull
     @Override
-    public Set<Range<Integer>> getSupportedFrameRateRanges() {
+    public @NonNull Set<Range<Integer>> getSupportedFrameRateRanges() {
         Range<Integer>[] availableTargetFpsRanges =
                 mCameraCharacteristicsCompat.get(
                         CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
@@ -629,20 +603,17 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
     /**
      * Gets the implementation of {@link Camera2CameraInfo}.
      */
-    @NonNull
-    public Camera2CameraInfo getCamera2CameraInfo() {
+    public @NonNull Camera2CameraInfo getCamera2CameraInfo() {
         return mCamera2CameraInfo;
     }
 
-    @NonNull
     @Override
-    public Object getCameraCharacteristics() {
+    public @NonNull Object getCameraCharacteristics() {
         return mCameraCharacteristicsCompat.toCameraCharacteristics();
     }
 
-    @Nullable
     @Override
-    public Object getPhysicalCameraCharacteristics(@NonNull String physicalCameraId) {
+    public @Nullable Object getPhysicalCameraCharacteristics(@NonNull String physicalCameraId) {
         try {
             if (!mCameraCharacteristicsCompat.getPhysicalCameraIds().contains(physicalCameraId)) {
                 return null;
@@ -665,8 +636,7 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
      * their CameraCharacteristics.
      *
      */
-    @NonNull
-    public Map<String, CameraCharacteristics> getCameraCharacteristicsMap() {
+    public @NonNull Map<String, CameraCharacteristics> getCameraCharacteristicsMap() {
         LinkedHashMap<String, CameraCharacteristics> map = new LinkedHashMap<>();
 
         map.put(mCameraId, mCameraCharacteristicsCompat.toCameraCharacteristics());
@@ -687,9 +657,8 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
         return map;
     }
 
-    @NonNull
     @Override
-    public Set<CameraInfo> getPhysicalCameraInfos() {
+    public @NonNull Set<CameraInfo> getPhysicalCameraInfos() {
         if (mPhysicalCameraInfos == null) {
             mPhysicalCameraInfos = new HashSet<>();
             for (String physicalCameraId : mCameraCharacteristicsCompat.getPhysicalCameraIds()) {
