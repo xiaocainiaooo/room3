@@ -19,10 +19,13 @@ package androidx.camera.core;
 import static androidx.camera.core.ImageProcessingUtil.convertJpegBytesToImage;
 import static androidx.camera.core.ImageProcessingUtil.rotateYUV;
 import static androidx.camera.core.ImageProcessingUtil.writeJpegBytesToSurface;
+import static androidx.camera.testing.impl.IgnoreProblematicDeviceRule.Companion;
 import static androidx.camera.testing.impl.ImageProxyUtil.createYUV420ImagePlanes;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
+
+import static org.junit.Assume.assumeFalse;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,7 +36,10 @@ import android.graphics.PixelFormat;
 import android.media.ImageWriter;
 
 import androidx.annotation.IntRange;
+import androidx.annotation.RequiresApi;
 import androidx.camera.core.impl.utils.Exif;
+import androidx.camera.core.internal.utils.ImageUtil;
+import androidx.camera.testing.impl.TestImageUtil;
 import androidx.camera.testing.impl.fakes.FakeImageInfo;
 import androidx.camera.testing.impl.fakes.FakeImageProxy;
 import androidx.core.math.MathUtils;
@@ -89,51 +95,63 @@ public class ImageProcessingUtilTest {
 
     @Before
     public void setUp() {
-        mYUVImageProxy = new FakeImageProxy(new FakeImageInfo());
-        mYUVImageProxy.setWidth(WIDTH);
-        mYUVImageProxy.setHeight(HEIGHT);
+        createTestResources(WIDTH, HEIGHT, 90);
+    }
+
+    @After
+    public void tearDown() {
+        closeTestResources();
+    }
+
+    private void createTestResources(int width, int height, int rotation) {
+        mYUVImageProxy = TestImageUtil.createYuvFakeImageProxy(new FakeImageInfo(), width, height,
+                true, true);
+        mYUVImageProxy.setWidth(width);
+        mYUVImageProxy.setHeight(height);
         mYUVImageProxy.setFormat(ImageFormat.YUV_420_888);
+
+        boolean flipWh = rotation % 180 != 0;
 
         // rgb image reader proxy should not be mocked for JNI native code
         mRGBImageReaderProxy = new SafeCloseImageReaderProxy(
                 ImageReaderProxys.createIsolatedReader(
-                        WIDTH,
-                        HEIGHT,
+                        width,
+                        height,
                         PixelFormat.RGBA_8888,
                         MAX_IMAGES));
 
         // rotated image reader proxy with width and height flipped
         mRotatedRGBImageReaderProxy = new SafeCloseImageReaderProxy(
                 ImageReaderProxys.createIsolatedReader(
-                        HEIGHT,
-                        WIDTH,
+                        flipWh ? height : width,
+                        flipWh ? width : height,
                         PixelFormat.RGBA_8888,
                         MAX_IMAGES));
 
         mRotatedYUVImageReaderProxy = new SafeCloseImageReaderProxy(
                 ImageReaderProxys.createIsolatedReader(
-                        HEIGHT,
-                        WIDTH,
+                        flipWh ? height : width,
+                        flipWh ? width : height,
                         ImageFormat.YUV_420_888,
                         MAX_IMAGES));
 
         mJpegImageReaderProxy = new SafeCloseImageReaderProxy(
                 ImageReaderProxys.createIsolatedReader(
-                        WIDTH,
-                        HEIGHT,
+                        flipWh ? height : width,
+                        flipWh ? width : height,
                         ImageFormat.JPEG,
                         MAX_IMAGES));
 
-        mRgbConvertedBuffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4);
-        mYRotatedBuffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT);
-        mURotatedBuffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT / 2);
-        mVRotatedBuffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT / 2);
+        mRgbConvertedBuffer = ByteBuffer.allocateDirect(width * height * 4);
+        mYRotatedBuffer = ByteBuffer.allocateDirect(width * height);
+        mURotatedBuffer = ByteBuffer.allocateDirect(width * height / 2);
+        mVRotatedBuffer = ByteBuffer.allocateDirect(width * height / 2);
     }
 
-    @After
-    public void tearDown() {
+    private void closeTestResources() {
         mRGBImageReaderProxy.safeClose();
         mRotatedRGBImageReaderProxy.safeClose();
+        mRotatedYUVImageReaderProxy.safeClose();
         mJpegImageReaderProxy.safeClose();
     }
 
@@ -388,15 +406,38 @@ public class ImageProcessingUtilTest {
 
     @SdkSuppress(minSdkVersion = 23)
     @Test
-    public void rotateYUV_imageRotated() {
+    public void rotateYUV_imageRotated_0() {
+        rotateYUV_imageRotated(0, true);
+    }
+
+    @SdkSuppress(minSdkVersion = 23)
+    @Test
+    public void rotateYUV_imageRotated_90() {
+        rotateYUV_imageRotated(90, false);
+    }
+
+    @SdkSuppress(minSdkVersion = 23)
+    @Test
+    public void rotateYUV_imageRotated_180() {
+        rotateYUV_imageRotated(180, false);
+    }
+
+    @SdkSuppress(minSdkVersion = 23)
+    @Test
+    public void rotateYUV_imageRotated_270() {
+        rotateYUV_imageRotated(270, false);
+    }
+
+    @RequiresApi(23)
+    private void rotateYUV_imageRotated(int rotation,
+            boolean outputShouldBeNull) {
+        // Pixel2 API28 emulator has problem to run the test
+        assumeFalse(Companion.isPixel2Api28Emulator());
         // Arrange.
-        mYUVImageProxy.setPlanes(createYUV420ImagePlanes(
-                WIDTH,
-                HEIGHT,
-                PIXEL_STRIDE_Y,
-                PIXEL_STRIDE_UV,
-                /*flipUV=*/true,
-                /*incrementValue=*/false));
+        int width = 640;
+        int height = 480;
+        closeTestResources();
+        createTestResources(width, height, rotation);
 
         // Act.
         ImageProxy yuvImageProxy = rotateYUV(
@@ -408,14 +449,29 @@ public class ImageProcessingUtilTest {
                 mYRotatedBuffer,
                 mURotatedBuffer,
                 mVRotatedBuffer,
-                /*rotation=*/90);
+                /*rotation=*/rotation);
 
         // Assert.
+        if (outputShouldBeNull) {
+            assertThat(yuvImageProxy).isNull();
+            return;
+        }
+
+        boolean flipWh = rotation % 180 != 0;
         assertThat(yuvImageProxy).isNotNull();
         assertThat(yuvImageProxy.getFormat()).isEqualTo(ImageFormat.YUV_420_888);
         assertThat(yuvImageProxy.getPlanes().length).isEqualTo(3);
-        assertThat(yuvImageProxy.getWidth()).isEqualTo(HEIGHT);
-        assertThat(yuvImageProxy.getHeight()).isEqualTo(WIDTH);
+        assertThat(yuvImageProxy.getWidth()).isEqualTo(flipWh ? height : width);
+        assertThat(yuvImageProxy.getHeight()).isEqualTo(flipWh ? width : height);
+
+        // Verifies the color value diff between the rotated input image and the decoded output
+        // image proxy.
+        Bitmap inputDecodedBitmap = ImageUtil.createBitmapFromImageProxy(mYUVImageProxy);
+        Bitmap inputRotatedBitmap = TestImageUtil.rotateBitmap(inputDecodedBitmap, rotation);
+        Bitmap outputBitmap = ImageUtil.createBitmapFromImageProxy(yuvImageProxy);
+        assertThat(TestImageUtil.getAverageDiff(inputRotatedBitmap, outputBitmap))
+                .isEqualTo(0);
+
         yuvImageProxy.close();
     }
 
