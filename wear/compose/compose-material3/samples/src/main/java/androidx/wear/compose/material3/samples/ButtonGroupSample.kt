@@ -34,19 +34,58 @@ import androidx.wear.compose.material3.Text
 @Sampled
 @Composable
 fun ButtonGroupSample() {
-    val interactionSourceLeft = remember { MutableInteractionSource() }
-    val interactionSourceRight = remember { MutableInteractionSource() }
+    val interactionSource1 = remember { MutableInteractionSource() }
+    val interactionSource2 = remember { MutableInteractionSource() }
+
     Box(Modifier.size(300.dp), contentAlignment = Alignment.Center) {
         ButtonGroup(Modifier.fillMaxWidth()) {
-            buttonGroupItem(interactionSource = interactionSourceLeft) {
-                Button(onClick = {}, interactionSource = interactionSourceLeft) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("L") }
-                }
+            Button(
+                onClick = {},
+                modifier = Modifier.enlargeOnPress(interactionSource1),
+                interactionSource = interactionSource1
+            ) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("L") }
             }
-            buttonGroupItem(interactionSource = interactionSourceRight) {
-                Button(onClick = {}, interactionSource = interactionSourceRight) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("R") }
-                }
+            Button(
+                onClick = {},
+                modifier = Modifier.enlargeOnPress(interactionSource2),
+                interactionSource = interactionSource2
+            ) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("R") }
+            }
+        }
+    }
+}
+
+@Sampled
+@Composable
+fun ButtonGroupThreeButtonsSample() {
+    val interactionSource1 = remember { MutableInteractionSource() }
+    val interactionSource2 = remember { MutableInteractionSource() }
+    val interactionSource3 = remember { MutableInteractionSource() }
+
+    Box(Modifier.size(300.dp), contentAlignment = Alignment.Center) {
+        ButtonGroup(Modifier.fillMaxWidth()) {
+            Button(
+                onClick = {},
+                modifier = Modifier.enlargeOnPress(interactionSource1),
+                interactionSource = interactionSource1
+            ) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("A") }
+            }
+            Button(
+                onClick = {},
+                modifier = Modifier.weight(1.5f).enlargeOnPress(interactionSource2),
+                interactionSource = interactionSource2
+            ) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("B") }
+            }
+            Button(
+                onClick = {},
+                modifier = Modifier.enlargeOnPress(interactionSource3),
+                interactionSource = interactionSource3
+            ) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("C") }
             }
         }
     }
