@@ -172,7 +172,6 @@ import androidx.compose.material3.samples.RichTooltipSample
 import androidx.compose.material3.samples.RichTooltipWithCaretSample
 import androidx.compose.material3.samples.RichTooltipWithCustomCaretSample
 import androidx.compose.material3.samples.RichTooltipWithManualInvocationSample
-import androidx.compose.material3.samples.RoundToggleButtonSample
 import androidx.compose.material3.samples.ScaffoldWithCoroutinesSnackbar
 import androidx.compose.material3.samples.ScaffoldWithCustomSnackbar
 import androidx.compose.material3.samples.ScaffoldWithIndefiniteSnackbar
@@ -211,6 +210,7 @@ import androidx.compose.material3.samples.SplitButtonWithIconSample
 import androidx.compose.material3.samples.SplitButtonWithTextSample
 import androidx.compose.material3.samples.SplitButtonWithUnCheckableTrailingButtonSample
 import androidx.compose.material3.samples.SquareButtonSample
+import androidx.compose.material3.samples.SquareToggleButtonSample
 import androidx.compose.material3.samples.StepRangeSliderSample
 import androidx.compose.material3.samples.StepsSliderSample
 import androidx.compose.material3.samples.SuggestionChipSample
@@ -1567,7 +1567,7 @@ val ToggleButtonsExamples =
             description = ToggleButtonsExampleDescription,
             sourceUrl = ToggleButtonsExampleSourceUrl,
         ) {
-            RoundToggleButtonSample()
+            SquareToggleButtonSample()
         },
         Example(
             name = "ElevatedToggleButtonSample",
