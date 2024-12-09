@@ -335,7 +335,6 @@ dependencies {
     docs("androidx.security:security-app-authenticator-testing:1.0.0-beta01")
     docs("androidx.security:security-crypto:1.1.0-alpha06")
     docs("androidx.security:security-crypto-ktx:1.1.0-alpha06")
-    docs("androidx.security:security-identity-credential:1.0.0-alpha03")
     docs("androidx.security:security-state:1.0.0-alpha04")
     docs("androidx.sharetarget:sharetarget:1.2.0")
     docs("androidx.slice:slice-builders:1.1.0-alpha02")
