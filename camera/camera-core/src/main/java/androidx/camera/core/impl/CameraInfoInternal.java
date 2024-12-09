@@ -19,6 +19,7 @@ package androidx.camera.core.impl;
 import android.graphics.ImageFormat;
 import android.graphics.PixelFormat;
 import android.hardware.camera2.CaptureRequest;
+import android.util.Range;
 import android.util.Size;
 
 import androidx.annotation.NonNull;
@@ -132,6 +133,38 @@ public interface CameraInfoInternal extends CameraInfo {
      */
     @NonNull
     Set<DynamicRange> getSupportedDynamicRanges();
+
+    /** Returns if high speed capturing is supported on the device. */
+    boolean isHighSpeedSupported();
+
+    /** Returns the supported high speed frame rate ranges. */
+    @NonNull
+    Set<Range<Integer>> getSupportedHighSpeedFrameRateRanges();
+
+    /**
+     * Returns the supported high speed frame rate ranges for a given size.
+     *
+     * @param size one of the sizes returned by {@link #getSupportedHighSpeedResolutions()}.
+     * @return a set of supported high speed frame rate ranges for a given size, or an empty set
+     * if the size is not supported.
+     */
+    @NonNull
+    Set<Range<Integer>> getSupportedHighSpeedFrameRateRangesFor(@NonNull Size size);
+
+    /** Returns the supported high speed resolutions. */
+    @NonNull
+    List<Size> getSupportedHighSpeedResolutions();
+
+    /**
+     * Returns the supported high speed resolutions for a given frame rate range.
+     *
+     * @param fpsRange one of the frame rate ranges returned by
+     * {@link #getSupportedHighSpeedFrameRateRanges()}.
+     * @return a list of supported high speed resolutions for the given frame rate range, or an
+     * empty list if the frame rate range is not supported.
+     */
+    @NonNull
+    List<Size> getSupportedHighSpeedResolutionsFor(@NonNull Range<Integer> fpsRange);
 
     /**
      * Returns if preview stabilization is supported on the device.
