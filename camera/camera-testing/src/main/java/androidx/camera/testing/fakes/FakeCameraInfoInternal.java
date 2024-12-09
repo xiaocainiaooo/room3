@@ -83,6 +83,7 @@ public final class FakeCameraInfoInternal implements CameraInfoInternal {
     private final MutableLiveData<Integer> mTorchState = new MutableLiveData<>(TorchState.OFF);
     private final MutableLiveData<ZoomState> mZoomLiveData;
     private final Map<Integer, List<Size>> mSupportedResolutionMap = new HashMap<>();
+    private final Map<Range<Integer>, List<Size>> mSupportedHighSpeedFpsToSizeMap = new HashMap<>();
     private final Map<Integer, List<Size>> mSupportedHighResolutionMap = new HashMap<>();
     private MutableLiveData<CameraState> mCameraStateMutableLiveData;
 
@@ -98,6 +99,7 @@ public final class FakeCameraInfoInternal implements CameraInfoInternal {
     private float mIntrinsicZoomRatio = 1.0F;
 
     private boolean mIsFocusMeteringSupported = false;
+    private boolean mIsHighSpeedSupported = false;
 
     private ExposureState mExposureState = new FakeExposureState();
     @NonNull
@@ -297,6 +299,52 @@ public final class FakeCameraInfoInternal implements CameraInfoInternal {
         return mSupportedDynamicRanges;
     }
 
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @Override
+    public boolean isHighSpeedSupported() {
+        return mIsHighSpeedSupported;
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @NonNull
+    @Override
+    public Set<Range<Integer>> getSupportedHighSpeedFrameRateRanges() {
+        return mSupportedHighSpeedFpsToSizeMap.keySet();
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @NonNull
+    @Override
+    public Set<Range<Integer>> getSupportedHighSpeedFrameRateRangesFor(@NonNull Size size) {
+        Set<Range<Integer>> ranges = new HashSet<>();
+        for (Map.Entry<Range<Integer>, List<Size>> entry :
+                mSupportedHighSpeedFpsToSizeMap.entrySet()) {
+            if (entry.getValue().contains(size)) {
+                ranges.add(entry.getKey());
+            }
+        }
+        return ranges;
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @NonNull
+    @Override
+    public List<Size> getSupportedHighSpeedResolutions() {
+        Set<Size> resolutions = new HashSet<>();
+        for (List<Size> sizes : mSupportedHighSpeedFpsToSizeMap.values()) {
+            resolutions.addAll(sizes);
+        }
+        return new ArrayList<>(resolutions);
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @NonNull
+    @Override
+    public List<Size> getSupportedHighSpeedResolutionsFor(@NonNull Range<Integer> fpsRange) {
+        List<Size> resolutions = mSupportedHighSpeedFpsToSizeMap.get(fpsRange);
+        return resolutions != null ? resolutions : Collections.emptyList();
+    }
+
     /**
      * Returns the supported dynamic ranges of this camera from a set of candidate dynamic ranges.
      *
@@ -418,6 +466,19 @@ public final class FakeCameraInfoInternal implements CameraInfoInternal {
     /** Set the supported high resolutions for testing */
     public void setSupportedHighResolutions(int format, @NonNull List<Size> resolutions) {
         mSupportedHighResolutionMap.put(format, resolutions);
+    }
+
+    /** Sets the return value for {@link #isHighSpeedSupported()}}. */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public void setHighSpeedSupported(boolean supported) {
+        mIsHighSpeedSupported = supported;
+    }
+
+    /** Set the supported high speed resolutions for testing */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public void setSupportedHighSpeedResolutions(@NonNull Range<Integer> fps,
+            @NonNull List<Size> resolutions) {
+        mSupportedHighSpeedFpsToSizeMap.put(fps, resolutions);
     }
 
     /** Set the isPrivateReprocessingSupported flag for testing */

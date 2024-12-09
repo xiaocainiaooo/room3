@@ -19,6 +19,7 @@ package androidx.camera.camera2.internal.compat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Build;
+import android.util.Range;
 import android.util.Size;
 
 import androidx.annotation.NonNull;
@@ -81,6 +82,32 @@ class StreamConfigurationMapCompatBaseImpl
             return Api23Impl.getHighResolutionOutputSizes(mStreamConfigurationMap, format);
         }
         return null;
+    }
+
+    @Nullable
+    @Override
+    public Range<Integer>[] getHighSpeedVideoFpsRanges() {
+        return mStreamConfigurationMap.getHighSpeedVideoFpsRanges();
+    }
+
+    @Nullable
+    @Override
+    public Range<Integer>[] getHighSpeedVideoFpsRangesFor(@NonNull Size size)
+            throws IllegalArgumentException {
+        return mStreamConfigurationMap.getHighSpeedVideoFpsRangesFor(size);
+    }
+
+    @Nullable
+    @Override
+    public Size[] getHighSpeedVideoSizes() {
+        return mStreamConfigurationMap.getHighSpeedVideoSizes();
+    }
+
+    @Nullable
+    @Override
+    public Size[] getHighSpeedVideoSizesFor(@NonNull Range<Integer> fpsRange)
+            throws IllegalArgumentException {
+        return mStreamConfigurationMap.getHighSpeedVideoSizesFor(fpsRange);
     }
 
     @NonNull

@@ -19,6 +19,7 @@ package androidx.camera.camera2.internal;
 import static android.hardware.camera2.CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES;
 import static android.hardware.camera2.CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_ON;
 import static android.hardware.camera2.CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION;
+import static android.hardware.camera2.CameraMetadata.REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO;
 import static android.hardware.camera2.CameraMetadata.REQUEST_AVAILABLE_CAPABILITIES_LOGICAL_MULTI_CAMERA;
 import static android.hardware.camera2.CameraMetadata.REQUEST_AVAILABLE_CAPABILITIES_PRIVATE_REPROCESSING;
 import static android.hardware.camera2.CameraMetadata.SENSOR_INFO_TIMESTAMP_SOURCE_REALTIME;
@@ -480,6 +481,54 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
                 mCameraCharacteristicsCompat);
 
         return dynamicRangesCompat.getSupportedDynamicRanges();
+    }
+
+    @Override
+    public boolean isHighSpeedSupported() {
+        return Build.VERSION.SDK_INT >= 23 && isCapabilitySupported(mCameraCharacteristicsCompat,
+                REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO);
+    }
+
+    @NonNull
+    @Override
+    public Set<Range<Integer>> getSupportedHighSpeedFrameRateRanges() {
+        Range<Integer>[] ranges = mCameraCharacteristicsCompat.getStreamConfigurationMapCompat()
+                .getHighSpeedVideoFpsRanges();
+        return ranges != null ? new HashSet<>(Arrays.asList(ranges)) : Collections.emptySet();
+    }
+
+    @NonNull
+    @Override
+    public Set<Range<Integer>> getSupportedHighSpeedFrameRateRangesFor(@NonNull Size size) {
+        Range<Integer>[] ranges = null;
+        try {
+            ranges = mCameraCharacteristicsCompat.getStreamConfigurationMapCompat()
+                    .getHighSpeedVideoFpsRangesFor(size);
+        } catch (IllegalArgumentException e) {
+            Logger.w(TAG, "Can't get high speed frame rate ranges for " + size, e);
+        }
+        return ranges != null ? new HashSet<>(Arrays.asList(ranges)) : Collections.emptySet();
+    }
+
+    @NonNull
+    @Override
+    public List<Size> getSupportedHighSpeedResolutions() {
+        Size[] sizes = mCameraCharacteristicsCompat.getStreamConfigurationMapCompat()
+                .getHighSpeedVideoSizes();
+        return sizes != null ? Arrays.asList(sizes) : Collections.emptyList();
+    }
+
+    @NonNull
+    @Override
+    public List<Size> getSupportedHighSpeedResolutionsFor(@NonNull Range<Integer> fpsRange) {
+        Size[] sizes = null;
+        try {
+            sizes = mCameraCharacteristicsCompat.getStreamConfigurationMapCompat()
+                    .getHighSpeedVideoSizesFor(fpsRange);
+        } catch (IllegalArgumentException e) {
+            Logger.w(TAG, "Can't get high speed resolutions for " + fpsRange, e);
+        }
+        return sizes != null ? Arrays.asList(sizes) : Collections.emptyList();
     }
 
     @NonNull

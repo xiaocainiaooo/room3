@@ -20,6 +20,7 @@ import android.graphics.ImageFormat;
 import android.graphics.PixelFormat;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Build;
+import android.util.Range;
 import android.util.Size;
 
 import androidx.annotation.NonNull;
@@ -187,6 +188,32 @@ public class StreamConfigurationMapCompat {
         return outputSizes != null ? outputSizes.clone() : null;
     }
 
+    /** Get a list of supported high speed video recording FPS ranges. */
+    @Nullable
+    public Range<Integer>[] getHighSpeedVideoFpsRanges() {
+        return mImpl.getHighSpeedVideoFpsRanges();
+    }
+
+    /** Get the frame per second ranges (fpsMin, fpsMax) for input high speed video size. */
+    @Nullable
+    public Range<Integer>[] getHighSpeedVideoFpsRangesFor(@NonNull Size size)
+            throws IllegalArgumentException {
+        return mImpl.getHighSpeedVideoFpsRangesFor(size);
+    }
+
+    /** Get a list of supported high speed video recording sizes. */
+    @Nullable
+    public Size[] getHighSpeedVideoSizes() {
+        return mImpl.getHighSpeedVideoSizes();
+    }
+
+    /** Get the supported video sizes for an input high speed FPS range. */
+    @Nullable
+    public Size[] getHighSpeedVideoSizesFor(@NonNull Range<Integer> fpsRange)
+            throws IllegalArgumentException {
+        return mImpl.getHighSpeedVideoSizesFor(fpsRange);
+    }
+
     /**
      * Returns the {@link StreamConfigurationMap} represented by this object.
      */
@@ -208,6 +235,20 @@ public class StreamConfigurationMapCompat {
 
         @Nullable
         Size[] getHighResolutionOutputSizes(int format);
+
+        @Nullable
+        Range<Integer>[] getHighSpeedVideoFpsRanges();
+
+        @Nullable
+        Range<Integer>[] getHighSpeedVideoFpsRangesFor(@NonNull Size size)
+                throws IllegalArgumentException;
+
+        @Nullable
+        Size[] getHighSpeedVideoSizes();
+
+        @Nullable
+        Size[] getHighSpeedVideoSizesFor(@NonNull Range<Integer> fpsRange)
+                throws IllegalArgumentException;
 
         /**
          * Returns the underlying {@link StreamConfigurationMap} instance.
