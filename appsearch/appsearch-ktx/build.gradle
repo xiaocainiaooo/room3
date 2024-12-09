@@ -24,10 +24,10 @@
 import androidx.build.LibraryType
 
 plugins {
-    id('AndroidXPlugin')
-    id('com.android.library')
-    id('org.jetbrains.kotlin.android')
-    id('org.jetbrains.kotlin.kapt')
+    id("AndroidXPlugin")
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.kapt")
 }
 
 dependencies {

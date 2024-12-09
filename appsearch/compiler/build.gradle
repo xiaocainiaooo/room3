@@ -24,8 +24,8 @@
 import androidx.build.LibraryType
 
 plugins {
-    id('AndroidXPlugin')
-    id('java-library')
+    id("AndroidXPlugin")
+    id("java-library")
 }
 
 androidx.configureAarAsJarForConfiguration("testImplementation")

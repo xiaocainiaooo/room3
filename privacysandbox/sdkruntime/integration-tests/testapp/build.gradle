@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 plugins {
-    id('AndroidXPlugin')
-    id('com.android.application')
-    id('org.jetbrains.kotlin.android')
+    id("AndroidXPlugin")
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
 }
 android {
     namespace = "androidx.privacysandbox.sdkruntime.integration.testapp"
