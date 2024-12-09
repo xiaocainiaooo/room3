@@ -45,6 +45,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -469,3 +471,26 @@ internal enum class Status {
 }
 
 class StableRef<T>(var value: T)
+
+/**
+ * Creates a [HapticFeedback] that can execute a custom code when
+ * [HapticFeedback.performHapticFeedback] is triggered.
+ */
+internal fun hapticFeedback(
+    perform: (hapticFeedbackType: HapticFeedbackType) -> Unit
+): HapticFeedback =
+    object : HapticFeedback {
+        override fun performHapticFeedback(hapticFeedbackType: HapticFeedbackType) {
+            perform(hapticFeedbackType)
+        }
+    }
+
+/**
+ * Implementation to be used with [hapticFeedback] to collect all the haptic feedback performed and
+ * store in [results].
+ */
+internal fun collectResultsFromHapticFeedback(
+    results: MutableMap<HapticFeedbackType, Int>
+): (hapticFeedbackType: HapticFeedbackType) -> Unit = { hapticFeedbackType: HapticFeedbackType ->
+    results.merge(hapticFeedbackType, 1, Int::plus)
+}
