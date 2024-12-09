@@ -48,6 +48,7 @@ android {
 }
 
 dependencies {
+    api(libs.jspecify)
     // Internal library
     implementation(project(":camera:camera-camera2"))
     implementation(project(":camera:camera-camera2-pipe-integration"))
@@ -106,9 +107,4 @@ dependencies {
         // Ensure camera-testing does not pull in androidx.test dependencies
         exclude(group:"androidx.test")
     }
-}
-
-androidx {
-    // TODO: b/326456246
-    optOutJSpecify = true
 }
