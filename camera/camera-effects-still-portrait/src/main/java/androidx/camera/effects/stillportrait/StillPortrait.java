@@ -16,11 +16,12 @@
 
 package androidx.camera.effects.stillportrait;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.camera.core.CameraEffect;
 import androidx.camera.core.SurfaceProcessor;
 import androidx.camera.core.UseCase;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.Executor;
 
