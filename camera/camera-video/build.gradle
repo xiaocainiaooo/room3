@@ -47,7 +47,7 @@ dependencies {
         exclude group: "androidx.camera", module: "camera-core"
     })
 
-    androidTestImplementation(project(path: ":camera:camera-camera2"))
+    androidTestImplementation(project(":camera:camera-camera2"))
     androidTestImplementation(libs.testExtJunit)
     androidTestImplementation(libs.testCore)
     androidTestImplementation(libs.testRunner)

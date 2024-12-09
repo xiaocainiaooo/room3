@@ -33,7 +33,7 @@ dependencies {
     api(libs.kotlinStdlib)
     api("androidx.annotation:annotation:1.8.1")
 
-    implementation project(path: ':privacysandbox:ui:ui-core')
+    implementation project(':privacysandbox:ui:ui-core')
     implementation("androidx.core:core:1.12.0")
     implementation(libs.kotlinCoroutinesCore)
 
