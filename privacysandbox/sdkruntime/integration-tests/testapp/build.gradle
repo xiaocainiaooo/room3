@@ -31,13 +31,13 @@ android {
 }
 
 dependencies {
-    implementation(project(':privacysandbox:sdkruntime:integration-tests:testaidl'))
-    implementation(project(':privacysandbox:sdkruntime:integration-tests:testsdk-asb'))
+    implementation(project(":privacysandbox:sdkruntime:integration-tests:testaidl"))
+    implementation(project(":privacysandbox:sdkruntime:integration-tests:testsdk-asb"))
 
     implementation 'androidx.appcompat:appcompat:1.6.0'
-    implementation(project(':privacysandbox:sdkruntime:sdkruntime-client'))
+    implementation(project(":privacysandbox:sdkruntime:sdkruntime-client"))
 
-    androidTestImplementation(project(':internal-testutils-runtime'))
+    androidTestImplementation(project(":internal-testutils-runtime"))
     androidTestImplementation(libs.truth)
     androidTestImplementation(libs.testExtJunit)
     androidTestImplementation(libs.espressoCore)

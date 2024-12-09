@@ -41,7 +41,7 @@ dependencies {
     api(libs.protobuf)
     api(libs.kotlinPoet)
     implementation(libs.guava)
-    implementation project(':privacysandbox:tools:tools')
+    implementation project(":privacysandbox:tools:tools")
 
     testImplementation(libs.junit)
     testImplementation(libs.truth)

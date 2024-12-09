@@ -47,5 +47,5 @@ dependencies {
     implementation(libs.testCore)
     implementation(libs.testRunner)
     implementation(libs.testUiautomator)
-    implementation project(':wear:compose:compose-material')
+    implementation project(":wear:compose:compose-material")
 }
