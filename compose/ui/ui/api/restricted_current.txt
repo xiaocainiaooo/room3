@@ -2581,6 +2581,10 @@ package androidx.compose.ui.layout {
     method @kotlin.PublishedApi internal static androidx.compose.ui.layout.MeasurePolicy createMeasurePolicy(androidx.compose.ui.layout.MultiContentMeasurePolicy measurePolicy);
   }
 
+  public final class OnGlobalLayoutListenerKt {
+    method public static kotlinx.coroutines.DisposableHandle registerOnGlobalLayoutListener(androidx.compose.ui.node.DelegatableNode, int throttleMs, int debounceMs, kotlin.jvm.functions.Function1<? super androidx.compose.ui.spatial.RectInfo,kotlin.Unit> callback);
+  }
+
   @kotlin.jvm.JvmDefaultWithCompatibility public interface OnGloballyPositionedModifier extends androidx.compose.ui.Modifier.Element {
     method public void onGloballyPositioned(androidx.compose.ui.layout.LayoutCoordinates coordinates);
   }
@@ -4071,6 +4075,7 @@ package androidx.compose.ui.semantics {
 package androidx.compose.ui.spatial {
 
   public final class RectInfo {
+    method public java.util.List<androidx.compose.ui.unit.IntRect> calculateOcclusions();
     method public int getHeight();
     method public long getPositionInRoot();
     method public long getPositionInScreen();

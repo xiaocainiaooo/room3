@@ -216,7 +216,7 @@ class ThrottledCallbacksTest {
     }
 
     private fun ThrottledCallbacks.fire(id: Int) {
-        fire(id, 0, 0, currentTime)
+        fireOnUpdatedRect(id, 0, 0, currentTime)
     }
 
     private fun ThrottledCallbacks.register(
@@ -225,7 +225,7 @@ class ThrottledCallbacksTest {
         debounceMs: Long,
         callback: (RectInfo) -> Unit
     ): DisposableHandle {
-        return register(id, throttleMs, debounceMs, fakeNode(), callback)
+        return registerOnRectChanged(id, throttleMs, debounceMs, fakeNode(), callback)
     }
 
     private inline fun test(block: ThrottledCallbacks.() -> Unit) {

@@ -23,7 +23,9 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
@@ -830,5 +832,82 @@ class OnGlobalRectChangedTest {
             assertThat(positionCalled1Count).isEqualTo(1)
             assertThat(positionCalled2Count).isEqualTo(1)
         }
+    }
+
+    @Test
+    fun occlusionCalculationOnRectChangedCallbacks() {
+        var box2Fraction by mutableStateOf(1f)
+
+        var box0RectInfo: RectInfo? = null
+
+        var box0Occlusions = emptyList<IntRect>()
+        var box1Occlusions = emptyList<IntRect>()
+        var box2Occlusions = emptyList<IntRect>()
+
+        var box0CallbackCount = 0
+        var box1CallbackCount = 0
+        var box2CallbackCount = 0
+        rule.setContent {
+            Box(Modifier.fillMaxSize()) {
+                Box(
+                    Modifier.fillMaxWidth()
+                        .fillMaxHeight(0.5f)
+                        .align(Alignment.TopStart)
+                        .onRectChanged(0, 0) { rectInfo ->
+                            box0RectInfo = rectInfo
+                            box0CallbackCount++
+                            box0Occlusions = rectInfo.calculateOcclusions()
+                        }
+                )
+                Box(
+                    // Should initially occlude first box
+                    Modifier.fillMaxWidth()
+                        .fillMaxHeight(0.7f)
+                        .align(Alignment.BottomStart)
+                        .onRectChanged(0, 0) { rectInfo ->
+                            box1CallbackCount++
+                            box1Occlusions = rectInfo.calculateOcclusions()
+                        }
+                )
+                Box(
+                    // Should initially occlude both boxes
+                    Modifier.fillMaxSize(box2Fraction).align(Alignment.BottomStart).onRectChanged(
+                        0,
+                        0
+                    ) { rectInfo ->
+                        box2CallbackCount++
+                        box2Occlusions = rectInfo.calculateOcclusions()
+                    }
+                )
+            }
+        }
+        rule.waitForIdle()
+
+        // Occlusion calculation should return expected result from each layout
+        assertThat(box0Occlusions.size).isEqualTo(2)
+        assertThat(box1Occlusions.size).isEqualTo(1)
+        assertThat(box2Occlusions.size).isEqualTo(0)
+
+        assertThat(box0CallbackCount).isEqualTo(1)
+        assertThat(box1CallbackCount).isEqualTo(1)
+        assertThat(box2CallbackCount).isEqualTo(1)
+
+        // We change box2 so that it no longer occludes box0
+        box2Fraction = 0.3f
+        rule.waitForIdle()
+
+        // Only box2 should receive a new callback, so most of the pre-existing information should
+        // remain the same, except for box2CallbackCount
+        assertThat(box0Occlusions.size).isEqualTo(2)
+        assertThat(box1Occlusions.size).isEqualTo(1)
+        assertThat(box2Occlusions.size).isEqualTo(0)
+
+        assertThat(box0CallbackCount).isEqualTo(1)
+        assertThat(box1CallbackCount).isEqualTo(1)
+        assertThat(box2CallbackCount).isEqualTo(2)
+
+        // Currently, it's possible to capture rectInfo and re-calculate occlusions
+        // The new calculation should reflect one less occluding box
+        assertThat(box0RectInfo!!.calculateOcclusions().size).isEqualTo(1)
     }
 }
