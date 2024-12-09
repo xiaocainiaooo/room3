@@ -349,3 +349,7 @@ ChromeHeadless was not killed in.*
 For more details, see: https://kotl\.in/gradle/internal\-compiler\-symbols
 # https://youtrack.jetbrains.com/issue/KT-72471/
 .*SubclassOptInRequired\.<init>.*
+# b/382336155 Capture more logging for Kotlin JS Tests
+\[log\].*
+# b/382336155 Capture more logging for Kotlin JS Tests
+.*STANDARD_OUT

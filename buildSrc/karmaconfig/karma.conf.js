@@ -8,7 +8,11 @@ config.set({
   // https://karma-runner.github.io/6.4/config/configuration-file.html
     browserDisconnectTimeout: browserDisconnectTimeoutInMs,
     processKillTimeout: testTimeoutInMs,
-    concurrency: 10
+    concurrency: 10,
+    logLevel: config.LOG_DEBUG,
+    client: {
+      captureConsole: true,
+    },
 })
 config.set({
   client: {
