@@ -244,6 +244,9 @@
     <string name="regular">regular</string>
     <string name="round">round</string>
 
+    <string name="recycler_view_with_collapsing_toolbar">Widget/RecyclerView with Collapsing Appbar</string>
+    <string name="recycler_view_with_collapsing_toolbar_title">Header</string>
+
     <string name="drawable_compat_no_tint">Not tint</string>
     <string name="drawable_compat_color_tint">Color tint</string>
     <string name="drawable_compat_color_list_tint">Color state list</string>
