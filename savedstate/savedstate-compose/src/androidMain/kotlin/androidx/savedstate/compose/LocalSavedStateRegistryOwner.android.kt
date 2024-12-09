@@ -36,30 +36,32 @@ import androidx.savedstate.SavedStateRegistryOwner
  * Please note that backward compatibility reflection may be removed once Compose >= 1.8 is stable.
  * A Gradle dependency constraint will be put in place to ensure smooth migration for clients.
  */
-actual val LocalSavedStateRegistryOwner: ProvidableCompositionLocal<SavedStateRegistryOwner> = run {
-    val compositionLocalFromComposeUi = runCatching {
-        // Use the CompositionLocal class to find the `classLoader` from the `Application`.
-        val classLoader = SavedStateRegistryOwner::class.java.classLoader!!
-        // Top-level class name from Compose UI 1.6.* that holds the old CompositionLocal.
-        val className = "androidx.compose.ui.platform.AndroidCompositionLocals_androidKt"
-        // The Java getter used when accessing the CompositionLocal property in Kotlin.
-        val methodName = "getLocalSavedStateRegistryOwner"
+public actual val LocalSavedStateRegistryOwner:
+    ProvidableCompositionLocal<SavedStateRegistryOwner> =
+    run {
+        val compositionLocalFromComposeUi = runCatching {
+            // Use the CompositionLocal class to find the `classLoader` from the `Application`.
+            val classLoader = SavedStateRegistryOwner::class.java.classLoader!!
+            // Top-level class name from Compose UI 1.6.* that holds the old CompositionLocal.
+            val className = "androidx.compose.ui.platform.AndroidCompositionLocals_androidKt"
+            // The Java getter used when accessing the CompositionLocal property in Kotlin.
+            val methodName = "getLocalSavedStateRegistryOwner"
 
-        val methodRef = classLoader.loadClass(className).getMethod(methodName)
-        if (methodRef.annotations.none { it is Deprecated }) {
-            // If the method IS NOT deprecated, we are running with Compose 1.6.*.
-            // We use reflection to access the older CompositionLocal from `compose-ui`.
-            @Suppress("UNCHECKED_CAST", "BanUncheckedReflection")
-            methodRef.invoke(null) as? ProvidableCompositionLocal<SavedStateRegistryOwner>
-        } else {
-            // If the method IS deprecated, we are running with Compose 1.7.*.
-            // The new CompositionLocal is available, no reflection needed.
-            null
+            val methodRef = classLoader.loadClass(className).getMethod(methodName)
+            if (methodRef.annotations.none { it is Deprecated }) {
+                // If the method IS NOT deprecated, we are running with Compose 1.6.*.
+                // We use reflection to access the older CompositionLocal from `compose-ui`.
+                @Suppress("UNCHECKED_CAST", "BanUncheckedReflection")
+                methodRef.invoke(null) as? ProvidableCompositionLocal<SavedStateRegistryOwner>
+            } else {
+                // If the method IS deprecated, we are running with Compose 1.7.*.
+                // The new CompositionLocal is available, no reflection needed.
+                null
+            }
         }
+
+        return@run compositionLocalFromComposeUi.getOrNull()
+            ?: staticCompositionLocalOf<SavedStateRegistryOwner> {
+                error("CompositionLocal LocalSavedStateRegistryOwner not present")
+            }
     }
-
-    return@run compositionLocalFromComposeUi.getOrNull()
-        ?: staticCompositionLocalOf<SavedStateRegistryOwner> {
-            error("CompositionLocal LocalSavedStateRegistryOwner not present")
-        }
-}

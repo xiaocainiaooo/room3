@@ -22,10 +22,6 @@ androidXMultiplatform {
     jvmStubs()
     linuxX64Stubs()
 
-    kotlin {
-        explicitApi = ExplicitApiMode.Strict
-    }
-
     defaultPlatform(PlatformIdentifier.ANDROID)
 
     sourceSets {
@@ -99,7 +95,6 @@ androidx {
     samples(project(":savedstate:savedstate-compose"))
     inceptionYear = "2018"
     description = "Compose integration with Saved State"
-    legacyDisableKotlinStrictApiMode = true
     metalavaK2UastEnabled = false
     kotlinTarget = KotlinTarget.KOTLIN_1_9
 }
