@@ -18,7 +18,7 @@ package androidx.camera.extensions.impl.advanced;
 
 import android.util.Size;
 
-import androidx.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Surface will be created by constructing a ImageReader.
@@ -29,8 +29,7 @@ public interface ImageReaderOutputConfigImpl extends Camera2OutputConfigImpl {
     /**
      * Returns the size of the surface.
      */
-    @NonNull
-    Size getSize();
+    @NonNull Size getSize();
 
     /**
      * Gets the image format of the surface.

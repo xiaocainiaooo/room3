@@ -18,7 +18,7 @@ package androidx.camera.extensions.impl;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Implementation for extension version check.
@@ -59,8 +59,7 @@ public class ExtensionVersionImpl {
      * should be used.
      */
     @SuppressWarnings("unused")
-    @NonNull
-    public String checkApiVersion(@NonNull String version) {
+    public @NonNull String checkApiVersion(@NonNull String version) {
         Log.d(TAG, "Extension device library version " + VERSION);
         return VERSION;
     }
