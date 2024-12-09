@@ -254,6 +254,18 @@ fun SegmentedProgressIndicatorBinarySample() {
 fun SmallSegmentedProgressIndicatorSample() {
     Box(modifier = Modifier.fillMaxSize()) {
         SegmentedCircularProgressIndicator(
+            segmentCount = 6,
+            progress = { 0.75f },
+            modifier = Modifier.align(Alignment.Center).size(80.dp),
+        )
+    }
+}
+
+@Sampled
+@Composable
+fun SmallSegmentedProgressIndicatorBinarySample() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        SegmentedCircularProgressIndicator(
             segmentCount = 8,
             segmentValue = { it % 2 != 0 },
             modifier = Modifier.align(Alignment.Center).size(80.dp)

@@ -20,6 +20,7 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -329,6 +330,48 @@ class ProgressIndicatorScreenshotTest {
                 enabled = false,
             )
         }
+
+    @Test
+    fun segmented_progress_indicator_small_size(@TestParameter screenSize: ScreenSize) {
+        val customIndicatorColor = Color.Green
+        val customTrackColor = Color.Black
+
+        verifyProgressIndicatorScreenshot(screenSize = screenSize) {
+            Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+                SegmentedCircularProgressIndicator(
+                    progress = { 0.7f },
+                    segmentCount = 6,
+                    modifier = Modifier.testTag(TEST_TAG).align(Alignment.Center).size(80.dp),
+                    colors =
+                        ProgressIndicatorDefaults.colors(
+                            indicatorColor = customIndicatorColor,
+                            trackColor = customTrackColor,
+                        ),
+                )
+            }
+        }
+    }
+
+    @Test
+    fun segmented_progress_indicator_small_size_binary(@TestParameter screenSize: ScreenSize) {
+        val customIndicatorColor = Color.Green
+        val customTrackColor = Color.Black
+
+        verifyProgressIndicatorScreenshot(screenSize = screenSize) {
+            Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+                SegmentedCircularProgressIndicator(
+                    segmentCount = 6,
+                    segmentValue = { it % 2 != 0 },
+                    modifier = Modifier.testTag(TEST_TAG).align(Alignment.Center).size(80.dp),
+                    colors =
+                        ProgressIndicatorDefaults.colors(
+                            indicatorColor = customIndicatorColor,
+                            trackColor = customTrackColor,
+                        ),
+                )
+            }
+        }
+    }
 
     @Test
     fun progress_indicator_indeterminate(@TestParameter screenSize: ScreenSize) =

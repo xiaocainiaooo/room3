@@ -25,6 +25,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.isSpecified
@@ -300,14 +301,15 @@ internal fun DrawScope.drawIndicatorSegment(
     sweep: Float,
     gapSweep: Float,
     brush: Brush,
-    stroke: Stroke
+    strokeWidth: Float,
+    strokePadding: Float = 0f,
 ) {
     if (sweep <= gapSweep) {
         // Draw a small indicator.
         val angle = (startAngle + sweep / 2f).toRadians()
-        val radius = size.minDimension / 2 - stroke.width / 2
-        val circleRadius = (stroke.width / 2) * sweep / gapSweep
-        val alpha = (circleRadius / stroke.width * 2f).coerceAtMost(1f)
+        val radius = size.minDimension / 2 - strokeWidth / 2
+        val circleRadius = ((strokeWidth + strokePadding) / 2) * sweep / gapSweep
+        val alpha = (circleRadius / strokeWidth * 2f).coerceAtMost(1f)
         drawCircle(
             brushWithAlpha(brush, alpha),
             circleRadius,
@@ -323,8 +325,10 @@ internal fun DrawScope.drawIndicatorSegment(
         // To do this we need to remove half the stroke width from the total diameter for both
         // sides.
         val diameter = min(size.width, size.height)
-        val diameterOffset = stroke.width / 2
+        val diameterOffset = strokeWidth / 2
         val arcDimen = diameter - 2 * diameterOffset
+        val stroke = Stroke(width = strokeWidth + strokePadding, cap = StrokeCap.Round)
+
         drawArc(
             brush = brush,
             startAngle = startAngle + gapSweep / 2,
