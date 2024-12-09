@@ -22,7 +22,6 @@ import androidx.build.addToBuildOnServer
 import androidx.build.getCheckoutRoot
 import androidx.build.getOperatingSystem
 import androidx.build.getPrebuiltsRoot
-import androidx.build.getSupportRootFolder
 import androidx.build.java.JavaCompileInputs
 import androidx.build.multiplatformExtension
 import java.io.File
@@ -164,7 +163,7 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
             addAll(
                 listOf(
                     "-corpus",
-                    "android.googlesource.com/platform/frameworks/support//androidx-main",
+                    ANDROIDX_CORPUS,
                     "-kotlin_out",
                     compiledSources.singleFile.relativeTo(checkoutRoot).path,
                     "-o",
@@ -186,7 +185,7 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
         }
     }
 
-    companion object {
+    internal companion object {
         fun setupProject(
             project: Project,
             javaInputs: JavaCompileInputs,
@@ -194,21 +193,6 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
             kotlinTarget: Property<KotlinTarget>,
             javaVersion: JavaVersion,
         ) {
-            // TODO(b/379936315): Make these compatible with koltinc/javac that indexer is using
-            if (
-                project.path in
-                    listOf(
-                        // Uses Java 9+ APIs, which are not part of any dependency in the classpath
-                        ":room:room-compiler-processing",
-                        ":room:room-compiler-processing-testing",
-                        // KSP generated folders not visible to AGP variant api (b/380363756)
-                        ":privacysandbox:tools:integration-tests:testsdk",
-                        ":room:room-runtime"
-                    )
-            ) {
-                return
-            }
-
             val kotlincFreeCompilerArgs =
                 project.objects.listProperty(String::class.java).apply {
                     project.tasks.withType(KotlinCompilationTask::class.java).configureEach {
@@ -226,7 +210,7 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                         )
                         sourcePaths.setFrom(javaInputs.sourcePaths)
                         commonModuleSourcePaths.from(javaInputs.commonModuleSourcePaths)
-                        vnamesJson.set(File(project.getSupportRootFolder(), "buildSrc/vnames.json"))
+                        vnamesJson.set(project.getVnamesJson())
                         dependencyClasspath.setFrom(
                             javaInputs.dependencyClasspath + javaInputs.bootClasspath
                         )
