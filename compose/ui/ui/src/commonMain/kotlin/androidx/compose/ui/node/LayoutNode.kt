@@ -477,7 +477,7 @@ internal class LayoutNode(
         if (nodes.has(Nodes.Semantics)) {
             invalidateSemantics()
         }
-        owner.onAttach(this)
+        owner.onPreAttach(this)
 
         // Update lookahead root when attached. For nested cases, we'll always use the
         // closest lookahead root
@@ -507,6 +507,7 @@ internal class LayoutNode(
         onAttach?.invoke(owner)
 
         layoutDelegate.updateParentData()
+        owner.onPostAttach(this)
     }
 
     /**
