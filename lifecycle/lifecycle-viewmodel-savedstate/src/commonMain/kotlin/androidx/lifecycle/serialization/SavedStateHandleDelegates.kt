@@ -33,7 +33,7 @@ import kotlinx.serialization.serializer
  * @param init The function to provide the initial value of the property.
  * @return A property delegate that manages the saving and restoring of the value.
  */
-inline fun <reified T : Any> SavedStateHandle.saved(
+public inline fun <reified T : Any> SavedStateHandle.saved(
     noinline init: () -> T,
 ): ReadWriteProperty<Any?, T> {
     return saved(serializer(), init)
@@ -48,7 +48,7 @@ inline fun <reified T : Any> SavedStateHandle.saved(
  * @param init The function to provide the initial value of the property.
  * @return A property delegate that manages the saving and restoring of the value.
  */
-inline fun <reified T : Any> SavedStateHandle.saved(
+public inline fun <reified T : Any> SavedStateHandle.saved(
     key: String,
     noinline init: () -> T,
 ): ReadWriteProperty<Any?, T> {
@@ -64,7 +64,7 @@ inline fun <reified T : Any> SavedStateHandle.saved(
  * @param init The function to provide the initial value of the property.
  * @return A property delegate that manages the saving and restoring of the value.
  */
-fun <T : Any> SavedStateHandle.saved(
+public fun <T : Any> SavedStateHandle.saved(
     serializer: KSerializer<T>,
     init: () -> T,
 ): ReadWriteProperty<Any?, T> {
@@ -85,7 +85,7 @@ fun <T : Any> SavedStateHandle.saved(
  * @param init The function to provide the initial value of the property.
  * @return A property delegate that manages the saving and restoring of the value.
  */
-fun <T : Any> SavedStateHandle.saved(
+public fun <T : Any> SavedStateHandle.saved(
     key: String,
     serializer: KSerializer<T>,
     init: () -> T,

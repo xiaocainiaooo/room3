@@ -38,10 +38,6 @@ androidXMultiplatform {
     linux()
     ios()
 
-    kotlin {
-        explicitApi = ExplicitApiMode.Strict
-    }
-
     defaultPlatform(PlatformIdentifier.JVM)
 
     sourceSets {
