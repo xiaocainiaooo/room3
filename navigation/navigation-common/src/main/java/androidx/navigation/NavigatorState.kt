@@ -37,7 +37,7 @@ public abstract class NavigatorState {
 
     @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @set:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public var isNavigating = false
+    public var isNavigating: Boolean = false
 
     /**
      * While the [NavController] is responsible for the combined back stack across all Navigators,

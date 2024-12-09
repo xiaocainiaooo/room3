@@ -37,27 +37,27 @@ public class ComposeNavigatorDestinationBuilder :
     private val composeNavigator: ComposeNavigator
     private val content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit)
 
-    var enterTransition:
+    public var enterTransition:
         (@JvmSuppressWildcards
         AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? =
         null
 
-    var exitTransition:
+    public var exitTransition:
         (@JvmSuppressWildcards
         AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? =
         null
 
-    var popEnterTransition:
+    public var popEnterTransition:
         (@JvmSuppressWildcards
         AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition?)? =
         null
 
-    var popExitTransition:
+    public var popExitTransition:
         (@JvmSuppressWildcards
         AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition?)? =
         null
 
-    var sizeTransform:
+    public var sizeTransform:
         (@JvmSuppressWildcards
         AnimatedContentTransitionScope<NavBackStackEntry>.() -> SizeTransform?)? =
         null
