@@ -21,6 +21,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.unit.Dp.Companion.Hairline
+import androidx.compose.ui.util.fastIsFinite
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
@@ -159,7 +160,7 @@ inline fun Dp.coerceAtMost(maximumValue: Dp): Dp = Dp(value.coerceAtMost(maximum
 /** Return `true` when it is finite or `false` when it is [Dp.Infinity] */
 @Stable
 inline val Dp.isFinite: Boolean
-    get() = value != Float.POSITIVE_INFINITY
+    get() = value.fastIsFinite()
 
 /**
  * Linearly interpolate between two [Dp]s.
