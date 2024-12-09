@@ -536,6 +536,10 @@ internal class LayoutNodeLayoutDelegate(
             if (isPlaced) {
                 isPlaced = false
                 layoutNode.forEachCoordinatorIncludingInner {
+                    // TODO(b/309776096): Node can be detached without calling this, so we need to
+                    //  find a better place to more reliable call this.
+                    it.onUnplaced()
+
                     // nodes are not placed with a layer anymore, so the layers should be released
                     it.releaseLayer()
                 }
