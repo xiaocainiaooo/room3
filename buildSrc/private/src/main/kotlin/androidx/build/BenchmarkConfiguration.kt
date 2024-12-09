@@ -52,6 +52,12 @@ internal fun HasDeviceTests.enableMicrobenchmarkInternalDefaults(project: Projec
             // Check that speed compilation always used when benchmark invoked
             deviceTest.instrumentationRunnerArguments.put("androidx.benchmark.requireAot", "true")
 
+            // Throw if measureRepeated() called on main thread to avoid ANRs
+            deviceTest.instrumentationRunnerArguments.put(
+                "androidx.benchmark.throwOnMainThreadMeasureRepeated",
+                "true"
+            )
+
             // Enables long-running method tracing on the UI thread, even if that risks ANR for
             // profiling convenience.
             // NOTE, this *must* be suppressed in CI!!
