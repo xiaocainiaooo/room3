@@ -25,10 +25,6 @@ androidXMultiplatform {
     linux()
     mac()
 
-    kotlin {
-        explicitApi = ExplicitApiMode.Strict
-    }
-
     defaultPlatform(PlatformIdentifier.ANDROID)
 
     sourceSets {
@@ -174,7 +170,6 @@ androidx {
     samples(project(":savedstate:savedstate-samples"))
     inceptionYear = "2018"
     description = "Android Lifecycle Saved State"
-    legacyDisableKotlinStrictApiMode = true
     metalavaK2UastEnabled = false
     kotlinTarget = KotlinTarget.KOTLIN_1_9
 }

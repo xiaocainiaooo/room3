@@ -39,7 +39,10 @@ import kotlinx.serialization.serializer
  * @return The encoded [SavedState].
  * @throws SerializationException if [value] cannot be serialized.
  */
-fun <T : Any> encodeToSavedState(serializer: SerializationStrategy<T>, value: T): SavedState =
+public fun <T : Any> encodeToSavedState(
+    serializer: SerializationStrategy<T>,
+    value: T
+): SavedState =
     savedState().apply { SavedStateEncoder(this).encodeSerializableValue(serializer, value) }
 
 /**
@@ -50,7 +53,7 @@ fun <T : Any> encodeToSavedState(serializer: SerializationStrategy<T>, value: T)
  * @return The encoded [SavedState].
  * @throws SerializationException if [value] cannot be serialized.
  */
-inline fun <reified T : Any> encodeToSavedState(value: T): SavedState {
+public inline fun <reified T : Any> encodeToSavedState(value: T): SavedState {
     return encodeToSavedState(serializer<T>(), value)
 }
 
