@@ -81,13 +81,15 @@ package androidx.compose.material3.adaptive.layout {
 
   @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi @androidx.compose.runtime.Stable public final class MutableThreePaneScaffoldState extends androidx.compose.material3.adaptive.layout.ThreePaneScaffoldState {
     ctor public MutableThreePaneScaffoldState(androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue initialScaffoldValue);
-    method public suspend Object? animateTo(optional androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue targetState, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float>? animationSpec, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? animateTo(optional androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue targetState, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float>? animationSpec, optional boolean isPredictiveBackInProgress, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue getCurrentState();
     method @FloatRange(from=0.0, to=1.0) public float getProgressFraction();
     method public androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue getTargetState();
-    method public suspend Object? seekTo(@FloatRange(from=0.0, to=1.0) float fraction, optional androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue targetState, kotlin.coroutines.Continuation<? super kotlin.Unit>);
-    method public suspend Object? snapTo(androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue targetState, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public boolean isPredictiveBackInProgress();
+    method public suspend Object? seekTo(@FloatRange(from=0.0, to=1.0) float fraction, optional androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue targetState, optional boolean isPredictiveBackInProgress, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? snapTo(androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue targetState, optional boolean isPredictiveBackInProgress, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue currentState;
+    property public boolean isPredictiveBackInProgress;
     property @FloatRange(from=0.0, to=1.0) public float progressFraction;
     property public androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue targetState;
   }
@@ -419,7 +421,9 @@ package androidx.compose.material3.adaptive.layout {
     method public abstract androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue getCurrentState();
     method @FloatRange(from=0.0, to=1.0) public abstract float getProgressFraction();
     method public abstract androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue getTargetState();
+    method public abstract boolean isPredictiveBackInProgress();
     property public abstract androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue currentState;
+    property public abstract boolean isPredictiveBackInProgress;
     property @FloatRange(from=0.0, to=1.0) public abstract float progressFraction;
     property public abstract androidx.compose.material3.adaptive.layout.ThreePaneScaffoldValue targetState;
   }

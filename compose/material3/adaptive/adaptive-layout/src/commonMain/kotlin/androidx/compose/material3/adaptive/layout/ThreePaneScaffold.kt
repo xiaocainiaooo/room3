@@ -16,6 +16,8 @@
 
 package androidx.compose.material3.adaptive.layout
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,9 +27,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.layout.Measurable
@@ -268,7 +273,14 @@ private object DefaultThreePaneScaffoldOverride : ThreePaneScaffoldOverride {
                     this.paneOrder = ltrPaneOrder
                 }
 
-        Layout(contents = contents, modifier = modifier, measurePolicy = measurePolicy)
+        val predictiveBackScale = remember { Animatable(initialValue = 1f) }
+        PredictiveBackScaleEffect(scaffoldState, predictiveBackScale)
+
+        Layout(
+            contents = contents,
+            modifier = modifier.predictiveBackTransform(predictiveBackScale::value),
+            measurePolicy = measurePolicy,
+        )
     }
 }
 
@@ -869,3 +881,43 @@ internal object ThreePaneScaffoldDefaults {
      */
     const val HiddenPaneZIndex = -0.1f
 }
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+private fun PredictiveBackScaleEffect(
+    scaffoldState: ThreePaneScaffoldState,
+    animatable: Animatable<Float, AnimationVector1D>,
+) {
+    LaunchedEffect(scaffoldState) {
+        snapshotFlow { scaffoldState.progressFraction }
+            .collect { value ->
+                if (scaffoldState.isPredictiveBackInProgress) {
+                    val scale = convertStateProgressToPredictiveBackScale(value)
+                    animatable.snapTo(scale)
+                } else {
+                    animatable.animateTo(1f)
+                }
+            }
+    }
+}
+
+private const val PredictiveBackMinScale: Float = 0.95f
+
+private fun convertStateProgressToPredictiveBackScale(fraction: Float): Float {
+    // A decay curve such that: When fraction = 0, function returns 1.
+    // When fraction -> 1, function asymptotically approaches PredictiveBackMinScale
+    val delta = 1f - PredictiveBackMinScale
+    val shift = delta / 2
+    val curveScale = delta * delta / 2
+    return curveScale / (fraction + shift) + PredictiveBackMinScale
+}
+
+private fun Modifier.predictiveBackTransform(scale: () -> Float): Modifier = graphicsLayer {
+    val scaleValue = scale()
+    scaleX = scaleValue
+    scaleY = scaleValue
+    transformOrigin = TransformOriginTopCenter
+}
+
+// TODO(371450910): Investigate why animation fails if transform origin has y != 0.
+private val TransformOriginTopCenter = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0f)
