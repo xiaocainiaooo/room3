@@ -39,7 +39,7 @@ import kotlinx.serialization.serializer
  * @throws SerializationException for any deserialization error.
  * @throws IllegalArgumentException if [savedState] is not valid.
  */
-fun <T : Any> decodeFromSavedState(
+public fun <T : Any> decodeFromSavedState(
     deserializer: DeserializationStrategy<T>,
     savedState: SavedState
 ): T {
@@ -55,7 +55,7 @@ fun <T : Any> decodeFromSavedState(
  * @throws SerializationException for any deserialization error.
  * @throws IllegalArgumentException if [savedState] is not valid.
  */
-inline fun <reified T : Any> decodeFromSavedState(savedState: SavedState): T =
+public inline fun <reified T : Any> decodeFromSavedState(savedState: SavedState): T =
     decodeFromSavedState(serializer<T>(), savedState)
 
 /**
