@@ -445,12 +445,12 @@ private fun CircularProgressIndicatorContentImpl(
             .drawWithCache {
                 onDrawWithContent {
                     val fullSweep = 360f - ((startAngle - endAngle) % 360 + 360) % 360
-                    val stroke = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
+                    val strokePx = strokeWidth.toPx()
                     val gapSizePx = gapSize.toPx()
                     val minSize = min(size.height, size.width)
                     // Sweep angle between two progress indicator segments.
                     val gapSweep =
-                        asin((stroke.width + gapSizePx) / (minSize - stroke.width)).toDegrees() * 2f
+                        asin((strokePx + gapSizePx) / (minSize - strokePx)).toDegrees() * 2f
                     val hasOverflow = allowProgressOverflow && progress() > 1f
                     val currentProgress = progress()
                     val wrappedProgress = wrapProgress(currentProgress, allowProgressOverflow)
@@ -480,7 +480,7 @@ private fun CircularProgressIndicatorContentImpl(
                             sweep = fullSweep - progressSweep,
                             gapSweep = gapSweep,
                             brush = colors.overflowTrackBrush(enabled, overflowColorAlphaFraction),
-                            stroke = stroke,
+                            strokeWidth = strokePx,
                         )
                     } else {
                         // Draw the track background.
@@ -489,7 +489,7 @@ private fun CircularProgressIndicatorContentImpl(
                             sweep = fullSweep - progressSweep,
                             gapSweep = gapSweep,
                             brush = colors.trackBrush(enabled),
-                            stroke = stroke,
+                            strokeWidth = strokePx,
                         )
                     }
 
@@ -503,7 +503,7 @@ private fun CircularProgressIndicatorContentImpl(
                             sweep = progressSweep,
                             gapSweep = gapFraction,
                             brush = colors.indicatorBrush(enabled),
-                            stroke = stroke,
+                            strokeWidth = strokePx,
                         )
                     } else {
                         // Draw the indicator.
@@ -512,7 +512,7 @@ private fun CircularProgressIndicatorContentImpl(
                             sweep = progressSweep,
                             gapSweep = gapSweep,
                             brush = colors.indicatorBrush(enabled),
-                            stroke = stroke,
+                            strokeWidth = strokePx,
                         )
                     }
                 }
