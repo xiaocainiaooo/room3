@@ -32,14 +32,14 @@ import androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec.Companio
  *   an activity or when an activity moves to back).
  * @property changeAnimation the animation spec to use for change transitions (when an activity
  *   resizes or moves).
+ * @see Builder
  * @see SplitAttributes.animationParams
  * @see EmbeddingAnimationBackground
  * @see EmbeddingAnimationBackground.createColorBackground
  * @see EmbeddingAnimationBackground.DEFAULT
  */
 class EmbeddingAnimationParams
-@JvmOverloads
-constructor(
+private constructor(
     val animationBackground: EmbeddingAnimationBackground = EmbeddingAnimationBackground.DEFAULT,
     val openAnimation: AnimationSpec = DEFAULT,
     val closeAnimation: AnimationSpec = DEFAULT,

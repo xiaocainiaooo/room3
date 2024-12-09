@@ -275,11 +275,6 @@ package androidx.window.embedding {
   }
 
   public final class EmbeddingAnimationParams {
-    ctor public EmbeddingAnimationParams();
-    ctor public EmbeddingAnimationParams(optional androidx.window.embedding.EmbeddingAnimationBackground animationBackground);
-    ctor public EmbeddingAnimationParams(optional androidx.window.embedding.EmbeddingAnimationBackground animationBackground, optional androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec openAnimation);
-    ctor public EmbeddingAnimationParams(optional androidx.window.embedding.EmbeddingAnimationBackground animationBackground, optional androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec openAnimation, optional androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec closeAnimation);
-    ctor public EmbeddingAnimationParams(optional androidx.window.embedding.EmbeddingAnimationBackground animationBackground, optional androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec openAnimation, optional androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec closeAnimation, optional androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec changeAnimation);
     method public androidx.window.embedding.EmbeddingAnimationBackground getAnimationBackground();
     method public androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec getChangeAnimation();
     method public androidx.window.embedding.EmbeddingAnimationParams.AnimationSpec getCloseAnimation();
@@ -324,20 +319,17 @@ package androidx.window.embedding {
   }
 
   public final class EmbeddingConfiguration {
-    ctor public EmbeddingConfiguration();
-    ctor public EmbeddingConfiguration(optional @androidx.window.RequiresWindowSdkExtension(version=5) androidx.window.embedding.EmbeddingConfiguration.DimAreaBehavior dimAreaBehavior);
-    ctor public EmbeddingConfiguration(optional @androidx.window.RequiresWindowSdkExtension(version=5) androidx.window.embedding.EmbeddingConfiguration.DimAreaBehavior dimAreaBehavior, optional @androidx.window.RequiresWindowSdkExtension(version=8) boolean isAutoSaveEmbeddingState);
     method public androidx.window.embedding.EmbeddingConfiguration.DimAreaBehavior getDimAreaBehavior();
     method public boolean isAutoSaveEmbeddingState();
-    property @androidx.window.RequiresWindowSdkExtension(version=5) public final androidx.window.embedding.EmbeddingConfiguration.DimAreaBehavior dimAreaBehavior;
-    property @androidx.window.RequiresWindowSdkExtension(version=8) public final boolean isAutoSaveEmbeddingState;
+    property public final androidx.window.embedding.EmbeddingConfiguration.DimAreaBehavior dimAreaBehavior;
+    property public final boolean isAutoSaveEmbeddingState;
   }
 
   public static final class EmbeddingConfiguration.Builder {
     ctor public EmbeddingConfiguration.Builder();
     method public androidx.window.embedding.EmbeddingConfiguration build();
-    method public androidx.window.embedding.EmbeddingConfiguration.Builder setAutoSaveEmbeddingState(boolean saveState);
-    method public androidx.window.embedding.EmbeddingConfiguration.Builder setDimAreaBehavior(androidx.window.embedding.EmbeddingConfiguration.DimAreaBehavior area);
+    method @androidx.window.RequiresWindowSdkExtension(version=8) public androidx.window.embedding.EmbeddingConfiguration.Builder setAutoSaveEmbeddingState(boolean saveState);
+    method @androidx.window.RequiresWindowSdkExtension(version=5) public androidx.window.embedding.EmbeddingConfiguration.Builder setDimAreaBehavior(androidx.window.embedding.EmbeddingConfiguration.DimAreaBehavior area);
   }
 
   public static final class EmbeddingConfiguration.DimAreaBehavior {
@@ -375,11 +367,6 @@ package androidx.window.embedding {
   }
 
   public final class SplitAttributes {
-    ctor public SplitAttributes();
-    ctor public SplitAttributes(optional androidx.window.embedding.SplitAttributes.SplitType splitType);
-    ctor public SplitAttributes(optional androidx.window.embedding.SplitAttributes.SplitType splitType, optional androidx.window.embedding.SplitAttributes.LayoutDirection layoutDirection);
-    ctor public SplitAttributes(optional androidx.window.embedding.SplitAttributes.SplitType splitType, optional androidx.window.embedding.SplitAttributes.LayoutDirection layoutDirection, optional androidx.window.embedding.EmbeddingAnimationParams animationParams);
-    ctor public SplitAttributes(optional androidx.window.embedding.SplitAttributes.SplitType splitType, optional androidx.window.embedding.SplitAttributes.LayoutDirection layoutDirection, optional androidx.window.embedding.EmbeddingAnimationParams animationParams, optional androidx.window.embedding.DividerAttributes dividerAttributes);
     method public androidx.window.embedding.EmbeddingAnimationParams getAnimationParams();
     method public androidx.window.embedding.DividerAttributes getDividerAttributes();
     method public androidx.window.embedding.SplitAttributes.LayoutDirection getLayoutDirection();
