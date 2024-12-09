@@ -63,15 +63,9 @@ android {
     defaultConfig {
         minSdk = 26
     }
-
     sourceSets {
         androidTest.assets.srcDirs += project.rootDir.absolutePath + "/../../golden/wear/wear-tiles-material"
     }
-
-    defaultConfig {
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
     namespace = "androidx.wear.tiles.material"
 }
 
