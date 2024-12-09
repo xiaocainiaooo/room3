@@ -170,8 +170,8 @@ fun SubmittedScreen(navController: NavController) {
 fun RegisterScreen(navController: NavController) {
     TwoButtonNavigationScaffold(
         navController,
-        "home",
         "login",
+        "home",
         content = { RegisterScreenContent() }
     )
 }
@@ -192,8 +192,8 @@ fun LoginScreen(navController: NavController) {
 fun ScrollingRegisterScreen(navController: NavController) {
     TwoButtonNavigationScaffold(
         navController,
-        "home",
         "login",
+        "home",
         content = { ScrollingRegisterScreenContent() }
     )
 }
@@ -204,8 +204,8 @@ fun ScrollingRegisterScreen(navController: NavController) {
 fun RegisterThenScrollScreen(navController: NavController) {
     TwoButtonNavigationScaffold(
         navController,
-        "home",
         "login",
+        "home",
         content = { RegisterThenScrollScreenContent() }
     )
 }
