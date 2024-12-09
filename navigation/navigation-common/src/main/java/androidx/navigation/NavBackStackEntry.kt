@@ -82,7 +82,7 @@ private constructor(
     SavedStateRegistryOwner {
 
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    constructor(
+    public constructor(
         entry: NavBackStackEntry,
         arguments: SavedState? = entry.arguments
     ) : this(

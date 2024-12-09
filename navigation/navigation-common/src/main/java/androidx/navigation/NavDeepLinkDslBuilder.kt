@@ -84,7 +84,7 @@ public class NavDeepLinkDslBuilder {
     private var route: KClass<*>? = null
     private var typeMap: Map<KType, NavType<*>> = emptyMap()
 
-    constructor()
+    public constructor()
 
     /**
      * DSl for constructing a new [NavDeepLink] with a route

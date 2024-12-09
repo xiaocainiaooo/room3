@@ -83,7 +83,7 @@ public abstract class NavType<T>(
      * @return combined parsed value of the type represented by this NavType
      * @throws IllegalArgumentException if value cannot be parsed into this type
      */
-    public open fun parseValue(value: String, previousValue: T) = parseValue(value)
+    public open fun parseValue(value: String, previousValue: T): T = parseValue(value)
 
     /**
      * Parse a value of this type from a String and put it in a `bundle`
@@ -1024,7 +1024,7 @@ public abstract class NavType<T>(
         override fun valueEquals(
             @Suppress("ArrayReturn") value: Array<D>?,
             @Suppress("ArrayReturn") other: Array<D>?
-        ) = value.contentDeepEquals(other)
+        ): Boolean = value.contentDeepEquals(other)
 
         /** Constructs a NavType that supports arrays of a given Parcelable type. */
         init {
@@ -1186,7 +1186,7 @@ public abstract class NavType<T>(
         override fun valueEquals(
             @Suppress("ArrayReturn") value: Array<D>?,
             @Suppress("ArrayReturn") other: Array<D>?
-        ) = value.contentDeepEquals(other)
+        ): Boolean = value.contentDeepEquals(other)
 
         /** Constructs a NavType that supports arrays of a given Serializable type. */
         init {

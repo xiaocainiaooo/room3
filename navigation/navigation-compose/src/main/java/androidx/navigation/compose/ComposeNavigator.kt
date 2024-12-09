@@ -28,6 +28,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.compose.ComposeNavigator.Destination
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Navigator that navigates through [Composable]s. Every destination using this Navigator must set a
@@ -42,7 +43,7 @@ public class ComposeNavigator : Navigator<Destination>() {
         get() = state.transitionsInProgress
 
     /** Get the back stack from the [state]. */
-    public val backStack
+    public val backStack: StateFlow<List<NavBackStackEntry>>
         get() = state.backStack
 
     internal val isPop = mutableStateOf(false)
@@ -102,7 +103,7 @@ public class ComposeNavigator : Navigator<Destination>() {
             message = "Deprecated in favor of Destination that supports AnimatedContent",
             level = DeprecationLevel.HIDDEN,
         )
-        constructor(
+        public constructor(
             navigator: ComposeNavigator,
             content: @Composable (NavBackStackEntry) -> @JvmSuppressWildcards Unit
         ) : this(navigator, content = { entry -> content(entry) })

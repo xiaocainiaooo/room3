@@ -390,7 +390,7 @@ public fun NavHost(
     navController: NavHostController,
     graph: NavGraph,
     modifier: Modifier = Modifier
-) = NavHost(navController, graph, modifier)
+): Unit = NavHost(navController, graph, modifier)
 
 /**
  * Provides a place in the Compose hierarchy for self contained navigation to occur.
