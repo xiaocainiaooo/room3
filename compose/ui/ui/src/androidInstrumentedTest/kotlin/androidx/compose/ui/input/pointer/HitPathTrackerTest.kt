@@ -63,6 +63,7 @@ import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.WindowInfo
+import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.spatial.RectManager
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -3418,6 +3419,9 @@ private class MockOwner(
     }
 
     override val pointerIconService: PointerIconService
+        get() = TODO("Not yet implemented")
+
+    override val semanticsOwner: SemanticsOwner
         get() = TODO("Not yet implemented")
 
     override val focusOwner: FocusOwner

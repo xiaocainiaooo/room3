@@ -457,7 +457,8 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
     override val rootForTest: RootForTest = this
 
-    override val semanticsOwner: SemanticsOwner = SemanticsOwner(root, rootSemanticsNode)
+    override val semanticsOwner: SemanticsOwner =
+        SemanticsOwner(root, rootSemanticsNode, layoutNodes)
     private val composeAccessibilityDelegate = AndroidComposeViewAccessibilityDelegateCompat(this)
     internal var contentCaptureManager =
         AndroidContentCaptureManager(

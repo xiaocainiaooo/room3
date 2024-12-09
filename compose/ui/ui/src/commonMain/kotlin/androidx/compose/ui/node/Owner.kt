@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.WindowInfo
+import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.spatial.RectManager
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -138,6 +139,13 @@ internal interface Owner : PositionCalculator {
     val softwareKeyboardController: SoftwareKeyboardController
 
     val pointerIconService: PointerIconService
+
+    /**
+     * Semantics owner that provides access to
+     * [SemanticsInfo][androidx.compose.ui.semantics.SemanticsInfo] and
+     * [SemanticListeners][androidx.compose.ui.semantics.SemanticsListener].
+     */
+    val semanticsOwner: SemanticsOwner
 
     /** Provide a focus owner that controls focus within Compose. */
     val focusOwner: FocusOwner
