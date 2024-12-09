@@ -42,7 +42,7 @@ public abstract class AbstractSavedStateViewModelFactory :
      * must have called [enableSavedStateHandles]. See [CreationExtras.createSavedStateHandle] docs
      * for more details.
      */
-    constructor() {}
+    public constructor() {}
 
     /**
      * Constructs this factory.
@@ -53,7 +53,7 @@ public abstract class AbstractSavedStateViewModelFactory :
      *   passed in [ViewModels][ViewModel] if there is no previously saved state or previously saved
      *   state misses a value by such key
      */
-    constructor(owner: SavedStateRegistryOwner, defaultArgs: Bundle?) {
+    public constructor(owner: SavedStateRegistryOwner, defaultArgs: Bundle?) {
         savedStateRegistry = owner.savedStateRegistry
         lifecycle = owner.lifecycle
         this.defaultArgs = defaultArgs
