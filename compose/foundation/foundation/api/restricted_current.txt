@@ -1677,20 +1677,20 @@ package androidx.compose.foundation.shape {
 
 package androidx.compose.foundation.text {
 
-  public sealed interface AutoSize {
-    field public static final androidx.compose.foundation.text.AutoSize.Companion Companion;
+  @Deprecated public sealed interface AutoSize {
+    field @Deprecated public static final androidx.compose.foundation.text.AutoSize.Companion Companion;
   }
 
-  public static final class AutoSize.Companion {
-    method public androidx.compose.foundation.text.AutoSize StepBased(optional long minFontSize, optional long maxFontSize, optional long stepSize);
+  @Deprecated public static final class AutoSize.Companion {
+    method @Deprecated public androidx.compose.foundation.text.TextAutoSize StepBased(optional long minFontSize, optional long maxFontSize, optional long stepSize);
   }
 
-  public final class AutoSizeDefaults {
-    method public long getMaxFontSize();
-    method public long getMinFontSize();
-    property public final long MaxFontSize;
-    property public final long MinFontSize;
-    field public static final androidx.compose.foundation.text.AutoSizeDefaults INSTANCE;
+  @Deprecated public final class AutoSizeDefaults {
+    method @Deprecated public long getMaxFontSize();
+    method @Deprecated public long getMinFontSize();
+    property @Deprecated public final long MaxFontSize;
+    property @Deprecated public final long MinFontSize;
+    field @Deprecated public static final androidx.compose.foundation.text.AutoSizeDefaults INSTANCE;
   }
 
   public final class AutofillHighlightKt {
@@ -1714,12 +1714,12 @@ package androidx.compose.foundation.text {
   public final class BasicTextKt {
     method @Deprecated @androidx.compose.runtime.Composable public static void BasicText(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>? onTextLayout, optional int overflow, optional boolean softWrap, optional int maxLines, optional int minLines, optional java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent);
     method @Deprecated @androidx.compose.runtime.Composable public static void BasicText(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>? onTextLayout, optional int overflow, optional boolean softWrap, optional int maxLines, optional int minLines, optional java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent, optional androidx.compose.ui.graphics.ColorProducer? color);
-    method @androidx.compose.runtime.Composable public static void BasicText(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>? onTextLayout, optional int overflow, optional boolean softWrap, optional int maxLines, optional int minLines, optional java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent, optional androidx.compose.ui.graphics.ColorProducer? color, optional androidx.compose.foundation.text.AutoSize? autoSize);
+    method @androidx.compose.runtime.Composable public static void BasicText(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>? onTextLayout, optional int overflow, optional boolean softWrap, optional int maxLines, optional int minLines, optional java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent, optional androidx.compose.ui.graphics.ColorProducer? color, optional androidx.compose.foundation.text.TextAutoSize? textAutoSize);
     method @Deprecated @androidx.compose.runtime.Composable public static void BasicText(androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>? onTextLayout, optional int overflow, optional boolean softWrap, optional int maxLines, optional java.util.Map<java.lang.String,androidx.compose.foundation.text.InlineTextContent> inlineContent);
     method @Deprecated @androidx.compose.runtime.Composable public static void BasicText(String text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>? onTextLayout, optional int overflow, optional boolean softWrap, optional int maxLines);
     method @Deprecated @androidx.compose.runtime.Composable public static void BasicText(String text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>? onTextLayout, optional int overflow, optional boolean softWrap, optional int maxLines, optional int minLines);
     method @Deprecated @androidx.compose.runtime.Composable public static void BasicText(String text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>? onTextLayout, optional int overflow, optional boolean softWrap, optional int maxLines, optional int minLines, optional androidx.compose.ui.graphics.ColorProducer? color);
-    method @androidx.compose.runtime.Composable public static void BasicText(String text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>? onTextLayout, optional int overflow, optional boolean softWrap, optional int maxLines, optional int minLines, optional androidx.compose.ui.graphics.ColorProducer? color, optional androidx.compose.foundation.text.AutoSize? autoSize);
+    method @androidx.compose.runtime.Composable public static void BasicText(String text, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.text.TextStyle style, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.TextLayoutResult,kotlin.Unit>? onTextLayout, optional int overflow, optional boolean softWrap, optional int maxLines, optional int minLines, optional androidx.compose.ui.graphics.ColorProducer? color, optional androidx.compose.foundation.text.TextAutoSize? autoSize);
   }
 
   public final class ClickableTextKt {
@@ -1807,6 +1807,25 @@ package androidx.compose.foundation.text {
   public static final class KeyboardOptions.Companion {
     method public androidx.compose.foundation.text.KeyboardOptions getDefault();
     property @androidx.compose.runtime.Stable public final androidx.compose.foundation.text.KeyboardOptions Default;
+  }
+
+  public interface TextAutoSize {
+    method public boolean equals(Object? other);
+    method public long getFontSize(androidx.compose.foundation.text.modifiers.TextAutoSizeLayoutScope, long constraints, androidx.compose.ui.text.AnnotatedString text);
+    method public int hashCode();
+    field public static final androidx.compose.foundation.text.TextAutoSize.Companion Companion;
+  }
+
+  public static final class TextAutoSize.Companion {
+    method public androidx.compose.foundation.text.TextAutoSize StepBased(optional long minFontSize, optional long maxFontSize, optional long stepSize);
+  }
+
+  public final class TextAutoSizeDefaults {
+    method public long getMaxFontSize();
+    method public long getMinFontSize();
+    property public final long MaxFontSize;
+    property public final long MinFontSize;
+    field public static final androidx.compose.foundation.text.TextAutoSizeDefaults INSTANCE;
   }
 
 }
@@ -1972,6 +1991,14 @@ package androidx.compose.foundation.text.input {
     method public void undo();
     property public final boolean canRedo;
     property public final boolean canUndo;
+  }
+
+}
+
+package androidx.compose.foundation.text.modifiers {
+
+  public sealed interface TextAutoSizeLayoutScope extends androidx.compose.ui.unit.Density {
+    method public androidx.compose.ui.text.TextLayoutResult performLayout(long constraints, androidx.compose.ui.text.AnnotatedString text, long fontSize);
   }
 
 }
