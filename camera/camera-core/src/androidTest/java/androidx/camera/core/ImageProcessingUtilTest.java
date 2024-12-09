@@ -16,8 +16,11 @@
 
 package androidx.camera.core;
 
+import static androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_NV21;
+import static androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888;
 import static androidx.camera.core.ImageProcessingUtil.convertJpegBytesToImage;
 import static androidx.camera.core.ImageProcessingUtil.rotateYUV;
+import static androidx.camera.core.ImageProcessingUtil.rotateYUVAndConvertToNV21;
 import static androidx.camera.core.ImageProcessingUtil.writeJpegBytesToSurface;
 import static androidx.camera.testing.impl.IgnoreProblematicDeviceRule.Companion;
 import static androidx.camera.testing.impl.ImageProxyUtil.createYUV420ImagePlanes;
@@ -34,9 +37,9 @@ import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.PixelFormat;
 import android.media.ImageWriter;
+import android.os.Build;
 
 import androidx.annotation.IntRange;
-import androidx.annotation.RequiresApi;
 import androidx.camera.core.impl.utils.Exif;
 import androidx.camera.core.internal.utils.ImageUtil;
 import androidx.camera.testing.impl.TestImageUtil;
@@ -82,6 +85,8 @@ public class ImageProcessingUtilTest {
     private ByteBuffer mYRotatedBuffer;
     private ByteBuffer mURotatedBuffer;
     private ByteBuffer mVRotatedBuffer;
+    private ByteBuffer mNV21YDelegatedByteBuffer;
+    private ByteBuffer mNV21UVDelegatedByteBuffer;
     private static final int[] YUV_WHITE_STUDIO_SWING_BT601 = {/*y=*/235, /*u=*/128, /*v=*/128};
     private static final int[] YUV_BLACK_STUDIO_SWING_BT601 = {/*y=*/16, /*u=*/128, /*v=*/128};
     private static final int[] YUV_BLUE_STUDIO_SWING_BT601 = {/*y=*/16, /*u=*/240, /*v=*/128};
@@ -146,6 +151,8 @@ public class ImageProcessingUtilTest {
         mYRotatedBuffer = ByteBuffer.allocateDirect(width * height);
         mURotatedBuffer = ByteBuffer.allocateDirect(width * height / 2);
         mVRotatedBuffer = ByteBuffer.allocateDirect(width * height / 2);
+        mNV21YDelegatedByteBuffer = ByteBuffer.allocateDirect(width * height);
+        mNV21UVDelegatedByteBuffer = ByteBuffer.allocateDirect(width * height / 2);
     }
 
     private void closeTestResources() {
@@ -407,29 +414,50 @@ public class ImageProcessingUtilTest {
     @SdkSuppress(minSdkVersion = 23)
     @Test
     public void rotateYUV_imageRotated_0() {
-        rotateYUV_imageRotated(0, true);
+        rotateYUV_imageRotated(OUTPUT_IMAGE_FORMAT_YUV_420_888, 0, true);
     }
 
     @SdkSuppress(minSdkVersion = 23)
     @Test
     public void rotateYUV_imageRotated_90() {
-        rotateYUV_imageRotated(90, false);
+        rotateYUV_imageRotated(OUTPUT_IMAGE_FORMAT_YUV_420_888, 90, false);
     }
 
     @SdkSuppress(minSdkVersion = 23)
     @Test
     public void rotateYUV_imageRotated_180() {
-        rotateYUV_imageRotated(180, false);
+        rotateYUV_imageRotated(OUTPUT_IMAGE_FORMAT_YUV_420_888, 180, false);
     }
 
     @SdkSuppress(minSdkVersion = 23)
     @Test
     public void rotateYUV_imageRotated_270() {
-        rotateYUV_imageRotated(270, false);
+        rotateYUV_imageRotated(OUTPUT_IMAGE_FORMAT_YUV_420_888, 270, false);
     }
 
-    @RequiresApi(23)
-    private void rotateYUV_imageRotated(int rotation,
+    @Test
+    public void rotateYUV_imageRotated_0_outputNV21() {
+        rotateYUV_imageRotated(OUTPUT_IMAGE_FORMAT_NV21, 0, false);
+    }
+
+    @Test
+    public void rotateYUV_imageRotated_90_outputNV21() {
+        rotateYUV_imageRotated(OUTPUT_IMAGE_FORMAT_NV21, 90, false);
+    }
+
+    @Test
+    public void rotateYUV_imageRotated_180_outputNV21() {
+        rotateYUV_imageRotated(OUTPUT_IMAGE_FORMAT_NV21, 180, false);
+    }
+
+    @Test
+    public void rotateYUV_imageRotated_270_outputNV21() {
+        rotateYUV_imageRotated(OUTPUT_IMAGE_FORMAT_NV21, 270, false);
+    }
+
+    private void rotateYUV_imageRotated(
+            int outputImageFormat,
+            int rotation,
             boolean outputShouldBeNull) {
         // Pixel2 API28 emulator has problem to run the test
         assumeFalse(Companion.isPixel2Api28Emulator());
@@ -440,16 +468,29 @@ public class ImageProcessingUtilTest {
         createTestResources(width, height, rotation);
 
         // Act.
-        ImageProxy yuvImageProxy = rotateYUV(
-                mYUVImageProxy,
-                mRotatedYUVImageReaderProxy,
-                ImageWriter.newInstance(
-                        mRotatedYUVImageReaderProxy.getSurface(),
-                        mRotatedYUVImageReaderProxy.getMaxImages()),
-                mYRotatedBuffer,
-                mURotatedBuffer,
-                mVRotatedBuffer,
-                /*rotation=*/rotation);
+        ImageProxy yuvImageProxy = null;
+
+        if (outputImageFormat == OUTPUT_IMAGE_FORMAT_YUV_420_888 && Build.VERSION.SDK_INT >= 23) {
+            yuvImageProxy = rotateYUV(
+                    mYUVImageProxy,
+                    mRotatedYUVImageReaderProxy,
+                    ImageWriter.newInstance(
+                            mRotatedYUVImageReaderProxy.getSurface(),
+                            mRotatedYUVImageReaderProxy.getMaxImages()),
+                    mYRotatedBuffer,
+                    mURotatedBuffer,
+                    mVRotatedBuffer,
+                    /*rotation=*/rotation);
+        } else if (outputImageFormat == OUTPUT_IMAGE_FORMAT_NV21) {
+            yuvImageProxy = rotateYUVAndConvertToNV21(
+                    mYUVImageProxy,
+                    mYRotatedBuffer,
+                    mURotatedBuffer,
+                    mVRotatedBuffer,
+                    mNV21YDelegatedByteBuffer,
+                    mNV21UVDelegatedByteBuffer,
+                    /*rotation=*/rotation);
+        }
 
         // Assert.
         if (outputShouldBeNull) {

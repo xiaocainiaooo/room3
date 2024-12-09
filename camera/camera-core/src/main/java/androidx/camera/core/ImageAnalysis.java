@@ -185,6 +185,36 @@ public final class ImageAnalysis extends UseCase {
     public static final int OUTPUT_IMAGE_FORMAT_RGBA_8888 = 2;
 
     /**
+     * Images sent to the analyzer will be formatted in NV21.
+     *
+     * <p>All {@link ImageProxy} sent to {@link Analyzer#analyze(ImageProxy)} will be in
+     * {@link ImageFormat#YUV_420_888} format with their image data formatted in NV21.
+     *
+     * <p>The output {@link ImageProxy} has three planes with the order of Y, U, V. The pixel
+     * stride of U or V planes are 2. The byte buffer pointer position of V plane will be ahead
+     * of the position of the U plane. Applications can directly read the <code>plane[2]</code>
+     * to get all the VU interleaved data.
+     *
+     * <p>Due to limitations on some Android devices in producing images in NV21 format, the
+     * {@link android.media.Image} object obtained from {@link ImageProxy#getImage()} will be the
+     * original image produced by the camera  capture pipeline. This may result in discrepancies
+     * between the  {@link android.media.Image} and the {@link ImageProxy}, such as:
+     *
+     * <ul>
+     * <li>Plane data may differ.
+     * <li>Width and height may differ.
+     * <li>Other properties may also differ.
+     * </ul>
+     *
+     * <p>Developers should be aware of these potential differences and use the properties from the
+     * {@link ImageProxy} when necessary.
+     *
+     * @see Builder#setOutputImageFormat(int)
+     */
+    @RestrictTo(Scope.LIBRARY_GROUP)
+    public static final int OUTPUT_IMAGE_FORMAT_NV21 = 3;
+
+    /**
      * Provides a static configuration with implementation-agnostic options.
      */
     @RestrictTo(Scope.LIBRARY_GROUP)
@@ -376,6 +406,8 @@ public final class ImageAnalysis extends UseCase {
 
         boolean isYuv2Rgb = getImageFormat() == ImageFormat.YUV_420_888
                 && getOutputImageFormat() == OUTPUT_IMAGE_FORMAT_RGBA_8888;
+        boolean isYuv2Nv21 = getImageFormat() == ImageFormat.YUV_420_888
+                && getOutputImageFormat() == OUTPUT_IMAGE_FORMAT_NV21;
         boolean isYuvRotationOrPixelShift = getImageFormat() == ImageFormat.YUV_420_888
                 && ((getCamera() != null && getRelativeRotation(getCamera()) != 0)
                 || Boolean.TRUE.equals(getOnePixelShiftEnabled()));
@@ -384,7 +416,7 @@ public final class ImageAnalysis extends UseCase {
         // supporting RGB natively. The logic here will check if the specific configured size is
         // available in RGB and if not, fall back to YUV-RGB conversion.
         final SafeCloseImageReaderProxy processedImageReaderProxy =
-                (isYuv2Rgb || isYuvRotationOrPixelShift)
+                (isYuv2Rgb || (isYuvRotationOrPixelShift && !isYuv2Nv21))
                         ? new SafeCloseImageReaderProxy(
                         ImageReaderProxys.createIsolatedReader(
                                 width,
@@ -841,7 +873,8 @@ public final class ImageAnalysis extends UseCase {
      *
      * @see Builder#setOutputImageFormat(int)
      */
-    @IntDef({OUTPUT_IMAGE_FORMAT_YUV_420_888, OUTPUT_IMAGE_FORMAT_RGBA_8888})
+    @IntDef({OUTPUT_IMAGE_FORMAT_YUV_420_888, OUTPUT_IMAGE_FORMAT_RGBA_8888,
+            OUTPUT_IMAGE_FORMAT_NV21})
     @Retention(RetentionPolicy.SOURCE)
     @RestrictTo(Scope.LIBRARY_GROUP)
     public @interface OutputImageFormat {

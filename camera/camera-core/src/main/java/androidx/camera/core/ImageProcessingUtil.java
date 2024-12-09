@@ -25,6 +25,7 @@ import android.media.Image;
 import android.media.ImageWriter;
 import android.os.Build;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Surface;
 
 import androidx.annotation.IntRange;
@@ -388,6 +389,92 @@ public final class ImageProcessingUtil {
         return wrappedRotatedImageProxy;
     }
 
+
+    /**
+     * Rotates YUV image proxy and output the NV21 format image proxy with the delegated byte
+     * buffers.
+     *
+     * @param imageProxy              input image proxy.
+     * @param yRotatedBuffer          intermediate image buffer for y plane rotation.
+     * @param uRotatedBuffer          intermediate image buffer for u plane rotation.
+     * @param vRotatedBuffer          intermediate image buffer for v plane rotation.
+     * @param nv21YDelegatedBuffer    delegated image buffer for y plane.
+     * @param nv21UVDelegatedBuffer   delegated image buffer for u/v plane.
+     * @param rotationDegrees         output image rotation degrees.
+     * @return rotated image proxy or null if rotation fails or format is not supported.
+     */
+    public static @Nullable ImageProxy rotateYUVAndConvertToNV21(
+            @NonNull ImageProxy imageProxy,
+            @NonNull ByteBuffer yRotatedBuffer,
+            @NonNull ByteBuffer uRotatedBuffer,
+            @NonNull ByteBuffer vRotatedBuffer,
+            @NonNull ByteBuffer nv21YDelegatedBuffer,
+            @NonNull ByteBuffer nv21UVDelegatedBuffer,
+            @IntRange(from = 0, to = 359) int rotationDegrees) {
+        if (!isSupportedYUVFormat(imageProxy)) {
+            Logger.e(TAG, "Unsupported format for rotate YUV");
+            return null;
+        }
+
+        if (!isSupportedRotationDegrees(rotationDegrees)) {
+            Logger.e(TAG, "Unsupported rotation degrees for rotate YUV");
+            return null;
+        }
+
+        // If both rotation and format conversion processing are unnecessary, directly return here.
+        if (rotationDegrees == 0 && isNV21FormatImage(imageProxy)) {
+            return null;
+        }
+
+        int rotatedWidth =
+                (rotationDegrees % 180 == 0) ? imageProxy.getWidth() : imageProxy.getHeight();
+        int rotatedHeight =
+                (rotationDegrees % 180 == 0) ? imageProxy.getHeight() : imageProxy.getWidth();
+
+        Pair<ByteBuffer, ByteBuffer> nv21UVByteBuffers = nativeCreateNV21ByteBuffers(
+                nv21UVDelegatedBuffer, nv21UVDelegatedBuffer.capacity());
+
+        int result = nativeRotateYUV(
+                imageProxy.getPlanes()[0].getBuffer(),
+                imageProxy.getPlanes()[0].getRowStride(),
+                imageProxy.getPlanes()[1].getBuffer(),
+                imageProxy.getPlanes()[1].getRowStride(),
+                imageProxy.getPlanes()[2].getBuffer(),
+                imageProxy.getPlanes()[2].getRowStride(),
+                imageProxy.getPlanes()[2].getPixelStride(),
+                nv21YDelegatedBuffer,
+                rotatedWidth,
+                1,
+                nv21UVByteBuffers.first,
+                rotatedWidth,
+                2,
+                nv21UVByteBuffers.second,
+                rotatedWidth,
+                2,
+                yRotatedBuffer,
+                uRotatedBuffer,
+                vRotatedBuffer,
+                imageProxy.getWidth(),
+                imageProxy.getHeight(),
+                rotationDegrees);
+
+        if (result != 0) {
+            Logger.e(TAG, "rotate YUV failure");
+            return null;
+        }
+
+        // Wraps to NV21ImageProxy to make sure that the returned v plane position is in front of u
+        // plane position.
+        return new SingleCloseImageProxy(
+                new NV21ImageProxy(imageProxy,
+                        nv21YDelegatedBuffer,
+                        nv21UVByteBuffers.first,
+                        nv21UVByteBuffers.second,
+                        rotatedWidth,
+                        rotatedHeight,
+                        rotationDegrees));
+    }
+
     private static boolean isSupportedYUVFormat(@NonNull ImageProxy imageProxy) {
         return imageProxy.getFormat() == ImageFormat.YUV_420_888
                 && imageProxy.getPlanes().length == 3;
@@ -527,6 +614,116 @@ public final class ImageProcessingUtil {
         return SUCCESS;
     }
 
+    /**
+     * Checks whether the image proxy data is formatted in NV21.
+     */
+    public static boolean isNV21FormatImage(@NonNull ImageProxy imageProxy) {
+        if (imageProxy.getPlanes().length != 3) {
+            return false;
+        }
+        if (imageProxy.getPlanes()[1].getPixelStride() != 2) {
+            return false;
+        }
+        return nativeGetYUVImageVUOff(
+                imageProxy.getPlanes()[2].getBuffer(),
+                imageProxy.getPlanes()[1].getBuffer()) == -1;
+    }
+
+    /**
+     * A wrapper to make sure that the returned v plane position (getPlanes()[2]) is in front of
+     * u plane position (getPlanes()[1]). So that the following operations can correctly check
+     * whether the format is NV12 or NV21 by the plane buffers' pointer positions.
+     *
+     * <p>The callers need to ensure that the v data is put in the plane with former position and v
+     * data is put in the plane with the later position in the associated image proxy.
+     */
+    private static class NV21ImageProxy extends ForwardingImageProxy {
+        private final ImageProxy.PlaneProxy[] mPlanes;
+        private final int mWidth;
+        private final int mHeight;
+
+        NV21ImageProxy(@NonNull ImageProxy imageProxy,
+                @NonNull ByteBuffer delegateBufferY,
+                @NonNull ByteBuffer delegateBufferU,
+                @NonNull ByteBuffer delegateBufferV,
+                int width, int height,
+                @IntRange(from = 0, to = 359) int rotatedRotationDegrees) {
+            super(imageProxy);
+            mPlanes = createPlanes(delegateBufferY, delegateBufferU, delegateBufferV, width);
+            mWidth = width;
+            mHeight = height;
+        }
+
+        @Override
+        public int getHeight() {
+            return mHeight;
+        }
+
+        @Override
+        public int getWidth() {
+            return mWidth;
+        }
+
+        @Override
+        public ImageProxy.PlaneProxy @NonNull [] getPlanes() {
+            return mPlanes;
+        }
+
+        private ImageProxy.PlaneProxy @NonNull [] createPlanes(
+                @NonNull ByteBuffer delegateBufferY,
+                @NonNull ByteBuffer delegateBufferU,
+                @NonNull ByteBuffer delegateBufferV,
+                int rowStride
+        ) {
+            ImageProxy.PlaneProxy[] planes = new ImageProxy.PlaneProxy[3];
+            planes[0] = new ImageProxy.PlaneProxy() {
+                @Override
+                public int getRowStride() {
+                    return rowStride;
+                }
+
+                @Override
+                public int getPixelStride() {
+                    return 1;
+                }
+
+                @Override
+                public @NonNull ByteBuffer getBuffer() {
+                    return delegateBufferY;
+                }
+            };
+            planes[1] = new NV21PlaneProxy(delegateBufferU, rowStride);
+            planes[2] = new NV21PlaneProxy(delegateBufferV, rowStride);
+
+            return planes;
+        }
+    }
+
+    private static class NV21PlaneProxy implements ImageProxy.PlaneProxy {
+        private final ByteBuffer mByteBuffer;
+        private final int mRowStride;
+
+        NV21PlaneProxy(@NonNull ByteBuffer byteBuffer, int rowStride) {
+            mByteBuffer = byteBuffer;
+            mRowStride = rowStride;
+        }
+
+        @Override
+        public int getRowStride() {
+            return mRowStride;
+        }
+
+        @Override
+        public int getPixelStride() {
+            // Force return pixel stride value 2
+            return 2;
+        }
+
+        @Override
+        public @NonNull ByteBuffer getBuffer() {
+            return mByteBuffer;
+        }
+    }
 
     private static native int nativeCopyBetweenByteBufferAndBitmap(Bitmap bitmap,
             ByteBuffer byteBuffer,
@@ -607,4 +804,14 @@ public final class ImageProcessingUtil {
             int width,
             int height,
             @ImageOutputConfig.RotationDegreesValue int rotationDegrees);
+
+    private static native int nativeGetYUVImageVUOff(
+            @NonNull ByteBuffer srcByteBufferV,
+            @NonNull ByteBuffer srcByteBufferU
+    );
+
+    private static native Pair<ByteBuffer, ByteBuffer> nativeCreateNV21ByteBuffers(
+            @NonNull ByteBuffer byteBuffer,
+            int vuDataLength
+    );
 }

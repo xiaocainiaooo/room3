@@ -658,4 +658,36 @@ JNIEXPORT jint Java_androidx_camera_core_ImageProcessingUtil_nativeRotateYUV(
     return result;
 }
 
+JNIEXPORT jint Java_androidx_camera_core_ImageProcessingUtil_nativeGetYUVImageVUOff(
+        JNIEnv* env,
+        jclass,
+        jobject byte_buffer_v,
+        jobject byte_buffer_u) {
+    uint8_t *byte_buffer_v_ptr =
+            static_cast<uint8_t *>(env->GetDirectBufferAddress(byte_buffer_v));
+    uint8_t *byte_buffer_u_ptr =
+            static_cast<uint8_t *>(env->GetDirectBufferAddress(byte_buffer_u));
+    return byte_buffer_v_ptr - byte_buffer_u_ptr;
+}
+
+JNIEXPORT jobject Java_androidx_camera_core_ImageProcessingUtil_nativeCreateNV21ByteBuffers(
+        JNIEnv *env,
+        jclass,
+        jobject byte_buffer,
+        jint vu_data_length) {
+
+    uint8_t *byte_buffer_ptr =
+            static_cast<uint8_t *>(env->GetDirectBufferAddress(byte_buffer));
+
+    // Create the ByteBuffers
+    jobject vByteBuffer = env->NewDirectByteBuffer(byte_buffer_ptr, vu_data_length);
+    jobject uByteBuffer = env->NewDirectByteBuffer(byte_buffer_ptr + 1, vu_data_length);
+
+    jclass pairClass = env->FindClass("android/util/Pair");
+    jmethodID pairConstructor = env->GetMethodID(pairClass, "<init>",
+                                                 "(Ljava/lang/Object;Ljava/lang/Object;)V");
+
+    return env->NewObject(pairClass, pairConstructor, uByteBuffer, vByteBuffer);
+}
+
 }  // extern "C"
