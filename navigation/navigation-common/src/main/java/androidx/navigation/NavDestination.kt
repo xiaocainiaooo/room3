@@ -844,7 +844,7 @@ public open class NavDestination(
          * @param T the route from KClass
          */
         @JvmStatic
-        public inline fun <reified T : Any> NavDestination.hasRoute() = hasRoute(T::class)
+        public inline fun <reified T : Any> NavDestination.hasRoute(): Boolean = hasRoute(T::class)
 
         /**
          * Checks if the NavDestination's route was generated from [T]
@@ -855,7 +855,7 @@ public open class NavDestination(
          */
         @OptIn(InternalSerializationApi::class)
         @JvmStatic
-        public fun <T : Any> NavDestination.hasRoute(route: KClass<T>) =
+        public fun <T : Any> NavDestination.hasRoute(route: KClass<T>): Boolean =
             route.serializer().generateHashCode() == id
     }
 }

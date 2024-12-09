@@ -22,16 +22,11 @@
  * modifying its settings.
  */
 import androidx.build.LibraryType
-import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-}
-
-kotlin {
-    explicitApi = ExplicitApiMode.Strict
 }
 
 dependencies {

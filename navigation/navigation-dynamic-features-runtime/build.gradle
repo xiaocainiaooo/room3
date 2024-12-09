@@ -73,5 +73,4 @@ androidx {
     type = LibraryType.PUBLISHED_LIBRARY
     inceptionYear = "2019"
     description = "Android Dynamic Feature Navigation Runtime"
-    legacyDisableKotlinStrictApiMode = true
 }
