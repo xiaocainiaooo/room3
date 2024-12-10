@@ -1058,9 +1058,9 @@ package androidx.appsearch.ast.operators {
   @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public final class PropertyRestrictNode implements androidx.appsearch.ast.Node {
     ctor public PropertyRestrictNode(androidx.appsearch.app.PropertyPath, androidx.appsearch.ast.Node);
     method public androidx.appsearch.ast.Node getChild();
-    method public androidx.appsearch.app.PropertyPath getProperty();
+    method public androidx.appsearch.app.PropertyPath getPropertyPath();
     method public void setChild(androidx.appsearch.ast.Node);
-    method public void setProperty(androidx.appsearch.app.PropertyPath);
+    method public void setPropertyPath(androidx.appsearch.app.PropertyPath);
   }
 
 }
@@ -1077,26 +1077,26 @@ package androidx.appsearch.ast.query {
   @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public final class HasPropertyNode implements androidx.appsearch.ast.FunctionNode {
     ctor public HasPropertyNode(androidx.appsearch.app.PropertyPath);
     method public String getFunctionName();
-    method public androidx.appsearch.app.PropertyPath getProperty();
-    method public void setProperty(androidx.appsearch.app.PropertyPath);
+    method public androidx.appsearch.app.PropertyPath getPropertyPath();
+    method public void setPropertyPath(androidx.appsearch.app.PropertyPath);
   }
 
   @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public final class PropertyDefinedNode implements androidx.appsearch.ast.FunctionNode {
     ctor public PropertyDefinedNode(androidx.appsearch.app.PropertyPath);
     method public String getFunctionName();
-    method public androidx.appsearch.app.PropertyPath getProperty();
-    method public void setProperty(androidx.appsearch.app.PropertyPath);
+    method public androidx.appsearch.app.PropertyPath getPropertyPath();
+    method public void setPropertyPath(androidx.appsearch.app.PropertyPath);
   }
 
   @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public final class SearchNode implements androidx.appsearch.ast.FunctionNode {
     ctor public SearchNode(androidx.appsearch.ast.Node);
     ctor public SearchNode(androidx.appsearch.ast.Node, java.util.List<androidx.appsearch.app.PropertyPath!>);
-    method public void addProperty(androidx.appsearch.app.PropertyPath);
+    method public void addPropertyPath(androidx.appsearch.app.PropertyPath);
     method public androidx.appsearch.ast.Node getChild();
     method public String getFunctionName();
-    method public java.util.List<androidx.appsearch.app.PropertyPath!> getProperties();
+    method public java.util.List<androidx.appsearch.app.PropertyPath!> getPropertyPaths();
     method public void setChild(androidx.appsearch.ast.Node);
-    method public void setProperties(java.util.List<androidx.appsearch.app.PropertyPath!>);
+    method public void setPropertyPaths(java.util.List<androidx.appsearch.app.PropertyPath!>);
   }
 
   @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public final class SemanticSearchNode implements androidx.appsearch.ast.FunctionNode {
