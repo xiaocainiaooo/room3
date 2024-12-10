@@ -48,10 +48,6 @@ android {
         minSdk = 26
     }
     namespace = "androidx.wear.protolayout.testing"
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
 }
 
 androidx {

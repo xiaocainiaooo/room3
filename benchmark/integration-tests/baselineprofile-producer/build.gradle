@@ -33,7 +33,6 @@ plugins {
 android {
     defaultConfig {
         minSdk = 24
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     testOptions.managedDevices.allDevices {
         pixel6Api31(ManagedVirtualDevice) {

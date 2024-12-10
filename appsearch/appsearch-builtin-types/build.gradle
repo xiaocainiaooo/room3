@@ -24,8 +24,8 @@
 import androidx.build.LibraryType
 
 plugins {
-    id('AndroidXPlugin')
-    id('com.android.library')
+    id("AndroidXPlugin")
+    id("com.android.library")
 }
 
 dependencies {
@@ -33,11 +33,11 @@ dependencies {
     implementation project(":appsearch:appsearch")
     implementation("androidx.core:core:1.8.0")
 
-    annotationProcessor project(':appsearch:appsearch-compiler')
+    annotationProcessor project(":appsearch:appsearch-compiler")
 
-    androidTestImplementation project(':appsearch:appsearch')
-    androidTestImplementation project(':appsearch:appsearch-local-storage')
-    androidTestImplementation project(':appsearch:appsearch-test-util')
+    androidTestImplementation project(":appsearch:appsearch")
+    androidTestImplementation project(":appsearch:appsearch-local-storage")
+    androidTestImplementation project(":appsearch:appsearch-test-util")
     androidTestImplementation(libs.testExtJunit)
     androidTestImplementation(libs.testCore)
     androidTestImplementation(libs.testRunner)
