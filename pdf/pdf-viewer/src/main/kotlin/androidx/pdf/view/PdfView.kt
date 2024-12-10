@@ -27,12 +27,14 @@ import android.util.AttributeSet
 import android.util.Range
 import android.view.MotionEvent
 import android.view.View
+import android.widget.OverScroller
 import androidx.annotation.RestrictTo
 import androidx.core.os.HandlerCompat
 import androidx.pdf.PdfDocument
 import androidx.pdf.util.ZoomUtils
 import java.util.concurrent.Executors
 import kotlin.math.round
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
@@ -136,6 +138,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     private val gestureHandler = ZoomScrollGestureHandler(this@PdfView)
     private val gestureTracker = GestureTracker(context).apply { delegate = gestureHandler }
+    private val scroller = OverScroller(context)
 
     // To avoid allocations during drawing
     private val visibleAreaRect = Rect()
@@ -174,7 +177,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      * being loaded from the PDF.
      */
     @Suppress("UNUSED_PARAMETER")
-    public fun scrollToPosition(position: PdfPoint, animateScroll: Boolean = false) {
+    public fun scrollToPosition(position: PdfPoint) {
         checkMainThread()
         val localPageLayoutManager =
             pageLayoutManager
@@ -212,10 +215,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         val x = round((pageRect.left + pageRect.width() / 2f) * zoom - (viewportWidth / 2f))
         val y = round((pageRect.top + pageRect.height() / 2f) * zoom - (viewportHeight / 2f))
 
-        // Scroll to the center of the page, then set zoom to fit the width of the page
-        // TODO(b/376136621) - Animate scrolling if requested by scrollToPage API
-        scrollTo(x.toInt(), y.toInt())
+        // Set zoom to fit the width of the page, then scroll to the center of the page
         this.zoom = zoom
+        scrollTo(x.toInt(), y.toInt())
     }
 
     private fun gotoPoint(position: PdfPoint) {
@@ -244,14 +246,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         val x = round((pageRect.left + pageRect.width() / 2f) * zoom - (viewportWidth / 2f))
         val y = round((pageRect.top + position.pagePoint.y) * zoom - (viewportHeight / 2f))
 
-        // Scroll to the requested Y position on the page, then set zoom to fit the width of the
-        // page
-        // TODO(b/376136621) - Animate scrolling if requested by scrollToPage API
-        scrollTo(
-            toViewCoord(x, this.zoom, scrollX).toInt(),
-            toViewCoord(y, this.zoom, scrollY).toInt()
-        )
+        // Set zoom to fit the width of the page, then scroll to the requested point on the page
         this.zoom = zoom
+        scrollTo(x.toInt(), y.toInt())
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -334,6 +331,50 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
     }
 
+    override fun scrollBy(x: Int, y: Int) {
+        // This is precisely the implementation of View.scrollBy; this is defensive in case the
+        // View implementation changes given we assume all scrolling flows through scrollTo
+        scrollTo(scrollX + x, scrollY + y)
+    }
+
+    override fun scrollTo(x: Int, y: Int) {
+        val cappedX = x.coerceIn(0..computeHorizontalScrollRange())
+        val cappedY = y.coerceIn(minVerticalScrollPosition..computeVerticalScrollRange())
+        super.scrollTo(cappedX, cappedY)
+    }
+
+    override fun computeHorizontalScrollRange(): Int {
+        // Note we provide scroll = 0 here, as we shouldn't consider the current scroll position
+        // to compute the maximum scroll position. Scroll position is absolute, not relative
+        val contentWidthPx = toViewCoord(contentWidth.toFloat(), zoom, scroll = 0)
+        return if (contentWidthPx < width) 0 else (contentWidthPx - width).roundToInt()
+    }
+
+    private val minVerticalScrollPosition: Int
+        get() {
+            // Note we provide scroll = 0 here, as we shouldn't consider the current scroll position
+            // to compute the maximum scroll position. Scroll position is absolute, not relative
+            val contentHeightPx = toViewCoord(contentHeight.toFloat(), zoom, scroll = 0)
+            return if (contentHeightPx < height) {
+                // Center vertically
+                -(height - contentHeightPx).roundToInt() / 2
+            } else {
+                0
+            }
+        }
+
+    override fun computeVerticalScrollRange(): Int {
+        // Note we provide scroll = 0 here, as we shouldn't consider the current scroll position
+        // to compute the maximum scroll position. Scroll position is absolute, not relative
+        val contentHeightPx = toViewCoord(contentHeight.toFloat(), zoom, scroll = 0)
+        return if (contentHeightPx < height) {
+            // Center vertically
+            -(height - contentHeightPx).roundToInt() / 2
+        } else {
+            (contentHeightPx - height).roundToInt()
+        }
+    }
+
     /**
      * Returns true if we are able to restore a previous state from savedInstanceState
      *
@@ -372,8 +413,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     }
 
     private fun scrollToRestoredPosition(position: PointF, zoom: Float) {
-        scrollTo(round(position.x - width / 2f).toInt(), round(position.y - height / 2f).toInt())
         this.zoom = zoom
+        scrollTo(round(position.x - width / 2f).toInt(), round(position.y - height / 2f).toInt())
         scrollPositionToRestore = null
         zoomToRestore = null
     }
@@ -471,6 +512,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         // the viewport
         pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
 
+        // We use scrollY to center content smaller than the viewport. This triggers the initial
+        // centering if it's needed. It doesn't override any restored state because we're scrolling
+        // to the current scroll position.
+        if (pageNum == 0) {
+            scrollTo(scrollX, scrollY)
+        }
+
         val localDeferredPosition = deferredScrollPosition
         val localDeferredPage = deferredScrollPage
         if (localDeferredPosition != null && localDeferredPosition.pageNum <= pageNum) {
@@ -550,6 +598,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private fun toContentCoord(viewCoord: Float, zoom: Float, scroll: Int): Float {
         return (viewCoord + scroll) / zoom
     }
+
+    private val contentWidth: Int
+        get() = pageLayoutManager?.paginationModel?.maxWidth ?: 0
+
+    private val contentHeight: Int
+        get() = pageLayoutManager?.paginationModel?.totalEstimatedHeight ?: 0
 
     public companion object {
         public const val DEFAULT_INIT_ZOOM: Float = 1.0f
