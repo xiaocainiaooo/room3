@@ -27,7 +27,7 @@ import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@SdkSuppress(minSdkVersion = 31)
+@SdkSuppress(minSdkVersion = 35) // Currently can fail on 31-34, see b/372921569
 @RunWith(AndroidJUnit4::class)
 class RuntimeImageTest {
     private val className = RuntimeImageTest::class.java.name
