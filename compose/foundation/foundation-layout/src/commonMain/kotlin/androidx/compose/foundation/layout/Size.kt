@@ -870,7 +870,8 @@ private class SizeNode(
         return if (constraints.hasFixedWidth) {
             constraints.maxWidth
         } else {
-            constraints.constrainWidth(measurable.minIntrinsicWidth(height))
+            val childHeight = if (enforceIncoming) height else constraints.constrainHeight(height)
+            constraints.constrainWidth(measurable.minIntrinsicWidth(childHeight))
         }
     }
 
@@ -882,7 +883,8 @@ private class SizeNode(
         return if (constraints.hasFixedHeight) {
             constraints.maxHeight
         } else {
-            constraints.constrainHeight(measurable.minIntrinsicHeight(width))
+            val childWidth = if (enforceIncoming) width else constraints.constrainWidth(width)
+            constraints.constrainHeight(measurable.minIntrinsicHeight(childWidth))
         }
     }
 
@@ -894,7 +896,8 @@ private class SizeNode(
         return if (constraints.hasFixedWidth) {
             constraints.maxWidth
         } else {
-            constraints.constrainWidth(measurable.maxIntrinsicWidth(height))
+            val childHeight = if (enforceIncoming) height else constraints.constrainHeight(height)
+            constraints.constrainWidth(measurable.maxIntrinsicWidth(childHeight))
         }
     }
 
@@ -906,7 +909,8 @@ private class SizeNode(
         return if (constraints.hasFixedHeight) {
             constraints.maxHeight
         } else {
-            constraints.constrainHeight(measurable.maxIntrinsicHeight(width))
+            val childWidth = if (enforceIncoming) width else constraints.constrainWidth(width)
+            constraints.constrainHeight(measurable.maxIntrinsicHeight(childWidth))
         }
     }
 }
