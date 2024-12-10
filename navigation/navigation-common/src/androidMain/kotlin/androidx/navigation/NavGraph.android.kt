@@ -13,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+@file:JvmName("NavGraphKt")
+@file:JvmMultifileClass
+
 package androidx.navigation
 
 import android.content.Context
