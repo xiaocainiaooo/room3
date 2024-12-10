@@ -60,6 +60,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.Executor;
 
 /**
  * Implementation for {@link ZslControl}.
@@ -76,6 +77,7 @@ final class ZslControlImpl implements ZslControl {
     static final int MAX_IMAGES = RING_BUFFER_CAPACITY * 3;
 
     private final @NonNull CameraCharacteristicsCompat mCameraCharacteristicsCompat;
+    private final @NonNull Executor mExecutor;
 
     @VisibleForTesting
     @SuppressWarnings("WeakerAccess")
@@ -94,8 +96,10 @@ final class ZslControlImpl implements ZslControl {
 
     @Nullable ImageWriter mReprocessingImageWriter;
 
-    ZslControlImpl(@NonNull CameraCharacteristicsCompat cameraCharacteristicsCompat) {
+    ZslControlImpl(@NonNull CameraCharacteristicsCompat cameraCharacteristicsCompat,
+            @NonNull Executor executor) {
         mCameraCharacteristicsCompat = cameraCharacteristicsCompat;
+        mExecutor = executor;
         mIsPrivateReprocessingSupported =
                 isCapabilitySupported(mCameraCharacteristicsCompat,
                         REQUEST_AVAILABLE_CAPABILITIES_PRIVATE_REPROCESSING);
@@ -104,7 +108,7 @@ final class ZslControlImpl implements ZslControl {
 
         mImageRingBuffer = new ZslRingBuffer(
                 RING_BUFFER_CAPACITY,
-                imageProxy -> imageProxy.close());
+                ImageProxy::close);
     }
 
     @Override
@@ -240,6 +244,13 @@ final class ZslControlImpl implements ZslControl {
         if (Build.VERSION.SDK_INT >= 23 && mReprocessingImageWriter != null && image != null) {
             try {
                 ImageWriterCompat.queueInputImage(mReprocessingImageWriter, image);
+                // It's essential to call ImageProxy#close().
+                // Add an OnImageReleasedListener to ensure the ImageProxy is closed after
+                // the image is written to the output surface. This is crucial to prevent
+                // resource leaks, where images might not be closed properly if CameraX fails
+                // to propagate close events to its internal components.
+                ImageWriterCompat.setOnImageReleasedListener(mReprocessingImageWriter,
+                        writer -> imageProxy.close(), mExecutor);
             } catch (IllegalStateException e) {
                 Logger.e(TAG, "enqueueImageToImageWriter throws IllegalStateException = "
                         + e.getMessage());
