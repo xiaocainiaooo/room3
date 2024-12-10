@@ -797,7 +797,7 @@ class CarouselTest {
                     Modifier.focusProperties {
                             onEnter = {
                                 focusRequester.requestFocus()
-                                cancelFocus()
+                                cancelFocusChange()
                             }
                         }
                         .focusGroup()
