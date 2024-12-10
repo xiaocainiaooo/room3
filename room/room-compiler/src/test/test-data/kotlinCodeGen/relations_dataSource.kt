@@ -43,12 +43,12 @@ public class MyDao_Impl(
         return object : LimitOffsetDataSource<SongWithArtist>(__db, _statement, false, true,
             "Artist", "Song") {
           protected override fun convertRows(statement: SQLiteStatement): List<SongWithArtist> {
-            val _cursorIndexOfSongId: Int = getColumnIndexOrThrow(statement, "songId")
-            val _cursorIndexOfArtistKey: Int = getColumnIndexOrThrow(statement, "artistKey")
+            val _columnIndexOfSongId: Int = getColumnIndexOrThrow(statement, "songId")
+            val _columnIndexOfArtistKey: Int = getColumnIndexOrThrow(statement, "artistKey")
             val _collectionArtist: MutableMap<Long, Artist?> = mutableMapOf()
             while (statement.step()) {
               val _tmpKey: Long
-              _tmpKey = statement.getLong(_cursorIndexOfArtistKey)
+              _tmpKey = statement.getLong(_columnIndexOfArtistKey)
               _collectionArtist.put(_tmpKey, null)
             }
             statement.reset()
@@ -58,13 +58,13 @@ public class MyDao_Impl(
               val _item: SongWithArtist
               val _tmpSong: Song
               val _tmpSongId: Long
-              _tmpSongId = statement.getLong(_cursorIndexOfSongId)
+              _tmpSongId = statement.getLong(_columnIndexOfSongId)
               val _tmpArtistKey: Long
-              _tmpArtistKey = statement.getLong(_cursorIndexOfArtistKey)
+              _tmpArtistKey = statement.getLong(_columnIndexOfArtistKey)
               _tmpSong = Song(_tmpSongId,_tmpArtistKey)
               val _tmpArtist: Artist?
               val _tmpKey_1: Long
-              _tmpKey_1 = statement.getLong(_cursorIndexOfArtistKey)
+              _tmpKey_1 = statement.getLong(_columnIndexOfArtistKey)
               _tmpArtist = _collectionArtist.get(_tmpKey_1)
               if (_tmpArtist == null) {
                 error("Relationship item 'artist' was expected to be NON-NULL but is NULL in @Relation involving a parent column named 'artistKey' and entityColumn named 'artistId'.")
@@ -88,11 +88,11 @@ public class MyDao_Impl(
         return object : LimitOffsetDataSource<ArtistAndSongs>(__db, _statement, false, true, "Song",
             "Artist") {
           protected override fun convertRows(statement: SQLiteStatement): List<ArtistAndSongs> {
-            val _cursorIndexOfArtistId: Int = getColumnIndexOrThrow(statement, "artistId")
+            val _columnIndexOfArtistId: Int = getColumnIndexOrThrow(statement, "artistId")
             val _collectionSongs: MutableMap<Long, MutableList<Song>> = mutableMapOf()
             while (statement.step()) {
               val _tmpKey: Long
-              _tmpKey = statement.getLong(_cursorIndexOfArtistId)
+              _tmpKey = statement.getLong(_columnIndexOfArtistId)
               if (!_collectionSongs.containsKey(_tmpKey)) {
                 _collectionSongs.put(_tmpKey, mutableListOf())
               }
@@ -104,11 +104,11 @@ public class MyDao_Impl(
               val _item: ArtistAndSongs
               val _tmpArtist: Artist
               val _tmpArtistId: Long
-              _tmpArtistId = statement.getLong(_cursorIndexOfArtistId)
+              _tmpArtistId = statement.getLong(_columnIndexOfArtistId)
               _tmpArtist = Artist(_tmpArtistId)
               val _tmpSongsCollection: MutableList<Song>
               val _tmpKey_1: Long
-              _tmpKey_1 = statement.getLong(_cursorIndexOfArtistId)
+              _tmpKey_1 = statement.getLong(_columnIndexOfArtistId)
               _tmpSongsCollection = _collectionSongs.getValue(_tmpKey_1)
               _item = ArtistAndSongs(_tmpArtist,_tmpSongsCollection)
               _res.add(_item)
@@ -129,11 +129,11 @@ public class MyDao_Impl(
         return object : LimitOffsetDataSource<PlaylistAndSongs>(__db, _statement, false, true,
             "PlaylistSongXRef", "Song", "Playlist") {
           protected override fun convertRows(statement: SQLiteStatement): List<PlaylistAndSongs> {
-            val _cursorIndexOfPlaylistId: Int = getColumnIndexOrThrow(statement, "playlistId")
+            val _columnIndexOfPlaylistId: Int = getColumnIndexOrThrow(statement, "playlistId")
             val _collectionSongs: MutableMap<Long, MutableList<Song>> = mutableMapOf()
             while (statement.step()) {
               val _tmpKey: Long
-              _tmpKey = statement.getLong(_cursorIndexOfPlaylistId)
+              _tmpKey = statement.getLong(_columnIndexOfPlaylistId)
               if (!_collectionSongs.containsKey(_tmpKey)) {
                 _collectionSongs.put(_tmpKey, mutableListOf())
               }
@@ -145,11 +145,11 @@ public class MyDao_Impl(
               val _item: PlaylistAndSongs
               val _tmpPlaylist: Playlist
               val _tmpPlaylistId: Long
-              _tmpPlaylistId = statement.getLong(_cursorIndexOfPlaylistId)
+              _tmpPlaylistId = statement.getLong(_columnIndexOfPlaylistId)
               _tmpPlaylist = Playlist(_tmpPlaylistId)
               val _tmpSongsCollection: MutableList<Song>
               val _tmpKey_1: Long
-              _tmpKey_1 = statement.getLong(_cursorIndexOfPlaylistId)
+              _tmpKey_1 = statement.getLong(_columnIndexOfPlaylistId)
               _tmpSongsCollection = _collectionSongs.getValue(_tmpKey_1)
               _item = PlaylistAndSongs(_tmpPlaylist,_tmpSongsCollection)
               _res.add(_item)
@@ -190,14 +190,14 @@ public class MyDao_Impl(
       if (_itemKeyIndex == -1) {
         return
       }
-      val _cursorIndexOfArtistId: Int = 0
+      val _columnIndexOfArtistId: Int = 0
       while (_stmt.step()) {
         val _tmpKey: Long
         _tmpKey = _stmt.getLong(_itemKeyIndex)
         if (_map.containsKey(_tmpKey)) {
           val _item_1: Artist
           val _tmpArtistId: Long
-          _tmpArtistId = _stmt.getLong(_cursorIndexOfArtistId)
+          _tmpArtistId = _stmt.getLong(_columnIndexOfArtistId)
           _item_1 = Artist(_tmpArtistId)
           _map.put(_tmpKey, _item_1)
         }
@@ -236,8 +236,8 @@ public class MyDao_Impl(
       if (_itemKeyIndex == -1) {
         return
       }
-      val _cursorIndexOfSongId: Int = 0
-      val _cursorIndexOfArtistKey: Int = 1
+      val _columnIndexOfSongId: Int = 0
+      val _columnIndexOfArtistKey: Int = 1
       while (_stmt.step()) {
         val _tmpKey: Long
         _tmpKey = _stmt.getLong(_itemKeyIndex)
@@ -245,9 +245,9 @@ public class MyDao_Impl(
         if (_tmpRelation != null) {
           val _item_1: Song
           val _tmpSongId: Long
-          _tmpSongId = _stmt.getLong(_cursorIndexOfSongId)
+          _tmpSongId = _stmt.getLong(_columnIndexOfSongId)
           val _tmpArtistKey: Long
-          _tmpArtistKey = _stmt.getLong(_cursorIndexOfArtistKey)
+          _tmpArtistKey = _stmt.getLong(_columnIndexOfArtistKey)
           _item_1 = Song(_tmpSongId,_tmpArtistKey)
           _tmpRelation.add(_item_1)
         }
@@ -287,8 +287,8 @@ public class MyDao_Impl(
       if (_itemKeyIndex == -1) {
         return
       }
-      val _cursorIndexOfSongId: Int = 0
-      val _cursorIndexOfArtistKey: Int = 1
+      val _columnIndexOfSongId: Int = 0
+      val _columnIndexOfArtistKey: Int = 1
       while (_stmt.step()) {
         val _tmpKey: Long
         _tmpKey = _stmt.getLong(_itemKeyIndex)
@@ -296,9 +296,9 @@ public class MyDao_Impl(
         if (_tmpRelation != null) {
           val _item_1: Song
           val _tmpSongId: Long
-          _tmpSongId = _stmt.getLong(_cursorIndexOfSongId)
+          _tmpSongId = _stmt.getLong(_columnIndexOfSongId)
           val _tmpArtistKey: Long
-          _tmpArtistKey = _stmt.getLong(_cursorIndexOfArtistKey)
+          _tmpArtistKey = _stmt.getLong(_columnIndexOfArtistKey)
           _item_1 = Song(_tmpSongId,_tmpArtistKey)
           _tmpRelation.add(_item_1)
         }

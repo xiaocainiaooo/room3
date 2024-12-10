@@ -72,58 +72,58 @@ public class MyDao_Impl(
     return performBlocking(__db, true, false) { _connection ->
       val _stmt: SQLiteStatement = _connection.prepare(_sql)
       try {
-        val _cursorIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
-        val _cursorIndexOfPrimitive: Int = getColumnIndexOrThrow(_stmt, "primitive")
-        val _cursorIndexOfString: Int = getColumnIndexOrThrow(_stmt, "string")
-        val _cursorIndexOfNullableString: Int = getColumnIndexOrThrow(_stmt, "nullableString")
-        val _cursorIndexOfFieldString: Int = getColumnIndexOrThrow(_stmt, "fieldString")
-        val _cursorIndexOfNullableFieldString: Int = getColumnIndexOrThrow(_stmt,
+        val _columnIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
+        val _columnIndexOfPrimitive: Int = getColumnIndexOrThrow(_stmt, "primitive")
+        val _columnIndexOfString: Int = getColumnIndexOrThrow(_stmt, "string")
+        val _columnIndexOfNullableString: Int = getColumnIndexOrThrow(_stmt, "nullableString")
+        val _columnIndexOfFieldString: Int = getColumnIndexOrThrow(_stmt, "fieldString")
+        val _columnIndexOfNullableFieldString: Int = getColumnIndexOrThrow(_stmt,
             "nullableFieldString")
-        val _cursorIndexOfVariablePrimitive: Int = getColumnIndexOrThrow(_stmt, "variablePrimitive")
-        val _cursorIndexOfVariableString: Int = getColumnIndexOrThrow(_stmt, "variableString")
-        val _cursorIndexOfVariableNullableString: Int = getColumnIndexOrThrow(_stmt,
+        val _columnIndexOfVariablePrimitive: Int = getColumnIndexOrThrow(_stmt, "variablePrimitive")
+        val _columnIndexOfVariableString: Int = getColumnIndexOrThrow(_stmt, "variableString")
+        val _columnIndexOfVariableNullableString: Int = getColumnIndexOrThrow(_stmt,
             "variableNullableString")
-        val _cursorIndexOfVariableFieldString: Int = getColumnIndexOrThrow(_stmt,
+        val _columnIndexOfVariableFieldString: Int = getColumnIndexOrThrow(_stmt,
             "variableFieldString")
-        val _cursorIndexOfVariableNullableFieldString: Int = getColumnIndexOrThrow(_stmt,
+        val _columnIndexOfVariableNullableFieldString: Int = getColumnIndexOrThrow(_stmt,
             "variableNullableFieldString")
         val _result: MyEntity
         if (_stmt.step()) {
           val _tmpPk: Int
-          _tmpPk = _stmt.getLong(_cursorIndexOfPk).toInt()
+          _tmpPk = _stmt.getLong(_columnIndexOfPk).toInt()
           val _tmpPrimitive: Long
-          _tmpPrimitive = _stmt.getLong(_cursorIndexOfPrimitive)
+          _tmpPrimitive = _stmt.getLong(_columnIndexOfPrimitive)
           val _tmpString: String
-          _tmpString = _stmt.getText(_cursorIndexOfString)
+          _tmpString = _stmt.getText(_columnIndexOfString)
           val _tmpNullableString: String?
-          if (_stmt.isNull(_cursorIndexOfNullableString)) {
+          if (_stmt.isNull(_columnIndexOfNullableString)) {
             _tmpNullableString = null
           } else {
-            _tmpNullableString = _stmt.getText(_cursorIndexOfNullableString)
+            _tmpNullableString = _stmt.getText(_columnIndexOfNullableString)
           }
           val _tmpFieldString: String
-          _tmpFieldString = _stmt.getText(_cursorIndexOfFieldString)
+          _tmpFieldString = _stmt.getText(_columnIndexOfFieldString)
           val _tmpNullableFieldString: String?
-          if (_stmt.isNull(_cursorIndexOfNullableFieldString)) {
+          if (_stmt.isNull(_columnIndexOfNullableFieldString)) {
             _tmpNullableFieldString = null
           } else {
-            _tmpNullableFieldString = _stmt.getText(_cursorIndexOfNullableFieldString)
+            _tmpNullableFieldString = _stmt.getText(_columnIndexOfNullableFieldString)
           }
           _result =
               MyEntity(_tmpPk,_tmpPrimitive,_tmpString,_tmpNullableString,_tmpFieldString,_tmpNullableFieldString)
-          _result.variablePrimitive = _stmt.getLong(_cursorIndexOfVariablePrimitive)
-          _result.variableString = _stmt.getText(_cursorIndexOfVariableString)
-          if (_stmt.isNull(_cursorIndexOfVariableNullableString)) {
+          _result.variablePrimitive = _stmt.getLong(_columnIndexOfVariablePrimitive)
+          _result.variableString = _stmt.getText(_columnIndexOfVariableString)
+          if (_stmt.isNull(_columnIndexOfVariableNullableString)) {
             _result.variableNullableString = null
           } else {
-            _result.variableNullableString = _stmt.getText(_cursorIndexOfVariableNullableString)
+            _result.variableNullableString = _stmt.getText(_columnIndexOfVariableNullableString)
           }
-          _result.variableFieldString = _stmt.getText(_cursorIndexOfVariableFieldString)
-          if (_stmt.isNull(_cursorIndexOfVariableNullableFieldString)) {
+          _result.variableFieldString = _stmt.getText(_columnIndexOfVariableFieldString)
+          if (_stmt.isNull(_columnIndexOfVariableNullableFieldString)) {
             _result.variableNullableFieldString = null
           } else {
             _result.variableNullableFieldString =
-                _stmt.getText(_cursorIndexOfVariableNullableFieldString)
+                _stmt.getText(_columnIndexOfVariableNullableFieldString)
           }
         } else {
           error("The query result was empty, but expected a single row to return a NON-NULL object of type <MyEntity>.")

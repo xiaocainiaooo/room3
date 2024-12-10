@@ -23,11 +23,9 @@ import androidx.room.compiler.codegen.XPropertySpec
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.box
 import androidx.room.compiler.processing.XType
-import androidx.room.ext.AndroidTypeNames
 import androidx.room.ext.InvokeWithLambdaParameter
 import androidx.room.ext.LambdaSpec
 import androidx.room.ext.RoomMemberNames.DB_UTIL_PERFORM_SUSPENDING
-import androidx.room.ext.RoomMemberNames.DB_UTIL_QUERY
 import androidx.room.ext.SQLiteDriverTypeNames
 import androidx.room.solver.CodeGenScope
 
@@ -37,54 +35,6 @@ class CoroutineResultBinder(
     private val continuationParamName: String,
     adapter: QueryResultAdapter?
 ) : QueryResultBinder(adapter) {
-
-    private fun XCodeBlock.Builder.createRunQueryAndReturnStatements(
-        roomSQLiteQueryVar: String,
-        canReleaseQuery: Boolean,
-        dbProperty: XPropertySpec,
-        inTransaction: Boolean,
-        scope: CodeGenScope,
-        cancellationSignalVar: String
-    ) {
-        val transactionWrapper =
-            if (inTransaction) {
-                transactionWrapper(dbProperty.name)
-            } else {
-                null
-            }
-        val shouldCopyCursor = adapter?.shouldCopyCursor() == true
-        val outVar = scope.getTmpVar("_result")
-        val cursorVar = scope.getTmpVar("_cursor")
-        transactionWrapper?.beginTransactionWithControlFlow()
-        addLocalVariable(
-            name = cursorVar,
-            typeName = AndroidTypeNames.CURSOR,
-            assignExpr =
-                XCodeBlock.of(
-                    "%M(%N, %L, %L, %L)",
-                    DB_UTIL_QUERY,
-                    dbProperty,
-                    roomSQLiteQueryVar,
-                    if (shouldCopyCursor) "true" else "false",
-                    cancellationSignalVar
-                )
-        )
-        beginControlFlow("try").apply {
-            val adapterScope = scope.fork()
-            adapter?.convert(outVar, cursorVar, adapterScope)
-            add(adapterScope.generate())
-            transactionWrapper?.commitTransaction()
-            addStatement("return %L", outVar)
-        }
-        nextControlFlow("finally").apply {
-            addStatement("%L.close()", cursorVar)
-            if (canReleaseQuery) {
-                addStatement("%L.release()", roomSQLiteQueryVar)
-            }
-        }
-        endControlFlow()
-        transactionWrapper?.endTransactionWithControlFlow()
-    }
 
     override fun convertAndReturn(
         sqlQueryVar: String,

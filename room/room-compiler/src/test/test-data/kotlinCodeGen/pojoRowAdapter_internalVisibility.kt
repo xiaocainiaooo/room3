@@ -45,19 +45,19 @@ public class MyDao_Impl(
     return performBlocking(__db, true, false) { _connection ->
       val _stmt: SQLiteStatement = _connection.prepare(_sql)
       try {
-        val _cursorIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
-        val _cursorIndexOfInternalVal: Int = getColumnIndexOrThrow(_stmt, "internalVal")
-        val _cursorIndexOfInternalVar: Int = getColumnIndexOrThrow(_stmt, "internalVar")
-        val _cursorIndexOfInternalSetterVar: Int = getColumnIndexOrThrow(_stmt, "internalSetterVar")
+        val _columnIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
+        val _columnIndexOfInternalVal: Int = getColumnIndexOrThrow(_stmt, "internalVal")
+        val _columnIndexOfInternalVar: Int = getColumnIndexOrThrow(_stmt, "internalVar")
+        val _columnIndexOfInternalSetterVar: Int = getColumnIndexOrThrow(_stmt, "internalSetterVar")
         val _result: MyEntity
         if (_stmt.step()) {
           val _tmpPk: Int
-          _tmpPk = _stmt.getLong(_cursorIndexOfPk).toInt()
+          _tmpPk = _stmt.getLong(_columnIndexOfPk).toInt()
           val _tmpInternalVal: Long
-          _tmpInternalVal = _stmt.getLong(_cursorIndexOfInternalVal)
+          _tmpInternalVal = _stmt.getLong(_columnIndexOfInternalVal)
           _result = MyEntity(_tmpPk,_tmpInternalVal)
-          _result.internalVar = _stmt.getLong(_cursorIndexOfInternalVar)
-          _result.internalSetterVar = _stmt.getLong(_cursorIndexOfInternalSetterVar)
+          _result.internalVar = _stmt.getLong(_columnIndexOfInternalVar)
+          _result.internalSetterVar = _stmt.getLong(_columnIndexOfInternalSetterVar)
         } else {
           error("The query result was empty, but expected a single row to return a NON-NULL object of type <MyEntity>.")
         }

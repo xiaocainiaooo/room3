@@ -48,19 +48,19 @@ public class MyDao_Impl(
     return performBlocking(__db, true, false) { _connection ->
       val _stmt: SQLiteStatement = _connection.prepare(_sql)
       try {
-        val _cursorIndexOfMValue: Int = getColumnIndexOrThrow(_stmt, "mValue")
-        val _cursorIndexOfMNullableValue: Int = getColumnIndexOrThrow(_stmt, "mNullableValue")
+        val _columnIndexOfMValue: Int = getColumnIndexOrThrow(_stmt, "mValue")
+        val _columnIndexOfMNullableValue: Int = getColumnIndexOrThrow(_stmt, "mNullableValue")
         val _result: MyEntity
         if (_stmt.step()) {
           _result = MyEntity()
           val _tmpMValue: Long
-          _tmpMValue = _stmt.getLong(_cursorIndexOfMValue)
+          _tmpMValue = _stmt.getLong(_columnIndexOfMValue)
           _result.setValue(_tmpMValue)
           val _tmpMNullableValue: String?
-          if (_stmt.isNull(_cursorIndexOfMNullableValue)) {
+          if (_stmt.isNull(_columnIndexOfMNullableValue)) {
             _tmpMNullableValue = null
           } else {
-            _tmpMNullableValue = _stmt.getText(_cursorIndexOfMNullableValue)
+            _tmpMNullableValue = _stmt.getText(_columnIndexOfMNullableValue)
           }
           _result.setNullableValue(_tmpMNullableValue)
         } else {

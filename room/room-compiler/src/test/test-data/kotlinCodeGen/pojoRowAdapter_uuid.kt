@@ -51,20 +51,20 @@ public class MyDao_Impl(
     return performBlocking(__db, true, false) { _connection ->
       val _stmt: SQLiteStatement = _connection.prepare(_sql)
       try {
-        val _cursorIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
-        val _cursorIndexOfUuid: Int = getColumnIndexOrThrow(_stmt, "uuid")
-        val _cursorIndexOfNullableUuid: Int = getColumnIndexOrThrow(_stmt, "nullableUuid")
+        val _columnIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
+        val _columnIndexOfUuid: Int = getColumnIndexOrThrow(_stmt, "uuid")
+        val _columnIndexOfNullableUuid: Int = getColumnIndexOrThrow(_stmt, "nullableUuid")
         val _result: MyEntity
         if (_stmt.step()) {
           val _tmpPk: Int
-          _tmpPk = _stmt.getLong(_cursorIndexOfPk).toInt()
+          _tmpPk = _stmt.getLong(_columnIndexOfPk).toInt()
           val _tmpUuid: UUID
-          _tmpUuid = convertByteToUUID(_stmt.getBlob(_cursorIndexOfUuid))
+          _tmpUuid = convertByteToUUID(_stmt.getBlob(_columnIndexOfUuid))
           val _tmpNullableUuid: UUID?
-          if (_stmt.isNull(_cursorIndexOfNullableUuid)) {
+          if (_stmt.isNull(_columnIndexOfNullableUuid)) {
             _tmpNullableUuid = null
           } else {
-            _tmpNullableUuid = convertByteToUUID(_stmt.getBlob(_cursorIndexOfNullableUuid))
+            _tmpNullableUuid = convertByteToUUID(_stmt.getBlob(_columnIndexOfNullableUuid))
           }
           _result = MyEntity(_tmpPk,_tmpUuid,_tmpNullableUuid)
         } else {

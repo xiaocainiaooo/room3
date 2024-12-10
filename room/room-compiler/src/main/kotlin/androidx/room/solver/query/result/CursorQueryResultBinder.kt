@@ -60,7 +60,7 @@ class CursorQueryResultBinder : QueryResultBinder(NO_OP_RESULT_ADAPTER) {
             object : QueryResultAdapter(emptyList()) {
                 override fun convert(
                     outVarName: String,
-                    cursorVarName: String,
+                    stmtVarName: String,
                     scope: CodeGenScope
                 ) {}
             }

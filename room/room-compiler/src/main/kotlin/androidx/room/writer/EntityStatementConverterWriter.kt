@@ -29,7 +29,7 @@ import androidx.room.vo.Entity
 import androidx.room.vo.FieldWithIndex
 import java.util.Locale
 
-class EntityCursorConverterWriter(private val entity: Entity) :
+class EntityStatementConverterWriter(private val entity: Entity) :
     TypeWriter.SharedFunctionSpec(
         "entityStatementConverter_${entity.className.canonicalName.stripNonJava()}"
     ) {
@@ -39,14 +39,14 @@ class EntityCursorConverterWriter(private val entity: Entity) :
 
     override fun prepare(methodName: String, writer: TypeWriter, builder: XFunSpec.Builder) {
         builder.apply {
-            val cursorParamName = "statement"
-            addParameter(cursorParamName, SQLiteDriverTypeNames.STATEMENT)
+            val stmtParamName = "statement"
+            addParameter(stmtParamName, SQLiteDriverTypeNames.STATEMENT)
             returns(entity.typeName)
-            addCode(buildConvertMethodBody(writer, cursorParamName))
+            addCode(buildConvertMethodBody(writer, stmtParamName))
         }
     }
 
-    private fun buildConvertMethodBody(writer: TypeWriter, cursorParamName: String): XCodeBlock {
+    private fun buildConvertMethodBody(writer: TypeWriter, stmtParamName: String): XCodeBlock {
         val scope = CodeGenScope(writer)
         val entityVar = scope.getTmpVar("_entity")
         scope.builder.apply {
@@ -55,26 +55,21 @@ class EntityCursorConverterWriter(private val entity: Entity) :
                 entity.fields.map {
                     val indexVar =
                         scope.getTmpVar(
-                            "_cursorIndexOf${it.name.stripNonJava().capitalize(Locale.US)}"
+                            "_columnIndexOf${it.name.stripNonJava().capitalize(Locale.US)}"
                         )
                     val packageMember = STATEMENT_UTIL.packageMember("getColumnIndex")
                     addLocalVariable(
                         name = indexVar,
                         typeName = XTypeName.PRIMITIVE_INT,
                         assignExpr =
-                            XCodeBlock.of(
-                                "%M(%N, %S)",
-                                packageMember,
-                                cursorParamName,
-                                it.columnName
-                            )
+                            XCodeBlock.of("%M(%N, %S)", packageMember, stmtParamName, it.columnName)
                     )
                     FieldWithIndex(field = it, indexVar = indexVar, alwaysExists = false)
                 }
-            FieldReadWriteWriter.readFromCursor(
+            FieldReadWriteWriter.readFromStatement(
                 outVar = entityVar,
                 outPojo = entity,
-                cursorVar = cursorParamName,
+                stmtVar = stmtParamName,
                 fieldsWithIndices = fieldsWithIndices,
                 relationCollectors = emptyList(), // no relationship for entities
                 scope = scope

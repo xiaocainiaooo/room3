@@ -88,56 +88,56 @@ public class MyDao_Impl(
     return performBlocking(__db, true, false) { _connection ->
       val _stmt: SQLiteStatement = _connection.prepare(_sql)
       try {
-        val _cursorIndexOfInt: Int = getColumnIndexOrThrow(_stmt, "int")
-        val _cursorIndexOfShort: Int = getColumnIndexOrThrow(_stmt, "short")
-        val _cursorIndexOfByte: Int = getColumnIndexOrThrow(_stmt, "byte")
-        val _cursorIndexOfLong: Int = getColumnIndexOrThrow(_stmt, "long")
-        val _cursorIndexOfChar: Int = getColumnIndexOrThrow(_stmt, "char")
-        val _cursorIndexOfFloat: Int = getColumnIndexOrThrow(_stmt, "float")
-        val _cursorIndexOfDouble: Int = getColumnIndexOrThrow(_stmt, "double")
+        val _columnIndexOfInt: Int = getColumnIndexOrThrow(_stmt, "int")
+        val _columnIndexOfShort: Int = getColumnIndexOrThrow(_stmt, "short")
+        val _columnIndexOfByte: Int = getColumnIndexOrThrow(_stmt, "byte")
+        val _columnIndexOfLong: Int = getColumnIndexOrThrow(_stmt, "long")
+        val _columnIndexOfChar: Int = getColumnIndexOrThrow(_stmt, "char")
+        val _columnIndexOfFloat: Int = getColumnIndexOrThrow(_stmt, "float")
+        val _columnIndexOfDouble: Int = getColumnIndexOrThrow(_stmt, "double")
         val _result: MyEntity
         if (_stmt.step()) {
           val _tmpInt: Int?
-          if (_stmt.isNull(_cursorIndexOfInt)) {
+          if (_stmt.isNull(_columnIndexOfInt)) {
             _tmpInt = null
           } else {
-            _tmpInt = _stmt.getLong(_cursorIndexOfInt).toInt()
+            _tmpInt = _stmt.getLong(_columnIndexOfInt).toInt()
           }
           val _tmpShort: Short?
-          if (_stmt.isNull(_cursorIndexOfShort)) {
+          if (_stmt.isNull(_columnIndexOfShort)) {
             _tmpShort = null
           } else {
-            _tmpShort = _stmt.getLong(_cursorIndexOfShort).toShort()
+            _tmpShort = _stmt.getLong(_columnIndexOfShort).toShort()
           }
           val _tmpByte: Byte?
-          if (_stmt.isNull(_cursorIndexOfByte)) {
+          if (_stmt.isNull(_columnIndexOfByte)) {
             _tmpByte = null
           } else {
-            _tmpByte = _stmt.getLong(_cursorIndexOfByte).toByte()
+            _tmpByte = _stmt.getLong(_columnIndexOfByte).toByte()
           }
           val _tmpLong: Long?
-          if (_stmt.isNull(_cursorIndexOfLong)) {
+          if (_stmt.isNull(_columnIndexOfLong)) {
             _tmpLong = null
           } else {
-            _tmpLong = _stmt.getLong(_cursorIndexOfLong)
+            _tmpLong = _stmt.getLong(_columnIndexOfLong)
           }
           val _tmpChar: Char?
-          if (_stmt.isNull(_cursorIndexOfChar)) {
+          if (_stmt.isNull(_columnIndexOfChar)) {
             _tmpChar = null
           } else {
-            _tmpChar = _stmt.getLong(_cursorIndexOfChar).toChar()
+            _tmpChar = _stmt.getLong(_columnIndexOfChar).toChar()
           }
           val _tmpFloat: Float?
-          if (_stmt.isNull(_cursorIndexOfFloat)) {
+          if (_stmt.isNull(_columnIndexOfFloat)) {
             _tmpFloat = null
           } else {
-            _tmpFloat = _stmt.getDouble(_cursorIndexOfFloat).toFloat()
+            _tmpFloat = _stmt.getDouble(_columnIndexOfFloat).toFloat()
           }
           val _tmpDouble: Double?
-          if (_stmt.isNull(_cursorIndexOfDouble)) {
+          if (_stmt.isNull(_columnIndexOfDouble)) {
             _tmpDouble = null
           } else {
-            _tmpDouble = _stmt.getDouble(_cursorIndexOfDouble)
+            _tmpDouble = _stmt.getDouble(_columnIndexOfDouble)
           }
           _result = MyEntity(_tmpInt,_tmpShort,_tmpByte,_tmpLong,_tmpChar,_tmpFloat,_tmpDouble)
         } else {

@@ -54,19 +54,19 @@ public class MyDao_Impl(
     return performBlocking(__db, true, false) { _connection ->
       val _stmt: SQLiteStatement = _connection.prepare(_sql)
       try {
-        val _cursorIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
-        val _cursorIndexOfFoo: Int = getColumnIndexOrThrow(_stmt, "foo")
-        val _cursorIndexOfBar: Int = getColumnIndexOrThrow(_stmt, "bar")
+        val _columnIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
+        val _columnIndexOfFoo: Int = getColumnIndexOrThrow(_stmt, "foo")
+        val _columnIndexOfBar: Int = getColumnIndexOrThrow(_stmt, "bar")
         val _result: MyEntity
         if (_stmt.step()) {
           val _tmpPk: Int
-          _tmpPk = _stmt.getLong(_cursorIndexOfPk).toInt()
+          _tmpPk = _stmt.getLong(_columnIndexOfPk).toInt()
           val _tmpFoo: Foo
           val _tmp: String?
-          if (_stmt.isNull(_cursorIndexOfFoo)) {
+          if (_stmt.isNull(_columnIndexOfFoo)) {
             _tmp = null
           } else {
-            _tmp = _stmt.getText(_cursorIndexOfFoo)
+            _tmp = _stmt.getText(_columnIndexOfFoo)
           }
           val _tmp_1: Foo? = FooBarConverter.fromString(_tmp)
           if (_tmp_1 == null) {
@@ -76,10 +76,10 @@ public class MyDao_Impl(
           }
           val _tmpBar: Bar
           val _tmp_2: String?
-          if (_stmt.isNull(_cursorIndexOfBar)) {
+          if (_stmt.isNull(_columnIndexOfBar)) {
             _tmp_2 = null
           } else {
-            _tmp_2 = _stmt.getText(_cursorIndexOfBar)
+            _tmp_2 = _stmt.getText(_columnIndexOfBar)
           }
           val _tmp_3: Foo? = FooBarConverter.fromString(_tmp_2)
           val _tmp_4: Bar?

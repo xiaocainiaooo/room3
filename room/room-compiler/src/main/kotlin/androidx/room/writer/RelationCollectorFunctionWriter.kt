@@ -114,10 +114,7 @@ class RelationCollectorFunctionWriter(private val collector: RelationCollector) 
         addRelationCollectorCode(scope, stmtVar)
     }
 
-    private fun XCodeBlock.Builder.addRelationCollectorCode(
-        scope: CodeGenScope,
-        cursorVar: String
-    ) {
+    private fun XCodeBlock.Builder.addRelationCollectorCode(scope: CodeGenScope, stmtVar: String) {
         val relation = collector.relation
         beginControlFlow("try").apply {
             // Gets index of the column to be used as key
@@ -141,7 +138,7 @@ class RelationCollectorFunctionWriter(private val collector: RelationCollector) 
                     typeName = XTypeName.PRIMITIVE_INT,
                     assignExprFormat = "%M(%L, %S)",
                     RoomTypeNames.STATEMENT_UTIL.packageMember("getColumnIndex"),
-                    cursorVar,
+                    stmtVar,
                     relation.entityField.columnName
                 )
             }
@@ -152,13 +149,13 @@ class RelationCollectorFunctionWriter(private val collector: RelationCollector) 
             endControlFlow()
 
             // Prepare item column indices
-            collector.rowAdapter.onCursorReady(cursorVarName = cursorVar, scope = scope)
+            collector.rowAdapter.onStatementReady(stmtVarName = stmtVar, scope = scope)
             val tmpVarName = scope.getTmpVar("_item")
             val stepName = "step"
-            beginControlFlow("while (%L.$stepName())", cursorVar).apply {
-                // Read key from the cursor, convert row to item and place it on map
+            beginControlFlow("while (%L.$stepName())", stmtVar).apply {
+                // Read key from the statement, convert row to item and place it on map
                 collector.readKey(
-                    cursorVarName = cursorVar,
+                    stmtVarName = stmtVar,
                     indexVar = itemKeyIndexVar,
                     keyReader = collector.entityKeyColumnReader,
                     scope = scope
@@ -174,13 +171,13 @@ class RelationCollectorFunctionWriter(private val collector: RelationCollector) 
                         )
                         beginControlFlow("if (%L != null)", relationVar)
                         addLocalVariable(tmpVarName, relation.pojoTypeName)
-                        collector.rowAdapter.convert(tmpVarName, cursorVar, scope)
+                        collector.rowAdapter.convert(tmpVarName, stmtVar, scope)
                         addStatement("%L.add(%L)", relationVar, tmpVarName)
                         endControlFlow()
                     } else {
                         beginControlFlow("if (%N.containsKey(%L))", PARAM_MAP_VARIABLE, keyVar)
                         addLocalVariable(tmpVarName, relation.pojoTypeName)
-                        collector.rowAdapter.convert(tmpVarName, cursorVar, scope)
+                        collector.rowAdapter.convert(tmpVarName, stmtVar, scope)
                         addStatement("%N.put(%L, %L)", PARAM_MAP_VARIABLE, keyVar, tmpVarName)
                         endControlFlow()
                     }
@@ -188,7 +185,7 @@ class RelationCollectorFunctionWriter(private val collector: RelationCollector) 
             }
             endControlFlow()
         }
-        nextControlFlow("finally").apply { addStatement("%L.close()", cursorVar) }
+        nextControlFlow("finally").apply { addStatement("%L.close()", stmtVar) }
         endControlFlow()
     }
 

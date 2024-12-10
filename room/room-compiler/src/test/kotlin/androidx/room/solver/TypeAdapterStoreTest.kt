@@ -431,7 +431,7 @@ class TypeAdapterStoreTest {
             )
 
             val cursorScope = testCodeGenScope()
-            adapter.readFromCursor("res", "curs", "7", cursorScope)
+            adapter.readFromStatement("res", "curs", "7", cursorScope)
             assertThat(
                 cursorScope.generate().toString(CodeLanguage.JAVA).trim(),
                 `is`(
@@ -502,7 +502,7 @@ class TypeAdapterStoreTest {
             )
 
             val cursorScope = testCodeGenScope()
-            adapter.readFromCursor("res", "curs", "11", cursorScope).toString()
+            adapter.readFromStatement("res", "curs", "11", cursorScope).toString()
             assertThat(
                 cursorScope.generate().toString(CodeLanguage.JAVA).trim(),
                 `is`(
@@ -528,11 +528,11 @@ class TypeAdapterStoreTest {
                     dateTypeConverters(invocation.processingEnv)
                 )
             val tDate = invocation.processingEnv.requireType("java.util.Date").makeNullable()
-            val adapter = store.findCursorValueReader(tDate, SQLTypeAffinity.INTEGER)
+            val adapter = store.findStatementValueReader(tDate, SQLTypeAffinity.INTEGER)
             assertThat(adapter, notNullValue())
             assertThat(adapter?.typeMirror(), `is`(tDate))
             val bindScope = testCodeGenScope()
-            adapter!!.readFromCursor("outDate", "curs", "0", bindScope)
+            adapter!!.readFromStatement("outDate", "curs", "0", bindScope)
             assertThat(
                 bindScope.generate().toString(CodeLanguage.JAVA).trim(),
                 `is`(

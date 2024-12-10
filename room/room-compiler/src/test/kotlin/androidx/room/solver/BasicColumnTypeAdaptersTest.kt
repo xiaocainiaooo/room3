@@ -279,7 +279,7 @@ class BasicColumnTypeAdaptersTest(
                 """
                         .trimIndent()
                 }
-            adapter.readFromCursor("out", "readSt", "9", scope)
+            adapter.readFromStatement("out", "readSt", "9", scope)
             assertThat(scope.generate().toString(CodeLanguage.JAVA).trim(), `is`(expected))
             generateCode(invocation, scope, type)
         }
@@ -300,7 +300,7 @@ class BasicColumnTypeAdaptersTest(
                         affinity = null,
                         skipDefaultConverter = false
                     )!!
-            adapter.readFromCursor("out", "readSt", "9", scope)
+            adapter.readFromStatement("out", "readSt", "9", scope)
             val expected =
                 if (invocation.isKsp) {
                     readCode
@@ -330,7 +330,7 @@ class BasicColumnTypeAdaptersTest(
                         BuiltInConverterFlags.DEFAULT
                     )
                     .findColumnTypeAdapter(nullableType, null, false)!!
-            adapter.readFromCursor("out", "readSt", "9", scope)
+            adapter.readFromStatement("out", "readSt", "9", scope)
             assertThat(
                 scope.generate().toString(CodeLanguage.JAVA).trim(),
                 `is`(

@@ -49,20 +49,20 @@ public class MyDao_Impl(
     return performBlocking(__db, true, false) { _connection ->
       val _stmt: SQLiteStatement = _connection.prepare(_sql)
       try {
-        val _cursorIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
-        val _cursorIndexOfByteArray: Int = getColumnIndexOrThrow(_stmt, "byteArray")
-        val _cursorIndexOfNullableByteArray: Int = getColumnIndexOrThrow(_stmt, "nullableByteArray")
+        val _columnIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
+        val _columnIndexOfByteArray: Int = getColumnIndexOrThrow(_stmt, "byteArray")
+        val _columnIndexOfNullableByteArray: Int = getColumnIndexOrThrow(_stmt, "nullableByteArray")
         val _result: MyEntity
         if (_stmt.step()) {
           val _tmpPk: Int
-          _tmpPk = _stmt.getLong(_cursorIndexOfPk).toInt()
+          _tmpPk = _stmt.getLong(_columnIndexOfPk).toInt()
           val _tmpByteArray: ByteArray
-          _tmpByteArray = _stmt.getBlob(_cursorIndexOfByteArray)
+          _tmpByteArray = _stmt.getBlob(_columnIndexOfByteArray)
           val _tmpNullableByteArray: ByteArray?
-          if (_stmt.isNull(_cursorIndexOfNullableByteArray)) {
+          if (_stmt.isNull(_columnIndexOfNullableByteArray)) {
             _tmpNullableByteArray = null
           } else {
-            _tmpNullableByteArray = _stmt.getBlob(_cursorIndexOfNullableByteArray)
+            _tmpNullableByteArray = _stmt.getBlob(_columnIndexOfNullableByteArray)
           }
           _result = MyEntity(_tmpPk,_tmpByteArray,_tmpNullableByteArray)
         } else {
