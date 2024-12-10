@@ -17,19 +17,43 @@
 package androidx.core.backported.fixes
 
 /** List of all known issue reportable by [BackportedFixManager] */
-internal enum class KnownIssue(public val id: Long, public val alias: Int) {
+internal class KnownIssue private constructor(val id: Long, val alias: Int) {
+    // TODO b/381266031 - Make public
     // TODO b/381267367 - Add link to public list issues
+    override fun equals(other: Any?) = other is KnownIssue && id == other.id
 
-    // keep-sorted start newline_separated=yes sticky_prefixes=/*
-    /** Sample known issue that is always fixed on a device. */
-    KI_350037023(350037023L, 1),
+    override fun hashCode() = id.hashCode()
 
-    /** Sample known issue that is never fixed on a device. */
-    KI_350037348(350037348L, 3),
+    override fun toString(): String {
+        return if (alias == 0) {
+            "$id without alias"
+        } else {
+            "$id with alias $alias"
+        }
+    }
 
-    /** Sample known issue that is only applies to robolectric devices */
-    KI_372917199(372917199L, 2),
+    companion object {
+        // keep-sorted start newline_separated=yes sticky_prefixes=/*
+        /** Sample known issue that is always fixed on a device. */
+        @JvmField val KI_350037023 = KnownIssue(350037023L, 1)
 
-    // keep-sorted end
+        /** Sample known issue that is never fixed on a device. */
+        @JvmField val KI_350037348 = KnownIssue(350037348L, 3)
 
+        /** Sample known issue that is only applies to robolectric devices */
+        @JvmField val KI_372917199 = KnownIssue(372917199L, 2)
+
+        // keep-sorted end
+
+        @JvmField
+        val values = lazy {
+            listOf(
+                // keep-sorted start
+                KI_350037023,
+                KI_350037348,
+                KI_372917199,
+                // keep-sorted end
+            )
+        }
+    }
 }
