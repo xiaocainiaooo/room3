@@ -18,52 +18,29 @@ package androidx.compose.ui.autofill
 
 import android.graphics.Rect
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
-import android.text.InputType
 import android.util.Log
 import android.util.SparseArray
 import android.view.View
 import android.view.ViewStructure
-import android.view.autofill.AutofillManager as PlatformAndroidManager
+import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
-import android.view.inputmethod.EditorInfo
 import androidx.annotation.RequiresApi
-import androidx.collection.IntObjectMap
-import androidx.collection.MutableIntObjectMap
 import androidx.collection.MutableIntSet
-import androidx.collection.intObjectMapOf
-import androidx.collection.mutableIntObjectMapOf
+import androidx.collection.mutableObjectListOf
 import androidx.compose.ui.internal.checkPreconditionNotNull
-import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.platform.AndroidComposeView
-import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.TextClassName
-import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.TextFieldClassName
-import androidx.compose.ui.platform.SemanticsNodeCopy
-import androidx.compose.ui.platform.SemanticsNodeWithAdjustedBounds
-import androidx.compose.ui.platform.getAllUncoveredSemanticsNodesToIntObjectMap
-import androidx.compose.ui.semantics.Role.Companion.Tab
-import androidx.compose.ui.semantics.SemanticsActions.OnAutofillText
-import androidx.compose.ui.semantics.SemanticsActions.OnClick
-import androidx.compose.ui.semantics.SemanticsActions.OnLongClick
-import androidx.compose.ui.semantics.SemanticsActions.SetText
-import androidx.compose.ui.semantics.SemanticsNode
-import androidx.compose.ui.semantics.SemanticsProperties.ContentDataType as SemanticsContentDataType
-import androidx.compose.ui.semantics.SemanticsProperties.ContentDescription
-import androidx.compose.ui.semantics.SemanticsProperties.ContentType
-import androidx.compose.ui.semantics.SemanticsProperties.Disabled
-import androidx.compose.ui.semantics.SemanticsProperties.EditableText
-import androidx.compose.ui.semantics.SemanticsProperties.Focused
-import androidx.compose.ui.semantics.SemanticsProperties.MaxTextLength
-import androidx.compose.ui.semantics.SemanticsProperties.Password
-import androidx.compose.ui.semantics.SemanticsProperties.Role
-import androidx.compose.ui.semantics.SemanticsProperties.Selected
-import androidx.compose.ui.semantics.SemanticsProperties.Text
-import androidx.compose.ui.semantics.SemanticsProperties.ToggleableState
+import androidx.compose.ui.platform.coreshims.ViewCompatShims
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsConfiguration
+import androidx.compose.ui.semantics.SemanticsInfo
+import androidx.compose.ui.semantics.SemanticsListener
+import androidx.compose.ui.semantics.SemanticsOwner
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
-import androidx.compose.ui.state.ToggleableState.On
+import androidx.compose.ui.spatial.RectManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.util.fastForEach
+
+private const val logTag = "ComposeAutofillManager"
 
 /**
  * Semantic autofill implementation for Android.
@@ -71,512 +48,217 @@ import androidx.compose.ui.util.fastForEach
  * @param view The parent compose view.
  */
 @RequiresApi(Build.VERSION_CODES.O)
-internal class AndroidAutofillManager(val view: AndroidComposeView) :
-    AutofillManager, View.OnAttachStateChangeListener {
-    internal var autofillManager: AutofillManagerWrapper = AutofillManagerWrapperImpl(view)
-
-    private var previouslyDisplayedIDs = MutableIntSet()
-    private var currentlyDisplayedIDs = MutableIntSet()
-    private var pendingChanges = false
+internal class AndroidAutofillManager(
+    var platformAutofillManager: PlatformAutofillManager,
+    private val semanticsOwner: SemanticsOwner,
+    private val view: View,
+    private val rectManager: RectManager,
+    private val packageName: String,
+) : AutofillManager, SemanticsListener {
+    private var reusableRect = Rect()
+    private var rootAutofillId: AutofillId
 
     init {
         view.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_YES
+        rootAutofillId =
+            checkPreconditionNotNull(ViewCompatShims.getAutofillId(view)?.toAutofillId())
     }
 
-    private val handler = Handler(Looper.getMainLooper())
+    override fun commit() {
+        platformAutofillManager.commit()
+    }
 
-    // `previousSemanticsNodes` holds the previous pruned semantics tree so that we can compare the
-    // current and previous trees in onSemanticsChange(). We use SemanticsNodeCopy here because
-    // SemanticsNode's children are dynamically generated and always reflect the current children.
-    // We need to keep a copy of its old structure for comparison.
-    private var previousSemanticsNodes: MutableIntObjectMap<SemanticsNodeCopy> =
-        mutableIntObjectMapOf()
-    private var previousSemanticsRoot =
-        SemanticsNodeCopy(view.semanticsOwner.unmergedRootSemanticsNode, intObjectMapOf())
-    private var checkingForSemanticsChanges = false
+    override fun cancel() {
+        platformAutofillManager.cancel()
+    }
 
-    internal var currentSemanticsNodesInvalidated = true
-    // This will be used to request autofill when `AutofillManager.requestAutofill()` is called
-    // (e.g. from the text toolbar).
-    private var previouslyFocusedId = 0
+    // This will be used to request autofill when
+    // `AutofillManager.requestAutofillForActiveElement()` is called (e.g. from the text toolbar).
+    private var previouslyFocusedId = -1
 
-    internal var currentSemanticsNodes: IntObjectMap<SemanticsNodeWithAdjustedBounds> =
-        intObjectMapOf()
-        get() {
-            if (currentSemanticsNodesInvalidated) { // first instance of retrieving all nodes
-                currentSemanticsNodesInvalidated = false
-                field = view.semanticsOwner.getAllUncoveredSemanticsNodesToIntObjectMap()
-            }
-            return field
+    override fun requestAutofillForActiveElement() {
+        if (previouslyFocusedId <= 0) return
+
+        rectManager.rects.withRect(previouslyFocusedId) { left, top, right, bottom ->
+            reusableRect.set(left, top, right, bottom)
+            platformAutofillManager.requestAutofill(view, previouslyFocusedId, reusableRect)
         }
-
-    private fun updateSemanticsCopy() {
-        previousSemanticsNodes.clear()
-        currentSemanticsNodes.forEach { key, value ->
-            previousSemanticsNodes[key] =
-                SemanticsNodeCopy(value.semanticsNode, currentSemanticsNodes)
-        }
-        previousSemanticsRoot =
-            SemanticsNodeCopy(view.semanticsOwner.unmergedRootSemanticsNode, currentSemanticsNodes)
     }
 
-    private val autofillChangeChecker = Runnable {
-        checkForAutofillPropertyChanges(currentSemanticsNodes)
-        updateSemanticsCopy()
-        checkingForSemanticsChanges = false
-    }
-
-    private fun checkForAutofillPropertyChanges(
-        newSemanticsNodes: IntObjectMap<SemanticsNodeWithAdjustedBounds>
+    /** Send events to the autofill service in response to semantics changes. */
+    override fun onSemanticsChanged(
+        semanticsInfo: SemanticsInfo,
+        previousSemanticsConfiguration: SemanticsConfiguration?
     ) {
-        newSemanticsNodes.forEachKey { id ->
-            // We do this search because the new configuration is set as a whole, so we
-            // can't indicate which property is changed when setting the new configuration.
-            val previousNode = previousSemanticsNodes[id]
-            val currNode =
-                checkPreconditionNotNull(newSemanticsNodes[id]?.semanticsNode) {
-                    "no value for specified key"
+        val config = semanticsInfo.semanticsConfiguration
+        val prevConfig = previousSemanticsConfiguration
+        val semanticsId = semanticsInfo.semanticsId
+
+        // Check Editable Text.
+        val previousText = prevConfig?.getOrNull(SemanticsProperties.EditableText)?.text
+        val newText = config?.getOrNull(SemanticsProperties.EditableText)?.text
+        if (previousText != newText && newText != null) {
+            val contentDataType = config.getOrNull(SemanticsProperties.ContentDataType)
+            if (contentDataType == ContentDataType.Text) {
+                platformAutofillManager.notifyValueChanged(
+                    view,
+                    semanticsId,
+                    AutofillApi26Helper.getAutofillTextValue(newText.toString())
+                )
+            }
+        }
+
+        // Check Focus.
+        // TODO: Instead of saving the focused item here, add some internal API to focusManager
+        //  so that this could be more efficient.
+        val previousFocus = prevConfig?.getOrNull(SemanticsProperties.Focused)
+        val currFocus = config?.getOrNull(SemanticsProperties.Focused)
+        val supportsAutofill = config?.getOrNull(SemanticsActions.OnAutofillText) != null
+        if (previousFocus != true && currFocus == true && supportsAutofill) {
+            previouslyFocusedId = semanticsId
+            rectManager.rects.withRect(semanticsId) { left, top, right, bottom ->
+                platformAutofillManager.notifyViewEntered(
+                    view,
+                    semanticsId,
+                    Rect(left, top, right, bottom)
+                )
+            }
+        }
+        val previouslySupportedAutofill = config?.getOrNull(SemanticsActions.OnAutofillText) != null
+        if (previousFocus == true && currFocus != true && previouslySupportedAutofill) {
+            platformAutofillManager.notifyViewExited(view, semanticsId)
+        }
+
+        // Update currentlyDisplayedIDs if relevance to Autofill has changed.
+        val prevRelatedToAutofill = prevConfig?.isRelatedToAutofill()
+        val currRelatedToAutofill = config?.isRelatedToAutofill()
+        if (prevRelatedToAutofill != currRelatedToAutofill) {
+            if (currRelatedToAutofill == true) {
+                currentlyDisplayedIDs.add(semanticsId)
+            } else {
+                currentlyDisplayedIDs.remove(semanticsId)
+            }
+            executeAutoCommit()
+        }
+    }
+
+    /** Populate the structure of the entire view hierarchy when the framework requests it. */
+    fun populateViewStructure(rootViewStructure: ViewStructure) {
+        val autofillApi = AutofillApi26Helper
+        val rootSemanticInfo = semanticsOwner.rootInfo
+
+        // Populate view structure for the root.
+        rootViewStructure.populate(rootSemanticInfo, rootAutofillId, packageName, rectManager)
+
+        // We save the semanticInfo and viewStructure of the item in a list. These are always stored
+        // as pairs, and we need to cast them back to the required types when we extract them.
+        val populateChildren = mutableObjectListOf<Any>(rootSemanticInfo, rootViewStructure)
+
+        @Suppress("Range") // isNotEmpty ensures removeAt is not called with -1.
+        while (populateChildren.isNotEmpty()) {
+
+            val parentStructure =
+                populateChildren.removeAt(populateChildren.lastIndex) as ViewStructure
+            val parentInfo = populateChildren.removeAt(populateChildren.lastIndex) as SemanticsInfo
+
+            parentInfo.childrenInfo.fastForEach { childInfo ->
+                if (childInfo.isDeactivated || !childInfo.isAttached || !childInfo.isPlaced) {
+                    return@fastForEach
                 }
 
-            if (previousNode == null) {
-                return@forEachKey
-            }
-
-            // Notify Autofill that the value has changed if there is a difference between
-            // the previous and current values.
-
-            // Check Editable Text —————————
-            val previousText = previousNode.unmergedConfig.getOrNull(EditableText)?.text
-            val newText = currNode.unmergedConfig.getOrNull(EditableText)?.text
-            if (previousText != newText && newText != null) {
-                notifyAutofillValueChanged(id, newText)
-            }
-
-            // Check Focus —————————
-            val previousFocus = previousNode.unmergedConfig.getOrNull(Focused)
-            val currFocus = currNode.unmergedConfig.getOrNull(Focused)
-            if (previousFocus != true && currFocus == true) {
-                notifyViewEntered(id)
-                previouslyFocusedId = id
-            }
-            if (previousFocus == true && currFocus != true) {
-                notifyViewExited(id)
-            }
-
-            // Check Visibility —————————
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                val prevTransparency = previousNode.isTransparent
-                val currTransparency = currNode.isTransparent
-                if (prevTransparency != currTransparency) {
-                    notifyVisibilityChanged(id, currTransparency)
+                // TODO(b/378160001): For now we only populate autofill-able nodes. Populate the
+                //  structure for all nodes in the future.
+                val semanticsConfigurationChild = childInfo.semanticsConfiguration
+                if (semanticsConfigurationChild?.isRelatedToAutofill() != true) {
+                    populateChildren.add(childInfo)
+                    populateChildren.add(parentStructure)
+                    return@fastForEach
                 }
-            }
 
-            // Check if relevance to Autofill has changed —————————
-            if (previousNode.isRelatedToAutofill != currNode.isRelatedToAutofill) {
-                if (currNode.isRelatedToAutofill) {
-                    // Add node to currently displayed set if it's related to autofill now
-                    currentlyDisplayedIDs.add(currNode.id)
-                } else {
-                    // Remove node from currently displayed set if it's no longer related to
-                    // autofill
-                    currentlyDisplayedIDs.remove(currNode.id)
-                }
-                pendingChanges = true
-                // We need to manually update the previous and current displays if there has been
-                // an added/removed autofillable component. (`onEndApplyChanges` is not called
-                // after `onSemanticsChange`.)
-                onEndApplyChanges()
+                val childIndex = autofillApi.addChildCount(parentStructure, 1)
+                val childStructure = autofillApi.newChild(parentStructure, childIndex)
+                childStructure.populate(childInfo, rootAutofillId, packageName, rectManager)
+                populateChildren.add(childInfo)
+                populateChildren.add(childStructure)
             }
         }
     }
 
-    internal fun onPostAttach(node: LayoutNode) {
-        if (node.isRelatedToAutofill) {
-            currentlyDisplayedIDs.add(node.semanticsId)
-            pendingChanges = true
-            // TODO(MNUZEN): Notify autofill manager that a node has been added via
-            // `notifyViewVisibilityChanged`
+    /** When the autofill service provides data, perform autofill using semantic actions. */
+    fun performAutofill(values: SparseArray<AutofillValue>) {
+        for (index in 0 until values.size()) {
+            val itemId = values.keyAt(index)
+            val value = values[itemId]
+            when {
+                AutofillApi26Helper.isText(value) ->
+                    semanticsOwner[itemId]
+                        ?.semanticsConfiguration
+                        ?.getOrNull(SemanticsActions.OnAutofillText)
+                        ?.action
+                        ?.invoke(AnnotatedString(AutofillApi26Helper.textValue(value).toString()))
+
+                // TODO(b/138604541): Add Autofill support for date fields.
+                AutofillApi26Helper.isDate(value) ->
+                    Log.w(logTag, "Auto filling Date fields is not yet supported.")
+
+                // TODO(b/138604541): Add Autofill support for dropdown lists.
+                AutofillApi26Helper.isList(value) ->
+                    Log.w(logTag, "Auto filling dropdown lists is not yet supported.")
+
+                // TODO(b/138604541): Add Autofill support for toggle fields.
+                AutofillApi26Helper.isToggle(value) ->
+                    Log.w(logTag, "Auto filling toggle fields are not yet supported.")
+            }
         }
     }
 
-    internal fun onDetach(node: LayoutNode) {
-        if (node.isRelatedToAutofill) {
-            currentlyDisplayedIDs.remove(node.semanticsId)
-            pendingChanges = true
-            // TODO(MNUZEN): Notify autofill manager that a node has been removed via
-            // `notifyViewVisibilityChanged`
+    // Consider moving the currently displayed IDs to a separate VisibilityManager class. This might
+    // be needed by ContentCapture and Accessibility.
+    private var currentlyDisplayedIDs = MutableIntSet()
+    private var pendingChangesToDisplayedIds = false
+
+    internal fun onPostAttach(semanticsInfo: SemanticsInfo) {
+        if (semanticsInfo.semanticsConfiguration?.isRelatedToAutofill() == true) {
+            currentlyDisplayedIDs.add(semanticsInfo.semanticsId)
+            pendingChangesToDisplayedIds = true
+            // TODO(MNUZEN): Notify autofill manager that a node has been added.
+            // platformAutofillManager
+            //     .notifyViewVisibilityChanged(view, semanticsInfo.semanticsId, true)
+        }
+    }
+
+    internal fun onDetach(semanticsInfo: SemanticsInfo) {
+        if (semanticsInfo.semanticsConfiguration?.isRelatedToAutofill() == true) {
+            currentlyDisplayedIDs.remove(semanticsInfo.semanticsId)
+            pendingChangesToDisplayedIds = true
+            // TODO(MNUZEN): Notify autofill manager that a node has been removed.
+            // platformAutofillManager
+            //     .notifyViewVisibilityChanged(view, semanticsInfo.semanticsId, false)
         }
     }
 
     internal fun onEndApplyChanges() {
-        // Return if there are no changes
-        if (!pendingChanges) {
-            return
+        if (pendingChangesToDisplayedIds) {
+            executeAutoCommit()
+            pendingChangesToDisplayedIds = false
         }
+    }
 
-        // Check for screen changes or complete removal
+    // We maintain a copy of the previously displayed IDs, and call AutofillManager.commit() when
+    // all the previously displayed IDs were removed.
+    private var previouslyDisplayedIDs = MutableIntSet()
+
+    private fun executeAutoCommit() {
+        // Check for screen changes or complete removal.
         if (!currentlyDisplayedIDs.containsAll(previouslyDisplayedIDs)) {
-            autofillManager.commit()
+            platformAutofillManager.commit()
         }
-
         previouslyDisplayedIDs.copyFrom(currentlyDisplayedIDs)
-        pendingChanges = false
-    }
-
-    internal fun onSemanticsChange() {
-        currentSemanticsNodesInvalidated = true
-        if (!checkingForSemanticsChanges) {
-            checkingForSemanticsChanges = true
-            handler.post(autofillChangeChecker)
-        }
-    }
-
-    private fun notifyViewEntered(semanticsId: Int) {
-        currentSemanticsNodes[semanticsId]?.adjustedBounds?.let {
-            autofillManager.notifyViewEntered(semanticsId, it)
-        }
-    }
-
-    private fun notifyViewExited(semanticsId: Int) {
-        autofillManager.notifyViewExited(semanticsId)
-    }
-
-    private fun notifyAutofillValueChanged(semanticsId: Int, newAutofillValue: Any) {
-        val currSemanticsNode = currentSemanticsNodes[semanticsId]?.semanticsNode
-        val currDataType =
-            currSemanticsNode?.unmergedConfig?.getOrNull(SemanticsContentDataType) ?: return
-        when (currDataType) {
-            ContentDataType.Text ->
-                autofillManager.notifyValueChanged(
-                    semanticsId,
-                    AutofillValue.forText(newAutofillValue.toString())
-                )
-            ContentDataType.Date ->
-                TODO("b/138604541: Add Autofill support for ContentDataType.Date")
-            ContentDataType.List ->
-                TODO("b/138604541: Add Autofill support for ContentDataType.List")
-            ContentDataType.Toggle ->
-                TODO("b/138604541: Add Autofill support for ContentDataType.Toggle")
-            else -> {
-                TODO("b/138604541: Add Autofill support for ContentDataType.None")
-            }
-        }
-    }
-
-    private fun notifyVisibilityChanged(semanticsId: Int, isInvisible: Boolean) {
-        autofillManager.notifyViewVisibilityChanged(semanticsId, !isInvisible)
-    }
-
-    override fun commit() {
-        autofillManager.commit()
-    }
-
-    override fun cancel() {
-        autofillManager.cancel()
-    }
-
-    override fun requestAutofillForActiveElement() {
-        currentSemanticsNodes[previouslyFocusedId]?.let {
-            autofillManager.requestAutofill(previouslyFocusedId, it.adjustedBounds)
-        }
-    }
-
-    internal fun onTextFillHelper(toFillId: Int, autofillValue: String) {
-        // Use mapping to find lambda corresponding w semanticsNodeId,
-        // then invoke the lambda. This will change the field text.
-        val currSemanticsNode = currentSemanticsNodes[toFillId]?.semanticsNode
-        currSemanticsNode
-            ?.unmergedConfig
-            ?.getOrNull(OnAutofillText)
-            ?.action
-            ?.invoke(AnnotatedString(autofillValue))
-    }
-
-    companion object {
-        /**
-         * Autofill Manager callback.
-         *
-         * This callback is called when we receive autofill events. It adds some logs that can be
-         * useful for debug purposes.
-         */
-        internal object AutofillSemanticCallback : PlatformAndroidManager.AutofillCallback() {
-            override fun onAutofillEvent(view: View, virtualId: Int, event: Int) {
-                super.onAutofillEvent(view, virtualId, event)
-                Log.d(
-                    "Autofill Status",
-                    when (event) {
-                        EVENT_INPUT_SHOWN -> "Autofill popup was shown."
-                        EVENT_INPUT_HIDDEN -> "Autofill popup was hidden."
-                        EVENT_INPUT_UNAVAILABLE ->
-                            """
-                        |Autofill popup isn't shown because autofill is not available.
-                        |
-                        |Did you set up autofill?
-                        |1. Go to Settings > System > Languages&input > Advanced > Autofill Service
-                        |2. Pick a service
-                        |
-                        |Did you add an account?
-                        |1. Go to Settings > System > Languages&input > Advanced
-                        |2. Click on the settings icon next to the Autofill Service
-                        |3. Add your account
-                        """
-                                .trimMargin()
-                        else -> "Unknown status event."
-                    }
-                )
-            }
-
-            /** Registers the autofill debug callback. */
-            fun register(androidAutofillManager: AndroidAutofillManager) {
-                androidAutofillManager.autofillManager.autofillManager.registerCallback(this)
-            }
-
-            /** Unregisters the autofill debug callback. */
-            fun unregister(androidAutofillManager: AndroidAutofillManager) {
-                androidAutofillManager.autofillManager.autofillManager.unregisterCallback(this)
-            }
-        }
-    }
-
-    override fun onViewAttachedToWindow(v: View) {}
-
-    override fun onViewDetachedFromWindow(v: View) {
-        handler.removeCallbacks(autofillChangeChecker)
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-internal fun AndroidAutofillManager.populateViewStructure(root: ViewStructure) {
-    // Add child nodes. The function returns the index to the first item.
-    val count =
-        currentSemanticsNodes.count { _, semanticsNodeWithAdjustedBounds ->
-            // TODO(333102566): remove the `isRelatedToAutofill` check below
-            //  for heuristics based autofill support.
-            semanticsNodeWithAdjustedBounds.semanticsNode.unmergedConfig.contains(ContentType) ||
-                semanticsNodeWithAdjustedBounds.semanticsNode.unmergedConfig.contains(
-                    SemanticsContentDataType
-                )
-        }
-
-    // TODO(b/138549623): Instead of creating a flattened tree by using the nodes from the map, we
-    //  can use SemanticsOwner to get the root SemanticsInfo and create a more representative tree.
-    var index = AutofillApi26Helper.addChildCount(root, count)
-
-    // Iterate through currentSemanticsNodes, finding autofill-related nodes
-    // and call corresponding APIs on the viewStructure as listed above
-    currentSemanticsNodes.forEach { semanticsId, adjustedNode ->
-        if (
-            adjustedNode.semanticsNode.unmergedConfig.contains(ContentType) ||
-                adjustedNode.semanticsNode.unmergedConfig.contains(SemanticsContentDataType)
-        ) {
-            AutofillApi26Helper.newChild(root, index)?.also { child ->
-                AutofillApi26Helper.setAutofillId(
-                    child,
-                    AutofillApi26Helper.getAutofillId(root)!!,
-                    semanticsId
-                )
-                AutofillApi26Helper.setId(child, semanticsId, view.context.packageName, null, null)
-
-                adjustedNode.semanticsNode.unmergedConfig.getOrNull(SemanticsContentDataType)?.let {
-                    AutofillApi26Helper.setAutofillTypeForViewStruct(child, it)
-                }
-
-                adjustedNode.semanticsNode.unmergedConfig
-                    .getOrNull(ContentType)
-                    ?.contentHints
-                    ?.toTypedArray()
-                    ?.let { AutofillApi26Helper.setAutofillHints(child, it) }
-
-                adjustedNode.adjustedBounds.run {
-                    AutofillApi26Helper.setDimens(child, left, top, 0, 0, width(), height())
-                }
-
-                adjustedNode.semanticsNode.populateViewStructure(child)
-            }
-            index++
-        }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-internal fun SemanticsNode.populateViewStructure(child: ViewStructure) {
-    // ———————— Interactions (clicking, checking, selecting, etc.)
-    AutofillApi26Helper.setClickable(child, unmergedConfig.contains(OnClick))
-    AutofillApi26Helper.setCheckable(child, unmergedConfig.contains(ToggleableState))
-    AutofillApi26Helper.setEnabled(child, (!config.contains(Disabled)))
-    AutofillApi26Helper.setFocused(child, unmergedConfig.getOrNull(Focused) == true)
-    AutofillApi26Helper.setFocusable(child, unmergedConfig.contains(Focused))
-    AutofillApi26Helper.setLongClickable(child, unmergedConfig.contains(OnLongClick))
-    unmergedConfig.getOrNull(Selected)?.let { AutofillApi26Helper.setSelected(child, it) }
-
-    unmergedConfig.getOrNull(ToggleableState)?.let {
-        AutofillApi26Helper.setChecked(child, it == On)
-    }
-    // TODO(MNUZEN): Set setAccessibilityFocused as well
-
-    // ———————— Visibility, elevation, alpha
-    // Transparency should be the only thing affecting View.VISIBLE (pruning will take care of all
-    // covered nodes).
-    // TODO(mnuzen): since we are removing pruning in semantics/accessibility with `semanticInfo`,
-    // double check that this is the correct behavior even after switching.
-    AutofillApi26Helper.setVisibility(
-        child,
-        if (!isTransparent || isRoot) View.VISIBLE else View.INVISIBLE
-    )
-
-    // TODO(335726351): will call the below method when b/335726351 has been fulfilled and
-    // `isOpaque` is added back.
-    // AutofillApi26Helper.setOpaque(child, isOpaque)
-
-    // ———————— Text, role, content description
-    config.getOrNull(Text)?.let { textList ->
-        var concatenatedText = ""
-        textList.fastForEach { text -> concatenatedText += text.text + "\n" }
-        AutofillApi26Helper.setText(child, concatenatedText)
-        AutofillApi26Helper.setClassName(child, TextClassName)
-    }
-
-    unmergedConfig.getOrNull(MaxTextLength)?.let {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            AutofillApi28Helper.setMaxTextLength(child, it)
-        }
-    }
-
-    val role = unmergedConfig.getOrNull(Role)
-    role?.let {
-        if (isFake || replacedChildren.isEmpty()) {
-            AutofillApi26Helper.setClassName(child, it.toLegacyClassName())
-        }
-    }
-
-    if (unmergedConfig.contains(SetText)) {
-        // If `SetText` action exists, then the element is a TextField
-        AutofillApi26Helper.setClassName(child, TextFieldClassName)
-        // If the element is a TextField, then we also want to set the current text value for
-        // autofill. (This data is used when we save autofilled values.)
-        unmergedConfig.getOrNull(Text)?.let { textList ->
-            var concatenatedText = ""
-            textList.fastForEach { text -> concatenatedText += text.text + "\n" }
-            AutofillApi26Helper.setAutofillValue(
-                child,
-                AutofillApi26Helper.getAutofillTextValue(concatenatedText)
-            )
-        }
-    }
-
-    unmergedConfig.getOrNull(Selected)?.let {
-        if (role == Tab) {
-            AutofillApi26Helper.setSelected(child, it)
-        } else {
-            AutofillApi26Helper.setCheckable(child, true)
-            AutofillApi26Helper.setChecked(child, it)
-        }
-    }
-
-    unmergedConfig.getOrNull(ContentDescription)?.firstOrNull()?.let {
-        AutofillApi26Helper.setContentDescription(child, it)
-    }
-
-    // ———————— Parsing autofill hints and types
-    // If there is no explicitly set data type, parse it from semantics.
-    if (unmergedConfig.contains(SetText)) {
-        if (!unmergedConfig.contains(SemanticsContentDataType)) {
-            AutofillApi26Helper.setAutofillType(child, View.AUTOFILL_TYPE_TEXT)
-        }
-    }
-
-    // If it's a password, setInputType and the sensitive flag
-    if (unmergedConfig.contains(Password)) {
-        AutofillApi26Helper.setInputType(
-            child,
-            InputType.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
-        )
-        AutofillApi26Helper.setDataIsSensitive(child, true)
-    }
-
-    // if the toggleableState is not null, set autofillType to AUTOFILL_TYPE_TOGGLE
-    if (unmergedConfig.contains(ToggleableState)) {
-        AutofillApi26Helper.setAutofillType(child, View.AUTOFILL_TYPE_TOGGLE)
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-internal fun AndroidAutofillManager.performAutofill(values: SparseArray<AutofillValue>) {
-    for (index in 0 until values.size()) {
-        val itemId = values.keyAt(index)
-        val value = values[itemId]
-        when {
-            AutofillApi26Helper.isText(value) -> // passing in the autofillID
-            onTextFillHelper(itemId, AutofillApi26Helper.textValue(value).toString())
-            AutofillApi26Helper.isDate(value) ->
-                TODO("b/138604541: Add Autofill support for ContentDataType.Date")
-            AutofillApi26Helper.isList(value) ->
-                TODO("b/138604541: Add Autofill support for ContentDataType.List")
-            AutofillApi26Helper.isToggle(value) ->
-                TODO("b/138604541: Add Autofill support for ContentDataType.Toggle")
-        }
-    }
-}
-
-/** Wrapper for the final AutofillManager class. This can be mocked in testing. */
-@RequiresApi(Build.VERSION_CODES.O)
-internal interface AutofillManagerWrapper {
-    val autofillManager: PlatformAndroidManager
-
-    fun notifyViewEntered(semanticsId: Int, bounds: Rect)
-
-    fun notifyViewExited(semanticsId: Int)
-
-    fun notifyValueChanged(semanticsId: Int, autofillValue: AutofillValue)
-
-    fun notifyViewVisibilityChanged(semanticsId: Int, isVisible: Boolean)
-
-    fun commit()
-
-    fun cancel()
-
-    fun requestAutofill(semanticsId: Int, bounds: Rect)
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-private class AutofillManagerWrapperImpl(val view: View) : AutofillManagerWrapper {
-    override val autofillManager =
-        view.context.getSystemService(PlatformAndroidManager::class.java)
-            ?: error("Autofill service could not be located.")
-
-    override fun notifyViewEntered(semanticsId: Int, bounds: Rect) {
-        autofillManager.notifyViewEntered(view, semanticsId, bounds)
-    }
-
-    override fun notifyViewExited(semanticsId: Int) {
-        autofillManager.notifyViewExited(view, semanticsId)
-    }
-
-    override fun notifyValueChanged(semanticsId: Int, autofillValue: AutofillValue) {
-        autofillManager.notifyValueChanged(view, semanticsId, autofillValue)
-    }
-
-    override fun notifyViewVisibilityChanged(semanticsId: Int, isVisible: Boolean) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            AutofillApi27Helper.notifyViewVisibilityChanged(
-                view,
-                autofillManager,
-                semanticsId,
-                isVisible
-            )
-        }
-    }
-
-    override fun commit() {
-        autofillManager.commit()
-    }
-
-    override fun cancel() {
-        autofillManager.cancel()
-    }
-
-    override fun requestAutofill(semanticsId: Int, bounds: Rect) {
-        autofillManager.requestAutofill(view, semanticsId, bounds)
-    }
+private fun SemanticsConfiguration.isRelatedToAutofill(): Boolean {
+    return props.contains(SemanticsActions.OnAutofillText) ||
+        props.contains(SemanticsProperties.ContentType) ||
+        props.contains(SemanticsProperties.ContentDataType)
 }

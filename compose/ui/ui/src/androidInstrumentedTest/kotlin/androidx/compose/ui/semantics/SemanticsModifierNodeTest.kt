@@ -35,6 +35,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -52,10 +53,19 @@ class SemanticsModifierNodeTest(private val precomputedSemantics: Boolean) {
         fun initParameters() = listOf(false, true)
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
+    private val previousFlagValue = ComposeUiFlags.isSemanticAutofillEnabled
+
     @Before
-    fun setup() {
+    fun enableAutofill() {
         @OptIn(ExperimentalComposeUiApi::class)
         ComposeUiFlags.isSemanticAutofillEnabled = precomputedSemantics
+    }
+
+    @After
+    fun disableAutofill() {
+        @OptIn(ExperimentalComposeUiApi::class)
+        ComposeUiFlags.isSemanticAutofillEnabled = previousFlagValue
     }
 
     @Test

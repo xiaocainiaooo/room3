@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.autofill
 
+// TODO(b/383201236): This is replaced by ContentType. It was experimental in 1.7 so mark it
+//  deprecated before 1.8.
 /**
  * Autofill type information.
  *

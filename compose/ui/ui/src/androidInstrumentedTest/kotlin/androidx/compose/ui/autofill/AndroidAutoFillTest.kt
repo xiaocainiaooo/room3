@@ -77,6 +77,7 @@ class AndroidAutoFillTest {
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun onProvideAutofillVirtualStructure_populatesViewStructure() {
+        // TODO(b/383201236): Ensure the old API works when the new API is enabled.
         if (isSemanticAutofillEnabled) return
         // Arrange.
         val viewStructure: ViewStructure = FakeViewStructure()
@@ -99,10 +100,11 @@ class AndroidAutoFillTest {
                     children.add(
                         FakeViewStructure().apply {
                             virtualId = autofillNode.id
+                            autofillId = ownerView.autofillId
+                            autofillType = View.AUTOFILL_TYPE_TEXT
+                            autofillHints = mutableListOf(AUTOFILL_HINT_PERSON_NAME)
                             packageName = currentPackageName
-                            setAutofillType(View.AUTOFILL_TYPE_TEXT)
-                            setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))
-                            setDimens(0, 0, 0, 0, 0, 0)
+                            bounds = android.graphics.Rect(0, 0, 0, 0)
                         }
                     )
                 }
@@ -112,6 +114,7 @@ class AndroidAutoFillTest {
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun autofill_triggersOnFill() {
+        // TODO(b/383201236): Ensure the old API works when the new API is enabled.
         if (isSemanticAutofillEnabled) return
         // Arrange.
         val expectedValue = "PersonName"

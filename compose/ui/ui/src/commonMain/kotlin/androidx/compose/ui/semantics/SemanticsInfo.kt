@@ -16,10 +16,8 @@
 
 package androidx.compose.ui.semantics
 
-import androidx.compose.runtime.collection.MutableVector
+import androidx.collection.MutableObjectList
 import androidx.compose.ui.layout.LayoutInfo
-import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.node.LayoutNode
 
 /**
  * This is an internal interface that can be used by [SemanticsListener]s to read semantic
@@ -31,6 +29,9 @@ internal interface SemanticsInfo : LayoutInfo {
     /** The semantics configuration (Semantic properties and actions) associated with this node. */
     val semanticsConfiguration: SemanticsConfiguration?
 
+    /** Whether the node is transparent. */
+    fun isTransparent(): Boolean
+
     /**
      * The [SemanticsInfo] of the parent.
      *
@@ -39,13 +40,12 @@ internal interface SemanticsInfo : LayoutInfo {
     override val parentInfo: SemanticsInfo?
 
     /**
-     * Returns the children list sorted by their [LayoutNode.zIndex] first (smaller first) and the
-     * order they were placed via [Placeable.placeAt] by parent (smaller first). Please note that
-     * this list contains not placed items as well, so you have to manually filter them.
+     * Returns the list of children.
      *
-     * Note that the object is reused so you shouldn't save it for later.
+     * Please note that this list contains not placed items as well, so you have to manually filter
+     * them. Note that the object is reused so you shouldn't save it for later.
      */
-    val childrenInfo: MutableVector<SemanticsInfo>
+    val childrenInfo: List<SemanticsInfo>
 }
 
 /** The semantics parent (nearest ancestor which has semantic properties). */
@@ -68,18 +68,36 @@ internal fun SemanticsInfo.findMergingSemanticsParent(): SemanticsInfo? {
     return null
 }
 
-internal inline fun SemanticsInfo.findSemanticsChildren(
-    includeDeactivated: Boolean = false,
-    block: (SemanticsInfo) -> Unit
-) {
-    val unvisitedStack = MutableVector<SemanticsInfo>(childrenInfo.size)
-    childrenInfo.forEachReversed { unvisitedStack += it }
-    while (unvisitedStack.isNotEmpty()) {
-        val child = unvisitedStack.removeAt(unvisitedStack.lastIndex)
-        when {
-            child.isDeactivated && !includeDeactivated -> continue
-            child.semanticsConfiguration != null -> block(child)
-            else -> child.childrenInfo.forEachReversed { unvisitedStack += it }
-        }
+/** Merges the semantics of all the children of this node into a single SemanticsConfiguration. */
+internal fun SemanticsInfo.mergedSemanticsConfiguration(): SemanticsConfiguration? {
+    val unMergedConfig = semanticsConfiguration
+    if (
+        unMergedConfig == null ||
+            !unMergedConfig.isMergingSemanticsOfDescendants ||
+            unMergedConfig.isClearingSemantics
+    ) {
+        return unMergedConfig
     }
+
+    var mergedConfig: SemanticsConfiguration = unMergedConfig.copy()
+    val needsMerging: MutableObjectList<SemanticsInfo> =
+        MutableObjectList<SemanticsInfo>(childrenInfo.size).apply { addAll(childrenInfo) }
+
+    @Suppress("Range") // isNotEmpty ensures removeAt is not called with -1.
+    while (needsMerging.isNotEmpty()) {
+        val childInfo = needsMerging.removeAt(needsMerging.lastIndex)
+        val childConfig = childInfo.semanticsConfiguration
+
+        // Don't merge children that themselves merge all their descendants (because that
+        // indicates they are independently screen-reader-focusable).
+        if (childConfig == null || childConfig.isMergingSemanticsOfDescendants) continue
+
+        // Merge child values.
+        mergedConfig.mergeChild(childConfig)
+
+        // Merge children (unless this child is clearing semantics).
+        if (!childConfig.isClearingSemantics) needsMerging.addAll(childInfo.childrenInfo)
+    }
+
+    return mergedConfig
 }

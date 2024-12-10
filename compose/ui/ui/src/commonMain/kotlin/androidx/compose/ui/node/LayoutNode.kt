@@ -398,6 +398,8 @@ internal class LayoutNode(
         invalidateMeasurements()
     }
 
+    override fun isTransparent(): Boolean = outerCoordinator.isTransparent()
+
     private var isSemanticsInvalidated = false
 
     internal fun invalidateSemantics() {
@@ -621,10 +623,6 @@ internal class LayoutNode(
             }
             return _zSortedChildren
         }
-
-    @Suppress("UNCHECKED_CAST")
-    override val childrenInfo: MutableVector<SemanticsInfo>
-        get() = zSortedChildren as MutableVector<SemanticsInfo>
 
     override val isValidOwnerScope: Boolean
         get() = isAttached
@@ -1356,6 +1354,9 @@ internal class LayoutNode(
 
     override val parentInfo: SemanticsInfo?
         get() = parent
+
+    override val childrenInfo: List<SemanticsInfo>
+        get() = children
 
     override var isDeactivated = false
         private set

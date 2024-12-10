@@ -53,6 +53,7 @@ import androidx.compose.ui.util.fastJoinToString
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.runner.RunWith
@@ -72,10 +73,19 @@ class SemanticsListenerTest(private val isSemanticAutofillEnabled: Boolean) {
         fun initParameters() = listOf(false, true)
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
+    private val previousFlagValue = ComposeUiFlags.isSemanticAutofillEnabled
+
     @Before
-    fun setup() {
+    fun enableAutofill() {
         @OptIn(ExperimentalComposeUiApi::class)
         ComposeUiFlags.isSemanticAutofillEnabled = isSemanticAutofillEnabled
+    }
+
+    @After
+    fun disableAutofill() {
+        @OptIn(ExperimentalComposeUiApi::class)
+        ComposeUiFlags.isSemanticAutofillEnabled = previousFlagValue
     }
 
     // Initial layout does not trigger listeners. Users have to detect the initial semantics
