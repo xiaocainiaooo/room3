@@ -23,7 +23,7 @@ package androidx.window.demo.embedding
  * corresponding views in each item.
  */
 class SplitActivityRecyclerViewBindingData {
-    data class Item(
+    class Item(
         val type: Int,
         val withDivider: Boolean = false,
     ) {
