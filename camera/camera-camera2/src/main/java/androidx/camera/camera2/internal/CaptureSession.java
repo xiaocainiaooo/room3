@@ -31,8 +31,6 @@ import android.os.Build;
 import android.view.Surface;
 
 import androidx.annotation.GuardedBy;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.annotation.RequiresApi;
 import androidx.camera.camera2.impl.Camera2ImplConfig;
@@ -66,6 +64,9 @@ import androidx.tracing.Trace;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -94,17 +95,14 @@ final class CaptureSession implements CaptureSessionInterface {
     @GuardedBy("mSessionLock")
     private final StateCallback mCaptureSessionStateCallback;
     /** The Opener to help on creating the SynchronizedCaptureSession. */
-    @Nullable
     @GuardedBy("mSessionLock")
-    SynchronizedCaptureSession.Opener mSessionOpener;
+    SynchronizedCaptureSession.@Nullable Opener mSessionOpener;
     /** The framework camera capture session held by this session. */
-    @Nullable
     @GuardedBy("mSessionLock")
-    SynchronizedCaptureSession mSynchronizedCaptureSession;
+    @Nullable SynchronizedCaptureSession mSynchronizedCaptureSession;
     /** The configuration for the currently issued capture requests. */
-    @Nullable
     @GuardedBy("mSessionLock")
-    SessionConfig mSessionConfig;
+    @Nullable SessionConfig mSessionConfig;
     /**
      * The map of DeferrableSurface to Surface. It is both for restoring the surfaces used to
      * configure the current capture session and for getting the configured surface from a
@@ -128,9 +126,8 @@ final class CaptureSession implements CaptureSessionInterface {
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
     @GuardedBy("mSessionLock")
     CallbackToFutureAdapter.Completer<Void> mReleaseCompleter;
-    @NonNull
     @GuardedBy("mSessionLock")
-    private Map<DeferrableSurface, Long> mStreamUseCaseMap = new HashMap<>();
+    private @NonNull Map<DeferrableSurface, Long> mStreamUseCaseMap = new HashMap<>();
     private final StillCaptureFlow mStillCaptureFlow = new StillCaptureFlow();
     private final TorchStateReset mTorchStateReset = new TorchStateReset();
     private final RequestMonitor mRequestMonitor;
@@ -185,9 +182,8 @@ final class CaptureSession implements CaptureSessionInterface {
     /**
      * {@inheritDoc}
      */
-    @Nullable
     @Override
-    public SessionConfig getSessionConfig() {
+    public @Nullable SessionConfig getSessionConfig() {
         synchronized (mSessionLock) {
             return mSessionConfig;
         }
@@ -235,11 +231,10 @@ final class CaptureSession implements CaptureSessionInterface {
     /**
      * {@inheritDoc}
      */
-    @NonNull
     @Override
-    public ListenableFuture<Void> open(@NonNull SessionConfig sessionConfig,
+    public @NonNull ListenableFuture<Void> open(@NonNull SessionConfig sessionConfig,
             @NonNull CameraDevice cameraDevice,
-            @NonNull SynchronizedCaptureSession.Opener opener) {
+            SynchronizedCaptureSession.@NonNull Opener opener) {
         synchronized (mSessionLock) {
             switch (mState) {
                 case INITIALIZED:
@@ -296,9 +291,9 @@ final class CaptureSession implements CaptureSessionInterface {
     }
 
     @OptIn(markerClass = ExperimentalCamera2Interop.class)
-    @NonNull
-    private ListenableFuture<Void> openCaptureSession(@NonNull List<Surface> configuredSurfaces,
-            @NonNull SessionConfig sessionConfig, @NonNull CameraDevice cameraDevice) {
+    private @NonNull ListenableFuture<Void> openCaptureSession(
+            @NonNull List<Surface> configuredSurfaces, @NonNull SessionConfig sessionConfig,
+            @NonNull CameraDevice cameraDevice) {
         synchronized (mSessionLock) {
             switch (mState) {
                 case UNINITIALIZED:
@@ -410,8 +405,7 @@ final class CaptureSession implements CaptureSessionInterface {
         }
     }
 
-    @NonNull
-    private List<OutputConfigurationCompat> getUniqueOutputConfigurations(
+    private @NonNull List<OutputConfigurationCompat> getUniqueOutputConfigurations(
             @NonNull List<OutputConfigurationCompat> outputConfigurations) {
         List<Surface> addedSurfaces = new ArrayList<>();
         List<OutputConfigurationCompat> results = new ArrayList<>();
@@ -426,9 +420,8 @@ final class CaptureSession implements CaptureSessionInterface {
         return results;
     }
 
-    @NonNull
-    private OutputConfigurationCompat getOutputConfigurationCompat(
-            @NonNull SessionConfig.OutputConfig outputConfig,
+    private @NonNull OutputConfigurationCompat getOutputConfigurationCompat(
+            SessionConfig.@NonNull OutputConfig outputConfig,
             @NonNull Map<DeferrableSurface, Surface> configuredSurfaceMap,
             @Nullable String physicalCameraIdForAllStreams) {
         Surface surface = configuredSurfaceMap.get(outputConfig.getSurface());
@@ -530,9 +523,8 @@ final class CaptureSession implements CaptureSessionInterface {
      * {@inheritDoc}
      */
     @SuppressWarnings("ObjectToString")
-    @NonNull
     @Override
-    public ListenableFuture<Void> release(boolean abortInFlightCaptures) {
+    public @NonNull ListenableFuture<Void> release(boolean abortInFlightCaptures) {
         synchronized (mSessionLock) {
             switch (mState) {
                 case UNINITIALIZED:
@@ -629,8 +621,7 @@ final class CaptureSession implements CaptureSessionInterface {
      * {@inheritDoc}
      */
     @Override
-    @NonNull
-    public List<CaptureConfig> getCaptureConfigs() {
+    public @NonNull List<CaptureConfig> getCaptureConfigs() {
         synchronized (mSessionLock) {
             return Collections.unmodifiableList(mCaptureConfigs);
         }
@@ -972,8 +963,7 @@ final class CaptureSession implements CaptureSessionInterface {
     /**
      * Returns the map which contains the data by mapping surface group id to OutputConfig list.
      */
-    @NonNull
-    private static Map<Integer, List<SessionConfig.OutputConfig>> groupMrirOutputConfigs(
+    private static @NonNull Map<Integer, List<SessionConfig.OutputConfig>> groupMrirOutputConfigs(
             @NonNull Collection<SessionConfig.OutputConfig> outputConfigs) {
         Map<Integer, List<SessionConfig.OutputConfig>> groupResult = new HashMap<>();
 
@@ -1005,9 +995,8 @@ final class CaptureSession implements CaptureSessionInterface {
         return mrirGroupResult;
     }
 
-    @NonNull
     @RequiresApi(35)
-    private static Map<SessionConfig.OutputConfig, OutputConfigurationCompat>
+    private static @NonNull Map<SessionConfig.OutputConfig, OutputConfigurationCompat>
             createMultiResolutionOutputConfigurationCompats(
             @NonNull Map<Integer, List<SessionConfig.OutputConfig>> groupIdToOutputConfigsMap,
             @NonNull Map<DeferrableSurface, Surface> configuredSurfaceMap) {
@@ -1056,8 +1045,7 @@ final class CaptureSession implements CaptureSessionInterface {
     @SuppressLint("BanUncheckedReflection")
     @SuppressWarnings("unchecked")
     @RequiresApi(35)
-    @Nullable
-    private static List<OutputConfiguration> createInstancesForMultiResolutionOutput(
+    private static @Nullable List<OutputConfiguration> createInstancesForMultiResolutionOutput(
             @NonNull List<MultiResolutionStreamInfo> streamInfos, int format) {
         // TODO(b/376185185): Invoke the API directly after the androidx code base upgrades to
         //  compile by API 35 SDK.

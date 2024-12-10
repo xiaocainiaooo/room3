@@ -32,8 +32,6 @@ import android.util.ArrayMap;
 import android.util.Rational;
 
 import androidx.annotation.GuardedBy;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.annotation.VisibleForTesting;
 import androidx.camera.camera2.impl.Camera2ImplConfig;
@@ -66,6 +64,9 @@ import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.util.Preconditions;
 
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -144,8 +145,7 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
 
     static final String TAG_SESSION_UPDATE_ID = "CameraControlSessionUpdateId";
     private final AtomicLong mNextSessionUpdateId = new AtomicLong(0);
-    @NonNull
-    private volatile ListenableFuture<Void> mFlashModeChangeSessionUpdateFuture =
+    private volatile @NonNull ListenableFuture<Void> mFlashModeChangeSessionUpdateFuture =
             Futures.immediateFuture(null);
 
     //******************** Should only be accessed by executor *****************************//
@@ -159,7 +159,7 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
     @VisibleForTesting
     Camera2CameraControlImpl(@NonNull CameraCharacteristicsCompat cameraCharacteristics,
             @NonNull ScheduledExecutorService scheduler,
-            @NonNull @CameraExecutor Executor executor,
+            @CameraExecutor @NonNull Executor executor,
             @NonNull ControlUpdateCallback controlUpdateCallback) {
         this(cameraCharacteristics, scheduler, executor, controlUpdateCallback,
                 new Quirks(new ArrayList<>()));
@@ -180,9 +180,9 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
      */
     Camera2CameraControlImpl(@NonNull CameraCharacteristicsCompat cameraCharacteristics,
             @NonNull ScheduledExecutorService scheduler,
-            @NonNull @CameraExecutor Executor executor,
+            @CameraExecutor @NonNull Executor executor,
             @NonNull ControlUpdateCallback controlUpdateCallback,
-            @NonNull final Quirks cameraQuirks) {
+            final @NonNull Quirks cameraQuirks) {
         mCameraCharacteristics = cameraCharacteristics;
         mControlUpdateCallback = controlUpdateCallback;
         mExecutor = executor;
@@ -250,33 +250,27 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
         }
     }
 
-    @NonNull
-    public ZoomControl getZoomControl() {
+    public @NonNull ZoomControl getZoomControl() {
         return mZoomControl;
     }
 
-    @NonNull
-    public FocusMeteringControl getFocusMeteringControl() {
+    public @NonNull FocusMeteringControl getFocusMeteringControl() {
         return mFocusMeteringControl;
     }
 
-    @NonNull
-    public TorchControl getTorchControl() {
+    public @NonNull TorchControl getTorchControl() {
         return mTorchControl;
     }
 
-    @NonNull
-    public ExposureControl getExposureControl() {
+    public @NonNull ExposureControl getExposureControl() {
         return mExposureControl;
     }
 
-    @NonNull
-    public ZslControl getZslControl() {
+    public @NonNull ZslControl getZslControl() {
         return mZslControl;
     }
 
-    @NonNull
-    public Camera2CameraControl getCamera2CameraControl() {
+    public @NonNull Camera2CameraControl getCamera2CameraControl() {
         return mCamera2CameraControl;
     }
 
@@ -295,9 +289,8 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
         }, CameraXExecutors.directExecutor());
     }
 
-    @NonNull
     @Override
-    public Config getInteropConfig() {
+    public @NonNull Config getInteropConfig() {
         return mCamera2CameraControl.getCamera2ImplConfig();
     }
 
@@ -331,9 +324,8 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
         mFocusMeteringControl.setPreviewAspectRatio(previewAspectRatio);
     }
 
-    @NonNull
     @Override
-    public ListenableFuture<FocusMeteringResult> startFocusAndMetering(
+    public @NonNull ListenableFuture<FocusMeteringResult> startFocusAndMetering(
             @NonNull FocusMeteringAction action) {
         if (!isControlInUse()) {
             return Futures.immediateFailedFuture(
@@ -343,9 +335,8 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
                 mFocusMeteringControl.startFocusAndMetering(action));
     }
 
-    @NonNull
     @Override
-    public ListenableFuture<Void> cancelFocusAndMetering() {
+    public @NonNull ListenableFuture<Void> cancelFocusAndMetering() {
         if (!isControlInUse()) {
             return Futures.immediateFailedFuture(
                     new OperationCanceledException("Camera is not active."));
@@ -353,9 +344,8 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
         return Futures.nonCancellationPropagating(mFocusMeteringControl.cancelFocusAndMetering());
     }
 
-    @NonNull
     @Override
-    public ListenableFuture<Void> setZoomRatio(float ratio) {
+    public @NonNull ListenableFuture<Void> setZoomRatio(float ratio) {
         if (!isControlInUse()) {
             return Futures.immediateFailedFuture(
                     new OperationCanceledException("Camera is not active."));
@@ -363,9 +353,8 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
         return Futures.nonCancellationPropagating(mZoomControl.setZoomRatio(ratio));
     }
 
-    @NonNull
     @Override
-    public ListenableFuture<Void> setLinearZoom(float linearZoom) {
+    public @NonNull ListenableFuture<Void> setLinearZoom(float linearZoom) {
         if (!isControlInUse()) {
             return Futures.immediateFailedFuture(
                     new OperationCanceledException("Camera is not active."));
@@ -406,13 +395,12 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
         mScreenFlash = screenFlash;
     }
 
-    @Nullable
-    public ScreenFlash getScreenFlash() {
+    public @Nullable ScreenFlash getScreenFlash() {
         return mScreenFlash;
     }
 
     @Override
-    public void addZslConfig(@NonNull SessionConfig.Builder sessionConfigBuilder) {
+    public void addZslConfig(SessionConfig.@NonNull Builder sessionConfigBuilder) {
         mZslControl.addZslConfig(sessionConfigBuilder);
     }
 
@@ -428,8 +416,7 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
 
     /** {@inheritDoc} */
     @Override
-    @NonNull
-    public ListenableFuture<Void> enableTorch(final boolean torch) {
+    public @NonNull ListenableFuture<Void> enableTorch(final boolean torch) {
         if (!isControlInUse()) {
             return Futures.immediateFailedFuture(
                     new OperationCanceledException("Camera is not active."));
@@ -438,8 +425,7 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
     }
 
     @ExecutedBy("mExecutor")
-    @NonNull
-    private ListenableFuture<Void> waitForSessionUpdateId(long sessionUpdateIdToWait) {
+    private @NonNull ListenableFuture<Void> waitForSessionUpdateId(long sessionUpdateIdToWait) {
         return CallbackToFutureAdapter.getFuture(completer -> {
             addCaptureResultListener(captureResult -> {
                 boolean updated = isSessionUpdated(captureResult, sessionUpdateIdToWait);
@@ -477,9 +463,8 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
         return false;
     }
 
-    @NonNull
     @Override
-    public ListenableFuture<Integer> setExposureCompensationIndex(int exposure) {
+    public @NonNull ListenableFuture<Integer> setExposureCompensationIndex(int exposure) {
         if (!isControlInUse()) {
             return Futures.immediateFailedFuture(
                     new OperationCanceledException("Camera is not active."));
@@ -488,9 +473,8 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
     }
 
     /** {@inheritDoc} */
-    @NonNull
     @Override
-    public ListenableFuture<List<Void>> submitStillCaptureRequests(
+    public @NonNull ListenableFuture<List<Void>> submitStillCaptureRequests(
             @NonNull List<CaptureConfig> captureConfigs,
             @ImageCapture.CaptureMode int captureMode,
             @ImageCapture.FlashType int flashType) {
@@ -510,9 +494,8 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
                         flashMode, flashType), mExecutor);
     }
 
-    @NonNull
     @Override
-    public ListenableFuture<CameraCapturePipeline> getCameraCapturePipelineAsync(
+    public @NonNull ListenableFuture<CameraCapturePipeline> getCameraCapturePipelineAsync(
             @ImageCapture.CaptureMode int captureMode, @ImageCapture.FlashType int flashType) {
         if (!isControlInUse()) {
             Logger.w(TAG, "Camera is not active.");
@@ -533,9 +516,8 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
 
     /** {@inheritDoc} */
     @Override
-    @NonNull
     @ExecutedBy("mExecutor")
-    public SessionConfig getSessionConfig() {
+    public @NonNull SessionConfig getSessionConfig() {
         mSessionConfigBuilder.setTemplateType(mTemplate);
         mSessionConfigBuilder.setImplementationOptions(getSessionOptions());
         mSessionConfigBuilder.addTag(TAG_SESSION_UPDATE_ID, mCurrentSessionUpdateId);
@@ -570,8 +552,7 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
      * Triggers an update to the session and returns a ListenableFuture which completes when the
      * session is updated successfully.
      */
-    @NonNull
-    public ListenableFuture<Void> updateSessionConfigAsync() {
+    public @NonNull ListenableFuture<Void> updateSessionConfigAsync() {
         ListenableFuture<Void> future = CallbackToFutureAdapter.getFuture(completer -> {
             mExecutor.execute(() -> {
                 long sessionUpdateId = updateSessionConfigSynchronous();
@@ -599,15 +580,13 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
     }
 
     @ExecutedBy("mExecutor")
-    @NonNull
-    Rect getCropSensorRegion() {
+    @NonNull Rect getCropSensorRegion() {
         return mZoomControl.getCropSensorRegion();
     }
 
     @Override
     @ExecutedBy("mExecutor")
-    @NonNull
-    public Rect getSensorRect() {
+    public @NonNull Rect getSensorRect() {
         Rect sensorRect =
                 mCameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
         if ("robolectric".equals(Build.FINGERPRINT) && sensorRect == null) {
@@ -896,7 +875,7 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
         @CameraExecutor
         private final Executor mExecutor;
 
-        CameraControlSessionCallback(@NonNull @CameraExecutor Executor executor) {
+        CameraControlSessionCallback(@CameraExecutor @NonNull Executor executor) {
             mExecutor = executor;
         }
 
@@ -914,7 +893,7 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
         public void onCaptureCompleted(
                 @NonNull CameraCaptureSession session,
                 @NonNull CaptureRequest request,
-                @NonNull final TotalCaptureResult result) {
+                final @NonNull TotalCaptureResult result) {
 
             mExecutor.execute(() -> {
                 Set<CaptureResultListener> removeSet = new HashSet<>();

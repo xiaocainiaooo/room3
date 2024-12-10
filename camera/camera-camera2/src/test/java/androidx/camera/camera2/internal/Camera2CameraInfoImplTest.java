@@ -52,7 +52,6 @@ import android.util.Size;
 import android.util.SizeF;
 import android.view.Surface;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.camera.camera2.internal.compat.CameraAccessExceptionCompat;
 import androidx.camera.camera2.internal.compat.CameraCharacteristicsCompat;
@@ -76,6 +75,7 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.google.common.collect.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -1137,44 +1137,41 @@ public class Camera2CameraInfoImplTest {
                 @NonNull CameraCharacteristics cameraCharacteristics) {
             mCameraIdCharacteristics.put(cameraId, cameraCharacteristics);
         }
-        @NonNull
         @Override
-        public String[] getCameraIdList() throws CameraAccessExceptionCompat {
+        public String @NonNull [] getCameraIdList() throws CameraAccessExceptionCompat {
             return mCameraIdCharacteristics.keySet().toArray(new String[0]);
         }
 
-        @NonNull
         @Override
-        public Set<Set<String>> getConcurrentCameraIds() throws CameraAccessExceptionCompat {
+        public @NonNull Set<Set<String>> getConcurrentCameraIds()
+                throws CameraAccessExceptionCompat {
             return ImmutableSet.of(mCameraIdCharacteristics.keySet());
         }
 
         @Override
         public void registerAvailabilityCallback(@NonNull Executor executor,
-                @NonNull CameraManager.AvailabilityCallback callback) {
+                CameraManager.@NonNull AvailabilityCallback callback) {
         }
 
         @Override
         public void unregisterAvailabilityCallback(
-                @NonNull CameraManager.AvailabilityCallback callback) {
+                CameraManager.@NonNull AvailabilityCallback callback) {
         }
 
-        @NonNull
         @Override
-        public CameraCharacteristics getCameraCharacteristics(@NonNull String cameraId)
+        public @NonNull CameraCharacteristics getCameraCharacteristics(@NonNull String cameraId)
                 throws CameraAccessExceptionCompat {
             return mCameraIdCharacteristics.get(cameraId);
         }
 
         @Override
         public void openCamera(@NonNull String cameraId, @NonNull Executor executor,
-                @NonNull CameraDevice.StateCallback callback) throws CameraAccessExceptionCompat {
+                CameraDevice.@NonNull StateCallback callback) throws CameraAccessExceptionCompat {
 
         }
 
-        @NonNull
         @Override
-        public CameraManager getCameraManager() {
+        public @NonNull CameraManager getCameraManager() {
             return null;
         }
     }

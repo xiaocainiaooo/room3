@@ -56,7 +56,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.camera.camera2.Camera2Config;
 import androidx.camera.camera2.impl.Camera2ImplConfig;
@@ -94,6 +93,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import com.google.common.truth.BooleanSubject;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -872,8 +872,7 @@ public final class Camera2CameraControlImplDeviceTest {
         assertThat(sessionZoomRatio).isEqualTo(2.0f);
     }
 
-    @NonNull
-    private Rect getSessionCropRegion(
+    private @NonNull Rect getSessionCropRegion(
             CameraControlInternal.ControlUpdateCallback controlUpdateCallback)
             throws InterruptedException {
         verify(controlUpdateCallback, times(1)).onCameraControlUpdateSessionConfig();
@@ -886,9 +885,8 @@ public final class Camera2CameraControlImplDeviceTest {
                 CaptureRequest.SCALER_CROP_REGION, null);
     }
 
-    @NonNull
     @RequiresApi(30)
-    private Float getSessionZoomRatio(
+    private @NonNull Float getSessionZoomRatio(
             CameraControlInternal.ControlUpdateCallback controlUpdateCallback)
             throws InterruptedException {
         verify(controlUpdateCallback, times(1)).onCameraControlUpdateSessionConfig();

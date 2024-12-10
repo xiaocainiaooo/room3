@@ -25,8 +25,6 @@ import android.os.Handler;
 import android.view.Surface;
 
 import androidx.annotation.GuardedBy;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.camera.camera2.internal.annotation.CameraExecutor;
 import androidx.camera.camera2.internal.compat.CameraCaptureSessionCompat;
@@ -45,6 +43,9 @@ import androidx.concurrent.futures.CallbackToFutureAdapter.Completer;
 import androidx.core.util.Preconditions;
 
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -71,36 +72,26 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
     final Object mLock = new Object();
 
-    @NonNull
-    final CaptureSessionRepository mCaptureSessionRepository;
-    @NonNull
-    final Handler mCompatHandler;
-    @NonNull
+    final @NonNull CaptureSessionRepository mCaptureSessionRepository;
+    final @NonNull Handler mCompatHandler;
     @CameraExecutor
-    final Executor mExecutor;
-    @NonNull
-    private final ScheduledExecutorService mScheduledExecutorService;
+    final @NonNull Executor mExecutor;
+    private final @NonNull ScheduledExecutorService mScheduledExecutorService;
 
-    @Nullable
-    StateCallback mCaptureSessionStateCallback;
-    @Nullable
-    CameraCaptureSessionCompat mCameraCaptureSessionCompat;
+    @Nullable StateCallback mCaptureSessionStateCallback;
+    @Nullable CameraCaptureSessionCompat mCameraCaptureSessionCompat;
 
-    @Nullable
     @GuardedBy("mLock")
-    ListenableFuture<Void> mOpenCaptureSessionFuture;
+    @Nullable ListenableFuture<Void> mOpenCaptureSessionFuture;
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
-    @Nullable
     @GuardedBy("mLock")
-    Completer<Void> mOpenCaptureSessionCompleter;
+    @Nullable Completer<Void> mOpenCaptureSessionCompleter;
 
-    @Nullable
     @GuardedBy("mLock")
-    private ListenableFuture<List<Surface>> mStartingSurface;
+    private @Nullable ListenableFuture<List<Surface>> mStartingSurface;
 
-    @Nullable
     @GuardedBy("mLock")
-    private List<DeferrableSurface> mHeldDeferrableSurfaces = null;
+    private @Nullable List<DeferrableSurface> mHeldDeferrableSurfaces = null;
 
     @GuardedBy("mLock")
     private boolean mClosed = false;
@@ -110,7 +101,7 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
     private boolean mSessionFinished = false;
 
     SynchronizedCaptureSessionBaseImpl(@NonNull CaptureSessionRepository repository,
-            @NonNull @CameraExecutor Executor executor,
+            @CameraExecutor @NonNull Executor executor,
             @NonNull ScheduledExecutorService scheduledExecutorService,
             @NonNull Handler compatHandler) {
         mCaptureSessionRepository = repository;
@@ -119,21 +110,18 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
         mScheduledExecutorService = scheduledExecutorService;
     }
 
-    @NonNull
     @Override
-    public StateCallback getStateCallback() {
+    public @NonNull StateCallback getStateCallback() {
         return this;
     }
 
-    @NonNull
     @Override
-    public ListenableFuture<Void> getOpeningBlocker() {
+    public @NonNull ListenableFuture<Void> getOpeningBlocker() {
         return Futures.immediateFuture(null);
     }
 
-    @NonNull
     @Override
-    public ListenableFuture<Void> openCaptureSession(@NonNull CameraDevice cameraDevice,
+    public @NonNull ListenableFuture<Void> openCaptureSession(@NonNull CameraDevice cameraDevice,
             @NonNull SessionConfigurationCompat sessionConfigurationCompat,
             @NonNull List<DeferrableSurface> deferrableSurfaces) {
         synchronized (mLock) {
@@ -184,9 +172,8 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
         }
     }
 
-    @NonNull
     @Override
-    public SessionConfigurationCompat createSessionConfigurationCompat(
+    public @NonNull SessionConfigurationCompat createSessionConfigurationCompat(
             int sessionType,
             @NonNull List<OutputConfigurationCompat> outputsCompat,
             @NonNull StateCallback stateCallback) {
@@ -273,10 +260,9 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
                 });
     }
 
-    @NonNull
     @Override
     @CameraExecutor
-    public Executor getExecutor() {
+    public @NonNull Executor getExecutor() {
         return mExecutor;
     }
 
@@ -288,9 +274,8 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
     }
 
     @SuppressWarnings("ConstantConditions") // Implied non-null type use for surfaces.
-    @NonNull
     @Override
-    public ListenableFuture<List<Surface>> startWithDeferrableSurface(
+    public @NonNull ListenableFuture<List<Surface>> startWithDeferrableSurface(
             @NonNull List<DeferrableSurface> deferrableSurfaces, long timeout) {
         synchronized (mLock) {
             if (mOpenerDisabled) {
@@ -350,23 +335,20 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
         }
     }
 
-    @NonNull
     @Override
-    public CameraCaptureSessionCompat toCameraCaptureSessionCompat() {
+    public @NonNull CameraCaptureSessionCompat toCameraCaptureSessionCompat() {
         Preconditions.checkNotNull(mCameraCaptureSessionCompat);
         return mCameraCaptureSessionCompat;
     }
 
-    @NonNull
     @Override
-    public CameraDevice getDevice() {
+    public @NonNull CameraDevice getDevice() {
         Preconditions.checkNotNull(mCameraCaptureSessionCompat);
         return mCameraCaptureSessionCompat.toCameraCaptureSession().getDevice();
     }
 
-    @Nullable
     @Override
-    public Surface getInputSurface() {
+    public @Nullable Surface getInputSurface() {
         Preconditions.checkNotNull(mCameraCaptureSessionCompat);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return Api23Impl.getInputSurface(mCameraCaptureSessionCompat.toCameraCaptureSession());
@@ -377,7 +359,7 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
 
     @Override
     public int captureSingleRequest(@NonNull CaptureRequest request,
-            @NonNull CameraCaptureSession.CaptureCallback listener) throws CameraAccessException {
+            CameraCaptureSession.@NonNull CaptureCallback listener) throws CameraAccessException {
         Preconditions.checkNotNull(mCameraCaptureSessionCompat, "Need to call openCaptureSession "
                 + "before using this API.");
         return mCameraCaptureSessionCompat.captureSingleRequest(request, getExecutor(), listener);
@@ -386,7 +368,7 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
     @Override
     public int captureBurstRequests(
             @NonNull List<CaptureRequest> requests,
-            @NonNull CameraCaptureSession.CaptureCallback listener)
+            CameraCaptureSession.@NonNull CaptureCallback listener)
             throws CameraAccessException {
         Preconditions.checkNotNull(mCameraCaptureSessionCompat, "Need to call openCaptureSession "
                 + "before using this API.");
@@ -396,7 +378,7 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
     @Override
     public int setSingleRepeatingRequest(
             @NonNull CaptureRequest request,
-            @NonNull CameraCaptureSession.CaptureCallback listener)
+            CameraCaptureSession.@NonNull CaptureCallback listener)
             throws CameraAccessException {
         Preconditions.checkNotNull(mCameraCaptureSessionCompat, "Need to call openCaptureSession "
                 + "before using this API.");
@@ -407,7 +389,7 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
     @Override
     public int setRepeatingBurstRequests(
             @NonNull List<CaptureRequest> requests,
-            @NonNull CameraCaptureSession.CaptureCallback listener)
+            CameraCaptureSession.@NonNull CaptureCallback listener)
             throws CameraAccessException {
         Preconditions.checkNotNull(mCameraCaptureSessionCompat, "Need to call openCaptureSession "
                 + "before using this API.");
@@ -417,7 +399,7 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
 
     @Override
     public int captureSingleRequest(@NonNull CaptureRequest request, @NonNull Executor executor,
-            @NonNull CameraCaptureSession.CaptureCallback listener) throws CameraAccessException {
+            CameraCaptureSession.@NonNull CaptureCallback listener) throws CameraAccessException {
         Preconditions.checkNotNull(mCameraCaptureSessionCompat,
                 "Need to call openCaptureSession before using this API.");
         return mCameraCaptureSessionCompat.captureSingleRequest(request, executor, listener);
@@ -425,7 +407,7 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
 
     @Override
     public int captureBurstRequests(@NonNull List<CaptureRequest> requests,
-            @NonNull Executor executor, @NonNull CameraCaptureSession.CaptureCallback listener)
+            @NonNull Executor executor, CameraCaptureSession.@NonNull CaptureCallback listener)
             throws CameraAccessException {
         Preconditions.checkNotNull(mCameraCaptureSessionCompat,
                 "Need to call openCaptureSession before using this API.");
@@ -434,7 +416,7 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
 
     @Override
     public int setSingleRepeatingRequest(@NonNull CaptureRequest request,
-            @NonNull Executor executor, @NonNull CameraCaptureSession.CaptureCallback listener)
+            @NonNull Executor executor, CameraCaptureSession.@NonNull CaptureCallback listener)
             throws CameraAccessException {
         Preconditions.checkNotNull(mCameraCaptureSessionCompat,
                 "Need to call openCaptureSession before using this API.");
@@ -443,7 +425,7 @@ class SynchronizedCaptureSessionBaseImpl extends SynchronizedCaptureSession.Stat
 
     @Override
     public int setRepeatingBurstRequests(@NonNull List<CaptureRequest> requests,
-            @NonNull Executor executor, @NonNull CameraCaptureSession.CaptureCallback listener)
+            @NonNull Executor executor, CameraCaptureSession.@NonNull CaptureCallback listener)
             throws CameraAccessException {
         Preconditions.checkNotNull(mCameraCaptureSessionCompat,
                 "Need to call openCaptureSession before using this API.");

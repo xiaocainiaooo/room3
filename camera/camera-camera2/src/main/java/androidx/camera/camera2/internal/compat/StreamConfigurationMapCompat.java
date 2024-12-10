@@ -23,10 +23,11 @@ import android.os.Build;
 import android.util.Range;
 import android.util.Size;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.camera.camera2.internal.compat.workaround.OutputSizesCorrector;
 import androidx.camera.core.Logger;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,8 +64,7 @@ public class StreamConfigurationMapCompat {
      *                                                         retrieved.
      * @return wrapped class
      */
-    @NonNull
-    static StreamConfigurationMapCompat toStreamConfigurationMapCompat(
+    static @NonNull StreamConfigurationMapCompat toStreamConfigurationMapCompat(
             @NonNull StreamConfigurationMap map,
             @NonNull OutputSizesCorrector outputSizesCorrector) {
         return new StreamConfigurationMapCompat(map, outputSizesCorrector);
@@ -81,8 +81,7 @@ public class StreamConfigurationMapCompat {
      * @see ImageFormat
      * @see PixelFormat
      */
-    @Nullable
-    public int[] getOutputFormats() {
+    public int @Nullable [] getOutputFormats() {
         int[] result = mImpl.getOutputFormats();
         return result == null ? null : result.clone();
     }
@@ -98,8 +97,7 @@ public class StreamConfigurationMapCompat {
      * @see ImageFormat
      * @see PixelFormat
      */
-    @Nullable
-    public Size[] getOutputSizes(int format) {
+    public Size @Nullable [] getOutputSizes(int format) {
         if (mCachedFormatOutputSizes.containsKey(format)) {
             Size[] cachedOutputSizes = mCachedFormatOutputSizes.get(format);
             return cachedOutputSizes == null ? null : mCachedFormatOutputSizes.get(format).clone();
@@ -134,8 +132,7 @@ public class StreamConfigurationMapCompat {
      * or {@code null} iff the {@code klass} is not a supported output.
      * @throws NullPointerException if {@code klass} was {@code null}
      */
-    @Nullable
-    public <T> Size[] getOutputSizes(@NonNull Class<T> klass) {
+    public <T> Size @Nullable [] getOutputSizes(@NonNull Class<T> klass) {
         if (mCachedClassOutputSizes.containsKey(klass)) {
             Size[] cachedOutputSizes = mCachedClassOutputSizes.get(klass);
             return cachedOutputSizes == null ? null : mCachedClassOutputSizes.get(klass).clone();
@@ -169,8 +166,7 @@ public class StreamConfigurationMapCompat {
      * @see ImageFormat
      * @see PixelFormat
      */
-    @Nullable
-    public Size[] getHighResolutionOutputSizes(int format) {
+    public Size @Nullable [] getHighResolutionOutputSizes(int format) {
         if (mCachedFormatHighResolutionOutputSizes.containsKey(format)) {
             Size[] cachedOutputSizes = mCachedFormatHighResolutionOutputSizes.get(format);
             return cachedOutputSizes == null ? null : mCachedFormatHighResolutionOutputSizes.get(
@@ -217,24 +213,19 @@ public class StreamConfigurationMapCompat {
     /**
      * Returns the {@link StreamConfigurationMap} represented by this object.
      */
-    @NonNull
-    public StreamConfigurationMap toStreamConfigurationMap() {
+    public @NonNull StreamConfigurationMap toStreamConfigurationMap() {
         return mImpl.unwrap();
     }
 
     interface StreamConfigurationMapCompatImpl {
 
-        @Nullable
-        int[] getOutputFormats();
+        int @Nullable [] getOutputFormats();
 
-        @Nullable
-        Size[] getOutputSizes(int format);
+        Size @Nullable [] getOutputSizes(int format);
 
-        @Nullable
-        <T> Size[] getOutputSizes(@NonNull Class<T> klass);
+        <T> Size @Nullable [] getOutputSizes(@NonNull Class<T> klass);
 
-        @Nullable
-        Size[] getHighResolutionOutputSizes(int format);
+        Size @Nullable [] getHighResolutionOutputSizes(int format);
 
         @Nullable
         Range<Integer>[] getHighSpeedVideoFpsRanges();
@@ -253,7 +244,6 @@ public class StreamConfigurationMapCompat {
         /**
          * Returns the underlying {@link StreamConfigurationMap} instance.
          */
-        @NonNull
-        StreamConfigurationMap unwrap();
+        @NonNull StreamConfigurationMap unwrap();
     }
 }

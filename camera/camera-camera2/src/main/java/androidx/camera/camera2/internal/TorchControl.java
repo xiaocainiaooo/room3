@@ -19,8 +19,6 @@ package androidx.camera.camera2.internal;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CaptureRequest;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.camera.camera2.internal.annotation.CameraExecutor;
 import androidx.camera.camera2.internal.compat.CameraCharacteristicsCompat;
 import androidx.camera.camera2.internal.compat.workaround.FlashAvailabilityChecker;
@@ -36,6 +34,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.concurrent.Executor;
 
@@ -170,8 +171,7 @@ final class TorchControl {
      *
      * @return a {@link LiveData} containing current torch state.
      */
-    @NonNull
-    LiveData<Integer> getTorchState() {
+    @NonNull LiveData<Integer> getTorchState() {
         return mTorchState;
     }
 
