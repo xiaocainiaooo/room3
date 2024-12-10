@@ -33,8 +33,6 @@ import android.os.Build;
 import android.util.Size;
 import android.view.Surface;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
@@ -55,6 +53,9 @@ import androidx.camera.core.impl.utils.executor.CameraXExecutors;
 import androidx.camera.core.internal.compat.ImageWriterCompat;
 import androidx.camera.core.internal.utils.ZslRingBuffer;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,13 +75,11 @@ final class ZslControlImpl implements ZslControl {
     @VisibleForTesting
     static final int MAX_IMAGES = RING_BUFFER_CAPACITY * 3;
 
-    @NonNull
-    private final CameraCharacteristicsCompat mCameraCharacteristicsCompat;
+    private final @NonNull CameraCharacteristicsCompat mCameraCharacteristicsCompat;
 
     @VisibleForTesting
     @SuppressWarnings("WeakerAccess")
-    @NonNull
-    final ZslRingBuffer mImageRingBuffer;
+    final @NonNull ZslRingBuffer mImageRingBuffer;
 
     private boolean mIsZslDisabledByUseCaseConfig = false;
     private boolean mIsZslDisabledByFlashMode = false;
@@ -93,8 +92,7 @@ final class ZslControlImpl implements ZslControl {
     private CameraCaptureCallback mMetadataMatchingCaptureCallback;
     private DeferrableSurface mReprocessingImageDeferrableSurface;
 
-    @Nullable
-    ImageWriter mReprocessingImageWriter;
+    @Nullable ImageWriter mReprocessingImageWriter;
 
     ZslControlImpl(@NonNull CameraCharacteristicsCompat cameraCharacteristicsCompat) {
         mCameraCharacteristicsCompat = cameraCharacteristicsCompat;
@@ -130,7 +128,7 @@ final class ZslControlImpl implements ZslControl {
     }
 
     @Override
-    public void addZslConfig(@NonNull SessionConfig.Builder sessionConfigBuilder) {
+    public void addZslConfig(SessionConfig.@NonNull Builder sessionConfigBuilder) {
         cleanup();
 
         // Early return only if use case config doesn't support zsl. If flash mode doesn't
@@ -222,9 +220,8 @@ final class ZslControlImpl implements ZslControl {
                 mReprocessingImageReader.getImageFormat()));
     }
 
-    @Nullable
     @Override
-    public ImageProxy dequeueImageFromBuffer() {
+    public @Nullable ImageProxy dequeueImageFromBuffer() {
         ImageProxy imageProxy = null;
         try {
             imageProxy = mImageRingBuffer.dequeue();
@@ -282,8 +279,7 @@ final class ZslControlImpl implements ZslControl {
         }
     }
 
-    @NonNull
-    private Map<Integer, Size> createReprocessingInputSizeMap(
+    private @NonNull Map<Integer, Size> createReprocessingInputSizeMap(
             @NonNull CameraCharacteristicsCompat cameraCharacteristicsCompat) {
         StreamConfigurationMap map = null;
         try {

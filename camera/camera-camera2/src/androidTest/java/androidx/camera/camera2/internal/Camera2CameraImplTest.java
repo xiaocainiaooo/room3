@@ -62,8 +62,6 @@ import android.os.Looper;
 import android.util.Size;
 import android.view.Surface;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.camera.camera2.Camera2Config;
 import androidx.camera.camera2.internal.compat.CameraManagerCompat;
 import androidx.camera.camera2.internal.util.SemaphoreReleasingCamera2Callbacks;
@@ -109,6 +107,8 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -742,7 +742,7 @@ public final class Camera2CameraImplTest {
         Observable.Observer<CameraInternal.State> observer =
                 new Observable.Observer<CameraInternal.State>() {
                     @Override
-                    public void onNewData(@Nullable CameraInternal.State value) {
+                    public void onNewData(CameraInternal.@Nullable State value) {
                         // Ignore any transient states.
                         if (STABLE_STATES.contains(value)) {
                             lastStableState.set(value);
@@ -898,28 +898,23 @@ public final class Camera2CameraImplTest {
         mSemaphore.release();
     }
 
-    @NonNull
-    private TestUseCase createUseCase() {
+    private @NonNull TestUseCase createUseCase() {
         return createUseCase(DEFAULT_TEMPLATE_TYPE);
     }
 
-    @NonNull
-    private TestUseCase createUseCase(int template) {
+    private @NonNull TestUseCase createUseCase(int template) {
         return createUseCase(template, DEFAULT_IMAGE_FORMAT);
     }
 
-    @NonNull
-    private TestUseCase createUseCase(int template, int imageFormat) {
+    private @NonNull TestUseCase createUseCase(int template, int imageFormat) {
         return createUseCase(template, DEFAULT_SURFACE_OPTION, imageFormat);
     }
 
-    @NonNull
-    private TestUseCase createUseCase(@NonNull SurfaceOption surfaceOption) {
+    private @NonNull TestUseCase createUseCase(@NonNull SurfaceOption surfaceOption) {
         return createUseCase(DEFAULT_TEMPLATE_TYPE, surfaceOption, DEFAULT_IMAGE_FORMAT);
     }
 
-    @NonNull
-    private TestUseCase createUseCase(int template, @NonNull SurfaceOption surfaceOption,
+    private @NonNull TestUseCase createUseCase(int template, @NonNull SurfaceOption surfaceOption,
             int imageFormat) {
         boolean isZslDisabled = getDefaultZslDisabled(template);
         FakeUseCaseConfig.Builder configBuilder =
@@ -931,8 +926,7 @@ public final class Camera2CameraImplTest {
                 imageFormat);
     }
 
-    @NonNull
-    private TestUseCase createUseCase(@NonNull FakeUseCaseConfig config, int template,
+    private @NonNull TestUseCase createUseCase(@NonNull FakeUseCaseConfig config, int template,
             @NonNull SurfaceOption surfaceOption, int imageFormat) {
         TestUseCase testUseCase = new TestUseCase(
                 template,
@@ -951,8 +945,7 @@ public final class Camera2CameraImplTest {
         return testUseCase;
     }
 
-    @NonNull
-    private ImageCapture createImageCapture() {
+    private @NonNull ImageCapture createImageCapture() {
         UseCaseConfigFactory useCaseConfigFactory =
                 new Camera2UseCaseConfigFactory(ApplicationProvider.getApplicationContext());
 
@@ -978,8 +971,7 @@ public final class Camera2CameraImplTest {
         return imageCapture;
     }
 
-    @NonNull
-    private StreamSharing createStreamSharingUseCase(@NonNull Set<UseCase> children) {
+    private @NonNull StreamSharing createStreamSharingUseCase(@NonNull Set<UseCase> children) {
         UseCaseConfigFactory useCaseConfigFactory =
                 new Camera2UseCaseConfigFactory(ApplicationProvider.getApplicationContext());
 
@@ -1448,8 +1440,7 @@ public final class Camera2CameraImplTest {
         }
 
         @Override
-        @NonNull
-        protected StreamSpec onSuggestedStreamSpecUpdated(
+        protected @NonNull StreamSpec onSuggestedStreamSpecUpdated(
                 @NonNull StreamSpec primaryStreamSpec,
                 @Nullable StreamSpec secondaryStreamSpec) {
             if (mDeferrableSurface != null) {
@@ -1488,8 +1479,7 @@ public final class Camera2CameraImplTest {
             }
         }
 
-        @NonNull
-        private DeferrableSurface createDeferrableSurface(@NonNull StreamSpec streamSpec,
+        private @NonNull DeferrableSurface createDeferrableSurface(@NonNull StreamSpec streamSpec,
                 int imageFormat) {
             Size suggestedResolution = streamSpec.getResolution();
             Surface surface;

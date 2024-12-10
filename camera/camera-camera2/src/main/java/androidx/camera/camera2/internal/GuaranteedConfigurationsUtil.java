@@ -20,12 +20,13 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraMetadata;
 import android.os.Build;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.camera.core.impl.SurfaceCombination;
 import androidx.camera.core.impl.SurfaceConfig;
 import androidx.camera.core.impl.SurfaceConfig.ConfigSize;
 import androidx.camera.core.impl.SurfaceConfig.ConfigType;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,8 +48,7 @@ public final class GuaranteedConfigurationsUtil {
     /**
      * Returns the at least supported stream combinations for legacy devices.
      */
-    @NonNull
-    public static List<SurfaceCombination> getLegacySupportedCombinationList() {
+    public static @NonNull List<SurfaceCombination> getLegacySupportedCombinationList() {
         List<SurfaceCombination> combinationList = new ArrayList<>();
 
         // (PRIV, MAXIMUM)
@@ -119,8 +119,7 @@ public final class GuaranteedConfigurationsUtil {
      * Returns the at least supported stream combinations for limited-level devices
      * in addition to those for legacy devices.
      */
-    @NonNull
-    public static List<SurfaceCombination> getLimitedSupportedCombinationList() {
+    public static @NonNull List<SurfaceCombination> getLimitedSupportedCombinationList() {
         List<SurfaceCombination> combinationList = new ArrayList<>();
 
         // (PRIV, PREVIEW) + (PRIV, RECORD)
@@ -184,8 +183,7 @@ public final class GuaranteedConfigurationsUtil {
      * Returns the at least supported stream combinations for full-level devices
      * in addition to those for limited-level and legacy devices.
      */
-    @NonNull
-    public static List<SurfaceCombination> getFullSupportedCombinationList() {
+    public static @NonNull List<SurfaceCombination> getFullSupportedCombinationList() {
         List<SurfaceCombination> combinationList = new ArrayList<>();
 
         // (PRIV, PREVIEW) + (PRIV, MAXIMUM)
@@ -249,8 +247,7 @@ public final class GuaranteedConfigurationsUtil {
      * Returns the at least supported stream combinations for RAW-capability devices
      * on both full and limited devices.
      */
-    @NonNull
-    public static List<SurfaceCombination> getRAWSupportedCombinationList() {
+    public static @NonNull List<SurfaceCombination> getRAWSupportedCombinationList() {
         List<SurfaceCombination> combinationList = new ArrayList<>();
 
         // (RAW, MAXIMUM)
@@ -335,8 +332,7 @@ public final class GuaranteedConfigurationsUtil {
      * devices, so this table is only relevant for LIMITED-level devices that support the
      * BURST_CAPTURE capability.
      */
-    @NonNull
-    public static List<SurfaceCombination> getBurstSupportedCombinationList() {
+    public static @NonNull List<SurfaceCombination> getBurstSupportedCombinationList() {
         List<SurfaceCombination> combinationList = new ArrayList<>();
 
         // (PRIV, PREVIEW) + (PRIV, MAXIMUM)
@@ -370,8 +366,7 @@ public final class GuaranteedConfigurationsUtil {
      * Returns the at least supported stream combinations for level-3 devices
      * in addition to tje combinations for full and for RAW capability.
      */
-    @NonNull
-    public static List<SurfaceCombination> getLevel3SupportedCombinationList() {
+    public static @NonNull List<SurfaceCombination> getLevel3SupportedCombinationList() {
         List<SurfaceCombination> combinationList = new ArrayList<>();
 
         // (PRIV, PREVIEW) + (PRIV, ANALYSIS) + (YUV, MAXIMUM) + (RAW, MAXIMUM)
@@ -405,8 +400,8 @@ public final class GuaranteedConfigurationsUtil {
      * Returns the at least supported stream combinations for the ultra high resolution pixel
      * sensor mode.
      */
-    @NonNull
-    public static List<SurfaceCombination> getUltraHighResolutionSupportedCombinationList() {
+    public static @NonNull List<SurfaceCombination>
+            getUltraHighResolutionSupportedCombinationList() {
         List<SurfaceCombination> combinationList = new ArrayList<>();
 
         // (YUV, ULTRA_MAXIMUM) + (PRIV, PREVIEW) + (PRIV, RECORD)
@@ -542,8 +537,7 @@ public final class GuaranteedConfigurationsUtil {
      * Returns the minimally guaranteed stream combinations when one or more
      * streams are configured as a 10-bit input.
      */
-    @NonNull
-    public static List<SurfaceCombination> get10BitSupportedCombinationList() {
+    public static @NonNull List<SurfaceCombination> get10BitSupportedCombinationList() {
         List<SurfaceCombination> combinationList = new ArrayList<>();
 
         // (PRIV, MAXIMUM)
@@ -616,8 +610,7 @@ public final class GuaranteedConfigurationsUtil {
     /**
      * Returns the minimally guaranteed stream combinations for Ultra HDR.
      */
-    @NonNull
-    public static List<SurfaceCombination> getUltraHdrSupportedCombinationList() {
+    public static @NonNull List<SurfaceCombination> getUltraHdrSupportedCombinationList() {
         // Due to the unique characteristics of JPEG/R, some devices might configure an extra 8-bit
         // JPEG stream internally in addition to the 10-bit YUV stream. The 10-bit mandatory
         // stream combination table is actually not suitable for use. Adds only (PRIV, PREVIEW) +
@@ -645,8 +638,7 @@ public final class GuaranteedConfigurationsUtil {
     /**
      * Returns the at least supported stream combinations for concurrent cameras.
      */
-    @NonNull
-    public static List<SurfaceCombination> getConcurrentSupportedCombinationList() {
+    public static @NonNull List<SurfaceCombination> getConcurrentSupportedCombinationList() {
         List<SurfaceCombination> combinationList = new ArrayList<>();
 
         // (YUV, s1440p)
@@ -722,8 +714,7 @@ public final class GuaranteedConfigurationsUtil {
      * Returns the entire supported stream combinations for devices with Stream Use Case capability
      */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    @NonNull
-    public static List<SurfaceCombination> getStreamUseCaseSupportedCombinationList() {
+    public static @NonNull List<SurfaceCombination> getStreamUseCaseSupportedCombinationList() {
         List<SurfaceCombination> combinationList = new ArrayList<>();
 
         // (PRIV, s1440p, PREVIEW_VIDEO_STILL)
@@ -864,8 +855,8 @@ public final class GuaranteedConfigurationsUtil {
      * Returns the supported stream combinations for preview stabilization.
      */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    @NonNull
-    public static List<SurfaceCombination> getPreviewStabilizationSupportedCombinationList() {
+    public static @NonNull List<SurfaceCombination>
+            getPreviewStabilizationSupportedCombinationList() {
         List<SurfaceCombination> combinationList = new ArrayList<>();
 
         // (PRIV, s1440p)
@@ -951,9 +942,8 @@ public final class GuaranteedConfigurationsUtil {
      * Returns the supported stream combinations based on the hardware level and capabilities of
      * the device.
      */
-    @NonNull
-    public static List<SurfaceCombination> generateSupportedCombinationList(int hardwareLevel,
-            boolean isRawSupported, boolean isBurstCaptureSupported) {
+    public static @NonNull List<SurfaceCombination> generateSupportedCombinationList(
+            int hardwareLevel, boolean isRawSupported, boolean isBurstCaptureSupported) {
         List<SurfaceCombination> surfaceCombinations = new ArrayList<>();
         surfaceCombinations.addAll(getLegacySupportedCombinationList());
 

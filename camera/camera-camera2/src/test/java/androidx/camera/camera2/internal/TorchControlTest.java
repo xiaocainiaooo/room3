@@ -20,14 +20,14 @@ import static android.os.Looper.getMainLooper;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import static kotlinx.coroutines.test.TestCoroutineDispatchersKt.UnconfinedTestDispatcher;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.robolectric.Shadows.shadowOf;
-
-import static kotlinx.coroutines.test.TestCoroutineDispatchersKt.UnconfinedTestDispatcher;
 
 import android.content.Context;
 import android.hardware.camera2.CameraAccessException;
