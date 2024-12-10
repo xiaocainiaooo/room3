@@ -26,6 +26,8 @@ import androidx.compose.ui.text.AnnotatedString.Range
 import androidx.compose.ui.text.internal.checkPrecondition
 import androidx.compose.ui.text.internal.requirePrecondition
 import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastFilter
@@ -711,6 +713,18 @@ internal constructor(internal val annotations: List<Range<out Annotation>>?, val
             annotations.add(MutableRange(clickable, start, end))
         }
 
+        /** Adds an annotation to draw a bullet */
+        internal fun addBullet(bullet: Bullet, start: Int, end: Int) {
+            annotations.add(MutableRange(item = bullet, start = start, end = end))
+        }
+
+        /** Adds an annotation to draw a bullet and a paragraph to add an indentation */
+        internal fun addBullet(bullet: Bullet, indentation: TextUnit, start: Int, end: Int) {
+            val bulletParStyle = ParagraphStyle(textIndent = TextIndent(indentation, indentation))
+            annotations.add(MutableRange(item = bulletParStyle, start = start, end = end))
+            annotations.add(MutableRange(item = bullet, start = start, end = end))
+        }
+
         /**
          * Applies the given [SpanStyle] to any appended text until a corresponding [pop] is called.
          *
@@ -734,6 +748,18 @@ internal constructor(internal val annotations: List<Range<out Annotation>>?, val
          */
         fun pushStyle(style: ParagraphStyle): Int {
             MutableRange(item = style, start = text.length).also {
+                styleStack.add(it)
+                annotations.add(it)
+            }
+            return styleStack.size - 1
+        }
+
+        /**
+         * Applies the given [bullet] annotation to any appended text until a corresponding [pop] is
+         * called.
+         */
+        internal fun pushBullet(bullet: Bullet): Int {
+            MutableRange(item = bullet, start = text.length).also {
                 styleStack.add(it)
                 annotations.add(it)
             }
