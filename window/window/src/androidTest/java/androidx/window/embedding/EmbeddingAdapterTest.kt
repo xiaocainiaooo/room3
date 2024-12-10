@@ -545,7 +545,8 @@ class EmbeddingAdapterTest {
         WindowTestUtils.assumeAtLeastWindowExtensionVersion(5)
 
         val dimAreaBehavior = EmbeddingConfiguration.DimAreaBehavior.ON_TASK
-        adapter.embeddingConfiguration = EmbeddingConfiguration(dimAreaBehavior)
+        adapter.embeddingConfiguration =
+            EmbeddingConfiguration.Builder().setDimAreaBehavior(dimAreaBehavior).build()
         val oemSplitAttributes = adapter.translateSplitAttributes(SplitAttributes.Builder().build())
 
         assertEquals(dimAreaBehavior.value, oemSplitAttributes.windowAttributes.dimAreaBehavior)
