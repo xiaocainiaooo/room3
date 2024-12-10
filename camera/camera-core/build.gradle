@@ -43,7 +43,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-common:2.1.0")
     implementation("androidx.tracing:tracing:1.2.0")
     implementation(libs.autoValueAnnotations)
-    androidTestImplementation project(path: ':camera:camera-camera2')
+    androidTestImplementation project(":camera:camera-camera2")
     compileOnly(project(":external:libyuv"))
 
     annotationProcessor(libs.autoValue)

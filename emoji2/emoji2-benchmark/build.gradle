@@ -31,7 +31,7 @@ plugins {
 }
 
 ext {
-    fontDir = project(':noto-emoji-compat-font').projectDir
+    fontDir = project(":noto-emoji-compat-font").projectDir
 }
 
 android {
@@ -58,7 +58,7 @@ dependencies {
     androidTestImplementation(libs.testRules)
     androidTestImplementation(libs.mockitoCore)
     androidTestImplementation(libs.dexmakerMockito)
-    androidTestImplementation project(':internal-testutils-runtime')
+    androidTestImplementation project(":internal-testutils-runtime")
     androidTestImplementation(libs.kotlinStdlib)
 }
 

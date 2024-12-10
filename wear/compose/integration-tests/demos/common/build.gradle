@@ -25,7 +25,7 @@ dependencies {
     implementation(libs.kotlinStdlib)
 
     api("androidx.activity:activity:1.2.0")
-    implementation(project(':wear:compose:compose-material'))
+    implementation(project(":wear:compose:compose-material"))
 
 }
 

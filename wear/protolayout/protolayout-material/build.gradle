@@ -67,15 +67,9 @@ android {
     defaultConfig {
         minSdk = 26
     }
-
     sourceSets {
         androidTest.assets.srcDirs += project.rootDir.absolutePath + "/../../golden/wear/wear-protolayout-material"
     }
-
-    defaultConfig {
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
     namespace = "androidx.wear.protolayout.material"
 }
 

@@ -38,10 +38,10 @@ dependencies {
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-text"))
 
-    implementation(project(':wear:compose:compose-foundation'))
-    implementation(project(':wear:compose:compose-material3'))
-    implementation(project(':wear:compose:compose-material3-samples'))
-    implementation(project(':wear:compose:integration-tests:demos:common'))
+    implementation(project(":wear:compose:compose-foundation"))
+    implementation(project(":wear:compose:compose-material3"))
+    implementation(project(":wear:compose:compose-material3-samples"))
+    implementation(project(":wear:compose:integration-tests:demos:common"))
     implementation("androidx.compose.material:material-icons-core:1.6.7")
 }
 

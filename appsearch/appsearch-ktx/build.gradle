@@ -24,19 +24,19 @@
 import androidx.build.LibraryType
 
 plugins {
-    id('AndroidXPlugin')
-    id('com.android.library')
-    id('org.jetbrains.kotlin.android')
-    id('org.jetbrains.kotlin.kapt')
+    id("AndroidXPlugin")
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.kapt")
 }
 
 dependencies {
     api(libs.kotlinStdlib)
 
-    kaptAndroidTest project(':appsearch:appsearch-compiler')
-    androidTestImplementation project(':appsearch:appsearch')
-    androidTestImplementation project(':appsearch:appsearch-local-storage')
-    androidTestImplementation project(':appsearch:appsearch-test-util')
+    kaptAndroidTest project(":appsearch:appsearch-compiler")
+    androidTestImplementation project(":appsearch:appsearch")
+    androidTestImplementation project(":appsearch:appsearch-local-storage")
+    androidTestImplementation project(":appsearch:appsearch-test-util")
     androidTestImplementation(libs.testCore)
     androidTestImplementation(libs.testRules)
     androidTestImplementation(libs.truth)

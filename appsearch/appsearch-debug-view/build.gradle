@@ -35,9 +35,9 @@ android {
 
 dependencies {
     api(libs.jspecify)
-    implementation project(':appsearch:appsearch')
-    implementation project(':appsearch:appsearch-local-storage')
-    implementation project(':appsearch:appsearch-platform-storage')
+    implementation project(":appsearch:appsearch")
+    implementation project(":appsearch:appsearch-local-storage")
+    implementation project(":appsearch:appsearch-platform-storage")
     implementation('androidx.concurrent:concurrent-futures:1.0.0')
     implementation('androidx.constraintlayout:constraintlayout:2.2.0-beta01')
     implementation('androidx.core:core:1.5.0')

@@ -25,7 +25,7 @@ dependencies {
     androidTestImplementation(libs.espressoCore)
     androidTestImplementation(libs.kotlinStdlib)
     androidTestImplementation(libs.truth)
-    androidTestImplementation(project(':internal-testutils-runtime'))
+    androidTestImplementation(project(":internal-testutils-runtime"))
     androidTestImplementation("androidx.window:window-testing:1.2.0")
 }
 
