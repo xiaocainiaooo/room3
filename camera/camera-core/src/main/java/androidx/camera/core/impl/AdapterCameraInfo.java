@@ -20,8 +20,6 @@ import android.util.Range;
 import android.util.Rational;
 
 import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.camera.core.ExposureState;
 import androidx.camera.core.FocusMeteringAction;
 import androidx.camera.core.TorchState;
@@ -30,6 +28,9 @@ import androidx.camera.core.impl.utils.SessionProcessorUtil;
 import androidx.camera.core.internal.ImmutableZoomState;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -61,12 +62,10 @@ public class AdapterCameraInfo extends ForwardingCameraInfo {
     }
 
     private final CameraInfoInternal mCameraInfo;
-    @Nullable
-    private final SessionProcessor mSessionProcessor;
+    private final @Nullable SessionProcessor mSessionProcessor;
     private boolean mIsPostviewSupported = false;
     private boolean mIsCaptureProcessProgressSupported = false;
-    @NonNull
-    private final CameraConfig mCameraConfig;
+    private final @NonNull CameraConfig mCameraConfig;
 
     public AdapterCameraInfo(@NonNull CameraInfoInternal cameraInfo,
             @NonNull CameraConfig cameraConfig) {
@@ -79,22 +78,19 @@ public class AdapterCameraInfo extends ForwardingCameraInfo {
         setCaptureProcessProgressSupported(cameraConfig.isCaptureProcessProgressSupported());
     }
 
-    @NonNull
-    public CameraConfig getCameraConfig() {
+    public @NonNull CameraConfig getCameraConfig() {
         return mCameraConfig;
     }
 
-    @NonNull
     @Override
-    public CameraInfoInternal getImplementation() {
+    public @NonNull CameraInfoInternal getImplementation() {
         return mCameraInfo;
     }
 
     /**
      * Returns the session processor associated with the AdapterCameraInfo.
      */
-    @Nullable
-    public SessionProcessor getSessionProcessor() {
+    public @Nullable SessionProcessor getSessionProcessor() {
         return mSessionProcessor;
     }
 
@@ -107,9 +103,8 @@ public class AdapterCameraInfo extends ForwardingCameraInfo {
         return mCameraInfo.hasFlashUnit();
     }
 
-    @NonNull
     @Override
-    public LiveData<Integer> getTorchState() {
+    public @NonNull LiveData<Integer> getTorchState() {
         if (!SessionProcessorUtil.isOperationSupported(mSessionProcessor, CAMERA_OPERATION_TORCH)) {
             return new MutableLiveData<>(TorchState.OFF);
         }
@@ -117,9 +112,8 @@ public class AdapterCameraInfo extends ForwardingCameraInfo {
         return mCameraInfo.getTorchState();
     }
 
-    @NonNull
     @Override
-    public LiveData<ZoomState> getZoomState() {
+    public @NonNull LiveData<ZoomState> getZoomState() {
         if (!SessionProcessorUtil.isOperationSupported(mSessionProcessor, CAMERA_OPERATION_ZOOM)) {
             return new MutableLiveData<>(ImmutableZoomState.create(
                     /* zoomRatio */1f, /* maxZoomRatio */ 1f,
@@ -128,9 +122,8 @@ public class AdapterCameraInfo extends ForwardingCameraInfo {
         return mCameraInfo.getZoomState();
     }
 
-    @NonNull
     @Override
-    public ExposureState getExposureState() {
+    public @NonNull ExposureState getExposureState() {
         if (!SessionProcessorUtil.isOperationSupported(mSessionProcessor,
                 CAMERA_OPERATION_EXPOSURE_COMPENSATION)) {
             return new ExposureState() {
@@ -139,15 +132,13 @@ public class AdapterCameraInfo extends ForwardingCameraInfo {
                     return 0;
                 }
 
-                @NonNull
                 @Override
-                public Range<Integer> getExposureCompensationRange() {
+                public @NonNull Range<Integer> getExposureCompensationRange() {
                     return new Range<>(0, 0);
                 }
 
-                @NonNull
                 @Override
-                public Rational getExposureCompensationStep() {
+                public @NonNull Rational getExposureCompensationStep() {
                     return Rational.ZERO;
                 }
 

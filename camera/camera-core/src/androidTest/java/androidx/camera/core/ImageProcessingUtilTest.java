@@ -33,7 +33,6 @@ import android.graphics.PixelFormat;
 import android.media.ImageWriter;
 
 import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
 import androidx.camera.core.impl.utils.Exif;
 import androidx.camera.testing.impl.fakes.FakeImageInfo;
 import androidx.camera.testing.impl.fakes.FakeImageProxy;
@@ -43,6 +42,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SdkSuppress;
 import androidx.test.filters.SmallTest;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -513,7 +513,7 @@ public class ImageProcessingUtilTest {
         fillPlane(imageProxy.getPlanes()[2], (byte) v);
     }
 
-    private static void fillPlane(@NonNull ImageProxy.PlaneProxy plane, byte value) {
+    private static void fillPlane(ImageProxy.@NonNull PlaneProxy plane, byte value) {
         ByteBuffer buffer = plane.getBuffer();
         int pixelStride = plane.getPixelStride();
         // Ignore row stride here, we don't need to be efficient, so we'll fill the padding also.
@@ -525,8 +525,7 @@ public class ImageProcessingUtilTest {
         }
     }
 
-    @NonNull
-    private ImageProxy createYuvImageProxyWithPlanes() {
+    private @NonNull ImageProxy createYuvImageProxyWithPlanes() {
         FakeImageProxy yuvImageProxy = new FakeImageProxy(new FakeImageInfo());
         yuvImageProxy.setWidth(WIDTH);
         yuvImageProxy.setHeight(HEIGHT);
