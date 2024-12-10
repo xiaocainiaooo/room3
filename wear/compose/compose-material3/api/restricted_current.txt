@@ -71,7 +71,7 @@ package androidx.wear.compose.material3 {
   }
 
   public final class ArcProgressIndicatorKt {
-    method @androidx.compose.runtime.Composable public static void ArcProgressIndicator(optional float startAngle, optional float endAngle, optional androidx.compose.ui.Modifier modifier, optional int angularDirection, optional androidx.wear.compose.material3.ProgressIndicatorColors colors, optional float strokeWidth, optional float gapSize);
+    method @androidx.compose.runtime.Composable public static void ArcProgressIndicator(optional androidx.compose.ui.Modifier modifier, optional float startAngle, optional float endAngle, optional int angularDirection, optional androidx.wear.compose.material3.ProgressIndicatorColors colors, optional float strokeWidth, optional float gapSize);
   }
 
   @androidx.compose.runtime.Immutable public final class ButtonColors {
