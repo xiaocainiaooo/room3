@@ -45,8 +45,8 @@ import androidx.wear.compose.material3.MotionScheme.Companion.standard
 import kotlinx.coroutines.flow.collectLatest
 
 /**
- * A base dialog component used by [AlertDialog] and [Confirmation] variations. This dialog provides
- * a full-screen experience with custom entry/exit animations.
+ * A base dialog component used by [AlertDialog] and [ConfirmationDialog] variations. This dialog
+ * provides a full-screen experience with custom entry/exit animations.
  *
  * Dialogs provide important prompts in a user flow. They can require an action, communicate
  * information, or help users accomplish a task.

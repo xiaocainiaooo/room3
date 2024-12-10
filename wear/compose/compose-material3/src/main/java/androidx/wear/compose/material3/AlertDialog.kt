@@ -64,21 +64,24 @@ import androidx.wear.compose.materialcore.screenWidthDp
  * bottom of the dialog. It should be used when the user will be presented with a binary decision,
  * to either confirm or dismiss an action.
  *
+ * Where user input is not required, such as displaying a transient success or failure message, use
+ * [ConfirmationDialog], [SuccessConfirmationDialog] or [FailureConfirmationDialog] instead.
+ *
  * Example of an [AlertDialog] with an icon, title and two buttons to confirm and dismiss:
  *
  * @sample androidx.wear.compose.material3.samples.AlertDialogWithConfirmAndDismissSample
- * @param show A boolean indicating whether the dialog should be displayed.
+ * @param visible A boolean indicating whether the dialog should be displayed.
  * @param onDismissRequest A lambda function to be called when the dialog is dismissed by swiping
  *   right (typically also called by the [dismissButton]).
  * @param confirmButton A slot for a [Button] indicating positive sentiment. Clicking the button
- *   must remove the dialog from the composition hierarchy e.g. by setting [show] to false. It's
+ *   must remove the dialog from the composition hierarchy e.g. by setting [visible] to false. It's
  *   recommended to use [AlertDialogDefaults.ConfirmButton] in this slot with onClick callback.
  * @param title A slot for displaying the title of the dialog. Title should contain a summary of the
  *   dialog's purpose or content and should not exceed 3 lines of text. By default,
  *   [TextOverflow.Ellipsis] will be applied when text exceeds 3 lines.
  * @param modifier Modifier to be applied to the dialog content.
  * @param dismissButton A slot for a [Button] indicating negative sentiment. Clicking the button
- *   must remove the dialog from the composition hierarchy e.g. by setting [show] to false. It's
+ *   must remove the dialog from the composition hierarchy e.g. by setting [visible] to false. It's
  *   recommended to use [AlertDialogDefaults.DismissButton] in this slot with onClick callback.
  * @param icon Optional slot for an icon to be shown at the top of the dialog.
  * @param text Optional slot for displaying the message of the dialog below the title. Should
@@ -93,7 +96,7 @@ import androidx.wear.compose.materialcore.screenWidthDp
  */
 @Composable
 fun AlertDialog(
-    show: Boolean,
+    visible: Boolean,
     onDismissRequest: () -> Unit,
     confirmButton: @Composable RowScope.() -> Unit,
     title: @Composable () -> Unit,
@@ -109,7 +112,7 @@ fun AlertDialog(
     content: (ScalingLazyListScope.() -> Unit)? = null
 ) {
     Dialog(
-        show = show,
+        show = visible,
         onDismissRequest = onDismissRequest,
         properties = properties,
     ) {
@@ -136,7 +139,10 @@ fun AlertDialog(
  * caller has flexibility in how to seek user input. In most cases, we recommend using other
  * AlertDialog variations with 2 confirm/dismiss buttons or a single confirmation button.
  *
- * @param show A boolean indicating whether the dialog should be displayed.
+ * Where user input is not required, such as displaying a transient success or failure message, use
+ * [ConfirmationDialog], [SuccessConfirmationDialog] or [FailureConfirmationDialog] instead.
+ *
+ * @param visible A boolean indicating whether the dialog should be displayed.
  * @param onDismissRequest A lambda function to be called when the dialog is dismissed by swiping to
  *   the right or by other dismiss action.
  * @param title A slot for displaying the title of the dialog. Title should contain a summary of the
@@ -156,7 +162,7 @@ fun AlertDialog(
  */
 @Composable
 fun AlertDialog(
-    show: Boolean,
+    visible: Boolean,
     onDismissRequest: () -> Unit,
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -168,7 +174,7 @@ fun AlertDialog(
     content: (ScalingLazyListScope.() -> Unit)? = null
 ) {
     Dialog(
-        show = show,
+        show = visible,
         onDismissRequest = onDismissRequest,
         properties = properties,
     ) {
@@ -192,6 +198,9 @@ fun AlertDialog(
  * This overload has a single slot for a confirm [EdgeButton] at the bottom of the dialog. It should
  * be used when the user will be presented with a single acknowledgement.
  *
+ * Where user input is not required, such as displaying a transient success or failure message, use
+ * [ConfirmationDialog], [SuccessConfirmationDialog] or [FailureConfirmationDialog] instead.
+ *
  * Example of an [AlertDialog] with an icon, title, text and bottom [EdgeButton]:
  *
  * @sample androidx.wear.compose.material3.samples.AlertDialogWithEdgeButtonSample
@@ -199,11 +208,11 @@ fun AlertDialog(
  * Example of an [AlertDialog] with content groups and a bottom [EdgeButton]:
  *
  * @sample androidx.wear.compose.material3.samples.AlertDialogWithContentGroupsSample
- * @param show A boolean indicating whether the dialog should be displayed.
+ * @param visible A boolean indicating whether the dialog should be displayed.
  * @param onDismissRequest A lambda function to be called when the dialog is dismissed by swiping to
  *   the right or by other dismiss action.
  * @param edgeButton Slot for an [EdgeButton] indicating positive sentiment. Clicking the button
- *   must remove the dialog from the composition hierarchy e.g. by setting [show] to false. It's
+ *   must remove the dialog from the composition hierarchy e.g. by setting [visible] to false. It's
  *   recommended to use [AlertDialogDefaults.EdgeButton] in this slot with onClick callback. Note
  *   that when using an [EdgeButton] which is not Medium size, the contentPadding parameters should
  *   be specified.
@@ -226,7 +235,7 @@ fun AlertDialog(
  */
 @Composable
 fun AlertDialog(
-    show: Boolean,
+    visible: Boolean,
     onDismissRequest: () -> Unit,
     edgeButton: (@Composable BoxScope.() -> Unit),
     title: @Composable () -> Unit,
@@ -239,7 +248,7 @@ fun AlertDialog(
     content: (ScalingLazyListScope.() -> Unit)? = null
 ) {
     Dialog(
-        show = show,
+        show = visible,
         onDismissRequest = onDismissRequest,
         properties = properties,
     ) {

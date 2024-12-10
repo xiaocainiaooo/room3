@@ -262,9 +262,9 @@ class ColorScheme(
     internal var defaultLevelIndicatorColorsCached: LevelIndicatorColors? = null
 
     // Confirmation
-    internal var defaultConfirmationColorsCached: ConfirmationColors? = null
-    internal var defaultSuccessConfirmationColorsCached: ConfirmationColors? = null
-    internal var defaultFailureConfirmationColorsCached: ConfirmationColors? = null
+    internal var defaultConfirmationColorsCached: ConfirmationDialogColors? = null
+    internal var defaultSuccessConfirmationColorsCached: ConfirmationDialogColors? = null
+    internal var defaultFailureConfirmationColorsCached: ConfirmationDialogColors? = null
 
     // Open on Phone dialog
     internal var mDefaultOpenOnPhoneDialogColorsCached: OpenOnPhoneDialogColors? = null

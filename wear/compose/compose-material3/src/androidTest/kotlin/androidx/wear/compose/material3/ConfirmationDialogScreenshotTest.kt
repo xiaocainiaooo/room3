@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
-import androidx.wear.compose.material3.ConfirmationDefaults.curvedText
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import org.junit.Rule
@@ -58,8 +57,8 @@ class ConfirmationScreenshotTest {
             screenshotRule = screenshotRule,
             screenSize = screenSize
         ) { modifier ->
-            Confirmation(
-                show = true,
+            ConfirmationDialog(
+                visible = true,
                 modifier = modifier,
                 onDismissRequest = {},
                 text = { Text("Your message has been sent") }
@@ -76,11 +75,12 @@ class ConfirmationScreenshotTest {
             screenshotRule = screenshotRule,
             screenSize = screenSize
         ) { modifier ->
-            Confirmation(
-                show = true,
+            val style = ConfirmationDialogDefaults.curvedTextStyle
+            ConfirmationDialog(
+                visible = true,
                 modifier = modifier,
                 onDismissRequest = {},
-                curvedText = curvedText("Confirmed")
+                curvedText = { confirmationCurvedText("Confirmed", style) }
             ) {
                 DefaultIcon()
             }
@@ -94,8 +94,8 @@ class ConfirmationScreenshotTest {
             screenshotRule = screenshotRule,
             screenSize = screenSize
         ) { modifier ->
-            Confirmation(
-                show = true,
+            ConfirmationDialog(
+                visible = true,
                 modifier = modifier,
                 onDismissRequest = {},
                 curvedText = null
@@ -112,11 +112,12 @@ class ConfirmationScreenshotTest {
             screenshotRule = screenshotRule,
             screenSize = screenSize
         ) { modifier ->
-            SuccessConfirmation(
-                show = true,
+            val style = ConfirmationDialogDefaults.curvedTextStyle
+            SuccessConfirmationDialog(
+                visible = true,
                 modifier = modifier,
                 onDismissRequest = {},
-                curvedText = curvedText("Success")
+                curvedText = { confirmationCurvedText("Success", style) }
             )
         }
     }
@@ -128,8 +129,8 @@ class ConfirmationScreenshotTest {
             screenshotRule = screenshotRule,
             screenSize = screenSize
         ) { modifier ->
-            SuccessConfirmation(
-                show = true,
+            SuccessConfirmationDialog(
+                visible = true,
                 modifier = modifier,
                 onDismissRequest = {},
                 curvedText = null
@@ -144,11 +145,12 @@ class ConfirmationScreenshotTest {
             screenshotRule = screenshotRule,
             screenSize = screenSize
         ) { modifier ->
-            FailureConfirmation(
-                show = true,
+            val style = ConfirmationDialogDefaults.curvedTextStyle
+            FailureConfirmationDialog(
+                visible = true,
                 modifier = modifier,
                 onDismissRequest = {},
-                curvedText = curvedText("Failure")
+                curvedText = { confirmationCurvedText("Failure", style) }
             )
         }
     }
@@ -160,8 +162,8 @@ class ConfirmationScreenshotTest {
             screenshotRule = screenshotRule,
             screenSize = screenSize
         ) { modifier ->
-            FailureConfirmation(
-                show = true,
+            FailureConfirmationDialog(
+                visible = true,
                 modifier = modifier,
                 onDismissRequest = {},
                 curvedText = null,
@@ -190,7 +192,7 @@ class ConfirmationScreenshotTest {
     private fun DefaultIcon() {
         Icon(
             Icons.Filled.Add,
-            modifier = Modifier.size(ConfirmationDefaults.IconSize),
+            modifier = Modifier.size(ConfirmationDialogDefaults.IconSize),
             tint = MaterialTheme.colorScheme.primary,
             contentDescription = null
         )
@@ -200,7 +202,7 @@ class ConfirmationScreenshotTest {
     private fun DefaultSmallIcon() {
         Icon(
             Icons.Filled.Add,
-            modifier = Modifier.size(ConfirmationDefaults.SmallIconSize),
+            modifier = Modifier.size(ConfirmationDialogDefaults.SmallIconSize),
             tint = MaterialTheme.colorScheme.primary,
             contentDescription = null
         )
