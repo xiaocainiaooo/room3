@@ -123,12 +123,23 @@ internal fun Spannable.setTextIndent(
 internal fun Spannable.setBulletSpans(
     annotations: List<AnnotatedString.Range<out AnnotatedString.Annotation>>,
     contextFontSize: Float,
-    density: Density
+    density: Density,
+    textIndent: TextIndent?
 ) {
+    val textIndentPx =
+        textIndent?.let {
+            with(density) {
+                when (textIndent.firstLine.type) {
+                    TextUnitType.Sp -> textIndent.firstLine.toPx()
+                    TextUnitType.Em -> textIndent.firstLine.value * contextFontSize
+                    else -> 0f
+                }
+            }
+        } ?: 0f
     annotations.fastForEach {
         (it.item as? Bullet)?.let { bullet ->
             val bulletSize = resolveBulletTextUnitToPx(bullet.size, contextFontSize, density)
-            val gapWidthPx = resolveBulletTextUnitToPx(bullet.gapWidth, contextFontSize, density)
+            val gapWidthPx = resolveBulletTextUnitToPx(bullet.padding, contextFontSize, density)
             if (!bulletSize.isNaN() && !gapWidthPx.isNaN()) {
                 setSpan(
                     CustomBulletSpan(
@@ -139,7 +150,8 @@ internal fun Spannable.setBulletSpans(
                         density = density,
                         brush = bullet.brush,
                         alpha = bullet.alpha,
-                        drawStyle = bullet.drawStyle
+                        drawStyle = bullet.drawStyle,
+                        textIndentPx = textIndentPx
                     ),
                     it.start,
                     it.end

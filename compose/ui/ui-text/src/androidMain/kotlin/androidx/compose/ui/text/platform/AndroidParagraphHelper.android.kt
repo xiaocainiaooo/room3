@@ -122,7 +122,12 @@ internal fun createCharSequence(
 
     // apply this after setTextIndent so we have space to draw the bullets. Bullets by itself don't
     // add any paddings
-    spannableString.setBulletSpans(annotations, contextFontSize, density)
+    spannableString.setBulletSpans(
+        annotations,
+        contextFontSize,
+        density,
+        contextTextStyle.textIndent
+    )
 
     spannableString.setPlaceholders(placeholders, density)
 

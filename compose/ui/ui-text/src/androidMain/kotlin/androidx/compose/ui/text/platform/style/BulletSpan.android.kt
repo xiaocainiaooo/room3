@@ -37,21 +37,28 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 internal class CustomBulletSpan(
     private val shape: Shape,
     private val bulletWidthPx: Float,
     private val bulletHeightPx: Float,
-    private val gapWidthPx: Float,
+    gapWidthPx: Float,
     private val brush: Brush?,
     private val alpha: Float,
     private val drawStyle: DrawStyle,
-    private val density: Density
+    private val density: Density,
+    textIndentPx: Float
 ) : LeadingMarginSpan {
+
+    private val minimumRequiredIndent = (bulletWidthPx + gapWidthPx).roundToInt()
+    private val diff = textIndentPx.roundToInt() - minimumRequiredIndent
+
     override fun getLeadingMargin(first: Boolean): Int {
-        // We don't add any margin since it should be handled by the ParagraphStyle that is added
-        // together with a bullet.
-        return 0
+        // if there isn't enough margin added by the paragraph indentation, add the rest to at least
+        // fit the bullet with its padding
+        return if (diff >= 0) 0 else abs(diff)
     }
 
     override fun drawLeadingMargin(
@@ -70,8 +77,7 @@ internal class CustomBulletSpan(
     ) {
         if (c == null) return
         val yCenter = (top + bottom) / 2f
-        // This implementation assumes that there's space to draw the span
-        val xStart = x - bulletWidthPx - gapWidthPx
+        val xStart = (x - minimumRequiredIndent).coerceAtLeast(0)
 
         // this check ensures we only draw bullet ones at the beginning of the paragraph and
         // not on every line
@@ -90,7 +96,7 @@ internal class CustomBulletSpan(
                             if (dir > 0) LayoutDirection.Ltr else LayoutDirection.Rtl,
                             density
                         )
-                    outline.draw(c, paint, xStart, yCenter, dir)
+                    outline.draw(c, paint, xStart.toFloat(), yCenter, dir)
                 }
 
                 // restore Canvas's style
