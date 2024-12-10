@@ -79,7 +79,7 @@ private class FocusGroupPropertiesNode :
                     rect = getCurrentlyFocusedRect(focusOwner, hostView, embeddedView)
                 )
             if (!targetViewFocused) {
-                cancelFocus()
+                cancelFocusChange()
             }
         }
     }
@@ -116,7 +116,7 @@ private class FocusGroupPropertiesNode :
                     }
                 if (nextView != null && embeddedView.containsDescendant(nextView)) {
                     nextView.requestFocus(androidFocusDirection, focusedRect)
-                    cancelFocus()
+                    cancelFocusChange()
                 } else {
                     check(hostView.requestFocus()) { "host view did not take focus" }
                 }

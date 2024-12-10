@@ -588,7 +588,8 @@ package androidx.compose.ui.focus {
   }
 
   public sealed interface FocusEnterExitScope {
-    method public void cancelFocus();
+    method @Deprecated @SuppressCompatibility @androidx.compose.ui.ExperimentalComposeUiApi public default void cancelFocus();
+    method public void cancelFocusChange();
     method public int getRequestedFocusDirection();
     property public abstract int requestedFocusDirection;
   }
