@@ -19,7 +19,7 @@ package androidx.room.paging
 import android.database.AbstractCursor
 import androidx.sqlite.SQLiteStatement
 
-/** Wrapper class for backwards compatibility in room-paging. */
+/** Cursor backed by a SQLiteStatement used for backwards compatibility of Paging APIs. */
 internal class SQLiteStatementCursor(
     private val statement: SQLiteStatement,
     private val rowCount: Int

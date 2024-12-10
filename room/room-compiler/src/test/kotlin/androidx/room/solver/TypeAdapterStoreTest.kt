@@ -61,6 +61,7 @@ import androidx.room.solver.binderprovider.RxJava3PagingSourceQueryResultBinderP
 import androidx.room.solver.binderprovider.RxQueryResultBinderProvider
 import androidx.room.solver.query.parameter.CollectionQueryParameterAdapter
 import androidx.room.solver.query.result.MultiTypedPagingSourceQueryResultBinder
+import androidx.room.solver.query.result.Paging3PagingSourceQueryResultBinder
 import androidx.room.solver.shortcut.binderprovider.GuavaListenableFutureDeleteOrUpdateMethodBinderProvider
 import androidx.room.solver.shortcut.binderprovider.GuavaListenableFutureInsertOrUpsertMethodBinderProvider
 import androidx.room.solver.shortcut.binderprovider.RxCallableDeleteOrUpdateMethodBinderProvider
@@ -1428,7 +1429,7 @@ class TypeAdapterStoreTest {
             val parsedDao = parser.process()
             val binder =
                 parsedDao.queryMethods.filterIsInstance<ReadQueryMethod>().first().queryResultBinder
-            assertThat(binder is MultiTypedPagingSourceQueryResultBinder).isTrue()
+            assertThat(binder is Paging3PagingSourceQueryResultBinder).isTrue()
 
             val pagingSourceXRawType: XRawType? =
                 invocation.context.processingEnv
