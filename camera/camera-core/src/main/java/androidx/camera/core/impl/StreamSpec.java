@@ -20,11 +20,12 @@ import android.hardware.camera2.CameraMetadata;
 import android.util.Range;
 import android.util.Size;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.camera.core.DynamicRange;
 
 import com.google.auto.value.AutoValue;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A stream specification defining how a camera frame stream should be configured.
@@ -42,31 +43,27 @@ public abstract class StreamSpec {
      * Returns the resolution for the stream associated with this stream specification.
      * @return the resolution for the stream.
      */
-    @NonNull
-    public abstract Size getResolution();
+    public abstract @NonNull Size getResolution();
 
     /**
      * Returns the {@link DynamicRange} for the stream associated with this stream specification.
      * @return the dynamic range for the stream.
      */
-    @NonNull
-    public abstract DynamicRange getDynamicRange();
+    public abstract @NonNull DynamicRange getDynamicRange();
 
     /**
      * Returns the expected frame rate range for the stream associated with this stream
      * specification.
      * @return the expected frame rate range for the stream.
      */
-    @NonNull
-    public abstract Range<Integer> getExpectedFrameRateRange();
+    public abstract @NonNull Range<Integer> getExpectedFrameRateRange();
 
     /**
      * Returns the implementation options associated with this stream
      * specification.
      * @return the implementation options for the stream.
      */
-    @Nullable
-    public abstract Config getImplementationOptions();
+    public abstract @Nullable Config getImplementationOptions();
 
     /**
      * Returns the flag if zero-shutter lag needs to be disabled by user case combinations.
@@ -74,8 +71,7 @@ public abstract class StreamSpec {
     public abstract boolean getZslDisabled();
 
     /** Returns a build for a stream configuration that takes a required resolution. */
-    @NonNull
-    public static Builder builder(@NonNull Size resolution) {
+    public static @NonNull Builder builder(@NonNull Size resolution) {
         return new AutoValue_StreamSpec.Builder()
                 .setResolution(resolution)
                 .setExpectedFrameRateRange(FRAME_RATE_RANGE_UNSPECIFIED)
@@ -84,8 +80,7 @@ public abstract class StreamSpec {
     }
 
     /** Returns a builder pre-populated with the current specification. */
-    @NonNull
-    public abstract Builder toBuilder();
+    public abstract @NonNull Builder toBuilder();
 
     /** A builder for a stream specification */
     @AutoValue.Builder
@@ -95,16 +90,14 @@ public abstract class StreamSpec {
         }
 
         /** Sets the resolution, overriding the existing resolution set in this builder. */
-        @NonNull
-        public abstract Builder setResolution(@NonNull Size resolution);
+        public abstract @NonNull Builder setResolution(@NonNull Size resolution);
 
         /**
          * Sets the dynamic range.
          *
          * <p>If not set, the default dynamic range is {@link DynamicRange#SDR}.
          */
-        @NonNull
-        public abstract Builder setDynamicRange(@NonNull DynamicRange dynamicRange);
+        public abstract @NonNull Builder setDynamicRange(@NonNull DynamicRange dynamicRange);
 
         /**
          * Sets the expected frame rate range.
@@ -112,8 +105,7 @@ public abstract class StreamSpec {
          * <p>If not set, the default expected frame rate range is
          * {@link #FRAME_RATE_RANGE_UNSPECIFIED}.
          */
-        @NonNull
-        public abstract Builder setExpectedFrameRateRange(@NonNull Range<Integer> range);
+        public abstract @NonNull Builder setExpectedFrameRateRange(@NonNull Range<Integer> range);
 
         /**
          * Sets the implementation options.
@@ -121,18 +113,15 @@ public abstract class StreamSpec {
          * <p>If not set, the default expected frame rate range is
          * {@link CameraMetadata#SCALER_AVAILABLE_STREAM_USE_CASES_DEFAULT}.
          */
-        @NonNull
-        public abstract Builder setImplementationOptions(@NonNull Config config);
+        public abstract @NonNull Builder setImplementationOptions(@NonNull Config config);
 
         /**
          * Sets the flag if zero-shutter lag needs to be disabled by user case combinations.
          */
-        @NonNull
-        public abstract Builder setZslDisabled(boolean disabled);
+        public abstract @NonNull Builder setZslDisabled(boolean disabled);
 
         /** Builds the stream specification */
-        @NonNull
-        public abstract StreamSpec build();
+        public abstract @NonNull StreamSpec build();
     }
 
 }

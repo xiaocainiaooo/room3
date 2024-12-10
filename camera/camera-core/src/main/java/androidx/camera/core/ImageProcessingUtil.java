@@ -28,8 +28,6 @@ import android.util.Log;
 import android.view.Surface;
 
 import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 import androidx.camera.core.impl.ImageOutputConfig;
@@ -37,6 +35,9 @@ import androidx.camera.core.impl.ImageReaderProxy;
 import androidx.camera.core.internal.compat.ImageWriterCompat;
 import androidx.camera.core.internal.utils.ImageUtil;
 import androidx.core.util.Preconditions;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.ByteBuffer;
 import java.util.Locale;
@@ -72,10 +73,9 @@ public final class ImageProcessingUtil {
      * given ImageReader. The image format of the ImageReader has to be JPEG, and the JPEG image
      * size has to match the size of the ImageReader.
      */
-    @Nullable
-    public static ImageProxy convertJpegBytesToImage(
+    public static @Nullable ImageProxy convertJpegBytesToImage(
             @NonNull ImageReaderProxy jpegImageReaderProxy,
-            @NonNull byte[] jpegBytes) {
+            byte @NonNull [] jpegBytes) {
         Preconditions.checkArgument(jpegImageReaderProxy.getImageFormat() == ImageFormat.JPEG);
         Preconditions.checkNotNull(jpegBytes);
 
@@ -134,7 +134,7 @@ public final class ImageProcessingUtil {
      */
     public static boolean writeJpegBytesToSurface(
             @NonNull Surface surface,
-            @NonNull byte[] jpegBytes) {
+            byte @NonNull [] jpegBytes) {
         Preconditions.checkNotNull(jpegBytes);
         Preconditions.checkNotNull(surface);
 
@@ -195,8 +195,7 @@ public final class ImageProcessingUtil {
      * @param onePixelShiftEnabled true if one pixel shift should be applied, otherwise false.
      * @return output image proxy in RGB.
      */
-    @Nullable
-    public static ImageProxy convertYUVToRGB(
+    public static @Nullable ImageProxy convertYUVToRGB(
             @NonNull ImageProxy imageProxy,
             @NonNull ImageReaderProxy rgbImageReaderProxy,
             @Nullable ByteBuffer rgbConvertedBuffer,
@@ -264,8 +263,7 @@ public final class ImageProcessingUtil {
      * @param imageProxy input image proxy in YUV.
      * @return bitmap output bitmap in RGBA.
      */
-    @NonNull
-    public static Bitmap convertYUVToBitmap(@NonNull ImageProxy imageProxy) {
+    public static @NonNull Bitmap convertYUVToBitmap(@NonNull ImageProxy imageProxy) {
         if (imageProxy.getFormat() != ImageFormat.YUV_420_888) {
             throw new IllegalArgumentException("Input image format must be YUV_420_888");
         }
@@ -334,8 +332,7 @@ public final class ImageProcessingUtil {
      * @param rotationDegrees         output image rotation degrees.
      * @return rotated image proxy or null if rotation fails or format is not supported.
      */
-    @Nullable
-    public static ImageProxy rotateYUV(
+    public static @Nullable ImageProxy rotateYUV(
             @NonNull ImageProxy imageProxy,
             @NonNull ImageReaderProxy rotatedImageReaderProxy,
             @NonNull ImageWriter rotatedImageWriter,
@@ -404,8 +401,7 @@ public final class ImageProcessingUtil {
                 || rotationDegrees == 270;
     }
 
-    @NonNull
-    private static Result convertYUVToRGBInternal(
+    private static @NonNull Result convertYUVToRGBInternal(
             @NonNull ImageProxy imageProxy,
             @NonNull Surface surface,
             @Nullable ByteBuffer rgbConvertedBuffer,
@@ -446,8 +442,7 @@ public final class ImageProcessingUtil {
         return SUCCESS;
     }
 
-    @NonNull
-    private static Result applyPixelShiftInternal(@NonNull ImageProxy imageProxy) {
+    private static @NonNull Result applyPixelShiftInternal(@NonNull ImageProxy imageProxy) {
         int imageWidth = imageProxy.getWidth();
         int imageHeight = imageProxy.getHeight();
         int srcStrideY = imageProxy.getPlanes()[0].getRowStride();
@@ -481,8 +476,7 @@ public final class ImageProcessingUtil {
     }
 
     @RequiresApi(23)
-    @Nullable
-    private static Result rotateYUVInternal(
+    private static @Nullable Result rotateYUVInternal(
             @NonNull ImageProxy imageProxy,
             @NonNull ImageWriter rotatedImageWriter,
             @NonNull ByteBuffer yRotatedBuffer,
@@ -540,7 +534,7 @@ public final class ImageProcessingUtil {
             boolean isCopyBufferToBitmap);
 
 
-    private static native int nativeWriteJpegToSurface(@NonNull byte[] jpegArray,
+    private static native int nativeWriteJpegToSurface(byte @NonNull [] jpegArray,
             @NonNull Surface surface);
 
     private static native int nativeConvertAndroid420ToABGR(

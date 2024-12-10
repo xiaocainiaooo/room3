@@ -33,8 +33,6 @@ import static org.mockito.Mockito.verify;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.camera.core.impl.ImageReaderProxy;
 import androidx.camera.core.impl.utils.executor.CameraXExecutors;
 import androidx.camera.testing.impl.fakes.FakeImageInfo;
@@ -45,6 +43,8 @@ import androidx.test.filters.SmallTest;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -481,9 +481,8 @@ public class ImageAnalysisAbstractAnalyzerTest {
             mImageAnalysisNonBlockingAnalyzer = imageAnalysisNonBlockingAnalyzer;
         }
 
-        @Nullable
         @Override
-        ImageProxy acquireImage(@NonNull ImageReaderProxy imageReaderProxy) {
+        @Nullable ImageProxy acquireImage(@NonNull ImageReaderProxy imageReaderProxy) {
             return mImageAnalysisNonBlockingAnalyzer.acquireImage(imageReaderProxy);
         }
 
@@ -499,7 +498,7 @@ public class ImageAnalysisAbstractAnalyzerTest {
 
         @Override
         void setAnalyzer(@Nullable Executor userExecutor,
-                @Nullable ImageAnalysis.Analyzer subscribedAnalyzer) {
+                ImageAnalysis.@Nullable Analyzer subscribedAnalyzer) {
             mImageAnalysisNonBlockingAnalyzer.setAnalyzer(userExecutor, subscribedAnalyzer);
         }
 
@@ -547,23 +546,19 @@ public class ImageAnalysisAbstractAnalyzerTest {
             mImageAnalysisNonBlockingAnalyzer.setRelativeRotation(relativeRotation);
         }
 
-        @Nullable
-        ByteBuffer getRGBConverterBuffer() {
+        @Nullable ByteBuffer getRGBConverterBuffer() {
             return mImageAnalysisNonBlockingAnalyzer.mRGBConvertedBuffer;
         }
 
-        @Nullable
-        ByteBuffer getYRotatedBuffer() {
+        @Nullable ByteBuffer getYRotatedBuffer() {
             return mImageAnalysisNonBlockingAnalyzer.mYRotatedBuffer;
         }
 
-        @Nullable
-        ByteBuffer getURotatedBuffer() {
+        @Nullable ByteBuffer getURotatedBuffer() {
             return mImageAnalysisNonBlockingAnalyzer.mURotatedBuffer;
         }
 
-        @Nullable
-        ByteBuffer getVRotatedBuffer() {
+        @Nullable ByteBuffer getVRotatedBuffer() {
             return mImageAnalysisNonBlockingAnalyzer.mVRotatedBuffer;
         }
     }

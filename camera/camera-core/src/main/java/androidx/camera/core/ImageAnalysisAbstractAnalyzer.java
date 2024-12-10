@@ -31,8 +31,6 @@ import android.os.Build;
 
 import androidx.annotation.GuardedBy;
 import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.camera.core.impl.ImageReaderProxy;
 import androidx.camera.core.impl.utils.futures.Futures;
@@ -41,6 +39,9 @@ import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.os.OperationCanceledException;
 
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.Executor;
@@ -79,12 +80,10 @@ abstract class ImageAnalysisAbstractAnalyzer implements ImageReaderProxy.OnImage
     private Executor mUserExecutor;
 
     @GuardedBy("mAnalyzerLock")
-    @Nullable
-    private SafeCloseImageReaderProxy mProcessedImageReaderProxy;
+    private @Nullable SafeCloseImageReaderProxy mProcessedImageReaderProxy;
 
     @GuardedBy("mAnalyzerLock")
-    @Nullable
-    private ImageWriter mProcessedImageWriter;
+    private @Nullable ImageWriter mProcessedImageWriter;
 
     @GuardedBy("mAnalyzerLock")
     private Rect mOriginalViewPortCropRect = new Rect();
@@ -99,20 +98,16 @@ abstract class ImageAnalysisAbstractAnalyzer implements ImageReaderProxy.OnImage
     private Matrix mUpdatedSensorToBufferTransformMatrix = new Matrix();
 
     @GuardedBy("mAnalyzerLock")
-    @Nullable
-    @VisibleForTesting ByteBuffer mRGBConvertedBuffer;
+    @VisibleForTesting @Nullable ByteBuffer mRGBConvertedBuffer;
 
     @GuardedBy("mAnalyzerLock")
-    @Nullable
-    @VisibleForTesting ByteBuffer mYRotatedBuffer;
+    @VisibleForTesting @Nullable ByteBuffer mYRotatedBuffer;
 
     @GuardedBy("mAnalyzerLock")
-    @Nullable
-    @VisibleForTesting ByteBuffer mURotatedBuffer;
+    @VisibleForTesting @Nullable ByteBuffer mURotatedBuffer;
 
     @GuardedBy("mAnalyzerLock")
-    @Nullable
-    @VisibleForTesting ByteBuffer mVRotatedBuffer;
+    @VisibleForTesting @Nullable ByteBuffer mVRotatedBuffer;
 
     // Lock that synchronizes the access to mSubscribedAnalyzer/mUserExecutor to prevent mismatch.
     private final Object mAnalyzerLock = new Object();
@@ -141,8 +136,7 @@ abstract class ImageAnalysisAbstractAnalyzer implements ImageReaderProxy.OnImage
      * Implemented by children to acquireImage via {@link ImageReaderProxy#acquireLatestImage()} or
      * {@link ImageReaderProxy#acquireNextImage()}.
      */
-    @Nullable
-    abstract ImageProxy acquireImage(@NonNull ImageReaderProxy imageReaderProxy);
+    abstract @Nullable ImageProxy acquireImage(@NonNull ImageReaderProxy imageReaderProxy);
 
     /**
      * Called when a new valid {@link ImageProxy} becomes available via
@@ -298,8 +292,7 @@ abstract class ImageAnalysisAbstractAnalyzer implements ImageReaderProxy.OnImage
         return future;
     }
 
-    @NonNull
-    private static SafeCloseImageReaderProxy createImageReaderProxy(
+    private static @NonNull SafeCloseImageReaderProxy createImageReaderProxy(
             int imageWidth,
             int imageHeight,
             int rotation,
@@ -357,7 +350,7 @@ abstract class ImageAnalysisAbstractAnalyzer implements ImageReaderProxy.OnImage
     }
 
     void setAnalyzer(@Nullable Executor userExecutor,
-            @Nullable ImageAnalysis.Analyzer subscribedAnalyzer) {
+            ImageAnalysis.@Nullable Analyzer subscribedAnalyzer) {
         // Keep clearCache out of mAnalyzerLock critical section to avoid deadlock.
         if (subscribedAnalyzer == null) {
             clearCache();
@@ -458,8 +451,7 @@ abstract class ImageAnalysisAbstractAnalyzer implements ImageReaderProxy.OnImage
                 additionalTransformMatrix);
     }
 
-    @NonNull
-    static Rect getUpdatedCropRect(
+    static @NonNull Rect getUpdatedCropRect(
             @NonNull Rect originalCropRect,
             @NonNull Matrix additionalTransformMatrix) {
         RectF rectF = new RectF(originalCropRect);
@@ -470,8 +462,7 @@ abstract class ImageAnalysisAbstractAnalyzer implements ImageReaderProxy.OnImage
     }
 
     @VisibleForTesting
-    @NonNull
-    static Matrix getAdditionalTransformMatrixAppliedByProcessor(
+    static @NonNull Matrix getAdditionalTransformMatrixAppliedByProcessor(
             int originalWidth,
             int originalHeight,
             int rotatedWidth,

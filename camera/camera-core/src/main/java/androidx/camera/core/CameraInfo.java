@@ -22,7 +22,6 @@ import android.util.Range;
 import android.view.Surface;
 
 import androidx.annotation.FloatRange;
-import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.annotation.RestrictTo.Scope;
 import androidx.annotation.StringDef;
@@ -32,6 +31,8 @@ import androidx.camera.core.internal.compat.MediaActionSoundCompat;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+
+import org.jspecify.annotations.NonNull;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -58,8 +59,7 @@ public interface CameraInfo {
      *
      */
     @RestrictTo(Scope.LIBRARY_GROUP)
-    @NonNull
-    String IMPLEMENTATION_TYPE_UNKNOWN = "<unknown>";
+    @NonNull String IMPLEMENTATION_TYPE_UNKNOWN = "<unknown>";
 
     /**
      * A Camera2 API implementation type where the camera support level is
@@ -72,8 +72,7 @@ public interface CameraInfo {
      *
      */
     @RestrictTo(Scope.LIBRARY_GROUP)
-    @NonNull
-    String IMPLEMENTATION_TYPE_CAMERA2 = "androidx.camera.camera2";
+    @NonNull String IMPLEMENTATION_TYPE_CAMERA2 = "androidx.camera.camera2";
 
     /**
      * A Camera2 API implementation type where the camera support level is
@@ -81,16 +80,14 @@ public interface CameraInfo {
      *
      */
     @RestrictTo(Scope.LIBRARY_GROUP)
-    @NonNull
-    String IMPLEMENTATION_TYPE_CAMERA2_LEGACY = IMPLEMENTATION_TYPE_CAMERA2 + ".legacy";
+    @NonNull String IMPLEMENTATION_TYPE_CAMERA2_LEGACY = IMPLEMENTATION_TYPE_CAMERA2 + ".legacy";
 
     /**
      * A fake camera implementation type.
      *
      */
     @RestrictTo(Scope.LIBRARY_GROUP)
-    @NonNull
-    String IMPLEMENTATION_TYPE_FAKE = "androidx.camera.fake";
+    @NonNull String IMPLEMENTATION_TYPE_FAKE = "androidx.camera.fake";
 
     /**
      * Returns whether the shutter sound must be played in accordance to regional restrictions.
@@ -159,8 +156,7 @@ public interface CameraInfo {
      *
      * @return a {@link LiveData} containing current torch state.
      */
-    @NonNull
-    LiveData<Integer> getTorchState();
+    @NonNull LiveData<Integer> getTorchState();
 
     /**
      * Returns a {@link LiveData} of {@link ZoomState}.
@@ -170,16 +166,14 @@ public interface CameraInfo {
      * or {@link CameraControl#setLinearZoom(float)}. The zoom state can also change anytime a
      * camera starts up, for example when a {@link UseCase} is bound to it.
      */
-    @NonNull
-    LiveData<ZoomState> getZoomState();
+    @NonNull LiveData<ZoomState> getZoomState();
 
     /**
      * Returns a {@link ExposureState}.
      *
      * <p>The {@link ExposureState} contains the current exposure related information.
      */
-    @NonNull
-    ExposureState getExposureState();
+    @NonNull ExposureState getExposureState();
 
     /**
      * Returns a {@link LiveData} of the camera's state.
@@ -198,8 +192,7 @@ public interface CameraInfo {
      *
      * @return a {@link LiveData} of the camera's state.
      */
-    @NonNull
-    LiveData<CameraState> getCameraState();
+    @NonNull LiveData<CameraState> getCameraState();
 
     /**
      * Returns the implementation type of the camera, this depends on the {@link CameraXConfig}
@@ -209,18 +202,16 @@ public interface CameraInfo {
      * {@link #IMPLEMENTATION_TYPE_UNKNOWN}, {@link #IMPLEMENTATION_TYPE_CAMERA2_LEGACY},
      * {@link #IMPLEMENTATION_TYPE_CAMERA2}, {@link #IMPLEMENTATION_TYPE_FAKE}.
      */
-    @NonNull
     @RestrictTo(Scope.LIBRARY_GROUP)
     @ImplementationType
-    String getImplementationType();
+    @NonNull String getImplementationType();
 
     /**
      * Returns a {@link CameraSelector} unique to this camera.
      *
      * @return {@link CameraSelector} unique to this camera.
      */
-    @NonNull
-    CameraSelector getCameraSelector();
+    @NonNull CameraSelector getCameraSelector();
 
     /**
      * Returns the lens facing of this camera.
@@ -322,8 +313,7 @@ public interface CameraInfo {
      * @return The set of FPS ranges supported by the device's AE algorithm
      * @see androidx.camera.video.VideoCapture.Builder#setTargetFrameRate(Range)
      */
-    @NonNull
-    default Set<Range<Integer>> getSupportedFrameRateRanges() {
+    default @NonNull Set<Range<Integer>> getSupportedFrameRateRanges() {
         return Collections.emptySet();
     }
 
@@ -409,8 +399,7 @@ public interface CameraInfo {
      * @see Preview.Builder#setDynamicRange(DynamicRange)
      * @see androidx.camera.video.RecorderVideoCapabilities#getSupportedDynamicRanges()
      */
-    @NonNull
-    default Set<DynamicRange> querySupportedDynamicRanges(
+    default @NonNull Set<DynamicRange> querySupportedDynamicRanges(
             @NonNull Set<DynamicRange> candidateDynamicRanges) {
         // For the default implementation, only assume SDR is supported.
         return DynamicRanges.findAllPossibleMatches(candidateDynamicRanges,
@@ -430,8 +419,7 @@ public interface CameraInfo {
      * @return Set of physical camera {@link CameraInfo}s.
      * @see #isLogicalMultiCameraSupported()
      */
-    @NonNull
-    default Set<CameraInfo> getPhysicalCameraInfos() {
+    default @NonNull Set<CameraInfo> getPhysicalCameraInfos() {
         return Collections.emptySet();
     }
 
