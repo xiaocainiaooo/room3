@@ -214,6 +214,11 @@ private fun WideNavigationRailLayout(
             targetValue = if (!expanded) NavigationRailCollapsedTokens.ItemVerticalSpace else 0.dp,
             animationSpec = animationSpec
         )
+    val itemMinHeight by
+        animateDpAsState(
+            targetValue = if (!expanded) TopIconItemMinHeight else minimumA11ySize,
+            animationSpec = animationSpec
+        )
 
     Surface(
         color = if (!isModal) colors.containerColor else colors.modalContainerColor,
@@ -288,10 +293,7 @@ private fun WideNavigationRailLayout(
                                             .constrain(
                                                 Constraints.fitPrioritizingWidth(
                                                     minWidth = minimumA11ySize.roundToPx(),
-                                                    minHeight =
-                                                        if (!expanded)
-                                                            TopIconItemMinHeight.roundToPx()
-                                                        else minimumA11ySize.roundToPx(),
+                                                    minHeight = itemMinHeight.roundToPx(),
                                                     maxWidth = itemMaxWidthConstraint,
                                                     maxHeight = looseConstraints.maxHeight,
                                                 )
