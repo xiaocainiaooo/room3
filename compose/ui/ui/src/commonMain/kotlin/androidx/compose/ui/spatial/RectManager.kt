@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.spatial
 
+import androidx.collection.IntObjectMap
+import androidx.collection.intObjectMapOf
 import androidx.collection.mutableObjectListOf
 import androidx.compose.ui.ComposeUiFlags
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -38,8 +40,10 @@ import androidx.compose.ui.util.trace
 import kotlin.math.max
 import kotlinx.coroutines.DisposableHandle
 
-internal class RectManager {
-
+internal class RectManager(
+    /** [LayoutNode.semanticsId] to [LayoutNode] mapping, maintained by Owner. */
+    private val layoutNodes: IntObjectMap<LayoutNode> = intObjectMapOf(),
+) {
     val rects: RectList = RectList()
 
     private val throttledCallbacks = ThrottledCallbacks()
@@ -75,18 +79,26 @@ internal class RectManager {
     // TODO: we need to make sure these are dispatched after draw if needed
     fun dispatchCallbacks() {
         val currentTime = currentTimeMillis()
+
+        // For ThrottledCallbacks on global changes we need to make sure they are all called for any
+        // change
+        val isDispatchGlobalCallbacks = isDirty || isScreenOrWindowDirty
+
         // TODO: we need to move this to avoid double-firing
         if (isDirty) {
             isDirty = false
             callbacks.forEach { it() }
             rects.forEachUpdatedRect { id, topLeft, bottomRight ->
-                throttledCallbacks.fire(id, topLeft, bottomRight, currentTime)
+                throttledCallbacks.fireOnUpdatedRect(id, topLeft, bottomRight, currentTime)
             }
             rects.clearUpdated()
         }
         if (isScreenOrWindowDirty) {
             isScreenOrWindowDirty = false
-            throttledCallbacks.fireAll(currentTime)
+            throttledCallbacks.fireOnRectChangedEntries(currentTime)
+        }
+        if (isDispatchGlobalCallbacks) {
+            throttledCallbacks.fireGlobalChangeEntries(currentTime)
         }
         // The hierarchy is "settled" in terms of nodes being added/removed for this frame
         // This makes it a reasonable time to "defragment" the RectList data structure. This
@@ -131,12 +143,12 @@ internal class RectManager {
         rects.withRect(id) { l, t, r, b ->
             result =
                 rectInfoFor(
-                    node,
-                    packXY(l, t),
-                    packXY(r, b),
-                    throttledCallbacks.windowOffset,
-                    throttledCallbacks.screenOffset,
-                    throttledCallbacks.viewToWindowMatrix,
+                    node = node,
+                    topLeft = packXY(l, t),
+                    bottomRight = packXY(r, b),
+                    windowOffset = throttledCallbacks.windowOffset,
+                    screenOffset = throttledCallbacks.screenOffset,
+                    viewToWindowMatrix = throttledCallbacks.viewToWindowMatrix,
                 )
         }
         return result
@@ -154,12 +166,28 @@ internal class RectManager {
         node: DelegatableNode,
         callback: (RectInfo) -> Unit
     ): DisposableHandle {
-        return throttledCallbacks.register(
+        return throttledCallbacks.registerOnRectChanged(
             id,
             throttleMs.toLong(),
             debounceMs.toLong(),
             node,
             callback,
+        )
+    }
+
+    fun registerOnGlobalLayoutCallback(
+        id: Int,
+        throttleMs: Int,
+        debounceMs: Int,
+        node: DelegatableNode,
+        callback: (RectInfo) -> Unit
+    ): DisposableHandle {
+        return throttledCallbacks.registerOnGlobalChange(
+            id = id,
+            throttleMs = throttleMs.toLong(),
+            debounceMs = debounceMs.toLong(),
+            node = node,
+            callback = callback,
         )
     }
 
@@ -408,6 +436,62 @@ internal class RectManager {
         rects.remove(layoutNode.semanticsId)
         invalidate()
         isFragmented = true
+    }
+
+    /**
+     * For occlusion calculation, returns whether the [LayoutNode] corresponding to [targetId] is
+     * drawn first compared to the [LayoutNode] corresponding to [otherId].
+     *
+     * @return true when the target will be drawn first, false for everything else, including when
+     *   either is an ancestor of the other.
+     */
+    internal fun isTargetDrawnFirst(targetId: Int, otherId: Int): Boolean {
+        var nodeA = layoutNodes[targetId] ?: return false
+        var nodeB = layoutNodes[otherId] ?: return false
+
+        if (nodeA.depth == 0 || nodeB.depth == 0) {
+            // Fail early when either is Root
+            return false
+        }
+
+        while (nodeA.depth > nodeB.depth) {
+            nodeA = nodeA.parent ?: return false // Early check avoids these null parent cases
+        }
+
+        if (nodeA === nodeB) {
+            // Node B was parent of Node A
+            return false
+        }
+
+        while (nodeB.depth > nodeA.depth) {
+            nodeB = nodeB.parent ?: return false
+        }
+
+        if (nodeA === nodeB) {
+            // Node A was parent of Node B
+            return false
+        }
+
+        // Keep track of the branching parent for both nodes, the draw order of these decide how
+        // [targetId] and [otherId] compare.
+        var lastParentA: LayoutNode = nodeA
+        var lastParentB: LayoutNode = nodeB
+
+        while (nodeA !== nodeB) {
+            lastParentA = nodeA
+            lastParentB = nodeB
+            // Null parent means we went past the root without finding common ancestor, shouldn't
+            // happen but we only return true when we know the target is drawn first
+            nodeA = nodeA.parent ?: return false
+            nodeB = nodeB.parent ?: return false
+        }
+
+        // Lower zIndex is drawn first, otherwise lower placeOrder decides draw order
+        if (lastParentA.measurePassDelegate.zIndex == lastParentB.measurePassDelegate.zIndex) {
+            return lastParentA.placeOrder < lastParentB.placeOrder
+        } else {
+            return lastParentA.measurePassDelegate.zIndex < lastParentB.measurePassDelegate.zIndex
+        }
     }
 }
 
