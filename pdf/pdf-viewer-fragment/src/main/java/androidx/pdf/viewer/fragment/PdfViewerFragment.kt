@@ -331,6 +331,7 @@ public open class PdfViewerFragment : Fragment() {
         arguments?.let { args ->
             documentUri = BundleCompat.getParcelable(args, KEY_DOCUMENT_URI, Uri::class.java)
             isTextSearchActive = args.getBoolean(KEY_TEXT_SEARCH_ACTIVE)
+            isToolboxVisible = args.getBoolean(KEY_TOOLBOX_VISIBILITY)
         }
 
         pdfLoaderCallbacks =
