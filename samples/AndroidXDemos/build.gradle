@@ -27,12 +27,12 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.annotation)
     implementation("androidx.collection:collection:1.4.2")
-    implementation('androidx.loader:loader:1.0.0')
-    implementation('androidx.cursoradapter:cursoradapter:1.0.0')
-    implementation('androidx.lifecycle:lifecycle-viewmodel:2.6.2')
-    implementation('androidx.fragment:fragment:1.5.4')
-    implementation('androidx.coordinatorlayout:coordinatorlayout:1.1.0')
-    implementation('androidx.viewpager:viewpager:1.0.0')
+    implementation("androidx.loader:loader:1.0.0")
+    implementation("androidx.cursoradapter:cursoradapter:1.0.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.2")
+    implementation("androidx.fragment:fragment:1.5.4")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
+    implementation("androidx.viewpager:viewpager:1.0.0")
 }
 
 android {

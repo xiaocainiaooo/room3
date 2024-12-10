@@ -38,12 +38,12 @@ android {
 
 dependencies {
     api(libs.jspecify)
-    api('androidx.annotation:annotation:1.1.0')
+    api("androidx.annotation:annotation:1.1.0")
     api(libs.guavaListenableFuture)
     api(libs.autoServiceAnnotations)
 
     implementation("androidx.collection:collection:1.4.2")
-    implementation('androidx.concurrent:concurrent-futures:1.0.0')
+    implementation("androidx.concurrent:concurrent-futures:1.0.0")
     implementation("androidx.core:core:1.9.0")
 
     annotationProcessor project(":appsearch:appsearch-compiler")

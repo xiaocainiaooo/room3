@@ -34,8 +34,8 @@ dependencies {
 
     implementation(project(":appsearch:appsearch"))
     implementation("androidx.collection:collection:1.4.2")
-    implementation('androidx.concurrent:concurrent-futures:1.0.0')
-    implementation('androidx.core:core:1.0.0')
+    implementation("androidx.concurrent:concurrent-futures:1.0.0")
+    implementation("androidx.core:core:1.0.0")
 
     androidTestImplementation(libs.testCore)
     androidTestImplementation(libs.testRules)
