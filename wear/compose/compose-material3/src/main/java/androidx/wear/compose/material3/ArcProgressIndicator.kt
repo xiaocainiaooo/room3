@@ -43,13 +43,13 @@ import kotlin.math.asin
  * Example of indeterminate arc progress indicator:
  *
  * @sample androidx.wear.compose.material3.samples.IndeterminateProgressArcSample
+ * @param modifier Modifier to be applied to the ArcProgressIndicator.
  * @param startAngle the start angle of this progress indicator arc (specified in degrees). It is
  *   recommended to use [ArcProgressIndicatorDefaults.IndeterminateStartAngle]. Measured clockwise
  *   from the three o'clock position.
  * @param endAngle the end angle of this progress indicator arc (specified in degrees). It is
  *   recommended to use [ArcProgressIndicatorDefaults.IndeterminateEndAngle]. Measured clockwise
  *   from the three o'clock position.
- * @param modifier Modifier to be applied to the ArcProgressIndicator.
  * @param angularDirection Determines whether the animation is in the clockwise or counter-clockwise
  *   direction.
  * @param colors [ProgressIndicatorColors] that will be used to resolve the indicator and track
@@ -61,9 +61,9 @@ import kotlin.math.asin
  */
 @Composable
 fun ArcProgressIndicator(
+    modifier: Modifier = Modifier,
     startAngle: Float = ArcProgressIndicatorDefaults.IndeterminateStartAngle,
     endAngle: Float = ArcProgressIndicatorDefaults.IndeterminateEndAngle,
-    modifier: Modifier = Modifier,
     angularDirection: AngularDirection = AngularDirection.CounterClockwise,
     colors: ProgressIndicatorColors = ProgressIndicatorDefaults.colors(),
     strokeWidth: Dp = ArcProgressIndicatorDefaults.IndeterminateStrokeWidth,
