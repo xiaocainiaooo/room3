@@ -35,7 +35,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Build;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 import androidx.camera.core.ImageInfo;
@@ -43,6 +42,8 @@ import androidx.camera.core.internal.CameraCaptureResultImageInfo;
 import androidx.camera.testing.fakes.FakeCameraCaptureResult;
 import androidx.camera.testing.impl.fakes.FakeImageProxy;
 import androidx.camera.testing.impl.fakes.FakeJpegPlaneProxy;
+
+import org.jspecify.annotations.NonNull;
 
 import java.io.ByteArrayOutputStream;
 
@@ -95,8 +96,7 @@ public class TestImageUtil {
      *
      * TODO(b/245940015): fix the content of the image to match the value of {@link #createBitmap}.
      */
-    @NonNull
-    public static FakeImageProxy createYuvFakeImageProxy(@NonNull ImageInfo imageInfo,
+    public static @NonNull FakeImageProxy createYuvFakeImageProxy(@NonNull ImageInfo imageInfo,
             int width, int height) {
         FakeImageProxy image = new FakeImageProxy(imageInfo);
         image.setFormat(YUV_420_888);
@@ -109,8 +109,7 @@ public class TestImageUtil {
     /**
      * Creates a [FakeImageProxy] with [RAW_SENSOR] format.
      */
-    @NonNull
-    public static FakeImageProxy createRawFakeImageProxy(@NonNull ImageInfo imageInfo,
+    public static @NonNull FakeImageProxy createRawFakeImageProxy(@NonNull ImageInfo imageInfo,
             int width, int height) {
         FakeImageProxy image = new FakeImageProxy(imageInfo);
         image.setFormat(RAW_SENSOR);
@@ -123,9 +122,8 @@ public class TestImageUtil {
     /**
      * Creates a {@link FakeImageProxy} from JPEG bytes.
      */
-    @NonNull
-    public static FakeImageProxy createJpegFakeImageProxy(@NonNull ImageInfo imageInfo,
-            @NonNull byte[] jpegBytes) {
+    public static @NonNull FakeImageProxy createJpegFakeImageProxy(@NonNull ImageInfo imageInfo,
+            byte @NonNull [] jpegBytes) {
         Bitmap bitmap = decodeByteArray(jpegBytes, 0, jpegBytes.length);
         return createJpegFakeImageProxy(imageInfo, jpegBytes, bitmap.getWidth(),
                 bitmap.getHeight());
@@ -134,9 +132,8 @@ public class TestImageUtil {
     /**
      * Creates a {@link FakeImageProxy} from JPEG bytes of JPEG/R.
      */
-    @NonNull
-    public static FakeImageProxy createJpegrFakeImageProxy(@NonNull ImageInfo imageInfo,
-            @NonNull byte[] jpegBytes) {
+    public static @NonNull FakeImageProxy createJpegrFakeImageProxy(@NonNull ImageInfo imageInfo,
+            byte @NonNull [] jpegBytes) {
         Bitmap bitmap = decodeByteArray(jpegBytes, 0, jpegBytes.length);
         return createJpegrFakeImageProxy(imageInfo, jpegBytes, bitmap.getWidth(),
                 bitmap.getHeight());
@@ -145,9 +142,8 @@ public class TestImageUtil {
     /**
      * Creates a {@link FakeImageProxy} from JPEG bytes.
      */
-    @NonNull
-    public static FakeImageProxy createJpegFakeImageProxy(@NonNull ImageInfo imageInfo,
-            @NonNull byte[] jpegBytes, int width, int height) {
+    public static @NonNull FakeImageProxy createJpegFakeImageProxy(@NonNull ImageInfo imageInfo,
+            byte @NonNull [] jpegBytes, int width, int height) {
         FakeImageProxy image = new FakeImageProxy(imageInfo);
         image.setFormat(JPEG);
         image.setPlanes(new FakeJpegPlaneProxy[]{new FakeJpegPlaneProxy(jpegBytes)});
@@ -159,9 +155,8 @@ public class TestImageUtil {
     /**
      * Creates a {@link FakeImageProxy} from JPEG bytes of JPEG/R.
      */
-    @NonNull
-    public static FakeImageProxy createJpegrFakeImageProxy(@NonNull ImageInfo imageInfo,
-            @NonNull byte[] jpegBytes, int width, int height) {
+    public static @NonNull FakeImageProxy createJpegrFakeImageProxy(@NonNull ImageInfo imageInfo,
+            byte @NonNull [] jpegBytes, int width, int height) {
         FakeImageProxy image = new FakeImageProxy(imageInfo);
         image.setFormat(JPEG_R);
         image.setPlanes(new FakeJpegPlaneProxy[]{new FakeJpegPlaneProxy(jpegBytes)});
@@ -173,8 +168,7 @@ public class TestImageUtil {
     /**
      * Creates a {@link FakeImageProxy} from JPEG bytes.
      */
-    @NonNull
-    public static FakeImageProxy createJpegFakeImageProxy(@NonNull byte[] jpegBytes) {
+    public static @NonNull FakeImageProxy createJpegFakeImageProxy(byte @NonNull [] jpegBytes) {
         return createJpegFakeImageProxy(
                 new CameraCaptureResultImageInfo(new FakeCameraCaptureResult()), jpegBytes);
     }
@@ -182,8 +176,7 @@ public class TestImageUtil {
     /**
      * Creates a {@link FakeImageProxy} from JPEG bytes of JPEG/R.
      */
-    @NonNull
-    public static FakeImageProxy createJpegrFakeImageProxy(@NonNull byte[] jpegBytes) {
+    public static @NonNull FakeImageProxy createJpegrFakeImageProxy(byte @NonNull [] jpegBytes) {
         return createJpegrFakeImageProxy(
                 new CameraCaptureResultImageInfo(new FakeCameraCaptureResult()), jpegBytes);
     }
@@ -191,8 +184,7 @@ public class TestImageUtil {
     /**
      * Generates a JPEG image.
      */
-    @NonNull
-    public static byte[] createJpegBytes(int width, int height) {
+    public static byte @NonNull [] createJpegBytes(int width, int height) {
         Bitmap bitmap = createBitmap(width, height);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
@@ -203,8 +195,7 @@ public class TestImageUtil {
      * Generates a JPEG/R image.
      */
     @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    @NonNull
-    public static byte[] createJpegrBytes(int width, int height) {
+    public static byte @NonNull [] createJpegrBytes(int width, int height) {
         Bitmap bitmap = createBitmapWithGainmap(width, height);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
@@ -214,8 +205,7 @@ public class TestImageUtil {
     /**
      * Generates a A24 problematic JPEG image.
      */
-    @NonNull
-    public static byte[] createA24ProblematicJpegByteArray(int width, int height) {
+    public static byte @NonNull [] createA24ProblematicJpegByteArray(int width, int height) {
         byte[] incorrectHeaderByteData =
                 new byte[]{(byte) 0xff, (byte) 0xd8, (byte) 0xff, (byte) 0xe1, (byte) 0xff,
                         (byte) 0x7c, (byte) 0x45, (byte) 0x78, (byte) 0x69, (byte) 0x66,
@@ -230,8 +220,7 @@ public class TestImageUtil {
     /**
      * Generates a {@link Bitmap} image and paints it with 4 color blocks.
      */
-    @NonNull
-    public static Bitmap createBitmap(int width, int height) {
+    public static @NonNull Bitmap createBitmap(int width, int height) {
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         int centerX = width / 2;
         int centerY = height / 2;
@@ -248,8 +237,7 @@ public class TestImageUtil {
      * scale blocks) set.
      */
     @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    @NonNull
-    public static Bitmap createBitmapWithGainmap(int width, int height) {
+    public static @NonNull Bitmap createBitmapWithGainmap(int width, int height) {
         Bitmap bitmap = createBitmap(width, height);
         Api34Impl.setGainmap(bitmap, createGainmap(width, height));
         return bitmap;
@@ -259,8 +247,7 @@ public class TestImageUtil {
      * Generates a {@link Gainmap} image and paints it with 4 gray scale blocks.
      */
     @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    @NonNull
-    public static Gainmap createGainmap(int width, int height) {
+    public static @NonNull Gainmap createGainmap(int width, int height) {
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         int oneFourthY = height / 4;
         int twoFourthsY = oneFourthY * 2;
@@ -276,8 +263,7 @@ public class TestImageUtil {
     /**
      * Rotates the bitmap clockwise by the given degrees.
      */
-    @NonNull
-    public static Bitmap rotateBitmap(@NonNull Bitmap bitmap, int rotationDegrees) {
+    public static @NonNull Bitmap rotateBitmap(@NonNull Bitmap bitmap, int rotationDegrees) {
         Matrix matrix = new Matrix();
         matrix.postRotate(rotationDegrees);
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix,
@@ -287,7 +273,7 @@ public class TestImageUtil {
     /**
      * Calculates the average color difference between the 2 JPEG images.
      */
-    public static int getAverageDiff(@NonNull byte[] jpeg1, @NonNull byte[] jpeg2) {
+    public static int getAverageDiff(byte @NonNull [] jpeg1, byte @NonNull [] jpeg2) {
         return getAverageDiff(
                 decodeByteArray(jpeg1, 0, jpeg1.length),
                 decodeByteArray(jpeg2, 0, jpeg2.length));
