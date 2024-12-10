@@ -47,10 +47,10 @@ dependencies {
     androidTestImplementation(libs.espressoCore)
     androidTestImplementation(libs.mockitoCore)
     androidTestImplementation(libs.dexmakerMockito)
-    androidTestImplementation project(":internal-testutils-runtime")
+    androidTestImplementation(project(":internal-testutils-runtime"))
 
     // view tests that use font are in this module as well; for licensing reasons
-    androidTestImplementation project(":emoji2:emoji2-views")
+    androidTestImplementation(project(":emoji2:emoji2-views"))
 }
 
 androidx {

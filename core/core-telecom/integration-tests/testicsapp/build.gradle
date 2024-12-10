@@ -46,7 +46,7 @@ dependencies {
     //@Serialize
     implementation(libs.kotlinSerializationCore)
     // Test package
-    implementation project(":core:core-telecom")
+    implementation(project(":core:core-telecom"))
     // Compose
     implementation("androidx.activity:activity-compose:1.9.1")
     // Themes and Dynamic coloring

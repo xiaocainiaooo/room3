@@ -38,7 +38,7 @@ android {
 }
 
 dependencies {
-    api project(":work:work-runtime")
+    api(project(":work:work-runtime"))
     implementation(libs.gcmNetworkManager)
     annotationProcessor("androidx.room:room-compiler:2.5.0")
     implementation("androidx.room:room-runtime:2.5.0")

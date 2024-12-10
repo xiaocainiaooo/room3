@@ -36,12 +36,12 @@ dependencies {
 
     implementation(libs.kotlinStdlib)
 
-    compileOnly project(":annotation:annotation-sampled")
+    compileOnly(project(":annotation:annotation-sampled"))
 
     implementation "androidx.compose.foundation:foundation:1.2.1"
     implementation "androidx.compose.material:material:1.2.1"
-    implementation project(":compose:runtime:runtime")
-    implementation project(":compose:runtime:runtime-saveable")
+    implementation(project(":compose:runtime:runtime"))
+    implementation(project(":compose:runtime:runtime-saveable"))
 }
 
 androidx {
