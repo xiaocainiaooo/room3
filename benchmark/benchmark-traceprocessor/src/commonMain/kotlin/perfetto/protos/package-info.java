@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright (C) 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.benchmark.perfetto
-
 /**
- * Annotation indicating experimental API for querying data from Perfetto traces with Perfetto Trace
- * Processor.
+ * Hide the perfetto.protos package, as it's an implementation detail of benchmark
+ *
+ * Note: other attempts to use these protos in a benchmark process may clash with our
+ * definitions. If this becomes an issue, we can move ours to a separate, internal package.
  */
-@RequiresOptIn
-@Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-annotation class ExperimentalPerfettoTraceProcessorApi
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+package perfetto.protos;
+
+import androidx.annotation.RestrictTo;
