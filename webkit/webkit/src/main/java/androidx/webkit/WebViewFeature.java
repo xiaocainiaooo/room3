@@ -114,6 +114,7 @@ public class WebViewFeature {
             SPECULATIVE_LOADING,
             BACK_FORWARD_CACHE,
             DEFAULT_TRAFFICSTATS_TAGGING,
+            DELETE_BROWSING_DATA,
     })
     @Retention(RetentionPolicy.SOURCE)
     @Target({ElementType.PARAMETER, ElementType.METHOD})
@@ -646,6 +647,9 @@ public class WebViewFeature {
      * {@link androidx.webkit.WebViewCompat#setDefaultTrafficStatsTag(int)}}
      */
     public static final String DEFAULT_TRAFFICSTATS_TAGGING = "DEFAULT_TRAFFICSTATS_TAGGING";
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public static final String DELETE_BROWSING_DATA = "DELETE_BROWSING_DATA";
 
     /**
      * Return whether a feature is supported at run-time. This will check whether a feature is
