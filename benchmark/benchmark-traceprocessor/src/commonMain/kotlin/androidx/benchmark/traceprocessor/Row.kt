@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package androidx.benchmark.perfetto
+package androidx.benchmark.traceprocessor
 
 /**
  * Convenience for constructing a RowResult for given column values.
  *
  * Useful when asserting expected query results in tests.
  */
-@ExperimentalPerfettoTraceProcessorApi
-fun rowOf(vararg pairs: Pair<String, Any?>): Row {
+public fun rowOf(vararg pairs: Pair<String, Any?>): Row {
     return Row(pairs.toMap())
 }
 
@@ -42,25 +41,24 @@ fun rowOf(vararg pairs: Pair<String, Any?>): Row {
  *
  * Nullable variants of each convenience method are also provided.
  */
-@ExperimentalPerfettoTraceProcessorApi
-class Row(private val map: Map<String, Any?>) : Map<String, Any?> by map {
-    fun string(columnName: String): String = map[columnName] as String
+public class Row(private val map: Map<String, Any?>) : Map<String, Any?> by map {
+    public fun string(columnName: String): String = map[columnName] as String
 
-    fun long(columnName: String): Long = map[columnName] as Long
+    public fun long(columnName: String): Long = map[columnName] as Long
 
-    fun double(columnName: String): Double = map[columnName] as Double
+    public fun double(columnName: String): Double = map[columnName] as Double
 
-    fun bytes(columnName: String): ByteArray = map[columnName] as ByteArray
+    public fun bytes(columnName: String): ByteArray = map[columnName] as ByteArray
 
-    fun nullableString(columnName: String): String? = map[columnName] as String?
-
-    @Suppress("AutoBoxing") // primitives are already internally boxed
-    fun nullableLong(columnName: String): Long? = map[columnName] as Long?
+    public fun nullableString(columnName: String): String? = map[columnName] as String?
 
     @Suppress("AutoBoxing") // primitives are already internally boxed
-    fun nullableDouble(columnName: String): Double? = map[columnName] as Double?
+    public fun nullableLong(columnName: String): Long? = map[columnName] as Long?
 
-    fun nullableBytes(columnName: String): ByteArray? = map[columnName] as ByteArray?
+    @Suppress("AutoBoxing") // primitives are already internally boxed
+    public fun nullableDouble(columnName: String): Double? = map[columnName] as Double?
+
+    public fun nullableBytes(columnName: String): ByteArray? = map[columnName] as ByteArray?
 
     override fun hashCode(): Int = map.hashCode()
 

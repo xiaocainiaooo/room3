@@ -19,7 +19,7 @@ package androidx.benchmark.macro.perfetto
 import androidx.benchmark.Insight
 import androidx.benchmark.TraceDeepLink
 import androidx.benchmark.inMemoryTrace
-import androidx.benchmark.perfetto.PerfettoTraceProcessor
+import androidx.benchmark.traceprocessor.TraceProcessor
 import perfetto.protos.AndroidStartupMetric.SlowStartReason
 import perfetto.protos.AndroidStartupMetric.ThresholdValue.ThresholdUnit
 import perfetto.protos.TraceMetrics
@@ -59,7 +59,7 @@ private fun SlowStartReason.toInsight(
             else -> " ${thresholdUnit.toString().lowercase()}"
         }
 
-    val thresholdValue = expected_value.value_!!
+    val thresholdValue = expected_value!!.value_!!
 
     val thresholdString =
         StringBuilder()
@@ -75,8 +75,8 @@ private fun SlowStartReason.toInsight(
                             )
                     }
                 } else {
-                    if (expected_value.higher_expected == true) append("> ")
-                    if (expected_value.higher_expected == false) append("< ")
+                    if (expected_value!!.higher_expected == true) append("> ")
+                    if (expected_value!!.higher_expected == false) append("< ")
                     append(thresholdValue)
                     append(unitSuffix)
                 }
@@ -110,7 +110,7 @@ private fun SlowStartReason.toInsight(
     )
 }
 
-internal fun PerfettoTraceProcessor.Session.queryStartupInsights(
+internal fun TraceProcessor.Session.queryStartupInsights(
     helpUrlBase: String?,
     traceOutputRelativePath: String,
     iteration: Int,
