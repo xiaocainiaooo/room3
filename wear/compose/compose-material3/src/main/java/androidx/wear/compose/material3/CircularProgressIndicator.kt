@@ -106,7 +106,7 @@ import kotlinx.coroutines.launch
  *   visually disabled.
  */
 @Composable
-fun CircularProgressIndicator(
+public fun CircularProgressIndicator(
     progress: () -> Float,
     modifier: Modifier = Modifier,
     allowProgressOverflow: Boolean = false,
@@ -182,7 +182,7 @@ fun CircularProgressIndicator(
  *   the min progress values should be enforced. For no animation this should be null.
  */
 @Composable
-fun CircularProgressIndicatorStatic(
+public fun CircularProgressIndicatorStatic(
     progress: () -> Float,
     modifier: Modifier = Modifier,
     allowProgressOverflow: Boolean = false,
@@ -194,7 +194,7 @@ fun CircularProgressIndicatorStatic(
     enabled: Boolean = true,
     overflowColorAlphaFraction: Float = 1f,
     targetProgress: (() -> Float)? = null,
-) {
+): Unit {
     // Canvas internally uses Spacer.drawBehind.
     // Using Spacer.drawWithCache to optimize the stroke allocations.
     Spacer(
@@ -297,7 +297,7 @@ fun CircularProgressIndicatorStatic(
  *   track. The stroke endcaps are not included in this distance.
  */
 @Composable
-fun CircularProgressIndicator(
+public fun CircularProgressIndicator(
     modifier: Modifier = Modifier,
     colors: ProgressIndicatorColors = ProgressIndicatorDefaults.colors(),
     strokeWidth: Dp = CircularProgressIndicatorDefaults.IndeterminateStrokeWidth,
@@ -469,13 +469,13 @@ private fun AnimatedCircularProgressIndicatorWithOverflowImpl(
 }
 
 /** Contains default values for [CircularProgressIndicator]. */
-object CircularProgressIndicatorDefaults {
+public object CircularProgressIndicatorDefaults {
     /** Large stroke width for circular progress indicator. */
-    val largeStrokeWidth: Dp
+    public val largeStrokeWidth: Dp
         @Composable get() = if (isSmallScreen()) 8.dp else 12.dp
 
     /** Small stroke width for circular progress indicator. */
-    val smallStrokeWidth: Dp
+    public val smallStrokeWidth: Dp
         @Composable get() = if (isSmallScreen()) 5.dp else 8.dp
 
     /**
@@ -483,23 +483,23 @@ object CircularProgressIndicatorDefaults {
      *
      * This can be customized with `startAngle` parameter on [CircularProgressIndicator].
      */
-    val StartAngle = 270f
+    public val StartAngle: Float = 270f
 
     /**
      * Returns recommended size of the gap based on `strokeWidth`.
      *
      * The absolute value can be customized with `gapSize` parameter on [CircularProgressIndicator].
      */
-    fun calculateRecommendedGapSize(strokeWidth: Dp): Dp = strokeWidth / 3f
+    public fun calculateRecommendedGapSize(strokeWidth: Dp): Dp = strokeWidth / 3f
 
     /** Padding used for displaying [CircularProgressIndicator] full screen. */
-    val FullScreenPadding = PaddingDefaults.edgePadding
+    public val FullScreenPadding: Dp = PaddingDefaults.edgePadding
 
     /** Diameter of the indicator circle for indeterminate progress. */
-    internal val IndeterminateCircularIndicatorDiameter = 24.dp
+    internal val IndeterminateCircularIndicatorDiameter: Dp = 24.dp
 
     /** Default stroke width for indeterminate [CircularProgressIndicator]. */
-    val IndeterminateStrokeWidth = 3.dp
+    public val IndeterminateStrokeWidth: Dp = 3.dp
 }
 
 private fun coercedProgressWithGap(progress: Float, isFullCircle: Boolean): Float {

@@ -94,7 +94,7 @@ import androidx.wear.compose.materialcore.screenWidthDp
  * @param content A slot for additional content, displayed within a scrollable [ScalingLazyColumn].
  */
 @Composable
-fun AlertDialog(
+public fun AlertDialog(
     visible: Boolean,
     onDismissRequest: () -> Unit,
     confirmButton: @Composable RowScope.() -> Unit,
@@ -160,7 +160,7 @@ fun AlertDialog(
  * @param content A slot for additional content, displayed within a scrollable [ScalingLazyColumn].
  */
 @Composable
-fun AlertDialog(
+public fun AlertDialog(
     visible: Boolean,
     onDismissRequest: () -> Unit,
     title: @Composable () -> Unit,
@@ -233,7 +233,7 @@ fun AlertDialog(
  * @param content A slot for additional content, displayed within a scrollable [ScalingLazyColumn].
  */
 @Composable
-fun AlertDialog(
+public fun AlertDialog(
     visible: Boolean,
     onDismissRequest: () -> Unit,
     edgeButton: (@Composable BoxScope.() -> Unit),
@@ -291,7 +291,7 @@ fun AlertDialog(
  * @param content A slot for additional content, displayed within a scrollable [ScalingLazyColumn].
  */
 @Composable
-fun AlertDialogContent(
+public fun AlertDialogContent(
     confirmButton: @Composable RowScope.() -> Unit,
     title: @Composable () -> Unit,
     dismissButton: @Composable RowScope.() -> Unit,
@@ -335,7 +335,7 @@ fun AlertDialogContent(
  * @param content A slot for additional content, displayed within a scrollable [ScalingLazyColumn].
  */
 @Composable
-fun AlertDialogContent(
+public fun AlertDialogContent(
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     icon: @Composable (() -> Unit)? = null,
@@ -383,7 +383,7 @@ fun AlertDialogContent(
  * @param content A slot for additional content, displayed within a scrollable [ScalingLazyColumn].
  */
 @Composable
-fun AlertDialogContent(
+public fun AlertDialogContent(
     edgeButton: (@Composable BoxScope.() -> Unit),
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -406,7 +406,7 @@ fun AlertDialogContent(
 }
 
 /** Contains the default values used by [AlertDialog] */
-object AlertDialogDefaults {
+public object AlertDialogDefaults {
     /**
      * Default composable for the edge button in an [AlertDialog]. This is a medium sized
      * [EdgeButton]. Should be used with [AlertDialog] overload which contains a single edgeButton
@@ -418,7 +418,7 @@ object AlertDialogDefaults {
      * @param content The composable content of the button. Defaults to [ConfirmIcon].
      */
     @Composable
-    fun EdgeButton(
+    public fun EdgeButton(
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
         colors: ButtonColors = ButtonDefaults.buttonColors(),
@@ -443,7 +443,7 @@ object AlertDialogDefaults {
      * @param content The composable content of the button. Defaults to [ConfirmIcon].
      */
     @Composable
-    fun ConfirmButton(
+    public fun ConfirmButton(
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
         colors: IconButtonColors = IconButtonDefaults.filledIconButtonColors(),
@@ -477,7 +477,7 @@ object AlertDialogDefaults {
      * @param content The composable content of the button. Defaults to [DismissIcon].
      */
     @Composable
-    fun DismissButton(
+    public fun DismissButton(
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
         colors: IconButtonColors = IconButtonDefaults.filledTonalIconButtonColors(),
@@ -503,7 +503,7 @@ object AlertDialogDefaults {
      * buttons.
      */
     @Composable
-    fun confirmDismissContentPadding(): PaddingValues {
+    public fun confirmDismissContentPadding(): PaddingValues {
         val verticalPadding = verticalContentPadding()
         val horizontalPadding = horizontalContentPadding()
         return PaddingValues(horizontal = horizontalPadding, vertical = verticalPadding)
@@ -515,7 +515,7 @@ object AlertDialogDefaults {
      * [ScreenScaffoldDefaults.contentPaddingWithEdgeButton]
      */
     @Composable
-    fun contentPaddingWithEdgeButton(
+    public fun contentPaddingWithEdgeButton(
         edgeButtonSize: EdgeButtonSize = EdgeButtonSize.Medium
     ): PaddingValues {
         val topPadding = verticalContentPadding()
@@ -534,7 +534,7 @@ object AlertDialogDefaults {
      * options and no buttons at the end.
      */
     @Composable
-    fun contentPadding(): PaddingValues {
+    public fun contentPadding(): PaddingValues {
         val topPadding = verticalContentPadding()
         val horizontalPadding = horizontalContentPadding()
         return PaddingValues(
@@ -550,16 +550,16 @@ object AlertDialogDefaults {
      * groups of elements.
      */
     @Composable
-    fun GroupSeparator() {
+    public fun GroupSeparator() {
         Spacer(Modifier.height(8.dp))
     }
 
     /** Default vertical arrangement for an [AlertDialog]. */
-    val VerticalArrangement: Arrangement.Vertical =
+    public val VerticalArrangement: Arrangement.Vertical =
         Arrangement.spacedBy(space = 4.dp, alignment = Alignment.CenterVertically)
 
     /** Default icon for the confirm button. */
-    val ConfirmIcon: @Composable RowScope.() -> Unit = {
+    public val ConfirmIcon: @Composable RowScope.() -> Unit = {
         Icon(
             imageVector = Icons.Filled.Check,
             contentDescription = getString(Strings.AlertDialogContentDescriptionConfirmButton),
@@ -568,7 +568,7 @@ object AlertDialogDefaults {
     }
 
     /** Default icon for the dismiss button. */
-    val DismissIcon: @Composable RowScope.() -> Unit = {
+    public val DismissIcon: @Composable RowScope.() -> Unit = {
         Icon(
             imageVector = Icons.Outlined.Close,
             contentDescription = getString(Strings.AlertDialogContentDescriptionDismissButton),

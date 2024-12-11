@@ -109,7 +109,7 @@ import kotlinx.coroutines.launch
  * @see [androidx.wear.compose.foundation.SwipeToReveal]
  */
 @Composable
-fun SwipeToReveal(
+public fun SwipeToReveal(
     actions: SwipeToRevealScope.() -> Unit,
     modifier: Modifier = Modifier,
     revealState: RevealState = rememberRevealState(),
@@ -242,7 +242,7 @@ fun SwipeToReveal(
  * Scope for the actions of a [SwipeToReveal] composable. Used to define the primary, secondary,
  * undo primary and undo secondary actions.
  */
-class SwipeToRevealScope {
+public class SwipeToRevealScope {
     /**
      * Adds the primary action to a [SwipeToReveal]. This is required and exactly one primary action
      * should be specified. In case there are multiple, only the latest one will be displayed.
@@ -260,7 +260,7 @@ class SwipeToRevealScope {
      * @param containerColor Container color for this action.
      * @param contentColor Content color for this action.
      */
-    fun primaryAction(
+    public fun primaryAction(
         onClick: () -> Unit,
         icon: @Composable () -> Unit,
         text: @Composable () -> Unit,
@@ -287,7 +287,7 @@ class SwipeToRevealScope {
      * @param containerColor Container color for this action.
      * @param contentColor Content color for this action.
      */
-    fun secondaryAction(
+    public fun secondaryAction(
         onClick: () -> Unit,
         icon: @Composable () -> Unit,
         label: String,
@@ -311,7 +311,7 @@ class SwipeToRevealScope {
      * @param containerColor Container color for this action.
      * @param contentColor Content color for this action.
      */
-    fun undoPrimaryAction(
+    public fun undoPrimaryAction(
         onClick: () -> Unit,
         text: @Composable () -> Unit,
         icon: @Composable (() -> Unit)? = null,
@@ -335,7 +335,7 @@ class SwipeToRevealScope {
      * @param containerColor Container color for this action.
      * @param contentColor Content color for this action.
      */
-    fun undoSecondaryAction(
+    public fun undoSecondaryAction(
         onClick: () -> Unit,
         text: @Composable () -> Unit,
         icon: @Composable (() -> Unit)? = null,
@@ -367,7 +367,7 @@ class SwipeToRevealScope {
  * @param swipeDirection Direction of the swipe to reveal the actions.
  */
 @Composable
-fun rememberRevealState(
+public fun rememberRevealState(
     initialValue: RevealValue = RevealValue.Covered,
     anchorWidth: Dp = SwipeToRevealDefaults.SingleActionAnchorWidth,
     useAnchoredActions: Boolean = true,
@@ -385,19 +385,19 @@ fun rememberRevealState(
     )
 }
 
-object SwipeToRevealDefaults {
+public object SwipeToRevealDefaults {
 
     /** Width that's required to display both actions in a [SwipeToReveal] composable. */
-    val DoubleActionAnchorWidth = 130.dp
+    public val DoubleActionAnchorWidth: Dp = 130.dp
 
     /** Width that's required to display a single action in a [SwipeToReveal] composable. */
-    val SingleActionAnchorWidth = 64.dp
+    public val SingleActionAnchorWidth: Dp = 64.dp
 
     /** Standard height for a small revealed action, such as when the swiped item is a Button. */
-    val SmallActionButtonHeight = 52.dp
+    public val SmallActionButtonHeight: Dp = 52.dp
 
     /** Standard height for a large revealed action, such as when the swiped item is a Card. */
-    val LargeActionButtonHeight = 84.dp
+    public val LargeActionButtonHeight: Dp = 84.dp
 
     internal val IconSize = 26.dp
 }

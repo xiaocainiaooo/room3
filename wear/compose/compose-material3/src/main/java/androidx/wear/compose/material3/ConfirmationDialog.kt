@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.wear.compose.foundation.CurvedDirection
@@ -104,7 +105,7 @@ import kotlinx.coroutines.launch
  *   set its size to [ConfirmationDialogDefaults.IconSize]
  */
 @Composable
-fun ConfirmationDialog(
+public fun ConfirmationDialog(
     visible: Boolean,
     onDismissRequest: () -> Unit,
     curvedText: (CurvedScope.() -> Unit)?,
@@ -113,7 +114,7 @@ fun ConfirmationDialog(
     properties: DialogProperties = DialogProperties(),
     durationMillis: Long = ConfirmationDialogDefaults.DurationMillis,
     content: @Composable () -> Unit
-) {
+): Unit {
     AnimateConfirmationDialog(
         visible = visible,
         performHapticFeedback = null,
@@ -151,12 +152,12 @@ fun ConfirmationDialog(
  *   set its size to [ConfirmationDialogDefaults.IconSize]
  */
 @Composable
-fun ConfirmationDialogContent(
+public fun ConfirmationDialogContent(
     curvedText: (CurvedScope.() -> Unit)?,
     modifier: Modifier = Modifier,
     colors: ConfirmationDialogColors = ConfirmationDialogDefaults.colors(),
     content: @Composable () -> Unit
-) {
+): Unit {
     ConfirmationDialogContentWrapper(
         curvedText = curvedText,
         modifier = modifier,
@@ -200,7 +201,7 @@ fun ConfirmationDialogContent(
  *   animated. It's recommended to set its size to [ConfirmationDialogDefaults.SmallIconSize]
  */
 @Composable
-fun ConfirmationDialog(
+public fun ConfirmationDialog(
     visible: Boolean,
     onDismissRequest: () -> Unit,
     text: @Composable (ColumnScope.() -> Unit)?,
@@ -243,7 +244,7 @@ fun ConfirmationDialog(
  *   set its size to [ConfirmationDialogDefaults.IconSize]
  */
 @Composable
-fun ConfirmationDialogContent(
+public fun ConfirmationDialogContent(
     text: @Composable (ColumnScope.() -> Unit)?,
     modifier: Modifier = Modifier,
     colors: ConfirmationDialogColors = ConfirmationDialogDefaults.colors(),
@@ -327,7 +328,7 @@ fun ConfirmationDialogContent(
  *   animated. Defaults to an animated [ConfirmationDialogDefaults.SuccessIcon].
  */
 @Composable
-fun SuccessConfirmationDialog(
+public fun SuccessConfirmationDialog(
     visible: Boolean,
     onDismissRequest: () -> Unit,
     curvedText: (CurvedScope.() -> Unit)?,
@@ -384,7 +385,7 @@ fun SuccessConfirmationDialog(
  *   animated. Defaults to an animated [ConfirmationDialogDefaults.SuccessIcon].
  */
 @Composable
-fun SuccessConfirmationDialogContent(
+public fun SuccessConfirmationDialogContent(
     curvedText: (CurvedScope.() -> Unit)?,
     modifier: Modifier = Modifier,
     colors: ConfirmationDialogColors = ConfirmationDialogDefaults.successColors(),
@@ -434,7 +435,7 @@ fun SuccessConfirmationDialogContent(
  *   animated. Defaults to [ConfirmationDialogDefaults.FailureIcon].
  */
 @Composable
-fun FailureConfirmationDialog(
+public fun FailureConfirmationDialog(
     visible: Boolean,
     onDismissRequest: () -> Unit,
     curvedText: (CurvedScope.() -> Unit)?,
@@ -488,7 +489,7 @@ fun FailureConfirmationDialog(
  *   animated. Defaults to [ConfirmationDialogDefaults.FailureIcon].
  */
 @Composable
-fun FailureConfirmationDialogContent(
+public fun FailureConfirmationDialogContent(
     curvedText: (CurvedScope.() -> Unit)?,
     modifier: Modifier = Modifier,
     colors: ConfirmationDialogColors = ConfirmationDialogDefaults.failureColors(),
@@ -532,10 +533,10 @@ fun FailureConfirmationDialogContent(
  * @param style It is recommended to use [ConfirmationDialogDefaults.curvedTextStyle] for curved
  *   text in Confirmation Dialogs.
  */
-fun CurvedScope.confirmationCurvedText(
+public fun CurvedScope.confirmationCurvedText(
     text: String,
     style: CurvedTextStyle,
-) =
+): Unit =
     curvedText(
         text = text,
         style = style,
@@ -544,20 +545,20 @@ fun CurvedScope.confirmationCurvedText(
     )
 
 /** Contains default values used by [ConfirmationDialog] composable. */
-object ConfirmationDialogDefaults {
+public object ConfirmationDialogDefaults {
 
     /** The default style for curved text content. */
-    val curvedTextStyle
+    public val curvedTextStyle: CurvedTextStyle
         @Composable get() = CurvedTextStyle(MaterialTheme.typography.titleLarge)
 
     /** The default message for a [SuccessConfirmationDialog]. */
-    val successText
+    public val successText: String
         @Composable
         get() =
             LocalContext.current.resources.getString(R.string.wear_m3c_confirmation_success_message)
 
     /** The default message for a [FailureConfirmationDialog]. */
-    val failureText
+    public val failureText: String
         @Composable
         get() =
             LocalContext.current.resources.getString(R.string.wear_m3c_confirmation_failure_message)
@@ -568,7 +569,7 @@ object ConfirmationDialogDefaults {
      */
     @OptIn(ExperimentalAnimationGraphicsApi::class)
     @Composable
-    fun SuccessIcon() {
+    public fun SuccessIcon() {
         val animation =
             AnimatedImageVector.animatedVectorResource(R.drawable.wear_m3c_check_animation)
         var atEnd by remember { mutableStateOf(false) }
@@ -591,7 +592,7 @@ object ConfirmationDialogDefaults {
      */
     @OptIn(ExperimentalAnimationGraphicsApi::class)
     @Composable
-    fun FailureIcon() {
+    public fun FailureIcon() {
         val animation =
             AnimatedImageVector.animatedVectorResource(R.drawable.wear_m3c_failure_animation)
         var atEnd by remember { mutableStateOf(false) }
@@ -612,7 +613,9 @@ object ConfirmationDialogDefaults {
      * Creates a [ConfirmationDialogColors] that represents the default colors used in a
      * [ConfirmationDialog].
      */
-    @Composable fun colors() = MaterialTheme.colorScheme.defaultConfirmationDialogColors
+    @Composable
+    public fun colors(): ConfirmationDialogColors =
+        MaterialTheme.colorScheme.defaultConfirmationDialogColors
 
     /**
      * Creates a [ConfirmationDialogColors] with modified colors used in [ConfirmationDialog].
@@ -622,11 +625,11 @@ object ConfirmationDialogDefaults {
      * @param textColor The text color.
      */
     @Composable
-    fun colors(
+    public fun colors(
         iconColor: Color = Color.Unspecified,
         iconContainerColor: Color = Color.Unspecified,
         textColor: Color = Color.Unspecified,
-    ) =
+    ): ConfirmationDialogColors =
         MaterialTheme.colorScheme.defaultConfirmationDialogColors.copy(
             iconColor = iconColor,
             iconContainerColor = iconContainerColor,
@@ -638,7 +641,8 @@ object ConfirmationDialogDefaults {
      * [SuccessConfirmationDialog].
      */
     @Composable
-    fun successColors() = MaterialTheme.colorScheme.defaultSuccessConfirmationDialogColors
+    public fun successColors(): ConfirmationDialogColors =
+        MaterialTheme.colorScheme.defaultSuccessConfirmationDialogColors
 
     /**
      * Creates a [ConfirmationDialogColors] with modified colors used in
@@ -649,11 +653,11 @@ object ConfirmationDialogDefaults {
      * @param textColor The text color.
      */
     @Composable
-    fun successColors(
+    public fun successColors(
         iconColor: Color = Color.Unspecified,
         iconContainerColor: Color = Color.Unspecified,
         textColor: Color = Color.Unspecified,
-    ) =
+    ): ConfirmationDialogColors =
         MaterialTheme.colorScheme.defaultSuccessConfirmationDialogColors.copy(
             iconColor = iconColor,
             iconContainerColor = iconContainerColor,
@@ -665,7 +669,8 @@ object ConfirmationDialogDefaults {
      * [FailureConfirmationDialog].
      */
     @Composable
-    fun failureColors() = MaterialTheme.colorScheme.defaultFailureConfirmationDialogColors
+    public fun failureColors(): ConfirmationDialogColors =
+        MaterialTheme.colorScheme.defaultFailureConfirmationDialogColors
 
     /**
      * Creates a [ConfirmationDialogColors] with modified colors used in
@@ -676,11 +681,11 @@ object ConfirmationDialogDefaults {
      * @param textColor The text color.
      */
     @Composable
-    fun failureColors(
+    public fun failureColors(
         iconColor: Color = Color.Unspecified,
         iconContainerColor: Color = Color.Unspecified,
         textColor: Color = Color.Unspecified,
-    ) =
+    ): ConfirmationDialogColors =
         MaterialTheme.colorScheme.defaultFailureConfirmationDialogColors.copy(
             iconColor = iconColor,
             iconContainerColor = iconContainerColor,
@@ -691,13 +696,13 @@ object ConfirmationDialogDefaults {
      * Default timeout for the [ConfirmationDialog] dialog, in milliseconds. The actual timeout used
      * will be adjusted for accessibility, taking into account the contents displayed.
      */
-    const val DurationMillis = 4000L
+    public const val DurationMillis: Long = 4000L
 
     /** Default icon size for the [ConfirmationDialog] with curved content */
-    val IconSize = 52.dp
+    public val IconSize: Dp = 52.dp
 
     /** Default icon size for the [ConfirmationDialog] with linear content */
-    val SmallIconSize = 36.dp
+    public val SmallIconSize: Dp = 36.dp
 
     private val ColorScheme.defaultConfirmationDialogColors: ConfirmationDialogColors
         get() {
@@ -744,10 +749,10 @@ object ConfirmationDialogDefaults {
  * @param iconContainerColor The color of the container behind the icon.
  * @param textColor Color used to tint the text.
  */
-class ConfirmationDialogColors(
-    val iconColor: Color,
-    val iconContainerColor: Color,
-    val textColor: Color,
+public class ConfirmationDialogColors(
+    public val iconColor: Color,
+    public val iconContainerColor: Color,
+    public val textColor: Color,
 ) {
     /**
      * Returns a copy of this ConfirmationColors, optionally overriding some of the values.
@@ -756,11 +761,11 @@ class ConfirmationDialogColors(
      * @param iconContainerColor The color of the container behind the icon.
      * @param textColor Color used to tint the text.
      */
-    fun copy(
+    public fun copy(
         iconColor: Color = this.iconColor,
         iconContainerColor: Color = this.iconContainerColor,
         textColor: Color = this.textColor
-    ) =
+    ): ConfirmationDialogColors =
         ConfirmationDialogColors(
             iconColor = iconColor.takeOrElse { this.iconColor },
             iconContainerColor = iconContainerColor.takeOrElse { this.iconContainerColor },

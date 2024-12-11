@@ -98,7 +98,7 @@ import java.time.temporal.ChronoField
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TimePicker(
+public fun TimePicker(
     initialTime: LocalTime,
     onTimePicked: (LocalTime) -> Unit,
     modifier: Modifier = Modifier,
@@ -356,17 +356,17 @@ fun TimePicker(
 /** Specifies the types of columns to display in the TimePicker. */
 @Immutable
 @JvmInline
-value class TimePickerType internal constructor(internal val value: Int) {
-    companion object {
+public value class TimePickerType internal constructor(internal val value: Int) {
+    public companion object {
         /** Displays two columns for hours (24-hour format) and minutes. */
-        val HoursMinutes24H = TimePickerType(0)
+        public val HoursMinutes24H: TimePickerType = TimePickerType(0)
         /** Displays three columns for hours (24-hour format), minutes and seconds. */
-        val HoursMinutesSeconds24H = TimePickerType(1)
+        public val HoursMinutesSeconds24H: TimePickerType = TimePickerType(1)
         /** Displays three columns for hours (12-hour format), minutes and AM/PM label. */
-        val HoursMinutesAmPm12H = TimePickerType(2)
+        public val HoursMinutesAmPm12H: TimePickerType = TimePickerType(2)
     }
 
-    override fun toString() =
+    override fun toString(): String =
         when (this) {
             HoursMinutes24H -> "HoursMinutes24H"
             HoursMinutesSeconds24H -> "HoursMinutesSeconds24H"
@@ -376,10 +376,10 @@ value class TimePickerType internal constructor(internal val value: Int) {
 }
 
 /** Contains the default values used by [TimePicker] */
-object TimePickerDefaults {
+public object TimePickerDefaults {
 
     /** The default [TimePickerType] for [TimePicker] aligns with the current system time format. */
-    val timePickerType: TimePickerType
+    public val timePickerType: TimePickerType
         @Composable
         get() =
             if (is24HourFormat()) {
@@ -389,7 +389,9 @@ object TimePickerDefaults {
             }
 
     /** Creates a [TimePickerColors] for a [TimePicker]. */
-    @Composable fun timePickerColors() = MaterialTheme.colorScheme.defaultTimePickerColors
+    @Composable
+    public fun timePickerColors(): TimePickerColors =
+        MaterialTheme.colorScheme.defaultTimePickerColors
 
     /**
      * Creates a [TimePickerColors] for a [TimePicker].
@@ -402,14 +404,14 @@ object TimePickerDefaults {
      * @param confirmButtonContainerColor The container color of the confirm button.
      */
     @Composable
-    fun timePickerColors(
+    public fun timePickerColors(
         selectedPickerContentColor: Color = Color.Unspecified,
         unselectedPickerContentColor: Color = Color.Unspecified,
         separatorColor: Color = Color.Unspecified,
         pickerLabelColor: Color = Color.Unspecified,
         confirmButtonContentColor: Color = Color.Unspecified,
         confirmButtonContainerColor: Color = Color.Unspecified,
-    ) =
+    ): TimePickerColors =
         MaterialTheme.colorScheme.defaultTimePickerColors.copy(
             selectedPickerContentColor = selectedPickerContentColor,
             unselectedPickerContentColor = unselectedPickerContentColor,
@@ -449,13 +451,13 @@ object TimePickerDefaults {
  * @param confirmButtonContainerColor The container color of the confirm button.
  */
 @Immutable
-class TimePickerColors(
-    val selectedPickerContentColor: Color,
-    val unselectedPickerContentColor: Color,
-    val separatorColor: Color,
-    val pickerLabelColor: Color,
-    val confirmButtonContentColor: Color,
-    val confirmButtonContainerColor: Color,
+public class TimePickerColors(
+    public val selectedPickerContentColor: Color,
+    public val unselectedPickerContentColor: Color,
+    public val separatorColor: Color,
+    public val pickerLabelColor: Color,
+    public val confirmButtonContentColor: Color,
+    public val confirmButtonContainerColor: Color,
 ) {
     /**
      * Returns a copy of this TimePickerColors( optionally overriding some of the values.
@@ -467,14 +469,14 @@ class TimePickerColors(
      * @param confirmButtonContentColor The content color of the confirm button.
      * @param confirmButtonContainerColor The container color of the confirm button.
      */
-    fun copy(
+    public fun copy(
         selectedPickerContentColor: Color = this.selectedPickerContentColor,
         unselectedPickerContentColor: Color = this.unselectedPickerContentColor,
         separatorColor: Color = this.separatorColor,
         pickerLabelColor: Color = this.pickerLabelColor,
         confirmButtonContentColor: Color = this.confirmButtonContentColor,
         confirmButtonContainerColor: Color = this.confirmButtonContainerColor,
-    ) =
+    ): TimePickerColors =
         TimePickerColors(
             selectedPickerContentColor =
                 selectedPickerContentColor.takeOrElse { this.selectedPickerContentColor },

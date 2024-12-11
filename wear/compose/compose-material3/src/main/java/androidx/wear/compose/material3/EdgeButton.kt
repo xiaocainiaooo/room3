@@ -124,7 +124,7 @@ import kotlin.math.sqrt
  */
 // TODO(b/261838497) Add Material3 UX guidance links
 @Composable
-fun EdgeButton(
+public fun EdgeButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     buttonSize: EdgeButtonSize = EdgeButtonSize.Small,
@@ -279,7 +279,7 @@ fun EdgeButton(
  * shape and the space available for the content.
  */
 @JvmInline
-value class EdgeButtonSize internal constructor(internal val maximumHeight: Dp) {
+public value class EdgeButtonSize internal constructor(internal val maximumHeight: Dp) {
     internal fun maximumHeightPlusPadding() = maximumHeight + VERTICAL_PADDING * 2
 
     internal fun verticalPadding() =
@@ -291,41 +291,41 @@ value class EdgeButtonSize internal constructor(internal val maximumHeight: Dp) 
             else -> Pair(14.dp, 20.dp)
         }
 
-    companion object {
+    public companion object {
         /** The Size to be applied for an extra small [EdgeButton]. */
-        val ExtraSmall = EdgeButtonSize(46.dp)
+        public val ExtraSmall: EdgeButtonSize = EdgeButtonSize(46.dp)
 
         /** The Size to be applied for an small [EdgeButton]. */
-        val Small = EdgeButtonSize(56.dp)
+        public val Small: EdgeButtonSize = EdgeButtonSize(56.dp)
 
         /** The Size to be applied for an medium [EdgeButton]. */
-        val Medium = EdgeButtonSize(70.dp)
+        public val Medium: EdgeButtonSize = EdgeButtonSize(70.dp)
 
         /** The Size to be applied for an large [EdgeButton]. */
-        val Large = EdgeButtonSize(96.dp)
+        public val Large: EdgeButtonSize = EdgeButtonSize(96.dp)
     }
 }
 
 /** Contains the default values used by [EdgeButton]. */
-object EdgeButtonDefaults {
+public object EdgeButtonDefaults {
     /** The recommended icon size when used with [EdgeButtonSize.ExtraSmall]. */
-    val ExtraSmallIconSize = 24.dp
+    public val ExtraSmallIconSize: Dp = 24.dp
 
     /** The recommended icon size when used with [EdgeButtonSize.Small]. */
-    val SmallIconSize = 32.dp
+    public val SmallIconSize: Dp = 32.dp
 
     /** The recommended icon size when used with [EdgeButtonSize.Medium]. */
-    val MediumIconSize = 32.dp
+    public val MediumIconSize: Dp = 32.dp
 
     /** The recommended icon size when used with [EdgeButtonSize.Large]. */
-    val LargeIconSize = 36.dp
+    public val LargeIconSize: Dp = 36.dp
 
     /**
      * Recommended icon size for a given edge button size.
      *
      * @param edgeButtonSize The size of the edge button
      */
-    fun iconSizeFor(edgeButtonSize: EdgeButtonSize): Dp =
+    public fun iconSizeFor(edgeButtonSize: EdgeButtonSize): Dp =
         when (edgeButtonSize) {
             EdgeButtonSize.ExtraSmall -> ExtraSmallIconSize
             EdgeButtonSize.Small -> SmallIconSize

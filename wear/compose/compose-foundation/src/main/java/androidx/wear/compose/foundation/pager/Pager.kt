@@ -99,7 +99,7 @@ import kotlinx.coroutines.coroutineScope
  *   Pager. This is where the UI elements that should appear within each page should be placed.
  */
 @Composable
-fun HorizontalPager(
+public fun HorizontalPager(
     state: PagerState,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
@@ -224,7 +224,7 @@ fun HorizontalPager(
  *   Pager. This is where the UI elements that should appear within each page should be placed.
  */
 @Composable
-fun VerticalPager(
+public fun VerticalPager(
     state: PagerState,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
@@ -268,7 +268,7 @@ fun VerticalPager(
 }
 
 /** Contains the default values used by [Pager]. These are optimised for Wear. */
-object PagerDefaults {
+public object PagerDefaults {
     /**
      * Default fling behavior for pagers on Wear, snaps at most one page at a time.
      *
@@ -297,7 +297,7 @@ object PagerDefaults {
      *   the next page in the direction of the fling.
      */
     @Composable
-    fun snapFlingBehavior(
+    public fun snapFlingBehavior(
         state: PagerState,
         pagerSnapDistance: PagerSnapDistance = PagerSnapDistance.atMost(1),
         decayAnimationSpec: DecayAnimationSpec<Float> = rememberSplineBasedDecay(),
@@ -318,20 +318,20 @@ object PagerDefaults {
      * The default value of swipeToDismissEdgeZoneFraction used to configure the size of the edge
      * zone in a [HorizontalPager].
      */
-    const val SwipeToDismissEdgeZoneFraction: Float = 0.15f
+    public const val SwipeToDismissEdgeZoneFraction: Float = 0.15f
 
     /**
      * The default value of beyondViewportPageCount used to specify the number of pages to compose
      * and layout before and after the visible pages. It does not include the pages automatically
      * composed and laid out by the pre-fetcher in the direction of the scroll during scroll events.
      */
-    const val BeyondViewportPageCount = 0
+    public const val BeyondViewportPageCount: Int = 0
 
     /**
      * The recommended medium-high stiffness used by default for the spring stiffness parameter in
      * the Pager's snap animation
      */
-    const val Stiffness = 2000f
+    public const val Stiffness: Float = 2000f
 }
 
 internal const val CustomTouchSlopMultiplier = 1.10f
