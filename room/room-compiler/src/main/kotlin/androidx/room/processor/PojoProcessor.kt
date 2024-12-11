@@ -698,7 +698,7 @@ private constructor(
         return if (inferEntity || typeArg.asTypeName() == entity.typeName) {
             entity.columnNames
         } else {
-            val columnAdapter = context.typeAdapterStore.findCursorValueReader(typeArg, null)
+            val columnAdapter = context.typeAdapterStore.findStatementValueReader(typeArg, null)
             if (columnAdapter != null) {
                 // nice, there is a column adapter for this, assume single column response
                 listOf(entityField.name)
@@ -708,7 +708,7 @@ private constructor(
                     createFor(
                             context = context,
                             element = typeArgElement,
-                            bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                            bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                             parent = parent,
                             referenceStack = referenceStack
                         )
@@ -786,7 +786,7 @@ private constructor(
                 }
             )
         context.checker.check(
-            success || bindingScope == FieldProcessor.BindingScope.READ_FROM_CURSOR,
+            success || bindingScope == FieldProcessor.BindingScope.READ_FROM_STMT,
             field.element,
             CANNOT_FIND_GETTER_FOR_FIELD
         )
@@ -891,8 +891,8 @@ private constructor(
                         fieldType = field.typeName.toString(context.codeLanguage)
                     )
             )
-            field.cursorValueReader =
-                context.typeAdapterStore.findCursorValueReader(
+            field.statementValueReader =
+                context.typeAdapterStore.findStatementValueReader(
                     output = field.setter.type,
                     affinity = field.affinity
                 )

@@ -109,11 +109,11 @@ import androidx.room.solver.types.ByteArrayWrapperColumnTypeAdapter
 import androidx.room.solver.types.ByteBufferColumnTypeAdapter
 import androidx.room.solver.types.ColumnTypeAdapter
 import androidx.room.solver.types.CompositeAdapter
-import androidx.room.solver.types.CursorValueReader
 import androidx.room.solver.types.EnumColumnTypeAdapter
 import androidx.room.solver.types.PrimitiveBooleanToIntConverter
 import androidx.room.solver.types.PrimitiveColumnTypeAdapter
 import androidx.room.solver.types.StatementValueBinder
+import androidx.room.solver.types.StatementValueReader
 import androidx.room.solver.types.StringColumnTypeAdapter
 import androidx.room.solver.types.TypeConverter
 import androidx.room.solver.types.UuidColumnTypeAdapter
@@ -279,8 +279,8 @@ private constructor(
         return null
     }
 
-    /** Searches 1 way to read it from cursor */
-    fun findCursorValueReader(output: XType, affinity: SQLTypeAffinity?): CursorValueReader? {
+    /** Searches 1 way to read it from a statement */
+    fun findStatementValueReader(output: XType, affinity: SQLTypeAffinity?): StatementValueReader? {
         if (output.isError()) {
             return null
         }
@@ -293,7 +293,7 @@ private constructor(
         fun findTypeConverterAdapter(): ColumnTypeAdapter? {
             val targetTypes = affinity?.getTypeMirrors(context.processingEnv)
             val converter =
-                typeConverterStore.findConverterFromCursor(
+                typeConverterStore.findConverterFromStatement(
                     columnTypes = targetTypes,
                     output = output
                 ) ?: return null
@@ -321,7 +321,7 @@ private constructor(
 
     /**
      * Finds a two way converter, if you need 1 way, use findStatementValueBinder or
-     * findCursorValueReader.
+     * findStatementValueReader.
      */
     fun findColumnTypeAdapter(
         out: XType,
@@ -344,7 +344,7 @@ private constructor(
                     columnTypes = targetTypes
                 ) ?: return null
             // ok found a converter, try the reverse now
-            val fromCursor =
+            val fromStmt =
                 typeConverterStore.reverse(intoStatement)
                     ?: typeConverterStore.findTypeConverter(intoStatement.to, out)
                     ?: return null
@@ -352,7 +352,7 @@ private constructor(
                 out,
                 getAllColumnAdapters(intoStatement.to).first(),
                 intoStatement,
-                fromCursor
+                fromStmt
             )
         }
 
@@ -650,13 +650,13 @@ private constructor(
             validateMapKeyTypeArg(
                 context = context,
                 keyTypeArg = keyTypeArg,
-                keyReader = findCursorValueReader(keyTypeArg, null),
+                keyReader = findStatementValueReader(keyTypeArg, null),
                 keyColumnName = mappedKeyColumnName
             )
             validateMapValueTypeArg(
                 context = context,
                 valueTypeArg = valueTypeArg,
-                valueReader = findCursorValueReader(valueTypeArg, null),
+                valueReader = findStatementValueReader(valueTypeArg, null),
                 valueColumnName = mappedValueColumnName
             )
             return GuavaImmutableMultimapQueryResultAdapter(
@@ -724,7 +724,7 @@ private constructor(
             validateMapKeyTypeArg(
                 context = context,
                 keyTypeArg = keyTypeArg,
-                keyReader = findCursorValueReader(keyTypeArg, null),
+                keyReader = findStatementValueReader(keyTypeArg, null),
                 keyColumnName = mappedKeyColumnName
             )
 
@@ -841,7 +841,7 @@ private constructor(
             validateMapValueTypeArg(
                 context = context,
                 valueTypeArg = valueTypeArg,
-                valueReader = findCursorValueReader(valueTypeArg, null),
+                valueReader = findStatementValueReader(valueTypeArg, null),
                 valueColumnName = mappedValueColumnName
             )
 
@@ -887,7 +887,7 @@ private constructor(
             validateMapValueTypeArg(
                 context = context,
                 valueTypeArg = mapValueTypeArg,
-                valueReader = findCursorValueReader(mapValueTypeArg, null),
+                valueReader = findStatementValueReader(mapValueTypeArg, null),
                 valueColumnName = mappedValueColumnName
             )
             return MapValueResultAdapter.EndMapValueResultAdapter(
@@ -899,7 +899,7 @@ private constructor(
     }
 
     /**
-     * Find a converter from cursor to the given type mirror. If there is information about the
+     * Find a converter from statement to the given type mirror. If there is information about the
      * query result, we try to use it to accept *any* POJO.
      */
     fun findRowAdapter(
@@ -927,7 +927,7 @@ private constructor(
                             PojoProcessor.createFor(
                                     context = subContext,
                                     element = typeElement,
-                                    bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                                    bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                                     parent = null
                                 )
                                 .process()
@@ -961,7 +961,7 @@ private constructor(
 
             if (columnName != null) {
                 val singleNamedColumn =
-                    findCursorValueReader(
+                    findStatementValueReader(
                         typeMirror,
                         query.resultInfo?.columns?.find { it.name == columnName }?.type
                     )
@@ -972,7 +972,7 @@ private constructor(
 
             if ((resultInfo?.columns?.size ?: 1) == 1) {
                 val singleColumn =
-                    findCursorValueReader(typeMirror, resultInfo?.columns?.get(0)?.type)
+                    findStatementValueReader(typeMirror, resultInfo?.columns?.get(0)?.type)
                 if (singleColumn != null) {
                     return SingleColumnRowAdapter(singleColumn)
                 }
@@ -995,7 +995,7 @@ private constructor(
                     PojoProcessor.createFor(
                             context = context,
                             element = typeElement,
-                            bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                            bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                             parent = null
                         )
                         .process()
@@ -1011,7 +1011,7 @@ private constructor(
         } else {
             if (columnName != null) {
                 val singleNamedColumn =
-                    findCursorValueReader(
+                    findStatementValueReader(
                         typeMirror,
                         query.resultInfo?.columns?.find { it.name == columnName }?.type
                     )
@@ -1019,7 +1019,7 @@ private constructor(
                     return SingleNamedColumnRowAdapter(singleNamedColumn, columnName)
                 }
             }
-            val singleColumn = findCursorValueReader(typeMirror, null) ?: return null
+            val singleColumn = findStatementValueReader(typeMirror, null) ?: return null
             return SingleColumnRowAdapter(singleColumn)
         }
     }

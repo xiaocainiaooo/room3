@@ -53,29 +53,29 @@ public class MyDao_Impl(
     return performBlocking(__db, true, false) { _connection ->
       val _stmt: SQLiteStatement = _connection.prepare(_sql)
       try {
-        val _cursorIndexOfInt: Int = getColumnIndexOrThrow(_stmt, "int")
-        val _cursorIndexOfShort: Int = getColumnIndexOrThrow(_stmt, "short")
-        val _cursorIndexOfByte: Int = getColumnIndexOrThrow(_stmt, "byte")
-        val _cursorIndexOfLong: Int = getColumnIndexOrThrow(_stmt, "long")
-        val _cursorIndexOfChar: Int = getColumnIndexOrThrow(_stmt, "char")
-        val _cursorIndexOfFloat: Int = getColumnIndexOrThrow(_stmt, "float")
-        val _cursorIndexOfDouble: Int = getColumnIndexOrThrow(_stmt, "double")
+        val _columnIndexOfInt: Int = getColumnIndexOrThrow(_stmt, "int")
+        val _columnIndexOfShort: Int = getColumnIndexOrThrow(_stmt, "short")
+        val _columnIndexOfByte: Int = getColumnIndexOrThrow(_stmt, "byte")
+        val _columnIndexOfLong: Int = getColumnIndexOrThrow(_stmt, "long")
+        val _columnIndexOfChar: Int = getColumnIndexOrThrow(_stmt, "char")
+        val _columnIndexOfFloat: Int = getColumnIndexOrThrow(_stmt, "float")
+        val _columnIndexOfDouble: Int = getColumnIndexOrThrow(_stmt, "double")
         val _result: MyEntity
         if (_stmt.step()) {
           val _tmpInt: Int
-          _tmpInt = _stmt.getLong(_cursorIndexOfInt).toInt()
+          _tmpInt = _stmt.getLong(_columnIndexOfInt).toInt()
           val _tmpShort: Short
-          _tmpShort = _stmt.getLong(_cursorIndexOfShort).toShort()
+          _tmpShort = _stmt.getLong(_columnIndexOfShort).toShort()
           val _tmpByte: Byte
-          _tmpByte = _stmt.getLong(_cursorIndexOfByte).toByte()
+          _tmpByte = _stmt.getLong(_columnIndexOfByte).toByte()
           val _tmpLong: Long
-          _tmpLong = _stmt.getLong(_cursorIndexOfLong)
+          _tmpLong = _stmt.getLong(_columnIndexOfLong)
           val _tmpChar: Char
-          _tmpChar = _stmt.getLong(_cursorIndexOfChar).toChar()
+          _tmpChar = _stmt.getLong(_columnIndexOfChar).toChar()
           val _tmpFloat: Float
-          _tmpFloat = _stmt.getDouble(_cursorIndexOfFloat).toFloat()
+          _tmpFloat = _stmt.getDouble(_columnIndexOfFloat).toFloat()
           val _tmpDouble: Double
-          _tmpDouble = _stmt.getDouble(_cursorIndexOfDouble)
+          _tmpDouble = _stmt.getDouble(_columnIndexOfDouble)
           _result = MyEntity(_tmpInt,_tmpShort,_tmpByte,_tmpLong,_tmpChar,_tmpFloat,_tmpDouble)
         } else {
           error("The query result was empty, but expected a single row to return a NON-NULL object of type <MyEntity>.")

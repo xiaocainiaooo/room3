@@ -51,23 +51,23 @@ public class MyDao_Impl(
     return performBlocking(__db, true, false) { _connection ->
       val _stmt: SQLiteStatement = _connection.prepare(_sql)
       try {
-        val _cursorIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
-        val _cursorIndexOfBoolean: Int = getColumnIndexOrThrow(_stmt, "boolean")
-        val _cursorIndexOfNullableBoolean: Int = getColumnIndexOrThrow(_stmt, "nullableBoolean")
+        val _columnIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
+        val _columnIndexOfBoolean: Int = getColumnIndexOrThrow(_stmt, "boolean")
+        val _columnIndexOfNullableBoolean: Int = getColumnIndexOrThrow(_stmt, "nullableBoolean")
         val _result: MyEntity
         if (_stmt.step()) {
           val _tmpPk: Int
-          _tmpPk = _stmt.getLong(_cursorIndexOfPk).toInt()
+          _tmpPk = _stmt.getLong(_columnIndexOfPk).toInt()
           val _tmpBoolean: Boolean
           val _tmp: Int
-          _tmp = _stmt.getLong(_cursorIndexOfBoolean).toInt()
+          _tmp = _stmt.getLong(_columnIndexOfBoolean).toInt()
           _tmpBoolean = _tmp != 0
           val _tmpNullableBoolean: Boolean?
           val _tmp_1: Int?
-          if (_stmt.isNull(_cursorIndexOfNullableBoolean)) {
+          if (_stmt.isNull(_columnIndexOfNullableBoolean)) {
             _tmp_1 = null
           } else {
-            _tmp_1 = _stmt.getLong(_cursorIndexOfNullableBoolean).toInt()
+            _tmp_1 = _stmt.getLong(_columnIndexOfNullableBoolean).toInt()
           }
           _tmpNullableBoolean = _tmp_1?.let { it != 0 }
           _result = MyEntity(_tmpPk,_tmpBoolean,_tmpNullableBoolean)

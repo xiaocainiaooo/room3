@@ -25,9 +25,9 @@ class ImmutableListQueryResultAdapter(
     private val typeArg: XType,
     private val rowAdapter: RowAdapter
 ) : QueryResultAdapter(listOf(rowAdapter)) {
-    override fun convert(outVarName: String, cursorVarName: String, scope: CodeGenScope) {
+    override fun convert(outVarName: String, stmtVarName: String, scope: CodeGenScope) {
         scope.builder.apply {
-            rowAdapter.onCursorReady(cursorVarName = cursorVarName, scope = scope)
+            rowAdapter.onStatementReady(stmtVarName = stmtVarName, scope = scope)
             val collectionType = GuavaTypeNames.IMMUTABLE_LIST.parametrizedBy(typeArg.asTypeName())
             val immutableListBuilderType =
                 GuavaTypeNames.IMMUTABLE_LIST_BUILDER.parametrizedBy(typeArg.asTypeName())
@@ -40,9 +40,9 @@ class ImmutableListQueryResultAdapter(
 
             val tmpVarName = scope.getTmpVar("_item")
             val stepName = "step"
-            beginControlFlow("while (%L.$stepName())", cursorVarName).apply {
+            beginControlFlow("while (%L.$stepName())", stmtVarName).apply {
                 addLocalVariable(name = tmpVarName, typeName = typeArg.asTypeName())
-                rowAdapter.convert(tmpVarName, cursorVarName, scope)
+                rowAdapter.convert(tmpVarName, stmtVarName, scope)
                 addStatement("%L.add(%L)", immutableListBuilderName, tmpVarName)
             }
             endControlFlow()

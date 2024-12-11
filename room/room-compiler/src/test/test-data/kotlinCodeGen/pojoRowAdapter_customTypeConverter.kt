@@ -45,15 +45,15 @@ public class MyDao_Impl(
     return performBlocking(__db, true, false) { _connection ->
       val _stmt: SQLiteStatement = _connection.prepare(_sql)
       try {
-        val _cursorIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
-        val _cursorIndexOfFoo: Int = getColumnIndexOrThrow(_stmt, "foo")
+        val _columnIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
+        val _columnIndexOfFoo: Int = getColumnIndexOrThrow(_stmt, "foo")
         val _result: MyEntity
         if (_stmt.step()) {
           val _tmpPk: Int
-          _tmpPk = _stmt.getLong(_cursorIndexOfPk).toInt()
+          _tmpPk = _stmt.getLong(_columnIndexOfPk).toInt()
           val _tmpFoo: Foo
           val _tmp: String
-          _tmp = _stmt.getText(_cursorIndexOfFoo)
+          _tmp = _stmt.getText(_columnIndexOfFoo)
           _tmpFoo = __fooConverter.fromString(_tmp)
           _result = MyEntity(_tmpPk,_tmpFoo)
         } else {

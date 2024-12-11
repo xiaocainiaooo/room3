@@ -46,7 +46,7 @@ class PojoRowAdapter(
 
     private val indexAdapter: PojoIndexAdapter
 
-    // Set when cursor is ready.
+    // Set when statement is ready.
     private lateinit var fieldsWithIndices: List<FieldWithIndex>
 
     init {
@@ -112,8 +112,8 @@ class PojoRowAdapter(
             .distinct()
     }
 
-    override fun onCursorReady(
-        cursorVarName: String,
+    override fun onStatementReady(
+        stmtVarName: String,
         scope: CodeGenScope,
         indices: List<ColumnIndexVar>
     ) {
@@ -122,30 +122,30 @@ class PojoRowAdapter(
                 val field = mapping.matchedFields.first { it.columnName == column }
                 FieldWithIndex(field = field, indexVar = indexVar, alwaysExists = info != null)
             }
-        emitRelationCollectorsReady(cursorVarName, scope)
+        emitRelationCollectorsReady(stmtVarName, scope)
     }
 
-    private fun emitRelationCollectorsReady(cursorVarName: String, scope: CodeGenScope) {
+    private fun emitRelationCollectorsReady(stmtVarName: String, scope: CodeGenScope) {
         if (relationCollectors.isNotEmpty()) {
             relationCollectors.forEach { it.writeInitCode(scope) }
             scope.builder.apply {
-                beginControlFlow("while (%L.step())", cursorVarName).apply {
+                beginControlFlow("while (%L.step())", stmtVarName).apply {
                     relationCollectors.forEach {
-                        it.writeReadParentKeyCode(cursorVarName, fieldsWithIndices, scope)
+                        it.writeReadParentKeyCode(stmtVarName, fieldsWithIndices, scope)
                     }
                 }
                 endControlFlow()
-                addStatement("%L.reset()", cursorVarName)
+                addStatement("%L.reset()", stmtVarName)
             }
             relationCollectors.forEach { it.writeFetchRelationCall(scope) }
         }
     }
 
-    override fun convert(outVarName: String, cursorVarName: String, scope: CodeGenScope) {
-        FieldReadWriteWriter.readFromCursor(
+    override fun convert(outVarName: String, stmtVarName: String, scope: CodeGenScope) {
+        FieldReadWriteWriter.readFromStatement(
             outVar = outVarName,
             outPojo = pojo,
-            cursorVar = cursorVarName,
+            stmtVar = stmtVarName,
             fieldsWithIndices = fieldsWithIndices,
             relationCollectors = relationCollectors,
             scope = scope

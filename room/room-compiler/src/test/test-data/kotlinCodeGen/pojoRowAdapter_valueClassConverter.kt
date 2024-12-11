@@ -74,46 +74,46 @@ public class MyDao_Impl(
     return performBlocking(__db, true, false) { _connection ->
       val _stmt: SQLiteStatement = _connection.prepare(_sql)
       try {
-        val _cursorIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
-        val _cursorIndexOfUuidData: Int = getColumnIndexOrThrow(_stmt, "uuidData")
-        val _cursorIndexOfNullableUuidData: Int = getColumnIndexOrThrow(_stmt, "nullableUuidData")
-        val _cursorIndexOfNullableLongData: Int = getColumnIndexOrThrow(_stmt, "nullableLongData")
-        val _cursorIndexOfDoubleNullableLongData: Int = getColumnIndexOrThrow(_stmt,
+        val _columnIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
+        val _columnIndexOfUuidData: Int = getColumnIndexOrThrow(_stmt, "uuidData")
+        val _columnIndexOfNullableUuidData: Int = getColumnIndexOrThrow(_stmt, "nullableUuidData")
+        val _columnIndexOfNullableLongData: Int = getColumnIndexOrThrow(_stmt, "nullableLongData")
+        val _columnIndexOfDoubleNullableLongData: Int = getColumnIndexOrThrow(_stmt,
             "doubleNullableLongData")
-        val _cursorIndexOfGenericData: Int = getColumnIndexOrThrow(_stmt, "genericData")
+        val _columnIndexOfGenericData: Int = getColumnIndexOrThrow(_stmt, "genericData")
         val _result: MyEntity
         if (_stmt.step()) {
           val _tmpPk: LongValueClass
           val _data: Long
-          _data = _stmt.getLong(_cursorIndexOfPk)
+          _data = _stmt.getLong(_columnIndexOfPk)
           _tmpPk = LongValueClass(_data)
           val _tmpUuidData: UUIDValueClass
           val _data_1: UUID
-          _data_1 = convertByteToUUID(_stmt.getBlob(_cursorIndexOfUuidData))
+          _data_1 = convertByteToUUID(_stmt.getBlob(_columnIndexOfUuidData))
           _tmpUuidData = UUIDValueClass(_data_1)
           val _tmpNullableUuidData: UUIDValueClass?
-          if (_stmt.isNull(_cursorIndexOfNullableUuidData)) {
+          if (_stmt.isNull(_columnIndexOfNullableUuidData)) {
             _tmpNullableUuidData = null
           } else {
             val _data_2: UUID
-            _data_2 = convertByteToUUID(_stmt.getBlob(_cursorIndexOfNullableUuidData))
+            _data_2 = convertByteToUUID(_stmt.getBlob(_columnIndexOfNullableUuidData))
             _tmpNullableUuidData = UUIDValueClass(_data_2)
           }
           val _tmpNullableLongData: NullableLongValueClass
           val _data_3: Long
-          _data_3 = _stmt.getLong(_cursorIndexOfNullableLongData)
+          _data_3 = _stmt.getLong(_columnIndexOfNullableLongData)
           _tmpNullableLongData = NullableLongValueClass(_data_3)
           val _tmpDoubleNullableLongData: NullableLongValueClass?
-          if (_stmt.isNull(_cursorIndexOfDoubleNullableLongData)) {
+          if (_stmt.isNull(_columnIndexOfDoubleNullableLongData)) {
             _tmpDoubleNullableLongData = null
           } else {
             val _data_4: Long
-            _data_4 = _stmt.getLong(_cursorIndexOfDoubleNullableLongData)
+            _data_4 = _stmt.getLong(_columnIndexOfDoubleNullableLongData)
             _tmpDoubleNullableLongData = NullableLongValueClass(_data_4)
           }
           val _tmpGenericData: GenericValueClass<String>
           val _password: String
-          _password = _stmt.getText(_cursorIndexOfGenericData)
+          _password = _stmt.getText(_columnIndexOfGenericData)
           _tmpGenericData = GenericValueClass<String>(_password)
           _result =
               MyEntity(_tmpPk,_tmpUuidData,_tmpNullableUuidData,_tmpNullableLongData,_tmpDoubleNullableLongData,_tmpGenericData)
