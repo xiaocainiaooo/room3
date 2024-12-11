@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@file:JvmName("NavControllerKt")
+@file:JvmMultifileClass
+
 package androidx.navigation
 
 import android.app.Activity

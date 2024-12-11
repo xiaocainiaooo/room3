@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@file:JvmName("ActivityNavigatorExtrasKt")
+@file:JvmMultifileClass
+
 package androidx.navigation
 
 import androidx.core.app.ActivityOptionsCompat
