@@ -135,8 +135,9 @@ public final class ImageAnalysisConfig
      * Returns the output image format for image analysis.
      *
      * <p>The supported output image format
-     * is {@link ImageAnalysis.OutputImageFormat#OUTPUT_IMAGE_FORMAT_YUV_420_888} and
-     * {@link ImageAnalysis.OutputImageFormat#OUTPUT_IMAGE_FORMAT_RGBA_8888}.
+     * is {@link ImageAnalysis.OutputImageFormat#OUTPUT_IMAGE_FORMAT_YUV_420_888},
+     * {@link ImageAnalysis.OutputImageFormat#OUTPUT_IMAGE_FORMAT_RGBA_8888} and
+     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_NV21}.
      *
      * @param valueIfMissing The value to return if this configuration option has not been set.
      * @return The stored value or <code>valueIfMissing</code> if the value does not exist in this

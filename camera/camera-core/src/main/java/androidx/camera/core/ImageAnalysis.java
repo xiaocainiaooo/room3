@@ -211,7 +211,6 @@ public final class ImageAnalysis extends UseCase {
      *
      * @see Builder#setOutputImageFormat(int)
      */
-    @RestrictTo(Scope.LIBRARY_GROUP)
     public static final int OUTPUT_IMAGE_FORMAT_NV21 = 3;
 
     /**
@@ -690,8 +689,9 @@ public final class ImageAnalysis extends UseCase {
      * Gets output image format.
      *
      * <p>The returned image format will be
-     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_YUV_420_888} or
-     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_RGBA_8888}.
+     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_YUV_420_888},
+     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_RGBA_8888} or
+     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_NV21}.
      *
      * @return output image format.
      * @see ImageAnalysis.Builder#setOutputImageFormat(int)
@@ -866,8 +866,9 @@ public final class ImageAnalysis extends UseCase {
      * Supported output image format for image analysis.
      *
      * <p>The supported output image format
-     * is {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_YUV_420_888} and
-     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_RGBA_8888}.
+     * is {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_YUV_420_888},
+     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_RGBA_8888} and
+     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_NV21}.
      *
      * <p>By default, {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_YUV_420_888} will be used.
      *
@@ -1194,13 +1195,15 @@ public final class ImageAnalysis extends UseCase {
          * Sets output image format.
          *
          * <p>The supported output image format
-         * is {@link OutputImageFormat#OUTPUT_IMAGE_FORMAT_YUV_420_888} and
-         * {@link OutputImageFormat#OUTPUT_IMAGE_FORMAT_RGBA_8888}.
+         * is {@link OutputImageFormat#OUTPUT_IMAGE_FORMAT_YUV_420_888},
+         * {@link OutputImageFormat#OUTPUT_IMAGE_FORMAT_RGBA_8888} and
+         * {@link OutputImageFormat#OUTPUT_IMAGE_FORMAT_NV21}.
          *
          * <p>If not set, {@link OutputImageFormat#OUTPUT_IMAGE_FORMAT_YUV_420_888} will be used.
          *
-         * Requesting {@link OutputImageFormat#OUTPUT_IMAGE_FORMAT_RGBA_8888} will have extra
-         * overhead because format conversion takes time.
+         * Requesting {@link OutputImageFormat#OUTPUT_IMAGE_FORMAT_RGBA_8888} or
+         * {@link OutputImageFormat#OUTPUT_IMAGE_FORMAT_NV21} will have extra overhead because
+         * format conversion takes time.
          *
          * @param outputImageFormat The output image format.
          * @return The current Builder.
