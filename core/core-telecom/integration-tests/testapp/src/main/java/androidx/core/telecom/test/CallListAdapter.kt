@@ -103,6 +103,7 @@ class CallListAdapter(
                     }
                     when (ItemsViewModel.callObject.mCallControl!!.setActive()) {
                         is CallControlResult.Success -> {
+                            ItemsViewModel.callObject.updateNotificationToOngoing()
                             holder.currentState.text = "CurrentState=[active]"
                         }
                         is CallControlResult.Error -> {
@@ -130,6 +131,7 @@ class CallListAdapter(
             holder.disconnectButton.setOnClickListener {
                 CoroutineScope(Dispatchers.IO).launch {
                     endAudioRecording()
+                    ItemsViewModel.callObject.clearNotification()
                     ItemsViewModel.callObject.mCallControl?.disconnect(
                         DisconnectCause(DisconnectCause.LOCAL)
                     )

@@ -21,7 +21,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.telecom.CallAttributesCompat
 
 @RequiresApi(34)
-class Utilities {
+class Constants {
     companion object {
         const val APP_SCHEME = "MyCustomScheme:"
         const val TEST_NUMBER = "6506958985"
