@@ -944,21 +944,53 @@ internal class LayoutNodeLayoutDelegate(
         }
 
         override fun minIntrinsicWidth(height: Int): Int {
+            // If there is an intrinsic size query coming from above the lookahead root, we will
+            // direct the query down to the lookahead pass. Note, when a regular measure call
+            // reaches a top-level lookahead root, the measure call is turned into lookahead
+            // measure followed by approach measure. This is a similar, although not exactly the
+            // same, mental model.
+            if (layoutNode.isOutMostLookaheadRoot) {
+                return lookaheadPassDelegate!!.minIntrinsicWidth(height)
+            }
             onIntrinsicsQueried()
             return outerCoordinator.minIntrinsicWidth(height)
         }
 
         override fun maxIntrinsicWidth(height: Int): Int {
+            // If there is an intrinsic size query coming from above the lookahead root, we will
+            // direct the query down to the lookahead pass. Note, when a regular measure call
+            // reaches a top-level lookahead root, the measure call is turned into lookahead
+            // measure followed by approach measure. This is a similar, although not exactly the
+            // same, mental model.
+            if (layoutNode.isOutMostLookaheadRoot) {
+                return lookaheadPassDelegate!!.maxIntrinsicWidth(height)
+            }
             onIntrinsicsQueried()
             return outerCoordinator.maxIntrinsicWidth(height)
         }
 
         override fun minIntrinsicHeight(width: Int): Int {
+            // If there is an intrinsic size query coming from above the lookahead root, we will
+            // direct the query down to the lookahead pass. Note, when a regular measure call
+            // reaches a top-level lookahead root, the measure call is turned into lookahead
+            // measure followed by approach measure. This is a similar, although not exactly the
+            // same, mental model.
+            if (layoutNode.isOutMostLookaheadRoot) {
+                return lookaheadPassDelegate!!.minIntrinsicHeight(width)
+            }
             onIntrinsicsQueried()
             return outerCoordinator.minIntrinsicHeight(width)
         }
 
         override fun maxIntrinsicHeight(width: Int): Int {
+            // If there is an intrinsic size query coming from above the lookahead root, we will
+            // direct the query down to the lookahead pass. Note, when a regular measure call
+            // reaches a top-level lookahead root, the measure call is turned into lookahead
+            // measure followed by approach measure. This is a similar, although not exactly the
+            // same, mental model.
+            if (layoutNode.isOutMostLookaheadRoot) {
+                return lookaheadPassDelegate!!.maxIntrinsicHeight(width)
+            }
             onIntrinsicsQueried()
             return outerCoordinator.maxIntrinsicHeight(width)
         }
