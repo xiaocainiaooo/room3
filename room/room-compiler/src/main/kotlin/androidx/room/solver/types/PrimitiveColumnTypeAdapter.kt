@@ -127,40 +127,26 @@ class PrimitiveColumnTypeAdapter(
         scope.builder.addStatement(
             "%L = %L",
             outVarName,
-            XCodeBlock.of(
-                    "%L.%L(%L)",
-                    cursorVarName,
-                    if (scope.useDriverApi) stmtGetter else cursorGetter,
-                    indexVarName
-                )
-                .let {
-                    // These primitives don't have an exact cursor / statement getter.
-                    val castFunction =
-                        if (scope.useDriverApi) {
-                            when (primitive) {
-                                Primitive.INT -> "toInt"
-                                Primitive.SHORT -> "toShort"
-                                Primitive.BYTE -> "toByte"
-                                Primitive.CHAR -> "toChar"
-                                Primitive.FLOAT -> "toFloat"
-                                else -> null
-                            }
-                        } else {
-                            when (primitive) {
-                                Primitive.BYTE -> "toByte"
-                                Primitive.CHAR -> "toChar"
-                                else -> null
-                            }
-                        } ?: return@let it
-                    buildCodeBlock { language ->
-                        when (language) {
-                            // For Java a cast will suffice
-                            CodeLanguage.JAVA -> add(XCodeBlock.ofCast(out.asTypeName(), it))
-                            // For Kotlin a converter function is emitted
-                            CodeLanguage.KOTLIN -> add(XCodeBlock.of("%L.%L()", it, castFunction))
-                        }
+            XCodeBlock.of("%L.%L(%L)", cursorVarName, stmtGetter, indexVarName).let {
+                // These primitives don't have an exact cursor / statement getter.
+                val castFunction =
+                    when (primitive) {
+                        Primitive.INT -> "toInt"
+                        Primitive.SHORT -> "toShort"
+                        Primitive.BYTE -> "toByte"
+                        Primitive.CHAR -> "toChar"
+                        Primitive.FLOAT -> "toFloat"
+                        else -> null
+                    } ?: return@let it
+                buildCodeBlock { language ->
+                    when (language) {
+                        // For Java a cast will suffice
+                        CodeLanguage.JAVA -> add(XCodeBlock.ofCast(out.asTypeName(), it))
+                        // For Kotlin a converter function is emitted
+                        CodeLanguage.KOTLIN -> add(XCodeBlock.of("%L.%L()", it, castFunction))
                     }
                 }
+            }
         )
     }
 }

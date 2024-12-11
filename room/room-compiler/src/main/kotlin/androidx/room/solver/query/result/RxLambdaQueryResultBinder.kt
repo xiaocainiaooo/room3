@@ -28,7 +28,6 @@ import androidx.room.compiler.codegen.XTypeSpec.Builder.Companion.applyTo
 import androidx.room.compiler.processing.XNullability
 import androidx.room.compiler.processing.XType
 import androidx.room.ext.AndroidTypeNames.CURSOR
-import androidx.room.ext.CallableTypeSpecBuilder
 import androidx.room.ext.InvokeWithLambdaParameter
 import androidx.room.ext.LambdaSpec
 import androidx.room.ext.RoomMemberNames.DB_UTIL_QUERY
@@ -42,43 +41,6 @@ internal class RxLambdaQueryResultBinder(
     val typeArg: XType,
     adapter: QueryResultAdapter?
 ) : QueryResultBinder(adapter) {
-    override fun convertAndReturn(
-        roomSQLiteQueryVar: String,
-        canReleaseQuery: Boolean,
-        dbProperty: XPropertySpec,
-        inTransaction: Boolean,
-        scope: CodeGenScope
-    ) {
-        val callable =
-            CallableTypeSpecBuilder(typeArg.asTypeName()) {
-                    addCode(
-                        XCodeBlock.builder()
-                            .apply {
-                                fillInCallMethod(
-                                    roomSQLiteQueryVar = roomSQLiteQueryVar,
-                                    dbProperty = dbProperty,
-                                    inTransaction = inTransaction,
-                                    scope = scope,
-                                    returnType = typeArg
-                                )
-                            }
-                            .build()
-                    )
-                }
-                .apply {
-                    if (canReleaseQuery) {
-                        createFinalizeMethod(roomSQLiteQueryVar)
-                    }
-                }
-                .build()
-        scope.builder.apply {
-            if (rxType.isSingle()) {
-                addStatement("return %M(%L)", rxType.factoryMethodName, callable)
-            } else {
-                addStatement("return %T.fromCallable(%L)", rxType.className, callable)
-            }
-        }
-    }
 
     private fun XCodeBlock.Builder.fillInCallMethod(
         roomSQLiteQueryVar: String,
@@ -163,8 +125,6 @@ internal class RxLambdaQueryResultBinder(
             )
         }
     }
-
-    override fun isMigratedToDriver() = adapter?.isMigratedToDriver() == true
 
     override fun convertAndReturn(
         sqlQueryVar: String,

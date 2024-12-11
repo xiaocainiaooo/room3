@@ -50,6 +50,4 @@ class ImmutableMapQueryResultAdapter(
             )
         }
     }
-
-    override fun isMigratedToDriver() = true
 }

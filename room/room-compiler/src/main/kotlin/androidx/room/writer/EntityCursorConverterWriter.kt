@@ -20,8 +20,6 @@ import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XFunSpec
 import androidx.room.compiler.codegen.XMemberName.Companion.packageMember
 import androidx.room.compiler.codegen.XTypeName
-import androidx.room.ext.AndroidTypeNames
-import androidx.room.ext.RoomTypeNames.CURSOR_UTIL
 import androidx.room.ext.RoomTypeNames.STATEMENT_UTIL
 import androidx.room.ext.SQLiteDriverTypeNames
 import androidx.room.ext.capitalize
@@ -31,33 +29,25 @@ import androidx.room.vo.Entity
 import androidx.room.vo.FieldWithIndex
 import java.util.Locale
 
-class EntityCursorConverterWriter(private val entity: Entity, private val userDriverApi: Boolean) :
+class EntityCursorConverterWriter(private val entity: Entity) :
     TypeWriter.SharedFunctionSpec(
-        if (userDriverApi) {
-            "entityStatementConverter_${entity.className.canonicalName.stripNonJava()}"
-        } else {
-            "entityCursorConverter_${entity.className.canonicalName.stripNonJava()}"
-        }
+        "entityStatementConverter_${entity.className.canonicalName.stripNonJava()}"
     ) {
     override fun getUniqueKey(): String {
-        return "generic_entity_converter_of_${entity.element.qualifiedName}-$userDriverApi"
+        return "generic_entity_converter_of_${entity.element.qualifiedName}"
     }
 
     override fun prepare(methodName: String, writer: TypeWriter, builder: XFunSpec.Builder) {
         builder.apply {
-            val cursorParamName = if (userDriverApi) "statement" else "cursor"
-            if (userDriverApi) {
-                addParameter(cursorParamName, SQLiteDriverTypeNames.STATEMENT)
-            } else {
-                addParameter(cursorParamName, AndroidTypeNames.CURSOR)
-            }
+            val cursorParamName = "statement"
+            addParameter(cursorParamName, SQLiteDriverTypeNames.STATEMENT)
             returns(entity.typeName)
             addCode(buildConvertMethodBody(writer, cursorParamName))
         }
     }
 
     private fun buildConvertMethodBody(writer: TypeWriter, cursorParamName: String): XCodeBlock {
-        val scope = CodeGenScope(writer, userDriverApi)
+        val scope = CodeGenScope(writer)
         val entityVar = scope.getTmpVar("_entity")
         scope.builder.apply {
             addLocalVariable(entityVar, entity.typeName)
@@ -67,12 +57,7 @@ class EntityCursorConverterWriter(private val entity: Entity, private val userDr
                         scope.getTmpVar(
                             "_cursorIndexOf${it.name.stripNonJava().capitalize(Locale.US)}"
                         )
-                    val packageMember =
-                        if (scope.useDriverApi) {
-                            STATEMENT_UTIL.packageMember("getColumnIndex")
-                        } else {
-                            CURSOR_UTIL.packageMember("getColumnIndex")
-                        }
+                    val packageMember = STATEMENT_UTIL.packageMember("getColumnIndex")
                     addLocalVariable(
                         name = indexVar,
                         typeName = XTypeName.PRIMITIVE_INT,

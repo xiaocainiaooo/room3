@@ -35,9 +35,9 @@ class EntityCursorConverterWriterTest : BaseEntityParserTest() {
         val OUT_PREFIX =
             """
             package foo.bar;
-            import android.database.Cursor;
             import androidx.annotation.NonNull;
-            import androidx.room.util.CursorUtil;
+            import androidx.room.util.SQLiteStatementUtil;
+            import androidx.sqlite.SQLiteStatement;
             import java.lang.SuppressWarnings;
             import javax.annotation.processing.Generated;
             @Generated("androidx.room.RoomProcessor")
@@ -65,24 +65,25 @@ class EntityCursorConverterWriterTest : BaseEntityParserTest() {
             output = {
                 fun stringAdapterCode(out: String, indexVar: String) =
                     """
-                    if (cursor.isNull($indexVar)) {
+                    if (statement.isNull($indexVar)) {
                       $out = null;
                     } else {
-                      $out = cursor.getString($indexVar);
+                      $out = statement.getText($indexVar);
                     }
                     """
                         .trimIndent()
                 """
-                |private MyEntity __entityCursorConverter_fooBarMyEntity(@NonNull final Cursor cursor) {
+                |private MyEntity __entityStatementConverter_fooBarMyEntity(
+                |@NonNull final SQLiteStatement statement) {
                 |  final MyEntity _entity;
-                |  final int _cursorIndexOfId = CursorUtil.getColumnIndex(cursor, "id");
-                |  final int _cursorIndexOfName = CursorUtil.getColumnIndex(cursor, "name");
-                |  final int _cursorIndexOfLastName = CursorUtil.getColumnIndex(cursor, "lastName");
-                |  final int _cursorIndexOfAge = CursorUtil.getColumnIndex(cursor, "age");
+                |  final int _cursorIndexOfId = SQLiteStatementUtil.getColumnIndex(statement, "id");
+                |  final int _cursorIndexOfName = SQLiteStatementUtil.getColumnIndex(statement, "name");
+                |  final int _cursorIndexOfLastName = SQLiteStatementUtil.getColumnIndex(statement, "lastName");
+                |  final int _cursorIndexOfAge = SQLiteStatementUtil.getColumnIndex(statement, "age");
                 |  _entity = new MyEntity();
                 |  if (_cursorIndexOfId != -1) {
                 |    final int _tmpId;
-                |    _tmpId = cursor.getInt(_cursorIndexOfId);
+                |    _tmpId = (int) (statement.getLong(_cursorIndexOfId));
                 |    _entity.setId(_tmpId);
                 |  }
                 |  if (_cursorIndexOfName != -1) {
@@ -92,7 +93,7 @@ class EntityCursorConverterWriterTest : BaseEntityParserTest() {
                 |    ${stringAdapterCode("_entity.lastName", "_cursorIndexOfLastName")}
                 |  }
                 |  if (_cursorIndexOfAge != -1) {
-                |    _entity.age = cursor.getInt(_cursorIndexOfAge);
+                |    _entity.age = (int) (statement.getLong(_cursorIndexOfAge));
                 |  }
                 |  return _entity;
                 |}
@@ -126,7 +127,7 @@ class EntityCursorConverterWriterTest : BaseEntityParserTest() {
                     override val packageName = className.packageName
 
                     override fun createTypeSpecBuilder(): XTypeSpec.Builder {
-                        getOrCreateFunction(EntityCursorConverterWriter(entity, false))
+                        getOrCreateFunction(EntityCursorConverterWriter(entity))
                         return XTypeSpec.classBuilder(className).applyToJavaPoet {
                             addModifiers(Modifier.PUBLIC)
                         }

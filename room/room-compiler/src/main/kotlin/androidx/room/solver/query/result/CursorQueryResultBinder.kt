@@ -55,19 +55,6 @@ class CursorQueryResultBinder : QueryResultBinder(NO_OP_RESULT_ADAPTER) {
         }
     }
 
-    override fun convertAndReturn(
-        roomSQLiteQueryVar: String,
-        canReleaseQuery: Boolean,
-        dbProperty: XPropertySpec,
-        inTransaction: Boolean,
-        scope: CodeGenScope
-    ) {
-        error(
-            "This convertAndReturn() should never be invoked, it will be removed once " +
-                "migration to drivers is completed."
-        )
-    }
-
     companion object {
         private val NO_OP_RESULT_ADAPTER =
             object : QueryResultAdapter(emptyList()) {

@@ -79,20 +79,4 @@ class InstantInsertOrUpsertMethodBinder(adapter: InsertOrUpsertMethodAdapter?) :
             }
         scope.builder.add("$returnPrefix%L", performBlock)
     }
-
-    override fun convertAndReturnCompat(
-        parameters: List<ShortcutQueryParameter>,
-        adapters: Map<String, Pair<XPropertySpec, Any>>,
-        dbProperty: XPropertySpec,
-        scope: CodeGenScope
-    ) {
-        adapter?.generateMethodBodyCompat(
-            parameters = parameters,
-            adapters = adapters,
-            dbProperty = dbProperty,
-            scope = scope
-        )
-    }
-
-    override fun isMigratedToDriver() = true
 }

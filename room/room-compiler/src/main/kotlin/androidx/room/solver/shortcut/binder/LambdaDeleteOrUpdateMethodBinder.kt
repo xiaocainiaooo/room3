@@ -75,15 +75,4 @@ class LambdaDeleteOrUpdateMethodBinder(
             )
         scope.builder.add("return %L", performBlock)
     }
-
-    override fun convertAndReturnCompat(
-        parameters: List<ShortcutQueryParameter>,
-        adapters: Map<String, Pair<XPropertySpec, XTypeSpec>>,
-        dbProperty: XPropertySpec,
-        scope: CodeGenScope
-    ) {
-        error("Wrong executeAndReturn invoked")
-    }
-
-    override fun isMigratedToDriver() = true
 }

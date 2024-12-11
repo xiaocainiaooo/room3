@@ -17,7 +17,6 @@
 package androidx.room.writer
 
 import androidx.room.compiler.codegen.XCodeBlock
-import androidx.room.compiler.codegen.XPropertySpec
 import androidx.room.ext.RoomTypeNames
 import androidx.room.vo.Pojo
 import androidx.room.vo.ShortcutEntity
@@ -29,25 +28,10 @@ class EntityUpsertAdapterWriter private constructor(val tableName: String, val p
         }
     }
 
-    fun createConcrete(
-        entity: ShortcutEntity,
-        typeWriter: TypeWriter,
-        dbProperty: XPropertySpec,
-        useDriverApi: Boolean
-    ): XCodeBlock {
-        val upsertAdapter =
-            if (useDriverApi) {
-                    RoomTypeNames.UPSERT_ADAPTER
-                } else {
-                    RoomTypeNames.UPSERT_ADAPTER_COMPAT
-                }
-                .parametrizedBy(pojo.typeName)
-        val insertHelper =
-            EntityInsertAdapterWriter.create(entity, "")
-                .createAnonymous(typeWriter, dbProperty, useDriverApi)
-        val updateHelper =
-            EntityUpdateAdapterWriter.create(entity, "")
-                .createAnonymous(typeWriter, dbProperty.name, useDriverApi)
+    fun createConcrete(entity: ShortcutEntity, typeWriter: TypeWriter): XCodeBlock {
+        val upsertAdapter = RoomTypeNames.UPSERT_ADAPTER.parametrizedBy(pojo.typeName)
+        val insertHelper = EntityInsertAdapterWriter.create(entity, "").createAnonymous(typeWriter)
+        val updateHelper = EntityUpdateAdapterWriter.create(entity, "").createAnonymous(typeWriter)
         return XCodeBlock.ofNewInstance(
             typeName = upsertAdapter,
             argsFormat = "%L, %L",

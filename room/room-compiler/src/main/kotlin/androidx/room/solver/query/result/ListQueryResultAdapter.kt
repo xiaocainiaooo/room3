@@ -53,8 +53,7 @@ class ListQueryResultAdapter(private val typeArg: XType, private val rowAdapter:
             }
             .apply {
                 val tmpVarName = scope.getTmpVar("_item")
-                val stepName = if (scope.useDriverApi) "step" else "moveToNext"
-                beginControlFlow("while (%L.$stepName())", cursorVarName).apply {
+                beginControlFlow("while (%L.step())", cursorVarName).apply {
                     addLocalVariable(name = tmpVarName, typeName = typeArg.asTypeName())
                     rowAdapter.convert(tmpVarName, cursorVarName, scope)
                     addStatement("%L.add(%L)", outVarName, tmpVarName)
@@ -62,6 +61,4 @@ class ListQueryResultAdapter(private val typeArg: XType, private val rowAdapter:
                 endControlFlow()
             }
     }
-
-    override fun isMigratedToDriver(): Boolean = rowAdapter.isMigratedToDriver()
 }
