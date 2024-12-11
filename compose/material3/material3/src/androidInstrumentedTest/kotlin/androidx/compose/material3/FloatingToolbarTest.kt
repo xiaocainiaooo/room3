@@ -33,9 +33,9 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.FloatingAppBarDefaults.floatingToolbarVerticalNestedScroll
-import androidx.compose.material3.FloatingAppBarExitDirection.Companion.Bottom
-import androidx.compose.material3.FloatingAppBarExitDirection.Companion.End
+import androidx.compose.material3.FloatingToolbarDefaults.floatingToolbarVerticalNestedScroll
+import androidx.compose.material3.FloatingToolbarExitDirection.Companion.Bottom
+import androidx.compose.material3.FloatingToolbarExitDirection.Companion.End
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -79,31 +79,32 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-class FloatingAppBarTest {
+class FloatingToolbarTest {
 
     @get:Rule val rule = createComposeRule()
 
     @Test
-    fun horizontalFloatingAppBar_scrolledPositioning() {
-        lateinit var scrollBehavior: FloatingAppBarScrollBehavior
+    fun horizontalFloatingToolbar_scrolledPositioning() {
+        lateinit var scrollBehavior: FloatingToolbarScrollBehavior
         var backgroundColor = Color.Unspecified
         var containerColor = Color.Unspecified
         val scrollHeightOffsetDp = 20.dp
         var scrollHeightOffsetPx = 0f
         var containerSizePx = 0f
-        val screenOffsetDp = FloatingAppBarDefaults.ScreenOffset
+        val screenOffsetDp = FloatingToolbarDefaults.ScreenOffset
         var screenOffsetPx = 0f
 
         rule.setMaterialContent(lightColorScheme()) {
             backgroundColor = MaterialTheme.colorScheme.background
-            containerColor = FloatingAppBarDefaults.ContainerColor
-            scrollBehavior = FloatingAppBarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
+            containerColor = FloatingToolbarDefaults.ContainerColor
+            scrollBehavior =
+                FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
             scrollHeightOffsetPx = with(LocalDensity.current) { scrollHeightOffsetDp.toPx() }
             containerSizePx =
-                with(LocalDensity.current) { FloatingAppBarDefaults.ContainerSize.toPx() }
+                with(LocalDensity.current) { FloatingToolbarDefaults.ContainerSize.toPx() }
             screenOffsetPx = with(LocalDensity.current) { screenOffsetDp.toPx() }
-            HorizontalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag).offset(y = -screenOffsetDp),
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag).offset(y = -screenOffsetDp),
                 expanded = false,
                 scrollBehavior = scrollBehavior,
                 shape = RectangleShape,
@@ -122,7 +123,7 @@ class FloatingAppBarTest {
             scrollBehavior.state.contentOffset = -scrollHeightOffsetPx
         }
         rule.waitForIdle()
-        rule.onNodeWithTag(FloatingAppBarTestTag).captureToImage().assertPixels(null) { pos ->
+        rule.onNodeWithTag(FloatingToolbarTestTag).captureToImage().assertPixels(null) { pos ->
             val scrolled = (scrollHeightOffsetPx - screenOffsetPx).roundToInt()
             when (pos.y) {
                 0 -> backgroundColor
@@ -134,26 +135,26 @@ class FloatingAppBarTest {
     }
 
     @Test
-    fun verticalFloatingAppBar_scrolledPositioning() {
-        lateinit var scrollBehavior: FloatingAppBarScrollBehavior
+    fun verticalFloatingToolbar_scrolledPositioning() {
+        lateinit var scrollBehavior: FloatingToolbarScrollBehavior
         var backgroundColor = Color.Unspecified
         var containerColor = Color.Unspecified
         val scrollHeightOffsetDp = 20.dp
         var scrollHeightOffsetPx = 0f
         var containerSizePx = 0f
-        val screenOffsetDp = FloatingAppBarDefaults.ScreenOffset
+        val screenOffsetDp = FloatingToolbarDefaults.ScreenOffset
         var screenOffsetPx = 0f
 
         rule.setMaterialContent(lightColorScheme()) {
             backgroundColor = MaterialTheme.colorScheme.background
-            containerColor = FloatingAppBarDefaults.ContainerColor
-            scrollBehavior = FloatingAppBarDefaults.exitAlwaysScrollBehavior(exitDirection = End)
+            containerColor = FloatingToolbarDefaults.ContainerColor
+            scrollBehavior = FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = End)
             scrollHeightOffsetPx = with(LocalDensity.current) { scrollHeightOffsetDp.toPx() }
             containerSizePx =
-                with(LocalDensity.current) { FloatingAppBarDefaults.ContainerSize.toPx() }
+                with(LocalDensity.current) { FloatingToolbarDefaults.ContainerSize.toPx() }
             screenOffsetPx = with(LocalDensity.current) { screenOffsetDp.toPx() }
-            VerticalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag).offset(x = -screenOffsetDp),
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag).offset(x = -screenOffsetDp),
                 expanded = false,
                 scrollBehavior = scrollBehavior,
                 shape = RectangleShape,
@@ -172,7 +173,7 @@ class FloatingAppBarTest {
             scrollBehavior.state.contentOffset = -scrollHeightOffsetPx
         }
         rule.waitForIdle()
-        rule.onNodeWithTag(FloatingAppBarTestTag).captureToImage().assertPixels(null) { pos ->
+        rule.onNodeWithTag(FloatingToolbarTestTag).captureToImage().assertPixels(null) { pos ->
             val scrolled = (scrollHeightOffsetPx - screenOffsetPx).roundToInt()
             when (pos.x) {
                 0 -> backgroundColor
@@ -184,12 +185,12 @@ class FloatingAppBarTest {
     }
 
     @Test
-    fun horizontalFloatingAppBar_transparentContainerColor() {
-        val expectedColorBehindAppBar: Color = Color.Red
+    fun horizontalFloatingToolbar_transparentContainerColor() {
+        val expectedColorBehindToolbar: Color = Color.Red
         rule.setMaterialContent(lightColorScheme()) {
-            Box(modifier = Modifier.background(color = expectedColorBehindAppBar)) {
-                HorizontalFloatingAppBar(
-                    modifier = Modifier.testTag(FloatingAppBarTestTag),
+            Box(modifier = Modifier.background(color = expectedColorBehindToolbar)) {
+                HorizontalFloatingToolbar(
+                    modifier = Modifier.testTag(FloatingToolbarTestTag),
                     expanded = false,
                     containerColor = Color.Transparent,
                     content = {
@@ -202,18 +203,18 @@ class FloatingAppBarTest {
         }
 
         rule
-            .onNodeWithTag(FloatingAppBarTestTag)
+            .onNodeWithTag(FloatingToolbarTestTag)
             .captureToImage()
-            .assertContainsColor(expectedColorBehindAppBar)
+            .assertContainsColor(expectedColorBehindToolbar)
     }
 
     @Test
-    fun verticalFloatingAppBar_transparentContainerColor() {
-        val expectedColorBehindAppBar: Color = Color.Red
+    fun verticalFloatingToolbar_transparentContainerColor() {
+        val expectedColorBehindToolbar: Color = Color.Red
         rule.setMaterialContent(lightColorScheme()) {
-            Box(modifier = Modifier.background(color = expectedColorBehindAppBar)) {
-                VerticalFloatingAppBar(
-                    modifier = Modifier.testTag(FloatingAppBarTestTag),
+            Box(modifier = Modifier.background(color = expectedColorBehindToolbar)) {
+                VerticalFloatingToolbar(
+                    modifier = Modifier.testTag(FloatingToolbarTestTag),
                     expanded = false,
                     containerColor = Color.Transparent,
                     content = {
@@ -226,17 +227,17 @@ class FloatingAppBarTest {
         }
 
         rule
-            .onNodeWithTag(FloatingAppBarTestTag)
+            .onNodeWithTag(FloatingToolbarTestTag)
             .captureToImage()
-            .assertContainsColor(expectedColorBehindAppBar)
+            .assertContainsColor(expectedColorBehindToolbar)
     }
 
     @Test
-    fun horizontalFloatingAppBar_customContentPadding() {
+    fun horizontalFloatingToolbar_customContentPadding() {
         val expectedPadding: Dp = 20.dp
         rule.setMaterialContent(lightColorScheme()) {
-            HorizontalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 expanded = false,
                 contentPadding = PaddingValues(expectedPadding),
                 content = {
@@ -248,17 +249,17 @@ class FloatingAppBarTest {
         }
 
         rule
-            .onNodeWithTag(FloatingAppBarTestTag)
+            .onNodeWithTag(FloatingToolbarTestTag)
             .onChild()
             .assertTopPositionInRootIsEqualTo(expectedPadding)
     }
 
     @Test
-    fun verticalFloatingAppBar_customContentPadding() {
+    fun verticalFloatingToolbar_customContentPadding() {
         val expectedPadding: Dp = 20.dp
         rule.setMaterialContent(lightColorScheme()) {
-            VerticalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 expanded = false,
                 contentPadding = PaddingValues(expectedPadding),
                 content = {
@@ -270,16 +271,16 @@ class FloatingAppBarTest {
         }
 
         rule
-            .onNodeWithTag(FloatingAppBarTestTag)
+            .onNodeWithTag(FloatingToolbarTestTag)
             .onChild()
             .assertLeftPositionInRootIsEqualTo(expectedPadding)
     }
 
     @Test
-    fun horizontalFloatingAppBar_trailingContent_expanded() {
+    fun horizontalFloatingToolbar_trailingContent_expanded() {
         rule.setMaterialContent(lightColorScheme()) {
-            HorizontalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 expanded = true,
                 trailingContent = {
                     IconButton(onClick = { /* doSomething() */ }) {
@@ -290,15 +291,15 @@ class FloatingAppBarTest {
             )
         }
 
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildren().assertCountEquals(1)
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChild().assertExists()
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(1)
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertExists()
     }
 
     @Test
-    fun horizontalFloatingAppBar_trailingContent_notExpanded() {
+    fun horizontalFloatingToolbar_trailingContent_notExpanded() {
         rule.setMaterialContent(lightColorScheme()) {
-            HorizontalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 expanded = false,
                 trailingContent = {
                     IconButton(onClick = { /* doSomething() */ }) {
@@ -309,15 +310,15 @@ class FloatingAppBarTest {
             )
         }
 
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildren().assertCountEquals(0)
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChild().assertDoesNotExist()
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(0)
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertDoesNotExist()
     }
 
     @Test
-    fun horizontalFloatingAppBar_leadingContent_expanded() {
+    fun horizontalFloatingToolbar_leadingContent_expanded() {
         rule.setMaterialContent(lightColorScheme()) {
-            HorizontalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 expanded = true,
                 leadingContent = {
                     IconButton(onClick = { /* doSomething() */ }) {
@@ -328,15 +329,15 @@ class FloatingAppBarTest {
             )
         }
 
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildren().assertCountEquals(1)
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChild().assertExists()
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(1)
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertExists()
     }
 
     @Test
-    fun horizontalFloatingAppBar_leadingContent_notExpanded() {
+    fun horizontalFloatingToolbar_leadingContent_notExpanded() {
         rule.setMaterialContent(lightColorScheme()) {
-            HorizontalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 expanded = false,
                 leadingContent = {
                     IconButton(onClick = { /* doSomething() */ }) {
@@ -347,140 +348,15 @@ class FloatingAppBarTest {
             )
         }
 
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildren().assertCountEquals(0)
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChild().assertDoesNotExist()
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(0)
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertDoesNotExist()
     }
 
     @Test
-    fun horizontalFloatingAppBar_leadingAndTrailingContent_expanded() {
+    fun horizontalFloatingToolbar_leadingAndTrailingContent_expanded() {
         rule.setMaterialContent(lightColorScheme()) {
-            HorizontalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
-                expanded = true,
-                leadingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                trailingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
-            )
-        }
-
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildren().assertCountEquals(2)
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildAt(0).assertExists()
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildAt(1).assertExists()
-    }
-
-    @Test
-    fun horizontalFloatingAppBar_leadingAndTrailingContent_notExpanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            HorizontalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
-                expanded = false,
-                leadingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                trailingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
-            )
-        }
-
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildren().assertCountEquals(0)
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChild().assertDoesNotExist()
-    }
-
-    @Test
-    fun verticalFloatingAppBar_trailingContent_expanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            VerticalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
-                expanded = true,
-                trailingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
-            )
-        }
-
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildren().assertCountEquals(1)
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChild().assertExists()
-    }
-
-    @Test
-    fun verticalFloatingAppBar_trailingContent_notExpanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            VerticalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
-                expanded = false,
-                trailingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
-            )
-        }
-
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildren().assertCountEquals(0)
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChild().assertDoesNotExist()
-    }
-
-    @Test
-    fun verticalFloatingAppBar_leadingContent_expanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            VerticalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
-                expanded = true,
-                leadingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
-            )
-        }
-
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildren().assertCountEquals(1)
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChild().assertExists()
-    }
-
-    @Test
-    fun verticalFloatingAppBar_leadingContent_notExpanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            VerticalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
-                expanded = false,
-                leadingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
-            )
-        }
-
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildren().assertCountEquals(0)
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChild().assertDoesNotExist()
-    }
-
-    @Test
-    fun verticalFloatingAppBar_leadingAndTrailingContent_expanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            VerticalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 expanded = true,
                 leadingContent = {
                     IconButton(onClick = { /* doSomething() */ }) {
@@ -496,16 +372,16 @@ class FloatingAppBarTest {
             )
         }
 
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildren().assertCountEquals(2)
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildAt(0).assertExists()
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildAt(1).assertExists()
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(2)
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildAt(0).assertExists()
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildAt(1).assertExists()
     }
 
     @Test
-    fun verticalFloatingAppBar_leadingAndTrailingContent_notExpanded() {
+    fun horizontalFloatingToolbar_leadingAndTrailingContent_notExpanded() {
         rule.setMaterialContent(lightColorScheme()) {
-            VerticalFloatingAppBar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 expanded = false,
                 leadingContent = {
                     IconButton(onClick = { /* doSomething() */ }) {
@@ -521,30 +397,155 @@ class FloatingAppBarTest {
             )
         }
 
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChildren().assertCountEquals(0)
-        rule.onNodeWithTag(FloatingAppBarTestTag).onChild().assertDoesNotExist()
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(0)
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertDoesNotExist()
     }
 
     @Test
-    fun state_restoresFloatingAppBarState() {
+    fun verticalFloatingToolbar_trailingContent_expanded() {
+        rule.setMaterialContent(lightColorScheme()) {
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = true,
+                trailingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(1)
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertExists()
+    }
+
+    @Test
+    fun verticalFloatingToolbar_trailingContent_notExpanded() {
+        rule.setMaterialContent(lightColorScheme()) {
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = false,
+                trailingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(0)
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertDoesNotExist()
+    }
+
+    @Test
+    fun verticalFloatingToolbar_leadingContent_expanded() {
+        rule.setMaterialContent(lightColorScheme()) {
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = true,
+                leadingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(1)
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertExists()
+    }
+
+    @Test
+    fun verticalFloatingToolbar_leadingContent_notExpanded() {
+        rule.setMaterialContent(lightColorScheme()) {
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = false,
+                leadingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(0)
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertDoesNotExist()
+    }
+
+    @Test
+    fun verticalFloatingToolbar_leadingAndTrailingContent_expanded() {
+        rule.setMaterialContent(lightColorScheme()) {
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = true,
+                leadingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                    }
+                },
+                trailingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(2)
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildAt(0).assertExists()
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildAt(1).assertExists()
+    }
+
+    @Test
+    fun verticalFloatingToolbar_leadingAndTrailingContent_notExpanded() {
+        rule.setMaterialContent(lightColorScheme()) {
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = false,
+                leadingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                    }
+                },
+                trailingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(0)
+        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertDoesNotExist()
+    }
+
+    @Test
+    fun state_restoresFloatingToolbarState() {
         val restorationTester = StateRestorationTester(rule)
-        var floatingAppBarState: FloatingAppBarState? = null
-        restorationTester.setContent { floatingAppBarState = rememberFloatingAppBarState() }
+        var floatingToolbarState: FloatingToolbarState? = null
+        restorationTester.setContent { floatingToolbarState = rememberFloatingToolbarState() }
 
         rule.runOnIdle {
-            floatingAppBarState!!.offsetLimit = -350f
-            floatingAppBarState!!.offset = -300f
-            floatingAppBarState!!.contentOffset = -550f
+            floatingToolbarState!!.offsetLimit = -350f
+            floatingToolbarState!!.offset = -300f
+            floatingToolbarState!!.contentOffset = -550f
         }
 
-        floatingAppBarState = null
+        floatingToolbarState = null
 
         restorationTester.emulateSavedInstanceStateRestore()
 
         rule.runOnIdle {
-            assertThat(floatingAppBarState!!.offsetLimit).isEqualTo(-350f)
-            assertThat(floatingAppBarState!!.offset).isEqualTo(-300f)
-            assertThat(floatingAppBarState!!.contentOffset).isEqualTo(-550f)
+            assertThat(floatingToolbarState!!.offsetLimit).isEqualTo(-350f)
+            assertThat(floatingToolbarState!!.offset).isEqualTo(-300f)
+            assertThat(floatingToolbarState!!.contentOffset).isEqualTo(-550f)
         }
     }
 
@@ -553,7 +554,7 @@ class FloatingAppBarTest {
         var expanded by mutableStateOf(false)
         rule.setMaterialContent(lightColorScheme()) {
             HorizontalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 expanded = expanded,
                 floatingActionButton = { ToolbarFab() },
             ) {
@@ -564,17 +565,17 @@ class FloatingAppBarTest {
         // When collapsed, check that the FAB is in its largest size.
         rule
             .onNodeWithTag(FloatingActionButtonTestTag)
-            .assertIsSquareWithSize(FloatingAppBarDefaults.FabSizeRange.endInclusive)
+            .assertIsSquareWithSize(FloatingToolbarDefaults.FabSizeRange.endInclusive)
 
         // Check a sampled item from the content to ensure it's not visible.
         rule.onNodeWithTag(FloatingToolbarContentLastItemTestTag).assertIsNotDisplayed()
 
         val componentWidth =
-            FloatingAppBarDefaults.FabSizeRange.endInclusive +
+            FloatingToolbarDefaults.FabSizeRange.endInclusive +
                 /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
-                FloatingAppBarDefaults.ToolbarToFabGap
+                FloatingToolbarDefaults.ToolbarToFabGap
         // The total size of the component still the total size of all the elements.
-        rule.onNodeWithTag(FloatingAppBarTestTag).assertWidthIsEqualTo(componentWidth)
+        rule.onNodeWithTag(FloatingToolbarTestTag).assertWidthIsEqualTo(componentWidth)
 
         // Expand the component.
         expanded = true
@@ -583,20 +584,20 @@ class FloatingAppBarTest {
         // When expanded, check that the FAB is in its smallest size.
         rule
             .onNodeWithTag(FloatingActionButtonTestTag)
-            .assertIsSquareWithSize(FloatingAppBarDefaults.FabSizeRange.start)
+            .assertIsSquareWithSize(FloatingToolbarDefaults.FabSizeRange.start)
         // Check a sampled item from the content to ensure it's visible.
         rule.onNodeWithTag(FloatingToolbarContentLastItemTestTag).assertIsDisplayed()
         // The total size of the component still the total size of all the elements.
-        rule.onNodeWithTag(FloatingAppBarTestTag).assertWidthIsEqualTo(componentWidth)
+        rule.onNodeWithTag(FloatingToolbarTestTag).assertWidthIsEqualTo(componentWidth)
     }
 
     @Test
     fun horizontalFloatingToolbar_customContentColor() {
         rule.setMaterialContent(lightColorScheme()) {
             HorizontalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 colors =
-                    FloatingAppBarDefaults.standardFloatingToolbarColors(
+                    FloatingToolbarDefaults.standardFloatingToolbarColors(
                         toolbarContainerColor = Color.Blue
                     ),
                 expanded = true,
@@ -606,14 +607,14 @@ class FloatingAppBarTest {
             }
         }
 
-        rule.onNodeWithTag(FloatingAppBarTestTag).captureToImage().assertContainsColor(Color.Blue)
+        rule.onNodeWithTag(FloatingToolbarTestTag).captureToImage().assertContainsColor(Color.Blue)
     }
 
     @Test
     fun horizontalFloatingToolbar_defaultContentPadding() {
         rule.setMaterialContent(lightColorScheme()) {
             HorizontalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 expanded = true,
                 // Set a RectangleShape to get an accurate padding measure without the default
                 // rounded shape influence over the size.
@@ -625,19 +626,19 @@ class FloatingAppBarTest {
         }
 
         val componentWidth =
-            FloatingAppBarDefaults.ContentPaddingWithFloatingActionButton * 2 +
-                FloatingAppBarDefaults.FabSizeRange.start +
+            FloatingToolbarDefaults.ContentPaddingWithFloatingActionButton * 2 +
+                FloatingToolbarDefaults.FabSizeRange.start +
                 /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
-                FloatingAppBarDefaults.ToolbarToFabGap
-        rule.onNodeWithTag(FloatingAppBarTestTag).assertWidthIsEqualTo(componentWidth)
+                FloatingToolbarDefaults.ToolbarToFabGap
+        rule.onNodeWithTag(FloatingToolbarTestTag).assertWidthIsEqualTo(componentWidth)
     }
 
     @Test
-    fun horizontalFloatingToolbar_customContentPadding() {
+    fun horizontalFloatingToolbar_withFab_customContentPadding() {
         val padding = 64.dp
         rule.setMaterialContent(lightColorScheme()) {
             HorizontalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 contentPadding = PaddingValues(horizontal = padding),
                 expanded = true,
                 floatingActionButton = { ToolbarFab() },
@@ -648,10 +649,10 @@ class FloatingAppBarTest {
 
         val componentWidth =
             padding * 2 +
-                FloatingAppBarDefaults.FabSizeRange.start +
+                FloatingToolbarDefaults.FabSizeRange.start +
                 /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
-                FloatingAppBarDefaults.ToolbarToFabGap
-        rule.onNodeWithTag(FloatingAppBarTestTag).assertWidthIsEqualTo(componentWidth)
+                FloatingToolbarDefaults.ToolbarToFabGap
+        rule.onNodeWithTag(FloatingToolbarTestTag).assertWidthIsEqualTo(componentWidth)
     }
 
     @Test
@@ -659,7 +660,7 @@ class FloatingAppBarTest {
         var expanded by mutableStateOf(false)
         rule.setMaterialContent(lightColorScheme()) {
             VerticalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 expanded = expanded,
                 floatingActionButton = { ToolbarFab() },
             ) {
@@ -670,17 +671,17 @@ class FloatingAppBarTest {
         // When collapsed, check that the FAB is in its largest size.
         rule
             .onNodeWithTag(FloatingActionButtonTestTag)
-            .assertIsSquareWithSize(FloatingAppBarDefaults.FabSizeRange.endInclusive)
+            .assertIsSquareWithSize(FloatingToolbarDefaults.FabSizeRange.endInclusive)
 
         // Check a sampled item from the content to ensure it's not visible.
         rule.onNodeWithTag(FloatingToolbarContentLastItemTestTag).assertIsNotDisplayed()
 
         val componentHeight =
-            FloatingAppBarDefaults.FabSizeRange.endInclusive +
+            FloatingToolbarDefaults.FabSizeRange.endInclusive +
                 /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
-                FloatingAppBarDefaults.ToolbarToFabGap
+                FloatingToolbarDefaults.ToolbarToFabGap
         // The total size of the component still the total size of all the elements.
-        rule.onNodeWithTag(FloatingAppBarTestTag).assertHeightIsEqualTo(componentHeight)
+        rule.onNodeWithTag(FloatingToolbarTestTag).assertHeightIsEqualTo(componentHeight)
 
         // Expand the component.
         expanded = true
@@ -689,20 +690,20 @@ class FloatingAppBarTest {
         // When expanded, check that the FAB is in its smallest size.
         rule
             .onNodeWithTag(FloatingActionButtonTestTag)
-            .assertIsSquareWithSize(FloatingAppBarDefaults.FabSizeRange.start)
+            .assertIsSquareWithSize(FloatingToolbarDefaults.FabSizeRange.start)
         // Check a sampled item from the content to ensure it's visible.
         rule.onNodeWithTag(FloatingToolbarContentLastItemTestTag).assertIsDisplayed()
         // The total size of the component still the total size of all the elements.
-        rule.onNodeWithTag(FloatingAppBarTestTag).assertHeightIsEqualTo(componentHeight)
+        rule.onNodeWithTag(FloatingToolbarTestTag).assertHeightIsEqualTo(componentHeight)
     }
 
     @Test
     fun verticalFloatingToolbar_customContentColor() {
         rule.setMaterialContent(lightColorScheme()) {
             VerticalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 colors =
-                    FloatingAppBarDefaults.standardFloatingToolbarColors(
+                    FloatingToolbarDefaults.standardFloatingToolbarColors(
                         toolbarContainerColor = Color.Blue
                     ),
                 expanded = true,
@@ -712,14 +713,14 @@ class FloatingAppBarTest {
             }
         }
 
-        rule.onNodeWithTag(FloatingAppBarTestTag).captureToImage().assertContainsColor(Color.Blue)
+        rule.onNodeWithTag(FloatingToolbarTestTag).captureToImage().assertContainsColor(Color.Blue)
     }
 
     @Test
     fun verticalFloatingToolbar_defaultContentPadding() {
         rule.setMaterialContent(lightColorScheme()) {
             VerticalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 expanded = true,
                 // Set a RectangleShape to get an accurate padding measure without the default
                 // rounded shape influence over the size.
@@ -731,19 +732,19 @@ class FloatingAppBarTest {
         }
 
         val componentHeight =
-            FloatingAppBarDefaults.ContentPaddingWithFloatingActionButton * 2 +
-                FloatingAppBarDefaults.FabSizeRange.start +
+            FloatingToolbarDefaults.ContentPaddingWithFloatingActionButton * 2 +
+                FloatingToolbarDefaults.FabSizeRange.start +
                 /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
-                FloatingAppBarDefaults.ToolbarToFabGap
-        rule.onNodeWithTag(FloatingAppBarTestTag).assertHeightIsEqualTo(componentHeight)
+                FloatingToolbarDefaults.ToolbarToFabGap
+        rule.onNodeWithTag(FloatingToolbarTestTag).assertHeightIsEqualTo(componentHeight)
     }
 
     @Test
-    fun verticalFloatingToolbar_customContentPadding() {
+    fun verticalFloatingToolbar_withFab_customContentPadding() {
         val padding = 64.dp
         rule.setMaterialContent(lightColorScheme()) {
             VerticalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
                 contentPadding = PaddingValues(vertical = padding),
                 expanded = true,
                 floatingActionButton = { ToolbarFab() },
@@ -754,10 +755,10 @@ class FloatingAppBarTest {
 
         val componentHeight =
             padding * 2 +
-                FloatingAppBarDefaults.FabSizeRange.start +
+                FloatingToolbarDefaults.FabSizeRange.start +
                 /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
-                FloatingAppBarDefaults.ToolbarToFabGap
-        rule.onNodeWithTag(FloatingAppBarTestTag).assertHeightIsEqualTo(componentHeight)
+                FloatingToolbarDefaults.ToolbarToFabGap
+        rule.onNodeWithTag(FloatingToolbarTestTag).assertHeightIsEqualTo(componentHeight)
     }
 
     private val mainLayoutTag = "mainLayout"
@@ -858,7 +859,9 @@ class FloatingAppBarTest {
                 initialValue = expanded
             )
             thresholdPx =
-                with(LocalDensity.current) { FloatingAppBarDefaults.ScrollDistanceThreshold.toPx() }
+                with(LocalDensity.current) {
+                    FloatingToolbarDefaults.ScrollDistanceThreshold.toPx()
+                }
         }
 
         assertThat(expanded).isEqualTo(true)
@@ -948,7 +951,7 @@ class FloatingAppBarTest {
     @Composable
     private fun ToolbarFab() {
 
-        FloatingAppBarDefaults.StandardFloatingActionButton(
+        FloatingToolbarDefaults.StandardFloatingActionButton(
             modifier = Modifier.testTag(FloatingActionButtonTestTag),
             onClick = { /* doSomething() */ },
         ) {
@@ -976,7 +979,7 @@ class FloatingAppBarTest {
     }
 
     private val MinTouchTarget = 48.dp
-    private val FloatingAppBarTestTag = "floatingAppBar"
+    private val FloatingToolbarTestTag = "floatingToolbar"
     private val FloatingActionButtonTestTag = "floatingActionButton"
     private val FloatingToolbarContentLastItemTestTag = "floatingToolbarContentLastItem"
 }

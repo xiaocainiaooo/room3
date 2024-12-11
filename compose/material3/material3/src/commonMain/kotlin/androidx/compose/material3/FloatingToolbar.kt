@@ -49,14 +49,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.FloatingAppBarDefaults.horizontalEnterTransition
-import androidx.compose.material3.FloatingAppBarDefaults.horizontalExitTransition
-import androidx.compose.material3.FloatingAppBarDefaults.verticalEnterTransition
-import androidx.compose.material3.FloatingAppBarDefaults.verticalExitTransition
-import androidx.compose.material3.FloatingAppBarExitDirection.Companion.Bottom
-import androidx.compose.material3.FloatingAppBarExitDirection.Companion.End
-import androidx.compose.material3.FloatingAppBarExitDirection.Companion.Start
-import androidx.compose.material3.FloatingAppBarExitDirection.Companion.Top
+import androidx.compose.material3.FloatingToolbarDefaults.horizontalEnterTransition
+import androidx.compose.material3.FloatingToolbarDefaults.horizontalExitTransition
+import androidx.compose.material3.FloatingToolbarDefaults.verticalEnterTransition
+import androidx.compose.material3.FloatingToolbarDefaults.verticalExitTransition
+import androidx.compose.material3.FloatingToolbarExitDirection.Companion.Bottom
+import androidx.compose.material3.FloatingToolbarExitDirection.Companion.End
+import androidx.compose.material3.FloatingToolbarExitDirection.Companion.Start
+import androidx.compose.material3.FloatingToolbarExitDirection.Companion.Top
 import androidx.compose.material3.tokens.ColorSchemeKeyTokens
 import androidx.compose.material3.tokens.ElevationTokens
 import androidx.compose.material3.tokens.FabBaselineTokens
@@ -104,36 +104,36 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
- * A horizontal floating app bar displays navigation and key actions in a [Row]. It can be
+ * A horizontal floating toolbar displays navigation and key actions in a [Row]. It can be
  * positioned anywhere on the screen and floats over the rest of the content.
  *
- * @sample androidx.compose.material3.samples.ExpandableHorizontalFloatingAppBarSample
- * @sample androidx.compose.material3.samples.ScrollableHorizontalFloatingAppBarSample
- * @param expanded whether the FloatingAppBar is in expanded mode, i.e. showing [leadingContent] and
- *   [trailingContent].
- * @param modifier the [Modifier] to be applied to this FloatingAppBar.
- * @param containerColor the color used for the background of this FloatingAppBar. Use
+ * @sample androidx.compose.material3.samples.ExpandableHorizontalFloatingToolbarSample
+ * @sample androidx.compose.material3.samples.ScrollableHorizontalFloatingToolbarSample
+ * @param expanded whether the FloatingToolbar is in expanded mode, i.e. showing [leadingContent]
+ *   and [trailingContent].
+ * @param modifier the [Modifier] to be applied to this FloatingToolbar.
+ * @param containerColor the color used for the background of this FloatingToolbar. Use
  *   [Color.Transparent] to have no color.
- * @param contentPadding the padding applied to the content of this FloatingAppBar.
- * @param scrollBehavior a [FloatingAppBarScrollBehavior]. If null, this FloatingAppBar will not
+ * @param contentPadding the padding applied to the content of this FloatingToolbar.
+ * @param scrollBehavior a [FloatingToolbarScrollBehavior]. If null, this FloatingToolbar will not
  *   automatically react to scrolling.
- * @param shape the shape used for this FloatingAppBar.
- * @param leadingContent the leading content of this FloatingAppBar. The default layout here is a
+ * @param shape the shape used for this FloatingToolbar.
+ * @param leadingContent the leading content of this FloatingToolbar. The default layout here is a
  *   [Row], so content inside will be placed horizontally. Only showing if [expanded] is true.
- * @param trailingContent the trailing content of this FloatingAppBar. The default layout here is a
+ * @param trailingContent the trailing content of this FloatingToolbar. The default layout here is a
  *   [Row], so content inside will be placed horizontally. Only showing if [expanded] is true.
- * @param content the main content of this FloatingAppBar. The default layout here is a [Row], so
+ * @param content the main content of this FloatingToolbar. The default layout here is a [Row], so
  *   content inside will be placed horizontally.
  */
 @ExperimentalMaterial3ExpressiveApi
 @Composable
-fun HorizontalFloatingAppBar(
+fun HorizontalFloatingToolbar(
     expanded: Boolean,
     modifier: Modifier = Modifier,
-    containerColor: Color = FloatingAppBarDefaults.ContainerColor,
-    contentPadding: PaddingValues = FloatingAppBarDefaults.ContentPadding,
-    scrollBehavior: FloatingAppBarScrollBehavior? = null,
-    shape: Shape = FloatingAppBarDefaults.ContainerShape,
+    containerColor: Color = FloatingToolbarDefaults.ContainerColor,
+    contentPadding: PaddingValues = FloatingToolbarDefaults.ContentPadding,
+    scrollBehavior: FloatingToolbarScrollBehavior? = null,
+    shape: Shape = FloatingToolbarDefaults.ContainerShape,
     leadingContent: @Composable (RowScope.() -> Unit)? = null,
     trailingContent: @Composable (RowScope.() -> Unit)? = null,
     content: @Composable RowScope.() -> Unit
@@ -146,7 +146,7 @@ fun HorizontalFloatingAppBar(
                     scrollBehavior?.let { with(it) { Modifier.floatingScrollBehavior() } }
                         ?: Modifier
                 )
-                .height(FloatingAppBarDefaults.ContainerSize)
+                .height(FloatingToolbarDefaults.ContainerSize)
                 .background(color = containerColor, shape = shape)
                 .padding(contentPadding),
         horizontalArrangement = Arrangement.Center,
@@ -191,12 +191,12 @@ fun HorizontalFloatingAppBar(
  * @param expanded whether the floating toolbar is expanded or not. In its expanded state, the FAB
  *   and the toolbar content are organized horizontally. Otherwise, only the FAB is visible.
  * @param floatingActionButton a floating action button to be displayed by the toolbar. It's
- *   recommended to use a [FloatingAppBarDefaults.VibrantFloatingActionButton] or
- *   [FloatingAppBarDefaults.StandardFloatingActionButton] that is styled to match the [colors].
+ *   recommended to use a [FloatingToolbarDefaults.VibrantFloatingActionButton] or
+ *   [FloatingToolbarDefaults.StandardFloatingActionButton] that is styled to match the [colors].
  * @param modifier the [Modifier] to be applied to this floating toolbar.
  * @param colors the colors used for this floating toolbar. There are two predefined
- *   [FloatingToolbarColors] at [FloatingAppBarDefaults.standardFloatingToolbarColors] and
- *   [FloatingAppBarDefaults.vibrantFloatingToolbarColors] which you can use or modify. See also
+ *   [FloatingToolbarColors] at [FloatingToolbarDefaults.standardFloatingToolbarColors] and
+ *   [FloatingToolbarDefaults.vibrantFloatingToolbarColors] which you can use or modify. See also
  *   [floatingActionButton] for more information on the right FAB to use for proper styling.
  * @param contentPadding the padding applied to the content of this floating toolbar.
  * @param shape the shape used for this floating toolbar content.
@@ -214,20 +214,20 @@ fun HorizontalFloatingToolbar(
     expanded: Boolean,
     floatingActionButton: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    colors: FloatingToolbarColors = FloatingAppBarDefaults.standardFloatingToolbarColors(),
+    colors: FloatingToolbarColors = FloatingToolbarDefaults.standardFloatingToolbarColors(),
     contentPadding: PaddingValues =
-        PaddingValues(horizontal = FloatingAppBarDefaults.ContentPaddingWithFloatingActionButton),
-    shape: Shape = FloatingAppBarDefaults.ContainerShape,
+        PaddingValues(horizontal = FloatingToolbarDefaults.ContentPaddingWithFloatingActionButton),
+    shape: Shape = FloatingToolbarDefaults.ContainerShape,
     floatingActionButtonPosition: FloatingToolbarHorizontalFabPosition =
         FloatingToolbarHorizontalFabPosition.End,
-    animationSpec: FiniteAnimationSpec<Float> = FloatingAppBarDefaults.animationSpec(),
+    animationSpec: FiniteAnimationSpec<Float> = FloatingToolbarDefaults.animationSpec(),
     content: @Composable RowScope.() -> Unit
 ) {
     HorizontalFloatingToolbarWithFabLayout(
         modifier = modifier,
         expanded = expanded,
         colors = colors,
-        toolbarToFabGap = FloatingAppBarDefaults.ToolbarToFabGap,
+        toolbarToFabGap = FloatingToolbarDefaults.ToolbarToFabGap,
         toolbarContentPadding = contentPadding,
         toolbarShape = shape,
         animationSpec = animationSpec,
@@ -238,36 +238,36 @@ fun HorizontalFloatingToolbar(
 }
 
 /**
- * A vertical floating app bar displays navigation and key actions in a [Column]. It can be
+ * A vertical floating toolbar displays navigation and key actions in a [Column]. It can be
  * positioned anywhere on the screen and floats over the rest of the content.
  *
- * @sample androidx.compose.material3.samples.ExpandableVerticalFloatingAppBarSample
- * @sample androidx.compose.material3.samples.ScrollableVerticalFloatingAppBarSample
- * @param expanded whether the FloatingAppBar is in expanded mode, i.e. showing [leadingContent] and
- *   [trailingContent].
- * @param modifier the [Modifier] to be applied to this FloatingAppBar.
- * @param containerColor the color used for the background of this FloatingAppBar. Use
+ * @sample androidx.compose.material3.samples.ExpandableVerticalFloatingToolbarSample
+ * @sample androidx.compose.material3.samples.ScrollableVerticalFloatingToolbarSample
+ * @param expanded whether the FloatingToolbar is in expanded mode, i.e. showing [leadingContent]
+ *   and [trailingContent].
+ * @param modifier the [Modifier] to be applied to this FloatingToolbar.
+ * @param containerColor the color used for the background of this FloatingToolbar. Use
  *   Color.Transparent] to have no color.
- * @param contentPadding the padding applied to the content of this FloatingAppBar.
- * @param scrollBehavior a [FloatingAppBarScrollBehavior]. If null, this FloatingAppBar will not
+ * @param contentPadding the padding applied to the content of this FloatingToolbar.
+ * @param scrollBehavior a [FloatingToolbarScrollBehavior]. If null, this FloatingToolbar will not
  *   automatically react to scrolling.
- * @param shape the shape used for this FloatingAppBar.
- * @param leadingContent the leading content of this FloatingAppBar. The default layout here is a
+ * @param shape the shape used for this FloatingToolbar.
+ * @param leadingContent the leading content of this FloatingToolbar. The default layout here is a
  *   [Column], so content inside will be placed vertically. Only showing if [expanded] is true.
- * @param trailingContent the trailing content of this FloatingAppBar. The default layout here is a
+ * @param trailingContent the trailing content of this FloatingToolbar. The default layout here is a
  *   [Column], so content inside will be placed vertically. Only showing if [expanded] is true.
- * @param content the main content of this FloatingAppBar. The default layout here is a [Column], so
- *   content inside will be placed vertically.
+ * @param content the main content of this FloatingToolbar. The default layout here is a [Column],
+ *   so content inside will be placed vertically.
  */
 @ExperimentalMaterial3ExpressiveApi
 @Composable
-fun VerticalFloatingAppBar(
+fun VerticalFloatingToolbar(
     expanded: Boolean,
     modifier: Modifier = Modifier,
-    containerColor: Color = FloatingAppBarDefaults.ContainerColor,
-    contentPadding: PaddingValues = FloatingAppBarDefaults.ContentPadding,
-    scrollBehavior: FloatingAppBarScrollBehavior? = null,
-    shape: Shape = FloatingAppBarDefaults.ContainerShape,
+    containerColor: Color = FloatingToolbarDefaults.ContainerColor,
+    contentPadding: PaddingValues = FloatingToolbarDefaults.ContentPadding,
+    scrollBehavior: FloatingToolbarScrollBehavior? = null,
+    shape: Shape = FloatingToolbarDefaults.ContainerShape,
     leadingContent: @Composable (ColumnScope.() -> Unit)? = null,
     trailingContent: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
@@ -279,7 +279,7 @@ fun VerticalFloatingAppBar(
                     scrollBehavior?.let { with(it) { Modifier.floatingScrollBehavior() } }
                         ?: Modifier
                 )
-                .width(FloatingAppBarDefaults.ContainerSize)
+                .width(FloatingToolbarDefaults.ContainerSize)
                 .background(color = containerColor, shape = shape)
                 .padding(contentPadding),
         verticalArrangement = Arrangement.Center,
@@ -317,12 +317,12 @@ fun VerticalFloatingAppBar(
  * @param expanded whether the floating toolbar is expanded or not. In its expanded state, the FAB
  *   and the toolbar content are organized vertically. Otherwise, only the FAB is visible.
  * @param floatingActionButton a floating action button to be displayed by the toolbar. It's
- *   recommended to use a [FloatingAppBarDefaults.VibrantFloatingActionButton] or
- *   [FloatingAppBarDefaults.StandardFloatingActionButton] that is styled to match the [colors].
+ *   recommended to use a [FloatingToolbarDefaults.VibrantFloatingActionButton] or
+ *   [FloatingToolbarDefaults.StandardFloatingActionButton] that is styled to match the [colors].
  * @param modifier the [Modifier] to be applied to this floating toolbar.
  * @param colors the colors used for this floating toolbar. There are two predefined
- *   [FloatingToolbarColors] at [FloatingAppBarDefaults.standardFloatingToolbarColors] and
- *   [FloatingAppBarDefaults.vibrantFloatingToolbarColors] which you can use or modify. See also
+ *   [FloatingToolbarColors] at [FloatingToolbarDefaults.standardFloatingToolbarColors] and
+ *   [FloatingToolbarDefaults.vibrantFloatingToolbarColors] which you can use or modify. See also
  *   [floatingActionButton] for more information on the right FAB to use for proper styling.
  * @param contentPadding the padding applied to the content of this floating toolbar.
  * @param shape the shape used for this floating toolbar content.
@@ -340,20 +340,20 @@ fun VerticalFloatingToolbar(
     expanded: Boolean,
     floatingActionButton: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    colors: FloatingToolbarColors = FloatingAppBarDefaults.standardFloatingToolbarColors(),
+    colors: FloatingToolbarColors = FloatingToolbarDefaults.standardFloatingToolbarColors(),
     contentPadding: PaddingValues =
-        PaddingValues(vertical = FloatingAppBarDefaults.ContentPaddingWithFloatingActionButton),
-    shape: Shape = FloatingAppBarDefaults.ContainerShape,
+        PaddingValues(vertical = FloatingToolbarDefaults.ContentPaddingWithFloatingActionButton),
+    shape: Shape = FloatingToolbarDefaults.ContainerShape,
     floatingActionButtonPosition: FloatingToolbarVerticalFabPosition =
         FloatingToolbarVerticalFabPosition.Bottom,
-    animationSpec: FiniteAnimationSpec<Float> = FloatingAppBarDefaults.animationSpec(),
+    animationSpec: FiniteAnimationSpec<Float> = FloatingToolbarDefaults.animationSpec(),
     content: @Composable ColumnScope.() -> Unit
 ) {
     VerticalFloatingToolbarWithFabLayout(
         modifier = modifier,
         expanded = expanded,
         colors = colors,
-        toolbarToFabGap = FloatingAppBarDefaults.ToolbarToFabGap,
+        toolbarToFabGap = FloatingToolbarDefaults.ToolbarToFabGap,
         toolbarContentPadding = contentPadding,
         toolbarShape = shape,
         animationSpec = animationSpec,
@@ -364,33 +364,33 @@ fun VerticalFloatingToolbar(
 }
 
 /**
- * A FloatingAppBarScrollBehavior defines how a floating app bar should behave when the content
+ * A FloatingToolbarScrollBehavior defines how a floating toolbar should behave when the content
  * under it is scrolled.
  *
- * @see [FloatingAppBarDefaults.exitAlwaysScrollBehavior]
+ * @see [FloatingToolbarDefaults.exitAlwaysScrollBehavior]
  */
 @ExperimentalMaterial3ExpressiveApi
 @Stable
-sealed interface FloatingAppBarScrollBehavior : NestedScrollConnection {
+sealed interface FloatingToolbarScrollBehavior : NestedScrollConnection {
 
-    /** Indicates the direction towards which the floating app bar exits the screen. */
-    val exitDirection: FloatingAppBarExitDirection
+    /** Indicates the direction towards which the floating toolbar exits the screen. */
+    val exitDirection: FloatingToolbarExitDirection
 
     /**
-     * A [FloatingAppBarState] that is attached to this behavior and is read and updated when
+     * A [FloatingToolbarState] that is attached to this behavior and is read and updated when
      * scrolling happens.
      */
-    val state: FloatingAppBarState
+    val state: FloatingToolbarState
 
     /**
-     * An [AnimationSpec] that defines how the floating app bar snaps to either fully collapsed or
+     * An [AnimationSpec] that defines how the floating toolbar snaps to either fully collapsed or
      * fully extended state when a fling or a drag scrolled it into an intermediate position.
      */
     val snapAnimationSpec: AnimationSpec<Float>
 
     /**
-     * An [DecayAnimationSpec] that defines how to fling the floating app bar when the user flings
-     * the app bar itself, or the content below it.
+     * An [DecayAnimationSpec] that defines how to fling the floating toolbar when the user flings
+     * the toolbar itself, or the content below it.
      */
     val flingAnimationSpec: DecayAnimationSpec<Float>
 
@@ -399,28 +399,28 @@ sealed interface FloatingAppBarScrollBehavior : NestedScrollConnection {
 }
 
 /**
- * A [FloatingAppBarScrollBehavior] that adjusts its properties to affect the size of a floating app
- * bar.
+ * A [FloatingToolbarScrollBehavior] that adjusts its properties to affect the size of a floating
+ * toolbar.
  *
- * A floating app bar that is set up with this [FloatingAppBarScrollBehavior] will immediately
+ * A floating toolbar that is set up with this [FloatingToolbarScrollBehavior] will immediately
  * collapse when the nested content is pulled up, and will immediately appear when the content is
  * pulled down.
  *
- * @param exitDirection indicates the direction towards which the floating app bar exits the screen
- * @param state a [FloatingAppBarState]
- * @param snapAnimationSpec an [AnimationSpec] that defines how the floating app bar snaps to either
+ * @param exitDirection indicates the direction towards which the floating toolbar exits the screen
+ * @param state a [FloatingToolbarState]
+ * @param snapAnimationSpec an [AnimationSpec] that defines how the floating toolbar snaps to either
  *   fully collapsed or fully extended state when a fling or a drag scrolled it into an intermediate
  *   position
- * @param flingAnimationSpec an [DecayAnimationSpec] that defines how to fling the floating app bar
- *   when the user flings the app bar itself, or the content below it
+ * @param flingAnimationSpec an [DecayAnimationSpec] that defines how to fling the floating toolbar
+ *   when the user flings the toolbar itself, or the content below it
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-private class ExitAlwaysFloatingAppBarScrollBehavior(
-    override val exitDirection: FloatingAppBarExitDirection,
-    override val state: FloatingAppBarState,
+private class ExitAlwaysFloatingToolbarScrollBehavior(
+    override val exitDirection: FloatingToolbarExitDirection,
+    override val state: FloatingToolbarState,
     override val snapAnimationSpec: AnimationSpec<Float>,
     override val flingAnimationSpec: DecayAnimationSpec<Float>,
-) : FloatingAppBarScrollBehavior {
+) : FloatingToolbarScrollBehavior {
 
     override fun onPostScroll(
         consumed: Offset,
@@ -440,7 +440,7 @@ private class ExitAlwaysFloatingAppBarScrollBehavior(
         }
         val superConsumed = super.onPostFling(consumed, available)
         return superConsumed +
-            settleFloatingAppBar(state, available.y, snapAnimationSpec, flingAnimationSpec)
+            settleFloatingToolbar(state, available.y, snapAnimationSpec, flingAnimationSpec)
     }
 
     override fun Modifier.floatingScrollBehavior(): Modifier {
@@ -464,7 +464,7 @@ private class ExitAlwaysFloatingAppBarScrollBehavior(
         return this.layout { measurable, constraints ->
                 isRtl = layoutDirection == LayoutDirection.Rtl
 
-                // Sets the app bar's offset to collapse the entire bar's when content scrolled.
+                // Sets the toolbar's offset to collapse the entire bar's when content scrolled.
                 val placeable = measurable.measure(constraints)
                 val offset =
                     if (exitDirection in listOf(Start, End) && isRtl) -state.offset
@@ -482,11 +482,11 @@ private class ExitAlwaysFloatingAppBarScrollBehavior(
                 orientation = orientation,
                 state = draggableState,
                 onDragStopped = { velocity ->
-                    settleFloatingAppBar(state, velocity, snapAnimationSpec, flingAnimationSpec)
+                    settleFloatingToolbar(state, velocity, snapAnimationSpec, flingAnimationSpec)
                 }
             )
             .onGloballyPositioned { coordinates ->
-                // Updates the app bar's offsetLimit relative to the parent.
+                // Updates the toolbar's offsetLimit relative to the parent.
                 val parentOffset = coordinates.positionInParent()
                 val parentSize = coordinates.parentLayoutCoordinates?.size ?: IntSize.Zero
                 val width = coordinates.size.width
@@ -506,27 +506,30 @@ private class ExitAlwaysFloatingAppBarScrollBehavior(
 }
 
 // TODO tokens
-/** Contains default values used for the floating app bar implementations. */
+/** Contains default values used for the floating toolbar implementations. */
 @ExperimentalMaterial3ExpressiveApi
-object FloatingAppBarDefaults {
+object FloatingToolbarDefaults {
 
-    /** Default size used for [HorizontalFloatingAppBar] and [VerticalFloatingAppBar] container */
+    /** Default size used for [HorizontalFloatingToolbar] and [VerticalFloatingToolbar] container */
     val ContainerSize: Dp = FloatingToolbarTokens.ContainerHeight
 
-    /** Default color used for [HorizontalFloatingAppBar] and [VerticalFloatingAppBar] container */
+    /**
+     * Default color used for [HorizontalFloatingToolbar] and [VerticalFloatingToolbar] container
+     */
     val ContainerColor: Color
         @Composable get() = ColorSchemeKeyTokens.PrimaryContainer.value
 
-    /** Default elevation used for [HorizontalFloatingAppBar] and [VerticalFloatingAppBar] */
+    /** Default elevation used for [HorizontalFloatingToolbar] and [VerticalFloatingToolbar] */
     val ContainerElevation: Dp = ElevationTokens.Level0
 
-    /** Default shape used for [HorizontalFloatingAppBar] and [VerticalFloatingAppBar] */
+    /** Default shape used for [HorizontalFloatingToolbar] and [VerticalFloatingToolbar] */
     val ContainerShape: Shape
         @Composable get() = FloatingToolbarTokens.ContainerShape.value
 
     /**
-     * Default padding used for [HorizontalFloatingAppBar] and [VerticalFloatingAppBar] when content
-     * are default size (24dp) icons in [IconButton] that meet the minimum touch target (48.dp).
+     * Default padding used for [HorizontalFloatingToolbar] and [VerticalFloatingToolbar] when
+     * content are default size (24dp) icons in [IconButton] that meet the minimum touch target
+     * (48.dp).
      */
     val ContentPadding = PaddingValues(12.dp)
 
@@ -538,8 +541,8 @@ object FloatingAppBarDefaults {
     val ContentPaddingWithFloatingActionButton = 12.dp
 
     /**
-     * Default offset from the edge of the screen used for [HorizontalFloatingAppBar] and
-     * [VerticalFloatingAppBar].
+     * Default offset from the edge of the screen used for [HorizontalFloatingToolbar] and
+     * [VerticalFloatingToolbar].
      */
     val ScreenOffset = FloatingToolbarTokens.ContainerExternalPadding
 
@@ -555,35 +558,35 @@ object FloatingAppBarDefaults {
 
     // TODO: note that this scroll behavior may impact assistive technologies making the component
     //  inaccessible.
-    //  See @sample androidx.compose.material3.samples.ScrollableHorizontalFloatingAppBar on how
+    //  See @sample androidx.compose.material3.samples.ScrollableHorizontalFloatingToolbar on how
     //  to disable scrolling when touch exploration is enabled.
     /**
-     * Returns a [FloatingAppBarScrollBehavior]. A floating app bar that is set up with this
-     * [FloatingAppBarScrollBehavior] will immediately collapse when the content is pulled up, and
+     * Returns a [FloatingToolbarScrollBehavior]. A floating toolbar that is set up with this
+     * [FloatingToolbarScrollBehavior] will immediately collapse when the content is pulled up, and
      * will immediately appear when the content is pulled down.
      *
-     * @param exitDirection indicates the direction towards which the floating app bar exits the
+     * @param exitDirection indicates the direction towards which the floating toolbar exits the
      *   screen
-     * @param state the state object to be used to control or observe the floating app bar's scroll
-     *   state. See [rememberFloatingAppBarState] for a state that is remembered across
+     * @param state the state object to be used to control or observe the floating toolbar's scroll
+     *   state. See [rememberFloatingToolbarState] for a state that is remembered across
      *   compositions.
-     * @param snapAnimationSpec an [AnimationSpec] that defines how the floating app bar snaps to
+     * @param snapAnimationSpec an [AnimationSpec] that defines how the floating toolbar snaps to
      *   either fully collapsed or fully extended state when a fling or a drag scrolled it into an
      *   intermediate position
      * @param flingAnimationSpec an [DecayAnimationSpec] that defines how to fling the floating app
-     *   bar when the user flings the app bar itself, or the content below it
+     *   bar when the user flings the toolbar itself, or the content below it
      */
     // TODO Load the motionScheme tokens from the component tokens file
     @ExperimentalMaterial3ExpressiveApi
     @Composable
     fun exitAlwaysScrollBehavior(
-        exitDirection: FloatingAppBarExitDirection,
-        state: FloatingAppBarState = rememberFloatingAppBarState(),
+        exitDirection: FloatingToolbarExitDirection,
+        state: FloatingToolbarState = rememberFloatingToolbarState(),
         snapAnimationSpec: AnimationSpec<Float> = MotionSchemeKeyTokens.DefaultEffects.value(),
         flingAnimationSpec: DecayAnimationSpec<Float> = rememberSplineBasedDecay()
-    ): FloatingAppBarScrollBehavior =
+    ): FloatingToolbarScrollBehavior =
         remember(exitDirection, state, snapAnimationSpec, flingAnimationSpec) {
-            ExitAlwaysFloatingAppBarScrollBehavior(
+            ExitAlwaysFloatingToolbarScrollBehavior(
                 exitDirection = exitDirection,
                 state = state,
                 snapAnimationSpec = snapAnimationSpec,
@@ -591,7 +594,7 @@ object FloatingAppBarDefaults {
             )
         }
 
-    /** Default enter transition used for [HorizontalFloatingAppBar] when expanding */
+    /** Default enter transition used for [HorizontalFloatingToolbar] when expanding */
     @Composable
     fun horizontalEnterTransition(expandFrom: Alignment.Horizontal) =
         expandHorizontally(
@@ -599,7 +602,7 @@ object FloatingAppBarDefaults {
             expandFrom = expandFrom,
         )
 
-    /** Default enter transition used for [VerticalFloatingAppBar] when expanding */
+    /** Default enter transition used for [VerticalFloatingToolbar] when expanding */
     @Composable
     fun verticalEnterTransition(expandFrom: Alignment.Vertical) =
         expandVertically(
@@ -607,7 +610,7 @@ object FloatingAppBarDefaults {
             expandFrom = expandFrom,
         )
 
-    /** Default exit transition used for [HorizontalFloatingAppBar] when shrinking */
+    /** Default exit transition used for [HorizontalFloatingToolbar] when shrinking */
     @Composable
     fun horizontalExitTransition(shrinkTowards: Alignment.Horizontal) =
         shrinkHorizontally(
@@ -615,7 +618,7 @@ object FloatingAppBarDefaults {
             shrinkTowards = shrinkTowards,
         )
 
-    /** Default exit transition used for [VerticalFloatingAppBar] when shrinking */
+    /** Default exit transition used for [VerticalFloatingToolbar] when shrinking */
     @Composable
     fun verticalExitTransition(shrinkTowards: Alignment.Vertical) =
         shrinkVertically(
@@ -1063,8 +1066,8 @@ class FloatingToolbarColors(
 /**
  * The possible positions for a [FloatingActionButton] attached to a [HorizontalFloatingToolbar]
  *
- * @see FloatingAppBarDefaults.StandardFloatingActionButton
- * @see FloatingAppBarDefaults.VibrantFloatingActionButton
+ * @see FloatingToolbarDefaults.StandardFloatingActionButton
+ * @see FloatingToolbarDefaults.VibrantFloatingActionButton
  */
 @ExperimentalMaterial3ExpressiveApi
 @JvmInline
@@ -1089,8 +1092,8 @@ internal constructor(@Suppress("unused") private val value: Int) {
 /**
  * The possible positions for a [FloatingActionButton] attached to a [VerticalFloatingToolbar]
  *
- * @see FloatingAppBarDefaults.StandardFloatingActionButton
- * @see FloatingAppBarDefaults.VibrantFloatingActionButton
+ * @see FloatingToolbarDefaults.StandardFloatingActionButton
+ * @see FloatingToolbarDefaults.VibrantFloatingActionButton
  */
 @ExperimentalMaterial3ExpressiveApi
 @JvmInline
@@ -1113,68 +1116,68 @@ internal constructor(@Suppress("unused") private val value: Int) {
 }
 
 /**
- * Creates a [FloatingAppBarState] that is remembered across compositions.
+ * Creates a [FloatingToolbarState] that is remembered across compositions.
  *
- * @param initialOffsetLimit the initial value for [FloatingAppBarState.offsetLimit], which
- *   represents the pixel limit that a floating app bar is allowed to collapse when the scrollable
+ * @param initialOffsetLimit the initial value for [FloatingToolbarState.offsetLimit], which
+ *   represents the pixel limit that a floating toolbar is allowed to collapse when the scrollable
  *   content is scrolled.
- * @param initialOffset the initial value for [FloatingAppBarState.offset]. The initial offset
+ * @param initialOffset the initial value for [FloatingToolbarState.offset]. The initial offset
  *   should be between zero and [initialOffsetLimit].
- * @param initialContentOffset the initial value for [FloatingAppBarState.contentOffset]
+ * @param initialContentOffset the initial value for [FloatingToolbarState.contentOffset]
  */
 @ExperimentalMaterial3ExpressiveApi
 @Composable
-fun rememberFloatingAppBarState(
+fun rememberFloatingToolbarState(
     initialOffsetLimit: Float = -Float.MAX_VALUE,
     initialOffset: Float = 0f,
     initialContentOffset: Float = 0f
-): FloatingAppBarState {
-    return rememberSaveable(saver = FloatingAppBarState.Saver) {
-        FloatingAppBarState(initialOffsetLimit, initialOffset, initialContentOffset)
+): FloatingToolbarState {
+    return rememberSaveable(saver = FloatingToolbarState.Saver) {
+        FloatingToolbarState(initialOffsetLimit, initialOffset, initialContentOffset)
     }
 }
 
 /**
- * A state object that can be hoisted to control and observe the floating app bar state. The state
- * is read and updated by a [FloatingAppBarScrollBehavior] implementation.
+ * A state object that can be hoisted to control and observe the floating toolbar state. The state
+ * is read and updated by a [FloatingToolbarScrollBehavior] implementation.
  *
- * In most cases, this state will be created via [rememberFloatingAppBarState].
+ * In most cases, this state will be created via [rememberFloatingToolbarState].
  */
 @ExperimentalMaterial3ExpressiveApi
-interface FloatingAppBarState {
+interface FloatingToolbarState {
 
     /**
-     * The floating app bar's offset limit in pixels, which represents the limit that a floating app
-     * bar is allowed to collapse to.
+     * The floating toolbar's offset limit in pixels, which represents the limit that a floating
+     * toolbar is allowed to collapse to.
      *
      * Use this limit to coerce the [offset] value when it's updated.
      */
     var offsetLimit: Float
 
     /**
-     * The floating app bar's current offset in pixels. This offset is applied to the fixed size of
-     * the app bar to control the displayed size when content is being scrolled.
+     * The floating toolbar's current offset in pixels. This offset is applied to the fixed size of
+     * the toolbar to control the displayed size when content is being scrolled.
      *
      * Updates to the [offset] value are coerced between zero and [offsetLimit].
      */
     var offset: Float
 
     /**
-     * The total offset of the content scrolled under the floating app bar.
+     * The total offset of the content scrolled under the floating toolbar.
      *
-     * This value is updated by a [FloatingAppBarScrollBehavior] whenever a nested scroll connection
-     * consumes scroll events. A common implementation would update the value to be the sum of all
-     * [NestedScrollConnection.onPostScroll] `consumed` values.
+     * This value is updated by a [FloatingToolbarScrollBehavior] whenever a nested scroll
+     * connection consumes scroll events. A common implementation would update the value to be the
+     * sum of all [NestedScrollConnection.onPostScroll] `consumed` values.
      */
     var contentOffset: Float
 
     companion object {
-        /** The default [Saver] implementation for [FloatingAppBarState]. */
-        internal val Saver: Saver<FloatingAppBarState, *> =
+        /** The default [Saver] implementation for [FloatingToolbarState]. */
+        internal val Saver: Saver<FloatingToolbarState, *> =
             listSaver(
                 save = { listOf(it.offsetLimit, it.offset, it.contentOffset) },
                 restore = {
-                    FloatingAppBarState(
+                    FloatingToolbarState(
                         initialOffsetLimit = it[0],
                         initialOffset = it[1],
                         initialContentOffset = it[2]
@@ -1185,30 +1188,30 @@ interface FloatingAppBarState {
 }
 
 /**
- * Creates a [FloatingAppBarState].
+ * Creates a [FloatingToolbarState].
  *
- * @param initialOffsetLimit the initial value for [FloatingAppBarState.offsetLimit], which
- *   represents the pixel limit that a floating app bar is allowed to collapse when the scrollable
+ * @param initialOffsetLimit the initial value for [FloatingToolbarState.offsetLimit], which
+ *   represents the pixel limit that a floating toolbar is allowed to collapse when the scrollable
  *   content is scrolled.
- * @param initialOffset the initial value for [FloatingAppBarState.offset]. The initial offset
+ * @param initialOffset the initial value for [FloatingToolbarState.offset]. The initial offset
  *   should be between zero and [initialOffsetLimit].
- * @param initialContentOffset the initial value for [FloatingAppBarState.contentOffset]
+ * @param initialContentOffset the initial value for [FloatingToolbarState.contentOffset]
  */
 @ExperimentalMaterial3ExpressiveApi
-fun FloatingAppBarState(
+fun FloatingToolbarState(
     initialOffsetLimit: Float,
     initialOffset: Float,
     initialContentOffset: Float
-): FloatingAppBarState =
-    FloatingAppBarStateImpl(initialOffsetLimit, initialOffset, initialContentOffset)
+): FloatingToolbarState =
+    FloatingToolbarStateImpl(initialOffsetLimit, initialOffset, initialContentOffset)
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Stable
-private class FloatingAppBarStateImpl(
+private class FloatingToolbarStateImpl(
     initialOffsetLimit: Float,
     initialOffset: Float,
     initialContentOffset: Float
-) : FloatingAppBarState {
+) : FloatingToolbarState {
 
     override var offsetLimit by mutableFloatStateOf(initialOffsetLimit)
 
@@ -1224,17 +1227,17 @@ private class FloatingAppBarStateImpl(
 }
 
 /**
- * Settles the app bar by flinging, in case the given velocity is greater than zero, and snapping
+ * Settles the toolbar by flinging, in case the given velocity is greater than zero, and snapping
  * after the fling settles.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-private suspend fun settleFloatingAppBar(
-    state: FloatingAppBarState,
+private suspend fun settleFloatingToolbar(
+    state: FloatingToolbarState,
     velocity: Float,
     snapAnimationSpec: AnimationSpec<Float>,
     flingAnimationSpec: DecayAnimationSpec<Float>
 ): Velocity {
-    // Check if the app bar is completely collapsed/expanded. If so, no need to settle the app bar,
+    // Check if the toolbar is completely collapsed/expanded. If so, no need to settle the toolbar,
     // and just return Zero Velocity.
     // Note that we don't check for 0f due to float precision with the collapsedFraction
     // calculation.
@@ -1244,7 +1247,7 @@ private suspend fun settleFloatingAppBar(
     }
     var remainingVelocity = velocity
     // In case there is an initial velocity that was left after a previous user fling, animate to
-    // continue the motion to expand or collapse the app bar.
+    // continue the motion to expand or collapse the toolbar.
     if (abs(velocity) > 1f) {
         var lastValue = 0f
         AnimationState(
@@ -1280,7 +1283,7 @@ private suspend fun settleFloatingAppBar(
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-private fun FloatingAppBarState.collapsedFraction() =
+private fun FloatingToolbarState.collapsedFraction() =
     if (offsetLimit != 0f) {
         offset / offsetLimit
     } else {
@@ -1288,33 +1291,33 @@ private fun FloatingAppBarState.collapsedFraction() =
     }
 
 /**
- * The possible directions for a [HorizontalFloatingAppBar] or [VerticalFloatingAppBar], used to
- * determine the exit direction when a [FloatingAppBarScrollBehavior] is attached.
+ * The possible directions for a [HorizontalFloatingToolbar] or [VerticalFloatingToolbar], used to
+ * determine the exit direction when a [FloatingToolbarScrollBehavior] is attached.
  */
 @ExperimentalMaterial3ExpressiveApi
 @JvmInline
-value class FloatingAppBarExitDirection
+value class FloatingToolbarExitDirection
 internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
-        /** FloatingAppBar exits towards the bottom of the screen */
-        val Bottom = FloatingAppBarExitDirection(0)
+        /** FloatingToolbar exits towards the bottom of the screen */
+        val Bottom = FloatingToolbarExitDirection(0)
 
-        /** FloatingAppBar exits towards the top of the screen */
-        val Top = FloatingAppBarExitDirection(1)
+        /** FloatingToolbar exits towards the top of the screen */
+        val Top = FloatingToolbarExitDirection(1)
 
-        /** FloatingAppBar exits towards the start of the screen */
-        val Start = FloatingAppBarExitDirection(2)
+        /** FloatingToolbar exits towards the start of the screen */
+        val Start = FloatingToolbarExitDirection(2)
 
-        /** FloatingAppBar exits towards the end of the screen */
-        val End = FloatingAppBarExitDirection(3)
+        /** FloatingToolbar exits towards the end of the screen */
+        val End = FloatingToolbarExitDirection(3)
     }
 
     override fun toString(): String {
         return when (this) {
-            Bottom -> "FloatingAppBarExitDirection.Bottom"
-            Top -> "FloatingAppBarExitDirection.Top"
-            Start -> "FloatingAppBarExitDirection.Start"
-            else -> "FloatingAppBarExitDirection.End"
+            Bottom -> "FloatingToolbarExitDirection.Bottom"
+            Top -> "FloatingToolbarExitDirection.Top"
+            Start -> "FloatingToolbarExitDirection.Start"
+            else -> "FloatingToolbarExitDirection.End"
         }
     }
 }
@@ -1353,14 +1356,14 @@ private fun HorizontalFloatingToolbarWithFabLayout(
             fab()
         },
         modifier =
-            modifier.defaultMinSize(minHeight = FloatingAppBarDefaults.FabSizeRange.endInclusive)
+            modifier.defaultMinSize(minHeight = FloatingToolbarDefaults.FabSizeRange.endInclusive)
     ) { measurables, constraints ->
         val toolbarMeasurable = measurables[0]
         val fabMeasurable = measurables[1]
 
         // The FAB is in its smallest size when the expanded progress is 1f.
         val fabSizeConstraint =
-            FloatingAppBarDefaults.FabSizeRange.lerp(1f - expandedProgress.value).roundToPx()
+            FloatingToolbarDefaults.FabSizeRange.lerp(1f - expandedProgress.value).roundToPx()
         val fabPlaceable =
             fabMeasurable.measure(
                 constraints.copy(minWidth = fabSizeConstraint, minHeight = fabSizeConstraint)
@@ -1370,7 +1373,7 @@ private fun HorizontalFloatingToolbarWithFabLayout(
         // actual width with the animation progress and the total layout width.
         val maxToolbarPlaceableWidth =
             toolbarMeasurable.maxIntrinsicWidth(
-                height = FloatingAppBarDefaults.ContainerSize.roundToPx()
+                height = FloatingToolbarDefaults.ContainerSize.roundToPx()
             )
         // Constraint the toolbar to the available width while taking into account the FAB width.
         val toolbarPlaceable =
@@ -1380,14 +1383,14 @@ private fun HorizontalFloatingToolbarWithFabLayout(
                         (maxToolbarPlaceableWidth * expandedProgress.value)
                             .coerceAtLeast(0f)
                             .toInt(),
-                    minHeight = FloatingAppBarDefaults.ContainerSize.roundToPx()
+                    minHeight = FloatingToolbarDefaults.ContainerSize.roundToPx()
                 )
             )
 
         val width =
             maxToolbarPlaceableWidth +
                 toolbarToFabGap.roundToPx() +
-                FloatingAppBarDefaults.FabSizeRange.start.roundToPx()
+                FloatingToolbarDefaults.FabSizeRange.start.roundToPx()
         val height = constraints.minHeight
 
         val toolbarTopOffset = (height - toolbarPlaceable.height) / 2
@@ -1408,12 +1411,12 @@ private fun HorizontalFloatingToolbarWithFabLayout(
 
         layout(width, height) {
             toolbarPlaceable.placeRelativeWithLayer(x = toolbarX, y = toolbarTopOffset) {
-                shadowElevation = FloatingAppBarDefaults.ToolbarElevationWithFab.toPx()
+                shadowElevation = FloatingToolbarDefaults.ToolbarElevationWithFab.toPx()
                 shape = toolbarShape
                 clip = true
             }
             val fabElevation =
-                FloatingAppBarDefaults.FabElevationRange.lerp(
+                FloatingToolbarDefaults.FabElevationRange.lerp(
                         1f - expandedProgress.value.coerceAtMost(1f)
                     )
                     .toPx()
@@ -1460,14 +1463,14 @@ private fun VerticalFloatingToolbarWithFabLayout(
             fab()
         },
         modifier =
-            modifier.defaultMinSize(minWidth = FloatingAppBarDefaults.FabSizeRange.endInclusive)
+            modifier.defaultMinSize(minWidth = FloatingToolbarDefaults.FabSizeRange.endInclusive)
     ) { measurables, constraints ->
         val toolbarMeasurable = measurables[0]
         val fabMeasurable = measurables[1]
 
         // The FAB is in its smallest size when the expanded progress is 1f.
         val fabSizeConstraint =
-            FloatingAppBarDefaults.FabSizeRange.lerp(1f - expandedProgress.value).roundToPx()
+            FloatingToolbarDefaults.FabSizeRange.lerp(1f - expandedProgress.value).roundToPx()
         val fabPlaceable =
             fabMeasurable.measure(
                 constraints.copy(minWidth = fabSizeConstraint, minHeight = fabSizeConstraint)
@@ -1477,7 +1480,7 @@ private fun VerticalFloatingToolbarWithFabLayout(
         // actual height with the animation progress and the total layout height.
         val maxToolbarPlaceableHeight =
             toolbarMeasurable.maxIntrinsicHeight(
-                width = FloatingAppBarDefaults.ContainerSize.roundToPx()
+                width = FloatingToolbarDefaults.ContainerSize.roundToPx()
             )
         // Constraint the toolbar to the available height while taking into account the FAB height.
         val toolbarPlaceable =
@@ -1487,7 +1490,7 @@ private fun VerticalFloatingToolbarWithFabLayout(
                         (maxToolbarPlaceableHeight * expandedProgress.value)
                             .coerceAtLeast(0f)
                             .toInt(),
-                    minWidth = FloatingAppBarDefaults.ContainerSize.roundToPx()
+                    minWidth = FloatingToolbarDefaults.ContainerSize.roundToPx()
                 )
             )
 
@@ -1495,7 +1498,7 @@ private fun VerticalFloatingToolbarWithFabLayout(
         val height =
             maxToolbarPlaceableHeight +
                 toolbarToFabGap.roundToPx() +
-                FloatingAppBarDefaults.FabSizeRange.start.roundToPx()
+                FloatingToolbarDefaults.FabSizeRange.start.roundToPx()
 
         val toolbarEdgeOffset = (width - toolbarPlaceable.width) / 2
         val fapEdgeOffset = (width - fabPlaceable.width) / 2
@@ -1518,12 +1521,12 @@ private fun VerticalFloatingToolbarWithFabLayout(
                 x = toolbarEdgeOffset,
                 y = toolbarY,
             ) {
-                shadowElevation = FloatingAppBarDefaults.ToolbarElevationWithFab.toPx()
+                shadowElevation = FloatingToolbarDefaults.ToolbarElevationWithFab.toPx()
                 shape = toolbarShape
                 clip = true
             }
             val fabElevation =
-                FloatingAppBarDefaults.FabElevationRange.lerp(
+                FloatingToolbarDefaults.FabElevationRange.lerp(
                         1f - expandedProgress.value.coerceAtMost(1f)
                     )
                     .toPx()

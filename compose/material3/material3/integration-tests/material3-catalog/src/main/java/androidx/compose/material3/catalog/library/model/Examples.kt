@@ -80,8 +80,8 @@ import androidx.compose.material3.samples.ExitUntilCollapsedCenterAlignedLargeTo
 import androidx.compose.material3.samples.ExitUntilCollapsedCenterAlignedMediumTopAppBarWithSubtitle
 import androidx.compose.material3.samples.ExitUntilCollapsedLargeTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedMediumTopAppBar
-import androidx.compose.material3.samples.ExpandableHorizontalFloatingAppBarSample
-import androidx.compose.material3.samples.ExpandableVerticalFloatingAppBarSample
+import androidx.compose.material3.samples.ExpandableHorizontalFloatingToolbarSample
+import androidx.compose.material3.samples.ExpandableVerticalFloatingToolbarSample
 import androidx.compose.material3.samples.ExposedDropdownMenuSample
 import androidx.compose.material3.samples.ExtendedFloatingActionButtonSample
 import androidx.compose.material3.samples.ExtendedFloatingActionButtonTextSample
@@ -180,8 +180,8 @@ import androidx.compose.material3.samples.ScaffoldWithCustomSnackbar
 import androidx.compose.material3.samples.ScaffoldWithIndefiniteSnackbar
 import androidx.compose.material3.samples.ScaffoldWithMultilineSnackbar
 import androidx.compose.material3.samples.ScaffoldWithSimpleSnackbar
-import androidx.compose.material3.samples.ScrollableHorizontalFloatingAppBarSample
-import androidx.compose.material3.samples.ScrollableVerticalFloatingAppBarSample
+import androidx.compose.material3.samples.ScrollableHorizontalFloatingToolbarSample
+import androidx.compose.material3.samples.ScrollableVerticalFloatingToolbarSample
 import androidx.compose.material3.samples.ScrollingFancyIndicatorContainerTabs
 import androidx.compose.material3.samples.ScrollingPrimaryTextTabs
 import androidx.compose.material3.samples.ScrollingSecondaryTextTabs
@@ -837,57 +837,57 @@ val TopAppBarExamples =
         },
     )
 
-private const val FloatingAppBarsExampleDescription = "Floating app bar examples"
-private const val FloatingAppBarsExampleSourceUrl = "$SampleSourceUrl/FloatingAppBarSamples.kt"
+private const val FloatingToolbarsExampleDescription = "Floating toolbar examples"
+private const val FloatingToolbarsExampleSourceUrl = "$SampleSourceUrl/FloatingToolbarSamples.kt"
 
-val FloatingAppBarsExamples =
+val FloatingToolbarsExamples =
     listOf(
         Example(
-            name = "ExpandableHorizontalFloatingAppBarSample",
-            description = FloatingAppBarsExampleDescription,
-            sourceUrl = FloatingAppBarsExampleSourceUrl,
+            name = "ExpandableHorizontalFloatingToolbarSample",
+            description = FloatingToolbarsExampleDescription,
+            sourceUrl = FloatingToolbarsExampleSourceUrl,
         ) {
-            ExpandableHorizontalFloatingAppBarSample()
+            ExpandableHorizontalFloatingToolbarSample()
         },
         Example(
-            name = "ScrollableHorizontalFloatingAppBarSample",
-            description = FloatingAppBarsExampleDescription,
-            sourceUrl = FloatingAppBarsExampleSourceUrl,
+            name = "ScrollableHorizontalFloatingToolbarSample",
+            description = FloatingToolbarsExampleDescription,
+            sourceUrl = FloatingToolbarsExampleSourceUrl,
         ) {
-            ScrollableHorizontalFloatingAppBarSample()
+            ScrollableHorizontalFloatingToolbarSample()
         },
         Example(
-            name = "ExpandableVerticalFloatingAppBarSample",
-            description = FloatingAppBarsExampleDescription,
-            sourceUrl = FloatingAppBarsExampleSourceUrl,
+            name = "ExpandableVerticalFloatingToolbarSample",
+            description = FloatingToolbarsExampleDescription,
+            sourceUrl = FloatingToolbarsExampleSourceUrl,
         ) {
-            ExpandableVerticalFloatingAppBarSample()
+            ExpandableVerticalFloatingToolbarSample()
         },
         Example(
-            name = "ScrollableVerticalFloatingAppBarSample",
-            description = FloatingAppBarsExampleDescription,
-            sourceUrl = FloatingAppBarsExampleSourceUrl,
+            name = "ScrollableVerticalFloatingToolbarSample",
+            description = FloatingToolbarsExampleDescription,
+            sourceUrl = FloatingToolbarsExampleSourceUrl,
         ) {
-            ScrollableVerticalFloatingAppBarSample()
+            ScrollableVerticalFloatingToolbarSample()
         },
         Example(
             name = "HorizontalFloatingToolbarWithFabSample",
-            description = FloatingAppBarsExampleDescription,
-            sourceUrl = FloatingAppBarsExampleSourceUrl,
+            description = FloatingToolbarsExampleDescription,
+            sourceUrl = FloatingToolbarsExampleSourceUrl,
         ) {
             HorizontalFloatingToolbarWithFabSample()
         },
         Example(
             name = "VerticalFloatingToolbarWithFabSample",
-            description = FloatingAppBarsExampleDescription,
-            sourceUrl = FloatingAppBarsExampleSourceUrl,
+            description = FloatingToolbarsExampleDescription,
+            sourceUrl = FloatingToolbarsExampleSourceUrl,
         ) {
             VerticalFloatingToolbarWithFabSample()
         },
         Example(
             name = "HorizontalFloatingToolbarAsScaffoldFabSample",
-            description = FloatingAppBarsExampleDescription,
-            sourceUrl = FloatingAppBarsExampleSourceUrl,
+            description = FloatingToolbarsExampleDescription,
+            sourceUrl = FloatingToolbarsExampleSourceUrl,
         ) {
             HorizontalFloatingToolbarAsScaffoldFabSample()
         },
