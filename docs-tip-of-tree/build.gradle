@@ -248,7 +248,7 @@ dependencies {
     docs(project(":mediarouter:mediarouter"))
     docs(project(":mediarouter:mediarouter-testing"))
     docs(project(":metrics:metrics-performance"))
-    kmpDocs(project(":navigation:navigation-common"))
+    docs(project(":navigation:navigation-common"))
     docs(project(":navigation:navigation-common-ktx"))
     docs(project(":navigation:navigation-compose"))
     docs(project(":navigation:navigation-dynamic-features-fragment"))

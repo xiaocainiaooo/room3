@@ -24,133 +24,12 @@
 
 import androidx.build.KotlinTarget
 import androidx.build.LibraryType
-import androidx.build.PlatformIdentifier
-import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
+    id("kotlin-android")
     alias(libs.plugins.kotlinSerialization)
-}
-
-androidXMultiplatform {
-    android()
-    desktop()
-    mac()
-    linux()
-    ios()
-
-    defaultPlatform(PlatformIdentifier.ANDROID)
-
-    sourceSets {
-        commonMain {
-            dependencies {
-                api("androidx.annotation:annotation:1.8.1")
-                api("androidx.lifecycle:lifecycle-common:2.9.0-alpha07")
-                api("androidx.lifecycle:lifecycle-runtime:2.9.0-alpha07")
-                api("androidx.lifecycle:lifecycle-viewmodel:2.9.0-alpha07")
-                api("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.9.0-alpha07")
-                api("androidx.savedstate:savedstate:1.3.0-alpha05")
-                api(libs.kotlinStdlib)
-                implementation("androidx.collection:collection:1.4.2")
-                implementation(libs.kotlinSerializationCore)
-            }
-        }
-        commonTest {
-            dependencies {
-                implementation(libs.kotlinTest)
-            }
-        }
-
-        nonAndroidMain {
-            dependsOn(commonMain)
-        }
-        nonAndroidTest {
-            dependsOn(commonTest)
-        }
-        jvmCommonMain {
-            dependsOn(commonMain)
-        }
-        jvmCommonTest {
-            dependsOn(commonTest)
-        }
-        desktopMain {
-            dependsOn(jvmCommonMain)
-            dependsOn(nonAndroidMain)
-        }
-        desktopTest {
-            dependsOn(jvmCommonTest)
-            dependsOn(nonAndroidTest)
-        }
-        androidMain {
-            dependsOn(jvmCommonMain)
-            dependencies {
-                api("androidx.lifecycle:lifecycle-runtime-ktx:2.9.0-alpha07")
-                api("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.0-alpha07")
-                api("androidx.savedstate:savedstate-ktx:1.3.0-alpha05")
-                implementation("androidx.core:core-ktx:1.1.0")
-                implementation("androidx.profileinstaller:profileinstaller:1.4.0")
-            }
-        }
-
-        androidUnitTest {
-            dependsOn(commonTest)
-            dependencies {
-                implementation(project(":navigation:navigation-testing"))
-                implementation("androidx.arch.core:core-testing:2.2.0")
-                implementation(libs.junit)
-                implementation(libs.mockitoCore4)
-                implementation(libs.truth)
-                implementation(libs.kotlinCoroutinesCore)
-                implementation(libs.kotlinCoroutinesTest)
-            }
-        }
-
-        androidInstrumentedTest {
-            dependsOn(commonTest)
-            dependencies {
-                implementation(libs.junit)
-                implementation(libs.testExtJunit)
-                implementation(libs.testRunner)
-                implementation(libs.truth)
-                implementation(libs.mockitoCore)
-                implementation(libs.dexmakerMockito)
-            }
-        }
-
-        nonJvmCommonMain {
-            dependsOn(nonAndroidMain)
-        }
-
-        nonJvmCommonTest {
-            dependsOn(nonAndroidTest)
-        }
-
-        nativeMain {
-            dependsOn(nonJvmCommonMain)
-        }
-        linuxMain.dependsOn(nativeMain)
-        darwinMain.dependsOn(nativeMain)
-
-        nativeTest {
-            dependsOn(nonJvmCommonTest)
-        }
-        linuxTest.dependsOn(nativeTest)
-        darwinTest.dependsOn(nativeTest)
-
-        targets.configureEach { target ->
-            if (target.platformType == KotlinPlatformType.native) {
-                if (target.konanTarget.family.appleFamily) {
-                    target.compilations["main"].defaultSourceSet.dependsOn(darwinMain)
-                    target.compilations["test"].defaultSourceSet.dependsOn(darwinTest)
-                } else if (target.konanTarget.family == org.jetbrains.kotlin.konan.target.Family.LINUX) {
-                    target.compilations["main"].defaultSourceSet.dependsOn(linuxMain)
-                    target.compilations["test"].defaultSourceSet.dependsOn(linuxTest)
-                }
-            }
-        }
-    }
 }
 
 android {
@@ -161,8 +40,38 @@ android {
 }
 
 dependencies {
+    api("androidx.annotation:annotation:1.8.1")
+    api("androidx.lifecycle:lifecycle-common:2.9.0-alpha07")
+    api("androidx.lifecycle:lifecycle-runtime-ktx:2.9.0-alpha07")
+    api("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.0-alpha07")
+    api("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.9.0-alpha07")
+    api("androidx.savedstate:savedstate-ktx:1.3.0-alpha05")
+    api(libs.kotlinStdlib)
+
+    implementation("androidx.core:core-ktx:1.1.0")
+    implementation("androidx.collection:collection-ktx:1.4.2")
+    implementation("androidx.profileinstaller:profileinstaller:1.4.0")
+    implementation(libs.kotlinSerializationCore)
+
+    testImplementation(project(":navigation:navigation-testing"))
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation(libs.junit)
+    testImplementation(libs.mockitoCore4)
+    testImplementation(libs.truth)
+    testImplementation(libs.kotlinCoroutinesCore)
+    testImplementation(libs.kotlinCoroutinesTest)
+    testImplementation(libs.kotlinTest)
+
     androidTestRuntimeOnly(libs.kotlinTestJunit)
     androidTestRuntimeOnly(libs.testCore)
+
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.kotlinTest)
+    androidTestImplementation(libs.testExtJunit)
+    androidTestImplementation(libs.testRunner)
+    androidTestImplementation(libs.truth)
+    androidTestImplementation(libs.mockitoCore)
+    androidTestImplementation(libs.dexmakerMockito)
 
     lintPublish(project(":navigation:navigation-common-lint"))
 }

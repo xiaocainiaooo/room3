@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-@file:JvmName("NavDeepLinkDslBuilderKt")
-@file:JvmMultifileClass
-
 package androidx.navigation
 
 import androidx.navigation.serialization.generateRoutePattern
