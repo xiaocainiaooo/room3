@@ -24,7 +24,6 @@ import androidx.room.Dao
 import androidx.room.compiler.codegen.CodeLanguage
 import androidx.room.compiler.codegen.XCodeBlock
 import androidx.room.compiler.codegen.XTypeName
-import androidx.room.compiler.codegen.XTypeName.Companion.PRIMITIVE_INT
 import androidx.room.compiler.codegen.compat.XConverters.toString
 import androidx.room.compiler.processing.XProcessingEnv
 import androidx.room.compiler.processing.XRawType
@@ -438,7 +437,7 @@ class TypeAdapterStoreTest {
                 `is`(
                     """
                     final int ${tmp(0)};
-                    ${tmp(0)} = curs.getInt(7);
+                    ${tmp(0)} = (int) (curs.getLong(7));
                     res = ${tmp(0)} != 0;
                     """
                         .trimIndent()
@@ -509,7 +508,7 @@ class TypeAdapterStoreTest {
                 `is`(
                     """
                     final int ${tmp(0)};
-                    ${tmp(0)} = curs.getInt(11);
+                    ${tmp(0)} = (int) (curs.getLong(11));
                     final boolean ${tmp(1)} = ${tmp(0)} != 0;
                     res = foo.bar.Point.fromBoolean(${tmp(1)});
                     """
@@ -573,7 +572,7 @@ class TypeAdapterStoreTest {
             val expectedAdapterCode =
                 if (invocation.isKsp) {
                     """
-                stmt.bindString(41, ${tmp(0)});
+                stmt.bindText(41, ${tmp(0)});
                 """
                         .trimIndent()
                 } else {
@@ -581,7 +580,7 @@ class TypeAdapterStoreTest {
                 if (${tmp(0)} == null) {
                   stmt.bindNull(41);
                 } else {
-                  stmt.bindString(41, ${tmp(0)});
+                  stmt.bindText(41, ${tmp(0)});
                 }
                 """
                         .trimIndent()

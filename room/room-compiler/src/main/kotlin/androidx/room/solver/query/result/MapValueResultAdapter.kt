@@ -59,8 +59,6 @@ sealed class MapValueResultAdapter(val rowAdapters: List<RowAdapter>) {
     /** Right-Hand-Side of a Map value type arg initialization. */
     abstract fun getInstantiationCodeBlock(): XCodeBlock
 
-    abstract fun isMigratedToDriver(): Boolean
-
     abstract fun convert(
         scope: CodeGenScope,
         valuesVarName: String,
@@ -146,8 +144,6 @@ sealed class MapValueResultAdapter(val rowAdapters: List<RowAdapter>) {
                         )
                     )
             }
-
-        override fun isMigratedToDriver(): Boolean = mapValueResultAdapter.isMigratedToDriver()
 
         override fun convert(
             scope: CodeGenScope,
@@ -341,8 +337,6 @@ sealed class MapValueResultAdapter(val rowAdapters: List<RowAdapter>) {
                 else -> XCodeBlock.ofNewInstance(valueTypeArg.asTypeName())
             }
         }
-
-        override fun isMigratedToDriver(): Boolean = valueRowAdapter.isMigratedToDriver()
 
         override fun convert(
             scope: CodeGenScope,

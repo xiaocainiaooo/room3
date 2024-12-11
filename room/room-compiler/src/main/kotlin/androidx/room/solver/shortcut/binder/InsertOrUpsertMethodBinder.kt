@@ -34,14 +34,4 @@ abstract class InsertOrUpsertMethodBinder(val adapter: InsertOrUpsertMethodAdapt
         dbProperty: XPropertySpec,
         scope: CodeGenScope
     )
-
-    abstract fun convertAndReturnCompat(
-        parameters: List<ShortcutQueryParameter>,
-        adapters: Map<String, Pair<XPropertySpec, Any>>,
-        dbProperty: XPropertySpec,
-        scope: CodeGenScope
-    )
-
-    // TODO(b/319660042): Remove once migration to driver API is done.
-    open fun isMigratedToDriver(): Boolean = false
 }

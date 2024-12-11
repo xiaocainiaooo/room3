@@ -73,15 +73,4 @@ class CoroutineDeleteOrUpdateMethodBinder(
             )
         scope.builder.add("return %L", performBlock)
     }
-
-    override fun convertAndReturnCompat(
-        parameters: List<ShortcutQueryParameter>,
-        adapters: Map<String, Pair<XPropertySpec, XTypeSpec>>,
-        dbProperty: XPropertySpec,
-        scope: CodeGenScope
-    ) {
-        TODO("Will be removed")
-    }
-
-    override fun isMigratedToDriver(): Boolean = true
 }

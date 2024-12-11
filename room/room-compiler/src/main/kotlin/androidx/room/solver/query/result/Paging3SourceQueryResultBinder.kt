@@ -49,21 +49,6 @@ class Paging3PagingSourceQueryResultBinder(
         listAdapter?.rowAdapters?.firstOrNull()?.out?.asTypeName() ?: XTypeName.ANY_OBJECT
     private val pagingSourceTypeName: XTypeName = className.parametrizedBy(itemTypeName)
 
-    override fun isMigratedToDriver(): Boolean = true
-
-    override fun convertAndReturn(
-        roomSQLiteQueryVar: String,
-        canReleaseQuery: Boolean,
-        dbProperty: XPropertySpec,
-        inTransaction: Boolean,
-        scope: CodeGenScope
-    ) {
-        error(
-            "This convertAndReturn() should never be invoked, it will be removed once " +
-                "migration to drivers is completed."
-        )
-    }
-
     override fun convertAndReturn(
         sqlQueryVar: String,
         dbProperty: XPropertySpec,
