@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package androidx.benchmark.traceprocessor
+package androidx.benchmark.perfetto
 
 import androidx.benchmark.Outputs
 import androidx.benchmark.Shell
-import androidx.benchmark.macro.ShellServerLifecycleManager
 import androidx.benchmark.macro.createTempFileFromAsset
-import androidx.benchmark.macro.runServer
-import androidx.benchmark.macro.runSingleSessionServer
 import androidx.benchmark.perfetto.PerfettoHelper.Companion.isAbiSupported
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -45,11 +42,11 @@ import perfetto.protos.TraceMetrics
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class TraceProcessorTest {
+class PerfettoTraceProcessorTest {
     @Test
     fun shellPath() {
         assumeTrue(isAbiSupported())
-        val shellPath = ShellServerLifecycleManager.shellPath
+        val shellPath = PerfettoTraceProcessor.shellPath
         val out = Shell.executeScriptCaptureStdout("$shellPath --version")
         assertTrue("expect to get Perfetto version string, saw: $out", out.contains("Perfetto v"))
     }
@@ -58,7 +55,7 @@ class TraceProcessorTest {
     fun getJsonMetrics_tracePathWithSpaces() {
         assumeTrue(isAbiSupported())
         assertFailsWith<IllegalArgumentException> {
-            TraceProcessor.runSingleSessionServer("/a b") {}
+            PerfettoTraceProcessor.runSingleSessionServer("/a b") {}
         }
     }
 
@@ -66,7 +63,7 @@ class TraceProcessorTest {
     fun getJsonMetrics_metricWithSpaces() {
         assumeTrue(isAbiSupported())
         assertFailsWith<IllegalArgumentException> {
-            TraceProcessor.runSingleSessionServer(
+            PerfettoTraceProcessor.runSingleSessionServer(
                 createTempFileFromAsset("api31_startup_cold", ".perfetto-trace").absolutePath
             ) {
                 getTraceMetrics("a b")
@@ -77,10 +74,10 @@ class TraceProcessorTest {
     @Test
     fun validateAbiNotSupportedBehavior() {
         assumeFalse(isAbiSupported())
-        assertFailsWith<IllegalStateException> { ShellServerLifecycleManager.shellPath }
+        assertFailsWith<IllegalStateException> { PerfettoTraceProcessor.shellPath }
 
         assertFailsWith<IllegalStateException> {
-            TraceProcessor.runSingleSessionServer(
+            PerfettoTraceProcessor.runSingleSessionServer(
                 createTempFileFromAsset("api31_startup_cold", ".perfetto-trace").absolutePath
             ) {
                 getTraceMetrics("ignored_metric")
@@ -104,7 +101,7 @@ class TraceProcessorTest {
         // check known slice content is queryable
         assumeTrue(isAbiSupported())
         val traceFile = createTempFileFromAsset("api31_startup_cold", ".perfetto-trace")
-        TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
+        PerfettoTraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
             assertEquals(
                 expected =
                     when (mode) {
@@ -146,7 +143,7 @@ class TraceProcessorTest {
     fun query_syntaxError() {
         assumeTrue(isAbiSupported())
         val traceFile = createTempFileFromAsset("api31_startup_cold", ".perfetto-trace")
-        TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
+        PerfettoTraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
             val error = assertFailsWith<IllegalStateException> { query("SYNTAX ERROR, PLEASE") }
             assertContains(
                 charSequence = error.message!!,
@@ -160,7 +157,7 @@ class TraceProcessorTest {
     fun query() {
         assumeTrue(isAbiSupported())
         val traceFile = createTempFileFromAsset("api31_startup_cold", ".perfetto-trace")
-        TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
+        PerfettoTraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
             // raw list of maps
             assertEquals(
                 expected =
@@ -209,7 +206,7 @@ class TraceProcessorTest {
     fun queryBytes() {
         assumeTrue(isAbiSupported())
         val traceFile = createTempFileFromAsset("api31_startup_cold", ".perfetto-trace")
-        TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
+        PerfettoTraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
             val query = "SELECT name,ts,dur FROM slice WHERE name LIKE \"activityStart\""
             val bytes = rawQuery(query)
             val queryResult = perfetto.protos.QueryResult.ADAPTER.decode(bytes)
@@ -233,7 +230,7 @@ class TraceProcessorTest {
         assumeTrue(isAbiSupported())
         val traceFile = createTempFileFromAsset("api31_startup_cold", ".perfetto-trace")
         val startups =
-            TraceProcessor.runServer {
+            PerfettoTraceProcessor.runServer {
                 loadTrace(PerfettoTrace(traceFile.absolutePath)) {
                     query(
                             """
@@ -258,7 +255,7 @@ class TraceProcessorTest {
     fun queryMetricsJson() {
         assumeTrue(isAbiSupported())
         val traceFile = createTempFileFromAsset("api31_startup_cold", ".perfetto-trace")
-        TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
+        PerfettoTraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
             val metrics = queryMetricsJson(listOf("android_startup"))
             assertTrue(metrics.contains("\"android_startup\": {"))
             assertTrue(metrics.contains("\"startup_type\": \"cold\","))
@@ -269,7 +266,7 @@ class TraceProcessorTest {
     fun queryMetricsProtoBinary() {
         assumeTrue(isAbiSupported())
         val traceFile = createTempFileFromAsset("api31_startup_cold", ".perfetto-trace")
-        TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
+        PerfettoTraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
             val metrics =
                 TraceMetrics.ADAPTER.decode(queryMetricsProtoBinary(listOf("android_startup")))
             val startup = metrics.android_startup!!
@@ -281,7 +278,7 @@ class TraceProcessorTest {
     fun queryMetricsProtoText() {
         assumeTrue(isAbiSupported())
         val traceFile = createTempFileFromAsset("api31_startup_cold", ".perfetto-trace")
-        TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
+        PerfettoTraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
             val metrics = queryMetricsProtoText(listOf("android_startup"))
             assertTrue(metrics.contains("android_startup {"))
             assertTrue(metrics.contains("startup_type: \"cold\""))
@@ -289,7 +286,7 @@ class TraceProcessorTest {
     }
 
     @Test
-    fun validateTraceProcessorBinariesExist() {
+    fun validatePerfettoTraceProcessorBinariesExist() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val suffixes = listOf("aarch64")
         val entries = suffixes.map { "trace_processor_shell_$it" }.toSet()
@@ -304,7 +301,7 @@ class TraceProcessorTest {
         // Check server is not running
         assertTrue(!isRunning())
 
-        TraceProcessor.runServer {
+        PerfettoTraceProcessor.runServer {
             // Check server is running
             assertTrue(isRunning())
         }
@@ -320,7 +317,7 @@ class TraceProcessorTest {
         // Check server is not running
         assertTrue(!isRunning())
 
-        TraceProcessor.runServer((-1).milliseconds) {
+        PerfettoTraceProcessor.runServer((-1).milliseconds) {
             // Check server is running
             assertTrue(isRunning())
         }
@@ -336,7 +333,7 @@ class TraceProcessorTest {
         // Check server is not running
         assertTrue(!isRunning())
 
-        TraceProcessor.runServer((0).milliseconds) {
+        PerfettoTraceProcessor.runServer((0).milliseconds) {
             // Check server is running
             assertTrue(isRunning())
         }
@@ -349,7 +346,7 @@ class TraceProcessorTest {
     fun testParseTracesWithProcessTracks() {
         assumeTrue(isAbiSupported())
         val traceFile = createTempFileFromAsset("api31_startup_cold", ".perfetto-trace")
-        TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
+        PerfettoTraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
             val slices = querySlices("launching:%", packageName = null)
             assertEquals(
                 expected =
@@ -382,7 +379,7 @@ class TraceProcessorTest {
                             .copyTo(out)
                 }
             }
-        TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
+        PerfettoTraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
             // This would throw an exception if there is an error in the parsing.
             getTraceMetrics("android_startup")
         }
@@ -394,7 +391,7 @@ class TraceProcessorTest {
      */
     private fun isRunning(): Boolean =
         try {
-            val url = URL("http://localhost:${ShellServerLifecycleManager.PORT}/")
+            val url = URL("http://localhost:${PerfettoTraceProcessor.PORT}/")
             with(url.openConnection() as HttpURLConnection) {
                 return@with responseCode == 200
             }

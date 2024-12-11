@@ -22,9 +22,8 @@ import androidx.benchmark.macro.perfetto.FrameTimingQuery.SubMetric.FrameDuratio
 import androidx.benchmark.macro.perfetto.FrameTimingQuery.SubMetric.FrameDurationUiNs
 import androidx.benchmark.macro.perfetto.FrameTimingQuery.SubMetric.FrameOverrunNs
 import androidx.benchmark.macro.perfetto.FrameTimingQuery.getFrameSubMetrics
-import androidx.benchmark.macro.runSingleSessionServer
 import androidx.benchmark.perfetto.PerfettoHelper.Companion.isAbiSupported
-import androidx.benchmark.traceprocessor.TraceProcessor
+import androidx.benchmark.perfetto.PerfettoTraceProcessor
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import kotlin.test.assertEquals
@@ -42,7 +41,7 @@ class FrameTimingQueryTest {
         val traceFile = createTempFileFromAsset("api28_scroll", ".perfetto-trace")
 
         val frameSubMetrics =
-            TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
+            PerfettoTraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
                 FrameTimingQuery.getFrameData(
                         session = this,
                         captureApiLevel = 28,
@@ -73,7 +72,7 @@ class FrameTimingQueryTest {
         val traceFile = createTempFileFromAsset("api31_scroll", ".perfetto-trace")
 
         val frameSubMetrics =
-            TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
+            PerfettoTraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
                 FrameTimingQuery.getFrameData(
                         session = this,
                         captureApiLevel = 31,
@@ -110,7 +109,7 @@ class FrameTimingQueryTest {
         val traceFile = createTempFileFromAsset("api33_motionlayout_messagejson", ".perfetto-trace")
 
         val frameData =
-            TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
+            PerfettoTraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
                 FrameTimingQuery.getFrameData(
                     session = this,
                     captureApiLevel = 33,
@@ -165,7 +164,7 @@ class FrameTimingQueryTest {
         val traceFile = createTempFileFromAsset("api34_invalid_expect_actual", ".perfetto-trace")
 
         val frameData =
-            TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
+            PerfettoTraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
                 FrameTimingQuery.getFrameData(
                     session = this,
                     captureApiLevel = 34,

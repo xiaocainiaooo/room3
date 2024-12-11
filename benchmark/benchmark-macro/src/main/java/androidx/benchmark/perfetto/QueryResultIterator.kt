@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.benchmark.traceprocessor
+package androidx.benchmark.perfetto
 
-import androidx.annotation.RestrictTo
 import perfetto.protos.QueryResult
 
-/** Iterator for results from a [TraceProcessor] query. */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-public class QueryResultIterator constructor(queryResult: QueryResult) : Iterator<Row> {
+/** Iterator for results from a [PerfettoTraceProcessor] query. */
+internal class QueryResultIterator constructor(queryResult: QueryResult) : Iterator<Row> {
     private val dataLists =
         object {
             val stringBatches = mutableListOf<String>()
@@ -58,12 +56,12 @@ public class QueryResultIterator constructor(queryResult: QueryResult) : Iterato
     }
 
     /** Returns the number of rows in the query result. */
-    public fun size(): Int {
+    fun size(): Int {
         return count
     }
 
     /** Returns true whether there are no results stored in this iterator, false otherwise. */
-    public fun isEmpty(): Boolean {
+    fun isEmpty(): Boolean {
         return count == 0
     }
 

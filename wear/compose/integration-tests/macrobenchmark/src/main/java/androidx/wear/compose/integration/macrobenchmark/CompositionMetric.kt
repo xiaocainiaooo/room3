@@ -17,16 +17,17 @@ package androidx.wear.compose.integration.macrobenchmark
 
 import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.TraceMetric
-import androidx.benchmark.traceprocessor.TraceProcessor
+import androidx.benchmark.perfetto.ExperimentalPerfettoTraceProcessorApi
+import androidx.benchmark.perfetto.PerfettoTraceProcessor
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.DurationUnit
 
 @OptIn(ExperimentalMetricApi::class)
 internal class CompositionMetric(private val composable: String) : TraceMetric() {
-    @OptIn(ExperimentalMetricApi::class)
+    @OptIn(ExperimentalMetricApi::class, ExperimentalPerfettoTraceProcessorApi::class)
     override fun getMeasurements(
         captureInfo: CaptureInfo,
-        traceSession: TraceProcessor.Session
+        traceSession: PerfettoTraceProcessor.Session
     ): List<Measurement> {
         val shortName = composable.substringAfterLast(".")
 

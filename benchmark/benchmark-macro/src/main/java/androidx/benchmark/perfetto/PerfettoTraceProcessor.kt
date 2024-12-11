@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package androidx.benchmark.traceprocessor
+package androidx.benchmark.perfetto
 
 import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP
+import androidx.benchmark.InstrumentationResults
+import androidx.benchmark.Outputs
+import androidx.benchmark.Profiler
+import androidx.benchmark.inMemoryTrace
+import androidx.benchmark.macro.perfetto.server.PerfettoHttpServer
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import org.intellij.lang.annotations.Language
 import perfetto.protos.ComputeMetricArgs
 import perfetto.protos.ComputeMetricResult
 import perfetto.protos.QueryResult
@@ -38,7 +44,7 @@ import perfetto.protos.TraceMetrics
  *
  * ```
  * // Collect the duration of all slices named "activityStart" in the trace
- * val activityStartDurationNs = TraceProcessor.runServer {
+ * val activityStartDurationNs = PerfettoTraceProcessor.runServer {
  *     loadTrace(trace) {
  *         query("SELECT dur FROM slice WHERE name LIKE \"activityStart\"").toList {
  *             it.long("dur")
@@ -72,98 +78,98 @@ import perfetto.protos.TraceMetrics
  *
  * @see PerfettoTrace
  */
-public class TraceProcessor
-@Suppress("ExecutorRegistration") // purely synchronous
-@ExperimentalTraceProcessorApi
-constructor(
-    private val serverLifecycleManager: ServerLifecycleManager,
-    private val tracer: Tracer = Tracer(),
-    private val eventCallback: EventCallback = EventCallback.Noop,
-) {
-    public open class Tracer {
-        public open fun beginTraceSection(label: String) {}
-
-        public open fun endTraceSection() {}
-
-        public inline fun <T> trace(label: String, block: () -> T): T {
-            beginTraceSection(label)
-            return try {
-                block()
-            } finally {
-                endTraceSection()
-            }
-        }
-    }
-
-    public interface EventCallback {
-        public fun onLoadTraceFailure(trace: PerfettoTrace, throwable: Throwable)
-
-        public object Noop : EventCallback {
-            override fun onLoadTraceFailure(trace: PerfettoTrace, throwable: Throwable) {}
-        }
-    }
-
-    public companion object {
+@ExperimentalPerfettoTraceProcessorApi
+class PerfettoTraceProcessor {
+    companion object {
         private val SERVER_START_TIMEOUT_MS = 60.seconds
+        internal const val PORT = 9001
+
+        /**
+         * The actual [File] path to the `trace_processor_shell`.
+         *
+         * Lazily copies the `trace_processor_shell` and enables parsing of the Perfetto trace
+         * files.
+         */
+        internal val shellPath: String by lazy {
+            // Checks for ABI support
+            PerfettoHelper.createExecutable("trace_processor_shell")
+        }
 
         /**
          * Starts a Perfetto trace processor shell server in http mode, loads a trace and executes
-         * the given block.
+         * the given block. It stops the server after the block is complete
          *
-         * @param serverLifecycleManager controls starting and stopping the TraceProcessor process.
-         * @param eventCallback callback for events such as trace load failure.
-         * @param tracer used to trace begin and end of significant events within this managed run.
-         * @param timeout waiting for the server to start. If less or equal to zero use 60 seconds
+         * Uses a default timeout of 5 seconds
+         *
          * @param block Command to execute using trace processor
          */
-        @Suppress(
-            "ExecutorRegistration", // purely synchronous
-            "MissingJvmstatic", // JvmOverload doesn't handle mangling
-        )
-        @ExperimentalTraceProcessorApi
         @JvmStatic
-        public fun <T> runServer(
-            serverLifecycleManager: ServerLifecycleManager,
-            eventCallback: EventCallback,
-            @Suppress("ListenerLast") tracer: Tracer,
-            @Suppress("ListenerLast") timeout: Duration = SERVER_START_TIMEOUT_MS,
-            @Suppress("ListenerLast") block: TraceProcessor.() -> T
-        ): T =
-            tracer.trace("TraceProcessor#runServer") {
+        fun <T> runServer(block: PerfettoTraceProcessor.() -> T): T =
+            runServer(SERVER_START_TIMEOUT_MS, block)
+
+        /**
+         * Starts a Perfetto trace processor shell server in http mode, loads a trace and executes
+         * the given block. It stops the server after the block is complete
+         *
+         * @param timeout waiting for the server to start. If less or equal to zero use 5 seconds
+         * @param block Command to execute using trace processor
+         */
+        @JvmStatic
+        fun <T> runServer(timeout: Duration, block: PerfettoTraceProcessor.() -> T): T =
+            inMemoryTrace("PerfettoTraceProcessor#runServer") {
                 var actualTimeout = timeout
                 if (actualTimeout <= Duration.ZERO) {
                     actualTimeout = SERVER_START_TIMEOUT_MS
                 }
 
-                var traceProcessor: TraceProcessor? = null
+                var perfettoTraceProcessor: PerfettoTraceProcessor? = null
                 try {
 
                     // Initializes the server process
-                    traceProcessor =
-                        TraceProcessor(
-                                eventCallback = eventCallback,
-                                serverLifecycleManager = serverLifecycleManager
-                            )
-                            .startServer(actualTimeout)
+                    perfettoTraceProcessor = PerfettoTraceProcessor().startServer(actualTimeout)
 
                     // Executes the query block
-                    return@trace tracer.trace("TraceProcessor#runServer#block") {
-                        block(traceProcessor)
+                    return@inMemoryTrace inMemoryTrace("PerfettoTraceProcessor#runServer#block") {
+                        block(perfettoTraceProcessor)
                     }
                 } finally {
-                    traceProcessor?.stopServer()
+                    perfettoTraceProcessor?.stopServer()
                 }
+            }
+
+        @RestrictTo(LIBRARY_GROUP)
+        fun <T> runSingleSessionServer(absoluteTracePath: String, block: Session.() -> T) =
+            runServer {
+                loadTrace(PerfettoTrace(absoluteTracePath)) { block(this) }
             }
     }
 
     /** Loads a PerfettoTrace into the trace processor server to query data out of the trace. */
-    public fun <T> loadTrace(trace: PerfettoTrace, block: Session.() -> T): T {
+    fun <T> loadTrace(trace: PerfettoTrace, block: Session.() -> T): T {
         loadTraceImpl(trace.path)
         // TODO: unload trace after block
         try {
             return block.invoke(Session(this))
         } catch (t: Throwable) {
-            eventCallback.onLoadTraceFailure(trace, t)
+            // TODO: move this behavior to an extension function in benchmark when
+            //  this class moves out of benchmark group
+            // TODO: consider a label argument to control logging like this in the success case as
+            //  well, which lets us get rid of FileLinkingRule (which doesn't work well anyway)
+            if (trace.path.startsWith(Outputs.outputDirectory.absolutePath)) {
+                // only link trace with failure to Studio if it's an output file
+                InstrumentationResults.instrumentationReport {
+                    val label = "Trace with processing error: ${t.message?.take(50)?.trim()}..."
+                    reportSummaryToIde(
+                        profilerResults =
+                            listOf(
+                                Profiler.ResultFile.ofPerfettoTrace(
+                                    label = label,
+                                    absolutePath = trace.path
+                                )
+                            )
+                    )
+                }
+            }
             throw t
         }
     }
@@ -173,10 +179,10 @@ constructor(
      *
      * @see query
      */
-    public class Session internal constructor(private val traceProcessor: TraceProcessor) {
+    class Session internal constructor(private val traceProcessor: PerfettoTraceProcessor) {
         /** Computes the given metric on the previously loaded trace. */
         @RestrictTo(LIBRARY_GROUP) // avoids exposing Proto API
-        public fun getTraceMetrics(metric: String): TraceMetrics {
+        fun getTraceMetrics(metric: String): TraceMetrics {
             val computeResult =
                 queryAndVerifyMetricResult(
                     listOf(metric),
@@ -195,7 +201,7 @@ constructor(
          * [perfetto metric docs](https://perfetto.dev/docs/quickstart/trace-analysis#trace-based-metrics)
          * for an overview on trace based metrics.
          */
-        public fun queryMetricsProtoBinary(metrics: List<String>): ByteArray {
+        fun queryMetricsProtoBinary(metrics: List<String>): ByteArray {
             val computeResult =
                 queryAndVerifyMetricResult(metrics, ComputeMetricArgs.ResultFormat.BINARY_PROTOBUF)
             return computeResult.metrics!!.toByteArray()
@@ -211,7 +217,7 @@ constructor(
          * [perfetto metric docs](https://perfetto.dev/docs/quickstart/trace-analysis#trace-based-metrics)
          * for an overview on trace based metrics.
          */
-        public fun queryMetricsJson(metrics: List<String>): String {
+        fun queryMetricsJson(metrics: List<String>): String {
             val computeResult =
                 queryAndVerifyMetricResult(metrics, ComputeMetricArgs.ResultFormat.JSON)
             check(computeResult.metrics_as_json != null)
@@ -228,7 +234,7 @@ constructor(
          * [perfetto metric docs](https://perfetto.dev/docs/quickstart/trace-analysis#trace-based-metrics)
          * for an overview on trace based metrics.
          */
-        public fun queryMetricsProtoText(metrics: List<String>): String {
+        fun queryMetricsProtoText(metrics: List<String>): String {
             val computeResult =
                 queryAndVerifyMetricResult(metrics, ComputeMetricArgs.ResultFormat.TEXTPROTO)
             check(computeResult.metrics_as_prototext != null)
@@ -244,14 +250,13 @@ constructor(
                 "Metrics must not constain spaces, metrics: $nameString"
             }
 
-            traceProcessor.tracer.trace("TraceProcessor#getTraceMetrics $nameString") {
-                require(traceProcessor.traceProcessorHttpServer.isRunning()) {
+            inMemoryTrace("PerfettoTraceProcessor#getTraceMetrics $nameString") {
+                require(traceProcessor.perfettoHttpServer.isRunning()) {
                     "Perfetto trace_shell_process is not running."
                 }
 
                 // Compute metrics
-                val computeResult =
-                    traceProcessor.traceProcessorHttpServer.computeMetric(metrics, format)
+                val computeResult = traceProcessor.perfettoHttpServer.computeMetric(metrics, format)
                 if (computeResult.error != null) {
                     throw IllegalStateException(computeResult.error)
                 }
@@ -269,7 +274,7 @@ constructor(
          * ```
          * // Runs the provided callback on each activityStart instance in the trace,
          * // providing name, start timestamp (in ns) and duration (in ns)
-         * fun TraceProcessor.Session.forEachActivityStart(callback: (String, Long, Long) -> Unit) {
+         * fun PerfettoTraceProcessor.Session.forEachActivityStart(callback: (String, Long, Long) -> Unit) {
          *     query("SELECT name,ts,dur FROM slice WHERE name LIKE \"activityStart\"").forEach {
          *         callback(it.string("name"), it.long("ts"), it.long("dur")
          *         // or, used as a map:
@@ -278,16 +283,16 @@ constructor(
          * }
          * ```
          *
-         * @see TraceProcessor
-         * @see TraceProcessor.Session
+         * @see PerfettoTraceProcessor
+         * @see PerfettoTraceProcessor.Session
          */
-        public fun query(query: String): Sequence<Row> {
-            traceProcessor.tracer.trace("TraceProcessor#query $query") {
-                require(traceProcessor.traceProcessorHttpServer.isRunning()) {
+        fun query(query: String): Sequence<Row> {
+            inMemoryTrace("PerfettoTraceProcessor#query $query".take(127)) {
+                require(traceProcessor.perfettoHttpServer.isRunning()) {
                     "Perfetto trace_shell_process is not running."
                 }
                 val queryResult =
-                    traceProcessor.traceProcessorHttpServer.rawQuery(query) {
+                    traceProcessor.perfettoHttpServer.rawQuery(query) {
                         // Note: check for errors as part of decode, so it's immediate
                         // instead of lazily in QueryResultIterator
                         QueryResult.decodeAndCheckError(query, it)
@@ -321,12 +326,12 @@ constructor(
          *
          * @see Session.query
          */
-        public fun rawQuery(query: String): ByteArray {
-            traceProcessor.tracer.trace("TraceProcessor#query $query") {
-                require(traceProcessor.traceProcessorHttpServer.isRunning()) {
+        fun rawQuery(@Language("sql") query: String): ByteArray {
+            inMemoryTrace("PerfettoTraceProcessor#query $query".take(127)) {
+                require(traceProcessor.perfettoHttpServer.isRunning()) {
                     "Perfetto trace_shell_process is not running."
                 }
-                return traceProcessor.traceProcessorHttpServer.rawQuery(query) { it.readBytes() }
+                return traceProcessor.perfettoHttpServer.rawQuery(query) { it.readBytes() }
             }
         }
 
@@ -336,11 +341,11 @@ constructor(
          * Note that sliceNames may include wildcard matches, such as `foo%`
          */
         @RestrictTo(LIBRARY_GROUP) // Slice API not currently exposed, since it doesn't track table
-        public fun querySlices(
+        fun querySlices(
             vararg sliceNames: String,
             packageName: String?,
         ): List<Slice> {
-            require(traceProcessor.traceProcessorHttpServer.isRunning()) {
+            require(traceProcessor.perfettoHttpServer.isRunning()) {
                 "Perfetto trace_shell_process is not running."
             }
 
@@ -405,22 +410,20 @@ constructor(
         }
     }
 
-    @OptIn(ExperimentalTraceProcessorApi::class)
-    private val traceProcessorHttpServer: TraceProcessorHttpServer =
-        TraceProcessorHttpServer(serverLifecycleManager)
+    private val perfettoHttpServer: PerfettoHttpServer = PerfettoHttpServer()
     private var traceLoaded = false
 
-    private fun startServer(timeout: Duration): TraceProcessor =
-        tracer.trace("TraceProcessor#startServer") {
+    private fun startServer(timeout: Duration): PerfettoTraceProcessor =
+        inMemoryTrace("PerfettoTraceProcessor#startServer") {
             println("startserver($timeout)")
-            traceProcessorHttpServer.startServer(timeout)
-            return@trace this
+            perfettoHttpServer.startServer(timeout)
+            return@inMemoryTrace this
         }
 
     private fun stopServer() =
-        tracer.trace("TraceProcessor#stopServer") {
+        inMemoryTrace("PerfettoTraceProcessor#stopServer") {
             println("stopserver")
-            traceProcessorHttpServer.stopServer()
+            perfettoHttpServer.stopServer()
         }
 
     /**
@@ -428,7 +431,7 @@ constructor(
      * trace if existing.
      */
     private fun loadTraceImpl(absoluteTracePath: String) {
-        tracer.trace("TraceProcessor#loadTraceImpl") {
+        inMemoryTrace("PerfettoTraceProcessor#loadTraceImpl") {
             require(!absoluteTracePath.contains(" ")) {
                 "Trace path must not contain spaces: $absoluteTracePath"
             }
@@ -443,11 +446,11 @@ constructor(
                 clearTrace()
             }
 
-            val parseResults = traceProcessorHttpServer.parse(FileInputStream(traceFile))
+            val parseResults = perfettoHttpServer.parse(FileInputStream(traceFile))
             parseResults.forEach { if (it.error != null) throw IllegalStateException(it.error) }
 
             // Notifies the server that it won't receive any more trace parts
-            traceProcessorHttpServer.notifyEof()
+            perfettoHttpServer.notifyEof()
 
             traceLoaded = true
         }
@@ -455,14 +458,14 @@ constructor(
 
     /** Clears the current loaded trace. */
     private fun clearTrace() =
-        tracer.trace("TraceProcessor#clearTrace") {
-            traceProcessorHttpServer.restoreInitialTables()
+        inMemoryTrace("PerfettoTraceProcessor#clearTrace") {
+            perfettoHttpServer.restoreInitialTables()
             traceLoaded = false
         }
 }
 
 /** Helper for fuzzy matching process name to package */
-public fun processNameLikePkg(pkg: String): String {
+internal fun processNameLikePkg(pkg: String): String {
     // check for truncated package names, which can sometimes occur if perfetto can't capture full
     // names, and only has 16 bytes from sched info (which results in 15 chars due to null
     // termination)
