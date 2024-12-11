@@ -46,7 +46,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
@@ -112,6 +114,7 @@ fun SwipeToReveal(
     actionButtonHeight: Dp = SwipeToRevealDefaults.SmallActionButtonHeight,
     content: @Composable () -> Unit,
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
     val children = SwipeToRevealScope()
     with(children, actions)
     val primaryAction = children.primaryAction
@@ -222,6 +225,15 @@ fun SwipeToReveal(
         state = revealState,
         content = content,
     )
+
+    LaunchedEffect(revealState.targetValue) {
+        if (
+            (revealState.targetValue == RevealValue.LeftRevealed ||
+                revealState.targetValue == RevealValue.RightRevealed)
+        ) {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+        }
+    }
 }
 
 /**
