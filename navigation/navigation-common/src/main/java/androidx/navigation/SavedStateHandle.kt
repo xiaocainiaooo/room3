@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-@file:JvmName("SavedStateHandleKt")
-@file:JvmMultifileClass
-
 package androidx.navigation
 
 import androidx.lifecycle.SavedStateHandle
