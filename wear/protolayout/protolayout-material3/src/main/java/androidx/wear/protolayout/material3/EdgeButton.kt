@@ -166,9 +166,8 @@ private fun MaterialScope.edgeButton(
 ): LayoutElement {
     val containerWidth = deviceConfiguration.screenWidthDp.toDp()
     val horizontalMarginPercent: Float =
-        if (deviceConfiguration.screenWidthDp < SCREEN_WIDTH_BREAKPOINT_DP)
-            HORIZONTAL_MARGIN_PERCENT_SMALL
-        else HORIZONTAL_MARGIN_PERCENT_LARGE
+        if (deviceConfiguration.screenWidthDp.isBreakpoint()) HORIZONTAL_MARGIN_PERCENT_LARGE
+        else HORIZONTAL_MARGIN_PERCENT_SMALL
     val edgeButtonWidth: Float =
         (100f - 2f * horizontalMarginPercent) * deviceConfiguration.screenWidthDp / 100f
     val bottomCornerRadiusX = dp(edgeButtonWidth / 2f)

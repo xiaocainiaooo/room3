@@ -28,6 +28,7 @@ import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ModifiersBuilders.Background
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
+import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.filled
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.filledTonal
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.filledVariant
@@ -160,7 +161,7 @@ object TestCasesGenerator {
                     titleSlot = { text("Title that overflows".prop(), color = colorScheme.error) }
                 )
             }
-        testCases["primarylayout_bottomslot_golden$goldenSuffix"] =
+        testCases["primarylayout_titlecard_bottomslot_golden$goldenSuffix"] =
             materialScope(
                 ApplicationProvider.getApplicationContext(),
                 deviceParameters,
@@ -168,10 +169,23 @@ object TestCasesGenerator {
             ) {
                 primaryLayout(
                     mainSlot = {
-                        coloredBox(color = colorScheme.onSecondary, shape = shapes.medium)
+                        titleCard(
+                            onClick = clickable,
+                            contentDescription = "Card".prop(),
+                            height = expand(),
+                            title = {
+                                text(
+                                    "Title Card text that will overflow after 2 max lines of text"
+                                        .prop()
+                                )
+                            },
+                            time = { text("Now".prop()) },
+                            content = { text("Default title card".prop()) },
+                            colors = filledVariantCardColors()
+                        )
                     },
                     bottomSlot = { text("Bottom Slot that overflows".prop()) },
-                    titleSlot = { text("Title".prop(), color = colorScheme.secondaryDim) }
+                    titleSlot = { text("TitleCard".prop(), color = colorScheme.secondaryDim) }
                 )
             }
         testCases["primarylayout_bottomslot_withlabel_golden$goldenSuffix"] =

@@ -30,7 +30,15 @@ import androidx.wear.protolayout.DimensionBuilders.WrappedDimensionProp
 import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.DimensionBuilders.wrap
+import androidx.wear.protolayout.LayoutElementBuilders
+import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER
+import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_END
+import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_LEFT
+import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_RIGHT
+import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_START
+import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_UNDEFINED
 import androidx.wear.protolayout.LayoutElementBuilders.Spacer
+import androidx.wear.protolayout.LayoutElementBuilders.TextAlignment
 import androidx.wear.protolayout.ModifiersBuilders.Background
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.ElementMetadata
@@ -46,7 +54,7 @@ import java.nio.charset.StandardCharsets
  * The breakpoint value defining the screen width on and after which, some properties should be
  * changed, depending on the use case.
  */
-internal const val SCREEN_WIDTH_BREAKPOINT_DP = 225
+internal const val SCREEN_SIZE_BREAKPOINT_DP = 225
 
 /** Minimum tap target for any clickable element. */
 internal val MINIMUM_TAP_TARGET_SIZE: DpProp = dp(48f)
@@ -74,10 +82,7 @@ internal fun Float.dpToSp(fontScale: Float): Float =
     (if (SDK_INT >= UPSIDE_DOWN_CAKE) FontScaleConverterFactory.forScale(fontScale) else null)
         ?.convertDpToSp(this) ?: dpToSpLinear(fontScale)
 
-@Dimension(unit = SP)
-private fun Float.dpToSpLinear(fontScale: Float): Float {
-    return this / fontScale
-}
+@Dimension(unit = SP) private fun Float.dpToSpLinear(fontScale: Float): Float = this / fontScale
 
 internal fun StringProp.buttonRoleSemantics() =
     Semantics.Builder().setContentDescription(this).setRole(SEMANTICS_ROLE_BUTTON).build()
@@ -87,9 +92,12 @@ internal fun Int.toDp() = dp(this.toFloat())
 internal fun String.toElementMetadata() = ElementMetadata.Builder().setTagData(toTagBytes()).build()
 
 /** Builds a horizontal Spacer, with width set to expand and height set to the given value. */
-internal fun horizontalSpacer(@Dimension(unit = DP) heightDp: Int): Spacer {
-    return Spacer.Builder().setWidth(expand()).setHeight(dp(heightDp.toFloat())).build()
-}
+internal fun horizontalSpacer(@Dimension(unit = DP) heightDp: Int): Spacer =
+    Spacer.Builder().setWidth(expand()).setHeight(heightDp.toDp()).build()
+
+/** Builds a vertical Spacer, with height set to expand and width set to the given value. */
+internal fun verticalSpacer(@Dimension(unit = DP) widthDp: Int): Spacer =
+    Spacer.Builder().setWidth(widthDp.toDp()).setHeight(expand()).build()
 
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public fun String.prop(): StringProp = StringProp.Builder(this).build()
@@ -125,3 +133,22 @@ public fun ColorProp.withOpacity(@FloatRange(from = 0.0, to = 1.0) ratio: Float)
     val alphaPosition = 24
     return argb((this.argb and alphaMask) or (alpha shl alphaPosition))
 }
+
+/** Returns corresponding text alignment based on the given horizontal alignment. */
+@TextAlignment
+internal fun Int.horizontalAlignToTextAlign(): Int =
+    when (this) {
+        HORIZONTAL_ALIGN_CENTER -> LayoutElementBuilders.TEXT_ALIGN_CENTER
+        HORIZONTAL_ALIGN_LEFT,
+        HORIZONTAL_ALIGN_START -> LayoutElementBuilders.TEXT_ALIGN_START
+        HORIZONTAL_ALIGN_END,
+        HORIZONTAL_ALIGN_RIGHT -> LayoutElementBuilders.TEXT_ALIGN_END
+        HORIZONTAL_ALIGN_UNDEFINED -> LayoutElementBuilders.TEXT_ALIGN_UNDEFINED
+        else -> LayoutElementBuilders.TEXT_ALIGN_UNDEFINED
+    }
+
+/**
+ * Returns whether the provided DP size is equal or above the [SCREEN_SIZE_BREAKPOINT_DP]
+ * breakpoint.
+ */
+internal fun Int.isBreakpoint() = this >= SCREEN_SIZE_BREAKPOINT_DP

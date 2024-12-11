@@ -27,6 +27,8 @@ import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint
 import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
+import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
+import androidx.wear.protolayout.material3.TitleCardStyle.Companion.largeTitleCardStyle
 import androidx.wear.protolayout.material3.Typography
 import androidx.wear.protolayout.material3.backgroundImage
 import androidx.wear.protolayout.material3.buttonGroup
@@ -38,6 +40,7 @@ import androidx.wear.protolayout.material3.primaryLayout
 import androidx.wear.protolayout.material3.prop
 import androidx.wear.protolayout.material3.text
 import androidx.wear.protolayout.material3.textEdgeButton
+import androidx.wear.protolayout.material3.titleCard
 
 /** Builds Material3 text element with default options. */
 @Sampled
@@ -139,6 +142,29 @@ fun cardSample(
                 ) {
                     text("Content of the Card!".prop())
                 }
+            }
+        )
+    }
+
+@Sampled
+fun titleCardSample(
+    context: Context,
+    deviceConfiguration: DeviceParameters,
+    clickable: Clickable
+): LayoutElement =
+    materialScope(context, deviceConfiguration) {
+        primaryLayout(
+            mainSlot = {
+                titleCard(
+                    onClick = clickable,
+                    contentDescription = "Card with image background".prop(),
+                    height = expand(),
+                    colors = filledVariantCardColors(),
+                    style = largeTitleCardStyle(),
+                    title = { text("This is title of the title card".prop()) },
+                    time = { text("NOW".prop()) },
+                    content = { text("Content of the Card!".prop()) }
+                )
             }
         )
     }

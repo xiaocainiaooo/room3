@@ -21,10 +21,13 @@ import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.ResourceBuilders
 import androidx.wear.protolayout.TimelineBuilders
-import androidx.wear.protolayout.material3.card
+import androidx.wear.protolayout.material3.CardColors
 import androidx.wear.protolayout.material3.materialScope
 import androidx.wear.protolayout.material3.primaryLayout
+import androidx.wear.protolayout.material3.prop
 import androidx.wear.protolayout.material3.text
+import androidx.wear.protolayout.material3.textEdgeButton
+import androidx.wear.protolayout.material3.titleCard
 import androidx.wear.tiles.RequestBuilders
 import androidx.wear.tiles.TileBuilders
 import androidx.wear.tiles.TileService
@@ -69,20 +72,43 @@ private fun tileLayout(
     materialScope(context = context, deviceConfiguration = requestParams.deviceConfiguration) {
         primaryLayout(
             mainSlot = {
-                card(
+                titleCard(
                     onClick = EMPTY_LOAD_CLICKABLE,
                     contentDescription = "Sample Card".prop(),
-                    backgroundColor = colorScheme.tertiary,
-                    width = expand(),
+                    colors =
+                        CardColors(
+                            background = colorScheme.tertiary,
+                            title = colorScheme.onTertiary,
+                            content = colorScheme.onTertiary,
+                            time = colorScheme.onTertiary
+                        ),
                     height = expand(),
+                    title = {
+                        text(
+                            "Title Card!".prop(),
+                            maxLines = 1,
+                        )
+                    },
                     content = {
                         text(
                             "Hello and welcome Tiles in AndroidX!".prop(),
                             maxLines = 2,
-                            color = colorScheme.onTertiary
+                        )
+                    },
+                    time = {
+                        text(
+                            "NOW".prop(),
                         )
                     }
                 )
+            },
+            bottomSlot = {
+                textEdgeButton(
+                    onClick = EMPTY_LOAD_CLICKABLE,
+                    contentDescription = "EdgeButton".prop(),
+                ) {
+                    text("Edge".prop())
+                }
             }
         )
     }
