@@ -43,7 +43,7 @@ private class NonEntityOrViewProcessor(
         PojoProcessor.createFor(
                 context = context,
                 element = element,
-                bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                 parent = null,
                 referenceStack = referenceStack
             )

@@ -48,7 +48,7 @@ import androidx.room.solver.CodeGenScope
 import androidx.room.solver.query.parameter.QueryParameterAdapter
 import androidx.room.solver.query.result.RowAdapter
 import androidx.room.solver.query.result.SingleColumnRowAdapter
-import androidx.room.solver.types.CursorValueReader
+import androidx.room.solver.types.StatementValueReader
 import androidx.room.verifier.DatabaseVerificationErrors
 import androidx.room.writer.QueryWriter
 import androidx.room.writer.RelationCollectorFunctionWriter
@@ -69,9 +69,9 @@ data class RelationCollector(
     // query writer for the relating entity query
     val queryWriter: QueryWriter,
     // key reader for the parent field
-    val parentKeyColumnReader: CursorValueReader,
+    val parentKeyColumnReader: StatementValueReader,
     // key reader for the entity field
-    val entityKeyColumnReader: CursorValueReader,
+    val entityKeyColumnReader: StatementValueReader,
     // adapter for the relating pojo
     val rowAdapter: RowAdapter,
     // parsed relating entity query
@@ -112,7 +112,7 @@ data class RelationCollector(
 
     // called to extract the key if it exists and adds it to the map of relations to fetch.
     fun writeReadParentKeyCode(
-        cursorVarName: String,
+        stmtVarName: String,
         fieldsWithIndices: List<FieldWithIndex>,
         scope: CodeGenScope
     ) {
@@ -123,7 +123,7 @@ data class RelationCollector(
                 ISSUE_TRACKER_LINK
         }
         scope.builder.apply {
-            readKey(cursorVarName, indexVar, parentKeyColumnReader, scope) { tmpVar ->
+            readKey(stmtVarName, indexVar, parentKeyColumnReader, scope) { tmpVar ->
                 // for relation collection put an empty collections in the map, otherwise put nulls
                 if (relationTypeIsCollection) {
                     beginControlFlow("if (!%L.containsKey(%L))", varName, tmpVar).apply {
@@ -150,7 +150,7 @@ data class RelationCollector(
 
     // called to extract key and relation collection, defaulting to empty collection if not found
     fun writeReadCollectionIntoTmpVar(
-        cursorVarName: String,
+        stmtVarName: String,
         fieldsWithIndices: List<FieldWithIndex>,
         scope: CodeGenScope
     ): Pair<String, Field> {
@@ -168,7 +168,7 @@ data class RelationCollector(
         scope.builder.apply {
             addLocalVariable(name = tmpRelationVar, typeName = relationTypeName)
             readKey(
-                cursorVarName = cursorVarName,
+                stmtVarName = stmtVarName,
                 indexVar = indexVar,
                 keyReader = parentKeyColumnReader,
                 scope = scope,
@@ -256,21 +256,21 @@ data class RelationCollector(
 
     // called to read key and call `onKeyReady` to write code once it is successfully read
     fun readKey(
-        cursorVarName: String,
+        stmtVarName: String,
         indexVar: String,
-        keyReader: CursorValueReader,
+        keyReader: StatementValueReader,
         scope: CodeGenScope,
         onKeyReady: XCodeBlock.Builder.(String) -> Unit
     ) {
-        readKey(cursorVarName, indexVar, keyReader, scope, onKeyReady, null)
+        readKey(stmtVarName, indexVar, keyReader, scope, onKeyReady, null)
     }
 
     // called to read key and call `onKeyReady` to write code once it is successfully read and
     // `onKeyUnavailable` if the key is unavailable (missing column due to bad projection).
     private fun readKey(
-        cursorVarName: String,
+        stmtVarName: String,
         indexVar: String,
-        keyReader: CursorValueReader,
+        keyReader: StatementValueReader,
         scope: CodeGenScope,
         onKeyReady: XCodeBlock.Builder.(String) -> Unit,
         onKeyUnavailable: (XCodeBlock.Builder.() -> Unit)?,
@@ -278,7 +278,7 @@ data class RelationCollector(
         scope.builder.apply {
             val tmpVar = scope.getTmpVar("_tmpKey")
             addLocalVariable(tmpVar, keyReader.typeMirror().asTypeName())
-            keyReader.readFromCursor(tmpVar, cursorVarName, indexVar, scope)
+            keyReader.readFromStatement(tmpVar, stmtVarName, indexVar, scope)
             if (keyReader.typeMirror().nullability == XNullability.NONNULL) {
                 onKeyReady(tmpVar)
             } else {
@@ -426,7 +426,7 @@ data class RelationCollector(
                         )
 
                     val parentKeyColumnReader =
-                        context.typeAdapterStore.findCursorValueReader(
+                        context.typeAdapterStore.findStatementValueReader(
                             output =
                                 context.processingEnv.requireType(keyTypeName).let {
                                     if (!relation.parentField.nonNull) it.makeNullable() else it
@@ -434,7 +434,7 @@ data class RelationCollector(
                             affinity = affinity
                         )
                     val entityKeyColumnReader =
-                        context.typeAdapterStore.findCursorValueReader(
+                        context.typeAdapterStore.findStatementValueReader(
                             output =
                                 context.processingEnv.requireType(keyTypeName).let { keyType ->
                                     if (!relation.entityField.nonNull) keyType.makeNullable()
@@ -462,7 +462,7 @@ data class RelationCollector(
                         ) {
                             // check for a column adapter first
                             val cursorReader =
-                                context.typeAdapterStore.findCursorValueReader(
+                                context.typeAdapterStore.findStatementValueReader(
                                     relation.pojoType,
                                     resultInfo.columns.first().type
                                 )
@@ -516,12 +516,12 @@ data class RelationCollector(
                     SQLTypeAffinity.TEXT
                 }
 
-            val parentAffinity = relation.parentField.cursorValueReader?.affinity()
-            val childAffinity = relation.entityField.cursorValueReader?.affinity()
+            val parentAffinity = relation.parentField.statementValueReader?.affinity()
+            val childAffinity = relation.entityField.statementValueReader?.affinity()
             val junctionParentAffinity =
-                relation.junction?.parentField?.cursorValueReader?.affinity()
+                relation.junction?.parentField?.statementValueReader?.affinity()
             val junctionChildAffinity =
-                relation.junction?.entityField?.cursorValueReader?.affinity()
+                relation.junction?.entityField?.statementValueReader?.affinity()
             return if (relation.junction != null) {
                 checkAffinity(childAffinity, junctionChildAffinity) {
                     context.logger.w(

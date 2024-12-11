@@ -33,9 +33,9 @@ import androidx.room.writer.TypeWriter
 class EnumColumnTypeAdapter(private val enumTypeElement: XEnumTypeElement, out: XType) :
     ColumnTypeAdapter(out, TEXT) {
 
-    override fun readFromCursor(
+    override fun readFromStatement(
         outVarName: String,
-        cursorVarName: String,
+        stmtVarName: String,
         indexVarName: String,
         scope: CodeGenScope
     ) {
@@ -46,14 +46,14 @@ class EnumColumnTypeAdapter(private val enumTypeElement: XEnumTypeElement, out: 
                     "%L = %N(%L.getText(%L))",
                     outVarName,
                     stringToEnumMethod,
-                    cursorVarName,
+                    stmtVarName,
                     indexVarName
                 )
             }
             if (out.nullability == XNullability.NONNULL) {
                 addGetStringStatement()
             } else {
-                beginControlFlow("if (%L.isNull(%L))", cursorVarName, indexVarName)
+                beginControlFlow("if (%L.isNull(%L))", stmtVarName, indexVarName)
                     .addStatement("%L = null", outVarName)
                 nextControlFlow("else").addGetStringStatement()
                 endControlFlow()

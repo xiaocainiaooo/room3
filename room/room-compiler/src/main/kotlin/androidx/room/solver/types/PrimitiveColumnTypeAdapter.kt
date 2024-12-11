@@ -118,16 +118,16 @@ class PrimitiveColumnTypeAdapter(
         scope.builder.addStatement("%L.%L(%L, %L)", stmtName, stmtSetter, indexVarName, valueExpr)
     }
 
-    override fun readFromCursor(
+    override fun readFromStatement(
         outVarName: String,
-        cursorVarName: String,
+        stmtVarName: String,
         indexVarName: String,
         scope: CodeGenScope
     ) {
         scope.builder.addStatement(
             "%L = %L",
             outVarName,
-            XCodeBlock.of("%L.%L(%L)", cursorVarName, stmtGetter, indexVarName).let {
+            XCodeBlock.of("%L.%L(%L)", stmtVarName, stmtGetter, indexVarName).let {
                 // These primitives don't have an exact cursor / statement getter.
                 val castFunction =
                     when (primitive) {

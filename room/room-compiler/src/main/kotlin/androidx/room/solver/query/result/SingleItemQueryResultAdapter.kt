@@ -26,12 +26,12 @@ class SingleItemQueryResultAdapter(private val rowAdapter: RowAdapter) :
     QueryResultAdapter(listOf(rowAdapter)) {
     val type = rowAdapter.out
 
-    override fun convert(outVarName: String, cursorVarName: String, scope: CodeGenScope) {
+    override fun convert(outVarName: String, stmtVarName: String, scope: CodeGenScope) {
         scope.builder.apply {
-            rowAdapter.onCursorReady(cursorVarName = cursorVarName, scope = scope)
+            rowAdapter.onStatementReady(stmtVarName = stmtVarName, scope = scope)
             addLocalVariable(outVarName, type.asTypeName())
-            beginControlFlow("if (%L.step())", cursorVarName).apply {
-                rowAdapter.convert(outVarName, cursorVarName, scope)
+            beginControlFlow("if (%L.step())", stmtVarName).apply {
+                rowAdapter.convert(outVarName, stmtVarName, scope)
             }
             nextControlFlow("else").applyTo { language ->
                 val defaultValue = rowAdapter.out.defaultValue()

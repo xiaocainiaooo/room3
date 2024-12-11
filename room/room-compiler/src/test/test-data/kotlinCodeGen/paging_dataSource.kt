@@ -32,15 +32,15 @@ public class MyDao_Impl(
       public override fun create(): LimitOffsetDataSource<MyEntity> = object :
           LimitOffsetDataSource<MyEntity>(__db, _statement, false, true, "MyEntity") {
         protected override fun convertRows(statement: SQLiteStatement): List<MyEntity> {
-          val _cursorIndexOfPk: Int = getColumnIndexOrThrow(statement, "pk")
-          val _cursorIndexOfOther: Int = getColumnIndexOrThrow(statement, "other")
+          val _columnIndexOfPk: Int = getColumnIndexOrThrow(statement, "pk")
+          val _columnIndexOfOther: Int = getColumnIndexOrThrow(statement, "other")
           val _res: MutableList<MyEntity> = mutableListOf()
           while (statement.step()) {
             val _item: MyEntity
             val _tmpPk: Int
-            _tmpPk = statement.getLong(_cursorIndexOfPk).toInt()
+            _tmpPk = statement.getLong(_columnIndexOfPk).toInt()
             val _tmpOther: String
-            _tmpOther = statement.getText(_cursorIndexOfOther)
+            _tmpOther = statement.getText(_columnIndexOfOther)
             _item = MyEntity(_tmpPk,_tmpOther)
             _res.add(_item)
           }
@@ -59,15 +59,15 @@ public class MyDao_Impl(
       public override fun create(): LimitOffsetDataSource<MyEntity> = object :
           LimitOffsetDataSource<MyEntity>(__db, _statement, false, true, "MyEntity") {
         protected override fun convertRows(statement: SQLiteStatement): List<MyEntity> {
-          val _cursorIndexOfPk: Int = getColumnIndexOrThrow(statement, "pk")
-          val _cursorIndexOfOther: Int = getColumnIndexOrThrow(statement, "other")
+          val _columnIndexOfPk: Int = getColumnIndexOrThrow(statement, "pk")
+          val _columnIndexOfOther: Int = getColumnIndexOrThrow(statement, "other")
           val _res: MutableList<MyEntity> = mutableListOf()
           while (statement.step()) {
             val _item: MyEntity
             val _tmpPk: Int
-            _tmpPk = statement.getLong(_cursorIndexOfPk).toInt()
+            _tmpPk = statement.getLong(_columnIndexOfPk).toInt()
             val _tmpOther: String
-            _tmpOther = statement.getText(_cursorIndexOfOther)
+            _tmpOther = statement.getText(_columnIndexOfOther)
             _item = MyEntity(_tmpPk,_tmpOther)
             _res.add(_item)
           }

@@ -38,11 +38,11 @@ class PojoIndexAdapter(
 
     private lateinit var columnIndexVars: List<ColumnIndexVar>
 
-    override fun onCursorReady(cursorVarName: String, scope: CodeGenScope) {
+    override fun onStatementReady(stmtVarName: String, scope: CodeGenScope) {
         columnIndexVars =
             mapping.matchedFields.map {
                 val indexVar =
-                    scope.getTmpVar("_cursorIndexOf${it.name.stripNonJava().capitalize(Locale.US)}")
+                    scope.getTmpVar("_columnIndexOf${it.name.stripNonJava().capitalize(Locale.US)}")
                 if (info != null && query != null && query.hasTopStarProjection == false) {
                     // When result info is available and query does not have a top-level star
                     // projection we can generate column to field index since the column result
@@ -68,7 +68,7 @@ class PojoIndexAdapter(
                         name = indexVar,
                         typeName = XTypeName.PRIMITIVE_INT,
                         assignExpr =
-                            XCodeBlock.of("%M(%L, %S)", packageMember, cursorVarName, it.columnName)
+                            XCodeBlock.of("%M(%L, %S)", packageMember, stmtVarName, it.columnName)
                     )
                 }
                 ColumnIndexVar(it.columnName, indexVar)

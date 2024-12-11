@@ -30,7 +30,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class EntityCursorConverterWriterTest : BaseEntityParserTest() {
+class EntityStatementConverterWriterTest : BaseEntityParserTest() {
     companion object {
         val OUT_PREFIX =
             """
@@ -76,24 +76,24 @@ class EntityCursorConverterWriterTest : BaseEntityParserTest() {
                 |private MyEntity __entityStatementConverter_fooBarMyEntity(
                 |@NonNull final SQLiteStatement statement) {
                 |  final MyEntity _entity;
-                |  final int _cursorIndexOfId = SQLiteStatementUtil.getColumnIndex(statement, "id");
-                |  final int _cursorIndexOfName = SQLiteStatementUtil.getColumnIndex(statement, "name");
-                |  final int _cursorIndexOfLastName = SQLiteStatementUtil.getColumnIndex(statement, "lastName");
-                |  final int _cursorIndexOfAge = SQLiteStatementUtil.getColumnIndex(statement, "age");
+                |  final int _columnIndexOfId = SQLiteStatementUtil.getColumnIndex(statement, "id");
+                |  final int _columnIndexOfName = SQLiteStatementUtil.getColumnIndex(statement, "name");
+                |  final int _columnIndexOfLastName = SQLiteStatementUtil.getColumnIndex(statement, "lastName");
+                |  final int _columnIndexOfAge = SQLiteStatementUtil.getColumnIndex(statement, "age");
                 |  _entity = new MyEntity();
-                |  if (_cursorIndexOfId != -1) {
+                |  if (_columnIndexOfId != -1) {
                 |    final int _tmpId;
-                |    _tmpId = (int) (statement.getLong(_cursorIndexOfId));
+                |    _tmpId = (int) (statement.getLong(_columnIndexOfId));
                 |    _entity.setId(_tmpId);
                 |  }
-                |  if (_cursorIndexOfName != -1) {
-                |    ${stringAdapterCode("_entity.name", "_cursorIndexOfName")}
+                |  if (_columnIndexOfName != -1) {
+                |    ${stringAdapterCode("_entity.name", "_columnIndexOfName")}
                 |  }
-                |  if (_cursorIndexOfLastName != -1) {
-                |    ${stringAdapterCode("_entity.lastName", "_cursorIndexOfLastName")}
+                |  if (_columnIndexOfLastName != -1) {
+                |    ${stringAdapterCode("_entity.lastName", "_columnIndexOfLastName")}
                 |  }
-                |  if (_cursorIndexOfAge != -1) {
-                |    _entity.age = (int) (statement.getLong(_cursorIndexOfAge));
+                |  if (_columnIndexOfAge != -1) {
+                |    _entity.age = (int) (statement.getLong(_columnIndexOfAge));
                 |  }
                 |  return _entity;
                 |}
@@ -127,7 +127,7 @@ class EntityCursorConverterWriterTest : BaseEntityParserTest() {
                     override val packageName = className.packageName
 
                     override fun createTypeSpecBuilder(): XTypeSpec.Builder {
-                        getOrCreateFunction(EntityCursorConverterWriter(entity))
+                        getOrCreateFunction(EntityStatementConverterWriter(entity))
                         return XTypeSpec.classBuilder(className).applyToJavaPoet {
                             addModifiers(Modifier.PUBLIC)
                         }

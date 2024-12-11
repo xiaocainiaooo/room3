@@ -49,22 +49,22 @@ public class MyDao_Impl(
     return performBlocking(__db, true, false) { _connection ->
       val _stmt: SQLiteStatement = _connection.prepare(_sql)
       try {
-        val _cursorIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
-        val _cursorIndexOfVariablePrimitive: Int = getColumnIndexOrThrow(_stmt, "variablePrimitive")
-        val _cursorIndexOfVariableString: Int = getColumnIndexOrThrow(_stmt, "variableString")
-        val _cursorIndexOfVariableNullableString: Int = getColumnIndexOrThrow(_stmt,
+        val _columnIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
+        val _columnIndexOfVariablePrimitive: Int = getColumnIndexOrThrow(_stmt, "variablePrimitive")
+        val _columnIndexOfVariableString: Int = getColumnIndexOrThrow(_stmt, "variableString")
+        val _columnIndexOfVariableNullableString: Int = getColumnIndexOrThrow(_stmt,
             "variableNullableString")
         val _result: MyEntity
         if (_stmt.step()) {
           val _tmpPk: Int
-          _tmpPk = _stmt.getLong(_cursorIndexOfPk).toInt()
+          _tmpPk = _stmt.getLong(_columnIndexOfPk).toInt()
           _result = MyEntity(_tmpPk)
-          _result.variablePrimitive = _stmt.getLong(_cursorIndexOfVariablePrimitive)
-          _result.variableString = _stmt.getText(_cursorIndexOfVariableString)
-          if (_stmt.isNull(_cursorIndexOfVariableNullableString)) {
+          _result.variablePrimitive = _stmt.getLong(_columnIndexOfVariablePrimitive)
+          _result.variableString = _stmt.getText(_columnIndexOfVariableString)
+          if (_stmt.isNull(_columnIndexOfVariableNullableString)) {
             _result.variableNullableString = null
           } else {
-            _result.variableNullableString = _stmt.getText(_cursorIndexOfVariableNullableString)
+            _result.variableNullableString = _stmt.getText(_columnIndexOfVariableNullableString)
           }
         } else {
           error("The query result was empty, but expected a single row to return a NON-NULL object of type <MyEntity>.")

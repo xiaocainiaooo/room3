@@ -279,7 +279,8 @@ class TableEntityProcessorTest : BaseEntityParserTest() {
         ) { entity, invocation ->
             val idField = entity.fields.first()
             val cursorValueReader =
-                idField.cursorValueReader ?: throw AssertionError("must have a cursor value reader")
+                idField.statementValueReader
+                    ?: throw AssertionError("must have a cursor value reader")
             assertThat(
                 cursorValueReader.typeMirror().asTypeName(),
                 `is`(invocation.processingEnv.requireType(XTypeName.PRIMITIVE_INT).asTypeName())

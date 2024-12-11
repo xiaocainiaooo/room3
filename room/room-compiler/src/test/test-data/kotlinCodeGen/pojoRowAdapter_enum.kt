@@ -49,20 +49,20 @@ public class MyDao_Impl(
     return performBlocking(__db, true, false) { _connection ->
       val _stmt: SQLiteStatement = _connection.prepare(_sql)
       try {
-        val _cursorIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
-        val _cursorIndexOfEnum: Int = getColumnIndexOrThrow(_stmt, "enum")
-        val _cursorIndexOfNullableEnum: Int = getColumnIndexOrThrow(_stmt, "nullableEnum")
+        val _columnIndexOfPk: Int = getColumnIndexOrThrow(_stmt, "pk")
+        val _columnIndexOfEnum: Int = getColumnIndexOrThrow(_stmt, "enum")
+        val _columnIndexOfNullableEnum: Int = getColumnIndexOrThrow(_stmt, "nullableEnum")
         val _result: MyEntity
         if (_stmt.step()) {
           val _tmpPk: Int
-          _tmpPk = _stmt.getLong(_cursorIndexOfPk).toInt()
+          _tmpPk = _stmt.getLong(_columnIndexOfPk).toInt()
           val _tmpEnum: Fruit
-          _tmpEnum = __Fruit_stringToEnum(_stmt.getText(_cursorIndexOfEnum))
+          _tmpEnum = __Fruit_stringToEnum(_stmt.getText(_columnIndexOfEnum))
           val _tmpNullableEnum: Fruit?
-          if (_stmt.isNull(_cursorIndexOfNullableEnum)) {
+          if (_stmt.isNull(_columnIndexOfNullableEnum)) {
             _tmpNullableEnum = null
           } else {
-            _tmpNullableEnum = __Fruit_stringToEnum(_stmt.getText(_cursorIndexOfNullableEnum))
+            _tmpNullableEnum = __Fruit_stringToEnum(_stmt.getText(_columnIndexOfNullableEnum))
           }
           _result = MyEntity(_tmpPk,_tmpEnum,_tmpNullableEnum)
         } else {

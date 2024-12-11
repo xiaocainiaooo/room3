@@ -465,7 +465,7 @@ class PojoProcessorTargetMethodTest {
             PojoProcessor.createFor(
                     context = invocation.context,
                     element = invocation.processingEnv.requireTypeElement(MY_POJO),
-                    bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                    bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                     parent = null
                 )
                 .process()
@@ -510,7 +510,7 @@ class PojoProcessorTargetMethodTest {
             PojoProcessor.createFor(
                     context = invocation.context,
                     element = invocation.processingEnv.requireTypeElement(MY_POJO),
-                    bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                    bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                     parent = null
                 )
                 .process()

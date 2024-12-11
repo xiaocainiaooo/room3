@@ -105,7 +105,7 @@ class PojoProcessorTest {
                 PojoProcessor.createFor(
                         context = invocation.context,
                         element = invocation.processingEnv.requireTypeElement(MY_POJO),
-                        bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                        bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                         parent = null
                     )
                     .process()
@@ -1080,7 +1080,7 @@ class PojoProcessorTest {
                 PojoProcessor.createFor(
                         invocation.context,
                         element,
-                        FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                        FieldProcessor.BindingScope.READ_FROM_STMT,
                         null
                     )
                     .process()
@@ -1711,7 +1711,7 @@ class PojoProcessorTest {
                     PojoProcessor.createFor(
                             context = invocation.context,
                             element = invocation.processingEnv.requireTypeElement(it),
-                            bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                            bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                             parent = null
                         )
                         .process()
@@ -1729,7 +1729,7 @@ class PojoProcessorTest {
                         invocation.processingEnv.requireTypeElement(
                             "foo.bar.TestData.WithJvmOverloads"
                         ),
-                    bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                    bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                     parent = null
                 )
                 .process()
@@ -1757,7 +1757,7 @@ class PojoProcessorTest {
                 PojoProcessor.createFor(
                         context = invocation.context,
                         element = invocation.processingEnv.requireTypeElement(MY_POJO),
-                        bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                        bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                         parent = null
                     )
                     .process()
@@ -1796,7 +1796,7 @@ class PojoProcessorTest {
                 PojoProcessor.createFor(
                         context = invocation.context,
                         element = invocation.processingEnv.requireTypeElement(MY_POJO),
-                        bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                        bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                         parent = null
                     )
                     .process()
@@ -1833,7 +1833,7 @@ class PojoProcessorTest {
                 PojoProcessor.createFor(
                         context = invocation.context,
                         element = invocation.processingEnv.requireTypeElement(MY_POJO),
-                        bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                        bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                         parent = null
                     )
                     .process()
@@ -1865,7 +1865,7 @@ class PojoProcessorTest {
                 PojoProcessor.createFor(
                         context = invocation.context,
                         element = invocation.processingEnv.requireTypeElement(MY_POJO),
-                        bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                        bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                         parent = null
                     )
                     .process()
@@ -1896,7 +1896,7 @@ class PojoProcessorTest {
                 PojoProcessor.createFor(
                         context = invocation.context,
                         element = invocation.processingEnv.requireTypeElement(MY_POJO),
-                        bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                        bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                         parent = null
                     )
                     .process()
@@ -1991,7 +1991,7 @@ class PojoProcessorTest {
             PojoProcessor.createFor(
                     context = invocation.context,
                     element = invocation.processingEnv.requireTypeElement(MY_POJO),
-                    bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                    bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                     parent = null
                 )
                 .process()
@@ -2087,7 +2087,7 @@ class PojoProcessorTest {
             PojoProcessor.createFor(
                     context = invocation.context,
                     element = invocation.processingEnv.requireTypeElement(MY_POJO),
-                    bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                    bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                     parent = null
                 )
                 .process()
@@ -2115,7 +2115,7 @@ class PojoProcessorTest {
                 PojoProcessor.createFor(
                         context = invocation.context,
                         element = invocation.processingEnv.requireTypeElement("foo.bar.Book"),
-                        bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                        bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                         parent = null
                     )
                     .process()
@@ -2169,7 +2169,7 @@ class PojoProcessorTest {
                     PojoProcessor.createFor(
                             context = invocation.context,
                             element = invocation.processingEnv.requireTypeElement(it),
-                            bindingScope = FieldProcessor.BindingScope.READ_FROM_CURSOR,
+                            bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                             parent = null
                         )
                         .process()

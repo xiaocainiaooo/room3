@@ -32,7 +32,7 @@ import androidx.room.processor.ProcessorErrors
 import androidx.room.processor.ProcessorErrors.AmbiguousColumnLocation.ENTITY
 import androidx.room.processor.ProcessorErrors.AmbiguousColumnLocation.MAP_INFO
 import androidx.room.processor.ProcessorErrors.AmbiguousColumnLocation.POJO
-import androidx.room.solver.types.CursorValueReader
+import androidx.room.solver.types.StatementValueReader
 import androidx.room.verifier.ColumnInfo
 import androidx.room.vo.ColumnIndexVar
 import androidx.room.vo.Warning
@@ -127,7 +127,7 @@ abstract class MultimapQueryResultAdapter(
         fun validateMapKeyTypeArg(
             context: Context,
             keyTypeArg: XType,
-            keyReader: CursorValueReader?,
+            keyReader: StatementValueReader?,
             keyColumnName: String?,
         ) {
             if (!keyTypeArg.implementsEqualsAndHashcode()) {
@@ -156,7 +156,7 @@ abstract class MultimapQueryResultAdapter(
         fun validateMapValueTypeArg(
             context: Context,
             valueTypeArg: XType,
-            valueReader: CursorValueReader?,
+            valueReader: StatementValueReader?,
             valueColumnName: String?,
         ) {
             val hasValueColumnName = valueColumnName?.isNotEmpty() ?: false
@@ -213,7 +213,7 @@ abstract class MultimapQueryResultAdapter(
     }
 
     /** Generates a code expression that verifies if all matched fields are null. */
-    fun getColumnNullCheckCode(cursorVarName: String, indexVars: List<ColumnIndexVar>) =
+    fun getColumnNullCheckCode(stmtVarName: String, indexVars: List<ColumnIndexVar>) =
         buildCodeBlock { language ->
             val space =
                 when (language) {
@@ -221,7 +221,7 @@ abstract class MultimapQueryResultAdapter(
                     CodeLanguage.KOTLIN -> " "
                 }
             val conditions =
-                indexVars.map { XCodeBlock.of("%L.isNull(%L)", cursorVarName, it.indexVar) }
+                indexVars.map { XCodeBlock.of("%L.isNull(%L)", stmtVarName, it.indexVar) }
             val placeholders = conditions.joinToString(separator = "$space&&$space") { "%L" }
             add(placeholders, *conditions.toTypedArray())
         }
