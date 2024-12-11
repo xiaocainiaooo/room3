@@ -77,6 +77,7 @@ tasks.withType(KotlinCompile).configureEach {
                 "-opt-in=androidx.benchmark.ExperimentalBenchmarkConfigApi",
                 "-opt-in=androidx.benchmark.macro.ExperimentalMetricApi",
                 "-opt-in=androidx.benchmark.perfetto.ExperimentalPerfettoCaptureApi",
+                "-opt-in=androidx.benchmark.perfetto.ExperimentalPerfettoTraceProcessorApi",
         ]
     }
 }
