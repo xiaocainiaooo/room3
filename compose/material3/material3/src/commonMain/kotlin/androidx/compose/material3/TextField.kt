@@ -74,10 +74,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
@@ -1399,12 +1401,42 @@ private class TextFieldMeasurePolicy(
 }
 
 /** A draw modifier that draws a bottom indicator line in [TextField] */
-internal fun Modifier.drawIndicatorLine(indicatorBorder: State<BorderStroke>): Modifier {
-    return drawWithContent {
-        drawContent()
+internal fun Modifier.drawIndicatorLine(
+    indicatorBorder: State<BorderStroke>,
+    textFieldShape: Shape,
+): Modifier {
+    return drawWithCache {
         val strokeWidth = indicatorBorder.value.width.toPx()
-        val y = size.height - strokeWidth / 2
-        drawLine(indicatorBorder.value.brush, Offset(0f, y), Offset(size.width, y), strokeWidth)
+        val textFieldShapePath =
+            Path().apply {
+                addOutline(
+                    textFieldShape.createOutline(
+                        size,
+                        layoutDirection,
+                        density = this@drawWithCache
+                    )
+                )
+            }
+        val linePath =
+            Path().apply {
+                addRect(
+                    Rect(
+                        left = 0f,
+                        top = size.height - strokeWidth,
+                        right = size.width,
+                        bottom = size.height,
+                    )
+                )
+            }
+        val clippedLine = linePath and textFieldShapePath
+
+        onDrawWithContent {
+            drawContent()
+            drawPath(
+                path = clippedLine,
+                brush = indicatorBorder.value.brush,
+            )
+        }
     }
 }
 

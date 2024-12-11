@@ -257,6 +257,7 @@ object TextFieldDefaults {
                     isError = isError,
                     interactionSource = interactionSource,
                     colors = colors,
+                    textFieldShape = shape,
                     focusedIndicatorLineThickness = focusedIndicatorLineThickness,
                     unfocusedIndicatorLineThickness = unfocusedIndicatorLineThickness,
                 )
@@ -275,7 +276,10 @@ object TextFieldDefaults {
      * @param isError whether the text field's current value is in error
      * @param interactionSource the [InteractionSource] of the text field. Used to determine if the
      *   text field is in focus or not
-     * @param colors [TextFieldColors] used to resolve colors of the text field
+     * @param colors [TextFieldColors] used to resolve colors of the text field. If `null`, defaults
+     *   to [TextFieldDefaults.colors].
+     * @param textFieldShape the shape of the text field container. Used for clipping the indicator.
+     *   If `null`, defaults to [TextFieldDefaults.shape].
      * @param focusedIndicatorLineThickness thickness of the indicator line when the text field is
      *   focused
      * @param unfocusedIndicatorLineThickness thickness of the indicator line when the text field is
@@ -286,7 +290,8 @@ object TextFieldDefaults {
         enabled: Boolean,
         isError: Boolean,
         interactionSource: InteractionSource,
-        colors: TextFieldColors,
+        colors: TextFieldColors? = null,
+        textFieldShape: Shape? = null,
         focusedIndicatorLineThickness: Dp = FocusedIndicatorThickness,
         unfocusedIndicatorLineThickness: Dp = UnfocusedIndicatorThickness
     ) =
@@ -302,17 +307,19 @@ object TextFieldDefaults {
                     properties["unfocusedIndicatorLineThickness"] = unfocusedIndicatorLineThickness
                 }
         ) {
+            val resolvedColors = colors ?: colors()
+            val shape = textFieldShape ?: shape
             val focused = interactionSource.collectIsFocusedAsState().value
             val stroke =
                 animateBorderStrokeAsState(
                     enabled,
                     isError,
                     focused,
-                    colors,
+                    resolvedColors,
                     focusedIndicatorLineThickness,
                     unfocusedIndicatorLineThickness
                 )
-            Modifier.drawIndicatorLine(stroke)
+            Modifier.drawIndicatorLine(stroke, shape)
         }
 
     /**
@@ -726,6 +733,29 @@ object TextFieldDefaults {
                     )
                     .also { defaultTextFieldColorsCached = it }
         }
+
+    @Deprecated(
+        level = DeprecationLevel.HIDDEN,
+        message = "Maintained for binary compatibility. Use overload with `textFieldShape`.",
+    )
+    @ExperimentalMaterial3Api
+    fun Modifier.indicatorLine(
+        enabled: Boolean,
+        isError: Boolean,
+        interactionSource: InteractionSource,
+        colors: TextFieldColors,
+        focusedIndicatorLineThickness: Dp = FocusedIndicatorThickness,
+        unfocusedIndicatorLineThickness: Dp = UnfocusedIndicatorThickness
+    ) =
+        indicatorLine(
+            enabled = enabled,
+            isError = isError,
+            interactionSource = interactionSource,
+            colors = colors,
+            textFieldShape = null,
+            focusedIndicatorLineThickness = focusedIndicatorLineThickness,
+            unfocusedIndicatorLineThickness = unfocusedIndicatorLineThickness,
+        )
 
     @Deprecated(
         message = "Renamed to TextFieldDefaults.Container",
