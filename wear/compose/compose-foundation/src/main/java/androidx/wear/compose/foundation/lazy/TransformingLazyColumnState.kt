@@ -155,7 +155,7 @@ class TransformingLazyColumnState() : ScrollableState {
         layoutInfoState.value = measureResult
         canScrollBackward = measureResult.canScrollBackward
         canScrollForward = measureResult.canScrollForward
-        nearestRange = calculateNearestItemsRange(anchorItemIndex)
+        nearestRange = calculateNearestItemsRange(measureResult.anchorItemIndex)
     }
 
     internal companion object {
@@ -289,7 +289,7 @@ class TransformingLazyColumnState() : ScrollableState {
         nearestRange = calculateNearestItemsRange(anchorItemIndex)
     }
 
-    private fun onScroll(distance: Float): Float {
+    internal fun onScroll(distance: Float): Float {
         if (distance < 0 && !canScrollForward || distance > 0 && !canScrollBackward) {
             return 0f
         }
