@@ -112,9 +112,9 @@ private class ScrollPdfViewToPage : ViewAction {
         // This should be guaranteed by our constraints, but this makes smartcasts work nicely
         check(view is PdfView)
         if (pointOnPage != null) {
-            view.scrollToPosition(PdfPoint(pageNum, pointOnPage), animateScroll = false)
+            view.scrollToPosition(PdfPoint(pageNum, pointOnPage))
         } else {
-            view.scrollToPage(pageNum, animateScroll = false)
+            view.scrollToPage(pageNum)
         }
         uiController.loopMainThreadUntilIdle()
     }
