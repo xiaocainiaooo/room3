@@ -106,3 +106,7 @@ fun Project.getRepositoryDirectory(): File {
     directory.mkdirs()
     return directory
 }
+
+/** Directory in a maven format to put per project publishing artifacts. */
+fun Project.getPerProjectRepositoryDirectory(): Provider<Directory> =
+    project.layout.buildDirectory.dir("repository")

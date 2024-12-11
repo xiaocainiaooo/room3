@@ -163,7 +163,10 @@ private fun Project.configureComponentPublishing(
     }
 
     configure<PublishingExtension> {
-        repositories { it.maven { repo -> repo.setUrl(getRepositoryDirectory()) } }
+        repositories {
+            it.maven { repo -> repo.setUrl(getRepositoryDirectory()) }
+            it.maven { repo -> repo.setUrl(getPerProjectRepositoryDirectory()) }
+        }
         publications {
             if (appliesJavaGradlePluginPlugin()) {
                 // The 'java-gradle-plugin' will also add to the 'pluginMaven' publication
