@@ -19,12 +19,27 @@ package androidx.compose.material3
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.FloatingAppBarDefaults.floatingToolbarVerticalNestedScroll
 import androidx.compose.material3.FloatingAppBarExitDirection.Companion.Bottom
 import androidx.compose.material3.FloatingAppBarExitDirection.Companion.End
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertContainsColor
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
@@ -33,8 +48,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -42,6 +61,9 @@ import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -526,5 +548,435 @@ class FloatingAppBarTest {
         }
     }
 
+    @Test
+    fun horizontalFloatingToolbar_expansionStateChange() {
+        var expanded by mutableStateOf(false)
+        rule.setMaterialContent(lightColorScheme()) {
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                expanded = expanded,
+                floatingActionButton = { ToolbarFab() },
+            ) {
+                ToolbarContent()
+            }
+        }
+
+        // When collapsed, check that the FAB is in its largest size.
+        rule
+            .onNodeWithTag(FloatingActionButtonTestTag)
+            .assertIsSquareWithSize(FloatingAppBarDefaults.FabSizeRange.endInclusive)
+
+        // Check a sampled item from the content to ensure it's not visible.
+        rule.onNodeWithTag(FloatingToolbarContentLastItemTestTag).assertIsNotDisplayed()
+
+        val componentWidth =
+            FloatingAppBarDefaults.FabSizeRange.endInclusive +
+                /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
+                FloatingAppBarDefaults.ToolbarToFabGap
+        // The total size of the component still the total size of all the elements.
+        rule.onNodeWithTag(FloatingAppBarTestTag).assertWidthIsEqualTo(componentWidth)
+
+        // Expand the component.
+        expanded = true
+        rule.waitForIdle()
+
+        // When expanded, check that the FAB is in its smallest size.
+        rule
+            .onNodeWithTag(FloatingActionButtonTestTag)
+            .assertIsSquareWithSize(FloatingAppBarDefaults.FabSizeRange.start)
+        // Check a sampled item from the content to ensure it's visible.
+        rule.onNodeWithTag(FloatingToolbarContentLastItemTestTag).assertIsDisplayed()
+        // The total size of the component still the total size of all the elements.
+        rule.onNodeWithTag(FloatingAppBarTestTag).assertWidthIsEqualTo(componentWidth)
+    }
+
+    @Test
+    fun horizontalFloatingToolbar_customContentColor() {
+        rule.setMaterialContent(lightColorScheme()) {
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                colors =
+                    FloatingAppBarDefaults.standardFloatingToolbarColors(
+                        toolbarContainerColor = Color.Blue
+                    ),
+                expanded = true,
+                floatingActionButton = { ToolbarFab() },
+            ) {
+                ToolbarContent()
+            }
+        }
+
+        rule.onNodeWithTag(FloatingAppBarTestTag).captureToImage().assertContainsColor(Color.Blue)
+    }
+
+    @Test
+    fun horizontalFloatingToolbar_defaultContentPadding() {
+        rule.setMaterialContent(lightColorScheme()) {
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                expanded = true,
+                // Set a RectangleShape to get an accurate padding measure without the default
+                // rounded shape influence over the size.
+                shape = RectangleShape,
+                floatingActionButton = { ToolbarFab() },
+            ) {
+                ToolbarContent()
+            }
+        }
+
+        val componentWidth =
+            FloatingAppBarDefaults.ContentPaddingWithFloatingActionButton * 2 +
+                FloatingAppBarDefaults.FabSizeRange.start +
+                /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
+                FloatingAppBarDefaults.ToolbarToFabGap
+        rule.onNodeWithTag(FloatingAppBarTestTag).assertWidthIsEqualTo(componentWidth)
+    }
+
+    @Test
+    fun horizontalFloatingToolbar_customContentPadding() {
+        val padding = 64.dp
+        rule.setMaterialContent(lightColorScheme()) {
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                contentPadding = PaddingValues(horizontal = padding),
+                expanded = true,
+                floatingActionButton = { ToolbarFab() },
+            ) {
+                ToolbarContent()
+            }
+        }
+
+        val componentWidth =
+            padding * 2 +
+                FloatingAppBarDefaults.FabSizeRange.start +
+                /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
+                FloatingAppBarDefaults.ToolbarToFabGap
+        rule.onNodeWithTag(FloatingAppBarTestTag).assertWidthIsEqualTo(componentWidth)
+    }
+
+    @Test
+    fun verticalFloatingToolbar_expansionStateChange() {
+        var expanded by mutableStateOf(false)
+        rule.setMaterialContent(lightColorScheme()) {
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                expanded = expanded,
+                floatingActionButton = { ToolbarFab() },
+            ) {
+                ToolbarContent()
+            }
+        }
+
+        // When collapsed, check that the FAB is in its largest size.
+        rule
+            .onNodeWithTag(FloatingActionButtonTestTag)
+            .assertIsSquareWithSize(FloatingAppBarDefaults.FabSizeRange.endInclusive)
+
+        // Check a sampled item from the content to ensure it's not visible.
+        rule.onNodeWithTag(FloatingToolbarContentLastItemTestTag).assertIsNotDisplayed()
+
+        val componentHeight =
+            FloatingAppBarDefaults.FabSizeRange.endInclusive +
+                /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
+                FloatingAppBarDefaults.ToolbarToFabGap
+        // The total size of the component still the total size of all the elements.
+        rule.onNodeWithTag(FloatingAppBarTestTag).assertHeightIsEqualTo(componentHeight)
+
+        // Expand the component.
+        expanded = true
+        rule.waitForIdle()
+
+        // When expanded, check that the FAB is in its smallest size.
+        rule
+            .onNodeWithTag(FloatingActionButtonTestTag)
+            .assertIsSquareWithSize(FloatingAppBarDefaults.FabSizeRange.start)
+        // Check a sampled item from the content to ensure it's visible.
+        rule.onNodeWithTag(FloatingToolbarContentLastItemTestTag).assertIsDisplayed()
+        // The total size of the component still the total size of all the elements.
+        rule.onNodeWithTag(FloatingAppBarTestTag).assertHeightIsEqualTo(componentHeight)
+    }
+
+    @Test
+    fun verticalFloatingToolbar_customContentColor() {
+        rule.setMaterialContent(lightColorScheme()) {
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                colors =
+                    FloatingAppBarDefaults.standardFloatingToolbarColors(
+                        toolbarContainerColor = Color.Blue
+                    ),
+                expanded = true,
+                floatingActionButton = { ToolbarFab() },
+            ) {
+                ToolbarContent()
+            }
+        }
+
+        rule.onNodeWithTag(FloatingAppBarTestTag).captureToImage().assertContainsColor(Color.Blue)
+    }
+
+    @Test
+    fun verticalFloatingToolbar_defaultContentPadding() {
+        rule.setMaterialContent(lightColorScheme()) {
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                expanded = true,
+                // Set a RectangleShape to get an accurate padding measure without the default
+                // rounded shape influence over the size.
+                shape = RectangleShape,
+                floatingActionButton = { ToolbarFab() },
+            ) {
+                ToolbarContent()
+            }
+        }
+
+        val componentHeight =
+            FloatingAppBarDefaults.ContentPaddingWithFloatingActionButton * 2 +
+                FloatingAppBarDefaults.FabSizeRange.start +
+                /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
+                FloatingAppBarDefaults.ToolbarToFabGap
+        rule.onNodeWithTag(FloatingAppBarTestTag).assertHeightIsEqualTo(componentHeight)
+    }
+
+    @Test
+    fun verticalFloatingToolbar_customContentPadding() {
+        val padding = 64.dp
+        rule.setMaterialContent(lightColorScheme()) {
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingAppBarTestTag),
+                contentPadding = PaddingValues(vertical = padding),
+                expanded = true,
+                floatingActionButton = { ToolbarFab() },
+            ) {
+                ToolbarContent()
+            }
+        }
+
+        val componentHeight =
+            padding * 2 +
+                FloatingAppBarDefaults.FabSizeRange.start +
+                /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
+                FloatingAppBarDefaults.ToolbarToFabGap
+        rule.onNodeWithTag(FloatingAppBarTestTag).assertHeightIsEqualTo(componentHeight)
+    }
+
+    private val mainLayoutTag = "mainLayout"
+
+    @Test
+    fun floatingToolbarVerticalNestedScroll_verticalSwipesUpdateValue() {
+        var expanded = true
+        rule.setContent {
+            VerticalNestedScrollTestContent(
+                onExpanded = { expanded = true },
+                onCollapsed = { expanded = false },
+                initialValue = expanded,
+            )
+        }
+
+        assertThat(expanded).isEqualTo(true)
+
+        // Toggle the value by scrolling up and down.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeDown(top, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+    }
+
+    @Test
+    fun floatingToolbarVerticalNestedScroll_verticalSwipesUpdateValue_reverseLayout() {
+        var expanded = true
+        rule.setContent {
+            VerticalNestedScrollTestContent(
+                onExpanded = { expanded = true },
+                onCollapsed = { expanded = false },
+                initialValue = expanded,
+                reverseLayout = true,
+            )
+        }
+
+        assertThat(expanded).isEqualTo(true)
+
+        // Toggle the value by scrolling down and up in this reverse layout..
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeDown(top, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+    }
+
+    @Test
+    fun floatingToolbarVerticalNestedScroll_disableScrollInterception() {
+        var expanded = true
+        rule.setContent {
+            VerticalNestedScrollTestContent(
+                onExpanded = { expanded = true },
+                onCollapsed = { expanded = false },
+                toolbarNestedScrollEnabled = false,
+                initialValue = expanded,
+                reverseLayout = true
+            )
+        }
+
+        assertThat(expanded).isEqualTo(true)
+
+        // Scrolling up or down should not change the value.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeDown(top, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+    }
+
+    @Test
+    fun floatingToolbarVerticalNestedScroll_falseInitialValue() {
+        var expanded = false
+        rule.setContent {
+            VerticalNestedScrollTestContent(
+                onExpanded = { expanded = true },
+                onCollapsed = { expanded = false },
+                initialValue = expanded
+            )
+        }
+
+        assertThat(expanded).isEqualTo(false)
+
+        // Simulate a scroll up and ensure that the value is still false.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
+        // Simulate a scroll down to toggle the value to true.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeDown(top, centerY) }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+    }
+
+    @Test
+    fun floatingToolbarVerticalNestedScroll_threshold() {
+        var expanded = true
+        var thresholdPx = 0f
+
+        rule.setContent {
+            VerticalNestedScrollTestContent(
+                onExpanded = { expanded = true },
+                onCollapsed = { expanded = false },
+                initialValue = expanded
+            )
+            thresholdPx =
+                with(LocalDensity.current) { FloatingAppBarDefaults.ScrollDistanceThreshold.toPx() }
+        }
+
+        assertThat(expanded).isEqualTo(true)
+
+        // Simulate a short scroll below the threshold and ensure that the value is still true.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput {
+            swipeUp(bottom, bottom - thresholdPx / 4f)
+        }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+
+        // Simulate an additional scroll to cross the threshold and ensure that the value is now
+        // false.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput {
+            swipeUp(bottom, bottom - thresholdPx * 2)
+        }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
+    }
+
+    @Test
+    fun floatingToolbarVerticalNestedScroll_customThreshold() {
+        val customThreshold = 100.dp
+        var expanded = true
+        var thresholdPx = 0f
+
+        rule.setContent {
+            VerticalNestedScrollTestContent(
+                onExpanded = { expanded = true },
+                onCollapsed = { expanded = false },
+                initialValue = expanded
+            )
+            thresholdPx = with(LocalDensity.current) { customThreshold.toPx() }
+        }
+
+        assertThat(expanded).isEqualTo(true)
+
+        // Simulate a short scroll below the threshold and ensure that the value is still true.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput {
+            swipeUp(bottom, bottom - thresholdPx / 4f)
+        }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
+
+        // Simulate an additional scroll to cross the threshold and ensure that the value is now
+        // false.
+        rule.onNodeWithTag(mainLayoutTag).performTouchInput {
+            swipeUp(bottom, bottom - thresholdPx)
+        }
+        rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
+    }
+
+    @Composable
+    private fun VerticalNestedScrollTestContent(
+        onExpanded: () -> Unit,
+        onCollapsed: () -> Unit,
+        toolbarNestedScrollEnabled: Boolean = true,
+        initialValue: Boolean = true,
+        reverseLayout: Boolean = false
+    ) {
+        Column(
+            modifier =
+                Modifier.fillMaxSize() then
+                    (if (toolbarNestedScrollEnabled) {
+                        Modifier.floatingToolbarVerticalNestedScroll(
+                            expanded = initialValue,
+                            reverseLayout = reverseLayout,
+                            onExpand = onExpanded,
+                            onCollapse = onCollapsed
+                        )
+                    } else {
+                        Modifier
+                    })
+        ) {
+            Box(modifier = Modifier.fillMaxWidth().height(80.dp))
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth().testTag(mainLayoutTag).weight(1f),
+                reverseLayout = reverseLayout
+            ) {
+                items(100) {
+                    Box(modifier = Modifier.fillMaxWidth().height(60.dp).background(Color.Gray)) {
+                        Text(text = it.toString())
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun ToolbarFab() {
+
+        FloatingAppBarDefaults.StandardFloatingActionButton(
+            modifier = Modifier.testTag(FloatingActionButtonTestTag),
+            onClick = { /* doSomething() */ },
+        ) {
+            Icon(Icons.Filled.Check, "Localized description")
+        }
+    }
+
+    @Composable
+    private fun ToolbarContent() {
+        IconButton(onClick = { /* doSomething() */ }) {
+            Icon(Icons.Filled.Person, contentDescription = "Localized description")
+        }
+        IconButton(onClick = { /* doSomething() */ }) {
+            Icon(Icons.Filled.Edit, contentDescription = "Localized description")
+        }
+        IconButton(onClick = { /* doSomething() */ }) {
+            Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+        }
+        IconButton(
+            onClick = { /* doSomething() */ },
+            modifier = Modifier.testTag(FloatingToolbarContentLastItemTestTag)
+        ) {
+            Icon(Icons.Filled.MoreVert, contentDescription = "Localized description")
+        }
+    }
+
+    private val MinTouchTarget = 48.dp
     private val FloatingAppBarTestTag = "floatingAppBar"
+    private val FloatingActionButtonTestTag = "floatingActionButton"
+    private val FloatingToolbarContentLastItemTestTag = "floatingToolbarContentLastItem"
 }
