@@ -45,8 +45,7 @@ internal class KnownIssue private constructor(val id: Long, val alias: Int) {
 
         // keep-sorted end
 
-        @JvmField
-        val values = lazy {
+        private val values by lazy {
             listOf(
                 // keep-sorted start
                 KI_350037023,
@@ -54,6 +53,12 @@ internal class KnownIssue private constructor(val id: Long, val alias: Int) {
                 KI_372917199,
                 // keep-sorted end
             )
+        }
+
+        /** List of all known issues */
+        @JvmStatic
+        internal fun values(): List<KnownIssue> {
+            return values
         }
     }
 }
