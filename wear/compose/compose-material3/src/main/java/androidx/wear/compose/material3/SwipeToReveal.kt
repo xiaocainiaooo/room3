@@ -52,6 +52,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.RevealActionType
@@ -554,7 +555,7 @@ private fun ActionText(action: SwipeToRevealAction, contentColor: Color) {
             LocalTextConfiguration provides
                 TextConfiguration(
                     textAlign = LocalTextConfiguration.current.textAlign,
-                    overflow = LocalTextConfiguration.current.overflow,
+                    overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
         ) {

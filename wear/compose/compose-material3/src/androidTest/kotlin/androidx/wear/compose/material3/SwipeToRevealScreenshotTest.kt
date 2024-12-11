@@ -139,6 +139,36 @@ class SwipeToRevealScreenshotTest {
     }
 
     @Test
+    fun swipeToReveal_showsUndoPrimaryAction_singleLineTruncated() {
+        verifyScreenshotForSize(ScreenSize.SMALL) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                SwipeToReveal(
+                    modifier = Modifier.testTag(TEST_TAG),
+                    revealState = rememberRevealState(initialValue = RevealValue.RightRevealed),
+                    actions = {
+                        primaryAction(
+                            {}, /* Empty for testing */
+                            {}, /* Empty for testing */
+                            {} /* Empty for testing */,
+                            ""
+                        )
+                        undoPrimaryAction(
+                            {},
+                            {
+                                Text(
+                                    "Undo Delete action with an extremely long label that should truncate."
+                                )
+                            }
+                        )
+                    }
+                ) {
+                    Button({}) { Text(/* Empty for testing */ "") }
+                }
+            }
+        }
+    }
+
+    @Test
     fun swipeToReveal_showsUndoSecondaryAction(@TestParameter screenSize: ScreenSize) {
         verifyScreenshotForSize(screenSize) {
             Box(modifier = Modifier.fillMaxSize()) {
@@ -161,6 +191,44 @@ class SwipeToRevealScreenshotTest {
                         )
                         secondaryAction({}, /* Empty for testing */ {}, /* Empty for testing */ "")
                         undoSecondaryAction({}, { Text("Undo Secondary") })
+                    }
+                ) {
+                    Button({}) { Text(/* Empty for testing */ "") }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun swipeToReveal_showsUndoSecondaryAction_singleLineTruncated() {
+        verifyScreenshotForSize(ScreenSize.SMALL) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                SwipeToReveal(
+                    modifier = Modifier.testTag(TEST_TAG),
+                    revealState =
+                        rememberRevealState(initialValue = RevealValue.RightRevealed).apply {
+                            lastActionType = RevealActionType.SecondaryAction
+                        },
+                    actions = {
+                        primaryAction(
+                            {}, /* Empty for testing */
+                            {}, /* Empty for testing */
+                            {}, /* Empty for testing */
+                            ""
+                        )
+                        undoPrimaryAction(
+                            {}, /* Empty for testing */
+                            {}, /* Empty for testing */
+                        )
+                        secondaryAction({}, /* Empty for testing */ {}, /* Empty for testing */ "")
+                        undoSecondaryAction(
+                            {},
+                            {
+                                Text(
+                                    "Undo Delete action with an extremely long label that should truncate."
+                                )
+                            }
+                        )
                     }
                 ) {
                     Button({}) { Text(/* Empty for testing */ "") }
