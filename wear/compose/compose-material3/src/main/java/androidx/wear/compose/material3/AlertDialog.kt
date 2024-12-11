@@ -46,7 +46,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListScope
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.AlertDialogDefaults.edgeButtonExtraTopPadding
 import androidx.wear.compose.material3.PaddingDefaults.horizontalContentPadding
 import androidx.wear.compose.material3.PaddingDefaults.verticalContentPadding
 import androidx.wear.compose.material3.internal.Strings
@@ -226,9 +225,8 @@ public fun AlertDialog(
  * @param verticalArrangement The vertical arrangement of the dialog's children. There is a default
  *   padding between icon, title, and text, which will be added to the spacing specified in this
  *   [verticalArrangement] parameter.
- * @param contentPadding The padding to apply around the entire dialog's contents. Ensure there is
- *   enough space for the [EdgeButton], for example, using
- *   [AlertDialogDefaults.contentPaddingWithEdgeButton]
+ * @param contentPadding The padding to apply around the entire dialog's contents. Bottom padding
+ *   will be ignored and default spacing for the [EdgeButton] will be used.
  * @param properties An optional [DialogProperties] object for configuring the dialog's behavior.
  * @param content A slot for additional content, displayed within a scrollable [ScalingLazyColumn].
  */
@@ -242,7 +240,7 @@ public fun AlertDialog(
     icon: @Composable (() -> Unit)? = null,
     text: @Composable (() -> Unit)? = null,
     verticalArrangement: Arrangement.Vertical = AlertDialogDefaults.VerticalArrangement,
-    contentPadding: PaddingValues = AlertDialogDefaults.contentPaddingWithEdgeButton(),
+    contentPadding: PaddingValues = AlertDialogDefaults.contentPadding(),
     properties: DialogProperties = DialogProperties(),
     content: (ScalingLazyListScope.() -> Unit)? = null
 ) {
@@ -302,16 +300,28 @@ public fun AlertDialogContent(
     contentPadding: PaddingValues = AlertDialogDefaults.confirmDismissContentPadding(),
     content: (ScalingLazyListScope.() -> Unit)? = null
 ) {
-    AlertDialogImpl(
+    val state = rememberScalingLazyListState(initialCenterItemIndex = 0)
+
+    ScreenScaffold(
+        scrollState = state,
         modifier = modifier,
-        verticalArrangement = verticalArrangement,
         contentPadding = contentPadding,
-        title = title,
-        icon = icon,
-        text = text,
-        alertButtonsParams = AlertButtonsParams.ConfirmDismissButtons(confirmButton, dismissButton),
-        content = content
-    )
+    ) {
+        ScalingLazyColumn(
+            state = state,
+            contentPadding = it,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = verticalArrangement,
+            autoCentering = null,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            alertDialogCommonContent(icon = icon, title = title, text = text, content = content)
+
+            item {
+                ConfirmDismissButtons(confirmButton = confirmButton, dismissButton = dismissButton)
+            }
+        }
+    }
 }
 
 /**
@@ -344,16 +354,24 @@ public fun AlertDialogContent(
     contentPadding: PaddingValues = AlertDialogDefaults.contentPadding(),
     content: (ScalingLazyListScope.() -> Unit)? = null
 ) {
-    AlertDialogImpl(
+    val state = rememberScalingLazyListState(initialCenterItemIndex = 0)
+
+    ScreenScaffold(
+        scrollState = state,
         modifier = modifier,
-        verticalArrangement = verticalArrangement,
         contentPadding = contentPadding,
-        title = title,
-        icon = icon,
-        text = text,
-        alertButtonsParams = AlertButtonsParams.NoButtons,
-        content = content
-    )
+    ) {
+        ScalingLazyColumn(
+            state = state,
+            contentPadding = it,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = verticalArrangement,
+            autoCentering = null,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            alertDialogCommonContent(icon, title, text, content)
+        }
+    }
 }
 
 /**
@@ -377,9 +395,8 @@ public fun AlertDialogContent(
  * @param verticalArrangement The vertical arrangement of the dialog's children. There is a default
  *   padding between icon, title, and text, which will be added to the spacing specified in this
  *   [verticalArrangement] parameter.
- * @param contentPadding The padding to apply around the entire dialog's contents. Ensure there is
- *   enough space for the [EdgeButton], for example, using
- *   [AlertDialogDefaults.contentPaddingWithEdgeButton]
+ * @param contentPadding The padding to apply around the entire dialog's contents. Bottom padding
+ *   will be ignored and default spacing for the [EdgeButton] will be used.
  * @param content A slot for additional content, displayed within a scrollable [ScalingLazyColumn].
  */
 @Composable
@@ -390,19 +407,29 @@ public fun AlertDialogContent(
     icon: @Composable (() -> Unit)? = null,
     text: @Composable (() -> Unit)? = null,
     verticalArrangement: Arrangement.Vertical = AlertDialogDefaults.VerticalArrangement,
-    contentPadding: PaddingValues = AlertDialogDefaults.contentPaddingWithEdgeButton(),
+    contentPadding: PaddingValues = AlertDialogDefaults.contentPadding(),
     content: (ScalingLazyListScope.() -> Unit)? = null
 ) {
-    AlertDialogImpl(
+    val state = rememberScalingLazyListState(initialCenterItemIndex = 0)
+
+    ScreenScaffold(
+        scrollState = state,
+        edgeButton = edgeButton,
         modifier = modifier,
-        verticalArrangement = verticalArrangement,
         contentPadding = contentPadding,
-        title = title,
-        icon = icon,
-        text = text,
-        alertButtonsParams = AlertButtonsParams.EdgeButton(edgeButton),
-        content = content
-    )
+        edgeButtonSpacing = AlertEdgeButtonSpacing,
+    ) {
+        ScalingLazyColumn(
+            state = state,
+            contentPadding = it,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = verticalArrangement,
+            autoCentering = null,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            alertDialogCommonContent(icon, title, text, content)
+        }
+    }
 }
 
 /** Contains the default values used by [AlertDialog] */
@@ -510,26 +537,6 @@ public object AlertDialogDefaults {
     }
 
     /**
-     * The padding to apply around the content for the [AlertDialog] variation with a bottom button.
-     * If you need to configure custom paddings, consider using
-     * [ScreenScaffoldDefaults.contentPaddingWithEdgeButton]
-     */
-    @Composable
-    public fun contentPaddingWithEdgeButton(
-        edgeButtonSize: EdgeButtonSize = EdgeButtonSize.Medium
-    ): PaddingValues {
-        val topPadding = verticalContentPadding()
-        val horizontalPadding = horizontalContentPadding()
-        return ScreenScaffoldDefaults.contentPaddingWithEdgeButton(
-            edgeButtonSize,
-            top = topPadding,
-            start = horizontalPadding,
-            end = horizontalPadding,
-            extraBottom = edgeButtonExtraTopPadding
-        )
-    }
-
-    /**
      * The padding to apply around the content for the [AlertDialog] variation with a stack of
      * options and no buttons at the end.
      */
@@ -582,61 +589,22 @@ public object AlertDialogDefaults {
     internal val cancelButtonPadding = 1.dp
 }
 
-@Composable
-private fun AlertDialogImpl(
-    modifier: Modifier = Modifier,
-    verticalArrangement: Arrangement.Vertical,
-    contentPadding: PaddingValues,
+private fun ScalingLazyListScope.alertDialogCommonContent(
+    icon: @Composable (() -> Unit)? = null,
     title: @Composable () -> Unit,
-    icon: @Composable (() -> Unit)?,
     text: @Composable (() -> Unit)? = null,
-    alertButtonsParams: AlertButtonsParams,
-    content: (ScalingLazyListScope.() -> Unit)?
+    content: (ScalingLazyListScope.() -> Unit)? = null
 ) {
-    val state = rememberScalingLazyListState(initialCenterItemIndex = 0)
-    ScreenScaffold(
-        scrollState = state,
-        modifier = modifier,
-        edgeButton =
-            if (alertButtonsParams is AlertButtonsParams.EdgeButton) {
-                {
-                    Box(
-                        Modifier.padding(top = edgeButtonExtraTopPadding),
-                        content = alertButtonsParams.edgeButton
-                    )
-                }
-            } else null
-    ) {
-        ScalingLazyColumn(
-            state = state,
-            contentPadding = contentPadding,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = verticalArrangement,
-            autoCentering = null,
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            if (icon != null) {
-                item { IconAlert(icon) }
-            }
-            item { Title(title) }
-            if (text != null) {
-                item { TextMessage(text) }
-            }
-            if (content != null) {
-                item { Spacer(Modifier.height(ContentTopSpacing)) }
-                content()
-            }
-
-            when (alertButtonsParams) {
-                is AlertButtonsParams.ConfirmDismissButtons ->
-                    item { ConfirmDismissButtons(alertButtonsParams) }
-                is AlertButtonsParams.EdgeButton ->
-                    if (content == null) {
-                        item { Spacer(Modifier.height(BottomButtonSpacing)) }
-                    }
-                is AlertButtonsParams.NoButtons -> Unit
-            }
-        }
+    if (icon != null) {
+        item { IconAlert(icon) }
+    }
+    item { Title(title) }
+    if (text != null) {
+        item { TextMessage(text) }
+    }
+    if (content != null) {
+        item { Spacer(Modifier.height(ContentTopSpacing)) }
+        content()
     }
 }
 
@@ -667,7 +635,10 @@ private fun Title(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun ConfirmDismissButtons(alertButtonsParams: AlertButtonsParams.ConfirmDismissButtons) {
+private fun ConfirmDismissButtons(
+    confirmButton: @Composable RowScope.() -> Unit,
+    dismissButton: @Composable RowScope.() -> Unit
+) {
     Column {
         Spacer(modifier = Modifier.height(ConfirmDismissButtonsTopSpacing))
         Row(
@@ -675,12 +646,12 @@ private fun ConfirmDismissButtons(alertButtonsParams: AlertButtonsParams.Confirm
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.width(6.dp))
-            alertButtonsParams.dismissButton(this)
+            dismissButton(this)
             Spacer(
                 modifier =
                     Modifier.width(screenWidthDp().dp * ConfirmDismissBetweenButtonsPaddingFraction)
             )
-            alertButtonsParams.confirmButton(this)
+            confirmButton(this)
             Spacer(modifier = Modifier.width(2.dp))
         }
         Spacer(
@@ -709,20 +680,8 @@ private fun TextMessage(content: @Composable () -> Unit) {
     }
 }
 
-private sealed interface AlertButtonsParams {
-    object NoButtons : AlertButtonsParams
-
-    class EdgeButton(
-        val edgeButton: @Composable BoxScope.() -> Unit,
-    ) : AlertButtonsParams
-
-    class ConfirmDismissButtons(
-        val confirmButton: @Composable RowScope.() -> Unit,
-        val dismissButton: @Composable RowScope.() -> Unit
-    ) : AlertButtonsParams
-}
-
 internal val AlertIconBottomSpacing = 4.dp
+internal val AlertEdgeButtonSpacing = 4.dp
 internal val AlertTextMessageTopSpacing = 8.dp
 internal val ConfirmDismissButtonsTopSpacing = 12.dp
 internal const val ConfirmDismissButtonsBottomSpacingFraction = 0.045f

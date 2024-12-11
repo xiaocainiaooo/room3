@@ -23,6 +23,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,11 +50,9 @@ import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.EdgeButton
-import androidx.wear.compose.material3.EdgeButtonSize
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
-import androidx.wear.compose.material3.ScreenScaffoldDefaults
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.scrollTransform
 import androidx.wear.compose.material3.lazy.targetMorphingHeight
@@ -61,6 +60,7 @@ import kotlin.random.Random
 import kotlinx.coroutines.launch
 
 @Preview
+@Sampled
 @Composable
 fun TransformingLazyColumnScrollingSample() {
     val state = rememberTransformingLazyColumnState()
@@ -76,6 +76,14 @@ fun TransformingLazyColumnScrollingSample() {
                 elements.subList(index, elements.count())
     }
 
+    fun rainbowColor(progress: Float): Color {
+        val hue = progress * 360f
+        val saturation = 1f
+        val value = 1f
+
+        return Color(android.graphics.Color.HSVToColor(floatArrayOf(hue, saturation, value)))
+    }
+
     AppScaffold {
         ScreenScaffold(
             state,
@@ -89,18 +97,11 @@ fun TransformingLazyColumnScrollingSample() {
                     Text("Add item")
                 }
             }
-        ) {
+        ) { contentPadding ->
             val random = remember { Random }
             TransformingLazyColumn(
                 state = state,
-                contentPadding =
-                    ScreenScaffoldDefaults.contentPaddingWithEdgeButton(
-                        EdgeButtonSize.Small,
-                        start = 10.dp,
-                        end = 10.dp,
-                        top = 20.dp,
-                        extraBottom = 20.dp
-                    ),
+                contentPadding = contentPadding,
                 modifier = Modifier.background(MaterialTheme.colorScheme.background)
             ) {
                 items(elements, key = { it }) {
@@ -185,22 +186,16 @@ fun TransformingLazyColumnScalingMorphingEffectSample() {
     AppScaffold {
         ScreenScaffold(
             state,
+            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 20.dp),
             edgeButton = {
                 EdgeButton(onClick = { coroutineScope.launch { state.scrollToItem(1) } }) {
                     Text("To top")
                 }
             }
-        ) {
+        ) { contentPadding ->
             TransformingLazyColumn(
                 state = state,
-                contentPadding =
-                    ScreenScaffoldDefaults.contentPaddingWithEdgeButton(
-                        EdgeButtonSize.Small,
-                        start = 10.dp,
-                        end = 10.dp,
-                        top = 20.dp,
-                        extraBottom = 20.dp
-                    ),
+                contentPadding = contentPadding,
                 modifier = Modifier.background(MaterialTheme.colorScheme.background)
             ) {
                 item(contentType = "header") {
@@ -249,6 +244,7 @@ fun TransformingLazyColumnTargetMorphingHeightSample() {
     AppScaffold {
         ScreenScaffold(
             state,
+            contentPadding = PaddingValues(horizontal = 10.dp),
             edgeButton = {
                 EdgeButton(
                     onClick = {
@@ -261,15 +257,10 @@ fun TransformingLazyColumnTargetMorphingHeightSample() {
                     Text("To top")
                 }
             }
-        ) {
+        ) { contentPadding ->
             TransformingLazyColumn(
                 state = state,
-                contentPadding =
-                    ScreenScaffoldDefaults.contentPaddingWithEdgeButton(
-                        EdgeButtonSize.Medium,
-                        start = 10.dp,
-                        end = 10.dp
-                    ),
+                contentPadding = contentPadding,
                 modifier = Modifier.background(MaterialTheme.colorScheme.background),
             ) {
                 item(contentType = "header") {
@@ -302,12 +293,4 @@ fun TransformingLazyColumnTargetMorphingHeightSample() {
             }
         }
     }
-}
-
-private fun rainbowColor(progress: Float): Color {
-    val hue = progress * 360f
-    val saturation = 1f
-    val value = 1f
-
-    return Color(android.graphics.Color.HSVToColor(floatArrayOf(hue, saturation, value)))
 }
