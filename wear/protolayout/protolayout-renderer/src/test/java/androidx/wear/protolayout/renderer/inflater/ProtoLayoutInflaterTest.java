@@ -2336,7 +2336,7 @@ public class ProtoLayoutInflaterTest {
     }
 
     @Test
-    public void inflate_arc_withSpacer() {
+    public void inflate_arc_withSpacerInDegrees() {
         LayoutElement root =
                 LayoutElement.newBuilder()
                         .setArc(
@@ -2358,6 +2358,47 @@ public class ProtoLayoutInflaterTest {
         // Dimensions are in DP, but the density is currently 1 in the tests, so this is fine:
         assertThat(spacer.getThickness()).isEqualTo(20);
     }
+
+    @Test
+    public void inflate_arc_withSpacerInDp() {
+        float containerSize = 100;
+        float thickness = 10;
+        float spacerLength = 20;
+        ContainerDimension containerDimension =
+                ContainerDimension.newBuilder().setLinearDimension(dp(containerSize)).build();
+        Arc.Builder arcBuilder =
+                Arc.newBuilder()
+                        .setAnchorAngle(degrees(0).build())
+                        .addContents(
+                                ArcLayoutElement.newBuilder()
+                                        .setSpacer(
+                                                ArcSpacer.newBuilder()
+                                                        .setAngularLength(
+                                                                AngularDimension.newBuilder().setDp(
+                                                                        dp(spacerLength)))
+                                                        .setThickness(dp(thickness))));
+        LayoutElement root =
+                LayoutElement.newBuilder()
+                        .setBox(
+                                Box.newBuilder()
+                                        .setWidth(containerDimension)
+                                        .setHeight(containerDimension)
+                                        .addContents(LayoutElement.newBuilder().setArc(arcBuilder)))
+                        .build();
+
+        FrameLayout rootLayout = renderer(fingerprintedLayout(root)).inflate();
+
+        float radius = (containerSize - thickness) / 2;
+        float sweepAngle = (float) Math.toDegrees(spacerLength / radius);
+
+        ArcLayout arcLayout = (ArcLayout) ((ViewGroup) rootLayout.getChildAt(0)).getChildAt(0);
+        assertThat(arcLayout.getChildCount()).isEqualTo(1);
+        WearCurvedSpacer spacer = (WearCurvedSpacer) arcLayout.getChildAt(0);
+        assertThat(spacer.getSweepAngleDegrees()).isEqualTo(sweepAngle);
+        // Dimensions are in DP, but the density is currently 1 in the tests, so this is fine:
+        assertThat(spacer.getThickness()).isEqualTo((int) thickness);
+    }
+
 
     @Test
     public void inflate_arc_withMaxAngleAndWeights() {

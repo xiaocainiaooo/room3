@@ -2721,7 +2721,7 @@ public final class ProtoLayoutInflater {
             ArcSpacer spacer,
             String posId,
             Optional<PipelineMaker> pipelineMaker) {
-        float lengthDegrees = 0;
+        float length = 0;
         int thicknessPx = safeDpToPx(spacer.getThickness());
         WearCurvedSpacer space = new WearCurvedSpacer(mUiContext);
         ArcLayout.LayoutParams layoutParams =
@@ -2731,7 +2731,8 @@ public final class ProtoLayoutInflater {
             final AngularDimension angularLength = spacer.getAngularLength();
             switch (angularLength.getInnerCase()) {
                 case DEGREES:
-                    lengthDegrees = max(0, angularLength.getDegrees().getValue());
+                    length = max(0, angularLength.getDegrees().getValue());
+                    space.setSweepAngleDegrees(length);
                     break;
 
                 case EXPANDED_ANGULAR_DIMENSION:
@@ -2761,20 +2762,21 @@ public final class ProtoLayoutInflater {
                     }
 
                 case DP:
-                    // TODO: b/377325905 - ArcSpacer accepts Dp length.
+                    length = max(0, safeDpToPx(angularLength.getDp().getValue()));
+                    space.setLengthPx(length);
                     break;
 
                 case INNER_NOT_SET:
                     break;
             }
         } else {
-            lengthDegrees = max(0, spacer.getLength().getValue());
+            length = max(0, spacer.getLength().getValue());
+            space.setSweepAngleDegrees(length);
         }
 
-        if (lengthDegrees == 0 && thicknessPx == 0) {
+        if (length == 0 && thicknessPx == 0) {
             return null;
         }
-        space.setSweepAngleDegrees(lengthDegrees);
         space.setThickness(thicknessPx);
 
         View wrappedView =
