@@ -821,16 +821,17 @@ internal class LayoutNodeLayoutDelegate(
         private var needsCoordinatesUpdate = false
 
         override var isPlacedUnderMotionFrameOfReference: Boolean = false
-            set(new) {
-                // Delegated to outerCoordinator
-                val old = outerCoordinator.isPlacedUnderMotionFrameOfReference
-                if (new != old) {
-                    outerCoordinator.isPlacedUnderMotionFrameOfReference = old
-                    // Affects coordinates measurements
-                    this.needsCoordinatesUpdate = true
-                }
-                field = new
+
+        override fun updatePlacedUnderMotionFrameOfReference(newMFR: Boolean) {
+            // Delegated to outerCoordinator
+            val old = outerCoordinator.isPlacedUnderMotionFrameOfReference
+            if (newMFR != old) {
+                outerCoordinator.isPlacedUnderMotionFrameOfReference = newMFR
+                // Affects coordinates measurements
+                this.needsCoordinatesUpdate = true
             }
+            isPlacedUnderMotionFrameOfReference = newMFR
+        }
 
         private fun placeSelf(
             position: IntOffset,
@@ -1540,14 +1541,15 @@ internal class LayoutNodeLayoutDelegate(
         }
 
         override var isPlacedUnderMotionFrameOfReference: Boolean = false
-            set(new) {
-                // Delegated to outerCoordinator
-                val old = outerCoordinator.lookaheadDelegate?.isPlacedUnderMotionFrameOfReference
-                if (new != old) {
-                    outerCoordinator.lookaheadDelegate?.isPlacedUnderMotionFrameOfReference = new
-                }
-                field = new
+
+        override fun updatePlacedUnderMotionFrameOfReference(newMFR: Boolean) {
+            // Delegated to outerCoordinator
+            val old = outerCoordinator.lookaheadDelegate?.isPlacedUnderMotionFrameOfReference
+            if (newMFR != old) {
+                outerCoordinator.lookaheadDelegate?.isPlacedUnderMotionFrameOfReference = newMFR
             }
+            isPlacedUnderMotionFrameOfReference = newMFR
+        }
 
         private fun placeSelf(
             position: IntOffset,
@@ -2054,20 +2056,33 @@ internal interface AlignmentLinesOwner : Measurable {
  * [LookaheadCapablePlaceable.isPlacedUnderMotionFrameOfReference] to the proper placeable.
  */
 internal interface MotionReferencePlacementDelegate {
-
     /**
      * Called when a layout is about to be placed.
      *
-     * The corresponding [LookaheadCapablePlaceable] should have their
-     * [LookaheadCapablePlaceable.isPlacedUnderMotionFrameOfReference] flag updated to the given
-     * value.
+     * This updates the corresponding [LookaheadCapablePlaceable]'s
+     * [LookaheadCapablePlaceable.isPlacedUnderMotionFrameOfReference] flag IF AND ONLY IF the
+     * placement call comes from parent [LookaheadCapablePlaceable]. More specifically, for
+     * [LookaheadCapablePlaceable] that are the head of the modifier chain (e.g. outerCoordinator),
+     * the placement call doesn't always come from the parent, as the node can be independently
+     * replaced. For these [LookaheadCapablePlaceable], we maintain the old
+     * [isPlacedUnderMotionFrameOfReference] until the next placement call comes from the parent.
+     * This reason is that only placement from parent runs the placement lambda where
+     * [Placeable.PlacementScope.withMotionFrameOfReferencePlacement] is invoked. Also note, for
+     * [LookaheadCapablePlaceable] that are not the head of the modifier chain, the placement call
+     * always comes from the parent.
      *
      * The placeable should be tagged such that its corresponding coordinates reflect the flag in
      * [androidx.compose.ui.layout.LayoutCoordinates.introducesMotionFrameOfReference]. Note that
      * when it's placed on the current frame of reference, it means it doesn't introduce a new frame
      * of reference.
-     *
-     * This also means that coordinates consumers (onPlaced readers) are expected to be updated.
      */
-    var isPlacedUnderMotionFrameOfReference: Boolean
+    fun updatePlacedUnderMotionFrameOfReference(newMFR: Boolean)
+
+    /**
+     * Flag to indicate whether the [MotionReferencePlacementDelegate] is being placed under motion
+     * frame of reference. This is also reflected in
+     * [androidx.compose.ui.layout.LayoutCoordinates.introducesMotionFrameOfReference], which is
+     * used for local position calculation between coordinates.
+     */
+    val isPlacedUnderMotionFrameOfReference: Boolean
 }
