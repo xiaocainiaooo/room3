@@ -38,7 +38,12 @@ class MainActivityV2 : AppCompatActivity() {
     @VisibleForTesting
     var filePicker: ActivityResultLauncher<String> =
         registerForActivityResult(GetContent()) { uri: Uri? ->
-            uri?.let { pdfViewerFragment?.documentUri = uri }
+            uri?.let {
+                if (pdfViewerFragment == null) {
+                    setPdfView()
+                }
+                pdfViewerFragment?.documentUri = uri
+            }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,9 +59,6 @@ class MainActivityV2 : AppCompatActivity() {
         val getContentButton: MaterialButton = findViewById(R.id.launch_button)
 
         getContentButton.setOnClickListener { filePicker.launch(MIME_TYPE_PDF) }
-        if (savedInstanceState == null) {
-            setPdfView()
-        }
     }
 
     private fun setPdfView() {
