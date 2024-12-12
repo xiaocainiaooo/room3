@@ -29,9 +29,9 @@ import androidx.compose.ui.unit.roundToIntRect
  * Represents an axis-aligned bounding Rectangle for an element in a compose hierarchy, in the
  * coordinates of either the Root of the compose hierarchy, the Window, or the Screen.
  *
- * @see androidx.compose.ui.layout.onRectChanged
+ * @see androidx.compose.ui.layout.onLayoutRectChanged
  */
-class RectInfo
+class RelativeLayoutBounds
 internal constructor(
     private val topLeft: Long,
     private val bottomRight: Long,
@@ -86,7 +86,7 @@ internal constructor(
     /**
      * The positioned bounding Rect in the coordinates of the root node of the compose hierarchy.
      */
-    val rootRect: IntRect
+    val boundsInRoot: IntRect
         get() {
             val l = unpackX(topLeft)
             val t = unpackY(topLeft)
@@ -96,7 +96,7 @@ internal constructor(
         }
 
     /** The positioned bounding Rect in the coordinates of the Window which it is contained in. */
-    val windowRect: IntRect
+    val boundsInWindow: IntRect
         get() {
             val l = unpackX(topLeft)
             val t = unpackY(topLeft)
@@ -116,10 +116,10 @@ internal constructor(
         }
 
     /** The positioned bounding Rect in the coordinates of the Screen which it is contained in. */
-    val screenRect: IntRect
+    val boundsInScreen: IntRect
         get() {
             if (viewToWindowMatrix != null) {
-                val windowRect = windowRect
+                val windowRect = boundsInWindow
                 val offset = windowOffset
                 return IntRect(
                     windowRect.left + offset.x,
@@ -139,8 +139,9 @@ internal constructor(
 
     /**
      * At the current state of the layout, calculates which other Composable Layouts are occluding
-     * the Composable associated with this [RectInfo]. **Note**: Calling this method during measure
-     * or layout may result on calculations with stale (or partially stale) layout information.
+     * the Composable associated with this [RelativeLayoutBounds]. **Note**: Calling this method
+     * during measure or layout may result on calculations with stale (or partially stale) layout
+     * information.
      *
      * An occlusion is defined by an intersecting Composable that may draw on top of the target
      * Composable.

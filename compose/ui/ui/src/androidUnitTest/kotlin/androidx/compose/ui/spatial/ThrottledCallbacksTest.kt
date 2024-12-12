@@ -223,7 +223,7 @@ class ThrottledCallbacksTest {
         id: Int,
         throttleMs: Long,
         debounceMs: Long,
-        callback: (RectInfo) -> Unit
+        callback: (RelativeLayoutBounds) -> Unit
     ): DisposableHandle {
         return registerOnRectChanged(id, throttleMs, debounceMs, fakeNode(), callback)
     }
