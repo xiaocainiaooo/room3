@@ -151,6 +151,7 @@ import androidx.wear.protolayout.proto.LayoutElementProto.ArcText;
 import androidx.wear.protolayout.proto.LayoutElementProto.Box;
 import androidx.wear.protolayout.proto.LayoutElementProto.ColorFilter;
 import androidx.wear.protolayout.proto.LayoutElementProto.Column;
+import androidx.wear.protolayout.proto.LayoutElementProto.DashedArcLine;
 import androidx.wear.protolayout.proto.LayoutElementProto.ExtensionLayoutElement;
 import androidx.wear.protolayout.proto.LayoutElementProto.FontFeatureSetting;
 import androidx.wear.protolayout.proto.LayoutElementProto.FontSetting;
@@ -6193,6 +6194,111 @@ public class ProtoLayoutInflaterTest {
         TextView textView = (TextView) box.getChildAt(0);
         assertSlideInInitialOffset(
                 box, textView, inflatedViewParent.getLeft() - textView.getLeft());
+    }
+
+    @Test
+    public void inflate_dashedArcLine_dynamicLength() {
+        AppDataKey<DynamicBuilders.DynamicFloat> keyFoo = new AppDataKey<>("foo");
+        mStateStore.setAppStateEntryValuesProto(
+                ImmutableMap.of(
+                        keyFoo,
+                        DynamicDataValue.newBuilder()
+                                .setFloatVal(FixedFloat.newBuilder().setValue(10F))
+                                .build()));
+
+        DynamicFloat arcLength =
+                DynamicFloat.newBuilder()
+                        .setStateSource(StateFloatSource.newBuilder().setSourceKey("foo").build())
+                        .build();
+
+        DashedArcLine dashedArcLine =
+                DashedArcLine.newBuilder()
+                        // Shorter than 360 degrees, so should be drawn as an arc:
+                        .setLength(degreesDynamic(arcLength, /* valueForLayout= */ 180f))
+                        .setThickness(dp(12))
+                        .build();
+
+        WearDashedArcLineView lineView = inflateDashedArcLine(dashedArcLine);
+        assertThat(lineView.getSweepAngleDegrees()).isEqualTo(10);
+
+        mStateStore.setAppStateEntryValuesProto(
+                ImmutableMap.of(
+                        keyFoo,
+                        DynamicDataValue.newBuilder()
+                                .setFloatVal(FixedFloat.newBuilder().setValue(20F))
+                                .build()));
+
+        assertThat(lineView.getSweepAngleDegrees()).isEqualTo(20);
+    }
+
+    @Test
+    public void inflate_dashedArcLine_usesZeroValueForLayout() {
+        DynamicFloat arcLength =
+                DynamicFloat.newBuilder().setFixed(FixedFloat.newBuilder().setValue(45f)).build();
+
+        DashedArcLine dashedArcLine =
+                DashedArcLine.newBuilder()
+                        .setLength(degreesDynamic(arcLength, /* valueForLayout= */ 0f))
+                        .setThickness(dp(12))
+                        .build();
+
+        WearDashedArcLineView lineView = inflateDashedArcLine(dashedArcLine);
+        expect.that(lineView.getMaxSweepAngleDegrees()).isEqualTo(0f);
+    }
+
+    @Test
+    public void inflate_dashedArcLine_dynamicColor() {
+        AppDataKey<DynamicBuilders.DynamicColor> keyFoo = new AppDataKey<>("foo");
+        mStateStore.setAppStateEntryValuesProto(
+                ImmutableMap.of(
+                        keyFoo,
+                        DynamicDataValue.newBuilder()
+                                .setColorVal(FixedColor.newBuilder().setArgb(Color.CYAN))
+                                .build()));
+
+        DynamicColor arcColor =
+                DynamicColor.newBuilder()
+                        .setStateSource(StateColorSource.newBuilder().setSourceKey("foo").build())
+                        .build();
+
+        DashedArcLine dashedArcLine =
+                DashedArcLine.newBuilder()
+                        // Shorter than 360 degrees, so should be drawn as an arc:
+                        .setLength(degrees(180))
+                        .setColor(ColorProp.newBuilder().setDynamicValue(arcColor))
+                        .setThickness(dp(12))
+                        .build();
+
+        WearDashedArcLineView lineView = inflateDashedArcLine(dashedArcLine);
+        assertThat(lineView.getColor()).isEqualTo(Color.CYAN);
+
+        mStateStore.setAppStateEntryValuesProto(
+                ImmutableMap.of(
+                        keyFoo,
+                        DynamicDataValue.newBuilder()
+                                .setColorVal(FixedColor.newBuilder().setArgb(Color.MAGENTA))
+                                .build()));
+
+        assertThat(lineView.getColor()).isEqualTo(Color.MAGENTA);
+    }
+
+    private WearDashedArcLineView inflateDashedArcLine(DashedArcLine dashedArcLine) {
+        LayoutElement root =
+                LayoutElement.newBuilder()
+                        .setArc(
+                                Arc.newBuilder()
+                                        .addContents(ArcLayoutElement.newBuilder().setDashedLine(
+                                                dashedArcLine)))
+                        .build();
+
+        FrameLayout rootLayout = renderer(fingerprintedLayout(root)).inflate();
+        ArcLayout arcLayout = (ArcLayout) rootLayout.getChildAt(0);
+
+        if (arcLayout.getChildAt(0) instanceof SizedArcContainer) {
+            return (WearDashedArcLineView) ((SizedArcContainer) arcLayout.getChildAt(0)).getChildAt(
+                    0);
+        }
+        return (WearDashedArcLineView) arcLayout.getChildAt(0);
     }
 
     private void assertSlideInInitialOffset(
