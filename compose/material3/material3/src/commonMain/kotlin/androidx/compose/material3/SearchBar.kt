@@ -16,14 +16,17 @@
 
 package androidx.compose.material3
 
+import androidx.annotation.FloatRange
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -38,16 +41,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.onConsumedWindowInsetsChanged
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -60,11 +68,15 @@ import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.SearchBarDefaults.InputFieldHeight
 import androidx.compose.material3.internal.BackEventCompat
+import androidx.compose.material3.internal.BackEventProgress
 import androidx.compose.material3.internal.BackHandler
+import androidx.compose.material3.internal.BasicEdgeToEdgeDialog
 import androidx.compose.material3.internal.MutableWindowInsets
 import androidx.compose.material3.internal.PredictiveBack
 import androidx.compose.material3.internal.PredictiveBackHandler
+import androidx.compose.material3.internal.PredictiveBackState
 import androidx.compose.material3.internal.Strings
+import androidx.compose.material3.internal.SwipeEdge
 import androidx.compose.material3.internal.getString
 import androidx.compose.material3.internal.textFieldBackground
 import androidx.compose.material3.tokens.ElevationTokens
@@ -78,12 +90,20 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -92,14 +112,22 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionOnScreen
+import androidx.compose.ui.platform.InterceptPlatformTextInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
@@ -109,11 +137,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.round
 import androidx.compose.ui.util.fastFirst
 import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.lerp
@@ -124,7 +154,71 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sign
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+/**
+ * <a href="https://m3.material.io/components/search/overview" class="external"
+ * target="_blank">Material Design search</a>.
+ *
+ * A search bar represents a field that allows users to enter a keyword or phrase and get relevant
+ * information. It can be used as a way to navigate through an app via search queries.
+ *
+ * ![Search bar
+ * image](https://developer.android.com/images/reference/androidx/compose/material3/search-bar.png)
+ *
+ * A search bar expands when focused to display dynamic suggestions or search results. An expanded
+ * [SearchBar] displays its results in a full-screen dialog. If this expansion behavior is
+ * undesirable, for example on large tablet screens, consider using [DockedSearchBar] instead.
+ *
+ * @param state the state of the search bar. This state should also be passed to the [inputField].
+ * @param inputField the input field of this search bar that allows entering a query, typically a
+ *   [SearchBarDefaults.InputField].
+ * @param modifier the [Modifier] to be applied to this search bar when collapsed.
+ * @param shape the shape of this search bar when it is collapsed. When expanded, the shape will
+ *   always be [SearchBarDefaults.fullScreenShape].
+ * @param colors [SearchBarColors] that will be used to resolve the colors used for this search bar
+ *   in different states. See [SearchBarDefaults.colors].
+ * @param tonalElevation when [SearchBarColors.containerColor] is [ColorScheme.surface], a
+ *   translucent primary color overlay is applied on top of the container. A higher tonal elevation
+ *   value will result in a darker color in light theme and lighter color in dark theme. See also:
+ *   [Surface].
+ * @param shadowElevation the elevation for the shadow below this search bar.
+ * @param content the content of this search bar to display search results below the [inputField].
+ */
+@ExperimentalMaterial3Api
+@Composable
+internal fun SearchBar(
+    state: SearchBarState,
+    inputField: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    shape: Shape = SearchBarDefaults.inputFieldShape,
+    colors: SearchBarColors = SearchBarDefaults.colors(),
+    tonalElevation: Dp = SearchBarDefaults.TonalElevation,
+    shadowElevation: Dp = SearchBarDefaults.ShadowElevation,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    CollapsedSearchBar(
+        // Modifier gets passed to Collapsed because Expanded opens a separate dialog.
+        modifier = modifier,
+        state = state,
+        inputField = inputField,
+        shape = shape,
+        colors = colors,
+        tonalElevation = tonalElevation,
+        shadowElevation = shadowElevation
+    )
+    ExpandedFullScreenSearchBar(
+        state = state,
+        inputField = inputField,
+        collapsedShape = shape,
+        colors = colors,
+        tonalElevation = tonalElevation,
+        shadowElevation = shadowElevation,
+        content = content
+    )
+}
 
 /**
  * <a href="https://m3.material.io/components/search/overview" class="external"
@@ -328,6 +422,240 @@ fun DockedSearchBar(
     BackHandler(enabled = expanded) { onExpandedChange(false) }
 }
 
+/**
+ * A building block component representing a search bar in the collapsed state.
+ *
+ * Unless specific customization is needed, consider using a higher level component such as
+ * [SearchBar] or [DockedSearchBar] instead.
+ *
+ * @param state the state of the search bar. This state should also be passed to the [inputField].
+ * @param inputField the input field of this search bar that allows entering a query, typically a
+ *   [SearchBarDefaults.InputField].
+ * @param modifier the [Modifier] to be applied to this collapsed search bar.
+ * @param shape the shape of this search bar.
+ * @param colors [SearchBarColors] that will be used to resolve the colors used for this search bar
+ *   in different states. See [SearchBarDefaults.colors].
+ * @param tonalElevation when [SearchBarColors.containerColor] is [ColorScheme.surface], a
+ *   translucent primary color overlay is applied on top of the container. A higher tonal elevation
+ *   value will result in a darker color in light theme and lighter color in dark theme. See also:
+ *   [Surface].
+ * @param shadowElevation the elevation for the shadow below this search bar.
+ */
+@Suppress("ComposableLambdaParameterNaming", "ComposableLambdaParameterPosition")
+@ExperimentalMaterial3Api
+@Composable
+internal fun CollapsedSearchBar(
+    state: SearchBarState,
+    inputField: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    shape: Shape = SearchBarDefaults.inputFieldShape,
+    colors: SearchBarColors = SearchBarDefaults.colors(),
+    tonalElevation: Dp = SearchBarDefaults.TonalElevation,
+    shadowElevation: Dp = SearchBarDefaults.ShadowElevation,
+) {
+    // Disable when collapsed to avoid keyboard flicker when the expanded search bar opens.
+    DisableSoftKeyboard {
+        Surface(
+            modifier = modifier.onGloballyPositioned { state.collapsedCoords = it },
+            shape = shape,
+            color = colors.containerColor,
+            contentColor = contentColorFor(colors.containerColor),
+            tonalElevation = tonalElevation,
+            shadowElevation = shadowElevation,
+            content = inputField,
+        )
+    }
+}
+
+/**
+ * A building block component representing a search bar that is currently expanding or in the
+ * expanded state. This component is displayed in a new full-screen dialog.
+ *
+ * Unless specific customization is needed, consider using a higher level component such as
+ * [SearchBar] or [DockedSearchBar] instead.
+ *
+ * @param state the state of the search bar. This state should also be passed to the [inputField].
+ * @param inputField the input field of this search bar that allows entering a query, typically a
+ *   [SearchBarDefaults.InputField].
+ * @param modifier the [Modifier] to be applied to this expanded search bar.
+ * @param collapsedShape the shape of the search bar when it is collapsed. When fully expanded, the
+ *   shape will always be [SearchBarDefaults.fullScreenShape].
+ * @param colors [SearchBarColors] that will be used to resolve the colors used for this search bar
+ *   in different states. See [SearchBarDefaults.colors].
+ * @param tonalElevation when [SearchBarColors.containerColor] is [ColorScheme.surface], a
+ *   translucent primary color overlay is applied on top of the container. A higher tonal elevation
+ *   value will result in a darker color in light theme and lighter color in dark theme. See also:
+ *   [Surface].
+ * @param shadowElevation the elevation for the shadow below this search bar.
+ * @param windowInsets the window insets that this search bar will respect.
+ * @param content the content of this search bar to display search results below the [inputField].
+ */
+@ExperimentalMaterial3Api
+@Composable
+internal fun ExpandedFullScreenSearchBar(
+    state: SearchBarState,
+    inputField: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    collapsedShape: Shape = SearchBarDefaults.inputFieldShape,
+    colors: SearchBarColors = SearchBarDefaults.colors(),
+    tonalElevation: Dp = SearchBarDefaults.TonalElevation,
+    shadowElevation: Dp = SearchBarDefaults.ShadowElevation,
+    windowInsets: @Composable () -> WindowInsets = { SearchBarDefaults.windowInsets },
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    if (!state.isExpanded) return
+
+    val coroutineScope = rememberCoroutineScope()
+
+    BasicEdgeToEdgeDialog(
+        onDismissRequest = { coroutineScope.launch { state.animateToCollapsed() } }
+    ) { predictiveBackState ->
+        val softwareKeyboardController = LocalSoftwareKeyboardController.current
+        SideEffect { state.softwareKeyboardController = softwareKeyboardController }
+        FullScreenSearchBarLayout(
+            state = state,
+            predictiveBackState = predictiveBackState,
+            inputField = inputField,
+            modifier = modifier,
+            collapsedShape = collapsedShape,
+            colors = colors,
+            tonalElevation = tonalElevation,
+            shadowElevation = shadowElevation,
+            windowInsets = windowInsets(),
+            content = content,
+        )
+    }
+}
+
+/**
+ * The state of a search bar.
+ *
+ * @property focusRequester The [FocusRequester] to request focus on the search bar.
+ *   [SearchBarDefaults.InputField] applies this automatically. Custom input fields must attach this
+ *   focus requester using [Modifier.focusRequester].
+ */
+@ExperimentalMaterial3Api
+@Stable
+internal class SearchBarState
+private constructor(
+    private val animatable: Animatable<Float, AnimationVector1D>,
+    private val animationSpecForExpand: AnimationSpec<Float>,
+    private val animationSpecForCollapse: AnimationSpec<Float>,
+    val focusRequester: FocusRequester,
+) {
+    /**
+     * Construct a [SearchBarState].
+     *
+     * @param initialExpanded the initial value of whether the search bar is expanded.
+     * @param animationSpecForExpand the animation spec used when the search bar expands.
+     * @param animationSpecForCollapse the animation spec used when the search bar collapses.
+     * @param focusRequester the focus requester to be applied to the search bar's input field.
+     */
+    constructor(
+        initialExpanded: Boolean,
+        animationSpecForExpand: AnimationSpec<Float>,
+        animationSpecForCollapse: AnimationSpec<Float>,
+        focusRequester: FocusRequester = FocusRequester(),
+    ) : this(
+        animatable = Animatable(if (initialExpanded) 1f else 0f),
+        animationSpecForExpand = animationSpecForExpand,
+        animationSpecForCollapse = animationSpecForCollapse,
+        focusRequester = focusRequester,
+    )
+
+    /** The layout coordinates, if available, of the search bar when it is collapsed. */
+    var collapsedCoords: LayoutCoordinates? by mutableStateOf(null)
+
+    /**
+     * The animation progress of the search bar, where 0 represents the collapsed state and 1
+     * represents the expanded state.
+     */
+    @get:FloatRange(from = 0.0, to = 1.0)
+    val progress: Float
+        get() = animatable.value.coerceIn(0f, 1f)
+
+    /**
+     * Whether this search bar is expanded (showing search results), or in the process of expanding.
+     */
+    val isExpanded: Boolean by derivedStateOf { progress > 0f }
+
+    internal var softwareKeyboardController: SoftwareKeyboardController? = null
+
+    /** Animate the search bar to its expanded state. */
+    suspend fun animateToExpanded() {
+        animatable.animateTo(targetValue = 1f, animationSpec = animationSpecForExpand)
+        focusRequester.requestFocus()
+    }
+
+    /** Animate the search bar to its collapsed state. */
+    suspend fun animateToCollapsed() {
+        softwareKeyboardController?.hide()
+        animatable.animateTo(targetValue = 0f, animationSpec = animationSpecForCollapse)
+    }
+
+    /** Snap the search bar progress to the given [fraction]. */
+    suspend fun snapTo(fraction: Float) {
+        animatable.snapTo(fraction)
+    }
+
+    companion object {
+        fun Saver(
+            animationSpecForExpand: AnimationSpec<Float>,
+            animationSpecForCollapse: AnimationSpec<Float>,
+            focusRequester: FocusRequester,
+        ): Saver<SearchBarState, *> =
+            listSaver(
+                save = { listOf(it.progress) },
+                restore = {
+                    SearchBarState(
+                        animatable = Animatable(it[0], Float.VectorConverter),
+                        animationSpecForExpand = animationSpecForExpand,
+                        animationSpecForCollapse = animationSpecForCollapse,
+                        focusRequester = focusRequester,
+                    )
+                },
+            )
+    }
+}
+
+/**
+ * Create and remember a [SearchBarState].
+ *
+ * @param initialExpanded the initial value of whether the search bar is expanded.
+ * @param animationSpecForExpand the animation spec used when the search bar expands.
+ * @param animationSpecForCollapse the animation spec used when the search bar collapses.
+ * @param focusRequester the focus requester to be applied to the search bar's input field.
+ */
+@ExperimentalMaterial3Api
+@Composable
+internal fun rememberSearchBarState(
+    initialExpanded: Boolean = false,
+    animationSpecForExpand: AnimationSpec<Float> = MotionSchemeKeyTokens.SlowSpatial.value(),
+    animationSpecForCollapse: AnimationSpec<Float> = MotionSchemeKeyTokens.DefaultSpatial.value(),
+    focusRequester: FocusRequester? = null,
+): SearchBarState {
+    @Suppress("NAME_SHADOWING") val focusRequester = focusRequester ?: remember { FocusRequester() }
+    return rememberSaveable(
+        initialExpanded,
+        animationSpecForExpand,
+        animationSpecForCollapse,
+        focusRequester,
+        saver =
+            SearchBarState.Saver(
+                animationSpecForExpand = animationSpecForExpand,
+                animationSpecForCollapse = animationSpecForCollapse,
+                focusRequester = focusRequester,
+            )
+    ) {
+        SearchBarState(
+            initialExpanded = initialExpanded,
+            animationSpecForExpand = animationSpecForExpand,
+            animationSpecForCollapse = animationSpecForCollapse,
+            focusRequester = focusRequester,
+        )
+    }
+}
+
 /** Defaults used in [SearchBar] and [DockedSearchBar]. */
 @ExperimentalMaterial3Api
 object SearchBarDefaults {
@@ -361,7 +689,7 @@ object SearchBarDefaults {
 
     /** Default window insets for a [SearchBar]. */
     val windowInsets: WindowInsets
-        @Composable get() = WindowInsets.statusBars
+        @Composable get() = WindowInsets.safeDrawing
 
     /**
      * Creates a [SearchBarColors] that represents the different colors used in parts of the search
@@ -497,8 +825,170 @@ object SearchBarDefaults {
      * A text field to input a query in a search bar.
      *
      * This overload of [InputField] uses [TextFieldState] to keep track of the text content and
-     * position of the cursor or selection. It is the recommended overload to use with [SearchBar]
-     * and [DockedSearchBar].
+     * position of the cursor or selection, and [SearchBarState] to keep track of the state of the
+     * search bar.
+     *
+     * @param textFieldState [TextFieldState] that holds the internal editing state of the input
+     *   field.
+     * @param searchBarState the state of the search bar as a whole.
+     * @param onSearch the callback to be invoked when the input service triggers the
+     *   [ImeAction.Search] action. The current query in the [textFieldState] comes as a parameter
+     *   of the callback.
+     * @param modifier the [Modifier] to be applied to this input field.
+     * @param enabled the enabled state of this input field. When `false`, this component will not
+     *   respond to user input, and it will appear visually disabled and disabled to accessibility
+     *   services.
+     * @param readOnly controls the editable state of the input field. When `true`, the field cannot
+     *   be modified. However, a user can focus it and copy text from it.
+     * @param textStyle the style to be applied to the input text. Defaults to [LocalTextStyle].
+     * @param placeholder the placeholder to be displayed when the input text is empty.
+     * @param leadingIcon the leading icon to be displayed at the start of the input field.
+     * @param trailingIcon the trailing icon to be displayed at the end of the input field.
+     * @param prefix the optional prefix to be displayed before the input text.
+     * @param suffix the optional suffix to be displayed after the input text.
+     * @param inputTransformation optional [InputTransformation] that will be used to transform
+     *   changes to the [TextFieldState] made by the user. The transformation will be applied to
+     *   changes made by hardware and software keyboard events, pasting or dropping text,
+     *   accessibility services, and tests. The transformation will _not_ be applied when changing
+     *   the [textFieldState] programmatically, or when the transformation is changed. If the
+     *   transformation is changed on an existing text field, it will be applied to the next user
+     *   edit. The transformation will not immediately affect the current [textFieldState].
+     * @param outputTransformation optional [OutputTransformation] that transforms how the contents
+     *   of the text field are presented.
+     * @param scrollState scroll state that manages the horizontal scroll of the input field.
+     * @param shape the shape of the input field.
+     * @param colors [TextFieldColors] that will be used to resolve the colors used for this input
+     *   field in different states. See [SearchBarDefaults.inputFieldColors].
+     * @param interactionSource an optional hoisted [MutableInteractionSource] for observing and
+     *   emitting [Interaction]s for this input field. You can use this to change the search bar's
+     *   appearance or preview the search bar in different states. Note that if `null` is provided,
+     *   interactions will still happen internally.
+     */
+    @ExperimentalMaterial3Api
+    @Composable
+    internal fun InputField(
+        textFieldState: TextFieldState,
+        searchBarState: SearchBarState,
+        onSearch: (String) -> Unit,
+        modifier: Modifier = Modifier,
+        enabled: Boolean = true,
+        readOnly: Boolean = false,
+        textStyle: TextStyle = LocalTextStyle.current,
+        placeholder: @Composable (() -> Unit)? = null,
+        leadingIcon: @Composable (() -> Unit)? = null,
+        trailingIcon: @Composable (() -> Unit)? = null,
+        prefix: @Composable (() -> Unit)? = null,
+        suffix: @Composable (() -> Unit)? = null,
+        inputTransformation: InputTransformation? = null,
+        outputTransformation: OutputTransformation? = null,
+        scrollState: ScrollState = rememberScrollState(),
+        shape: Shape = inputFieldShape,
+        colors: TextFieldColors = inputFieldColors(),
+        interactionSource: MutableInteractionSource? = null,
+    ) {
+        @Suppress("NAME_SHADOWING")
+        val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
+
+        val focused = interactionSource.collectIsFocusedAsState().value
+        val focusManager = LocalFocusManager.current
+
+        val searchSemantics = getString(Strings.SearchBarSearch)
+        val suggestionsAvailableSemantics = getString(Strings.SuggestionsAvailable)
+
+        val textColor =
+            textStyle.color.takeOrElse {
+                colors.textColor(enabled, isError = false, focused = focused)
+            }
+        val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
+
+        val coroutineScope = rememberCoroutineScope()
+
+        BasicTextField(
+            state = textFieldState,
+            modifier =
+                modifier
+                    .sizeIn(
+                        minWidth = SearchBarMinWidth,
+                        maxWidth = SearchBarMaxWidth,
+                        minHeight = InputFieldHeight,
+                    )
+                    .focusRequester(searchBarState.focusRequester)
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            coroutineScope.launch { searchBarState.animateToExpanded() }
+                        }
+                    }
+                    .semantics {
+                        contentDescription = searchSemantics
+                        if (searchBarState.isExpanded) {
+                            stateDescription = suggestionsAvailableSemantics
+                        }
+                        onClick {
+                            searchBarState.focusRequester.requestFocus()
+                            true
+                        }
+                    },
+            enabled = enabled,
+            readOnly = readOnly,
+            lineLimits = TextFieldLineLimits.SingleLine,
+            textStyle = mergedTextStyle,
+            cursorBrush = SolidColor(colors.cursorColor(isError = false)),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            onKeyboardAction = { onSearch(textFieldState.text.toString()) },
+            interactionSource = interactionSource,
+            inputTransformation = inputTransformation,
+            outputTransformation = outputTransformation,
+            scrollState = scrollState,
+            decorator =
+                TextFieldDefaults.decorator(
+                    state = textFieldState,
+                    enabled = enabled,
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                    outputTransformation = outputTransformation,
+                    interactionSource = interactionSource,
+                    placeholder = placeholder,
+                    leadingIcon =
+                        leadingIcon?.let { leading ->
+                            { Box(Modifier.offset(x = SearchBarIconOffsetX)) { leading() } }
+                        },
+                    trailingIcon =
+                        trailingIcon?.let { trailing ->
+                            { Box(Modifier.offset(x = -SearchBarIconOffsetX)) { trailing() } }
+                        },
+                    prefix = prefix,
+                    suffix = suffix,
+                    colors = colors,
+                    contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(),
+                    container = {
+                        val containerColor =
+                            animateColorAsState(
+                                targetValue =
+                                    colors.containerColor(
+                                        enabled = enabled,
+                                        isError = false,
+                                        focused = focused
+                                    ),
+                                animationSpec = MotionSchemeKeyTokens.FastEffects.value(),
+                            )
+                        Box(Modifier.textFieldBackground(containerColor::value, shape))
+                    },
+                )
+        )
+
+        val shouldClearFocus = !searchBarState.isExpanded && focused
+        LaunchedEffect(searchBarState.isExpanded) {
+            if (shouldClearFocus) {
+                focusManager.clearFocus()
+            }
+        }
+    }
+
+    /**
+     * A text field to input a query in a search bar.
+     *
+     * This overload of [InputField] uses [TextFieldState] to keep track of the text content and
+     * position of the cursor or selection, and [expanded] and [onExpandedChange] to keep track of
+     * the state of the search bar.
      *
      * @param state [TextFieldState] that holds the internal editing state of the input field.
      * @param onSearch the callback to be invoked when the input service triggers the
@@ -1354,6 +1844,228 @@ private fun SearchBarLayout(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FullScreenSearchBarLayout(
+    state: SearchBarState,
+    predictiveBackState: PredictiveBackState,
+    inputField: @Composable () -> Unit,
+    modifier: Modifier,
+    collapsedShape: Shape,
+    colors: SearchBarColors,
+    tonalElevation: Dp,
+    shadowElevation: Dp,
+    windowInsets: WindowInsets,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val backEvent by remember { derivedStateOf { predictiveBackState.value } }
+    val firstInProgressValue =
+        remember { mutableStateOf<BackEventProgress.InProgress?>(null) }
+            .apply {
+                when (val event = backEvent) {
+                    is BackEventProgress.InProgress -> if (value == null) value = event
+                    BackEventProgress.NotRunning -> value = null
+                    BackEventProgress.Completed -> Unit
+                }
+            }
+    val lastInProgressValue =
+        remember { mutableStateOf<BackEventProgress.InProgress?>(null) }
+            .apply {
+                when (val event = backEvent) {
+                    is BackEventProgress.InProgress -> value = event
+                    BackEventProgress.NotRunning -> value = null
+                    BackEventProgress.Completed -> Unit
+                }
+            }
+
+    val density = LocalDensity.current
+    val fullScreenShape = SearchBarDefaults.fullScreenShape
+    val animatedShape =
+        remember(density, fullScreenShape) {
+            GenericShape { size, layoutDirection ->
+                if (collapsedShape === CircleShape && fullScreenShape === RectangleShape) {
+                    // The shape can only be animated if it's the default spec value
+                    val radius =
+                        with(density) {
+                            val fraction =
+                                max(1 - state.progress, lastInProgressValue.value.transform())
+                            (SearchBarCornerRadius * fraction).toPx()
+                        }
+                    if (radius < 1e-3) {
+                        addRect(size.toRect())
+                    } else {
+                        addRoundRect(RoundRect(size.toRect(), CornerRadius(radius)))
+                    }
+                } else {
+                    val shape = if (state.progress < 0.5f) collapsedShape else fullScreenShape
+                    addOutline(shape.createOutline(size, layoutDirection, density))
+                }
+            }
+        }
+
+    // Top window insets need to be animated, but `Modifier.windowInsetsPadding` does not support
+    // animation. The top insets are separated out so the animation calculations can be done
+    // manually in the Layout's MeasureScope.
+    val unconsumedInsets = remember { MutableWindowInsets() }
+    val nonTopInsets =
+        unconsumedInsets.insets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+    Layout(
+        modifier =
+            modifier
+                .onConsumedWindowInsetsChanged { consumedInsets ->
+                    unconsumedInsets.insets = windowInsets.exclude(consumedInsets)
+                }
+                .consumeWindowInsets(windowInsets),
+        content = {
+            Box(
+                modifier =
+                    Modifier.layoutId(LayoutIdInputField)
+                        .padding(nonTopInsets.only(WindowInsetsSides.Horizontal).asPaddingValues()),
+                propagateMinConstraints = true,
+            ) {
+                inputField()
+            }
+
+            Surface(
+                modifier = Modifier.layoutId(LayoutIdSurface),
+                shape = animatedShape,
+                color = colors.containerColor,
+                contentColor = contentColorFor(colors.containerColor),
+                tonalElevation = tonalElevation,
+                shadowElevation = shadowElevation,
+                content = {},
+            )
+
+            Column(
+                Modifier.layoutId(LayoutIdSearchContent).padding(nonTopInsets.asPaddingValues())
+            ) {
+                HorizontalDivider(color = colors.dividerColor)
+                content()
+            }
+        },
+    ) { measurables, constraints ->
+        val predictiveBackProgress = lastInProgressValue.value.transform()
+
+        val predictiveBackEndWidth =
+            (constraints.maxWidth * SearchBarPredictiveBackMinScale)
+                .roundToInt()
+                .coerceAtLeast(state.collapsedBounds.width)
+        val predictiveBackEndHeight =
+            (constraints.maxHeight * SearchBarPredictiveBackMinScale)
+                .roundToInt()
+                .coerceAtLeast(state.collapsedBounds.height)
+        val endWidth = lerp(constraints.maxWidth, predictiveBackEndWidth, predictiveBackProgress)
+        val endHeight = lerp(constraints.maxHeight, predictiveBackEndHeight, predictiveBackProgress)
+        val width =
+            constraints.constrainWidth(lerp(state.collapsedBounds.width, endWidth, state.progress))
+        val height =
+            constraints.constrainHeight(
+                lerp(state.collapsedBounds.height, endHeight, state.progress)
+            )
+
+        val surfaceMeasurable = measurables.fastFirst { it.layoutId == LayoutIdSurface }
+        val surfacePlaceable = surfaceMeasurable.measure(Constraints.fixed(width, height))
+
+        val inputFieldMeasurable = measurables.fastFirst { it.layoutId == LayoutIdInputField }
+        val inputFieldPlaceable =
+            inputFieldMeasurable.measure(Constraints.fixed(width, state.collapsedBounds.height))
+
+        val contentMeasurable = measurables.fastFirst { it.layoutId == LayoutIdSearchContent }
+        val contentPlaceable =
+            contentMeasurable.measure(
+                Constraints(
+                    minWidth = width,
+                    maxWidth = width,
+                    minHeight = 0,
+                    maxHeight = height,
+                )
+            )
+
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            val topPadding =
+                unconsumedInsets.getTop(this@Layout) + SearchBarVerticalPadding.roundToPx()
+            val bottomPadding = SearchBarVerticalPadding.roundToPx()
+            val animatedTopPadding =
+                lerp(0, topPadding, min(state.progress, 1 - predictiveBackProgress))
+            val animatedBottomPadding = lerp(0, bottomPadding, state.progress)
+
+            fun BackEventProgress.InProgress.endOffsetX(): Int =
+                (if (swipeEdge == SwipeEdge.Left) {
+                        constraints.maxWidth -
+                            SearchBarPredictiveBackMinMargin.roundToPx() -
+                            predictiveBackEndWidth
+                    } else {
+                        SearchBarPredictiveBackMinMargin.roundToPx()
+                    })
+                    .coerceAtLeast(state.collapsedBounds.right - predictiveBackEndWidth)
+                    .coerceAtMost(state.collapsedBounds.left)
+
+            fun BackEventProgress.InProgress.endOffsetY(): Int {
+                val absoluteDeltaY = this.touchY - (firstInProgressValue.value?.touchY ?: return 0)
+                val relativeDeltaY = abs(absoluteDeltaY) / constraints.maxHeight
+
+                val availableVerticalSpace =
+                    ((constraints.maxHeight - predictiveBackEndHeight) / 2 -
+                            SearchBarPredictiveBackMinMargin.roundToPx())
+                        .coerceAtLeast(0)
+                val totalOffsetY =
+                    min(
+                        availableVerticalSpace,
+                        SearchBarPredictiveBackMaxOffsetY.roundToPx(),
+                    )
+                val interpolatedOffsetY = lerp(0, totalOffsetY, relativeDeltaY)
+                return (interpolatedOffsetY * sign(absoluteDeltaY).toInt() + topPadding)
+                    .coerceAtMost(state.collapsedBounds.top)
+            }
+
+            val endOffsetX =
+                lerp(
+                    0,
+                    lastInProgressValue.value?.endOffsetX() ?: 0,
+                    predictiveBackProgress,
+                )
+            val endOffsetY =
+                lerp(
+                    0,
+                    lastInProgressValue.value?.endOffsetY() ?: 0,
+                    predictiveBackProgress,
+                )
+            val offsetX = lerp(state.collapsedBounds.left, endOffsetX, state.progress)
+            val offsetY = lerp(state.collapsedBounds.top, endOffsetY, state.progress)
+
+            surfacePlaceable.place(x = offsetX, y = offsetY)
+            inputFieldPlaceable.place(x = offsetX, y = offsetY + animatedTopPadding)
+            contentPlaceable.placeWithLayer(
+                x = offsetX,
+                y =
+                    offsetY +
+                        animatedTopPadding +
+                        inputFieldPlaceable.height +
+                        animatedBottomPadding,
+                layerBlock = { alpha = state.progress },
+            )
+        }
+    }
+}
+
+private fun BackEventProgress.InProgress?.transform(): Float =
+    if (this == null) 0f else PredictiveBack.transform(this.progress)
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun DisableSoftKeyboard(content: @Composable () -> Unit) {
+    InterceptPlatformTextInput(
+        interceptor = { _, _ -> awaitCancellation() },
+        content = content,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+private val SearchBarState.collapsedBounds: IntRect
+    get() =
+        collapsedCoords?.let { IntRect(offset = it.positionOnScreen().round(), size = it.size) }
+            ?: IntRect.Zero
 
 private fun calculatePredictiveBackMultiplier(
     currentBackEvent: BackEventCompat?,
