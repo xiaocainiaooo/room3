@@ -27,13 +27,11 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingAppBarDefaults
-import androidx.compose.material3.HorizontalFloatingAppBar
+import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.VerticalFloatingAppBar
 import androidx.compose.material3.VerticalFloatingToolbar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -61,7 +59,7 @@ import org.junit.runners.Parameterized
 
 @LargeTest
 @RunWith(Parameterized::class)
-class FloatingAppBarBenchmark(private val type: FloatingToolbarType) {
+class FloatingToolbarBenchmark(private val type: FloatingToolbarType) {
 
     companion object {
         @Parameterized.Parameters(name = "{0}")
@@ -71,12 +69,12 @@ class FloatingAppBarBenchmark(private val type: FloatingToolbarType) {
 
     @get:Rule val benchmarkRule = ComposeBenchmarkRule()
 
-    private val floatingAppBarTestCaseFactory = { FloatingAppBarTestCase(type) }
+    private val mFloatingToolbarTestCaseFactory = { FloatingToolbarTestCase(type) }
     private val floatingToolbarWithFabTestCaseFactory = { FloatingToolbarWithFabTestCase(type) }
 
     @Test
-    fun floatingAppBar_firstPixel() {
-        benchmarkRule.benchmarkToFirstPixel(floatingAppBarTestCaseFactory)
+    fun floatingToolbar_firstPixel() {
+        benchmarkRule.benchmarkToFirstPixel(mFloatingToolbarTestCaseFactory)
     }
 
     @Test
@@ -86,26 +84,26 @@ class FloatingAppBarBenchmark(private val type: FloatingToolbarType) {
 
     @Ignore
     @Test
-    fun floatingAppBar_first_compose() {
-        benchmarkRule.benchmarkFirstCompose(floatingAppBarTestCaseFactory)
+    fun floatingToolbar_first_compose() {
+        benchmarkRule.benchmarkFirstCompose(mFloatingToolbarTestCaseFactory)
     }
 
     @Ignore
     @Test
-    fun floatingAppBar_first_measure() {
-        benchmarkRule.benchmarkFirstMeasure(floatingAppBarTestCaseFactory)
+    fun floatingToolbar_first_measure() {
+        benchmarkRule.benchmarkFirstMeasure(mFloatingToolbarTestCaseFactory)
     }
 
     @Ignore
     @Test
-    fun floatingAppBar_first_layout() {
-        benchmarkRule.benchmarkFirstLayout(floatingAppBarTestCaseFactory)
+    fun floatingToolbar_first_layout() {
+        benchmarkRule.benchmarkFirstLayout(mFloatingToolbarTestCaseFactory)
     }
 
     @Ignore
     @Test
-    fun floatingAppBar_first_draw() {
-        benchmarkRule.benchmarkFirstDraw(floatingAppBarTestCaseFactory)
+    fun floatingToolbar_first_draw() {
+        benchmarkRule.benchmarkFirstDraw(mFloatingToolbarTestCaseFactory)
     }
 
     @Test
@@ -145,13 +143,13 @@ class FloatingAppBarBenchmark(private val type: FloatingToolbarType) {
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-internal class FloatingAppBarTestCase(private val type: FloatingToolbarType) :
+internal class FloatingToolbarTestCase(private val type: FloatingToolbarType) :
     LayeredComposeTestCase() {
     @Composable
     override fun MeasuredContent() {
         when (type) {
             FloatingToolbarType.Horizontal ->
-                HorizontalFloatingAppBar(
+                HorizontalFloatingToolbar(
                     expanded = true,
                     modifier = Modifier.fillMaxWidth(),
                     leadingContent = { LeadingContent() },
@@ -159,7 +157,7 @@ internal class FloatingAppBarTestCase(private val type: FloatingToolbarType) :
                     content = { MainContent() },
                 )
             FloatingToolbarType.Vertical ->
-                VerticalFloatingAppBar(
+                VerticalFloatingToolbar(
                     expanded = true,
                     modifier = Modifier.fillMaxHeight(),
                     leadingContent = { LeadingContent() },
@@ -244,7 +242,7 @@ private fun MainContent() {
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ToolbarFab() {
-    FloatingAppBarDefaults.StandardFloatingActionButton(
+    FloatingToolbarDefaults.StandardFloatingActionButton(
         onClick = { /* doSomething() */ },
     ) {
         Icon(Icons.Filled.Check, "Localized description")
