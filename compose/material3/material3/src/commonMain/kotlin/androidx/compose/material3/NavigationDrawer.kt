@@ -46,6 +46,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.internal.AnchoredDraggableState
 import androidx.compose.material3.internal.DraggableAnchors
+import androidx.compose.material3.internal.FloatProducer
 import androidx.compose.material3.internal.Strings
 import androidx.compose.material3.internal.anchoredDraggable
 import androidx.compose.material3.internal.getString
@@ -797,7 +798,7 @@ internal fun DrawerSheet(
     drawerContainerColor: Color = DrawerDefaults.standardContainerColor,
     drawerContentColor: Color = contentColorFor(drawerContainerColor),
     drawerTonalElevation: Dp = DrawerDefaults.PermanentDrawerElevation,
-    drawerOffset: () -> Float = { 0F },
+    drawerOffset: FloatProducer = FloatProducer { 0F },
     content: @Composable ColumnScope.() -> Unit
 ) {
     val density = LocalDensity.current
@@ -862,7 +863,7 @@ internal fun DrawerSheet(
  * @see horizontalScaleDown
  */
 private fun Modifier.horizontalScaleUp(
-    drawerOffset: () -> Float,
+    drawerOffset: FloatProducer,
     drawerWidth: Float,
     isRtl: Boolean
 ) = graphicsLayer {
@@ -880,7 +881,7 @@ private fun Modifier.horizontalScaleUp(
  * @see horizontalScaleUp
  */
 private fun Modifier.horizontalScaleDown(
-    drawerOffset: () -> Float,
+    drawerOffset: FloatProducer,
     drawerWidth: Float,
     isRtl: Boolean
 ) = graphicsLayer {
