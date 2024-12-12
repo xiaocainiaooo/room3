@@ -107,8 +107,8 @@ fun SingleSelectConnectedButtonGroupSample() {
 
     ButtonGroup(
         modifier = Modifier.padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.connectedSpaceBetween),
-        animateFraction = 0f
+        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+        expandedRatio = 0f
     ) {
         options.forEachIndexed { index, label ->
             ToggleButton(
@@ -158,8 +158,8 @@ fun MultiSelectConnectedButtonGroupSample() {
 
     ButtonGroup(
         modifier = Modifier.padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.connectedSpaceBetween),
-        animateFraction = 0f
+        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+        expandedRatio = 0f
     ) {
         options.forEachIndexed { index, label ->
             ToggleButton(
