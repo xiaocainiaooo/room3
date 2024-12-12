@@ -1,7 +1,7 @@
 // Signature format: 4.0
 package androidx.xr.scenecore.testing {
 
-  public class FakeImpressApi implements com.google.ar.imp.apibindings.ImpressApi {
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public class FakeImpressApi implements com.google.ar.imp.apibindings.ImpressApi {
     ctor public FakeImpressApi();
     method public com.google.common.util.concurrent.ListenableFuture<java.lang.Void!> animateGltfModel(int, String?, boolean);
     method public int createImpressNode();
@@ -26,7 +26,7 @@ package androidx.xr.scenecore.testing {
     method public void stopGltfModelAnimation(int);
   }
 
-  public class FakeScheduledExecutorService extends java.util.concurrent.AbstractExecutorService implements java.lang.AutoCloseable java.util.concurrent.ScheduledExecutorService {
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public class FakeScheduledExecutorService extends java.util.concurrent.AbstractExecutorService implements java.lang.AutoCloseable java.util.concurrent.ScheduledExecutorService {
     ctor public FakeScheduledExecutorService();
     method public boolean awaitTermination(long, java.util.concurrent.TimeUnit?);
     method public void close();
@@ -48,7 +48,7 @@ package androidx.xr.scenecore.testing {
     method public boolean simulateSleepExecutingAtMostOneTask(java.time.Duration);
   }
 
-  public class FakeXrExtensions implements androidx.xr.extensions.XrExtensions {
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public class FakeXrExtensions implements androidx.xr.extensions.XrExtensions {
     ctor public FakeXrExtensions();
     method public void addFindableView(android.view.View, android.view.ViewGroup);
     method @Deprecated public void attachSpatialEnvironment(android.app.Activity, androidx.xr.extensions.node.Node);

@@ -16,14 +16,17 @@
 
 package androidx.xr.runtime
 
+import androidx.annotation.RestrictTo
+
 /** Result of a [Session.create] call. */
-public sealed class SessionCreateResult
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public sealed class SessionCreateResult
 
 /**
  * Result of a successful [Session.create] call.
  *
  * @property session the [Session] that was created.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class SessionCreateSuccess(public val session: Session) : SessionCreateResult()
 
 /**
@@ -32,25 +35,29 @@ public class SessionCreateSuccess(public val session: Session) : SessionCreateRe
  *
  * @property permissions the permissions that were not granted.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class SessionCreatePermissionsNotGranted(public val permissions: List<String>) :
     SessionCreateResult()
 
 /** Result of a [Session.configure] call. */
-public sealed class SessionConfigureResult
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public sealed class SessionConfigureResult
 
 /** Result of a successful [Session.configure] call. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class SessionConfigureSuccess() : SessionConfigureResult()
 
 /**
  * Result of an unsuccessful [Session.configure] call. The session was not configured due to the
  * given [SessionConfig] not being supported.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class SessionConfigureConfigurationNotSupported() : SessionConfigureResult()
 
 /** Result of a [Session.resume] call. */
-public sealed class SessionResumeResult
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public sealed class SessionResumeResult
 
 /** Result of a successful [Session.resume] call. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class SessionResumeSuccess() : SessionResumeResult()
 
 /**
@@ -59,5 +66,6 @@ public class SessionResumeSuccess() : SessionResumeResult()
  *
  * @property permissions the permissions that were not granted.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class SessionResumePermissionsNotGranted(public val permissions: List<String>) :
     SessionResumeResult()

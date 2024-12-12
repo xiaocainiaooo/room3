@@ -16,6 +16,7 @@
 
 package androidx.xr.runtime.openxr
 
+import androidx.annotation.RestrictTo
 import androidx.xr.runtime.internal.Anchor
 import androidx.xr.runtime.internal.HitResult
 import androidx.xr.runtime.internal.PerceptionManager
@@ -28,6 +29,7 @@ import java.util.Arrays
 import java.util.UUID
 
 /** Implementation of the perception capabilities of a runtime using OpenXR. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class OpenXrPerceptionManager
 internal constructor(private val timeSource: OpenXrTimeSource) : PerceptionManager {
 

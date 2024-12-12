@@ -18,6 +18,7 @@
 
 package androidx.xr.runtime.java
 
+import androidx.annotation.RestrictTo
 import androidx.xr.runtime.Session
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.flow.Flow
@@ -31,5 +32,6 @@ import kotlinx.coroutines.rx3.asObservable
  * @param session the [Session] that originated the [flow].
  * @param flow the [Flow] to convert to an [Observable].
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun <T : Any> toObservable(session: Session, flow: Flow<T>): Observable<T> =
     flow.asObservable(session.coroutineScope.coroutineContext)

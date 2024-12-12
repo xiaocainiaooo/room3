@@ -17,6 +17,7 @@
 package androidx.xr.runtime.openxr
 
 import android.os.IBinder
+import androidx.annotation.RestrictTo
 import androidx.xr.runtime.internal.Anchor
 import androidx.xr.runtime.internal.TrackingState
 import androidx.xr.runtime.math.Pose
@@ -24,6 +25,7 @@ import java.nio.ByteBuffer
 import java.util.UUID
 
 /** Wraps the native [XrSpace] with the [Anchor] interface. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class OpenXrAnchor
 internal constructor(
     override public val nativePointer: Long,

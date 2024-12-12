@@ -25,6 +25,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.annotation.MainThread
+import androidx.annotation.RestrictTo
 import androidx.xr.arcore.Anchor
 import androidx.xr.runtime.math.Pose
 import androidx.xr.scenecore.JxrPlatformAdapter.Entity as RtEntity
@@ -50,6 +51,7 @@ import java.util.function.Consumer
  * real world.
  */
 // TODO: Make this class thread safe.
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class Session(
     public val activity: Activity,
     public val runtime: JxrPlatformAdapter,

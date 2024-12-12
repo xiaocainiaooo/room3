@@ -17,6 +17,7 @@
 package androidx.xr.compose.spatial
 
 import androidx.activity.ComponentActivity
+import androidx.annotation.RestrictTo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -71,6 +72,7 @@ private val LocalIsInApplicationSubspace: ProvidableCompositionLocal<Boolean> =
  * @param content The 3D content to render within this Subspace.
  */
 @Composable
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun Subspace(content: @Composable @SubspaceComposable SpatialBoxScope.() -> Unit) {
     val activity = LocalContext.current.getActivity()
 
