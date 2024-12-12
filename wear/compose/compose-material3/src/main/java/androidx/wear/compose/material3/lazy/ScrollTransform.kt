@@ -19,7 +19,6 @@ package androidx.wear.compose.material3.lazy
 import androidx.compose.animation.core.Easing
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +34,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.util.fastRoundToInt
+import androidx.compose.ui.util.lerp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScope
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress
@@ -185,33 +185,17 @@ internal fun Modifier.scrollTransform(
                 .transformedHeight { height, scrollProgress ->
                     // TODO: may be better to create once and update. Still need to ensure readers
                     // are reading a state so they register to updates.
-                    val transformProgress = transformProgress(scrollProgress, updatedSpec)
-                    val scale = transformProgress.compute(updatedSpec.scale, updatedSpec.easing)
-                    val morphedHeight = height.toFloat() // TODO: Implement morphing
-                    transformation.value =
-                        TransformationState(
-                            scale = scale,
-                            containerAlpha =
-                                transformProgress.compute(
-                                    updatedSpec.containerAlpha,
-                                    updatedSpec.easing
-                                ),
-                            contentAlpha =
-                                transformProgress.compute(
-                                    updatedSpec.contentAlpha,
-                                    updatedSpec.easing
-                                ),
-                            morphWidth =
-                                transformProgress.compute(
-                                    updatedSpec.containerWidth,
-                                    updatedSpec.easing
-                                ),
-                            minMorphingHeight = minMorphingHeight,
-                            morphedHeight = morphedHeight
+                    transformationState(
+                            spec = updatedSpec,
+                            itemHeight = height.toFloat(),
+                            minMorphingHeight = minMorphingHeight.value,
+                            scrollProgress = scrollProgress
                         )
-                    (morphedHeight * scale).fastRoundToInt()
+                        .also { transformation.value = it }
+                        .placementHeight
+                        .fastRoundToInt()
                 }
-                .graphicsLayer { contentTransformation(transformation) }
+                .graphicsLayer { contentTransformation(transformation.value) }
     }
 
 /**
@@ -253,33 +237,17 @@ internal fun Modifier.scrollTransform(
                 .transformedHeight { height, scrollProgress ->
                     // TODO: may be better to create once and update. Still need to ensure readers
                     // are reading a state so they register to updates.
-                    val transformProgress = transformProgress(scrollProgress, updatedSpec)
-                    val scale = transformProgress.compute(updatedSpec.scale, updatedSpec.easing)
-                    val morphedHeight = height.toFloat() // TODO: Implement morphing
-                    transformation.value =
-                        TransformationState(
-                            scale = scale,
-                            containerAlpha =
-                                transformProgress.compute(
-                                    updatedSpec.containerAlpha,
-                                    updatedSpec.easing
-                                ),
-                            contentAlpha =
-                                transformProgress.compute(
-                                    updatedSpec.contentAlpha,
-                                    updatedSpec.easing
-                                ),
-                            morphWidth =
-                                transformProgress.compute(
-                                    updatedSpec.containerWidth,
-                                    updatedSpec.easing
-                                ),
-                            minMorphingHeight = minMorphingHeight,
-                            morphedHeight = morphedHeight
+                    transformationState(
+                            spec = updatedSpec,
+                            itemHeight = height.toFloat(),
+                            minMorphingHeight = minMorphingHeight.value,
+                            scrollProgress = scrollProgress
                         )
-                    (morphedHeight * scale).fastRoundToInt()
+                        .also { transformation.value = it }
+                        .placementHeight
+                        .fastRoundToInt()
                 }
-                .graphicsLayer { contentTransformation(transformation) }
+                .graphicsLayer { contentTransformation(transformState = transformation.value) }
                 .clip(shape)
     }
 
@@ -288,7 +256,7 @@ internal fun Modifier.scrollTransform(
  * top transition area, the bottom transition area, or neither.
  */
 @JvmInline
-private value class TransitionAreaProgress(private val encodedProgress: Float) {
+internal value class TransitionAreaProgress(private val encodedProgress: Float) {
     // encodedProgress is, going from top to bottom:
     // -1 to 0 for top transition
     // 0 in the center of the screen, no transition
@@ -317,11 +285,7 @@ private value class TransitionAreaProgress(private val encodedProgress: Float) {
                 variable.transformationZoneExitFraction,
                 progress
             )
-        return androidx.compose.ui.util.lerp(
-            edgeValue,
-            1f,
-            easing.transform(transformationZoneProgress)
-        )
+        return lerp(edgeValue, 1f, easing.transform(transformationZoneProgress))
     }
 
     companion object {
@@ -342,6 +306,34 @@ private value class TransitionAreaProgress(private val encodedProgress: Float) {
     }
 }
 
+/** Uses a TransformationSpec to compute a TransformationState. */
+internal fun transformationState(
+    spec: TransformationSpec,
+    itemHeight: Float,
+    minMorphingHeight: Float?,
+    scrollProgress: TransformingLazyColumnItemScrollProgress
+): TransformationState {
+    val transformProgress = transformProgress(scrollProgress, spec)
+    val scale = transformProgress.compute(spec.scale, spec.easing)
+    val morphedHeight =
+        minMorphingHeight?.let {
+            morphedHeight(
+                scrollProgress = scrollProgress,
+                spec = spec,
+                itemHeight = itemHeight,
+                minMorphingHeight = it
+            )
+        } ?: itemHeight
+
+    return TransformationState(
+        scale = scale,
+        containerAlpha = transformProgress.compute(spec.containerAlpha, spec.easing),
+        contentAlpha = transformProgress.compute(spec.contentAlpha, spec.easing),
+        morphWidth = transformProgress.compute(spec.containerWidth, spec.easing),
+        morphedHeight = morphedHeight
+    )
+}
+
 /** Uses a TransformationSpec to convert a scrollProgress into a transitionProgress. */
 private fun transformProgress(
     scrollProgress: TransformingLazyColumnItemScrollProgress?,
@@ -360,8 +352,7 @@ private fun transformProgress(
 
         // Size of each transition area.
         val scalingLine =
-            androidx.compose.ui.util
-                .lerp(spec.minTransitionArea, spec.maxTransitionArea, sizeRatio)
+            lerp(spec.minTransitionArea, spec.maxTransitionArea, sizeRatio)
                 // Ensure the top & bottom transition areas don't overlap.
                 .coerceAtMost((1f + relativeItemHeight) / 2f)
 
@@ -373,14 +364,43 @@ private fun transformProgress(
         }
     }
 
+/** Compute new morphing height for the item based on its size and position on the screen. */
+private fun morphedHeight(
+    scrollProgress: TransformingLazyColumnItemScrollProgress,
+    spec: TransformationSpec,
+    itemHeight: Float,
+    minMorphingHeight: Float
+): Float {
+    // Size of the item, relative to the screen
+    val relativeItemHeight = scrollProgress.bottomOffsetFraction - scrollProgress.topOffsetFraction
+    val screenSize = itemHeight / relativeItemHeight
+
+    val growthStartTopOffsetFraction =
+        spec.growthStartScreenFraction - minMorphingHeight / screenSize
+    val growthEndTopOffsetFraction = spec.growthEndScreenFraction - relativeItemHeight
+    // Fraction of how item has grown so far.
+    val heightMorphProgress =
+        // growthStartTopOffsetFraction > growthEndTopOffsetFraction since item has minimum size at
+        // the bottom of the screen.
+        inverseLerp(
+                growthStartTopOffsetFraction,
+                growthEndTopOffsetFraction,
+                scrollProgress.topOffsetFraction
+            )
+            .coerceIn(0f, 1f)
+    return lerp(minMorphingHeight, itemHeight, heightMorphProgress)
+}
+
 // TODO: Decide what we want to compute & store vs compute when needed.
 internal data class TransformationState(
     val containerAlpha: Float,
     val contentAlpha: Float,
     val scale: Float,
     val morphWidth: Float,
-    val minMorphingHeight: State<Float?>,
     val morphedHeight: Float, // Height after morphing, before scaling
-    val contentXOffsetFraction: Float = 0f, // TODO: Implement morphing
-    val backgroundXOffsetFraction: Float = 1f // TODO: Implement morphing
-)
+    val contentXOffsetFraction: Float = 0f, // TODO: Implement horizontal morphing
+    val backgroundXOffsetFraction: Float = 1f // TODO: Implement horizontal morphing
+) {
+    internal val placementHeight: Float
+        get() = morphedHeight * scale
+}

@@ -89,16 +89,27 @@ internal data class TransformationSpec(
     /** Configuration for the width of the container. */
     val containerWidth: TransformVariableSpec,
 
-    // TBD
-    val morphHeight: Float,
-    val morphHeightDriftFactor: Float,
-    val morphPivotX: Float,
-    val morphPivotY: Float,
+    /**
+     * Configuration for the screen point where the height morphing starts (item is touching this
+     * screen point with its bottom edge).
+     */
+    val growthStartScreenFraction: Float,
+
+    /**
+     * Configuration for the screen point where the height morphing ends and item is fully expanded
+     * (item is touching this screen point with its bottom edge).
+     */
+    val growthEndScreenFraction: Float,
 ) {
     init {
         // The element height range must be non-empty.
         require(minElementHeight < maxElementHeight) {
             "minElementHeight must be smaller than maxElementHeight"
+        }
+
+        // Morphing start point should be below the growth end.
+        require(growthEndScreenFraction < growthStartScreenFraction) {
+            "growthEndScreenFraction must be smaller than growthStartScreenFraction"
         }
     }
 }
@@ -203,10 +214,8 @@ private fun lerp(start: TransformationSpec, stop: TransformationSpec, progress: 
         lerp(start.contentAlpha, stop.contentAlpha, progress),
         lerp(start.scale, stop.scale, progress),
         lerp(start.containerWidth, stop.containerWidth, progress),
-        lerp(start.morphHeight, stop.morphHeight, progress),
-        lerp(start.morphHeightDriftFactor, stop.morphHeightDriftFactor, progress),
-        lerp(start.morphPivotX, stop.morphPivotX, progress),
-        lerp(start.morphPivotY, stop.morphPivotY, progress)
+        lerp(start.growthStartScreenFraction, stop.growthStartScreenFraction, progress),
+        lerp(start.growthEndScreenFraction, stop.growthEndScreenFraction, progress),
     )
 
 /**
