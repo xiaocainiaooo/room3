@@ -78,9 +78,6 @@ android {
     }
     // Use Robolectric 4.+
     testOptions.unitTests.includeAndroidResources = true
-    sourceSets.androidTest.assets.srcDirs +=
-            project.rootDir.absolutePath + "/../../golden/wear/compose/foundation"
-
     buildTypes.configureEach {
         consumerProguardFiles("proguard-rules.pro")
     }
@@ -98,4 +95,5 @@ androidx {
     samples(project(":wear:compose:compose-foundation-samples"))
     legacyDisableKotlinStrictApiMode = true
     metalavaK2UastEnabled = false
+    addGoldenImageAssets()
 }

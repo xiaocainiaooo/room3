@@ -63,9 +63,6 @@ android {
     defaultConfig {
         minSdk = 26
     }
-    sourceSets {
-        androidTest.assets.srcDirs += project.rootDir.absolutePath + "/../../golden/wear/wear-tiles-material"
-    }
     namespace = "androidx.wear.tiles.material"
 }
 
@@ -75,4 +72,5 @@ androidx {
     inceptionYear = "2021"
     description = "Material components library for Android Wear Tiles."
     legacyDisableKotlinStrictApiMode = true
+    addGoldenImageAssets()
 }

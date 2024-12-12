@@ -71,10 +71,6 @@ android {
     defaultConfig {
         minSdk = 26
     }
-
-    sourceSets {
-        androidTest.assets.srcDirs += project.rootDir.absolutePath + "/../../golden/wear/wear-protolayout-material3"
-    }
     namespace = "androidx.wear.protolayout.material3"
 }
 
@@ -85,4 +81,5 @@ androidx {
     inceptionYear = "2024"
     description = "Material3 components library for ProtoLayout."
     samples(project(":wear:protolayout:protolayout-material3-samples"))
+    addGoldenImageAssets()
 }

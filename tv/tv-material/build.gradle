@@ -63,8 +63,6 @@ dependencies {
 android {
     compileSdk = 35
     namespace = "androidx.tv.material"
-    sourceSets.androidTest.assets.srcDirs +=
-             project.rootDir.absolutePath + "/../../golden/tv/compose/material3"
 }
 
 androidx {
@@ -76,4 +74,5 @@ androidx {
     legacyDisableKotlinStrictApiMode = true
     metalavaK2UastEnabled = false
     samples(project(":tv:tv-material-samples"))
+    addGoldenImageAssets()
 }
