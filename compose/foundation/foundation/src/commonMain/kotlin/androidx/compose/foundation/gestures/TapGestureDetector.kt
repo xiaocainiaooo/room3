@@ -293,6 +293,19 @@ suspend fun AwaitPointerEventScope.awaitFirstDown(
     return event.changes[0]
 }
 
+// TODO(b/384562201): Remove once [awaitFirstDown] will be aligned for all platforms and have this
+// behavior.
+internal suspend fun AwaitPointerEventScope.awaitPrimaryFirstDown(
+    requireUnconsumed: Boolean = true,
+    pass: PointerEventPass = PointerEventPass.Main,
+): PointerInputChange {
+    var event: PointerEvent
+    do {
+        event = awaitPointerEvent(pass)
+    } while (!event.isChangedToDown(requireUnconsumed, onlyPrimaryMouseButton = true))
+    return event.changes[0]
+}
+
 /**
  * Whether [AwaitPointerEventScope.awaitFirstDown], for mouse events, responds only to the primary
  * mouse button being pressed. The behavior currently differs between Android and Desktop, and
@@ -300,10 +313,12 @@ suspend fun AwaitPointerEventScope.awaitFirstDown(
  */
 internal expect fun firstDownRefersToPrimaryMouseButtonOnly(): Boolean
 
-private fun PointerEvent.isChangedToDown(requireUnconsumed: Boolean): Boolean {
+private fun PointerEvent.isChangedToDown(
+    requireUnconsumed: Boolean,
+    onlyPrimaryMouseButton: Boolean = firstDownRefersToPrimaryMouseButtonOnly(),
+): Boolean {
     val onlyPrimaryButtonCausesDown =
-        firstDownRefersToPrimaryMouseButtonOnly() &&
-            changes.fastAll { it.type == PointerType.Mouse }
+        onlyPrimaryMouseButton && changes.fastAll { it.type == PointerType.Mouse }
     if (onlyPrimaryButtonCausesDown && !buttons.isPrimaryPressed) return false
 
     return changes.fastAll {
