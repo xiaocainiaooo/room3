@@ -28,10 +28,10 @@ import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ModifiersBuilders.Background
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
+import androidx.wear.protolayout.material3.ButtonDefaults.filledButtonColors
+import androidx.wear.protolayout.material3.ButtonDefaults.filledTonalButtonColors
+import androidx.wear.protolayout.material3.ButtonDefaults.filledVariantButtonColors
 import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
-import androidx.wear.protolayout.material3.EdgeButtonDefaults.filled
-import androidx.wear.protolayout.material3.EdgeButtonDefaults.filledTonal
-import androidx.wear.protolayout.material3.EdgeButtonDefaults.filledVariant
 import androidx.wear.protolayout.material3.MaterialGoldenTest.Companion.pxToDp
 import com.google.common.collect.ImmutableMap
 
@@ -88,7 +88,7 @@ object TestCasesGenerator {
                             onClick = clickable,
                             labelContent = { text("Action".prop()) },
                             contentDescription = CONTENT_DESCRIPTION_PLACEHOLDER.prop(),
-                            colors = filled()
+                            colors = filledButtonColors()
                         )
                     },
                     titleSlot = { text("Title".prop()) },
@@ -123,7 +123,7 @@ object TestCasesGenerator {
                             onClick = clickable,
                             labelContent = { text("Action that overflows".prop()) },
                             contentDescription = CONTENT_DESCRIPTION_PLACEHOLDER.prop(),
-                            colors = filledVariant()
+                            colors = filledVariantButtonColors()
                         )
                     },
                     overrideIcon = true
@@ -155,7 +155,7 @@ object TestCasesGenerator {
                             onClick = clickable,
                             iconContent = { icon(ICON_ID) },
                             contentDescription = CONTENT_DESCRIPTION_PLACEHOLDER.prop(),
-                            colors = filledTonal()
+                            colors = filledTonalButtonColors()
                         )
                     },
                     titleSlot = { text("Title that overflows".prop(), color = colorScheme.error) }

@@ -1,6 +1,24 @@
 // Signature format: 4.0
 package androidx.wear.protolayout.material3 {
 
+  public final class ButtonColors {
+    ctor public ButtonColors();
+    ctor public ButtonColors(optional androidx.wear.protolayout.ColorBuilders.ColorProp container, optional androidx.wear.protolayout.ColorBuilders.ColorProp icon, optional androidx.wear.protolayout.ColorBuilders.ColorProp label);
+    method public androidx.wear.protolayout.ColorBuilders.ColorProp getContainer();
+    method public androidx.wear.protolayout.ColorBuilders.ColorProp getIcon();
+    method public androidx.wear.protolayout.ColorBuilders.ColorProp getLabel();
+    property public final androidx.wear.protolayout.ColorBuilders.ColorProp container;
+    property public final androidx.wear.protolayout.ColorBuilders.ColorProp icon;
+    property public final androidx.wear.protolayout.ColorBuilders.ColorProp label;
+  }
+
+  public final class ButtonDefaults {
+    method public androidx.wear.protolayout.material3.ButtonColors filledButtonColors(androidx.wear.protolayout.material3.MaterialScope);
+    method public androidx.wear.protolayout.material3.ButtonColors filledTonalButtonColors(androidx.wear.protolayout.material3.MaterialScope);
+    method public androidx.wear.protolayout.material3.ButtonColors filledVariantButtonColors(androidx.wear.protolayout.material3.MaterialScope);
+    field public static final androidx.wear.protolayout.material3.ButtonDefaults INSTANCE;
+  }
+
   public final class ButtonGroupDefaults {
     property public final androidx.wear.protolayout.LayoutElementBuilders.Spacer DEFAULT_SPACER_BETWEEN_BUTTON_GROUPS;
     property @Dimension(unit=androidx.annotation.Dimension.Companion.DP) public static final float DEFAULT_SPACER_WIDTH_DP;
@@ -108,24 +126,9 @@ package androidx.wear.protolayout.material3 {
     method public static boolean isDynamicColorSchemeEnabled(android.content.Context context);
   }
 
-  public final class EdgeButtonColors {
-    ctor public EdgeButtonColors(androidx.wear.protolayout.ColorBuilders.ColorProp container, androidx.wear.protolayout.ColorBuilders.ColorProp content);
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getContainer();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getContent();
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp container;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp content;
-  }
-
-  public final class EdgeButtonDefaults {
-    method public androidx.wear.protolayout.material3.EdgeButtonColors filled(androidx.wear.protolayout.material3.MaterialScope);
-    method public androidx.wear.protolayout.material3.EdgeButtonColors filledTonal(androidx.wear.protolayout.material3.MaterialScope);
-    method public androidx.wear.protolayout.material3.EdgeButtonColors filledVariant(androidx.wear.protolayout.material3.MaterialScope);
-    field public static final androidx.wear.protolayout.material3.EdgeButtonDefaults INSTANCE;
-  }
-
   public final class EdgeButtonKt {
-    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement iconEdgeButton(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.ModifiersBuilders.Clickable onClick, androidx.wear.protolayout.TypeBuilders.StringProp contentDescription, optional androidx.wear.protolayout.material3.EdgeButtonColors colors, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> iconContent);
-    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement textEdgeButton(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.ModifiersBuilders.Clickable onClick, androidx.wear.protolayout.TypeBuilders.StringProp contentDescription, optional androidx.wear.protolayout.material3.EdgeButtonColors colors, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> labelContent);
+    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement iconEdgeButton(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.ModifiersBuilders.Clickable onClick, androidx.wear.protolayout.TypeBuilders.StringProp contentDescription, optional androidx.wear.protolayout.material3.ButtonColors colors, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> iconContent);
+    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement textEdgeButton(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.ModifiersBuilders.Clickable onClick, androidx.wear.protolayout.TypeBuilders.StringProp contentDescription, optional androidx.wear.protolayout.material3.ButtonColors colors, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> labelContent);
   }
 
   public final class EdgeButtonStyle {

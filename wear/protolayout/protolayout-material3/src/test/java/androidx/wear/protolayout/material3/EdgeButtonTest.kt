@@ -94,9 +94,9 @@ class EdgeButtonTest {
                         onClick = CLICKABLE,
                         contentDescription = CONTENT_DESCRIPTION,
                         colors =
-                            EdgeButtonColors(
-                                COLOR_SCHEME.tertiaryContainer,
-                                COLOR_SCHEME.onTertiary
+                            ButtonColors(
+                                container = COLOR_SCHEME.tertiaryContainer,
+                                icon = COLOR_SCHEME.onTertiary
                             ),
                     ) {
                         icon(RES_ID)
