@@ -635,7 +635,7 @@ class FloatingToolbarTest {
 
     @Test
     fun horizontalFloatingToolbar_withFab_customContentPadding() {
-        val padding = 64.dp
+        val padding = 48.dp
         rule.setMaterialContent(lightColorScheme()) {
             HorizontalFloatingToolbar(
                 modifier = Modifier.testTag(FloatingToolbarTestTag),
