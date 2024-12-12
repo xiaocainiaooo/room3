@@ -69,10 +69,6 @@ android {
     defaultConfig {
         minSdk = 26
     }
-
-    sourceSets.androidTest.assets.srcDirs +=
-         project.rootDir.absolutePath + "/../../golden/wear/wear-watchface"
-
     // Use Robolectric 4.+
     testOptions.unitTests.includeAndroidResources = true
     namespace = "androidx.wear.watchface"
@@ -85,4 +81,5 @@ androidx {
     description = "Android Wear Watchface"
     legacyDisableKotlinStrictApiMode = true
     samples(project(":wear:watchface:watchface-samples"))
+    addGoldenImageAssets()
 }

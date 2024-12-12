@@ -76,15 +76,10 @@ android {
     }
     // Use Robolectric 4.+
     testOptions.unitTests.includeAndroidResources = true
-    sourceSets.androidTest.assets.srcDirs +=
-            project.rootDir.absolutePath + "/../../golden/wear/compose/material3"
     buildTypes.configureEach {
         consumerProguardFiles("proguard-rules.pro")
     }
     namespace = "androidx.wear.compose.material3"
-    lint {
-        baseline = file("lint-baseline.xml")
-    }
 }
 
 androidx {
@@ -100,6 +95,7 @@ androidx {
     metalavaK2UastEnabled = false
     samples(project(":wear:compose:compose-material3-samples"))
     kotlinTarget = KotlinTarget.KOTLIN_1_9
+    addGoldenImageAssets()
 }
 
 tasks.withType(KotlinCompile).configureEach {
