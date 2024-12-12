@@ -138,8 +138,8 @@ internal class RectManager(
         dispatchToken = postDelayed(delay, dispatchLambda)
     }
 
-    fun currentRectInfo(id: Int, node: DelegatableNode): RectInfo? {
-        var result: RectInfo? = null
+    fun currentRectInfo(id: Int, node: DelegatableNode): RelativeLayoutBounds? {
+        var result: RelativeLayoutBounds? = null
         rects.withRect(id) { l, t, r, b ->
             result =
                 rectInfoFor(
@@ -161,15 +161,15 @@ internal class RectManager(
 
     fun registerOnRectChangedCallback(
         id: Int,
-        throttleMs: Int,
-        debounceMs: Int,
+        throttleMillis: Long,
+        debounceMillis: Long,
         node: DelegatableNode,
-        callback: (RectInfo) -> Unit
+        callback: (RelativeLayoutBounds) -> Unit
     ): DisposableHandle {
         return throttledCallbacks.registerOnRectChanged(
             id,
-            throttleMs.toLong(),
-            debounceMs.toLong(),
+            throttleMillis,
+            debounceMillis,
             node,
             callback,
         )
@@ -177,15 +177,15 @@ internal class RectManager(
 
     fun registerOnGlobalLayoutCallback(
         id: Int,
-        throttleMs: Int,
-        debounceMs: Int,
+        throttleMillis: Long,
+        debounceMillis: Long,
         node: DelegatableNode,
-        callback: (RectInfo) -> Unit
+        callback: (RelativeLayoutBounds) -> Unit
     ): DisposableHandle {
         return throttledCallbacks.registerOnGlobalChange(
             id = id,
-            throttleMs = throttleMs.toLong(),
-            debounceMs = debounceMs.toLong(),
+            throttleMillis = throttleMillis,
+            debounceMillis = debounceMillis,
             node = node,
             callback = callback,
         )

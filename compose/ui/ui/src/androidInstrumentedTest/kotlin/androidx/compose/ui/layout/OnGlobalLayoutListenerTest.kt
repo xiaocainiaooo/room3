@@ -42,7 +42,7 @@ import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.requireOwner
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.spatial.RectInfo
+import androidx.compose.ui.spatial.RelativeLayoutBounds
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertAll
@@ -513,8 +513,13 @@ class OnGlobalLayoutListenerTest {
         }
     }
 
-    private fun Modifier.testGlobalLayoutListener(callback: (RectInfo) -> Unit) =
-        this then OnGlobaLayoutListenerElement(throttleMs = 0, debounceMs = 0, callback = callback)
+    private fun Modifier.testGlobalLayoutListener(callback: (RelativeLayoutBounds) -> Unit) =
+        this then
+            OnGlobaLayoutListenerElement(
+                throttleMillis = 0,
+                debounceMillis = 0,
+                callback = callback
+            )
 }
 
 /**
@@ -555,28 +560,28 @@ private fun PlaceTwoLayoutsApartVert(
 }
 
 private data class OnGlobaLayoutListenerElement(
-    val throttleMs: Int,
-    val debounceMs: Int,
-    val callback: (RectInfo) -> Unit,
+    val throttleMillis: Long,
+    val debounceMillis: Long,
+    val callback: (RelativeLayoutBounds) -> Unit,
 ) : ModifierNodeElement<OnGlobalLayoutListenerNode>() {
     override fun create(): OnGlobalLayoutListenerNode =
         OnGlobalLayoutListenerNode(
-            throttleMs = throttleMs,
-            debounceMs = debounceMs,
+            throttleMillis = throttleMillis,
+            debounceMillis = debounceMillis,
             callback = callback
         )
 
     override fun update(node: OnGlobalLayoutListenerNode) {
-        node.throttleMs = throttleMs
-        node.debounceMs = debounceMs
+        node.throttleMillis = throttleMillis
+        node.debounceMillis = debounceMillis
         node.callback = callback
         node.diposeAndRegister()
     }
 
     override fun InspectorInfo.inspectableProperties() {
         name = "onLayoutCalculatorChanged"
-        properties["throttleMs"] = throttleMs
-        properties["debounceMs"] = debounceMs
+        properties["throttleMillis"] = throttleMillis
+        properties["debounceMillis"] = debounceMillis
         properties["callback"] = callback
     }
 
@@ -586,31 +591,31 @@ private data class OnGlobaLayoutListenerElement(
 
         other as OnGlobaLayoutListenerElement
 
-        if (throttleMs != other.throttleMs) return false
-        if (debounceMs != other.debounceMs) return false
+        if (throttleMillis != other.throttleMillis) return false
+        if (debounceMillis != other.debounceMillis) return false
         if (callback != other.callback) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = throttleMs
-        result = 31 * result + debounceMs
+        var result = throttleMillis.hashCode()
+        result = 31 * result + debounceMillis.hashCode()
         result = 31 * result + callback.hashCode()
         return result
     }
 }
 
 private class OnGlobalLayoutListenerNode(
-    var throttleMs: Int,
-    var debounceMs: Int,
-    var callback: (RectInfo) -> Unit,
+    var throttleMillis: Long,
+    var debounceMillis: Long,
+    var callback: (RelativeLayoutBounds) -> Unit,
 ) : Modifier.Node() {
     var handle: DisposableHandle? = null
 
     fun diposeAndRegister() {
         handle?.dispose()
-        handle = registerOnGlobalLayoutListener(throttleMs, debounceMs, callback)
+        handle = registerOnGlobalLayoutListener(throttleMillis, debounceMillis, callback)
     }
 
     override fun onAttach() {
