@@ -73,6 +73,7 @@ import androidx.compose.ui.text.android.style.LineHeightStyleSpan
 import androidx.compose.ui.text.android.style.getEllipsizedLeftPadding
 import androidx.compose.ui.text.android.style.getEllipsizedRightPadding
 import androidx.compose.ui.text.internal.requirePrecondition
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
@@ -326,29 +327,12 @@ constructor(
                     layout.getLineEnd(lastLine) != charSequence.length
             }
 
+        val verticalPaddings = getVerticalPaddings()
+
         lineHeightSpans = getLineHeightSpans()
-
-        // Even though it is an array of spans, we know that LineHeightStyle is part of
-        // ParagraphStyle and there can only be one ParagraphStyle per text layout. So there should
-        // also be only one LineHeightStyleSpan in this array. Please check getLastLineMetrics that
-        // uses a similar approach.
-        val shouldForceTrimTop =
-            lineHeightSpans?.firstOrNull()?.let { it.trimFirstLineTop && !it.preserveMinimumHeight }
-                ?: false
-
-        val shouldForceTrimBottom =
-            lineHeightSpans?.firstOrNull()?.let {
-                it.trimLastLineBottom && !it.preserveMinimumHeight
-            } ?: false
-
-        if (shouldForceTrimTop && shouldForceTrimBottom) {
-            topPadding = 0
-            bottomPadding = 0
-        } else {
-            val verticalPaddings = getVerticalPaddings()
-            topPadding = if (shouldForceTrimTop) 0 else verticalPaddings.topPadding
-            bottomPadding = if (shouldForceTrimBottom) 0 else verticalPaddings.bottomPadding
-        }
+        val lineHeightPaddings = lineHeightSpans?.getLineHeightPaddings() ?: ZeroVerticalPadding
+        topPadding = max(verticalPaddings.topPadding, lineHeightPaddings.topPadding)
+        bottomPadding = max(verticalPaddings.bottomPadding, lineHeightPaddings.bottomPadding)
 
         val fontMetrics = getLastLineMetrics(textPaint, frameworkTextDir, lineHeightSpans)
         lastLineExtra =
@@ -818,10 +802,6 @@ constructor(
         }
     }
 
-    /**
-     * Checks certain configuration values to understand whether the created text layout comes with
-     * fallback line spacing behavior included. Otherwise it needs to be handled here.
-     */
     internal fun isFallbackLinespacingApplied(): Boolean {
         return if (isBoringLayout) {
             BoringLayoutFactory.isFallbackLineSpacingEnabled(layout as BoringLayout)
@@ -988,11 +968,7 @@ internal value class VerticalPaddings internal constructor(internal val packedVa
         get() = unpackInt2(packedValue)
 }
 
-/**
- * When includeFontPadding is turned off and fallback line spacing is not applied, there remains a
- * chance that tall glyphs may be cut on top and bottom of the text layout. Vertical paddings is a
- * backport of `useFallbackLineSpacing` from the platform.
- */
+@OptIn(InternalPlatformTextApi::class)
 private fun TextLayout.getVerticalPaddings(): VerticalPaddings {
     if (includePadding || isFallbackLinespacingApplied()) return ZeroVerticalPadding
 
@@ -1039,6 +1015,27 @@ private fun TextLayout.getVerticalPaddings(): VerticalPaddings {
 }
 
 private val ZeroVerticalPadding = VerticalPaddings(0, 0)
+
+@OptIn(InternalPlatformTextApi::class)
+private fun Array<LineHeightStyleSpan>.getLineHeightPaddings(): VerticalPaddings {
+    var firstAscentDiff = 0
+    var lastDescentDiff = 0
+
+    for (span in this) {
+        if (span.firstAscentDiff < 0) {
+            firstAscentDiff = max(firstAscentDiff, abs(span.firstAscentDiff))
+        }
+        if (span.lastDescentDiff < 0) {
+            lastDescentDiff = max(firstAscentDiff, abs(span.lastDescentDiff))
+        }
+    }
+
+    return if (firstAscentDiff == 0 && lastDescentDiff == 0) {
+        ZeroVerticalPadding
+    } else {
+        VerticalPaddings(firstAscentDiff, lastDescentDiff)
+    }
+}
 
 @OptIn(InternalPlatformTextApi::class)
 private fun TextLayout.getLastLineMetrics(
