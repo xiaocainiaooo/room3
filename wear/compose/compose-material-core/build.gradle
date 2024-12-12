@@ -48,8 +48,6 @@ dependencies {
     androidTestImplementation(project(":compose:ui:ui-test"))
     androidTestImplementation(project(":compose:ui:ui-test-junit4"))
     androidTestImplementation(project(":compose:test-utils"))
-
-    androidTestImplementation(project(":test:screenshot:screenshot"))
     androidTestImplementation(libs.testRunner)
     androidTestImplementation(libs.truth)
 
@@ -66,8 +64,6 @@ android {
     }
     // Use Robolectric 4.+
     testOptions.unitTests.includeAndroidResources = true
-    sourceSets.androidTest.assets.srcDirs +=
-            project.rootDir.absolutePath + "/../../golden/wear/compose/materialcore"
     buildTypes.configureEach {
         consumerProguardFiles("proguard-rules.pro")
     }
