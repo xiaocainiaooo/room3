@@ -88,11 +88,6 @@ android {
     // Use Robolectric 4.+
     testOptions.unitTests.includeAndroidResources = true
     resourcePrefix "glance_"
-
-    sourceSets {
-        androidTest.assets.srcDirs += project.rootDir.absolutePath + "/../../golden/glance/glance-appwidget"
-    }
-
     buildTypes {
         debug {
             pseudoLocalesEnabled = true
@@ -118,6 +113,7 @@ androidx {
     legacyDisableKotlinStrictApiMode = true
     metalavaK2UastEnabled = false
     samples(project(":glance:glance-appwidget:glance-appwidget-samples"))
+    addGoldenImageAssets()
 }
 
 LayoutGeneratorTask.registerLayoutGenerator(

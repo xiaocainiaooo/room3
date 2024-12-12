@@ -16,7 +16,9 @@
 
 package androidx.build
 
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import groovy.lang.Closure
+import java.io.File
 import javax.inject.Inject
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -439,6 +441,20 @@ abstract class AndroidXExtension(
      */
     fun samples(samplesProject: Project) {
         samplesProjects.add(samplesProject)
+    }
+
+    /** Adds golden image assets to Android test APKs to use for screenshot tests. */
+    fun addGoldenImageAssets() {
+        project.extensions.findByType(LibraryAndroidComponentsExtension::class.java)?.onVariants {
+            variant ->
+            val subdirectory = project.path.replace(":", "/")
+            variant.androidTest
+                ?.sources
+                ?.assets
+                ?.addStaticSourceDirectory(
+                    File(project.rootDir, "../../golden$subdirectory").absolutePath
+                )
+        }
     }
 
     /** Locates a project by path. */
