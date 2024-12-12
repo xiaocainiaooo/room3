@@ -438,3 +438,5 @@ internal typealias PlatformTemperatureDelta =
 internal typealias PlatformVelocity = android.health.connect.datatypes.units.Velocity
 
 internal typealias PlatformVolume = android.health.connect.datatypes.units.Volume
+
+internal typealias PlatformFhirVersion = android.health.connect.datatypes.FhirVersion

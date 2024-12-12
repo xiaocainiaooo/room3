@@ -78,7 +78,9 @@ android {
     }
     testOptions.unitTests.includeAndroidResources = true
     namespace = "androidx.health.connect.client"
-    compileSdk = 35
+    // TODO(b/381533698): change to compileSdk = 35 and compileSdkExtension 16
+    // compileSdk should always point to the latest publicly available version
+    compileSdkPreview = "Baklava"
 }
 
 androidx {
