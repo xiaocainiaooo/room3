@@ -30,10 +30,10 @@ import androidx.sqlite.use
  */
 internal class SupportSQLiteConnectionPool(internal val supportDriver: SupportSQLiteDriver) :
     ConnectionPool {
-    private val supportConnection by
-        lazy(LazyThreadSafetyMode.PUBLICATION) {
+    private val supportConnection: SupportSQLitePooledConnection
+        get() {
             val fileName = supportDriver.openHelper.databaseName ?: ":memory:"
-            SupportSQLitePooledConnection(supportDriver.open(fileName))
+            return SupportSQLitePooledConnection(supportDriver.open(fileName))
         }
 
     override suspend fun <R> useConnection(
