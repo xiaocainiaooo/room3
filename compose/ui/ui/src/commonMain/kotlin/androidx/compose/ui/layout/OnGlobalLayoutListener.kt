@@ -19,52 +19,52 @@ package androidx.compose.ui.layout
 import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.requireLayoutNode
 import androidx.compose.ui.node.requireOwner
-import androidx.compose.ui.spatial.RectInfo
+import androidx.compose.ui.spatial.RelativeLayoutBounds
 import kotlinx.coroutines.DisposableHandle
 
 /**
  * Registers a [callback] to be executed with the position of this modifier node relative to the
  * coordinate system of the root of the composition, as well as in screen coordinates and window
- * coordinates, see [RectInfo].
+ * coordinates, see [RelativeLayoutBounds].
  *
  * It may also be used to calculate certain Layout relationships at the time of the callback
- * execution, such as [RectInfo.calculateOcclusions].
+ * execution, such as [RelativeLayoutBounds.calculateOcclusions].
  *
  * This will be called after layout pass. This API allows for throttling and debouncing parameters
  * in order to moderate the frequency with which the callback gets invoked during high rates of
  * change (e.g. scrolling).
  *
- * Specifying [throttleMs] will prevent [callback] from being executed more than once over that time
- * period. Specifying [debounceMs] will delay the execution of [callback] until that amount of time
- * has elapsed without a new position.
+ * Specifying [throttleMillis] will prevent [callback] from being executed more than once over that
+ * time period. Specifying [debounceMillis] will delay the execution of [callback] until that amount
+ * of time has elapsed without a new position.
  *
- * Specifying 0 for both [throttleMs] and [debounceMs] will result in the callback being executed
- * every time the position has changed. Specifying non-zero amounts for both will result in both
- * conditions being met.
+ * Specifying 0 for both [throttleMillis] and [debounceMillis] will result in the callback being
+ * executed every time the position has changed. Specifying non-zero amounts for both will result in
+ * both conditions being met.
  *
- * @param throttleMs The duration, in milliseconds, to prevent [callback] from being executed more
- *   than once over that time period.
- * @param debounceMs The duration, in milliseconds, to delay the execution of [callback] until that
- *   amount of time has elapsed without a new position.
- * @param callback The callback to be executed, provides a new [RectInfo] instance associated to
- *   this [DelegatableNode]. Keep in mind this callback is executed on the main thread even when
- *   debounced.
+ * @param throttleMillis The duration, in milliseconds, to prevent [callback] from being executed
+ *   more than once over that time period.
+ * @param debounceMillis The duration, in milliseconds, to delay the execution of [callback] until
+ *   that amount of time has elapsed without a new position.
+ * @param callback The callback to be executed, provides a new [RelativeLayoutBounds] instance
+ *   associated to this [DelegatableNode]. Keep in mind this callback is executed on the main thread
+ *   even when debounced.
  * @return an object which should be used to unregister/dispose this callback, such as when a node
  *   is detached
  */
 @Suppress("PairedRegistration") // User expected to handle disposing
 fun DelegatableNode.registerOnGlobalLayoutListener(
-    throttleMs: Int,
-    debounceMs: Int,
-    callback: (RectInfo) -> Unit
+    throttleMillis: Long,
+    debounceMillis: Long,
+    callback: (RelativeLayoutBounds) -> Unit
 ): DisposableHandle {
     val layoutNode = requireLayoutNode()
     val id = layoutNode.semanticsId
     val rectManager = layoutNode.requireOwner().rectManager
     return rectManager.registerOnGlobalLayoutCallback(
         id = id,
-        throttleMs = throttleMs,
-        debounceMs = debounceMs,
+        throttleMillis = throttleMillis,
+        debounceMillis = debounceMillis,
         node = node,
         callback = callback
     )

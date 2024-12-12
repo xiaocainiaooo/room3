@@ -31,7 +31,7 @@ import kotlinx.coroutines.DisposableHandle
 internal class ThrottledCallbacks {
 
     /**
-     * Entry for a throttled callback for [RectInfo] associated to the given [node].
+     * Entry for a throttled callback for [RelativeLayoutBounds] associated to the given [node].
      *
      * Supports a linked-list structure for multiple callbacks on the same [node] through [next].
      */
@@ -40,7 +40,7 @@ internal class ThrottledCallbacks {
         val throttleMillis: Long,
         val debounceMillis: Long,
         val node: DelegatableNode,
-        val callback: (RectInfo) -> Unit,
+        val callback: (RelativeLayoutBounds) -> Unit,
     ) : DisposableHandle {
 
         var next: Entry? = null
@@ -119,21 +119,21 @@ internal class ThrottledCallbacks {
 
     fun registerOnRectChanged(
         id: Int,
-        throttleMs: Long,
-        debounceMs: Long,
+        throttleMillis: Long,
+        debounceMillis: Long,
         node: DelegatableNode,
-        callback: (RectInfo) -> Unit,
+        callback: (RelativeLayoutBounds) -> Unit,
     ): DisposableHandle {
         // If zero is set for debounce, we use throttle in its place. This guarantees that
         // consumers will get the value where the node "settled".
-        val debounceToUse = if (debounceMs == 0L) throttleMs else debounceMs
+        val debounceToUse = if (debounceMillis == 0L) throttleMillis else debounceMillis
 
         return rectChangedMap.multiPut(
             key = id,
             value =
                 Entry(
                     id = id,
-                    throttleMillis = throttleMs,
+                    throttleMillis = throttleMillis,
                     debounceMillis = debounceToUse,
                     node = node,
                     callback = callback,
@@ -143,19 +143,19 @@ internal class ThrottledCallbacks {
 
     fun registerOnGlobalChange(
         id: Int,
-        throttleMs: Long,
-        debounceMs: Long,
+        throttleMillis: Long,
+        debounceMillis: Long,
         node: DelegatableNode,
-        callback: (RectInfo) -> Unit,
+        callback: (RelativeLayoutBounds) -> Unit,
     ): DisposableHandle {
         // If zero is set for debounce, we use throttle in its place. This guarantees that
         // consumers will get the value where the node "settled".
-        val debounceToUse = if (debounceMs == 0L) throttleMs else debounceMs
+        val debounceToUse = if (debounceMillis == 0L) throttleMillis else debounceMillis
 
         val entry =
             Entry(
                 id = id,
-                throttleMillis = throttleMs,
+                throttleMillis = throttleMillis,
                 debounceMillis = debounceToUse,
                 node = node,
                 callback = callback,
@@ -455,7 +455,7 @@ internal fun rectInfoFor(
     windowOffset: IntOffset,
     screenOffset: IntOffset,
     viewToWindowMatrix: Matrix?,
-): RectInfo? {
+): RelativeLayoutBounds? {
     val coordinator = node.requireCoordinator(Nodes.Layout)
     val layoutNode = node.requireLayoutNode()
     if (!layoutNode.isPlaced) return null
@@ -467,7 +467,7 @@ internal fun rectInfoFor(
     val needsTransform = layoutNode.outerCoordinator !== coordinator
     return if (needsTransform) {
         val transformed = layoutNode.outerCoordinator.coordinates.localBoundingBoxOf(coordinator)
-        RectInfo(
+        RelativeLayoutBounds(
             transformed.topLeft.round().packedValue,
             transformed.bottomRight.round().packedValue,
             windowOffset,
@@ -476,7 +476,7 @@ internal fun rectInfoFor(
             node,
         )
     } else
-        RectInfo(
+        RelativeLayoutBounds(
             topLeft,
             bottomRight,
             windowOffset,
