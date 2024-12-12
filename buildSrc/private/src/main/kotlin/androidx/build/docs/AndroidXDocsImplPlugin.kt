@@ -252,6 +252,8 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             // during the task execution, as that breaks configuration caching.
             val localVar = archiveOperations
             val tempDir = project.layout.buildDirectory.dir("tmp/JvmSources").get().asFile
+            // Get rid of stale files in the directory
+            tempDir.deleteRecursively()
             task.into(sourcesDestinationDirectory)
             task.from(
                 pairProvider
@@ -275,6 +277,8 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 // during the task execution, as that breaks configuration caching.
                 val localVar = archiveOperations
                 val tempDir = project.layout.buildDirectory.dir("tmp/SampleSources").get().asFile
+                // Get rid of stale files in the directory
+                tempDir.deleteRecursively()
                 task.into(samplesDestinationDirectory)
                 task.from(
                     pairProvider
@@ -852,6 +856,9 @@ abstract class UnzipMultiplatformSourcesTask() : DefaultTask() {
             projectLayout.buildDirectory.dir("tmp/MultiplatformSources").get().asFile
         val tempSamplesDir =
             projectLayout.buildDirectory.dir("tmp/MultiplatformSamples").get().asFile
+        // Get rid of stale files in the directories
+        tempSourcesDir.deleteRecursively()
+        tempSamplesDir.deleteRecursively()
 
         val (sources, samples) =
             inputJars
