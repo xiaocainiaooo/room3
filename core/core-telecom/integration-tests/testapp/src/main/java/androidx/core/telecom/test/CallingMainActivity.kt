@@ -18,6 +18,9 @@ package androidx.core.telecom.test
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.NotificationManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.telecom.DisconnectCause
 import android.util.Log
@@ -31,11 +34,13 @@ import androidx.core.telecom.CallAttributesCompat.Companion.DIRECTION_OUTGOING
 import androidx.core.telecom.CallEndpointCompat
 import androidx.core.telecom.CallsManager
 import androidx.core.telecom.extensions.RaiseHandState
-import androidx.core.telecom.test.Utilities.Companion.ALL_CALL_CAPABILITIES
-import androidx.core.telecom.test.Utilities.Companion.INCOMING_NAME
-import androidx.core.telecom.test.Utilities.Companion.INCOMING_URI
-import androidx.core.telecom.test.Utilities.Companion.OUTGOING_NAME
-import androidx.core.telecom.test.Utilities.Companion.OUTGOING_URI
+import androidx.core.telecom.test.Constants.Companion.ALL_CALL_CAPABILITIES
+import androidx.core.telecom.test.Constants.Companion.INCOMING_NAME
+import androidx.core.telecom.test.Constants.Companion.INCOMING_URI
+import androidx.core.telecom.test.Constants.Companion.OUTGOING_NAME
+import androidx.core.telecom.test.Constants.Companion.OUTGOING_URI
+import androidx.core.telecom.test.NotificationsUtilities.Companion.IS_ANSWER_ACTION
+import androidx.core.telecom.test.NotificationsUtilities.Companion.NOTIFICATION_CHANNEL_ID
 import androidx.core.telecom.util.ExperimentalAppActions
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,6 +50,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -55,29 +61,38 @@ class CallingMainActivity : Activity() {
     // Activity
     private val TAG = CallingMainActivity::class.simpleName
     private val mScope = CoroutineScope(Dispatchers.Default)
-    private var mCallCount: Int = 0
-
+    private lateinit var mContext: Context
+    private var mCurrentCallCount: Int = 0
     // Telecom
-    private var mCallsManager: CallsManager? = null
-
+    private lateinit var mCallsManager: CallsManager
     // Ongoing Call List
     private var mRecyclerView: RecyclerView? = null
     private var mCallObjects: ArrayList<CallRow> = ArrayList()
     private lateinit var mAdapter: CallListAdapter
-
     // Pre-Call Endpoint List
     private var mPreCallEndpointsRecyclerView: RecyclerView? = null
     private var mCurrentPreCallEndpoints: ArrayList<CallEndpointCompat> = arrayListOf()
     private lateinit var mPreCallEndpointAdapter: PreCallEndpointsAdapter
+    // Notification
+    private var mNextNotificationId: Int = 1
+    private lateinit var mNotificationManager: NotificationManager
+    private val mNotificationActionInfoFlow: MutableStateFlow<NotificationActionInfo> =
+        MutableStateFlow(NotificationActionInfo(-1, false))
+
+    /**
+     * NotificationActionInfo couples information propagated from the Call-Style notification on
+     * which action button was clicked (e.g. answer the call or decline ) *
+     */
+    data class NotificationActionInfo(val id: Int, val isAnswer: Boolean)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i(TAG, "onCreate")
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
-
+        mContext = applicationContext
+        initNotifications(mContext)
         mCallsManager = CallsManager(this)
-        mCallCount = 0
 
         val raiseHandCheckBox = findViewById<CheckBox>(R.id.RaiseHandCheckbox)
         val kickParticipantCheckBox = findViewById<CheckBox>(R.id.KickPartCheckbox)
@@ -154,6 +169,23 @@ class CallingMainActivity : Activity() {
         mPreCallEndpointsRecyclerView?.adapter = mPreCallEndpointAdapter
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.i(TAG, "onNewIntent: intent=[$intent]")
+        maybeHandleNotificationAction(intent)
+    }
+
+    private fun maybeHandleNotificationAction(intent: Intent?) {
+        if (intent != null) {
+            val id = intent.getIntExtra(NotificationsUtilities.NOTIFICATION_ID, -1)
+            if (id != -1) {
+                val isAnswer = intent.getBooleanExtra(IS_ANSWER_ACTION, false)
+                Log.i(TAG, "handleNotification: id=$id, isAnswer=$isAnswer")
+                mNotificationActionInfoFlow.value = NotificationActionInfo(id, isAnswer)
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         for (call in mCallObjects) {
@@ -165,6 +197,12 @@ class CallingMainActivity : Activity() {
                 }
             }
         }
+        NotificationsUtilities.deleteNotificationChannel(mContext)
+    }
+
+    private fun initNotifications(c: Context) {
+        NotificationsUtilities.initNotificationChannel(c)
+        mNotificationManager = c.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     }
 
     @SuppressLint("WrongConstant")
@@ -179,7 +217,7 @@ class CallingMainActivity : Activity() {
         if (streamingCheckBox.isChecked) {
             capabilities = capabilities or CallsManager.CAPABILITY_SUPPORTS_CALL_STREAMING
         }
-        mCallsManager?.registerAppWithTelecom(capabilities)
+        mCallsManager.registerAppWithTelecom(capabilities)
     }
 
     private suspend fun addCallWithAttributes(
@@ -189,7 +227,8 @@ class CallingMainActivity : Activity() {
         isKickParticipantEnabled: Boolean
     ) {
         Log.i(TAG, "addCallWithAttributes: attributes=$attributes")
-        val callObject = VoipCall()
+        val callObject = VoipCall(this, attributes)
+        callObject.setNotificationId(mNextNotificationId++)
 
         try {
             val handler = CoroutineExceptionHandler { _, exception ->
@@ -209,28 +248,43 @@ class CallingMainActivity : Activity() {
                     }
                 } catch (e: Exception) {
                     logException(e, "addCallWithAttributes: catch inner")
+                    NotificationsUtilities.clearNotification(mContext, callObject.mNotificationId)
                 } finally {
                     Log.i(TAG, "addCallWithAttributes: finally block")
                 }
             }
         } catch (e: Exception) {
             logException(e, "addCallWithAttributes: catch outer")
+            NotificationsUtilities.clearNotification(mContext, callObject.mNotificationId)
         }
     }
 
     private suspend fun addCall(attributes: CallAttributesCompat, callObject: VoipCall) {
-        mCallsManager!!.addCall(
+        mCallsManager.addCall(
             attributes,
             callObject.mOnAnswerLambda,
             callObject.mOnDisconnectLambda,
             callObject.mOnSetActiveLambda,
             callObject.mOnSetInActiveLambda,
         ) {
+            postNotification(attributes, callObject)
             mPreCallEndpointAdapter.mSelectedCallEndpoint = null
             // inject client control interface into the VoIP call object
             callObject.setCallId(getCallId().toString())
             callObject.setCallControl(this)
 
+            launch {
+                mNotificationActionInfoFlow.collect {
+                    if (it.id == callObject.mNotificationId) {
+                        if (it.isAnswer) {
+                            answer(CallAttributesCompat.CALL_TYPE_AUDIO_CALL)
+                        } else {
+                            disconnect(DisconnectCause(DisconnectCause.LOCAL))
+                        }
+                        handleUpdateToNotification(it, attributes, callObject)
+                    }
+                }
+            }
             // Collect updates
             launch { currentCallEndpoint.collect { callObject.onCallEndpointChanged(it) } }
 
@@ -241,6 +295,23 @@ class CallingMainActivity : Activity() {
         }
     }
 
+    private fun handleUpdateToNotification(
+        it: NotificationActionInfo,
+        attributes: CallAttributesCompat,
+        callObject: VoipCall
+    ) {
+        if (it.isAnswer) {
+            NotificationsUtilities.updateNotificationToOngoing(
+                mContext,
+                callObject.mNotificationId,
+                NOTIFICATION_CHANNEL_ID,
+                attributes.displayName.toString()
+            )
+        } else {
+            NotificationsUtilities.clearNotification(mContext, callObject.mNotificationId)
+        }
+    }
+
     @OptIn(ExperimentalAppActions::class)
     private suspend fun addCallWithExtensions(
         attributes: CallAttributesCompat,
@@ -248,7 +319,7 @@ class CallingMainActivity : Activity() {
         isRaiseHandEnabled: Boolean = false,
         isKickParticipantEnabled: Boolean = false
     ) {
-        mCallsManager!!.addCallWithExtensions(
+        mCallsManager.addCallWithExtensions(
             attributes,
             callObject.mOnAnswerLambda,
             callObject.mOnDisconnectLambda,
@@ -282,6 +353,7 @@ class CallingMainActivity : Activity() {
                 }
             }
             onCall {
+                postNotification(attributes, callObject)
                 mPreCallEndpointAdapter.mSelectedCallEndpoint = null
                 // inject client control interface into the VoIP call object
                 callObject.setCallId(getCallId().toString())
@@ -293,7 +365,18 @@ class CallingMainActivity : Activity() {
                     )
                 )
                 addCallRow(callObject)
-
+                launch {
+                    mNotificationActionInfoFlow.collect {
+                        if (it.id == callObject.mNotificationId) {
+                            if (it.isAnswer) {
+                                answer(CallAttributesCompat.CALL_TYPE_AUDIO_CALL)
+                            } else {
+                                disconnect(DisconnectCause(DisconnectCause.LOCAL))
+                            }
+                            handleUpdateToNotification(it, attributes, callObject)
+                        }
+                    }
+                }
                 // Collect updates
                 participants.participants
                     .onEach {
@@ -329,7 +412,7 @@ class CallingMainActivity : Activity() {
     }
 
     private fun fetchPreCallEndpoints(cancelFlowButton: Button) {
-        val endpointsFlow = mCallsManager!!.getAvailableStartingCallEndpoints()
+        val endpointsFlow = mCallsManager.getAvailableStartingCallEndpoints()
         CoroutineScope(Dispatchers.Default).launch {
             launch {
                 val endpointsCoroutineScope = this
@@ -351,12 +434,24 @@ class CallingMainActivity : Activity() {
         }
     }
 
+    private fun postNotification(attributes: CallAttributesCompat, voipCall: VoipCall) {
+        val notification =
+            NotificationsUtilities.createInitialCallStyleNotification(
+                mContext,
+                voipCall.mNotificationId,
+                NOTIFICATION_CHANNEL_ID,
+                attributes.displayName.toString(),
+                attributes.direction == DIRECTION_OUTGOING
+            )
+        mNotificationManager.notify(voipCall.mNotificationId, notification)
+    }
+
     private fun logException(e: Exception, prefix: String) {
         Log.i(TAG, "$prefix: e=[$e], e.msg=[${e.message}], e.stack:${e.printStackTrace()}")
     }
 
     private fun addCallRow(callObject: VoipCall) {
-        mCallObjects.add(CallRow(++mCallCount, callObject))
+        mCallObjects.add(CallRow(++mCurrentCallCount, callObject))
         callObject.setCallAdapter(mAdapter)
         updateCallList()
     }
