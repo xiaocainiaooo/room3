@@ -100,7 +100,6 @@ abstract class GenerateApiTask @Inject constructor(workerExecutor: WorkerExecuto
         val inputs =
             StandardCompilationInputs(
                 sourcePaths = sourcePaths,
-                commonModuleSourcePaths = commonModuleSourcePaths,
                 dependencyClasspath = dependencyClasspath,
                 bootClasspath = bootClasspath
             )
