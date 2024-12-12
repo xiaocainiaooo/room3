@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.guavaAndroid)
     implementation(libs.espressoIdlingNet)
     implementation(libs.espressoIdlingResource)
+    implementation(libs.okhttpMockwebserver)
 
     androidTestImplementation(libs.testExtJunit)
     androidTestImplementation(libs.testCore)
