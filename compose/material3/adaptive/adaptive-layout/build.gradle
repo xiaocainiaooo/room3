@@ -23,7 +23,6 @@
  */
 import androidx.build.LibraryType
 import androidx.build.PlatformIdentifier
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -110,12 +109,10 @@ androidx {
     legacyDisableKotlinStrictApiMode = true
     metalavaK2UastEnabled = false
     samples(project(":compose:material3:adaptive:adaptive-samples"))
+    addGoldenImageAssets()
 }
 
-// Screenshot tests related setup
 android {
     compileSdk = 35
-    sourceSets.androidTest.assets.srcDirs +=
-            project.rootDir.absolutePath + "/../../golden/compose/material3/adaptive"
     namespace = "androidx.compose.material3.adaptive.layout"
 }
