@@ -42,19 +42,17 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.FloatingAppBarDefaults
-import androidx.compose.material3.FloatingAppBarDefaults.ScreenOffset
-import androidx.compose.material3.FloatingAppBarDefaults.floatingToolbarVerticalNestedScroll
-import androidx.compose.material3.FloatingAppBarExitDirection.Companion.Bottom
-import androidx.compose.material3.FloatingAppBarExitDirection.Companion.End
-import androidx.compose.material3.HorizontalFloatingAppBar
+import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.FloatingToolbarDefaults.ScreenOffset
+import androidx.compose.material3.FloatingToolbarDefaults.floatingToolbarVerticalNestedScroll
+import androidx.compose.material3.FloatingToolbarExitDirection.Companion.Bottom
+import androidx.compose.material3.FloatingToolbarExitDirection.Companion.End
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalFloatingAppBar
 import androidx.compose.material3.VerticalFloatingToolbar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -76,7 +74,7 @@ import androidx.compose.ui.unit.dp
 @Preview
 @Sampled
 @Composable
-fun ExpandableHorizontalFloatingAppBarSample() {
+fun ExpandableHorizontalFloatingToolbarSample() {
     val context = LocalContext.current
     val isTouchExplorationEnabled = remember {
         val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
@@ -108,7 +106,7 @@ fun ExpandableHorizontalFloatingAppBarSample() {
                         )
                     }
                 }
-                HorizontalFloatingAppBar(
+                HorizontalFloatingToolbar(
                     modifier = Modifier.align(BottomCenter).offset(y = -ScreenOffset),
                     expanded = expanded || isTouchExplorationEnabled,
                     leadingContent = { leadingContent() },
@@ -131,7 +129,7 @@ fun ExpandableHorizontalFloatingAppBarSample() {
 @Preview
 @Sampled
 @Composable
-fun ScrollableHorizontalFloatingAppBarSample() {
+fun ScrollableHorizontalFloatingToolbarSample() {
     val context = LocalContext.current
     val isTouchExplorationEnabled = remember {
         val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
@@ -139,7 +137,7 @@ fun ScrollableHorizontalFloatingAppBarSample() {
     }
     val listState = rememberLazyListState()
     val exitAlwaysScrollBehavior =
-        FloatingAppBarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
+        FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
     Scaffold(
         modifier = Modifier.nestedScroll(exitAlwaysScrollBehavior),
         content = { innerPadding ->
@@ -158,7 +156,7 @@ fun ScrollableHorizontalFloatingAppBarSample() {
                         )
                     }
                 }
-                HorizontalFloatingAppBar(
+                HorizontalFloatingToolbar(
                     modifier = Modifier.align(BottomCenter).offset(y = -ScreenOffset),
                     expanded = true,
                     leadingContent = { leadingContent() },
@@ -183,7 +181,7 @@ fun ScrollableHorizontalFloatingAppBarSample() {
 @Preview
 @Sampled
 @Composable
-fun ExpandableVerticalFloatingAppBarSample() {
+fun ExpandableVerticalFloatingToolbarSample() {
     val context = LocalContext.current
     val isTouchExplorationEnabled = remember {
         val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
@@ -215,7 +213,7 @@ fun ExpandableVerticalFloatingAppBarSample() {
                         )
                     }
                 }
-                VerticalFloatingAppBar(
+                VerticalFloatingToolbar(
                     modifier = Modifier.align(CenterEnd).offset(x = -ScreenOffset),
                     expanded = expanded || isTouchExplorationEnabled,
                     leadingContent = { leadingContent() },
@@ -238,7 +236,7 @@ fun ExpandableVerticalFloatingAppBarSample() {
 @Preview
 @Sampled
 @Composable
-fun ScrollableVerticalFloatingAppBarSample() {
+fun ScrollableVerticalFloatingToolbarSample() {
     val context = LocalContext.current
     val isTouchExplorationEnabled = remember {
         val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
@@ -246,7 +244,7 @@ fun ScrollableVerticalFloatingAppBarSample() {
     }
     val listState = rememberLazyListState()
     val exitAlwaysScrollBehavior =
-        FloatingAppBarDefaults.exitAlwaysScrollBehavior(exitDirection = End)
+        FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = End)
     Scaffold(
         modifier = Modifier.nestedScroll(exitAlwaysScrollBehavior),
         content = { innerPadding ->
@@ -265,7 +263,7 @@ fun ScrollableVerticalFloatingAppBarSample() {
                         )
                     }
                 }
-                VerticalFloatingAppBar(
+                VerticalFloatingToolbar(
                     modifier = Modifier.align(CenterEnd).offset(x = -ScreenOffset),
                     expanded = true,
                     leadingContent = { leadingContent() },
@@ -298,7 +296,7 @@ fun HorizontalFloatingToolbarWithFabSample() {
     }
 
     var expanded by rememberSaveable { mutableStateOf(true) }
-    val vibrantColors = FloatingAppBarDefaults.vibrantFloatingToolbarColors()
+    val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
     Scaffold { innerPadding ->
         Box(Modifier.padding(innerPadding)) {
             Column(
@@ -326,7 +324,7 @@ fun HorizontalFloatingToolbarWithFabSample() {
                 expanded = expanded,
                 floatingActionButton = {
                     // Match the FAB to the vibrantColors. See also StandardFloatingActionButton.
-                    FloatingAppBarDefaults.VibrantFloatingActionButton(
+                    FloatingToolbarDefaults.VibrantFloatingActionButton(
                         onClick = { /* doSomething() */ },
                     ) {
                         Icon(Icons.Filled.Add, "Localized description")
@@ -364,7 +362,7 @@ fun VerticalFloatingToolbarWithFabSample() {
         am.isEnabled && am.isTouchExplorationEnabled
     }
     var expanded by rememberSaveable { mutableStateOf(true) }
-    val vibrantColors = FloatingAppBarDefaults.vibrantFloatingToolbarColors()
+    val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
     Scaffold { innerPadding ->
         Box(Modifier.padding(innerPadding)) {
             Column(
@@ -392,7 +390,7 @@ fun VerticalFloatingToolbarWithFabSample() {
                 expanded = expanded,
                 floatingActionButton = {
                     // Match the FAB to the vibrantColors. See also StandardFloatingActionButton.
-                    FloatingAppBarDefaults.VibrantFloatingActionButton(
+                    FloatingToolbarDefaults.VibrantFloatingActionButton(
                         onClick = { /* doSomething() */ },
                     ) {
                         Icon(Icons.Filled.Add, "Localized description")
@@ -431,14 +429,14 @@ fun HorizontalFloatingToolbarAsScaffoldFabSample() {
     }
 
     var expanded by rememberSaveable { mutableStateOf(true) }
-    val vibrantColors = FloatingAppBarDefaults.vibrantFloatingToolbarColors()
+    val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
     Scaffold(
         floatingActionButton = {
             HorizontalFloatingToolbar(
                 expanded = expanded,
                 floatingActionButton = {
                     // Match the FAB to the vibrantColors. See also StandardFloatingActionButton.
-                    FloatingAppBarDefaults.VibrantFloatingActionButton(
+                    FloatingToolbarDefaults.VibrantFloatingActionButton(
                         onClick = { expanded = !expanded },
                     ) {
                         Icon(Icons.Filled.Add, "Localized description")
