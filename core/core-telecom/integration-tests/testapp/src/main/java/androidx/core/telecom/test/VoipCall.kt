@@ -16,12 +16,15 @@
 
 package androidx.core.telecom.test
 
+import android.content.Context
 import android.telecom.DisconnectCause
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.telecom.CallAttributesCompat
 import androidx.core.telecom.CallControlScope
 import androidx.core.telecom.CallEndpointCompat
 import androidx.core.telecom.extensions.LocalCallSilenceExtension
+import androidx.core.telecom.test.NotificationsUtilities.Companion.NOTIFICATION_CHANNEL_ID
 import androidx.core.telecom.util.ExperimentalAppActions
 import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -29,9 +32,9 @@ import kotlinx.coroutines.launch
 
 @ExperimentalAppActions
 @RequiresApi(34)
-class VoipCall {
+class VoipCall(val context: Context, val attributes: CallAttributesCompat) {
     private val TAG = VoipCall::class.simpleName
-
+    var mNotificationId: Int = -1
     var mAdapter: CallListAdapter? = null
     var mCallControl: CallControlScope? = null
     var mParticipantControl: ParticipantControl? = null
@@ -40,6 +43,7 @@ class VoipCall {
     var mIsMuted = false
     var mTelecomCallId: String = ""
     var mIsLocallySilence: Boolean = false
+    var hasUpdatedToOngoing = false
     var mLocalCallSilenceExtension: LocalCallSilenceExtension? = null
 
     val mOnSetActiveLambda: suspend () -> Unit = {
@@ -55,10 +59,12 @@ class VoipCall {
     val mOnAnswerLambda: suspend (type: Int) -> Unit = {
         Log.i(TAG, "onAnswer: callType=[$it]")
         mAdapter?.updateCallState(mTelecomCallId, "Answered")
+        updateNotificationToOngoing()
     }
 
     val mOnDisconnectLambda: suspend (cause: DisconnectCause) -> Unit = {
         Log.i(TAG, "onDisconnect: disconnectCause=[$it]")
+        NotificationsUtilities.clearNotification(context, mNotificationId)
         mAdapter?.updateCallState(mTelecomCallId, "Disconnected")
     }
 
@@ -68,6 +74,27 @@ class VoipCall {
 
     fun setParticipantControl(participantControl: ParticipantControl) {
         mParticipantControl = participantControl
+    }
+
+    fun setNotificationId(id: Int) {
+        mNotificationId = id
+    }
+
+    fun clearNotification() {
+        Log.i(TAG, "clearNotification with id=[$mNotificationId]")
+        NotificationsUtilities.clearNotification(context, mNotificationId)
+    }
+
+    fun updateNotificationToOngoing() {
+        if (!hasUpdatedToOngoing) {
+            NotificationsUtilities.updateNotificationToOngoing(
+                context = context,
+                notificationId = mNotificationId,
+                channelId = NOTIFICATION_CHANNEL_ID,
+                callerName = attributes.displayName.toString()
+            )
+        }
+        hasUpdatedToOngoing = true
     }
 
     @OptIn(ExperimentalAppActions::class)
