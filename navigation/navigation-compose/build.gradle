@@ -94,12 +94,10 @@ androidx {
     description = "Compose integration with Navigation"
     samples(project(":navigation:navigation-compose:navigation-compose-samples"))
     kotlinTarget = KotlinTarget.KOTLIN_1_9
+    addGoldenImageAssets()
 }
 
 android {
     compileSdk = 35
-    sourceSets.androidTest.assets.srcDirs +=
-            project.rootDir.absolutePath + "/../../golden/navigation/navigation-compose"
-
     namespace = "androidx.navigation.compose"
 }
