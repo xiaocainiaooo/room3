@@ -42,6 +42,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.internal.FloatProducer
 import androidx.compose.material3.internal.ProvideContentColorTextStyle
 import androidx.compose.material3.internal.systemBarsForVisualComponents
 import androidx.compose.material3.tokens.BottomAppBarTokens
@@ -2597,7 +2598,7 @@ private fun Modifier.adjustHeightOffsetLimit(scrollBehavior: TopAppBarScrollBeha
  * the actions are optional.
  *
  * @param modifier a [Modifier]
- * @param scrolledOffset a [ScrolledOffset] that provides the app bar offset in pixels (note that
+ * @param scrolledOffset a [FloatProducer] that provides the app bar offset in pixels (note that
  *   when the app bar is scrolled, the lambda will output negative values)
  * @param navigationIconContentColor the content color that will be applied via a
  *   [LocalContentColor] when composing the navigation icon
@@ -2623,7 +2624,7 @@ private fun Modifier.adjustHeightOffsetLimit(scrollBehavior: TopAppBarScrollBeha
 @Composable
 private fun TopAppBarLayout(
     modifier: Modifier,
-    scrolledOffset: ScrolledOffset,
+    scrolledOffset: FloatProducer,
     navigationIconContentColor: Color,
     titleContentColor: Color,
     actionIconContentColor: Color,
@@ -2720,7 +2721,7 @@ private fun TopAppBarLayout(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 private class TopAppBarMeasurePolicy(
-    val scrolledOffset: ScrolledOffset,
+    val scrolledOffset: FloatProducer,
     val titleVerticalArrangement: Arrangement.Vertical,
     val titleHorizontalAlignment: TopAppBarTitleAlignment,
     val titleBottomPadding: Int,
@@ -2761,7 +2762,7 @@ private class TopAppBarMeasurePolicy(
 
         // Subtract the scrolledOffset from the maxHeight. The scrolledOffset is expected to be
         // equal or smaller than zero.
-        val scrolledOffsetValue = scrolledOffset.offset()
+        val scrolledOffsetValue = scrolledOffset()
         val heightOffset = if (scrolledOffsetValue.isNaN()) 0 else scrolledOffsetValue.roundToInt()
 
         val maxLayoutHeight = max(expandedHeight.roundToPx(), titlePlaceable.height)
@@ -2895,11 +2896,6 @@ private class TopAppBarMeasurePolicy(
                 y = (layoutHeight - actionIconsPlaceable.height) / 2
             )
         }
-}
-
-/** A functional interface for providing an app-bar scroll offset. */
-private fun interface ScrolledOffset {
-    fun offset(): Float
 }
 
 /**
