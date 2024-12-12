@@ -19,7 +19,7 @@ package androidx.build.metalava
 import androidx.build.Version
 import androidx.build.checkapi.ApiBaselinesLocation
 import androidx.build.checkapi.ApiLocation
-import androidx.build.java.JavaCompileInputs
+import androidx.build.java.StandardCompilationInputs
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.file.Directory
@@ -95,7 +95,7 @@ abstract class GenerateApiTask @Inject constructor(workerExecutor: WorkerExecuto
         }
 
         val inputs =
-            JavaCompileInputs(
+            StandardCompilationInputs(
                 sourcePaths = sourcePaths,
                 commonModuleSourcePaths = commonModuleSourcePaths,
                 dependencyClasspath = dependencyClasspath,

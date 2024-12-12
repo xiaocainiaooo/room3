@@ -66,15 +66,6 @@
 
     <issue
         id="EagerGradleConfiguration"
-        message="Avoid using method get"
-        errorLine1="            val verifyOutputsTask = verifyOutputs.get()"
-        errorLine2="                                                  ~~~">
-        <location
-            file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/Release.kt"/>
-    </issue>
-
-    <issue
-        id="EagerGradleConfiguration"
         message="Use configureEach instead of whenObjectAdded"
         errorLine1="    configurations.whenObjectAdded {"
         errorLine2="                   ~~~~~~~~~~~~~~~">
@@ -256,7 +247,7 @@
     <issue
         id="GradleProjectIsolation"
         message="Use isolated.rootProject instead of getRootProject"
-        errorLine1="    rootProject.layout.buildDirectory.dir(&quot;privacysandbox-files&quot;)"
+        errorLine1="    rootProject.layout.buildDirectory.dir(&quot;app-apks-files&quot;)"
         errorLine2="    ~~~~~~~~~~~">
         <location
             file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*3}/androidx/build/BuildServerConfiguration.kt"/>
@@ -269,6 +260,15 @@
         errorLine2="                                                                     ~~~~~~~~~~~">
         <location
             file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*3}/androidx/build/BuildServerConfiguration.kt"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Avoid using method getParent"
+        errorLine1="                    ${project.parent}."
+        errorLine2="                              ~~~~~~">
+        <location
+            file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/java/CompilationInputs.kt"/>
     </issue>
 
     <issue
@@ -341,15 +341,6 @@
         errorLine2="                                         ~~~~~~~~~~~">
         <location
             file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/gitclient/GitClient.kt"/>
-    </issue>
-
-    <issue
-        id="GradleProjectIsolation"
-        message="Avoid using method getParent"
-        errorLine1="                    ${project.parent}."
-        errorLine2="                              ~~~~~~">
-        <location
-            file="${:buildSrc-tests*main*MAIN*sourceProvider*0*javaDir*4}/androidx/build/java/JavaCompileInputs.kt"/>
     </issue>
 
     <issue

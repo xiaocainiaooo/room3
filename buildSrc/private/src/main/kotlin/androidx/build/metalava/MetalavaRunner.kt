@@ -19,7 +19,7 @@ package androidx.build.metalava
 import androidx.build.Version
 import androidx.build.checkapi.ApiLocation
 import androidx.build.getLibraryByName
-import androidx.build.java.JavaCompileInputs
+import androidx.build.java.CompilationInputs
 import androidx.build.logging.TERMINAL_RED
 import androidx.build.logging.TERMINAL_RESET
 import java.io.ByteArrayOutputStream
@@ -240,9 +240,9 @@ sealed class ApiLintMode {
 /**
  * Generates all of the specified api files, as well as a version history JSON for the public API.
  */
-fun generateApi(
+internal fun generateApi(
     metalavaClasspath: FileCollection,
-    files: JavaCompileInputs,
+    files: CompilationInputs,
     apiLocation: ApiLocation,
     apiLintMode: ApiLintMode,
     includeRestrictToLibraryGroupApis: Boolean,
@@ -284,7 +284,7 @@ fun generateApi(
  */
 private fun generateApi(
     metalavaClasspath: FileCollection,
-    files: JavaCompileInputs,
+    files: CompilationInputs,
     outputLocation: ApiLocation,
     generateApiMode: GenerateApiMode,
     apiLintMode: ApiLintMode,
