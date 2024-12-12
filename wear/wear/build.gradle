@@ -59,7 +59,6 @@ android {
 
     sourceSets {
         main.res.srcDirs += "src/main/res-public"
-        androidTest.assets.srcDirs += project.rootDir.absolutePath + "/../../golden/wear/wear"
     }
 
     buildTypes.configureEach {
@@ -79,4 +78,5 @@ androidx {
     description = "Android Wear Support UI"
     failOnDeprecationWarnings = false
     legacyDisableKotlinStrictApiMode = true
+    addGoldenImageAssets()
 }

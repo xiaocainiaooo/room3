@@ -138,11 +138,8 @@ dependencies {
     lintPublish(project(":compose:foundation:foundation-lint"))
 }
 
-// Screenshot tests related setup
 android {
     compileSdk = 35
-    sourceSets.androidTest.assets.srcDirs +=
-            project.rootDir.absolutePath + "/../../golden/compose/foundation/foundation"
     namespace = "androidx.compose.foundation"
     buildTypes.configureEach {
         consumerProguardFiles("proguard-rules.pro")
@@ -160,4 +157,5 @@ androidx {
     metalavaK2UastEnabled = false
     samples(project(":compose:foundation:foundation:foundation-samples"))
     kotlinTarget = KotlinTarget.KOTLIN_1_9
+    addGoldenImageAssets()
 }

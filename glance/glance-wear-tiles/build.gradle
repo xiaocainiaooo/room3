@@ -84,12 +84,7 @@ android {
         // protobuf generates unannotated methods
         disable "UnknownNullness"
     }
-
-    sourceSets {
-        androidTest.assets.srcDirs += project.rootDir.absolutePath + "/../../golden/glance/glance-wear-tiles"
-    }
     namespace = "androidx.glance.wear.tiles"
-
 }
 
 androidx {
@@ -101,4 +96,5 @@ androidx {
             "Compose-style API."
     legacyDisableKotlinStrictApiMode = true
     metalavaK2UastEnabled = false
+    addGoldenImageAssets()
 }
