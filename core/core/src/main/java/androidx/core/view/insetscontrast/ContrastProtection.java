@@ -22,11 +22,12 @@ import android.view.animation.Interpolator;
 import android.view.animation.PathInterpolator;
 
 import androidx.annotation.FloatRange;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsCompat.Side.InsetsSide;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An abstract class which describes a layer to be placed on the content of a window and underneath
@@ -109,8 +110,7 @@ public abstract class ContrastProtection {
      *
      * @return the attributes this protection is associated with.
      */
-    @NonNull
-    Attributes getAttributes() {
+    @NonNull Attributes getAttributes() {
         return mAttributes;
     }
 
@@ -153,8 +153,7 @@ public abstract class ContrastProtection {
         return updateLayout();
     }
 
-    @NonNull
-    Insets updateLayout() {
+    @NonNull Insets updateLayout() {
         Insets consumed = Insets.NONE;
         final int inset;
         switch (mSide) {
@@ -416,8 +415,7 @@ public abstract class ContrastProtection {
          *
          * @return the margin of the protection in pixels.
          */
-        @NonNull
-        Insets getMargin() {
+        @NonNull Insets getMargin() {
             return mMargin;
         }
 
@@ -435,8 +433,7 @@ public abstract class ContrastProtection {
          *
          * @return the {@link Drawable} that fills the protection.
          */
-        @Nullable
-        Drawable getDrawable() {
+        @Nullable Drawable getDrawable() {
             return mDrawable;
         }
 
