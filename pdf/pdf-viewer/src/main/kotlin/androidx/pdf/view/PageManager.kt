@@ -41,6 +41,11 @@ internal class PageManager(
     private val pdfDocument: PdfDocument,
     private val backgroundScope: CoroutineScope,
     private val pagePrefetchRadius: Int,
+    /**
+     * The maximum size of any single [android.graphics.Bitmap] we render for a page, i.e. the
+     * threshold for tiled rendering
+     */
+    private val maxBitmapSizePx: Point,
 ) {
     /**
      * Replay at least 1 value in case of an invalidation signal issued while [PdfView] is not
@@ -99,7 +104,7 @@ internal class PageManager(
     fun onPageSizeReceived(pageNum: Int, size: Point, isVisible: Boolean, currentZoomLevel: Float) {
         if (pages.contains(pageNum)) return
         val page =
-            Page(pageNum, size, pdfDocument, backgroundScope) {
+            Page(pageNum, size, pdfDocument, backgroundScope, maxBitmapSizePx) {
                     _invalidationSignalFlow.tryEmit(Unit)
                 }
                 .apply { if (isVisible) setVisible(currentZoomLevel) }
