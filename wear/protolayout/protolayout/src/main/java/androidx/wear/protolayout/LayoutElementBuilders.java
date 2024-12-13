@@ -4822,8 +4822,8 @@ public final class LayoutElementBuilders {
     }
 
     /**
-     * A dashed arc line that can be placed in an {@link Arc} container. It is an arc line made up
-     * of arc line segments separated by gaps.
+     * A dashed arc line. It is an arc line made up of arc line segments separated by gaps, and can
+     * be placed in an {@link Arc} container.
      */
     @RequiresSchemaVersion(major = 1, minor = 500)
     public static final class DashedArcLine implements ArcLayoutElement {
@@ -4837,10 +4837,6 @@ public final class LayoutElementBuilders {
 
         /**
          * Gets the length of this line in degrees, including gaps.
-         *
-         * <p>When using a dynamic value, make sure to specify the bounding constraints for the
-         * affected layout element through {@code setLayoutConstraintsForDynamicLength
-         * (AngularLayoutConstraint)}, otherwise {@code build()} fails.
          */
         public @Nullable DegreesProp getLength() {
             if (mImpl.hasLength()) {
@@ -4967,7 +4963,8 @@ public final class LayoutElementBuilders {
             public Builder() {}
 
             /**
-             * Sets the length of this line, in degrees. If not defined, defaults to 0.
+             * Sets the length of this line in degrees, including gaps. If not defined, defaults to
+             * 0.
              *
              * <p>When using a dynamic value, make sure to specify the bounding constraints for the
              * affected layout element through {@code setLayoutConstraintsForDynamicLength
@@ -5016,8 +5013,8 @@ public final class LayoutElementBuilders {
             }
 
             /**
-             * Sets the direction in which this line is drawn. If not set, defaults to
-             * ARC_DIRECTION_CLOCKWISE.
+             * Sets the direction in which this line is drawn. If not set, defaults to the {@link
+             * Arc} container's direction where it is placed in.
              */
             @RequiresSchemaVersion(major = 1, minor = 500)
             public @NonNull Builder setArcDirection(@NonNull ArcDirectionProp arcDirection) {
@@ -5028,8 +5025,8 @@ public final class LayoutElementBuilders {
             }
 
             /**
-             * Sets the direction in which this line is drawn. If not set, defaults to
-             * ARC_DIRECTION_CLOCKWISE.
+             * Sets the direction in which this line is drawn. If not set, defaults to the {@link
+             * Arc} container's direction where it is placed in.
              */
             @RequiresSchemaVersion(major = 1, minor = 500)
             public @NonNull Builder setArcDirection(@ArcDirection int arcDirection) {
@@ -5078,7 +5075,10 @@ public final class LayoutElementBuilders {
         }
     }
 
-    /** A dashed line pattern which describes how the dashed arc line is segmented by gaps. */
+    /**
+     * A dashed line pattern which describes how the dashed arc line is segmented by gaps. It
+     * determines the gap size and the gap locations.
+     */
     @RequiresSchemaVersion(major = 1, minor = 500)
     public static final class DashedLinePattern {
         private final LayoutElementProto.DashedLinePattern mImpl;
@@ -5186,8 +5186,8 @@ public final class LayoutElementBuilders {
             /**
              * Sets the list of each gap's center location in degrees.
              *
-             * <p>The interval between any two locations could not be shorter than thickness plus
-             * gap size.
+             * <p>The interval between any two locations must not be shorter than thickness plus gap
+             * size,  otherwise the gap is ignored.
              *
              * <p>Note that calling this method will invalidate the previous call of {@link
              * #setGapInterval}
@@ -5207,7 +5207,8 @@ public final class LayoutElementBuilders {
              * Sets the interval length in degrees between two consecutive gap center locations. The
              * arc line will have arc line segments with equal length.
              *
-             * <p>The interval could not be shorter than thickness plus gap size.
+             * <p>The interval between any two locations must not be shorter than thickness plus gap
+             * size, otherwise the gap is ignored.
              *
              * <p>Note that calling this method will remove all the gap locations set previously
              * with {@link #setGapLocations}
@@ -5217,7 +5218,7 @@ public final class LayoutElementBuilders {
             public @NonNull Builder setGapInterval(float gapIntervalInDegrees) {
                 mImpl.clearGapLocations();
 
-                float gapLocation = gapIntervalInDegrees;
+                float gapLocation = 0;
                 while (gapLocation <= 360F) {
                     addGapLocation(degrees(gapLocation));
                     gapLocation += gapIntervalInDegrees;
