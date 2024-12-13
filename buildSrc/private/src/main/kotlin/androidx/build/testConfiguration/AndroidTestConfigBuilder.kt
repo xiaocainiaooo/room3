@@ -21,7 +21,9 @@ import groovy.xml.XmlUtil
 
 class ConfigBuilder {
     lateinit var configName: String
-    var appApksModel: AppApksModel? = null
+    var appApkName: String? = null
+    var appApkSha256: String? = null
+    val appSplits = mutableListOf<String>()
     lateinit var applicationId: String
     var isMicrobenchmark: Boolean = false
     var isMacrobenchmark: Boolean = false
@@ -33,11 +35,16 @@ class ConfigBuilder {
     lateinit var testApkSha256: String
     lateinit var testRunner: String
     val additionalApkKeys = mutableListOf<String>()
+    val initialSetupApks = mutableListOf<String>()
     val instrumentationArgsMap = mutableMapOf<String, String>()
 
     fun configName(configName: String) = apply { this.configName = configName }
 
-    fun appApksModel(appApksModel: AppApksModel) = apply { this.appApksModel = appApksModel }
+    fun appApkName(appApkName: String) = apply { this.appApkName = appApkName }
+
+    fun appApkSha256(appApkSha256: String) = apply { this.appApkSha256 = appApkSha256 }
+
+    fun appSplits(appSplits: List<String>) = apply { this.appSplits.addAll(appSplits) }
 
     fun applicationId(applicationId: String) = apply { this.applicationId = applicationId }
 
@@ -61,6 +68,8 @@ class ConfigBuilder {
 
     fun additionalApkKeys(keys: List<String>) = apply { additionalApkKeys.addAll(keys) }
 
+    fun initialSetupApks(apks: List<String>) = apply { initialSetupApks.addAll(apks) }
+
     fun testApkName(testApkName: String) = apply { this.testApkName = testApkName }
 
     fun testApkSha256(testApkSha256: String) = apply { this.testApkSha256 = testApkSha256 }
@@ -83,7 +92,6 @@ class ConfigBuilder {
                 listOf(InstrumentationArg("notAnnotation", "androidx.test.filters.FlakyTest"))
             }
         )
-        val appApk = singleAppApk()
         val values =
             mapOf(
                 "name" to configName,
@@ -91,8 +99,8 @@ class ConfigBuilder {
                 "testSuiteTags" to tags,
                 "testApk" to testApkName,
                 "testApkSha256" to testApkSha256,
-                "appApk" to appApk?.name,
-                "appApkSha256" to appApk?.sha256,
+                "appApk" to appApkName,
+                "appApkSha256" to appApkSha256,
                 "instrumentationArgs" to instrumentationArgsList,
                 "additionalApkKeys" to additionalApkKeys
             )
@@ -124,7 +132,7 @@ class ConfigBuilder {
                     listOf(
                         InstrumentationArg(
                             "androidx.benchmark.output.payload.appApkSha256",
-                            checkNotNull(appApksModel?.sha256()) {
+                            checkNotNull(appApkSha256) {
                                 "app apk sha should be provided for macrobenchmarks."
                             }
                         ),
@@ -144,13 +152,14 @@ class ConfigBuilder {
             )
         }
         sb.append(SETUP_INCLUDE).append(TARGET_PREPARER_OPEN.replace("CLEANUP_APKS", "true"))
+        initialSetupApks.forEach { apk -> sb.append(APK_INSTALL_OPTION.replace("APK_NAME", apk)) }
         sb.append(APK_INSTALL_OPTION.replace("APK_NAME", testApkName))
-        appApksModel?.apkGroups?.forEach { group ->
-            if (group.isUsingApkSplits()) {
-                val apkList = group.apks.map(ApkFile::name).joinToString(",")
-                sb.append(APK_WITH_SPLITS_INSTALL_OPTION.replace("APK_LIST", apkList))
+        if (!appApkName.isNullOrEmpty()) {
+            if (appSplits.isEmpty()) {
+                sb.append(APK_INSTALL_OPTION.replace("APK_NAME", appApkName!!))
             } else {
-                sb.append(APK_INSTALL_OPTION.replace("APK_NAME", group.apks.single().name))
+                val apkList = appApkName + "," + appSplits.joinToString(",")
+                sb.append(APK_WITH_SPLITS_INSTALL_OPTION.replace("APK_LIST", apkList))
             }
         }
         sb.append(TARGET_PREPARER_CLOSE)
@@ -177,14 +186,6 @@ class ConfigBuilder {
             .append(TEST_BLOCK_CLOSE)
         sb.append(CONFIGURATION_CLOSE)
         return sb.toString()
-    }
-
-    private fun singleAppApk(): ApkFile? {
-        val apkGroups = appApksModel?.apkGroups
-        if (apkGroups.isNullOrEmpty()) {
-            return null
-        }
-        return apkGroups.single().apks.single()
     }
 }
 
