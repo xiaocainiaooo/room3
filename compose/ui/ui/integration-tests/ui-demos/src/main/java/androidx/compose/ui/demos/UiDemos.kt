@@ -32,6 +32,7 @@ import androidx.compose.ui.demos.accessibility.ScaffoldSampleDemo
 import androidx.compose.ui.demos.accessibility.ScaffoldSampleScrollDemo
 import androidx.compose.ui.demos.accessibility.ScrollingColumnDemo
 import androidx.compose.ui.demos.accessibility.SimpleRtlLayoutDemo
+import androidx.compose.ui.demos.autofill.AutofillNavigation
 import androidx.compose.ui.demos.autofill.BTFResetCredentialsDemo
 import androidx.compose.ui.demos.autofill.BasicSecureTextFieldAutofillDemo
 import androidx.compose.ui.demos.autofill.BasicTextFieldAutofill
@@ -286,7 +287,8 @@ private val AutofillDemos =
                 BasicSecureTextFieldAutofillDemo()
             },
             ComposableDemo("S: TextField Autofill") { LegacyTextFieldAutofillDemo() },
-            ComposableDemo("S: OutlinedTextField Autofill") { OutlinedTextFieldAutofillDemo() }
+            ComposableDemo("S: OutlinedTextField Autofill") { OutlinedTextFieldAutofillDemo() },
+            ComposableDemo("Navigation Sample") { AutofillNavigation() }
         )
     )
 

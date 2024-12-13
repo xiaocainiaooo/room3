@@ -1195,7 +1195,10 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
     }
 
     override fun onPostAttach(node: LayoutNode) {
-        // TODO(MNUZEN): add autofill logic here
+        @OptIn(ExperimentalComposeUiApi::class)
+        if (SDK_INT >= 26 && isSemanticAutofillEnabled) {
+            _autofillManager?.onPostAttach(node)
+        }
     }
 
     override fun onDetach(node: LayoutNode) {
@@ -1205,6 +1208,10 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         @OptIn(ExperimentalComposeUiApi::class)
         if (ComposeUiFlags.isRectTrackingEnabled) {
             rectManager.remove(node)
+        }
+        @OptIn(ExperimentalComposeUiApi::class)
+        if (SDK_INT >= 26 && isSemanticAutofillEnabled) {
+            _autofillManager?.onDetach(node)
         }
     }
 
@@ -1220,6 +1227,10 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         val childAndroidViews = _androidViewsHandler
         if (childAndroidViews != null) {
             clearChildInvalidObservations(childAndroidViews)
+        }
+        @OptIn(ExperimentalComposeUiApi::class)
+        if (SDK_INT >= 26 && isSemanticAutofillEnabled) {
+            _autofillManager?.onEndApplyChanges()
         }
         // Listeners can add more items to the list and we want to ensure that they
         // are executed after being added, so loop until the list is empty

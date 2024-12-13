@@ -31,9 +31,11 @@ import android.view.inputmethod.EditorInfo
 import androidx.annotation.RequiresApi
 import androidx.collection.IntObjectMap
 import androidx.collection.MutableIntObjectMap
+import androidx.collection.MutableIntSet
 import androidx.collection.intObjectMapOf
 import androidx.collection.mutableIntObjectMapOf
 import androidx.compose.ui.internal.checkPreconditionNotNull
+import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.TextClassName
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.TextFieldClassName
@@ -72,6 +74,10 @@ import androidx.compose.ui.util.fastForEach
 internal class AndroidAutofillManager(val view: AndroidComposeView) :
     AutofillManager, View.OnAttachStateChangeListener {
     internal var autofillManager: AutofillManagerWrapper = AutofillManagerWrapperImpl(view)
+
+    private var previouslyDisplayedIDs = MutableIntSet()
+    private var currentlyDisplayedIDs = MutableIntSet()
+    private var pendingChanges = false
 
     init {
         view.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_YES
@@ -165,7 +171,57 @@ internal class AndroidAutofillManager(val view: AndroidComposeView) :
                     notifyVisibilityChanged(id, currTransparency)
                 }
             }
+
+            // Check if relevance to Autofill has changed —————————
+            if (previousNode.isRelatedToAutofill != currNode.isRelatedToAutofill) {
+                if (currNode.isRelatedToAutofill) {
+                    // Add node to currently displayed set if it's related to autofill now
+                    currentlyDisplayedIDs.add(currNode.id)
+                } else {
+                    // Remove node from currently displayed set if it's no longer related to
+                    // autofill
+                    currentlyDisplayedIDs.remove(currNode.id)
+                }
+                pendingChanges = true
+                // We need to manually update the previous and current displays if there has been
+                // an added/removed autofillable component. (`onEndApplyChanges` is not called
+                // after `onSemanticsChange`.)
+                onEndApplyChanges()
+            }
         }
+    }
+
+    internal fun onPostAttach(node: LayoutNode) {
+        if (node.isRelatedToAutofill) {
+            currentlyDisplayedIDs.add(node.semanticsId)
+            pendingChanges = true
+            // TODO(MNUZEN): Notify autofill manager that a node has been added via
+            // `notifyViewVisibilityChanged`
+        }
+    }
+
+    internal fun onDetach(node: LayoutNode) {
+        if (node.isRelatedToAutofill) {
+            currentlyDisplayedIDs.remove(node.semanticsId)
+            pendingChanges = true
+            // TODO(MNUZEN): Notify autofill manager that a node has been removed via
+            // `notifyViewVisibilityChanged`
+        }
+    }
+
+    internal fun onEndApplyChanges() {
+        // Return if there are no changes
+        if (!pendingChanges) {
+            return
+        }
+
+        // Check for screen changes or complete removal
+        if (!currentlyDisplayedIDs.containsAll(previouslyDisplayedIDs)) {
+            autofillManager.commit()
+        }
+
+        previouslyDisplayedIDs.copyFrom(currentlyDisplayedIDs)
+        pendingChanges = false
     }
 
     internal fun onSemanticsChange() {
