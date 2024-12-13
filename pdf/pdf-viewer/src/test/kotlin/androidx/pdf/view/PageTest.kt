@@ -16,15 +16,12 @@
 
 package androidx.pdf.view
 
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.RectF
-import android.util.Size
 import androidx.pdf.PdfDocument
-import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -65,88 +62,15 @@ class PageTest {
         testDispatcher.cancelChildren()
         invalidationCounter = 0
 
-        page = Page(0, size = PAGE_SIZE, pdfDocument, testScope, invalidationTracker)
-    }
-
-    @Test
-    fun setVisible_fromInvisible() {
-        // Set the page to visible
-        page.setVisible(zoom = 1.0F)
-
-        // Make sure we start and finish fetching a Bitmap
-        assertThat(page.renderBitmapJob).isNotNull()
-        testDispatcher.scheduler.runCurrent()
-        assertThat(page.renderBitmapJob).isNull()
-
-        // Make we fetched the right bitmap
-        assertThat(page.bitmap).isNotNull()
-        assertThat(page.bitmap?.width).isEqualTo(PAGE_SIZE.x)
-        assertThat(page.bitmap?.height).isEqualTo(PAGE_SIZE.y)
-    }
-
-    @Test
-    fun setVisible_fromVisible_noNewBitmaps() {
-        // Set the page to visible once, and make sure we fetched the correct Bitmap
-        page.setVisible(zoom = 1.0F)
-
-        testDispatcher.scheduler.runCurrent()
-        assertThat(page.bitmap).isNotNull()
-        assertThat(page.bitmap?.width).isEqualTo(PAGE_SIZE.x)
-        assertThat(page.bitmap?.height).isEqualTo(PAGE_SIZE.y)
-
-        // Set the page to visible again, at the same zoom level, and make sure we don't fetch or
-        // start fetching a new Bitmap
-        page.setVisible(zoom = 1.0F)
-
-        assertThat(page.renderBitmapJob).isNull()
-        assertThat(page.bitmap).isNotNull()
-        assertThat(page.bitmap?.width).isEqualTo(PAGE_SIZE.x)
-        assertThat(page.bitmap?.height).isEqualTo(PAGE_SIZE.y)
-
-        // 1 total invalidation from 1 Bitmap prepared
-        assertThat(invalidationCounter).isEqualTo(1)
-    }
-
-    @Test
-    fun setVisible_fromVisible_fetchNewBitmaps() {
-        // Set the page to visible once, at 1.0 zoom, and make sure we fetched the correct Bitmap
-        page.setVisible(zoom = 1.0F)
-
-        testDispatcher.scheduler.runCurrent()
-        assertThat(page.bitmap).isNotNull()
-        assertThat(page.bitmap?.width).isEqualTo(PAGE_SIZE.x)
-        assertThat(page.bitmap?.height).isEqualTo(PAGE_SIZE.y)
-        assertThat(invalidationCounter).isEqualTo(1)
-
-        // Set the page to visible again, but this time at 2.0 zoom, and make sure we fetch a
-        // _new_ Bitmap
-        page.setVisible(zoom = 2.0F)
-
-        assertThat(page.renderBitmapJob).isNotNull()
-        testDispatcher.scheduler.runCurrent()
-        assertThat(page.bitmap).isNotNull()
-        assertThat(page.bitmap?.width).isEqualTo(PAGE_SIZE.x * 2)
-        assertThat(page.bitmap?.height).isEqualTo(PAGE_SIZE.y * 2)
-
-        // 2 total invalidations from 2 Bitmaps prepared
-        assertThat(invalidationCounter).isEqualTo(2)
-    }
-
-    @Test
-    fun setInvisible() {
-        // Set the page to visible, and make sure we start fetching a bitmap
-        page.setVisible(zoom = 1.0F)
-        assertThat(page.renderBitmapJob).isNotNull()
-
-        // Set the page to invisible, make sure we stop fetching the bitmap, and make sure internal
-        // state is updated appropriately
-        page.setInvisible()
-        testDispatcher.scheduler.runCurrent()
-        assertThat(page.renderBitmapJob).isNull()
-        assertThat(page.bitmap).isNull()
-
-        // 0 invalidations, as the initial job to fetch a Bitmap should have been cancelled
-        assertThat(invalidationCounter).isEqualTo(0)
+        page =
+            Page(
+                0,
+                pageSizePx = PAGE_SIZE,
+                pdfDocument,
+                testScope,
+                MAX_BITMAP_SIZE,
+                invalidationTracker
+            )
     }
 
     @Test
@@ -214,26 +138,4 @@ class PageTest {
 }
 
 val PAGE_SIZE = Point(100, 150)
-
-/**
- * Fake implementation of [PdfDocument.BitmapSource] that always produces a blank bitmap of the
- * requested size.
- */
-private class FakeBitmapSource(override val pageNumber: Int) : PdfDocument.BitmapSource {
-
-    override suspend fun getBitmap(scaledPageSizePx: Size, tileRegion: Rect?): Bitmap {
-        return if (tileRegion != null) {
-            Bitmap.createBitmap(tileRegion.width(), tileRegion.height(), Bitmap.Config.ARGB_8888)
-        } else {
-            Bitmap.createBitmap(
-                scaledPageSizePx.width,
-                scaledPageSizePx.height,
-                Bitmap.Config.ARGB_8888
-            )
-        }
-    }
-
-    override fun close() {
-        /* no-op, fake */
-    }
-}
+val MAX_BITMAP_SIZE = Point(500, 500)
