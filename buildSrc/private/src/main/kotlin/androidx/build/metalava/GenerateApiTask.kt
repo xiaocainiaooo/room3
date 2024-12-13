@@ -23,6 +23,7 @@ import androidx.build.java.StandardCompilationInputs
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.file.Directory
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -83,6 +84,8 @@ abstract class GenerateApiTask @Inject constructor(workerExecutor: WorkerExecuto
         return getFilesForApiLevels(projectApiDirectory.asFileTree.files, currentVersion.get())
     }
 
+    @get:Internal abstract val projectDirectory: DirectoryProperty
+
     @TaskAction
     fun exec() {
         check(bootClasspath.files.isNotEmpty()) { "Android boot classpath not set." }
@@ -111,6 +114,8 @@ abstract class GenerateApiTask @Inject constructor(workerExecutor: WorkerExecuto
 
         generateApi(
             metalavaClasspath,
+            projectDirectory.get().asFile,
+            projectXml.orNull?.asFile,
             inputs,
             apiLocation.get(),
             ApiLintMode.CheckBaseline(baselines.get().apiLintFile, targetsJavaConsumers),
