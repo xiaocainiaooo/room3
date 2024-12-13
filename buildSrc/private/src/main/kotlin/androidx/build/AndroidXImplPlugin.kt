@@ -1093,7 +1093,8 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
 
         buildToolsVersion = project.defaultAndroidConfig.buildToolsVersion
 
-        defaultConfig.ndk.abiFilters.addAll(SUPPORTED_BUILD_ABIS)
+        // b/366238650
+        defaultConfig.ndk.abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
         defaultConfig.minSdk = defaultMinSdk
         defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -1445,9 +1446,6 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
         const val TASK_GROUP_API = "API"
 
         const val EXTENSION_NAME = "androidx"
-
-        // b/366238650
-        val SUPPORTED_BUILD_ABIS = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
 
         /** Fail the build if a non-Studio task runs longer than expected */
         const val TASK_TIMEOUT_MINUTES = 60L
