@@ -32,17 +32,13 @@ plugins {
 
 dependencies {
     api(libs.kotlinStdlib)
-
-    def annotationVersion = "1.8.0"
-    def composeVersion = "1.6.8"
-    def profileInstallerVersion = "1.4.0"
-
     api("androidx.annotation:annotation:1.8.1")
+
+    val composeVersion = "1.6.8"
     api("androidx.compose.animation:animation:$composeVersion")
     api("androidx.compose.foundation:foundation:$composeVersion")
     api("androidx.compose.foundation:foundation-layout:$composeVersion")
     api("androidx.compose.runtime:runtime:$composeVersion")
-    api("androidx.compose.material:material-icons-core:$composeVersion")
     api("androidx.compose.ui:ui-util:$composeVersion")
     api("androidx.compose.ui:ui:$composeVersion")
     api("androidx.compose.ui:ui-graphics:$composeVersion")
@@ -55,24 +51,23 @@ dependencies {
     androidTestImplementation(project(":compose:ui:ui-test"))
     androidTestImplementation(project(":compose:ui:ui-test-junit4"))
     androidTestImplementation(project(":compose:test-utils"))
-    androidTestImplementation(project(":test:screenshot:screenshot"))
-    androidTestImplementation(project(":tv:tv-foundation"))
     androidTestImplementation(libs.testRunner)
 }
 
 android {
     compileSdk = 35
-    namespace = "androidx.tv.material"
+    namespace = "androidx.tv.foundation"
 }
 
 androidx {
-    name = "TV Material"
+    name = "TV Foundation"
     type = LibraryType.PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS
-    mavenVersion = LibraryVersions.TV_MATERIAL
+    mavenVersion = LibraryVersions["TV"]
     inceptionYear = "2022"
-    description = "build TV applications using controls that adhere to Material Design Language."
+    description = "This library makes it easier for developers" +
+            "to write Jetpack Compose applications for TV devices by providing " +
+            "functionality to support TV specific devices sizes, shapes and d-pad navigation " +
+            "supported components. It builds upon the Jetpack Compose libraries."
     legacyDisableKotlinStrictApiMode = true
     metalavaK2UastEnabled = false
-    samples(project(":tv:tv-material-samples"))
-    addGoldenImageAssets()
 }
