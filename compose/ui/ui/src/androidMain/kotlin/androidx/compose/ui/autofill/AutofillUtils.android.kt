@@ -22,8 +22,12 @@ import android.view.autofill.AutofillId
 import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillValue
 import androidx.annotation.RequiresApi
+import androidx.collection.MutableIntSet
+import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.ClassName
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.semantics.SemanticsProperties
 
 /**
  * This class is here to ensure that the classes that use this API will get verified and can be AOT
@@ -208,3 +212,23 @@ internal fun Role.toLegacyClassName(): String =
         Role.ValuePicker -> "android.widget.NumberPicker"
         else -> ClassName
     }
+
+internal val SemanticsNode.isRelatedToAutofill: Boolean
+    get() =
+        unmergedConfig.contains(SemanticsProperties.ContentDataType) ||
+            unmergedConfig.contains(SemanticsProperties.ContentType)
+
+internal val LayoutNode.isRelatedToAutofill: Boolean
+    get() =
+        semanticsConfiguration?.contains(SemanticsProperties.ContentDataType) == true ||
+            semanticsConfiguration?.contains(SemanticsProperties.ContentType) == true
+
+// Copy all elements from `other` to `this`.
+internal fun MutableIntSet.copyFrom(other: MutableIntSet) {
+    this.clear()
+    this.addAll(other)
+}
+
+internal fun MutableIntSet.containsAll(other: MutableIntSet): Boolean {
+    return other.all { this.contains(it) }
+}

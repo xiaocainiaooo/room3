@@ -34,6 +34,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -48,9 +49,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalAutofillManager
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -227,13 +228,7 @@ fun RegisterScreenContent() {
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = "Enter your username and password below:")
         Spacer(modifier = Modifier.height(8.dp))
-        BasicTextField(
-            state = remember { TextFieldState() },
-            modifier =
-                Modifier.fillMaxWidth().border(1.dp, Color.LightGray).semantics {
-                    contentType = ContentType.NewUsername
-                }
-        )
+        NavigationDemoTextField(contentType = ContentType.NewUsername)
 
         Spacer(modifier = Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -243,13 +238,7 @@ fun RegisterScreenContent() {
 
         if (showPassword) {
             Spacer(modifier = Modifier.height(8.dp))
-            BasicTextField(
-                state = remember { TextFieldState() },
-                modifier =
-                    Modifier.fillMaxWidth().border(1.dp, Color.LightGray).semantics {
-                        contentType = ContentType.NewPassword
-                    }
-            )
+            NavigationDemoTextField(contentType = ContentType.NewPassword)
         }
     }
 }
@@ -269,21 +258,8 @@ fun LoginScreenContent() {
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = "Enter your username and password below:")
         Spacer(modifier = Modifier.height(8.dp))
-        BasicTextField(
-            state = remember { TextFieldState() },
-            modifier =
-                Modifier.fillMaxWidth().border(1.dp, Color.LightGray).semantics {
-                    contentType = ContentType.Username
-                }
-        )
-
-        BasicTextField(
-            state = remember { TextFieldState() },
-            modifier =
-                Modifier.fillMaxWidth().border(1.dp, Color.LightGray).semantics {
-                    contentType = ContentType.Password
-                }
-        )
+        NavigationDemoTextField(contentType = ContentType.Username)
+        NavigationDemoTextField(contentType = ContentType.Password)
     }
 }
 
@@ -297,13 +273,7 @@ fun ScrollingRegisterScreenContent() {
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = "Enter your username and password below:")
         Spacer(modifier = Modifier.height(8.dp))
-        BasicTextField(
-            state = remember { TextFieldState() },
-            modifier =
-                Modifier.fillMaxWidth().border(1.dp, Color.LightGray).semantics {
-                    contentType = ContentType.NewUsername
-                }
-        )
+        NavigationDemoTextField(contentType = ContentType.NewUsername)
 
         repeat(50) {
             Text(
@@ -313,13 +283,7 @@ fun ScrollingRegisterScreenContent() {
             )
         }
 
-        BasicTextField(
-            state = remember { TextFieldState() },
-            modifier =
-                Modifier.fillMaxWidth().border(1.dp, Color.LightGray).semantics {
-                    contentType = ContentType.NewPassword
-                }
-        )
+        NavigationDemoTextField(contentType = ContentType.NewPassword)
     }
 }
 
@@ -334,21 +298,8 @@ fun RegisterThenScrollScreenContent() {
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = "Enter your username and password below:")
         Spacer(modifier = Modifier.height(8.dp))
-        BasicTextField(
-            state = remember { TextFieldState() },
-            modifier =
-                Modifier.fillMaxWidth().border(1.dp, Color.LightGray).semantics {
-                    contentType = ContentType.NewUsername
-                }
-        )
-
-        BasicTextField(
-            state = remember { TextFieldState() },
-            modifier =
-                Modifier.fillMaxWidth().border(1.dp, Color.LightGray).semantics {
-                    contentType = ContentType.NewPassword
-                }
-        )
+        NavigationDemoTextField(contentType = ContentType.NewUsername)
+        NavigationDemoTextField(contentType = ContentType.NewPassword)
 
         repeat(50) {
             Text(
@@ -364,6 +315,23 @@ fun RegisterThenScrollScreenContent() {
 // Helper functions
 // ============================================================================================
 
+@Composable
+fun NavigationDemoTextField(
+    modifier: Modifier = Modifier,
+    state: TextFieldState = remember { TextFieldState() },
+    contentType: ContentType,
+    textStyle: TextStyle = LocalTextStyle.current.copy(color = Color.White)
+) {
+    BasicTextField(
+        state = state,
+        modifier =
+            modifier.fillMaxWidth().border(1.dp, Color.LightGray).semantics {
+                this.contentType = contentType
+            },
+        textStyle = textStyle
+    )
+}
+
 /** Template scaffold for the navigation demo with two buttons: forward and backwards. */
 @Composable
 fun TwoButtonNavigationScaffold(
@@ -372,8 +340,6 @@ fun TwoButtonNavigationScaffold(
     backwardRoute: String,
     content: @Composable () -> Unit
 ) {
-    val autofillManager = LocalAutofillManager.current
-
     Scaffold(
         content = { padding ->
             Column(modifier = Modifier.fillMaxSize().padding(padding)) {
@@ -392,11 +358,7 @@ fun TwoButtonNavigationScaffold(
 
                 // Navigation Button forwards
                 Button(
-                    onClick = {
-                        navController.navigate(forwardRoute)
-                        // Navigating forwards should commit an autofill context.
-                        autofillManager?.commit()
-                    },
+                    onClick = { navController.navigate(forwardRoute) },
                     modifier = Modifier.align(Alignment.Start)
                 ) {
                     Icon(
