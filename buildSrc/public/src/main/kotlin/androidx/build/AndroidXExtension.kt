@@ -326,6 +326,7 @@ abstract class AndroidXExtension(
     fun isPublishConfigured(): Boolean = (publish != Publish.UNSET || type.publish != Publish.UNSET)
 
     fun shouldPublishSbom(): Boolean {
+        if (isIsolatedProjectsEnabled()) return false
         // IDE plugins are used by and ship inside Studio
         return shouldPublish() || type == LibraryType.IDE_PLUGIN
     }
