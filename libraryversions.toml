@@ -24,7 +24,7 @@ COMPOSE = "1.8.0-alpha07"
 COMPOSE_MATERIAL3 = "1.4.0-alpha05"
 COMPOSE_MATERIAL3_ADAPTIVE = "1.1.0-alpha08"
 COMPOSE_MATERIAL3_COMMON = "1.0.0-alpha01"
-# Adding a comment to prevent merge conflicts
+COMPOSE_MATERIAL3_XR = "1.0.0-alpha01"
 COMPOSE_RUNTIME = "1.8.0-beta01"
 CONSTRAINTLAYOUT = "2.2.0-beta01"
 CONSTRAINTLAYOUT_COMPOSE = "1.1.0-beta01"
@@ -180,6 +180,10 @@ WINDOW_EXTENSIONS_CORE = "1.1.0-alpha01"
 WINDOW_SIDECAR = "1.0.0-rc01"
 WORK = "2.10.0-rc01"
 XR = "1.0.0-alpha01"
+XR_ARCORE = "1.0.0-alpha01"
+XR_COMPOSE = "1.0.0-alpha01"
+XR_RUNTIME = "1.0.0-alpha01"
+XR_SCENECORE = "1.0.0-alpha01"
 
 [groups]
 ACTIVITY = { group = "androidx.activity", atomicGroupVersion = "versions.ACTIVITY" }
@@ -209,6 +213,7 @@ COMPOSE_MATERIAL = { group = "androidx.compose.material" }
 COMPOSE_MATERIAL3 = { group = "androidx.compose.material3", atomicGroupVersion = "versions.COMPOSE_MATERIAL3" }
 COMPOSE_MATERIAL3_ADAPTIVE = { group = "androidx.compose.material3.adaptive", atomicGroupVersion = "versions.COMPOSE_MATERIAL3_ADAPTIVE" }
 COMPOSE_MATERIAL3_ADAPTIVE_NAVIGATION_SUITE = { group = "androidx.compose.material3", atomicGroupVersion = "versions.COMPOSE_MATERIAL3", overrideInclude = [ ":compose:material3:material3-adaptive-navigation-suite" ] }
+COMPOSE_MATERIAL3_XR = { group = "androidx.xr.compose.material3", atomicGroupVersion = "versions.COMPOSE_MATERIAL3_XR" }
 COMPOSE_RUNTIME = { group = "androidx.compose.runtime", atomicGroupVersion = "versions.COMPOSE" }
 COMPOSE_UI = { group = "androidx.compose.ui", atomicGroupVersion = "versions.COMPOSE" }
 CONCURRENT = { group = "androidx.concurrent", atomicGroupVersion = "versions.FUTURES" }
@@ -312,3 +317,7 @@ WINDOW_EXTENSIONS_CORE = { group = "androidx.window.extensions.core", atomicGrou
 WINDOW_SIDECAR = { group = "androidx.window.sidecar", atomicGroupVersion = "versions.WINDOW_SIDECAR" }
 WORK = { group = "androidx.work", atomicGroupVersion = "versions.WORK" }
 XR = { group = "androidx.xr", atomicGroupVersion = "versions.XR" }
+XR_ARCORE = { group = "androidx.xr.arcore", atomicGroupVersion = "versions.XR_ARCORE" }
+XR_COMPOSE = { group = "androidx.xr.compose", atomicGroupVersion = "versions.XR_COMPOSE" }
+XR_RUNTIME = { group = "androidx.xr.runtime", atomicGroupVersion = "versions.XR_RUNTIME" }
+XR_SCENECORE = { group = "androidx.xr.scenecore", atomicGroupVersion = "versions.XR_SCENECORE" }
