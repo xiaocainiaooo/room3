@@ -52,9 +52,9 @@ dependencies {
     androidTestImplementation(libs.espressoCore)
     androidTestImplementation(libs.mockitoCore)
     androidTestImplementation(libs.testUiautomator)
-    androidTestImplementation project(":appcompat:appcompat")
-    androidTestImplementation project(":privacysandbox:ui:ui-provider")
-    androidTestImplementation project(":privacysandbox:ui:integration-tests:testingutils")
+    androidTestImplementation(project(":appcompat:appcompat"))
+    androidTestImplementation(project(":privacysandbox:ui:ui-provider"))
+    androidTestImplementation(project(":privacysandbox:ui:integration-tests:testingutils"))
 }
 
 android {

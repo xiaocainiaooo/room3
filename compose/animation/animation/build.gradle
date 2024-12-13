@@ -129,7 +129,7 @@ androidXMultiplatform {
 }
 
 dependencies {
-    lintPublish project(":compose:animation:animation-lint")
+    lintPublish(project(":compose:animation:animation-lint"))
 }
 
 androidx {

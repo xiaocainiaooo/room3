@@ -54,7 +54,7 @@ androidXMultiplatform {
 
         commonTest {
             dependencies {
-                implementation project(":compose:ui:ui-tooling")
+                implementation(project(":compose:ui:ui-tooling"))
                 implementation(project(":compose:test-utils"))
                 implementation(project(":internal-testutils-paging"))
             }

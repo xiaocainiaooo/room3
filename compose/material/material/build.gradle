@@ -127,8 +127,8 @@ androidXMultiplatform {
 }
 
 dependencies {
-    lintChecks project(":compose:material:material-lint")
-    lintPublish project(":compose:material:material-lint")
+    lintChecks(project(":compose:material:material-lint"))
+    lintPublish(project(":compose:material:material-lint"))
 }
 
 androidx {

@@ -27,8 +27,8 @@ plugins {
 dependencies {
     implementation(libs.kotlinStdlib)
 
-    compileOnly project(":annotation:annotation-sampled")
-    implementation project(":graphics:graphics-core")
+    compileOnly(project(":annotation:annotation-sampled"))
+    implementation(project(":graphics:graphics-core"))
     implementation "androidx.annotation:annotation:1.8.1"
 }
 
