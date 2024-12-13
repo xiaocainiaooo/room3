@@ -48,8 +48,8 @@ import androidx.wear.compose.material3.ArcProgressIndicator
 import androidx.wear.compose.material3.ArcProgressIndicatorDefaults
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.CircularProgressIndicator
-import androidx.wear.compose.material3.CircularProgressIndicatorContent
 import androidx.wear.compose.material3.CircularProgressIndicatorDefaults
+import androidx.wear.compose.material3.CircularProgressIndicatorStatic
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.IconButton
 import androidx.wear.compose.material3.IconButtonDefaults
@@ -165,7 +165,7 @@ fun SmallValuesProgressIndicatorSample() {
 
 @Sampled
 @Composable
-fun CircularProgressIndicatorContentSample() {
+fun CircularProgressIndicatorStaticSample() {
     val progress = remember { mutableFloatStateOf(0f) }
     val animatedProgress = remember { Animatable(0f) }
 
@@ -187,9 +187,9 @@ fun CircularProgressIndicatorContentSample() {
             label = { Text("Animate") },
         )
 
-        // Since CircularProgressIndicatorContent does not have any built-in progress animations,
+        // Since CircularProgressIndicatorStatic does not have any built-in progress animations,
         // we can implement a custom progress animation by using an Animatable progress value.
-        CircularProgressIndicatorContent(
+        CircularProgressIndicatorStatic(
             progress = animatedProgress::value,
             startAngle = 120f,
             endAngle = 60f,
