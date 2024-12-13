@@ -25,6 +25,8 @@ import androidx.annotation.RequiresApi;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.MediumTest;
 import androidx.test.filters.SdkSuppress;
+import androidx.webkit.test.common.WebkitUtils;
+import androidx.webkit.test.common.WebViewOnUiThread;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -50,7 +52,7 @@ public class WebStorageTest {
 
     @Before
     public void setUp() {
-        mWebViewOnUiThread = new androidx.webkit.WebViewOnUiThread();
+        mWebViewOnUiThread = new WebViewOnUiThread();
         mWebViewOnUiThread.getSettings().setCacheMode(LOAD_DEFAULT);
     }
 
