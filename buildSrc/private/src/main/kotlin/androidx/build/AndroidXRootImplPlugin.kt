@@ -101,12 +101,12 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         extra.set("projects", ConcurrentHashMap<String, String>())
 
         /**
-         * Copy PrivacySandbox related APKs into [getTestConfigDirectory] before zipping. Flatten
-         * directory hierarchy as both TradeFed and FTL work with flat hierarchy.
+         * Copy App APKs (from ApkOutputProviders) into [getTestConfigDirectory] before zipping.
+         * Flatten directory hierarchy as both TradeFed and FTL work with flat hierarchy.
          */
         val finalizeConfigsTask =
             project.tasks.register(FINALIZE_TEST_CONFIGS_WITH_APKS_TASK, Copy::class.java) {
-                it.from(project.getPrivacySandboxFilesDirectory())
+                it.from(project.getAppApksFilesDirectory())
                 it.into(project.getTestConfigDirectory())
                 it.eachFile { f -> f.relativePath = RelativePath(true, f.name) }
                 it.includeEmptyDirs = false
