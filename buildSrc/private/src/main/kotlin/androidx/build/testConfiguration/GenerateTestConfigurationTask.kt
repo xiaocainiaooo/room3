@@ -45,36 +45,17 @@ import org.gradle.work.DisableCachingByDefault
 @DisableCachingByDefault(because = "Doesn't benefit from caching")
 abstract class GenerateTestConfigurationTask : DefaultTask() {
 
+    /** File containing [AppApksModel] with list of App APKs to install */
     @get:InputFile
     @get:Optional
-    @get:PathSensitive(PathSensitivity.NAME_ONLY)
-    abstract val appApk: RegularFileProperty
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val appApksModel: RegularFileProperty
 
     /** File existence check to determine whether to run this task. */
     @get:InputFiles
     @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val androidTestSourceCodeCollection: ConfigurableFileCollection
-
-    /**
-     * Extracted APKs for PrivacySandbox SDKs dependencies. Produced by AGP.
-     *
-     * Should be set only for applications with PrivacySandbox SDKs dependencies.
-     */
-    @get:InputFiles
-    @get:Optional
-    @get:PathSensitive(PathSensitivity.NAME_ONLY)
-    abstract val privacySandboxSdkApks: ConfigurableFileCollection
-
-    /**
-     * Extracted splits required for running app with PrivacySandbox SDKs. Produced by AGP.
-     *
-     * Should be set only for applications with PrivacySandbox SDKs dependencies.
-     */
-    @get:InputFiles
-    @get:Optional
-    @get:PathSensitive(PathSensitivity.NAME_ONLY)
-    abstract val privacySandboxAppSplits: ConfigurableFileCollection
 
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NAME_ONLY)
@@ -83,6 +64,9 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     @get:Input abstract val applicationId: Property<String>
 
     @get:Input abstract val minSdk: Property<Int>
+
+    /** Add commands to enable privacy sandbox for test */
+    @get:Input abstract val enablePrivacySandbox: Property<Boolean>
 
     @get:Input abstract val macrobenchmark: Property<Boolean>
 
@@ -118,20 +102,11 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
          */
         val configBuilder = ConfigBuilder()
         configBuilder.configName = outputXml.asFile.get().name
-        if (appApk.isPresent) {
-            val appApkFile = appApk.get().asFile
-            configBuilder.appApkName(appApkFile.name).appApkSha256(sha256(appApkFile))
+        if (appApksModel.isPresent) {
+            val modelJson = appApksModel.get().asFile.readText()
+            val model = AppApksModel.fromJson(modelJson)
+            configBuilder.appApksModel(model)
         }
-
-        val privacySandboxSdkApksFileNames =
-            privacySandboxSdkApks.asFileTree.map { f -> f.name }.sorted()
-        if (privacySandboxSdkApksFileNames.isNotEmpty()) {
-            configBuilder.enablePrivacySandbox(true)
-            configBuilder.initialSetupApks(privacySandboxSdkApksFileNames)
-        }
-        val privacySandboxSplitsFileNames =
-            privacySandboxAppSplits.asFileTree.map { f -> f.name }.sorted()
-        configBuilder.appSplits(privacySandboxSplitsFileNames)
 
         configBuilder.additionalApkKeys(additionalApkKeys.get())
         val isPresubmit = presubmit.get()
@@ -173,6 +148,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             .minSdk(minSdk.get().toString())
             .testRunner(testRunner.get())
             .testApkSha256(sha256(testApkFile))
+            .enablePrivacySandbox(enablePrivacySandbox.get())
         createOrFail(outputXml).writeText(configBuilder.buildXml())
         if (outputJson.isPresent) {
             if (!outputJson.asFile.get().name.startsWith("_")) {
