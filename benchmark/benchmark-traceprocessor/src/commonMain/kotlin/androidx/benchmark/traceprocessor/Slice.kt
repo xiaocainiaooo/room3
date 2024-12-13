@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.benchmark.perfetto
+package androidx.benchmark.traceprocessor
 
 import androidx.annotation.RestrictTo
 
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-data class Slice(val name: String, val ts: Long, val dur: Long) {
+public data class Slice(val name: String, val ts: Long, val dur: Long) {
     val endTs: Long = ts + dur
 
     val frameId: Int?
@@ -38,7 +38,7 @@ data class Slice(val name: String, val ts: Long, val dur: Long) {
             }
     }
 
-    fun contains(targetTs: Long): Boolean {
+    public fun contains(targetTs: Long): Boolean {
         return targetTs >= ts && targetTs <= (ts + dur)
     }
 }
@@ -47,5 +47,6 @@ data class Slice(val name: String, val ts: Long, val dur: Long) {
  * Convenient function to immediately retrieve a list of slices. Note that this method is provided
  * for convenience.
  */
-internal fun Sequence<Row>.toSlices(): List<Slice> =
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+public fun Sequence<Row>.toSlices(): List<Slice> =
     map { Slice(name = it.string("name"), ts = it.long("ts"), dur = it.long("dur")) }.toList()
