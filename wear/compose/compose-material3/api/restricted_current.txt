@@ -59,15 +59,15 @@ package androidx.wear.compose.material3 {
 
   public final class ArcProgressIndicatorDefaults {
     method public float calculateRecommendedGapSize(float strokeWidth);
+    method public float getIndeterminateEndAngle();
+    method public float getIndeterminateStartAngle();
     method public float getIndeterminateStrokeWidth();
     method @androidx.compose.runtime.Composable public float getRecommendedIndeterminateDiameter();
-    property public static final float IndeterminateEndAngle;
-    property public static final float IndeterminateStartAngle;
+    property public final float IndeterminateEndAngle;
+    property public final float IndeterminateStartAngle;
     property public final float IndeterminateStrokeWidth;
     property @androidx.compose.runtime.Composable public final float recommendedIndeterminateDiameter;
     field public static final androidx.wear.compose.material3.ArcProgressIndicatorDefaults INSTANCE;
-    field public static final float IndeterminateEndAngle = 118.0f;
-    field public static final float IndeterminateStartAngle = 62.0f;
   }
 
   public final class ArcProgressIndicatorKt {
