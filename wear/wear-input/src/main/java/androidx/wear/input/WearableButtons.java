@@ -21,7 +21,7 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RotateDrawable;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
 
@@ -254,33 +254,40 @@ public final class WearableButtons {
         // Get the screen size for the locationZone
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Point screenSize = new Point();
-        wm.getDefaultDisplay().getSize(screenSize);
+        Display display = wm.getDefaultDisplay();
+        display.getSize(screenSize);
+        int rotation = display.getRotation();
 
-        if (isLeftyModeEnabled(context)) {
-            // By default, the rotated placement is exactly the opposite.
-            // This may be overridden if there is a remapping of buttons applied as well.
-            float screenRotatedX = screenSize.x - screenLocationX;
-            float screenRotatedY = screenSize.y - screenLocationY;
-
-            if (bundle.containsKey(X_KEY_ROTATED) && bundle.containsKey(Y_KEY_ROTATED)) {
-                screenRotatedX = bundle.getFloat(X_KEY_ROTATED);
-                screenRotatedY = bundle.getFloat(Y_KEY_ROTATED);
-            }
-
-            screenLocationX = screenRotatedX;
-            screenLocationY = screenRotatedY;
+        float screenRotatedX = screenLocationX;
+        float screenRotatedY = screenLocationY;
+        switch (rotation) {
+            case Surface.ROTATION_90:
+                screenLocationX = (screenRotatedY - screenSize.y / 2f) + screenSize.x / 2f;
+                screenLocationY = -(screenRotatedX - screenSize.x / 2f) + screenSize.y / 2f;
+                break;
+            case Surface.ROTATION_180:
+                if (bundle.containsKey(X_KEY_ROTATED) && bundle.containsKey(Y_KEY_ROTATED)) {
+                    // Override if there is a remapping of buttons applied as well.
+                    screenLocationX = bundle.getFloat(X_KEY_ROTATED);
+                    screenLocationY = bundle.getFloat(Y_KEY_ROTATED);
+                } else {
+                    // By default, the rotated placement is exactly the opposite.
+                    screenLocationX = screenSize.x - screenRotatedX;
+                    screenLocationY = screenSize.y - screenRotatedY;
+                }
+                break;
+            case Surface.ROTATION_270:
+                screenLocationX = -(screenRotatedY - screenSize.y / 2f) + screenSize.x / 2f;
+                screenLocationY = (screenRotatedX - screenSize.x / 2f) + screenSize.y / 2f;
+                break;
         }
 
         boolean isRound = context.getResources().getConfiguration().isScreenRound();
-
-        ButtonInfo info =
-                new ButtonInfo(
-                        keycode,
-                        screenLocationX,
-                        screenLocationY,
-                        getLocationZone(isRound, screenSize, screenLocationX, screenLocationY));
-
-        return info;
+        return new ButtonInfo(
+                keycode,
+                screenLocationX,
+                screenLocationY,
+                getLocationZone(isRound, screenSize, screenLocationX, screenLocationY));
     }
 
     /**
@@ -715,14 +722,6 @@ public final class WearableButtons {
         } else {
             return 2;
         }
-    }
-
-    private static boolean isLeftyModeEnabled(Context context) {
-        return Settings.System.getInt(
-                        context.getContentResolver(),
-                        Settings.System.USER_ROTATION,
-                        Surface.ROTATION_0)
-                == Surface.ROTATION_180;
     }
 
     /** Metadata for a specific button. */
