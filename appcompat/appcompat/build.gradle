@@ -79,11 +79,6 @@ android {
         // This disables the builds tools automatic vector -> PNG generation
         generatedDensities = []
     }
-
-    sourceSets {
-        main.res.srcDirs += "src/main/res-public"
-    }
-
     aaptOptions {
         additionalParameters "--no-version-vectors"
         noCompress "ttf"

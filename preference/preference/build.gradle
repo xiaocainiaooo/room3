@@ -46,13 +46,6 @@ dependencies {
 }
 
 android {
-    sourceSets {
-        main.res.srcDirs = [
-                "res",
-                "res-public"
-        ]
-    }
-
     defaultConfig {
         vectorDrawables.useSupportLibrary = true
     }
