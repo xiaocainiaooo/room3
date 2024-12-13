@@ -30,7 +30,7 @@ plugins {
 }
 
 dependencies {
-    api project(":work:work-runtime")
+    api(project(":work:work-runtime"))
 }
 
 androidx {

@@ -38,7 +38,7 @@ android {
 }
 
 dependencies {
-    api project(":work:work-runtime")
+    api(project(":work:work-runtime"))
     api(libs.kotlinStdlib)
     api(libs.kotlinCoroutinesAndroid)
     api(libs.guavaListenableFuture)

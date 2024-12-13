@@ -35,10 +35,10 @@ android {
 dependencies {
     api(libs.kotlinStdlib)
     api("androidx.annotation:annotation:1.8.1")
-    implementation project(":privacysandbox:sdkruntime:sdkruntime-provider")
-    implementation project(":privacysandbox:ui:integration-tests:testaidl")
-    implementation project(":privacysandbox:ui:integration-tests:sdkproviderutils")
-    implementation project(":privacysandbox:ui:ui-core")
-    implementation project(":privacysandbox:ui:ui-provider")
-    implementation project(":webkit:webkit")
+    implementation(project(":privacysandbox:sdkruntime:sdkruntime-provider"))
+    implementation(project(":privacysandbox:ui:integration-tests:testaidl"))
+    implementation(project(":privacysandbox:ui:integration-tests:sdkproviderutils"))
+    implementation(project(":privacysandbox:ui:ui-core"))
+    implementation(project(":privacysandbox:ui:ui-provider"))
+    implementation(project(":webkit:webkit"))
 }
