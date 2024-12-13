@@ -115,8 +115,8 @@ public class CoordinatorLayout extends ViewGroup implements NestedScrollingParen
         NestedScrollingParent3 {
     static final String TAG = "CoordinatorLayout";
     static final String WIDGET_PACKAGE_NAME;
-    // For the UP/DOWN keys, we scroll 1/10th of the screen.
-    private static final float KEY_SCROLL_FRACTION_AMOUNT = 0.1f;
+    // For the UP/DOWN keys, we scroll 20% of the screen.
+    private static final float KEY_SCROLL_FRACTION_AMOUNT = 0.2f;
 
     static {
         final Package pkg = CoordinatorLayout.class.getPackage();
@@ -2087,6 +2087,16 @@ public class CoordinatorLayout extends ViewGroup implements NestedScrollingParen
                 ViewCompat.TYPE_NON_TOUCH
         );
 
+        onNestedPreScroll(
+                focusedView,
+                0,
+                yScrollDelta,
+                mKeyTriggeredScrollConsumed,
+                ViewCompat.TYPE_NON_TOUCH
+        );
+
+        int yScrollDeltaConsumed = mKeyTriggeredScrollConsumed[1];
+
         // Reset consumed values to zero.
         mKeyTriggeredScrollConsumed[0] = 0;
         mKeyTriggeredScrollConsumed[1] = 0;
@@ -2094,7 +2104,7 @@ public class CoordinatorLayout extends ViewGroup implements NestedScrollingParen
         onNestedScroll(
                 focusedView,
                 0,
-                0,
+                yScrollDeltaConsumed,
                 0,
                 yScrollDelta,
                 ViewCompat.TYPE_NON_TOUCH,
