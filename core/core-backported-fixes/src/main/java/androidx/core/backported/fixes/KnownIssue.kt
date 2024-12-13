@@ -17,9 +17,31 @@
 package androidx.core.backported.fixes
 
 /** List of all known issue reportable by [BackportedFixManager] */
-internal class KnownIssue private constructor(val id: Long, val alias: Int) {
+internal class KnownIssue
+private constructor(
+
+    /**
+     * The public id of this issue in the [Google Issue Tracker](https://issuetracker.google.com)
+     */
+    val id: Long,
+    /**
+     * The alias for this issue, if one exists.
+     *
+     * Known issues can have at most one alias.
+     *
+     * The value 0 indicates there is no alias for this issue. Non-zero alias values are unique
+     * across all known issues.
+     */
+    val alias: Int
+) {
     // TODO b/381266031 - Make public
     // TODO b/381267367 - Add link to public list issues
+
+    /**
+     * The url to the [Google Issue Tracker](https://issuetracker.google.com) for this known issue.
+     */
+    internal val url = "https://issuetracker.google.com/issues/$id"
+
     override fun equals(other: Any?) = other is KnownIssue && id == other.id
 
     override fun hashCode() = id.hashCode()
