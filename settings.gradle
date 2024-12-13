@@ -188,13 +188,35 @@ private String getRequestedProjectSubsetName() {
     return null
 }
 
-private String getRequestedProjectPrefix() {
-    def envProp = providers.environmentVariable("PROJECT_PREFIX")
-    if (envProp.isPresent()) {
-        return envProp.get()
+/**
+ * Utility class to handle PROJECT_PREFIX environment variable.
+ */
+class ProjectPrefixFilter {
+    // list of projects parsed from the PROJECT_PREFIX env environmentVariable
+    private final List<String> projectPrefixes
+    // set to true if the environment variable is present
+    final boolean isConfigured
+    ProjectPrefixFilter(providers) {
+        def envProp = providers.environmentVariable("PROJECT_PREFIX")
+        if (envProp.isPresent()) {
+            isConfigured = true
+            def value = envProp.get()
+            projectPrefixes = value?.split(',')?.collect { it.trim() } ?: []
+        } else {
+            isConfigured = false
+            projectPrefixes = []
+        }
     }
-    return null
+
+
+    boolean matches(String name) {
+        return projectPrefixes.any { prefix ->
+            name.startsWith(prefix)
+        }
+    }
 }
+ext.projectPrefixFilter = new ProjectPrefixFilter(providers)
+
 
 boolean isAllProjects() {
     return requestedProjectSubsetName == null || requestedProjectSubsetName == "ALL"
@@ -313,9 +335,13 @@ filteredProjects.add(":lint-checks")
 //   the Maven artifactId
 //
 def includeProject(String name, filePath, List<BuildType> filter = []) {
-    if (getRequestedProjectPrefix() != null) {
-        if (name.startsWith(getRequestedProjectPrefix())) filteredProjects.add(name)
-    } else if (shouldIncludeForFilter(filter)) filteredProjects.add(name)
+    if (projectPrefixFilter.isConfigured) {
+        if (projectPrefixFilter.matches(name)) {
+            filteredProjects.add(name)
+        }
+    } else if (shouldIncludeForFilter(filter)) {
+        filteredProjects.add(name)
+    }
     def file
     if (filePath != null) {
         if (filePath instanceof String) {
