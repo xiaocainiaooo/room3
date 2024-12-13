@@ -92,7 +92,7 @@ fun Project.parse(): ProjectParser.ParsedProject {
 
 fun Project.parseBuildFile(buildFile: File): ProjectParser.ParsedProject {
     val parserProvider =
-        project.rootProject.gradle.sharedServices.registerIfAbsent(
+        project.gradle.sharedServices.registerIfAbsent(
             "ProjectParser",
             ProjectParser::class.java
         ) {}
