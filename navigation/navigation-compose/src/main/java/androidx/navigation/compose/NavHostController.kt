@@ -17,7 +17,6 @@
 package androidx.navigation.compose
 
 import android.content.Context
-import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -76,7 +75,7 @@ private fun createNavController(context: Context) =
 
 /** Saver to save and restore the NavController across config change and process death. */
 private fun NavControllerSaver(context: Context): Saver<NavHostController, *> =
-    Saver<NavHostController, Bundle>(
+    Saver(
         save = { it.saveState() },
         restore = { createNavController(context).apply { restoreState(it) } }
     )
