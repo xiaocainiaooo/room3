@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import androidx.activity.ComponentActivity
+import androidx.annotation.RestrictTo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -48,6 +49,7 @@ private val activityToSpatialComposeScene = mutableMapOf<Activity, SpatialCompos
  *   it is not. Should only be used for testing, it will cause crashes on non-Android XR devices.
  * @param content A `@Composable` function declaring the spatial UI content.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun ComponentActivity.setSubspaceContent(
     session: Session? = null,
     enableXrForTesting: Boolean = false,

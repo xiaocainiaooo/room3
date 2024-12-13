@@ -16,6 +16,7 @@
 
 package androidx.xr.compose.subspace.layout
 
+import androidx.annotation.RestrictTo
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.xr.compose.subspace.node.SubspaceModifierElement
 
@@ -31,6 +32,7 @@ import androidx.xr.compose.subspace.node.SubspaceModifierElement
  * you are using the [LayoutVolumeCoordinates] to calculate position on the screen, and not just
  * inside the window, you may not receive a callback.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun SubspaceModifier.onGloballyPositioned(
     onGloballyPositioned: (SubspaceLayoutCoordinates) -> Unit
 ): SubspaceModifier = this then OnGloballyPositionedVolumeElement(onGloballyPositioned)
@@ -58,5 +60,6 @@ private class OnGloballyPositionedVolumeElement(
 }
 
 /** Node associated with [onGloballyPositioned]. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class OnGloballyPositionedNode(public var callback: (SubspaceLayoutCoordinates) -> Unit) :
     SubspaceModifier.Node()

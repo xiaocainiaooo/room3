@@ -22,6 +22,7 @@ import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.annotation.RestrictTo
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -50,6 +51,7 @@ import androidx.xr.scenecore.PanelEntity
 private const val DEFAULT_SIZE_PX = 400
 
 /** Contains default values used by spatial panels. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public object SpatialPanelDefaults {
 
     /** Default shape for a Spatial Panel. */
@@ -67,6 +69,7 @@ public object SpatialPanelDefaults {
  */
 @Composable
 @SubspaceComposable
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun SpatialPanel(
     view: View,
     modifier: SubspaceModifier = SubspaceModifier,
@@ -87,6 +90,7 @@ public fun SpatialPanel(
  */
 @Composable
 @SubspaceComposable
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun SpatialPanel(
     modifier: SubspaceModifier = SubspaceModifier,
     name: String = defaultSpatialPanelName(),
@@ -126,6 +130,7 @@ public fun SpatialPanel(
  */
 @Composable
 @SubspaceComposable
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun MainPanel(
     modifier: SubspaceModifier = SubspaceModifier,
     shape: SpatialShape = SpatialPanelDefaults.shape,
@@ -156,6 +161,7 @@ public fun MainPanel(
  */
 @Composable
 @SubspaceComposable
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun SpatialPanel(
     intent: Intent,
     modifier: SubspaceModifier = SubspaceModifier,

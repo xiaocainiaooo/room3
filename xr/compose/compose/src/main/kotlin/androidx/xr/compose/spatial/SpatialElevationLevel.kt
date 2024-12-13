@@ -16,6 +16,7 @@
 
 package androidx.xr.compose.spatial
 
+import androidx.annotation.RestrictTo
 import androidx.compose.ui.unit.dp
 import androidx.xr.compose.unit.toMeter
 
@@ -30,6 +31,7 @@ import androidx.xr.compose.unit.toMeter
  * Values are expressed in meters for consistency with spatial positioning.
  */
 @JvmInline
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public value class SpatialElevationLevel internal constructor(public val level: Float) {
     public companion object {
         internal val ActivityDefault = SpatialElevationLevel(0f)

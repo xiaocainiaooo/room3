@@ -16,6 +16,7 @@
 
 package androidx.xr.runtime.openxr
 
+import androidx.annotation.RestrictTo
 import androidx.xr.runtime.internal.Anchor
 import androidx.xr.runtime.internal.Plane
 import androidx.xr.runtime.internal.TrackingState
@@ -23,6 +24,7 @@ import androidx.xr.runtime.math.Pose
 import androidx.xr.runtime.math.Vector2
 
 /** Wraps the native [XrTrackableANDROID] with the [Plane] interface. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class OpenXrPlane
 internal constructor(
     internal val planeId: Long,

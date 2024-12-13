@@ -16,12 +16,14 @@
 
 package androidx.xr.runtime.testing
 
+import androidx.annotation.RestrictTo
 import androidx.xr.runtime.internal.Anchor as RuntimeAnchor
 import androidx.xr.runtime.internal.TrackingState
 import androidx.xr.runtime.math.Pose
 import java.util.UUID
 
 /** Test-only implementation of [RuntimeAnchor] */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class FakeRuntimeAnchor(
     override var pose: Pose,
     public val anchorHolder: AnchorHolder? = null,

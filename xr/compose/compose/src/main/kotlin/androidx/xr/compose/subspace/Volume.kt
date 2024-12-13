@@ -16,6 +16,7 @@
 
 package androidx.xr.compose.subspace
 
+import androidx.annotation.RestrictTo
 import androidx.compose.runtime.Composable
 import androidx.xr.compose.subspace.layout.SubspaceLayout
 import androidx.xr.compose.subspace.layout.SubspaceModifier
@@ -35,6 +36,7 @@ import androidx.xr.scenecore.Entity
  */
 @Composable
 @SubspaceComposable
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun Volume(
     modifier: SubspaceModifier = SubspaceModifier,
     name: String = defaultVolumeName(),

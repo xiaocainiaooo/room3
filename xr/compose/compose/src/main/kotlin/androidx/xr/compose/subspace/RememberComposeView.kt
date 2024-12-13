@@ -16,6 +16,7 @@
 
 package androidx.xr.compose.subspace
 
+import androidx.annotation.RestrictTo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ import java.util.UUID
  * This handles propagating the composition context and ensures that savable state is remembered.
  */
 @Composable
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun rememberComposeView(content: @Composable () -> Unit): ComposeView {
     val localId = rememberSaveable { UUID.randomUUID() }
     val context = LocalContext.current

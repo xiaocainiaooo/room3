@@ -17,6 +17,7 @@
 package androidx.xr.scenecore
 
 import android.util.Log
+import androidx.annotation.RestrictTo
 import androidx.xr.runtime.math.Pose
 
 /**
@@ -25,6 +26,7 @@ import androidx.xr.runtime.math.Pose
  * A ActivityPose contains a pose in activity space and it's pose can be transformed into a pose
  * relative to another ActivityPose.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public interface ActivityPose {
 
     /**
@@ -49,6 +51,7 @@ public interface ActivityPose {
  * The BaseActivityPose is an implementation of ActivityPose interface that wraps a platformAdapter
  * ActivityPose.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public sealed class BaseActivityPose<out RtActivityPoseType : JxrPlatformAdapter.ActivityPose>(
     internal val rtActivityPose: RtActivityPoseType
 ) : ActivityPose {
@@ -70,6 +73,7 @@ public sealed class BaseActivityPose<out RtActivityPoseType : JxrPlatformAdapter
 }
 
 /** A ActivityPose which tracks a camera's position and view into physical space. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class CameraView
 private constructor(
     private val rtCameraViewActivityPose: JxrPlatformAdapter.CameraViewActivityPose
@@ -119,6 +123,7 @@ private constructor(
  * Head is a ActivityPose used to track the position of the user's head. If there is a left and
  * right camera it is calculated as the position bettween the two.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class Head private constructor(rtActivityPose: JxrPlatformAdapter.HeadActivityPose) :
     BaseActivityPose<JxrPlatformAdapter.HeadActivityPose>(rtActivityPose) {
 
@@ -135,6 +140,7 @@ public class Head private constructor(rtActivityPose: JxrPlatformAdapter.HeadAct
  * PerceptionSpace is ActivityPose used to track the origin of the space used by ARCore for XR APIs.
  */
 // TODO: b/360870690 - Remove suppression annotation when API council review is complete.
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class PerceptionSpace
 private constructor(rtActivityPose: JxrPlatformAdapter.PerceptionSpaceActivityPose) :
     BaseActivityPose<JxrPlatformAdapter.PerceptionSpaceActivityPose>(rtActivityPose) {

@@ -16,6 +16,7 @@
 
 package androidx.xr.compose.subspace.node
 
+import androidx.annotation.RestrictTo
 import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.xr.compose.subspace.layout.CoreEntity
 import androidx.xr.compose.unit.IntVolumeSize
@@ -30,6 +31,7 @@ import androidx.xr.scenecore.Component
  * one layout node. It also contains the "collapsed" configuration of any other semantics modifiers
  * on the same layout node.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class SubspaceSemanticsNode
 internal constructor(private val layoutNode: SubspaceLayoutNode) {
     /** The unique ID of this semantics node. */
