@@ -110,6 +110,8 @@ internal class CaptureSessionState(
         CLOSED
     }
 
+    private val sessionDisconnected = CountDownLatch(1)
+
     @GuardedBy("lock") private var hasAttemptedCaptureSession = false
     private val captureSessionAttemptCompleted = CountDownLatch(1)
 
@@ -193,6 +195,13 @@ internal class CaptureSessionState(
         Log.debug { "$this session disconnecting" }
         Debug.traceStart { "$this#onSessionDisconnected" }
         disconnect()
+        // Important: CaptureSessionState can be disconnected on a separate path, and we may lose
+        // the race if another disconnect call was invoked in parallel. When that happens, we get
+        // an early return, but the winning disconnect call may still be in the process of
+        // disconnecting - notably doing stopRepeating() and abortCaptures(). We wait here such
+        // that we don't prematurely create a new capture session, which would close the capture
+        // session that is still being disconnected. See b/383434693 for details.
+        Debug.trace("$this#onSessionDisconnected Await") { sessionDisconnected.await() }
         Debug.traceStop()
     }
 
@@ -281,7 +290,7 @@ internal class CaptureSessionState(
 
         synchronized(lock) {
             if (state == State.CLOSING || state == State.CLOSED) {
-                return@synchronized
+                return
             }
             state = State.CLOSING
 
@@ -396,6 +405,9 @@ internal class CaptureSessionState(
             graphListener.onGraphStopped(null)
             Debug.traceStop()
         }
+
+        /** Do not remove - see [onSessionDisconnected] for details. */
+        sessionDisconnected.countDown()
     }
 
     /**
