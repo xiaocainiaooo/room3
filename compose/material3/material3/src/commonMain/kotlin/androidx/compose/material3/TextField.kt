@@ -16,9 +16,16 @@
 
 package androidx.compose.material3
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.VectorConverter
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.AnimationVector4D
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.snap
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
@@ -41,6 +48,7 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits.MultiLine
 import androidx.compose.foundation.text.input.TextFieldLineLimits.SingleLine
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.material3.TextFieldDefaults.defaultTextFieldColors
 import androidx.compose.material3.internal.AboveLabelBottomPadding
 import androidx.compose.material3.internal.AboveLabelHorizontalPadding
 import androidx.compose.material3.internal.ContainerId
@@ -67,15 +75,17 @@ import androidx.compose.material3.internal.minimizedLabelHalfHeight
 import androidx.compose.material3.internal.subtractConstraintSafely
 import androidx.compose.material3.internal.textFieldHorizontalIconPadding
 import androidx.compose.material3.internal.widthOrZero
+import androidx.compose.material3.tokens.FilledTextFieldTokens
+import androidx.compose.material3.tokens.MotionSchemeKeyTokens
 import androidx.compose.material3.tokens.MotionTokens.EasingEmphasizedAccelerateCubicBezier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.CacheDrawModifierNode
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
@@ -90,6 +100,11 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.node.CompositionLocalConsumerModifierNode
+import androidx.compose.ui.node.DelegatingNode
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.node.currentValueOf
+import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -113,6 +128,8 @@ import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.lerp
 import kotlin.math.max
 import kotlin.math.roundToInt
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 /**
  * <a href="https://m3.material.io/components/text-fields/overview" class="external"
@@ -1400,44 +1417,242 @@ private class TextFieldMeasurePolicy(
     }
 }
 
-/** A draw modifier that draws a bottom indicator line in [TextField] */
-internal fun Modifier.drawIndicatorLine(
-    indicatorBorder: State<BorderStroke>,
-    textFieldShape: Shape,
-): Modifier {
-    return drawWithCache {
-        val strokeWidth = indicatorBorder.value.width.toPx()
-        val textFieldShapePath =
-            Path().apply {
-                addOutline(
-                    textFieldShape.createOutline(
-                        size,
-                        layoutDirection,
-                        density = this@drawWithCache
-                    )
-                )
-            }
-        val linePath =
-            Path().apply {
-                addRect(
-                    Rect(
-                        left = 0f,
-                        top = size.height - strokeWidth,
-                        right = size.width,
-                        bottom = size.height,
-                    )
-                )
-            }
-        val clippedLine = linePath and textFieldShapePath
+internal data class IndicatorLineElement(
+    val enabled: Boolean,
+    val isError: Boolean,
+    val interactionSource: InteractionSource,
+    val colors: TextFieldColors?,
+    val textFieldShape: Shape?,
+    val focusedIndicatorLineThickness: Dp,
+    val unfocusedIndicatorLineThickness: Dp,
+) : ModifierNodeElement<IndicatorLineNode>() {
+    override fun create(): IndicatorLineNode {
+        return IndicatorLineNode(
+            enabled = enabled,
+            isError = isError,
+            interactionSource = interactionSource,
+            colors = colors,
+            textFieldShape = textFieldShape,
+            focusedIndicatorWidth = focusedIndicatorLineThickness,
+            unfocusedIndicatorWidth = unfocusedIndicatorLineThickness,
+        )
+    }
 
-        onDrawWithContent {
-            drawContent()
-            drawPath(
-                path = clippedLine,
-                brush = indicatorBorder.value.brush,
+    override fun update(node: IndicatorLineNode) {
+        node.update(
+            enabled = enabled,
+            isError = isError,
+            interactionSource = interactionSource,
+            colors = colors,
+            textFieldShape = textFieldShape,
+            focusedIndicatorWidth = focusedIndicatorLineThickness,
+            unfocusedIndicatorWidth = unfocusedIndicatorLineThickness,
+        )
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "indicatorLine"
+        properties["enabled"] = enabled
+        properties["isError"] = isError
+        properties["interactionSource"] = interactionSource
+        properties["colors"] = colors
+        properties["textFieldShape"] = textFieldShape
+        properties["focusedIndicatorLineThickness"] = focusedIndicatorLineThickness
+        properties["unfocusedIndicatorLineThickness"] = unfocusedIndicatorLineThickness
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+internal class IndicatorLineNode(
+    private var enabled: Boolean,
+    private var isError: Boolean,
+    private var interactionSource: InteractionSource,
+    colors: TextFieldColors?,
+    textFieldShape: Shape?,
+    private var focusedIndicatorWidth: Dp,
+    private var unfocusedIndicatorWidth: Dp,
+) : DelegatingNode(), CompositionLocalConsumerModifierNode {
+    private var focused = false
+    private var trackFocusStateJob: Job? = null
+
+    private var _colors: TextFieldColors? = colors
+    private val colors: TextFieldColors
+        get() =
+            _colors
+                ?: currentValueOf(LocalColorScheme)
+                    .defaultTextFieldColors(currentValueOf(LocalTextSelectionColors))
+
+    // Must be initialized in `onAttach` so `colors` can read from the `MaterialTheme`
+    private var colorAnimatable: Animatable<Color, AnimationVector4D>? = null
+
+    private var _shape: Shape? = textFieldShape
+        private set(value) {
+            if (field != value) {
+                field = value
+                drawWithCacheModifierNode.invalidateDrawCache()
+            }
+        }
+
+    private val shape: Shape
+        get() =
+            _shape ?: currentValueOf(LocalShapes).fromToken(FilledTextFieldTokens.ContainerShape)
+
+    private val widthAnimatable: Animatable<Dp, AnimationVector1D> =
+        Animatable(
+            initialValue =
+                if (focused && this.enabled) this.focusedIndicatorWidth
+                else this.unfocusedIndicatorWidth,
+            typeConverter = Dp.VectorConverter,
+        )
+
+    fun update(
+        enabled: Boolean,
+        isError: Boolean,
+        interactionSource: InteractionSource,
+        colors: TextFieldColors?,
+        textFieldShape: Shape?,
+        focusedIndicatorWidth: Dp,
+        unfocusedIndicatorWidth: Dp,
+    ) {
+        var shouldInvalidate = false
+
+        if (this.enabled != enabled) {
+            this.enabled = enabled
+            shouldInvalidate = true
+        }
+
+        if (this.isError != isError) {
+            this.isError = isError
+            shouldInvalidate = true
+        }
+
+        if (this.interactionSource !== interactionSource) {
+            this.interactionSource = interactionSource
+            trackFocusStateJob?.cancel()
+            trackFocusStateJob = coroutineScope.launch { trackFocusState() }
+        }
+
+        if (this._colors != colors) {
+            this._colors = colors
+            shouldInvalidate = true
+        }
+
+        if (this._shape != textFieldShape) {
+            this._shape = textFieldShape
+            shouldInvalidate = true
+        }
+
+        if (this.focusedIndicatorWidth != focusedIndicatorWidth) {
+            this.focusedIndicatorWidth = focusedIndicatorWidth
+            shouldInvalidate = true
+        }
+
+        if (this.unfocusedIndicatorWidth != unfocusedIndicatorWidth) {
+            this.unfocusedIndicatorWidth = unfocusedIndicatorWidth
+            shouldInvalidate = true
+        }
+
+        if (shouldInvalidate) {
+            invalidateIndicator()
+        }
+    }
+
+    override val shouldAutoInvalidate: Boolean
+        get() = false
+
+    override fun onAttach() {
+        trackFocusStateJob = coroutineScope.launch { trackFocusState() }
+        if (colorAnimatable == null) {
+            val initialColor = colors.indicatorColor(enabled, isError, focused)
+            colorAnimatable =
+                Animatable(
+                    initialValue = initialColor,
+                    typeConverter = Color.VectorConverter(initialColor.colorSpace),
+                )
+        }
+    }
+
+    /** Copied from [InteractionSource.collectIsFocusedAsState] */
+    private suspend fun trackFocusState() {
+        focused = false
+        val focusInteractions = mutableListOf<FocusInteraction.Focus>()
+        interactionSource.interactions.collect { interaction ->
+            when (interaction) {
+                is FocusInteraction.Focus -> focusInteractions.add(interaction)
+                is FocusInteraction.Unfocus -> focusInteractions.remove(interaction.focus)
+            }
+            val isFocused = focusInteractions.isNotEmpty()
+            if (isFocused != focused) {
+                focused = isFocused
+                invalidateIndicator()
+            }
+        }
+    }
+
+    private fun invalidateIndicator() {
+        coroutineScope.launch {
+            colorAnimatable?.animateTo(
+                targetValue = colors.indicatorColor(enabled, isError, focused),
+                animationSpec =
+                    if (enabled) {
+                        currentValueOf(LocalMotionScheme)
+                            .fromToken(MotionSchemeKeyTokens.FastEffects)
+                    } else {
+                        snap()
+                    },
+            )
+        }
+        coroutineScope.launch {
+            widthAnimatable.animateTo(
+                targetValue =
+                    if (focused && enabled) focusedIndicatorWidth else unfocusedIndicatorWidth,
+                animationSpec =
+                    if (enabled) {
+                        currentValueOf(LocalMotionScheme)
+                            .fromToken(MotionSchemeKeyTokens.FastSpatial)
+                    } else {
+                        snap()
+                    },
             )
         }
     }
+
+    private val drawWithCacheModifierNode =
+        delegate(
+            CacheDrawModifierNode {
+                val strokeWidth = widthAnimatable.value.toPx()
+                val textFieldShapePath =
+                    Path().apply {
+                        addOutline(
+                            this@IndicatorLineNode.shape.createOutline(
+                                size,
+                                layoutDirection,
+                                density = this@CacheDrawModifierNode
+                            )
+                        )
+                    }
+                val linePath =
+                    Path().apply {
+                        addRect(
+                            Rect(
+                                left = 0f,
+                                top = size.height - strokeWidth,
+                                right = size.width,
+                                bottom = size.height,
+                            )
+                        )
+                    }
+                val clippedLine = linePath and textFieldShapePath
+
+                onDrawWithContent {
+                    drawContent()
+                    drawPath(
+                        path = clippedLine,
+                        brush = SolidColor(colorAnimatable!!.value),
+                    )
+                }
+            }
+        )
 }
 
 /** Padding from text field top to label top, and from input field bottom to text field bottom */
