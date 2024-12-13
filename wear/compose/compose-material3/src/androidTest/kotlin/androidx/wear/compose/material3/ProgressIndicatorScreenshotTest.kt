@@ -180,7 +180,7 @@ class ProgressIndicatorScreenshotTest {
     @Test
     fun circular_progress_indicator_content(@TestParameter screenSize: ScreenSize) =
         verifyProgressIndicatorScreenshot(screenSize = screenSize) {
-            CircularProgressIndicatorContent(
+            CircularProgressIndicatorStatic(
                 progress = { 0.25f },
                 modifier = Modifier.aspectRatio(1f).testTag(TEST_TAG),
                 startAngle = 120f,
@@ -191,7 +191,7 @@ class ProgressIndicatorScreenshotTest {
     @Test
     fun circular_progress_indicator_content_overflow(@TestParameter screenSize: ScreenSize) =
         verifyProgressIndicatorScreenshot(screenSize = screenSize) {
-            CircularProgressIndicatorContent(
+            CircularProgressIndicatorStatic(
                 progress = { 1.2f },
                 modifier = Modifier.aspectRatio(1f).testTag(TEST_TAG),
                 startAngle = 120f,
@@ -203,7 +203,7 @@ class ProgressIndicatorScreenshotTest {
     @Test
     fun circular_progress_indicator_content_disabled(@TestParameter screenSize: ScreenSize) =
         verifyProgressIndicatorScreenshot(screenSize = screenSize) {
-            CircularProgressIndicatorContent(
+            CircularProgressIndicatorStatic(
                 progress = { 0.25f },
                 modifier = Modifier.aspectRatio(1f).testTag(TEST_TAG),
                 startAngle = 120f,
@@ -215,7 +215,7 @@ class ProgressIndicatorScreenshotTest {
     @Test
     fun circular_progress_indicator_content_custom_color(@TestParameter screenSize: ScreenSize) =
         verifyProgressIndicatorScreenshot(screenSize = screenSize) {
-            CircularProgressIndicatorContent(
+            CircularProgressIndicatorStatic(
                 progress = { 0.75f },
                 modifier = Modifier.size(200.dp).testTag(TEST_TAG),
                 startAngle = 120f,
