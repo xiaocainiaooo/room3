@@ -29,10 +29,11 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.leanback.R;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Renders a {@link DetailsOverviewRow} to display an overview of an item.
@@ -552,7 +553,7 @@ public class DetailsOverviewRowPresenter extends RowPresenter {
 
     @Override
     protected void onBindRowViewHolder(
-            @NonNull RowPresenter.ViewHolder holder,
+            RowPresenter.@NonNull ViewHolder holder,
             @NonNull Object item
     ) {
         super.onBindRowViewHolder(holder, item);
@@ -567,7 +568,7 @@ public class DetailsOverviewRowPresenter extends RowPresenter {
     }
 
     @Override
-    protected void onUnbindRowViewHolder(@NonNull RowPresenter.ViewHolder holder) {
+    protected void onUnbindRowViewHolder(RowPresenter.@NonNull ViewHolder holder) {
         ViewHolder vh = (ViewHolder) holder;
         DetailsOverviewRow dor = (DetailsOverviewRow) vh.getRow();
         dor.removeListener(vh.mListener);
@@ -594,7 +595,7 @@ public class DetailsOverviewRowPresenter extends RowPresenter {
     }
 
     @Override
-    protected void onRowViewAttachedToWindow(@NonNull RowPresenter.ViewHolder vh) {
+    protected void onRowViewAttachedToWindow(RowPresenter.@NonNull ViewHolder vh) {
         super.onRowViewAttachedToWindow(vh);
         if (mDetailsPresenter != null) {
             mDetailsPresenter.onViewAttachedToWindow(
@@ -603,7 +604,7 @@ public class DetailsOverviewRowPresenter extends RowPresenter {
     }
 
     @Override
-    protected void onRowViewDetachedFromWindow(@NonNull RowPresenter.ViewHolder vh) {
+    protected void onRowViewDetachedFromWindow(RowPresenter.@NonNull ViewHolder vh) {
         super.onRowViewDetachedFromWindow(vh);
         if (mDetailsPresenter != null) {
             mDetailsPresenter.onViewDetachedFromWindow(

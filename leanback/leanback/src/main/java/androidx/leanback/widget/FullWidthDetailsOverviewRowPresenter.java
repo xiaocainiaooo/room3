@@ -25,10 +25,11 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.FrameLayout;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.leanback.R;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Renders a {@link DetailsOverviewRow} to display an overview of an item. Typically this row will
@@ -576,7 +577,7 @@ public class FullWidthDetailsOverviewRowPresenter extends RowPresenter {
 
     @Override
     protected void onBindRowViewHolder(
-            @NonNull RowPresenter.ViewHolder holder,
+            RowPresenter.@NonNull ViewHolder holder,
             @NonNull Object item
     ) {
         super.onBindRowViewHolder(holder, item);
@@ -590,7 +591,7 @@ public class FullWidthDetailsOverviewRowPresenter extends RowPresenter {
     }
 
     @Override
-    protected void onUnbindRowViewHolder(@NonNull RowPresenter.ViewHolder holder) {
+    protected void onUnbindRowViewHolder(RowPresenter.@NonNull ViewHolder holder) {
         ViewHolder vh = (ViewHolder) holder;
         vh.onUnbind();
         mDetailsPresenter.onUnbindViewHolder(vh.mDetailsDescriptionViewHolder);
@@ -614,7 +615,7 @@ public class FullWidthDetailsOverviewRowPresenter extends RowPresenter {
     }
 
     @Override
-    protected void onRowViewAttachedToWindow(@NonNull RowPresenter.ViewHolder vh) {
+    protected void onRowViewAttachedToWindow(RowPresenter.@NonNull ViewHolder vh) {
         super.onRowViewAttachedToWindow(vh);
         ViewHolder viewHolder = (ViewHolder) vh;
         mDetailsPresenter.onViewAttachedToWindow(viewHolder.mDetailsDescriptionViewHolder);
@@ -622,7 +623,7 @@ public class FullWidthDetailsOverviewRowPresenter extends RowPresenter {
     }
 
     @Override
-    protected void onRowViewDetachedFromWindow(@NonNull RowPresenter.ViewHolder vh) {
+    protected void onRowViewDetachedFromWindow(RowPresenter.@NonNull ViewHolder vh) {
         super.onRowViewDetachedFromWindow(vh);
         ViewHolder viewHolder = (ViewHolder) vh;
         mDetailsPresenter.onViewDetachedFromWindow(viewHolder.mDetailsDescriptionViewHolder);
@@ -779,7 +780,7 @@ public class FullWidthDetailsOverviewRowPresenter extends RowPresenter {
     }
 
     @Override
-    public void setEntranceTransitionState(@NonNull RowPresenter.ViewHolder holder,
+    public void setEntranceTransitionState(RowPresenter.@NonNull ViewHolder holder,
             boolean afterEntrance) {
         super.setEntranceTransitionState(holder, afterEntrance);
         if (mParticipatingEntranceTransition) {
