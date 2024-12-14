@@ -38,7 +38,9 @@ import androidx.wear.protolayout.ModifiersBuilders.ElementMetadata
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Semantics
 import androidx.wear.protolayout.StateBuilders
+import androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint
 import androidx.wear.protolayout.TypeBuilders.StringProp
+import androidx.wear.protolayout.expression.DynamicBuilders
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -141,6 +143,24 @@ class FiltersTest {
     fun hasText() {
         val textContent = "random test content"
         val testElement = Text.Builder().setText(textContent).build()
+
+        assertThat(hasText(textContent).matches(testElement)).isTrue()
+        assertThat(hasText("blabla").matches(testElement)).isFalse()
+    }
+
+    @Test
+    fun hasDynamicText() {
+        val textContent =
+            StringProp.Builder("static content")
+                .setDynamicValue(DynamicBuilders.DynamicString.constant("dynamic content"))
+                .build()
+        val testElement =
+            Text.Builder()
+                .setText(textContent)
+                .setLayoutConstraintsForDynamicText(
+                    StringLayoutConstraint.Builder("static content").build()
+                )
+                .build()
 
         assertThat(hasText(textContent).matches(testElement)).isTrue()
         assertThat(hasText("blabla").matches(testElement)).isFalse()

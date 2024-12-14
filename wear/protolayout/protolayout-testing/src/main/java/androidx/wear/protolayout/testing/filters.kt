@@ -91,7 +91,10 @@ public fun containsTag(value: String): LayoutElementMatcher =
  */
 public fun hasText(value: StringProp): LayoutElementMatcher =
     LayoutElementMatcher("Element text = '$value'") {
-        it is Text && it.text?.toProto() == value.toProto()
+        it is Text &&
+            // TODO: b/375448507 - Add dynamic data evaluation and compare the current string value
+            it.text?.toProto()?.value == value.toProto().value &&
+            it.text?.toProto()?.dynamicValue == value.toProto().dynamicValue
     }
 
 /**
