@@ -63,6 +63,7 @@ android {
 }
 
 dependencies {
+    api(libs.jspecify)
     ksp("androidx.room:room-compiler:2.6.1")
     api("androidx.core:core:1.12.0")
     implementation("androidx.room:room-ktx:2.6.1")
@@ -108,6 +109,4 @@ androidx {
     description = "Android WorkManager runtime library"
     failOnDeprecationWarnings = false
     legacyDisableKotlinStrictApiMode = true
-    // TODO: b/326456246
-    optOutJSpecify = true
 }

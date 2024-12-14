@@ -27,7 +27,6 @@ import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.PersistableBundle;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
 import androidx.work.BackoffPolicy;
@@ -37,6 +36,8 @@ import androidx.work.Logger;
 import androidx.work.NetworkType;
 import androidx.work.impl.WorkManagerImpl;
 import androidx.work.impl.model.WorkSpec;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Converts a {@link WorkSpec} into a JobInfo.
@@ -164,7 +165,7 @@ class SystemJobInfoConverter {
      * @param networkType The {@link NetworkType} instance.
      */
     static void setRequiredNetwork(
-            @NonNull JobInfo.Builder builder,
+            JobInfo.@NonNull Builder builder,
             @NonNull NetworkType networkType) {
 
         if (Build.VERSION.SDK_INT >= 30 && networkType == NetworkType.TEMPORARILY_UNMETERED) {

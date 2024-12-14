@@ -45,8 +45,6 @@ import android.database.sqlite.SQLiteTableLockedException;
 import android.os.Build;
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.os.UserManagerCompat;
@@ -62,6 +60,9 @@ import androidx.work.impl.background.systemjob.SystemJobScheduler;
 import androidx.work.impl.model.WorkProgressDao;
 import androidx.work.impl.model.WorkSpec;
 import androidx.work.impl.model.WorkSpecDao;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
