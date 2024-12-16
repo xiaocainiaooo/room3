@@ -38,6 +38,7 @@ import androidx.compose.material3.samples.BottomAppBarWithFAB
 import androidx.compose.material3.samples.BottomSheetScaffoldNestedScrollSample
 import androidx.compose.material3.samples.ButtonGroupSample
 import androidx.compose.material3.samples.ButtonSample
+import androidx.compose.material3.samples.ButtonWithAnimatedShapeSample
 import androidx.compose.material3.samples.ButtonWithIconSample
 import androidx.compose.material3.samples.CardSample
 import androidx.compose.material3.samples.CheckboxSample
@@ -65,6 +66,7 @@ import androidx.compose.material3.samples.DockedSearchBarSample
 import androidx.compose.material3.samples.EditableExposedDropdownMenuSample
 import androidx.compose.material3.samples.ElevatedAssistChipSample
 import androidx.compose.material3.samples.ElevatedButtonSample
+import androidx.compose.material3.samples.ElevatedButtonWithAnimatedShapeSample
 import androidx.compose.material3.samples.ElevatedCardSample
 import androidx.compose.material3.samples.ElevatedFilterChipSample
 import androidx.compose.material3.samples.ElevatedSplitButtonSample
@@ -94,6 +96,7 @@ import androidx.compose.material3.samples.FilledIconButtonSample
 import androidx.compose.material3.samples.FilledIconToggleButtonSample
 import androidx.compose.material3.samples.FilledSplitButtonSample
 import androidx.compose.material3.samples.FilledTonalButtonSample
+import androidx.compose.material3.samples.FilledTonalButtonWithAnimatedShapeSample
 import androidx.compose.material3.samples.FilledTonalIconButtonSample
 import androidx.compose.material3.samples.FilledTonalIconToggleButtonSample
 import androidx.compose.material3.samples.FilterChipSample
@@ -146,6 +149,7 @@ import androidx.compose.material3.samples.NavigationRailSample
 import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.OneLineListItem
 import androidx.compose.material3.samples.OutlinedButtonSample
+import androidx.compose.material3.samples.OutlinedButtonWithAnimatedShapeSample
 import androidx.compose.material3.samples.OutlinedCardSample
 import androidx.compose.material3.samples.OutlinedIconButtonSample
 import androidx.compose.material3.samples.OutlinedIconToggleButtonSample
@@ -223,6 +227,7 @@ import androidx.compose.material3.samples.SwitchWithThumbIconSample
 import androidx.compose.material3.samples.TextAndIconTabs
 import androidx.compose.material3.samples.TextArea
 import androidx.compose.material3.samples.TextButtonSample
+import androidx.compose.material3.samples.TextButtonWithAnimatedShapeSample
 import androidx.compose.material3.samples.TextFieldWithErrorState
 import androidx.compose.material3.samples.TextFieldWithHideKeyboardOnImeAction
 import androidx.compose.material3.samples.TextFieldWithIcons
@@ -344,6 +349,13 @@ val ButtonsExamples =
             ButtonSample()
         },
         Example(
+            name = "ButtonWithAnimatedShapeSample",
+            description = ButtonsExampleDescription,
+            sourceUrl = ButtonsExampleSourceUrl,
+        ) {
+            ButtonWithAnimatedShapeSample()
+        },
+        Example(
             name = "SquareButtonSample",
             description = ButtonsExampleDescription,
             sourceUrl = ButtonsExampleSourceUrl,
@@ -365,11 +377,25 @@ val ButtonsExamples =
             ElevatedButtonSample()
         },
         Example(
+            name = "ElevatedButtonWithAnimatedShapeSample",
+            description = ButtonsExampleDescription,
+            sourceUrl = ButtonsExampleSourceUrl,
+        ) {
+            ElevatedButtonWithAnimatedShapeSample()
+        },
+        Example(
             name = "FilledTonalButtonSample",
             description = ButtonsExampleDescription,
             sourceUrl = ButtonsExampleSourceUrl,
         ) {
             FilledTonalButtonSample()
+        },
+        Example(
+            name = "FilledTonalButtonWithAnimatedShapeSample",
+            description = ButtonsExampleDescription,
+            sourceUrl = ButtonsExampleSourceUrl,
+        ) {
+            FilledTonalButtonWithAnimatedShapeSample()
         },
         Example(
             name = "OutlinedButtonSample",
@@ -379,11 +405,25 @@ val ButtonsExamples =
             OutlinedButtonSample()
         },
         Example(
+            name = "OutlinedButtonWithAnimatedShapeSample",
+            description = ButtonsExampleDescription,
+            sourceUrl = ButtonsExampleSourceUrl,
+        ) {
+            OutlinedButtonWithAnimatedShapeSample()
+        },
+        Example(
             name = "TextButtonSample",
             description = ButtonsExampleDescription,
             sourceUrl = ButtonsExampleSourceUrl,
         ) {
             TextButtonSample()
+        },
+        Example(
+            name = "TextButtonWithAnimatedShapeSample",
+            description = ButtonsExampleDescription,
+            sourceUrl = ButtonsExampleSourceUrl,
+        ) {
+            TextButtonWithAnimatedShapeSample()
         },
         Example(
             name = "ButtonWithIconSample",
