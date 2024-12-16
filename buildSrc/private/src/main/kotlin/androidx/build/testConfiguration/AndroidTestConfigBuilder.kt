@@ -21,11 +21,11 @@ import groovy.xml.XmlUtil
 
 class ConfigBuilder {
     lateinit var configName: String
+    lateinit var configType: TestConfigType
     var appApksModel: AppApksModel? = null
     lateinit var applicationId: String
     var isMicrobenchmark: Boolean = false
     var isMacrobenchmark: Boolean = false
-    var enablePrivacySandbox: Boolean = false
     var isPostsubmit: Boolean = true
     lateinit var minSdk: String
     val tags = mutableListOf<String>()
@@ -36,6 +36,8 @@ class ConfigBuilder {
     val instrumentationArgsMap = mutableMapOf<String, String>()
 
     fun configName(configName: String) = apply { this.configName = configName }
+
+    fun configType(configType: TestConfigType) = apply { this.configType = configType }
 
     fun appApksModel(appApksModel: AppApksModel) = apply { this.appApksModel = appApksModel }
 
@@ -50,10 +52,6 @@ class ConfigBuilder {
     }
 
     fun isPostsubmit(isPostsubmit: Boolean) = apply { this.isPostsubmit = isPostsubmit }
-
-    fun enablePrivacySandbox(enablePrivacySandbox: Boolean) = apply {
-        this.enablePrivacySandbox = enablePrivacySandbox
-    }
 
     fun minSdk(minSdk: String) = apply { this.minSdk = minSdk }
 
@@ -83,6 +81,11 @@ class ConfigBuilder {
                 listOf(InstrumentationArg("notAnnotation", "androidx.test.filters.FlakyTest"))
             }
         )
+        if (configType.isAddedToInstrumentationArgs()) {
+            instrumentationArgsList.add(
+                InstrumentationArg("androidx.testConfigType", configType.toString())
+            )
+        }
         val appApk = singleAppApk()
         val values =
             mapOf(
@@ -134,6 +137,11 @@ class ConfigBuilder {
                 )
             }
         }
+        if (configType.isAddedToInstrumentationArgs()) {
+            instrumentationArgsList.add(
+                InstrumentationArg("androidx.testConfigType", configType.toString())
+            )
+        }
         instrumentationArgsList.forEach { (key, value) ->
             sb.append(
                 """
@@ -158,7 +166,7 @@ class ConfigBuilder {
         if (isMicrobenchmark) {
             sb.append(benchmarkPostInstallCommandOption(applicationId))
         }
-        if (enablePrivacySandbox) {
+        if (configType == TestConfigType.PRIVACY_SANDBOX_MAIN) {
             sb.append(PRIVACY_SANDBOX_ENABLE_PREPARER)
         }
         sb.append(TEST_BLOCK_OPEN)

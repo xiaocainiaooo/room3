@@ -74,12 +74,12 @@ private fun Project.createTestConfigurationGenerationTask(
         */
         registerGenerateTestConfigurationTask(
             "${GENERATE_PRIVACY_SANDBOX_MAIN_TEST_CONFIGURATION_TASK}$variantName",
+            TestConfigType.PRIVACY_SANDBOX_MAIN,
             xmlName = "${path.asFilenamePrefix()}$variantName.xml",
             jsonName = null, // Privacy sandbox not yet supported in JSON configs
             copyTestApksTask.flatMap { it.outputApplicationId },
             copyTestApksTask.flatMap { it.outputTestApk },
             minSdk = max(minSdk, PRIVACY_SANDBOX_MIN_API_LEVEL),
-            enablePrivacySandbox = true,
             testRunner,
             instrumentationRunnerArgs,
             variant,
@@ -88,12 +88,12 @@ private fun Project.createTestConfigurationGenerationTask(
 
         registerGenerateTestConfigurationTask(
             "${GENERATE_PRIVACY_SANDBOX_COMPAT_TEST_CONFIGURATION_TASK}${variantName}",
+            TestConfigType.PRIVACY_SANDBOX_COMPAT,
             xmlName = "${path.asFilenamePrefix()}${variantName}Compat.xml",
             jsonName = null, // Privacy sandbox not yet supported in JSON configs
             copyTestApksTask.flatMap { it.outputApplicationId },
             copyTestApksTask.flatMap { it.outputTestApk },
             minSdk,
-            enablePrivacySandbox = false,
             testRunner,
             instrumentationRunnerArgs,
             variant,
@@ -102,12 +102,12 @@ private fun Project.createTestConfigurationGenerationTask(
     } else {
         registerGenerateTestConfigurationTask(
             "${GENERATE_TEST_CONFIGURATION_TASK}$variantName",
+            TestConfigType.DEFAULT,
             xmlName = "${path.asFilenamePrefix()}$variantName.xml",
             jsonName = "_${path.asFilenamePrefix()}$variantName.json",
             copyTestApksTask.flatMap { it.outputApplicationId },
             copyTestApksTask.flatMap { it.outputTestApk },
             minSdk,
-            enablePrivacySandbox = false,
             testRunner,
             instrumentationRunnerArgs,
             variant,
@@ -142,12 +142,12 @@ private fun Project.registerCopyTestApksTask(
 
 private fun Project.registerGenerateTestConfigurationTask(
     taskName: String,
+    configType: TestConfigType,
     xmlName: String,
     jsonName: String?,
     applicationIdFile: Provider<RegularFile>,
     testApk: Provider<RegularFile>,
     minSdk: Int,
-    enablePrivacySandbox: Boolean,
     testRunner: Provider<String>,
     instrumentationRunnerArgs: Provider<Map<String, String>>,
     variant: Variant?,
@@ -155,6 +155,8 @@ private fun Project.registerGenerateTestConfigurationTask(
 ) {
     val generateTestConfigurationTask =
         tasks.register(taskName, GenerateTestConfigurationTask::class.java) { task ->
+            task.testConfigType.set(configType)
+
             task.applicationId.set(project.providers.fileContents(applicationIdFile).asText)
             task.testApk.set(testApk)
 
@@ -166,7 +168,6 @@ private fun Project.registerGenerateTestConfigurationTask(
             task.presubmit.set(isPresubmitBuild())
             task.instrumentationArgs.putAll(instrumentationRunnerArgs)
             task.minSdk.set(minSdk)
-            task.enablePrivacySandbox.set(enablePrivacySandbox)
             task.hasBenchmarkPlugin.set(hasBenchmarkPlugin())
             task.macrobenchmark.set(isMacrobenchmark())
             task.testRunner.set(testRunner)
