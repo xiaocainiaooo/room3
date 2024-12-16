@@ -95,7 +95,7 @@ package androidx.navigation3 {
   }
 
   public final class SavedStateNavContentWrapper implements androidx.navigation3.NavContentWrapper {
-    method @androidx.compose.runtime.Composable public <T> void WrapContent(androidx.navigation3.NavRecord<T> record);
+    method public <T> void WrapContent(androidx.navigation3.NavRecord<T> record);
     field public static final androidx.navigation3.SavedStateNavContentWrapper INSTANCE;
   }
 
