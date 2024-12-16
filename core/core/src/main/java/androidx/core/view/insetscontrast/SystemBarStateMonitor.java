@@ -34,12 +34,13 @@ import android.view.ViewParent;
 import android.view.Window;
 import android.view.WindowInsets;
 
-import androidx.annotation.NonNull;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -134,10 +135,9 @@ public class SystemBarStateMonitor {
                     }
 
                     @Override
-                    @NonNull
-                    public WindowInsetsAnimationCompat.BoundsCompat onStart(
+                    public WindowInsetsAnimationCompat.@NonNull BoundsCompat onStart(
                             @NonNull WindowInsetsAnimationCompat animation,
-                            @NonNull WindowInsetsAnimationCompat.BoundsCompat bounds) {
+                            WindowInsetsAnimationCompat.@NonNull BoundsCompat bounds) {
                         if (!animatesSystemBars(animation)) {
                             return bounds;
                         }
@@ -161,8 +161,8 @@ public class SystemBarStateMonitor {
                     }
 
                     @Override
-                    @NonNull
-                    public WindowInsetsCompat onProgress(@NonNull WindowInsetsCompat windowInsets,
+                    public @NonNull WindowInsetsCompat onProgress(
+                            @NonNull WindowInsetsCompat windowInsets,
                             @NonNull List<WindowInsetsAnimationCompat> runningAnimations) {
                         final RectF alpha = new RectF(1f, 1f, 1f, 1f);
                         int animatingSides = 0;
