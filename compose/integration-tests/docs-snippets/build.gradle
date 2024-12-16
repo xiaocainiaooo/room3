@@ -21,7 +21,7 @@
  * Please use that script when creating a new project, rather than copying an existing project and
  * modifying its settings.
  */
-import androidx.build.Publish
+import androidx.build.LibraryType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -65,7 +65,7 @@ dependencies {
 
 androidx {
     name = "Compose Documentation Snippets"
-    publish = Publish.NONE
+    type = LibraryType.TEST_APPLICATION
     description = "Compose Documentation Snippets on developer.android.com"
 }
 

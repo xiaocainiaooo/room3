@@ -6,7 +6,6 @@
  * modifying its settings.
  */
 import androidx.build.LibraryType
-import androidx.build.Publish
 
 plugins {
     id("AndroidXPlugin")

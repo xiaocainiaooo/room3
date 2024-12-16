@@ -294,22 +294,15 @@ abstract class AndroidXExtension(
 
     private var extraLicenses: MutableCollection<License> = ArrayList()
 
-    // Should only be used to override LibraryType.publish, if a library isn't ready to publish yet
-    var publish: Publish = Publish.UNSET
-
     fun shouldPublish(): Boolean =
-        if (publish != Publish.UNSET) {
-            publish.shouldPublish()
-        } else if (type != LibraryType.UNSET) {
+        if (type != LibraryType.UNSET) {
             type.publish.shouldPublish()
         } else {
             false
         }
 
     fun shouldRelease(): Boolean =
-        if (publish != Publish.UNSET) {
-            publish.shouldRelease()
-        } else if (type != LibraryType.UNSET) {
+        if (type != LibraryType.UNSET) {
             type.publish.shouldRelease()
         } else {
             false
@@ -323,7 +316,7 @@ abstract class AndroidXExtension(
         }
     }
 
-    fun isPublishConfigured(): Boolean = (publish != Publish.UNSET || type.publish != Publish.UNSET)
+    fun isPublishConfigured(): Boolean = type.publish != Publish.UNSET
 
     fun shouldPublishSbom(): Boolean {
         if (isIsolatedProjectsEnabled()) return false

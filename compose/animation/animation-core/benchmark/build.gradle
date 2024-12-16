@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import androidx.build.LibraryType
+
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
@@ -38,4 +40,8 @@ android {
     compileSdk = 35
 
     namespace = "androidx.compose.animation.core.benchmark"
+}
+
+androidx {
+    type = LibraryType.BENCHMARK
 }

@@ -22,7 +22,7 @@
  * modifying its settings.
  */
 import androidx.build.ApkCopyHelperKt
-import androidx.build.Publish
+import androidx.build.LibraryType
 
 plugins {
     id("AndroidXPlugin")
@@ -73,7 +73,7 @@ ApkCopyHelperKt.setupAppApkCopy(project, "release")
 
 androidx {
     name = "Compose Material Catalog app"
-    publish = Publish.NONE
+    type = LibraryType.TEST_APPLICATION
     inceptionYear = "2021"
     description = "This is a project for the Compose Material Catalog app."
 }
