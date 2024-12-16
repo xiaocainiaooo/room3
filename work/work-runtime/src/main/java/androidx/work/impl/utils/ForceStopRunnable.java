@@ -25,7 +25,6 @@ import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static androidx.work.WorkInfo.State.ENQUEUED;
 import static androidx.work.impl.model.WorkSpec.SCHEDULE_NOT_REQUESTED_YET;
 
-import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.ApplicationExitInfo;
@@ -193,7 +192,6 @@ public class ForceStopRunnable implements Runnable {
      * @return {@code true} If the application was force stopped.
      */
     @VisibleForTesting
-    @SuppressLint("ClassVerificationFailure")
     public boolean isForceStopped() {
         // Alarms get cancelled when an app is force-stopped starting at Eclair MR1.
         // Cancelling of Jobs on force-stop was introduced in N-MR1 (SDK 25).
@@ -385,7 +383,6 @@ public class ForceStopRunnable implements Runnable {
         return intent;
     }
 
-    @SuppressLint("ClassVerificationFailure")
     static void setAlarm(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         // Using FLAG_UPDATE_CURRENT, because we only ever want once instance of this alarm.
