@@ -325,17 +325,11 @@ enum class CompilationTarget {
  * Publish Enum: Publish.NONE -> Generates no artifacts; does not generate snapshot artifacts or
  * releasable maven artifacts Publish.SNAPSHOT_ONLY -> Only generates snapshot artifacts
  * Publish.SNAPSHOT_AND_RELEASE -> Generates both snapshot artifacts and releasable maven artifact
- * Publish.UNSET -> Do the default, based on LibraryType. If LibraryType.UNSET -> Publish.NONE
- *
- * TODO: should we introduce a Publish.lintPublish?
- * TODO: remove Publish.UNSET once we remove LibraryType.UNSET. It is necessary now in order to be
- *   able to override LibraryType.publish (with Publish.None)
  */
 enum class Publish {
     NONE,
     SNAPSHOT_ONLY,
-    SNAPSHOT_AND_RELEASE,
-    UNSET;
+    SNAPSHOT_AND_RELEASE;
 
     fun shouldRelease() = this == SNAPSHOT_AND_RELEASE
 

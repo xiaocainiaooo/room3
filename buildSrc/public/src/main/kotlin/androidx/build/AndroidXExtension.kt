@@ -294,19 +294,9 @@ abstract class AndroidXExtension(
 
     private var extraLicenses: MutableCollection<License> = ArrayList()
 
-    fun shouldPublish(): Boolean =
-        if (type != LibraryType.UNSET) {
-            type.publish.shouldPublish()
-        } else {
-            false
-        }
+    fun shouldPublish(): Boolean = type.publish.shouldPublish()
 
-    fun shouldRelease(): Boolean =
-        if (type != LibraryType.UNSET) {
-            type.publish.shouldRelease()
-        } else {
-            false
-        }
+    fun shouldRelease(): Boolean = type.publish.shouldRelease()
 
     fun ifReleasing(action: () -> Unit) {
         project.afterEvaluate {
@@ -315,8 +305,6 @@ abstract class AndroidXExtension(
             }
         }
     }
-
-    fun isPublishConfigured(): Boolean = type.publish != Publish.UNSET
 
     fun shouldPublishSbom(): Boolean {
         if (isIsolatedProjectsEnabled()) return false
