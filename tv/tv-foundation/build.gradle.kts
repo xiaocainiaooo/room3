@@ -69,5 +69,4 @@ androidx {
             "functionality to support TV specific devices sizes, shapes and d-pad navigation " +
             "supported components. It builds upon the Jetpack Compose libraries."
     legacyDisableKotlinStrictApiMode = true
-    metalavaK2UastEnabled = false
 }
