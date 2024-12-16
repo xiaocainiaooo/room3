@@ -56,6 +56,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.RevealActionType
+import androidx.wear.compose.foundation.RevealScope
 import androidx.wear.compose.foundation.RevealState
 import androidx.wear.compose.foundation.RevealValue
 import androidx.wear.compose.foundation.SwipeDirection
@@ -402,7 +403,7 @@ object SwipeToRevealDefaults {
 }
 
 @Composable
-internal fun ActionButton(
+internal fun RevealScope.ActionButton(
     revealState: RevealState,
     action: SwipeToRevealAction,
     revealActionType: RevealActionType,
@@ -513,7 +514,6 @@ internal fun ActionButton(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val density = LocalDensity.current
             val primaryActionTextRevealed = remember { mutableStateOf(false) }
             action.icon?.let {
                 ActionIconWrapper(revealState, iconStartFadeInFraction, iconEndFadeInFraction, it)
@@ -529,12 +529,8 @@ internal fun ActionButton(
                     }
 
                     LaunchedEffect(revealState.offset) {
-                        val minimumOffsetToRevealPx =
-                            with(density) {
-                                SwipeToRevealDefaults.DoubleActionAnchorWidth.toPx().toInt()
-                            }
                         primaryActionTextRevealed.value =
-                            abs(revealState.offset) > minimumOffsetToRevealPx &&
+                            abs(revealState.offset) > revealOffset &&
                                 (revealState.targetValue == RevealValue.RightRevealed ||
                                     revealState.targetValue == RevealValue.LeftRevealed)
                     }
