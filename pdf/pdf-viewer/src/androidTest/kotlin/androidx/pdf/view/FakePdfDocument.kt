@@ -65,6 +65,7 @@ internal open class FakePdfDocument(
     override val isLinearized: Boolean = false,
     private val searchResults: SparseArray<List<PageMatchBounds>> = SparseArray(),
     override val uri: Uri = Uri.parse("content://test.app/document.pdf"),
+    private val pageLinks: List<PdfDocument.PdfPageLinks> = emptyList()
 ) : PdfDocument {
     override val pageCount: Int = pages.size
 
@@ -84,8 +85,11 @@ internal open class FakePdfDocument(
     }
 
     override suspend fun getPageLinks(pageNumber: Int): PdfDocument.PdfPageLinks {
-        // TODO(b/376136907) provide a useful implementation when it's needed for testing
-        return PdfDocument.PdfPageLinks(listOf(), listOf())
+        return if (pageNumber < pageLinks.size) {
+            pageLinks[pageNumber]
+        } else {
+            PdfDocument.PdfPageLinks(emptyList(), emptyList())
+        }
     }
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
