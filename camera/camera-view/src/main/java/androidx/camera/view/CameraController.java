@@ -1421,8 +1421,9 @@ public abstract class CameraController {
      * <p>If not set, {@link ImageAnalysis.OutputImageFormat#OUTPUT_IMAGE_FORMAT_YUV_420_888}
      * will be used.
      *
-     * <p>Requesting {@link ImageAnalysis.OutputImageFormat#OUTPUT_IMAGE_FORMAT_RGBA_8888}
-     * causes extra overhead because format conversion takes time.
+     * <p>Requesting {@link ImageAnalysis.OutputImageFormat#OUTPUT_IMAGE_FORMAT_RGBA_8888} or
+     * {@link ImageAnalysis.OutputImageFormat#OUTPUT_IMAGE_FORMAT_NV21} causes extra overhead
+     * because format conversion takes time.
      *
      * <p>Changing the value will reconfigure the camera, which may cause additional latency. To
      * avoid this, set the value before controller is bound to lifecycle. If the value is changed
@@ -1449,8 +1450,9 @@ public abstract class CameraController {
      * Gets the output image format for {@link ImageAnalysis}.
      *
      * <p>The returned image format can be either
-     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_YUV_420_888} or
-     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_RGBA_8888}.
+     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_YUV_420_888},
+     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_RGBA_8888} or
+     * {@link ImageAnalysis#OUTPUT_IMAGE_FORMAT_NV21}.
      *
      * @see ImageAnalysis.Builder#setOutputImageFormat(int)
      * @see ImageAnalysis.Builder#getOutputImageFormat()
