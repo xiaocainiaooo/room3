@@ -16,23 +16,15 @@
 
 package androidx.pdf.search.model
 
-import android.util.SparseArray
 import androidx.annotation.RestrictTo
-import androidx.pdf.content.PageMatchBounds
 
-/** Model class to hold search results over pdf document for a search query. */
+/** A model class that holds the index of a data element within [QueryResults]'s resultBounds. */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-internal class SearchResults(
-    /**
-     * search query provided to initiate search
-     *
-     * By default it will be empty string.
-     */
-    val searchQuery: String = "",
-    /**
-     * search results in pdf document for [searchQuery]
-     *
-     * By default it will be initialized to empty [SparseArray].
-     */
-    val results: SparseArray<List<PageMatchBounds>> = SparseArray()
+public class QueryResultsIndex(
+
+    /** The page number of the document where the current search result is located. */
+    public val pageNum: Int,
+
+    /** The index of the search result on the page specified by [pageNum]. */
+    public val resultBoundsIndex: Int
 )

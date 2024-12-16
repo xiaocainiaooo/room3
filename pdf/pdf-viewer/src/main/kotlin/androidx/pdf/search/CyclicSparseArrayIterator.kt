@@ -19,7 +19,7 @@ package androidx.pdf.search
 import android.util.SparseArray
 import androidx.annotation.RestrictTo
 import androidx.pdf.content.PageMatchBounds
-import androidx.pdf.search.model.SelectedSearchResult
+import androidx.pdf.search.model.QueryResultsIndex
 
 /**
  * A cyclic iterator implementation over SparseArray.
@@ -54,13 +54,13 @@ internal class CyclicSparseArrayIterator(
     }
 
     /** Get the current state of selected search result. */
-    fun current(): SelectedSearchResult {
+    fun current(): QueryResultsIndex {
         val currentPageNum = pageNumList[pageNumIndex]
-        return SelectedSearchResult(currentPageNum, searchIndexOnPage)
+        return QueryResultsIndex(pageNum = currentPageNum, resultBoundsIndex = searchIndexOnPage)
     }
 
     /** Move to the nex element in the current page, or to the next page cyclically. */
-    fun next(): SelectedSearchResult {
+    fun next(): QueryResultsIndex {
         if (totalPages == 0) {
             throw NoSuchElementException("No elements to iterate.")
         }
@@ -80,7 +80,7 @@ internal class CyclicSparseArrayIterator(
     }
 
     /** Move to the previous element in the page list, or to the previous page cyclically. */
-    fun prev(): SelectedSearchResult {
+    fun prev(): QueryResultsIndex {
         if (totalPages == 0) {
             throw NoSuchElementException("No elements to iterate.")
         }
@@ -94,6 +94,8 @@ internal class CyclicSparseArrayIterator(
         // If we're at the beginning of the current page, move to the previous page
         if (searchIndexOnPage == resultsOnPage.size - 1) {
             pageNumIndex = (pageNumIndex - 1 + totalPages) % totalPages
+            // update the search index of page to last result on updated page
+            searchIndexOnPage = searchData.valueAt(pageNumIndex).lastIndex
         }
 
         return current()
