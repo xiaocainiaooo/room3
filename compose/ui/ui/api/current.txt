@@ -221,10 +221,10 @@ package androidx.compose.ui.autofill {
     method public void requestAutofillForNode(androidx.compose.ui.autofill.AutofillNode autofillNode);
   }
 
-  public interface AutofillManager {
-    method public void cancel();
-    method public void commit();
-    method public void requestAutofillForActiveElement();
+  public abstract class AutofillManager {
+    method public abstract void cancel();
+    method public abstract void commit();
+    method public abstract void requestAutofillForActiveElement();
   }
 
   public final class AutofillNode {

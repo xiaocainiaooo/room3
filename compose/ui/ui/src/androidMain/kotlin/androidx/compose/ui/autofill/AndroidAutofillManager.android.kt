@@ -54,7 +54,7 @@ internal class AndroidAutofillManager(
     private val view: View,
     private val rectManager: RectManager,
     private val packageName: String,
-) : AutofillManager, SemanticsListener {
+) : AutofillManager(), SemanticsListener {
     private var reusableRect = Rect()
     private var rootAutofillId: AutofillId
 
