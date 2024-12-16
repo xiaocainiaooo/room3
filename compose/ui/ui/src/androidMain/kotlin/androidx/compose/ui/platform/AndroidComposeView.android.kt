@@ -55,6 +55,7 @@ import android.view.ViewStructure
 import android.view.ViewTreeObserver
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.animation.AnimationUtils
+import android.view.autofill.AutofillManager as PlatformAndroidManager
 import android.view.autofill.AutofillValue
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
@@ -74,7 +75,6 @@ import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.ComposeUiFlags
-import androidx.compose.ui.ComposeUiFlags.isSemanticAutofillEnabled
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -85,6 +85,7 @@ import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillCallback
 import androidx.compose.ui.autofill.AutofillManager
 import androidx.compose.ui.autofill.AutofillTree
+import androidx.compose.ui.autofill.PlatformAutofillManagerImpl
 import androidx.compose.ui.autofill.performAutofill
 import androidx.compose.ui.autofill.populateViewStructure
 import androidx.compose.ui.contentcapture.AndroidContentCaptureManager
@@ -455,6 +456,8 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
     override val layoutNodes: MutableIntObjectMap<LayoutNode> = mutableIntObjectMapOf()
 
+    override val rectManager = RectManager(layoutNodes)
+
     override val rootForTest: RootForTest = this
 
     override val semanticsOwner: SemanticsOwner =
@@ -506,7 +509,20 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
     private val _autofill = if (autofillSupported()) AndroidAutofill(this, autofillTree) else null
 
-    internal val _autofillManager = if (autofillSupported()) AndroidAutofillManager(this) else null
+    internal val _autofillManager =
+        if (autofillSupported()) {
+            val platformAutofill = context.getSystemService(PlatformAndroidManager::class.java)
+            checkPreconditionNotNull(platformAutofill) { "Autofill service could not be located." }
+            AndroidAutofillManager(
+                platformAutofillManager = PlatformAutofillManagerImpl(platformAutofill),
+                semanticsOwner = semanticsOwner,
+                view = this,
+                rectManager = rectManager,
+                packageName = context.packageName
+            )
+        } else {
+            null
+        }
 
     // Used as a CompositionLocal for performing autofill.
     override val autofill: Autofill?
@@ -627,6 +643,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
      * The legacy text input service. This is only used for new text input sessions if
      * [textInputSessionMutex] is null.
      */
+    @Deprecated("Use PlatformTextInputModifierNode instead.")
     override val textInputService =
         TextInputService(platformTextInputServiceInterceptor(legacyTextInputServiceAndroid))
 
@@ -819,7 +836,6 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
     init {
         addOnAttachStateChangeListener(contentCaptureManager)
-        _autofillManager?.let { addOnAttachStateChangeListener(it) }
         setWillNotDraw(false)
         isFocusable = true
         if (SDK_INT >= O) {
@@ -1061,7 +1077,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
 
     override fun onPostAttach(node: LayoutNode) {
         @OptIn(ExperimentalComposeUiApi::class)
-        if (SDK_INT >= 26 && isSemanticAutofillEnabled) {
+        if (autofillSupported() && ComposeUiFlags.isSemanticAutofillEnabled) {
             _autofillManager?.onPostAttach(node)
         }
     }
@@ -1075,7 +1091,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
             rectManager.remove(node)
         }
         @OptIn(ExperimentalComposeUiApi::class)
-        if (SDK_INT >= 26 && isSemanticAutofillEnabled) {
+        if (autofillSupported() && ComposeUiFlags.isSemanticAutofillEnabled) {
             _autofillManager?.onDetach(node)
         }
     }
@@ -1094,7 +1110,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
             clearChildInvalidObservations(childAndroidViews)
         }
         @OptIn(ExperimentalComposeUiApi::class)
-        if (SDK_INT >= 26 && isSemanticAutofillEnabled) {
+        if (autofillSupported() && ComposeUiFlags.isSemanticAutofillEnabled) {
             _autofillManager?.onEndApplyChanges()
         }
         // Listeners can add more items to the list and we want to ensure that they
@@ -1635,18 +1651,12 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
     override fun onSemanticsChange() {
         composeAccessibilityDelegate.onSemanticsChange()
         contentCaptureManager.onSemanticsChange()
-        @OptIn(ExperimentalComposeUiApi::class)
-        if (SDK_INT >= 26 && isSemanticAutofillEnabled) {
-            _autofillManager?.onSemanticsChange()
-        }
     }
 
     override fun onLayoutChange(layoutNode: LayoutNode) {
         composeAccessibilityDelegate.onLayoutChange(layoutNode)
         contentCaptureManager.onLayoutChange(layoutNode)
     }
-
-    override val rectManager = RectManager(layoutNodes)
 
     override fun onLayoutNodeDeactivated(layoutNode: LayoutNode) {
         @OptIn(ExperimentalComposeUiApi::class)
@@ -1862,9 +1872,8 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         viewTreeObserver.addOnScrollChangedListener(scrollChangedListener)
         viewTreeObserver.addOnTouchModeChangeListener(touchModeChangeListener)
 
-        if (SDK_INT >= S) {
-            AndroidComposeViewTranslationCallbackS.setViewTranslationCallback(this)
-        }
+        if (SDK_INT >= S) AndroidComposeViewTranslationCallbackS.setViewTranslationCallback(this)
+        if (autofillSupported()) _autofillManager?.let { semanticsOwner.listeners += it }
     }
 
     override fun onDetachedFromWindow() {
@@ -1889,25 +1898,26 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         viewTreeObserver.removeOnTouchModeChangeListener(touchModeChangeListener)
 
         if (SDK_INT >= S) AndroidComposeViewTranslationCallbackS.clearViewTranslationCallback(this)
+        if (autofillSupported()) _autofillManager?.let { semanticsOwner.listeners -= it }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     override fun onProvideAutofillVirtualStructure(structure: ViewStructure?, flags: Int) {
         if (autofillSupported() && structure != null) {
-            if (isSemanticAutofillEnabled) {
+            if (@OptIn(ExperimentalComposeUiApi::class) ComposeUiFlags.isSemanticAutofillEnabled) {
                 _autofillManager?.populateViewStructure(structure)
             } else {
+                // TODO(b/383201236): Remove _autofill and route requests through _autofillManager.
                 _autofill?.populateViewStructure(structure)
             }
         }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     override fun autofill(values: SparseArray<AutofillValue>) {
         if (autofillSupported()) {
-            if (isSemanticAutofillEnabled) {
+            if (@OptIn(ExperimentalComposeUiApi::class) ComposeUiFlags.isSemanticAutofillEnabled) {
                 _autofillManager?.performAutofill(values)
             } else {
+                // TODO(b/383201236): Remove _autofill and route requests through _autofillManager.
                 _autofill?.performAutofill(values)
             }
         }

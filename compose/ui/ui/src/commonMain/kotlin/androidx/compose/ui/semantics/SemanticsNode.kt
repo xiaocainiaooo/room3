@@ -216,7 +216,11 @@ internal constructor(
         get() {
             if (isMergingSemanticsOfDescendants) {
                 val mergedConfig = unmergedConfig.copy()
-                mergeConfig(mutableListOf(), mergedConfig)
+                mergeConfig(
+                    // TODO(b/384549982): Pass in the unmerged children instead of an empty list.
+                    mutableListOf(),
+                    mergedConfig
+                )
                 return mergedConfig
             } else {
                 return unmergedConfig

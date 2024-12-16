@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
@@ -61,12 +62,13 @@ class SemanticsInfoTest {
         // Assert.
         assertThat(rootSemantics).isNotNull()
         assertThat(rootSemantics.parentInfo).isNull()
-        assertThat(rootSemantics.childrenInfo.size).isEqualTo(1)
+        assertThat(rootSemantics.childrenInfo.map { it.semanticsConfiguration })
+            .comparingElementsUsing(SemanticsConfigurationComparator)
+            .containsExactly(null)
 
         // Assert extension Functions.
         assertThat(rootSemantics.nearestParentThatHasSemantics()).isNull()
         assertThat(rootSemantics.findMergingSemanticsParent()).isNull()
-        assertThat(rootSemantics.findSemanticsChildren()).isEmpty()
     }
 
     @Test
@@ -81,21 +83,21 @@ class SemanticsInfoTest {
 
         // Assert.
         assertThat(rootSemantics.parentInfo).isNull()
-        assertThat(rootSemantics.childrenInfo.asMutableList()).containsExactly(semantics)
+        assertThat(rootSemantics.childrenInfo).containsExactly(semantics)
 
         assertThat(semantics.parentInfo).isEqualTo(rootSemantics)
-        assertThat(semantics.childrenInfo.size).isEqualTo(0)
+        assertThat(semantics.childrenInfo).isEmpty()
 
         // Assert extension Functions.
         assertThat(rootSemantics.nearestParentThatHasSemantics()).isNull()
         assertThat(rootSemantics.findMergingSemanticsParent()).isNull()
-        assertThat(rootSemantics.findSemanticsChildren().map { it.semanticsConfiguration })
+        assertThat(rootSemantics.childrenInfo.map { it.semanticsConfiguration })
             .comparingElementsUsing(SemanticsConfigurationComparator)
             .containsExactly(SemanticsConfiguration().apply { testTag = "testTag" })
 
         assertThat(semantics.nearestParentThatHasSemantics()).isEqualTo(rootSemantics)
         assertThat(semantics.findMergingSemanticsParent()).isNull()
-        assertThat(semantics.findSemanticsChildren()).isEmpty()
+        assertThat(semantics.childrenInfo).isEmpty()
     }
 
     @Test
@@ -122,7 +124,7 @@ class SemanticsInfoTest {
             )
             .inOrder()
 
-        assertThat(rootSemantics.findSemanticsChildren().map { it.semanticsConfiguration })
+        assertThat(rootSemantics.childrenInfo.map { it.semanticsConfiguration })
             .comparingElementsUsing(SemanticsConfigurationComparator)
             .containsExactly(
                 SemanticsConfiguration().apply { testTag = "item1" },
@@ -132,16 +134,16 @@ class SemanticsInfoTest {
 
         checkNotNull(semantics1)
         assertThat(semantics1.parentInfo).isEqualTo(rootSemantics)
-        assertThat(semantics1.childrenInfo.size).isEqualTo(0)
+        assertThat(semantics1.childrenInfo).isEmpty()
 
         checkNotNull(semantics2)
         assertThat(semantics2.parentInfo).isEqualTo(rootSemantics)
-        assertThat(semantics2.childrenInfo.size).isEqualTo(0)
+        assertThat(semantics2.childrenInfo).isEmpty()
 
         // Assert extension Functions.
         assertThat(rootSemantics.nearestParentThatHasSemantics()).isNull()
         assertThat(rootSemantics.findMergingSemanticsParent()).isNull()
-        assertThat(rootSemantics.findSemanticsChildren().map { it.semanticsConfiguration })
+        assertThat(rootSemantics.childrenInfo.map { it.semanticsConfiguration })
             .comparingElementsUsing(SemanticsConfigurationComparator)
             .containsExactly(
                 SemanticsConfiguration().apply { testTag = "item1" },
@@ -151,11 +153,11 @@ class SemanticsInfoTest {
 
         assertThat(semantics1.nearestParentThatHasSemantics()).isEqualTo(rootSemantics)
         assertThat(semantics1.findMergingSemanticsParent()).isNull()
-        assertThat(semantics1.findSemanticsChildren()).isEmpty()
+        assertThat(semantics1.childrenInfo).isEmpty()
 
         assertThat(semantics2.nearestParentThatHasSemantics()).isEqualTo(rootSemantics)
         assertThat(semantics2.findMergingSemanticsParent()).isNull()
-        assertThat(semantics2.findSemanticsChildren()).isEmpty()
+        assertThat(semantics2.childrenInfo).isEmpty()
     }
 
     // TODO(ralu): Split this into multiple tests.
@@ -203,13 +205,14 @@ class SemanticsInfoTest {
         assertThat(testTarget.parentInfo).isNotEqualTo(row)
         assertThat(testTarget.nearestParentThatHasSemantics()).isEqualTo(row)
         assertThat(testTarget.findMergingSemanticsParent()).isEqualTo(column)
-        assertThat(testTarget.childrenInfo.size).isEqualTo(5)
-        assertThat(testTarget.findSemanticsChildren().map { it.semanticsConfiguration })
+        assertThat(testTarget.childrenInfo.map { it.semanticsConfiguration })
             .comparingElementsUsing(SemanticsConfigurationComparator)
             .containsExactly(
-                SemanticsConfiguration().apply { testTag = "child1" },
+                null,
                 SemanticsConfiguration().apply { testTag = "child2" },
-                SemanticsConfiguration().apply { testTag = "child3" }
+                null,
+                null,
+                null
             )
             .inOrder()
         assertThat(testTarget.semanticsConfiguration?.getOrNull(TestTag)).isEqualTo("testTarget")
@@ -241,18 +244,71 @@ class SemanticsInfoTest {
         }
     }
 
+    @Test
+    fun transparent() {
+        // Arrange.
+        rule.setTestContent { Box(Modifier.alpha(0.0f)) { Box(Modifier.testTag("item")) } }
+        rule.waitForIdle()
+
+        // Act.
+        val semantics = rule.getSemanticsInfoForTag("item")
+
+        // Assert.
+        assertThat(semantics?.isTransparent()).isTrue()
+    }
+
+    @Test
+    fun semiTransparent() {
+        // Arrange.
+        rule.setTestContent { Box(Modifier.alpha(0.5f)) { Box(Modifier.testTag("item")) } }
+        rule.waitForIdle()
+
+        // Act.
+        val semantics = rule.getSemanticsInfoForTag("item")
+
+        // Assert.
+        assertThat(semantics?.isTransparent()).isFalse()
+    }
+
+    @Test
+    fun nonTransparent() {
+        // Arrange.
+        rule.setTestContent { Box(Modifier.alpha(1.0f)) { Box(Modifier.testTag("item")) } }
+        rule.waitForIdle()
+
+        // Act.
+        val semantics = rule.getSemanticsInfoForTag("item")
+
+        // Assert.
+        assertThat(semantics?.isTransparent()).isFalse()
+    }
+
+    @Test
+    fun transparencyOfStackedItems() {
+        // Arrange.
+        rule.setTestContent {
+            Box(Modifier.alpha(1.0f)) { Box(Modifier.testTag("item1")) }
+            Box(Modifier.alpha(1.0f)) { Box(Modifier.testTag("item2")) }
+            Box(Modifier.alpha(0.0f)) { Box(Modifier.testTag("item3")) }
+        }
+        rule.waitForIdle()
+
+        // Act.
+        val semantics1 = rule.getSemanticsInfoForTag("item1")
+        val semantics2 = rule.getSemanticsInfoForTag("item2")
+        val semantics3 = rule.getSemanticsInfoForTag("item3")
+
+        // Assert.
+        assertThat(semantics1?.isTransparent()).isFalse()
+        assertThat(semantics2?.isTransparent()).isFalse()
+        assertThat(semantics3?.isTransparent()).isTrue()
+    }
+
     private fun ComposeContentTestRule.setTestContent(composable: @Composable () -> Unit) {
         setContent {
             semanticsOwner = (LocalView.current as RootForTest).semanticsOwner
             composable()
         }
-    }
-
-    /** Helper function that returns a list of children that is easier to assert on in tests. */
-    private fun SemanticsInfo.findSemanticsChildren(): List<SemanticsInfo> {
-        val children = mutableListOf<SemanticsInfo>()
-        this@findSemanticsChildren.findSemanticsChildren { children.add(it) }
-        return children
     }
 
     private fun ComposeContentTestRule.getSemanticsInfoForTag(
@@ -266,9 +322,10 @@ class SemanticsInfoTest {
         private val SemanticsConfigurationComparator =
             Correspondence.from<SemanticsConfiguration, SemanticsConfiguration>(
                 { actual, expected ->
-                    actual != null &&
-                        expected != null &&
-                        actual.getOrNull(TestTag) == expected.getOrNull(TestTag)
+                    (actual == null && expected == null) ||
+                        (actual != null &&
+                            expected != null &&
+                            actual.getOrNull(TestTag) == expected.getOrNull(TestTag))
                 },
                 "has same test tag as "
             )
