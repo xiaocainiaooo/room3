@@ -30,6 +30,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.jspecify)
     api(project(":work:work-runtime"))
     api(libs.rxjava2)
     implementation("androidx.concurrent:concurrent-futures:1.1.0")
@@ -46,8 +47,6 @@ androidx {
     description = "Android WorkManager RxJava2 interoperatibility library"
     failOnDeprecationWarnings = false
     legacyDisableKotlinStrictApiMode = true
-    // TODO: b/326456246
-    optOutJSpecify = true
 }
 
 android {

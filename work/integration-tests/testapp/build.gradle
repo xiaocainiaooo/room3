@@ -44,6 +44,7 @@ android {
 }
 
 dependencies {
+    api(libs.jspecify)
     annotationProcessor(project(":room:room-compiler"))
     implementation(project(":room:room-runtime"))
     implementation(project(":room:room-ktx"))
@@ -64,9 +65,4 @@ dependencies {
 // See b/198431380
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-parameters"
-}
-
-androidx {
-    // TODO: b/326456246
-    optOutJSpecify = true
 }
