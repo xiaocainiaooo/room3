@@ -23,8 +23,9 @@ import static androidx.core.view.WindowInsetsCompat.Side.TOP;
 
 import android.graphics.RectF;
 
-import androidx.annotation.NonNull;
 import androidx.core.graphics.Insets;
+
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -170,8 +171,7 @@ class ProtectionGroup implements SystemBarStateMonitor.Callback {
      * @param index the index of the protection to return.
      * @return the protection at the specified position in this group.
      */
-    @NonNull
-    ContrastProtection getProtection(int index) {
+    @NonNull ContrastProtection getProtection(int index) {
         return mProtections.get(index);
     }
 
