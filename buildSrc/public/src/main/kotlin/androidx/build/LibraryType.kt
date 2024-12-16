@@ -180,30 +180,6 @@ sealed class LibraryType(
             compilationTarget = CompilationTarget.HOST
         )
 
-    class CompilerDaemon :
-        LibraryType(
-            Publish.SNAPSHOT_AND_RELEASE,
-            sourceJars = false,
-            RunApiTasks.No("Compiler Daemon (Host-only)"),
-            CompilationTarget.HOST
-        )
-
-    class CompilerDaemonTest :
-        LibraryType(
-            Publish.NONE,
-            sourceJars = false,
-            RunApiTasks.No("Compiler Daemon (Host-only) Test"),
-            CompilationTarget.HOST
-        )
-
-    class CompilerPlugin :
-        LibraryType(
-            Publish.SNAPSHOT_AND_RELEASE,
-            sourceJars = false,
-            RunApiTasks.No("Compiler Plugin (Host-only)"),
-            CompilationTarget.HOST
-        )
-
     class GradlePlugin :
         LibraryType(
             Publish.SNAPSHOT_AND_RELEASE,
