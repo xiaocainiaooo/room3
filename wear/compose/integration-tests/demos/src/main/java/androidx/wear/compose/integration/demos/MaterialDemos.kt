@@ -16,7 +16,6 @@
 
 package androidx.wear.compose.integration.demos
 
-import android.annotation.SuppressLint
 import android.os.Build
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.getValue
@@ -95,7 +94,6 @@ import androidx.wear.compose.material.samples.ToggleChipWithSwitch
 import java.time.LocalDate
 import java.time.LocalTime
 
-@SuppressLint("ClassVerificationFailure")
 val WearMaterialDemos =
     DemoCategory(
         "Material",

@@ -391,7 +391,6 @@ object SandboxedUiAdapterFactory {
                 }
             }
 
-            @SuppressLint("ClassVerificationFailure")
             override fun notifyResized(width: Int, height: Int) {
 
                 val parentView = surfaceView.parent as View

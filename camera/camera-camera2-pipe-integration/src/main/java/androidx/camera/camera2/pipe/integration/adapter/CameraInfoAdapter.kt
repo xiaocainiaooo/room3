@@ -213,12 +213,10 @@ constructor(
         return streamConfigurationMapCompat.getOutputFormats()?.toSet() ?: emptySet()
     }
 
-    @SuppressLint("ClassVerificationFailure")
     override fun getSupportedResolutions(format: Int): List<Size> {
         return streamConfigurationMapCompat.getOutputSizes(format)?.toList() ?: emptyList()
     }
 
-    @SuppressLint("ClassVerificationFailure")
     override fun getSupportedHighResolutions(format: Int): List<Size> {
         return streamConfigurationMapCompat.getHighResolutionOutputSizes(format)?.toList()
             ?: emptyList()

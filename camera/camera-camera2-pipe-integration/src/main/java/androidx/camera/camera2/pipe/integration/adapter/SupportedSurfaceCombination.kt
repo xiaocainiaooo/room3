@@ -16,7 +16,6 @@
 
 package androidx.camera.camera2.pipe.integration.adapter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.FEATURE_CAMERA_CONCURRENT
@@ -1512,7 +1511,6 @@ public class SupportedSurfaceCombination(
      * @param highResolutionIncluded whether high resolution output sizes are included
      * @return the max supported output size for the image format
      */
-    @SuppressLint("ClassVerificationFailure")
     internal fun getMaxOutputSizeByFormat(
         map: StreamConfigurationMap?,
         imageFormat: Int,

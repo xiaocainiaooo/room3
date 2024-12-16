@@ -49,7 +49,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 
 @RequiresApi(34)
-@Suppress("ClassVerificationFailure")
 internal class CallSession(
     val coroutineContext: CoroutineContext,
     val attributes: CallAttributesCompat,
