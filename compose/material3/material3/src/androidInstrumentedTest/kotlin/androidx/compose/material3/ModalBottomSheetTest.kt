@@ -683,21 +683,18 @@ class ModalBottomSheetTest {
             ModalBottomSheet(
                 onDismissRequest = {},
                 modifier = Modifier.testTag(topTag),
+                dragHandle = null,
                 sheetState = sheetState,
             ) {
                 if (showShortContent) {
-                    Box(Modifier.fillMaxWidth().height(100.dp))
+                    Box(Modifier.fillMaxWidth().height(1.dp))
                 } else {
                     Box(Modifier.fillMaxSize().testTag(sheetTag))
                 }
             }
         }
 
-        rule.onNodeWithTag(topTag).performTouchInput {
-            swipeDown()
-            swipeDown()
-        }
-
+        scope.launch { sheetState.hide() }
         rule.runOnIdle { assertThat(sheetState.currentValue).isEqualTo(SheetValue.Hidden) }
 
         showShortContent = true
