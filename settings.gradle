@@ -872,7 +872,6 @@ includeProject(":navigation:lint:common-test", [BuildType.MAIN, BuildType.FLAN, 
 includeProject(":navigation:navigation-runtime", [BuildType.MAIN, BuildType.FLAN, BuildType.COMPOSE])
 includeProject(":navigation:navigation-runtime-lint", [BuildType.MAIN, BuildType.FLAN, BuildType.COMPOSE])
 includeProject(":navigation:navigation-runtime-ktx", [BuildType.MAIN, BuildType.FLAN, BuildType.COMPOSE])
-includeProject(":navigation:navigation-runtime-truth", [BuildType.MAIN, BuildType.FLAN])
 includeProject(":navigation:navigation-safe-args-generator", [BuildType.MAIN, BuildType.FLAN])
 includeProject(":navigation:navigation-safe-args-gradle-plugin", [BuildType.MAIN, BuildType.FLAN])
 includeProject(":navigation:navigation-testing", [BuildType.MAIN, BuildType.FLAN, BuildType.COMPOSE])
