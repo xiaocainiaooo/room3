@@ -17,7 +17,9 @@
 package androidx.pdf.view
 
 import android.graphics.Point
+import android.graphics.PointF
 import android.graphics.Rect
+import android.graphics.RectF
 import android.util.Range
 import androidx.pdf.PdfDocument
 import kotlin.math.ceil
@@ -102,6 +104,47 @@ internal class PageLayoutManager(
     }
 
     /**
+     * Returns the page number containing the specified PDF coordinates within the given viewport.
+     * If no page contains the coordinates, returns [INVALID_ID].
+     *
+     * @param pdfCoordinates The PDF coordinates to check.
+     * @param viewport The visible area of the PDF.
+     * @return The page number or [INVALID_ID].
+     */
+    fun getPageNumberAt(pdfCoordinates: PointF, viewport: Rect): Int {
+        val visiblePages = visiblePages.value
+        for (pageIndex in visiblePages.lower..visiblePages.upper) {
+            val pageBounds = paginationModel.getPageLocation(pageIndex, viewport)
+            if (RectF(pageBounds).contains(pdfCoordinates.x, pdfCoordinates.y)) {
+                return pageIndex
+            }
+        }
+        return INVALID_ID
+    }
+
+    /**
+     * Converts tap coordinates (relative to the viewport) to content coordinates relative to the
+     * specified page.
+     *
+     * @param pageNum The 0-indexed page number.
+     * @param viewport The current viewport's dimensions.
+     * @param tapCoordinates The tap coordinates relative to the visible pages.
+     * @return The coordinates relative to the clicked page.
+     */
+    fun getPageCoordinatesRelativeToTappedPage(
+        pageNum: Int,
+        viewport: Rect,
+        tapCoordinates: PointF
+    ): PointF {
+        val pageLocation = getPageLocation(pageNum, viewport)
+
+        val contentX = tapCoordinates.x - pageLocation.left
+        val contentY = tapCoordinates.y - pageLocation.top
+
+        return PointF(contentX, contentY)
+    }
+
+    /**
      * Emits a new [Range] to [visiblePages] based on the current [scrollY], [height], and [zoom] of
      * a [PdfView]
      */
@@ -148,5 +191,6 @@ internal class PageLayoutManager(
 
     companion object {
         private const val DEFAULT_PAGE_SPACING_PX: Int = 20
+        private const val INVALID_ID = -1
     }
 }
