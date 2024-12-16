@@ -25,11 +25,13 @@ import android.os.Looper
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.util.Range
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.OverScroller
 import androidx.annotation.RestrictTo
 import androidx.core.os.HandlerCompat
+import androidx.core.view.ViewCompat
 import androidx.pdf.PdfDocument
 import androidx.pdf.util.ZoomUtils
 import java.util.concurrent.Executors
@@ -145,6 +147,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     // To avoid allocations during drawing
     private val visibleAreaRect = Rect()
 
+    private var accessibilityPageHelper: AccessibilityPageHelper? = null
+
     /**
      * Scrolls to the 0-indexed [pageNum], optionally animating the scroll
      *
@@ -253,6 +257,21 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         scrollTo(x.toInt(), y.toInt())
     }
 
+    override fun dispatchHoverEvent(event: MotionEvent): Boolean {
+        return accessibilityPageHelper?.dispatchHoverEvent(event) == true ||
+            super.dispatchHoverEvent(event)
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        return accessibilityPageHelper?.dispatchKeyEvent(event) == true ||
+            super.dispatchKeyEvent(event)
+    }
+
+    override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
+        accessibilityPageHelper?.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val localPaginationManager = pageLayoutManager ?: return
@@ -276,11 +295,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
+        accessibilityPageHelper?.invalidateRoot()
     }
 
     override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
         super.onScrollChanged(l, t, oldl, oldt)
         pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
+        accessibilityPageHelper?.invalidateRoot()
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -409,6 +430,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         } else {
             scrollToRestoredPosition(positionToRestore, localStateToRestore.zoom)
         }
+        setAccessibility()
 
         stateToRestore = null
         return true
@@ -452,7 +474,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
                     // Prevent 2 copies from running concurrently
                     invalidationToJoin?.join()
-                    manager.invalidationSignalFlow.collect { invalidate() }
+                    launch { manager.invalidationSignalFlow.collect { invalidate() } }
+                    launch {
+                        manager.pageTextReadyFlow.collect { pageNum ->
+                            accessibilityPageHelper?.onPageTextReady(pageNum)
+                        }
+                    }
                 }
         }
     }
@@ -486,6 +513,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             pageLayoutManager =
                 PageLayoutManager(localPdfDocument, backgroundScope, DEFAULT_PAGE_PREFETCH_RADIUS)
                     .apply { onViewportChanged(scrollY, height, zoom) }
+            setAccessibility()
         }
         // If not, we'll start doing this when we _are_ attached to a visible window
         if (isAttachedToVisibleWindow) {
@@ -507,6 +535,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         if (!gestureTracker.matches(GestureTracker.Gesture.ZOOM)) {
             pageManager?.maybeUpdateBitmaps(visiblePages, zoom)
         }
+        accessibilityPageHelper?.invalidateRoot()
     }
 
     /**
@@ -585,7 +614,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      * Computes the part of the content visible within the outer part of this view (including this
      * view's padding) in co-ordinates of the content.
      */
-    private fun getVisibleAreaInContentCoords(): Rect {
+    internal fun getVisibleAreaInContentCoords(): Rect {
         visibleAreaRect.set(
             toContentX(-paddingLeft.toFloat()).toInt(),
             toContentY(-paddingTop.toFloat()).toInt(),
@@ -593,6 +622,21 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             toContentY(viewportHeight.toFloat() + paddingBottom).toInt(),
         )
         return visibleAreaRect
+    }
+
+    /**
+     * Initializes and sets the accessibility delegate for the PdfView.
+     *
+     * This method creates an instance of [AccessibilityPageHelper] if both [.pageLayoutManager] and
+     * [.pageManager] are initialized, and sets it as the accessibility delegate for the view using
+     * [ViewCompat.setAccessibilityDelegate].
+     */
+    private fun setAccessibility() {
+        if (pageLayoutManager != null && pageManager != null) {
+            accessibilityPageHelper =
+                AccessibilityPageHelper(this, pageLayoutManager!!, pageManager!!)
+            ViewCompat.setAccessibilityDelegate(this, accessibilityPageHelper)
+        }
     }
 
     /** The height of the viewport, minus padding */
@@ -604,12 +648,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         get() = right - left - paddingRight - paddingLeft
 
     /** Converts an X coordinate in View space to an X coordinate in content space */
-    private fun toContentX(viewX: Float): Float {
+    internal fun toContentX(viewX: Float): Float {
         return toContentCoord(viewX, zoom, scrollX)
     }
 
     /** Converts a Y coordinate in View space to a Y coordinate in content space */
-    private fun toContentY(viewY: Float): Float {
+    internal fun toContentY(viewY: Float): Float {
         return toContentCoord(viewY, zoom, scrollY)
     }
 

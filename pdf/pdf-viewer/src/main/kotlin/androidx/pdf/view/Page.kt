@@ -27,18 +27,20 @@ import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import androidx.pdf.PdfDocument
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 /** A single PDF page that knows how to render and draw itself */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 internal class Page(
     /** The 0-based index of this page in the PDF */
-    pageNum: Int,
+    private val pageNum: Int,
     /** The size of this PDF page, in content coordinates */
     pageSizePx: Point,
     /** The [PdfDocument] this [Page] belongs to */
-    pdfDocument: PdfDocument,
+    private val pdfDocument: PdfDocument,
     /** The [CoroutineScope] to use for background work */
-    backgroundScope: CoroutineScope,
+    private val backgroundScope: CoroutineScope,
     /**
      * The maximum size of any single [android.graphics.Bitmap] we render for a page, i.e. the
      * threshold for tiled rendering
@@ -46,6 +48,8 @@ internal class Page(
     maxBitmapSizePx: Point,
     /** A function to call when the [PdfView] hosting this [Page] ought to invalidate itself */
     onPageUpdate: () -> Unit,
+    /** A function to call when page text is ready (invoked with page number). */
+    private val onPageTextReady: ((Int) -> Unit)
 ) {
     init {
         require(pageNum >= 0) { "Invalid negative page" }
@@ -66,14 +70,34 @@ internal class Page(
     private val highlightPaint = Paint().apply { style = Style.FILL }
     private val highlightRect = RectF()
     private val tileLocationRect = RectF()
+    internal var fetchPageTextJob: Job? = null
+    internal var pageText: String? = null
 
     fun setVisible(zoom: Float) {
         bitmapFetcher.isActive = true
         bitmapFetcher.onScaleChanged(zoom)
+        fetchPageText()
     }
 
     fun setInvisible() {
         bitmapFetcher.isActive = false
+
+        pageText = null
+        fetchPageTextJob?.cancel()
+        fetchPageTextJob = null
+    }
+
+    fun fetchPageText() {
+        if (fetchPageTextJob?.isActive == true || pageText != null) {
+            return
+        }
+
+        fetchPageTextJob =
+            backgroundScope.launch {
+                pageText =
+                    pdfDocument.getPageContent(pageNum)?.textContents?.joinToString { it.text }
+                onPageTextReady.invoke(pageNum)
+            }
     }
 
     fun draw(canvas: Canvas, locationInView: Rect, highlights: List<Highlight>) {
