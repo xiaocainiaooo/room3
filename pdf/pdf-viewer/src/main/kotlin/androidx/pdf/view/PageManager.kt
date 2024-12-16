@@ -21,7 +21,6 @@ import android.graphics.Point
 import android.graphics.Rect
 import android.util.Range
 import android.util.SparseArray
-import androidx.annotation.VisibleForTesting
 import androidx.core.util.keyIterator
 import androidx.core.util.valueIterator
 import androidx.pdf.PdfDocument
@@ -63,7 +62,11 @@ internal class PageManager(
     val invalidationSignalFlow: SharedFlow<Unit>
         get() = _invalidationSignalFlow
 
-    @VisibleForTesting val pages = SparseArray<Page>()
+    internal val pages = SparseArray<Page>()
+
+    private val _pageTextReadyFlow = MutableSharedFlow<Int>(replay = 1)
+    val pageTextReadyFlow: SharedFlow<Int>
+        get() = _pageTextReadyFlow
 
     /**
      * [Highlight]s supplied by the developer to be drawn along with the pages they belong to
@@ -104,9 +107,15 @@ internal class PageManager(
     fun onPageSizeReceived(pageNum: Int, size: Point, isVisible: Boolean, currentZoomLevel: Float) {
         if (pages.contains(pageNum)) return
         val page =
-            Page(pageNum, size, pdfDocument, backgroundScope, maxBitmapSizePx) {
-                    _invalidationSignalFlow.tryEmit(Unit)
-                }
+            Page(
+                    pageNum,
+                    size,
+                    pdfDocument,
+                    backgroundScope,
+                    maxBitmapSizePx,
+                    onPageUpdate = { _invalidationSignalFlow.tryEmit(Unit) },
+                    onPageTextReady = { pageNumber -> _pageTextReadyFlow.tryEmit(pageNumber) }
+                )
                 .apply { if (isVisible) setVisible(currentZoomLevel) }
         pages.put(pageNum, page)
     }
