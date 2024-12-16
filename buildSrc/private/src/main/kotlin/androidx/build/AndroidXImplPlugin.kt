@@ -50,6 +50,9 @@ import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.attributes.BuildTypeAttr
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.KotlinMultiplatformAndroidDeviceTestCompilation
+import com.android.build.api.dsl.KotlinMultiplatformAndroidHostTestCompilation
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.dsl.PrivacySandboxSdkExtension
 import com.android.build.api.dsl.TestBuildType
@@ -682,10 +685,9 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
         project.configureJavaCompilationWarnings(androidXExtension)
     }
 
-    @Suppress("TYPEALIAS_EXPANSION_DEPRECATION")
     private fun configureWithKotlinMultiplatformAndroidPlugin(
         project: Project,
-        kotlinMultiplatformAndroidTarget: DeprecatedKotlinMultiplatformAndroidTarget,
+        kotlinMultiplatformAndroidTarget: KotlinMultiplatformAndroidLibraryTarget,
         androidXExtension: AndroidXExtension
     ) {
         val kotlinMultiplatformAndroidComponentsExtension =
@@ -1154,8 +1156,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
         )
     }
 
-    @Suppress("TYPEALIAS_EXPANSION_DEPRECATION")
-    private fun DeprecatedKotlinMultiplatformAndroidTarget.configureAndroidBaseOptions(
+    private fun KotlinMultiplatformAndroidLibraryTarget.configureAndroidBaseOptions(
         project: Project,
         componentsExtension: KotlinMultiplatformAndroidComponentsExtension
     ) {
@@ -1169,13 +1170,13 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
 
         lint.targetSdk = project.defaultAndroidConfig.targetSdk
         compilations
-            .withType(DeprecatedKotlinMultiplatformAndroidTestOnDeviceCompilation::class.java)
+            .withType(KotlinMultiplatformAndroidDeviceTestCompilation::class.java)
             .configureEach {
                 it.instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 it.animationsDisabled = true
             }
         compilations
-            .withType(DeprecatedKotlinMultiplatformAndroidTestOnJvmCompilation::class.java)
+            .withType(KotlinMultiplatformAndroidHostTestCompilation::class.java)
             .configureEach {
                 it.isReturnDefaultValues = true
                 // Include resources in Robolectric tests as a workaround for b/184641296
