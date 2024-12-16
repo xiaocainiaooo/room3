@@ -323,7 +323,9 @@ inline fun BenchmarkRule.measureRepeatedOnMainThread(
             val localScope = scope
 
             val initialTimeNs = System.nanoTime()
+            // we try to stop next measurement after soft deadline...
             val softDeadlineNs = initialTimeNs + TimeUnit.SECONDS.toNanos(2)
+            // ... and throw if took longer than hard deadline
             val hardDeadlineNs = initialTimeNs + TimeUnit.SECONDS.toNanos(10)
             var timeNs: Long = 0
 
@@ -355,7 +357,7 @@ inline fun BenchmarkRule.measureRepeatedOnMainThread(
                 resumeScheduled = true
                 localState.pauseTiming()
 
-                if (timeNs > hardDeadlineNs) {
+                if (timeNs > hardDeadlineNs && Arguments.measureRepeatedOnMainThrowOnDeadline) {
                     localState.cleanupBeforeThrow()
                     val overrunInSec = (timeNs - hardDeadlineNs) / 1_000_000_000.0
                     throw IllegalStateException(
