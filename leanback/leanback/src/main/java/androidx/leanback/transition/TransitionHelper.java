@@ -35,9 +35,10 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.AnimationUtils;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Helper for view transitions.
@@ -62,8 +63,7 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @Nullable
-    public static Object getSharedElementEnterTransition(@NonNull Window window) {
+    public static @Nullable Object getSharedElementEnterTransition(@NonNull Window window) {
         if (Build.VERSION.SDK_INT >= 21) {
             return window.getSharedElementEnterTransition();
         }
@@ -81,8 +81,7 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @Nullable
-    public static Object getSharedElementReturnTransition(@NonNull Window window) {
+    public static @Nullable Object getSharedElementReturnTransition(@NonNull Window window) {
         if (Build.VERSION.SDK_INT >= 21) {
             return window.getSharedElementReturnTransition();
         }
@@ -100,8 +99,7 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @Nullable
-    public static Object getSharedElementExitTransition(@NonNull Window window) {
+    public static @Nullable Object getSharedElementExitTransition(@NonNull Window window) {
         if (Build.VERSION.SDK_INT >= 21) {
             return window.getSharedElementExitTransition();
         }
@@ -109,8 +107,7 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @Nullable
-    public static Object getSharedElementReenterTransition(@NonNull Window window) {
+    public static @Nullable Object getSharedElementReenterTransition(@NonNull Window window) {
         if (Build.VERSION.SDK_INT >= 21) {
             return window.getSharedElementReenterTransition();
         }
@@ -118,8 +115,7 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @Nullable
-    public static Object getEnterTransition(@NonNull Window window) {
+    public static @Nullable Object getEnterTransition(@NonNull Window window) {
         if (Build.VERSION.SDK_INT >= 21) {
             return window.getEnterTransition();
         }
@@ -134,8 +130,7 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @Nullable
-    public static Object getReturnTransition(@NonNull Window window) {
+    public static @Nullable Object getReturnTransition(@NonNull Window window) {
         if (Build.VERSION.SDK_INT >= 21) {
             return window.getReturnTransition();
         }
@@ -150,8 +145,7 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @Nullable
-    public static Object getExitTransition(@NonNull Window window) {
+    public static @Nullable Object getExitTransition(@NonNull Window window) {
         if (Build.VERSION.SDK_INT >= 21) {
             return window.getExitTransition();
         }
@@ -159,8 +153,7 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @Nullable
-    public static Object getReenterTransition(@NonNull Window window) {
+    public static @Nullable Object getReenterTransition(@NonNull Window window) {
         if (Build.VERSION.SDK_INT >= 21) {
             return window.getReenterTransition();
         }
@@ -168,24 +161,21 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @Nullable
-    public static Object createScene(@NonNull ViewGroup sceneRoot, @Nullable Runnable r) {
+    public static @Nullable Object createScene(@NonNull ViewGroup sceneRoot, @Nullable Runnable r) {
         Scene scene = new Scene(sceneRoot);
         scene.setEnterAction(r);
         return scene;
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @NonNull
-    public static Object createChangeBounds(boolean reparent) {
+    public static @NonNull Object createChangeBounds(boolean reparent) {
         CustomChangeBounds changeBounds = new CustomChangeBounds();
         changeBounds.setReparent(reparent);
         return changeBounds;
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @NonNull
-    public static Object createChangeTransform() {
+    public static @NonNull Object createChangeTransform() {
         if (Build.VERSION.SDK_INT >= 21) {
             return new ChangeTransform();
         }
@@ -225,24 +215,21 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @NonNull
-    public static Object createTransitionSet(boolean sequential) {
+    public static @NonNull Object createTransitionSet(boolean sequential) {
         TransitionSet set = new TransitionSet();
         set.setOrdering(sequential ? TransitionSet.ORDERING_SEQUENTIAL
                 : TransitionSet.ORDERING_TOGETHER);
         return set;
     }
 
-    @NonNull
-    public static Object createSlide(int slideEdge) {
+    public static @NonNull Object createSlide(int slideEdge) {
         SlideKitkat slide = new SlideKitkat();
         slide.setSlideEdge(slideEdge);
         return slide;
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @NonNull
-    public static Object createScale() {
+    public static @NonNull Object createScale() {
         if (Build.VERSION.SDK_INT >= 21) {
             return new ChangeTransform();
         }
@@ -303,14 +290,12 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @NonNull
-    public static Object createAutoTransition() {
+    public static @NonNull Object createAutoTransition() {
         return new AutoTransition();
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @NonNull
-    public static Object createFadeTransition(int fadeMode) {
+    public static @NonNull Object createFadeTransition(int fadeMode) {
         return new Fade(fadeMode);
     }
 
@@ -384,8 +369,7 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @Nullable
-    public static Object createDefaultInterpolator(@NonNull Context context) {
+    public static @Nullable Object createDefaultInterpolator(@NonNull Context context) {
         if (Build.VERSION.SDK_INT >= 21) {
             return AnimationUtils.loadInterpolator(context,
                     android.R.interpolator.fast_out_linear_in);
@@ -394,8 +378,7 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @NonNull
-    public static Object loadTransition(@NonNull Context context, int resId) {
+    public static @NonNull Object loadTransition(@NonNull Context context, int resId) {
         return TransitionInflater.from(context).inflateTransition(resId);
     }
 
@@ -441,8 +424,7 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @NonNull
-    public static Object createFadeAndShortSlide(int edge) {
+    public static @NonNull Object createFadeAndShortSlide(int edge) {
         if (Build.VERSION.SDK_INT >= 21) {
             return new FadeAndShortSlide(edge);
         }
@@ -450,8 +432,7 @@ public final class TransitionHelper {
     }
 
     @SuppressLint("ClassVerificationFailure")
-    @NonNull
-    public static Object createFadeAndShortSlide(int edge, float distance) {
+    public static @NonNull Object createFadeAndShortSlide(int edge, float distance) {
         if (Build.VERSION.SDK_INT >= 21) {
             FadeAndShortSlide slide = new FadeAndShortSlide(edge);
             slide.setDistance(distance);
@@ -481,7 +462,7 @@ public final class TransitionHelper {
     @SuppressLint("ClassVerificationFailure")
     public static void setEpicenterCallback(
             @NonNull Object transition,
-            @Nullable final TransitionEpicenterCallback callback
+            final @Nullable TransitionEpicenterCallback callback
     ) {
         if (Build.VERSION.SDK_INT >= 21) {
             if (callback == null) {
