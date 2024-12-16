@@ -26,11 +26,8 @@ package androidx.build
  * purpose of the library needs to be set, rather than a variety of more arcane options.
  *
  * These properties are as follows: LibraryType.publish represents how the library is published to
- * GMaven LibraryType.sourceJars represents whether we publish the source code for the library to
- * GMaven in a way accessible to download, such as by Android Studio LibraryType.generateDocs
- * represents whether we generate documentation from the library to put on developer.android.com
- * LibraryType.checkApi represents whether we enforce API compatibility of the library according to
- * our semantic versioning protocol
+ * GMaven LibraryType.checkApi represents whether we enforce API compatibility of the library
+ * according to our semantic versioning protocol
  *
  * The possible values of LibraryType are as follows:
  * - [PUBLISHED_LIBRARY]: a conventional library published, sourced, documented, and versioned.
@@ -60,7 +57,6 @@ package androidx.build
  */
 sealed class LibraryType(
     val publish: Publish = Publish.NONE,
-    val sourceJars: Boolean = false,
     val checkApi: RunApiTasks = RunApiTasks.No("Unknown Library Type"),
     val compilationTarget: CompilationTarget = CompilationTarget.DEVICE,
     val allowCallingVisibleForTestsApis: Boolean = false,
@@ -131,7 +127,6 @@ sealed class LibraryType(
     ) :
         LibraryType(
             publish = Publish.SNAPSHOT_AND_RELEASE,
-            sourceJars = true,
             checkApi = checkApi,
             allowCallingVisibleForTestsApis = allowCallingVisibleForTestsApis,
             targetsKotlinConsumersOnly = targetsKotlinConsumersOnly
@@ -160,14 +155,12 @@ sealed class LibraryType(
     class Samples :
         LibraryType(
             publish = Publish.SNAPSHOT_AND_RELEASE,
-            sourceJars = true,
             checkApi = RunApiTasks.No("Sample Library")
         )
 
     class Lint :
         LibraryType(
             publish = Publish.NONE,
-            sourceJars = false,
             checkApi = RunApiTasks.No("Lint Library"),
             compilationTarget = CompilationTarget.HOST
         )
@@ -175,7 +168,6 @@ sealed class LibraryType(
     class StandalonePublishedLint :
         LibraryType(
             publish = Publish.SNAPSHOT_AND_RELEASE,
-            sourceJars = true,
             checkApi = RunApiTasks.No("Lint Library"),
             compilationTarget = CompilationTarget.HOST
         )
@@ -183,7 +175,6 @@ sealed class LibraryType(
     class GradlePlugin :
         LibraryType(
             Publish.SNAPSHOT_AND_RELEASE,
-            sourceJars = false,
             RunApiTasks.No("Gradle Plugin (Host-only)"),
             CompilationTarget.HOST
         )
@@ -191,7 +182,6 @@ sealed class LibraryType(
     class AnnotationProcessor :
         LibraryType(
             publish = Publish.SNAPSHOT_AND_RELEASE,
-            sourceJars = false,
             checkApi = RunApiTasks.No("Annotation Processor"),
             compilationTarget = CompilationTarget.HOST
         )
@@ -199,7 +189,6 @@ sealed class LibraryType(
     class AnnotationProcessorUtils :
         LibraryType(
             publish = Publish.SNAPSHOT_AND_RELEASE,
-            sourceJars = true,
             checkApi = RunApiTasks.No("Annotation Processor Helper Library"),
             compilationTarget = CompilationTarget.HOST
         )
@@ -207,7 +196,6 @@ sealed class LibraryType(
     class OtherCodeProcessor(publish: Publish = Publish.SNAPSHOT_AND_RELEASE) :
         LibraryType(
             publish = publish,
-            sourceJars = false,
             checkApi = RunApiTasks.No("Code Processor (Host-only)"),
             compilationTarget = CompilationTarget.HOST
         )
@@ -215,7 +203,6 @@ sealed class LibraryType(
     class IdePlugin :
         LibraryType(
             publish = Publish.NONE,
-            sourceJars = false,
             // TODO: figure out a way to make sure we don't break Studio
             checkApi = RunApiTasks.No("IDE Plugin (consumed only by Android Studio"),
             // This is a bit complicated. IDE plugins usually have an on-device component installed
