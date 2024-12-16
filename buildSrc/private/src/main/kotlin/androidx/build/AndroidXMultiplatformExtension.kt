@@ -48,7 +48,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinWasmTargetDsl
 import org.jetbrains.kotlin.gradle.targets.js.ir.DefaultIncrementalSyncTask
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
@@ -746,16 +746,18 @@ private fun Project.configureWasm() {
 }
 
 private fun Project.configureNode() {
-    rootProject.extensions.findByType<NodeJsRootExtension>()?.let { nodeJs ->
-        nodeJs.version = getVersionByName("node")
+    extensions.findByType<NodeJsEnvSpec>()?.let { nodeJs ->
+        nodeJs.version.set(getVersionByName("node"))
         if (!ProjectLayoutType.isPlayground(this)) {
-            nodeJs.downloadBaseUrl =
+            nodeJs.downloadBaseUrl.set(
                 File(project.getPrebuiltsRoot(), "androidx/external/org/nodejs/node")
                     .toURI()
                     .toString()
+            )
         }
     }
 
+    // https://youtrack.jetbrains.com/issue/KT-73913/K-Wasm-yarn-version-per-project
     rootProject.extensions.findByType(YarnRootExtension::class.java)?.let { yarn ->
         yarn.version = getVersionByName("yarn")
         yarn.yarnLockMismatchReport = YarnLockMismatchReport.FAIL
