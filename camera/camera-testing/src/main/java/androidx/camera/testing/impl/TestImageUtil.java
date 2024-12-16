@@ -46,6 +46,7 @@ import androidx.camera.testing.impl.fakes.FakeJpegPlaneProxy;
 import org.jspecify.annotations.NonNull;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 
 /**
  * Generates images for testing.
@@ -90,20 +91,76 @@ public class TestImageUtil {
     private TestImageUtil() {
     }
 
-
     /**
      * Creates a [FakeImageProxy] with YUV format.
-     *
-     * TODO(b/245940015): fix the content of the image to match the value of {@link #createBitmap}.
      */
     public static @NonNull FakeImageProxy createYuvFakeImageProxy(@NonNull ImageInfo imageInfo,
             int width, int height) {
+        return createYuvFakeImageProxy(imageInfo, width, height, false, false);
+    }
+
+    /**
+     * Creates a [FakeImageProxy] with YUV format with the content of the image to match the
+     * value of {@link #createBitmap}.
+     */
+    @NonNull
+    public static FakeImageProxy createYuvFakeImageProxy(@NonNull ImageInfo imageInfo,
+            int width, int height, boolean flipUV, boolean insertRgbTestData) {
         FakeImageProxy image = new FakeImageProxy(imageInfo);
         image.setFormat(YUV_420_888);
-        image.setPlanes(createYUV420ImagePlanes(width, height, 1, 1, false, false));
+        image.setPlanes(createYUV420ImagePlanes(width, height, 1, 1, flipUV, false));
         image.setWidth(width);
         image.setHeight(height);
+
+        // Directly returns the image if RGB test data is not needed.
+        if (!insertRgbTestData) {
+            return image;
+        }
+
+        Bitmap rgbBitmap = createBitmap(width, height);
+        writeBitmapToYuvByteBuffers(rgbBitmap,
+                image.getPlanes()[0].getBuffer(),
+                image.getPlanes()[1].getBuffer(),
+                image.getPlanes()[2].getBuffer());
+
         return image;
+    }
+
+    private static void writeBitmapToYuvByteBuffers(
+            @NonNull Bitmap bitmap,
+            @NonNull ByteBuffer yByteBuffer,
+            @NonNull ByteBuffer uByteBuffer,
+            @NonNull ByteBuffer vByteBuffer) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int[] argb = new int[width * height];
+        bitmap.getPixels(argb, 0, width, 0, 0, width, height);
+
+        int yIndex = 0;
+        int uvIndex = 0;
+
+        for (int j = 0; j < height; j++) {
+            for (int i = 0; i < width; i++) {
+                int rgb = argb[j * width + i];
+                int r = (rgb >> 16) & 0xFF;
+                int g = (rgb >> 8) & 0xFF;
+                int b = rgb & 0xFF;
+
+                int y = (int) (0.299 * r + 0.587 * g + 0.114 * b);
+                int u = (int) (-0.169 * r - 0.331 * g + 0.5 * b + 128);
+                int v = (int) (0.5 * r - 0.419 * g - 0.081 * b + 128);
+
+                yByteBuffer.put(yIndex++, (byte) y);
+                if (j % 2 == 0 && i % 2 == 0) {
+                    uByteBuffer.put(uvIndex, (byte) u);
+                    vByteBuffer.put(uvIndex, (byte) v);
+                    uvIndex++;
+                }
+            }
+        }
+        yByteBuffer.rewind();
+        uByteBuffer.rewind();
+        vByteBuffer.rewind();
     }
 
     /**
