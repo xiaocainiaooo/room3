@@ -22,7 +22,6 @@ import androidx.room.coroutines.ConnectionPool
 import androidx.room.coroutines.RawConnectionAccessor
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.SQLiteStatement
-import androidx.sqlite.use
 
 /**
  * An implementation of a connection pool used in compatibility mode. This impl doesn't do any
