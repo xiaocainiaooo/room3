@@ -38,6 +38,7 @@ class AndroidTestConfigBuilderTest {
         builder = ConfigBuilder()
         builder
             .configName("placeHolderAndroidTest.xml")
+            .configType(TestConfigType.DEFAULT)
             .isMicrobenchmark(false)
             .applicationId("com.androidx.placeholder.Placeholder")
             .isPostsubmit(true)
@@ -71,7 +72,7 @@ class AndroidTestConfigBuilderTest {
                     )
             )
         )
-        builder.enablePrivacySandbox(true)
+        builder.configType(TestConfigType.PRIVACY_SANDBOX_MAIN)
         MatcherAssert.assertThat(
             builder.buildXml(),
             CoreMatchers.`is`(goldenConfigForMainSandboxConfiguration)
@@ -130,7 +131,7 @@ class AndroidTestConfigBuilderTest {
                     )
             )
         )
-        builder.enablePrivacySandbox(true)
+        builder.configType(TestConfigType.PRIVACY_SANDBOX_MAIN)
 
         // NOTE: blocklisted arg is removed
         builder.instrumentationArgsMap["androidx.benchmark.profiling.skipWhenDurationRisksAnr"] =
@@ -435,6 +436,7 @@ private val goldenConfigForMainSandboxConfiguration =
     <option name="config-descriptor:metadata" key="applicationId" value="com.androidx.placeholder.Placeholder" />
     <option name="wifi:disable" value="true" />
     <option name="instrumentation-arg" key="notAnnotation" value="androidx.test.filters.FlakyTest" />
+    <option name="instrumentation-arg" key="androidx.testConfigType" value="PRIVACY_SANDBOX_MAIN" />
     <include name="google/unbundled/common/setup" />
     <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
     <option name="cleanup-apks" value="true" />
@@ -569,6 +571,7 @@ private val goldenConfigForMainSandboxMacroBenchmark =
     <option name="instrumentation-arg" key="androidx.benchmark.output.payload.testApkSha256" value="123456" />
     <option name="instrumentation-arg" key="androidx.benchmark.output.payload.appApkSha256" value="a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3" />
     <option name="instrumentation-arg" key="androidx.benchmark.enabledRules" value="Macrobenchmark" />
+    <option name="instrumentation-arg" key="androidx.testConfigType" value="PRIVACY_SANDBOX_MAIN" />
     <include name="google/unbundled/common/setup" />
     <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
     <option name="cleanup-apks" value="true" />

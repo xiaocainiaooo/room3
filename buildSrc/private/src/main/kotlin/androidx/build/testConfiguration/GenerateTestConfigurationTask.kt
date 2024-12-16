@@ -45,6 +45,8 @@ import org.gradle.work.DisableCachingByDefault
 @DisableCachingByDefault(because = "Doesn't benefit from caching")
 abstract class GenerateTestConfigurationTask : DefaultTask() {
 
+    @get:Input abstract val testConfigType: Property<TestConfigType>
+
     /** File containing [AppApksModel] with list of App APKs to install */
     @get:InputFile
     @get:Optional
@@ -64,9 +66,6 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     @get:Input abstract val applicationId: Property<String>
 
     @get:Input abstract val minSdk: Property<Int>
-
-    /** Add commands to enable privacy sandbox for test */
-    @get:Input abstract val enablePrivacySandbox: Property<Boolean>
 
     @get:Input abstract val macrobenchmark: Property<Boolean>
 
@@ -101,7 +100,8 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
         configurations testing Android Application projects, so that both APKs get installed.
          */
         val configBuilder = ConfigBuilder()
-        configBuilder.configName = outputXml.asFile.get().name
+        configBuilder.configName(outputXml.asFile.get().name)
+        configBuilder.configType(testConfigType.get())
         if (appApksModel.isPresent) {
             val modelJson = appApksModel.get().asFile.readText()
             val model = AppApksModel.fromJson(modelJson)
@@ -148,7 +148,6 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             .minSdk(minSdk.get().toString())
             .testRunner(testRunner.get())
             .testApkSha256(sha256(testApkFile))
-            .enablePrivacySandbox(enablePrivacySandbox.get())
         createOrFail(outputXml).writeText(configBuilder.buildXml())
         if (outputJson.isPresent) {
             if (!outputJson.asFile.get().name.startsWith("_")) {
