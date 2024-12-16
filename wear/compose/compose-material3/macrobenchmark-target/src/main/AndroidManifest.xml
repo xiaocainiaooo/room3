@@ -45,6 +45,16 @@
         </activity>
 
         <activity
+            android:name=".AndroidDialogActivity"
+            android:theme="@style/AppTheme"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.wear.compose.material3.macrobenchmark.target.ANDROID_DIALOG_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".AnimatedIconButtonActivity"
             android:theme="@style/AppTheme"
             android:exported="true">
