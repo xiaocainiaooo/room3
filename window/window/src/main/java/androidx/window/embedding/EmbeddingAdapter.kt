@@ -169,7 +169,7 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
 
     @RequiresWindowSdkExtension(OVERLAY_FEATURE_VERSION)
     @OptIn(ExperimentalWindowApi::class)
-    @SuppressLint("NewApi", "ClassVerificationFailure")
+    @SuppressLint("NewApi")
     internal fun translate(
         parentContainerInfo: OEMParentContainerInfo,
     ): ParentContainerInfo {
@@ -653,7 +653,7 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
                 )
                 .build()
 
-        @SuppressLint("ClassVerificationFailure", "NewApi")
+        @SuppressLint("NewApi")
         private fun translateActivityPairPredicates(splitPairFilters: Set<SplitPairFilter>): Any {
             return predicateAdapter.buildPairPredicate(Activity::class, Activity::class) {
                 first: Activity,
@@ -662,7 +662,7 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
             }
         }
 
-        @SuppressLint("ClassVerificationFailure", "NewApi")
+        @SuppressLint("NewApi")
         private fun translateActivityIntentPredicates(splitPairFilters: Set<SplitPairFilter>): Any {
             return predicateAdapter.buildPairPredicate(Activity::class, Intent::class) {
                 first,
@@ -712,21 +712,21 @@ internal class EmbeddingAdapter(private val predicateAdapter: PredicateAdapter) 
                 attrs.splitType.value != 1.0f &&
                 attrs.layoutDirection in arrayOf(LEFT_TO_RIGHT, RIGHT_TO_LEFT, LOCALE)
 
-        @SuppressLint("ClassVerificationFailure", "NewApi")
+        @SuppressLint("NewApi")
         private fun translateActivityPredicates(activityFilters: Set<ActivityFilter>): Any {
             return predicateAdapter.buildPredicate(Activity::class) { activity ->
                 activityFilters.any { filter -> filter.matchesActivity(activity) }
             }
         }
 
-        @SuppressLint("ClassVerificationFailure", "NewApi")
+        @SuppressLint("NewApi")
         private fun translateIntentPredicates(activityFilters: Set<ActivityFilter>): Any {
             return predicateAdapter.buildPredicate(Intent::class) { intent ->
                 activityFilters.any { filter -> filter.matchesIntent(intent) }
             }
         }
 
-        @SuppressLint("ClassVerificationFailure", "NewApi")
+        @SuppressLint("NewApi")
         private fun translateParentMetricsPredicate(context: Context, splitRule: SplitRule): Any =
             predicateAdapter.buildPredicate(AndroidWindowMetrics::class) { windowMetrics ->
                 splitRule.checkParentMetrics(context, windowMetrics)

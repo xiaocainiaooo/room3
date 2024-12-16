@@ -430,7 +430,6 @@ public final class CameraUtil {
             mCameraCaptureSession = openFuture.get(5, TimeUnit.SECONDS);
         }
 
-        @SuppressLint("ClassVerificationFailure")
         @SuppressWarnings({"deprecation", "newApi", "unchecked"})
         private @NonNull ListenableFuture<CameraCaptureSession> openCaptureSession(
                 @NonNull CameraDevice cameraDevice,

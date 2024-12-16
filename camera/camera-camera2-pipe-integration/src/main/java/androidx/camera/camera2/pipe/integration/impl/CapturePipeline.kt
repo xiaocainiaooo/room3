@@ -32,7 +32,6 @@
 
 package androidx.camera.camera2.pipe.integration.impl
 
-import android.annotation.SuppressLint
 import android.hardware.camera2.CameraCharacteristics.CONTROL_AE_STATE_FLASH_REQUIRED
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CaptureResult
@@ -616,7 +615,6 @@ constructor(
                                     completeSignal.complete(null)
                                 }
 
-                                @SuppressLint("ClassVerificationFailure")
                                 override fun onFailed(
                                     requestMetadata: RequestMetadata,
                                     frameNumber: FrameNumber,
