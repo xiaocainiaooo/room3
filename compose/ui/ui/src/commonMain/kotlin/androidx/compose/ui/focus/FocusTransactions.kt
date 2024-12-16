@@ -16,9 +16,6 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.ui.ComposeUiFlags
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.focus.CustomDestinationResult.Cancelled
 import androidx.compose.ui.focus.CustomDestinationResult.None
 import androidx.compose.ui.focus.CustomDestinationResult.RedirectCancelled
@@ -32,7 +29,6 @@ import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.node.Nodes.FocusTarget
 import androidx.compose.ui.node.nearestAncestor
 import androidx.compose.ui.node.observeReads
-import androidx.compose.ui.node.requireLayoutNode
 import androidx.compose.ui.node.requireOwner
 
 /**
@@ -62,14 +58,7 @@ internal fun FocusTargetNode.performRequestFocus(): Boolean {
                 }
             }
         }
-    if (success) {
-        @OptIn(ExperimentalComposeUiApi::class, InternalComposeUiApi::class)
-        if (ComposeUiFlags.isViewFocusFixEnabled && requireLayoutNode().getInteropView() == null) {
-            // This isn't an AndroidView, so we should be focused on this ComposeView
-            requireOwner().focusOwner.requestFocusForOwner(FocusDirection.Next, null)
-        }
-        dispatchFocusCallbacks()
-    }
+    if (success) dispatchFocusCallbacks()
     return success
 }
 

@@ -17,8 +17,6 @@
 package androidx.compose.ui.focus
 
 import androidx.collection.MutableLongSet
-import androidx.compose.ui.ComposeUiFlags
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.CustomDestinationResult.Cancelled
 import androidx.compose.ui.focus.CustomDestinationResult.None
@@ -204,11 +202,6 @@ internal class FocusOwnerImpl(
      * @return true if focus was moved successfully. false if the focused item is unchanged.
      */
     override fun moveFocus(focusDirection: FocusDirection): Boolean {
-        // First check to see if the focus should move within child Views
-        @OptIn(ExperimentalComposeUiApi::class)
-        if (ComposeUiFlags.isViewFocusFixEnabled && onMoveFocusInterop(focusDirection)) {
-            return true
-        }
         var requestFocusSuccess: Boolean? = false
         val generationBefore = focusTransactionManager.generation
         val focusSearchSuccess =
@@ -244,8 +237,7 @@ internal class FocusOwnerImpl(
         // If we couldn't move focus within compose, we attempt to move focus within embedded views.
         // We don't need this for 1D focus search because the wrap-around logic triggers a
         // focus exit which will perform a focus search among the subviews.
-        @OptIn(ExperimentalComposeUiApi::class)
-        return !ComposeUiFlags.isViewFocusFixEnabled && onMoveFocusInterop(focusDirection)
+        return onMoveFocusInterop(focusDirection)
     }
 
     override fun focusSearch(
