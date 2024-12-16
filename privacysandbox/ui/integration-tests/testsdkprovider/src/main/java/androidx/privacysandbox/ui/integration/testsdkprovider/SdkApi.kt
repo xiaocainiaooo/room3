@@ -35,16 +35,15 @@ import androidx.privacysandbox.ui.integration.sdkproviderutils.TestAdapters
 import androidx.privacysandbox.ui.integration.sdkproviderutils.ViewabilityHandler
 import androidx.privacysandbox.ui.integration.sdkproviderutils.fullscreen.FullscreenAd
 import androidx.privacysandbox.ui.integration.testaidl.IMediateeSdkApi
-import androidx.privacysandbox.ui.integration.testaidl.ISdkApi
 import androidx.privacysandbox.ui.provider.toCoreLibInfo
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class SdkApi(private val sdkContext: Context) : ISdkApi.Stub() {
+class SdkApi(private val sdkContext: Context) : ISdkApi {
     private val testAdapters = TestAdapters(sdkContext)
     private val handler = Handler(Looper.getMainLooper())
 
-    override fun loadBannerAd(
+    override suspend fun loadBannerAd(
         @AdType adType: Int,
         @MediationOption mediationOption: Int,
         waitInsideOnDraw: Boolean,

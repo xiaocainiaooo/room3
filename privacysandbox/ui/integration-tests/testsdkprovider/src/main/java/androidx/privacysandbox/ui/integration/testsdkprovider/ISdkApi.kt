@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package androidx.privacysandbox.ui.integration.testaidl;
+package androidx.privacysandbox.ui.integration.testsdkprovider
 
-import android.os.Bundle;
+import android.os.Bundle
+import androidx.privacysandbox.tools.PrivacySandboxService
 
+@PrivacySandboxService
 interface ISdkApi {
-   Bundle loadBannerAd(int adType, int sdkType, boolean withSlowDraw, boolean drawViewability);
-   void requestResize(int width, int height);
-   oneway void triggerProcessDeath();
-   oneway void launchFullscreenAd(in Bundle launcherInfo, int screenOrientation, int backButtonNavigation);
+    suspend fun loadBannerAd(
+        adType: Int,
+        mediationOption: Int,
+        waitInsideOnDraw: Boolean,
+        drawViewability: Boolean
+    ): Bundle
+
+    fun requestResize(width: Int, height: Int)
+
+    fun triggerProcessDeath()
+
+    fun launchFullscreenAd(launcherInfo: Bundle, screenOrientation: Int, backButtonNavigation: Int)
 }
