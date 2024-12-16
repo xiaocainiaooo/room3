@@ -27,6 +27,7 @@ import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ModifiersBuilders.Background
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
+import androidx.wear.protolayout.material3.AppCardStyle.Companion.largeAppCardStyle
 import androidx.wear.protolayout.material3.ButtonDefaults.filledButtonColors
 import androidx.wear.protolayout.material3.ButtonDefaults.filledTonalButtonColors
 import androidx.wear.protolayout.material3.ButtonDefaults.filledVariantButtonColors
@@ -221,7 +222,51 @@ object TestCasesGenerator {
             ) {
                 primaryLayout(
                     mainSlot = {
-                        coloredBox(color = colorScheme.tertiaryContainer, shape = shapes.extraLarge)
+                        appCard(
+                            onClick = clickable,
+                            modifier = LayoutModifier.contentDescription("Card"),
+                            title = {
+                                text(
+                                    "Default App Card text that will overflow after 1 line of text"
+                                        .layoutString
+                                )
+                            },
+                            time = { text("Now".layoutString) },
+                            content = { text("Default app card".layoutString) },
+                            label = { text("Label in card".layoutString) },
+                            avatar = { avatarImage(IMAGE_ID) }
+                        )
+                    },
+                    labelForBottomSlot = { text("Ignored Label in bottom slot".layoutString) },
+                    titleSlot = {
+                        text("Title".layoutString, color = colorScheme.secondaryContainer)
+                    }
+                )
+            }
+        testCases["primarylayout_largeappcard_nobottomslot_golden$goldenSuffix"] =
+            materialScope(
+                ApplicationProvider.getApplicationContext(),
+                deviceParameters,
+                allowDynamicTheme = false
+            ) {
+                primaryLayout(
+                    mainSlot = {
+                        appCard(
+                            onClick = clickable,
+                            modifier = LayoutModifier.contentDescription("Card"),
+                            title = {
+                                text(
+                                    "Large App Card text that will overflow after 1 line of text"
+                                        .layoutString
+                                )
+                            },
+                            time = { text("Now".layoutString) },
+                            content = { text("Large app card".layoutString) },
+                            label = { text("Label in card".layoutString) },
+                            avatar = { avatarImage(IMAGE_ID) },
+                            colors = filledVariantCardColors(),
+                            style = largeAppCardStyle()
+                        )
                     },
                     labelForBottomSlot = { text("Ignored Label in bottom slot".layoutString) },
                     titleSlot = {
