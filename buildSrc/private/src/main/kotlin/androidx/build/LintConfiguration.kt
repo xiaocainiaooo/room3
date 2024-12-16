@@ -15,6 +15,7 @@
  */
 package androidx.build
 
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import com.android.build.api.dsl.Lint
 import com.android.build.api.variant.KotlinMultiplatformAndroidComponentsExtension
 import com.android.build.gradle.AppPlugin
@@ -79,9 +80,8 @@ private fun Project.configureAndroidProjectForLint(isLibrary: Boolean) =
         configureLint(extension.lint, isLibrary)
     }
 
-@Suppress("TYPEALIAS_EXPANSION_DEPRECATION")
 private fun Project.configureAndroidMultiplatformProjectForLint(
-    extension: DeprecatedKotlinMultiplatformAndroidTarget,
+    extension: KotlinMultiplatformAndroidLibraryTarget,
     componentsExtension: KotlinMultiplatformAndroidComponentsExtension
 ) {
     componentsExtension.finalizeDsl {
