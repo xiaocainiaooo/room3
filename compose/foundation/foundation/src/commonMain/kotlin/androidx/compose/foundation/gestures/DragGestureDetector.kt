@@ -784,7 +784,7 @@ private suspend inline fun AwaitPointerEventScope.awaitDragOrUp(
  *   `null` if all pointers are raised or the position change was consumed by another gesture
  *   detector.
  */
-private suspend inline fun AwaitPointerEventScope.awaitPointerSlopOrCancellation(
+internal suspend inline fun AwaitPointerEventScope.awaitPointerSlopOrCancellation(
     pointerId: PointerId,
     pointerType: PointerType,
     orientation: Orientation?,
@@ -836,7 +836,7 @@ private suspend inline fun AwaitPointerEventScope.awaitPointerSlopOrCancellation
  * new [PointerInputChange] one should add it to this detector using [addPointerInputChange]. If the
  * position change causes the touch slop to be crossed, [addPointerInputChange] will return true.
  */
-private class TouchSlopDetector(
+internal class TouchSlopDetector(
     val orientation: Orientation? = null,
     val initialPositionChange: Offset
 ) {
