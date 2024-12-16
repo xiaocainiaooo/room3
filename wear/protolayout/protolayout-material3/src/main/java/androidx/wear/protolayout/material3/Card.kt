@@ -25,12 +25,15 @@ import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_START
 import androidx.wear.protolayout.LayoutElementBuilders.HorizontalAlignment
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
+import androidx.wear.protolayout.LayoutElementBuilders.TEXT_ALIGN_START
 import androidx.wear.protolayout.ModifiersBuilders.Background
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.TypeBuilders.StringProp
+import androidx.wear.protolayout.material3.AppCardDefaults.buildContentForAppCard
+import androidx.wear.protolayout.material3.AppCardStyle.Companion.defaultAppCardStyle
 import androidx.wear.protolayout.material3.CardDefaults.DEFAULT_CONTENT_PADDING
 import androidx.wear.protolayout.material3.CardDefaults.METADATA_TAG
 import androidx.wear.protolayout.material3.CardDefaults.filledCardColors
@@ -55,8 +58,9 @@ import androidx.wear.protolayout.types.LayoutColor
  *   [weight]
  * @param shape Defines the card's shape, in other words the corner radius for this card.
  * @param colors The colors to be used for a background and inner content of this card. If the
- *   background image is also specified, it will be laid out on top of the background color
- *   specified here. Specified colors can be [CardDefaults.filledCardColors] for high emphasis card,
+ *   background image is also specified, the image will be laid out on top of the background color.
+ *   In case of the fully opaque background image, then the background color will not be shown.
+ *   Specified colors can be [CardDefaults.filledCardColors] for high emphasis card,
  *   [CardDefaults.filledVariantCardColors] for high/medium emphasis card,
  *   [CardDefaults.filledTonalCardColors] for low/medium emphasis card,
  *   [CardDefaults.imageBackgroundCardColors] for card with image as a background or custom built
@@ -148,6 +152,143 @@ public fun MaterialScope.titleCard(
     }
 
 /**
+ * Opinionated ProtoLayout Material3 app card that offers up to 5 slots, usually text based.
+ *
+ * Those are vertically stacked title and content, and additional side slot for a time.
+ *
+ * The first row of the card has three slots:
+ * 1) a small optional image, such as [avatarImage]
+ * 2) label, which is expected to be a short [text]
+ * 3) time, end aligned.
+ *
+ * The second row shows a title, this is expected to be a single row of start aligned [text].
+ *
+ * The rest of the [appCard] contains the content which should be [text].
+ *
+ * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
+ *   associated action.
+ * @param contentDescription The content description to be read by Talkback.
+ * @param title A slot for displaying the title of the card, expected to be one line of text. Uses
+ *   [CardColors.title] color by default.
+ * @param content The optional body content of the card. Uses [CardColors.content] color by default.
+ * @param avatar An optional slot in header for displaying small image, such as [avatarImage].
+ * @param label An optional slot in header for displaying short, label text. Uses [CardColors.label]
+ *   color by default.
+ * @param time An optional slot for displaying the time relevant to the contents of the card,
+ *   expected to be a short piece of text. Uses [CardColors.time] color by default.
+ * @param height The height of this card. It's highly recommended to leave this with default value
+ *   as `wrap` if there's only 1 card on the screen. If there are two cards, it is highly
+ *   recommended to set this to [expand] and use the smaller styles.
+ * @param shape Defines the card's shape, in other words the corner radius for this card.
+ * @param colors The colors to be used for a background and inner content of this card. If the
+ *   background image is also specified, the image will be laid out on top of the background color.
+ *   In case of the fully opaque background image, then the background color will not be shown.
+ *   Specified colors can be [CardDefaults.filledCardColors] for high emphasis card,
+ *   [CardDefaults.filledVariantCardColors] for high/medium emphasis card,
+ *   [CardDefaults.filledTonalCardColors] for low/medium emphasis card,
+ *   [CardDefaults.imageBackgroundCardColors] for card with image as a background or custom built
+ *   [CardColors].
+ * @param background The background object to be used behind the content in the card. It is
+ *   recommended the default styling that is automatically provided by only calling
+ *   [backgroundImage] with the content. It can be combined with the specified [colors]'s background
+ *   color behind it.
+ * @param style The style which provides the attribute values required for constructing this title
+ *   card and its inner content. It also provides default style for the inner content, that can be
+ *   overridden by each content slot.
+ * @param contentPadding The inner padding used to prevent inner content from being too close to the
+ *   card's edge. It's highly recommended to keep the default.
+ * @sample androidx.wear.protolayout.material3.samples.appCardSample
+ */
+// TODO: b/346958146 - link Card visuals in DAC
+// TODO: b/373578620 - Add how corners affects margins in the layout.
+public fun MaterialScope.appCard(
+    onClick: Clickable,
+    contentDescription: StringProp,
+    title: (MaterialScope.() -> LayoutElement),
+    content: (MaterialScope.() -> LayoutElement)? = null,
+    avatar: (MaterialScope.() -> LayoutElement)? = null,
+    label: (MaterialScope.() -> LayoutElement)? = null,
+    time: (MaterialScope.() -> LayoutElement)? = null,
+    height: ContainerDimension = wrapWithMinTapTargetDimension(),
+    shape: Corner =
+        if (deviceConfiguration.screenWidthDp.isBreakpoint()) shapes.extraLarge else shapes.large,
+    colors: CardColors = filledCardColors(),
+    background: (MaterialScope.() -> LayoutElement)? = null,
+    style: AppCardStyle = defaultAppCardStyle(),
+    contentPadding: Padding = style.innerPadding,
+): LayoutElement =
+    card(
+        onClick = onClick,
+        contentDescription = contentDescription,
+        width = expand(),
+        height = height,
+        shape = shape,
+        backgroundColor = colors.background,
+        background = background,
+        contentPadding = contentPadding
+    ) {
+        buildContentForAppCard(
+            title =
+                withStyle(
+                        defaultTextElementStyle =
+                            TextElementStyle(
+                                typography = style.titleTypography,
+                                color = colors.title,
+                                multilineAlignment = TEXT_ALIGN_START
+                            )
+                    )
+                    .title(),
+            content =
+                content?.let {
+                    withStyle(
+                            defaultTextElementStyle =
+                                TextElementStyle(
+                                    typography = style.contentTypography,
+                                    color = colors.content,
+                                    multilineAlignment = TEXT_ALIGN_START
+                                )
+                        )
+                        .it()
+                },
+            time =
+                time?.let {
+                    withStyle(
+                            defaultTextElementStyle =
+                                TextElementStyle(
+                                    typography = style.timeTypography,
+                                    color = colors.time,
+                                )
+                        )
+                        .it()
+                },
+            label =
+                label?.let {
+                    withStyle(
+                            defaultTextElementStyle =
+                                TextElementStyle(
+                                    typography = style.labelTypography,
+                                    color = colors.label,
+                                    multilineAlignment = TEXT_ALIGN_START
+                                )
+                        )
+                        .it()
+                },
+            avatar =
+                avatar?.let {
+                    withStyle(
+                            defaultAvatarImageStyle =
+                                AvatarImageStyle(
+                                    width = style.avatarSize.toDp(),
+                                    height = style.avatarSize.toDp(),
+                                )
+                        )
+                        .it()
+                },
+            style = style
+        )
+    }
+
+/**
  * ProtoLayout Material3 clickable component card that offers a single slot to take any content.
  *
  * It can be used as the container for more opinionated Card components that take specific content
@@ -164,7 +305,8 @@ public fun MaterialScope.titleCard(
  * @param contentDescription The content description to be read by Talkback.
  * @param shape Defines the card's shape, in other words the corner radius for this card.
  * @param backgroundColor The color to be used as a background of this card. If the background image
- *   is also specified, it will be laid out on top of this color.
+ *   is also specified, the image will be laid out on top of this color. In case of the fully opaque
+ *   background image, then this background color will not be shown.
  * @param background The background object to be used behind the content in the card. It is
  *   recommended the default styling that is automatically provided by only calling
  *   [backgroundImage] with the content. It can be combined with the specified [backgroundColor]

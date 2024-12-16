@@ -32,7 +32,7 @@ import androidx.wear.protolayout.types.LayoutColor
  * Material components provide proper defaults for the background image. In order to take advantage
  * of those defaults, this should be used with the resource ID only: `backgroundImage("id")`.
  *
- * @param protoLayoutResourceId The protolayout resource id of the icon. Node that, this is not an
+ * @param protoLayoutResourceId The protolayout resource id of the image. Node that, this is not an
  *   Android resource id.
  * @param width The width of an image. Usually, this matches the width of the parent component this
  *   is used in.
@@ -79,4 +79,34 @@ public fun MaterialScope.backgroundImage(
                 )
                 .build()
         )
+        .build()
+
+/**
+ * Returns the avatar image with the defined style.
+ *
+ * Material components such as [appCard] provide proper defaults for the small avatar image. In
+ * order to take advantage of those defaults, this should be used with the resource ID only:
+ * `avatarImage("id")`.
+ *
+ * @param protoLayoutResourceId The protolayout resource id of the image. Node that, this is not an
+ *   Android resource id.
+ * @param width The width of an image. Usually, a small image that fit into the component's slot.
+ * @param height The height of an image. Usually, a small image that fit into the component's slot.
+ * @param shape The shape of the corners for the image. Usually it's circular image.
+ * @param contentScaleMode The content scale mode for the image to define how image will adapt to
+ *   the given size
+ */
+public fun MaterialScope.avatarImage(
+    protoLayoutResourceId: String,
+    width: ImageDimension = defaultAvatarImageStyle.width,
+    height: ImageDimension = defaultAvatarImageStyle.height,
+    shape: Corner = defaultAvatarImageStyle.shape,
+    @ContentScaleMode contentScaleMode: Int = defaultAvatarImageStyle.contentScaleMode,
+): LayoutElement =
+    Image.Builder()
+        .setWidth(width)
+        .setHeight(height)
+        .setModifiers(Modifiers.Builder().setBackground(shape.toBackground()).build())
+        .setResourceId(protoLayoutResourceId)
+        .setContentScaleMode(contentScaleMode)
         .build()

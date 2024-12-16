@@ -17,20 +17,23 @@
 package androidx.wear.tiles.samples.tile
 
 import android.content.Context
-import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.ResourceBuilders
+import androidx.wear.protolayout.ResourceBuilders.AndroidImageResourceByResId
+import androidx.wear.protolayout.ResourceBuilders.ImageResource
 import androidx.wear.protolayout.TimelineBuilders
 import androidx.wear.protolayout.material3.CardColors
+import androidx.wear.protolayout.material3.appCard
+import androidx.wear.protolayout.material3.avatarImage
 import androidx.wear.protolayout.material3.materialScope
 import androidx.wear.protolayout.material3.primaryLayout
 import androidx.wear.protolayout.material3.prop
 import androidx.wear.protolayout.material3.text
 import androidx.wear.protolayout.material3.textEdgeButton
-import androidx.wear.protolayout.material3.titleCard
 import androidx.wear.tiles.RequestBuilders
 import androidx.wear.tiles.TileBuilders
 import androidx.wear.tiles.TileService
+import androidx.wear.tiles.samples.R
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 
@@ -49,7 +52,19 @@ class PlaygroundTileService : TileService() {
 
 private fun resources() =
     Futures.immediateFuture(
-        ResourceBuilders.Resources.Builder().setVersion(RESOURCES_VERSION).build()
+        ResourceBuilders.Resources.Builder()
+            .addIdToImageMapping(
+                "id",
+                ImageResource.Builder()
+                    .setAndroidResourceByResId(
+                        AndroidImageResourceByResId.Builder()
+                            .setResourceId(R.drawable.avatar)
+                            .build()
+                    )
+                    .build()
+            )
+            .setVersion(RESOURCES_VERSION)
+            .build()
     )
 
 private fun tile(
@@ -72,7 +87,7 @@ private fun tileLayout(
     materialScope(context = context, deviceConfiguration = requestParams.deviceConfiguration) {
         primaryLayout(
             mainSlot = {
-                titleCard(
+                appCard(
                     onClick = EMPTY_LOAD_CLICKABLE,
                     contentDescription = "Sample Card".prop(),
                     colors =
@@ -82,7 +97,6 @@ private fun tileLayout(
                             content = colorScheme.onTertiary,
                             time = colorScheme.onTertiary
                         ),
-                    height = expand(),
                     title = {
                         text(
                             "Title Card!".prop(),
@@ -91,10 +105,16 @@ private fun tileLayout(
                     },
                     content = {
                         text(
-                            "Hello and welcome Tiles in AndroidX!".prop(),
-                            maxLines = 2,
+                            "Content of this Card!".prop(),
+                            maxLines = 1,
                         )
                     },
+                    label = {
+                        text(
+                            "Hello and welcome Tiles in AndroidX!".prop(),
+                        )
+                    },
+                    avatar = { avatarImage("id") },
                     time = {
                         text(
                             "NOW".prop(),
