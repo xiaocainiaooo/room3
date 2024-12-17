@@ -46,24 +46,24 @@ public final class StorageInfo extends AbstractSafeParcelable {
     @Field(id = 3, getter = "getAliveNamespacesCount")
     private int mAliveNamespacesCount;
 
-    @Field(id = 4, getter = "getBlobSizeBytes")
-    private long mBlobSizeBytes;
+    @Field(id = 4, getter = "getBlobsSizeBytes")
+    private long mBlobsSizeBytes;
 
-    @Field(id = 5, getter = "getBlobCount")
-    private int mBlobCount;
+    @Field(id = 5, getter = "getBlobsCount")
+    private int mBlobsCount;
 
     @Constructor
     StorageInfo(
             @Param(id = 1) long sizeBytes,
             @Param(id = 2) int aliveDocumentsCount,
             @Param(id = 3) int aliveNamespacesCount,
-            @Param(id = 4) long blobSizeBytes,
-            @Param(id = 5) int blobCount) {
+            @Param(id = 4) long blobsSizeBytes,
+            @Param(id = 5) int blobsCount) {
         mSizeBytes = sizeBytes;
         mAliveDocumentsCount = aliveDocumentsCount;
         mAliveNamespacesCount = aliveNamespacesCount;
-        mBlobSizeBytes = blobSizeBytes;
-        mBlobCount = blobCount;
+        mBlobsSizeBytes = blobsSizeBytes;
+        mBlobsCount = blobsCount;
     }
 
     /** Returns the estimated size of the session's database in bytes. */
@@ -101,8 +101,8 @@ public final class StorageInfo extends AbstractSafeParcelable {
      */
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     @ExperimentalAppSearchApi
-    public long getBlobSizeBytes() {
-        return mBlobSizeBytes;
+    public long getBlobsSizeBytes() {
+        return mBlobsSizeBytes;
     }
 
     /**
@@ -114,8 +114,8 @@ public final class StorageInfo extends AbstractSafeParcelable {
      */
     @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
     @ExperimentalAppSearchApi
-    public int getBlobCount() {
-        return mBlobCount;
+    public int getBlobsCount() {
+        return mBlobsCount;
     }
 
     /** Builder for {@link StorageInfo} objects. */
@@ -123,8 +123,8 @@ public final class StorageInfo extends AbstractSafeParcelable {
         private long mSizeBytes;
         private int mAliveDocumentsCount;
         private int mAliveNamespacesCount;
-        private long mBlobSizeBytes;
-        private int mBlobCount;
+        private long mBlobsSizeBytes;
+        private int mBlobsCount;
 
         /** Sets the size in bytes. */
         @CanIgnoreReturnValue
@@ -151,8 +151,8 @@ public final class StorageInfo extends AbstractSafeParcelable {
         @CanIgnoreReturnValue
         @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
         @ExperimentalAppSearchApi
-        public StorageInfo.@NonNull Builder setBlobSizeBytes(long blobSizeBytes) {
-            mBlobSizeBytes = blobSizeBytes;
+        public StorageInfo.@NonNull Builder setBlobsSizeBytes(long blobsSizeBytes) {
+            mBlobsSizeBytes = blobsSizeBytes;
             return this;
         }
 
@@ -160,15 +160,15 @@ public final class StorageInfo extends AbstractSafeParcelable {
         @CanIgnoreReturnValue
         @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
         @ExperimentalAppSearchApi
-        public StorageInfo.@NonNull Builder setBlobCount(int blobCount) {
-            mBlobCount = blobCount;
+        public StorageInfo.@NonNull Builder setBlobsCount(int blobsCount) {
+            mBlobsCount = blobsCount;
             return this;
         }
 
         /** Builds a {@link StorageInfo} object. */
         public @NonNull StorageInfo build() {
             return new StorageInfo(mSizeBytes, mAliveDocumentsCount, mAliveNamespacesCount,
-                    mBlobSizeBytes,  mBlobCount);
+                    mBlobsSizeBytes, mBlobsCount);
         }
     }
 
