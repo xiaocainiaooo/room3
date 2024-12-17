@@ -36,6 +36,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.pdf.view.PdfView
+import androidx.pdf.view.ToolBoxView
 import androidx.pdf.view.search.PdfSearchView
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.DocumentError
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.DocumentLoaded
@@ -93,7 +94,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
     public var isToolboxVisible: Boolean
         get() = documentViewModel.isToolboxVisibleFromState
         set(value) {
-            documentViewModel.onToolboxViewToggle(value)
+            documentViewModel.updateToolboxState(value)
         }
 
     /**
@@ -140,6 +141,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
     }
 
     private lateinit var pdfView: PdfView
+    private lateinit var toolboxView: ToolBoxView
     private lateinit var errorView: TextView
     private lateinit var loadingView: ProgressBar
     private lateinit var pdfSearchView: PdfSearchView
@@ -187,6 +189,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
             errorView = findViewById(R.id.errorTextView)
             loadingView = findViewById(R.id.pdfLoadingProgressBar)
             pdfSearchView = findViewById(R.id.pdfSearchView)
+            toolboxView = findViewById(R.id.toolBoxView)
         }
         pdfViewManager =
             PdfViewManager(
@@ -295,34 +298,56 @@ public open class PdfViewerFragmentV2 : Fragment() {
     }
 
     private fun handleLoading() {
-        setViewVisibility(pdfView = GONE, loadingView = VISIBLE, errorView = GONE)
+        setViewVisibility(
+            pdfView = GONE,
+            loadingView = VISIBLE,
+            errorView = GONE,
+            toolboxView = GONE
+        )
         // Cancel view state collection upon new document load.
         // These state should only be relevant if document is loaded successfully.
         cancelViewStateCollection()
     }
 
     private fun handlePasswordRequested() {
-        setViewVisibility(pdfView = GONE, loadingView = GONE, errorView = GONE)
+        setViewVisibility(pdfView = GONE, loadingView = GONE, errorView = GONE, toolboxView = GONE)
         // Utilize retry param to show incorrect password on PasswordDialog
     }
 
     private fun handleDocumentLoaded(uiState: DocumentLoaded) {
         onLoadDocumentSuccess()
         pdfView.pdfDocument = uiState.pdfDocument
-        setViewVisibility(pdfView = VISIBLE, loadingView = GONE, errorView = GONE)
+        toolboxView.setPdfDocument(uiState.pdfDocument)
+        setViewVisibility(
+            pdfView = VISIBLE,
+            loadingView = GONE,
+            errorView = GONE,
+            toolboxView = VISIBLE
+        )
         // Start collection of view states like search, toolbox, etc. once document is loaded.
         collectViewStates()
     }
 
     private fun handleDocumentError(uiState: DocumentError) {
         onLoadDocumentError(uiState.exception)
-        setViewVisibility(pdfView = GONE, loadingView = GONE, errorView = VISIBLE)
+        setViewVisibility(
+            pdfView = GONE,
+            loadingView = GONE,
+            errorView = VISIBLE,
+            toolboxView = GONE
+        )
     }
 
-    private fun setViewVisibility(pdfView: Int, loadingView: Int, errorView: Int) {
+    private fun setViewVisibility(
+        pdfView: Int,
+        loadingView: Int,
+        errorView: Int,
+        toolboxView: Int
+    ) {
         this.pdfView.visibility = pdfView
         this.loadingView.visibility = loadingView
         this.errorView.visibility = errorView
+        this.toolboxView.visibility = toolboxView
     }
 
     private fun collectFlowOnLifecycleScope(block: suspend () -> Unit): Job {
