@@ -59,8 +59,6 @@ public object SavedStateNavContentWrapper : NavContentWrapper {
         }
 
         DisposableEffect(key1 = key) {
-            childRegistry.savedStateRegistryController.performAttach()
-            childRegistry.savedStateRegistryController.performRestore(childRegistry.savedState)
             childRegistry.lifecycle.currentState = Lifecycle.State.RESUMED
             onDispose {
                 val savedState = savedState()
@@ -79,4 +77,8 @@ private class RecordSavedStateRegistry : SavedStateRegistryOwner {
         savedStateRegistryController.savedStateRegistry
 
     var savedState: SavedState? = null
+
+    init {
+        savedStateRegistryController.performRestore(savedState)
+    }
 }
