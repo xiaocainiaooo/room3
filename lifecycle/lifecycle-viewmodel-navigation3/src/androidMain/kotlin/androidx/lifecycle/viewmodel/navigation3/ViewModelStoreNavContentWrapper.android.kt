@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.lifecycle.HasDefaultViewModelProviderFactory
 import androidx.lifecycle.SAVED_STATE_REGISTRY_OWNER_KEY
 import androidx.lifecycle.SavedStateViewModelFactory
@@ -36,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.NavContentWrapper
 import androidx.navigation3.NavRecord
+import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 
 /**
  * Provides the content of a [NavRecord] with a [ViewModelStoreOwner] and provides that

@@ -16,7 +16,6 @@
 
 package androidx.navigation3
 
-import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -24,12 +23,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleRegistry
+import androidx.savedstate.SavedState
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
+import androidx.savedstate.compose.LocalSavedStateRegistryOwner
+import androidx.savedstate.savedState
 
 /**
  * Provides the content of a [NavRecord] with a [SavedStateRegistryOwner] and provides that
@@ -62,9 +63,9 @@ public object SavedStateNavContentWrapper : NavContentWrapper {
             childRegistry.savedStateRegistryController.performRestore(childRegistry.savedState)
             childRegistry.lifecycle.currentState = Lifecycle.State.RESUMED
             onDispose {
-                val bundle = Bundle()
-                childRegistry.savedStateRegistryController.performSave(bundle)
-                childRegistry.savedState = bundle
+                val savedState = savedState()
+                childRegistry.savedStateRegistryController.performSave(savedState)
+                childRegistry.savedState = savedState
                 childRegistry.lifecycle.currentState = Lifecycle.State.DESTROYED
             }
         }
@@ -77,5 +78,5 @@ private class RecordSavedStateRegistry : SavedStateRegistryOwner {
     override val savedStateRegistry: SavedStateRegistry =
         savedStateRegistryController.savedStateRegistry
 
-    var savedState: Bundle? = null
+    var savedState: SavedState? = null
 }
