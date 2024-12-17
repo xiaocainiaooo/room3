@@ -16,7 +16,6 @@
 
 package androidx.wear.protolayout.material3
 
-import androidx.wear.protolayout.ColorBuilders.ColorProp
 import androidx.wear.protolayout.DimensionBuilders.DpProp
 import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.LayoutElementBuilders
@@ -30,6 +29,7 @@ import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.TypeBuilders.StringProp
+import androidx.wear.protolayout.material3.ButtonDefaults.filledButtonColors
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.BOTTOM_MARGIN_DP
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.EDGE_BUTTON_HEIGHT_DP
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.HORIZONTAL_MARGIN_PERCENT_LARGE
@@ -39,7 +39,6 @@ import androidx.wear.protolayout.material3.EdgeButtonDefaults.METADATA_TAG
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.TEXT_SIDE_PADDING_DP
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.TEXT_TOP_PADDING_DP
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.TOP_CORNER_RADIUS
-import androidx.wear.protolayout.material3.EdgeButtonDefaults.filled
 import androidx.wear.protolayout.material3.EdgeButtonStyle.Companion.DEFAULT
 import androidx.wear.protolayout.material3.EdgeButtonStyle.Companion.TOP_ALIGN
 
@@ -58,19 +57,20 @@ import androidx.wear.protolayout.material3.EdgeButtonStyle.Companion.TOP_ALIGN
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
  * @param contentDescription The content description to be read by Talkback.
- * @param colors The colors used for this button. If not set, [EdgeButtonDefaults.filled] will be
- *   used as high emphasis button. Other recommended colors are [EdgeButtonDefaults.filledTonal] and
- *   [EdgeButtonDefaults.filledVariant]. If using custom colors, it is important to choose a color
- *   pair from same role to ensure accessibility with sufficient color contrast.
+ * @param colors The colors used for this button. If not set, [ButtonDefaults.filledButtonColors]
+ *   will be used as high emphasis button. Other recommended colors are
+ *   [ButtonDefaults.filledTonalButtonColors] and [ButtonDefaults.filledVariantButtonColors]. If
+ *   using custom colors, it is important to choose a color pair from same role to ensure
+ *   accessibility with sufficient color contrast.
  * @param iconContent The icon slot for content displayed in this button. It is recommended to use
  *   default styling that is automatically provided by only calling [icon] with the resource ID.
  * @sample androidx.wear.protolayout.material3.samples.edgeButtonSampleIcon
  */
-// TODO(b/346958146): link EdgeButton visuals in DAC
+// TODO: b/346958146 - link EdgeButton visuals in DAC
 public fun MaterialScope.iconEdgeButton(
     onClick: Clickable,
     contentDescription: StringProp,
-    colors: EdgeButtonColors = filled(),
+    colors: ButtonColors = filledButtonColors(),
     iconContent: (MaterialScope.() -> LayoutElement)
 ): LayoutElement =
     edgeButton(
@@ -79,9 +79,7 @@ public fun MaterialScope.iconEdgeButton(
         colors = colors,
         style = DEFAULT
     ) {
-        withStyle(
-                defaultIconStyle = IconStyle(size = ICON_SIZE_DP.toDp(), tintColor = colors.content)
-            )
+        withStyle(defaultIconStyle = IconStyle(size = ICON_SIZE_DP.toDp(), tintColor = colors.icon))
             .iconContent()
     }
 
@@ -100,10 +98,11 @@ public fun MaterialScope.iconEdgeButton(
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
  * @param contentDescription The content description to be read by Talkback.
- * @param colors The colors used for this button. If not set, [EdgeButtonDefaults.filled] will be
- *   used as high emphasis button. Other recommended colors are [EdgeButtonDefaults.filledTonal] and
- *   [EdgeButtonDefaults.filledVariant]. If using custom colors, it is important to choose a color
- *   pair from same role to ensure accessibility with sufficient color contrast.
+ * @param colors The colors used for this button. If not set, [ButtonDefaults.filledButtonColors]
+ *   will be used as high emphasis button. Other recommended colors are
+ *   [ButtonDefaults.filledTonalButtonColors] and [ButtonDefaults.filledVariantButtonColors]. If
+ *   using custom colors, it is important to choose a color pair from same role to ensure
+ *   accessibility with sufficient color contrast.
  * @param labelContent The label slot for content displayed in this button. It is recommended to use
  *   default styling that is automatically provided by only calling [text] with the content.
  * @sample androidx.wear.protolayout.material3.samples.edgeButtonSampleText
@@ -112,7 +111,7 @@ public fun MaterialScope.iconEdgeButton(
 public fun MaterialScope.textEdgeButton(
     onClick: Clickable,
     contentDescription: StringProp,
-    colors: EdgeButtonColors = filled(),
+    colors: ButtonColors = filledButtonColors(),
     labelContent: (MaterialScope.() -> LayoutElement)
 ): LayoutElement =
     edgeButton(
@@ -125,7 +124,7 @@ public fun MaterialScope.textEdgeButton(
                 defaultTextElementStyle =
                     TextElementStyle(
                         typography = Typography.LABEL_MEDIUM,
-                        color = colors.content,
+                        color = colors.icon,
                         scalable = false
                     )
             )
@@ -146,10 +145,11 @@ public fun MaterialScope.textEdgeButton(
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
  * @param contentDescription The content description to be read by Talkback.
- * @param colors The colors used for this button. If not set, [EdgeButtonDefaults.filled] will be
- *   used as high emphasis button. Other recommended colors are [EdgeButtonDefaults.filledTonal] and
- *   [EdgeButtonDefaults.filledVariant]. If using custom colors, it is important to choose a color
- *   pair from same role to ensure accessibility with sufficient color contrast.
+ * @param colors The colors used for this button. If not set, [ButtonDefaults.filledButtonColors]
+ *   will be used as high emphasis button. Other recommended colors are
+ *   [ButtonDefaults.filledTonalButtonColors] and [ButtonDefaults.filledVariantButtonColors]. If
+ *   using custom colors, it is important to choose a color pair from same role to ensure
+ *   accessibility with sufficient color contrast.
  * @param style The style used for the inner content, specifying how the content should be aligned.
  *   It is recommended to use [EdgeButtonStyle.TOP_ALIGN] for long, wide content. If not set,
  *   defaults to [EdgeButtonStyle.DEFAULT] which center-aligns the content.
@@ -160,15 +160,14 @@ public fun MaterialScope.textEdgeButton(
 private fun MaterialScope.edgeButton(
     onClick: Clickable,
     contentDescription: StringProp,
-    colors: EdgeButtonColors,
+    colors: ButtonColors,
     style: EdgeButtonStyle = DEFAULT,
     content: MaterialScope.() -> LayoutElement
 ): LayoutElement {
     val containerWidth = deviceConfiguration.screenWidthDp.toDp()
     val horizontalMarginPercent: Float =
-        if (deviceConfiguration.screenWidthDp < SCREEN_WIDTH_BREAKPOINT_DP)
-            HORIZONTAL_MARGIN_PERCENT_SMALL
-        else HORIZONTAL_MARGIN_PERCENT_LARGE
+        if (deviceConfiguration.screenWidthDp.isBreakpoint()) HORIZONTAL_MARGIN_PERCENT_LARGE
+        else HORIZONTAL_MARGIN_PERCENT_SMALL
     val edgeButtonWidth: Float =
         (100f - 2f * horizontalMarginPercent) * deviceConfiguration.screenWidthDp / 100f
     val bottomCornerRadiusX = dp(edgeButtonWidth / 2f)
@@ -244,35 +243,7 @@ private constructor(
     }
 }
 
-public object EdgeButtonDefaults {
-    /**
-     * [EdgeButtonColors] for the high-emphasis button representing the primary, most important or
-     * most common action on a screen.
-     *
-     * These colors are using [ColorScheme.primary] for background color and [ColorScheme.onPrimary]
-     * for content color.
-     */
-    public fun MaterialScope.filled(): EdgeButtonColors =
-        EdgeButtonColors(theme.colorScheme.primary, theme.colorScheme.onPrimary)
-
-    /**
-     * [EdgeButtonColors] for the medium-emphasis button.
-     *
-     * These colors are using [ColorScheme.surfaceContainer] for background color and
-     * [ColorScheme.onSurface] for content color.
-     */
-    public fun MaterialScope.filledTonal(): EdgeButtonColors =
-        EdgeButtonColors(theme.colorScheme.surfaceContainer, theme.colorScheme.onSurface)
-
-    /**
-     * Alternative [EdgeButtonColors] for the high-emphasis button.
-     *
-     * These colors are using [ColorScheme.primaryContainer] for background color and
-     * [ColorScheme.primaryContainer] for content color.
-     */
-    public fun MaterialScope.filledVariant(): EdgeButtonColors =
-        EdgeButtonColors(theme.colorScheme.primaryContainer, theme.colorScheme.onPrimaryContainer)
-
+internal object EdgeButtonDefaults {
     @JvmField internal val TOP_CORNER_RADIUS: DpProp = dp(17f)
     /** The horizontal margin used for width of the EdgeButton, below the 225dp breakpoint. */
     internal const val HORIZONTAL_MARGIN_PERCENT_SMALL: Float = 24f
@@ -285,14 +256,6 @@ public object EdgeButtonDefaults {
     internal const val TEXT_TOP_PADDING_DP = 12
     internal const val TEXT_SIDE_PADDING_DP = 8
 }
-
-/** Represents the container and content colors used in [textEdgeButton] or [iconEdgeButton]. */
-public class EdgeButtonColors(
-    /** The container color to be used for a button. */
-    public val container: ColorProp,
-    /** The color or icon tint color to be used for all content within a button. */
-    public val content: ColorProp
-)
 
 internal fun LayoutElement.isSlotEdgeButton(): Boolean =
     this is Box && METADATA_TAG == this.modifiers?.metadata?.toTagName()
