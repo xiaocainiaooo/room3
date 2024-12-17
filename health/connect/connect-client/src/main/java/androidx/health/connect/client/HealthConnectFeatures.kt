@@ -50,7 +50,7 @@ interface HealthConnectFeatures {
         const val FEATURE_READ_HEALTH_DATA_HISTORY = 4
 
         /** Feature constant for Personal Health Records (PHR) APIs. */
-        @RestrictTo(RestrictTo.Scope.LIBRARY) const val FEATURE_PERSONAL_HEALTH_RECORD = 5
+        @RestrictTo(RestrictTo.Scope.LIBRARY) const val FEATURE_PERSONAL_HEALTH_RECORD = 100
 
         @Retention(AnnotationRetention.SOURCE)
         @IntDef(
