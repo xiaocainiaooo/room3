@@ -19,7 +19,7 @@ package androidx.build.metalava
 import androidx.build.Version
 import androidx.build.checkapi.ApiLocation
 import androidx.build.getLibraryByName
-import androidx.build.java.JavaCompileInputs
+import androidx.build.java.CompilationInputs
 import androidx.build.logging.TERMINAL_RED
 import androidx.build.logging.TERMINAL_RESET
 import java.io.ByteArrayOutputStream
@@ -240,9 +240,11 @@ sealed class ApiLintMode {
 /**
  * Generates all of the specified api files, as well as a version history JSON for the public API.
  */
-fun generateApi(
+internal fun generateApi(
     metalavaClasspath: FileCollection,
-    files: JavaCompileInputs,
+    projectDirectory: File,
+    projectXml: File?,
+    files: CompilationInputs,
     apiLocation: ApiLocation,
     apiLintMode: ApiLintMode,
     includeRestrictToLibraryGroupApis: Boolean,
@@ -265,6 +267,8 @@ fun generateApi(
     generateApiConfigs.forEach { (generateApiMode, apiLintMode) ->
         generateApi(
             metalavaClasspath,
+            projectDirectory,
+            projectXml,
             files,
             apiLocation,
             generateApiMode,
@@ -284,7 +288,9 @@ fun generateApi(
  */
 private fun generateApi(
     metalavaClasspath: FileCollection,
-    files: JavaCompileInputs,
+    projectDirectory: File,
+    projectXml: File?,
+    files: CompilationInputs,
     outputLocation: ApiLocation,
     generateApiMode: GenerateApiMode,
     apiLintMode: ApiLintMode,
@@ -298,8 +304,9 @@ private fun generateApi(
         getGenerateApiArgs(
             files.bootClasspath,
             files.dependencyClasspath,
+            projectDirectory,
+            projectXml,
             files.sourcePaths.files,
-            files.commonModuleSourcePaths.files,
             outputLocation,
             generateApiMode,
             apiLintMode,
@@ -316,8 +323,9 @@ private fun generateApi(
 fun getGenerateApiArgs(
     bootClasspath: FileCollection,
     dependencyClasspath: FileCollection,
+    projectDirectory: File,
+    projectXml: File?,
     sourcePaths: Collection<File>,
-    commonModuleSourcePaths: Collection<File>,
     outputLocation: ApiLocation?,
     generateApiMode: GenerateApiMode,
     apiLintMode: ApiLintMode,
@@ -327,16 +335,25 @@ fun getGenerateApiArgs(
     // generate public API txt
     val args =
         mutableListOf(
-            "--classpath",
-            (bootClasspath.files + dependencyClasspath.files).joinToString(File.pathSeparator),
+            // Supply source paths as relative paths because that's how they're specified in the
+            // project xml, and it causes issues with uast when the paths don't match.
             "--source-path",
-            sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
+            sourcePaths
+                .filter { it.exists() }
+                .joinToString(File.pathSeparator) { it.toRelativeString(projectDirectory) },
         )
 
-    val existentCommonModuleSourcePaths = commonModuleSourcePaths.filter { it.exists() }
-    if (existentCommonModuleSourcePaths.isNotEmpty()) {
-        args += listOf("--common-source-path", existentCommonModuleSourcePaths.joinToString(":"))
-    }
+    // If there's a project xml file, the classpath isn't needed
+    args +=
+        if (projectXml != null) {
+            listOf("--project", projectXml.path)
+        } else {
+            listOf(
+                "--classpath",
+                (bootClasspath.files + dependencyClasspath.files).joinToString(File.pathSeparator)
+            )
+        }
+
     args += listOf("--format=v4", "--warnings-as-errors")
 
     pathToManifest?.let { args += listOf("--manifest", pathToManifest) }

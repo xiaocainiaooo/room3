@@ -18,7 +18,7 @@ package androidx.build.kythe
 import androidx.build.addToBuildOnServer
 import androidx.build.getCheckoutRoot
 import androidx.build.getPrebuiltsRoot
-import androidx.build.java.JavaCompileInputs
+import androidx.build.java.CompilationInputs
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
@@ -127,7 +127,7 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
     internal companion object {
         fun setupProject(
             project: Project,
-            javaInputs: JavaCompileInputs,
+            javaInputs: CompilationInputs,
         ) {
             val annotationProcessorPaths =
                 project.objects.fileCollection().apply {
