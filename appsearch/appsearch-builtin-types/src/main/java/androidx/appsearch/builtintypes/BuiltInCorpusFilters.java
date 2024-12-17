@@ -15,8 +15,10 @@
  */
 package androidx.appsearch.builtintypes;
 
+import android.Manifest;
 import android.content.pm.PackageManager;
 
+import androidx.annotation.RequiresPermission;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.SearchSpec;
 import androidx.core.util.Preconditions;
@@ -30,7 +32,8 @@ import org.jspecify.annotations.NonNull;
 @ExperimentalAppSearchApi
 public class BuiltInCorpusFilters {
     /**
-     * Adds a filter for the {@link MobileApplication} corpus to the given {@link SearchSpec.Builder}.
+     * Adds a filter for the {@link MobileApplication} corpus to the given {@link
+     * SearchSpec.Builder}.
      *
      * <p>The MobileApplication corpus is a corpus of all apps on the device. Each document contains
      * information about the app such as label, package id, and icon uri. This corpus is useful for
@@ -48,6 +51,7 @@ public class BuiltInCorpusFilters {
      * @param builder The {@link SearchSpec.Builder} to add the filter to.
      * @return The modified {@link SearchSpec.Builder}.
      */
+    @RequiresPermission(value = Manifest.permission.QUERY_ALL_PACKAGES, conditional = true)
     public static SearchSpec.@NonNull Builder searchMobileApplicationCorpus(
             SearchSpec.@NonNull Builder builder) {
         return Preconditions.checkNotNull(builder)
@@ -74,6 +78,7 @@ public class BuiltInCorpusFilters {
      * @param builder The {@link SearchSpec.Builder} to add the filter to.
      * @return The modified {@link SearchSpec.Builder}.
      */
+    @RequiresPermission(value = Manifest.permission.READ_CONTACTS)
     public static SearchSpec.@NonNull Builder searchPersonCorpus(
             SearchSpec.@NonNull Builder builder) {
         return Preconditions.checkNotNull(builder)
