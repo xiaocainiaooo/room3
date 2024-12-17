@@ -16,7 +16,6 @@
 
 package androidx.wear.protolayout.material3
 
-import androidx.wear.protolayout.ColorBuilders.ColorProp
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.LayoutElementBuilders.Text
 import androidx.wear.protolayout.LayoutElementBuilders.TextAlignment
@@ -25,6 +24,7 @@ import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint
 import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.material3.Typography.TypographyToken
+import androidx.wear.protolayout.types.LayoutColor
 
 /**
  * ProtoLayout component that represents text object holding any information.
@@ -55,7 +55,7 @@ public fun MaterialScope.text(
     stringLayoutConstraint: StringLayoutConstraint =
         StringLayoutConstraint.Builder(text.value).build(),
     @TypographyToken typography: Int = defaultTextElementStyle.typography,
-    color: ColorProp = defaultTextElementStyle.color,
+    color: LayoutColor = defaultTextElementStyle.color,
     italic: Boolean = defaultTextElementStyle.italic,
     underline: Boolean = defaultTextElementStyle.underline,
     scalable: Boolean = defaultTextElementStyle.scalable,
@@ -69,7 +69,7 @@ public fun MaterialScope.text(
         .setLayoutConstraintsForDynamicText(stringLayoutConstraint)
         .setFontStyle(
             createFontStyleBuilder(typographyToken = typography, deviceConfiguration, scalable)
-                .setColor(color)
+                .setColor(color.prop)
                 .setItalic(italic)
                 .setUnderline(underline)
                 .build()

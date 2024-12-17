@@ -16,7 +16,6 @@
 
 package androidx.wear.protolayout.material3
 
-import androidx.wear.protolayout.ColorBuilders.ColorProp
 import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
 import androidx.wear.protolayout.DimensionBuilders.ImageDimension
 import androidx.wear.protolayout.LayoutElementBuilders.Box
@@ -25,6 +24,7 @@ import androidx.wear.protolayout.LayoutElementBuilders.Image
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
+import androidx.wear.protolayout.types.LayoutColor
 
 /**
  * Returns the image background with the defined style.
@@ -50,7 +50,7 @@ public fun MaterialScope.backgroundImage(
     protoLayoutResourceId: String,
     width: ImageDimension = defaultBackgroundImageStyle.width,
     height: ImageDimension = defaultBackgroundImageStyle.height,
-    overlayColor: ColorProp = defaultBackgroundImageStyle.overlayColor,
+    overlayColor: LayoutColor = defaultBackgroundImageStyle.overlayColor,
     overlayWidth: ContainerDimension = defaultBackgroundImageStyle.overlayWidth,
     overlayHeight: ContainerDimension = defaultBackgroundImageStyle.overlayHeight,
     shape: Corner = defaultBackgroundImageStyle.shape,

@@ -1483,6 +1483,21 @@ package androidx.wear.protolayout {
 
 package androidx.wear.protolayout.types {
 
+  public final class LayoutColor {
+    ctor public LayoutColor(@ColorInt int staticArgb, optional @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) androidx.wear.protolayout.expression.DynamicBuilders.DynamicColor? dynamicArgb);
+    method public androidx.wear.protolayout.expression.DynamicBuilders.DynamicColor? getDynamicArgb();
+    method public int getStaticArgb();
+    property @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public final androidx.wear.protolayout.expression.DynamicBuilders.DynamicColor? dynamicArgb;
+    property @ColorInt public final int staticArgb;
+  }
+
+  public final class LayoutColorKt {
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.types.LayoutColor asLayoutColor(androidx.wear.protolayout.expression.DynamicBuilders.DynamicColor, @ColorInt int staticArgb);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.types.LayoutColor asLayoutColor(androidx.wear.protolayout.expression.DynamicBuilders.DynamicColor, @ColorInt long staticArgb);
+    method public static androidx.wear.protolayout.types.LayoutColor getArgb(int);
+    method public static androidx.wear.protolayout.types.LayoutColor getArgb(long);
+  }
+
   public final class LayoutString {
     ctor public LayoutString(String staticValue);
     ctor @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public LayoutString(String staticValue, androidx.wear.protolayout.expression.DynamicBuilders.DynamicString dynamicValue, androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint layoutConstraint);

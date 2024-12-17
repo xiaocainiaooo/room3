@@ -3,13 +3,13 @@ package androidx.wear.protolayout.material3 {
 
   public final class ButtonColors {
     ctor public ButtonColors();
-    ctor public ButtonColors(optional androidx.wear.protolayout.ColorBuilders.ColorProp container, optional androidx.wear.protolayout.ColorBuilders.ColorProp icon, optional androidx.wear.protolayout.ColorBuilders.ColorProp label);
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getContainer();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getIcon();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getLabel();
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp container;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp icon;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp label;
+    ctor public ButtonColors(optional androidx.wear.protolayout.types.LayoutColor container, optional androidx.wear.protolayout.types.LayoutColor icon, optional androidx.wear.protolayout.types.LayoutColor label);
+    method public androidx.wear.protolayout.types.LayoutColor getContainer();
+    method public androidx.wear.protolayout.types.LayoutColor getIcon();
+    method public androidx.wear.protolayout.types.LayoutColor getLabel();
+    property public final androidx.wear.protolayout.types.LayoutColor container;
+    property public final androidx.wear.protolayout.types.LayoutColor icon;
+    property public final androidx.wear.protolayout.types.LayoutColor label;
   }
 
   public final class ButtonDefaults {
@@ -36,15 +36,15 @@ package androidx.wear.protolayout.material3 {
   }
 
   public final class CardColors {
-    ctor public CardColors(androidx.wear.protolayout.ColorBuilders.ColorProp background, androidx.wear.protolayout.ColorBuilders.ColorProp title, androidx.wear.protolayout.ColorBuilders.ColorProp content, optional androidx.wear.protolayout.ColorBuilders.ColorProp time);
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getBackground();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getContent();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getTime();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getTitle();
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp background;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp content;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp time;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp title;
+    ctor public CardColors(androidx.wear.protolayout.types.LayoutColor background, androidx.wear.protolayout.types.LayoutColor title, androidx.wear.protolayout.types.LayoutColor content, optional androidx.wear.protolayout.types.LayoutColor time);
+    method public androidx.wear.protolayout.types.LayoutColor getBackground();
+    method public androidx.wear.protolayout.types.LayoutColor getContent();
+    method public androidx.wear.protolayout.types.LayoutColor getTime();
+    method public androidx.wear.protolayout.types.LayoutColor getTitle();
+    property public final androidx.wear.protolayout.types.LayoutColor background;
+    property public final androidx.wear.protolayout.types.LayoutColor content;
+    property public final androidx.wear.protolayout.types.LayoutColor time;
+    property public final androidx.wear.protolayout.types.LayoutColor title;
   }
 
   public final class CardDefaults {
@@ -56,69 +56,69 @@ package androidx.wear.protolayout.material3 {
   }
 
   public final class CardKt {
-    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement card(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.ModifiersBuilders.Clickable onClick, androidx.wear.protolayout.TypeBuilders.StringProp contentDescription, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension width, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension height, optional androidx.wear.protolayout.ModifiersBuilders.Corner shape, optional androidx.wear.protolayout.ColorBuilders.ColorProp? backgroundColor, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? background, optional androidx.wear.protolayout.ModifiersBuilders.Padding contentPadding, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> content);
+    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement card(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.ModifiersBuilders.Clickable onClick, androidx.wear.protolayout.TypeBuilders.StringProp contentDescription, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension width, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension height, optional androidx.wear.protolayout.ModifiersBuilders.Corner shape, optional androidx.wear.protolayout.types.LayoutColor? backgroundColor, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? background, optional androidx.wear.protolayout.ModifiersBuilders.Padding contentPadding, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> content);
     method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement titleCard(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.ModifiersBuilders.Clickable onClick, androidx.wear.protolayout.TypeBuilders.StringProp contentDescription, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> title, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? content, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? time, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension height, optional androidx.wear.protolayout.ModifiersBuilders.Corner shape, optional androidx.wear.protolayout.material3.CardColors colors, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? background, optional androidx.wear.protolayout.material3.TitleCardStyle style, optional androidx.wear.protolayout.ModifiersBuilders.Padding contentPadding, optional int horizontalAlignment);
   }
 
   public final class ColorScheme {
     ctor public ColorScheme();
-    ctor public ColorScheme(optional androidx.wear.protolayout.ColorBuilders.ColorProp primary, optional androidx.wear.protolayout.ColorBuilders.ColorProp primaryDim, optional androidx.wear.protolayout.ColorBuilders.ColorProp primaryContainer, optional androidx.wear.protolayout.ColorBuilders.ColorProp onPrimary, optional androidx.wear.protolayout.ColorBuilders.ColorProp onPrimaryContainer, optional androidx.wear.protolayout.ColorBuilders.ColorProp secondary, optional androidx.wear.protolayout.ColorBuilders.ColorProp secondaryDim, optional androidx.wear.protolayout.ColorBuilders.ColorProp secondaryContainer, optional androidx.wear.protolayout.ColorBuilders.ColorProp onSecondary, optional androidx.wear.protolayout.ColorBuilders.ColorProp onSecondaryContainer, optional androidx.wear.protolayout.ColorBuilders.ColorProp tertiary, optional androidx.wear.protolayout.ColorBuilders.ColorProp tertiaryDim, optional androidx.wear.protolayout.ColorBuilders.ColorProp tertiaryContainer, optional androidx.wear.protolayout.ColorBuilders.ColorProp onTertiary, optional androidx.wear.protolayout.ColorBuilders.ColorProp onTertiaryContainer, optional androidx.wear.protolayout.ColorBuilders.ColorProp surfaceContainerLow, optional androidx.wear.protolayout.ColorBuilders.ColorProp surfaceContainer, optional androidx.wear.protolayout.ColorBuilders.ColorProp surfaceContainerHigh, optional androidx.wear.protolayout.ColorBuilders.ColorProp onSurface, optional androidx.wear.protolayout.ColorBuilders.ColorProp onSurfaceVariant, optional androidx.wear.protolayout.ColorBuilders.ColorProp outline, optional androidx.wear.protolayout.ColorBuilders.ColorProp outlineVariant, optional androidx.wear.protolayout.ColorBuilders.ColorProp background, optional androidx.wear.protolayout.ColorBuilders.ColorProp onBackground, optional androidx.wear.protolayout.ColorBuilders.ColorProp error, optional androidx.wear.protolayout.ColorBuilders.ColorProp onError, optional androidx.wear.protolayout.ColorBuilders.ColorProp errorContainer, optional androidx.wear.protolayout.ColorBuilders.ColorProp onErrorContainer);
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getBackground();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getError();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getErrorContainer();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getOnBackground();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getOnError();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getOnErrorContainer();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getOnPrimary();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getOnPrimaryContainer();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getOnSecondary();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getOnSecondaryContainer();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getOnSurface();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getOnSurfaceVariant();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getOnTertiary();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getOnTertiaryContainer();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getOutline();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getOutlineVariant();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getPrimary();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getPrimaryContainer();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getPrimaryDim();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getSecondary();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getSecondaryContainer();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getSecondaryDim();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getSurfaceContainer();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getSurfaceContainerHigh();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getSurfaceContainerLow();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getTertiary();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getTertiaryContainer();
-    method public androidx.wear.protolayout.ColorBuilders.ColorProp getTertiaryDim();
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp background;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp error;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp errorContainer;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp onBackground;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp onError;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp onErrorContainer;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp onPrimary;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp onPrimaryContainer;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp onSecondary;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp onSecondaryContainer;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp onSurface;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp onSurfaceVariant;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp onTertiary;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp onTertiaryContainer;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp outline;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp outlineVariant;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp primary;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp primaryContainer;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp primaryDim;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp secondary;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp secondaryContainer;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp secondaryDim;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp surfaceContainer;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp surfaceContainerHigh;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp surfaceContainerLow;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp tertiary;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp tertiaryContainer;
-    property public final androidx.wear.protolayout.ColorBuilders.ColorProp tertiaryDim;
+    ctor public ColorScheme(optional androidx.wear.protolayout.types.LayoutColor primary, optional androidx.wear.protolayout.types.LayoutColor primaryDim, optional androidx.wear.protolayout.types.LayoutColor primaryContainer, optional androidx.wear.protolayout.types.LayoutColor onPrimary, optional androidx.wear.protolayout.types.LayoutColor onPrimaryContainer, optional androidx.wear.protolayout.types.LayoutColor secondary, optional androidx.wear.protolayout.types.LayoutColor secondaryDim, optional androidx.wear.protolayout.types.LayoutColor secondaryContainer, optional androidx.wear.protolayout.types.LayoutColor onSecondary, optional androidx.wear.protolayout.types.LayoutColor onSecondaryContainer, optional androidx.wear.protolayout.types.LayoutColor tertiary, optional androidx.wear.protolayout.types.LayoutColor tertiaryDim, optional androidx.wear.protolayout.types.LayoutColor tertiaryContainer, optional androidx.wear.protolayout.types.LayoutColor onTertiary, optional androidx.wear.protolayout.types.LayoutColor onTertiaryContainer, optional androidx.wear.protolayout.types.LayoutColor surfaceContainerLow, optional androidx.wear.protolayout.types.LayoutColor surfaceContainer, optional androidx.wear.protolayout.types.LayoutColor surfaceContainerHigh, optional androidx.wear.protolayout.types.LayoutColor onSurface, optional androidx.wear.protolayout.types.LayoutColor onSurfaceVariant, optional androidx.wear.protolayout.types.LayoutColor outline, optional androidx.wear.protolayout.types.LayoutColor outlineVariant, optional androidx.wear.protolayout.types.LayoutColor background, optional androidx.wear.protolayout.types.LayoutColor onBackground, optional androidx.wear.protolayout.types.LayoutColor error, optional androidx.wear.protolayout.types.LayoutColor onError, optional androidx.wear.protolayout.types.LayoutColor errorContainer, optional androidx.wear.protolayout.types.LayoutColor onErrorContainer);
+    method public androidx.wear.protolayout.types.LayoutColor getBackground();
+    method public androidx.wear.protolayout.types.LayoutColor getError();
+    method public androidx.wear.protolayout.types.LayoutColor getErrorContainer();
+    method public androidx.wear.protolayout.types.LayoutColor getOnBackground();
+    method public androidx.wear.protolayout.types.LayoutColor getOnError();
+    method public androidx.wear.protolayout.types.LayoutColor getOnErrorContainer();
+    method public androidx.wear.protolayout.types.LayoutColor getOnPrimary();
+    method public androidx.wear.protolayout.types.LayoutColor getOnPrimaryContainer();
+    method public androidx.wear.protolayout.types.LayoutColor getOnSecondary();
+    method public androidx.wear.protolayout.types.LayoutColor getOnSecondaryContainer();
+    method public androidx.wear.protolayout.types.LayoutColor getOnSurface();
+    method public androidx.wear.protolayout.types.LayoutColor getOnSurfaceVariant();
+    method public androidx.wear.protolayout.types.LayoutColor getOnTertiary();
+    method public androidx.wear.protolayout.types.LayoutColor getOnTertiaryContainer();
+    method public androidx.wear.protolayout.types.LayoutColor getOutline();
+    method public androidx.wear.protolayout.types.LayoutColor getOutlineVariant();
+    method public androidx.wear.protolayout.types.LayoutColor getPrimary();
+    method public androidx.wear.protolayout.types.LayoutColor getPrimaryContainer();
+    method public androidx.wear.protolayout.types.LayoutColor getPrimaryDim();
+    method public androidx.wear.protolayout.types.LayoutColor getSecondary();
+    method public androidx.wear.protolayout.types.LayoutColor getSecondaryContainer();
+    method public androidx.wear.protolayout.types.LayoutColor getSecondaryDim();
+    method public androidx.wear.protolayout.types.LayoutColor getSurfaceContainer();
+    method public androidx.wear.protolayout.types.LayoutColor getSurfaceContainerHigh();
+    method public androidx.wear.protolayout.types.LayoutColor getSurfaceContainerLow();
+    method public androidx.wear.protolayout.types.LayoutColor getTertiary();
+    method public androidx.wear.protolayout.types.LayoutColor getTertiaryContainer();
+    method public androidx.wear.protolayout.types.LayoutColor getTertiaryDim();
+    property public final androidx.wear.protolayout.types.LayoutColor background;
+    property public final androidx.wear.protolayout.types.LayoutColor error;
+    property public final androidx.wear.protolayout.types.LayoutColor errorContainer;
+    property public final androidx.wear.protolayout.types.LayoutColor onBackground;
+    property public final androidx.wear.protolayout.types.LayoutColor onError;
+    property public final androidx.wear.protolayout.types.LayoutColor onErrorContainer;
+    property public final androidx.wear.protolayout.types.LayoutColor onPrimary;
+    property public final androidx.wear.protolayout.types.LayoutColor onPrimaryContainer;
+    property public final androidx.wear.protolayout.types.LayoutColor onSecondary;
+    property public final androidx.wear.protolayout.types.LayoutColor onSecondaryContainer;
+    property public final androidx.wear.protolayout.types.LayoutColor onSurface;
+    property public final androidx.wear.protolayout.types.LayoutColor onSurfaceVariant;
+    property public final androidx.wear.protolayout.types.LayoutColor onTertiary;
+    property public final androidx.wear.protolayout.types.LayoutColor onTertiaryContainer;
+    property public final androidx.wear.protolayout.types.LayoutColor outline;
+    property public final androidx.wear.protolayout.types.LayoutColor outlineVariant;
+    property public final androidx.wear.protolayout.types.LayoutColor primary;
+    property public final androidx.wear.protolayout.types.LayoutColor primaryContainer;
+    property public final androidx.wear.protolayout.types.LayoutColor primaryDim;
+    property public final androidx.wear.protolayout.types.LayoutColor secondary;
+    property public final androidx.wear.protolayout.types.LayoutColor secondaryContainer;
+    property public final androidx.wear.protolayout.types.LayoutColor secondaryDim;
+    property public final androidx.wear.protolayout.types.LayoutColor surfaceContainer;
+    property public final androidx.wear.protolayout.types.LayoutColor surfaceContainerHigh;
+    property public final androidx.wear.protolayout.types.LayoutColor surfaceContainerLow;
+    property public final androidx.wear.protolayout.types.LayoutColor tertiary;
+    property public final androidx.wear.protolayout.types.LayoutColor tertiaryContainer;
+    property public final androidx.wear.protolayout.types.LayoutColor tertiaryDim;
   }
 
   public final class DynamicColorSchemeKt {
@@ -143,15 +143,15 @@ package androidx.wear.protolayout.material3 {
   }
 
   public final class HelpersKt {
-    method public static androidx.wear.protolayout.ColorBuilders.ColorProp withOpacity(androidx.wear.protolayout.ColorBuilders.ColorProp, @FloatRange(from=0.0, to=1.0) float ratio);
+    method public static androidx.wear.protolayout.types.LayoutColor withOpacity(androidx.wear.protolayout.types.LayoutColor, @FloatRange(from=0.0, to=1.0) float ratio);
   }
 
   public final class IconKt {
-    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement icon(androidx.wear.protolayout.material3.MaterialScope, String protoLayoutResourceId, optional androidx.wear.protolayout.DimensionBuilders.ImageDimension size, optional androidx.wear.protolayout.ColorBuilders.ColorProp tintColor);
+    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement icon(androidx.wear.protolayout.material3.MaterialScope, String protoLayoutResourceId, optional androidx.wear.protolayout.DimensionBuilders.ImageDimension size, optional androidx.wear.protolayout.types.LayoutColor tintColor);
   }
 
   public final class ImageKt {
-    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement backgroundImage(androidx.wear.protolayout.material3.MaterialScope, String protoLayoutResourceId, optional androidx.wear.protolayout.DimensionBuilders.ImageDimension width, optional androidx.wear.protolayout.DimensionBuilders.ImageDimension height, optional androidx.wear.protolayout.ColorBuilders.ColorProp overlayColor, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension overlayWidth, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension overlayHeight, optional androidx.wear.protolayout.ModifiersBuilders.Corner shape, optional int contentScaleMode);
+    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement backgroundImage(androidx.wear.protolayout.material3.MaterialScope, String protoLayoutResourceId, optional androidx.wear.protolayout.DimensionBuilders.ImageDimension width, optional androidx.wear.protolayout.DimensionBuilders.ImageDimension height, optional androidx.wear.protolayout.types.LayoutColor overlayColor, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension overlayWidth, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension overlayHeight, optional androidx.wear.protolayout.ModifiersBuilders.Corner shape, optional int contentScaleMode);
   }
 
   @androidx.wear.protolayout.material3.MaterialScopeMarker public class MaterialScope {
@@ -193,7 +193,7 @@ package androidx.wear.protolayout.material3 {
   }
 
   public final class TextKt {
-    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement text(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.TypeBuilders.StringProp text, optional androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint stringLayoutConstraint, optional int typography, optional androidx.wear.protolayout.ColorBuilders.ColorProp color, optional boolean italic, optional boolean underline, optional boolean scalable, optional int maxLines, optional int multilineAlignment, optional int overflow, optional androidx.wear.protolayout.ModifiersBuilders.Modifiers modifiers);
+    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement text(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.TypeBuilders.StringProp text, optional androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint stringLayoutConstraint, optional int typography, optional androidx.wear.protolayout.types.LayoutColor color, optional boolean italic, optional boolean underline, optional boolean scalable, optional int maxLines, optional int multilineAlignment, optional int overflow, optional androidx.wear.protolayout.ModifiersBuilders.Modifiers modifiers);
   }
 
   public final class TitleCardDefaults {

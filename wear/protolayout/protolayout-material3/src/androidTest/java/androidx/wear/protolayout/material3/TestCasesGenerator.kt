@@ -19,7 +19,6 @@ package androidx.wear.protolayout.material3
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.wear.protolayout.ActionBuilders
-import androidx.wear.protolayout.ColorBuilders.ColorProp
 import androidx.wear.protolayout.DeviceParametersBuilders
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders
@@ -33,6 +32,7 @@ import androidx.wear.protolayout.material3.ButtonDefaults.filledTonalButtonColor
 import androidx.wear.protolayout.material3.ButtonDefaults.filledVariantButtonColors
 import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
 import androidx.wear.protolayout.material3.MaterialGoldenTest.Companion.pxToDp
+import androidx.wear.protolayout.types.LayoutColor
 import com.google.common.collect.ImmutableMap
 
 private const val CONTENT_DESCRIPTION_PLACEHOLDER = "Description"
@@ -233,13 +233,15 @@ object TestCasesGenerator {
         return collectTestCases(testCases)
     }
 
-    private fun coloredBox(color: ColorProp, shape: Corner) =
+    private fun coloredBox(color: LayoutColor, shape: Corner) =
         Box.Builder()
             .setWidth(expand())
             .setHeight(expand())
             .setModifiers(
                 Modifiers.Builder()
-                    .setBackground(Background.Builder().setColor(color).setCorner(shape).build())
+                    .setBackground(
+                        Background.Builder().setColor(color.prop).setCorner(shape).build()
+                    )
                     .build()
             )
             .build()

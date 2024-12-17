@@ -17,8 +17,9 @@
 package androidx.wear.protolayout.material3
 
 import android.graphics.Color
-import androidx.wear.protolayout.ColorBuilders.ColorProp
 import androidx.wear.protolayout.ColorBuilders.argb
+import androidx.wear.protolayout.types.LayoutColor
+import androidx.wear.protolayout.types.argb
 
 /**
  * Represents the container and content colors used in buttons, such as [textEdgeButton] or
@@ -26,11 +27,11 @@ import androidx.wear.protolayout.ColorBuilders.argb
  */
 public class ButtonColors(
     /** The container color to be used for a button. */
-    public val container: ColorProp = argb(Color.BLACK),
+    public val container: LayoutColor = Color.BLACK.argb,
     /** The icon tint color to be used for a button. */
-    public val icon: ColorProp = argb(Color.BLACK),
+    public val icon: LayoutColor = Color.BLACK.argb,
     /** The label color to be used for a button. */
-    public val label: ColorProp = argb(Color.BLACK),
+    public val label: LayoutColor = Color.BLACK.argb,
 )
 
 public object ButtonDefaults {
