@@ -24,8 +24,7 @@ import androidx.build.checkapi.getVersionedApiLocation
 import androidx.build.checkapi.isValidArtifactVersion
 import androidx.build.getAndroidJar
 import androidx.build.getCheckoutRoot
-import androidx.build.java.CompilationInputs
-import androidx.build.java.StandardCompilationInputs
+import androidx.build.java.JavaCompileInputs
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
@@ -160,7 +159,7 @@ constructor(private val workerExecutor: WorkerExecutor) : DefaultTask() {
         outputApiLocation: ApiLocation,
     ) {
         val mavenId = "$groupId:$artifactId:$version"
-        val inputs: CompilationInputs?
+        val inputs: JavaCompileInputs?
         try {
             inputs = getFiles(runnerProject, mavenId)
         } catch (e: TypedResolveException) {
@@ -186,13 +185,14 @@ constructor(private val workerExecutor: WorkerExecutor) : DefaultTask() {
         }
     }
 
-    private fun getFiles(runnerProject: Project, mavenId: String): CompilationInputs {
+    private fun getFiles(runnerProject: Project, mavenId: String): JavaCompileInputs {
         val jars = getJars(runnerProject, mavenId)
         val sources = getSources(runnerProject, "$mavenId:sources")
 
-        // TODO(b/330721660) parse META-INF/kotlin-project-structure-metadata.json for KMP projects
-        return StandardCompilationInputs(
+        return JavaCompileInputs(
             sourcePaths = sources,
+            // TODO(b/330721660) parse META-INF/kotlin-project-structure-metadata.json for
+            // common sources
             commonModuleSourcePaths = project.files(),
             dependencyClasspath = jars,
             bootClasspath = project.getAndroidJar()

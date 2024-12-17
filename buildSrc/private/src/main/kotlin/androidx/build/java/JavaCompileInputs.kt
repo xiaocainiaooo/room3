@@ -31,78 +31,57 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 
-/**
- * CompilationInputs contains the information required to compile Java/Kotlin code This can be
- * helpful for creating Metalava and Dokka tasks with the same settings
- *
- * There are two implementations: [StandardCompilationInputs] for non-multiplatform projects and
- * [MultiplatformCompilationInputs] for multiplatform projects.
- */
-internal sealed interface CompilationInputs {
-    /** Source files to process */
-    val sourcePaths: FileCollection
+// JavaCompileInputs contains the information required to compile Java/Kotlin code
+// This can be helpful for creating Metalava and Dokka tasks with the same settings
+data class JavaCompileInputs(
+    // Source files to process
+    val sourcePaths: FileCollection,
 
-    /** Source files from the KMP common module of this project */
-    val commonModuleSourcePaths: FileCollection
+    // Source files from the KMP common module of this project
+    val commonModuleSourcePaths: FileCollection,
 
-    /** Dependencies (compiled classes) of [sourcePaths]. */
-    val dependencyClasspath: FileCollection
+    // Dependencies (compiled classes) of [sourcePaths].
+    val dependencyClasspath: FileCollection,
 
-    /** Android's boot classpath. */
+    // Android's boot classpath.
     val bootClasspath: FileCollection
-
+) {
     companion object {
-        /** Constructs a JavaCompileInputs from a library and its variant */
-        fun fromLibraryVariant(variant: LibraryVariant, project: Project): CompilationInputs {
-            // The boot classpath is common to both multiplatform and standard configurations.
-            val bootClasspath =
-                project.files(
-                    project.extensions
-                        .findByType(LibraryAndroidComponentsExtension::class.java)!!
-                        .sdkComponents
-                        .bootClasspath
-                )
-
-            // If this is a multiplatform project, set up inputs for the androidJvm compilation
-            val multiplatformExtension = project.multiplatformExtension
-            if (multiplatformExtension != null) {
-                val androidJvmTarget =
-                    multiplatformExtension.targets
-                        .requirePlatform(KotlinPlatformType.androidJvm)
-                        .findCompilation(compilationName = variant.name)
-
-                val sourceCollection = project.files(project.sourceFiles(androidJvmTarget))
-
-                val commonModuleSourceCollection =
-                    project
-                        .files(project.commonModuleSourcePaths(androidJvmTarget))
-                        .builtBy(
-                            // Remove task dependency when b/332711506 is fixed, which should get us
-                            // an
-                            // API to get all sources (static and generated)
-                            project.tasks.named("compileReleaseJavaWithJavac")
-                        )
-
-                return MultiplatformCompilationInputs.fromCompilation(
-                    project = project,
-                    compilationProvider = androidJvmTarget,
-                    sourcePaths = sourceCollection,
-                    dependencyClasspath = variant.compileClasspath,
-                    bootClasspath = bootClasspath,
-                    commonModuleSourcePaths = commonModuleSourceCollection,
-                )
-            }
-
-            // Not a multiplatform project, set up standard inputs
+        // Constructs a JavaCompileInputs from a library and its variant
+        fun fromLibraryVariant(variant: LibraryVariant, project: Project): JavaCompileInputs {
             val kotlinCollection = project.files(variant.sources.kotlin?.all)
             val javaCollection = project.files(variant.sources.java?.all)
-            val sourceCollection = kotlinCollection + javaCollection
 
-            return StandardCompilationInputs(
+            val androidJvmTarget =
+                project.multiplatformExtension
+                    ?.targets
+                    ?.requirePlatform(KotlinPlatformType.androidJvm)
+                    ?.findCompilation(compilationName = variant.name)
+
+            val sourceCollection =
+                androidJvmTarget?.let { project.files(project.sourceFiles(it)) }
+                    ?: (kotlinCollection + javaCollection)
+
+            val commonModuleSourceCollection =
+                project
+                    .files(androidJvmTarget?.let { project.commonModuleSourcePaths(it) })
+                    .builtBy(
+                        // Remove task dependency when b/332711506 is fixed, which should get us an
+                        // API to get all sources (static and generated)
+                        project.tasks.named("compileReleaseJavaWithJavac")
+                    )
+
+            val bootClasspath =
+                project.extensions
+                    .findByType(LibraryAndroidComponentsExtension::class.java)!!
+                    .sdkComponents
+                    .bootClasspath
+
+            return JavaCompileInputs(
                 sourcePaths = sourceCollection,
-                commonModuleSourcePaths = project.files(),
+                commonModuleSourcePaths = commonModuleSourceCollection,
                 dependencyClasspath = variant.compileClasspath,
-                bootClasspath = bootClasspath
+                bootClasspath = project.files(bootClasspath)
             )
         }
 
@@ -111,7 +90,7 @@ internal sealed interface CompilationInputs {
          *
          * @param project The project whose main jvm target inputs will be returned.
          */
-        fun fromKmpJvmTarget(project: Project): CompilationInputs {
+        fun fromKmpJvmTarget(project: Project): JavaCompileInputs {
             val kmpExtension =
                 checkNotNull(project.multiplatformExtension) {
                     """
@@ -128,9 +107,7 @@ internal sealed interface CompilationInputs {
 
             val commonModuleSourcePaths = project.commonModuleSourcePaths(jvmCompilation)
 
-            return MultiplatformCompilationInputs.fromCompilation(
-                project = project,
-                compilationProvider = jvmCompilation,
+            return JavaCompileInputs(
                 sourcePaths = sourceCollection,
                 commonModuleSourcePaths = commonModuleSourcePaths,
                 dependencyClasspath =
@@ -145,7 +122,7 @@ internal sealed interface CompilationInputs {
          *
          * @param project The project whose main android target inputs will be returned.
          */
-        fun fromKmpAndroidTarget(project: Project): CompilationInputs {
+        fun fromKmpAndroidTarget(project: Project): JavaCompileInputs {
             val kmpExtension =
                 checkNotNull(project.multiplatformExtension) {
                     """
@@ -163,9 +140,7 @@ internal sealed interface CompilationInputs {
 
             val commonModuleSourcePaths = project.commonModuleSourcePaths(compilation)
 
-            return MultiplatformCompilationInputs.fromCompilation(
-                project = project,
-                compilationProvider = compilation,
+            return JavaCompileInputs(
                 sourcePaths = sourceCollection,
                 commonModuleSourcePaths = commonModuleSourcePaths,
                 dependencyClasspath =
@@ -175,12 +150,12 @@ internal sealed interface CompilationInputs {
             )
         }
 
-        /** Constructs a JavaCompileInputs from a sourceset */
-        fun fromSourceSet(sourceSet: SourceSet, project: Project): CompilationInputs {
+        // Constructs a JavaCompileInputs from a sourceset
+        fun fromSourceSet(sourceSet: SourceSet, project: Project): JavaCompileInputs {
             val sourcePaths: FileCollection =
                 project.files(project.provider { sourceSet.allSource.srcDirs })
             val dependencyClasspath = sourceSet.compileClasspath
-            return StandardCompilationInputs(
+            return JavaCompileInputs(
                 sourcePaths = sourcePaths,
                 commonModuleSourcePaths = project.files(),
                 dependencyClasspath = dependencyClasspath,
@@ -267,78 +242,6 @@ internal sealed interface CompilationInputs {
                 """
                         .trimIndent()
                 )
-        }
-    }
-}
-
-/** Compile inputs for a regular (non-multiplatform) project */
-internal data class StandardCompilationInputs(
-    override val sourcePaths: FileCollection,
-    override val dependencyClasspath: FileCollection,
-    override val bootClasspath: FileCollection,
-    override val commonModuleSourcePaths: FileCollection,
-) : CompilationInputs
-
-/** Compile inputs for a single source set from a multiplatform project. */
-internal data class SourceSetInputs(
-    /** Name of the source set, e.g. "androidMain" */
-    val sourceSetName: String,
-    /** Names of other source sets that this one depends on */
-    val dependsOnSourceSets: List<String>,
-    /** Source files of this source set */
-    val sourcePaths: FileCollection,
-    /** Compile dependencies for this source set */
-    val dependencyClasspath: FileCollection,
-)
-
-/** Inputs for a single compilation of a multiplatform project (just the android or jvm target) */
-internal class MultiplatformCompilationInputs(
-    project: Project,
-    /**
-     * The [SourceSetInputs] for this project's source sets. This is a [Provider] because not all
-     * relationships between source sets will be loaded at configuration time.
-     */
-    val sourceSets: Provider<List<SourceSetInputs>>,
-    override val bootClasspath: FileCollection,
-    override val commonModuleSourcePaths: FileCollection,
-) : CompilationInputs {
-    // Aggregate sources and classpath from all source sets
-    override val sourcePaths: ConfigurableFileCollection =
-        project.files(sourceSets.map { it.map { sourceSet -> sourceSet.sourcePaths } })
-    override val dependencyClasspath: ConfigurableFileCollection =
-        project.files(sourceSets.map { it.map { sourceSet -> sourceSet.dependencyClasspath } })
-
-    companion object {
-        /**
-         * Creates inputs based on one compilation of a multiplatform project.
-         *
-         * This currently just configures the default source set.
-         *
-         * TODO: update to handle all source sets for the compilation
-         */
-        fun fromCompilation(
-            project: Project,
-            compilationProvider: Provider<KotlinCompilation<*>>,
-            sourcePaths: FileCollection,
-            dependencyClasspath: FileCollection,
-            bootClasspath: FileCollection,
-            commonModuleSourcePaths: FileCollection,
-        ): MultiplatformCompilationInputs {
-            val sourceSet =
-                compilationProvider.map { compilation ->
-                    SourceSetInputs(
-                        compilation.defaultSourceSet.name,
-                        compilation.defaultSourceSet.dependsOn.map { it.name },
-                        sourcePaths,
-                        dependencyClasspath,
-                    )
-                }
-            return MultiplatformCompilationInputs(
-                project = project,
-                sourceSets = sourceSet.map { listOf(it) },
-                bootClasspath = bootClasspath,
-                commonModuleSourcePaths = commonModuleSourcePaths
-            )
         }
     }
 }
