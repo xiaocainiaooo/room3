@@ -18,13 +18,12 @@ package androidx.appsearch.ast.operators;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.ast.Node;
 import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
 import androidx.core.util.Preconditions;
-
-import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,6 +35,8 @@ import java.util.Objects;
  */
 @ExperimentalAppSearchApi
 @FlaggedApi(Flags.FLAG_ENABLE_ABSTRACT_SYNTAX_TREES)
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings("JSpecifyNullness")
 public final class AndNode implements Node {
     private List<Node> mChildren;
 
@@ -61,7 +62,7 @@ public final class AndNode implements Node {
      * @param additionalChildren Additional nodes to be ANDed over, which are optional.
      */
     public AndNode(@NonNull Node firstChild, @NonNull Node secondChild,
-            Node @NonNull ... additionalChildren) {
+            @NonNull Node... additionalChildren) {
         ArrayList<Node> childNodes = new ArrayList<>();
         childNodes.add(Preconditions.checkNotNull(firstChild));
         childNodes.add(Preconditions.checkNotNull(secondChild));

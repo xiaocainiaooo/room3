@@ -23,6 +23,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresFeature;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
@@ -37,9 +39,6 @@ import androidx.appsearch.util.BundleUtil;
 import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
 import androidx.core.util.Preconditions;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -58,11 +57,12 @@ import java.util.Set;
  * @see AppSearchSession#searchSuggestionAsync
  */
 @SafeParcelable.Class(creator = "SearchSuggestionSpecCreator")
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 public final class SearchSuggestionSpec extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    public static final Parcelable.@NonNull Creator<SearchSuggestionSpec> CREATOR =
+    public static final @NonNull Parcelable.Creator<SearchSuggestionSpec> CREATOR =
             new SearchSuggestionSpecCreator();
 
     @Field(id = 1, getter = "getFilterNamespaces")
@@ -281,7 +281,7 @@ public final class SearchSuggestionSpec extends AbstractSafeParcelable {
          * <p>If unset, the query will search over all namespaces.
          */
         @CanIgnoreReturnValue
-        public @NonNull Builder addFilterNamespaces(String @NonNull ... namespaces) {
+        public @NonNull Builder addFilterNamespaces(@NonNull String... namespaces) {
             Preconditions.checkNotNull(namespaces);
             resetIfBuilt();
             return addFilterNamespaces(Arrays.asList(namespaces));
@@ -324,7 +324,7 @@ public final class SearchSuggestionSpec extends AbstractSafeParcelable {
          * <p>If unset, the query will search over all schema.
          */
         @CanIgnoreReturnValue
-        public @NonNull Builder addFilterSchemas(String @NonNull ... schemaTypes) {
+        public @NonNull Builder addFilterSchemas(@NonNull String... schemaTypes) {
             Preconditions.checkNotNull(schemaTypes);
             resetIfBuilt();
             return addFilterSchemas(Arrays.asList(schemaTypes));
@@ -359,7 +359,7 @@ public final class SearchSuggestionSpec extends AbstractSafeParcelable {
         @SuppressLint("MissingGetterMatchingBuilder")
         @CanIgnoreReturnValue
         public @NonNull Builder addFilterDocumentClasses(
-                java.lang.Class<?> @NonNull ... documentClasses)
+                @NonNull java.lang.Class<?>... documentClasses)
                 throws AppSearchException {
             Preconditions.checkNotNull(documentClasses);
             resetIfBuilt();
@@ -491,7 +491,7 @@ public final class SearchSuggestionSpec extends AbstractSafeParcelable {
         @RequiresFeature(
                 enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                 name = Features.SEARCH_SPEC_ADD_FILTER_PROPERTIES)
-        public @NonNull Builder addFilterProperties(java.lang.@NonNull Class<?> documentClass,
+        public @NonNull Builder addFilterProperties(@NonNull java.lang.Class<?> documentClass,
                 @NonNull Collection<String> propertyPaths) throws AppSearchException {
             Preconditions.checkNotNull(documentClass);
             Preconditions.checkNotNull(propertyPaths);
@@ -523,7 +523,7 @@ public final class SearchSuggestionSpec extends AbstractSafeParcelable {
         @RequiresFeature(
                 enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                 name = Features.SEARCH_SPEC_ADD_FILTER_PROPERTIES)
-        public @NonNull Builder addFilterPropertyPaths(java.lang.@NonNull Class<?> documentClass,
+        public @NonNull Builder addFilterPropertyPaths(@NonNull java.lang.Class<?> documentClass,
                 @NonNull Collection<PropertyPath> propertyPaths) throws AppSearchException {
             Preconditions.checkNotNull(documentClass);
             Preconditions.checkNotNull(propertyPaths);
@@ -542,7 +542,7 @@ public final class SearchSuggestionSpec extends AbstractSafeParcelable {
          */
         @CanIgnoreReturnValue
         public @NonNull Builder addFilterDocumentIds(@NonNull String namespace,
-                String @NonNull ... documentIds) {
+                @NonNull String... documentIds) {
             Preconditions.checkNotNull(namespace);
             Preconditions.checkNotNull(documentIds);
             resetIfBuilt();
@@ -581,7 +581,7 @@ public final class SearchSuggestionSpec extends AbstractSafeParcelable {
                 name = Features.SEARCH_SPEC_SEARCH_STRING_PARAMETERS)
         @FlaggedApi(Flags.FLAG_ENABLE_SEARCH_SPEC_SEARCH_STRING_PARAMETERS)
         public @NonNull Builder addSearchStringParameters(
-                String @NonNull ... searchStringParameters) {
+                @NonNull String... searchStringParameters) {
             Preconditions.checkNotNull(searchStringParameters);
             resetIfBuilt();
             return addSearchStringParameters(Arrays.asList(searchStringParameters));

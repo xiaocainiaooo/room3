@@ -19,6 +19,7 @@ import android.os.Parcel;
 import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
 import androidx.appsearch.app.aidl.AppSearchBatchResultParcelV2;
 import androidx.appsearch.flags.FlaggedApi;
 import androidx.appsearch.flags.Flags;
@@ -26,8 +27,6 @@ import androidx.appsearch.safeparcel.AbstractSafeParcelable;
 import androidx.appsearch.safeparcel.SafeParcelable;
 import androidx.appsearch.safeparcel.stub.StubCreators.OpenBlobForReadResponseCreator;
 import androidx.core.util.Preconditions;
-
-import org.jspecify.annotations.NonNull;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -46,13 +45,14 @@ import java.io.IOException;
  * </p>
  */
 @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 @SafeParcelable.Class(creator = "OpenBlobForReadResponseCreator")
 @ExperimentalAppSearchApi
 public final class OpenBlobForReadResponse extends AbstractSafeParcelable implements
         Closeable {
 
-    public static final Parcelable.@NonNull Creator<OpenBlobForReadResponse> CREATOR =
+    public static final @NonNull Parcelable.Creator<OpenBlobForReadResponse> CREATOR =
             new OpenBlobForReadResponseCreator();
 
     @Field(id = 1)

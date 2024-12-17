@@ -16,11 +16,10 @@
 
 package androidx.appsearch.app;
 
+import androidx.annotation.NonNull;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.annotation.CurrentTimeMillisLong;
 import androidx.core.util.Preconditions;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * A request to report usage of a document owned by another app from a system UI surface.
@@ -31,6 +30,8 @@ import org.jspecify.annotations.NonNull;
  * <p>See {@link GlobalSearchSession#reportSystemUsageAsync} for a detailed description of usage
  * reporting.
  */
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings("JSpecifyNullness")
 public final class ReportSystemUsageRequest {
     private final String mPackageName;
     private final String mDatabase;
@@ -123,7 +124,7 @@ public final class ReportSystemUsageRequest {
          * {@link ReportSystemUsageRequest} is constructed.
          */
         @CanIgnoreReturnValue
-        public ReportSystemUsageRequest.@NonNull Builder setUsageTimestampMillis(
+        public @NonNull ReportSystemUsageRequest.Builder setUsageTimestampMillis(
                 @CurrentTimeMillisLong long usageTimestampMillis) {
             mUsageTimestampMillis = usageTimestampMillis;
             return this;

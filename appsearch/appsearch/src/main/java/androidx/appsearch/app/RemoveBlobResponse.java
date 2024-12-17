@@ -18,6 +18,7 @@ package androidx.appsearch.app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.app.aidl.AppSearchBatchResultParcelV2;
 import androidx.appsearch.flags.FlaggedApi;
@@ -27,8 +28,6 @@ import androidx.appsearch.safeparcel.SafeParcelable;
 import androidx.appsearch.safeparcel.stub.StubCreators.RemoveBlobResponseCreator;
 import androidx.core.util.Preconditions;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Results of {@link AppSearchSession#removeBlobAsync}, containing the outcome of the removal of
  * each handles.
@@ -37,12 +36,13 @@ import org.jspecify.annotations.NonNull;
  * blob handles.
  */
 @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 @SafeParcelable.Class(creator = "RemoveBlobResponseCreator")
 @ExperimentalAppSearchApi
 public final class RemoveBlobResponse extends AbstractSafeParcelable {
 
-    public static final Parcelable.@NonNull Creator<RemoveBlobResponse> CREATOR =
+    public static final @NonNull Parcelable.Creator<RemoveBlobResponse> CREATOR =
             new RemoveBlobResponseCreator();
 
     @Field(id = 1, getter = "getResponseParcel")

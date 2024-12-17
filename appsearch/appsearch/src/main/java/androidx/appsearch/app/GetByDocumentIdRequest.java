@@ -20,6 +20,8 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.flags.FlaggedApi;
@@ -31,9 +33,6 @@ import androidx.appsearch.util.BundleUtil;
 import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
 import androidx.core.util.Preconditions;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,12 +49,13 @@ import java.util.Set;
  *
  * @see AppSearchSession#getByDocumentIdAsync
  */
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 @SafeParcelable.Class(creator = "GetByDocumentIdRequestCreator")
 public final class GetByDocumentIdRequest extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    public static final Parcelable.@NonNull Creator<GetByDocumentIdRequest> CREATOR =
+    public static final @NonNull Parcelable.Creator<GetByDocumentIdRequest> CREATOR =
             new GetByDocumentIdRequestCreator();
     /**
      * Schema type to be used in
@@ -166,7 +166,7 @@ public final class GetByDocumentIdRequest extends AbstractSafeParcelable {
 
         /** Adds one or more document IDs to the request. */
         @CanIgnoreReturnValue
-        public @NonNull Builder addIds(String @NonNull ... ids) {
+        public @NonNull Builder addIds(@NonNull String... ids) {
             Preconditions.checkNotNull(ids);
             resetIfBuilt();
             return addIds(Arrays.asList(ids));
