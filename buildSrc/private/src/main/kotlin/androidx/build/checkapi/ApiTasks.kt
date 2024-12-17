@@ -23,7 +23,8 @@ import androidx.build.Version
 import androidx.build.binarycompatibilityvalidator.BinaryCompatibilityValidation
 import androidx.build.getSupportRootFolder
 import androidx.build.isWriteVersionedApiFilesEnabled
-import androidx.build.java.JavaCompileInputs
+import androidx.build.java.CompilationInputs
+import androidx.build.metalava.CreateProjectXmlTask
 import androidx.build.metalava.MetalavaTasks
 import androidx.build.multiplatformExtension
 import androidx.build.resources.ResourceTasks
@@ -166,9 +167,12 @@ fun Project.configureProjectForApiTasks(config: ApiTaskConfig, extension: Androi
             configureJavaInputsAndManifest(config) ?: return@afterEvaluate
         val baselinesApiLocation = ApiBaselinesLocation.fromApiLocation(currentApiLocation)
         val generateApiDependencies = createReleaseApiConfiguration()
+        val projectXml =
+            CreateProjectXmlTask.setupTask(project, javaInputs, generateApiDependencies)
 
         MetalavaTasks.setupProject(
             project,
+            projectXml,
             javaInputs,
             generateApiDependencies,
             extension,
@@ -206,25 +210,25 @@ fun Project.configureProjectForApiTasks(config: ApiTaskConfig, extension: Androi
 
 internal fun Project.configureJavaInputsAndManifest(
     config: ApiTaskConfig
-): Pair<JavaCompileInputs, Provider<RegularFile>?>? {
+): Pair<CompilationInputs, Provider<RegularFile>?>? {
     return when (config) {
         is LibraryApiTaskConfig -> {
             if (config.variant.name != Release.DEFAULT_PUBLISH_CONFIG) {
                 return null
             }
-            JavaCompileInputs.fromLibraryVariant(config.variant, project) to
+            CompilationInputs.fromLibraryVariant(config.variant, project) to
                 config.variant.artifacts.get(SingleArtifact.MERGED_MANIFEST)
         }
         is AndroidMultiplatformApiTaskConfig -> {
-            JavaCompileInputs.fromKmpAndroidTarget(project) to null
+            CompilationInputs.fromKmpAndroidTarget(project) to null
         }
         is KmpApiTaskConfig -> {
-            JavaCompileInputs.fromKmpJvmTarget(project) to null
+            CompilationInputs.fromKmpJvmTarget(project) to null
         }
         is JavaApiTaskConfig -> {
             val javaExtension = extensions.getByType<JavaPluginExtension>()
             val mainSourceSet = javaExtension.sourceSets.getByName("main")
-            JavaCompileInputs.fromSourceSet(mainSourceSet, this) to null
+            CompilationInputs.fromSourceSet(mainSourceSet, this) to null
         }
     }
 }

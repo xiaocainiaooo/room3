@@ -26,7 +26,6 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
@@ -75,16 +74,15 @@ constructor(@Internal protected val workerExecutor: WorkerExecutor) : DefaultTas
     /** Class files compiled from sourcePaths */
     @get:Classpath var compiledSources: FileCollection = project.files()
 
-    /** Multiplatform source files from the module's common sourceset */
-    @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
-    var commonModuleSourcePaths: FileCollection = project.files()
-
     @get:[Optional InputFile PathSensitive(PathSensitivity.NONE)]
     abstract val manifestPath: RegularFileProperty
 
     @get:Input abstract val k2UastEnabled: Property<Boolean>
 
     @get:Input abstract val kotlinSourceLevel: Property<KotlinVersion>
+
+    @get:[InputFile PathSensitive(PathSensitivity.NONE) Optional]
+    abstract val projectXml: RegularFileProperty
 
     fun runWithArgs(args: List<String>) {
         runMetalavaWithArgs(

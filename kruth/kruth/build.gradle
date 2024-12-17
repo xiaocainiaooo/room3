@@ -162,6 +162,5 @@ androidx {
     runApiTasks = new RunApiTasks.Yes() // Used to diff against Google Truth
     type = LibraryType.INTERNAL_TEST_LIBRARY
     doNotDocumentReason = "Not shipped externally"
-    metalavaK2UastEnabled = false
     kotlinTarget = KotlinTarget.KOTLIN_1_9
 }
