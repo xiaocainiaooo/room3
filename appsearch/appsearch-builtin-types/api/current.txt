@@ -93,8 +93,8 @@ package androidx.appsearch.builtintypes {
   }
 
   @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public class BuiltInCorpusFilters {
-    method public static androidx.appsearch.app.SearchSpec.Builder searchMobileApplicationCorpus(androidx.appsearch.app.SearchSpec.Builder);
-    method public static androidx.appsearch.app.SearchSpec.Builder searchPersonCorpus(androidx.appsearch.app.SearchSpec.Builder);
+    method @RequiresPermission(value=android.Manifest.permission.QUERY_ALL_PACKAGES, conditional=true) public static androidx.appsearch.app.SearchSpec.Builder searchMobileApplicationCorpus(androidx.appsearch.app.SearchSpec.Builder);
+    method @RequiresPermission(android.Manifest.permission.READ_CONTACTS) public static androidx.appsearch.app.SearchSpec.Builder searchPersonCorpus(androidx.appsearch.app.SearchSpec.Builder);
   }
 
   @androidx.appsearch.annotation.Document(name="builtin:ContactPoint") public class ContactPoint extends androidx.appsearch.builtintypes.Thing {
