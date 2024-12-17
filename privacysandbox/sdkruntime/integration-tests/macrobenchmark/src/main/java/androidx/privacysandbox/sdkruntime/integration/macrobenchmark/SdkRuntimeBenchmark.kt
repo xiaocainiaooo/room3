@@ -19,19 +19,22 @@ package androidx.privacysandbox.sdkruntime.integration.macrobenchmark
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.testutils.measureStartup
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 /**
  * ./gradlew :privacysandbox:sdkruntime:integration-tests:macrobenchmark:connectedReleaseAndroidTest
  */
 @LargeTest
-@RunWith(AndroidJUnit4::class)
-class SdkRuntimeBenchmark {
+@RunWith(Parameterized::class)
+class SdkRuntimeBenchmark(
+    @Suppress("unused") private val ciTestConfigType: String, // Added to test name by Parameterized
+) {
     @get:Rule val benchmarkRule = MacrobenchmarkRule()
 
     @Test
@@ -43,4 +46,15 @@ class SdkRuntimeBenchmark {
         ) {
             action = "androidx.privacysandbox.sdkruntime.integration.testapp.BenchmarkActivity"
         }
+
+    companion object {
+        /** Add test config type (main or compat) to test name */
+        @Parameterized.Parameters(name = "{0}")
+        @JvmStatic
+        fun params(): List<String> =
+            listOf(
+                InstrumentationRegistry.getArguments()
+                    .getString("androidx.testConfigType", "LOCAL_RUN")
+            )
+    }
 }
