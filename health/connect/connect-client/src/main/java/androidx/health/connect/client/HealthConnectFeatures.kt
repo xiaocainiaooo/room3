@@ -49,6 +49,9 @@ interface HealthConnectFeatures {
         /** Feature constant for reading health data history. */
         const val FEATURE_READ_HEALTH_DATA_HISTORY = 4
 
+        /** Feature constant for mindfulness session. */
+        @RestrictTo(RestrictTo.Scope.LIBRARY) const val FEATURE_MINDFULNESS_SESSION = 5
+
         /** Feature constant for Personal Health Records (PHR) APIs. */
         @RestrictTo(RestrictTo.Scope.LIBRARY) const val FEATURE_PERSONAL_HEALTH_RECORD = 100
 
@@ -60,7 +63,8 @@ interface HealthConnectFeatures {
                     FEATURE_SKIN_TEMPERATURE,
                     FEATURE_PLANNED_EXERCISE,
                     FEATURE_READ_HEALTH_DATA_HISTORY,
-                    FEATURE_PERSONAL_HEALTH_RECORD
+                    FEATURE_PERSONAL_HEALTH_RECORD,
+                    FEATURE_MINDFULNESS_SESSION
                 ]
         )
         @RestrictTo(RestrictTo.Scope.LIBRARY)
