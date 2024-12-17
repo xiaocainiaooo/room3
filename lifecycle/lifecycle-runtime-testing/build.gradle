@@ -85,5 +85,6 @@ androidx {
     type = LibraryType.PUBLISHED_TEST_LIBRARY
     inceptionYear = "2019"
     description = "Testing utilities for 'lifecycle' artifact"
+    metalavaK2UastEnabled = false
 }
 

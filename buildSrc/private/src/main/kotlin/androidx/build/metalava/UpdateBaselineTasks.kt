@@ -21,13 +21,11 @@ import androidx.build.checkapi.ApiBaselinesLocation
 import androidx.build.checkapi.ApiLocation
 import java.io.File
 import javax.inject.Inject
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
@@ -54,8 +52,6 @@ abstract class UpdateApiLintBaselineTask @Inject constructor(workerExecutor: Wor
 
     @OutputFile fun getApiLintBaseline(): File = baselines.get().apiLintFile
 
-    @get:Internal abstract val projectDirectory: DirectoryProperty
-
     @TaskAction
     fun updateBaseline() {
         check(bootClasspath.files.isNotEmpty()) { "Android boot classpath not set." }
@@ -64,9 +60,8 @@ abstract class UpdateApiLintBaselineTask @Inject constructor(workerExecutor: Wor
             getGenerateApiArgs(
                 bootClasspath,
                 dependencyClasspath,
-                projectDirectory.get().asFile,
-                projectXml.orNull?.asFile,
                 sourcePaths.files.filter { it.exists() },
+                commonModuleSourcePaths.files.filter { it.exists() },
                 null,
                 GenerateApiMode.PublicApi,
                 ApiLintMode.CheckBaseline(baselineFile, targetsJavaConsumers.get()),
