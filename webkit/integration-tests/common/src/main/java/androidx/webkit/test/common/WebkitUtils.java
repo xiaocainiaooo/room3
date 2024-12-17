@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.webkit;
+package androidx.webkit.test.common;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
 import androidx.concurrent.futures.ResolvableFuture;
+import androidx.webkit.WebViewFeature;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -29,6 +32,7 @@ import org.junit.Assume;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -66,7 +70,7 @@ public final class WebkitUtils {
      * @return a {@link ListenableFuture} representing the result of {@code callable}.
      */
     public static <T> @NonNull ListenableFuture<T> onMainThread(
-            final @NonNull Callable<T> callable)  {
+            final @NonNull Callable<T> callable) {
         return onMainThreadDelayed(0, callable);
     }
 
@@ -75,19 +79,19 @@ public final class WebkitUtils {
      *
      * @param runnable the {@link Runnable} to execute.
      */
-    public static void onMainThread(final @NonNull Runnable runnable)  {
+    public static void onMainThread(final @NonNull Runnable runnable) {
         onMainThreadDelayed(0, runnable);
     }
 
     /**
      * Executes a callable on the main thread after a delay, returning a future for the result.
      *
-     * @param delayMs the delay in milliseconds
+     * @param delayMs  the delay in milliseconds
      * @param callable the {@link Callable} to execute.
      * @return a {@link ListenableFuture} representing the result of {@code callable}.
      */
     public static <T> @NonNull ListenableFuture<T> onMainThreadDelayed(
-            long delayMs, final @NonNull Callable<T> callable)  {
+            long delayMs, final @NonNull Callable<T> callable) {
         final ResolvableFuture<T> future = ResolvableFuture.create();
         sMainHandler.postDelayed(() -> {
             try {
@@ -102,7 +106,7 @@ public final class WebkitUtils {
     /**
      * Executes a runnable asynchronously on the main thread after a delay.
      *
-     * @param delayMs the delay in milliseconds
+     * @param delayMs  the delay in milliseconds
      * @param runnable the {@link Runnable} to execute.
      */
     public static void onMainThreadDelayed(long delayMs, final @NonNull Runnable runnable) {
@@ -166,10 +170,29 @@ public final class WebkitUtils {
      * @param featureName the feature to be checked
      */
     public static void checkFeature(@NonNull String featureName) {
-        final String msg = "This device does not have the feature '" +  featureName + "'";
+        final String msg = "This device does not have the feature '" + featureName + "'";
         final boolean hasFeature = WebViewFeature.isFeatureSupported(featureName);
         Assume.assumeTrue(msg, hasFeature);
     }
+
+    /**
+     * Throws {@link org.junit.AssumptionViolatedException} if the device does not support the
+     * particular feature, otherwise returns.
+     *
+     * <p>
+     * This provides a more descriptive error message than a bare {@code assumeTrue} call.
+     *
+     * <p>
+     * Note that this method is AndroidX-specific, and is not reflected in the CTS class.
+     *
+     * @param featureName the feature to be checked
+     */
+    public static void checkStartupFeature(@NonNull Context ctx, @NonNull String featureName) {
+        final String msg = "This device does not have the startup feature '" + featureName + "'";
+        final boolean hasFeature = WebViewFeature.isStartupFeatureSupported(ctx, featureName);
+        Assume.assumeTrue(msg, hasFeature);
+    }
+
 
     /**
      * Waits for {@code future} and returns its value (or times out). If {@code future} has an
@@ -236,15 +259,16 @@ public final class WebkitUtils {
      * Write a string to a file, and create the whole parent directories if they don't exist.
      */
     public static void writeToFile(@NonNull File file, @NonNull String content)
-                  throws IOException {
+            throws IOException {
         file.getParentFile().mkdirs();
         try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(content.getBytes("utf-8"));
+            fos.write(content.getBytes(StandardCharsets.UTF_8));
         }
     }
 
     /**
      * Delete the given File and (if it's a directory) everything within it.
+     *
      * @param currentFile The file or directory to delete. Does not need to exist.
      * @return Whether currentFile does not exist afterwards.
      */
@@ -271,12 +295,14 @@ public final class WebkitUtils {
      * Note that this method is AndroidX-specific, and is not reflected in the CTS class.
      *
      * Backwards-compatible implementation of {@link Looper#isCurrentThread()}
+     *
      * @return {@code true} if the current thread is the loopers thread
      */
-    static boolean isCurrentThread(@NonNull Looper looper) {
+    public static boolean isCurrentThread(@NonNull Looper looper) {
         return Thread.currentThread().equals(looper.getThread());
     }
 
     // Do not instantiate this class.
-    private WebkitUtils() {}
+    private WebkitUtils() {
+    }
 }
