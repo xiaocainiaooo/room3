@@ -86,9 +86,6 @@ constructor(@Internal protected val workerExecutor: WorkerExecutor) : DefaultTas
 
     @get:Input abstract val kotlinSourceLevel: Property<KotlinVersion>
 
-    @get:[InputFile PathSensitive(PathSensitivity.NONE) Optional]
-    abstract val projectXml: RegularFileProperty
-
     fun runWithArgs(args: List<String>) {
         runMetalavaWithArgs(
             metalavaClasspath,

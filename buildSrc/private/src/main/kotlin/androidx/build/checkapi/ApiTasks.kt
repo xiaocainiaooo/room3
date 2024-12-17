@@ -24,7 +24,6 @@ import androidx.build.binarycompatibilityvalidator.BinaryCompatibilityValidation
 import androidx.build.getSupportRootFolder
 import androidx.build.isWriteVersionedApiFilesEnabled
 import androidx.build.java.CompilationInputs
-import androidx.build.metalava.CreateProjectXmlTask
 import androidx.build.metalava.MetalavaTasks
 import androidx.build.multiplatformExtension
 import androidx.build.resources.ResourceTasks
@@ -167,12 +166,9 @@ fun Project.configureProjectForApiTasks(config: ApiTaskConfig, extension: Androi
             configureJavaInputsAndManifest(config) ?: return@afterEvaluate
         val baselinesApiLocation = ApiBaselinesLocation.fromApiLocation(currentApiLocation)
         val generateApiDependencies = createReleaseApiConfiguration()
-        val projectXml =
-            CreateProjectXmlTask.setupTask(project, javaInputs, generateApiDependencies)
 
         MetalavaTasks.setupProject(
             project,
-            projectXml,
             javaInputs,
             generateApiDependencies,
             extension,
