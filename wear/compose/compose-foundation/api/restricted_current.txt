@@ -354,11 +354,13 @@ package androidx.wear.compose.foundation {
     ctor public SwipeToDismissBoxState();
     ctor public SwipeToDismissBoxState(optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.SwipeToDismissValue,java.lang.Boolean> confirmStateChange);
     method public androidx.wear.compose.foundation.SwipeToDismissValue getCurrentValue();
+    method public float getOffset();
     method public androidx.wear.compose.foundation.SwipeToDismissValue getTargetValue();
     method public boolean isAnimationRunning();
     method public suspend Object? snapTo(androidx.wear.compose.foundation.SwipeToDismissValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final androidx.wear.compose.foundation.SwipeToDismissValue currentValue;
     property public final boolean isAnimationRunning;
+    property public final float offset;
     property public final androidx.wear.compose.foundation.SwipeToDismissValue targetValue;
   }
 

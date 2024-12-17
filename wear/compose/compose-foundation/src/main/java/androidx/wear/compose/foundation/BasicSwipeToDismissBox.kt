@@ -331,6 +331,14 @@ class SwipeToDismissBoxState(
     val targetValue: SwipeToDismissValue
         get() = swipeableState.targetValue
 
+    /**
+     * The current offset, or [Float.NaN] if it has not been initialized yet.
+     *
+     * The offset shows how far the foreground content was swiped from its original position.
+     */
+    val offset: Float
+        get() = swipeableState.offset ?: Float.NaN
+
     /** Whether the state is currently animating. */
     val isAnimationRunning: Boolean
         get() = swipeableState.isAnimationRunning
