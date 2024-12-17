@@ -31,6 +31,7 @@ android {
 }
 
 dependencies {
+    api(libs.jspecify)
     api("androidx.core:core:1.7.0")
 
     implementation "com.google.android.gms:play-services-appindex:16.1.0"
@@ -54,6 +55,4 @@ androidx {
     mavenVersion = LibraryVersions.CORE_GOOGLE_SHORTCUTS
     inceptionYear = "2021"
     description = "Library for powering Google features with Android app shortcuts"
-    // TODO: b/326456246
-    optOutJSpecify = true
 }
