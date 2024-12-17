@@ -19,6 +19,8 @@ package androidx.appsearch.app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresFeature;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.flags.FlaggedApi;
@@ -27,9 +29,6 @@ import androidx.appsearch.safeparcel.AbstractSafeParcelable;
 import androidx.appsearch.safeparcel.SafeParcelable;
 import androidx.appsearch.safeparcel.stub.StubCreators.EmbeddingVectorCreator;
 import androidx.core.util.Preconditions;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -52,13 +51,14 @@ import java.util.Objects;
         name = Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG)
 @FlaggedApi(Flags.FLAG_ENABLE_SCHEMA_EMBEDDING_PROPERTY_CONFIG)
 @SafeParcelable.Class(creator = "EmbeddingVectorCreator")
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 public final class EmbeddingVector extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public static final Parcelable.@NonNull Creator<EmbeddingVector> CREATOR =
+    public static final @NonNull Parcelable.Creator<EmbeddingVector> CREATOR =
             new EmbeddingVectorCreator();
     @Field(id = 1, getter = "getValues")
-    private final float @NonNull [] mValues;
+    private final @NonNull float[] mValues;
     @Field(id = 2, getter = "getModelSignature")
     private final @NonNull String mModelSignature;
     private @Nullable Integer mHashCode;
@@ -70,7 +70,7 @@ public final class EmbeddingVector extends AbstractSafeParcelable {
      */
     @Constructor
     public EmbeddingVector(
-            @Param(id = 1) float @NonNull [] values,
+            @Param(id = 1) @NonNull float[] values,
             @Param(id = 2) @NonNull String modelSignature) {
         mValues = Preconditions.checkNotNull(values);
         if (mValues.length == 0) {
@@ -82,7 +82,7 @@ public final class EmbeddingVector extends AbstractSafeParcelable {
     /**
      * Returns the values of this embedding vector.
      */
-    public float @NonNull [] getValues() {
+    public @NonNull float[] getValues() {
         return mValues;
     }
 

@@ -19,6 +19,7 @@ package androidx.appsearch.app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.flags.FlaggedApi;
@@ -27,15 +28,14 @@ import androidx.appsearch.safeparcel.AbstractSafeParcelable;
 import androidx.appsearch.safeparcel.SafeParcelable;
 import androidx.appsearch.safeparcel.stub.StubCreators.StorageInfoCreator;
 
-import org.jspecify.annotations.NonNull;
-
 /** The response class of {@code AppSearchSession#getStorageInfo}. */
 @SafeParcelable.Class(creator = "StorageInfoCreator")
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 public final class StorageInfo extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    public static final Parcelable.@NonNull Creator<StorageInfo> CREATOR = new StorageInfoCreator();
+    public static final @NonNull Parcelable.Creator<StorageInfo> CREATOR = new StorageInfoCreator();
 
     @Field(id = 1, getter = "getSizeBytes")
     private long mSizeBytes;
@@ -128,21 +128,21 @@ public final class StorageInfo extends AbstractSafeParcelable {
 
         /** Sets the size in bytes. */
         @CanIgnoreReturnValue
-        public StorageInfo.@NonNull Builder setSizeBytes(long sizeBytes) {
+        public @NonNull StorageInfo.Builder setSizeBytes(long sizeBytes) {
             mSizeBytes = sizeBytes;
             return this;
         }
 
         /** Sets the number of alive documents. */
         @CanIgnoreReturnValue
-        public StorageInfo.@NonNull Builder setAliveDocumentsCount(int aliveDocumentsCount) {
+        public @NonNull StorageInfo.Builder setAliveDocumentsCount(int aliveDocumentsCount) {
             mAliveDocumentsCount = aliveDocumentsCount;
             return this;
         }
 
         /** Sets the number of alive namespaces. */
         @CanIgnoreReturnValue
-        public StorageInfo.@NonNull Builder setAliveNamespacesCount(int aliveNamespacesCount) {
+        public @NonNull StorageInfo.Builder setAliveNamespacesCount(int aliveNamespacesCount) {
             mAliveNamespacesCount = aliveNamespacesCount;
             return this;
         }
@@ -151,7 +151,7 @@ public final class StorageInfo extends AbstractSafeParcelable {
         @CanIgnoreReturnValue
         @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
         @ExperimentalAppSearchApi
-        public StorageInfo.@NonNull Builder setBlobsSizeBytes(long blobsSizeBytes) {
+        public @NonNull StorageInfo.Builder setBlobsSizeBytes(long blobsSizeBytes) {
             mBlobsSizeBytes = blobsSizeBytes;
             return this;
         }
@@ -160,7 +160,7 @@ public final class StorageInfo extends AbstractSafeParcelable {
         @CanIgnoreReturnValue
         @FlaggedApi(Flags.FLAG_ENABLE_BLOB_STORE)
         @ExperimentalAppSearchApi
-        public StorageInfo.@NonNull Builder setBlobsCount(int blobsCount) {
+        public @NonNull StorageInfo.Builder setBlobsCount(int blobsCount) {
             mBlobsCount = blobsCount;
             return this;
         }

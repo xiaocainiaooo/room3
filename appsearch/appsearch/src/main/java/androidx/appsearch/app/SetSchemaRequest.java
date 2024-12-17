@@ -20,6 +20,8 @@ import android.annotation.SuppressLint;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresFeature;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
@@ -29,9 +31,6 @@ import androidx.appsearch.flags.Flags;
 import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
 import androidx.core.util.Preconditions;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -88,6 +87,8 @@ import java.util.Set;
  * @see AppSearchSession#setSchemaAsync
  * @see Migrator
  */
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings("JSpecifyNullness")
 public final class SetSchemaRequest {
 
     /**
@@ -435,7 +436,7 @@ public final class SetSchemaRequest {
          * <p>Any documents of these types will be displayed on system UI surfaces by default.
          */
         @CanIgnoreReturnValue
-        public @NonNull Builder addSchemas(AppSearchSchema @NonNull ... schemas) {
+        public @NonNull Builder addSchemas(@NonNull AppSearchSchema... schemas) {
             Preconditions.checkNotNull(schemas);
             resetIfBuilt();
             return addSchemas(Arrays.asList(schemas));
@@ -468,7 +469,7 @@ public final class SetSchemaRequest {
          */
         @CanIgnoreReturnValue
         @SuppressLint("MissingGetterMatchingBuilder")
-        public @NonNull Builder addDocumentClasses(Class<?> @NonNull ... documentClasses)
+        public @NonNull Builder addDocumentClasses(@NonNull Class<?>... documentClasses)
                 throws AppSearchException {
             Preconditions.checkNotNull(documentClasses);
             resetIfBuilt();
