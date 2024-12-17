@@ -146,6 +146,11 @@ public class TestCustomTabsService extends CustomTabsService {
                 IBinder callback, Bundle extras) throws RemoteException {
             return mMock.setEngagementSignalsCallback(customTabsCallback, callback, extras);
         }
+
+        @Override
+        public boolean isEphemeralBrowsingSupported(Bundle extras) throws RemoteException {
+            return mMock.isEphemeralBrowsingSupported(extras);
+        }
     };
 
     @Override
