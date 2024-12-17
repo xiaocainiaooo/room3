@@ -131,6 +131,24 @@ package androidx.wear.protolayout {
     method public androidx.wear.protolayout.ColorBuilders.ColorStop build();
   }
 
+  @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public static final class ColorBuilders.LinearGradient implements androidx.wear.protolayout.ColorBuilders.Brush {
+    method public java.util.List<androidx.wear.protolayout.ColorBuilders.ColorStop!> getColorStops();
+    method public androidx.wear.protolayout.DimensionBuilders.OffsetDimension? getEndX();
+    method public androidx.wear.protolayout.DimensionBuilders.OffsetDimension? getEndY();
+    method public androidx.wear.protolayout.DimensionBuilders.OffsetDimension? getStartX();
+    method public androidx.wear.protolayout.DimensionBuilders.OffsetDimension? getStartY();
+  }
+
+  public static final class ColorBuilders.LinearGradient.Builder {
+    ctor @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) @java.lang.SafeVarargs public ColorBuilders.LinearGradient.Builder(androidx.wear.protolayout.ColorBuilders.ColorProp!...);
+    ctor @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) @java.lang.SafeVarargs public ColorBuilders.LinearGradient.Builder(androidx.wear.protolayout.ColorBuilders.ColorStop!...);
+    method public androidx.wear.protolayout.ColorBuilders.LinearGradient build();
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public androidx.wear.protolayout.ColorBuilders.LinearGradient.Builder setEndX(androidx.wear.protolayout.DimensionBuilders.OffsetDimension);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public androidx.wear.protolayout.ColorBuilders.LinearGradient.Builder setEndY(androidx.wear.protolayout.DimensionBuilders.OffsetDimension);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public androidx.wear.protolayout.ColorBuilders.LinearGradient.Builder setStartX(androidx.wear.protolayout.DimensionBuilders.OffsetDimension);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public androidx.wear.protolayout.ColorBuilders.LinearGradient.Builder setStartY(androidx.wear.protolayout.DimensionBuilders.OffsetDimension);
+  }
+
   @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=300) public static final class ColorBuilders.SweepGradient implements androidx.wear.protolayout.ColorBuilders.Brush {
     method public java.util.List<androidx.wear.protolayout.ColorBuilders.ColorStop!> getColorStops();
     method public androidx.wear.protolayout.DimensionBuilders.DegreesProp getEndAngle();
@@ -212,7 +230,7 @@ package androidx.wear.protolayout {
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public androidx.wear.protolayout.DimensionBuilders.AngularLayoutConstraint.Builder setAngularAlignment(int);
   }
 
-  @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=400) public static final class DimensionBuilders.BoundingBoxRatio implements androidx.wear.protolayout.DimensionBuilders.PivotDimension {
+  @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=400) public static final class DimensionBuilders.BoundingBoxRatio implements androidx.wear.protolayout.DimensionBuilders.OffsetDimension androidx.wear.protolayout.DimensionBuilders.PivotDimension {
     method public androidx.wear.protolayout.TypeBuilders.FloatProp getRatio();
   }
 
@@ -237,7 +255,7 @@ package androidx.wear.protolayout {
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=0) public androidx.wear.protolayout.DimensionBuilders.DegreesProp.Builder setValue(float);
   }
 
-  @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=0) public static final class DimensionBuilders.DpProp implements androidx.wear.protolayout.DimensionBuilders.AngularDimension androidx.wear.protolayout.DimensionBuilders.ContainerDimension androidx.wear.protolayout.DimensionBuilders.ExtensionDimension androidx.wear.protolayout.DimensionBuilders.ImageDimension androidx.wear.protolayout.DimensionBuilders.PivotDimension androidx.wear.protolayout.DimensionBuilders.SpacerDimension {
+  @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=0) public static final class DimensionBuilders.DpProp implements androidx.wear.protolayout.DimensionBuilders.AngularDimension androidx.wear.protolayout.DimensionBuilders.ContainerDimension androidx.wear.protolayout.DimensionBuilders.ExtensionDimension androidx.wear.protolayout.DimensionBuilders.ImageDimension androidx.wear.protolayout.DimensionBuilders.OffsetDimension androidx.wear.protolayout.DimensionBuilders.PivotDimension androidx.wear.protolayout.DimensionBuilders.SpacerDimension {
     method public androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat? getDynamicValue();
     method @Dimension(unit=androidx.annotation.Dimension.DP) public float getValue();
   }
@@ -285,6 +303,9 @@ package androidx.wear.protolayout {
   }
 
   @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=0) public static interface DimensionBuilders.ImageDimension {
+  }
+
+  @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public static interface DimensionBuilders.OffsetDimension {
   }
 
   @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=400) public static interface DimensionBuilders.PivotDimension {
@@ -963,6 +984,7 @@ package androidx.wear.protolayout {
   }
 
   @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=0) public static final class ModifiersBuilders.Background {
+    method public androidx.wear.protolayout.ColorBuilders.Brush? getBrush();
     method public androidx.wear.protolayout.ColorBuilders.ColorProp? getColor();
     method public androidx.wear.protolayout.ModifiersBuilders.Corner? getCorner();
   }
@@ -970,6 +992,7 @@ package androidx.wear.protolayout {
   public static final class ModifiersBuilders.Background.Builder {
     ctor public ModifiersBuilders.Background.Builder();
     method public androidx.wear.protolayout.ModifiersBuilders.Background build();
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public androidx.wear.protolayout.ModifiersBuilders.Background.Builder setBrush(androidx.wear.protolayout.ColorBuilders.Brush);
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=0) public androidx.wear.protolayout.ModifiersBuilders.Background.Builder setColor(androidx.wear.protolayout.ColorBuilders.ColorProp);
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=0) public androidx.wear.protolayout.ModifiersBuilders.Background.Builder setCorner(androidx.wear.protolayout.ModifiersBuilders.Corner);
   }
