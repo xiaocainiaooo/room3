@@ -22,6 +22,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.remember
 import androidx.lifecycle.HasDefaultViewModelProviderFactory
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.SAVED_STATE_REGISTRY_OWNER_KEY
 import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.VIEW_MODEL_STORE_OWNER_KEY
@@ -29,17 +30,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.enableSavedStateHandles
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.NavContentWrapper
 import androidx.navigation3.NavRecord
+import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 
 /**
  * Provides the content of a [NavRecord] with a [ViewModelStoreOwner] and provides that
  * [ViewModelStoreOwner] as a [LocalViewModelStoreOwner] so that it is available within the content.
+ *
+ * This requires that usage of the [SavedStateNavContentWrapper] to ensure that the [NavRecord]
+ * scoped [ViewModel]s can properly provide access to [SavedStateHandle]s
  */
 public object ViewModelStoreNavContentWrapper : NavContentWrapper {
 
@@ -84,7 +90,10 @@ public object ViewModelStoreNavContentWrapper : NavContentWrapper {
         val savedStateRegistryOwner = LocalSavedStateRegistryOwner.current
         CompositionLocalProvider(
             LocalViewModelStoreOwner provides
-                object : ViewModelStoreOwner, HasDefaultViewModelProviderFactory {
+                object :
+                    ViewModelStoreOwner,
+                    SavedStateRegistryOwner by savedStateRegistryOwner,
+                    HasDefaultViewModelProviderFactory {
                     override val viewModelStore: ViewModelStore
                         get() = viewModelStore
 
@@ -97,6 +106,16 @@ public object ViewModelStoreNavContentWrapper : NavContentWrapper {
                                 it[SAVED_STATE_REGISTRY_OWNER_KEY] = savedStateRegistryOwner
                                 it[VIEW_MODEL_STORE_OWNER_KEY] = this
                             }
+
+                    init {
+                        require(this.lifecycle.currentState == Lifecycle.State.INITIALIZED) {
+                            "The Lifecycle state is already beyond INITIALIZED. The " +
+                                "ViewModelStoreNavContentWrapper requires adding the " +
+                                "SavedStateNavContentWrapper to ensure support for " +
+                                "SavedStateHandles."
+                        }
+                        enableSavedStateHandles()
+                    }
                 }
         ) {
             record.content.invoke(key)
