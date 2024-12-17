@@ -16,10 +16,9 @@
 
 package androidx.appsearch.exceptions;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appsearch.app.AppSearchResult;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * An exception thrown by {@link androidx.appsearch.app.AppSearchSession} or a subcomponent.
@@ -27,6 +26,8 @@ import org.jspecify.annotations.Nullable;
  * <p>These exceptions can be converted into a failed {@link AppSearchResult}
  * for propagating to the client.
  */
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings("JSpecifyNullness")
 public class AppSearchException extends Exception {
     @AppSearchResult.ResultCode private final int mResultCode;
 
@@ -80,7 +81,8 @@ public class AppSearchException extends Exception {
     }
 
     /** Converts this {@link java.lang.Exception} into a failed {@link AppSearchResult}. */
-    public <T> @NonNull AppSearchResult<T> toAppSearchResult() {
+    @NonNull
+    public <T> AppSearchResult<T> toAppSearchResult() {
         return AppSearchResult.newFailedResult(mResultCode, getMessage());
     }
 }

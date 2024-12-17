@@ -19,6 +19,8 @@ package androidx.appsearch.app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.flags.FlaggedApi;
@@ -28,18 +30,16 @@ import androidx.appsearch.safeparcel.SafeParcelable;
 import androidx.appsearch.safeparcel.stub.StubCreators.SearchSuggestionResultCreator;
 import androidx.core.util.Preconditions;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * The result class of the {@link AppSearchSession#searchSuggestionAsync}.
  */
 @SafeParcelable.Class(creator = "SearchSuggestionResultCreator")
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 public final class SearchSuggestionResult extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    public static final Parcelable.@NonNull Creator<SearchSuggestionResult> CREATOR =
+    public static final @NonNull Parcelable.Creator<SearchSuggestionResult> CREATOR =
             new SearchSuggestionResultCreator();
 
     @Field(id = 1, getter = "getSuggestedResult")

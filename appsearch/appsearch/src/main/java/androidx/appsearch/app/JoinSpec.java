@@ -20,6 +20,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.flags.FlaggedApi;
@@ -28,8 +29,6 @@ import androidx.appsearch.safeparcel.AbstractSafeParcelable;
 import androidx.appsearch.safeparcel.SafeParcelable;
 import androidx.appsearch.safeparcel.stub.StubCreators.JoinSpecCreator;
 import androidx.core.util.Preconditions;
-
-import org.jspecify.annotations.NonNull;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -126,12 +125,13 @@ import java.util.Objects;
  * nested {@link SearchSpec}, as in {@link SearchResult#getRankingSignal}.
  */
 @SafeParcelable.Class(creator = "JoinSpecCreator")
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 public final class JoinSpec extends AbstractSafeParcelable {
     /** Creator class for {@link JoinSpec}. */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    public static final Parcelable.@NonNull Creator<JoinSpec> CREATOR = new JoinSpecCreator();
+    public static final @NonNull Parcelable.Creator<JoinSpec> CREATOR = new JoinSpecCreator();
 
     @Field(id = 1, getter = "getNestedQuery")
     private final String mNestedQuery;

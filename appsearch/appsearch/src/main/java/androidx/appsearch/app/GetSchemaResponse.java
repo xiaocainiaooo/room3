@@ -21,6 +21,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresFeature;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
@@ -33,9 +35,6 @@ import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
 import androidx.core.util.Preconditions;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,11 +43,12 @@ import java.util.Set;
 
 /** The response class of {@link AppSearchSession#getSchemaAsync} */
 @SafeParcelable.Class(creator = "GetSchemaResponseCreator")
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 public final class GetSchemaResponse extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    public static final Parcelable.@NonNull Creator<GetSchemaResponse> CREATOR =
+    public static final @NonNull Parcelable.Creator<GetSchemaResponse> CREATOR =
             new GetSchemaResponseCreator();
 
     @Field(id = 1, getter = "getVersion")
@@ -700,7 +700,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
             return new GetSchemaResponse(mVersion, mSchemas, visibilityConfigs);
         }
 
-        private InternalVisibilityConfig.@NonNull Builder getOrCreateVisibilityConfigBuilder(
+        private @NonNull InternalVisibilityConfig.Builder getOrCreateVisibilityConfigBuilder(
                 @NonNull String schemaType) {
             if (mVisibilityConfigBuilders == null) {
                 throw new IllegalStateException("GetSchemaResponse is not configured with"
@@ -714,7 +714,7 @@ public final class GetSchemaResponse extends AbstractSafeParcelable {
             return builder;
         }
 
-        private InternalVisibilityConfig.@Nullable Builder getVisibilityConfigBuilder(
+        private @Nullable InternalVisibilityConfig.Builder getVisibilityConfigBuilder(
                 @NonNull String schemaType) {
             if (mVisibilityConfigBuilders == null) {
                 throw new IllegalStateException("GetSchemaResponse is not configured with"

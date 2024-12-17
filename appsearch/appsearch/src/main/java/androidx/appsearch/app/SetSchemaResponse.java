@@ -19,6 +19,8 @@ package androidx.appsearch.app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.flags.FlaggedApi;
@@ -30,9 +32,6 @@ import androidx.appsearch.safeparcel.stub.StubCreators.SetSchemaResponseCreator;
 import androidx.collection.ArraySet;
 import androidx.core.util.Preconditions;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,11 +40,12 @@ import java.util.Set;
 
 /** The response class of {@link AppSearchSession#setSchemaAsync} */
 @SafeParcelable.Class(creator = "SetSchemaResponseCreator")
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 public final class SetSchemaResponse extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    public static final Parcelable.@NonNull Creator<SetSchemaResponse> CREATOR =
+    public static final @NonNull Parcelable.Creator<SetSchemaResponse> CREATOR =
             new SetSchemaResponseCreator();
 
     @Field(id = 1)
@@ -312,7 +312,7 @@ public final class SetSchemaResponse extends AbstractSafeParcelable {
     public static class MigrationFailure extends AbstractSafeParcelable {
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
         @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-        public static final Parcelable.@NonNull Creator<MigrationFailure> CREATOR =
+        public static final @NonNull Parcelable.Creator<MigrationFailure> CREATOR =
                 new MigrationFailureCreator();
 
         @Field(id = 1, getter = "getNamespace")

@@ -18,6 +18,8 @@ package androidx.appsearch.app;
 import android.util.Log;
 
 import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.exceptions.AppSearchException;
@@ -26,9 +28,6 @@ import androidx.appsearch.flags.Flags;
 import androidx.appsearch.util.LogUtil;
 import androidx.core.util.ObjectsCompat;
 import androidx.core.util.Preconditions;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.lang.annotation.Retention;
@@ -39,6 +38,8 @@ import java.lang.annotation.RetentionPolicy;
  *
  * @param <ValueType> The type of result object for successful calls.
  */
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings("JSpecifyNullness")
 public final class AppSearchResult<ValueType> {
     private static final String TAG = "AppSearchResult";
 

@@ -22,6 +22,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.annotation.RequiresFeature;
 import androidx.annotation.RestrictTo;
@@ -41,9 +43,6 @@ import androidx.appsearch.util.IndentingStringBuilder;
 import androidx.collection.ArraySet;
 import androidx.core.util.ObjectsCompat;
 import androidx.core.util.Preconditions;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -65,11 +64,12 @@ import java.util.Set;
  * @see AppSearchSession#setSchemaAsync
  */
 @SafeParcelable.Class(creator = "AppSearchSchemaCreator")
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 public final class AppSearchSchema extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    public static final Parcelable.@NonNull Creator<AppSearchSchema> CREATOR =
+    public static final @NonNull Parcelable.Creator<AppSearchSchema> CREATOR =
             new AppSearchSchemaCreator();
 
     @Field(id = 1, getter = "getSchemaType")
@@ -257,7 +257,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
         @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
-        public AppSearchSchema.@NonNull Builder setSchemaType(@NonNull String schemaType) {
+        public @NonNull AppSearchSchema.Builder setSchemaType(@NonNull String schemaType) {
             Preconditions.checkNotNull(schemaType);
             resetIfBuilt();
             mSchemaType = schemaType;
@@ -276,7 +276,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
         @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
         @ExperimentalAppSearchApi
         @CanIgnoreReturnValue
-        public AppSearchSchema.@NonNull Builder setDescription(@NonNull String description) {
+        public @NonNull AppSearchSchema.Builder setDescription(@NonNull String description) {
             Preconditions.checkNotNull(description);
             resetIfBuilt();
             mDescription = description;
@@ -285,7 +285,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
 
         /** Adds a property to the schema type. */
         @CanIgnoreReturnValue
-        public AppSearchSchema.@NonNull Builder addProperty(
+        public @NonNull AppSearchSchema.Builder addProperty(
                 @NonNull PropertyConfig propertyConfig) {
             Preconditions.checkNotNull(propertyConfig);
             resetIfBuilt();
@@ -304,7 +304,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
         @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
-        public AppSearchSchema.@NonNull Builder clearProperties() {
+        public @NonNull AppSearchSchema.Builder clearProperties() {
             resetIfBuilt();
             mPropertyConfigParcels.clear();
             mPropertyNames.clear();
@@ -374,7 +374,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
         @RequiresFeature(
                 enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                 name = Features.SCHEMA_ADD_PARENT_TYPE)
-        public AppSearchSchema.@NonNull Builder addParentType(@NonNull String parentSchemaType) {
+        public @NonNull AppSearchSchema.Builder addParentType(@NonNull String parentSchemaType) {
             Preconditions.checkNotNull(parentSchemaType);
             resetIfBuilt();
             mParentTypes.add(parentSchemaType);
@@ -388,7 +388,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
         @ExperimentalAppSearchApi
         @FlaggedApi(Flags.FLAG_ENABLE_ADDITIONAL_BUILDER_COPY_CONSTRUCTORS)
         @CanIgnoreReturnValue
-        public AppSearchSchema.@NonNull Builder clearParentTypes() {
+        public @NonNull AppSearchSchema.Builder clearParentTypes() {
             resetIfBuilt();
             mParentTypes.clear();
             return this;
@@ -1002,7 +1002,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
             @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
-            public StringPropertyConfig.@NonNull Builder setDescription(
+            public @NonNull StringPropertyConfig.Builder setDescription(
                     @NonNull String description) {
                 mDescription = Preconditions.checkNotNull(description);
                 return this;
@@ -1016,7 +1016,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
              */
             @CanIgnoreReturnValue
             @SuppressWarnings("MissingGetterMatchingBuilder")  // getter defined in superclass
-            public StringPropertyConfig.@NonNull Builder setCardinality(
+            public @NonNull StringPropertyConfig.Builder setCardinality(
                     @Cardinality int cardinality) {
                 Preconditions.checkArgumentInRange(
                         cardinality, CARDINALITY_REPEATED, CARDINALITY_REQUIRED, "cardinality");
@@ -1032,7 +1032,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
              * queries.
              */
             @CanIgnoreReturnValue
-            public StringPropertyConfig.@NonNull Builder setIndexingType(
+            public @NonNull StringPropertyConfig.Builder setIndexingType(
                     @StringPropertyConfig.IndexingType int indexingType) {
                 Preconditions.checkArgumentInRange(
                         indexingType, INDEXING_TYPE_NONE, INDEXING_TYPE_PREFIXES, "indexingType");
@@ -1052,7 +1052,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
              * {@link StringPropertyConfig#INDEXING_TYPE_NONE}).
              */
             @CanIgnoreReturnValue
-            public StringPropertyConfig.@NonNull Builder setTokenizerType(
+            public @NonNull StringPropertyConfig.Builder setTokenizerType(
                     @TokenizerType int tokenizerType) {
                 Preconditions.checkArgumentInRange(
                         tokenizerType, TOKENIZER_TYPE_NONE, TOKENIZER_TYPE_RFC822, "tokenizerType");
@@ -1069,7 +1069,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
              * <p>At most, 64 properties can be set as joinable per schema.
              */
             @CanIgnoreReturnValue
-            public StringPropertyConfig.@NonNull Builder setJoinableValueType(
+            public @NonNull StringPropertyConfig.Builder setJoinableValueType(
                     @JoinableValueType int joinableValueType) {
                 Preconditions.checkArgumentInRange(
                         joinableValueType,
@@ -1101,7 +1101,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                             .SCHEMA_STRING_PROPERTY_CONFIG_DELETE_PROPAGATION_TYPE_PROPAGATE_FROM)
             @FlaggedApi(Flags.FLAG_ENABLE_DELETE_PROPAGATION_TYPE)
             @ExperimentalAppSearchApi
-            public StringPropertyConfig.@NonNull Builder setDeletePropagationType(
+            public @NonNull StringPropertyConfig.Builder setDeletePropagationType(
                     @DeletePropagationType int deletePropagationType) {
                 Preconditions.checkArgumentInRange(
                         deletePropagationType,
@@ -1307,7 +1307,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
             @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
-            public LongPropertyConfig.@NonNull Builder setDescription(@NonNull String description) {
+            public @NonNull LongPropertyConfig.Builder setDescription(@NonNull String description) {
                 mDescription = Preconditions.checkNotNull(description);
                 return this;
             }
@@ -1320,7 +1320,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
              */
             @CanIgnoreReturnValue
             @SuppressWarnings("MissingGetterMatchingBuilder")  // getter defined in superclass
-            public LongPropertyConfig.@NonNull Builder setCardinality(
+            public @NonNull LongPropertyConfig.Builder setCardinality(
                     @Cardinality int cardinality) {
                 Preconditions.checkArgumentInRange(
                         cardinality, CARDINALITY_REPEATED, CARDINALITY_REQUIRED, "cardinality");
@@ -1336,7 +1336,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
              * and cannot be matched by queries.
              */
             @CanIgnoreReturnValue
-            public LongPropertyConfig.@NonNull Builder setIndexingType(
+            public @NonNull LongPropertyConfig.Builder setIndexingType(
                     @LongPropertyConfig.IndexingType int indexingType) {
                 Preconditions.checkArgumentInRange(
                         indexingType, INDEXING_TYPE_NONE, INDEXING_TYPE_RANGE, "indexingType");
@@ -1361,7 +1361,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                     name = Features.SCHEMA_SCORABLE_PROPERTY_CONFIG)
             @ExperimentalAppSearchApi
             @FlaggedApi(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
-            public LongPropertyConfig.@NonNull Builder setScoringEnabled(
+            public @NonNull LongPropertyConfig.Builder setScoringEnabled(
                     boolean scoringEnabled) {
                 mScoringEnabled = scoringEnabled;
                 return this;
@@ -1437,7 +1437,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
             @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
-            public DoublePropertyConfig.@NonNull Builder setDescription(
+            public @NonNull DoublePropertyConfig.Builder setDescription(
                     @NonNull String description) {
                 mDescription = Preconditions.checkNotNull(description);
                 return this;
@@ -1451,7 +1451,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
              */
             @CanIgnoreReturnValue
             @SuppressWarnings("MissingGetterMatchingBuilder")  // getter defined in superclass
-            public DoublePropertyConfig.@NonNull Builder setCardinality(
+            public @NonNull DoublePropertyConfig.Builder setCardinality(
                     @Cardinality int cardinality) {
                 Preconditions.checkArgumentInRange(
                         cardinality, CARDINALITY_REPEATED, CARDINALITY_REQUIRED, "cardinality");
@@ -1476,7 +1476,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                     name = Features.SCHEMA_SCORABLE_PROPERTY_CONFIG)
             @ExperimentalAppSearchApi
             @FlaggedApi(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
-            public DoublePropertyConfig.@NonNull Builder setScoringEnabled(
+            public @NonNull DoublePropertyConfig.Builder setScoringEnabled(
                     boolean scoringEnabled) {
                 mScoringEnabled = scoringEnabled;
                 return this;
@@ -1530,7 +1530,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
             @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
-            public BooleanPropertyConfig.@NonNull Builder setDescription(
+            public @NonNull BooleanPropertyConfig.Builder setDescription(
                     @NonNull String description) {
                 mDescription = Preconditions.checkNotNull(description);
                 return this;
@@ -1544,7 +1544,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
              */
             @CanIgnoreReturnValue
             @SuppressWarnings("MissingGetterMatchingBuilder")  // getter defined in superclass
-            public BooleanPropertyConfig.@NonNull Builder setCardinality(
+            public @NonNull BooleanPropertyConfig.Builder setCardinality(
                     @Cardinality int cardinality) {
                 Preconditions.checkArgumentInRange(
                         cardinality, CARDINALITY_REPEATED, CARDINALITY_REQUIRED, "cardinality");
@@ -1569,7 +1569,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                     name = Features.SCHEMA_SCORABLE_PROPERTY_CONFIG)
             @ExperimentalAppSearchApi
             @FlaggedApi(Flags.FLAG_ENABLE_SCORABLE_PROPERTY)
-            public BooleanPropertyConfig.@NonNull Builder setScoringEnabled(
+            public @NonNull BooleanPropertyConfig.Builder setScoringEnabled(
                     boolean scoringEnabled) {
                 mScoringEnabled = scoringEnabled;
                 return this;
@@ -1615,7 +1615,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
             @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
-            public BytesPropertyConfig.@NonNull Builder setDescription(
+            public @NonNull BytesPropertyConfig.Builder setDescription(
                     @NonNull String description) {
                 mDescription = Preconditions.checkNotNull(description);
                 return this;
@@ -1629,7 +1629,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
              */
             @CanIgnoreReturnValue
             @SuppressWarnings("MissingGetterMatchingBuilder")  // getter defined in superclass
-            public BytesPropertyConfig.@NonNull Builder setCardinality(
+            public @NonNull BytesPropertyConfig.Builder setCardinality(
                     @Cardinality int cardinality) {
                 Preconditions.checkArgumentInRange(
                         cardinality, CARDINALITY_REPEATED, CARDINALITY_REQUIRED, "cardinality");
@@ -1737,7 +1737,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
             @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
-            public DocumentPropertyConfig.@NonNull Builder setDescription(
+            public @NonNull DocumentPropertyConfig.Builder setDescription(
                     @NonNull String description) {
                 mDescription = Preconditions.checkNotNull(description);
                 return this;
@@ -1751,7 +1751,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
              */
             @CanIgnoreReturnValue
             @SuppressWarnings("MissingGetterMatchingBuilder")  // getter defined in superclass
-            public DocumentPropertyConfig.@NonNull Builder setCardinality(
+            public @NonNull DocumentPropertyConfig.Builder setCardinality(
                     @Cardinality int cardinality) {
                 Preconditions.checkArgumentInRange(
                         cardinality, CARDINALITY_REPEATED, CARDINALITY_REQUIRED, "cardinality");
@@ -1770,7 +1770,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
              * use {@link #addIndexableNestedProperties(Collection)}.
              */
             @CanIgnoreReturnValue
-            public DocumentPropertyConfig.@NonNull Builder setShouldIndexNestedProperties(
+            public @NonNull DocumentPropertyConfig.Builder setShouldIndexNestedProperties(
                     boolean indexNestedProperties) {
                 mShouldIndexNestedProperties = indexNestedProperties;
                 return this;
@@ -1786,8 +1786,8 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             @RequiresFeature(
                     enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                     name = Features.SCHEMA_ADD_INDEXABLE_NESTED_PROPERTIES)
-            public DocumentPropertyConfig.@NonNull Builder addIndexableNestedProperties(
-                    String @NonNull ... indexableNestedProperties) {
+            public @NonNull DocumentPropertyConfig.Builder addIndexableNestedProperties(
+                    @NonNull String... indexableNestedProperties) {
                 Preconditions.checkNotNull(indexableNestedProperties);
                 return addIndexableNestedProperties(Arrays.asList(indexableNestedProperties));
             }
@@ -1803,8 +1803,8 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             @RequiresFeature(
                     enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                     name = Features.SCHEMA_ADD_INDEXABLE_NESTED_PROPERTIES)
-            public DocumentPropertyConfig.@NonNull Builder addIndexableNestedPropertyPaths(
-                    PropertyPath @NonNull ... indexableNestedPropertyPaths) {
+            public @NonNull DocumentPropertyConfig.Builder addIndexableNestedPropertyPaths(
+                    @NonNull PropertyPath... indexableNestedPropertyPaths) {
                 Preconditions.checkNotNull(indexableNestedPropertyPaths);
                 return addIndexableNestedPropertyPaths(Arrays.asList(indexableNestedPropertyPaths));
             }
@@ -1842,7 +1842,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             @RequiresFeature(
                     enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                     name = Features.SCHEMA_ADD_INDEXABLE_NESTED_PROPERTIES)
-            public DocumentPropertyConfig.@NonNull Builder addIndexableNestedProperties(
+            public @NonNull DocumentPropertyConfig.Builder addIndexableNestedProperties(
                     @NonNull Collection<String> indexableNestedProperties) {
                 Preconditions.checkNotNull(indexableNestedProperties);
                 mIndexableNestedPropertiesList.addAll(indexableNestedProperties);
@@ -1860,7 +1860,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             @RequiresFeature(
                     enforcement = "androidx.appsearch.app.Features#isFeatureSupported",
                     name = Features.SCHEMA_ADD_INDEXABLE_NESTED_PROPERTIES)
-            public DocumentPropertyConfig.@NonNull Builder addIndexableNestedPropertyPaths(
+            public @NonNull DocumentPropertyConfig.Builder addIndexableNestedPropertyPaths(
                     @NonNull Collection<PropertyPath> indexableNestedPropertyPaths) {
                 Preconditions.checkNotNull(indexableNestedPropertyPaths);
                 List<PropertyPath> propertyPathList = new ArrayList<>(indexableNestedPropertyPaths);
@@ -2037,7 +2037,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
             @FlaggedApi(Flags.FLAG_ENABLE_APP_FUNCTIONS)
             @ExperimentalAppSearchApi
             @SuppressWarnings("MissingGetterMatchingBuilder") // getter defined in superclass
-            public EmbeddingPropertyConfig.@NonNull Builder setDescription(
+            public @NonNull EmbeddingPropertyConfig.Builder setDescription(
                     @NonNull String description) {
                 mDescription = Preconditions.checkNotNull(description);
                 return this;
@@ -2051,7 +2051,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
              */
             @CanIgnoreReturnValue
             @SuppressWarnings("MissingGetterMatchingBuilder")  // getter defined in superclass
-            public EmbeddingPropertyConfig.@NonNull Builder setCardinality(
+            public @NonNull EmbeddingPropertyConfig.Builder setCardinality(
                     @Cardinality int cardinality) {
                 Preconditions.checkArgumentInRange(
                         cardinality, CARDINALITY_REPEATED, CARDINALITY_REQUIRED, "cardinality");
@@ -2067,7 +2067,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
              * and cannot be matched by queries.
              */
             @CanIgnoreReturnValue
-            public EmbeddingPropertyConfig.@NonNull Builder setIndexingType(
+            public @NonNull EmbeddingPropertyConfig.Builder setIndexingType(
                     @EmbeddingPropertyConfig.IndexingType int indexingType) {
                 Preconditions.checkArgumentInRange(
                         indexingType, INDEXING_TYPE_NONE, INDEXING_TYPE_SIMILARITY,
@@ -2093,7 +2093,7 @@ public final class AppSearchSchema extends AbstractSafeParcelable {
                     name = Features.SCHEMA_EMBEDDING_QUANTIZATION)
             @FlaggedApi(Flags.FLAG_ENABLE_SCHEMA_EMBEDDING_QUANTIZATION)
             @CanIgnoreReturnValue
-            public EmbeddingPropertyConfig.@NonNull Builder setQuantizationType(
+            public @NonNull EmbeddingPropertyConfig.Builder setQuantizationType(
                     @EmbeddingPropertyConfig.QuantizationType int quantizationType) {
                 Preconditions.checkArgumentInRange(
                         quantizationType, QUANTIZATION_TYPE_NONE, QUANTIZATION_TYPE_8_BIT,

@@ -20,6 +20,8 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.annotation.RequiresFeature;
 import androidx.annotation.RestrictTo;
@@ -36,9 +38,6 @@ import androidx.appsearch.util.BundleUtil;
 import androidx.collection.ArrayMap;
 import androidx.core.util.ObjectsCompat;
 import androidx.core.util.Preconditions;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,11 +61,12 @@ import java.util.Set;
  * @see SearchResults
  */
 @SafeParcelable.Class(creator = "SearchResultCreator")
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 public final class SearchResult extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    public static final Parcelable.@NonNull Creator<SearchResult> CREATOR =
+    public static final @NonNull Parcelable.Creator<SearchResult> CREATOR =
             new SearchResultCreator();
 
     @Field(id = 1)
@@ -150,7 +150,7 @@ public final class SearchResult extends AbstractSafeParcelable {
      *       classpath.
      * @see GenericDocument#toDocumentClass(java.lang.Class)
      */
-    public <T> @NonNull T getDocument(java.lang.@NonNull Class<T> documentClass)
+    public <T> @NonNull T getDocument(@NonNull java.lang.Class<T> documentClass)
             throws AppSearchException {
         return getDocument(documentClass, /* documentClassMap= */null);
     }
@@ -177,7 +177,7 @@ public final class SearchResult extends AbstractSafeParcelable {
      * @see GenericDocument#toDocumentClass(java.lang.Class, DocumentClassMappingContext)
      */
     @OptIn(markerClass = ExperimentalAppSearchApi.class)
-    public <T> @NonNull T getDocument(java.lang.@NonNull Class<T> documentClass,
+    public <T> @NonNull T getDocument(@NonNull java.lang.Class<T> documentClass,
             @Nullable Map<String, List<String>> documentClassMap) throws AppSearchException {
         Preconditions.checkNotNull(documentClass);
         return getGenericDocument().toDocumentClass(documentClass,
@@ -594,7 +594,7 @@ public final class SearchResult extends AbstractSafeParcelable {
     public static final class MatchInfo extends AbstractSafeParcelable {
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
         @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-        public static final Parcelable.@NonNull Creator<MatchInfo> CREATOR =
+        public static final @NonNull Parcelable.Creator<MatchInfo> CREATOR =
                 new MatchInfoCreator();
 
         /** The path of the matching snippet property. */

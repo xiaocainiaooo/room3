@@ -20,6 +20,8 @@ import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.annotation.Document;
@@ -34,9 +36,6 @@ import androidx.appsearch.safeparcel.stub.StubCreators.ObserverSpecCreator;
 import androidx.collection.ArraySet;
 import androidx.core.util.Preconditions;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -49,11 +48,12 @@ import java.util.Set;
  * match against.
  */
 @SafeParcelable.Class(creator = "ObserverSpecCreator")
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 public final class ObserverSpec extends AbstractSafeParcelable {
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    public static final Parcelable.@NonNull Creator<ObserverSpec> CREATOR =
+    public static final @NonNull Parcelable.Creator<ObserverSpec> CREATOR =
             new ObserverSpecCreator();
 
     @Field(id = 1)
@@ -98,7 +98,7 @@ public final class ObserverSpec extends AbstractSafeParcelable {
          * <p>If unset, the observer will match documents of all types.
          */
         @CanIgnoreReturnValue
-        public @NonNull Builder addFilterSchemas(String @NonNull ... schemas) {
+        public @NonNull Builder addFilterSchemas(@NonNull String... schemas) {
             Preconditions.checkNotNull(schemas);
             resetIfBuilt();
             return addFilterSchemas(Arrays.asList(schemas));
@@ -132,7 +132,7 @@ public final class ObserverSpec extends AbstractSafeParcelable {
         @SuppressLint("MissingGetterMatchingBuilder")
         @CanIgnoreReturnValue
         public @NonNull Builder addFilterDocumentClasses(
-                java.lang.Class<?> @NonNull ... documentClasses) throws AppSearchException {
+                @NonNull java.lang.Class<?>... documentClasses) throws AppSearchException {
             Preconditions.checkNotNull(documentClasses);
             resetIfBuilt();
             return addFilterDocumentClasses(Arrays.asList(documentClasses));

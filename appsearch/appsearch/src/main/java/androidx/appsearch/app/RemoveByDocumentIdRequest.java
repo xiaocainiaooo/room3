@@ -19,6 +19,8 @@ package androidx.appsearch.app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.annotation.CanIgnoreReturnValue;
 import androidx.appsearch.flags.FlaggedApi;
@@ -28,9 +30,6 @@ import androidx.appsearch.safeparcel.SafeParcelable;
 import androidx.appsearch.safeparcel.stub.StubCreators.RemoveByDocumentIdRequestCreator;
 import androidx.collection.ArraySet;
 import androidx.core.util.Preconditions;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,12 +46,13 @@ import java.util.Set;
  * @see AppSearchSession#removeAsync
  */
 @SafeParcelable.Class(creator = "RemoveByDocumentIdRequestCreator")
-@SuppressWarnings("HiddenSuperclass")
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings({"HiddenSuperclass", "JSpecifyNullness"})
 public final class RemoveByDocumentIdRequest extends AbstractSafeParcelable {
     /** Creator class for {@link android.app.appsearch.RemoveByDocumentIdRequest}. */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @FlaggedApi(Flags.FLAG_ENABLE_SAFE_PARCELABLE_2)
-    public static final Parcelable.@NonNull Creator<RemoveByDocumentIdRequest> CREATOR =
+    public static final @NonNull Parcelable.Creator<RemoveByDocumentIdRequest> CREATOR =
             new RemoveByDocumentIdRequestCreator();
 
     @Field(id = 1, getter = "getNamespace")
@@ -108,7 +108,7 @@ public final class RemoveByDocumentIdRequest extends AbstractSafeParcelable {
 
         /** Adds one or more document IDs to the request. */
         @CanIgnoreReturnValue
-        public @NonNull Builder addIds(String @NonNull ... ids) {
+        public @NonNull Builder addIds(@NonNull String... ids) {
             Preconditions.checkNotNull(ids);
             resetIfBuilt();
             return addIds(Arrays.asList(ids));

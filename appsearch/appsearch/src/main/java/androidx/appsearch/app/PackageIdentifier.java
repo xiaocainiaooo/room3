@@ -16,16 +16,17 @@
 
 package androidx.appsearch.app;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RestrictTo;
 import androidx.appsearch.safeparcel.PackageIdentifierParcel;
 import androidx.core.util.Preconditions;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * This class represents a uniquely identifiable package.
  */
+// TODO(b/384721898): Switch to JSpecify annotations
+@SuppressWarnings("JSpecifyNullness")
 public class PackageIdentifier {
     private final @NonNull PackageIdentifierParcel mPackageIdentifierParcel;
 
@@ -44,7 +45,7 @@ public class PackageIdentifier {
      * @param packageName       Name of the package.
      * @param sha256Certificate SHA-256 certificate digest of the package.
      */
-    public PackageIdentifier(@NonNull String packageName, byte @NonNull [] sha256Certificate) {
+    public PackageIdentifier(@NonNull String packageName, @NonNull byte[] sha256Certificate) {
         Preconditions.checkNotNull(packageName);
         Preconditions.checkNotNull(sha256Certificate);
         mPackageIdentifierParcel = new PackageIdentifierParcel(packageName, sha256Certificate);
@@ -73,7 +74,7 @@ public class PackageIdentifier {
     }
 
     /** Returns the SHA-256 certificate for a package. */
-    public byte @NonNull [] getSha256Certificate() {
+    public @NonNull byte[] getSha256Certificate() {
         return mPackageIdentifierParcel.getSha256Certificate();
     }
 
