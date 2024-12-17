@@ -16,7 +16,7 @@
 
 package androidx.xr.compose.material3
 
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi
 import androidx.compose.material3.LocalNavigationBarComponentOverride
 import androidx.compose.material3.LocalNavigationRailComponentOverride
 import androidx.compose.runtime.Composable
@@ -31,7 +31,7 @@ import androidx.xr.compose.platform.LocalSpatialCapabilities
  * The [overrideEnabler] param determines whether each component will use an XR version.
  */
 @ExperimentalMaterial3XrApi
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3ComponentOverrideApi::class)
 @Composable
 public fun EnableXrComponentOverrides(
     overrideEnabler: XrComponentOverrideEnabler = DefaultXrComponentOverrideEnabler,

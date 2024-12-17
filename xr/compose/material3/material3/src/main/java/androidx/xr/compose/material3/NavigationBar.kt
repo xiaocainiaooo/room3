@@ -26,7 +26,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ComponentOverrideApi
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.NavigationBarComponentOverride
 import androidx.compose.material3.NavigationBarComponentOverrideContext
@@ -117,7 +117,7 @@ private object XrNavigationBarTokens {
 
 /** [NavigationBarComponentOverride] that uses the XR-specific [NavigationBar]. */
 @ExperimentalMaterial3XrApi
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3ComponentOverrideApi::class)
 internal object XrNavigationBarComponentOverride : NavigationBarComponentOverride {
     @Composable
     override fun NavigationBarComponentOverrideContext.NavigationBar() {
