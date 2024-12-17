@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalAutofill
 import androidx.compose.ui.platform.LocalAutofillTree
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
@@ -77,8 +78,6 @@ class AndroidAutoFillTest {
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun onProvideAutofillVirtualStructure_populatesViewStructure() {
-        // TODO(b/383201236): Ensure the old API works when the new API is enabled.
-        if (isSemanticAutofillEnabled) return
         // Arrange.
         val viewStructure: ViewStructure = FakeViewStructure()
         val autofillNode =
@@ -97,6 +96,13 @@ class AndroidAutoFillTest {
         assertThat(viewStructure)
             .isEqualTo(
                 FakeViewStructure().apply {
+                    if (isSemanticAutofillEnabled) {
+                        virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
+                        autofillId = ownerView.autofillId
+                        packageName = currentPackageName
+                        bounds = android.graphics.Rect(0, 0, 0, 0)
+                        isEnabled = true
+                    }
                     children.add(
                         FakeViewStructure().apply {
                             virtualId = autofillNode.id
@@ -114,14 +120,12 @@ class AndroidAutoFillTest {
     @SdkSuppress(minSdkVersion = 26)
     @Test
     fun autofill_triggersOnFill() {
-        // TODO(b/383201236): Ensure the old API works when the new API is enabled.
-        if (isSemanticAutofillEnabled) return
         // Arrange.
         val expectedValue = "PersonName"
-        var autofilledValue = ""
+        var autoFilledValue = ""
         val autofillNode =
             AutofillNode(
-                onFill = { autofilledValue = it },
+                onFill = { autoFilledValue = it },
                 autofillTypes = listOf(AutofillType.PersonFullName),
                 boundingBox = Rect(0f, 0f, 0f, 0f)
             )
@@ -135,6 +139,6 @@ class AndroidAutoFillTest {
         ownerView.autofill(autofillValues)
 
         // Assert.
-        assertThat(autofilledValue).isEqualTo(expectedValue)
+        assertThat(autoFilledValue).isEqualTo(expectedValue)
     }
 }

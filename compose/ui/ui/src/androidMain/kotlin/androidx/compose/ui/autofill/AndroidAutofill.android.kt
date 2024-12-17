@@ -83,6 +83,7 @@ internal class AndroidAutofill(val view: View, val autofillTree: AutofillTree) :
  */
 @RequiresApi(Build.VERSION_CODES.O)
 internal fun AndroidAutofill.populateViewStructure(root: ViewStructure) {
+    if (autofillTree.children.isEmpty()) return
 
     // Add child nodes. The function returns the index to the first item.
     var index = AutofillApi26Helper.addChildCount(root, autofillTree.children.count())
@@ -123,6 +124,8 @@ internal fun AndroidAutofill.populateViewStructure(root: ViewStructure) {
 /** Triggers onFill() in response to a request from the autofill framework. */
 @RequiresApi(Build.VERSION_CODES.O)
 internal fun AndroidAutofill.performAutofill(values: SparseArray<AutofillValue>) {
+    if (autofillTree.children.isEmpty()) return
+
     for (index in 0 until values.size()) {
         val itemId = values.keyAt(index)
         val value = values[itemId]
