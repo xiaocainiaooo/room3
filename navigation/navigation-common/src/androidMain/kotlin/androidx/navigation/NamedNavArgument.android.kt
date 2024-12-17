@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@file:JvmName("NamedNavArgumentKt")
+@file:JvmMultifileClass
+
 package androidx.navigation
 
 /** Construct a new [NavArgument] */
