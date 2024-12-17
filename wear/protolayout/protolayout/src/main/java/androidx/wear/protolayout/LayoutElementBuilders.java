@@ -5401,9 +5401,9 @@ public final class LayoutElementBuilders {
                 DimensionProto.AngularDimension angularDimensionProto =
                         angularLength.toAngularDimensionProto();
                 if ((angularDimensionProto.hasDegrees()
-                                && angularDimensionProto.getDegrees().getDynamicValue() != null)
+                        && angularDimensionProto.getDegrees().hasDynamicValue())
                         || (angularDimensionProto.hasDp()
-                                && angularDimensionProto.getDp().getDynamicValue() != null)) {
+                        && angularDimensionProto.getDp().hasDynamicValue())) {
                     throw new IllegalArgumentException(
                             "ArcSpacer.Builder.setAngularLength doesn't support dynamic values.");
                 }

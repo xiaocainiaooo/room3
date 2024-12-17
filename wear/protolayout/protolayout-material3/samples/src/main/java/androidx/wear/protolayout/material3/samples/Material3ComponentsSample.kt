@@ -19,16 +19,20 @@ package androidx.wear.protolayout.material3.samples
 import android.content.Context
 import androidx.annotation.Sampled
 import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
+import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.DimensionBuilders.weight
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
+import androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
 import androidx.wear.protolayout.material3.AppCardStyle
 import androidx.wear.protolayout.material3.CardDefaults.filledTonalCardColors
 import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
+import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults
+import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.filledVariantProgressIndicatorColors
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.extraLargeDataCardStyle
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.largeCompactDataCardStyle
 import androidx.wear.protolayout.material3.GraphicDataCardStyle.Companion.largeGraphicDataCardStyle
@@ -39,6 +43,7 @@ import androidx.wear.protolayout.material3.backgroundImage
 import androidx.wear.protolayout.material3.button
 import androidx.wear.protolayout.material3.buttonGroup
 import androidx.wear.protolayout.material3.card
+import androidx.wear.protolayout.material3.circularProgressIndicator
 import androidx.wear.protolayout.material3.graphicDataCard
 import androidx.wear.protolayout.material3.icon
 import androidx.wear.protolayout.material3.iconButton
@@ -399,5 +404,25 @@ fun imageButtonSample(
                     backgroundContent = { backgroundImage(protoLayoutResourceId = "id") }
                 )
             }
+        )
+    }
+
+@Sampled
+fun singleSegmentCircularProgressIndicator(
+    context: Context,
+    deviceParameters: DeviceParameters,
+): LayoutElement =
+    materialScope(context, deviceParameters) {
+        circularProgressIndicator(
+            dynamicProgress =
+                DynamicFloat.animate(
+                    0.0F,
+                    1.1F,
+                    CircularProgressIndicatorDefaults.recommendedAnimationSpec
+                ),
+            startAngleDegrees = 200F,
+            endAngleDegrees = 520F,
+            colors = filledVariantProgressIndicatorColors(),
+            size = dp(85F)
         )
     }
