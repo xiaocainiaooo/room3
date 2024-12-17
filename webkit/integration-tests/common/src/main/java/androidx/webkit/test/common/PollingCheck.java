@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 The Android Open Source Project
+ * Copyright 2018 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.webkit;
+package androidx.webkit.test.common;
 
 import android.annotation.SuppressLint;
 
@@ -52,7 +52,7 @@ public abstract class PollingCheck {
             try {
                 Thread.sleep(TIME_SLICE);
             } catch (InterruptedException e) {
-                Assert.fail("unexpected InterruptedException");
+                throw new AssertionError("unexpected InterruptedException", e);
             }
 
             if (check()) {

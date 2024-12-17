@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.webkit;
+package androidx.webkit.test.common;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -35,6 +36,13 @@ import android.webkit.WebViewClient;
 import androidx.annotation.CallSuper;
 import androidx.concurrent.futures.ResolvableFuture;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.webkit.ScriptHandler;
+import androidx.webkit.WebMessageCompat;
+import androidx.webkit.WebMessagePortCompat;
+import androidx.webkit.WebSettingsCompat;
+import androidx.webkit.WebViewClientCompat;
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewRenderProcessClient;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -163,13 +171,16 @@ public class WebViewOnUiThread implements AutoCloseable{
     /**
      * Called from WaitForLoadedClient.
      */
-    @SuppressWarnings("EmptyMethod")
+    // TODO(crbug.com/384100250): Refactor this class to not use synchronized methods
+    @SuppressWarnings({"EmptyMethod", "BanSynchronizedMethods"})
     synchronized void onPageStarted() {}
 
     /**
      * Called from WaitForLoadedClient, this is used to indicate that
      * the page is loaded, but not drawn yet.
      */
+    // TODO(crbug.com/384100250): Refactor this class to not use synchronized methods
+    @SuppressWarnings("BanSynchronizedMethods")
     synchronized void onPageFinished() {
         mLoaded = true;
         this.notifyAll();
@@ -180,6 +191,8 @@ public class WebViewOnUiThread implements AutoCloseable{
      * for a page.
      * @param progress The progress made so far between 0 and 100.
      */
+    // TODO(crbug.com/384100250): Refactor this class to not use synchronized methods
+    @SuppressWarnings("BanSynchronizedMethods")
     synchronized void onProgressChanged(int progress) {
         mProgress = progress;
         this.notifyAll();
@@ -276,6 +289,7 @@ public class WebViewOnUiThread implements AutoCloseable{
                 mWebView, script, allowedOriginRules));
     }
 
+    @SuppressLint("JavascriptInterface")
     public void addJavascriptInterface(final @NonNull Object object, final @NonNull String name) {
         WebkitUtils.onMainThreadSync(() -> mWebView.addJavascriptInterface(object, name));
     }
@@ -435,6 +449,8 @@ public class WebViewOnUiThread implements AutoCloseable{
     /**
      * @return Whether or not the load has finished.
      */
+    // TODO(crbug.com/384100250): Refactor this class to not use synchronized methods
+    @SuppressWarnings("BanSynchronizedMethods")
     private synchronized boolean isLoaded() {
         return mLoaded && mProgress == 100;
     }
@@ -461,6 +477,8 @@ public class WebViewOnUiThread implements AutoCloseable{
      * Called whenever a load has been completed so that a subsequent call to
      * waitForLoadCompletion doesn't return immediately.
      */
+    // TODO(crbug.com/384100250): Refactor this class to not use synchronized methods
+    @SuppressWarnings("BanSynchronizedMethods")
     private synchronized void clearLoad() {
         mLoaded = false;
         mProgress = 0;
@@ -488,6 +506,8 @@ public class WebViewOnUiThread implements AutoCloseable{
     /**
      * Uses a wait/notify to check when the criteria is met.
      */
+    // TODO(crbug.com/384100250): Refactor this class to not use synchronized methods
+    @SuppressWarnings("BanSynchronizedMethods")
     private synchronized void waitOnTestThread(long timeout, Callable<Boolean> doneCriteria) {
         try {
             long waitEnd = SystemClock.uptimeMillis() + timeout;
@@ -555,7 +575,7 @@ public class WebViewOnUiThread implements AutoCloseable{
     public static class WaitForLoadedClient extends WebViewClientCompat {
         private final WebViewOnUiThread mOnUiThread;
 
-        WaitForLoadedClient(WebViewOnUiThread onUiThread) {
+        public WaitForLoadedClient(@NonNull WebViewOnUiThread onUiThread) {
             mOnUiThread = onUiThread;
         }
 
