@@ -202,7 +202,7 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
         mZoomControl = new ZoomControl(this, mCameraCharacteristics, mExecutor);
         mTorchControl = new TorchControl(this, mCameraCharacteristics, mExecutor);
         if (Build.VERSION.SDK_INT >= 23) {
-            mZslControl = new ZslControlImpl(mCameraCharacteristics);
+            mZslControl = new ZslControlImpl(mCameraCharacteristics, mExecutor);
         } else {
             mZslControl = new ZslControlNoOpImpl();
         }

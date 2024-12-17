@@ -19,12 +19,15 @@ package androidx.camera.core.internal.compat;
 import android.media.Image;
 import android.media.ImageWriter;
 import android.os.Build;
+import android.os.Handler;
 import android.view.Surface;
 
 import androidx.annotation.IntRange;
 import androidx.annotation.RequiresApi;
 
 import org.jspecify.annotations.NonNull;
+
+import java.util.concurrent.Executor;
 
 /**
  * Helper for accessing features of {@link ImageWriter} in a backwards compatible fashion.
@@ -154,6 +157,25 @@ public final class ImageWriterCompat {
         throw new RuntimeException(
                 "Unable to call queueInputImage() on API " + Build.VERSION.SDK_INT
                         + ". Version 23 or higher required.");
+    }
+
+    /**
+     * Sets an {@link ImageWriter.OnImageReleasedListener} to be notified when an {@link Image} is
+     * released from the {@link ImageWriter}.
+     *
+     * <p>This method is a compatibility wrapper for
+     * {@link ImageWriter#setOnImageReleasedListener(ImageWriter.OnImageReleasedListener, Handler)}.
+     *
+     * @param imageWriter The {@link ImageWriter} to set the listener on.
+     * @param releasedListener The {@link ImageWriter.OnImageReleasedListener} to be notified when
+     *                        an image is released.
+     * @param executor The {@link Executor} on which the listener should be invoked.
+     */
+    public static void setOnImageReleasedListener(@NonNull ImageWriter imageWriter,
+            ImageWriter.@NonNull OnImageReleasedListener releasedListener, @NonNull
+            Executor executor) {
+        ImageWriterCompatApi23Impl.setOnImageReleasedListener(imageWriter, releasedListener,
+                executor);
     }
 
     /**

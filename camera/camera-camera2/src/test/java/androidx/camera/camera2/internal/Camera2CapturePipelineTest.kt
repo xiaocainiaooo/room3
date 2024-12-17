@@ -1438,7 +1438,8 @@ class Camera2CapturePipelineTest {
                     hasCapabilities = true,
                     isYuvReprocessingSupported = true,
                     isPrivateReprocessingSupported = true
-                )
+                ),
+                executorService
             )
 
         // Only need to initialize when not disabled
