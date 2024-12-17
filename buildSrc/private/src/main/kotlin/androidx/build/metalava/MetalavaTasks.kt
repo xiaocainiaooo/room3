@@ -219,6 +219,7 @@ internal object MetalavaTasks {
         generateApiDependencies: Configuration
     ) {
         task.sourcePaths = inputs.sourcePaths
+        task.commonModuleSourcePaths = inputs.commonModuleSourcePaths
         task.compiledSources = generateApiDependencies
         task.dependencyClasspath = inputs.dependencyClasspath
         task.bootClasspath = inputs.bootClasspath

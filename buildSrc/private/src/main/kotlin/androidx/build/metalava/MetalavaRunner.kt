@@ -307,6 +307,7 @@ private fun generateApi(
             projectDirectory,
             projectXml,
             files.sourcePaths.files,
+            files.commonModuleSourcePaths.files,
             outputLocation,
             generateApiMode,
             apiLintMode,
@@ -326,6 +327,7 @@ fun getGenerateApiArgs(
     projectDirectory: File,
     projectXml: File?,
     sourcePaths: Collection<File>,
+    commonModuleSourcePaths: Collection<File>,
     outputLocation: ApiLocation?,
     generateApiMode: GenerateApiMode,
     apiLintMode: ApiLintMode,
@@ -354,6 +356,10 @@ fun getGenerateApiArgs(
             )
         }
 
+    val existentCommonModuleSourcePaths = commonModuleSourcePaths.filter { it.exists() }
+    if (existentCommonModuleSourcePaths.isNotEmpty()) {
+        args += listOf("--common-source-path", existentCommonModuleSourcePaths.joinToString(":"))
+    }
     args += listOf("--format=v4", "--warnings-as-errors")
 
     pathToManifest?.let { args += listOf("--manifest", pathToManifest) }

@@ -67,6 +67,7 @@ abstract class UpdateApiLintBaselineTask @Inject constructor(workerExecutor: Wor
                 projectDirectory.get().asFile,
                 projectXml.orNull?.asFile,
                 sourcePaths.files.filter { it.exists() },
+                commonModuleSourcePaths.files.filter { it.exists() },
                 null,
                 GenerateApiMode.PublicApi,
                 ApiLintMode.CheckBaseline(baselineFile, targetsJavaConsumers.get()),

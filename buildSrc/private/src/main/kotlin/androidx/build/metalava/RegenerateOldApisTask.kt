@@ -195,6 +195,7 @@ constructor(private val workerExecutor: WorkerExecutor) : DefaultTask() {
         // TODO(b/330721660) parse META-INF/kotlin-project-structure-metadata.json for KMP projects
         return StandardCompilationInputs(
             sourcePaths = sources,
+            commonModuleSourcePaths = project.files(),
             dependencyClasspath = jars,
             bootClasspath = project.getAndroidJar()
         )

@@ -23,7 +23,6 @@ import androidx.build.getCheckoutRoot
 import androidx.build.getOperatingSystem
 import androidx.build.getPrebuiltsRoot
 import androidx.build.java.CompilationInputs
-import androidx.build.java.MultiplatformCompilationInputs
 import androidx.build.multiplatformExtension
 import java.io.File
 import java.util.jar.JarOutputStream
@@ -210,9 +209,7 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                             )
                         )
                         sourcePaths.setFrom(javaInputs.sourcePaths)
-                        commonModuleSourcePaths.from(
-                            (javaInputs as? MultiplatformCompilationInputs)?.commonModuleSourcePaths
-                        )
+                        commonModuleSourcePaths.from(javaInputs.commonModuleSourcePaths)
                         vnamesJson.set(project.getVnamesJson())
                         dependencyClasspath.setFrom(
                             javaInputs.dependencyClasspath + javaInputs.bootClasspath

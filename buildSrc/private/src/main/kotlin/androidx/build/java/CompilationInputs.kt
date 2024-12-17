@@ -42,6 +42,9 @@ internal sealed interface CompilationInputs {
     /** Source files to process */
     val sourcePaths: FileCollection
 
+    /** Source files from the KMP common module of this project */
+    val commonModuleSourcePaths: FileCollection
+
     /** Dependencies (compiled classes) of [sourcePaths]. */
     val dependencyClasspath: FileCollection
 
@@ -82,6 +85,7 @@ internal sealed interface CompilationInputs {
 
             return StandardCompilationInputs(
                 sourcePaths = sourceCollection,
+                commonModuleSourcePaths = project.files(),
                 dependencyClasspath = variant.compileClasspath,
                 bootClasspath = bootClasspath
             )
@@ -146,6 +150,7 @@ internal sealed interface CompilationInputs {
             val dependencyClasspath = sourceSet.compileClasspath
             return StandardCompilationInputs(
                 sourcePaths = sourcePaths,
+                commonModuleSourcePaths = project.files(),
                 dependencyClasspath = dependencyClasspath,
                 bootClasspath = project.getAndroidJar()
             )
@@ -204,6 +209,7 @@ internal data class StandardCompilationInputs(
     override val sourcePaths: FileCollection,
     override val dependencyClasspath: FileCollection,
     override val bootClasspath: FileCollection,
+    override val commonModuleSourcePaths: FileCollection,
 ) : CompilationInputs
 
 /** Compile inputs for a single source set from a multiplatform project. */
@@ -227,8 +233,7 @@ internal class MultiplatformCompilationInputs(
      */
     val sourceSets: Provider<List<SourceSetInputs>>,
     override val bootClasspath: FileCollection,
-    /** Source files from the KMP common module of this project */
-    val commonModuleSourcePaths: FileCollection,
+    override val commonModuleSourcePaths: FileCollection,
 ) : CompilationInputs {
     // Aggregate sources and classpath from all source sets
     override val sourcePaths: ConfigurableFileCollection =
