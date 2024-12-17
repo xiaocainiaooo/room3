@@ -385,7 +385,13 @@ private constructor(
                 findColumnTypeAdapter(
                     // Find an adapter for the non-null underlying type, nullability will be handled
                     // by the value class adapter.
-                    out = underlyingInfo.parameter.asMemberOf(type).makeNonNullable(),
+                    out =
+                        try {
+                            // Workaround for KSP2
+                            underlyingInfo.parameter.asMemberOf(type).makeNonNullable()
+                        } catch (ex: Throwable) {
+                            underlyingInfo.parameter.type.makeNonNullable()
+                        },
                     affinity = affinity,
                     skipDefaultConverter = false
                 ) ?: return null
