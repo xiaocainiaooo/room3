@@ -360,15 +360,20 @@ class Camera2CapturePipeline {
                 if (captureConfig.getTemplateType() == CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG
                         && !mCameraControl.getZslControl().isZslDisabledByFlashMode()
                         && !mCameraControl.getZslControl().isZslDisabledByUserCaseConfig()) {
-                    ImageProxy imageProxy =
-                            mCameraControl.getZslControl().dequeueImageFromBuffer();
-                    boolean isSuccess = imageProxy != null
-                            && mCameraControl.getZslControl().enqueueImageToImageWriter(
-                                        imageProxy);
-                    if (isSuccess) {
-                        cameraCaptureResult =
-                                CameraCaptureResults.retrieveCameraCaptureResult(
-                                        imageProxy.getImageInfo());
+                    ImageProxy imageProxy = mCameraControl.getZslControl().dequeueImageFromBuffer();
+                    if (imageProxy != null) {
+                        if (mCameraControl.getZslControl().enqueueImageToImageWriter(imageProxy)) {
+                            cameraCaptureResult = CameraCaptureResults.retrieveCameraCaptureResult(
+                                    imageProxy.getImageInfo());
+                        } else {
+                            Logger.e(TAG, "Failed to enqueue image to image writer");
+                        }
+
+                        if (cameraCaptureResult == null) {
+                            imageProxy.close();
+                        }
+                    } else {
+                        Logger.d(TAG, "ZSL capture skipped due to no valid buffer image");
                     }
                 }
 

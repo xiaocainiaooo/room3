@@ -56,6 +56,9 @@ public final class ZslRingBuffer extends ArrayRingBuffer<ImageProxy> {
     private boolean isValidZslFrame(@NonNull ImageInfo imageInfo) {
         CameraCaptureResult cameraCaptureResult =
                 CameraCaptureResults.retrieveCameraCaptureResult(imageInfo);
+        if (cameraCaptureResult == null) {
+            return false;
+        }
 
         if (cameraCaptureResult.getAfState() != AfState.LOCKED_FOCUSED
                 && cameraCaptureResult.getAfState() != AfState.PASSIVE_FOCUSED)  {
