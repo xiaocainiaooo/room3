@@ -49,6 +49,15 @@ class CardTest {
     }
 
     @Test
+    fun titleCard_size_default() {
+        LayoutElementAssertionsProvider(DEFAULT_TITLE_CARD_WITH_TEXT)
+            .onRoot()
+            .assert(hasWidth(expand()))
+            .assert(hasHeight(wrapWithMinTapTargetDimension()))
+            .assert(hasTag(CardDefaults.METADATA_TAG))
+    }
+
+    @Test
     fun containerCard_hasContentDescription() {
         LayoutElementAssertionsProvider(DEFAULT_CONTAINER_CARD_WITH_TEXT)
             .onRoot()
@@ -68,6 +77,27 @@ class CardTest {
     fun containerCard_hasContent_asText() {
         LayoutElementAssertionsProvider(DEFAULT_CONTAINER_CARD_WITH_TEXT)
             .onElement(hasText(TEXT))
+            .assertExists()
+    }
+
+    @Test
+    fun titleCard_hasTitle_asText() {
+        LayoutElementAssertionsProvider(DEFAULT_TITLE_CARD_WITH_TEXT)
+            .onElement(hasText(TEXT))
+            .assertExists()
+    }
+
+    @Test
+    fun titleCard_hasContent_asText() {
+        LayoutElementAssertionsProvider(DEFAULT_TITLE_CARD_WITH_TEXT)
+            .onElement(hasText(TEXT2))
+            .assertExists()
+    }
+
+    @Test
+    fun titleCard_hasTime_asText() {
+        LayoutElementAssertionsProvider(DEFAULT_TITLE_CARD_WITH_TEXT)
+            .onElement(hasText(TEXT3))
             .assertExists()
     }
 
@@ -103,6 +133,39 @@ class CardTest {
             }
 
         LayoutElementAssertionsProvider(card).onRoot().assert(hasColor(color))
+        LayoutElementAssertionsProvider(card).onRoot().assert(hasTag(CardDefaults.METADATA_TAG))
+    }
+
+    @Test
+    fun titleCard_hasColors() {
+        val titleColor = Color.YELLOW
+        val contentColor = Color.MAGENTA
+        val timeColor = Color.CYAN
+        val backgroundColor = Color.BLUE
+        val card =
+            materialScope(CONTEXT, DEVICE_CONFIGURATION) {
+                titleCard(
+                    onClick = CLICKABLE,
+                    contentDescription = CONTENT_DESCRIPTION.prop(),
+                    colors =
+                        CardColors(
+                            background = argb(backgroundColor),
+                            title = argb(titleColor),
+                            content = argb(contentColor),
+                            time = argb(timeColor)
+                        ),
+                    title = { text(TEXT.prop()) },
+                    content = { text(TEXT2.prop()) },
+                    time = { text(TEXT3.prop()) },
+                )
+            }
+
+        LayoutElementAssertionsProvider(card).onRoot().assert(hasColor(backgroundColor))
+        LayoutElementAssertionsProvider(card).onElement(hasText(TEXT)).assert(hasColor(titleColor))
+        LayoutElementAssertionsProvider(card)
+            .onElement(hasText(TEXT2))
+            .assert(hasColor(contentColor))
+        LayoutElementAssertionsProvider(card).onElement(hasText(TEXT3)).assert(hasColor(timeColor))
         LayoutElementAssertionsProvider(card).onRoot().assert(hasTag(CardDefaults.METADATA_TAG))
     }
 
@@ -146,12 +209,25 @@ class CardTest {
         private const val IMAGE_ID = "image"
 
         private const val TEXT = "Container card"
+        private const val TEXT2 = "Description"
+        private const val TEXT3 = "Now"
 
         private val DEFAULT_CONTAINER_CARD_WITH_TEXT =
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
                 card(onClick = CLICKABLE, contentDescription = CONTENT_DESCRIPTION.prop()) {
                     text(TEXT.prop())
                 }
+            }
+
+        private val DEFAULT_TITLE_CARD_WITH_TEXT =
+            materialScope(CONTEXT, DEVICE_CONFIGURATION) {
+                titleCard(
+                    onClick = CLICKABLE,
+                    contentDescription = CONTENT_DESCRIPTION.prop(),
+                    title = { text(TEXT.prop()) },
+                    content = { text(TEXT2.prop()) },
+                    time = { text(TEXT3.prop()) },
+                )
             }
     }
 }
