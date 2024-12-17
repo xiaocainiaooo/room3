@@ -35,6 +35,7 @@ import androidx.privacysandbox.ui.integration.sdkproviderutils.TestAdapters
 import androidx.privacysandbox.ui.integration.sdkproviderutils.ViewabilityHandler
 import androidx.privacysandbox.ui.integration.sdkproviderutils.fullscreen.FullscreenAd
 import androidx.privacysandbox.ui.integration.testaidl.IMediateeSdkApi
+import androidx.privacysandbox.ui.provider.AbstractSandboxedUiAdapter
 import androidx.privacysandbox.ui.provider.toCoreLibInfo
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -57,22 +58,25 @@ class SdkApi(private val sdkContext: Context) : ISdkApi {
                 testAdapters.OverlaidAd(mediateeBundle).toCoreLibInfo(sdkContext)
             } else mediateeBundle
         }
+        // TODO(b/384019227): Clean up to avoid casting.
         val adapter: SandboxedUiAdapter =
-            when (adType) {
-                AdType.BASIC_NON_WEBVIEW -> {
-                    loadNonWebViewBannerAd("Simple Ad", waitInsideOnDraw)
+            (when (adType) {
+                    AdType.BASIC_NON_WEBVIEW -> {
+                        loadNonWebViewBannerAd("Simple Ad", waitInsideOnDraw)
+                    }
+                    AdType.BASIC_WEBVIEW -> {
+                        loadWebViewBannerAd()
+                    }
+                    AdType.WEBVIEW_FROM_LOCAL_ASSETS -> {
+                        loadWebViewBannerAdFromLocalAssets()
+                    }
+                    AdType.NON_WEBVIEW_VIDEO -> loadVideoAd()
+                    else -> {
+                        loadNonWebViewBannerAd("Ad type not present", waitInsideOnDraw)
+                    }
                 }
-                AdType.BASIC_WEBVIEW -> {
-                    loadWebViewBannerAd()
-                }
-                AdType.WEBVIEW_FROM_LOCAL_ASSETS -> {
-                    loadWebViewBannerAdFromLocalAssets()
-                }
-                AdType.NON_WEBVIEW_VIDEO -> loadVideoAd()
-                else -> {
-                    loadNonWebViewBannerAd("Ad type not present", waitInsideOnDraw)
-                }
-            }.also { ViewabilityHandler.addObserverFactoryToAdapter(it, drawViewability) }
+                    as AbstractSandboxedUiAdapter)
+                .also { ViewabilityHandler.addObserverFactoryToAdapter(it, drawViewability) }
         return adapter.toCoreLibInfo(sdkContext)
     }
 
