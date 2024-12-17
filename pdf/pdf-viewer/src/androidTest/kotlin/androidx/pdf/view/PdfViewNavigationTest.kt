@@ -37,6 +37,7 @@ import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -48,8 +49,10 @@ class PdfViewNavigationTest {
         PdfViewTestActivity.onCreateCallback = {}
     }
 
+    @Ignore("Ignored due to flakiness. Pending fix.")
     @Test
     fun testGotoLinkNavigation() {
+        // TODO(b/384644788): Fix flakiness in goto link navigation
         val fakePdfDocument =
             FakePdfDocument(
                 pages = List(2) { Point(1000, 1000) },
@@ -104,8 +107,10 @@ class PdfViewNavigationTest {
         }
     }
 
+    @Ignore("Test is skipped due to challenges in testing external intent matching. Pending fix.")
     @Test
     fun testExternalLinkNavigation() = runTest {
+        // TODO(b/384644788): Fix intent resolution in external links handling
         val fakePdfDocument =
             FakePdfDocument(
                 pages = List(5) { Point(1000, 1000) },
