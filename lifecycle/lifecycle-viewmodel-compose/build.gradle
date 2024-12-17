@@ -100,6 +100,7 @@ androidx {
     type = LibraryType.PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS
     inceptionYear = "2021"
     description = "Compose integration with Lifecycle ViewModel"
+    metalavaK2UastEnabled = false
     samples(project(":lifecycle:lifecycle-viewmodel-compose:lifecycle-viewmodel-compose-samples"))
     kotlinTarget = KotlinTarget.KOTLIN_1_9
 }
