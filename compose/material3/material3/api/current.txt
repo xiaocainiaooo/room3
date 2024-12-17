@@ -272,8 +272,13 @@ package androidx.compose.material3 {
   }
 
   @SuppressCompatibility @androidx.compose.material3.ExperimentalMaterial3ExpressiveApi public final class ButtonGroupDefaults {
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ToggleButtonShapes connectedLeadingButtonShapes(optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.ui.graphics.Shape pressedShape, optional androidx.compose.ui.graphics.Shape checkedShape);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ToggleButtonShapes connectedMiddleButtonShapes(optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.ui.graphics.Shape pressedShape, optional androidx.compose.ui.graphics.Shape checkedShape);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ToggleButtonShapes connectedTrailingButtonShapes(optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.ui.graphics.Shape pressedShape, optional androidx.compose.ui.graphics.Shape checkedShape);
+    method public androidx.compose.foundation.shape.RoundedCornerShape getConnectedButtonCheckedShape();
     method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getConnectedLeadingButtonPressShape();
     method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getConnectedLeadingButtonShape();
+    method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getConnectedMiddleButtonPressShape();
     method public float getConnectedSpaceBetween();
     method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getConnectedTrailingButtonPressShape();
     method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getConnectedTrailingButtonShape();
@@ -282,8 +287,10 @@ package androidx.compose.material3 {
     property public final float ConnectedSpaceBetween;
     property public final float ExpandedRatio;
     property public final androidx.compose.foundation.layout.Arrangement.Horizontal HorizontalArrangement;
+    property public final androidx.compose.foundation.shape.RoundedCornerShape connectedButtonCheckedShape;
     property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape connectedLeadingButtonPressShape;
     property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape connectedLeadingButtonShape;
+    property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape connectedMiddleButtonPressShape;
     property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape connectedTrailingButtonPressShape;
     property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape connectedTrailingButtonShape;
     field public static final androidx.compose.material3.ButtonGroupDefaults INSTANCE;
