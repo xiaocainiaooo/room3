@@ -62,10 +62,6 @@ package androidx.privacysandbox.ui.core {
     method public void onSessionOpened(androidx.privacysandbox.ui.core.SandboxedUiAdapter.Session session);
   }
 
-  @Deprecated public interface SdkActivityLauncher {
-    method @Deprecated public suspend Object? launchSdkActivity(android.os.IBinder sdkActivityHandlerToken, kotlin.coroutines.Continuation<? super java.lang.Boolean>);
-  }
-
   public final class SdkRuntimeUiLibVersions {
     method public int getClientVersion();
     property public static final int apiVersion;
