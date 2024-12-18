@@ -56,7 +56,7 @@ import androidx.wear.compose.material3.samples.AlertDialogWithConfirmAndDismissS
 import androidx.wear.compose.material3.samples.AlertDialogWithContentGroupsSample
 import androidx.wear.compose.material3.samples.AlertDialogWithEdgeButtonSample
 
-val AlertDialogs =
+val AlertDialogDemos =
     listOf(
         ComposableDemo("Edge button") { AlertDialogWithEdgeButtonSample() },
         ComposableDemo("Confirm and Dismiss") { AlertDialogWithConfirmAndDismissSample() },
@@ -177,7 +177,7 @@ fun AlertDialogWithButtonStack() {
     }
 
     AlertDialog(
-        show = showDialog,
+        visible = showDialog,
         onDismissRequest = { showDialog = false },
         icon = {
             Icon(
@@ -334,7 +334,7 @@ private fun AlertDialogHelper(
 ) {
     if (onConfirmButton != null && onDismissButton != null) {
         AlertDialog(
-            show = show,
+            visible = show,
             onDismissRequest = onDismissRequest,
             modifier = modifier,
             properties = properties,
@@ -347,7 +347,7 @@ private fun AlertDialogHelper(
         )
     } else if (onEdgeButton != null) {
         AlertDialog(
-            show = show,
+            visible = show,
             onDismissRequest = onDismissRequest,
             modifier = modifier,
             properties = properties,
@@ -359,7 +359,7 @@ private fun AlertDialogHelper(
         )
     } else {
         AlertDialog(
-            show = show,
+            visible = show,
             onDismissRequest = onDismissRequest,
             modifier = modifier,
             properties = properties,

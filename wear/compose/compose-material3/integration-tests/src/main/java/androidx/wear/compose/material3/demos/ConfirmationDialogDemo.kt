@@ -29,23 +29,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.wear.compose.integration.demos.common.ComposableDemo
-import androidx.wear.compose.material3.Confirmation
-import androidx.wear.compose.material3.ConfirmationDefaults
+import androidx.wear.compose.material3.ConfirmationDialog
+import androidx.wear.compose.material3.ConfirmationDialogDefaults
 import androidx.wear.compose.material3.FilledTonalButton
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.samples.ConfirmationSample
-import androidx.wear.compose.material3.samples.FailureConfirmationSample
-import androidx.wear.compose.material3.samples.LongTextConfirmationSample
-import androidx.wear.compose.material3.samples.SuccessConfirmationSample
+import androidx.wear.compose.material3.confirmationCurvedText
+import androidx.wear.compose.material3.samples.ConfirmationDialogSample
+import androidx.wear.compose.material3.samples.FailureConfirmationDialogSample
+import androidx.wear.compose.material3.samples.LongTextConfirmationDialogSample
+import androidx.wear.compose.material3.samples.SuccessConfirmationDialogSample
 
-val Comfirmations =
+val ComfirmationDialogDemos =
     listOf(
-        ComposableDemo("Generic confirmation") { ConfirmationSample() },
-        ComposableDemo("Long content confirmation") { LongTextConfirmationSample() },
-        ComposableDemo("Success confirmation") { SuccessConfirmationSample() },
-        ComposableDemo("Failure confirmation") { FailureConfirmationSample() },
+        ComposableDemo("Generic confirmation") { ConfirmationDialogSample() },
+        ComposableDemo("Long content confirmation") { LongTextConfirmationDialogSample() },
+        ComposableDemo("Success confirmation") { SuccessConfirmationDialogSample() },
+        ComposableDemo("Failure confirmation") { FailureConfirmationDialogSample() },
         ComposableDemo("Confirmation without text") { ConfirmationWithoutText() },
         ComposableDemo("Confirmation with custom colors") { ConfirmationWithCustomColors() },
     )
@@ -62,15 +63,15 @@ fun ConfirmationWithoutText() {
         )
     }
 
-    Confirmation(
-        show = showConfirmation,
+    ConfirmationDialog(
+        visible = showConfirmation,
         onDismissRequest = { showConfirmation = false },
         curvedText = null
     ) {
         Icon(
             imageVector = Icons.Filled.Add,
             contentDescription = null,
-            modifier = Modifier.size(ConfirmationDefaults.IconSize).align(Alignment.Center),
+            modifier = Modifier.size(ConfirmationDialogDefaults.IconSize),
             tint = MaterialTheme.colorScheme.primary
         )
     }
@@ -88,21 +89,22 @@ fun ConfirmationWithCustomColors() {
         )
     }
 
-    Confirmation(
-        show = showConfirmation,
+    val curvedTextStyle = ConfirmationDialogDefaults.curvedTextStyle
+    ConfirmationDialog(
+        visible = showConfirmation,
         onDismissRequest = { showConfirmation = false },
         colors =
-            ConfirmationDefaults.confirmationColors(
+            ConfirmationDialogDefaults.colors(
                 iconColor = MaterialTheme.colorScheme.tertiary,
                 iconContainerColor = MaterialTheme.colorScheme.onTertiary,
                 textColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
-        curvedText = ConfirmationDefaults.curvedText("Custom confirmation")
+        curvedText = { confirmationCurvedText("Custom confirmation", curvedTextStyle) }
     ) {
         Icon(
             imageVector = Icons.Filled.Add,
             contentDescription = null,
-            modifier = Modifier.size(ConfirmationDefaults.IconSize).align(Alignment.Center),
+            modifier = Modifier.size(ConfirmationDialogDefaults.IconSize),
         )
     }
 }

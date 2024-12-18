@@ -18,6 +18,7 @@ package androidx.wear.compose.material3
 
 import android.os.Build
 import androidx.compose.foundation.background
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,14 +44,14 @@ import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 
-class ConfirmationTest {
+class ConfirmationDialogTest {
     @get:Rule val rule = createComposeRule()
 
     @Test
     fun confirmation_linearText_supports_testtag() {
         rule.setContentWithTheme {
-            Confirmation(
-                show = true,
+            ConfirmationDialog(
+                visible = true,
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = {},
                 text = {},
@@ -62,8 +63,8 @@ class ConfirmationTest {
     @Test
     fun confirmation_curvedText_supports_testtag() {
         rule.setContentWithTheme {
-            Confirmation(
-                show = true,
+            ConfirmationDialog(
+                visible = true,
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = {},
                 curvedText = {}
@@ -75,8 +76,8 @@ class ConfirmationTest {
     @Test
     fun successConfirmation_supports_testtag() {
         rule.setContentWithTheme {
-            SuccessConfirmation(
-                show = true,
+            SuccessConfirmationTest(
+                visible = true,
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = {},
             )
@@ -87,8 +88,8 @@ class ConfirmationTest {
     @Test
     fun failureConfirmation_supports_testtag() {
         rule.setContentWithTheme {
-            FailureConfirmation(
-                show = true,
+            FailureConfirmationTest(
+                visible = true,
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = {},
             )
@@ -101,14 +102,14 @@ class ConfirmationTest {
         var dismissCounter = 0
         rule.setContentWithTheme {
             var showDialog by remember { mutableStateOf(true) }
-            Confirmation(
+            ConfirmationDialog(
                 modifier = Modifier.testTag(TEST_TAG),
                 text = {},
                 onDismissRequest = {
                     showDialog = false
                     dismissCounter++
                 },
-                show = showDialog
+                visible = showDialog
             ) {}
         }
 
@@ -122,13 +123,13 @@ class ConfirmationTest {
         var dismissCounter = 0
         rule.setContentWithTheme {
             var showDialog by remember { mutableStateOf(true) }
-            Confirmation(
+            ConfirmationDialog(
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = {
                     showDialog = false
                     dismissCounter++
                 },
-                show = showDialog,
+                visible = showDialog,
                 curvedText = {}
             ) {}
         }
@@ -144,13 +145,13 @@ class ConfirmationTest {
         rule.mainClock.autoAdvance = false
         rule.setContentWithTheme {
             var showDialog by remember { mutableStateOf(true) }
-            SuccessConfirmation(
+            SuccessConfirmationTest(
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = {
                     showDialog = false
                     dismissCounter++
                 },
-                show = showDialog,
+                visible = showDialog,
             )
         }
         // Advancing time so that animation will finish its motion.
@@ -167,13 +168,13 @@ class ConfirmationTest {
         rule.mainClock.autoAdvance = false
         rule.setContentWithTheme {
             var showDialog by remember { mutableStateOf(true) }
-            FailureConfirmation(
+            FailureConfirmationTest(
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = {
                     showDialog = false
                     dismissCounter++
                 },
-                show = showDialog,
+                visible = showDialog,
             )
         }
         // Advancing time so that animation will finish its motion.
@@ -187,8 +188,8 @@ class ConfirmationTest {
     @Test
     fun hides_confirmation_linearText_when_show_false() {
         rule.setContentWithTheme {
-            Confirmation(
-                show = false,
+            ConfirmationDialog(
+                visible = false,
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = {},
                 text = {},
@@ -200,8 +201,8 @@ class ConfirmationTest {
     @Test
     fun hides_confirmation_curvedText_when_show_false() {
         rule.setContentWithTheme {
-            Confirmation(
-                show = false,
+            ConfirmationDialog(
+                visible = false,
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = {},
                 curvedText = {}
@@ -213,8 +214,8 @@ class ConfirmationTest {
     @Test
     fun hides_successConfirmation_when_show_false() {
         rule.setContentWithTheme {
-            SuccessConfirmation(
-                show = false,
+            SuccessConfirmationTest(
+                visible = false,
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = {},
             )
@@ -225,8 +226,8 @@ class ConfirmationTest {
     @Test
     fun hides_failureConfirmation_when_show_false() {
         rule.setContentWithTheme {
-            FailureConfirmation(
-                show = false,
+            FailureConfirmationTest(
+                visible = false,
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = {},
             )
@@ -240,13 +241,13 @@ class ConfirmationTest {
         val show = mutableStateOf(true)
         var dismissCounter = 0
         rule.setContentWithTheme {
-            Confirmation(
+            ConfirmationDialog(
                 modifier = Modifier.testTag(TEST_TAG),
                 text = {},
                 onDismissRequest = { dismissCounter++ },
                 // Set very long duration so that it won't be dismissed by the timeout
                 durationMillis = 100_000,
-                show = show.value
+                visible = show.value
             ) {}
         }
         rule.waitForIdle()
@@ -261,13 +262,13 @@ class ConfirmationTest {
         val show = mutableStateOf(true)
         var dismissCounter = 0
         rule.setContentWithTheme {
-            Confirmation(
+            ConfirmationDialog(
                 modifier = Modifier.testTag(TEST_TAG),
                 curvedText = {},
                 onDismissRequest = { dismissCounter++ },
                 // Set very long duration so that it won't be dismissed by the timeout
                 durationMillis = 100_000,
-                show = show.value
+                visible = show.value
             ) {}
         }
         rule.waitForIdle()
@@ -282,12 +283,12 @@ class ConfirmationTest {
         val show = mutableStateOf(true)
         var dismissCounter = 0
         rule.setContentWithTheme {
-            SuccessConfirmation(
+            SuccessConfirmationTest(
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = { dismissCounter++ },
                 // Set very long duration so that it won't be dismissed by the timeout
                 durationMillis = 100_000,
-                show = show.value
+                visible = show.value
             )
         }
         rule.waitForIdle()
@@ -302,12 +303,12 @@ class ConfirmationTest {
         val show = mutableStateOf(true)
         var dismissCounter = 0
         rule.setContentWithTheme {
-            FailureConfirmation(
+            FailureConfirmationTest(
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = { dismissCounter++ },
                 // Set very long duration so that it won't be dismissed by the timeout
                 durationMillis = 100_000,
-                show = show.value
+                visible = show.value
             )
         }
         rule.waitForIdle()
@@ -322,7 +323,7 @@ class ConfirmationTest {
         val show = mutableStateOf(true)
         var dismissCounter = 0
         rule.setContentWithTheme {
-            Confirmation(
+            ConfirmationDialog(
                 modifier = Modifier.testTag(TEST_TAG),
                 text = {},
                 onDismissRequest = {
@@ -330,7 +331,7 @@ class ConfirmationTest {
                     show.value = false
                 },
                 durationMillis = 100,
-                show = show.value
+                visible = show.value
             ) {}
         }
         rule.waitUntilDoesNotExist(hasTestTag(TEST_TAG))
@@ -344,7 +345,7 @@ class ConfirmationTest {
         var dismissCounter = 0
 
         rule.setContentWithTheme {
-            Confirmation(
+            ConfirmationDialog(
                 modifier = Modifier.testTag(TEST_TAG),
                 curvedText = {},
                 onDismissRequest = {
@@ -352,7 +353,7 @@ class ConfirmationTest {
                     show.value = false
                 },
                 durationMillis = 100,
-                show = show.value
+                visible = show.value
             ) {}
         }
         rule.waitUntilDoesNotExist(hasTestTag(TEST_TAG))
@@ -366,15 +367,15 @@ class ConfirmationTest {
         var dismissCounter = 0
 
         rule.setContentWithTheme {
-            SuccessConfirmation(
+            SuccessConfirmationTest(
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = {
                     dismissCounter++
                     show.value = false
                 },
                 durationMillis = 100,
-                show = show.value
-            ) {}
+                visible = show.value
+            )
         }
         rule.waitUntilDoesNotExist(hasTestTag(TEST_TAG))
         Assert.assertEquals(1, dismissCounter)
@@ -387,15 +388,15 @@ class ConfirmationTest {
         var dismissCounter = 0
 
         rule.setContentWithTheme {
-            FailureConfirmation(
+            FailureConfirmationTest(
                 modifier = Modifier.testTag(TEST_TAG),
                 onDismissRequest = {
                     dismissCounter++
                     show.value = false
                 },
                 durationMillis = 100,
-                show = show.value
-            ) {}
+                visible = show.value
+            )
         }
         rule.waitUntilDoesNotExist(hasTestTag(TEST_TAG))
         Assert.assertEquals(1, dismissCounter)
@@ -404,10 +405,10 @@ class ConfirmationTest {
     @Test
     fun confirmation_displays_icon_with_linearText() {
         rule.setContentWithTheme {
-            Confirmation(
+            ConfirmationDialog(
                 text = { Text("Text", modifier = Modifier.testTag(TextTestTag)) },
                 onDismissRequest = {},
-                show = true
+                visible = true
             ) {
                 TestImage(IconTestTag)
             }
@@ -419,9 +420,9 @@ class ConfirmationTest {
     @Test
     fun confirmation_displays_icon_with_curvedText() {
         rule.setContentWithTheme {
-            Confirmation(
+            ConfirmationDialog(
                 onDismissRequest = {},
-                show = true,
+                visible = true,
                 curvedText = { curvedText(CurvedText) }
             ) {
                 TestImage(IconTestTag)
@@ -434,10 +435,11 @@ class ConfirmationTest {
     @Test
     fun successConfirmation_displays_icon_with_text() {
         rule.setContentWithTheme {
-            SuccessConfirmation(
+            val style = ConfirmationDialogDefaults.curvedTextStyle
+            SuccessConfirmationDialog(
                 onDismissRequest = {},
-                show = true,
-                curvedText = ConfirmationDefaults.curvedText(CurvedText)
+                visible = true,
+                curvedText = { confirmationCurvedText(CurvedText, style) }
             ) {
                 TestImage(IconTestTag)
             }
@@ -449,10 +451,11 @@ class ConfirmationTest {
     @Test
     fun failureConfirmation_displays_icon_with_text() {
         rule.setContentWithTheme {
-            FailureConfirmation(
+            val style = ConfirmationDialogDefaults.curvedTextStyle
+            FailureConfirmationDialog(
                 onDismissRequest = {},
-                show = true,
-                curvedText = ConfirmationDefaults.curvedText(CurvedText)
+                visible = true,
+                curvedText = { confirmationCurvedText(CurvedText, style) }
             ) {
                 TestImage(IconTestTag)
             }
@@ -466,10 +469,14 @@ class ConfirmationTest {
         var dismissed = false
         rule.mainClock.autoAdvance = false
         rule.setContentWithTheme {
-            Confirmation(text = {}, onDismissRequest = { dismissed = true }, show = true) {}
+            ConfirmationDialog(
+                text = {},
+                onDismissRequest = { dismissed = true },
+                visible = true
+            ) {}
         }
         // Timeout longer than default confirmation duration
-        rule.mainClock.advanceTimeBy(ConfirmationDefaults.ConfirmationDurationMillis + 1000)
+        rule.mainClock.advanceTimeBy(ConfirmationDialogDefaults.DurationMillis + 1000)
         assert(dismissed)
     }
 
@@ -478,10 +485,14 @@ class ConfirmationTest {
         var dismissed = false
         rule.mainClock.autoAdvance = false
         rule.setContentWithTheme {
-            Confirmation(onDismissRequest = { dismissed = true }, show = true, curvedText = {}) {}
+            ConfirmationDialog(
+                onDismissRequest = { dismissed = true },
+                visible = true,
+                curvedText = {}
+            ) {}
         }
         // Timeout longer than default confirmation duration
-        rule.mainClock.advanceTimeBy(ConfirmationDefaults.ConfirmationDurationMillis + 1000)
+        rule.mainClock.advanceTimeBy(ConfirmationDialogDefaults.DurationMillis + 1000)
         assert(dismissed)
     }
 
@@ -490,13 +501,13 @@ class ConfirmationTest {
         var dismissed = false
         rule.mainClock.autoAdvance = false
         rule.setContentWithTheme {
-            SuccessConfirmation(
+            SuccessConfirmationTest(
                 onDismissRequest = { dismissed = true },
-                show = true,
+                visible = true,
             )
         }
         // Timeout longer than default confirmation duration
-        rule.mainClock.advanceTimeBy(ConfirmationDefaults.ConfirmationDurationMillis + 1000)
+        rule.mainClock.advanceTimeBy(ConfirmationDialogDefaults.DurationMillis + 1000)
         assert(dismissed)
     }
 
@@ -505,21 +516,21 @@ class ConfirmationTest {
         var dismissed = false
         rule.mainClock.autoAdvance = false
         rule.setContentWithTheme {
-            FailureConfirmation(
+            FailureConfirmationTest(
                 onDismissRequest = { dismissed = true },
-                show = true,
+                visible = true,
             )
         }
         // Timeout longer than default confirmation duration
-        rule.mainClock.advanceTimeBy(ConfirmationDefaults.ConfirmationDurationMillis + 1000)
+        rule.mainClock.advanceTimeBy(ConfirmationDialogDefaults.DurationMillis + 1000)
         assert(dismissed)
     }
 
     @Test
     fun confirmation_linearText_positioning() {
         rule.setContentWithThemeForSizeAssertions(useUnmergedTree = true) {
-            Confirmation(
-                show = true,
+            ConfirmationDialog(
+                visible = true,
                 text = {
                     Text(
                         "Title",
@@ -553,10 +564,10 @@ class ConfirmationTest {
         var expectedTextColor: Color = Color.Unspecified
 
         rule.setContentWithTheme {
-            Confirmation(
+            ConfirmationDialog(
                 onDismissRequest = {},
                 modifier = Modifier.testTag(TEST_TAG),
-                show = true,
+                visible = true,
                 text = { Text("Text") },
             ) {
                 TestIcon(Modifier.testTag(IconTestTag))
@@ -583,11 +594,12 @@ class ConfirmationTest {
         var expectedIconContainerColor: Color = Color.Unspecified
         var expectedTextColor: Color = Color.Unspecified
         rule.setContentWithTheme {
-            Confirmation(
+            val style = ConfirmationDialogDefaults.curvedTextStyle
+            ConfirmationDialog(
                 onDismissRequest = {},
                 modifier = Modifier.testTag(TEST_TAG),
-                show = true,
-                curvedText = ConfirmationDefaults.curvedText(CurvedText)
+                visible = true,
+                curvedText = { confirmationCurvedText(CurvedText, style) }
             ) {
                 TestIcon(Modifier.testTag(IconTestTag))
             }
@@ -614,10 +626,10 @@ class ConfirmationTest {
         var expectedTextColor: Color = Color.Unspecified
 
         rule.setContentWithTheme {
-            SuccessConfirmation(
+            SuccessConfirmationTest(
                 onDismissRequest = {},
                 modifier = Modifier.testTag(TEST_TAG),
-                show = true,
+                visible = true,
             )
             expectedIconColor = MaterialTheme.colorScheme.primary
             expectedIconContainerColor = MaterialTheme.colorScheme.onPrimary
@@ -641,10 +653,10 @@ class ConfirmationTest {
         var expectedTextColor: Color = Color.Unspecified
         val backgroundColor = Color.Black
         rule.setContentWithTheme {
-            FailureConfirmation(
+            FailureConfirmationTest(
                 onDismissRequest = {},
                 modifier = Modifier.testTag(TEST_TAG).background(backgroundColor),
-                show = true,
+                visible = true,
             ) {
                 TestIcon(Modifier.testTag(IconTestTag))
             }
@@ -673,13 +685,13 @@ class ConfirmationTest {
         val customTextColor: Color = Color.Blue
 
         rule.setContentWithTheme {
-            Confirmation(
+            ConfirmationDialog(
                 onDismissRequest = {},
                 modifier = Modifier.testTag(TEST_TAG),
-                show = true,
+                visible = true,
                 text = { Text("Text") },
                 colors =
-                    ConfirmationDefaults.confirmationColors(
+                    ConfirmationDialogDefaults.colors(
                         iconColor = customIconColor,
                         iconContainerColor = customIconContainerColor,
                         textColor = customTextColor
@@ -704,17 +716,18 @@ class ConfirmationTest {
         val customTextColor: Color = Color.Blue
 
         rule.setContentWithTheme {
-            Confirmation(
+            val style = ConfirmationDialogDefaults.curvedTextStyle
+            ConfirmationDialog(
                 onDismissRequest = {},
                 modifier = Modifier.testTag(TEST_TAG),
-                show = true,
+                visible = true,
                 colors =
-                    ConfirmationDefaults.confirmationColors(
+                    ConfirmationDialogDefaults.colors(
                         iconColor = customIconColor,
                         iconContainerColor = customIconContainerColor,
                         textColor = customTextColor
                     ),
-                curvedText = ConfirmationDefaults.curvedText(CurvedText)
+                curvedText = { confirmationCurvedText(CurvedText, style) }
             ) {
                 TestIcon(Modifier.testTag(IconTestTag))
             }
@@ -735,16 +748,18 @@ class ConfirmationTest {
         val customTextColor: Color = Color.Blue
 
         rule.setContentWithTheme {
-            SuccessConfirmation(
+            val style = ConfirmationDialogDefaults.curvedTextStyle
+            SuccessConfirmationDialog(
                 onDismissRequest = {},
                 modifier = Modifier.testTag(TEST_TAG),
-                show = true,
+                visible = true,
                 colors =
-                    ConfirmationDefaults.successColors(
+                    ConfirmationDialogDefaults.successColors(
                         iconColor = customIconColor,
                         iconContainerColor = customIconContainerColor,
                         textColor = customTextColor
                     ),
+                curvedText = { confirmationCurvedText(CurvedText, style) }
             ) {
                 TestIcon(Modifier.testTag(IconTestTag))
             }
@@ -765,16 +780,18 @@ class ConfirmationTest {
         val customTextColor: Color = Color.Blue
 
         rule.setContentWithTheme {
-            FailureConfirmation(
+            val style = ConfirmationDialogDefaults.curvedTextStyle
+            FailureConfirmationDialog(
                 onDismissRequest = {},
                 modifier = Modifier.testTag(TEST_TAG),
-                show = true,
+                visible = true,
                 colors =
-                    ConfirmationDefaults.failureColors(
+                    ConfirmationDialogDefaults.failureColors(
                         iconColor = customIconColor,
                         iconContainerColor = customIconContainerColor,
                         textColor = customTextColor
                     ),
+                curvedText = { confirmationCurvedText(CurvedText, style) }
             ) {
                 TestIcon(Modifier.testTag(IconTestTag))
             }
@@ -785,6 +802,44 @@ class ConfirmationTest {
         rule.onNodeWithTag(TEST_TAG).captureToImage().assertContainsColor(customIconContainerColor)
 
         rule.onNodeWithTag(TEST_TAG).captureToImage().assertContainsColor(customTextColor)
+    }
+
+    @Composable
+    private fun SuccessConfirmationTest(
+        visible: Boolean,
+        onDismissRequest: () -> Unit,
+        modifier: Modifier = Modifier,
+        durationMillis: Long = ConfirmationDialogDefaults.DurationMillis,
+    ) {
+        val successText = ConfirmationDialogDefaults.successText
+        val successTextStyle = ConfirmationDialogDefaults.curvedTextStyle
+        SuccessConfirmationDialog(
+            modifier = modifier,
+            visible = visible,
+            onDismissRequest = onDismissRequest,
+            curvedText = { confirmationCurvedText(successText, successTextStyle) },
+            durationMillis = durationMillis,
+        )
+    }
+
+    @Composable
+    private fun FailureConfirmationTest(
+        visible: Boolean,
+        onDismissRequest: () -> Unit,
+        modifier: Modifier = Modifier,
+        durationMillis: Long = ConfirmationDialogDefaults.DurationMillis,
+        content: @Composable () -> Unit = {}
+    ) {
+        val failureText = ConfirmationDialogDefaults.failureText
+        val failureTextStyle = ConfirmationDialogDefaults.curvedTextStyle
+        FailureConfirmationDialog(
+            modifier = modifier,
+            visible = visible,
+            onDismissRequest = onDismissRequest,
+            curvedText = { confirmationCurvedText(failureText, failureTextStyle) },
+            durationMillis = durationMillis,
+            content = content
+        )
     }
 }
 
