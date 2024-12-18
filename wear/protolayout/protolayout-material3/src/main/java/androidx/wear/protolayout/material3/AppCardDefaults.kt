@@ -107,6 +107,30 @@ internal constructor(
 
         /**
          * Default style variation for the [appCard] where all opinionated inner content is
+         * displayed in a small size.
+         */
+        public fun smallAppCardStyle(): AppCardStyle =
+            AppCardStyle(
+                innerPadding =
+                    Padding.Builder()
+                        .setTop(4.toDp())
+                        .setBottom(4.toDp())
+                        .setStart(14.toDp())
+                        .setEnd(14.toDp())
+                        .build(),
+                labelToTimeSpaceDp = DEFAULT_SPACE_DP,
+                labelToAvatarSpaceDp = DEFAULT_SPACE_DP,
+                avatarSize = 16,
+                titleToContentSpaceDp = 0,
+                headerToTitleSpaceDp = SMALL_SPACE_DP,
+                titleTypography = Typography.LABEL_SMALL,
+                contentTypography = Typography.BODY_SMALL,
+                timeTypography = Typography.BODY_SMALL,
+                labelTypography = Typography.LABEL_SMALL,
+            )
+
+        /**
+         * Default style variation for the [appCard] where all opinionated inner content is
          * displayed in a medium size.
          */
         public fun defaultAppCardStyle(): AppCardStyle =

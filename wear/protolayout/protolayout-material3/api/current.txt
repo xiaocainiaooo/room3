@@ -8,6 +8,7 @@ package androidx.wear.protolayout.material3 {
   public static final class AppCardStyle.Companion {
     method public androidx.wear.protolayout.material3.AppCardStyle defaultAppCardStyle();
     method public androidx.wear.protolayout.material3.AppCardStyle largeAppCardStyle();
+    method public androidx.wear.protolayout.material3.AppCardStyle smallAppCardStyle();
   }
 
   public final class ButtonColors {
@@ -251,6 +252,7 @@ package androidx.wear.protolayout.material3 {
     method public androidx.wear.protolayout.material3.TitleCardStyle defaultTitleCardStyle();
     method public androidx.wear.protolayout.material3.TitleCardStyle extraLargeTitleCardStyle();
     method public androidx.wear.protolayout.material3.TitleCardStyle largeTitleCardStyle();
+    method public androidx.wear.protolayout.material3.TitleCardStyle smallTitleCardStyle();
   }
 
   @kotlin.jvm.JvmInline public final value class TitleContentPlacementInDataCard {
