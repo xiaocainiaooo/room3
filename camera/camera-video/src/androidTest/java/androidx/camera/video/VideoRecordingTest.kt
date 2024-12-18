@@ -19,7 +19,6 @@ package androidx.camera.video
 import android.Manifest
 import android.content.Context
 import android.graphics.Rect
-import android.graphics.SurfaceTexture
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
@@ -42,7 +41,6 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.core.UseCase
-import androidx.camera.core.UseCaseGroup
 import androidx.camera.core.impl.CameraControlInternal
 import androidx.camera.core.impl.SessionConfig
 import androidx.camera.core.impl.utils.AspectRatioUtil.ASPECT_RATIO_16_9
@@ -60,8 +58,6 @@ import androidx.camera.testing.impl.AndroidUtil.skipVideoRecordingTestIfNotSuppo
 import androidx.camera.testing.impl.CameraPipeConfigTestRule
 import androidx.camera.testing.impl.CameraTaskTrackingExecutor
 import androidx.camera.testing.impl.CameraUtil
-import androidx.camera.testing.impl.InternalTestConvenience.ignoreTestForCameraPipe
-import androidx.camera.testing.impl.StreamSharingForceEnabledEffect
 import androidx.camera.testing.impl.SurfaceTextureProvider
 import androidx.camera.testing.impl.WakelockEmptyActivityRule
 import androidx.camera.testing.impl.fakes.FakeLifecycleOwner
@@ -73,7 +69,6 @@ import androidx.camera.testing.impl.video.AudioChecker
 import androidx.camera.testing.impl.video.Recording
 import androidx.camera.testing.impl.video.RecordingSession
 import androidx.camera.video.VideoRecordEvent.Finalize.ERROR_SOURCE_INACTIVE
-import androidx.lifecycle.LifecycleOwner
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -226,7 +221,10 @@ class VideoRecordingTest(
         ProcessCameraProvider.configureInstance(cameraXConfig)
 
         cameraProvider =
-            ProcessCameraProviderWrapper(ProcessCameraProvider.getInstance(context).get())
+            ProcessCameraProviderWrapper(
+                ProcessCameraProvider.getInstance(context).get(),
+                forceEnableStreamSharing
+            )
         lifecycleOwner = FakeLifecycleOwner()
         lifecycleOwner.startAndResume()
 
@@ -236,7 +234,7 @@ class VideoRecordingTest(
 
         instrumentation.runOnMainSync {
             // Sets surface provider to preview
-            preview.surfaceProvider = getSurfaceProvider()
+            preview.surfaceProvider = SurfaceTextureProvider.createSurfaceTextureProvider()
 
             // Retrieves the target testing camera and camera info
             camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector)
@@ -726,104 +724,6 @@ class VideoRecordingTest(
     }
 
     @Test
-    fun persistentRecording_canContinueRecordingAfterRebind() {
-        assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
-
-        // TODO(b/340406044): Enable the test for stream sharing use case.
-        assumeFalse(
-            "The test is temporarily ignored when stream sharing is enabled.",
-            forceEnableStreamSharing
-        )
-
-        checkAndBindUseCases(preview, videoCapture)
-
-        // TODO(b/340406044): Enable the test for stream sharing use case.
-        // Bypass stream sharing if it's enforced on the device. Like quirks in
-        // androidx.camera.core.internal.compat.workaround.StreamSharingForceEnabler.
-        assumeFalse(
-            "The test is temporarily ignored when the video capture requires transformation.",
-            isStreamSharingEnabled(videoCapture)
-        )
-
-        val recording =
-            recordingSession.createRecording(asPersistentRecording = true).startAndVerify()
-
-        instrumentation.runOnMainSync { cameraProvider.unbindAll() }
-        checkAndBindUseCases(preview, videoCapture)
-
-        recording.clearEvents()
-        recording.verifyStatus()
-
-        recording.stopAndVerify()
-    }
-
-    @Test
-    fun persistentRecording_canContinueRecordingPausedAfterRebind() {
-        assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
-
-        // TODO(b/340406044): Enable the test for stream sharing use case.
-        assumeFalse(
-            "The test is temporarily ignored when stream sharing is enabled.",
-            forceEnableStreamSharing
-        )
-
-        checkAndBindUseCases(preview, videoCapture)
-
-        // TODO(b/340406044): Enable the test for stream sharing use case.
-        // Bypass stream sharing if it's enforced on the device. Like quirks in
-        // androidx.camera.core.internal.compat.workaround.StreamSharingForceEnabler.
-        assumeFalse(
-            "The test is temporarily ignored when the video capture requires transformation.",
-            isStreamSharingEnabled(videoCapture)
-        )
-
-        val recording =
-            recordingSession
-                .createRecording(asPersistentRecording = true)
-                .startAndVerify()
-                .pauseAndVerify()
-
-        instrumentation.runOnMainSync { cameraProvider.unbindAll() }
-        checkAndBindUseCases(preview, videoCapture)
-
-        recording.resumeAndVerify().stopAndVerify()
-    }
-
-    @Test
-    fun persistentRecording_canStopAfterUnbind() {
-        assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
-
-        // TODO(b/353113961): Enable the test for camera pipe implementation.
-        implName.ignoreTestForCameraPipe(
-            "The test is temporarily ignored for camera pipe implementation.",
-            true
-        )
-
-        // TODO(b/340406044): Enable the test for stream sharing use case.
-        assumeFalse(
-            "The test is temporarily ignored when stream sharing is enabled.",
-            forceEnableStreamSharing
-        )
-
-        checkAndBindUseCases(preview, videoCapture)
-
-        // TODO(b/340406044): Enable the test for stream sharing use case.
-        // Bypass stream sharing if it's enforced on the device. Like quirks in
-        // androidx.camera.core.internal.compat.workaround.StreamSharingForceEnabler.
-        assumeFalse(
-            "The test is temporarily ignored when the video capture requires transformation.",
-            isStreamSharingEnabled(videoCapture)
-        )
-
-        val recording =
-            recordingSession.createRecording(asPersistentRecording = true).startAndVerify()
-
-        instrumentation.runOnMainSync { cameraProvider.unbindAll() }
-
-        recording.stopAndVerify()
-    }
-
-    @Test
     fun canRecordWithCorrectTransformation() {
         // Act.
         checkAndBindUseCases(preview, videoCapture)
@@ -922,74 +822,6 @@ class VideoRecordingTest(
             false,
             "Lifecycle stopped but camera still in video usage"
         )
-    }
-
-    @Test
-    fun updateVideoUsage_whenUseCaseUnboundAndReboundForPersistentRecording(): Unit = runBlocking {
-        assumeFalse(
-            "TODO: b/340406044 - Temporarily ignored when stream sharing is enabled.",
-            forceEnableStreamSharing
-        )
-
-        checkAndBindUseCases(preview, videoCapture)
-        val recording =
-            recordingSession.createRecording(asPersistentRecording = true).startAndVerify()
-
-        // Act 1 - unbind VideoCapture before recording completes, isRecording should be false.
-        instrumentation.runOnMainSync { cameraProvider.unbind(videoCapture) }
-
-        camera.cameraControl.verifyIfInVideoUsage(
-            false,
-            "VideoCapture unbound but camera still in video usage"
-        )
-
-        // Act 2 - rebind VideoCapture, isRecording should be true.
-        checkAndBindUseCases(videoCapture)
-
-        camera.cameraControl.verifyIfInVideoUsage(
-            true,
-            "VideoCapture re-bound but camera still not in video usage"
-        )
-
-        // TODO(b/382158668): Remove the check for the status events.
-        recording.clearEvents()
-        recording.verifyStatus()
-        recording.stopAndVerify()
-    }
-
-    @Test
-    fun updateVideoUsage_whenUseCaseBoundToNewCameraForPersistentRecording(): Unit = runBlocking {
-        assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
-
-        assumeFalse(
-            "TODO: b/340406044 - Temporarily ignored when stream sharing is enabled.",
-            forceEnableStreamSharing
-        )
-
-        checkAndBindUseCases(preview, videoCapture)
-        val recording =
-            recordingSession.createRecording(asPersistentRecording = true).startAndVerify()
-
-        // Act 1 - unbind before recording completes, isRecording should be false.
-        instrumentation.runOnMainSync { cameraProvider.unbindAll() }
-
-        camera.cameraControl.verifyIfInVideoUsage(
-            false,
-            "VideoCapture unbound but camera still in video usage"
-        )
-
-        // Act 2 - rebind VideoCapture to opposite camera, isRecording should be true.
-        checkAndBindUseCases(preview, videoCapture, useOppositeCamera = true)
-
-        oppositeCamera.cameraControl.verifyIfInVideoUsage(
-            true,
-            "VideoCapture re-bound but camera still not in video usage"
-        )
-
-        // TODO(b/382158668): Remove the check for the status events.
-        recording.clearEvents()
-        recording.verifyStatus()
-        recording.stopAndVerify()
     }
 
     // TODO: b/341691683 - Add tests for multiple VideoCapture bound and recording concurrently
@@ -1106,58 +938,8 @@ class VideoRecordingTest(
         }
     }
 
-    private fun getSurfaceProvider(): Preview.SurfaceProvider {
-        return SurfaceTextureProvider.createSurfaceTextureProvider(
-            object : SurfaceTextureProvider.SurfaceTextureCallback {
-                override fun onSurfaceTextureReady(
-                    surfaceTexture: SurfaceTexture,
-                    resolution: Size
-                ) {
-                    // No-op
-                }
-
-                override fun onSafeToRelease(surfaceTexture: SurfaceTexture) {
-                    surfaceTexture.release()
-                }
-            }
-        )
-    }
-
     private fun assumeExtraCroppingQuirk() {
         assumeExtraCroppingQuirk(implName)
-    }
-
-    private inner class ProcessCameraProviderWrapper(val cameraProvider: ProcessCameraProvider) {
-
-        fun bindToLifecycle(
-            lifecycleOwner: LifecycleOwner,
-            cameraSelector: CameraSelector,
-            vararg useCases: UseCase
-        ): Camera {
-            if (useCases.isEmpty()) {
-                return cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, *useCases)
-            }
-            val useCaseGroup =
-                UseCaseGroup.Builder()
-                    .apply {
-                        useCases.forEach { useCase -> addUseCase(useCase) }
-                        if (forceEnableStreamSharing) {
-                            addEffect(StreamSharingForceEnabledEffect())
-                        }
-                    }
-                    .build()
-            return cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCaseGroup)
-        }
-
-        fun unbind(vararg useCases: UseCase) {
-            cameraProvider.unbind(*useCases)
-        }
-
-        fun unbindAll() {
-            cameraProvider.unbindAll()
-        }
-
-        fun shutdownAsync(): ListenableFuture<Void> = cameraProvider.shutdownAsync()
     }
 
     private class ImageSavedCallback : ImageCapture.OnImageSavedCallback {
