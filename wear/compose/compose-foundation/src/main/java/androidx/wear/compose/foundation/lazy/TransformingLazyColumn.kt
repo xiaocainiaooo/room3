@@ -43,7 +43,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
@@ -92,20 +92,25 @@ fun TransformingLazyColumn(
     content: TransformingLazyColumnScope.() -> Unit
 ) {
     val graphicsContext = LocalGraphicsContext.current
+    val layoutDirection = LocalLayoutDirection.current
+    val density = LocalDensity.current
+    val measurementStrategy =
+        remember(contentPadding) {
+            TransformingLazyColumnContentPaddingMeasurementStrategy(
+                contentPadding = contentPadding,
+                layoutDirection = layoutDirection,
+                density = density,
+                graphicsContext = graphicsContext,
+                itemAnimator = state.animator,
+            )
+        }
 
     TransformingLazyColumnImpl(
         modifier = modifier,
         state = state,
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
-        measurementStrategyProvider = {
-            TransformingLazyColumnContentPaddingMeasurementStrategy(
-                contentPadding = contentPadding,
-                intrinsicMeasureScope = this,
-                graphicsContext = graphicsContext,
-                itemAnimator = state.animator,
-            )
-        },
+        measurementStrategy = measurementStrategy,
         flingBehavior = flingBehavior,
         userScrollEnabled = userScrollEnabled,
         rotaryScrollableBehavior = rotaryScrollableBehavior,
@@ -146,12 +151,13 @@ fun TransformingLazyColumn(
     rotaryScrollableBehavior: RotaryScrollableBehavior? = RotaryScrollableDefaults.behavior(state),
     content: TransformingLazyColumnScope.() -> Unit
 ) {
+    val measurementStrategy = remember { TransformingLazyColumnCenterBoundsMeasurementStrategy() }
     TransformingLazyColumnImpl(
         modifier = modifier,
         state = state,
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
-        measurementStrategyProvider = { TransformingLazyColumnCenterBoundsMeasurementStrategy() },
+        measurementStrategy = measurementStrategy,
         flingBehavior = flingBehavior,
         userScrollEnabled = userScrollEnabled,
         rotaryScrollableBehavior = rotaryScrollableBehavior,
@@ -179,8 +185,7 @@ internal fun TransformingLazyColumnImpl(
             alignment = Alignment.Top
         ),
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
-    measurementStrategyProvider:
-        IntrinsicMeasureScope.() -> TransformingLazyColumnMeasurementStrategy,
+    measurementStrategy: TransformingLazyColumnMeasurementStrategy,
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
     rotaryScrollableBehavior: RotaryScrollableBehavior? = RotaryScrollableDefaults.behavior(state),
@@ -213,7 +218,7 @@ internal fun TransformingLazyColumnImpl(
             state = state,
             horizontalAlignment = horizontalAlignment,
             verticalArrangement = verticalArrangement,
-            measurementStrategyProvider = measurementStrategyProvider,
+            measurementStrategy = measurementStrategy,
             coroutineScope = coroutineScope,
         )
     val reverseDirection =
