@@ -20,6 +20,7 @@ import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -375,6 +376,51 @@ class SliderScreenshotTest {
             }
         }
         assertSliderAgainstGolden("sliderTest_middle_custom_corners_track_icons")
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+    @Test
+    fun verticalSliderTest() {
+        rule.setMaterialContent(lightColorScheme()) {
+            val sliderState = remember { SliderState(0.3f) }
+            Box(wrap.testTag(wrapperTestTag)) {
+                VerticalSlider(
+                    state = sliderState,
+                    modifier = Modifier.height(300.dp),
+                    track = {
+                        SliderDefaults.Track(
+                            sliderState = sliderState,
+                            modifier = Modifier.width(36.dp),
+                            trackCornerSize = 12.dp
+                        )
+                    }
+                )
+            }
+        }
+        assertSliderAgainstGolden("verticalSliderTest")
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+    @Test
+    fun verticalSliderTest_reversed() {
+        rule.setMaterialContent(lightColorScheme()) {
+            val sliderState = remember { SliderState(0.3f) }
+            Box(wrap.testTag(wrapperTestTag)) {
+                VerticalSlider(
+                    state = sliderState,
+                    modifier = Modifier.height(300.dp),
+                    track = {
+                        SliderDefaults.Track(
+                            sliderState = sliderState,
+                            modifier = Modifier.width(36.dp),
+                            trackCornerSize = 12.dp
+                        )
+                    },
+                    reverseDirection = true
+                )
+            }
+        }
+        assertSliderAgainstGolden("verticalSliderTest_reversed")
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

@@ -25,6 +25,8 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.DragScope
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.Orientation.Horizontal
+import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -37,10 +39,13 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.material3.internal.IncreaseHorizontalSemanticsBounds
@@ -125,8 +130,9 @@ import kotlinx.coroutines.launch
  *
  * It uses [SliderDefaults.Thumb] and [SliderDefaults.Track] as the thumb and track.
  *
- * Sliders reflect a range of values along a bar, from which users may select a single value. They
- * are ideal for adjusting settings such as volume, brightness, or applying image filters.
+ * Sliders reflect a range of values along a horizontal bar, from which users may select a single
+ * value. They are ideal for adjusting settings such as volume, brightness, or applying image
+ * filters.
  *
  * ![Sliders
  * image](https://firebasestorage.googleapis.com/v0/b/design-spec/o/projects%2Fgoogle-material-3%2Fimages%2Flqe2zb2b-1.png?alt=media)
@@ -204,8 +210,9 @@ fun Slider(
  *
  * Sliders allow users to make selections from a range of values.
  *
- * Sliders reflect a range of values along a bar, from which users may select a single value. They
- * are ideal for adjusting settings such as volume, brightness, or applying image filters.
+ * Sliders reflect a range of values along a horizontal bar, from which users may select a single
+ * value. They are ideal for adjusting settings such as volume, brightness, or applying image
+ * filters.
  *
  * ![Sliders
  * image](https://firebasestorage.googleapis.com/v0/b/design-spec/o/projects%2Fgoogle-material-3%2Fimages%2Flqe2zb2b-1.png?alt=media)
@@ -226,11 +233,11 @@ fun Slider(
  *
  * Slider using custom track and thumb:
  *
- * @sample androidx.compose.material3.samples.SliderWithCustomTrackAndThumb
+ * @sample androidx.compose.material3.samples.SliderWithCustomTrackAndThumbSample
  *
  * Slider using track icons:
  *
- * @sample androidx.compose.material3.samples.SliderWithTrackIcons
+ * @sample androidx.compose.material3.samples.SliderWithTrackIconsSample
  * @param value current value of the slider. If outside of [valueRange] provided, value will be
  *   coerced to this range.
  * @param onValueChange callback in which value should be updated
@@ -303,8 +310,9 @@ fun Slider(
  *
  * Sliders allow users to make selections from a range of values.
  *
- * Sliders reflect a range of values along a bar, from which users may select a single value. They
- * are ideal for adjusting settings such as volume, brightness, or applying image filters.
+ * Sliders reflect a range of values along a horizontal bar, from which users may select a single
+ * value. They are ideal for adjusting settings such as volume, brightness, or applying image
+ * filters.
  *
  * ![Sliders
  * image](https://firebasestorage.googleapis.com/v0/b/design-spec/o/projects%2Fgoogle-material-3%2Fimages%2Flqe2zb2b-1.png?alt=media)
@@ -325,11 +333,11 @@ fun Slider(
  *
  * Slider using custom track and thumb:
  *
- * @sample androidx.compose.material3.samples.SliderWithCustomTrackAndThumb
+ * @sample androidx.compose.material3.samples.SliderWithCustomTrackAndThumbSample
  *
  * Slider using track icons:
  *
- * @sample androidx.compose.material3.samples.SliderWithTrackIcons
+ * @sample androidx.compose.material3.samples.SliderWithTrackIconsSample
  * @param state [SliderState] which contains the slider's current value.
  * @param modifier the [Modifier] to be applied to this slider
  * @param enabled controls the enabled state of this slider. When `false`, this component will not
@@ -365,6 +373,81 @@ fun Slider(
     }
 ) {
     require(state.steps >= 0) { "steps should be >= 0" }
+
+    SliderImpl(
+        state = state,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource,
+        thumb = thumb,
+        track = track
+    )
+}
+
+/**
+ * <a href="https://m3.material.io/components/sliders/overview" class="external"
+ * target="_blank">Material Design slider</a>.
+ *
+ * Vertical Sliders allow users to make selections from a range of values.
+ *
+ * Vertical Sliders reflect a range of values along a vertical bar, from which users may select a
+ * single value. They are ideal for adjusting settings such as volume, brightness, or applying image
+ * filters.
+ *
+ * ![Sliders
+ * image](https://firebasestorage.googleapis.com/v0/b/design-spec/o/projects%2Fgoogle-material-3%2Fimages%2Flqe2zb2b-1.png?alt=media)
+ *
+ * Vertical Slider:
+ *
+ * @sample androidx.compose.material3.samples.VerticalSliderSample
+ * @param state [SliderState] which contains the slider's current value.
+ * @param modifier the [Modifier] to be applied to this slider
+ * @param enabled controls the enabled state of this slider. When `false`, this component will not
+ *   respond to user input, and it will appear visually disabled and disabled to accessibility
+ *   services.
+ * @param reverseDirection controls the direction of this slider. Default is top to bottom.
+ * @param colors [SliderColors] that will be used to resolve the colors used for this slider in
+ *   different states. See [SliderDefaults.colors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ *   for this slider. You can create and pass in your own `remember`ed instance to observe
+ *   [Interaction]s and customize the appearance / behavior of this slider in different states.
+ * @param thumb the thumb to be displayed on the slider, it is placed on top of the track. The
+ *   lambda receives a [SliderState] which is used to obtain the current active track.
+ * @param track the track to be displayed on the slider, it is placed underneath the thumb. The
+ *   lambda receives a [SliderState] which is used to obtain the current active track.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@ExperimentalMaterial3ExpressiveApi
+@Composable
+fun VerticalSlider(
+    state: SliderState,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    reverseDirection: Boolean = false,
+    colors: SliderColors = SliderDefaults.colors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    thumb: @Composable (SliderState) -> Unit = { sliderState ->
+        SliderDefaults.Thumb(
+            interactionSource = interactionSource,
+            sliderState = sliderState,
+            colors = colors,
+            enabled = enabled,
+            thumbSize = VerticalThumbSize
+        )
+    },
+    track: @Composable (SliderState) -> Unit = { sliderState ->
+        SliderDefaults.Track(
+            colors = colors,
+            enabled = enabled,
+            sliderState = sliderState,
+            trackCornerSize = sliderState.trackWidth.dp / 2
+        )
+    }
+) {
+    require(state.steps >= 0) { "steps should be >= 0" }
+
+    state.orientation = Vertical
+    state.reverseVerticalDirection = reverseDirection
 
     SliderImpl(
         state = state,
@@ -677,24 +760,34 @@ private fun SliderImpl(
     track: @Composable (SliderState) -> Unit
 ) {
     state.isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val reverseDirection =
+        (state.orientation == Horizontal && state.isRtl) ||
+            (state.orientation == Vertical && state.reverseVerticalDirection)
     val press = Modifier.sliderTapModifier(state, interactionSource, enabled)
     val drag =
         Modifier.draggable(
-            orientation = Orientation.Horizontal,
-            reverseDirection = state.isRtl,
+            orientation = state.orientation,
+            reverseDirection = reverseDirection,
             enabled = enabled,
             interactionSource = interactionSource,
             onDragStopped = { state.gestureEndAction() },
             startDragImmediately = state.isDragging,
             state = state
         )
+    val thumbModifier =
+        if (state.orientation == Vertical) {
+            Modifier.layoutId(SliderComponents.THUMB).wrapContentHeight()
+        } else {
+            Modifier.layoutId(SliderComponents.THUMB).wrapContentWidth()
+        }
 
     Layout(
         {
             Box(
                 modifier =
-                    Modifier.layoutId(SliderComponents.THUMB).wrapContentWidth().onSizeChanged {
+                    thumbModifier.onSizeChanged {
                         state.thumbWidth = it.width
+                        state.thumbHeight = it.height
                     }
             ) {
                 thumb(state)
@@ -704,7 +797,10 @@ private fun SliderImpl(
         modifier =
             modifier
                 .minimumInteractiveComponentSize()
-                .requiredSizeIn(minWidth = ThumbWidth, minHeight = TrackHeight)
+                .requiredSizeIn(
+                    minWidth = if (state.orientation == Vertical) TrackHeight else ThumbWidth,
+                    minHeight = if (state.orientation == Vertical) ThumbWidth else TrackHeight,
+                )
                 .sliderSemantics(state, enabled)
                 .focusable(enabled, interactionSource)
                 .slideOnKeyEvents(
@@ -712,7 +808,7 @@ private fun SliderImpl(
                     state.steps,
                     state.valueRange,
                     state.value,
-                    state.isRtl,
+                    reverseDirection,
                     state.onValueChange,
                     state.onValueChangeFinished
                 )
@@ -722,20 +818,49 @@ private fun SliderImpl(
         val thumbPlaceable =
             measurables.fastFirst { it.layoutId == SliderComponents.THUMB }.measure(constraints)
 
+        val trackMeasurable = measurables.fastFirst { it.layoutId == SliderComponents.TRACK }
         val trackPlaceable =
-            measurables
-                .fastFirst { it.layoutId == SliderComponents.TRACK }
-                .measure(constraints.offset(horizontal = -thumbPlaceable.width).copy(minHeight = 0))
+            if (state.orientation == Vertical) {
+                trackMeasurable.measure(
+                    constraints.offset(vertical = -thumbPlaceable.height).copy(minWidth = 0)
+                )
+            } else {
+                trackMeasurable.measure(
+                    constraints.offset(horizontal = -thumbPlaceable.width).copy(minHeight = 0)
+                )
+            }
 
-        val sliderWidth = thumbPlaceable.width + trackPlaceable.width
-        val sliderHeight = max(trackPlaceable.height, thumbPlaceable.height)
+        val sliderWidth: Int
+        val sliderHeight: Int
+        val trackOffsetX: Int
+        val trackOffsetY: Int
+        val thumbOffsetX: Int
+        var thumbOffsetY: Int
+        if (state.orientation == Vertical) {
+            sliderWidth = max(trackPlaceable.width, thumbPlaceable.width)
+            sliderHeight = thumbPlaceable.height + trackPlaceable.height
+            trackOffsetX = (sliderWidth - trackPlaceable.width) / 2
+            trackOffsetY = thumbPlaceable.height / 2
+            thumbOffsetX = (sliderWidth - thumbPlaceable.width) / 2
+            thumbOffsetY = (trackPlaceable.height * state.coercedValueAsFraction).roundToInt()
+            if (state.reverseVerticalDirection) {
+                thumbOffsetY = trackPlaceable.height - thumbOffsetY
+            }
+        } else {
+            sliderWidth = thumbPlaceable.width + trackPlaceable.width
+            sliderHeight = max(trackPlaceable.height, thumbPlaceable.height)
+            trackOffsetX = thumbPlaceable.width / 2
+            trackOffsetY = (sliderHeight - trackPlaceable.height) / 2
+            thumbOffsetX = (trackPlaceable.width * state.coercedValueAsFraction).roundToInt()
+            thumbOffsetY = (sliderHeight - thumbPlaceable.height) / 2
+        }
 
-        state.updateDimensions(trackPlaceable.height, sliderWidth)
-
-        val trackOffsetX = thumbPlaceable.width / 2
-        val thumbOffsetX = ((trackPlaceable.width) * state.coercedValueAsFraction).roundToInt()
-        val trackOffsetY = (sliderHeight - trackPlaceable.height) / 2
-        val thumbOffsetY = (sliderHeight - thumbPlaceable.height) / 2
+        state.updateDimensions(
+            trackPlaceable.width,
+            trackPlaceable.height,
+            sliderWidth,
+            sliderHeight
+        )
 
         layout(sliderWidth, sliderHeight) {
             trackPlaceable.placeRelative(trackOffsetX, trackOffsetY)
@@ -749,7 +874,7 @@ private fun Modifier.slideOnKeyEvents(
     steps: Int,
     valueRange: ClosedFloatingPointRange<Float>,
     value: Float,
-    isRtl: Boolean,
+    reverseDirection: Boolean,
     onValueChangeState: ((Float) -> Unit)?,
     onValueChangeFinishedState: (() -> Unit)?
 ): Modifier {
@@ -766,22 +891,21 @@ private fun Modifier.slideOnKeyEvents(
                 // In this case, 1% of the valueRange seems to make sense.
                 val actualSteps = if (steps > 0) steps + 1 else 100
                 val delta = rangeLength / actualSteps
+                val sign = if (reverseDirection) -1 else 1
                 when (it.key) {
                     Key.DirectionUp -> {
-                        onValueChangeState((value + delta).coerceIn(valueRange))
+                        onValueChangeState((value + sign * delta).coerceIn(valueRange))
                         true
                     }
                     Key.DirectionDown -> {
-                        onValueChangeState((value - delta).coerceIn(valueRange))
+                        onValueChangeState((value - sign * delta).coerceIn(valueRange))
                         true
                     }
                     Key.DirectionRight -> {
-                        val sign = if (isRtl) -1 else 1
                         onValueChangeState((value + sign * delta).coerceIn(valueRange))
                         true
                     }
                     Key.DirectionLeft -> {
-                        val sign = if (isRtl) -1 else 1
                         onValueChangeState((value - sign * delta).coerceIn(valueRange))
                         true
                     }
@@ -858,7 +982,10 @@ private fun RangeSliderImpl(
                 modifier =
                     Modifier.layoutId(RangeSliderComponents.STARTTHUMB)
                         .wrapContentWidth()
-                        .onSizeChanged { state.startThumbWidth = it.width.toFloat() }
+                        .onSizeChanged {
+                            state.startThumbWidth = it.width.toFloat()
+                            state.startThumbHeight = it.height.toFloat()
+                        }
                         .rangeSliderStartThumbSemantics(state, enabled)
                         .semantics(mergeDescendants = true) {
                             contentDescription = startContentDescription
@@ -871,7 +998,10 @@ private fun RangeSliderImpl(
                 modifier =
                     Modifier.layoutId(RangeSliderComponents.ENDTHUMB)
                         .wrapContentWidth()
-                        .onSizeChanged { state.endThumbWidth = it.width.toFloat() }
+                        .onSizeChanged {
+                            state.endThumbWidth = it.width.toFloat()
+                            state.endThumbHeight = it.height.toFloat()
+                        }
                         .rangeSliderEndThumbSemantics(state, enabled)
                         .semantics(mergeDescendants = true) {
                             contentDescription = endContentDescription
@@ -914,6 +1044,7 @@ private fun RangeSliderImpl(
         val sliderHeight =
             maxOf(trackPlaceable.height, startThumbPlaceable.height, endThumbPlaceable.height)
 
+        state.trackWidth = trackPlaceable.width.toFloat()
         state.trackHeight = trackPlaceable.height.toFloat()
         state.totalWidth = sliderWidth
 
@@ -1083,6 +1214,64 @@ object SliderDefaults {
     }
 
     /**
+     * The Default thumb for [Slider], [VerticalSlider] and [RangeSlider]
+     *
+     * @param interactionSource the [MutableInteractionSource] representing the stream of
+     *   [Interaction]s for this thumb. You can create and pass in your own `remember`ed instance to
+     *   observe
+     * @param sliderState [SliderState] which is used to obtain the current active track.
+     * @param modifier the [Modifier] to be applied to the thumb.
+     * @param colors [SliderColors] that will be used to resolve the colors used for this thumb in
+     *   different states. See [SliderDefaults.colors].
+     * @param enabled controls the enabled state of this slider. When `false`, this component will
+     *   not respond to user input, and it will appear visually disabled and disabled to
+     *   accessibility services.
+     * @param thumbSize the size of the thumb.
+     */
+    @OptIn(ExperimentalMaterial3Api::class)
+    @ExperimentalMaterial3ExpressiveApi
+    @Composable
+    fun Thumb(
+        interactionSource: MutableInteractionSource,
+        sliderState: SliderState,
+        modifier: Modifier = Modifier,
+        colors: SliderColors = colors(),
+        enabled: Boolean = true,
+        thumbSize: DpSize = ThumbSize
+    ) {
+        val interactions = remember { mutableStateListOf<Interaction>() }
+        LaunchedEffect(interactionSource) {
+            interactionSource.interactions.collect { interaction ->
+                when (interaction) {
+                    is PressInteraction.Press -> interactions.add(interaction)
+                    is PressInteraction.Release -> interactions.remove(interaction.press)
+                    is PressInteraction.Cancel -> interactions.remove(interaction.press)
+                    is DragInteraction.Start -> interactions.add(interaction)
+                    is DragInteraction.Stop -> interactions.remove(interaction.start)
+                    is DragInteraction.Cancel -> interactions.remove(interaction.start)
+                }
+            }
+        }
+
+        val size =
+            if (interactions.isNotEmpty()) {
+                if (sliderState.orientation == Vertical) {
+                    thumbSize.copy(height = thumbSize.height / 2)
+                } else {
+                    thumbSize.copy(width = thumbSize.width / 2)
+                }
+            } else {
+                thumbSize
+            }
+        Spacer(
+            modifier
+                .size(size)
+                .hoverable(interactionSource = interactionSource)
+                .background(colors.thumbColor(enabled), SliderTokens.HandleShape.value)
+        )
+    }
+
+    /**
      * The Default track for [Slider] and [RangeSlider]
      *
      * @param sliderPositions [SliderPositions] which is used to obtain the current active track and
@@ -1231,7 +1420,7 @@ object SliderDefaults {
         thumbTrackGapSize: Dp = ThumbTrackGapSize,
         trackInsideCornerSize: Dp = TrackInsideCornerSize
     ) {
-        drawTrack(
+        DrawTrack(
             sliderState = sliderState,
             trackCornerSize = TrackHeight / 2,
             modifier = modifier,
@@ -1246,7 +1435,7 @@ object SliderDefaults {
     }
 
     /**
-     * The Default track for [Slider]
+     * The Default track for [Slider] and [VerticalSlider]
      *
      * This track has a different corner treatment where the corner size decreases as the thumb gets
      * closer.
@@ -1287,7 +1476,7 @@ object SliderDefaults {
         thumbTrackGapSize: Dp = ThumbTrackGapSize,
         trackInsideCornerSize: Dp = TrackInsideCornerSize
     ) {
-        drawTrack(
+        DrawTrack(
             sliderState = sliderState,
             trackCornerSize = trackCornerSize,
             modifier = modifier,
@@ -1303,7 +1492,7 @@ object SliderDefaults {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun drawTrack(
+    private fun DrawTrack(
         sliderState: SliderState,
         trackCornerSize: Dp,
         modifier: Modifier,
@@ -1320,8 +1509,14 @@ object SliderDefaults {
         val inactiveTickColor = colors.tickColor(enabled = enabled, active = false)
         val activeTickColor = colors.tickColor(enabled = enabled, active = true)
         Canvas(
-            modifier.fillMaxWidth().height(TrackHeight).let {
-                if (sliderState.isRtl) it.scale(-1f, 1f) else it
+            if (sliderState.orientation == Vertical) {
+                modifier.width(TrackHeight).fillMaxHeight().let {
+                    if (sliderState.reverseVerticalDirection) it.scale(1f, -1f) else it
+                }
+            } else {
+                modifier.fillMaxWidth().height(TrackHeight).let {
+                    if (sliderState.isRtl) it.scale(-1f, 1f) else it
+                }
             }
         ) {
             drawTrack(
@@ -1332,16 +1527,20 @@ object SliderDefaults {
                 activeTrackColor = activeTrackColor,
                 inactiveTickColor = inactiveTickColor,
                 activeTickColor = activeTickColor,
+                width = sliderState.trackWidth.toDp(),
                 height = sliderState.trackHeight.toDp(),
                 startThumbWidth = 0.toDp(),
+                startThumbHeight = 0.toDp(),
                 endThumbWidth = sliderState.thumbWidth.toDp(),
+                endThumbHeight = sliderState.thumbHeight.toDp(),
                 thumbTrackGapSize = thumbTrackGapSize,
                 trackInsideCornerSize = trackInsideCornerSize,
                 trackCornerSize = trackCornerSize,
                 drawStopIndicator = drawStopIndicator,
                 drawTick = drawTick,
                 isRangeSlider = false,
-                enableCornerShrinking = enableCornerShrinking
+                enableCornerShrinking = enableCornerShrinking,
+                orientation = sliderState.orientation
             )
         }
     }
@@ -1441,9 +1640,12 @@ object SliderDefaults {
                 activeTrackColor,
                 inactiveTickColor,
                 activeTickColor,
+                rangeSliderState.trackWidth.toDp(),
                 rangeSliderState.trackHeight.toDp(),
                 rangeSliderState.startThumbWidth.toDp(),
+                rangeSliderState.startThumbHeight.toDp(),
                 rangeSliderState.endThumbWidth.toDp(),
+                rangeSliderState.endThumbHeight.toDp(),
                 thumbTrackGapSize,
                 trackInsideCornerSize,
                 rangeSliderState.trackHeight.toDp() / 2,
@@ -1462,91 +1664,117 @@ object SliderDefaults {
         activeTrackColor: Color,
         inactiveTickColor: Color,
         activeTickColor: Color,
+        width: Dp,
         height: Dp,
         startThumbWidth: Dp,
+        startThumbHeight: Dp,
         endThumbWidth: Dp,
+        endThumbHeight: Dp,
         thumbTrackGapSize: Dp,
         trackInsideCornerSize: Dp,
         trackCornerSize: Dp,
         drawStopIndicator: (DrawScope.(Offset) -> Unit)?,
         drawTick: DrawScope.(Offset, Color) -> Unit,
         isRangeSlider: Boolean,
-        enableCornerShrinking: Boolean = false
+        enableCornerShrinking: Boolean = false,
+        orientation: Orientation = Horizontal
     ) {
-        val sliderStart = Offset(0f, center.y)
-        val sliderEnd = Offset(size.width, center.y)
-        val trackStrokeWidth = height.toPx()
-
-        val sliderValueEnd =
-            Offset(sliderStart.x + (sliderEnd.x - sliderStart.x) * activeRangeEnd, center.y)
-
-        val sliderValueStart =
-            Offset(sliderStart.x + (sliderEnd.x - sliderStart.x) * activeRangeStart, center.y)
+        val isVertical = orientation == Vertical
+        val sliderStart = 0f
+        val sliderEnd = if (isVertical) size.height else size.width
+        val sliderValueEnd = sliderStart + (sliderEnd - sliderStart) * activeRangeEnd
+        val sliderValueStart = sliderStart + (sliderEnd - sliderStart) * activeRangeStart
 
         val cornerSize = trackCornerSize.toPx()
         val insideCornerSize = trackInsideCornerSize.toPx()
         var startGap = 0f
         var endGap = 0f
         if (thumbTrackGapSize > 0.dp) {
-            startGap = startThumbWidth.toPx() / 2 + thumbTrackGapSize.toPx()
-            endGap = endThumbWidth.toPx() / 2 + thumbTrackGapSize.toPx()
+            if (isVertical) {
+                startGap = startThumbHeight.toPx() / 2 + thumbTrackGapSize.toPx()
+                endGap = endThumbHeight.toPx() / 2 + thumbTrackGapSize.toPx()
+            } else {
+                startGap = startThumbWidth.toPx() / 2 + thumbTrackGapSize.toPx()
+                endGap = endThumbWidth.toPx() / 2 + thumbTrackGapSize.toPx()
+            }
         }
 
         // inactive track (range slider)
-        var rangeInactiveTrackThreshold = sliderStart.x + startGap
+        var rangeInactiveTrackThreshold = sliderStart + startGap
         if (!enableCornerShrinking) {
             rangeInactiveTrackThreshold += cornerSize
         }
-        if (isRangeSlider && sliderValueStart.x > rangeInactiveTrackThreshold) {
-            val start = sliderStart.x
-            val end = sliderValueStart.x - startGap
+        if (isRangeSlider && sliderValueStart > rangeInactiveTrackThreshold) {
+            val start = sliderStart
+            val end = sliderValueStart - startGap
+            val size =
+                if (isVertical) Size(width.toPx(), end - start)
+                else Size(end - start, height.toPx())
             drawTrackPath(
+                orientation,
                 Offset.Zero,
-                Size(end - start, trackStrokeWidth),
+                size,
                 inactiveTrackColor,
                 cornerSize,
                 insideCornerSize
             )
-            drawStopIndicator?.invoke(this, Offset(start + cornerSize, center.y))
+            val stopIndicatorOffset =
+                if (isVertical) Offset(center.x, start + cornerSize)
+                else Offset(start + cornerSize, center.y)
+            drawStopIndicator?.invoke(this, stopIndicatorOffset)
         }
         // inactive track
-        var inactiveTrackThreshold = sliderEnd.x - endGap
+        var inactiveTrackThreshold = sliderEnd - endGap
         if (!enableCornerShrinking) {
             inactiveTrackThreshold -= cornerSize
         }
-        if (sliderValueEnd.x < inactiveTrackThreshold) {
-            val start = sliderValueEnd.x + endGap
-            val end = sliderEnd.x
+        if (sliderValueEnd < inactiveTrackThreshold) {
+            val start = sliderValueEnd + endGap
+            val end = sliderEnd
             val inactiveTrackWidth = end - start
+            val trackOffset = if (isVertical) Offset(0f, start) else Offset(start, 0f)
+            val size =
+                if (isVertical) Size(width.toPx(), inactiveTrackWidth)
+                else Size(inactiveTrackWidth, height.toPx())
             drawTrackPath(
-                Offset(start, 0f),
-                Size(inactiveTrackWidth, trackStrokeWidth),
+                orientation,
+                trackOffset,
+                size,
                 inactiveTrackColor,
                 insideCornerSize,
                 cornerSize
             )
-            drawStopIndicator?.invoke(this, Offset(end - cornerSize, center.y))
+            val stopIndicatorOffset =
+                if (isVertical) Offset(center.x, end - cornerSize)
+                else Offset(end - cornerSize, center.y)
+            drawStopIndicator?.invoke(this, stopIndicatorOffset)
         }
         // active track
-        val activeTrackStart = if (isRangeSlider) sliderValueStart.x + startGap else 0f
-        val activeTrackEnd = sliderValueEnd.x - endGap
+        val activeTrackStart = if (isRangeSlider) sliderValueStart + startGap else 0f
+        val activeTrackEnd = sliderValueEnd - endGap
         val startCornerRadius = if (isRangeSlider) insideCornerSize else cornerSize
         val activeTrackWidth = activeTrackEnd - activeTrackStart
         val activeTrackThreshold = if (enableCornerShrinking) 0f else startCornerRadius
         if (activeTrackWidth > activeTrackThreshold) {
+            val trackOffset =
+                if (isVertical) Offset(0f, activeTrackStart) else Offset(activeTrackStart, 0f)
+            val size =
+                if (isVertical) Size(width.toPx(), activeTrackWidth)
+                else Size(activeTrackWidth, height.toPx())
             drawTrackPath(
-                Offset(activeTrackStart, 0f),
-                Size(activeTrackWidth, trackStrokeWidth),
+                orientation,
+                trackOffset,
+                size,
                 activeTrackColor,
                 startCornerRadius,
                 insideCornerSize
             )
         }
 
-        val start = Offset(sliderStart.x + cornerSize, sliderStart.y)
-        val end = Offset(sliderEnd.x - cornerSize, sliderEnd.y)
-        val tickStartGap = sliderValueStart.x - startGap..sliderValueStart.x + startGap
-        val tickEndGap = sliderValueEnd.x - endGap..sliderValueEnd.x + endGap
+        val start = sliderStart + cornerSize
+        val end = sliderEnd - cornerSize
+        val tickStartGap = sliderValueStart - startGap..sliderValueStart + startGap
+        val tickEndGap = sliderValueEnd - endGap..sliderValueEnd + endGap
         tickFractions.forEachIndexed { index, tick ->
             // skip ticks that fall on the stop indicator
             if (drawStopIndicator != null) {
@@ -1556,20 +1784,23 @@ object SliderDefaults {
             }
 
             val outsideFraction = tick > activeRangeEnd || tick < activeRangeStart
-            val center = Offset(lerp(start, end, tick).x, center.y)
+            val centerTick = lerp(start, end, tick)
             // skip ticks that fall on a gap
-            if ((isRangeSlider && center.x in tickStartGap) || center.x in tickEndGap) {
+            if ((isRangeSlider && centerTick in tickStartGap) || centerTick in tickEndGap) {
                 return@forEachIndexed
             }
+            val offset =
+                if (isVertical) Offset(center.x, centerTick) else Offset(centerTick, center.y)
             drawTick(
                 this,
-                center, // offset
+                offset, // offset
                 if (outsideFraction) inactiveTickColor else activeTickColor // color
             )
         }
     }
 
     private fun DrawScope.drawTrackPath(
+        orientation: Orientation,
         offset: Offset,
         size: Size,
         color: Color,
@@ -1579,13 +1810,23 @@ object SliderDefaults {
         val startCorner = CornerRadius(startCornerRadius, startCornerRadius)
         val endCorner = CornerRadius(endCornerRadius, endCornerRadius)
         val track =
-            RoundRect(
-                rect = Rect(Offset(offset.x, 0f), size = Size(size.width, size.height)),
-                topLeft = startCorner,
-                topRight = endCorner,
-                bottomRight = endCorner,
-                bottomLeft = startCorner
-            )
+            if (orientation == Vertical) {
+                RoundRect(
+                    rect = Rect(offset, size = Size(size.width, size.height)),
+                    topLeft = startCorner,
+                    topRight = startCorner,
+                    bottomRight = endCorner,
+                    bottomLeft = endCorner
+                )
+            } else {
+                RoundRect(
+                    rect = Rect(offset, size = Size(size.width, size.height)),
+                    topLeft = startCorner,
+                    topRight = endCorner,
+                    bottomRight = endCorner,
+                    bottomLeft = startCorner
+                )
+            }
         trackPath.addRoundRect(track)
         drawPath(trackPath, color)
         trackPath.rewind()
@@ -2074,6 +2315,7 @@ internal val TrackHeight = SliderTokens.InactiveTrackHeight
 internal val ThumbWidth = SliderTokens.HandleWidth
 private val ThumbHeight = SliderTokens.HandleHeight
 private val ThumbSize = DpSize(ThumbWidth, ThumbHeight)
+private val VerticalThumbSize = DpSize(ThumbHeight, ThumbWidth)
 private val ThumbTrackGapSize: Dp = SliderTokens.ActiveHandleLeadingSpace
 private val TrackInsideCornerSize: Dp = 2.dp
 private const val SliderRangeTolerance = 0.0001
@@ -2184,8 +2426,15 @@ class SliderState(
     }
 
     override fun dispatchRawDelta(delta: Float) {
-        val maxPx = max(totalWidth - thumbWidth / 2f, 0f)
-        val minPx = min(thumbWidth / 2f, maxPx)
+        val maxPx: Float
+        val minPx: Float
+        if (orientation == Vertical) {
+            maxPx = max(totalHeight - thumbHeight / 2f, 0f)
+            minPx = min(thumbHeight / 2f, maxPx)
+        } else {
+            maxPx = max(totalWidth - thumbWidth / 2f, 0f)
+            minPx = min(thumbWidth / 2f, maxPx)
+        }
         rawOffset = (rawOffset + delta + pressOffset)
         pressOffset = 0f
         val offsetInTrack = snapValueToTick(rawOffset, tickFractions, minPx, maxPx)
@@ -2204,9 +2453,14 @@ class SliderState(
 
     internal val tickFractions = stepsToTickFractions(steps)
     private var totalWidth by mutableIntStateOf(0)
+    private var totalHeight by mutableIntStateOf(0)
     internal var isRtl = false
     internal var thumbWidth by mutableIntStateOf(0)
+    internal var thumbHeight by mutableIntStateOf(0)
+    internal var trackWidth by mutableIntStateOf(0)
     internal var trackHeight by mutableIntStateOf(0)
+    internal var orientation = Horizontal
+    internal var reverseVerticalDirection = false
 
     /** The fraction of the track that the thumb currently is in. */
     val coercedValueAsFraction: Float
@@ -2220,9 +2474,16 @@ class SliderState(
     internal var isDragging by mutableStateOf(false)
         private set
 
-    internal fun updateDimensions(newTrackHeight: Int, newTotalWidth: Int) {
+    internal fun updateDimensions(
+        newTrackWidth: Int,
+        newTrackHeight: Int,
+        newTotalWidth: Int,
+        newTotalHeight: Int
+    ) {
+        trackWidth = newTrackWidth
         trackHeight = newTrackHeight
         totalWidth = newTotalWidth
+        totalHeight = newTotalHeight
     }
 
     internal val gestureEndAction = {
@@ -2233,7 +2494,12 @@ class SliderState(
     }
 
     internal fun onPress(pos: Offset) {
-        val to = if (isRtl) totalWidth - pos.x else pos.x
+        val to =
+            if (orientation == Vertical) {
+                if (reverseVerticalDirection) totalHeight - pos.y else pos.y
+            } else {
+                if (isRtl) totalWidth - pos.x else pos.x
+            }
         pressOffset = to - rawOffset
     }
 
@@ -2315,9 +2581,12 @@ class RangeSliderState(
 
     internal val tickFractions = stepsToTickFractions(steps)
 
+    internal var trackWidth by mutableFloatStateOf(0f)
     internal var trackHeight by mutableFloatStateOf(0f)
     internal var startThumbWidth by mutableFloatStateOf(0f)
+    internal var startThumbHeight by mutableFloatStateOf(0f)
     internal var endThumbWidth by mutableFloatStateOf(0f)
+    internal var endThumbHeight by mutableFloatStateOf(0f)
     internal var totalWidth by mutableIntStateOf(0)
     internal var rawOffsetStart by mutableFloatStateOf(0f)
     internal var rawOffsetEnd by mutableFloatStateOf(0f)
