@@ -16,7 +16,6 @@
 
 package androidx.wear.protolayout.material3
 
-import androidx.wear.protolayout.ColorBuilders.ColorProp
 import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.DimensionBuilders.weight
@@ -37,6 +36,7 @@ import androidx.wear.protolayout.material3.CardDefaults.METADATA_TAG
 import androidx.wear.protolayout.material3.CardDefaults.filledCardColors
 import androidx.wear.protolayout.material3.TitleCardDefaults.buildContentForTitleCard
 import androidx.wear.protolayout.material3.TitleCardStyle.Companion.defaultTitleCardStyle
+import androidx.wear.protolayout.types.LayoutColor
 
 /**
  * Opinionated ProtoLayout Material3 title card that offers 1 to 3 slots, usually text based.
@@ -185,14 +185,14 @@ public fun MaterialScope.card(
     width: ContainerDimension = wrapWithMinTapTargetDimension(),
     height: ContainerDimension = wrapWithMinTapTargetDimension(),
     shape: Corner = shapes.large,
-    backgroundColor: ColorProp? = null,
+    backgroundColor: LayoutColor? = null,
     background: (MaterialScope.() -> LayoutElement)? = null,
     contentPadding: Padding = Padding.Builder().setAll(DEFAULT_CONTENT_PADDING.toDp()).build(),
     content: (MaterialScope.() -> LayoutElement)
 ): LayoutElement {
     val backgroundBuilder = Background.Builder().setCorner(shape)
 
-    backgroundColor?.let { backgroundBuilder.setColor(it) }
+    backgroundColor?.let { backgroundBuilder.setColor(it.prop) }
 
     val modifiers =
         Modifiers.Builder()

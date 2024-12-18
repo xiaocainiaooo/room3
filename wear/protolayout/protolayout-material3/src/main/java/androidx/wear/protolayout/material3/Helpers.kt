@@ -23,7 +23,6 @@ import androidx.annotation.Dimension.Companion.DP
 import androidx.annotation.Dimension.Companion.SP
 import androidx.annotation.FloatRange
 import androidx.annotation.RestrictTo
-import androidx.wear.protolayout.ColorBuilders.ColorProp
 import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.DimensionBuilders.DpProp
 import androidx.wear.protolayout.DimensionBuilders.WrappedDimensionProp
@@ -48,6 +47,8 @@ import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
 import androidx.wear.protolayout.ModifiersBuilders.Semantics
 import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.materialcore.fontscaling.FontScaleConverterFactory
+import androidx.wear.protolayout.types.LayoutColor
+import androidx.wear.protolayout.types.argb
 import java.nio.charset.StandardCharsets
 
 /**
@@ -113,7 +114,7 @@ internal fun wrapWithMinTapTargetDimension(): WrappedDimensionProp =
 internal fun Padding.toModifiers(): Modifiers = Modifiers.Builder().setPadding(this).build()
 
 /** Returns the [Background] object containing this color and nothing else. */
-internal fun ColorProp.toBackground(): Background = Background.Builder().setColor(this).build()
+internal fun LayoutColor.toBackground(): Background = Background.Builder().setColor(prop).build()
 
 /** Returns the [Background] object containing this corner and nothing else. */
 internal fun Corner.toBackground(): Background = Background.Builder().setCorner(this).build()
@@ -121,17 +122,17 @@ internal fun Corner.toBackground(): Background = Background.Builder().setCorner(
 /**
  * Changes the opacity/transparency of the given color.
  *
- * Note that this only looks at the static value of the [ColorProp], any dynamic value will be
+ * Note that this only looks at the static value of the [LayoutColor], any dynamic value will be
  * ignored.
  */
-public fun ColorProp.withOpacity(@FloatRange(from = 0.0, to = 1.0) ratio: Float): ColorProp {
+public fun LayoutColor.withOpacity(@FloatRange(from = 0.0, to = 1.0) ratio: Float): LayoutColor {
     // From androidx.core.graphics.ColorUtils
     require(!(ratio < 0 || ratio > 1)) { "setOpacityForColor ratio must be between 0 and 1." }
     val fullyOpaque = 255
     val alphaMask = 0x00ffffff
     val alpha = (ratio * fullyOpaque).toInt()
     val alphaPosition = 24
-    return argb((this.argb and alphaMask) or (alpha shl alphaPosition))
+    return ((this.staticArgb and alphaMask) or (alpha shl alphaPosition)).argb
 }
 
 /** Returns corresponding text alignment based on the given horizontal alignment. */

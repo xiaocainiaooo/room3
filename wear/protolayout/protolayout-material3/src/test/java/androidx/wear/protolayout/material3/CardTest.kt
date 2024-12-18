@@ -20,7 +20,6 @@ import android.content.Context
 import android.graphics.Color
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.DeviceParametersBuilders
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.testing.LayoutElementAssertionsProvider
@@ -32,6 +31,7 @@ import androidx.wear.protolayout.testing.hasImage
 import androidx.wear.protolayout.testing.hasTag
 import androidx.wear.protolayout.testing.hasText
 import androidx.wear.protolayout.testing.hasWidth
+import androidx.wear.protolayout.types.argb
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.internal.DoNotInstrument
@@ -126,7 +126,7 @@ class CardTest {
                 card(
                     onClick = CLICKABLE,
                     contentDescription = CONTENT_DESCRIPTION.prop(),
-                    backgroundColor = argb(color)
+                    backgroundColor = color.argb
                 ) {
                     text(TEXT.prop())
                 }
@@ -149,10 +149,10 @@ class CardTest {
                     contentDescription = CONTENT_DESCRIPTION.prop(),
                     colors =
                         CardColors(
-                            background = argb(backgroundColor),
-                            title = argb(titleColor),
-                            content = argb(contentColor),
-                            time = argb(timeColor)
+                            background = backgroundColor.argb,
+                            title = titleColor.argb,
+                            content = contentColor.argb,
+                            time = timeColor.argb
                         ),
                     title = { text(TEXT.prop()) },
                     content = { text(TEXT2.prop()) },

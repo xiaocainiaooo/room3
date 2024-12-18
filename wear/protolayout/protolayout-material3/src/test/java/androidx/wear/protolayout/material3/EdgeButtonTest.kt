@@ -70,7 +70,7 @@ class EdgeButtonTest {
     fun defaultBackgroundColor() {
         LayoutElementAssertionsProvider(ICON_EDGE_BUTTON)
             .onElement(isClickable())
-            .assert(hasColor(COLOR_SCHEME.primary.argb))
+            .assert(hasColor(COLOR_SCHEME.primary.staticArgb))
     }
 
     @Test
@@ -82,7 +82,7 @@ class EdgeButtonTest {
     fun iconColor() {
         LayoutElementAssertionsProvider(ICON_EDGE_BUTTON)
             .onElement(hasImage(RES_ID))
-            .assert(hasColor(COLOR_SCHEME.onPrimary.argb))
+            .assert(hasColor(COLOR_SCHEME.onPrimary.staticArgb))
     }
 
     @Test
@@ -104,10 +104,12 @@ class EdgeButtonTest {
                 }
             )
 
-        queryProvider.onElement(isClickable()).assert(hasColor(COLOR_SCHEME.tertiaryContainer.argb))
+        queryProvider
+            .onElement(isClickable())
+            .assert(hasColor(COLOR_SCHEME.tertiaryContainer.staticArgb))
         queryProvider
             .onElement(LayoutElementMatcher("Element type is Image") { it is Image })
-            .assert(hasColor(COLOR_SCHEME.onTertiary.argb))
+            .assert(hasColor(COLOR_SCHEME.onTertiary.staticArgb))
     }
 
     @Test
@@ -122,7 +124,7 @@ class EdgeButtonTest {
 
         LayoutElementAssertionsProvider(textEdgeButton)
             .onElement(hasText(label))
-            .assert(hasColor(COLOR_SCHEME.onPrimary.argb))
+            .assert(hasColor(COLOR_SCHEME.onPrimary.staticArgb))
     }
 
     @Test
@@ -143,7 +145,9 @@ class EdgeButtonTest {
                 }
             )
 
-        queryProvider.onElement(hasText(dynamicLabel)).assert(hasColor(COLOR_SCHEME.onPrimary.argb))
+        queryProvider
+            .onElement(hasText(dynamicLabel))
+            .assert(hasColor(COLOR_SCHEME.onPrimary.staticArgb))
     }
 
     companion object {
