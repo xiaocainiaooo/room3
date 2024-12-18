@@ -18,24 +18,49 @@ package androidx.benchmark.macro.perfetto
 
 import androidx.benchmark.Insight
 import androidx.benchmark.TraceDeepLink
+import androidx.benchmark.TraceDeepLink.StartupSelectionParams
 import androidx.benchmark.inMemoryTrace
 import androidx.benchmark.traceprocessor.TraceProcessor
 import perfetto.protos.AndroidStartupMetric.SlowStartReason
 import perfetto.protos.AndroidStartupMetric.ThresholdValue.ThresholdUnit
 import perfetto.protos.TraceMetrics
 
-private fun SlowStartReason.getDeepLinkSelectionParams(
-    packageName: String
-): TraceDeepLink.SelectionParams {
-    return TraceDeepLink.StartupSelectionParams(
-        packageName = packageName,
-        // TODO: Populate from SlowStartReason more elegantly
-        tid =
-            trace_thread_sections?.thread_section?.first()?.thread_tid
-                ?: trace_slice_sections?.slice_section?.first()?.thread_tid,
-        selectionStart = null, // TODO: Populate from SlowStartReason
-        selectionEnd = null, // TODO: Populate from SlowStartReason
-        reasonId = reason_id?.name
+private fun SlowStartReason.getStudioSelectionParams(): TraceDeepLink.StudioSelectionParams? {
+    trace_slice_sections?.apply {
+        val start = start_timestamp
+        val end = end_timestamp
+        return TraceDeepLink.StudioSelectionParams(
+            ts = if (start != null && end != null) start else null,
+            dur = if (start != null && end != null) end - start else null,
+            tid = slice_section.firstOrNull()?.thread_tid
+        )
+    }
+    trace_thread_sections?.apply {
+        val start = start_timestamp
+        val end = end_timestamp
+        return TraceDeepLink.StudioSelectionParams(
+            ts = if (start != null && end != null) start else null,
+            dur = if (start != null && end != null) end - start else null,
+            tid = thread_section.firstOrNull()?.thread_tid
+        )
+    }
+    // no thread sections or slices
+    return null
+}
+
+private fun getDeepLink(
+    traceOutputRelativePath: String,
+    packageName: String,
+    slowStartReason: SlowStartReason,
+): TraceDeepLink {
+    return TraceDeepLink(
+        outputRelativePath = traceOutputRelativePath,
+        perfettoUiParams =
+            StartupSelectionParams(
+                packageName = packageName,
+                reasonId = slowStartReason.reason_id?.name
+            ),
+        studioParams = slowStartReason.getStudioSelectionParams()
     )
 }
 
@@ -101,9 +126,10 @@ private fun SlowStartReason.toInsight(
                 "$observedValue$unitSuffix"
             },
         deepLink =
-            TraceDeepLink(
-                outputRelativePath = traceOutputRelativePath,
-                selectionParams = getDeepLinkSelectionParams(packageName = packageName)
+            getDeepLink(
+                traceOutputRelativePath = traceOutputRelativePath,
+                packageName = packageName,
+                slowStartReason = this
             ),
         iterationIndex = iterationIndex,
         category = category,
