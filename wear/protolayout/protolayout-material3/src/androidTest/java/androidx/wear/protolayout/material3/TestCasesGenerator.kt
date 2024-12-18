@@ -32,7 +32,9 @@ import androidx.wear.protolayout.material3.ButtonDefaults.filledButtonColors
 import androidx.wear.protolayout.material3.ButtonDefaults.filledTonalButtonColors
 import androidx.wear.protolayout.material3.ButtonDefaults.filledVariantButtonColors
 import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
+import androidx.wear.protolayout.material3.DataCardStyle.Companion.smallCompactDataCardStyle
 import androidx.wear.protolayout.material3.MaterialGoldenTest.Companion.pxToDp
+import androidx.wear.protolayout.material3.TitleContentPlacementInDataCard.Companion.Bottom
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.types.LayoutColor
@@ -110,15 +112,38 @@ object TestCasesGenerator {
                     mainSlot = {
                         buttonGroup {
                             buttonGroupItem {
-                                coloredBox(color = colorScheme.secondary, shape = shapes.full)
+                                iconDataCard(
+                                    onClick = clickable,
+                                    modifier = LayoutModifier.contentDescription("Data Card"),
+                                    title = { text("MM".layoutString) },
+                                    content = { text("Min".layoutString) },
+                                    secondaryIcon = { icon(ICON_ID) },
+                                    shape = shapes.full
+                                )
                             }
                             buttonGroupItem {
-                                coloredBox(color = colorScheme.secondaryDim, shape = shapes.small)
+                                iconDataCard(
+                                    onClick = clickable,
+                                    modifier = LayoutModifier.contentDescription("Data Card"),
+                                    title = { text("MM".layoutString) },
+                                    content = { text("Min".layoutString) },
+                                    secondaryIcon = { icon(ICON_ID) },
+                                    titleContentPlacement = Bottom
+                                )
                             }
                             buttonGroupItem {
-                                coloredBox(
-                                    color = colorScheme.secondaryContainer,
-                                    shape = shapes.large
+                                textDataCard(
+                                    onClick = clickable,
+                                    modifier = LayoutModifier.contentDescription("Data Card"),
+                                    title = { text("MM".layoutString) },
+                                    content = { text("Min".layoutString) },
+                                    secondaryText = { text("Label".layoutString) },
+                                    colors =
+                                        CardColors(
+                                            background = colorScheme.onSecondary,
+                                            title = colorScheme.secondary,
+                                            content = colorScheme.secondaryDim
+                                        )
                                 )
                             }
                         }
@@ -205,7 +230,20 @@ object TestCasesGenerator {
             ) {
                 primaryLayout(
                     mainSlot = {
-                        coloredBox(color = colorScheme.errorContainer, shape = shapes.extraLarge)
+                        iconDataCard(
+                            onClick = clickable,
+                            modifier = LayoutModifier.contentDescription("Data card labels only"),
+                            title = { text("000".layoutString) },
+                            content = { text("PM".layoutString) },
+                            style = smallCompactDataCardStyle(),
+                            colors =
+                                CardColors(
+                                    background = colorScheme.errorContainer,
+                                    title = colorScheme.onErrorContainer,
+                                    content = colorScheme.onError
+                                ),
+                            height = expand()
+                        )
                     },
                     bottomSlot = { text("Bottom Slot".layoutString) },
                     labelForBottomSlot = { text("Label in bottom slot overflows".layoutString) },
