@@ -52,6 +52,7 @@ import androidx.compose.material3.TextFieldDefaults.defaultTextFieldColors
 import androidx.compose.material3.internal.AboveLabelBottomPadding
 import androidx.compose.material3.internal.AboveLabelHorizontalPadding
 import androidx.compose.material3.internal.ContainerId
+import androidx.compose.material3.internal.FloatProducer
 import androidx.compose.material3.internal.LabelId
 import androidx.compose.material3.internal.LeadingId
 import androidx.compose.material3.internal.MinFocusedLabelLineHeight
@@ -74,6 +75,7 @@ import androidx.compose.material3.internal.minimizedAlignment
 import androidx.compose.material3.internal.minimizedLabelHalfHeight
 import androidx.compose.material3.internal.subtractConstraintSafely
 import androidx.compose.material3.internal.textFieldHorizontalIconPadding
+import androidx.compose.material3.internal.textFieldLabelMinHeight
 import androidx.compose.material3.internal.widthOrZero
 import androidx.compose.material3.tokens.FilledTextFieldTokens
 import androidx.compose.material3.tokens.MotionSchemeKeyTokens
@@ -666,7 +668,7 @@ internal fun TextFieldLayout(
     suffix: @Composable (() -> Unit)?,
     singleLine: Boolean,
     labelPosition: TextFieldLabelPosition,
-    labelProgress: Float,
+    labelProgress: FloatProducer,
     container: @Composable () -> Unit,
     supporting: @Composable (() -> Unit)?,
     paddingValues: PaddingValues
@@ -765,9 +767,9 @@ internal fun TextFieldLayout(
             if (label != null) {
                 Box(
                     Modifier.layoutId(LabelId)
-                        .heightIn(
-                            min = lerp(MinTextLineHeight, MinFocusedLabelLineHeight, labelProgress)
-                        )
+                        .textFieldLabelMinHeight {
+                            lerp(MinTextLineHeight, MinFocusedLabelLineHeight, labelProgress())
+                        }
                         .wrapContentHeight()
                         .then(labelPadding)
                 ) {
@@ -812,7 +814,7 @@ internal fun TextFieldLayout(
 private class TextFieldMeasurePolicy(
     private val singleLine: Boolean,
     private val labelPosition: TextFieldLabelPosition,
-    private val labelProgress: Float,
+    private val labelProgress: FloatProducer,
     private val paddingValues: PaddingValues,
     private val minimizedLabelHalfHeight: Dp,
 ) : MeasurePolicy {
@@ -820,6 +822,7 @@ private class TextFieldMeasurePolicy(
         measurables: List<Measurable>,
         constraints: Constraints
     ): MeasureResult {
+        val labelProgress = labelProgress()
         val topPaddingValue = paddingValues.calculateTopPadding().roundToPx()
         val bottomPaddingValue = paddingValues.calculateBottomPadding().roundToPx()
 
@@ -951,6 +954,7 @@ private class TextFieldMeasurePolicy(
                 supportingHeight = supportingPlaceable.heightOrZero,
                 constraints = constraints,
                 isLabelAbove = isLabelAbove,
+                labelProgress = labelProgress,
             )
         val height =
             totalHeight - supportingHeight - (if (isLabelAbove) labelPlaceable.heightOrZero else 0)
@@ -1000,6 +1004,7 @@ private class TextFieldMeasurePolicy(
                     labelStartY = labelStartY,
                     labelEndY = labelEndY,
                     isLabelAbove = isLabelAbove,
+                    labelProgress = labelProgress,
                     textPosition =
                         topPaddingValue + (if (isLabelAbove) 0 else labelPlaceable.height),
                     layoutDirection = layoutDirection,
@@ -1178,6 +1183,7 @@ private class TextFieldMeasurePolicy(
             supportingHeight = supportingHeight,
             constraints = Constraints(),
             isLabelAbove = labelPosition is TextFieldLabelPosition.Above,
+            labelProgress = labelProgress(),
         )
     }
 
@@ -1214,6 +1220,7 @@ private class TextFieldMeasurePolicy(
         supportingHeight: Int,
         constraints: Constraints,
         isLabelAbove: Boolean,
+        labelProgress: Float,
     ): Int {
         val verticalPadding =
             (paddingValues.calculateTopPadding() + paddingValues.calculateBottomPadding())
@@ -1276,6 +1283,7 @@ private class TextFieldMeasurePolicy(
         labelStartY: Int,
         labelEndY: Int,
         isLabelAbove: Boolean,
+        labelProgress: Float,
         textPosition: Int,
         layoutDirection: LayoutDirection,
     ) {
