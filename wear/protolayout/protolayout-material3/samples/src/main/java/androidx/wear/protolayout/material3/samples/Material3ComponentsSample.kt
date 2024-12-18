@@ -31,12 +31,14 @@ import androidx.wear.protolayout.material3.CardDefaults.filledTonalCardColors
 import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.extraLargeDataCardStyle
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.largeCompactDataCardStyle
+import androidx.wear.protolayout.material3.GraphicDataCardStyle.Companion.largeGraphicDataCardStyle
 import androidx.wear.protolayout.material3.TitleCardStyle.Companion.largeTitleCardStyle
 import androidx.wear.protolayout.material3.Typography
 import androidx.wear.protolayout.material3.appCard
 import androidx.wear.protolayout.material3.backgroundImage
 import androidx.wear.protolayout.material3.buttonGroup
 import androidx.wear.protolayout.material3.card
+import androidx.wear.protolayout.material3.graphicDataCard
 import androidx.wear.protolayout.material3.icon
 import androidx.wear.protolayout.material3.iconDataCard
 import androidx.wear.protolayout.material3.iconEdgeButton
@@ -269,6 +271,30 @@ fun dataCardSample(
                         )
                     }
                 }
+            }
+        )
+    }
+
+@Sampled
+fun graphicDataCardSample(
+    context: Context,
+    deviceConfiguration: DeviceParameters,
+    clickable: Clickable
+): LayoutElement =
+    materialScope(context, deviceConfiguration) {
+        primaryLayout(
+            mainSlot = {
+                graphicDataCard(
+                    onClick = clickable,
+                    modifier = LayoutModifier.contentDescription("Data Card with graphic"),
+                    height = expand(),
+                    colors = filledVariantCardColors(),
+                    style = largeGraphicDataCardStyle(),
+                    title = { text("1,234".layoutString) },
+                    content = { icon("steps") },
+                    // TODO: b/368272767 - Use CPI here
+                    graphic = { text("Run".layoutString) },
+                )
             }
         )
     }

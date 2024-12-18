@@ -22,6 +22,8 @@ import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
 import androidx.annotation.Dimension.Companion.SP
 import androidx.annotation.FloatRange
+import androidx.wear.protolayout.ColorBuilders.argb
+import androidx.wear.protolayout.DimensionBuilders
 import androidx.wear.protolayout.DimensionBuilders.DpProp
 import androidx.wear.protolayout.DimensionBuilders.WrappedDimensionProp
 import androidx.wear.protolayout.DimensionBuilders.dp
@@ -91,6 +93,10 @@ internal fun horizontalSpacer(@Dimension(unit = DP) heightDp: Int): Spacer =
 /** Builds a vertical Spacer, with height set to expand and width set to the given value. */
 internal fun verticalSpacer(@Dimension(unit = DP) widthDp: Int): Spacer =
     Spacer.Builder().setWidth(widthDp.toDp()).setHeight(expand()).build()
+
+/** Builds a vertical Spacer, with height set to expand and width set to the given value. */
+internal fun verticalSpacer(width: DimensionBuilders.ExpandedDimensionProp): Spacer =
+    Spacer.Builder().setWidth(width).setHeight(expand()).build()
 
 /**
  * Returns [wrap] but with minimum dimension of [MINIMUM_TAP_TARGET_SIZE] for accessibility

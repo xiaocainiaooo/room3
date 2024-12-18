@@ -79,6 +79,15 @@ class CardTest {
     }
 
     @Test
+    fun graphicDataCard_size_default() {
+        LayoutElementAssertionsProvider(DEFAULT_GRAPHIC_DATA_CARD)
+            .onRoot()
+            .assert(hasWidth(expand()))
+            .assert(hasHeight(wrapWithMinTapTargetDimension()))
+            .assert(hasTag(CardDefaults.METADATA_TAG))
+    }
+
+    @Test
     fun containerCard_hasContentDescription() {
         LayoutElementAssertionsProvider(DEFAULT_CONTAINER_CARD_WITH_TEXT)
             .onRoot()
@@ -123,6 +132,13 @@ class CardTest {
     }
 
     @Test
+    fun graphicDataCard_hasTitle_asText() {
+        LayoutElementAssertionsProvider(DEFAULT_GRAPHIC_DATA_CARD)
+            .onElement(hasText(TEXT))
+            .assertExists()
+    }
+
+    @Test
     fun titleCard_hasContent_asText() {
         LayoutElementAssertionsProvider(DEFAULT_TITLE_CARD_WITH_TEXT)
             .onElement(hasText(TEXT2))
@@ -139,6 +155,13 @@ class CardTest {
     @Test
     fun dataCard_hasContent_asText() {
         LayoutElementAssertionsProvider(DEFAULT_COMPACT_DATA_CARD)
+            .onElement(hasText(TEXT2))
+            .assertExists()
+    }
+
+    @Test
+    fun graphicDataCard_hasContent_asText() {
+        LayoutElementAssertionsProvider(DEFAULT_GRAPHIC_DATA_CARD)
             .onElement(hasText(TEXT2))
             .assertExists()
     }
@@ -182,6 +205,13 @@ class CardTest {
     fun dataCard_hasSecondaryText() {
         LayoutElementAssertionsProvider(DEFAULT_DATA_CARD_WITH_SECONDARY_TEXT)
             .onElement(hasText(TEXT4))
+            .assertExists()
+    }
+
+    @Test
+    fun graphicDataCard_hasGraphic() {
+        LayoutElementAssertionsProvider(DEFAULT_GRAPHIC_DATA_CARD)
+            .onElement(hasText(TEXT_GRAPHIC))
             .assertExists()
     }
 
@@ -360,6 +390,41 @@ class CardTest {
         LayoutElementAssertionsProvider(card).onRoot().assert(hasTag(CardDefaults.METADATA_TAG))
     }
 
+    @Test
+    fun graphicDataCard_withSecondaryLabel_hasColors() {
+        val titleColor = Color.YELLOW
+        val contentColor = Color.MAGENTA
+        // TODO: b/368272767 - Update to CPI when available.
+        val graphicColor = Color.CYAN
+        val backgroundColor = Color.BLUE
+        val card =
+            materialScope(CONTEXT, DEVICE_CONFIGURATION) {
+                graphicDataCard(
+                    onClick = CLICKABLE,
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
+                    colors =
+                        CardColors(
+                            background = backgroundColor.argb,
+                            title = titleColor.argb,
+                            content = contentColor.argb,
+                        ),
+                    title = { text(TEXT.layoutString) },
+                    content = { text(TEXT2.layoutString) },
+                    graphic = { text(TEXT_GRAPHIC.layoutString, color = graphicColor.argb) }
+                )
+            }
+
+        LayoutElementAssertionsProvider(card).onRoot().assert(hasColor(backgroundColor))
+        LayoutElementAssertionsProvider(card).onElement(hasText(TEXT)).assert(hasColor(titleColor))
+        LayoutElementAssertionsProvider(card)
+            .onElement(hasText(TEXT2))
+            .assert(hasColor(contentColor))
+        LayoutElementAssertionsProvider(card)
+            .onElement(hasText(TEXT_GRAPHIC))
+            .assert(hasColor(graphicColor))
+        LayoutElementAssertionsProvider(card).onRoot().assert(hasTag(CardDefaults.METADATA_TAG))
+    }
+
     // TODO: b/381518061 - Add test for corner shape.
 
     @Test
@@ -403,6 +468,8 @@ class CardTest {
         private const val TEXT2 = "Description"
         private const val TEXT3 = "Now"
         private const val TEXT4 = "Label"
+        // TODO: b/368272767 - Update this to CPI
+        private const val TEXT_GRAPHIC = "Graphic"
         private const val AVATAR_ID = "id"
 
         private val DEFAULT_CONTAINER_CARD_WITH_TEXT =
@@ -468,6 +535,17 @@ class CardTest {
                     modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     title = { this.text(TEXT.layoutString) },
                     content = { this.text(TEXT2.layoutString) },
+                )
+            }
+
+        private val DEFAULT_GRAPHIC_DATA_CARD =
+            materialScope(CONTEXT, DEVICE_CONFIGURATION) {
+                graphicDataCard(
+                    onClick = CLICKABLE,
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
+                    title = { text(TEXT.layoutString) },
+                    content = { text(TEXT2.layoutString) },
+                    graphic = { text(TEXT_GRAPHIC.layoutString) }
                 )
             }
     }

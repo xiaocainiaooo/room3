@@ -22,6 +22,7 @@ import androidx.wear.protolayout.DimensionBuilders.weight
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER
+import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_END
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_START
 import androidx.wear.protolayout.LayoutElementBuilders.HorizontalAlignment
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
@@ -39,6 +40,8 @@ import androidx.wear.protolayout.material3.CardDefaults.filledCardColors
 import androidx.wear.protolayout.material3.DataCardDefaults.buildContentForDataCard
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.defaultCompactDataCardStyle
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.defaultDataCardStyle
+import androidx.wear.protolayout.material3.GraphicDataCardDefaults.buildContentForGraphicDataCard
+import androidx.wear.protolayout.material3.GraphicDataCardStyle.Companion.defaultGraphicDataCardStyle
 import androidx.wear.protolayout.material3.TitleCardDefaults.buildContentForTitleCard
 import androidx.wear.protolayout.material3.TitleCardStyle.Companion.defaultTitleCardStyle
 import androidx.wear.protolayout.modifiers.LayoutModifier
@@ -518,6 +521,101 @@ public fun MaterialScope.iconDataCard(
                 },
             style = style,
             titleContentPlacement = titleContentPlacement
+        )
+    }
+
+// TODO: b/368272767 - Link directly to progress indicator when available and mention icon in it.
+/**
+ * Opinionated ProtoLayout Material3 graphic data card that offers a slot for graphic data such as
+ * progress indicator and up to 2 vertically stacked slots, usually for textual description.
+ *
+ * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
+ *   associated action.
+ * @param title A slot for displaying the title of the card, expected to be one line of text. Uses
+ *   [CardColors.title] color by default.
+ * @param modifier Modifiers to set to this element. It's highly recommended to set a content
+ *   description using [contentDescription].
+ * @param content The optional body content of the card. Uses [CardColors.content] color by default.
+ * @param graphic A slot for displaying graphic data, such as progress indicator.
+ * @param height The width of this card. It's highly recommended to set this to [expand] for the
+ *   most optimal experience across different screen sizes.
+ * @param shape Defines the card's shape, in other words the corner radius for this card.
+ * @param colors The colors to be used for a background and inner content of this card. Specified
+ *   colors can be [CardDefaults.filledCardColors] for high emphasis card,
+ *   [CardDefaults.filledVariantCardColors] for high/medium emphasis card,
+ *   [CardDefaults.filledTonalCardColors] for low/medium emphasis card,
+ *   [CardDefaults.imageBackgroundCardColors] for card with image as a background or custom built
+ *   [CardColors].
+ * @param style The style which provides the attribute values required for constructing this data
+ *   card and its inner content. It also provides default style for the inner content, that can be
+ *   overridden by each content slot. It is highly recommended to use one of
+ *   [GraphicDataCardStyle.defaultGraphicDataCardStyle] or
+ *   [GraphicDataCardStyle.largeGraphicDataCardStyle].
+ * @param horizontalAlignment The horizontal placement of the [graphic] content. This can be either
+ *   [HORIZONTAL_ALIGN_START] (when [graphic] is on the start side), or [HORIZONTAL_ALIGN_END] (when
+ *   it is on the end side).
+ * @param contentPadding The inner padding used to prevent inner content from being too close to the
+ *   card's edge. It's highly recommended to keep the default.
+ * @sample androidx.wear.protolayout.material3.samples.graphicDataCardSample
+ */
+// TODO: b/346958146 - link Card visuals in DAC
+// TODO: b/373578620 - Add how corners affects margins in the layout.
+public fun MaterialScope.graphicDataCard(
+    onClick: Clickable,
+    // TODO: b/368272767 - Potentially add helper for CPI and icon and link in KDocs.
+    graphic: (MaterialScope.() -> LayoutElement),
+    title: (MaterialScope.() -> LayoutElement),
+    modifier: LayoutModifier = LayoutModifier,
+    content: (MaterialScope.() -> LayoutElement)? = null,
+    height: ContainerDimension = wrapWithMinTapTargetDimension(),
+    shape: Corner = shapes.full,
+    colors: CardColors = filledCardColors(),
+    style: GraphicDataCardStyle = defaultGraphicDataCardStyle(),
+    @HorizontalAlignment horizontalAlignment: Int = HORIZONTAL_ALIGN_START,
+    contentPadding: Padding = style.innerPadding,
+): LayoutElement =
+    card(
+        onClick = onClick,
+        modifier = modifier,
+        width = expand(),
+        height = height,
+        shape = shape,
+        backgroundColor = colors.background,
+        contentPadding = contentPadding
+    ) {
+        buildContentForGraphicDataCard(
+            title =
+                withStyle(
+                        defaultTextElementStyle =
+                            TextElementStyle(
+                                typography = style.titleTypography,
+                                color = colors.title
+                            )
+                    )
+                    .title(),
+            content =
+                content?.let {
+                    withStyle(
+                            defaultTextElementStyle =
+                                TextElementStyle(
+                                    typography = style.contentTypography,
+                                    color = colors.content
+                                )
+                        )
+                        .it()
+                },
+            // TODO: b/368272767 - Rethink if we need separate style for graphic.
+            graphic = graphic(),
+            style = style,
+            height = height,
+            // Only support start and end align.
+            horizontalAlignment =
+                if (
+                    horizontalAlignment != HORIZONTAL_ALIGN_START &&
+                        horizontalAlignment != HORIZONTAL_ALIGN_END
+                )
+                    HORIZONTAL_ALIGN_START
+                else horizontalAlignment
         )
     }
 
