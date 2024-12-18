@@ -83,7 +83,7 @@ internal constructor(
             }
 
             val runtimeFactory: RuntimeFactory =
-                ServiceLoader.load(RuntimeFactory::class.java).iterator().next()
+                ServiceLoader.load(RuntimeFactory::class.java).single()
             val runtime = runtimeFactory.createRuntime(activity)
             runtime.lifecycleManager.create()
 
