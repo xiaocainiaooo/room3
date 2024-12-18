@@ -19,6 +19,7 @@ package androidx.pdf.view
 import android.graphics.Point
 import android.graphics.PointF
 import android.graphics.RectF
+import android.view.MotionEvent
 import androidx.pdf.PdfDocument
 import androidx.pdf.content.PageSelection
 import androidx.pdf.content.PdfPageTextContent
@@ -57,11 +58,32 @@ class SelectionStateManagerTest {
                 }
         }
 
+    /** It's simpler to set the selection manually for tests concerning the draggable handles */
+    private val initialSelectionForDragging =
+        SelectionModel(
+            TextSelection(
+                "This is the text that's selected",
+                listOf(
+                    PdfRect(pageNum = 0, RectF(150F, 150F, 190F, 160F)),
+                    PdfRect(pageNum = 0, RectF(10F, 170F, 50F, 180F)),
+                )
+            ),
+            startBoundary =
+                UiSelectionBoundary(PdfPoint(pageNum = 0, PointF(150F, 160F)), isRtl = true),
+            endBoundary =
+                UiSelectionBoundary(PdfPoint(pageNum = 0, PointF(50F, 180F)), isRtl = true),
+        )
+
     private lateinit var selectionStateManager: SelectionStateManager
 
     @Before
     fun setup() {
-        selectionStateManager = SelectionStateManager(pdfDocument, testScope)
+        selectionStateManager =
+            SelectionStateManager(
+                pdfDocument,
+                testScope,
+                handleTouchTargetSizePx = HANDLE_TOUCH_TARGET_PX
+            )
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -169,6 +191,213 @@ class SelectionStateManagerTest {
         assertThat(selectionStateManager.selectionModel).isNull()
     }
 
+    @Test
+    fun maybeDragHandle_actionDownOutsideHandle_returnFalse() {
+        selectionStateManager.selectionModel = initialSelectionForDragging
+
+        assertThat(
+                selectionStateManager.maybeDragSelectionHandle(
+                    MotionEvent.ACTION_DOWN,
+                    PdfPoint(pageNum = 0, PointF(0F, 0F)),
+                    currentZoom = 2.0F
+                )
+            )
+            .isFalse()
+    }
+
+    @Test
+    fun maybeDragHandle_actionDownInsideStartHandle_returnTrue() {
+        selectionStateManager.selectionModel = initialSelectionForDragging
+        // Chose a point inside the start handle touch target (below and behind the start position)
+        val insideStartHandle =
+            PointF(initialSelectionForDragging.startBoundary.location.pagePoint).apply {
+                offset(-HANDLE_TOUCH_TARGET_PX / 4.0F, HANDLE_TOUCH_TARGET_PX / 4.0F)
+            }
+
+        // "Grab" the start handle and make sure we handle the event
+        assertThat(
+                selectionStateManager.maybeDragSelectionHandle(
+                    MotionEvent.ACTION_DOWN,
+                    PdfPoint(pageNum = 0, insideStartHandle),
+                    currentZoom = 2.0F
+                )
+            )
+            .isTrue()
+    }
+
+    @Test
+    fun maybeDragHandle_actionDownInsideEndHandle_returnTrue() {
+        selectionStateManager.selectionModel = initialSelectionForDragging
+        // Chose a point inside the end handle touch target (below and ahead the end position)
+        val insideEndHandle =
+            PointF(initialSelectionForDragging.endBoundary.location.pagePoint).apply {
+                offset(HANDLE_TOUCH_TARGET_PX / 4.0F, HANDLE_TOUCH_TARGET_PX / 4.0F)
+            }
+
+        // "Grab" the end handle and make sure we handle the event
+        assertThat(
+                selectionStateManager.maybeDragSelectionHandle(
+                    MotionEvent.ACTION_DOWN,
+                    PdfPoint(pageNum = 0, insideEndHandle),
+                    currentZoom = 2.0F
+                )
+            )
+            .isTrue()
+    }
+
+    @Test
+    fun maybeDragHandle_actionMove_updateSelection() {
+        selectionStateManager.selectionModel = initialSelectionForDragging
+        // "Grab" the start handle
+        val insideStartHandle =
+            PointF(initialSelectionForDragging.startBoundary.location.pagePoint).apply {
+                offset(-HANDLE_TOUCH_TARGET_PX / 4.0F, HANDLE_TOUCH_TARGET_PX / 4.0F)
+            }
+        assertThat(
+                selectionStateManager.maybeDragSelectionHandle(
+                    MotionEvent.ACTION_DOWN,
+                    PdfPoint(pageNum = 0, insideStartHandle),
+                    currentZoom = 2.0F
+                )
+            )
+            .isTrue()
+
+        // Drag the start handle by 5px in both x and y
+        val newStartPosition =
+            PointF(insideStartHandle).apply { offset(/* dx= */ 5F, /* dy= */ 5F) }
+        assertThat(
+                selectionStateManager.maybeDragSelectionHandle(
+                    MotionEvent.ACTION_MOVE,
+                    PdfPoint(pageNum = 0, newStartPosition),
+                    currentZoom = 2.0F
+                )
+            )
+            .isTrue()
+
+        // Make sure the selection is updated appropriately
+        testDispatcher.scheduler.runCurrent()
+        val selection = selectionStateManager.selectionModel?.selection
+        assertThat(selection).isInstanceOf(TextSelection::class.java)
+        val expectedStartLoc = initialSelectionForDragging.endBoundary.location.pagePoint
+        val expectedEndLoc =
+            PointF(initialSelectionForDragging.startBoundary.location.pagePoint).apply {
+                offset(/* dx= */ 5F, /* dy= */ 5F)
+            }
+        assertThat((selection as TextSelection).text)
+            .isEqualTo("This is all the text between $expectedStartLoc and $expectedEndLoc")
+    }
+
+    @Test
+    fun maybeDragHandle_actionMoveOutsidePage_returnTrue() {
+        selectionStateManager.selectionModel = initialSelectionForDragging
+        // "Grab" the start handle
+        val insideStartHandle =
+            PointF(initialSelectionForDragging.startBoundary.location.pagePoint).apply {
+                offset(-HANDLE_TOUCH_TARGET_PX / 4.0F, HANDLE_TOUCH_TARGET_PX / 4.0F)
+            }
+        assertThat(
+                selectionStateManager.maybeDragSelectionHandle(
+                    MotionEvent.ACTION_DOWN,
+                    PdfPoint(pageNum = 0, insideStartHandle),
+                    currentZoom = 2.0F
+                )
+            )
+            .isTrue()
+
+        // Drag the handle to a location outside any page (location = null), and make sure we still
+        // "capture" the event
+        assertThat(
+                selectionStateManager.maybeDragSelectionHandle(
+                    MotionEvent.ACTION_MOVE,
+                    location = null,
+                    currentZoom = 2.0F
+                )
+            )
+            .isTrue()
+    }
+
+    @Test
+    fun maybeDragHandle_actionMoveWithoutActionDown_returnFalse() {
+        selectionStateManager.selectionModel = initialSelectionForDragging
+        // Chose a point inside the start handle touch target (below and behind the start position)
+        val insideStartHandle =
+            PointF(initialSelectionForDragging.startBoundary.location.pagePoint).apply {
+                offset(-HANDLE_TOUCH_TARGET_PX / 4.0F, HANDLE_TOUCH_TARGET_PX / 4.0F)
+            }
+
+        // Make sure we don't handle an ACTION_MOVE without an initial ACTION_DOWN, even when the
+        // move event occurs within one of the drag handles
+        assertThat(
+                selectionStateManager.maybeDragSelectionHandle(
+                    MotionEvent.ACTION_MOVE,
+                    PdfPoint(pageNum = 0, insideStartHandle),
+                    currentZoom = 2.0F
+                )
+            )
+            .isFalse()
+    }
+
+    @Test
+    fun maybeDragHandle_actionUpWithoutActionDown_returnFalse() {
+        selectionStateManager.selectionModel = initialSelectionForDragging
+        // Chose a point inside the start handle touch target (below and behind the start position)
+        val insideStartHandle =
+            PointF(initialSelectionForDragging.startBoundary.location.pagePoint).apply {
+                offset(-HANDLE_TOUCH_TARGET_PX / 4.0F, HANDLE_TOUCH_TARGET_PX / 4.0F)
+            }
+
+        // Make sure we don't handle an ACTION_UP without an initial ACTION_DOWN, even when the
+        // up event occurs within one of the drag handles
+        assertThat(
+                selectionStateManager.maybeDragSelectionHandle(
+                    MotionEvent.ACTION_UP,
+                    PdfPoint(pageNum = 0, insideStartHandle),
+                    currentZoom = 2.0F
+                )
+            )
+            .isFalse()
+    }
+
+    @Test
+    fun maybeDragHandle_actionUp_returnTrueAndStopHandlingEvents() {
+        selectionStateManager.selectionModel = initialSelectionForDragging
+        // Chose a point inside the start handle touch target (below and behind the start position)
+        val insideStartHandle =
+            PointF(initialSelectionForDragging.startBoundary.location.pagePoint).apply {
+                offset(-HANDLE_TOUCH_TARGET_PX / 4.0F, HANDLE_TOUCH_TARGET_PX / 4.0F)
+            }
+
+        // "Grab" the start handle
+        assertThat(
+                selectionStateManager.maybeDragSelectionHandle(
+                    MotionEvent.ACTION_DOWN,
+                    PdfPoint(pageNum = 0, insideStartHandle),
+                    currentZoom = 2.0F
+                )
+            )
+            .isTrue()
+
+        // "Release" the start handle, and make sure we handle the event
+        assertThat(
+                selectionStateManager.maybeDragSelectionHandle(
+                    MotionEvent.ACTION_UP,
+                    PdfPoint(pageNum = 0, insideStartHandle),
+                    currentZoom = 2.0F
+                )
+            )
+            .isTrue()
+
+        // Make sure we don't handle an ACTION_MOVE after releasing the gesture
+        assertThat(
+                selectionStateManager.maybeDragSelectionHandle(
+                    MotionEvent.ACTION_MOVE,
+                    PdfPoint(pageNum = 0, insideStartHandle),
+                    currentZoom = 2.0F
+                )
+            )
+            .isFalse()
+    }
+
     private fun pageSelectionFor(page: Int, start: PointF, end: PointF): PageSelection {
         return PageSelection(
             page,
@@ -190,3 +419,5 @@ class SelectionStateManagerTest {
         )
     }
 }
+
+private const val HANDLE_TOUCH_TARGET_PX = 48

@@ -37,6 +37,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
 import androidx.pdf.PdfDocument
+import androidx.pdf.R
 import androidx.pdf.util.Accessibility
 import androidx.pdf.util.MathUtils
 import androidx.pdf.util.Screen
@@ -348,8 +349,20 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        val handled = event?.let { gestureTracker.feed(it) } ?: false
+        var handled = maybeDragSelectionHandle(event)
+        handled = handled || event?.let { gestureTracker.feed(it) } ?: false
         return handled || super.onTouchEvent(event)
+    }
+
+    private fun maybeDragSelectionHandle(event: MotionEvent?): Boolean {
+        if (event == null) return false
+        val touchPoint =
+            pageLayoutManager?.getPdfPointAt(
+                PointF(toContentX(event.x), toContentY(event.y)),
+                getVisibleAreaInContentCoords()
+            )
+        return selectionStateManager?.maybeDragSelectionHandle(event.action, touchPoint, zoom) ==
+            true
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -630,6 +643,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             SelectionStateManager(
                 localPdfDocument,
                 backgroundScope,
+                resources.getDimensionPixelSize(R.dimen.text_select_handle_touch_size)
             )
         // We'll either create our layout manager from restored state, or instantiate a new one
         if (!maybeRestoreState()) {
@@ -936,7 +950,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
-
             val currentZoom = zoom
 
             val newZoom =
