@@ -202,7 +202,8 @@ import androidx.compose.material3.samples.SimpleTopAppBarWithSubtitle
 import androidx.compose.material3.samples.SingleSelectConnectedButtonGroupSample
 import androidx.compose.material3.samples.SliderSample
 import androidx.compose.material3.samples.SliderWithCustomThumbSample
-import androidx.compose.material3.samples.SliderWithCustomTrackAndThumb
+import androidx.compose.material3.samples.SliderWithCustomTrackAndThumbSample
+import androidx.compose.material3.samples.SliderWithTrackIconsSample
 import androidx.compose.material3.samples.SmallAnimatedExtendedFloatingActionButtonSample
 import androidx.compose.material3.samples.SmallButtonSample
 import androidx.compose.material3.samples.SmallExtendedFloatingActionButtonSample
@@ -242,6 +243,7 @@ import androidx.compose.material3.samples.TonalToggleButtonSample
 import androidx.compose.material3.samples.TriStateCheckboxSample
 import androidx.compose.material3.samples.TwoLineListItem
 import androidx.compose.material3.samples.VerticalFloatingToolbarWithFabSample
+import androidx.compose.material3.samples.VerticalSliderSample
 import androidx.compose.material3.samples.WideNavigationRailArrangementsSample
 import androidx.compose.material3.samples.WideNavigationRailCollapsedSample
 import androidx.compose.material3.samples.WideNavigationRailExpandedSample
@@ -1677,11 +1679,25 @@ val SlidersExamples =
             SliderWithCustomThumbSample()
         },
         Example(
-            name = "SliderWithCustomTrackAndThumb",
+            name = "SliderWithCustomTrackAndThumbSample",
             description = SlidersExampleDescription,
             sourceUrl = SlidersExampleSourceUrl
         ) {
-            SliderWithCustomTrackAndThumb()
+            SliderWithCustomTrackAndThumbSample()
+        },
+        Example(
+            name = "SliderWithTrackIconsSample",
+            description = SlidersExampleDescription,
+            sourceUrl = SlidersExampleSourceUrl
+        ) {
+            SliderWithTrackIconsSample()
+        },
+        Example(
+            name = "VerticalSliderSample",
+            description = SlidersExampleDescription,
+            sourceUrl = SlidersExampleSourceUrl
+        ) {
+            VerticalSliderSample()
         },
         Example(
             name = "RangeSliderSample",
