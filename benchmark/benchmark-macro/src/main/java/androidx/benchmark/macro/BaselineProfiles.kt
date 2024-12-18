@@ -81,7 +81,9 @@ fun collect(
                 } else {
                     // Don't reset for subsequent iterations
                     Log.d(TAG, "Killing package $packageName")
-                    scope.killProcess()
+                    // Always flush ART profiles before kill for subsequent iterations
+                    // so profiles are not dropped.
+                    scope.killProcessAndFlushArtProfiles()
                     mode.compileImpl(scope) {
                         scope.iteration = iteration
                         Log.d(TAG, "Compile iteration (${scope.iteration}) for $packageName")
