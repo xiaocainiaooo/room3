@@ -53,6 +53,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 @ExperimentalAppActions
@@ -120,40 +121,36 @@ class CallingMainActivity : Activity() {
 
         val addOutgoingCallButton = findViewById<Button>(R.id.addOutgoingCall)
         addOutgoingCallButton.setOnClickListener {
-            mScope.launch {
-                addCallWithAttributes(
-                    CallAttributesCompat(
-                        OUTGOING_NAME,
-                        OUTGOING_URI,
-                        DIRECTION_OUTGOING,
-                        CALL_TYPE_VIDEO_CALL,
-                        ALL_CALL_CAPABILITIES,
-                        mPreCallEndpointAdapter.mSelectedCallEndpoint
-                    ),
-                    participantCheckBox.isChecked,
-                    raiseHandCheckBox.isChecked,
-                    kickParticipantCheckBox.isChecked
-                )
-            }
+            addCallWithAttributes(
+                CallAttributesCompat(
+                    OUTGOING_NAME,
+                    OUTGOING_URI,
+                    DIRECTION_OUTGOING,
+                    CALL_TYPE_VIDEO_CALL,
+                    ALL_CALL_CAPABILITIES,
+                    mPreCallEndpointAdapter.mSelectedCallEndpoint
+                ),
+                participantCheckBox.isChecked,
+                raiseHandCheckBox.isChecked,
+                kickParticipantCheckBox.isChecked
+            )
         }
 
         val addIncomingCallButton = findViewById<Button>(R.id.addIncomingCall)
         addIncomingCallButton.setOnClickListener {
-            mScope.launch {
-                addCallWithAttributes(
-                    CallAttributesCompat(
-                        INCOMING_NAME,
-                        INCOMING_URI,
-                        DIRECTION_INCOMING,
-                        CALL_TYPE_VIDEO_CALL,
-                        ALL_CALL_CAPABILITIES,
-                        mPreCallEndpointAdapter.mSelectedCallEndpoint
-                    ),
-                    participantCheckBox.isChecked,
-                    raiseHandCheckBox.isChecked,
-                    kickParticipantCheckBox.isChecked
-                )
-            }
+            addCallWithAttributes(
+                CallAttributesCompat(
+                    INCOMING_NAME,
+                    INCOMING_URI,
+                    DIRECTION_INCOMING,
+                    CALL_TYPE_VIDEO_CALL,
+                    ALL_CALL_CAPABILITIES,
+                    mPreCallEndpointAdapter.mSelectedCallEndpoint
+                ),
+                participantCheckBox.isChecked,
+                raiseHandCheckBox.isChecked,
+                kickParticipantCheckBox.isChecked
+            )
         }
 
         // setup the adapters which hold the endpoint and call rows
@@ -220,7 +217,7 @@ class CallingMainActivity : Activity() {
         mCallsManager.registerAppWithTelecom(capabilities)
     }
 
-    private suspend fun addCallWithAttributes(
+    private fun addCallWithAttributes(
         attributes: CallAttributesCompat,
         isParticipantsEnabled: Boolean,
         isRaiseHandEnabled: Boolean,
@@ -233,26 +230,30 @@ class CallingMainActivity : Activity() {
         try {
             val handler = CoroutineExceptionHandler { _, exception ->
                 Log.i(TAG, "CoroutineExceptionHandler: handling e=$exception")
+                NotificationsUtilities.clearNotification(mContext, callObject.mNotificationId)
             }
-            CoroutineScope(Dispatchers.Default).launch(handler) {
-                try {
-                    if (isParticipantsEnabled) {
-                        addCallWithExtensions(
-                            attributes,
-                            callObject,
-                            isRaiseHandEnabled,
-                            isKickParticipantEnabled
+            val job =
+                mScope.launch(handler) {
+                    try {
+                        if (isParticipantsEnabled) {
+                            addCallWithExtensions(
+                                attributes,
+                                callObject,
+                                isRaiseHandEnabled,
+                                isKickParticipantEnabled
+                            )
+                        } else {
+                            addCall(attributes, callObject)
+                        }
+                    } finally {
+                        NotificationsUtilities.clearNotification(
+                            mContext,
+                            callObject.mNotificationId
                         )
-                    } else {
-                        addCall(attributes, callObject)
+                        Log.i(TAG, "addCallWithAttributes: finally block")
                     }
-                } catch (e: Exception) {
-                    logException(e, "addCallWithAttributes: catch inner")
-                    NotificationsUtilities.clearNotification(mContext, callObject.mNotificationId)
-                } finally {
-                    Log.i(TAG, "addCallWithAttributes: finally block")
                 }
-            }
+            callObject.setJob(job)
         } catch (e: Exception) {
             logException(e, "addCallWithAttributes: catch outer")
             NotificationsUtilities.clearNotification(mContext, callObject.mNotificationId)
@@ -270,6 +271,13 @@ class CallingMainActivity : Activity() {
             postNotification(attributes, callObject)
             mPreCallEndpointAdapter.mSelectedCallEndpoint = null
             // inject client control interface into the VoIP call object
+            callObject.onCallStateChanged(
+                when (attributes.direction) {
+                    DIRECTION_OUTGOING -> "Outgoing"
+                    DIRECTION_INCOMING -> "Incoming"
+                    else -> "?"
+                }
+            )
             callObject.setCallId(getCallId().toString())
             callObject.setCallControl(this)
 
@@ -356,6 +364,13 @@ class CallingMainActivity : Activity() {
                 postNotification(attributes, callObject)
                 mPreCallEndpointAdapter.mSelectedCallEndpoint = null
                 // inject client control interface into the VoIP call object
+                callObject.onCallStateChanged(
+                    when (attributes.direction) {
+                        DIRECTION_OUTGOING -> "Outgoing"
+                        DIRECTION_INCOMING -> "Incoming"
+                        else -> "?"
+                    }
+                )
                 callObject.setCallId(getCallId().toString())
                 callObject.setCallControl(this)
                 callObject.setParticipantControl(
@@ -394,7 +409,7 @@ class CallingMainActivity : Activity() {
                     .launchIn(this)
 
                 launch {
-                    while (true) {
+                    while (isActive) {
                         delay(1000)
                         participants.changeParticipantStates()
                     }
