@@ -199,6 +199,7 @@ protected constructor(
          * the equivalent Kotlin and Java type names are represented, [IntArray] and `int[]`
          * respectively.
          */
+        @JvmStatic
         fun getArrayName(componentTypeName: XTypeName): XTypeName {
             componentTypeName.java.let {
                 require(it !is JWildcardTypeName || it.lowerBounds.isEmpty()) {
@@ -243,6 +244,7 @@ protected constructor(
          *
          * In Java: `? super <bound>` In Kotlin `in <bound>
          */
+        @JvmStatic
         fun getConsumerSuperName(bound: XTypeName): XTypeName {
             return XTypeName(
                 java = JWildcardTypeName.supertypeOf(bound.java),
@@ -260,6 +262,7 @@ protected constructor(
          *
          * In Java: `? extends <bound>` In Kotlin `out <bound>
          */
+        @JvmStatic
         fun getProducerExtendsName(bound: XTypeName): XTypeName {
             return XTypeName(
                 java = JWildcardTypeName.subtypeOf(bound.java),

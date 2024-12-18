@@ -50,6 +50,7 @@ internal constructor(
     //  But a decision has to be made...
     val packageName: String = java.packageName()
     val simpleNames: List<String> = java.simpleNames()
+    val simpleName = simpleNames.last()
     val canonicalName: String = java.canonicalName()
     val reflectionName: String = java.reflectionName()
 
@@ -79,6 +80,20 @@ internal constructor(
         XClassName(
             java = java.nestedClass(name),
             kotlin = kotlin.nestedClass(name),
+            nullability = XNullability.NONNULL
+        )
+
+    fun peerClass(name: String) =
+        XClassName(
+            java = java.peerClass(name),
+            kotlin = kotlin.peerClass(name),
+            nullability = XNullability.NONNULL
+        )
+
+    fun topLevelClass() =
+        XClassName(
+            java = java.topLevelClassName(),
+            kotlin = kotlin.topLevelClassName(),
             nullability = XNullability.NONNULL
         )
 
