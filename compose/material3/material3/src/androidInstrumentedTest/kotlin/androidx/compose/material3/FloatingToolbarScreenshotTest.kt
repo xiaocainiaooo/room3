@@ -138,6 +138,30 @@ class FloatingToolbarScreenshotTest(private val scheme: ColorSchemeWrapper) {
     }
 
     @Test
+    fun horizontalFloatingToolbar_leading_trailing_vibrant() {
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(Modifier.testTag(FloatingToolbarTestTag)) {
+                HorizontalFloatingToolbar(
+                    expanded = true,
+                    colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(),
+                    leadingContent = { Text("leading") },
+                    trailingContent = { Text("trailing") }
+                ) {
+                    ToolbarContent()
+                }
+            }
+        }
+
+        rule
+            .onNodeWithTag(FloatingToolbarTestTag)
+            .captureToImage()
+            .assertAgainstGolden(
+                screenshotRule,
+                "horizontalFloatingToolbar_leading_trailing_vibrant_${scheme.name}"
+            )
+    }
+
+    @Test
     fun horizontalFloatingToolbar_leading_trailing_collapsed() {
         rule.setMaterialContent(scheme.colorScheme) {
             Box(Modifier.testTag(FloatingToolbarTestTag)) {
@@ -157,6 +181,30 @@ class FloatingToolbarScreenshotTest(private val scheme: ColorSchemeWrapper) {
             .assertAgainstGolden(
                 screenshotRule,
                 "horizontalFloatingToolbar_leading_trailing_collapsed_${scheme.name}"
+            )
+    }
+
+    @Test
+    fun horizontalFloatingToolbar_leading_trailing_collapsed_vibrant() {
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(Modifier.testTag(FloatingToolbarTestTag)) {
+                HorizontalFloatingToolbar(
+                    expanded = false,
+                    colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(),
+                    leadingContent = { Text("leading") },
+                    trailingContent = { Text("trailing") }
+                ) {
+                    ToolbarContent()
+                }
+            }
+        }
+
+        rule
+            .onNodeWithTag(FloatingToolbarTestTag)
+            .captureToImage()
+            .assertAgainstGolden(
+                screenshotRule,
+                "horizontalFloatingToolbar_leading_trailing_collapsed_vibrant_${scheme.name}"
             )
     }
 
@@ -247,6 +295,30 @@ class FloatingToolbarScreenshotTest(private val scheme: ColorSchemeWrapper) {
     }
 
     @Test
+    fun verticalFloatingToolbar_leading_trailing_vibrant() {
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(Modifier.testTag(FloatingToolbarTestTag)) {
+                VerticalFloatingToolbar(
+                    expanded = true,
+                    colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(),
+                    leadingContent = { Text(text = "leading") },
+                    trailingContent = { Text(text = "trailing") }
+                ) {
+                    ToolbarContent()
+                }
+            }
+        }
+
+        rule
+            .onNodeWithTag(FloatingToolbarTestTag)
+            .captureToImage()
+            .assertAgainstGolden(
+                screenshotRule,
+                "verticalFloatingToolbar_leading_trailing_vibrant_${scheme.name}"
+            )
+    }
+
+    @Test
     fun verticalFloatingToolbar_leading_trailing_collapsed() {
         rule.setMaterialContent(scheme.colorScheme) {
             Box(Modifier.testTag(FloatingToolbarTestTag)) {
@@ -270,7 +342,31 @@ class FloatingToolbarScreenshotTest(private val scheme: ColorSchemeWrapper) {
     }
 
     @Test
-    fun horizontalFloatingToolbar_expanded() {
+    fun verticalFloatingToolbar_leading_trailing_collapsed_vibrant() {
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(Modifier.testTag(FloatingToolbarTestTag)) {
+                VerticalFloatingToolbar(
+                    expanded = false,
+                    colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(),
+                    leadingContent = { Text(text = "leading") },
+                    trailingContent = { Text(text = "trailing") }
+                ) {
+                    ToolbarContent()
+                }
+            }
+        }
+
+        rule
+            .onNodeWithTag(FloatingToolbarTestTag)
+            .captureToImage()
+            .assertAgainstGolden(
+                screenshotRule,
+                "verticalFloatingToolbar_leading_trailing_collapsed_vibrant_${scheme.name}"
+            )
+    }
+
+    @Test
+    fun horizontalFloatingToolbar_withFab_expanded() {
         rule.setMaterialContent(scheme.colorScheme) {
             Box(Modifier.testTag(FloatingToolbarTestTag)) {
                 HorizontalFloatingToolbar(
@@ -287,12 +383,12 @@ class FloatingToolbarScreenshotTest(private val scheme: ColorSchemeWrapper) {
             .captureToImage()
             .assertAgainstGolden(
                 screenshotRule,
-                "horizontalFloatingToolbar_expanded_${scheme.name}"
+                "horizontalFloatingToolbar_withFab_expanded_${scheme.name}"
             )
     }
 
     @Test
-    fun horizontalFloatingToolbar_expanded_vibrant() {
+    fun horizontalFloatingToolbar_withFab_expanded_vibrant() {
         rule.setMaterialContent(scheme.colorScheme) {
             val colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
             Box(Modifier.testTag(FloatingToolbarTestTag)) {
@@ -311,12 +407,12 @@ class FloatingToolbarScreenshotTest(private val scheme: ColorSchemeWrapper) {
             .captureToImage()
             .assertAgainstGolden(
                 screenshotRule,
-                "horizontalFloatingToolbar_expanded_vibrant_${scheme.name}"
+                "horizontalFloatingToolbar_withFab_expanded_vibrant_${scheme.name}"
             )
     }
 
     @Test
-    fun horizontalFloatingToolbar_collapsed() {
+    fun horizontalFloatingToolbar_withFab_collapsed() {
         rule.setMaterialContent(scheme.colorScheme) {
             Box(Modifier.testTag(FloatingToolbarTestTag)) {
                 HorizontalFloatingToolbar(
@@ -333,12 +429,12 @@ class FloatingToolbarScreenshotTest(private val scheme: ColorSchemeWrapper) {
             .captureToImage()
             .assertAgainstGolden(
                 screenshotRule,
-                "horizontalFloatingToolbar_collapsed_${scheme.name}"
+                "horizontalFloatingToolbar_withFab_collapsed_${scheme.name}"
             )
     }
 
     @Test
-    fun verticalFloatingToolbar_expanded() {
+    fun verticalFloatingToolbar_withFab_expanded() {
         rule.setMaterialContent(scheme.colorScheme) {
             Box(Modifier.testTag(FloatingToolbarTestTag)) {
                 VerticalFloatingToolbar(
@@ -353,11 +449,14 @@ class FloatingToolbarScreenshotTest(private val scheme: ColorSchemeWrapper) {
         rule
             .onNodeWithTag(FloatingToolbarTestTag)
             .captureToImage()
-            .assertAgainstGolden(screenshotRule, "verticalFloatingToolbar_expanded_${scheme.name}")
+            .assertAgainstGolden(
+                screenshotRule,
+                "verticalFloatingToolbar_withFab_expanded_${scheme.name}"
+            )
     }
 
     @Test
-    fun verticalFloatingToolbar_expanded_vibrant() {
+    fun verticalFloatingToolbar_withFab_expanded_vibrant() {
         rule.setMaterialContent(scheme.colorScheme) {
             val colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
             Box(Modifier.testTag(FloatingToolbarTestTag)) {
@@ -376,12 +475,12 @@ class FloatingToolbarScreenshotTest(private val scheme: ColorSchemeWrapper) {
             .captureToImage()
             .assertAgainstGolden(
                 screenshotRule,
-                "verticalFloatingToolbar_expanded_vibrant_${scheme.name}"
+                "verticalFloatingToolbar_withFab_expanded_vibrant_${scheme.name}"
             )
     }
 
     @Test
-    fun verticalFloatingToolbar_collapsed() {
+    fun verticalFloatingToolbar_withFab_collapsed() {
         rule.setMaterialContent(scheme.colorScheme) {
             Box(Modifier.testTag(FloatingToolbarTestTag)) {
                 VerticalFloatingToolbar(
@@ -396,7 +495,10 @@ class FloatingToolbarScreenshotTest(private val scheme: ColorSchemeWrapper) {
         rule
             .onNodeWithTag(FloatingToolbarTestTag)
             .captureToImage()
-            .assertAgainstGolden(screenshotRule, "verticalFloatingToolbar_collapsed_${scheme.name}")
+            .assertAgainstGolden(
+                screenshotRule,
+                "verticalFloatingToolbar_withFab_collapsed_${scheme.name}"
+            )
     }
 
     @Composable

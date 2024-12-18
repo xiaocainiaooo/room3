@@ -65,6 +65,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -86,8 +87,8 @@ class FloatingToolbarTest {
     @Test
     fun horizontalFloatingToolbar_scrolledPositioning() {
         lateinit var scrollBehavior: FloatingToolbarScrollBehavior
+        lateinit var colors: FloatingToolbarColors
         var backgroundColor = Color.Unspecified
-        var containerColor = Color.Unspecified
         val scrollHeightOffsetDp = 20.dp
         var scrollHeightOffsetPx = 0f
         var containerSizePx = 0f
@@ -96,7 +97,7 @@ class FloatingToolbarTest {
 
         rule.setMaterialContent(lightColorScheme()) {
             backgroundColor = MaterialTheme.colorScheme.background
-            containerColor = FloatingToolbarDefaults.ContainerColor
+            colors = FloatingToolbarDefaults.standardFloatingToolbarColors()
             scrollBehavior =
                 FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
             scrollHeightOffsetPx = with(LocalDensity.current) { scrollHeightOffsetDp.toPx() }
@@ -128,7 +129,7 @@ class FloatingToolbarTest {
             when (pos.y) {
                 0 -> backgroundColor
                 scrolled - 2 -> backgroundColor
-                scrolled -> containerColor
+                scrolled -> colors.toolbarContainerColor
                 else -> null
             }
         }
@@ -137,8 +138,8 @@ class FloatingToolbarTest {
     @Test
     fun verticalFloatingToolbar_scrolledPositioning() {
         lateinit var scrollBehavior: FloatingToolbarScrollBehavior
+        lateinit var colors: FloatingToolbarColors
         var backgroundColor = Color.Unspecified
-        var containerColor = Color.Unspecified
         val scrollHeightOffsetDp = 20.dp
         var scrollHeightOffsetPx = 0f
         var containerSizePx = 0f
@@ -146,8 +147,8 @@ class FloatingToolbarTest {
         var screenOffsetPx = 0f
 
         rule.setMaterialContent(lightColorScheme()) {
+            colors = FloatingToolbarDefaults.standardFloatingToolbarColors()
             backgroundColor = MaterialTheme.colorScheme.background
-            containerColor = FloatingToolbarDefaults.ContainerColor
             scrollBehavior = FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = End)
             scrollHeightOffsetPx = with(LocalDensity.current) { scrollHeightOffsetDp.toPx() }
             containerSizePx =
@@ -178,7 +179,7 @@ class FloatingToolbarTest {
             when (pos.x) {
                 0 -> backgroundColor
                 scrolled - 2 -> backgroundColor
-                scrolled -> containerColor
+                scrolled -> colors.toolbarContainerColor
                 else -> null
             }
         }
@@ -192,7 +193,10 @@ class FloatingToolbarTest {
                 HorizontalFloatingToolbar(
                     modifier = Modifier.testTag(FloatingToolbarTestTag),
                     expanded = false,
-                    containerColor = Color.Transparent,
+                    colors =
+                        FloatingToolbarDefaults.standardFloatingToolbarColors(
+                            toolbarContainerColor = Color.Transparent
+                        ),
                     content = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(Icons.Filled.Check, contentDescription = "Localized description")
@@ -216,7 +220,10 @@ class FloatingToolbarTest {
                 VerticalFloatingToolbar(
                     modifier = Modifier.testTag(FloatingToolbarTestTag),
                     expanded = false,
-                    containerColor = Color.Transparent,
+                    colors =
+                        FloatingToolbarDefaults.standardFloatingToolbarColors(
+                            toolbarContainerColor = Color.Transparent
+                        ),
                     content = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(Icons.Filled.Check, contentDescription = "Localized description")
@@ -572,8 +579,7 @@ class FloatingToolbarTest {
 
         val componentWidth =
             FloatingToolbarDefaults.FabSizeRange.endInclusive +
-                /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
-                FloatingToolbarDefaults.ToolbarToFabGap
+                /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4
         // The total size of the component still the total size of all the elements.
         rule.onNodeWithTag(FloatingToolbarTestTag).assertWidthIsEqualTo(componentWidth)
 
@@ -626,7 +632,8 @@ class FloatingToolbarTest {
         }
 
         val componentWidth =
-            FloatingToolbarDefaults.ContentPaddingWithFloatingActionButton * 2 +
+            FloatingToolbarDefaults.ContentPadding.calculateLeftPadding(LayoutDirection.Ltr) +
+                FloatingToolbarDefaults.ContentPadding.calculateRightPadding(LayoutDirection.Ltr) +
                 FloatingToolbarDefaults.FabSizeRange.start +
                 /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
                 FloatingToolbarDefaults.ToolbarToFabGap
@@ -678,8 +685,7 @@ class FloatingToolbarTest {
 
         val componentHeight =
             FloatingToolbarDefaults.FabSizeRange.endInclusive +
-                /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
-                FloatingToolbarDefaults.ToolbarToFabGap
+                /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4
         // The total size of the component still the total size of all the elements.
         rule.onNodeWithTag(FloatingToolbarTestTag).assertHeightIsEqualTo(componentHeight)
 
@@ -732,7 +738,8 @@ class FloatingToolbarTest {
         }
 
         val componentHeight =
-            FloatingToolbarDefaults.ContentPaddingWithFloatingActionButton * 2 +
+            FloatingToolbarDefaults.ContentPadding.calculateTopPadding() +
+                FloatingToolbarDefaults.ContentPadding.calculateBottomPadding() +
                 FloatingToolbarDefaults.FabSizeRange.start +
                 /* 4 IconButtons at the ToolbarContent */ MinTouchTarget * 4 +
                 FloatingToolbarDefaults.ToolbarToFabGap
