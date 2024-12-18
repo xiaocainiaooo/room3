@@ -131,9 +131,6 @@ const val XCODEGEN_DOWNLOAD_URI = "androidx.benchmark.darwin.xcodeGenDownloadUri
 /** If true, don't restrict usage of compileSdk property. */
 const val ALLOW_CUSTOM_COMPILE_SDK = "androidx.allowCustomCompileSdk"
 
-/** If true, include Jetpack library projects that live outside of `frameworks/support`. */
-const val INCLUDE_OPTIONAL_PROJECTS = "androidx.includeOptionalProjects"
-
 /** If true, yarn dependencies are fetched from an offline mirror */
 const val YARN_OFFLINE_MODE = "androidx.yarnOfflineMode"
 
@@ -173,7 +170,6 @@ val ALL_ANDROIDX_PROPERTIES =
         ALLOW_CUSTOM_COMPILE_SDK,
         FilteredAnchorTask.PROP_TASK_NAME,
         FilteredAnchorTask.PROP_PATH_PREFIX,
-        INCLUDE_OPTIONAL_PROJECTS,
         YARN_OFFLINE_MODE,
         FORCE_KOTLIN_2_0_TARGET,
         FORCE_BENCHMARK_AOT_COMPILATION,

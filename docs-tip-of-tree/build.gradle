@@ -3,15 +3,6 @@ plugins {
     id("AndroidXDocsPlugin")
 }
 
-def docsForOptionalProject(path) {
-    Project project = findProject(path)
-    if (project != null) {
-        dependencies {
-            docs(project)
-        }
-    }
-}
-
 android {
     namespace = "androidx.docs.tipoftree"
 }
