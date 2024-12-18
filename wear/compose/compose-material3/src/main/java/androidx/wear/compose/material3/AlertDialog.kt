@@ -51,7 +51,6 @@ import androidx.wear.compose.material3.PaddingDefaults.horizontalContentPadding
 import androidx.wear.compose.material3.PaddingDefaults.verticalContentPadding
 import androidx.wear.compose.material3.internal.Strings
 import androidx.wear.compose.material3.internal.getString
-import androidx.wear.compose.materialcore.isSmallScreen
 import androidx.wear.compose.materialcore.screenHeightDp
 import androidx.wear.compose.materialcore.screenWidthDp
 
@@ -450,8 +449,8 @@ object AlertDialogDefaults {
         colors: IconButtonColors = IconButtonDefaults.filledIconButtonColors(),
         content: @Composable RowScope.() -> Unit = ConfirmIcon
     ) {
-        val confirmWidth = if (isSmallScreen()) 63.dp else 76.dp
-        val confirmHeight = if (isSmallScreen()) 54.dp else 65.dp
+        val confirmWidth = 63.dp
+        val confirmHeight = 54.dp
 
         val confirmShape = CircleShape
 
@@ -484,7 +483,7 @@ object AlertDialogDefaults {
         colors: IconButtonColors = IconButtonDefaults.filledTonalIconButtonColors(),
         content: @Composable RowScope.() -> Unit = DismissIcon
     ) {
-        val dismissSize = if (isSmallScreen()) 60.dp else 72.dp
+        val dismissSize = 60.dp
         val dismissShape = MaterialTheme.shapes.medium
 
         Box(modifier = Modifier.size(dismissSize + cancelButtonPadding)) {
@@ -677,10 +676,17 @@ private fun ConfirmDismissButtons(alertButtonsParams: AlertButtonsParams.Confirm
         ) {
             Spacer(modifier = Modifier.width(6.dp))
             alertButtonsParams.dismissButton(this)
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(
+                modifier =
+                    Modifier.width(screenWidthDp().dp * ConfirmDismissBetweenButtonsPaddingFraction)
+            )
             alertButtonsParams.confirmButton(this)
             Spacer(modifier = Modifier.width(2.dp))
         }
+        Spacer(
+            modifier =
+                Modifier.height(screenHeightDp().dp * ConfirmDismissButtonsBottomSpacingFraction)
+        )
     }
 }
 
@@ -719,9 +725,11 @@ private sealed interface AlertButtonsParams {
 internal val AlertIconBottomSpacing = 4.dp
 internal val AlertTextMessageTopSpacing = 8.dp
 internal val ConfirmDismissButtonsTopSpacing = 12.dp
+internal const val ConfirmDismissButtonsBottomSpacingFraction = 0.045f
 internal const val AlertTitleMaxLines = 3
 
 private val ContentTopSpacing = 8.dp
 private val BottomButtonSpacing = 8.dp
 private const val TextPaddingFraction = 0.0416f
 private const val TitlePaddingFraction = 0.12f
+private const val ConfirmDismissBetweenButtonsPaddingFraction = 0.03f
