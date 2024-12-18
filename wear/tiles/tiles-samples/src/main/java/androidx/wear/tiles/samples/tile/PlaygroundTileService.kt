@@ -30,6 +30,8 @@ import androidx.wear.protolayout.material3.primaryLayout
 import androidx.wear.protolayout.material3.prop
 import androidx.wear.protolayout.material3.text
 import androidx.wear.protolayout.material3.textEdgeButton
+import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.tiles.RequestBuilders
 import androidx.wear.tiles.TileBuilders
 import androidx.wear.tiles.TileService
@@ -89,7 +91,7 @@ private fun tileLayout(
             mainSlot = {
                 appCard(
                     onClick = EMPTY_LOAD_CLICKABLE,
-                    contentDescription = "Sample Card".prop(),
+                    modifier = LayoutModifier.contentDescription("Sample Card"),
                     colors =
                         CardColors(
                             background = colorScheme.tertiary,
@@ -125,7 +127,7 @@ private fun tileLayout(
             bottomSlot = {
                 textEdgeButton(
                     onClick = EMPTY_LOAD_CLICKABLE,
-                    contentDescription = "EdgeButton".prop(),
+                    modifier = LayoutModifier.contentDescription("EdgeButton"),
                 ) {
                     text("Edge".prop())
                 }

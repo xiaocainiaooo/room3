@@ -16,11 +16,14 @@
 
 package androidx.wear.protolayout.types
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.wear.protolayout.ColorBuilders.ColorProp
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicColor
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class LayoutColorTest {
     @Test
     fun staticColor_asLayoutColor() {

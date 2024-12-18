@@ -32,6 +32,8 @@ import androidx.wear.protolayout.material3.ButtonDefaults.filledTonalButtonColor
 import androidx.wear.protolayout.material3.ButtonDefaults.filledVariantButtonColors
 import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
 import androidx.wear.protolayout.material3.MaterialGoldenTest.Companion.pxToDp
+import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.types.LayoutColor
 import com.google.common.collect.ImmutableMap
 
@@ -87,7 +89,8 @@ object TestCasesGenerator {
                         textEdgeButton(
                             onClick = clickable,
                             labelContent = { text("Action".prop()) },
-                            contentDescription = CONTENT_DESCRIPTION_PLACEHOLDER.prop(),
+                            modifier =
+                                LayoutModifier.contentDescription(CONTENT_DESCRIPTION_PLACEHOLDER),
                             colors = filledButtonColors()
                         )
                     },
@@ -122,7 +125,8 @@ object TestCasesGenerator {
                         textEdgeButton(
                             onClick = clickable,
                             labelContent = { text("Action that overflows".prop()) },
-                            contentDescription = CONTENT_DESCRIPTION_PLACEHOLDER.prop(),
+                            modifier =
+                                LayoutModifier.contentDescription(CONTENT_DESCRIPTION_PLACEHOLDER),
                             colors = filledVariantButtonColors()
                         )
                     },
@@ -139,7 +143,7 @@ object TestCasesGenerator {
                     mainSlot = {
                         card(
                             onClick = clickable,
-                            contentDescription = "Card".prop(),
+                            modifier = LayoutModifier.contentDescription("Card"),
                             width = expand(),
                             height = expand(),
                             background = { backgroundImage(protoLayoutResourceId = IMAGE_ID) }
@@ -154,7 +158,8 @@ object TestCasesGenerator {
                         iconEdgeButton(
                             onClick = clickable,
                             iconContent = { icon(ICON_ID) },
-                            contentDescription = CONTENT_DESCRIPTION_PLACEHOLDER.prop(),
+                            modifier =
+                                LayoutModifier.contentDescription(CONTENT_DESCRIPTION_PLACEHOLDER),
                             colors = filledTonalButtonColors()
                         )
                     },
@@ -171,7 +176,7 @@ object TestCasesGenerator {
                     mainSlot = {
                         titleCard(
                             onClick = clickable,
-                            contentDescription = "Card".prop(),
+                            modifier = LayoutModifier.contentDescription("Card"),
                             height = expand(),
                             title = {
                                 text(
