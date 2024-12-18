@@ -104,18 +104,28 @@ package androidx.compose.material3.adaptive.layout {
   }
 
   @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi public abstract sealed class PaneExpansionAnchor {
+    method @androidx.compose.runtime.Composable public abstract String getDescription();
+    property @androidx.compose.runtime.Composable public abstract String description;
   }
 
   public static final class PaneExpansionAnchor.Offset extends androidx.compose.material3.adaptive.layout.PaneExpansionAnchor {
     ctor public PaneExpansionAnchor.Offset(float offset);
+    method @androidx.compose.runtime.Composable public String getDescription();
     method public float getOffset();
+    property @androidx.compose.runtime.Composable public String description;
     property public final float offset;
   }
 
   public static final class PaneExpansionAnchor.Proportion extends androidx.compose.material3.adaptive.layout.PaneExpansionAnchor {
     ctor public PaneExpansionAnchor.Proportion(@FloatRange(from=0.0, to=1.0) float proportion);
+    method @androidx.compose.runtime.Composable public String getDescription();
     method public float getProportion();
+    property @androidx.compose.runtime.Composable public String description;
     property @FloatRange(from=0.0, to=1.0) public final float proportion;
+  }
+
+  public final class PaneExpansionDraggableModifierKt {
+    method @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi @androidx.compose.runtime.Composable public static kotlin.jvm.functions.Function1<androidx.compose.ui.semantics.SemanticsPropertyReceiver,kotlin.Unit> defaultDragHandleSemantics(androidx.compose.material3.adaptive.layout.PaneExpansionState);
   }
 
   @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi @androidx.compose.runtime.Stable public final class PaneExpansionState {
@@ -295,7 +305,7 @@ package androidx.compose.material3.adaptive.layout {
   }
 
   public sealed interface PaneScaffoldScope {
-    method @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi public androidx.compose.ui.Modifier paneExpansionDraggable(androidx.compose.ui.Modifier, androidx.compose.material3.adaptive.layout.PaneExpansionState state, float minTouchTargetSize, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource);
+    method @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi public androidx.compose.ui.Modifier paneExpansionDraggable(androidx.compose.ui.Modifier, androidx.compose.material3.adaptive.layout.PaneExpansionState state, float minTouchTargetSize, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, kotlin.jvm.functions.Function1<? super androidx.compose.ui.semantics.SemanticsPropertyReceiver,kotlin.Unit> semanticsProperties);
     method public androidx.compose.ui.Modifier preferredWidth(androidx.compose.ui.Modifier, float width);
   }
 

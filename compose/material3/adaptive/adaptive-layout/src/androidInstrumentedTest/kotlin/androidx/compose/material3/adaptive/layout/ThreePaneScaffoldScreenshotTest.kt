@@ -528,7 +528,8 @@ internal fun ThreePaneScaffoldScope.MockDragHandle(state: PaneExpansionState) {
             Modifier.paneExpansionDraggable(
                 state,
                 LocalMinimumInteractiveComponentSize.current,
-                interactionSource
+                interactionSource,
+                state.defaultDragHandleSemantics()
             ),
         interactionSource = interactionSource
     )
