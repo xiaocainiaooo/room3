@@ -240,7 +240,7 @@ sealed class ApiLintMode {
 /**
  * Generates all of the specified api files, as well as a version history JSON for the public API.
  */
-fun generateApi(
+internal fun generateApi(
     metalavaClasspath: FileCollection,
     files: CompilationInputs,
     apiLocation: ApiLocation,
