@@ -145,13 +145,13 @@ fun ArcProgressIndicator(
 /** Contains default values for [ArcProgressIndicator]. */
 object ArcProgressIndicatorDefaults {
     /** The default start angle in degrees for an indeterminate arc progress indicator */
-    const val IndeterminateStartAngle = 62f
+    val IndeterminateStartAngle = 65f
 
     /** The default end angle in degrees for an indeterminate arc progress indicator */
-    const val IndeterminateEndAngle = 118f
+    val IndeterminateEndAngle = 115f
 
     /** Stroke width of the indeterminate arc progress indicator. */
-    val IndeterminateStrokeWidth = 8.dp
+    val IndeterminateStrokeWidth = 6.dp
 
     /**
      * The recommended diameter of the indeterminate arc progress indicator, which leaves room for
@@ -160,9 +160,9 @@ object ArcProgressIndicatorDefaults {
     val recommendedIndeterminateDiameter: Dp
         @Composable
         get() {
-            // Calculate the recommended diameter as 76% of screen height.
+            // Calculate the recommended diameter as a percentage of screen height.
             val screenHeight = screenHeightDp()
-            return 0.76.dp * screenHeight.toFloat()
+            return IndeterminateArcDiameterPercentage.dp * screenHeight.toFloat()
         }
 
     /**
@@ -219,3 +219,8 @@ internal const val HeadDelay = 0
 internal const val TailDelay = 300 // medium2
 
 internal val ArcIndeterminateProgressEasing = CubicBezierEasing(0.3f, 0f, 0.7f, 1f)
+
+// Recommended diameter for the indeterminate arc indicator:
+// Desired padding to bottom of the screen below the indeterminate arc indicator = 9.38%
+// 100 - 2 x 9.38 = 81.24
+private const val IndeterminateArcDiameterPercentage = 0.8124f
