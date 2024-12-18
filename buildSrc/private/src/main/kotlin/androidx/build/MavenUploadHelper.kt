@@ -97,7 +97,9 @@ fun Project.configureMavenArtifactUpload(
             validateTaskIsRegistered(Release.PROJECT_ARCHIVE_ZIP_TASK_NAME)
         }
         if (buildInfoTaskShouldBeRegistered(androidXExtension)) {
-            validateTaskIsRegistered(CreateLibraryBuildInfoFileTask.TASK_NAME)
+            if (!androidXExtension.isIsolatedProjectsEnabled()) {
+                validateTaskIsRegistered(CreateLibraryBuildInfoFileTask.TASK_NAME)
+            }
         }
     }
 }
