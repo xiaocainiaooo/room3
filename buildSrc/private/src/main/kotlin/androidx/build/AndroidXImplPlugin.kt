@@ -988,6 +988,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
             it.enableStricterValidation.set(true)
             it.failOnWarning.set(true)
         }
+        project.addToBuildOnServer("validatePlugins")
         SdkResourceGenerator.generateForHostTest(project)
     }
 
