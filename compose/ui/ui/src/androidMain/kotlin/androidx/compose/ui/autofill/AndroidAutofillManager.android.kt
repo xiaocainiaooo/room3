@@ -138,7 +138,7 @@ internal class AndroidAutofillManager(
             } else {
                 currentlyDisplayedIDs.remove(semanticsId)
             }
-            executeAutoCommit()
+            pendingChangesToDisplayedIds = true
         }
     }
 
