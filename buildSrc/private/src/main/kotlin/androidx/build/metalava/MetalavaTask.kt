@@ -17,12 +17,14 @@
 package androidx.build.metalava
 
 import androidx.build.checkapi.ApiBaselinesLocation
+import androidx.build.checkapi.SourceSetInputs
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
@@ -111,4 +113,30 @@ internal abstract class SourceMetalavaTask(workerExecutor: WorkerExecutor) :
     }
 
     @get:Input abstract val targetsJavaConsumers: Property<Boolean>
+
+    /**
+     * Information about all source sets for multiplatform projects. Non-multiplatform projects can
+     * be represented as a list with one source set.
+     *
+     * This is marked as [Internal] because [compiledSources] is what should determine whether to
+     * rerun metalava.
+     */
+    @get:Internal abstract val optionalSourceSets: ListProperty<SourceSetInputs>
+
+    /**
+     * Creates an XML file representing the project structure, if [optionalSourceSets] was set.
+     *
+     * This should only be called during task execution.
+     */
+    protected fun createProjectXmlFile(): File? {
+        val sourceSets = optionalSourceSets.get().ifEmpty { null } ?: return null
+        val outputFile = File(temporaryDir, "project.xml")
+        ProjectXml.create(
+            sourceSets,
+            bootClasspath.files,
+            compiledSources.singleFile,
+            outputFile,
+        )
+        return outputFile
+    }
 }
