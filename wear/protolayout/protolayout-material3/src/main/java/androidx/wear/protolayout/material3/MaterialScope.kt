@@ -72,6 +72,7 @@ internal constructor(
     internal val defaultTextElementStyle: TextElementStyle,
     internal val defaultIconStyle: IconStyle,
     internal val defaultBackgroundImageStyle: BackgroundImageStyle,
+    internal val defaultAvatarImageStyle: AvatarImageStyle,
 ) {
     /** Color Scheme used within this scope and its components. */
     public val colorScheme: ColorScheme = theme.colorScheme
@@ -82,7 +83,8 @@ internal constructor(
     internal fun withStyle(
         defaultTextElementStyle: TextElementStyle = this.defaultTextElementStyle,
         defaultIconStyle: IconStyle = this.defaultIconStyle,
-        defaultBackgroundImageStyle: BackgroundImageStyle = this.defaultBackgroundImageStyle
+        defaultBackgroundImageStyle: BackgroundImageStyle = this.defaultBackgroundImageStyle,
+        defaultAvatarImageStyle: AvatarImageStyle = this.defaultAvatarImageStyle
     ): MaterialScope =
         MaterialScope(
             context = context,
@@ -91,7 +93,8 @@ internal constructor(
             allowDynamicTheme = allowDynamicTheme,
             defaultTextElementStyle = defaultTextElementStyle,
             defaultIconStyle = defaultIconStyle,
-            defaultBackgroundImageStyle = defaultBackgroundImageStyle
+            defaultBackgroundImageStyle = defaultBackgroundImageStyle,
+            defaultAvatarImageStyle = defaultAvatarImageStyle
         )
 }
 
@@ -136,7 +139,8 @@ public fun materialScope(
                 ),
             defaultTextElementStyle = TextElementStyle(),
             defaultIconStyle = IconStyle(),
-            defaultBackgroundImageStyle = BackgroundImageStyle()
+            defaultBackgroundImageStyle = BackgroundImageStyle(),
+            defaultAvatarImageStyle = AvatarImageStyle()
         )
         .layout()
 
@@ -165,6 +169,14 @@ internal class BackgroundImageStyle(
     val overlayWidth: ContainerDimension = expand(),
     val overlayHeight: ContainerDimension = expand(),
     val shape: Corner = ShapeTokens.CORNER_LARGE,
+    @ContentScaleMode
+    val contentScaleMode: Int = LayoutElementBuilders.CONTENT_SCALE_MODE_FILL_BOUNDS
+)
+
+internal class AvatarImageStyle(
+    val width: ImageDimension = 24.toDp(),
+    val height: ImageDimension = 24.toDp(),
+    val shape: Corner = ShapeTokens.CORNER_FULL,
     @ContentScaleMode
     val contentScaleMode: Int = LayoutElementBuilders.CONTENT_SCALE_MODE_FILL_BOUNDS
 )
