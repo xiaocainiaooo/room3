@@ -18,12 +18,12 @@ package androidx.wear.compose.material3
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -522,8 +522,12 @@ internal fun RevealScope.ActionButton(
                 RevealActionType.PrimaryAction -> {
                     AnimatedVisibility(
                         visible = primaryActionTextRevealed.value,
-                        enter = fadeIn() + expandHorizontally() + scaleIn(),
-                        exit = fadeOut() + shrinkHorizontally() + scaleOut(),
+                        enter =
+                            fadeIn(spring(stiffness = Spring.StiffnessLow)) +
+                                expandHorizontally(spring(stiffness = Spring.StiffnessMedium)),
+                        exit =
+                            fadeOut(spring(stiffness = Spring.StiffnessHigh)) +
+                                shrinkHorizontally(spring(stiffness = Spring.StiffnessMedium)),
                     ) {
                         ActionText(action, contentColor)
                     }
