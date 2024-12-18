@@ -60,7 +60,7 @@ import java.util.concurrent.TimeoutException;
  * Modifications to this class should be reflected in that class as necessary. See
  * http://go/modifying-webview-cts.
  */
-public class WebViewOnUiThread implements AutoCloseable{
+public class WebViewOnUiThread implements AutoCloseable {
     /**
      * The maximum time, in milliseconds (10 seconds) to wait for a load
      * to be triggered.
@@ -173,7 +173,8 @@ public class WebViewOnUiThread implements AutoCloseable{
      */
     // TODO(crbug.com/384100250): Refactor this class to not use synchronized methods
     @SuppressWarnings({"EmptyMethod", "BanSynchronizedMethods"})
-    synchronized void onPageStarted() {}
+    synchronized void onPageStarted() {
+    }
 
     /**
      * Called from WaitForLoadedClient, this is used to indicate that
@@ -189,6 +190,7 @@ public class WebViewOnUiThread implements AutoCloseable{
     /**
      * Called from the WebChrome client, this sets the current progress
      * for a page.
+     *
      * @param progress The progress made so far between 0 and 100.
      */
     // TODO(crbug.com/384100250): Refactor this class to not use synchronized methods
@@ -298,6 +300,7 @@ public class WebViewOnUiThread implements AutoCloseable{
      * Calls loadUrl on the WebView and then waits onPageFinished
      * and onProgressChange to reach 100.
      * Test fails if the load timeout elapses.
+     *
      * @param url The URL to load.
      */
     public void loadUrlAndWaitForCompletion(final @NonNull String url) {
@@ -312,7 +315,8 @@ public class WebViewOnUiThread implements AutoCloseable{
      * Calls {@link WebView#loadData} on the WebView and then waits onPageFinished
      * and onProgressChange to reach 100.
      * Test fails if the load timeout elapses.
-     * @param data The data to load.
+     *
+     * @param data     The data to load.
      * @param mimeType The mimeType to pass to loadData.
      * @param encoding The encoding to pass to loadData.
      */
@@ -458,6 +462,7 @@ public class WebViewOnUiThread implements AutoCloseable{
     /**
      * Makes a WebView call, waits for completion and then resets the
      * load state in preparation for the next load call.
+     *
      * @param call The call to make on the UI thread prior to waiting.
      */
     private void callAndWait(Runnable call) {
