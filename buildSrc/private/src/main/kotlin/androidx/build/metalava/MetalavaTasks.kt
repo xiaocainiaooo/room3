@@ -22,8 +22,8 @@ import androidx.build.addToBuildOnServer
 import androidx.build.addToCheckTask
 import androidx.build.checkapi.ApiBaselinesLocation
 import androidx.build.checkapi.ApiLocation
+import androidx.build.checkapi.CompilationInputs
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
-import androidx.build.java.JavaCompileInputs
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import androidx.build.version
 import org.gradle.api.Project
@@ -37,7 +37,7 @@ object MetalavaTasks {
 
     fun setupProject(
         project: Project,
-        javaCompileInputs: JavaCompileInputs,
+        compilationInputs: CompilationInputs,
         generateApiDependencies: Configuration,
         extension: AndroidXExtension,
         androidManifest: Provider<RegularFile>?,
@@ -71,7 +71,7 @@ object MetalavaTasks {
                 task.currentVersion.set(version)
 
                 androidManifest?.let { task.manifestPath.set(it) }
-                applyInputs(javaCompileInputs, task, generateApiDependencies)
+                applyInputs(compilationInputs, task, generateApiDependencies)
                 // If we will be updating the api lint baselines, then we should do that before
                 // using it to validate the generated api
                 task.mustRunAfter("updateApiLintBaseline")
@@ -92,8 +92,8 @@ object MetalavaTasks {
                     task.baselines.set(baselinesApiLocation)
                     task.api.set(builtApiLocation)
                     task.version.set(version)
-                    task.dependencyClasspath = javaCompileInputs.dependencyClasspath
-                    task.bootClasspath = javaCompileInputs.bootClasspath
+                    task.dependencyClasspath = compilationInputs.dependencyClasspath
+                    task.bootClasspath = compilationInputs.bootClasspath
                     task.k2UastEnabled.set(extension.metalavaK2UastEnabled)
                     task.kotlinSourceLevel.set(kotlinSourceLevel)
                     task.cacheEvenIfNoOutputs()
@@ -108,8 +108,8 @@ object MetalavaTasks {
                     task.baselines.set(checkApiRelease!!.flatMap { it.baselines })
                     task.api.set(builtApiLocation)
                     task.version.set(version)
-                    task.dependencyClasspath = javaCompileInputs.dependencyClasspath
-                    task.bootClasspath = javaCompileInputs.bootClasspath
+                    task.dependencyClasspath = compilationInputs.dependencyClasspath
+                    task.bootClasspath = compilationInputs.bootClasspath
                     task.k2UastEnabled.set(extension.metalavaK2UastEnabled)
                     task.kotlinSourceLevel.set(kotlinSourceLevel)
                     task.dependsOn(generateApi)
@@ -127,7 +127,7 @@ object MetalavaTasks {
                 task.k2UastEnabled.set(extension.metalavaK2UastEnabled)
                 task.kotlinSourceLevel.set(kotlinSourceLevel)
                 androidManifest?.let { task.manifestPath.set(it) }
-                applyInputs(javaCompileInputs, task, generateApiDependencies)
+                applyInputs(compilationInputs, task, generateApiDependencies)
             }
 
         // Policy: All changes to API surfaces for which compatibility is enforced must be
@@ -208,7 +208,7 @@ object MetalavaTasks {
     }
 
     private fun applyInputs(
-        inputs: JavaCompileInputs,
+        inputs: CompilationInputs,
         task: MetalavaTask,
         generateApiDependencies: Configuration
     ) {

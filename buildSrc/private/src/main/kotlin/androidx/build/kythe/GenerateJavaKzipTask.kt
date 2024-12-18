@@ -16,9 +16,9 @@
 package androidx.build.kythe
 
 import androidx.build.addToBuildOnServer
+import androidx.build.checkapi.CompilationInputs
 import androidx.build.getCheckoutRoot
 import androidx.build.getPrebuiltsRoot
-import androidx.build.java.JavaCompileInputs
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
@@ -136,7 +136,7 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
     internal companion object {
         fun setupProject(
             project: Project,
-            javaInputs: JavaCompileInputs,
+            compilationInputs: CompilationInputs,
             compiledSources: Configuration,
         ) {
             val annotationProcessorPaths =
@@ -162,10 +162,10 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                                 "build-tools/common/javac_extractor.jar"
                             )
                         )
-                        sourcePaths.setFrom(javaInputs.sourcePaths)
+                        sourcePaths.setFrom(compilationInputs.sourcePaths)
                         vnamesJson.set(project.getVnamesJson())
                         dependencyClasspath.setFrom(
-                            javaInputs.dependencyClasspath + javaInputs.bootClasspath
+                            compilationInputs.dependencyClasspath + compilationInputs.bootClasspath
                         )
                         this.compiledSources.setFrom(compiledSources)
                         kzipOutputFile.set(

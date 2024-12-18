@@ -19,7 +19,7 @@ package androidx.build.kythe
 import androidx.build.AndroidXExtension
 import androidx.build.ProjectLayoutType
 import androidx.build.checkapi.ApiTaskConfig
-import androidx.build.checkapi.configureJavaInputsAndManifest
+import androidx.build.checkapi.configureCompilationInputsAndManifest
 import androidx.build.checkapi.createReleaseApiConfiguration
 import androidx.build.getDefaultTargetJavaVersion
 import androidx.build.getSupportRootFolder
@@ -58,18 +58,19 @@ fun Project.configureProjectForKzipTasks(config: ApiTaskConfig, extension: Andro
 
     // afterEvaluate required to read extension properties
     afterEvaluate {
-        val (javaInputs, _) = configureJavaInputsAndManifest(config) ?: return@afterEvaluate
+        val (compilationInputs, _) =
+            configureCompilationInputsAndManifest(config) ?: return@afterEvaluate
         val compiledSources = createReleaseApiConfiguration()
 
         GenerateKotlinKzipTask.setupProject(
             project,
-            javaInputs,
+            compilationInputs,
             compiledSources,
             extension.kotlinTarget,
             getDefaultTargetJavaVersion(extension.type, project.name)
         )
 
-        GenerateJavaKzipTask.setupProject(project, javaInputs, compiledSources)
+        GenerateJavaKzipTask.setupProject(project, compilationInputs, compiledSources)
     }
 }
 
