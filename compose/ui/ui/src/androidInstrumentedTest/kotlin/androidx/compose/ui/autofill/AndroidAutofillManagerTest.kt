@@ -54,6 +54,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -96,14 +97,9 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_empty() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
         rule.setContent {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
-            Box(
-                Modifier.semantics { contentType = ContentType.Username }
-                    .size(height, width)
-                    .testTag(usernameTag)
-            )
+            Box(Modifier.semantics { contentType = ContentType.Username }.size(height, width))
         }
 
         rule.runOnIdle { verifyNoMoreInteractions(am) }
@@ -113,17 +109,12 @@ class AndroidAutofillManagerTest {
     @SmallTest
     fun autofillManager_doNotCallCommit_nodesAppeared() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
         var isVisible by mutableStateOf(false)
 
         rule.setContent {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             if (isVisible) {
-                Box(
-                    Modifier.semantics { contentType = ContentType.Username }
-                        .size(height, width)
-                        .testTag(usernameTag)
-                )
+                Box(Modifier.semantics { contentType = ContentType.Username }.size(height, width))
             }
         }
 
@@ -137,7 +128,6 @@ class AndroidAutofillManagerTest {
     @SmallTest
     fun autofillManager_doNotCallCommit_autofillTagsAdded() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
         var isRelatedToAutofill by mutableStateOf(false)
 
         rule.setContent {
@@ -150,8 +140,7 @@ class AndroidAutofillManagerTest {
                                 contentDataType = ContentDataType.Text
                             }
                             .size(height, width)
-                            .testTag(usernameTag)
-                    else Modifier.size(height, width).testTag(usernameTag)
+                    else Modifier.size(height, width)
             )
         }
 
@@ -165,17 +154,12 @@ class AndroidAutofillManagerTest {
     @SmallTest
     fun autofillManager_callCommit_nodesDisappeared() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
         var revealFirstUsername by mutableStateOf(true)
 
         rule.setContent {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             if (revealFirstUsername) {
-                Box(
-                    Modifier.semantics { contentType = ContentType.Username }
-                        .size(height, width)
-                        .testTag(usernameTag)
-                )
+                Box(Modifier.semantics { contentType = ContentType.Username }.size(height, width))
             }
         }
 
@@ -189,26 +173,16 @@ class AndroidAutofillManagerTest {
     @SmallTest
     fun autofillManager_callCommit_nodesDisappearedAndAppeared() {
         val am: PlatformAutofillManager = mock()
-        val username1Tag = "username_tag"
-        val username2Tag = "username_tag"
         var revealFirstUsername by mutableStateOf(true)
         var revealSecondUsername by mutableStateOf(false)
 
         rule.setContent {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             if (revealFirstUsername) {
-                Box(
-                    Modifier.semantics { contentType = ContentType.Username }
-                        .size(height, width)
-                        .testTag(username1Tag)
-                )
+                Box(Modifier.semantics { contentType = ContentType.Username }.size(height, width))
             }
             if (revealSecondUsername) {
-                Box(
-                    Modifier.semantics { contentType = ContentType.Username }
-                        .size(height, width)
-                        .testTag(username2Tag)
-                )
+                Box(Modifier.semantics { contentType = ContentType.Username }.size(height, width))
             }
         }
 
@@ -224,7 +198,6 @@ class AndroidAutofillManagerTest {
     @SmallTest
     fun autofillManager_callCommit_nodesBecomeAutofillRelatedAndDisappear() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
         var isVisible by mutableStateOf(true)
         var isRelatedToAutofill by mutableStateOf(false)
 
@@ -239,8 +212,7 @@ class AndroidAutofillManagerTest {
                                     contentDataType = ContentDataType.Text
                                 }
                                 .size(height, width)
-                                .testTag(usernameTag)
-                        else Modifier.size(height, width).testTag(usernameTag)
+                        else Modifier.size(height, width)
                 )
             }
         }
@@ -257,7 +229,6 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notifyValueChanged() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
         var changeText by mutableStateOf(false)
 
         rule.setContent {
@@ -269,7 +240,52 @@ class AndroidAutofillManagerTest {
                         editableText = AnnotatedString(if (changeText) "1234" else "****")
                     }
                     .size(height, width)
-                    .testTag(usernameTag)
+            )
+        }
+
+        rule.runOnIdle { changeText = true }
+
+        rule.runOnIdle { verify(am).notifyValueChanged(any(), any(), any()) }
+    }
+
+    @SmallTest
+    @SdkSuppress(minSdkVersion = 26)
+    fun autofillManager_notifyValueChanged_fromEmpty() {
+        val am: PlatformAutofillManager = mock()
+        var changeText by mutableStateOf(false)
+
+        rule.setContent {
+            (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
+            Box(
+                Modifier.semantics {
+                        contentType = ContentType.Username
+                        contentDataType = ContentDataType.Text
+                        editableText = AnnotatedString(if (changeText) "1234" else "")
+                    }
+                    .size(height, width)
+            )
+        }
+
+        rule.runOnIdle { changeText = true }
+
+        rule.runOnIdle { verify(am).notifyValueChanged(any(), any(), any()) }
+    }
+
+    @SmallTest
+    @SdkSuppress(minSdkVersion = 26)
+    fun autofillManager_notifyValueChanged_toEmpty() {
+        val am: PlatformAutofillManager = mock()
+        var changeText by mutableStateOf(false)
+
+        rule.setContent {
+            (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
+            Box(
+                Modifier.semantics {
+                        contentType = ContentType.Username
+                        contentDataType = ContentDataType.Text
+                        editableText = AnnotatedString(if (changeText) "" else "1234")
+                    }
+                    .size(height, width)
             )
         }
 
@@ -281,9 +297,112 @@ class AndroidAutofillManagerTest {
     @Test
     @SmallTest
     @SdkSuppress(minSdkVersion = 26)
+    fun autofillManager_notifyValueChanged_editableTextAdded() {
+        val am: PlatformAutofillManager = mock()
+        var hasEditableText by mutableStateOf(false)
+
+        rule.setContent {
+            (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
+            Box(
+                Modifier.semantics {
+                        contentType = ContentType.Username
+                        contentDataType = ContentDataType.Text
+                        if (hasEditableText) editableText = AnnotatedString("1234")
+                    }
+                    .size(height, width)
+            )
+        }
+
+        rule.runOnIdle { hasEditableText = true }
+
+        // TODO: This does not send notifyValueChanged, but will we could add a test to verify that
+        //  it sends notifyVisibilityChanged after aosp/3391719 lands.
+        rule.runOnIdle { verify(am, never()).notifyValueChanged(any(), any(), any()) }
+    }
+
+    @Test
+    @SmallTest
+    @SdkSuppress(minSdkVersion = 26)
+    fun autofillManager_notifyValueChanged_editableTextRemoved() {
+        val am: PlatformAutofillManager = mock()
+        var hasEditableText by mutableStateOf(true)
+
+        rule.setContent {
+            (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
+            Box(
+                Modifier.semantics {
+                        contentType = ContentType.Username
+                        contentDataType = ContentDataType.Text
+                        if (hasEditableText) editableText = AnnotatedString("1234")
+                    }
+                    .size(height, width)
+            )
+        }
+
+        rule.runOnIdle { hasEditableText = false }
+
+        // TODO: This does not send notifyValueChanged, but will we could add a test to verify that
+        //  it sends notifyVisibilityChanged after aosp/3391719 lands.
+        rule.runOnIdle { verify(am, never()).notifyValueChanged(any(), any(), any()) }
+    }
+
+    @Test
+    @SmallTest
+    @SdkSuppress(minSdkVersion = 26)
+    fun autofillManager_notifyValueChanged_addedEmptyEditableText() {
+        val am: PlatformAutofillManager = mock()
+        var hasEditableText by mutableStateOf(false)
+
+        rule.setContent {
+            (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
+            Box(
+                Modifier.semantics {
+                        contentType = ContentType.Username
+                        contentDataType = ContentDataType.Text
+                        if (hasEditableText) editableText = AnnotatedString("")
+                    }
+                    .size(height, width)
+            )
+        }
+
+        rule.runOnIdle { hasEditableText = true }
+
+        // TODO: This does not send notifyValueChanged, but will we could add a test to verify that
+        //  it sends notifyVisibilityChanged after aosp/3391719 lands.
+        rule.runOnIdle { verify(am, never()).notifyValueChanged(any(), any(), any()) }
+    }
+
+    @Test
+    @SmallTest
+    @SdkSuppress(minSdkVersion = 26)
+    fun autofillManager_notifyValueChanged_removedEmptyEditableText() {
+        val am: PlatformAutofillManager = mock()
+        var hasEditableText by mutableStateOf(true)
+
+        rule.setContent {
+            (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
+            Box(
+                Modifier.semantics {
+                        contentType = ContentType.Username
+                        contentDataType = ContentDataType.Text
+                        if (hasEditableText) editableText = AnnotatedString("")
+                    }
+                    .size(height, width)
+            )
+        }
+
+        rule.runOnIdle { hasEditableText = false }
+
+        // TODO: This does not send notifyValueChanged, but will we could add a test to verify that
+        //  it sends notifyVisibilityChanged after aosp/3391719 lands.
+        rule.runOnIdle { verify(am, never()).notifyValueChanged(any(), any(), any()) }
+    }
+
+    @Test
+    @SmallTest
+    @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notifyViewEntered_previousFocusFalse() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
         var hasFocus by mutableStateOf(false)
 
         rule.setContent {
@@ -296,7 +415,6 @@ class AndroidAutofillManagerTest {
                         onAutofillText { true }
                     }
                     .size(height, width)
-                    .testTag(usernameTag)
             )
         }
 
@@ -310,7 +428,6 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notAutofillable_notifyViewEntered_previousFocusFalse() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
         var hasFocus by mutableStateOf(false)
 
         rule.setContent {
@@ -322,7 +439,6 @@ class AndroidAutofillManagerTest {
                         focused = hasFocus
                     }
                     .size(height, width)
-                    .testTag(usernameTag)
             )
         }
 
@@ -336,7 +452,6 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notifyViewEntered_previousFocusNull() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
         var hasFocus by mutableStateOf(false)
 
         rule.setContent {
@@ -351,8 +466,7 @@ class AndroidAutofillManagerTest {
                                 onAutofillText { true }
                             }
                             .size(height, width)
-                            .testTag(usernameTag)
-                    else plainVisibleModifier(usernameTag)
+                    else plainVisibleModifier("usernameTag")
             )
         }
 
@@ -366,7 +480,6 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notifyViewEntered_itemNotAutofillable() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
         var hasFocus by mutableStateOf(false)
 
         rule.setContent {
@@ -380,8 +493,7 @@ class AndroidAutofillManagerTest {
                                 focused = hasFocus
                             }
                             .size(height, width)
-                            .testTag(usernameTag)
-                    else plainVisibleModifier(usernameTag)
+                    else plainVisibleModifier("usernameTag")
             )
         }
 
@@ -395,7 +507,6 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notifyViewExited_previousFocusTrue() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
         var hasFocus by mutableStateOf(true)
 
         rule.setContent {
@@ -408,7 +519,6 @@ class AndroidAutofillManagerTest {
                         onAutofillText { true }
                     }
                     .size(height, width)
-                    .testTag(usernameTag)
             )
         }
 
@@ -422,7 +532,6 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notifyViewExited_previouslyFocusedItemNotAutofillable() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
         var hasFocus by mutableStateOf(true)
 
         rule.setContent {
@@ -434,7 +543,6 @@ class AndroidAutofillManagerTest {
                         focused = hasFocus
                     }
                     .size(height, width)
-                    .testTag(usernameTag)
             )
         }
 
@@ -449,7 +557,7 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 27)
     fun autofillManager_notifyVisibilityChanged_disappeared() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
+        val usernameTag = "usernameTag"
         var isVisible by mutableStateOf(true)
 
         rule.setContent {

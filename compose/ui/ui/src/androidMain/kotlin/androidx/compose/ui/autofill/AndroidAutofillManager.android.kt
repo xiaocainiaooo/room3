@@ -97,7 +97,7 @@ internal class AndroidAutofillManager(
         // Check Editable Text.
         val previousText = prevConfig?.getOrNull(SemanticsProperties.EditableText)?.text
         val newText = config?.getOrNull(SemanticsProperties.EditableText)?.text
-        if (previousText != newText && newText != null) {
+        if (!previousText.isNullOrEmpty() && previousText != newText && !newText.isNullOrEmpty()) {
             val contentDataType = config.getOrNull(SemanticsProperties.ContentDataType)
             if (contentDataType == ContentDataType.Text) {
                 platformAutofillManager.notifyValueChanged(
