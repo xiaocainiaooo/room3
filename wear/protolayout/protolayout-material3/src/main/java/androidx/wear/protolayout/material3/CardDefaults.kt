@@ -16,21 +16,21 @@
 
 package androidx.wear.protolayout.material3
 
-import androidx.wear.protolayout.ColorBuilders.ColorProp
+import androidx.wear.protolayout.types.LayoutColor
 
 /**
  * Represents colors used in card components, such as [titleCard].
  *
- * @param background [ColorProp] which is used to as the background color for the card.
+ * @param background [LayoutColor] which is used to as the background color for the card.
  * @param content the content color for the card.
  * @param time the color used for time for the card.
  * @param title the color used for title for the card.
  */
 public class CardColors(
-    public val background: ColorProp,
-    public val title: ColorProp,
-    public val content: ColorProp,
-    public val time: ColorProp = content
+    public val background: LayoutColor,
+    public val title: LayoutColor,
+    public val content: LayoutColor,
+    public val time: LayoutColor = content
 )
 
 public object CardDefaults {

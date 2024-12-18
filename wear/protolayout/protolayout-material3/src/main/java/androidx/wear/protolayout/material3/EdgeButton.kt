@@ -179,7 +179,7 @@ private fun MaterialScope.edgeButton(
             .setSemantics(contentDescription.buttonRoleSemantics())
             .setBackground(
                 Background.Builder()
-                    .setColor(colors.container)
+                    .setColor(colors.container.prop)
                     .setCorner(
                         Corner.Builder()
                             .setRadius(TOP_CORNER_RADIUS)
