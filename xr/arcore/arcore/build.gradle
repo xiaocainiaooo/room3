@@ -37,7 +37,6 @@ dependencies {
     api(project(":xr:runtime:runtime"))
 
     implementation("androidx.annotation:annotation:1.8.1")
-    implementation(project(":xr:runtime:runtime-openxr"))
 
     testImplementation(libs.kotlinCoroutinesTest)
     testImplementation(libs.junit)
