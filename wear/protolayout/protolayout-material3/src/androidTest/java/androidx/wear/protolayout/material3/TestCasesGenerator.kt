@@ -183,7 +183,7 @@ object TestCasesGenerator {
                             modifier = LayoutModifier.contentDescription("Card"),
                             height = expand(),
                             title = {
-                                text(
+                                this.text(
                                     "Title Card text that will overflow after 2 max lines of text"
                                         .layoutString
                                 )
@@ -226,7 +226,7 @@ object TestCasesGenerator {
                             onClick = clickable,
                             modifier = LayoutModifier.contentDescription("Card"),
                             title = {
-                                text(
+                                this.text(
                                     "Default App Card text that will overflow after 1 line of text"
                                         .layoutString
                                 )
@@ -255,7 +255,7 @@ object TestCasesGenerator {
                             onClick = clickable,
                             modifier = LayoutModifier.contentDescription("Card"),
                             title = {
-                                text(
+                                this.text(
                                     "Large App Card text that will overflow after 1 line of text"
                                         .layoutString
                                 )

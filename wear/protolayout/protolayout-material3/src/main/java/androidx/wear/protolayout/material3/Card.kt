@@ -36,6 +36,9 @@ import androidx.wear.protolayout.material3.AppCardStyle.Companion.defaultAppCard
 import androidx.wear.protolayout.material3.CardDefaults.DEFAULT_CONTENT_PADDING
 import androidx.wear.protolayout.material3.CardDefaults.METADATA_TAG
 import androidx.wear.protolayout.material3.CardDefaults.filledCardColors
+import androidx.wear.protolayout.material3.DataCardDefaults.buildContentForDataCard
+import androidx.wear.protolayout.material3.DataCardStyle.Companion.defaultCompactDataCardStyle
+import androidx.wear.protolayout.material3.DataCardStyle.Companion.defaultDataCardStyle
 import androidx.wear.protolayout.material3.TitleCardDefaults.buildContentForTitleCard
 import androidx.wear.protolayout.material3.TitleCardStyle.Companion.defaultTitleCardStyle
 import androidx.wear.protolayout.modifiers.LayoutModifier
@@ -70,7 +73,7 @@ import androidx.wear.protolayout.types.LayoutColor
  *   [CardDefaults.imageBackgroundCardColors] for card with image as a background or custom built
  *   [CardColors].
  * @param background The background object to be used behind the content in the card. It is
- *   recommended the default styling that is automatically provided by only calling
+ *   recommended to use the default styling that is automatically provided by only calling
  *   [backgroundImage] with the content. It can be combined with the specified [colors]'s background
  *   color behind it.
  * @param style The style which provides the attribute values required for constructing this title
@@ -194,7 +197,7 @@ public fun MaterialScope.titleCard(
  *   [CardDefaults.imageBackgroundCardColors] for card with image as a background or custom built
  *   [CardColors].
  * @param background The background object to be used behind the content in the card. It is
- *   recommended the default styling that is automatically provided by only calling
+ *   recommended to use the default styling that is automatically provided by only calling
  *   [backgroundImage] with the content. It can be combined with the specified [colors]'s background
  *   color behind it.
  * @param style The style which provides the attribute values required for constructing this title
@@ -294,6 +297,231 @@ public fun MaterialScope.appCard(
     }
 
 /**
+ * Opinionated ProtoLayout Material3 data card that offers up to 3 vertically stacked slots, usually
+ * text or numeral based.
+ *
+ * This card works well in [buttonGroup] with cards [width] and [height] is set to [expand].
+ *
+ * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
+ *   associated action.
+ * @param modifier Modifiers to set to this element. It's highly recommended to set a content
+ *   description using [contentDescription].
+ * @param title A slot for displaying the title of the card, expected to be one line of text. Uses
+ *   [CardColors.title] color by default.
+ * @param content The optional body content of the card. Uses [CardColors.content] color by default.
+ * @param secondaryText An optional slot for displaying short, secondary text. Uses
+ *   [CardColors.secondaryText] color by default.
+ * @param width The width of this card. It's highly recommended to set this to [expand] or [weight]
+ *   for the most optimal experience across different screen sizes.
+ * @param height The height of this card. It's highly recommended to set this to [expand] for the
+ *   most optimal experience across different screen sizes.
+ * @param shape Defines the card's shape, in other words the corner radius for this card.
+ * @param colors The colors to be used for a background and inner content of this card. If the
+ *   background image is also specified, the image will be laid out on top of the background color.
+ *   In case of the fully opaque background image, then the background color will not be shown.
+ *   Specified colors can be [CardDefaults.filledCardColors] for high emphasis card,
+ *   [CardDefaults.filledVariantCardColors] for high/medium emphasis card,
+ *   [CardDefaults.filledTonalCardColors] for low/medium emphasis card,
+ *   [CardDefaults.imageBackgroundCardColors] for card with image as a background or custom built
+ *   [CardColors].
+ * @param background The background object to be used behind the content in the card. It is
+ *   recommended to use the default styling that is automatically provided by only calling
+ *   [backgroundImage] with the content. It can be combined with the specified [colors]'s background
+ *   color behind it.
+ * @param style The style which provides the attribute values required for constructing this data
+ *   card and its inner content. It also provides default style for the inner content, that can be
+ *   overridden by each content slot. It is highly recommended to use one of
+ *   [DataCardStyle.smallDataCardStyle], [DataCardStyle.defaultDataCardStyle],
+ *   [DataCardStyle.largeDataCardStyle] or [DataCardStyle.extraLargeDataCardStyle] styles when
+ *   either [icon] or [secondaryText] are present. If they are not present, it's highly recommended
+ *   to use [DataCardStyle.smallCompactDataCardStyle], [DataCardStyle.defaultCompactDataCardStyle]
+ *   or [DataCardStyle.largeCompactDataCardStyle].
+ * @param contentPadding The inner padding used to prevent inner content from being too close to the
+ *   card's edge. It's highly recommended to keep the default.
+ * @sample androidx.wear.protolayout.material3.samples.dataCardSample
+ */
+// TODO: b/346958146 - link Card visuals in DAC
+// TODO: b/373578620 - Add how corners affects margins in the layout.
+public fun MaterialScope.textDataCard(
+    onClick: Clickable,
+    title: (MaterialScope.() -> LayoutElement),
+    modifier: LayoutModifier = LayoutModifier,
+    content: (MaterialScope.() -> LayoutElement)? = null,
+    secondaryText: (MaterialScope.() -> LayoutElement)? = null,
+    width: ContainerDimension = wrapWithMinTapTargetDimension(),
+    height: ContainerDimension = wrapWithMinTapTargetDimension(),
+    shape: Corner = shapes.large,
+    colors: CardColors = filledCardColors(),
+    background: (MaterialScope.() -> LayoutElement)? = null,
+    style: DataCardStyle =
+        if (secondaryText == null) defaultCompactDataCardStyle() else defaultDataCardStyle(),
+    contentPadding: Padding = style.innerPadding,
+): LayoutElement =
+    card(
+        onClick = onClick,
+        modifier = modifier,
+        width = width,
+        height = height,
+        shape = shape,
+        backgroundColor = colors.background,
+        background = background,
+        contentPadding = contentPadding
+    ) {
+        buildContentForDataCard(
+            title =
+                withStyle(
+                        defaultTextElementStyle =
+                            TextElementStyle(
+                                typography = style.titleTypography,
+                                color = colors.title
+                            )
+                    )
+                    .title(),
+            content =
+                content?.let {
+                    withStyle(
+                            defaultTextElementStyle =
+                                TextElementStyle(
+                                    typography = style.contentTypography,
+                                    color = colors.content
+                                )
+                        )
+                        .it()
+                },
+            secondaryText =
+                secondaryText?.let {
+                    withStyle(
+                            defaultTextElementStyle =
+                                TextElementStyle(
+                                    typography = style.secondaryLabelTypography,
+                                    color = colors.secondaryText
+                                )
+                        )
+                        .it()
+                },
+            style = style,
+        )
+    }
+
+/**
+ * Opinionated ProtoLayout Material3 data card that offers up to 3 vertically stacked slots, usually
+ * text or numeral based, with icon.
+ *
+ * Slots can have multiple placements, depending on their presence and [titleContentPlacement]:
+ * * If [secondaryIcon] are set, it will be placed first when [titleContentPlacement] is set to
+ *   [TitleContentPlacementInDataCard.Bottom], or last if [titleContentPlacement] is set to
+ *   [TitleContentPlacementInDataCard.Top].
+ * * If [secondaryIcon] is not set, this [textDataCard] is considered as `compact` data card, with
+ *   title and content only.
+ *
+ * This card works well in [buttonGroup] with cards [width] and [height] set to [expand].
+ *
+ * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
+ *   associated action.
+ * @param modifier Modifiers to set to this element. It's highly recommended to set a content
+ *   description using [contentDescription].
+ * @param title A slot for displaying the title of the card, expected to be one line of text. Uses
+ *   [CardColors.title] color by default.
+ * @param content The optional body content of the card. Uses [CardColors.content] color by default.
+ * @param secondaryIcon An optional slot for displaying small icon, such as [secondaryIcon]. Uses
+ *   [CardColors.secondaryIcon] tint color by default.
+ * @param width The width of this card. It's highly recommended to set this to [expand] or [weight]
+ *   for the most optimal experience across different screen sizes.
+ * @param height The height of this card. It's highly recommended to set this to [expand] for the
+ *   most optimal experience across different screen sizes.
+ * @param shape Defines the card's shape, in other words the corner radius for this card.
+ * @param colors The colors to be used for a background and inner content of this card. If the
+ *   background image is also specified, the image will be laid out on top of the background color.
+ *   In case of the fully opaque background image, then the background color will not be shown.
+ *   Specified colors can be [CardDefaults.filledCardColors] for high emphasis card,
+ *   [CardDefaults.filledVariantCardColors] for high/medium emphasis card,
+ *   [CardDefaults.filledTonalCardColors] for low/medium emphasis card,
+ *   [CardDefaults.imageBackgroundCardColors] for card with image as a background or custom built
+ *   [CardColors].
+ * @param background The background object to be used behind the content in the card. It is
+ *   recommended to use the default styling that is automatically provided by only calling
+ *   [backgroundImage] with the content. It can be combined with the specified [colors]'s background
+ *   color behind it.
+ * @param style The style which provides the attribute values required for constructing this data
+ *   card and its inner content. It also provides default style for the inner content, that can be
+ *   overridden by each content slot. It is highly recommended to use one of
+ *   [DataCardStyle.smallDataCardStyle], [DataCardStyle.defaultDataCardStyle],
+ *   [DataCardStyle.largeDataCardStyle] or [DataCardStyle.extraLargeDataCardStyle] styles when
+ *   [secondaryIcon]is present. If it's not present, it's highly recommended to use
+ *   [DataCardStyle.smallCompactDataCardStyle], [DataCardStyle.defaultCompactDataCardStyle] or
+ *   [DataCardStyle.largeCompactDataCardStyle].
+ * @param titleContentPlacement The placement of the [title] and [content] slots, relative to the
+ *   given [secondaryIcon].
+ * @param contentPadding The inner padding used to prevent inner content from being too close to the
+ *   card's edge. It's highly recommended to keep the default.
+ * @sample androidx.wear.protolayout.material3.samples.dataCardSample
+ */
+// TODO: b/346958146 - link Card visuals in DAC
+// TODO: b/373578620 - Add how corners affects margins in the layout.
+public fun MaterialScope.iconDataCard(
+    onClick: Clickable,
+    title: (MaterialScope.() -> LayoutElement),
+    modifier: LayoutModifier = LayoutModifier,
+    content: (MaterialScope.() -> LayoutElement)? = null,
+    secondaryIcon: (MaterialScope.() -> LayoutElement)? = null,
+    width: ContainerDimension = wrapWithMinTapTargetDimension(),
+    height: ContainerDimension = wrapWithMinTapTargetDimension(),
+    shape: Corner = shapes.large,
+    colors: CardColors = filledCardColors(),
+    background: (MaterialScope.() -> LayoutElement)? = null,
+    style: DataCardStyle =
+        if (secondaryIcon == null) defaultCompactDataCardStyle() else defaultDataCardStyle(),
+    titleContentPlacement: TitleContentPlacementInDataCard = TitleContentPlacementInDataCard.Bottom,
+    contentPadding: Padding = style.innerPadding,
+): LayoutElement =
+    card(
+        onClick = onClick,
+        modifier = modifier,
+        width = width,
+        height = height,
+        shape = shape,
+        backgroundColor = colors.background,
+        background = background,
+        contentPadding = contentPadding
+    ) {
+        buildContentForDataCard(
+            title =
+                withStyle(
+                        defaultTextElementStyle =
+                            TextElementStyle(
+                                typography = style.titleTypography,
+                                color = colors.title
+                            )
+                    )
+                    .title(),
+            content =
+                content?.let {
+                    withStyle(
+                            defaultTextElementStyle =
+                                TextElementStyle(
+                                    typography = style.contentTypography,
+                                    color = colors.content
+                                )
+                        )
+                        .it()
+                },
+            secondaryIcon =
+                secondaryIcon?.let {
+                    withStyle(
+                            defaultIconStyle =
+                                IconStyle(
+                                    size = style.iconSize.toDp(),
+                                    tintColor = colors.secondaryIcon
+                                )
+                        )
+                        .it()
+                },
+            style = style,
+            titleContentPlacement = titleContentPlacement
+        )
+    }
+
+/**
  * ProtoLayout Material3 clickable component card that offers a single slot to take any content.
  *
  * It can be used as the container for more opinionated Card components that take specific content
@@ -314,7 +542,7 @@ public fun MaterialScope.appCard(
  *   is also specified, the image will be laid out on top of this color. In case of the fully opaque
  *   background image, then this background color will not be shown.
  * @param background The background object to be used behind the content in the card. It is
- *   recommended the default styling that is automatically provided by only calling
+ *   recommended to use the default styling that is automatically provided by only calling
  *   [backgroundImage] with the content. It can be combined with the specified [backgroundColor]
  *   behind it.
  * @param width The width of this card. It's highly recommended to set this to [expand] or [weight]

@@ -30,9 +30,9 @@ import java.util.Optional
 
 internal object AppCardDefaults {
     /**
-     * Returns [LayoutElement] describing the inner content for the title card.
+     * Returns [LayoutElement] describing the inner content for the app card.
      *
-     * This is a Column containing the following:
+     * This is a [Column] containing the following:
      * * header slot
      *     * avatar, if present
      *     * spacing if label is present
@@ -84,7 +84,7 @@ internal object AppCardDefaults {
     }
 }
 
-/** Provides style values for the title card component. */
+/** Provides style values for the app card component. */
 public class AppCardStyle
 internal constructor(
     internal val innerPadding: Padding,

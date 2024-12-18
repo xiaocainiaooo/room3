@@ -17,17 +17,27 @@
 package androidx.wear.tiles.samples.tile
 
 import android.content.Context
+import androidx.wear.protolayout.DimensionBuilders.expand
+import androidx.wear.protolayout.DimensionBuilders.weight
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.ResourceBuilders
 import androidx.wear.protolayout.ResourceBuilders.AndroidImageResourceByResId
 import androidx.wear.protolayout.ResourceBuilders.ImageResource
 import androidx.wear.protolayout.TimelineBuilders
 import androidx.wear.protolayout.material3.CardColors
+import androidx.wear.protolayout.material3.CardDefaults.filledTonalCardColors
+import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
+import androidx.wear.protolayout.material3.DataCardStyle.Companion.extraLargeDataCardStyle
+import androidx.wear.protolayout.material3.DataCardStyle.Companion.smallCompactDataCardStyle
+import androidx.wear.protolayout.material3.MaterialScope
 import androidx.wear.protolayout.material3.appCard
 import androidx.wear.protolayout.material3.avatarImage
+import androidx.wear.protolayout.material3.buttonGroup
+import androidx.wear.protolayout.material3.iconDataCard
 import androidx.wear.protolayout.material3.materialScope
 import androidx.wear.protolayout.material3.primaryLayout
 import androidx.wear.protolayout.material3.text
+import androidx.wear.protolayout.material3.textDataCard
 import androidx.wear.protolayout.material3.textEdgeButton
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.contentDescription
@@ -112,7 +122,7 @@ private fun tileLayout(
                         )
                     },
                     label = {
-                        text(
+                        this.text(
                             "Hello and welcome Tiles in AndroidX!".layoutString,
                         )
                     },
@@ -134,3 +144,34 @@ private fun tileLayout(
             }
         )
     }
+
+internal fun MaterialScope.dataCards() = buttonGroup {
+    buttonGroupItem {
+        textDataCard(
+            onClick = EMPTY_LOAD_CLICKABLE,
+            modifier = LayoutModifier.contentDescription("Data Card with icon"),
+            width = weight(1f),
+            height = expand(),
+            colors = filledTonalCardColors(),
+            style = extraLargeDataCardStyle(),
+            title = { this.text("1km".layoutString) },
+            secondaryText = { this.text("id".layoutString) },
+            content = { this.text("Run".layoutString) },
+        )
+    }
+    buttonGroupItem {
+        iconDataCard(
+            onClick = EMPTY_LOAD_CLICKABLE,
+            modifier =
+                LayoutModifier.contentDescription(
+                    "Compact Data Card without icon or secondary label"
+                ),
+            width = weight(2f),
+            height = expand(),
+            colors = filledVariantCardColors(),
+            style = smallCompactDataCardStyle(),
+            title = { this.text("1".layoutString) },
+            content = { this.text("PM".layoutString) },
+        )
+    }
+}

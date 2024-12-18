@@ -33,7 +33,7 @@ public object TitleCardDefaults {
     /**
      * Returns [LayoutElement] describing the inner content for the title card.
      *
-     * This is a Column containing the following:
+     * This is a [Column] containing the following:
      * * header slot
      *     * title
      *     * spacing if time is present

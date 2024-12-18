@@ -142,3 +142,5 @@ internal fun Int.horizontalAlignToTextAlign(): Int =
  * breakpoint.
  */
 internal fun Int.isBreakpoint() = this >= SCREEN_SIZE_BREAKPOINT_DP
+
+internal fun Int.toPadding(): Padding = Padding.Builder().setAll(this.toDp()).build()
