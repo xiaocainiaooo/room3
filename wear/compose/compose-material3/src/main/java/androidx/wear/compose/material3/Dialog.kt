@@ -24,6 +24,7 @@ import androidx.compose.animation.core.rememberTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
@@ -158,6 +159,9 @@ fun Dialog(
             }
         }
     }
+
+    // We want to be sure that background is scaled back to 1f after dialog is disposed.
+    DisposableEffect(Unit) { onDispose { scaffoldState.parentScale.floatValue = 1f } }
 }
 
 @Composable
