@@ -234,8 +234,6 @@ constructor(
     internal val useUnmergedTree: Boolean,
     internal val selector: SemanticsSelector
 ) {
-    private var nodeIds: List<Int>? = null
-
     constructor(
         testContext: TestContext,
         useUnmergedTree: Boolean,
@@ -258,19 +256,12 @@ constructor(
         atLeastOneRootRequired: Boolean = true,
         errorMessageOnFail: String? = null
     ): List<SemanticsNode> {
-        if (nodeIds == null) {
-            val nodes =
-                testContext.testOwner.getAllSemanticsNodes(atLeastOneRootRequired, useUnmergedTree)
-
-            return testContext.testOwner
-                .runOnUiThread { selector.map(nodes, errorMessageOnFail.orEmpty()) }
-                .apply { nodeIds = selectedNodes.map { it.id }.toList() }
-                .selectedNodes
-        }
+        val nodes =
+            testContext.testOwner.getAllSemanticsNodes(atLeastOneRootRequired, useUnmergedTree)
 
         return testContext.testOwner
-            .getAllSemanticsNodes(atLeastOneRootRequired, useUnmergedTree)
-            .filter { it.id in nodeIds!! }
+            .runOnUiThread { selector.map(nodes, errorMessageOnFail.orEmpty()) }
+            .selectedNodes
     }
 
     /**
