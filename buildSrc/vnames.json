@@ -7,14 +7,7 @@
     }
   },
   {
-    "pattern": "^prebuilts/androidx/external/(.*)",
-    "vname": {
-      "root": "out",
-      "path": "@1@"
-    }
-  },
-  {
-    "pattern": "^prebuilts/androidx/internal/(.*)",
+    "pattern": "^prebuilts/(.*)",
     "vname": {
       "root": "out",
       "path": "@1@"

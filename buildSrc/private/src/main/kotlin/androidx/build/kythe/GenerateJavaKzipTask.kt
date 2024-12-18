@@ -23,6 +23,7 @@ import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -67,6 +68,8 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
 
     @get:Classpath abstract val dependencyClasspath: ConfigurableFileCollection
 
+    @get:Classpath abstract val compiledSources: ConfigurableFileCollection
+
     @get:Classpath abstract val annotationProcessor: ConfigurableFileCollection
 
     @get:OutputFile abstract val kzipOutputFile: RegularFileProperty
@@ -76,19 +79,25 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
     @TaskAction
     fun exec() {
         val sourceFiles =
-            if (sourcePaths.asFileTree.files.none { it.extension == "kt" }) {
-                sourcePaths.asFileTree.files
-                    .filter { it.extension == "java" }
-                    .map { it.relativeTo(checkoutRoot) }
-            } else {
-                emptyList()
-            }
+            sourcePaths.asFileTree.files
+                .filter { it.extension == "java" }
+                .map { it.relativeTo(checkoutRoot) }
 
         if (sourceFiles.isEmpty()) {
             return
         }
 
-        val dependencyClasspath = dependencyClasspath.filter { it.extension == "jar" }
+        val dependencyClasspath =
+            dependencyClasspath
+                .filter { it.extension == "jar" }
+                .let { filteredClasspath ->
+                    if (sourcePaths.asFileTree.files.any { it.extension == "kt" }) {
+                        filteredClasspath + compiledSources
+                    } else {
+                        filteredClasspath
+                    }
+                }
+
         val kytheBuildDirectory = kytheBuildDirectory.get().asFile.apply { mkdirs() }
 
         execOperations.javaexec {
@@ -128,6 +137,7 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
         fun setupProject(
             project: Project,
             javaInputs: JavaCompileInputs,
+            compiledSources: Configuration,
         ) {
             val annotationProcessorPaths =
                 project.objects.fileCollection().apply {
@@ -157,6 +167,7 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                         dependencyClasspath.setFrom(
                             javaInputs.dependencyClasspath + javaInputs.bootClasspath
                         )
+                        this.compiledSources.setFrom(compiledSources)
                         kzipOutputFile.set(
                             project.layout.buildDirectory.file(
                                 "kzips/${project.group}-${project.name}.java.kzip"
