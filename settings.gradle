@@ -358,13 +358,6 @@ def includeProject(String name, filePath, List<BuildType> filter = []) {
     projectDependencyGraph.addToAllProjects(name, file)
 }
 
-def includeOptionalProject(String name, File filePath, List<BuildType> filter = []) {
-    if (providers.gradleProperty("androidx.includeOptionalProjects")
-            .getOrElse("false").toBoolean()) {
-        includeProject(name, filePath, filter)
-    }
-}
-
 /////////////////////////////
 //
 // Libraries
