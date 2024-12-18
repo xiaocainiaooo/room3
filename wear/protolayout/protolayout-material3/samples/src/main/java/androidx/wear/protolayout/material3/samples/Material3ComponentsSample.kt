@@ -27,9 +27,12 @@ import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint
 import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
+import androidx.wear.protolayout.material3.AppCardStyle
+import androidx.wear.protolayout.material3.CardDefaults.filledTonalCardColors
 import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
 import androidx.wear.protolayout.material3.TitleCardStyle.Companion.largeTitleCardStyle
 import androidx.wear.protolayout.material3.Typography
+import androidx.wear.protolayout.material3.appCard
 import androidx.wear.protolayout.material3.backgroundImage
 import androidx.wear.protolayout.material3.buttonGroup
 import androidx.wear.protolayout.material3.card
@@ -157,13 +160,37 @@ fun titleCardSample(
             mainSlot = {
                 titleCard(
                     onClick = clickable,
-                    contentDescription = "Card with image background".prop(),
+                    contentDescription = "Title Card".prop(),
                     height = expand(),
                     colors = filledVariantCardColors(),
                     style = largeTitleCardStyle(),
                     title = { text("This is title of the title card".prop()) },
                     time = { text("NOW".prop()) },
                     content = { text("Content of the Card!".prop()) }
+                )
+            }
+        )
+    }
+
+@Sampled
+fun appCardSample(
+    context: Context,
+    deviceConfiguration: DeviceParameters,
+    clickable: Clickable
+): LayoutElement =
+    materialScope(context, deviceConfiguration) {
+        primaryLayout(
+            mainSlot = {
+                appCard(
+                    onClick = clickable,
+                    contentDescription = "App Card".prop(),
+                    height = expand(),
+                    colors = filledTonalCardColors(),
+                    style = AppCardStyle.largeAppCardStyle(),
+                    title = { text("This is title of the app card".prop()) },
+                    time = { text("NOW".prop()) },
+                    label = { text("Label".prop()) },
+                    content = { text("Content of the Card!".prop()) },
                 )
             }
         )
