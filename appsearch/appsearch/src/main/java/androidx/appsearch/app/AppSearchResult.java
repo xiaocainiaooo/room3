@@ -216,7 +216,7 @@ public final class AppSearchResult<ValueType> {
      * @param value An optional value to associate with the successful result of the operation
      *              being performed.
      */
-    public static <ValueType> @NonNull AppSearchResult<ValueType> newSuccessfulResult(
+    public static @NonNull <ValueType> AppSearchResult<ValueType> newSuccessfulResult(
             @Nullable ValueType value) {
         return new AppSearchResult<>(RESULT_OK, value, /*errorMessage=*/ null);
     }
@@ -227,7 +227,7 @@ public final class AppSearchResult<ValueType> {
      * @param resultCode One of the constants documented in {@link AppSearchResult#getResultCode}.
      * @param errorMessage An optional string describing the reason or nature of the failure.
      */
-    public static <ValueType> @NonNull AppSearchResult<ValueType> newFailedResult(
+    public static @NonNull <ValueType> AppSearchResult<ValueType> newFailedResult(
             @ResultCode int resultCode, @Nullable String errorMessage) {
         return new AppSearchResult<>(resultCode, /*resultValue=*/ null, errorMessage);
     }
@@ -238,7 +238,7 @@ public final class AppSearchResult<ValueType> {
      * @exportToFramework:hide
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public static <ValueType> @NonNull AppSearchResult<ValueType> newFailedResult(
+    public static @NonNull <ValueType> AppSearchResult<ValueType> newFailedResult(
             @NonNull AppSearchResult<?> otherFailedResult) {
         Preconditions.checkState(!otherFailedResult.isSuccess(),
                 "Cannot convert a success result to a failed result");
@@ -248,7 +248,7 @@ public final class AppSearchResult<ValueType> {
 
     /** @exportToFramework:hide */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public static <ValueType> @NonNull AppSearchResult<ValueType> throwableToFailedResult(
+    public static @NonNull <ValueType> AppSearchResult<ValueType> throwableToFailedResult(
             @NonNull Throwable t) {
         // Log for traceability. NOT_FOUND is logged at VERBOSE because this error can occur during
         // the regular operation of the system (b/183550974). Everything else is indicative of an
