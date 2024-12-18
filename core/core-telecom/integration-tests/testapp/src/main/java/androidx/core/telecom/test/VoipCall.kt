@@ -28,6 +28,8 @@ import androidx.core.telecom.test.NotificationsUtilities.Companion.NOTIFICATION_
 import androidx.core.telecom.util.ExperimentalAppActions
 import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 @ExperimentalAppActions
@@ -38,6 +40,7 @@ class VoipCall(val context: Context, val attributes: CallAttributesCompat) {
     var mAdapter: CallListAdapter? = null
     var mCallControl: CallControlScope? = null
     var mParticipantControl: ParticipantControl? = null
+    var mCurrentState: String = "?"
     var mCurrentEndpoint: CallEndpointCompat? = null
     var mAvailableEndpoints: List<CallEndpointCompat>? = ArrayList()
     var mIsMuted = false
@@ -45,27 +48,29 @@ class VoipCall(val context: Context, val attributes: CallAttributesCompat) {
     var mIsLocallySilence: Boolean = false
     var hasUpdatedToOngoing = false
     var mLocalCallSilenceExtension: LocalCallSilenceExtension? = null
+    var mCallJob: Job? = null
 
     val mOnSetActiveLambda: suspend () -> Unit = {
         Log.i(TAG, "onSetActive: completing")
-        mAdapter?.updateCallState(mTelecomCallId, "Active")
+        onCallStateChanged("Active")
     }
 
     val mOnSetInActiveLambda: suspend () -> Unit = {
         Log.i(TAG, "onSetInactive: completing")
-        mAdapter?.updateCallState(mTelecomCallId, "Inactive")
+        onCallStateChanged("Inactive")
     }
 
     val mOnAnswerLambda: suspend (type: Int) -> Unit = {
         Log.i(TAG, "onAnswer: callType=[$it]")
-        mAdapter?.updateCallState(mTelecomCallId, "Answered")
+        onCallStateChanged("Answered")
         updateNotificationToOngoing()
     }
 
     val mOnDisconnectLambda: suspend (cause: DisconnectCause) -> Unit = {
         Log.i(TAG, "onDisconnect: disconnectCause=[$it]")
         NotificationsUtilities.clearNotification(context, mNotificationId)
-        mAdapter?.updateCallState(mTelecomCallId, "Disconnected")
+        onCallStateChanged("Disconnected")
+        mCallJob?.cancel("call disconnected")
     }
 
     fun setCallControl(callControl: CallControlScope) {
@@ -97,6 +102,10 @@ class VoipCall(val context: Context, val attributes: CallAttributesCompat) {
         hasUpdatedToOngoing = true
     }
 
+    fun setJob(job: Job) {
+        mCallJob = job
+    }
+
     @OptIn(ExperimentalAppActions::class)
     suspend fun toggleLocalCallSilence() {
         CoroutineScope(coroutineContext).launch {
@@ -117,6 +126,11 @@ class VoipCall(val context: Context, val attributes: CallAttributesCompat) {
         }
     }
 
+    suspend fun disconnect(cause: DisconnectCause) {
+        mCallControl?.disconnect(cause)
+        mCallJob?.cancel("call disconnected")
+    }
+
     fun setCallAdapter(adapter: CallListAdapter?) {
         mAdapter = adapter
     }
@@ -127,6 +141,12 @@ class VoipCall(val context: Context, val attributes: CallAttributesCompat) {
 
     fun onParticipantsChanged(participants: List<ParticipantState>) {
         mAdapter?.updateParticipants(mTelecomCallId, participants)
+    }
+
+    fun onCallStateChanged(callState: String) {
+        Log.i(TAG, "onCallStateChanged: state=$callState")
+        mCurrentState = callState
+        mAdapter?.updateCallState(mTelecomCallId, callState)
     }
 
     fun onCallEndpointChanged(endpoint: CallEndpointCompat) {

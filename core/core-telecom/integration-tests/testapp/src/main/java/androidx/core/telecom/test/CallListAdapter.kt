@@ -41,7 +41,7 @@ class CallListAdapter(
     private var mAudioRecord: AudioRecord? = null
 ) : RecyclerView.Adapter<CallListAdapter.ViewHolder>() {
     var mCallIdToViewHolder: MutableMap<String, ViewHolder> = mutableMapOf()
-    private val CONTROL_ACTION_FAILED_MSG = "CurrentState=[FAILED-T]"
+    private val CONTROL_ACTION_FAILED_MSG = "[FAILED-T]"
     internal var mAudioRecordingCallback: AudioRecordingCallback? = null
 
     class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
@@ -85,14 +85,18 @@ class CallListAdapter(
 
     // Set the data for the user
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        // Making the items recyclable causes weird caching issues with the holder's params. Move
+        // to false since there are never that many calls active at a time.
+        holder.setIsRecyclable(false)
         val ItemsViewModel = mList?.get(position)
 
         // sets the text to the textview from our itemHolder class
         if (ItemsViewModel != null) {
             mCallIdToViewHolder[ItemsViewModel.callObject.mTelecomCallId] = holder
 
-            holder.callCount.text = "Call # " + ItemsViewModel.callNumber.toString() + "; "
-            holder.callIdTextView.text = "ID=[" + ItemsViewModel.callObject.mTelecomCallId + "]"
+            holder.callCount.text = ItemsViewModel.callNumber.toString()
+            holder.callIdTextView.text = ItemsViewModel.callObject.mTelecomCallId
+            holder.currentState.text = ItemsViewModel.callObject.mCurrentState
 
             holder.activeButton.setOnClickListener {
                 CoroutineScope(Dispatchers.Main).launch {
@@ -104,10 +108,10 @@ class CallListAdapter(
                     when (ItemsViewModel.callObject.mCallControl!!.setActive()) {
                         is CallControlResult.Success -> {
                             ItemsViewModel.callObject.updateNotificationToOngoing()
-                            holder.currentState.text = "CurrentState=[active]"
+                            ItemsViewModel.callObject.onCallStateChanged("Active")
                         }
                         is CallControlResult.Error -> {
-                            holder.currentState.text = CONTROL_ACTION_FAILED_MSG
+                            ItemsViewModel.callObject.onCallStateChanged(CONTROL_ACTION_FAILED_MSG)
                         }
                     }
                 }
@@ -119,10 +123,10 @@ class CallListAdapter(
                     mAudioRecord?.stop()
                     when (ItemsViewModel.callObject.mCallControl!!.setInactive()) {
                         is CallControlResult.Success -> {
-                            holder.currentState.text = "CurrentState=[onHold]"
+                            ItemsViewModel.callObject.onCallStateChanged("Inactive")
                         }
                         is CallControlResult.Error -> {
-                            holder.currentState.text = CONTROL_ACTION_FAILED_MSG
+                            ItemsViewModel.callObject.onCallStateChanged(CONTROL_ACTION_FAILED_MSG)
                         }
                     }
                 }
@@ -132,11 +136,9 @@ class CallListAdapter(
                 CoroutineScope(Dispatchers.IO).launch {
                     endAudioRecording()
                     ItemsViewModel.callObject.clearNotification()
-                    ItemsViewModel.callObject.mCallControl?.disconnect(
-                        DisconnectCause(DisconnectCause.LOCAL)
-                    )
+                    ItemsViewModel.callObject.disconnect(DisconnectCause(DisconnectCause.LOCAL))
                 }
-                holder.currentState.text = "CurrentState=[null]"
+                ItemsViewModel.callObject.onCallStateChanged("Disconnected")
                 mList?.remove(ItemsViewModel)
                 this.notifyDataSetChanged()
             }
@@ -146,9 +148,18 @@ class CallListAdapter(
                     val earpieceEndpoint =
                         ItemsViewModel.callObject.getEndpointType(CallEndpoint.TYPE_EARPIECE)
                     if (earpieceEndpoint != null) {
-                        ItemsViewModel.callObject.mCallControl?.requestEndpointChange(
-                            earpieceEndpoint
-                        )
+                        when (
+                            ItemsViewModel.callObject.mCallControl!!.requestEndpointChange(
+                                earpieceEndpoint
+                            )
+                        ) {
+                            is CallControlResult.Success -> {
+                                holder.currentEndpoint.text = "[earpiece]"
+                            }
+                            is CallControlResult.Error -> {
+                                holder.currentEndpoint.text = CONTROL_ACTION_FAILED_MSG
+                            }
+                        }
                     }
                 }
             }
@@ -163,10 +174,10 @@ class CallListAdapter(
                             )
                         ) {
                             is CallControlResult.Success -> {
-                                holder.currentState.text = "CurrentState=[speaker]"
+                                holder.currentEndpoint.text = "[speaker]"
                             }
                             is CallControlResult.Error -> {
-                                holder.currentState.text = CONTROL_ACTION_FAILED_MSG
+                                holder.currentEndpoint.text = CONTROL_ACTION_FAILED_MSG
                             }
                         }
                     }
@@ -184,12 +195,11 @@ class CallListAdapter(
                             )
                         ) {
                             is CallControlResult.Success -> {
-                                holder.currentEndpoint.text =
-                                    "currentEndpoint=[BT:${bluetoothEndpoint.name}]"
+                                holder.currentEndpoint.text = "[BT:${bluetoothEndpoint.name}]"
                             }
                             is CallControlResult.Error -> {
                                 // e.g. tear down call and
-                                holder.currentState.text = CONTROL_ACTION_FAILED_MSG
+                                holder.currentEndpoint.text = CONTROL_ACTION_FAILED_MSG
                             }
                         }
                     }
@@ -217,17 +227,21 @@ class CallListAdapter(
         }
     }
 
+    override fun getItemId(position: Int): Long {
+        return mList?.get(position)?.callNumber?.toLong() ?: RecyclerView.NO_ID
+    }
+
     fun updateParticipants(callId: String, participants: List<ParticipantState>) {
         CoroutineScope(Dispatchers.Main).launch {
             val holder = mCallIdToViewHolder[callId]
-            holder?.participants?.text = "participants=[${printParticipants(participants)}]"
+            holder?.participants?.text = "[${printParticipants(participants)}]"
         }
     }
 
     fun updateCallState(callId: String, state: String) {
         CoroutineScope(Dispatchers.Main).launch {
             val holder = mCallIdToViewHolder[callId]
-            holder?.callIdTextView?.text = "currentState=[$state]"
+            holder?.currentState?.text = "[$state]"
         }
     }
 
@@ -245,7 +259,7 @@ class CallListAdapter(
     fun updateEndpoint(callId: String, endpoint: String) {
         CoroutineScope(Dispatchers.Main).launch {
             val holder = mCallIdToViewHolder[callId]
-            holder?.currentEndpoint?.text = "currentEndpoint=[$endpoint]"
+            holder?.currentEndpoint?.text = "[$endpoint]"
         }
     }
 
