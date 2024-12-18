@@ -210,8 +210,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         val localPageLayoutManager =
             pageLayoutManager
                 ?: throw IllegalStateException("Can't scrollToPage without PdfDocument")
-        require(position.pageNum < (pdfDocument?.pageCount ?: Int.MIN_VALUE)) {
-            "Page ${position.pageNum} not in document"
+
+        if (position.pageNum >= (pdfDocument?.pageCount ?: Int.MIN_VALUE)) {
+            return
         }
 
         if (localPageLayoutManager.reach >= position.pageNum) {
@@ -896,7 +897,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                                     gotoLink.destination.yCoordinate
                                 )
                         )
-                    gotoPoint(destination)
+                    scrollToPosition(destination)
                     return true
                 }
             }
@@ -909,9 +910,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         ): Boolean {
             links.externalLinks.forEach { externalLink ->
                 if (externalLink.bounds.any { it.contains(pdfCoordinates.x, pdfCoordinates.y) }) {
-                    linkClickListener?.onLinkClicked(externalLink.uri)
+                    var uri = externalLink.uri
+                    linkClickListener?.onLinkClicked(uri)
                         ?: run {
-                            val intent = Intent(Intent.ACTION_VIEW, externalLink.uri)
+                            val intent = Intent(Intent.ACTION_VIEW, uri)
                             context.startActivity(intent)
                         }
                     return true

@@ -83,20 +83,17 @@ internal class Page(
     fun updateState(zoom: Float, isFlinging: Boolean = false) {
         bitmapFetcher.isActive = true
         bitmapFetcher.onScaleChanged(zoom)
-
         if (!isFlinging) {
-            fetchPageLinks()
+            maybeFetchLinks()
             fetchPageText()
         }
     }
 
     fun setInvisible() {
         bitmapFetcher.isActive = false
-
         pageText = null
         fetchPageTextJob?.cancel()
         fetchPageTextJob = null
-
         links = null
         fetchLinksJob?.cancel()
         fetchLinksJob = null
@@ -112,18 +109,6 @@ internal class Page(
                     pageText =
                         pdfDocument.getPageContent(pageNum)?.textContents?.joinToString { it.text }
                     onPageTextReady.invoke(pageNum)
-                }
-                .also { it.invokeOnCompletion { fetchPageTextJob = null } }
-    }
-
-    private fun fetchPageLinks() {
-        if (fetchLinksJob?.isActive == true || links != null) return
-
-        fetchLinksJob =
-            backgroundScope
-                .launch {
-                    ensureActive()
-                    links = pdfDocument.getPageLinks(pageNum)
                 }
                 .also { it.invokeOnCompletion { fetchPageTextJob = null } }
     }
@@ -147,6 +132,17 @@ internal class Page(
             highlightPaint.color = highlight.color
             canvas.drawRect(highlightRect, highlightPaint)
         }
+    }
+
+    private fun maybeFetchLinks() {
+        if (fetchLinksJob?.isActive == true || links != null) return
+        fetchLinksJob =
+            backgroundScope
+                .launch {
+                    ensureActive()
+                    links = pdfDocument.getPageLinks(pageNum)
+                }
+                .also { it.invokeOnCompletion { fetchLinksJob = null } }
     }
 
     private fun draw(fullPageBitmap: FullPageBitmap, canvas: Canvas, locationInView: Rect) {
