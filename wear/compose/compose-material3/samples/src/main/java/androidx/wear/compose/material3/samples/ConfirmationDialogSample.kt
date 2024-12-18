@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,18 +29,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.wear.compose.material3.Confirmation
-import androidx.wear.compose.material3.ConfirmationDefaults
-import androidx.wear.compose.material3.FailureConfirmation
+import androidx.wear.compose.material3.ConfirmationDialog
+import androidx.wear.compose.material3.ConfirmationDialogDefaults
+import androidx.wear.compose.material3.FailureConfirmationDialog
 import androidx.wear.compose.material3.FilledTonalButton
 import androidx.wear.compose.material3.Icon
-import androidx.wear.compose.material3.SuccessConfirmation
+import androidx.wear.compose.material3.SuccessConfirmationDialog
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.confirmationCurvedText
 import androidx.wear.compose.material3.samples.icons.FavoriteIcon
 
 @Sampled
 @Composable
-fun ConfirmationSample() {
+fun ConfirmationDialogSample() {
     var showConfirmation by remember { mutableStateOf(false) }
 
     Box(Modifier.fillMaxSize()) {
@@ -54,18 +54,19 @@ fun ConfirmationSample() {
 
     // Has an icon and a short curved text content, which will be displayed along the bottom edge of
     // the screen.
-    Confirmation(
-        show = showConfirmation,
+    val curvedTextStyle = ConfirmationDialogDefaults.curvedTextStyle
+    ConfirmationDialog(
+        visible = showConfirmation,
         onDismissRequest = { showConfirmation = false },
-        curvedText = ConfirmationDefaults.curvedText("Confirmed")
+        curvedText = { confirmationCurvedText("Confirmed", curvedTextStyle) },
     ) {
-        FavoriteIcon(ConfirmationDefaults.IconSize)
+        FavoriteIcon(ConfirmationDialogDefaults.IconSize)
     }
 }
 
 @Sampled
 @Composable
-fun LongTextConfirmationSample() {
+fun LongTextConfirmationDialogSample() {
     var showConfirmation by remember { mutableStateOf(false) }
 
     Box(Modifier.fillMaxSize()) {
@@ -78,22 +79,22 @@ fun LongTextConfirmationSample() {
 
     // Has an icon and a text content. Text will be displayed in the center of the screen below the
     // icon.
-    Confirmation(
-        show = showConfirmation,
+    ConfirmationDialog(
+        visible = showConfirmation,
         onDismissRequest = { showConfirmation = false },
         text = { Text(text = "Your message has been sent") },
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.Send,
             contentDescription = null,
-            modifier = Modifier.size(ConfirmationDefaults.SmallIconSize),
+            modifier = Modifier.size(ConfirmationDialogDefaults.SmallIconSize),
         )
     }
 }
 
 @Sampled
 @Composable
-fun FailureConfirmationSample() {
+fun FailureConfirmationDialogSample() {
     var showConfirmation by remember { mutableStateOf(false) }
 
     Box(Modifier.fillMaxSize()) {
@@ -104,12 +105,18 @@ fun FailureConfirmationSample() {
         )
     }
 
-    FailureConfirmation(show = showConfirmation, onDismissRequest = { showConfirmation = false })
+    val text = ConfirmationDialogDefaults.failureText
+    val style = ConfirmationDialogDefaults.curvedTextStyle
+    FailureConfirmationDialog(
+        visible = showConfirmation,
+        onDismissRequest = { showConfirmation = false },
+        curvedText = { confirmationCurvedText(text, style) }
+    )
 }
 
 @Sampled
 @Composable
-fun SuccessConfirmationSample() {
+fun SuccessConfirmationDialogSample() {
     var showConfirmation by remember { mutableStateOf(false) }
 
     Box(Modifier.fillMaxSize()) {
@@ -120,5 +127,11 @@ fun SuccessConfirmationSample() {
         )
     }
 
-    SuccessConfirmation(show = showConfirmation, onDismissRequest = { showConfirmation = false })
+    val text = ConfirmationDialogDefaults.successText
+    val style = ConfirmationDialogDefaults.curvedTextStyle
+    SuccessConfirmationDialog(
+        visible = showConfirmation,
+        onDismissRequest = { showConfirmation = false },
+        curvedText = { confirmationCurvedText(text, style) }
+    )
 }

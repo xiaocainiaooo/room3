@@ -68,8 +68,8 @@ val WearMaterial3Demos =
                 ComposableDemo("Color Scheme") { ColorSchemeDemos() },
                 ComposableDemo("Dynamic Color Scheme") { DynamicColorSchemeDemos() },
                 Material3DemoCategory("Curved Text", CurvedTextDemos),
-                Material3DemoCategory("Alert Dialog", AlertDialogs),
-                Material3DemoCategory("Confirmation", Comfirmations),
+                Material3DemoCategory("Alert Dialog", AlertDialogDemos),
+                Material3DemoCategory("Confirmation Dialog", ComfirmationDialogDemos),
                 Material3DemoCategory("Open on phone Dialog", OpenOnPhoneDialogDemos),
                 Material3DemoCategory(
                     "Scaffold",
