@@ -105,6 +105,7 @@ class AccessibilityPageHelperTest {
             ActivityScenario.launch(PdfViewTestActivity::class.java).onActivity { activity ->
                 pdfView = activity.findViewById<PdfView>(PDF_VIEW_ID)
                 requireNotNull(pdfView) { "PdfView must not be null." }
+                pdfView.isTouchExplorationEnabled = true
                 pdfView.pdfDocument = pdfDocument
             }
     }
@@ -115,33 +116,7 @@ class AccessibilityPageHelperTest {
     }
 
     @Test
-    fun getVirtualViewAt_returnsCorrectLink() = runTest {
-        val accessibilityPageHelper =
-            requireNotNull(pdfView.accessibilityPageHelper) {
-                "AccessibilityPageHelper must not be null."
-            }
-
-        // Wait until layout completes for the required pages
-        pdfDocument.waitForLayout(untilPage = 2)
-
-        // Test cases with content coordinates and expected page indices
-        val testCases =
-            listOf(
-                Triple(50f, 40f, 10), // Goto Link
-                Triple(50f, 70f, 11) // External Link
-            )
-
-        testCases.forEach { (x, y, expectedLinkId) ->
-            val adjustedX = pdfView.toViewCoord(x, pdfView.zoom, pdfView.scrollX)
-            val adjustedY = pdfView.toViewCoord(y, pdfView.zoom, pdfView.scrollY)
-
-            assertThat(accessibilityPageHelper.getVirtualViewAt(adjustedX, adjustedY))
-                .isEqualTo(expectedLinkId)
-        }
-    }
-
-    @Test
-    fun getVirtualViewAt_returnsCorrectPage() = runTest {
+    fun getVirtualViewAt_returnsCorrectPageAndLink() = runTest {
         val accessibilityPageHelper =
             requireNotNull(pdfView.accessibilityPageHelper) {
                 "AccessibilityPageHelper must not be null."
@@ -159,6 +134,8 @@ class AccessibilityPageHelperTest {
                 Triple(0f, 100f, 0), // Edge of the first page
                 Triple(110f, 25f, -1), // Outside valid page bounds
                 Triple(-10f, -10f, -1), // Outside viewport
+                Triple(50f, 40f, 10), // Goto Link
+                Triple(50f, 70f, 11) // External Link
             )
 
         testCases.forEach { (x, y, expectedPage) ->

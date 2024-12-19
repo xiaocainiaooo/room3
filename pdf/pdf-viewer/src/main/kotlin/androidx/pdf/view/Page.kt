@@ -49,6 +49,8 @@ internal class Page(
      * threshold for tiled rendering
      */
     maxBitmapSizePx: Point,
+    /** Whether touch exploration is enabled */
+    private val isTouchExplorationEnabled: Boolean,
     /** A function to call when the [PdfView] hosting this [Page] ought to invalidate itself */
     onPageUpdate: () -> Unit,
     /** A function to call when page text is ready (invoked with page number). */
@@ -94,7 +96,9 @@ internal class Page(
         bitmapFetcher.onScaleChanged(zoom)
         if (!isFlinging) {
             maybeFetchLinks()
-            fetchPageText()
+            if (isTouchExplorationEnabled) {
+                fetchPageText()
+            }
         }
     }
 
