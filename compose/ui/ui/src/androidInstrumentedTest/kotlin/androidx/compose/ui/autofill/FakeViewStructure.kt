@@ -59,7 +59,7 @@ internal data class FakeViewStructure(
     @JvmField var hint: CharSequence? = null,
     @JvmField var htmlInfo: HtmlInfo? = null,
     @JvmField var inputType: Int = 0,
-    @JvmField var isEnabled: Boolean = false,
+    @JvmField var isEnabled: Boolean = true,
     @JvmField var isAccessibilityFocused: Boolean = false,
     @JvmField var isChecked: Boolean = false,
     @JvmField var isClickable: Boolean = false,

@@ -47,6 +47,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDataType
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.maxTextLength
 import androidx.compose.ui.semantics.onLongClick
@@ -171,26 +172,25 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 FakeViewStructure().apply {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
-                    packageName = view.context.applicationInfo.packageName
-                    bounds = Rect(0, 0, width.dpToPx(), height.dpToPx())
                     autofillId = view.autofillId
-                    isEnabled = true
+                    bounds = Rect(0, 0, width.dpToPx(), height.dpToPx())
                     children.add(
                         FakeViewStructure().apply {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
-                            packageName = view.context.applicationInfo.packageName
-                            bounds = Rect(0, 0, width.dpToPx(), height.dpToPx())
-                            autofillId = view.autofillId
-                            isEnabled = true
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
-                            visibility = View.VISIBLE
-                            isLongClickable = false
+                            autofillId = view.autofillId
+                            bounds = Rect(0, 0, width.dpToPx(), height.dpToPx())
+                            isEnabled = true
                             isFocusable = false
                             isFocused = false
-                            isEnabled = true
+                            isLongClickable = false
+                            packageName = view.context.applicationInfo.packageName
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
+                            visibility = View.VISIBLE
                         }
                     )
+                    isEnabled = true
+                    packageName = view.context.applicationInfo.packageName
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -221,13 +221,13 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -258,13 +258,13 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillType = AUTOFILL_TYPE_TEXT
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -296,15 +296,15 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             isClickable = true
                             isFocusable = true
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -338,14 +338,14 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             contentDescription = contentTag
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -384,16 +384,16 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             isClickable = true
                             isFocusable = true
                             isSelected = true
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -432,19 +432,19 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             className = "android.widget.RadioButton"
-                            isClickable = true
-                            isFocusable = true
                             isCheckable = true
                             isChecked = true
+                            isClickable = true
+                            isFocusable = true
                             isSelected = true
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -483,19 +483,19 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             className = "android.widget.Spinner"
-                            isClickable = true
-                            isFocusable = true
                             isCheckable = true
                             isChecked = true
+                            isClickable = true
+                            isFocusable = true
                             isSelected = true
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -534,19 +534,19 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             className = "android.widget.NumberPicker"
-                            isClickable = true
-                            isFocusable = true
                             isCheckable = true
                             isChecked = true
+                            isClickable = true
+                            isFocusable = true
                             isSelected = true
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -581,14 +581,14 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             visibility = View.VISIBLE
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -621,14 +621,14 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             visibility = View.INVISIBLE
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -660,14 +660,14 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             visibility = View.VISIBLE
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -703,8 +703,8 @@ class PerformAndroidAutofillManagerTest {
                     virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             visibility = View.INVISIBLE
                         }
                     )
@@ -741,14 +741,14 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             isLongClickable = true
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -782,14 +782,14 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             isFocusable = true
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -822,15 +822,15 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             isFocusable = true
                             isFocused = true
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -845,9 +845,47 @@ class PerformAndroidAutofillManagerTest {
         rule.setContent {
             view = LocalView.current
             Box(
+                Modifier.semantics { contentType = ContentType.Username }
+                    .size(width, height)
+                    .testTag(contentTag)
+            )
+        }
+
+        // Act.
+        rule.runOnIdle {
+            // Compose does not use the Autofill flags parameter, passing in 0 as a placeholder flag
+            view.onProvideAutofillVirtualStructure(viewStructure, 0)
+        }
+
+        // Assert.
+        assertThat(viewStructure)
+            .isEqualTo(
+                ViewStructure(view) {
+                    children.add(
+                        ViewStructure(view) {
+                            autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
+                            isEnabled = true
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
+                        }
+                    )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
+                }
+            )
+    }
+
+    @Test
+    @SmallTest
+    @SdkSuppress(minSdkVersion = 26)
+    fun populateViewStructure_disabled() {
+        // Arrange.
+        lateinit var view: View
+        val viewStructure: ViewStructure = FakeViewStructure()
+        rule.setContent {
+            view = LocalView.current
+            Box(
                 Modifier.semantics {
                         contentType = ContentType.Username
-                        isEnabled()
+                        disabled()
                     }
                     .size(width, height)
                     .testTag(contentTag)
@@ -864,14 +902,14 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
-                            isEnabled = true
+                            isEnabled = false
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -906,16 +944,16 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
-                            autofillType = AUTOFILL_TYPE_TEXT
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
-                            maxTextLength = 5
+                            autofillType = AUTOFILL_TYPE_TEXT
                             className = "android.widget.EditText"
+                            maxTextLength = 5
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -949,14 +987,14 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             maxTextLength = -1
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -990,15 +1028,15 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             autofillType = View.AUTOFILL_TYPE_TOGGLE
                             isCheckable = true
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -1032,16 +1070,16 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             autofillType = View.AUTOFILL_TYPE_TOGGLE
                             isCheckable = true
                             isChecked = true
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -1073,18 +1111,18 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             autofillType = View.AUTOFILL_TYPE_TOGGLE
                             isCheckable = true
                             isChecked = true
-                            isFocusable = true
                             isClickable = true
+                            isFocusable = true
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -1119,11 +1157,8 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
-                            text = ""
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             autofillType = AUTOFILL_TYPE_TEXT
                             autofillValue = AutofillValue.forText("")
@@ -1131,9 +1166,12 @@ class PerformAndroidAutofillManagerTest {
                             isClickable = true
                             isFocusable = true
                             isLongClickable = true
+                            text = ""
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             visibility = View.VISIBLE
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -1168,11 +1206,8 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
-                            text = ""
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             autofillType = AUTOFILL_TYPE_TEXT
                             autofillValue = AutofillValue.forText("testUsername")
@@ -1180,9 +1215,12 @@ class PerformAndroidAutofillManagerTest {
                             isClickable = true
                             isFocusable = true
                             isLongClickable = true
+                            text = ""
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             visibility = View.VISIBLE
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -1219,24 +1257,24 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
-                            text = ""
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_PASSWORD)
                             autofillType = AUTOFILL_TYPE_TEXT
                             autofillValue = AutofillValue.forText("")
                             className = "android.widget.EditText"
-                            isClickable = true
                             dataIsSensitive = true
                             inputType =
                                 InputType.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
+                            isClickable = true
                             isFocusable = true
                             isLongClickable = true
+                            text = ""
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             visibility = View.VISIBLE
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -1271,24 +1309,24 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
-                            text = ""
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_PASSWORD)
                             autofillType = AUTOFILL_TYPE_TEXT
                             autofillValue = AutofillValue.forText("testPassword")
                             className = "android.widget.EditText"
-                            isClickable = true
                             dataIsSensitive = true
                             inputType =
                                 InputType.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
+                            isClickable = true
                             isFocusable = true
                             isLongClickable = true
+                            text = ""
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             visibility = View.VISIBLE
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -1324,14 +1362,14 @@ class PerformAndroidAutofillManagerTest {
         assertThat(viewStructure)
             .isEqualTo(
                 ViewStructure(view) {
-                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     children.add(
                         ViewStructure(view) {
-                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                             autofillHints = mutableListOf(HintConstants.AUTOFILL_HINT_USERNAME)
                             dataIsSensitive = true
+                            virtualId = rule.onNodeWithTag(contentTag).semanticsId()
                         }
                     )
+                    virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                 }
             )
     }
@@ -1437,10 +1475,10 @@ class PerformAndroidAutofillManagerTest {
         block: FakeViewStructure.() -> Unit
     ): FakeViewStructure {
         return FakeViewStructure().apply {
-            packageName = view.context.applicationInfo.packageName
-            bounds = Rect(0, 0, width.dpToPx(), height.dpToPx())
             autofillId = view.autofillId
+            bounds = Rect(0, 0, width.dpToPx(), height.dpToPx())
             isEnabled = true
+            packageName = view.context.applicationInfo.packageName
             block()
         }
     }
