@@ -312,23 +312,6 @@ abstract class AndroidXExtension(
         return shouldPublish() || type == LibraryType.IDE_PLUGIN
     }
 
-    /**
-     * Whether to run API tasks such as tracking and linting. The default value is
-     * [RunApiTasks.Auto], which automatically picks based on the project's properties.
-     */
-    // TODO: decide whether we want to support overriding runApiTasks
-    // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.runApiTasks")
-    var runApiTasks: RunApiTasks = RunApiTasks.Auto
-        get() = if (field == RunApiTasks.Auto && type != LibraryType.UNSET) type.checkApi else field
-        set(value) {
-            if (value is RunApiTasks.No) {
-                throw GradleException(
-                    "runApiTasks cannot be disabled from the AndroidX extension. Ensure you're using the correct library type if you really do not need API tracking"
-                )
-            }
-            field = value
-        }
-
     var doNotDocumentReason: String? = null
 
     var type: LibraryType = LibraryType.UNSET
@@ -368,7 +351,7 @@ abstract class AndroidXExtension(
     }
 
     fun shouldEnforceKotlinStrictApiMode(): Boolean {
-        return !legacyDisableKotlinStrictApiMode && runApiTasks is RunApiTasks.Yes
+        return !legacyDisableKotlinStrictApiMode && type.checkApi is RunApiTasks.Yes
     }
 
     fun extraLicense(closure: Closure<Any>): License {

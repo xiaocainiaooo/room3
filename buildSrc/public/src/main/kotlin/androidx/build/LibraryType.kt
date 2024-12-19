@@ -337,8 +337,6 @@ enum class Publish {
 }
 
 sealed class RunApiTasks {
-    /** Automatically determine whether API tasks should be run. */
-    object Auto : RunApiTasks()
 
     /** Always run API tasks regardless of other project properties. */
     data class Yes(val reason: String? = null) : RunApiTasks()
