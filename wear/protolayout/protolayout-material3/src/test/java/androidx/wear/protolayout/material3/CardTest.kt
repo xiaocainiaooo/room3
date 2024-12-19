@@ -22,6 +22,8 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.wear.protolayout.DeviceParametersBuilders
 import androidx.wear.protolayout.DimensionBuilders.expand
+import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.testing.LayoutElementAssertionsProvider
 import androidx.wear.protolayout.testing.hasClickable
 import androidx.wear.protolayout.testing.hasColor
@@ -151,7 +153,7 @@ class CardTest {
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
                 card(
                     onClick = CLICKABLE,
-                    contentDescription = CONTENT_DESCRIPTION.prop(),
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     background = { backgroundImage(IMAGE_ID) }
                 ) {
                     text(TEXT.prop())
@@ -169,7 +171,7 @@ class CardTest {
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
                 card(
                     onClick = CLICKABLE,
-                    contentDescription = CONTENT_DESCRIPTION.prop(),
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     backgroundColor = color.argb
                 ) {
                     text(TEXT.prop())
@@ -190,7 +192,7 @@ class CardTest {
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
                 titleCard(
                     onClick = CLICKABLE,
-                    contentDescription = CONTENT_DESCRIPTION.prop(),
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     colors =
                         CardColors(
                             background = backgroundColor.argb,
@@ -224,7 +226,7 @@ class CardTest {
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
                 appCard(
                     onClick = CLICKABLE,
-                    contentDescription = CONTENT_DESCRIPTION.prop(),
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     colors =
                         CardColors(
                             background = backgroundColor.argb,
@@ -259,7 +261,7 @@ class CardTest {
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
                 card(
                     onClick = CLICKABLE,
-                    contentDescription = CONTENT_DESCRIPTION.prop(),
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     width = expand(),
                     height = height.toDp()
                 ) {
@@ -297,7 +299,10 @@ class CardTest {
 
         private val DEFAULT_CONTAINER_CARD_WITH_TEXT =
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
-                card(onClick = CLICKABLE, contentDescription = CONTENT_DESCRIPTION.prop()) {
+                card(
+                    onClick = CLICKABLE,
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION)
+                ) {
                     text(TEXT.prop())
                 }
             }
@@ -306,7 +311,7 @@ class CardTest {
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
                 titleCard(
                     onClick = CLICKABLE,
-                    contentDescription = CONTENT_DESCRIPTION.prop(),
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     title = { text(TEXT.prop()) },
                     content = { text(TEXT2.prop()) },
                     time = { text(TEXT3.prop()) },
@@ -317,7 +322,7 @@ class CardTest {
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
                 appCard(
                     onClick = CLICKABLE,
-                    contentDescription = CONTENT_DESCRIPTION.prop(),
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     title = { text(TEXT.prop()) },
                     content = { text(TEXT2.prop()) },
                     time = { text(TEXT3.prop()) },

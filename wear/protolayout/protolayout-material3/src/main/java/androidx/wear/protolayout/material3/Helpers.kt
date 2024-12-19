@@ -43,8 +43,6 @@ import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.ElementMetadata
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Padding
-import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
-import androidx.wear.protolayout.ModifiersBuilders.Semantics
 import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.materialcore.fontscaling.FontScaleConverterFactory
 import androidx.wear.protolayout.types.LayoutColor
@@ -84,9 +82,6 @@ internal fun Float.dpToSp(fontScale: Float): Float =
         ?.convertDpToSp(this) ?: dpToSpLinear(fontScale)
 
 @Dimension(unit = SP) private fun Float.dpToSpLinear(fontScale: Float): Float = this / fontScale
-
-internal fun StringProp.buttonRoleSemantics() =
-    Semantics.Builder().setContentDescription(this).setRole(SEMANTICS_ROLE_BUTTON).build()
 
 internal fun Int.toDp() = dp(this.toFloat())
 

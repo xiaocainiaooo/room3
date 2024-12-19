@@ -44,6 +44,8 @@ import androidx.wear.protolayout.material3.prop
 import androidx.wear.protolayout.material3.text
 import androidx.wear.protolayout.material3.textEdgeButton
 import androidx.wear.protolayout.material3.titleCard
+import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.contentDescription
 
 /** Builds Material3 text element with default options. */
 @Sampled
@@ -79,7 +81,10 @@ fun edgeButtonSampleIcon(
     clickable: Clickable
 ): LayoutElement =
     materialScope(context, deviceConfiguration) {
-        iconEdgeButton(onClick = clickable, contentDescription = "Description of a button".prop()) {
+        iconEdgeButton(
+            onClick = clickable,
+            modifier = LayoutModifier.contentDescription("Description of a button")
+        ) {
             icon(protoLayoutResourceId = "id")
         }
     }
@@ -91,7 +96,10 @@ fun edgeButtonSampleText(
     clickable: Clickable
 ): LayoutElement =
     materialScope(context, deviceConfiguration) {
-        textEdgeButton(onClick = clickable, contentDescription = "Description of a button".prop()) {
+        textEdgeButton(
+            onClick = clickable,
+            modifier = LayoutModifier.contentDescription("Description of a button")
+        ) {
             text("Hello".prop())
         }
     }
@@ -123,7 +131,14 @@ fun topLeveLayout(
                     }
                 }
             },
-            bottomSlot = { iconEdgeButton(clickable, "Description".prop()) { icon("id") } }
+            bottomSlot = {
+                iconEdgeButton(
+                    clickable,
+                    modifier = LayoutModifier.contentDescription("Description")
+                ) {
+                    icon("id")
+                }
+            }
         )
     }
 
@@ -138,7 +153,7 @@ fun cardSample(
             mainSlot = {
                 card(
                     onClick = clickable,
-                    contentDescription = "Card with image background".prop(),
+                    modifier = LayoutModifier.contentDescription("Card with image background"),
                     width = expand(),
                     height = expand(),
                     background = { backgroundImage(protoLayoutResourceId = "id") }
@@ -160,7 +175,7 @@ fun titleCardSample(
             mainSlot = {
                 titleCard(
                     onClick = clickable,
-                    contentDescription = "Title Card".prop(),
+                    modifier = LayoutModifier.contentDescription("Title Card"),
                     height = expand(),
                     colors = filledVariantCardColors(),
                     style = largeTitleCardStyle(),
@@ -183,7 +198,7 @@ fun appCardSample(
             mainSlot = {
                 appCard(
                     onClick = clickable,
-                    contentDescription = "App Card".prop(),
+                    modifier = LayoutModifier.contentDescription("App Card"),
                     height = expand(),
                     colors = filledTonalCardColors(),
                     style = AppCardStyle.largeAppCardStyle(),

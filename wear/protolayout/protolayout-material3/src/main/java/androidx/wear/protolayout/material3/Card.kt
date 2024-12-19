@@ -29,9 +29,8 @@ import androidx.wear.protolayout.LayoutElementBuilders.TEXT_ALIGN_START
 import androidx.wear.protolayout.ModifiersBuilders.Background
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.ModifiersBuilders.Corner
-import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Padding
-import androidx.wear.protolayout.TypeBuilders.StringProp
+import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
 import androidx.wear.protolayout.material3.AppCardDefaults.buildContentForAppCard
 import androidx.wear.protolayout.material3.AppCardStyle.Companion.defaultAppCardStyle
 import androidx.wear.protolayout.material3.CardDefaults.DEFAULT_CONTENT_PADDING
@@ -39,6 +38,10 @@ import androidx.wear.protolayout.material3.CardDefaults.METADATA_TAG
 import androidx.wear.protolayout.material3.CardDefaults.filledCardColors
 import androidx.wear.protolayout.material3.TitleCardDefaults.buildContentForTitleCard
 import androidx.wear.protolayout.material3.TitleCardStyle.Companion.defaultTitleCardStyle
+import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.contentDescription
+import androidx.wear.protolayout.modifiers.semanticsRole
+import androidx.wear.protolayout.modifiers.toProtoLayoutModifiersBuilder
 import androidx.wear.protolayout.types.LayoutColor
 
 /**
@@ -48,9 +51,10 @@ import androidx.wear.protolayout.types.LayoutColor
  *
  * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
  *   associated action.
- * @param contentDescription The content description to be read by Talkback.
  * @param title A slot for displaying the title of the card, expected to be one or two lines of
  *   text. Uses [CardColors.title] color by default.
+ * @param modifier Modifiers to set to this element. It's highly recommended to set a content
+ *   description using [contentDescription].
  * @param content The optional body content of the card. Uses [CardColors.content] color by default.
  * @param time An optional slot for displaying the time relevant to the contents of the card,
  *   expected to be a short piece of text. Uses [CardColors.time] color by default.
@@ -83,8 +87,8 @@ import androidx.wear.protolayout.types.LayoutColor
 // TODO: b/373578620 - Add how corners affects margins in the layout.
 public fun MaterialScope.titleCard(
     onClick: Clickable,
-    contentDescription: StringProp,
     title: (MaterialScope.() -> LayoutElement),
+    modifier: LayoutModifier = LayoutModifier,
     content: (MaterialScope.() -> LayoutElement)? = null,
     time: (MaterialScope.() -> LayoutElement)? = null,
     height: ContainerDimension = wrapWithMinTapTargetDimension(),
@@ -99,7 +103,7 @@ public fun MaterialScope.titleCard(
 ): LayoutElement =
     card(
         onClick = onClick,
-        contentDescription = contentDescription,
+        modifier = modifier,
         width = expand(),
         height = height,
         shape = shape,
@@ -167,9 +171,10 @@ public fun MaterialScope.titleCard(
  *
  * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
  *   associated action.
- * @param contentDescription The content description to be read by Talkback.
  * @param title A slot for displaying the title of the card, expected to be one line of text. Uses
  *   [CardColors.title] color by default.
+ * @param modifier Modifiers to set to this element. It's highly recommended to set a content
+ *   description using [contentDescription].
  * @param content The optional body content of the card. Uses [CardColors.content] color by default.
  * @param avatar An optional slot in header for displaying small image, such as [avatarImage].
  * @param label An optional slot in header for displaying short, label text. Uses [CardColors.label]
@@ -203,8 +208,8 @@ public fun MaterialScope.titleCard(
 // TODO: b/373578620 - Add how corners affects margins in the layout.
 public fun MaterialScope.appCard(
     onClick: Clickable,
-    contentDescription: StringProp,
     title: (MaterialScope.() -> LayoutElement),
+    modifier: LayoutModifier = LayoutModifier,
     content: (MaterialScope.() -> LayoutElement)? = null,
     avatar: (MaterialScope.() -> LayoutElement)? = null,
     label: (MaterialScope.() -> LayoutElement)? = null,
@@ -219,7 +224,7 @@ public fun MaterialScope.appCard(
 ): LayoutElement =
     card(
         onClick = onClick,
-        contentDescription = contentDescription,
+        modifier = modifier,
         width = expand(),
         height = height,
         shape = shape,
@@ -302,7 +307,8 @@ public fun MaterialScope.appCard(
  *
  * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
  *   associated action.
- * @param contentDescription The content description to be read by Talkback.
+ * @param modifier Modifiers to set to this element. It's highly recommended to set a content
+ *   description using [contentDescription].
  * @param shape Defines the card's shape, in other words the corner radius for this card.
  * @param backgroundColor The color to be used as a background of this card. If the background image
  *   is also specified, the image will be laid out on top of this color. In case of the fully opaque
@@ -323,7 +329,7 @@ public fun MaterialScope.appCard(
 // TODO: b/373578620 - Add how corners affects margins in the layout.
 public fun MaterialScope.card(
     onClick: Clickable,
-    contentDescription: StringProp,
+    modifier: LayoutModifier = LayoutModifier,
     width: ContainerDimension = wrapWithMinTapTargetDimension(),
     height: ContainerDimension = wrapWithMinTapTargetDimension(),
     shape: Corner = shapes.large,
@@ -336,10 +342,11 @@ public fun MaterialScope.card(
 
     backgroundColor?.let { backgroundBuilder.setColor(it.prop) }
 
+    val defaultModifier = LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then modifier
     val modifiers =
-        Modifiers.Builder()
+        defaultModifier
+            .toProtoLayoutModifiersBuilder()
             .setClickable(onClick)
-            .setSemantics(contentDescription.buttonRoleSemantics())
             .setMetadata(METADATA_TAG.toElementMetadata())
             .setBackground(backgroundBuilder.build())
 

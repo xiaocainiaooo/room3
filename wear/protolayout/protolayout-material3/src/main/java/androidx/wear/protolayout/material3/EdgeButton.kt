@@ -28,7 +28,7 @@ import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Padding
-import androidx.wear.protolayout.TypeBuilders.StringProp
+import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
 import androidx.wear.protolayout.material3.ButtonDefaults.filledButtonColors
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.BOTTOM_MARGIN_DP
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.EDGE_BUTTON_HEIGHT_DP
@@ -41,6 +41,10 @@ import androidx.wear.protolayout.material3.EdgeButtonDefaults.TEXT_TOP_PADDING_D
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.TOP_CORNER_RADIUS
 import androidx.wear.protolayout.material3.EdgeButtonStyle.Companion.DEFAULT
 import androidx.wear.protolayout.material3.EdgeButtonStyle.Companion.TOP_ALIGN
+import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.contentDescription
+import androidx.wear.protolayout.modifiers.semanticsRole
+import androidx.wear.protolayout.modifiers.toProtoLayoutModifiersBuilder
 
 /**
  * ProtoLayout Material3 component edge button that offers a single slot to take an icon or similar
@@ -56,7 +60,8 @@ import androidx.wear.protolayout.material3.EdgeButtonStyle.Companion.TOP_ALIGN
  *
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
- * @param contentDescription The content description to be read by Talkback.
+ * @param modifier Modifiers to set to this element. It's highly recommended to set a content
+ *   description using [contentDescription].
  * @param colors The colors used for this button. If not set, [ButtonDefaults.filledButtonColors]
  *   will be used as high emphasis button. Other recommended colors are
  *   [ButtonDefaults.filledTonalButtonColors] and [ButtonDefaults.filledVariantButtonColors]. If
@@ -69,16 +74,11 @@ import androidx.wear.protolayout.material3.EdgeButtonStyle.Companion.TOP_ALIGN
 // TODO: b/346958146 - link EdgeButton visuals in DAC
 public fun MaterialScope.iconEdgeButton(
     onClick: Clickable,
-    contentDescription: StringProp,
+    modifier: LayoutModifier = LayoutModifier,
     colors: ButtonColors = filledButtonColors(),
     iconContent: (MaterialScope.() -> LayoutElement)
 ): LayoutElement =
-    edgeButton(
-        onClick = onClick,
-        contentDescription = contentDescription,
-        colors = colors,
-        style = DEFAULT
-    ) {
+    edgeButton(onClick = onClick, modifier = modifier, colors = colors, style = DEFAULT) {
         withStyle(defaultIconStyle = IconStyle(size = ICON_SIZE_DP.toDp(), tintColor = colors.icon))
             .iconContent()
     }
@@ -97,7 +97,8 @@ public fun MaterialScope.iconEdgeButton(
  *
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
- * @param contentDescription The content description to be read by Talkback.
+ * @param modifier Modifiers to set to this element. It's highly recommended to set a content
+ *   description using [contentDescription].
  * @param colors The colors used for this button. If not set, [ButtonDefaults.filledButtonColors]
  *   will be used as high emphasis button. Other recommended colors are
  *   [ButtonDefaults.filledTonalButtonColors] and [ButtonDefaults.filledVariantButtonColors]. If
@@ -110,16 +111,11 @@ public fun MaterialScope.iconEdgeButton(
 // TODO(b/346958146): link EdgeButton visuals in DAC
 public fun MaterialScope.textEdgeButton(
     onClick: Clickable,
-    contentDescription: StringProp,
+    modifier: LayoutModifier = LayoutModifier,
     colors: ButtonColors = filledButtonColors(),
     labelContent: (MaterialScope.() -> LayoutElement)
 ): LayoutElement =
-    edgeButton(
-        onClick = onClick,
-        contentDescription = contentDescription,
-        colors = colors,
-        style = TOP_ALIGN
-    ) {
+    edgeButton(onClick = onClick, modifier = modifier, colors = colors, style = TOP_ALIGN) {
         withStyle(
                 defaultTextElementStyle =
                     TextElementStyle(
@@ -144,12 +140,13 @@ public fun MaterialScope.textEdgeButton(
  *
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
- * @param contentDescription The content description to be read by Talkback.
  * @param colors The colors used for this button. If not set, [ButtonDefaults.filledButtonColors]
  *   will be used as high emphasis button. Other recommended colors are
  *   [ButtonDefaults.filledTonalButtonColors] and [ButtonDefaults.filledVariantButtonColors]. If
  *   using custom colors, it is important to choose a color pair from same role to ensure
  *   accessibility with sufficient color contrast.
+ * @param modifier Modifiers to set to this element. It's highly recommended to set a content
+ *   description using [contentDescription].
  * @param style The style used for the inner content, specifying how the content should be aligned.
  *   It is recommended to use [EdgeButtonStyle.TOP_ALIGN] for long, wide content. If not set,
  *   defaults to [EdgeButtonStyle.DEFAULT] which center-aligns the content.
@@ -159,8 +156,8 @@ public fun MaterialScope.textEdgeButton(
 // TODO(b/346958146): link EdgeButton visuals in DAC
 private fun MaterialScope.edgeButton(
     onClick: Clickable,
-    contentDescription: StringProp,
     colors: ButtonColors,
+    modifier: LayoutModifier = LayoutModifier,
     style: EdgeButtonStyle = DEFAULT,
     content: MaterialScope.() -> LayoutElement
 ): LayoutElement {
@@ -173,10 +170,11 @@ private fun MaterialScope.edgeButton(
     val bottomCornerRadiusX = dp(edgeButtonWidth / 2f)
     val bottomCornerRadiusY = dp(EDGE_BUTTON_HEIGHT_DP - TOP_CORNER_RADIUS.value)
 
-    val modifiers: Modifiers.Builder =
-        Modifiers.Builder()
+    val defaultModifier = LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then modifier
+    val modifiers =
+        defaultModifier
+            .toProtoLayoutModifiersBuilder()
             .setClickable(onClick)
-            .setSemantics(contentDescription.buttonRoleSemantics())
             .setBackground(
                 Background.Builder()
                     .setColor(colors.container.prop)
