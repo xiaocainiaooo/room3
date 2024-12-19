@@ -28,11 +28,8 @@ import androidx.webkit.Profile;
 import androidx.webkit.SpeculativeLoadingParameters;
 
 import org.chromium.support_lib_boundary.ProfileBoundaryInterface;
-import org.chromium.support_lib_boundary.util.BoundaryInterfaceReflectionUtil;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.lang.reflect.InvocationHandler;
 
 
 /**
@@ -108,52 +105,17 @@ public class ProfileImpl implements Profile {
             @Nullable CancellationSignal cancellationSignal,
             @NonNull SpeculativeLoadingParameters params,
             @NonNull OutcomeReceiverCompat<Void, PrefetchException> callback) {
-        ApiFeature.NoFramework feature = WebViewFeatureInternal.PROFILE_URL_PREFETCH;
-        if (feature.isSupportedByWebView()) {
-            InvocationHandler paramsBoundaryInterface =
-                    BoundaryInterfaceReflectionUtil.createInvocationHandlerFor(
-                            new SpeculativeLoadingParametersAdapter(params));
-
-            mProfileImpl.prefetchUrl(url, paramsBoundaryInterface,
-                    PrefetchOperationCallbackAdapter.buildInvocationHandler(callback));
-
-            if (cancellationSignal != null) {
-                cancellationSignal.setOnCancelListener(() -> mProfileImpl.cancelPrefetch(url,
-                        null));
-            }
-        } else {
-            throw WebViewFeatureInternal.getUnsupportedOperationException();
-        }
     }
 
     @Override
     public void prefetchUrlAsync(@NonNull String url,
             @Nullable CancellationSignal cancellationSignal,
             @NonNull OutcomeReceiverCompat<Void, PrefetchException> callback) {
-        ApiFeature.NoFramework feature = WebViewFeatureInternal.PROFILE_URL_PREFETCH;
-        if (feature.isSupportedByWebView()) {
-            mProfileImpl.prefetchUrl(url,
-                    PrefetchOperationCallbackAdapter.buildInvocationHandler(callback));
-
-            if (cancellationSignal != null) {
-                cancellationSignal.setOnCancelListener(() -> mProfileImpl.cancelPrefetch(url,
-                        null));
-            }
-        } else {
-            throw WebViewFeatureInternal.getUnsupportedOperationException();
-        }
     }
 
     @Override
     public void clearPrefetchAsync(@NonNull String url,
             @NonNull OutcomeReceiverCompat<Void, PrefetchException> callback) {
-        ApiFeature.NoFramework feature = WebViewFeatureInternal.PROFILE_URL_PREFETCH;
-        if (feature.isSupportedByWebView()) {
-            mProfileImpl.clearPrefetch(url,
-                    PrefetchOperationCallbackAdapter.buildInvocationHandler(callback));
-        } else {
-            throw WebViewFeatureInternal.getUnsupportedOperationException();
-        }
     }
 
 }
