@@ -81,7 +81,7 @@ import kotlinx.coroutines.launch
  *   visually disabled.
  */
 @Composable
-fun SegmentedCircularProgressIndicator(
+public fun SegmentedCircularProgressIndicator(
     @IntRange(from = 1) segmentCount: Int,
     progress: () -> Float,
     modifier: Modifier = Modifier,
@@ -261,7 +261,7 @@ fun SegmentedCircularProgressIndicator(
  *   visually disabled.
  */
 @Composable
-fun SegmentedCircularProgressIndicator(
+public fun SegmentedCircularProgressIndicator(
     @IntRange(from = 1) segmentCount: Int,
     segmentValue: (segmentIndex: Int) -> Boolean,
     modifier: Modifier = Modifier,

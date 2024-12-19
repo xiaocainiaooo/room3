@@ -60,7 +60,7 @@ import kotlin.math.asin
  *   track. The stroke end caps are not included in this distance.
  */
 @Composable
-fun ArcProgressIndicator(
+public fun ArcProgressIndicator(
     modifier: Modifier = Modifier,
     startAngle: Float = ArcProgressIndicatorDefaults.IndeterminateStartAngle,
     endAngle: Float = ArcProgressIndicatorDefaults.IndeterminateEndAngle,
@@ -143,21 +143,21 @@ fun ArcProgressIndicator(
 }
 
 /** Contains default values for [ArcProgressIndicator]. */
-object ArcProgressIndicatorDefaults {
+public object ArcProgressIndicatorDefaults {
     /** The default start angle in degrees for an indeterminate arc progress indicator */
-    val IndeterminateStartAngle = 65f
+    public val IndeterminateStartAngle: Float = 65f
 
     /** The default end angle in degrees for an indeterminate arc progress indicator */
-    val IndeterminateEndAngle = 115f
+    public val IndeterminateEndAngle: Float = 115f
 
     /** Stroke width of the indeterminate arc progress indicator. */
-    val IndeterminateStrokeWidth = 6.dp
+    public val IndeterminateStrokeWidth: Dp = 6.dp
 
     /**
      * The recommended diameter of the indeterminate arc progress indicator, which leaves room for
      * additional content such as a message above the indicator.
      */
-    val recommendedIndeterminateDiameter: Dp
+    public val recommendedIndeterminateDiameter: Dp
         @Composable
         get() {
             // Calculate the recommended diameter as a percentage of screen height.
@@ -170,18 +170,18 @@ object ArcProgressIndicatorDefaults {
      *
      * The absolute value can be customized with `gapSize` parameter on [CircularProgressIndicator].
      */
-    fun calculateRecommendedGapSize(strokeWidth: Dp): Dp = strokeWidth / 3f
+    public fun calculateRecommendedGapSize(strokeWidth: Dp): Dp = strokeWidth / 3f
 }
 
 /** Class to define angular direction - Clockwise and Counter Clockwise. */
 @JvmInline
-value class AngularDirection internal constructor(internal val type: Int) {
-    companion object {
+public value class AngularDirection internal constructor(internal val type: Int) {
+    public companion object {
         /** Clockwise is the standard direction for an analog clock. */
-        val Clockwise = AngularDirection(0)
+        public val Clockwise: AngularDirection = AngularDirection(0)
 
         /** CounterClockwise is the opposite direction to Clockwise */
-        val CounterClockwise = AngularDirection(1)
+        public val CounterClockwise: AngularDirection = AngularDirection(1)
     }
 }
 

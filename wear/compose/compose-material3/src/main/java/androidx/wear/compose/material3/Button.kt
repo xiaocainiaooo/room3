@@ -118,7 +118,7 @@ import androidx.wear.compose.material3.tokens.ShapeTokens
  */
 // TODO(b/261838497) Add Material3 UX guidance links
 @Composable
-fun Button(
+public fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
@@ -130,7 +130,7 @@ fun Button(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit,
-) =
+): Unit =
     ButtonImpl(
         onClick = onClick,
         modifier = modifier.buttonSizeModifier(),
@@ -199,7 +199,7 @@ fun Button(
  */
 // TODO(b/261838497) Add Material3 UX guidance links
 @Composable
-fun FilledTonalButton(
+public fun FilledTonalButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
@@ -211,7 +211,7 @@ fun FilledTonalButton(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit,
-) =
+): Unit =
     ButtonImpl(
         onClick = onClick,
         modifier = modifier.buttonSizeModifier(),
@@ -279,7 +279,7 @@ fun FilledTonalButton(
  */
 // TODO(b/261838497) Add Material3 UX guidance links
 @Composable
-fun OutlinedButton(
+public fun OutlinedButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
@@ -291,7 +291,7 @@ fun OutlinedButton(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit,
-) =
+): Unit =
     ButtonImpl(
         onClick = onClick,
         modifier = modifier.buttonSizeModifier(),
@@ -358,7 +358,7 @@ fun OutlinedButton(
  */
 // TODO(b/261838497) Add Material3 UX guidance links
 @Composable
-fun ChildButton(
+public fun ChildButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
@@ -370,7 +370,7 @@ fun ChildButton(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit,
-) =
+): Unit =
     ButtonImpl(
         onClick = onClick,
         modifier = modifier.buttonSizeModifier(),
@@ -455,7 +455,7 @@ fun ChildButton(
  */
 // TODO(b/261838497) Add Material3 UX guidance links
 @Composable
-fun Button(
+public fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
@@ -469,7 +469,7 @@ fun Button(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
     label: @Composable RowScope.() -> Unit,
-) =
+): Unit =
     ButtonImpl(
         onClick = onClick,
         modifier = modifier.buttonSizeModifier(),
@@ -578,7 +578,7 @@ fun Button(
  */
 // TODO(b/261838497) Add Material3 UX guidance links
 @Composable
-fun FilledTonalButton(
+public fun FilledTonalButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
@@ -592,7 +592,7 @@ fun FilledTonalButton(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
     label: @Composable RowScope.() -> Unit,
-) =
+): Unit =
     ButtonImpl(
         onClick = onClick,
         modifier = modifier.buttonSizeModifier(),
@@ -696,7 +696,7 @@ fun FilledTonalButton(
  */
 // TODO(b/261838497) Add Material3 UX guidance links
 @Composable
-fun OutlinedButton(
+public fun OutlinedButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
@@ -710,7 +710,7 @@ fun OutlinedButton(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
     label: @Composable RowScope.() -> Unit,
-) =
+): Unit =
     ButtonImpl(
         onClick = onClick,
         modifier = modifier.buttonSizeModifier(),
@@ -813,7 +813,7 @@ fun OutlinedButton(
  */
 // TODO(b/261838497) Add Material3 UX guidance links
 @Composable
-fun ChildButton(
+public fun ChildButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
@@ -827,7 +827,7 @@ fun ChildButton(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
     label: @Composable RowScope.() -> Unit,
-) =
+): Unit =
     ButtonImpl(
         onClick = onClick,
         modifier = modifier.buttonSizeModifier(),
@@ -952,7 +952,7 @@ fun ChildButton(
  */
 // TODO(b/261838497) Add Material3 samples and UX guidance links
 @Composable
-fun CompactButton(
+public fun CompactButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onLongClick: (() -> Unit)? = null,
@@ -1029,13 +1029,13 @@ fun CompactButton(
 }
 
 /** Contains the default values used by [Button] */
-object ButtonDefaults {
+public object ButtonDefaults {
     /** Recommended [RoundedCornerShape] for [Button]. */
-    val shape: RoundedCornerShape
+    public val shape: RoundedCornerShape
         @Composable get() = ShapeTokens.CornerLarge
 
     /** Recommended [RoundedCornerShape] for [CompactButton]. */
-    val compactButtonShape: RoundedCornerShape
+    public val compactButtonShape: RoundedCornerShape
         @Composable get() = ShapeTokens.CornerMedium
 
     /**
@@ -1048,7 +1048,8 @@ object ButtonDefaults {
      * applied and container will have alpha ([DisabledContainerAlpha]) value applied.
      */
     @Composable
-    fun filledTonalButtonColors() = MaterialTheme.colorScheme.defaultFilledTonalButtonColors
+    public fun filledTonalButtonColors(): ButtonColors =
+        MaterialTheme.colorScheme.defaultFilledTonalButtonColors
 
     /**
      * Creates a [ButtonColors] with a muted background and contrasting content color, the defaults
@@ -1071,7 +1072,7 @@ object ButtonDefaults {
      * @param disabledIconColor The content color of this [Button] when not enabled
      */
     @Composable
-    fun filledTonalButtonColors(
+    public fun filledTonalButtonColors(
         containerColor: Color = Color.Unspecified,
         contentColor: Color = Color.Unspecified,
         secondaryContentColor: Color = Color.Unspecified,
@@ -1106,7 +1107,8 @@ object ButtonDefaults {
      * @sample androidx.wear.compose.material3.samples.SimpleFilledVariantButtonSample
      */
     @Composable
-    fun filledVariantButtonColors() = MaterialTheme.colorScheme.defaultFilledVariantButtonColors
+    public fun filledVariantButtonColors(): ButtonColors =
+        MaterialTheme.colorScheme.defaultFilledVariantButtonColors
 
     /**
      * Creates a [ButtonColors] as an alternative to the [filledTonalButtonColors], giving a surface
@@ -1132,7 +1134,7 @@ object ButtonDefaults {
      * @param disabledIconColor The content color of this [Button] when not enabled
      */
     @Composable
-    fun filledVariantButtonColors(
+    public fun filledVariantButtonColors(
         containerColor: Color = Color.Unspecified,
         contentColor: Color = Color.Unspecified,
         secondaryContentColor: Color = Color.Unspecified,
@@ -1161,7 +1163,9 @@ object ButtonDefaults {
      * If a button is disabled then the content will have an alpha([DisabledContentAlpha]) value
      * applied and container will have an alpha([DisabledContainerAlpha]) applied.
      */
-    @Composable fun outlinedButtonColors() = MaterialTheme.colorScheme.defaultOutlinedButtonColors
+    @Composable
+    public fun outlinedButtonColors(): ButtonColors =
+        MaterialTheme.colorScheme.defaultOutlinedButtonColors
 
     /**
      * Creates a [ButtonColors] with a transparent background (typically paired with
@@ -1181,7 +1185,7 @@ object ButtonDefaults {
      * @param disabledIconColor The content color of this [Button] when not enabled
      */
     @Composable
-    fun outlinedButtonColors(
+    public fun outlinedButtonColors(
         contentColor: Color = Color.Unspecified,
         secondaryContentColor: Color = Color.Unspecified,
         iconColor: Color = Color.Unspecified,
@@ -1208,7 +1212,9 @@ object ButtonDefaults {
      * If a button is disabled then the content will have an alpha([DisabledContentAlpha]) value
      * applied and container will have an alpha([DisabledContainerAlpha]) value applied.
      */
-    @Composable fun childButtonColors() = MaterialTheme.colorScheme.defaultChildButtonColors
+    @Composable
+    public fun childButtonColors(): ButtonColors =
+        MaterialTheme.colorScheme.defaultChildButtonColors
 
     /**
      * Creates a [ButtonColors] with transparent background, the defaults for low emphasis buttons
@@ -1228,7 +1234,7 @@ object ButtonDefaults {
      * @param disabledIconColor The content color of this [Button] when not enabled
      */
     @Composable
-    fun childButtonColors(
+    public fun childButtonColors(
         contentColor: Color = Color.Unspecified,
         secondaryContentColor: Color = Color.Unspecified,
         iconColor: Color = Color.Unspecified,
@@ -1268,7 +1274,7 @@ object ButtonDefaults {
      *   component size.
      */
     @Composable
-    fun imageBackgroundButtonColors(
+    public fun imageBackgroundButtonColors(
         backgroundImagePainter: Painter,
         backgroundImageScrimBrush: Brush =
             Brush.linearGradient(
@@ -1345,7 +1351,7 @@ object ButtonDefaults {
      *   Material3.
      */
     @Composable
-    fun outlinedButtonBorder(
+    public fun outlinedButtonBorder(
         enabled: Boolean,
         borderColor: Color = OutlinedButtonTokens.ContainerBorderColor.value,
         disabledBorderColor: Color =
@@ -1363,7 +1369,8 @@ object ButtonDefaults {
      * Creates a [ButtonColors] that represents the default background and content colors used in a
      * [Button].
      */
-    @Composable fun buttonColors(): ButtonColors = MaterialTheme.colorScheme.defaultButtonColors
+    @Composable
+    public fun buttonColors(): ButtonColors = MaterialTheme.colorScheme.defaultButtonColors
 
     /**
      * Creates a [ButtonColors] that represents the default background and content colors used in a
@@ -1379,7 +1386,7 @@ object ButtonDefaults {
      * @param disabledIconColor The content color of this [Button] when not enabled
      */
     @Composable
-    fun buttonColors(
+    public fun buttonColors(
         containerColor: Color = Color.Unspecified,
         contentColor: Color = Color.Unspecified,
         secondaryContentColor: Color = Color.Unspecified,
@@ -1401,26 +1408,26 @@ object ButtonDefaults {
         )
 
     /** The recommended horizontal padding used by [Button] by default */
-    val ButtonHorizontalPadding = 14.dp
+    public val ButtonHorizontalPadding: Dp = 14.dp
 
     /** The recommended start padding to be used with [Button] with a large icon */
-    val ButtonLargeIconStartPadding = 12.dp
+    public val ButtonLargeIconStartPadding: Dp = 12.dp
 
     /** The recommended start padding to be used with [Button] with an extra large icon */
-    val ButtonExtraLargeIconStartPadding = 8.dp
+    public val ButtonExtraLargeIconStartPadding: Dp = 8.dp
 
     /** The recommended vertical padding used by [Button] by default */
-    val ButtonVerticalPadding = 6.dp
+    public val ButtonVerticalPadding: Dp = 6.dp
 
     /** The default content padding used by [Button] */
-    val ContentPadding: PaddingValues =
+    public val ContentPadding: PaddingValues =
         PaddingValues(
             horizontal = ButtonHorizontalPadding,
             vertical = ButtonVerticalPadding,
         )
 
     /** The default content padding used by [Button] with a large icon */
-    val ButtonWithLargeIconContentPadding: PaddingValues =
+    public val ButtonWithLargeIconContentPadding: PaddingValues =
         PaddingValues(
             start = ButtonLargeIconStartPadding,
             top = ButtonVerticalPadding,
@@ -1429,7 +1436,7 @@ object ButtonDefaults {
         )
 
     /** The default content padding used by [Button] with an extra large icon */
-    val ButtonWithExtraLargeIconContentPadding: PaddingValues =
+    public val ButtonWithExtraLargeIconContentPadding: PaddingValues =
         PaddingValues(
             start = ButtonExtraLargeIconStartPadding,
             top = ButtonVerticalPadding,
@@ -1438,31 +1445,31 @@ object ButtonDefaults {
         )
 
     /** The size of the icon when used with text inside a "[CompactButton]. */
-    val ExtraSmallIconSize: Dp = CompactButtonTokens.IconSize
+    public val ExtraSmallIconSize: Dp = CompactButtonTokens.IconSize
 
     /** The icon size for use with a CompactButton that has icon-only content. */
-    val SmallIconSize: Dp = CompactButtonTokens.IconOnlyIconSize
+    public val SmallIconSize: Dp = CompactButtonTokens.IconOnlyIconSize
 
     /** The default size of the icon when used inside a [Button]. */
-    val IconSize: Dp = FilledButtonTokens.IconSize
+    public val IconSize: Dp = FilledButtonTokens.IconSize
 
     /** The recommended icon size when used in [Button]s for icons such as an app icon */
-    val LargeIconSize: Dp = FilledButtonTokens.IconLargeSize
+    public val LargeIconSize: Dp = FilledButtonTokens.IconLargeSize
 
     /** The recommended icon size when used in [Button]s for icons such as an avatar icon */
-    val ExtraLargeIconSize: Dp = FilledButtonTokens.IconExtraLargeSize
+    public val ExtraLargeIconSize: Dp = FilledButtonTokens.IconExtraLargeSize
 
     /**
      * The default height applied for the [Button]. Note that you can override it by applying
      * Modifier.heightIn directly on [Button].
      */
-    val Height = FilledButtonTokens.ContainerHeight
+    public val Height: Dp = FilledButtonTokens.ContainerHeight
 
-    val CompactButtonHorizontalPadding = 12.dp
-    val CompactButtonVerticalPadding = 0.dp
+    public val CompactButtonHorizontalPadding: Dp = 12.dp
+    public val CompactButtonVerticalPadding: Dp = 0.dp
 
     /** The default content padding used by [CompactButton] */
-    val CompactButtonContentPadding: PaddingValues =
+    public val CompactButtonContentPadding: PaddingValues =
         PaddingValues(
             start = CompactButtonHorizontalPadding,
             top = CompactButtonVerticalPadding,
@@ -1478,19 +1485,20 @@ object ButtonDefaults {
      * Note that you can override it by adjusting Modifier.height and Modifier.padding directly on
      * [CompactButton].
      */
-    val CompactButtonHeight = CompactButtonTokens.ContainerHeight
+    public val CompactButtonHeight: Dp = CompactButtonTokens.ContainerHeight
 
     /**
      * The default padding to be provided around a [CompactButton] in order to ensure that its
      * tappable area meets minimum UX guidance.
      */
-    val CompactButtonTapTargetPadding: PaddingValues = PaddingValues(top = 8.dp, bottom = 8.dp)
+    public val CompactButtonTapTargetPadding: PaddingValues =
+        PaddingValues(top = 8.dp, bottom = 8.dp)
 
     /**
      * The default size of the spacing between an icon and a text when they are used inside a
      * [Button].
      */
-    val IconSpacing = 6.dp
+    public val IconSpacing: Dp = 6.dp
 
     private val ColorScheme.defaultFilledTonalButtonColors: ButtonColors
         get() {
@@ -1670,16 +1678,16 @@ object ButtonDefaults {
  * @param disabledIconColor The content color of this [Button] when not enabled.
  */
 @Immutable
-class ButtonColors
+public class ButtonColors
 constructor(
-    val containerPainter: Painter,
-    val contentColor: Color,
-    val secondaryContentColor: Color,
-    val iconColor: Color,
-    val disabledContainerPainter: Painter,
-    val disabledContentColor: Color,
-    val disabledSecondaryContentColor: Color,
-    val disabledIconColor: Color,
+    public val containerPainter: Painter,
+    public val contentColor: Color,
+    public val secondaryContentColor: Color,
+    public val iconColor: Color,
+    public val disabledContainerPainter: Painter,
+    public val disabledContentColor: Color,
+    public val disabledSecondaryContentColor: Color,
+    public val disabledIconColor: Color,
 ) {
     /**
      * Creates a [ButtonColors] where all of the values are explicitly defined.
@@ -1693,7 +1701,7 @@ constructor(
      * @param disabledSecondaryContentColor The content color of this [Button] when not enabled
      * @param disabledIconColor The content color of this [Button] when not enabled
      */
-    constructor(
+    public constructor(
         containerColor: Color,
         contentColor: Color,
         secondaryContentColor: Color,
@@ -1725,7 +1733,7 @@ constructor(
      * @param disabledSecondaryContentColor The content color of this [Button] when not enabled
      * @param disabledIconColor The content color of this [Button] when not enabled
      */
-    fun copy(
+    public fun copy(
         containerColor: Color = Color.Unspecified,
         contentColor: Color = Color.Unspecified,
         secondaryContentColor: Color = Color.Unspecified,
@@ -1734,7 +1742,7 @@ constructor(
         disabledContentColor: Color = Color.Unspecified,
         disabledSecondaryContentColor: Color = Color.Unspecified,
         disabledIconColor: Color = Color.Unspecified,
-    ) =
+    ): ButtonColors =
         ButtonColors(
             if (containerColor != Color.Unspecified) ColorPainter(containerColor)
             else this.containerPainter,

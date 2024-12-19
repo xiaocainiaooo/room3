@@ -107,7 +107,7 @@ import kotlinx.coroutines.launch
  *   AnimationSpec should be passed instead.
  */
 @Composable
-fun ScrollIndicator(
+public fun ScrollIndicator(
     state: ScrollState,
     modifier: Modifier = Modifier,
     reverseDirection: Boolean = false,
@@ -155,12 +155,12 @@ fun ScrollIndicator(
  *   AnimationSpec should be passed instead.
  */
 @Composable
-fun ScrollIndicator(
+public fun ScrollIndicator(
     state: ScalingLazyListState,
     modifier: Modifier = Modifier,
     reverseDirection: Boolean = false,
     positionAnimationSpec: AnimationSpec<Float> = ScrollIndicatorDefaults.PositionAnimationSpec
-) =
+): Unit =
     IndicatorImpl(
         state = ScalingLazyColumnStateAdapter(state = state),
         indicatorHeight = ScrollIndicatorDefaults.indicatorHeight,
@@ -172,12 +172,12 @@ fun ScrollIndicator(
     )
 
 @Composable
-fun ScrollIndicator(
+public fun ScrollIndicator(
     state: TransformingLazyColumnState,
     modifier: Modifier = Modifier,
     reverseDirection: Boolean = false,
     positionAnimationSpec: AnimationSpec<Float> = ScrollIndicatorDefaults.PositionAnimationSpec
-) =
+): Unit =
     IndicatorImpl(
         state = TransformingLazyColumnStateAdapter(state = state),
         indicatorHeight = ScrollIndicatorDefaults.indicatorHeight,
@@ -215,12 +215,12 @@ fun ScrollIndicator(
  *   AnimationSpec should be passed instead.
  */
 @Composable
-fun ScrollIndicator(
+public fun ScrollIndicator(
     state: LazyListState,
     modifier: Modifier = Modifier,
     reverseDirection: Boolean = false,
     positionAnimationSpec: AnimationSpec<Float> = ScrollIndicatorDefaults.PositionAnimationSpec
-) =
+): Unit =
     IndicatorImpl(
         state = LazyColumnStateAdapter(state = state),
         indicatorHeight = ScrollIndicatorDefaults.indicatorHeight,
@@ -232,12 +232,12 @@ fun ScrollIndicator(
     )
 
 /** Contains the default values used for [ScrollIndicator]. */
-object ScrollIndicatorDefaults {
+public object ScrollIndicatorDefaults {
     /**
      * [AnimationSpec] used for position animation. To disable this animation, pass [snap]
      * AnimationSpec instead
      */
-    val PositionAnimationSpec: AnimationSpec<Float> =
+    public val PositionAnimationSpec: AnimationSpec<Float> =
         tween(durationMillis = 500, easing = CubicBezierEasing(0f, 0f, 0f, 1f))
 
     internal const val minSizeFraction = 0.3f

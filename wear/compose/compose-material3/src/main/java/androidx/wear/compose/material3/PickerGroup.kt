@@ -78,7 +78,7 @@ import kotlinx.coroutines.coroutineScope
  */
 @Composable
 @Suppress("ComposableLambdaParameterPosition")
-fun PickerGroup(
+public fun PickerGroup(
     selectedPickerIndex: Int,
     onPickerSelected: (selectedIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -171,7 +171,7 @@ fun PickerGroup(
     }
 }
 
-class PickerGroupScope {
+public class PickerGroupScope {
     internal val items = mutableListOf<PickerGroupItem>()
 
     /**
@@ -195,7 +195,7 @@ class PickerGroupScope {
      * @param option A block which describes the content. The integer parameter to the composable
      *   denotes the index of the option and boolean denotes whether the picker is selected or not.
      */
-    fun pickerGroupItem(
+    public fun pickerGroupItem(
         pickerState: PickerState,
         modifier: Modifier = Modifier,
         contentDescription: String? = null,
@@ -204,7 +204,7 @@ class PickerGroupScope {
         readOnlyLabel: @Composable (BoxScope.() -> Unit)? = null,
         spacing: Dp = 0.dp,
         option: @Composable PickerScope.(optionIndex: Int, pickerSelected: Boolean) -> Unit
-    ) =
+    ): Boolean =
         items.add(
             PickerGroupItem(
                 pickerState,

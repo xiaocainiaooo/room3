@@ -97,7 +97,7 @@ import kotlin.math.roundToInt
  */
 @Composable
 @RequiresApi(31)
-fun AnimatedText(
+public fun AnimatedText(
     text: String,
     fontRegistry: AnimatedTextFontRegistry,
     progressFraction: () -> Float,
@@ -141,7 +141,7 @@ fun AnimatedText(
  */
 @Composable
 @RequiresApi(31)
-fun rememberAnimatedTextFontRegistry(
+public fun rememberAnimatedTextFontRegistry(
     startFontVariationSettings: FontVariation.Settings,
     endFontVariationSettings: FontVariation.Settings,
     textStyle: TextStyle = LocalTextStyle.current,
@@ -197,7 +197,7 @@ fun rememberAnimatedTextFontRegistry(
  *   to improve animation performance if needed, but it also increases the memory usage.
  */
 @RequiresApi(31)
-class AnimatedTextFontRegistry(
+public class AnimatedTextFontRegistry(
     private val textStyle: TextStyle,
     private val startFontVariationSettings: FontVariation.Settings,
     private val endFontVariationSettings: FontVariation.Settings,
@@ -386,9 +386,9 @@ class AnimatedTextFontRegistry(
 
 /** Defaults for AnimatedText. */
 @RequiresApi(31)
-object AnimatedTextDefaults {
+public object AnimatedTextDefaults {
     /** Default font cache size to be used in AnimatedTextFontRegistry. */
-    const val CacheSize = 5
+    public const val CacheSize: Int = 5
 
     /**
      * Default step size used to snap progress fractions. Progress fractions will be rounded down to
