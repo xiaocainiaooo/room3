@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.build.java
+package androidx.build.checkapi
 
 import androidx.build.getAndroidJar
 import androidx.build.multiplatformExtension
@@ -31,9 +31,9 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 
-// JavaCompileInputs contains the information required to compile Java/Kotlin code
+// CompilationInputs contains the information required to compile Java/Kotlin code
 // This can be helpful for creating Metalava and Dokka tasks with the same settings
-data class JavaCompileInputs(
+data class CompilationInputs(
     // Source files to process
     val sourcePaths: FileCollection,
 
@@ -47,8 +47,8 @@ data class JavaCompileInputs(
     val bootClasspath: FileCollection
 ) {
     companion object {
-        // Constructs a JavaCompileInputs from a library and its variant
-        fun fromLibraryVariant(variant: LibraryVariant, project: Project): JavaCompileInputs {
+        // Constructs a CompilationInputs from a library and its variant
+        fun fromLibraryVariant(variant: LibraryVariant, project: Project): CompilationInputs {
             val kotlinCollection = project.files(variant.sources.kotlin?.all)
             val javaCollection = project.files(variant.sources.java?.all)
 
@@ -77,7 +77,7 @@ data class JavaCompileInputs(
                     .sdkComponents
                     .bootClasspath
 
-            return JavaCompileInputs(
+            return CompilationInputs(
                 sourcePaths = sourceCollection,
                 commonModuleSourcePaths = commonModuleSourceCollection,
                 dependencyClasspath = variant.compileClasspath,
@@ -86,11 +86,11 @@ data class JavaCompileInputs(
         }
 
         /**
-         * Returns the JavaCompileInputs for the `jvm` target of a KMP project.
+         * Returns the CompilationInputs for the `jvm` target of a KMP project.
          *
          * @param project The project whose main jvm target inputs will be returned.
          */
-        fun fromKmpJvmTarget(project: Project): JavaCompileInputs {
+        fun fromKmpJvmTarget(project: Project): CompilationInputs {
             val kmpExtension =
                 checkNotNull(project.multiplatformExtension) {
                     """
@@ -107,7 +107,7 @@ data class JavaCompileInputs(
 
             val commonModuleSourcePaths = project.commonModuleSourcePaths(jvmCompilation)
 
-            return JavaCompileInputs(
+            return CompilationInputs(
                 sourcePaths = sourceCollection,
                 commonModuleSourcePaths = commonModuleSourcePaths,
                 dependencyClasspath =
@@ -118,11 +118,11 @@ data class JavaCompileInputs(
         }
 
         /**
-         * Returns the JavaCompileInputs for the `android` target of a KMP project.
+         * Returns the CompilationInputs for the `android` target of a KMP project.
          *
          * @param project The project whose main android target inputs will be returned.
          */
-        fun fromKmpAndroidTarget(project: Project): JavaCompileInputs {
+        fun fromKmpAndroidTarget(project: Project): CompilationInputs {
             val kmpExtension =
                 checkNotNull(project.multiplatformExtension) {
                     """
@@ -140,7 +140,7 @@ data class JavaCompileInputs(
 
             val commonModuleSourcePaths = project.commonModuleSourcePaths(compilation)
 
-            return JavaCompileInputs(
+            return CompilationInputs(
                 sourcePaths = sourceCollection,
                 commonModuleSourcePaths = commonModuleSourcePaths,
                 dependencyClasspath =
@@ -150,12 +150,12 @@ data class JavaCompileInputs(
             )
         }
 
-        // Constructs a JavaCompileInputs from a sourceset
-        fun fromSourceSet(sourceSet: SourceSet, project: Project): JavaCompileInputs {
+        // Constructs a CompilationInputs from a sourceset
+        fun fromSourceSet(sourceSet: SourceSet, project: Project): CompilationInputs {
             val sourcePaths: FileCollection =
                 project.files(project.provider { sourceSet.allSource.srcDirs })
             val dependencyClasspath = sourceSet.compileClasspath
-            return JavaCompileInputs(
+            return CompilationInputs(
                 sourcePaths = sourcePaths,
                 commonModuleSourcePaths = project.files(),
                 dependencyClasspath = dependencyClasspath,

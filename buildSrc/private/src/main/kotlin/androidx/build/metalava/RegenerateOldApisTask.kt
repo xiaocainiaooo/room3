@@ -18,13 +18,13 @@ package androidx.build.metalava
 
 import androidx.build.Version
 import androidx.build.checkapi.ApiLocation
+import androidx.build.checkapi.CompilationInputs
 import androidx.build.checkapi.getApiFileVersion
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
 import androidx.build.checkapi.getVersionedApiLocation
 import androidx.build.checkapi.isValidArtifactVersion
 import androidx.build.getAndroidJar
 import androidx.build.getCheckoutRoot
-import androidx.build.java.JavaCompileInputs
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
@@ -159,7 +159,7 @@ constructor(private val workerExecutor: WorkerExecutor) : DefaultTask() {
         outputApiLocation: ApiLocation,
     ) {
         val mavenId = "$groupId:$artifactId:$version"
-        val inputs: JavaCompileInputs?
+        val inputs: CompilationInputs?
         try {
             inputs = getFiles(runnerProject, mavenId)
         } catch (e: TypedResolveException) {
@@ -185,11 +185,11 @@ constructor(private val workerExecutor: WorkerExecutor) : DefaultTask() {
         }
     }
 
-    private fun getFiles(runnerProject: Project, mavenId: String): JavaCompileInputs {
+    private fun getFiles(runnerProject: Project, mavenId: String): CompilationInputs {
         val jars = getJars(runnerProject, mavenId)
         val sources = getSources(runnerProject, "$mavenId:sources")
 
-        return JavaCompileInputs(
+        return CompilationInputs(
             sourcePaths = sources,
             // TODO(b/330721660) parse META-INF/kotlin-project-structure-metadata.json for
             // common sources

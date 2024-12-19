@@ -16,7 +16,7 @@
 
 package androidx.build
 
-import androidx.build.java.JavaCompileInputs
+import androidx.build.checkapi.CompilationInputs
 import com.android.build.api.variant.AndroidComponentsExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -58,7 +58,7 @@ fun Project.configureErrorProneForJava() {
         makeKmpErrorProneTask(
             COMPILE_JAVA_TASK_NAME,
             jvmJarProvider,
-            JavaCompileInputs.fromKmpJvmTarget(project)
+            CompilationInputs.fromKmpJvmTarget(project)
         )
     } else {
         makeErrorProneTask(COMPILE_JAVA_TASK_NAME)
@@ -275,12 +275,12 @@ private fun JavaCompile.configureWithErrorProne() {
  * Note: Since ErrorProne only understands Java files which may be dependent on Kotlin source, using
  * this method to register ErrorProne task causes it to be dependent on jvmJar task.
  *
- * @param jvmCompileInputs [JavaCompileInputs] that specifies jvm source including Kotlin sources.
+ * @param jvmCompileInputs [CompilationInputs] that specifies jvm source including Kotlin sources.
  */
 private fun Project.makeKmpErrorProneTask(
     compileTaskName: String,
     jvmJarTaskProvider: TaskProvider<Jar>,
-    jvmCompileInputs: JavaCompileInputs
+    jvmCompileInputs: CompilationInputs
 ) {
     makeErrorProneTask(compileTaskName) { errorProneTask ->
         // ErrorProne doesn't understand Kotlin source, so first let kotlinCompile finish, then

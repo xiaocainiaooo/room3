@@ -19,10 +19,10 @@ package androidx.build.kythe
 import androidx.build.KotlinTarget
 import androidx.build.OperatingSystem
 import androidx.build.addToBuildOnServer
+import androidx.build.checkapi.CompilationInputs
 import androidx.build.getCheckoutRoot
 import androidx.build.getOperatingSystem
 import androidx.build.getPrebuiltsRoot
-import androidx.build.java.JavaCompileInputs
 import androidx.build.multiplatformExtension
 import java.io.File
 import java.util.jar.JarOutputStream
@@ -188,7 +188,7 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
     internal companion object {
         fun setupProject(
             project: Project,
-            javaInputs: JavaCompileInputs,
+            compilationInputs: CompilationInputs,
             compiledSources: Configuration,
             kotlinTarget: Property<KotlinTarget>,
             javaVersion: JavaVersion,
@@ -208,11 +208,11 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                                 "build-tools/${osName()}/bin/kotlinc_extractor"
                             )
                         )
-                        sourcePaths.setFrom(javaInputs.sourcePaths)
-                        commonModuleSourcePaths.from(javaInputs.commonModuleSourcePaths)
+                        sourcePaths.setFrom(compilationInputs.sourcePaths)
+                        commonModuleSourcePaths.from(compilationInputs.commonModuleSourcePaths)
                         vnamesJson.set(project.getVnamesJson())
                         dependencyClasspath.setFrom(
-                            javaInputs.dependencyClasspath + javaInputs.bootClasspath
+                            compilationInputs.dependencyClasspath + compilationInputs.bootClasspath
                         )
                         this.compiledSources.setFrom(compiledSources)
                         this.kotlinTarget.set(kotlinTarget)
