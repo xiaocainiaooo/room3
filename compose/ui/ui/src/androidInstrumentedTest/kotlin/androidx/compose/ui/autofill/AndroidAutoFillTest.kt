@@ -97,20 +97,19 @@ class AndroidAutoFillTest {
             .isEqualTo(
                 FakeViewStructure().apply {
                     if (isSemanticAutofillEnabled) {
-                        virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                         autofillId = ownerView.autofillId
-                        packageName = currentPackageName
                         bounds = android.graphics.Rect(0, 0, 0, 0)
-                        isEnabled = true
+                        packageName = currentPackageName
+                        virtualId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     }
                     children.add(
                         FakeViewStructure().apply {
-                            virtualId = autofillNode.id
+                            autofillHints = mutableListOf(AUTOFILL_HINT_PERSON_NAME)
                             autofillId = ownerView.autofillId
                             autofillType = View.AUTOFILL_TYPE_TEXT
-                            autofillHints = mutableListOf(AUTOFILL_HINT_PERSON_NAME)
-                            packageName = currentPackageName
                             bounds = android.graphics.Rect(0, 0, 0, 0)
+                            packageName = currentPackageName
+                            virtualId = autofillNode.id
                         }
                     )
                 }
