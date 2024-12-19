@@ -1481,6 +1481,33 @@ package androidx.wear.protolayout {
 
 }
 
+package androidx.wear.protolayout.modifiers {
+
+  public interface LayoutModifier {
+    method public <R> R foldIn(R initial, kotlin.jvm.functions.Function2<? super R,? super androidx.wear.protolayout.modifiers.LayoutModifier.Element,? extends R> operation);
+    method public default infix androidx.wear.protolayout.modifiers.LayoutModifier then(androidx.wear.protolayout.modifiers.LayoutModifier other);
+    field public static final androidx.wear.protolayout.modifiers.LayoutModifier.Companion Companion;
+  }
+
+  public static final class LayoutModifier.Companion implements androidx.wear.protolayout.modifiers.LayoutModifier {
+    method public <R> R foldIn(R initial, kotlin.jvm.functions.Function2<? super R,? super androidx.wear.protolayout.modifiers.LayoutModifier.Element,? extends R> operation);
+  }
+
+  public static interface LayoutModifier.Element extends androidx.wear.protolayout.modifiers.LayoutModifier {
+    method public default <R> R foldIn(R initial, kotlin.jvm.functions.Function2<? super R,? super androidx.wear.protolayout.modifiers.LayoutModifier.Element,? extends R> operation);
+  }
+
+  public final class ModifierAppliersKt {
+    method public static androidx.wear.protolayout.ModifiersBuilders.Modifiers toProtoLayoutModifiers(androidx.wear.protolayout.modifiers.LayoutModifier);
+  }
+
+  public final class SemanticsKt {
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier contentDescription(androidx.wear.protolayout.modifiers.LayoutModifier, String staticValue, optional @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) androidx.wear.protolayout.expression.DynamicBuilders.DynamicString? dynamicValue);
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier semanticsRole(androidx.wear.protolayout.modifiers.LayoutModifier, int semanticsRole);
+  }
+
+}
+
 package androidx.wear.protolayout.types {
 
   public final class LayoutColor {
