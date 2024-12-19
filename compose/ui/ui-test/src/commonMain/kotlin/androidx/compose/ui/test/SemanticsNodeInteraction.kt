@@ -60,17 +60,14 @@ constructor(
         atLeastOneRootRequired: Boolean,
         errorMessageOnFail: String? = null,
         skipDeactivatedNodes: Boolean = true
-    ): SelectionResult {
-        val nodes =
-            testContext.testOwner.getAllSemanticsNodes(
-                atLeastOneRootRequired = atLeastOneRootRequired,
-                useUnmergedTree = useUnmergedTree,
-                skipDeactivatedNodes = skipDeactivatedNodes
-            )
-        return testContext.testOwner.runOnUiThread {
-            selector.map(nodes, errorMessageOnFail.orEmpty())
+    ): SelectionResult =
+        testContext.testOwner.getAllSemanticsNodes(
+            atLeastOneRootRequired = atLeastOneRootRequired,
+            useUnmergedTree = useUnmergedTree,
+            skipDeactivatedNodes = skipDeactivatedNodes
+        ) {
+            selector.map(it, errorMessageOnFail.orEmpty())
         }
-    }
 
     /**
      * Returns the semantics node captured by this object.
@@ -201,13 +198,11 @@ constructor(
     /** If using the merged tree, performs the same search in the unmerged tree. */
     private fun getNodesInUnmergedTree(errorMessageOnFail: String?): List<SemanticsNode> {
         return if (!useUnmergedTree) {
-            val nodes =
-                testContext.testOwner.getAllSemanticsNodes(
-                    atLeastOneRootRequired = true,
-                    useUnmergedTree = true
-                )
-            testContext.testOwner.runOnUiThread {
-                selector.map(nodes, errorMessageOnFail.orEmpty()).selectedNodes
+            testContext.testOwner.getAllSemanticsNodes(
+                atLeastOneRootRequired = true,
+                useUnmergedTree = true
+            ) {
+                selector.map(it, errorMessageOnFail.orEmpty()).selectedNodes
             }
         } else {
             emptyList()
@@ -256,12 +251,9 @@ constructor(
         atLeastOneRootRequired: Boolean = true,
         errorMessageOnFail: String? = null
     ): List<SemanticsNode> {
-        val nodes =
-            testContext.testOwner.getAllSemanticsNodes(atLeastOneRootRequired, useUnmergedTree)
-
-        return testContext.testOwner
-            .runOnUiThread { selector.map(nodes, errorMessageOnFail.orEmpty()) }
-            .selectedNodes
+        return testContext.testOwner.getAllSemanticsNodes(atLeastOneRootRequired, useUnmergedTree) {
+            selector.map(it, errorMessageOnFail.orEmpty()).selectedNodes
+        }
     }
 
     /**
