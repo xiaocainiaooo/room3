@@ -44,7 +44,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.ConditionVariable;
 import android.os.Looper;
 
@@ -218,7 +220,7 @@ public final class MediaRouterDynamicProviderTest {
     }
 
     @Test()
-    public void addMemberToDynamicGroupAndRemoveRouteFromSelectedGroup_shouldChangeGroup() {
+    public void addRouteToGroupAndRemoveRouteFromGroup_shouldChangeGroup() {
         assertEquals(RouteConnectionState.STATE_UNKNOWN, mRouteConnectionState);
         List<MediaRouter.GroupRouteInfo> connectedGroupRoutes =
                 mCallback.connectAndWaitForOnConnected(mRoute2);
@@ -241,7 +243,7 @@ public final class MediaRouterDynamicProviderTest {
         verifyMemberRouteState(groupRouteInfo, mRoute3, /* isSelected= */ false);
 
         List<MediaRouter.RouteInfo> memberRoutes =
-                mCallback.addMemberToDynamicGroupAndWaitForOnChanged(groupRouteInfo, mRoute1);
+                mCallback.addRouteToGroupAndWaitForOnChanged(groupRouteInfo, mRoute1);
         assertEquals(2, mConnectedRoute.getSelectedRoutesInGroup().size());
         assertEquals(2, memberRoutes.size());
         assertNotNull(mChangedRoute);
@@ -252,8 +254,7 @@ public final class MediaRouterDynamicProviderTest {
         verifyMemberRouteState(groupRouteInfo, mRoute3, /* isSelected= */ false);
 
         mChangedRoute = null;
-        memberRoutes =
-                mCallback.removeMemberFromDynamicGroupAndWaitForOnChanged(groupRouteInfo, mRoute2);
+        memberRoutes = mCallback.removeRouteFromGroupAndWaitForOnChanged(groupRouteInfo, mRoute2);
         assertEquals(1, mConnectedRoute.getSelectedRoutesInGroup().size());
         assertEquals(1, memberRoutes.size());
         assertEquals(ROUTE_ID_1, memberRoutes.get(0).getDescriptorId());
@@ -266,7 +267,7 @@ public final class MediaRouterDynamicProviderTest {
     }
 
     @Test()
-    public void updateMembersForDynamicGroup_shouldChangeDynamicGroup() {
+    public void updateRoutesForGroup_shouldChangeGroup() {
         assertEquals(RouteConnectionState.STATE_UNKNOWN, mRouteConnectionState);
         List<MediaRouter.GroupRouteInfo> connectedGroupRoutes =
                 mCallback.connectAndWaitForOnConnected(mRoute1);
@@ -289,8 +290,7 @@ public final class MediaRouterDynamicProviderTest {
         verifyMemberRouteState(groupRouteInfo, mRoute3, /* isSelected= */ false);
 
         List<MediaRouter.RouteInfo> memberRoutes =
-                mCallback.updateMembersForDynamicGroupAndWaitForOnChanged(
-                        groupRouteInfo, List.of(mRoute3));
+                mCallback.updateRoutesForGroupAndWaitForOnChanged(groupRouteInfo, List.of(mRoute3));
         assertEquals(1, mConnectedRoute.getSelectedRoutesInGroup().size());
         assertEquals(1, memberRoutes.size());
         assertNotNull(mChangedRoute);
@@ -409,6 +409,45 @@ public final class MediaRouterDynamicProviderTest {
         assertEquals(expectedVolume, memberRoute.getVolume());
     }
 
+    @Test()
+    public void sendControlRequest_shouldSendControlRequestToGroupRouteController() {
+        final ConditionVariable sendControlRequestConditionVariable =
+                new ConditionVariable(/* state= */ true);
+        assertEquals(RouteConnectionState.STATE_UNKNOWN, mRouteConnectionState);
+        List<MediaRouter.GroupRouteInfo> connectedGroupRoutes =
+                mCallback.connectAndWaitForOnConnected(mRoute2);
+
+        assertNotNull(mConnectedRoute);
+        MediaRouter.GroupRouteInfo groupRouteInfo = mConnectedRoute.asGroup();
+        assertNotNull(groupRouteInfo);
+        assertEquals(1, connectedGroupRoutes.size());
+        MediaRouter.GroupRouteInfo connectedGroupRoute = connectedGroupRoutes.get(0);
+        assertTrue(runBlockingOnMainThreadWithResult(connectedGroupRoute::isConnected));
+
+        final Bundle[] sendControlRequestResults = new Bundle[1];
+        MediaRouter.ControlRequestCallback callback =
+                new MediaRouter.ControlRequestCallback() {
+                    @Override
+                    public void onResult(@Nullable Bundle data) {
+                        sendControlRequestResults[0] = data;
+                        sendControlRequestConditionVariable.open();
+                    }
+                };
+        sendControlRequestConditionVariable.close();
+        getInstrumentation()
+                .runOnMainSync(() -> groupRouteInfo.sendControlRequest(new Intent(), callback));
+        sendControlRequestConditionVariable.block();
+
+        Bundle sendControlRequestResult = sendControlRequestResults[0];
+        assertEquals(
+                StubDynamicMediaRouteProviderService.SEND_CONTROL_REQUEST_RESULT,
+                sendControlRequestResult);
+        assertEquals(
+                StubDynamicMediaRouteProviderService.SEND_CONTROL_REQUEST_VALUE,
+                sendControlRequestResult.getString(
+                        StubDynamicMediaRouteProviderService.SEND_CONTROL_REQUEST_KEY));
+    }
+
     // Internal methods.
 
     private Map<String, MediaRouter.RouteInfo> getCurrentRoutesAsMap() {
@@ -483,7 +522,7 @@ public final class MediaRouterDynamicProviderTest {
                 new ConditionVariable(/* state= */ true);
         private final ConditionVariable mMemberRouteRemovedConditionVariable =
                 new ConditionVariable(/* state= */ true);
-        private final ConditionVariable mMemberRouteUpdatedConditionVariable =
+        private final ConditionVariable mMemberRoutesUpdatedConditionVariable =
                 new ConditionVariable(/* state= */ true);
         private final ConditionVariable mGroupVolumeChangedConditionVariable =
                 new ConditionVariable(/* state= */ true);
@@ -538,7 +577,7 @@ public final class MediaRouterDynamicProviderTest {
             return runBlockingOnMainThreadWithResult(() -> mRouter.getConnectedGroupRoutes());
         }
 
-        public List<MediaRouter.RouteInfo> addMemberToDynamicGroupAndWaitForOnChanged(
+        public List<MediaRouter.RouteInfo> addRouteToGroupAndWaitForOnChanged(
                 MediaRouter.GroupRouteInfo groupRoute, MediaRouter.RouteInfo memberRoute) {
             mMemberRouteAddedConditionVariable.close();
             AtomicInteger addMemberStatus = new AtomicInteger();
@@ -549,7 +588,7 @@ public final class MediaRouterDynamicProviderTest {
             return runBlockingOnMainThreadWithResult(groupRoute::getSelectedRoutesInGroup);
         }
 
-        public List<MediaRouter.RouteInfo> removeMemberFromDynamicGroupAndWaitForOnChanged(
+        public List<MediaRouter.RouteInfo> removeRouteFromGroupAndWaitForOnChanged(
                 MediaRouter.GroupRouteInfo groupRoute, MediaRouter.RouteInfo memberRoute) {
             mMemberRouteRemovedConditionVariable.close();
             AtomicInteger removeMemberStatus = new AtomicInteger();
@@ -561,15 +600,15 @@ public final class MediaRouterDynamicProviderTest {
             return runBlockingOnMainThreadWithResult(groupRoute::getSelectedRoutesInGroup);
         }
 
-        public List<MediaRouter.RouteInfo> updateMembersForDynamicGroupAndWaitForOnChanged(
+        public List<MediaRouter.RouteInfo> updateRoutesForGroupAndWaitForOnChanged(
                 MediaRouter.GroupRouteInfo groupRoute, List<MediaRouter.RouteInfo> memberRoutes) {
-            mMemberRouteUpdatedConditionVariable.close();
+            mMemberRoutesUpdatedConditionVariable.close();
             AtomicInteger updateMembersStatus = new AtomicInteger();
             getInstrumentation()
                     .runOnMainSync(
                             () -> updateMembersStatus.set(groupRoute.updateRoutes(memberRoutes)));
             assertEquals(UPDATE_ROUTES_SUCCESSFUL, updateMembersStatus.get());
-            mMemberRouteUpdatedConditionVariable.block();
+            mMemberRoutesUpdatedConditionVariable.block();
             return runBlockingOnMainThreadWithResult(groupRoute::getSelectedRoutesInGroup);
         }
 
@@ -640,7 +679,7 @@ public final class MediaRouterDynamicProviderTest {
                 } else if (selectedRouteIds.containsAll(EXPECTED_ROUTE_IDS_AFTER_ROUTE_REMOVED)) {
                     mMemberRouteRemovedConditionVariable.open();
                 } else if (selectedRouteIds.containsAll(EXPECTED_ROUTE_IDS_AFTER_ROUTE_UPDATED)) {
-                    mMemberRouteUpdatedConditionVariable.open();
+                    mMemberRoutesUpdatedConditionVariable.open();
                 }
                 boolean isVolumeChanged = false;
                 if (route.getVolume()
