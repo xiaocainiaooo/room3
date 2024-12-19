@@ -62,7 +62,6 @@ internal fun ViewStructure.populate(
     var toggleableStateProp: ToggleableState? = null
 
     // Semantics properties form merged configuration.
-    var disabledMergedProp: Boolean? = null
     var textMergedProp: List<AnnotatedString>? = null
 
     // Semantics actions.
@@ -94,7 +93,7 @@ internal fun ViewStructure.populate(
     semanticsInfo.mergedSemanticsConfiguration()?.props?.forEach { property, value ->
         @Suppress("UNCHECKED_CAST")
         when (property) {
-            properties.Disabled -> disabledMergedProp = value as Boolean
+            properties.Disabled -> autofillApi.setEnabled(this, false)
             properties.Text -> textMergedProp = value as List<AnnotatedString>
         }
     }
@@ -123,9 +122,6 @@ internal fun ViewStructure.populate(
     rectManager.rects.withRect(semanticsInfo.semanticsId) { left, top, right, bottom ->
         autofillApi.setDimens(this, left, top, 0, 0, right - left, bottom - top)
     }
-
-    // Enabled.
-    autofillApi.setEnabled(this, disabledMergedProp != true)
 
     // Selected.
     selectedProp?.let { autofillApi.setSelected(this, it) }
