@@ -18,6 +18,7 @@ import androidx.build.AndroidXConfig
 import androidx.build.KotlinTarget
 import androidx.build.LibraryType
 import androidx.build.PlatformIdentifier
+import androidx.build.ProjectLayoutType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 /**
@@ -74,8 +75,10 @@ tasks.named("multiplatformSourceJar").configure {
     dependsOn(tasks.named("generateCommonMainProtos"))
 }
 afterEvaluate {
-    tasks.named("generateJavaKzip").configure {
-        dependsOn(tasks.named("generateCommonMainProtos"))
+    if (!ProjectLayoutType.isPlayground(project)) {
+        tasks.named("generateJavaKzip").configure {
+            dependsOn(tasks.named("generateCommonMainProtos"))
+        }
     }
 }
 
