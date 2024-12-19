@@ -46,6 +46,7 @@ dependencies {
     implementation("androidx.compose.animation:animation:1.2.1")
     implementation("androidx.compose.material:material:1.2.1")
     implementation("androidx.core:core-ktx:1.13.1")
+    implementation(libs.espressoAccessibility)
 }
 
 androidx {
