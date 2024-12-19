@@ -24,7 +24,6 @@
 
 import androidx.build.KotlinTarget
 import androidx.build.LibraryType
-import androidx.build.Publish
 
 plugins {
     id("AndroidXPlugin")

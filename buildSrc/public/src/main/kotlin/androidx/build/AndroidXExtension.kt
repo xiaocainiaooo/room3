@@ -294,26 +294,9 @@ abstract class AndroidXExtension(
 
     private var extraLicenses: MutableCollection<License> = ArrayList()
 
-    // Should only be used to override LibraryType.publish, if a library isn't ready to publish yet
-    var publish: Publish = Publish.UNSET
+    fun shouldPublish(): Boolean = type.publish.shouldPublish()
 
-    fun shouldPublish(): Boolean =
-        if (publish != Publish.UNSET) {
-            publish.shouldPublish()
-        } else if (type != LibraryType.UNSET) {
-            type.publish.shouldPublish()
-        } else {
-            false
-        }
-
-    fun shouldRelease(): Boolean =
-        if (publish != Publish.UNSET) {
-            publish.shouldRelease()
-        } else if (type != LibraryType.UNSET) {
-            type.publish.shouldRelease()
-        } else {
-            false
-        }
+    fun shouldRelease(): Boolean = type.publish.shouldRelease()
 
     fun ifReleasing(action: () -> Unit) {
         project.afterEvaluate {
@@ -323,30 +306,11 @@ abstract class AndroidXExtension(
         }
     }
 
-    fun isPublishConfigured(): Boolean = (publish != Publish.UNSET || type.publish != Publish.UNSET)
-
     fun shouldPublishSbom(): Boolean {
         if (isIsolatedProjectsEnabled()) return false
         // IDE plugins are used by and ship inside Studio
         return shouldPublish() || type == LibraryType.IDE_PLUGIN
     }
-
-    /**
-     * Whether to run API tasks such as tracking and linting. The default value is
-     * [RunApiTasks.Auto], which automatically picks based on the project's properties.
-     */
-    // TODO: decide whether we want to support overriding runApiTasks
-    // @Deprecated("Replaced with AndroidXExtension.type: LibraryType.runApiTasks")
-    var runApiTasks: RunApiTasks = RunApiTasks.Auto
-        get() = if (field == RunApiTasks.Auto && type != LibraryType.UNSET) type.checkApi else field
-        set(value) {
-            if (value is RunApiTasks.No) {
-                throw GradleException(
-                    "runApiTasks cannot be disabled from the AndroidX extension. Ensure you're using the correct library type if you really do not need API tracking"
-                )
-            }
-            field = value
-        }
 
     var doNotDocumentReason: String? = null
 
@@ -387,7 +351,7 @@ abstract class AndroidXExtension(
     }
 
     fun shouldEnforceKotlinStrictApiMode(): Boolean {
-        return !legacyDisableKotlinStrictApiMode && runApiTasks is RunApiTasks.Yes
+        return !legacyDisableKotlinStrictApiMode && type.checkApi is RunApiTasks.Yes
     }
 
     fun extraLicense(closure: Closure<Any>): License {

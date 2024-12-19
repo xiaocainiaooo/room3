@@ -19,7 +19,6 @@ package androidx.build.checkapi
 import androidx.build.AndroidXExtension
 import androidx.build.Release
 import androidx.build.RunApiTasks
-import androidx.build.Version
 import androidx.build.binarycompatibilityvalidator.BinaryCompatibilityValidation
 import androidx.build.getSupportRootFolder
 import androidx.build.isWriteVersionedApiFilesEnabled
@@ -60,63 +59,21 @@ fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
         )
     }
 
-    // API behavior is default for type
-    if (type.checkApi is RunApiTasks.No && runApiTasks is RunApiTasks.No) {
-        project.logger.info("Projects of type ${type.name} do not track API.")
-        return false
-    }
-
-    when (runApiTasks) {
-        // API behavior for type must have been overridden, because previous check did not trigger
+    return when (type.checkApi) {
         is RunApiTasks.No -> {
-            project.logger.info(
-                "Project ${project.name} has explicitly disabled API tasks with " +
-                    "reason: ${(runApiTasks as RunApiTasks.No).reason}"
-            )
-            return false
+            project.logger.info("Projects of type ${type.name} do not track API.")
+            false
         }
         is RunApiTasks.Yes -> {
-            // API behavior is default for type; not overridden
-            if (type.checkApi is RunApiTasks.Yes) {
-                return true
-            }
-            // API behavior for type is overridden
-            (runApiTasks as RunApiTasks.Yes).reason?.let { reason ->
+            (type.checkApi as RunApiTasks.Yes).reason?.let { reason ->
                 project.logger.info(
                     "Project ${project.name} has explicitly enabled API tasks " +
                         "with reason: $reason"
                 )
             }
-            return true
+            true
         }
-        else -> {}
     }
-
-    if (project.version !is Version) {
-        project.logger.info("Project ${project.name} has no version set, ignoring API tasks.")
-        return false
-    }
-
-    // If the project has an "api" directory, either because they used to track APIs or they
-    // added one manually to force tracking (as recommended below), continue tracking APIs.
-    if (project.hasApiFileDirectory() && !shouldRelease()) {
-        project.logger.error(
-            "Project ${project.name} is not published, but has an existing API " +
-                "directory. Forcing API tasks enabled. Please migrate to runApiTasks=Yes."
-        )
-        return true
-    }
-
-    if (!shouldRelease()) {
-        project.logger.info(
-            "Project ${project.name} is not published, ignoring API tasks. " +
-                "If you still want to track APIs, create an \"api\" directory in your project" +
-                " root and run the updateApi task."
-        )
-        return false
-    }
-
-    return true
 }
 
 /**

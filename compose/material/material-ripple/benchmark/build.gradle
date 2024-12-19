@@ -52,5 +52,5 @@ android {
 }
 
 androidx {
-    type = LibraryType.INTERNAL_TEST_LIBRARY
+    type = LibraryType.BENCHMARK
 }
