@@ -19,6 +19,7 @@ package androidx.build.metalava
 import androidx.build.Version
 import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.CompilationInputs
+import androidx.build.checkapi.StandardCompilationInputs
 import androidx.build.checkapi.getApiFileVersion
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
 import androidx.build.checkapi.getVersionedApiLocation
@@ -189,10 +190,9 @@ constructor(private val workerExecutor: WorkerExecutor) : DefaultTask() {
         val jars = getJars(runnerProject, mavenId)
         val sources = getSources(runnerProject, "$mavenId:sources")
 
-        return CompilationInputs(
+        // TODO(b/330721660) parse META-INF/kotlin-project-structure-metadata.json for KMP projects
+        return StandardCompilationInputs(
             sourcePaths = sources,
-            // TODO(b/330721660) parse META-INF/kotlin-project-structure-metadata.json for
-            // common sources
             commonModuleSourcePaths = project.files(),
             dependencyClasspath = jars,
             bootClasspath = project.getAndroidJar()
