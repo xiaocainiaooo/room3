@@ -29,9 +29,16 @@ import androidx.pdf.PdfDocument
 import androidx.pdf.PdfLoader
 import androidx.pdf.SandboxedPdfLoader
 import androidx.pdf.exceptions.PdfPasswordException
+import androidx.pdf.search.SearchRepository
+import androidx.pdf.search.model.NoQuery
+import androidx.pdf.search.model.QueryResults
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState
+import androidx.pdf.viewer.fragment.model.SearchViewUiState
+import androidx.pdf.viewer.fragment.util.countTotalElements
+import androidx.pdf.viewer.fragment.util.getFlattenedIndex
 import java.util.concurrent.Executors
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -61,6 +68,18 @@ internal class PdfDocumentViewModel(
     /** A Coroutine [Job] that manages the PDF loading task. */
     private var documentLoadJob: Job? = null
 
+    /**
+     * Parent [Job] for search query and result collectors. All children jobs will be cancelled upon
+     * disabling [PdfViewerFragmentV2.isTextSearchActive].
+     */
+    private val searchCollector = SupervisorJob(viewModelScope.coroutineContext[Job])
+
+    /**
+     * Parent [Job] for search operations triggered on [SearchRepository]. All children jobs will
+     * cancelled upon updating search query.
+     */
+    private var searchJob: Job = SupervisorJob(viewModelScope.coroutineContext[Job])
+
     private val _fragmentUiScreenState =
         MutableStateFlow<PdfFragmentUiState>(PdfFragmentUiState.Loading)
 
@@ -72,6 +91,12 @@ internal class PdfDocumentViewModel(
      */
     internal val fragmentUiScreenState: StateFlow<PdfFragmentUiState>
         get() = _fragmentUiScreenState.asStateFlow()
+
+    private val _searchViewUiState = MutableStateFlow<SearchViewUiState>(SearchViewUiState.Closed)
+
+    /** Stream of UI states of the PdfSearchView. */
+    internal val searchViewUiState: StateFlow<SearchViewUiState>
+        get() = _searchViewUiState.asStateFlow()
 
     /**
      * Indicates whether the user is entering their password for the first time or making a repeated
@@ -94,6 +119,9 @@ internal class PdfDocumentViewModel(
     val isToolboxVisibleFromState: Boolean
         get() = state[TOOLBOX_STATE_KEY] ?: false
 
+    /** Holds business logic for search feature. */
+    private lateinit var searchRepository: SearchRepository
+
     init {
         /**
          * Open PDF if documentUri was previously set in state. This will be required in events like
@@ -101,6 +129,15 @@ internal class PdfDocumentViewModel(
          */
         state.get<Uri>(DOCUMENT_URI_KEY)?.let { uri ->
             documentLoadJob = viewModelScope.launch { openDocument(uri) }
+            /*
+            Trigger restoring search view once document is loaded.
+            This is required as [SearchRepository] depends on [PdfDocument] which is created in
+            [PdfFragmentUiState.DocumentLoaded] state.
+            */
+            documentLoadJob?.invokeOnCompletion {
+                updateSearchState(isTextSearchActive = state[TEXT_SEARCH_STATE_KEY] ?: false)
+                // TODO: Restore SearchRepository using data in SSH. b/382307355
+            }
         }
     }
 
@@ -142,15 +179,60 @@ internal class PdfDocumentViewModel(
     }
 
     /**
-     * Handles user interaction related to enabling the search view.
+     * Called when the user toggles the search view's active state
+     * [PdfViewerFragmentV2.isTextSearchActive].
      *
-     * This function ensures that the search view is properly displayed and ready for user input
-     * when triggered.
+     * This function updates the search state in the [SavedStateHandle] and performs actions related
+     * to enabling/disabling the search view.
      */
-    fun onSearchViewToggle(isTextSearchActive: Boolean) {
+    internal fun updateSearchState(isTextSearchActive: Boolean) {
+        /**
+         * [SearchRepository] is initialized only after a document is successfully loaded. If user
+         * triggers search before document is loaded, it will be a No-Op.
+         */
+        if (fragmentUiScreenState.value !is PdfFragmentUiState.DocumentLoaded) return
+
         state[TEXT_SEARCH_STATE_KEY] = isTextSearchActive
-        // TODO: add implementation after integrating PdfSearchView b/379054326
+
+        if (isTextSearchActive) {
+            _searchViewUiState.update { SearchViewUiState.Init }
+            collectSearchResults()
+        } else {
+            searchJob.children.forEach { it.cancel() }
+            searchCollector.children.forEach { it.cancel() }
+            searchRepository.clearSearchResults()
+
+            _searchViewUiState.update { SearchViewUiState.Closed }
+        }
     }
+
+    private fun collectSearchResults() {
+        viewModelScope.launch(searchCollector) {
+            searchRepository.queryResults.collect { queryResults ->
+                val searchUiState =
+                    when (queryResults) {
+                        is NoQuery -> SearchViewUiState.Init
+                        is QueryResults.NoMatch ->
+                            SearchViewUiState.Active(currentIndex = 0, totalMatches = 0)
+                        is QueryResults.Matched -> queryResults.toMatchedUiState()
+                    }
+
+                _searchViewUiState.update { searchUiState }
+            }
+        }
+    }
+
+    private fun QueryResults.toMatchedUiState(): SearchViewUiState =
+        with(this as QueryResults.Matched) {
+            SearchViewUiState.Active(
+                currentIndex =
+                    resultBounds.getFlattenedIndex(
+                        queryResultsIndex.pageNum,
+                        queryResultsIndex.resultBoundsIndex
+                    ),
+                totalMatches = resultBounds.countTotalElements()
+            )
+        }
 
     /**
      * Handles user interaction related to enabling the toolbox view.
@@ -172,6 +254,8 @@ internal class PdfDocumentViewModel(
             // Try opening pdf with provided params
             val document = loader.openDocument(uri, password)
 
+            searchRepository = SearchRepository(document)
+
             /** Successful load, move to [PdfFragmentUiState.DocumentLoaded] state. */
             _fragmentUiScreenState.update { PdfFragmentUiState.DocumentLoaded(document) }
 
@@ -190,6 +274,40 @@ internal class PdfDocumentViewModel(
             /** Resets the [passwordFailed] state after a document failed to load. */
             passwordFailed = false
         }
+    }
+
+    /** Intent triggered when user submits a search query. */
+    fun searchDocument(query: String, visiblePageRange: IntRange) {
+        /**
+         * Cannot start searching document before [PdfViewerFragmentV2.isTextSearchActive] is
+         * enabled.
+         */
+        if (!isTextSearchActiveFromState) return
+
+        // Cancel any on-going search operation(s) as the results will not be valid anymore.
+        searchJob.children.forEach { it.cancel() }
+
+        viewModelScope.launch(searchJob) {
+            searchRepository.produceSearchResults(
+                query = query,
+                currentVisiblePage = visiblePageRange.getCenterPage()
+            )
+        }
+    }
+
+    /** Intent triggered when user clicks prev button. */
+    fun findPreviousMatch() {
+        viewModelScope.launch(searchJob) { searchRepository.producePreviousResult() }
+    }
+
+    /** Intent triggered when user clicks next button. */
+    fun findNextMatch() {
+        viewModelScope.launch(searchJob) { searchRepository.produceNextResult() }
+    }
+
+    private fun IntRange.getCenterPage(): Int {
+        val size = endInclusive - first + 1
+        return first + size / 2
     }
 
     @Suppress("UNCHECKED_CAST")

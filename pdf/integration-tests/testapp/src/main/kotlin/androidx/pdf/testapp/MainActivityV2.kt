@@ -57,8 +57,14 @@ class MainActivityV2 : AppCompatActivity() {
         }
 
         val getContentButton: MaterialButton = findViewById(R.id.launch_button)
+        val searchButton: MaterialButton = findViewById(R.id.search_pdf_button)
 
         getContentButton.setOnClickListener { filePicker.launch(MIME_TYPE_PDF) }
+        if (savedInstanceState == null) {
+            setPdfView()
+        }
+
+        searchButton.setOnClickListener { pdfViewerFragment?.isTextSearchActive = true }
     }
 
     private fun setPdfView() {
