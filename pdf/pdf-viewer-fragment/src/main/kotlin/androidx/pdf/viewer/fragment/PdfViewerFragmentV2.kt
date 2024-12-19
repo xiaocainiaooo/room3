@@ -18,9 +18,12 @@ package androidx.pdf.viewer.fragment
 
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout.GONE
 import android.widget.LinearLayout.VISIBLE
 import android.widget.ProgressBar
@@ -33,10 +36,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.pdf.view.PdfView
+import androidx.pdf.view.search.PdfSearchView
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.DocumentError
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.DocumentLoaded
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.Loading
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.PasswordRequested
+import androidx.pdf.viewer.fragment.search.PdfSearchViewManager
 import kotlinx.coroutines.launch
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -72,7 +77,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
     public var isTextSearchActive: Boolean
         get() = documentViewModel.isTextSearchActiveFromState
         set(value) {
-            documentViewModel.onSearchViewToggle(value)
+            documentViewModel.updateSearchState(value)
         }
 
     /**
@@ -134,6 +139,30 @@ public open class PdfViewerFragmentV2 : Fragment() {
     private lateinit var pdfView: PdfView
     private lateinit var errorView: TextView
     private lateinit var loadingView: ProgressBar
+    private lateinit var pdfSearchView: PdfSearchView
+    private lateinit var pdfSearchViewManager: PdfSearchViewManager
+
+    // Provides visible pages in viewport both end inclusive.
+    private val PdfView.visiblePages: IntRange
+        get() = IntRange(firstVisiblePage, firstVisiblePage + visiblePagesCount - 1)
+
+    private val searchQueryTextWatcher =
+        object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // No-Op.
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                documentViewModel.searchDocument(
+                    query = s.toString(),
+                    visiblePageRange = pdfView.visiblePages
+                )
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // No-Op.
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -145,6 +174,8 @@ public open class PdfViewerFragmentV2 : Fragment() {
         pdfView = root.findViewById(R.id.pdfView)
         errorView = root.findViewById(R.id.errorTextView)
         loadingView = root.findViewById(R.id.pdfLoadingProgressBar)
+        pdfSearchView = root.findViewById(R.id.pdfSearchView)
+        pdfSearchViewManager = PdfSearchViewManager(pdfSearchView)
 
         return root
     }
@@ -152,12 +183,51 @@ public open class PdfViewerFragmentV2 : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            /**
-             * [repeatOnLifecycle] launches the block in a new coroutine every time the lifecycle is
-             * in the STARTED state (or above) and cancels it when it's STOPPED.
-             */
-            repeatOnLifecycle(Lifecycle.State.STARTED) { collectFragmentUiScreenState() }
+        onPdfSearchViewCreated(pdfSearchView)
+
+        collectFlowOnLifecycleScope { collectFragmentUiScreenState() }
+    }
+
+    /**
+     * Called from Fragment.onViewCreated(). This gives subclasses a chance to customize component.
+     */
+    protected fun onPdfSearchViewCreated(pdfSearchView: PdfSearchView) {
+        setupSearchViewListeners(pdfSearchView)
+        collectSearchUiStates()
+        // TODO(b/382307165): add animator to align with keyboard
+    }
+
+    private fun setupSearchViewListeners(pdfSearchView: PdfSearchView) {
+        with(pdfSearchView) {
+            searchQueryBox.addTextChangedListener(searchQueryTextWatcher)
+
+            searchQueryBox.setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    performSearch()
+                }
+                true // IME action consumed
+            }
+            findPrevButton.setOnClickListener { documentViewModel.findPreviousMatch() }
+            findNextButton.setOnClickListener { documentViewModel.findNextMatch() }
+            closeButton.setOnClickListener { isTextSearchActive = false }
+        }
+    }
+
+    private fun PdfSearchView.performSearch() {
+        searchQueryBox.clearFocus()
+
+        searchDocument(searchQueryBox.text.toString())
+    }
+
+    private fun searchDocument(query: String) {
+        documentViewModel.searchDocument(query = query, visiblePageRange = pdfView.visiblePages)
+    }
+
+    private fun collectSearchUiStates() {
+        collectFlowOnLifecycleScope {
+            documentViewModel.searchViewUiState.collect { uiState ->
+                pdfSearchViewManager.setState(uiState)
+            }
         }
     }
 
@@ -203,5 +273,15 @@ public open class PdfViewerFragmentV2 : Fragment() {
         this.pdfView.visibility = pdfView
         this.loadingView.visibility = loadingView
         this.errorView.visibility = errorView
+    }
+
+    private fun collectFlowOnLifecycleScope(block: suspend () -> Unit) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            /**
+             * [repeatOnLifecycle] launches the block in a new coroutine every time the lifecycle is
+             * in the STARTED state (or above) and cancels it when it's STOPPED.
+             */
+            repeatOnLifecycle(Lifecycle.State.STARTED) { block() }
+        }
     }
 }
