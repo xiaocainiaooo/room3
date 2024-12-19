@@ -33,7 +33,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
-object MetalavaTasks {
+internal object MetalavaTasks {
 
     fun setupProject(
         project: Project,
