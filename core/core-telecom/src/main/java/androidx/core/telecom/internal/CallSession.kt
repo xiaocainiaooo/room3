@@ -134,7 +134,7 @@ internal class CallSession(
                 platformEndpoint.endpointType,
                 jetpackUuid
             )
-        Log.d(TAG, " n=[${platformEndpoint.endpointName}]  plat=[${platformEndpoint}] --> jet=[$j]")
+        Log.i(TAG, " n=[${platformEndpoint.endpointName}]  plat=[${platformEndpoint}] --> jet=[$j]")
         return j
     }
 
