@@ -116,8 +116,6 @@ val WearMaterial3Demos =
                 ComposableDemo("List Header") { Centralize { ListHeaderSample() } },
                 Material3DemoCategory("Time Text", TimeTextDemos),
                 ComposableDemo("Card") { CardDemo() },
-                ComposableDemo("Animated Shape Buttons") { AnimatedShapeButtonDemo() },
-                ComposableDemo("Animated Shape Toggle Buttons") { AnimatedShapeToggleButtonDemo() },
                 ComposableDemo("Text Toggle Button") { TextToggleButtonDemo() },
                 ComposableDemo("Icon Toggle Button") { IconToggleButtonDemo() },
                 ComposableDemo("Checkbox Button") { CheckboxButtonDemo() },
