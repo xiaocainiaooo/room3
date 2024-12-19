@@ -251,9 +251,9 @@ public class WrapperMediaRouteProvider extends MediaRouteProvider {
         }
 
         void addOriginalRoute(MediaRouter.@NonNull RouteInfo originalRoute) {
-            if (originalRoute.isSelected() || originalRoute.isConnected()) {
+            if (originalRoute.isSelected() || originalRoute instanceof MediaRouter.GroupRouteInfo) {
                 // The wrapper route provider only wraps discovered routes and it wouldn't wrap
-                // selected routes or connected routes.
+                // selected routes or group routes.
                 return;
             }
             String originalDescriptorId = getDescriptorId(originalRoute.getId());

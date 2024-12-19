@@ -21,6 +21,21 @@ import static androidx.mediarouter.media.MediaRouter.AVAILABILITY_FLAG_REQUIRE_M
 import static androidx.mediarouter.media.MediaRouter.CALLBACK_FLAG_FORCE_DISCOVERY;
 import static androidx.mediarouter.media.MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN;
 import static androidx.mediarouter.media.MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.ADD_ROUTE_FAILED_REASON_ALREADY_IN_GROUP;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.ADD_ROUTE_FAILED_REASON_NOT_AVAILABLE_ROUTE_CONNECTION;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.ADD_ROUTE_FAILED_REASON_NOT_GROUPABLE;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.ADD_ROUTE_FAILED_REASON_UNSUPPORTED_FOR_GROUP_ROUTE;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.ADD_ROUTE_SUCCESSFUL;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.REMOVE_ROUTE_FAILED_REASON_LAST_ROUTE_IN_GROUP;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.REMOVE_ROUTE_FAILED_REASON_NOT_AVAILABLE_ROUTE_CONNECTION;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.REMOVE_ROUTE_FAILED_REASON_NOT_IN_GROUP;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.REMOVE_ROUTE_FAILED_REASON_NOT_UNSELECTABLE;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.REMOVE_ROUTE_FAILED_REASON_UNSUPPORTED_FOR_GROUP_ROUTE;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.REMOVE_ROUTE_SUCCESSFUL;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.UPDATE_ROUTES_FAILED_REASON_NOT_AVAILABLE_ROUTE_CONNECTION;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.UPDATE_ROUTES_FAILED_REASON_NOT_TRANSFERABLE;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.UPDATE_ROUTES_FAILED_REASON_UNSUPPORTED_FOR_GROUP_ROUTE;
+import static androidx.mediarouter.media.MediaRouter.GroupRouteInfo.UPDATE_ROUTES_SUCCESSFUL;
 import static androidx.mediarouter.media.MediaRouter.UNSELECT_REASON_DISCONNECTED;
 import static androidx.mediarouter.media.MediaRouter.UNSELECT_REASON_ROUTE_CHANGED;
 import static androidx.mediarouter.media.MediaRouter.UNSELECT_REASON_STOPPED;
@@ -360,67 +375,183 @@ import java.util.Set;
     }
 
     @NonNull
-    /* package */ List<MediaRouter.RouteInfo> getConnectedRoutes() {
-        List<MediaRouter.RouteInfo> connectedRoutes = new ArrayList<>();
+    /* package */ List<MediaRouter.GroupRouteInfo> getConnectedGroupRoutes() {
+        List<MediaRouter.GroupRouteInfo> connectedGroupRoutes = new ArrayList<>();
         for (RouteConnection routeConnection : mRouteIdToRouteConnectionMap.values()) {
             if (routeConnection.mGroupRoute != null) {
-                connectedRoutes.add(routeConnection.mGroupRoute);
+                connectedGroupRoutes.add(routeConnection.mGroupRoute);
             }
         }
-        return connectedRoutes;
+        return connectedGroupRoutes;
     }
 
     @Nullable
-        /* package */ MediaRouter.RouteInfo.DynamicGroupState getDynamicGroupState(
-            MediaRouter.RouteInfo route) {
-        return mSelectedRoute.getDynamicGroupState(route);
+    private RouteConnection getRouteConnection(@NonNull MediaRouter.GroupRouteInfo groupRoute) {
+        for (RouteConnection routeConnection : mRouteIdToRouteConnectionMap.values()) {
+            if (routeConnection.mGroupRoute == groupRoute) {
+                return routeConnection;
+            }
+        }
+        return null;
     }
 
-    /* package */ void addMemberToDynamicGroup(@NonNull MediaRouter.RouteInfo route) {
-        if (!(mSelectedRouteController instanceof MediaRouteProvider.DynamicGroupRouteController)) {
-            throw new IllegalStateException("There is no currently selected dynamic group route.");
-        }
-        MediaRouter.RouteInfo.DynamicGroupState state = getDynamicGroupState(route);
-        if (mSelectedRoute.getRoutesInGroup().contains(route)
-                || state == null
-                || !state.isGroupable()) {
-            Log.w(TAG, "Ignoring attempt to add a non-groupable route to dynamic group : " + route);
+    /* package */ void addRouteToSelectedGroup(@NonNull MediaRouter.RouteInfo route) {
+        MediaRouter.GroupRouteInfo selectedGroupRoute = mSelectedRoute.asGroup();
+        if (selectedGroupRoute == null) {
+            Log.w(TAG, "Ignoring attempt to add a member route to a selected non-group route");
             return;
         }
-        ((MediaRouteProvider.DynamicGroupRouteController) mSelectedRouteController)
-                .onAddMemberRoute(route.getDescriptorId());
+        addRouteToGroup(selectedGroupRoute, route);
     }
 
-    /* package */ void removeMemberFromDynamicGroup(@NonNull MediaRouter.RouteInfo route) {
-        if (!(mSelectedRouteController instanceof MediaRouteProvider.DynamicGroupRouteController)) {
-            throw new IllegalStateException("There is no currently selected dynamic group route.");
-        }
-        MediaRouter.RouteInfo.DynamicGroupState state = getDynamicGroupState(route);
-        if (!mSelectedRoute.getRoutesInGroup().contains(route)
-                || state == null
-                || !state.isUnselectable()) {
-            Log.w(TAG, "Ignoring attempt to remove a non-unselectable member route : " + route);
+    /* package */ void removeRouteFromSelectedGroup(@NonNull MediaRouter.RouteInfo route) {
+        MediaRouter.GroupRouteInfo selectedGroupRoute = mSelectedRoute.asGroup();
+        if (selectedGroupRoute == null) {
+            Log.w(TAG, "Ignoring attempt to remove a member route from a selected non-group route");
             return;
         }
-        if (mSelectedRoute.getRoutesInGroup().size() <= 1) {
-            Log.w(TAG, "Ignoring attempt to remove the last member route.");
-            return;
-        }
-        ((MediaRouteProvider.DynamicGroupRouteController) mSelectedRouteController)
-                .onRemoveMemberRoute(route.getDescriptorId());
+        removeRouteFromGroup(selectedGroupRoute, route);
     }
 
     /* package */ void transferToRoute(@NonNull MediaRouter.RouteInfo route) {
-        if (!(mSelectedRouteController instanceof MediaRouteProvider.DynamicGroupRouteController)) {
-            throw new IllegalStateException("There is no currently selected dynamic group route.");
-        }
-        MediaRouter.RouteInfo.DynamicGroupState state = getDynamicGroupState(route);
-        if (state == null || !state.isTransferable()) {
-            Log.w(TAG, "Ignoring attempt to transfer to a non-transferable route.");
+        MediaRouter.GroupRouteInfo selectedGroupRoute = mSelectedRoute.asGroup();
+        if (selectedGroupRoute == null) {
+            Log.w(TAG, "Ignoring attempt to transfer for a selected non-group route");
             return;
         }
-        ((MediaRouteProvider.DynamicGroupRouteController) mSelectedRouteController)
-                .onUpdateMemberRoutes(Collections.singletonList(route.getDescriptorId()));
+        updateRoutesForGroup(selectedGroupRoute, Collections.singletonList(route));
+    }
+
+    @MediaRouter.GroupRouteInfo.AddRouteReason
+    /* package */ int addRouteToGroup(
+            @NonNull MediaRouter.GroupRouteInfo groupRoute,
+            @NonNull MediaRouter.RouteInfo memberRoute) {
+        if (!groupRoute.isGroupable(memberRoute)) {
+            Log.w(TAG, "Ignoring attempt to add a non-groupable member route: " + memberRoute);
+            return ADD_ROUTE_FAILED_REASON_NOT_GROUPABLE;
+        }
+        if (groupRoute.getSelectedRoutesInGroup().contains(memberRoute)) {
+            Log.w(TAG, "Ignoring attempt to add an existing member route: " + memberRoute);
+            return ADD_ROUTE_FAILED_REASON_ALREADY_IN_GROUP;
+        }
+        if (groupRoute.isSelected()) {
+            if (!(mSelectedRouteController
+                    instanceof MediaRouteProvider.DynamicGroupRouteController)) {
+                throw new IllegalStateException(
+                        "There is no currently selected dynamic group route.");
+            }
+            ((MediaRouteProvider.DynamicGroupRouteController) mSelectedRouteController)
+                    .onAddMemberRoute(memberRoute.getDescriptorId());
+        } else if (groupRoute.isConnected()) {
+            RouteConnection routeConnection = getRouteConnection(groupRoute);
+            if (routeConnection == null) {
+                Log.w(
+                        TAG,
+                        "Ignoring attempt to add a route to a non-available connected route: "
+                                + groupRoute);
+                return ADD_ROUTE_FAILED_REASON_NOT_AVAILABLE_ROUTE_CONNECTION;
+            }
+            routeConnection.mController.onAddMemberRoute(memberRoute.getDescriptorId());
+        } else {
+            Log.w(
+                    TAG,
+                    "Ignoring attempt to add a route to an unsupported group route:" + groupRoute);
+            return ADD_ROUTE_FAILED_REASON_UNSUPPORTED_FOR_GROUP_ROUTE;
+        }
+        return ADD_ROUTE_SUCCESSFUL;
+    }
+
+    @MediaRouter.GroupRouteInfo.RemoveRouteReason
+    /* package */ int removeRouteFromGroup(
+            @NonNull MediaRouter.GroupRouteInfo groupRoute,
+            @NonNull MediaRouter.RouteInfo memberRoute) {
+        if (!groupRoute.isUnselectable(memberRoute)) {
+            Log.w(
+                    TAG,
+                    "Ignoring attempt to remove a non-unselectable member route: " + memberRoute);
+            return REMOVE_ROUTE_FAILED_REASON_NOT_UNSELECTABLE;
+        }
+        if (!groupRoute.getSelectedRoutesInGroup().contains(memberRoute)) {
+            Log.w(TAG, "Ignoring attempt to remove a non-in-group member route: " + memberRoute);
+            return REMOVE_ROUTE_FAILED_REASON_NOT_IN_GROUP;
+        }
+        if (groupRoute.getSelectedRoutesInGroup().size() <= 1) {
+            Log.w(TAG, "Ignoring attempt to remove the last member route.");
+            return REMOVE_ROUTE_FAILED_REASON_LAST_ROUTE_IN_GROUP;
+        }
+        if (groupRoute.isSelected()) {
+            if (!(mSelectedRouteController
+                    instanceof MediaRouteProvider.DynamicGroupRouteController)) {
+                throw new IllegalStateException(
+                        "There is no currently selected dynamic group route.");
+            }
+            ((MediaRouteProvider.DynamicGroupRouteController) mSelectedRouteController)
+                    .onRemoveMemberRoute(memberRoute.getDescriptorId());
+        } else if (groupRoute.isConnected()) {
+            RouteConnection routeConnection = getRouteConnection(groupRoute);
+            if (routeConnection == null) {
+                Log.w(
+                        TAG,
+                        "Ignoring attempt to update routes for a non-available connected route: "
+                                + groupRoute);
+                return REMOVE_ROUTE_FAILED_REASON_NOT_AVAILABLE_ROUTE_CONNECTION;
+            }
+            routeConnection.mController.onRemoveMemberRoute(memberRoute.getDescriptorId());
+        } else {
+            Log.w(
+                    TAG,
+                    "Ignoring attempt to remove a route from an unsupported group route:"
+                            + groupRoute);
+            return REMOVE_ROUTE_FAILED_REASON_UNSUPPORTED_FOR_GROUP_ROUTE;
+        }
+        return REMOVE_ROUTE_SUCCESSFUL;
+    }
+
+    @MediaRouter.GroupRouteInfo.UpdateRoutesReason
+    /* package */ int updateRoutesForGroup(
+            @NonNull MediaRouter.GroupRouteInfo groupRoute,
+            @NonNull List<MediaRouter.RouteInfo> memberRoutes) {
+        List<String> memberRouteDescriptorIds = new ArrayList<>();
+        for (MediaRouter.RouteInfo route : memberRoutes) {
+            if (!groupRoute.isTransferable(route)) {
+                Log.w(
+                        TAG,
+                        "Ignoring attempt to update the group with a non-transferable route: "
+                                + route);
+                continue;
+            }
+            memberRouteDescriptorIds.add(route.getDescriptorId());
+        }
+        if (memberRouteDescriptorIds.isEmpty()) {
+            Log.w(TAG, "Ignoring attempt to update the group with non-transferable routes");
+            return UPDATE_ROUTES_FAILED_REASON_NOT_TRANSFERABLE;
+        }
+        if (groupRoute.isSelected()) {
+            if (!(mSelectedRouteController
+                    instanceof MediaRouteProvider.DynamicGroupRouteController)) {
+                throw new IllegalStateException(
+                        "There is no currently selected dynamic group route.");
+            }
+            ((MediaRouteProvider.DynamicGroupRouteController) mSelectedRouteController)
+                    .onUpdateMemberRoutes(memberRouteDescriptorIds);
+        } else if (groupRoute.isConnected()) {
+            RouteConnection routeConnection = getRouteConnection(groupRoute);
+            if (routeConnection == null) {
+                Log.w(
+                        TAG,
+                        "Ignoring attempt to update routes for a non-available connected route: "
+                                + groupRoute);
+                return UPDATE_ROUTES_FAILED_REASON_NOT_AVAILABLE_ROUTE_CONNECTION;
+            }
+            routeConnection.mController.onUpdateMemberRoutes(memberRouteDescriptorIds);
+        } else {
+            Log.w(
+                    TAG,
+                    "Ignoring attempt to update routes for an unsupported group route:"
+                            + groupRoute);
+            return UPDATE_ROUTES_FAILED_REASON_UNSUPPORTED_FOR_GROUP_ROUTE;
+        }
+        return UPDATE_ROUTES_SUCCESSFUL;
     }
 
     /**
@@ -1189,7 +1320,7 @@ import java.util.Set;
         if (!mSelectedRoute.isGroup()) {
             return;
         }
-        List<MediaRouter.RouteInfo> routes = mSelectedRoute.getRoutesInGroup();
+        List<MediaRouter.RouteInfo> routes = mSelectedRoute.getSelectedRoutesInGroup();
         // Build a set of descriptor IDs for the new route group.
         Set<String> idSet = new HashSet<>();
         for (MediaRouter.RouteInfo route : routes) {
@@ -1283,8 +1414,8 @@ import java.util.Set;
                                 String groupId = groupRouteDescriptor.getId();
 
                                 String uniqueId = assignRouteUniqueId(provider, groupId);
-                                MediaRouter.RouteInfo route =
-                                        new MediaRouter.RouteInfo(provider, groupId, uniqueId);
+                                MediaRouter.GroupRouteInfo route =
+                                        new MediaRouter.GroupRouteInfo(provider, groupId, uniqueId);
                                 route.maybeUpdateDescriptor(groupRouteDescriptor);
 
                                 if (mSelectedRoute == route) {
@@ -1307,7 +1438,11 @@ import java.util.Set;
                                     updateRouteDescriptorAndNotify(
                                             mSelectedRoute, groupRouteDescriptor);
                                 }
-                                mSelectedRoute.updateDynamicDescriptors(routes);
+                                MediaRouter.GroupRouteInfo groupRouteInfo =
+                                        mSelectedRoute.asGroup();
+                                if (groupRouteInfo != null) {
+                                    groupRouteInfo.updateDynamicDescriptors(routes);
+                                }
                             }
                         }
                     };
@@ -1514,7 +1649,7 @@ import java.util.Set;
         // Holds the {@link MediaRouter.RouteInfo} of the route that corresponds to the dynamic
         // group created as the result of connecting to {@link mRequestedRoute}. or null if the
         // dynamic group hasn't been created by the provider yet.
-        @Nullable private MediaRouter.RouteInfo mGroupRoute;
+        @Nullable private MediaRouter.GroupRouteInfo mGroupRoute;
 
         /* package */ RouteConnection(
                 MediaRouter.RouteInfo requestedRoute,
@@ -1550,7 +1685,9 @@ import java.util.Set;
             if (mController != controller) {
                 return;
             }
-            if (groupRouteDescriptor == null && mGroupRoute == null) {
+            MediaRouteDescriptor updatedGroupRouteDescriptor =
+                    updateGroupMemberIdsIfNeeded(groupRouteDescriptor, routes);
+            if (updatedGroupRouteDescriptor == null && mGroupRoute == null) {
                 // The provider has not yet set a group route descriptor, which is needed to
                 // establish the connection. We need to wait for a group route descriptor.
                 Log.e(
@@ -1560,23 +1697,61 @@ import java.util.Set;
                 return;
             }
             if (mGroupRoute == null) {
-                // groupRouteDescriptor cannot be null.
-                mGroupRoute = convertFromRouteDescriptorToRouteInfo(groupRouteDescriptor);
+                // updatedGroupRouteDescriptor cannot be null.
+                mGroupRoute = convertFromRouteDescriptorToRouteInfo(updatedGroupRouteDescriptor);
+                mGroupRoute.updateDynamicDescriptors(routes);
                 notifyRouteConnected();
             } else {
                 // mGroupRoute cannot be null.
+                updateRouteDescriptorAndNotify(mGroupRoute, updatedGroupRouteDescriptor);
                 mGroupRoute.updateDynamicDescriptors(routes);
-                updateRouteDescriptorAndNotify(mGroupRoute, groupRouteDescriptor);
             }
         }
 
-        private MediaRouter.RouteInfo convertFromRouteDescriptorToRouteInfo(
+        @Nullable
+        private MediaRouteDescriptor updateGroupMemberIdsIfNeeded(
+                @Nullable MediaRouteDescriptor groupRouteDescriptor,
+                @NonNull
+                        Collection<
+                                        MediaRouteProvider.DynamicGroupRouteController
+                                                .DynamicRouteDescriptor>
+                                routes) {
+            if (groupRouteDescriptor == null) {
+                return groupRouteDescriptor;
+            }
+            boolean memberRoutesMatched =
+                    groupRouteDescriptor.getGroupMemberIds().size() == routes.size();
+            if (memberRoutesMatched) {
+                for (MediaRouteProvider.DynamicGroupRouteController.DynamicRouteDescriptor route :
+                        routes) {
+                    String routeDescriptorId = route.getRouteDescriptor().getId();
+                    if (!groupRouteDescriptor.getGroupMemberIds().contains(routeDescriptorId)) {
+                        memberRoutesMatched = false;
+                        break;
+                    }
+                }
+            }
+            if (memberRoutesMatched) {
+                return groupRouteDescriptor;
+            }
+            List<String> groupMemberIds = new ArrayList<>();
+            for (MediaRouteProvider.DynamicGroupRouteController.DynamicRouteDescriptor route :
+                    routes) {
+                groupMemberIds.add(route.getRouteDescriptor().getId());
+            }
+            return new MediaRouteDescriptor.Builder(groupRouteDescriptor)
+                    .clearGroupMemberIds()
+                    .addGroupMemberIds(groupMemberIds)
+                    .build();
+        }
+
+        private MediaRouter.GroupRouteInfo convertFromRouteDescriptorToRouteInfo(
                 MediaRouteDescriptor routeDescriptor) {
             MediaRouter.ProviderInfo provider = mRequestedRoute.getProvider();
             String descriptorId = routeDescriptor.getId();
             String uniqueId = assignRouteUniqueId(provider, descriptorId);
-            MediaRouter.RouteInfo routeInfo =
-                    new MediaRouter.RouteInfo(provider, descriptorId, uniqueId);
+            MediaRouter.GroupRouteInfo routeInfo =
+                    new MediaRouter.GroupRouteInfo(provider, descriptorId, uniqueId);
             routeInfo.maybeUpdateDescriptor(routeDescriptor);
             return routeInfo;
         }
