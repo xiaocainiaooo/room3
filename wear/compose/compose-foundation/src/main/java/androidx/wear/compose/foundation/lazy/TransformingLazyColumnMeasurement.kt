@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.constrainHeight
@@ -50,19 +49,16 @@ internal fun rememberTransformingLazyColumnMeasurePolicy(
     coroutineScope: CoroutineScope,
     horizontalAlignment: Alignment.Horizontal,
     verticalArrangement: Arrangement.Vertical,
-    measurementStrategyProvider:
-        IntrinsicMeasureScope.() -> TransformingLazyColumnMeasurementStrategy,
+    measurementStrategy: TransformingLazyColumnMeasurementStrategy,
 ): LazyLayoutMeasureScope.(Constraints) -> MeasureResult =
     remember(
         itemProviderLambda,
         state,
         horizontalAlignment,
         verticalArrangement,
-        measurementStrategyProvider
+        measurementStrategy
     ) {
         { containerConstraints ->
-            val measurementStrategy = measurementStrategyProvider(this)
-
             val childConstraints =
                 Constraints(
                     maxHeight = Constraints.Infinity,
