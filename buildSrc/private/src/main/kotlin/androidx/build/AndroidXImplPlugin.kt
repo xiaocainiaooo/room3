@@ -1063,8 +1063,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
             val isProbablyPublished =
                 androidXExtension.type == LibraryType.PUBLISHED_LIBRARY ||
                     androidXExtension.type ==
-                        LibraryType.PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS ||
-                    androidXExtension.type == LibraryType.UNSET
+                        LibraryType.PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS
             if (mavenGroup != null && isProbablyPublished && androidXExtension.shouldPublish()) {
                 validateProjectMavenGroup(mavenGroup.group)
                 validateProjectMavenName(androidXExtension.name.get(), mavenGroup.group)
@@ -1311,7 +1310,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
     ) {
         if (buildFeatures.isIsolatedProjectsEnabled()) return
         afterEvaluate {
-            if (androidXExtension.type !in listOf(LibraryType.UNSET, LibraryType.SAMPLES)) {
+            if (androidXExtension.type.requiresDependencyVerification()) {
                 val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
                 if (verifyDependencyVersionsTask != null) {
                     taskConfigurator(verifyDependencyVersionsTask)
@@ -1635,10 +1634,6 @@ fun Project.validateProjectParser(androidXExtension: AndroidXExtension) {
         check(androidXExtension.type == parsed.libraryType) {
             "$errorPrefix Incorrectly computed libraryType = ${parsed.libraryType} " +
                 "instead of ${androidXExtension.type}"
-        }
-        check(androidXExtension.publish == parsed.publish) {
-            "$errorPrefix Incorrectly computed publish = ${parsed.publish} " +
-                "instead of ${androidXExtension.publish}"
         }
         check(androidXExtension.shouldPublish() == parsed.shouldPublish()) {
             "$errorPrefix Incorrectly computed shouldPublish() = ${parsed.shouldPublish()} " +

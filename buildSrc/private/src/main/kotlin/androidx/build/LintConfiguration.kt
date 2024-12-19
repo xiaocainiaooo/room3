@@ -164,7 +164,10 @@ private fun Project.configureLint(lint: Lint, isLibrary: Boolean) {
     val lintChecksProject = findLintProject(":lint-checks") ?: return
     project.dependencies.add("lintChecks", lintChecksProject)
 
-    if (extension.type == LibraryType.GRADLE_PLUGIN) {
+    if (
+        extension.type == LibraryType.GRADLE_PLUGIN ||
+            extension.type == LibraryType.INTERNAL_GRADLE_PLUGIN
+    ) {
         project.rootProject.findProject(":lint:lint-gradle")?.let {
             project.dependencies.add("lintChecks", it)
         }

@@ -114,13 +114,6 @@ object Release {
             )
             return
         }
-        if (!androidXExtension.isPublishConfigured()) {
-            project.logger.info(
-                "project ${project.name} isn't part of release, because" +
-                    " it does not set the \"publish\" property."
-            )
-            return
-        }
         if (!androidXExtension.shouldRelease() && !isSnapshotBuild()) {
             project.logger.info(
                 "project ${project.name} isn't part of release, because its" +

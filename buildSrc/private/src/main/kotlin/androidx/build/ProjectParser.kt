@@ -42,36 +42,13 @@ abstract class ProjectParser : BuildService<BuildServiceParameters.None> {
             if (line.contains("mavenVersion =")) specifiesVersion = true
         }
         val libraryTypeEnum = libraryType?.let { LibraryType.valueOf(it) } ?: LibraryType.UNSET
-        val publishEnum = publish?.let { Publish.valueOf(it) } ?: Publish.UNSET
-        return ParsedProject(
-            libraryType = libraryTypeEnum,
-            publish = publishEnum,
-            specifiesVersion = specifiesVersion
-        )
+        return ParsedProject(libraryType = libraryTypeEnum, specifiesVersion = specifiesVersion)
     }
 
-    data class ParsedProject(
-        val libraryType: LibraryType,
-        val publish: Publish,
-        val specifiesVersion: Boolean
-    ) {
-        fun shouldPublish(): Boolean =
-            if (publish != Publish.UNSET) {
-                publish.shouldPublish()
-            } else if (libraryType != LibraryType.UNSET) {
-                libraryType.publish.shouldPublish()
-            } else {
-                false
-            }
+    data class ParsedProject(val libraryType: LibraryType, val specifiesVersion: Boolean) {
+        fun shouldPublish(): Boolean = libraryType.publish.shouldPublish()
 
-        fun shouldRelease(): Boolean =
-            if (publish != Publish.UNSET) {
-                publish.shouldRelease()
-            } else if (libraryType != LibraryType.UNSET) {
-                libraryType.publish.shouldRelease()
-            } else {
-                false
-            }
+        fun shouldRelease(): Boolean = libraryType.publish.shouldRelease()
     }
 }
 

@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import androidx.build.LibraryType
+
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
@@ -57,4 +60,8 @@ dependencies {
     // but it doesn't work in androidx.
     // See aosp/1804059
     androidTestImplementation "androidx.lifecycle:lifecycle-common-java8:2.5.1"
+}
+
+androidx {
+    type = LibraryType.BENCHMARK
 }
