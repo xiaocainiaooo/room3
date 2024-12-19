@@ -16,6 +16,7 @@
 
 package androidx.pdf.view
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
@@ -788,8 +789,34 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
-            return super.onDoubleTap(e)
-            // TODO(b/376136331) Toggle between fit-to-page and zoomed-in on double tap gestures
+
+            val currentZoom = zoom
+
+            val newZoom =
+                ZoomUtils.calculateZoomForDoubleTap(
+                    viewportWidth,
+                    viewportHeight,
+                    contentWidth,
+                    currentZoom,
+                    minZoom,
+                    maxZoom,
+                )
+            if (newZoom == 0f) {
+                // viewport not initialized yet maybe?
+                return false
+            }
+
+            ValueAnimator.ofFloat(0f, 1f).apply {
+                duration = 200 // Slightly shorter duration for snappier feel
+                addUpdateListener { animator ->
+                    val animatedValue = animator.animatedValue as Float
+                    val value = currentZoom + (newZoom - currentZoom) * animatedValue
+                    zoomTo(value, e.x, e.y)
+                }
+                start()
+            }
+
+            return true
         }
 
         override fun onScale(detector: ScaleGestureDetector): Boolean {
