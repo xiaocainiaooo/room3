@@ -108,7 +108,6 @@ import androidx.compose.ui.focus.calculateBoundingRectRelativeTo
 import androidx.compose.ui.focus.focusRect
 import androidx.compose.ui.focus.is1dFocusSearch
 import androidx.compose.ui.focus.isBetterCandidate
-import androidx.compose.ui.focus.requestFocus
 import androidx.compose.ui.focus.requestInteropFocus
 import androidx.compose.ui.focus.toAndroidFocusDirection
 import androidx.compose.ui.focus.toFocusDirection
@@ -1905,10 +1904,8 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         if (autofillSupported() && structure != null) {
             if (@OptIn(ExperimentalComposeUiApi::class) ComposeUiFlags.isSemanticAutofillEnabled) {
                 _autofillManager?.populateViewStructure(structure)
-            } else {
-                // TODO(b/383201236): Remove _autofill and route requests through _autofillManager.
-                _autofill?.populateViewStructure(structure)
             }
+            _autofill?.populateViewStructure(structure)
         }
     }
 
@@ -1916,10 +1913,8 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         if (autofillSupported()) {
             if (@OptIn(ExperimentalComposeUiApi::class) ComposeUiFlags.isSemanticAutofillEnabled) {
                 _autofillManager?.performAutofill(values)
-            } else {
-                // TODO(b/383201236): Remove _autofill and route requests through _autofillManager.
-                _autofill?.performAutofill(values)
             }
+            _autofill?.performAutofill(values)
         }
     }
 

@@ -67,8 +67,7 @@ val LocalAutofillTree =
     staticCompositionLocalOf<AutofillTree> { noLocalProvidedFor("LocalAutofillTree") }
 
 /**
- * The CompositionLocal that can be used to trigger autofill actions. Eg.
- * [LocalAutofillManager.commit].
+ * The CompositionLocal that can be used to trigger autofill actions. Eg. [AutofillManager.commit].
  */
 @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 val LocalAutofillManager =
@@ -92,8 +91,9 @@ val LocalClipboard = staticCompositionLocalOf<Clipboard> { noLocalProvidedFor("L
  * Consumers that access this Local directly and call [GraphicsContext.createGraphicsLayer] are
  * responsible for calling [GraphicsContext.releaseGraphicsLayer].
  *
- * It is recommended that consumers invoke [rememberGraphicsLayer] instead to ensure that a
- * [GraphicsLayer] is released when the corresponding composable is disposed.
+ * It is recommended that consumers invoke [rememberGraphicsLayer][import
+ * androidx.compose.ui.graphics.rememberGraphicsLayer] instead to ensure that a [GraphicsLayer] is
+ * released when the corresponding composable is disposed.
  */
 val LocalGraphicsContext =
     staticCompositionLocalOf<GraphicsContext> { noLocalProvidedFor("LocalGraphicsContext") }
