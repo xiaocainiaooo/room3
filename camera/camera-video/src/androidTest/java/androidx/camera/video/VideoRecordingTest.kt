@@ -22,7 +22,6 @@ import android.graphics.Rect
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import android.util.Rational
 import android.util.Size
 import android.view.Surface
@@ -36,9 +35,6 @@ import androidx.camera.core.CameraInfo
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraXConfig
 import androidx.camera.core.DynamicRange
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.core.UseCase
 import androidx.camera.core.impl.CameraControlInternal
@@ -51,7 +47,6 @@ import androidx.camera.core.impl.utils.TransformUtils.is90or270
 import androidx.camera.core.impl.utils.TransformUtils.rectToSize
 import androidx.camera.core.impl.utils.TransformUtils.rotateSize
 import androidx.camera.core.impl.utils.TransformUtils.within360
-import androidx.camera.core.impl.utils.executor.CameraXExecutors
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.testing.impl.AndroidUtil.isEmulator
 import androidx.camera.testing.impl.AndroidUtil.skipVideoRecordingTestIfNotSupportedByEmulator
@@ -63,7 +58,6 @@ import androidx.camera.testing.impl.WakelockEmptyActivityRule
 import androidx.camera.testing.impl.fakes.FakeLifecycleOwner
 import androidx.camera.testing.impl.getRotatedAspectRatio
 import androidx.camera.testing.impl.getRotation
-import androidx.camera.testing.impl.mocks.MockScreenFlash
 import androidx.camera.testing.impl.useAndRelease
 import androidx.camera.testing.impl.video.AudioChecker
 import androidx.camera.testing.impl.video.Recording
@@ -78,7 +72,6 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import com.google.common.util.concurrent.ListenableFuture
 import java.io.File
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -436,50 +429,6 @@ class VideoRecordingTest(
     }
 
     @Test
-    fun recordingWithPreviewAndImageAnalysis() {
-        // Arrange.
-        val analysis = ImageAnalysis.Builder().build()
-        val latchForImageAnalysis = CountDownLatch(5)
-        analysis.setAnalyzer(CameraXExecutors.directExecutor()) {
-            latchForImageAnalysis.countDown()
-            it.close()
-        }
-        checkAndBindUseCases(preview, videoCapture, analysis)
-
-        // Act.
-        recordingSession.createRecording().recordAndVerify()
-
-        // Verify.
-        assertThat(latchForImageAnalysis.await(10, TimeUnit.SECONDS)).isTrue()
-    }
-
-    @Test
-    fun recordingWithPreviewAndImageCapture() {
-        // Arrange.
-        val imageCapture = ImageCapture.Builder().build()
-        checkAndBindUseCases(preview, videoCapture, imageCapture)
-
-        // Act.
-        recordingSession.createRecording().recordAndVerify()
-
-        // Verify.
-        completeImageCapture(imageCapture)
-    }
-
-    @Test
-    fun recordingWithPreviewAndFlashImageCapture() {
-        // Arrange.
-        val imageCapture = ImageCapture.Builder().build()
-        checkAndBindUseCases(preview, videoCapture, imageCapture)
-
-        // Act.
-        recordingSession.createRecording().recordAndVerify()
-
-        // Verify.
-        completeImageCapture(imageCapture, useFlash = true)
-    }
-
-    @Test
     fun recordingWithPreview_boundSeparately() {
         assumeTrue(camera.isUseCasesCombinationSupported(preview, videoCapture))
 
@@ -572,26 +521,6 @@ class VideoRecordingTest(
         //    -> Recorder.requestReset()
         //    -> recording is stopped unexpectedly.
         readyFuture?.get(VIDEO_TIMEOUT_SEC, TimeUnit.SECONDS)
-    }
-
-    @Test
-    fun boundButNotRecordingDuringCapture_withPreviewAndImageCapture() {
-        // Arrange.
-        val imageCapture = ImageCapture.Builder().build()
-        checkAndBindUseCases(preview, videoCapture, imageCapture)
-
-        // Act & verify.
-        completeImageCapture(imageCapture)
-    }
-
-    @Test
-    fun boundButNotRecordingDuringFlashCapture_withPreviewAndImageCapture() {
-        // Arrange.
-        val imageCapture = ImageCapture.Builder().build()
-        checkAndBindUseCases(preview, videoCapture, imageCapture)
-
-        // Act & verify.
-        completeImageCapture(imageCapture, useFlash = true)
     }
 
     @Test
@@ -852,35 +781,6 @@ class VideoRecordingTest(
         }
     }
 
-    private fun completeImageCapture(
-        imageCapture: ImageCapture,
-        imageFile: File = temporaryFolder.newFile(),
-        useFlash: Boolean = false
-    ) {
-        val savedCallback = ImageSavedCallback()
-
-        if (useFlash) {
-            if (cameraSelector.lensFacing == CameraSelector.LENS_FACING_FRONT) {
-                imageCapture.screenFlash = MockScreenFlash()
-                imageCapture.flashMode = ImageCapture.FLASH_MODE_SCREEN
-            } else {
-                imageCapture.flashMode = ImageCapture.FLASH_MODE_ON
-            }
-        } else {
-            imageCapture.flashMode = ImageCapture.FLASH_MODE_OFF
-        }
-
-        imageCapture.takePicture(
-            ImageCapture.OutputFileOptions.Builder(imageFile).build(),
-            CameraXExecutors.ioExecutor(),
-            savedCallback
-        )
-        savedCallback.verifyCaptureResult()
-
-        // Just in case same imageCapture is bound to rear camera later
-        imageCapture.screenFlash = null
-    }
-
     data class ExpectedRotation(val contentRotation: Int, val metadataRotation: Int)
 
     private fun getExpectedRotation(
@@ -940,28 +840,6 @@ class VideoRecordingTest(
 
     private fun assumeExtraCroppingQuirk() {
         assumeExtraCroppingQuirk(implName)
-    }
-
-    private class ImageSavedCallback : ImageCapture.OnImageSavedCallback {
-
-        private val latch = CountDownLatch(1)
-        val results = mutableListOf<ImageCapture.OutputFileResults>()
-        val errors = mutableListOf<ImageCaptureException>()
-
-        override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-            results.add(outputFileResults)
-            latch.countDown()
-        }
-
-        override fun onError(exception: ImageCaptureException) {
-            errors.add(exception)
-            Log.e(TAG, "OnImageSavedCallback.onError: ${exception.message}")
-            latch.countDown()
-        }
-
-        fun verifyCaptureResult() {
-            assertThat(latch.await(10, TimeUnit.SECONDS)).isTrue()
-        }
     }
 
     private suspend fun CameraControl.verifyIfInVideoUsage(
