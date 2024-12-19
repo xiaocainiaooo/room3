@@ -16,6 +16,8 @@
 
 package androidx.build.metalava
 
+import androidx.build.checkapi.ApiBaselinesLocation
+import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
@@ -45,9 +47,28 @@ constructor(@Internal protected val workerExecutor: WorkerExecutor) : DefaultTas
     /** Android's boot classpath */
     @get:Classpath lateinit var bootClasspath: FileCollection
 
-    /** Dependencies (compiled classes) of [sourcePaths]. */
+    /** Dependencies (compiled classes) of the project. */
     @get:Classpath lateinit var dependencyClasspath: FileCollection
 
+    @get:Input abstract val k2UastEnabled: Property<Boolean>
+
+    @get:Input abstract val kotlinSourceLevel: Property<KotlinVersion>
+
+    fun runWithArgs(args: List<String>) {
+        runMetalavaWithArgs(
+            metalavaClasspath,
+            args,
+            k2UastEnabled.get(),
+            kotlinSourceLevel.get(),
+            workerExecutor
+        )
+    }
+}
+
+/** A metalava task that takes source code as input (other tasks take signature files). */
+@CacheableTask
+internal abstract class SourceMetalavaTask(workerExecutor: WorkerExecutor) :
+    MetalavaTask(workerExecutor) {
     /**
      * Specifies both the source files and their corresponding compiled class files
      *
@@ -64,14 +85,10 @@ constructor(@Internal protected val workerExecutor: WorkerExecutor) : DefaultTas
      * So, we ask Gradle to rerun this task only if the public API changes, which we implement by
      * declaring the compiled classes as inputs rather than the sources
      */
-    fun putSourcePaths(sourcePaths: FileCollection, compiledSources: FileCollection) {
-        this.sourcePaths = sourcePaths
-        this.compiledSources = compiledSources
-    }
-
     /** Source files against which API signatures will be validated. */
     @get:Internal // UP-TO-DATE checking is done based on the compiled classes
     var sourcePaths: FileCollection = project.files()
+
     /** Class files compiled from sourcePaths */
     @get:Classpath var compiledSources: FileCollection = project.files()
 
@@ -82,17 +99,16 @@ constructor(@Internal protected val workerExecutor: WorkerExecutor) : DefaultTas
     @get:[Optional InputFile PathSensitive(PathSensitivity.NONE)]
     abstract val manifestPath: RegularFileProperty
 
-    @get:Input abstract val k2UastEnabled: Property<Boolean>
+    @get:Internal // already expressed by getApiLintBaseline()
+    abstract val baselines: Property<ApiBaselinesLocation>
 
-    @get:Input abstract val kotlinSourceLevel: Property<KotlinVersion>
-
-    fun runWithArgs(args: List<String>) {
-        runMetalavaWithArgs(
-            metalavaClasspath,
-            args,
-            k2UastEnabled.get(),
-            kotlinSourceLevel.get(),
-            workerExecutor
-        )
+    @Optional
+    @PathSensitive(PathSensitivity.NONE)
+    @InputFile
+    fun getInputApiLintBaseline(): File? {
+        val baseline = baselines.get().apiLintFile
+        return if (baseline.exists()) baseline else null
     }
+
+    @get:Input abstract val targetsJavaConsumers: Property<Boolean>
 }
