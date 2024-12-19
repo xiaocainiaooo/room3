@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalAutofillManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDataType
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.editableText
 import androidx.compose.ui.semantics.focused
@@ -192,6 +193,34 @@ class AndroidAutofillManagerTest {
         // `commit` should be called when an autofillable component leaves onscreen, even when
         // another, different autofillable component is added.
         rule.runOnIdle { verify(am, times(1)).commit() }
+    }
+
+    @Test
+    @SmallTest
+    fun autofillManager_doNotCallCommit_nonAutofillRelatedNodesAddedAndDisappear() {
+        val am: PlatformAutofillManager = mock()
+        var isVisible by mutableStateOf(true)
+        var semanticsExist by mutableStateOf(false)
+
+        rule.setContent {
+            (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
+            if (isVisible) {
+                Box(
+                    modifier =
+                        Modifier.then(
+                            if (semanticsExist)
+                                Modifier.semantics { contentDescription = "contentDescription" }
+                            else Modifier.size(height, width)
+                        )
+                )
+            }
+        }
+
+        rule.runOnIdle { semanticsExist = true }
+        rule.runOnIdle { isVisible = false }
+
+        // Adding in semantics not related to autofill should not trigger commit
+        rule.runOnIdle { verify(am, never()).commit() }
     }
 
     @Test
