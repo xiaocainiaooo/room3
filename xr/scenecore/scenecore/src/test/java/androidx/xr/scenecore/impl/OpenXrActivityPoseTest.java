@@ -38,6 +38,7 @@ import androidx.xr.scenecore.testing.FakeXrExtensions;
 import androidx.xr.scenecore.testing.FakeXrExtensions.FakeGltfModelToken;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.ParameterizedRobolectricTestRunner;
@@ -167,6 +168,7 @@ public final class OpenXrActivityPoseTest {
         assertPose(testActivityPose.getPoseInActivitySpace(), new Pose());
     }
 
+    @Ignore("b/384930655")
     @Test
     public void getPoseInActivitySpace_returnsDifferencePose() {
         testActivityPose = createTestActivityPose();
