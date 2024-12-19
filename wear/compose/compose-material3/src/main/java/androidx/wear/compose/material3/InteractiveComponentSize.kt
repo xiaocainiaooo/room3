@@ -43,7 +43,8 @@ import kotlin.math.roundToInt
  * This modifier is not needed for touch target expansion to happen. It only affects layout, to make
  * sure there is adequate space for touch target expansion.
  */
-fun Modifier.minimumInteractiveComponentSize(): Modifier = this then MinimumInteractiveModifier
+public fun Modifier.minimumInteractiveComponentSize(): Modifier =
+    this then MinimumInteractiveModifier
 
 internal object MinimumInteractiveModifier : ModifierNodeElement<MinimumInteractiveModifierNode>() {
     override fun create(): MinimumInteractiveModifierNode = MinimumInteractiveModifierNode()
@@ -109,7 +110,7 @@ internal class MinimumInteractiveModifierNode :
 @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
 @get:ExperimentalWearMaterial3Api
 @ExperimentalWearMaterial3Api
-val LocalMinimumInteractiveComponentEnforcement: ProvidableCompositionLocal<Boolean> =
+public val LocalMinimumInteractiveComponentEnforcement: ProvidableCompositionLocal<Boolean> =
     staticCompositionLocalOf {
         true
     }

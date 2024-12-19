@@ -79,7 +79,7 @@ import androidx.wear.compose.foundation.rotary.rotaryScrollable
  */
 // TODO: b/372629395 - Default to ContentPaddingMeasurementStrategy when no contentPadding provided.
 @Composable
-fun TransformingLazyColumn(
+public fun TransformingLazyColumn(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     state: TransformingLazyColumnState = rememberTransformingLazyColumnState(),
@@ -135,7 +135,7 @@ fun TransformingLazyColumn(
  */
 // TODO: b/372629395 - Remove this overload without contentPadding when clients are migrated.
 @Composable
-fun TransformingLazyColumn(
+public fun TransformingLazyColumn(
     modifier: Modifier = Modifier,
     state: TransformingLazyColumnState = rememberTransformingLazyColumnState(),
     verticalArrangement: Arrangement.Vertical =
@@ -163,7 +163,7 @@ fun TransformingLazyColumn(
  * Composition local for components that need to be able to react to being inside a
  * [TransformingLazyColumn]'s item.
  */
-val LocalTransformingLazyColumnItemScope:
+public val LocalTransformingLazyColumnItemScope:
     ProvidableCompositionLocal<TransformingLazyColumnItemScope?> =
     compositionLocalOf(structuralEqualityPolicy()) { null }
 

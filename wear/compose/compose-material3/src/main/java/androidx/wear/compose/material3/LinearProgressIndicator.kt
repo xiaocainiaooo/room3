@@ -71,7 +71,7 @@ import kotlinx.coroutines.flow.collectLatest
  *   visually disabled.
  */
 @Composable
-fun LinearProgressIndicator(
+public fun LinearProgressIndicator(
     progress: () -> Float,
     modifier: Modifier = Modifier,
     colors: ProgressIndicatorColors = ProgressIndicatorDefaults.colors(),
@@ -118,7 +118,7 @@ fun LinearProgressIndicator(
  *   visually disabled.
  */
 @Composable
-fun LinearProgressIndicatorContent(
+public fun LinearProgressIndicatorContent(
     progress: () -> Float,
     modifier: Modifier = Modifier,
     colors: ProgressIndicatorColors = ProgressIndicatorDefaults.colors(),
@@ -183,14 +183,14 @@ fun LinearProgressIndicatorContent(
 }
 
 /** Contains defaults for Linear Progress Indicator. */
-object LinearProgressIndicatorDefaults {
+public object LinearProgressIndicatorDefaults {
 
     /**
      * Large stroke width for [LinearProgressIndicator].
      *
      * This is also the default stroke width for [LinearProgressIndicator].
      */
-    val StrokeWidthLarge = 12.dp
+    public val StrokeWidthLarge: Dp = 12.dp
 
     /**
      * Small stroke width for [LinearProgressIndicator].
@@ -198,7 +198,7 @@ object LinearProgressIndicatorDefaults {
      * This is the minimum stroke value allowed for [LinearProgressIndicator] to ensure that the dot
      * shown at the end of the range can be distinguished.
      */
-    val StrokeWidthSmall = 8.dp
+    public val StrokeWidthSmall: Dp = 8.dp
 
     /** Radius for the dot shown at the end of the [LinearProgressIndicator]. */
     internal val DotRadius = 2.dp

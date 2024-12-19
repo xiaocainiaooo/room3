@@ -55,7 +55,7 @@ import androidx.wear.compose.foundation.lazy.inverseLerp
  * @param shape Shape of the background.
  */
 @Composable
-fun Modifier.scrollTransform(
+public fun Modifier.scrollTransform(
     scope: TransformingLazyColumnItemScope,
     backgroundColor: Color,
     shape: Shape = RectangleShape
@@ -100,7 +100,7 @@ fun Modifier.scrollTransform(
  * @param border Border to draw around the background, or null if no border is needed.
  */
 @Composable
-fun Modifier.scrollTransform(
+public fun Modifier.scrollTransform(
     scope: TransformingLazyColumnItemScope,
     shape: Shape,
     painter: Painter,
@@ -141,7 +141,7 @@ fun Modifier.scrollTransform(
  * @param scope The [TransformingLazyColumnItemScope] provides access to the item's index and key.
  */
 @Composable
-fun Modifier.scrollTransform(
+public fun Modifier.scrollTransform(
     scope: TransformingLazyColumnItemScope,
 ): Modifier =
     with(scope) {

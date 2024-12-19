@@ -40,9 +40,11 @@ import kotlin.math.round
 import kotlin.math.sin
 
 /** Contains defaults for Progress Indicators. */
-object ProgressIndicatorDefaults {
+public object ProgressIndicatorDefaults {
     /** Creates a [ProgressIndicatorColors] with the default colors. */
-    @Composable fun colors() = MaterialTheme.colorScheme.defaultProgressIndicatorColors
+    @Composable
+    public fun colors(): ProgressIndicatorColors =
+        MaterialTheme.colorScheme.defaultProgressIndicatorColors
 
     /**
      * Creates a [ProgressIndicatorColors] with modified colors.
@@ -55,14 +57,14 @@ object ProgressIndicatorDefaults {
      * @param disabledOverflowTrackColor The disabled overflow track color.
      */
     @Composable
-    fun colors(
+    public fun colors(
         indicatorColor: Color = Color.Unspecified,
         trackColor: Color = Color.Unspecified,
         overflowTrackColor: Color = Color.Unspecified,
         disabledIndicatorColor: Color = Color.Unspecified,
         disabledTrackColor: Color = Color.Unspecified,
         disabledOverflowTrackColor: Color = Color.Unspecified,
-    ) =
+    ): ProgressIndicatorColors =
         MaterialTheme.colorScheme.defaultProgressIndicatorColors.copy(
             indicatorColor = indicatorColor,
             trackColor = trackColor,
@@ -84,14 +86,14 @@ object ProgressIndicatorDefaults {
      *   disabled.
      */
     @Composable
-    fun colors(
+    public fun colors(
         indicatorBrush: Brush? = null,
         trackBrush: Brush? = null,
         overflowTrackBrush: Brush? = null,
         disabledIndicatorBrush: Brush? = null,
         disabledTrackBrush: Brush? = null,
         disabledOverflowTrackBrush: Brush? = null,
-    ) =
+    ): ProgressIndicatorColors =
         MaterialTheme.colorScheme.defaultProgressIndicatorColors.copy(
             indicatorBrush = indicatorBrush,
             trackBrush = trackBrush,
@@ -147,13 +149,13 @@ object ProgressIndicatorDefaults {
  * @param disabledOverflowTrackBrush [Brush] used to draw the overflow track if the component is
  *   disabled.
  */
-class ProgressIndicatorColors(
-    val indicatorBrush: Brush,
-    val trackBrush: Brush,
-    val overflowTrackBrush: Brush,
-    val disabledIndicatorBrush: Brush,
-    val disabledTrackBrush: Brush,
-    val disabledOverflowTrackBrush: Brush,
+public class ProgressIndicatorColors(
+    public val indicatorBrush: Brush,
+    public val trackBrush: Brush,
+    public val overflowTrackBrush: Brush,
+    public val disabledIndicatorBrush: Brush,
+    public val disabledTrackBrush: Brush,
+    public val disabledOverflowTrackBrush: Brush,
 ) {
     /**
      * Returns a copy of this ProgressIndicatorColors optionally overriding some of the values.
@@ -165,14 +167,14 @@ class ProgressIndicatorColors(
      * @param disabledTrackColor The disabled track color.
      * @param disabledOverflowTrackColor The disabled overflow track color.
      */
-    fun copy(
+    public fun copy(
         indicatorColor: Color = Color.Unspecified,
         trackColor: Color = Color.Unspecified,
         overflowTrackColor: Color = Color.Unspecified,
         disabledIndicatorColor: Color = Color.Unspecified,
         disabledTrackColor: Color = Color.Unspecified,
         disabledOverflowTrackColor: Color = Color.Unspecified,
-    ) =
+    ): ProgressIndicatorColors =
         ProgressIndicatorColors(
             indicatorBrush =
                 if (indicatorColor.isSpecified) SolidColor(indicatorColor) else indicatorBrush,
@@ -203,14 +205,14 @@ class ProgressIndicatorColors(
      * @param disabledOverflowTrackBrush [Brush] used to draw the overflow track if the component is
      *   disabled.
      */
-    fun copy(
+    public fun copy(
         indicatorBrush: Brush? = null,
         trackBrush: Brush? = null,
         overflowTrackBrush: Brush? = null,
         disabledIndicatorBrush: Brush? = null,
         disabledTrackBrush: Brush? = null,
         disabledOverflowTrackBrush: Brush? = null,
-    ) =
+    ): ProgressIndicatorColors =
         ProgressIndicatorColors(
             indicatorBrush = indicatorBrush ?: this.indicatorBrush,
             trackBrush = trackBrush ?: this.trackBrush,

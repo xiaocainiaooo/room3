@@ -46,7 +46,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 
 /** Scope for the children of a [ButtonGroup] */
-class ButtonGroupScope {
+public class ButtonGroupScope {
     internal val items = mutableListOf<ButtonGroupItem>()
 
     /**
@@ -62,12 +62,12 @@ class ButtonGroupScope {
      * @param content the content to use for this item. Usually, this will be one of the [Button]
      *   variants.
      */
-    fun buttonGroupItem(
+    public fun buttonGroupItem(
         interactionSource: InteractionSource,
         minWidth: Dp = minimumInteractiveComponentSize,
         weight: Float = 1f,
         content: @Composable () -> Unit
-    ) = items.add(ButtonGroupItem(interactionSource, minWidth, weight, content))
+    ): Boolean = items.add(ButtonGroupItem(interactionSource, minWidth, weight, content))
 }
 
 /**
@@ -87,7 +87,7 @@ class ButtonGroupScope {
  *   3 buttons within a ButtonGroup.
  */
 @Composable
-fun ButtonGroup(
+public fun ButtonGroup(
     modifier: Modifier = Modifier,
     spacing: Dp = ButtonGroupDefaults.Spacing,
     expansionWidth: Dp = ButtonGroupDefaults.ExpansionWidth,
@@ -219,13 +219,13 @@ fun ButtonGroup(
 }
 
 /** Contains the default values used by [ButtonGroup] */
-object ButtonGroupDefaults {
+public object ButtonGroupDefaults {
     /**
      * Return the recommended padding to use as the contentPadding of a [ButtonGroup], when it takes
      * the full width of the screen.
      */
     @Composable
-    fun fullWidthPaddings(): PaddingValues {
+    public fun fullWidthPaddings(): PaddingValues {
         val screenHeight = screenHeightDp().dp
         return PaddingValues(
             horizontal = screenHeight * FullWidthHorizontalPaddingPercentage / 100,
@@ -234,10 +234,10 @@ object ButtonGroupDefaults {
     }
 
     /** How much buttons grow (and neighbors shrink) when pressed. */
-    val ExpansionWidth: Dp = 24.dp
+    public val ExpansionWidth: Dp = 24.dp
 
     /** Spacing between buttons. */
-    val Spacing: Dp = 4.dp
+    public val Spacing: Dp = 4.dp
 
     /** Padding at each side of the [ButtonGroup], as a percentage of the available space. */
     private const val FullWidthHorizontalPaddingPercentage: Float = 5.2f

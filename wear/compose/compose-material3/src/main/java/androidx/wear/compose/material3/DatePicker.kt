@@ -99,7 +99,7 @@ import java.time.format.DateTimeFormatter
  */
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DatePicker(
+public fun DatePicker(
     initialDate: LocalDate,
     onDatePicked: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
@@ -487,12 +487,12 @@ fun DatePicker(
 /** Specifies the types of columns to display in the DatePicker. */
 @Immutable
 @JvmInline
-value class DatePickerType internal constructor(internal val value: Int) {
+public value class DatePickerType internal constructor(internal val value: Int) {
 
-    companion object {
-        val DayMonthYear = DatePickerType(0)
-        val MonthDayYear = DatePickerType(1)
-        val YearMonthDay = DatePickerType(2)
+    public companion object {
+        public val DayMonthYear: DatePickerType = DatePickerType(0)
+        public val MonthDayYear: DatePickerType = DatePickerType(1)
+        public val YearMonthDay: DatePickerType = DatePickerType(2)
     }
 
     override fun toString(): String {
@@ -506,10 +506,10 @@ value class DatePickerType internal constructor(internal val value: Int) {
 }
 
 /** Contains the default values used by [DatePicker] */
-object DatePickerDefaults {
+public object DatePickerDefaults {
 
     /** The default [DatePickerType] for [DatePicker] aligns with the current system date format. */
-    val datePickerType: DatePickerType
+    public val datePickerType: DatePickerType
         @Composable
         get() {
             val formatOrder = DateFormat.getDateFormatOrder(LocalContext.current)
@@ -521,7 +521,9 @@ object DatePickerDefaults {
         }
 
     /** Creates a [DatePickerColors] for a [DatePicker]. */
-    @Composable fun datePickerColors() = MaterialTheme.colorScheme.defaultDatePickerColors
+    @Composable
+    public fun datePickerColors(): DatePickerColors =
+        MaterialTheme.colorScheme.defaultDatePickerColors
 
     /**
      * Creates a [DatePickerColors] for a [DatePicker].
@@ -537,7 +539,7 @@ object DatePickerDefaults {
      * @param confirmButtonContainerColor The container color of the confirm button.
      */
     @Composable
-    fun datePickerColors(
+    public fun datePickerColors(
         selectedPickerContentColor: Color = Color.Unspecified,
         unselectedPickerContentColor: Color = Color.Unspecified,
         invalidPickerContentColor: Color = Color.Unspecified,
@@ -546,7 +548,7 @@ object DatePickerDefaults {
         nextButtonContainerColor: Color = Color.Unspecified,
         confirmButtonContentColor: Color = Color.Unspecified,
         confirmButtonContainerColor: Color = Color.Unspecified,
-    ) =
+    ): DatePickerColors =
         MaterialTheme.colorScheme.defaultDatePickerColors.copy(
             selectedPickerContentColor = selectedPickerContentColor,
             unselectedPickerContentColor = unselectedPickerContentColor,
@@ -585,15 +587,15 @@ object DatePickerDefaults {
 }
 
 @Immutable
-class DatePickerColors(
-    val selectedPickerContentColor: Color,
-    val unselectedPickerContentColor: Color,
-    val invalidPickerContentColor: Color,
-    val pickerLabelColor: Color,
-    val nextButtonContentColor: Color,
-    val nextButtonContainerColor: Color,
-    val confirmButtonContentColor: Color,
-    val confirmButtonContainerColor: Color,
+public class DatePickerColors(
+    public val selectedPickerContentColor: Color,
+    public val unselectedPickerContentColor: Color,
+    public val invalidPickerContentColor: Color,
+    public val pickerLabelColor: Color,
+    public val nextButtonContentColor: Color,
+    public val nextButtonContainerColor: Color,
+    public val confirmButtonContentColor: Color,
+    public val confirmButtonContainerColor: Color,
 ) {
     /**
      * Returns a copy of this DatePickerColors, optionally overriding some of the values.
@@ -607,7 +609,7 @@ class DatePickerColors(
      * @param confirmButtonContentColor The content color of the confirm button.
      * @param confirmButtonContainerColor The container color of the confirm button.
      */
-    fun copy(
+    public fun copy(
         selectedPickerContentColor: Color = this.selectedPickerContentColor,
         unselectedPickerContentColor: Color = this.unselectedPickerContentColor,
         invalidPickerContentColor: Color = this.invalidPickerContentColor,
@@ -616,7 +618,7 @@ class DatePickerColors(
         nextButtonContainerColor: Color = this.nextButtonContainerColor,
         confirmButtonContentColor: Color = this.confirmButtonContentColor,
         confirmButtonContainerColor: Color = this.confirmButtonContainerColor,
-    ) =
+    ): DatePickerColors =
         DatePickerColors(
             selectedPickerContentColor =
                 selectedPickerContentColor.takeOrElse { this.selectedPickerContentColor },

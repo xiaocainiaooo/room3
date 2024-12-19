@@ -63,7 +63,7 @@ import kotlinx.coroutines.flow.collectLatest
  * @param content A composable function that defines the content of the dialog.
  */
 @Composable
-fun Dialog(
+public fun Dialog(
     show: Boolean,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,

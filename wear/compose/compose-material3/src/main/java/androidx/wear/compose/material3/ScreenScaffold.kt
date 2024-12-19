@@ -80,7 +80,7 @@ import kotlin.math.roundToInt
  * @param content The body content for this screen.
  */
 @Composable
-fun ScreenScaffold(
+public fun ScreenScaffold(
     scrollState: ScalingLazyListState,
     modifier: Modifier = Modifier,
     timeText: (@Composable () -> Unit)? = null,
@@ -89,7 +89,7 @@ fun ScreenScaffold(
     },
     edgeButton: (@Composable BoxScope.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
-) =
+): Unit =
     if (edgeButton != null) {
         ScreenScaffold(
             edgeButton,
@@ -147,7 +147,7 @@ fun ScreenScaffold(
  * @param content The body content for this screen.
  */
 @Composable
-fun ScreenScaffold(
+public fun ScreenScaffold(
     scrollState: TransformingLazyColumnState,
     modifier: Modifier = Modifier,
     timeText: (@Composable () -> Unit)? = null,
@@ -156,7 +156,7 @@ fun ScreenScaffold(
     },
     edgeButton: (@Composable BoxScope.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
-) =
+): Unit =
     if (edgeButton != null) {
         ScreenScaffold(
             edgeButton,
@@ -210,7 +210,7 @@ fun ScreenScaffold(
  * @param content The body content for this screen.
  */
 @Composable
-fun ScreenScaffold(
+public fun ScreenScaffold(
     scrollState: LazyListState,
     modifier: Modifier = Modifier,
     timeText: (@Composable () -> Unit)? = null,
@@ -219,7 +219,7 @@ fun ScreenScaffold(
     },
     edgeButton: (@Composable BoxScope.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
-) =
+): Unit =
     if (edgeButton != null) {
         ScreenScaffold(
             edgeButton,
@@ -269,7 +269,7 @@ fun ScreenScaffold(
  * @param content The body content for this screen.
  */
 @Composable
-fun ScreenScaffold(
+public fun ScreenScaffold(
     scrollState: ScrollState,
     modifier: Modifier = Modifier,
     timeText: (@Composable () -> Unit)? = null,
@@ -277,7 +277,8 @@ fun ScreenScaffold(
         ScrollIndicator(scrollState, modifier = Modifier.align(Alignment.CenterEnd))
     },
     content: @Composable BoxScope.() -> Unit,
-) = ScreenScaffold(modifier, timeText, ScrollInfoProvider(scrollState), scrollIndicator, content)
+): Unit =
+    ScreenScaffold(modifier, timeText, ScrollInfoProvider(scrollState), scrollIndicator, content)
 
 /**
  * [ScreenScaffold] is one of the Wear Material3 scaffold components.
@@ -316,14 +317,14 @@ fun ScreenScaffold(
  * @param content The body content for this screen.
  */
 @Composable
-fun ScreenScaffold(
+public fun ScreenScaffold(
     edgeButton: @Composable BoxScope.() -> Unit,
     scrollInfoProvider: ScrollInfoProvider,
     modifier: Modifier = Modifier,
     timeText: (@Composable () -> Unit)? = null,
     scrollIndicator: (@Composable BoxScope.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
-) =
+): Unit =
     ScreenScaffold(
         modifier,
         timeText,
@@ -369,7 +370,7 @@ fun ScreenScaffold(
  * @param content The body content for this screen.
  */
 @Composable
-fun ScreenScaffold(
+public fun ScreenScaffold(
     modifier: Modifier = Modifier,
     timeText: (@Composable () -> Unit)? = null,
     scrollInfoProvider: ScrollInfoProvider? = null,
@@ -408,7 +409,7 @@ fun ScreenScaffold(
 }
 
 /** Contains the default values used by [ScreenScaffold] */
-object ScreenScaffoldDefaults {
+public object ScreenScaffoldDefaults {
     /**
      * Creates padding values with extra bottom padding for an EdgeButton.
      *
@@ -420,13 +421,14 @@ object ScreenScaffoldDefaults {
      *   edge button size.
      * @return A [PaddingValues] object with the calculated padding.
      */
-    fun contentPaddingWithEdgeButton(
+    public fun contentPaddingWithEdgeButton(
         edgeButtonSize: EdgeButtonSize,
         start: Dp = 0.dp,
         top: Dp = 0.dp,
         end: Dp = 0.dp,
         extraBottom: Dp = 0.dp,
-    ) = PaddingValues(start, top, end, extraBottom + edgeButtonSize.maximumHeightPlusPadding())
+    ): PaddingValues =
+        PaddingValues(start, top, end, extraBottom + edgeButtonSize.maximumHeightPlusPadding())
 }
 
 // Sets the height that will be used down the line, using a state as parameter, to avoid
