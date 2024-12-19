@@ -212,6 +212,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
             androidXKmpExtension,
             componentFactory
         ) {
+            if (buildFeatures.isIsolatedProjectsEnabled()) return@configureMavenArtifactUpload
             project.addCreateLibraryBuildInfoFileTasks(androidXExtension, androidXKmpExtension)
         }
         project.publishInspectionArtifacts()
@@ -1307,6 +1308,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
         androidXExtension: AndroidXExtension,
         taskConfigurator: (TaskProvider<VerifyDependencyVersionsTask>) -> Unit
     ) {
+        if (buildFeatures.isIsolatedProjectsEnabled()) return
         afterEvaluate {
             if (androidXExtension.type !in listOf(LibraryType.UNSET, LibraryType.SAMPLES)) {
                 val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
