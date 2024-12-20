@@ -16,7 +16,9 @@
 package androidx.mediarouter.media;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -54,11 +56,16 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
     public static final boolean ROUTE_GROUPABLE_3 = false;
     public static final boolean ROUTE_TRANSFERABLE_3 = true;
     public static final List<IntentFilter> CONTROL_FILTERS_TEST = new ArrayList<>();
+    public static final String SEND_CONTROL_REQUEST_KEY = "send_control_request_key";
+    public static final String SEND_CONTROL_REQUEST_VALUE = "send_control_request_value";
+    public static final Bundle SEND_CONTROL_REQUEST_RESULT = new Bundle();
 
     static {
         IntentFilter filter = new IntentFilter();
         filter.addCategory(CATEGORY_DYNAMIC_PROVIDER_TEST);
         CONTROL_FILTERS_TEST.add(filter);
+
+        SEND_CONTROL_REQUEST_RESULT.putString(SEND_CONTROL_REQUEST_KEY, SEND_CONTROL_REQUEST_VALUE);
     }
 
     @Override
@@ -303,6 +310,15 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
                         "StubDynamicRouteController.onRemoveMemberRoute with routeId = " + routeId);
                 mCurrentSelectedRouteIds.remove(routeId);
                 publishState();
+            }
+
+            @Override
+            public boolean onControlRequest(
+                    @NonNull Intent intent, @Nullable MediaRouter.ControlRequestCallback callback) {
+                if (callback != null) {
+                    callback.onResult(SEND_CONTROL_REQUEST_RESULT);
+                }
+                return true;
             }
 
             @Override

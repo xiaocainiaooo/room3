@@ -233,10 +233,9 @@ import java.util.Set;
             MediaRouter.RouteInfo route,
             Intent intent,
             MediaRouter.ControlRequestCallback callback) {
-        if (route == mSelectedRoute && mSelectedRouteController != null) {
-            if (mSelectedRouteController.onControlRequest(intent, callback)) {
-                return;
-            }
+        MediaRouteProvider.RouteController controller = getRouteController(route);
+        if (controller != null && controller.onControlRequest(intent, callback)) {
+            return;
         }
         if (mTransferNotifier != null
                 && route == mTransferNotifier.mToRoute
