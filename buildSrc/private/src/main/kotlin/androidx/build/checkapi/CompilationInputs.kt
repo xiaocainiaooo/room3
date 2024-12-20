@@ -227,14 +227,21 @@ internal class MultiplatformCompilationInputs(
      */
     val sourceSets: Provider<List<SourceSetInputs>>,
     override val bootClasspath: FileCollection,
-    /** Source files from the KMP common module of this project */
-    val commonModuleSourcePaths: FileCollection,
 ) : CompilationInputs {
     // Aggregate sources and classpath from all source sets
     override val sourcePaths: ConfigurableFileCollection =
         project.files(sourceSets.map { it.map { sourceSet -> sourceSet.sourcePaths } })
     override val dependencyClasspath: ConfigurableFileCollection =
         project.files(sourceSets.map { it.map { sourceSet -> sourceSet.dependencyClasspath } })
+
+    /** Source files from the KMP common module of this project */
+    val commonModuleSourcePaths: FileCollection =
+        project.files(
+            sourceSets.map {
+                it.filter { sourceSet -> sourceSet.dependsOnSourceSets.isEmpty() }
+                    .map { sourceSet -> sourceSet.sourcePaths }
+            }
+        )
 
     companion object {
         /** Creates inputs based on one compilation of a multiplatform project. */
@@ -291,21 +298,6 @@ internal class MultiplatformCompilationInputs(
                 project,
                 sourceSets,
                 bootClasspath,
-                project.commonModuleSourcePaths(compilationProvider)
-            )
-        }
-
-        private fun Project.commonModuleSourcePaths(
-            kotlinCompilation: Provider<KotlinCompilation<*>>
-        ): ConfigurableFileCollection {
-            return project.files(
-                project.provider {
-                    kotlinCompilation
-                        .get()
-                        .allKotlinSourceSets
-                        .filter { it.dependsOn.isEmpty() }
-                        .flatMap { it.kotlin.sourceDirectories.files }
-                }
             )
         }
     }
