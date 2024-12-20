@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
+import android.support.customtabs.IAuthTabCallback;
 import android.support.customtabs.ICustomTabsCallback;
 import android.support.customtabs.ICustomTabsService;
 import android.support.customtabs.IEngagementSignalsCallback;
@@ -700,6 +701,12 @@ public final class CustomTabsSession {
         @Override
         @ExperimentalEphemeralBrowsing
         public boolean isEphemeralBrowsingSupported(Bundle extras) throws RemoteException {
+            return false;
+        }
+
+        @Override
+        public boolean newAuthTabSession(IAuthTabCallback callback, Bundle extras)
+                throws RemoteException {
             return false;
         }
     }
