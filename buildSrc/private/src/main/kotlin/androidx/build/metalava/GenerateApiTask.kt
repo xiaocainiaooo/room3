@@ -96,6 +96,7 @@ internal abstract class GenerateApiTask @Inject constructor(workerExecutor: Work
 
         generateApi(
             metalavaClasspath,
+            createProjectXmlFile(),
             inputs,
             apiLocation.get(),
             ApiLintMode.CheckBaseline(baselines.get().apiLintFile, targetsJavaConsumers.get()),

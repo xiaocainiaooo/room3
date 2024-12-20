@@ -57,6 +57,7 @@ constructor(workerExecutor: WorkerExecutor) : SourceMetalavaTask(workerExecutor)
             getGenerateApiArgs(
                 bootClasspath,
                 dependencyClasspath,
+                createProjectXmlFile(),
                 sourcePaths.files.filter { it.exists() },
                 commonModuleSourcePaths.files.filter { it.exists() },
                 null,
