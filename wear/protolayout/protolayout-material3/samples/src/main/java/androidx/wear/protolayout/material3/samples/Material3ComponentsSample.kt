@@ -24,8 +24,6 @@ import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
-import androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint
-import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
 import androidx.wear.protolayout.material3.AppCardStyle
 import androidx.wear.protolayout.material3.CardDefaults.filledTonalCardColors
@@ -40,18 +38,20 @@ import androidx.wear.protolayout.material3.icon
 import androidx.wear.protolayout.material3.iconEdgeButton
 import androidx.wear.protolayout.material3.materialScope
 import androidx.wear.protolayout.material3.primaryLayout
-import androidx.wear.protolayout.material3.prop
 import androidx.wear.protolayout.material3.text
 import androidx.wear.protolayout.material3.textEdgeButton
 import androidx.wear.protolayout.material3.titleCard
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.contentDescription
+import androidx.wear.protolayout.types.LayoutString
+import androidx.wear.protolayout.types.asLayoutConstraint
+import androidx.wear.protolayout.types.layoutString
 
 /** Builds Material3 text element with default options. */
 @Sampled
 fun helloWorldTextDefault(context: Context, deviceConfiguration: DeviceParameters): LayoutElement =
     materialScope(context, deviceConfiguration) {
-        text(text = "Hello Material3".prop(), typography = Typography.DISPLAY_LARGE)
+        text(text = "Hello Material3".layoutString, typography = Typography.DISPLAY_LARGE)
     }
 
 /** Builds Material3 text element with some of the overridden defaults. */
@@ -63,10 +63,11 @@ fun helloWorldTextDynamicCustom(
     materialScope(context, deviceConfiguration) {
         text(
             text =
-                StringProp.Builder("Static")
-                    .setDynamicValue(DynamicString.constant("Dynamic"))
-                    .build(),
-            stringLayoutConstraint = StringLayoutConstraint.Builder("Constraint").build(),
+                LayoutString(
+                    "Static",
+                    DynamicString.constant("Dynamic"),
+                    "LongestConstraint".asLayoutConstraint()
+                ),
             typography = Typography.DISPLAY_LARGE,
             color = colorScheme.tertiary,
             underline = true,
@@ -100,7 +101,7 @@ fun edgeButtonSampleText(
             onClick = clickable,
             modifier = LayoutModifier.contentDescription("Description of a button")
         ) {
-            text("Hello".prop())
+            text("Hello".layoutString)
         }
     }
 
@@ -112,7 +113,7 @@ fun topLeveLayout(
 ): LayoutElement =
     materialScope(context, deviceConfiguration) {
         primaryLayout(
-            titleSlot = { text("App title".prop()) },
+            titleSlot = { text("App title".layoutString) },
             mainSlot = {
                 buttonGroup {
                     // To be populated with proper components
@@ -158,7 +159,7 @@ fun cardSample(
                     height = expand(),
                     background = { backgroundImage(protoLayoutResourceId = "id") }
                 ) {
-                    text("Content of the Card!".prop())
+                    text("Content of the Card!".layoutString)
                 }
             }
         )
@@ -179,9 +180,9 @@ fun titleCardSample(
                     height = expand(),
                     colors = filledVariantCardColors(),
                     style = largeTitleCardStyle(),
-                    title = { text("This is title of the title card".prop()) },
-                    time = { text("NOW".prop()) },
-                    content = { text("Content of the Card!".prop()) }
+                    title = { text("This is title of the title card".layoutString) },
+                    time = { text("NOW".layoutString) },
+                    content = { text("Content of the Card!".layoutString) }
                 )
             }
         )
@@ -202,10 +203,10 @@ fun appCardSample(
                     height = expand(),
                     colors = filledTonalCardColors(),
                     style = AppCardStyle.largeAppCardStyle(),
-                    title = { text("This is title of the app card".prop()) },
-                    time = { text("NOW".prop()) },
-                    label = { text("Label".prop()) },
-                    content = { text("Content of the Card!".prop()) },
+                    title = { text("This is title of the app card".layoutString) },
+                    time = { text("NOW".layoutString) },
+                    label = { text("Label".layoutString) },
+                    content = { text("Content of the Card!".layoutString) },
                 )
             }
         )

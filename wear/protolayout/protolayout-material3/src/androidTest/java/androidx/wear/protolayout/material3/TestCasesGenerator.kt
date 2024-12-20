@@ -35,6 +35,7 @@ import androidx.wear.protolayout.material3.MaterialGoldenTest.Companion.pxToDp
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.types.LayoutColor
+import androidx.wear.protolayout.types.layoutString
 import com.google.common.collect.ImmutableMap
 
 private const val CONTENT_DESCRIPTION_PLACEHOLDER = "Description"
@@ -81,20 +82,20 @@ object TestCasesGenerator {
                 primaryLayoutWithOverrideIcon(
                     mainSlot = {
                         text(
-                            text = "Text in the main slot that overflows".prop(),
+                            text = "Text in the main slot that overflows".layoutString,
                             color = colorScheme.secondary
                         )
                     },
                     bottomSlot = {
                         textEdgeButton(
                             onClick = clickable,
-                            labelContent = { text("Action".prop()) },
+                            labelContent = { text("Action".layoutString) },
                             modifier =
                                 LayoutModifier.contentDescription(CONTENT_DESCRIPTION_PLACEHOLDER),
                             colors = filledButtonColors()
                         )
                     },
-                    titleSlot = { text("Title".prop()) },
+                    titleSlot = { text("Title".layoutString) },
                     overrideIcon = true
                 )
             }
@@ -124,7 +125,7 @@ object TestCasesGenerator {
                     bottomSlot = {
                         textEdgeButton(
                             onClick = clickable,
-                            labelContent = { text("Action that overflows".prop()) },
+                            labelContent = { text("Action that overflows".layoutString) },
                             modifier =
                                 LayoutModifier.contentDescription(CONTENT_DESCRIPTION_PLACEHOLDER),
                             colors = filledVariantButtonColors()
@@ -149,7 +150,7 @@ object TestCasesGenerator {
                             background = { backgroundImage(protoLayoutResourceId = IMAGE_ID) }
                         ) {
                             text(
-                                "Card with image background".prop(),
+                                "Card with image background".layoutString,
                                 color = colorScheme.onBackground
                             )
                         }
@@ -163,7 +164,9 @@ object TestCasesGenerator {
                             colors = filledTonalButtonColors()
                         )
                     },
-                    titleSlot = { text("Title that overflows".prop(), color = colorScheme.error) }
+                    titleSlot = {
+                        text("Title that overflows".layoutString, color = colorScheme.error)
+                    }
                 )
             }
         testCases["primarylayout_titlecard_bottomslot_golden$goldenSuffix"] =
@@ -181,16 +184,16 @@ object TestCasesGenerator {
                             title = {
                                 text(
                                     "Title Card text that will overflow after 2 max lines of text"
-                                        .prop()
+                                        .layoutString
                                 )
                             },
-                            time = { text("Now".prop()) },
-                            content = { text("Default title card".prop()) },
+                            time = { text("Now".layoutString) },
+                            content = { text("Default title card".layoutString) },
                             colors = filledVariantCardColors()
                         )
                     },
-                    bottomSlot = { text("Bottom Slot that overflows".prop()) },
-                    titleSlot = { text("TitleCard".prop(), color = colorScheme.secondaryDim) }
+                    bottomSlot = { text("Bottom Slot that overflows".layoutString) },
+                    titleSlot = { text("TitleCard".layoutString, color = colorScheme.secondaryDim) }
                 )
             }
         testCases["primarylayout_bottomslot_withlabel_golden$goldenSuffix"] =
@@ -203,9 +206,11 @@ object TestCasesGenerator {
                     mainSlot = {
                         coloredBox(color = colorScheme.errorContainer, shape = shapes.extraLarge)
                     },
-                    bottomSlot = { text("Bottom Slot".prop()) },
-                    labelForBottomSlot = { text("Label in bottom slot overflows".prop()) },
-                    titleSlot = { text("Title".prop(), color = colorScheme.secondaryContainer) }
+                    bottomSlot = { text("Bottom Slot".layoutString) },
+                    labelForBottomSlot = { text("Label in bottom slot overflows".layoutString) },
+                    titleSlot = {
+                        text("Title".layoutString, color = colorScheme.secondaryContainer)
+                    }
                 )
             }
         testCases["primarylayout_nobottomslot_golden$goldenSuffix"] =
@@ -218,8 +223,10 @@ object TestCasesGenerator {
                     mainSlot = {
                         coloredBox(color = colorScheme.tertiaryContainer, shape = shapes.extraLarge)
                     },
-                    labelForBottomSlot = { text("Ignored Label in bottom slot".prop()) },
-                    titleSlot = { text("Title".prop(), color = colorScheme.secondaryContainer) }
+                    labelForBottomSlot = { text("Ignored Label in bottom slot".layoutString) },
+                    titleSlot = {
+                        text("Title".layoutString, color = colorScheme.secondaryContainer)
+                    }
                 )
             }
         testCases["primarylayout_nobottomslotnotitle_golden$NORMAL_SCALE_SUFFIX"] =
