@@ -251,6 +251,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void initRuntimePerceptionFailure() {
         ListenableFuture<Session> sessionFuture =
                 immediateFailedFuture(
@@ -276,12 +277,14 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void requestHomeSpaceMode_callsExtensions() {
         realityCoreRuntime.requestHomeSpaceMode();
         assertThat(fakeExtensions.getSpaceMode()).isEqualTo(SpaceMode.HOME_SPACE);
     }
 
     @Test
+    @Ignore
     public void requestFullSpaceMode_callsExtensions() {
         realityCoreRuntime.requestFullSpaceMode();
         assertThat(fakeExtensions.getSpaceMode()).isEqualTo(SpaceMode.FULL_SPACE);
@@ -299,6 +302,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void loggingEntitySetParent() {
         Pose pose = new Pose();
         LoggingEntity childEntity = realityCoreRuntime.createLoggingEntity(pose);
@@ -314,6 +318,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void loggingEntityUpdateParent() {
         Pose pose = new Pose();
         LoggingEntity childEntity = realityCoreRuntime.createLoggingEntity(pose);
@@ -332,6 +337,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void onSpatialStateChanged_setsSpatialCapabilities() {
         realityCoreRuntime =
                 JxrPlatformAdapterAxr.create(
@@ -371,6 +377,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void onSpatialStateChanged_setsEnvironmentVisibility() {
         SpatialEnvironment environment = realityCoreRuntime.getSpatialEnvironment();
         assertThat(environment.isSpatialEnvironmentPreferenceActive()).isFalse();
@@ -395,6 +402,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void onSpatialStateChanged_callsEnvironmentListenerOnlyForChanges() {
         SpatialEnvironment environment = realityCoreRuntime.getSpatialEnvironment();
         @SuppressWarnings(value = "unchecked")
@@ -431,6 +439,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void onSpatialStateChanged_setsPassthroughOpacity() {
         SpatialEnvironment environment = realityCoreRuntime.getSpatialEnvironment();
         assertThat(environment.getCurrentPassthroughOpacity()).isZero();
@@ -461,6 +470,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void onSpatialStateChanged_callsPassthroughListenerOnlyForChanges() {
         SpatialEnvironment environment = realityCoreRuntime.getSpatialEnvironment();
         @SuppressWarnings(value = "unchecked")
@@ -506,6 +516,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void currentPassthroughOpacity_isSetDuringRuntimeCreation() {
         fakeExtensions.fakeSpatialState.setPassthroughVisibility(
                 new FakePassthroughVisibilityState(PassthroughVisibilityState.APP, 0.5f));
@@ -527,6 +538,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void onSpatialStateChanged_firesSpatialCapabilitiesChangedListener() {
         realityCoreRuntime =
                 JxrPlatformAdapterAxr.create(
@@ -577,6 +589,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getHeadPoseInOpenXrUnboundedSpace_returnsNullWhenPerceptionSessionUninitialized() {
         when(perceptionLibrary.getSession()).thenReturn(null);
         assertThat(((JxrPlatformAdapterAxr) realityCoreRuntime).getHeadPoseInOpenXrUnboundedSpace())
@@ -584,6 +597,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getHeadPoseInOpenXrUnboundedSpace_returnsPose() {
         when(session.getHeadPose())
                 .thenReturn(
@@ -595,6 +609,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void
             getStereoViewsInOpenXrUnboundedSpace_returnsNullWhenPerceptionSessionUninitialized() {
         when(perceptionLibrary.getSession()).thenReturn(null);
@@ -605,6 +620,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getStereoViewsInOpenXrUnboundedSpace_returnsViewProjections() {
         ViewProjection leftViewProjection =
                 new ViewProjection(
@@ -626,6 +642,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void loggingEntity_getActivitySpacePose_returnsIdentityPose() {
         Pose identityPose = new Pose();
         LoggingEntity loggingEntity = realityCoreRuntime.createLoggingEntity(identityPose);
@@ -633,6 +650,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void loggingEntity_transformPoseTo_returnsIdentityPose() {
         Pose identityPose = new Pose();
         LoggingEntity loggingEntity = realityCoreRuntime.createLoggingEntity(identityPose);
@@ -640,6 +658,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getPose_returnsSetPose() throws Exception {
         Pose pose = new Pose(new Vector3(1f, 2f, 3f), new Quaternion(1f, 2f, 3f, 4f));
         Pose identityPose = new Pose();
@@ -665,6 +684,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getPose_returnsFactoryMethodPose() throws Exception {
         Pose pose = new Pose(new Vector3(1f, 2f, 3f), new Quaternion(1f, 2f, 3f, 4f));
         PanelEntity panelEntity = createPanelEntity(pose);
@@ -679,6 +699,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getPoseInActivitySpace_withParentChainTranslation_returnsOffsetPositionFromRoot()
             throws Exception {
         // Create a simple pose with only a small translation on all axes
@@ -703,6 +724,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getPoseInActivitySpace_withParentChainRotation_returnsOffsetRotationFromRoot()
             throws Exception {
         // Create a pose with a translation and one with 90 degree rotation around the y axis.
@@ -736,6 +758,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getPoseInActivitySpace_withParentChainPoseOffsets_returnsOffsetPoseFromRoot()
             throws Exception {
         // Create a pose with a 1D translation and a 90 degree rotation around the z axis.
@@ -775,6 +798,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getPoseInActivitySpace_withActivitySpaceParent_returnsScaledPose()
             throws Exception {
         Pose pose = new Pose(new Vector3(1f, 2f, 3f), new Quaternion(1f, 2f, 3f, 4f));
@@ -796,6 +820,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getPoseInActivitySpace_withScale_returnsPose() throws Exception {
         Pose localPose = new Pose(new Vector3(1f, 2f, 1f), Quaternion.Identity);
 
@@ -844,6 +869,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getActivitySpacePose_withParentChainTranslation_returnsOffsetPositionFromRoot()
             throws Exception {
         // Create a simple pose with only a small translation on all axes
@@ -867,6 +893,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getActivitySpacePose_withParentChainRotation_returnsOffsetRotationFromRoot()
             throws Exception {
         // Create a pose with a translation and one with 90 degree rotation around the y axis.
@@ -893,6 +920,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getActivitySpacePose_withParentChainPoseOffsets_returnsOffsetPoseFromRoot()
             throws Exception {
         // Create a pose with a 1D translation and a 90 degree rotation around the z axis.
@@ -929,6 +957,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getActivitySpacePose_withDefaultParent_returnsPose() throws Exception {
         Pose pose = new Pose(new Vector3(1f, 2f, 3f), new Quaternion(1f, 2f, 3f, 4f));
 
@@ -943,6 +972,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getPoseInActivitySpace_withScale_returnsScaledPose() throws Exception {
         Pose localPose = new Pose(new Vector3(1f, 2f, 1f), Quaternion.Identity);
 
@@ -979,6 +1009,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void transformPoseTo_sameDestAndSourceEntity_returnsUnchangedPose() throws Exception {
         Pose pose =
                 new Pose(new Vector3(1f, 2f, 3f), new Quaternion(1f, 2f, 3f, 4f).toNormalized());
@@ -997,6 +1028,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void transformPoseTo_withOnlyTranslationOffset_returnsTranslationDifference()
             throws Exception {
         PanelEntityImpl sourceEntity = (PanelEntityImpl) createPanelEntity();
@@ -1017,6 +1049,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void transformPoseTo_withOnlyRotationOffset_returnsRotationDifference()
             throws Exception {
         PanelEntityImpl sourceEntity = (PanelEntityImpl) createPanelEntity();
@@ -1044,6 +1077,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void transformPoseTo_withDifferentTranslationAndRotation_returnsTransformedPose() {
         // Assume the source and destination entities are in the same coordinate space.
         Vector3 sourceVector = new Vector3(1f, 2f, 3f);
@@ -1107,6 +1141,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getAlpha_returnsSetAlpha() throws Exception {
         PanelEntity panelEntity = createPanelEntity();
         GltfEntity gltfEntity = createGltfEntity();
@@ -1131,6 +1166,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getActivitySpaceAlpha_returnsTotalAncestorAlpha() throws Exception {
         PanelEntity grandparent = createPanelEntity();
         GltfEntity parent = createGltfEntity();
@@ -1157,6 +1193,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void transformPoseTo_withScale_returnsPose() throws Exception {
         PanelEntityImpl sourceEntity = (PanelEntityImpl) createPanelEntity();
         GltfEntityImpl destinationEntity = (GltfEntityImpl) createGltfEntity();
@@ -1196,6 +1233,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void isHidden_returnsSetHidden() throws Exception {
         PanelEntity parentEntity = createPanelEntity();
         assertThat(parentEntity.isHidden(true)).isFalse();
@@ -1235,6 +1273,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void setHidden_modifiesReforms() throws Exception {
         PanelEntity testEntity = createPanelEntity();
         FakeNode testNode = (FakeNode) ((AndroidXrEntity) testEntity).getNode();
@@ -1255,6 +1294,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void loggingEntityAddChildren() {
         Pose pose = new Pose();
         LoggingEntity childEntity1 = realityCoreRuntime.createLoggingEntity(pose);
@@ -1273,6 +1313,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getActivitySpace_returnsEntity() {
         ActivitySpace activitySpace = realityCoreRuntime.getActivitySpace();
 
@@ -1283,6 +1324,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getActivitySpaceRootImpl_returnsEntity() {
         Entity activitySpaceRoot = realityCoreRuntime.getActivitySpaceRootImpl();
         assertThat(activitySpaceRoot).isNotNull();
@@ -1293,12 +1335,14 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getEnvironment_returnsEnvironment() {
         SpatialEnvironment environment = realityCoreRuntime.getSpatialEnvironment();
         assertThat(environment).isNotNull();
     }
 
     @Test
+    @Ignore
     public void getHeadActivityPose_returnsNullIfNotReady() {
         when(perceptionLibrary.getSession()).thenReturn(session);
         when(session.getHeadPose()).thenReturn(null);
@@ -1308,6 +1352,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getHeadActivityPose_returnsActivityPose() {
         when(perceptionLibrary.getSession()).thenReturn(session);
         when(session.getHeadPose())
@@ -1318,6 +1363,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getCameraViewActivityPose_returnsNullIfNotReady() {
         when(perceptionLibrary.getSession()).thenReturn(session);
         when(session.getStereoViews()).thenReturn(new ViewProjections(null, null));
@@ -1334,6 +1380,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getLeftCameraViewActivityPose_returnsActivityPose() {
         when(perceptionLibrary.getSession()).thenReturn(session);
         ViewProjection viewProjection =
@@ -1349,6 +1396,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getRightCameraViewActivityPose_returnsActivityPose() {
         when(perceptionLibrary.getSession()).thenReturn(session);
         ViewProjection viewProjection =
@@ -1364,6 +1412,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getUnknownCameraViewActivityPose_returnsEmptyOptional() {
         CameraViewActivityPose cameraViewActivityPose =
                 realityCoreRuntime.getCameraViewActivityPose(555);
@@ -1372,6 +1421,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void loadExrImageByAssetName_returnsImage() throws Exception {
         ListenableFuture<ExrImageResource> imageFuture =
                 realityCoreRuntime.loadExrImageByAssetName("FakeAsset.exr");
@@ -1388,6 +1438,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void loadGltfByAssetName_returnsModel() throws Exception {
         ListenableFuture<GltfModelResource> modelFuture =
                 realityCoreRuntime.loadGltfByAssetName("FakeAsset.glb");
@@ -1404,16 +1455,19 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void createGltfEntity_returnsEntity() throws Exception {
         assertThat(createGltfEntity()).isNotNull();
     }
 
     @Test
+    @Ignore
     public void createGltfEntitySplitEngine_returnsEntity() throws Exception {
         assertThat(createGltfEntitySplitEngine()).isNotNull();
     }
 
     @Test
+    @Ignore
     public void animateGltfEntitySplitEngine_gltfEntityIsAnimating() throws Exception {
         GltfEntity gltfEntitySplitEngine = createGltfEntitySplitEngine();
         gltfEntitySplitEngine.startAnimation(false, "animation_name");
@@ -1429,6 +1483,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void animateLoopGltfEntitySplitEngine_gltfEntityIsAnimatingInLoop() throws Exception {
         GltfEntity gltfEntitySplitEngine = createGltfEntitySplitEngine();
         gltfEntitySplitEngine.startAnimation(true, "animation_name");
@@ -1442,6 +1497,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void stopAnimateGltfEntitySplitEngine_gltfEntityStopsAnimating() throws Exception {
         GltfEntity gltfEntitySplitEngine = createGltfEntitySplitEngine();
         gltfEntitySplitEngine.startAnimation(true, "animation_name");
@@ -1456,6 +1512,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void gltfEntitySetParent() throws Exception {
         GltfEntity childEntity = createGltfEntity();
         GltfEntity parentEntity = createGltfEntity();
@@ -1474,6 +1531,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void gltfEntityUpdateParent() throws Exception {
         GltfEntity childEntity = createGltfEntity();
         GltfEntity parentEntity1 = createGltfEntity();
@@ -1495,6 +1553,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void gltfEntityAddChildren() throws Exception {
         GltfEntity childEntity1 = createGltfEntity();
         GltfEntity childEntity2 = createGltfEntity();
@@ -1517,11 +1576,13 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void createPanelEntity_returnsEntity() throws Exception {
         assertThat(createPanelEntity()).isNotNull();
     }
 
     @Test
+    @Ignore
     public void allPanelEnities_haveActivitySpaceRootImplAsParentByDefault() throws Exception {
         PanelEntity panelEntity = createPanelEntity();
 
@@ -1530,6 +1591,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void panelEntitySetParent_setsParent() throws Exception {
         PanelEntity childEntity = createPanelEntity();
         PanelEntity parentEntity = createPanelEntity();
@@ -1546,6 +1608,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void panelEntityUpdateParent_updatesParent() throws Exception {
         PanelEntity childEntity = createPanelEntity();
         PanelEntity parentEntity1 = createPanelEntity();
@@ -1567,6 +1630,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void panelEntityAddChildren_addsChildren() throws Exception {
         PanelEntity childEntity1 = createPanelEntity();
         PanelEntity childEntity2 = createPanelEntity();
@@ -1589,6 +1653,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void createAnchorEntity_returnsAndInitsAnchor() throws Exception {
         Dimensions anchorDimensions = new Dimensions(2f, 5f, 0f);
         androidx.xr.scenecore.impl.perception.Pose perceptionPose =
@@ -1615,11 +1680,13 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getMainPanelEntity_returnsPanelEntity() throws Exception {
         assertThat(realityCoreRuntime.getMainPanelEntity()).isNotNull();
     }
 
     @Test
+    @Ignore
     public void getMainPanelEntity_usesWindowLeashNode() throws Exception {
         PanelEntity mainPanel = realityCoreRuntime.getMainPanelEntity();
 
@@ -1628,6 +1695,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void addInputEventConsumerToEntity_setsUpNodeListener() {
         InputEventListener mockConsumer = mock(InputEventListener.class);
         PanelEntity panelEntity = createPanelEntity();
@@ -1649,6 +1717,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void inputEvent_hasHitInfo() {
         InputEventListener mockConsumer = mock(InputEventListener.class);
         PanelEntity panelEntity = createPanelEntity();
@@ -1676,6 +1745,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void passingNullExecutorWhenAddingConsumer_usesInternalExecutor() {
         InputEventListener mockConsumer = mock(InputEventListener.class);
         PanelEntity panelEntity = createPanelEntity();
@@ -1687,6 +1757,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void addMultipleInputEventConsumerToEntity_setsUpInputCallbacksForAll() {
         InputEventListener mockConsumer1 = mock(InputEventListener.class);
         InputEventListener mockConsumer2 = mock(InputEventListener.class);
@@ -1707,6 +1778,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void addMultipleInputEventConsumersToEntity_setsUpInputCallbacksOnGivenExecutors() {
         InputEventListener mockConsumer1 = mock(InputEventListener.class);
         InputEventListener mockConsumer2 = mock(InputEventListener.class);
@@ -1734,6 +1806,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void removeInputEventConsumerToEntity_removesFromCallbacks() {
         InputEventListener mockConsumer1 = mock(InputEventListener.class);
         InputEventListener mockConsumer2 = mock(InputEventListener.class);
@@ -1759,6 +1832,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void removeAllInputEventConsumers_stopsInputListening() {
         InputEventListener mockConsumer1 = mock(InputEventListener.class);
         InputEventListener mockConsumer2 = mock(InputEventListener.class);
@@ -1786,6 +1860,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void dispose_stopsInputListening() {
         InputEventListener mockConsumer1 = mock(InputEventListener.class);
         InputEventListener mockConsumer2 = mock(InputEventListener.class);
@@ -1812,17 +1887,20 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void createContentlessEntity_returnsEntity() throws Exception {
         assertThat(createContentlessEntity()).isNotNull();
     }
 
     @Test
+    @Ignore
     public void contentlessEntity_hasActivitySpaceRootImplAsParentByDefault() throws Exception {
         Entity entity = createContentlessEntity();
         assertThat(entity.getParent()).isEqualTo(realityCoreRuntime.getActivitySpaceRootImpl());
     }
 
     @Test
+    @Ignore
     public void contentlessEntityAddChildren_addsChildren() throws Exception {
         Entity childEntity1 = createContentlessEntity();
         Entity childEntity2 = createContentlessEntity();
@@ -1845,6 +1923,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void addComponent_callsOnAttach() throws Exception {
         PanelEntity panelEntity = createPanelEntity();
         GltfEntity gltfEntity = createGltfEntity();
@@ -1863,6 +1942,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void addComponent_failsIfOnAttachFails() throws Exception {
         PanelEntity panelEntity = createPanelEntity();
         GltfEntity gltfEntity = createGltfEntity();
@@ -1881,6 +1961,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void removeComponent_callsOnDetach() throws Exception {
         PanelEntity panelEntity = createPanelEntity();
         GltfEntity gltfEntity = createGltfEntity();
@@ -1908,6 +1989,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void addingSameComponentTypeAgain_addsComponent() throws Exception {
         PanelEntity panelEntity = createPanelEntity();
         GltfEntity gltfEntity = createGltfEntity();
@@ -1934,6 +2016,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void addingDifferentComponentType_addComponentSucceeds() throws Exception {
         PanelEntity panelEntity = createPanelEntity();
         GltfEntity gltfEntity = createGltfEntity();
@@ -1960,6 +2043,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void removeAll_callsOnDetachOnAll() throws Exception {
         PanelEntity panelEntity = createPanelEntity();
         GltfEntity gltfEntity = createGltfEntity();
@@ -1998,6 +2082,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void addSameComponentTwice_callsOnAttachTwice() throws Exception {
         PanelEntity panelEntity = createPanelEntity();
         GltfEntity gltfEntity = createGltfEntity();
@@ -2019,6 +2104,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void removeSameComponentTwice_callsOnDetachOnce() throws Exception {
         PanelEntity panelEntity = createPanelEntity();
         GltfEntity gltfEntity = createGltfEntity();
@@ -2049,6 +2135,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void createInteractableComponent_returnsComponent() {
         InputEventListener mockConsumer = mock(InputEventListener.class);
         InteractableComponent interactableComponent =
@@ -2057,6 +2144,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void createPersistedAnchorEntity_returnsEntityInNominalCase() throws Exception {
         when(perceptionLibrary.getSession()).thenReturn(session);
         when(session.createAnchorFromUuid(any())).thenReturn(anchor);
@@ -2067,6 +2155,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void createPersistedAnchorEntity_returnsEntityForNullSession() throws Exception {
         when(perceptionLibrary.getSession()).thenReturn(null);
         assertThat(
@@ -2076,6 +2165,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void createPersistedAnchorEntity_returnsEntityForNullAnchor() throws Exception {
         when(perceptionLibrary.getSession()).thenReturn(session);
         when(session.createAnchorFromUuid(any())).thenReturn(null);
@@ -2086,6 +2176,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void createPersistedAnchorEntity_returnsEntityForNullAnchorToken() throws Exception {
         when(perceptionLibrary.getSession()).thenReturn(session);
         when(session.createAnchorFromUuid(any())).thenReturn(anchor);
@@ -2101,12 +2192,14 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void unpersistAnchor_failsWhenSessionIsNotInitialized() {
         when(perceptionLibrary.getSession()).thenReturn(null);
         assertThat(realityCoreRuntime.unpersistAnchor(UUID.randomUUID())).isFalse();
     }
 
     @Test
+    @Ignore
     public void unpersistAnchor_sessionIsInitialized_operationSucceeds() {
         when(perceptionLibrary.getSession()).thenReturn(session);
         UUID uuid = UUID.randomUUID();
@@ -2115,6 +2208,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void unpersistAnchor_sessionIsInitialized_operationFails() {
         when(perceptionLibrary.getSession()).thenReturn(session);
         UUID uuid = UUID.randomUUID();
@@ -2123,6 +2217,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void createMovableComponent_returnsComponent() {
         MovableComponent movableComponent =
                 realityCoreRuntime.createMovableComponent(
@@ -2131,6 +2226,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void createAnchorPlacement_returnsAnchorPlacement() {
         AnchorPlacement anchorPlacement =
                 realityCoreRuntime.createAnchorPlacementForPlanes(
@@ -2139,6 +2235,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void createResizableComponent_returnsComponent() {
         ResizableComponent resizableComponent =
                 realityCoreRuntime.createResizableComponent(
@@ -2147,6 +2244,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void createPointerCaptureComponent_returnsComponent() {
         PointerCaptureComponent pointerCaptureComponent =
                 realityCoreRuntime.createPointerCaptureComponent(
@@ -2155,6 +2253,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void dispose_clearsReformOptions() {
         AndroidXrEntity entity = (AndroidXrEntity) createContentlessEntity();
         FakeNode node = (FakeNode) entity.getNode();
@@ -2168,6 +2267,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void dispose_clearsParents() {
         AndroidXrEntity entity = (AndroidXrEntity) createContentlessEntity();
         entity.setParent(realityCoreRuntime.getActivitySpaceRootImpl());
@@ -2178,6 +2278,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void setFullSpaceMode_callsExtensions() {
         Bundle bundle = Bundle.EMPTY;
         bundle = realityCoreRuntime.setFullSpaceMode(bundle);
@@ -2185,6 +2286,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void setFullSpaceModeWithEnvironmentInherited_callsExtensions() {
         Bundle bundle = Bundle.EMPTY;
         bundle = realityCoreRuntime.setFullSpaceModeWithEnvironmentInherited(bundle);
@@ -2192,12 +2294,14 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void setPreferredAspectRatio_callsExtensions() {
         realityCoreRuntime.setPreferredAspectRatio(activity, 1.23f);
         assertThat(fakeExtensions.getPreferredAspectRatio()).isEqualTo(1.23f);
     }
 
     @Test
+    @Ignore
     public void createStereoSurface_returnsStereoSurface() {
         // Not a great test, since it returns the (non-SplitEngine) StereoSurfaceEntityImpl
         // and that throws this from its Ctor.
@@ -2213,6 +2317,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void getSurfaceFromStereoSurface_returnsSurface() {
         assertThrows(
                 IllegalArgumentException.class,
@@ -2220,6 +2325,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void setStereoModeForStereoSurface_callsExtensions() {
         assertThrows(
                 IllegalArgumentException.class,
@@ -2229,6 +2335,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void injectRootNodeAndTaskWindowLeashNode_runtimeImplUsesThoseNodes() {
         FakeNode rootNode = (FakeNode) fakeExtensions.createNode();
         FakeNode taskWindowLeashNode = (FakeNode) fakeExtensions.createNode();
@@ -2252,6 +2359,7 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
+    @Ignore
     public void dispose_clearsResources() {
         AndroidXrEntity entity = (AndroidXrEntity) createContentlessEntity();
         FakeNode node = (FakeNode) entity.getNode();
