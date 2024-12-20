@@ -130,10 +130,10 @@ internal class AndroidAutofillManager(
         }
 
         // Update currentlyDisplayedIDs if relevance to Autofill has changed.
-        val prevRelatedToAutofill = prevConfig?.isRelatedToAutofill()
-        val currRelatedToAutofill = config?.isRelatedToAutofill()
+        val prevRelatedToAutofill = prevConfig?.isRelatedToAutofill() ?: false
+        val currRelatedToAutofill = config?.isRelatedToAutofill() ?: false
         if (prevRelatedToAutofill != currRelatedToAutofill) {
-            if (currRelatedToAutofill == true) {
+            if (currRelatedToAutofill) {
                 currentlyDisplayedIDs.add(semanticsId)
             } else {
                 currentlyDisplayedIDs.remove(semanticsId)
