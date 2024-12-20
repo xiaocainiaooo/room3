@@ -26,11 +26,17 @@ import androidx.build.PlatformIdentifier
 
 plugins {
     id("AndroidXPlugin")
-    id("com.android.library")
 }
 
 androidXMultiplatform {
-    android()
+    androidLibrary {
+        namespace = "androidx.tracing"
+        withAndroidTestOnDeviceBuilder {
+            it.compilationName = "instrumentedTest"
+            it.defaultSourceSetName = "androidInstrumentedTest"
+            it.sourceSetTreeName = "test"
+        }
+    }
 
     defaultPlatform(PlatformIdentifier.ANDROID)
 
@@ -68,8 +74,4 @@ androidx {
     deviceTests {
         enableAlsoRunningOnPhysicalDevices = true
     }
-}
-
-android {
-    namespace = "androidx.tracing"
 }
