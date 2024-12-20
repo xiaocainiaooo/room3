@@ -61,6 +61,9 @@ kotlinSerialization = "1.6.3"
 kotlinToolingCore = "1.9.24"
 ksp = "2.1.0-1.0.29"
 ktfmt = "0.50"
+# Version format is: 1.KOTLIN_MAJOR_VERSION.0.KTFMT_VERSION
+# When updated, the id and checksum in StudioTask needs to be updated too
+ktfmtIdeaPlugin = "1.1.0.50"
 leakcanary = "2.13"
 media3 = "1.4.1"
 metalava = "1.0.0-alpha12"
