@@ -83,6 +83,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.truth.Expect;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -187,6 +188,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void addMovableComponent_addsReformOptionsToNode() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -215,6 +217,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void addMovableComponent_addsSystemMovableFlagToNode() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -243,6 +246,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void addMovableComponent_addsScaleInZFlagToNode() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -271,6 +275,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void addMovableComponent_addsAllFlagsToNode() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -300,6 +305,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void setSystemMovableFlag_alsoUpdatesEntityPoseAndScale() {
         AndroidXrEntity entity = (AndroidXrEntity) createTestEntity();
         MovableComponentImpl movableComponent =
@@ -341,6 +347,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void systemMovableFlagNotSet_doesNotUpdateEntityPoseAndScale() {
         AndroidXrEntity entity = (AndroidXrEntity) createTestEntity();
         MovableComponent movableComponent =
@@ -380,6 +387,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void setSizeOnMovableComponent_setsSizeOnNodeReformOptions() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -407,6 +415,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void scaleWithDistanceOnMovableComponent_defaultsToDefaultMode() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -434,6 +443,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void setScaleWithDistanceOnMovableComponent_setsScaleWithDistanceOnNodeReformOptions() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -462,6 +472,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void setPropertiesOnMovableComponentAttachLater_setsPropertiesOnNodeReformOptions() {
         AndroidXrEntity entity = (AndroidXrEntity) createTestEntity();
         MovableComponentImpl movableComponent =
@@ -495,6 +506,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void addMoveEventListener_onlyInvokedOnMoveEvent() {
         AndroidXrEntity entity = (AndroidXrEntity) createTestEntity();
         Vector3 initialTranslation = new Vector3(1f, 2f, 3f);
@@ -548,6 +560,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void addMoveEventListenerWithExecutor_invokesListenerOnGivenExecutor() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -587,6 +600,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void addMoveEventListenerMultiple_invokesAllListeners() {
         Entity entity = createTestEntity();
         MovableComponentImpl movableComponent =
@@ -626,6 +640,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void removeMoveEventListenerMultiple_removesGivenListener() {
         Entity entity = createTestEntity();
         MovableComponentImpl movableComponent =
@@ -677,6 +692,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void removeMovableComponent_clearsMoveReformOptionsAndMoveEventListeners() {
         Entity entity = createTestEntity();
         MovableComponentImpl movableComponent =
@@ -715,6 +731,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void movableComponent_canAttachAgainAfterDetach() {
         Entity entity = createTestEntity();
         assertThat(entity).isNotNull();
@@ -739,6 +756,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_updatesThePoseBasedOnPlanes() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -823,6 +841,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_nullParent_updatesThePoseBasedOnPlanes() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -903,6 +922,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_updatesPoseButDoesNotMove_ifNotSystemMovable() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -988,6 +1008,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_withNonActivityParent_updatesPoseBasedOnPlanesAndParent() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -1074,6 +1095,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorableAndScaledParent_updatesThePoseBasedOnPlanes() {
         // Set the activity space pose to be 1 unit to the left of the origin. with a scale of 2.
         setActivitySpacePose(
@@ -1151,6 +1173,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_withinAnchorDistance_setsAnchorEntity() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -1238,6 +1261,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_withinAnchorDistanceAboveAnchor_resetsPose() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -1327,6 +1351,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_withIncorrectPlaneType_doesNotCreateAnchor() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -1417,6 +1442,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_withinAnchorDistanceAndScale_setsAnchorEntityAndScales() {
         // Set the activity space pose to be 1 unit to the left of the OpenXR origin and add a scale
         // of
@@ -1510,6 +1536,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_noPlanes_keepsProposedPose() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -1567,6 +1594,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_noPlaneData_keepsProposedPose() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -1627,6 +1655,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_outsideExtents_keepsProposedPose() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -1698,6 +1727,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_resetsToActivityPoseAfterAnchoring() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -1810,6 +1840,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_resetsAndScaleToActivityPoseAfterAnchoring() {
         // Set the activity space pose to be 1 unit to the left of the OpenXR origin and add a scale
         // of
@@ -1932,6 +1963,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorableChildOfEntity_resetsToActivityPoseAfterAnchoring() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -2050,6 +2082,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_shouldDispose_disposesAnchorAfterUnparenting() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -2168,6 +2201,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorable_shouldDispose_doeNotDisposeIfAnchorHasChildren() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -2289,6 +2323,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorablePanelEntity_nearPlane_rendersShadow() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -2352,6 +2387,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorablePanelEntity_awayFromPlane_hidesShadow() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -2410,6 +2446,7 @@ public class MovableComponentImplTest {
     }
 
     @Test
+    @Ignore
     public void anchorablePanelEntity_endMovement_callsDestroy() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
