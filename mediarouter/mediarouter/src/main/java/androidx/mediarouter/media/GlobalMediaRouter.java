@@ -251,27 +251,42 @@ import java.util.Set;
     }
 
     /* package */ void requestSetVolume(MediaRouter.RouteInfo route, int volume) {
-        if (route == mSelectedRoute && mSelectedRouteController != null) {
-            mSelectedRouteController.onSetVolume(volume);
-        } else {
-            MediaRouteProvider.RouteController controller =
-                    mRouteControllerMap.get(route.mUniqueId);
-            if (controller != null) {
-                controller.onSetVolume(volume);
-            }
+        MediaRouteProvider.RouteController controller = getRouteController(route);
+        if (controller != null) {
+            controller.onSetVolume(volume);
         }
     }
 
     /* package */ void requestUpdateVolume(MediaRouter.RouteInfo route, int delta) {
+        MediaRouteProvider.RouteController controller = getRouteController(route);
+        if (controller != null) {
+            controller.onUpdateVolume(delta);
+        }
+    }
+
+    @Nullable
+    private MediaRouteProvider.RouteController getRouteController(MediaRouter.RouteInfo route) {
         if (route == mSelectedRoute && mSelectedRouteController != null) {
-            mSelectedRouteController.onUpdateVolume(delta);
-        } else {
-            MediaRouteProvider.RouteController controller =
-                    mRouteControllerMap.get(route.mUniqueId);
-            if (controller != null) {
-                controller.onUpdateVolume(delta);
+            return mSelectedRouteController;
+        }
+        if (route instanceof MediaRouter.GroupRouteInfo) {
+            MediaRouter.GroupRouteInfo groupRoute = (MediaRouter.GroupRouteInfo) route;
+            if (groupRoute.isConnected()) {
+                RouteConnection routeConnection = getRouteConnection(groupRoute);
+                return (routeConnection != null) ? routeConnection.mController : null;
             }
         }
+        MediaRouteProvider.RouteController controller = mRouteControllerMap.get(route.mUniqueId);
+        if (controller != null) {
+            return controller;
+        }
+        for (RouteConnection routeConnection : mRouteIdToRouteConnectionMap.values()) {
+            controller = routeConnection.mRouteIdToMemberControllerMap.get(route.mUniqueId);
+            if (controller != null) {
+                break;
+            }
+        }
+        return controller;
     }
 
     /* package */ MediaRouter.RouteInfo getRoute(String uniqueId) {
@@ -1644,6 +1659,7 @@ import java.util.Set;
 
         private final MediaRouter.RouteInfo mRequestedRoute;
         private final MediaRouteProvider.DynamicGroupRouteController mController;
+        private final Map<String, MediaRouteProvider.RouteController> mRouteIdToMemberControllerMap;
         private final Handler mHandler;
         private final Runnable mRouteConnectionTimeoutRunnable;
         // Holds the {@link MediaRouter.RouteInfo} of the route that corresponds to the dynamic
@@ -1656,6 +1672,7 @@ import java.util.Set;
                 MediaRouteProvider.DynamicGroupRouteController controller) {
             mRequestedRoute = requestedRoute;
             mController = controller;
+            mRouteIdToMemberControllerMap = new HashMap<>();
             mHandler = new Handler(Looper.getMainLooper());
             mRouteConnectionTimeoutRunnable = this::routeConnectionTimeout;
         }
@@ -1696,6 +1713,7 @@ import java.util.Set;
                                 + mRequestedRoute);
                 return;
             }
+
             if (mGroupRoute == null) {
                 // updatedGroupRouteDescriptor cannot be null.
                 mGroupRoute = convertFromRouteDescriptorToRouteInfo(updatedGroupRouteDescriptor);
@@ -1706,6 +1724,7 @@ import java.util.Set;
                 updateRouteDescriptorAndNotify(mGroupRoute, updatedGroupRouteDescriptor);
                 mGroupRoute.updateDynamicDescriptors(routes);
             }
+            updateMemberRouteControllers();
         }
 
         @Nullable
@@ -1743,6 +1762,49 @@ import java.util.Set;
                     .clearGroupMemberIds()
                     .addGroupMemberIds(groupMemberIds)
                     .build();
+        }
+
+        private void updateMemberRouteControllers() {
+            if (mGroupRoute == null) {
+                return;
+            }
+            Set<String> routeIdsToRemove = new HashSet<>(mRouteIdToMemberControllerMap.keySet());
+            for (MediaRouter.RouteInfo route : mGroupRoute.mSelectedRoutesInGroup) {
+                routeIdsToRemove.remove(route.mUniqueId);
+                if (!mRouteIdToMemberControllerMap.containsKey(route.mUniqueId)) {
+                    createAndConnectMemberRouteController(route);
+                }
+            }
+
+            for (String routeId : routeIdsToRemove) {
+                disconnectAndRemoveMemberRouteController(routeId);
+            }
+        }
+
+        private void createAndConnectMemberRouteController(MediaRouter.RouteInfo route) {
+            if (mRouteIdToMemberControllerMap.containsKey(route.mUniqueId) || mGroupRoute == null) {
+                return;
+            }
+            MediaRouteProvider.RouteController routeController =
+                    mRequestedRoute
+                            .getProviderInstance()
+                            .onCreateRouteController(
+                                    route.getDescriptorId(), mGroupRoute.getDescriptorId());
+            if (routeController != null) {
+                mRouteIdToMemberControllerMap.put(route.mUniqueId, routeController);
+                routeController.onSelect();
+            }
+        }
+
+        private void disconnectAndRemoveMemberRouteController(String routeId) {
+            MediaRouteProvider.RouteController routeController =
+                    mRouteIdToMemberControllerMap.get(routeId);
+            if (routeController == null) {
+                return;
+            }
+            routeController.onUnselect(UNSELECT_REASON_DISCONNECTED);
+            routeController.onRelease();
+            mRouteIdToMemberControllerMap.remove(routeId);
         }
 
         private MediaRouter.GroupRouteInfo convertFromRouteDescriptorToRouteInfo(

@@ -301,6 +301,114 @@ public final class MediaRouterDynamicProviderTest {
         verifyMemberRouteState(groupRouteInfo, mRoute3, /* isSelected= */ true);
     }
 
+    @Test()
+    public void setGroupVolume_shouldSetGroupVolume() {
+        assertEquals(RouteConnectionState.STATE_UNKNOWN, mRouteConnectionState);
+        List<MediaRouter.GroupRouteInfo> connectedGroupRoutes =
+                mCallback.connectAndWaitForOnConnected(mRoute1);
+
+        assertNotNull(mConnectedRoute);
+        MediaRouter.GroupRouteInfo groupRouteInfo = mConnectedRoute.asGroup();
+        assertNotNull(groupRouteInfo);
+        assertEquals(
+                StubDynamicMediaRouteProviderService.VOLUME_INITIAL_VALUE,
+                groupRouteInfo.getVolume());
+        assertEquals(1, connectedGroupRoutes.size());
+        MediaRouter.GroupRouteInfo connectedGroupRoute = connectedGroupRoutes.get(0);
+        assertTrue(runBlockingOnMainThreadWithResult(connectedGroupRoute::isConnected));
+        assertEquals(
+                StubDynamicMediaRouteProviderService.VOLUME_INITIAL_VALUE,
+                connectedGroupRoute.getVolume());
+
+        final int expectedVolume = 6;
+        int updatedVolume =
+                mCallback.setGroupVolumeAndWaitForOnVolumeSet(groupRouteInfo, expectedVolume);
+        assertEquals(expectedVolume, updatedVolume);
+        assertEquals(expectedVolume, mConnectedRoute.getVolume());
+    }
+
+    @Test()
+    public void updateGroupVolume_shouldUpdateGroupVolume() {
+        assertEquals(RouteConnectionState.STATE_UNKNOWN, mRouteConnectionState);
+        List<MediaRouter.GroupRouteInfo> connectedGroupRoutes =
+                mCallback.connectAndWaitForOnConnected(mRoute2);
+
+        assertNotNull(mConnectedRoute);
+        MediaRouter.GroupRouteInfo groupRouteInfo = mConnectedRoute.asGroup();
+        assertNotNull(groupRouteInfo);
+        assertEquals(
+                StubDynamicMediaRouteProviderService.VOLUME_INITIAL_VALUE,
+                groupRouteInfo.getVolume());
+        assertEquals(1, connectedGroupRoutes.size());
+        MediaRouter.GroupRouteInfo connectedGroupRoute = connectedGroupRoutes.get(0);
+        assertTrue(runBlockingOnMainThreadWithResult(connectedGroupRoute::isConnected));
+        assertEquals(
+                StubDynamicMediaRouteProviderService.VOLUME_INITIAL_VALUE,
+                connectedGroupRoute.getVolume());
+
+        final int volumeDelta = -3;
+        final int expectedVolume =
+                StubDynamicMediaRouteProviderService.VOLUME_INITIAL_VALUE + volumeDelta;
+        int updatedVolume =
+                mCallback.updateGroupVolumeAndWaitForOnVolumeUpdated(groupRouteInfo, volumeDelta);
+        assertEquals(expectedVolume, updatedVolume);
+        assertEquals(expectedVolume, mConnectedRoute.getVolume());
+    }
+
+    @Test()
+    public void setMemberVolume_shouldSetMemberVolume() {
+        assertEquals(RouteConnectionState.STATE_UNKNOWN, mRouteConnectionState);
+        List<MediaRouter.GroupRouteInfo> connectedGroupRoutes =
+                mCallback.connectAndWaitForOnConnected(mRoute2);
+
+        assertNotNull(mConnectedRoute);
+        MediaRouter.GroupRouteInfo groupRouteInfo = mConnectedRoute.asGroup();
+        assertNotNull(groupRouteInfo);
+        assertEquals(
+                StubDynamicMediaRouteProviderService.VOLUME_INITIAL_VALUE,
+                groupRouteInfo.getVolume());
+        assertEquals(1, connectedGroupRoutes.size());
+        MediaRouter.GroupRouteInfo connectedGroupRoute = connectedGroupRoutes.get(0);
+        assertTrue(runBlockingOnMainThreadWithResult(connectedGroupRoute::isConnected));
+        assertEquals(
+                StubDynamicMediaRouteProviderService.VOLUME_INITIAL_VALUE,
+                connectedGroupRoute.getVolume());
+
+        final int expectedVolume = 14;
+        getInstrumentation().runOnMainSync(() -> mRoute2.requestSetVolume(expectedVolume));
+        MediaRouter.RouteInfo memberRoute =
+                mCallback.waitForRouteVolume(ROUTE_ID_2, expectedVolume);
+        assertEquals(expectedVolume, memberRoute.getVolume());
+    }
+
+    @Test()
+    public void updateMemberVolume_shouldUpdateMemberVolume() {
+        assertEquals(RouteConnectionState.STATE_UNKNOWN, mRouteConnectionState);
+        List<MediaRouter.GroupRouteInfo> connectedGroupRoutes =
+                mCallback.connectAndWaitForOnConnected(mRoute1);
+
+        assertNotNull(mConnectedRoute);
+        MediaRouter.GroupRouteInfo groupRouteInfo = mConnectedRoute.asGroup();
+        assertNotNull(groupRouteInfo);
+        assertEquals(
+                StubDynamicMediaRouteProviderService.VOLUME_INITIAL_VALUE,
+                groupRouteInfo.getVolume());
+        assertEquals(1, connectedGroupRoutes.size());
+        MediaRouter.GroupRouteInfo connectedGroupRoute = connectedGroupRoutes.get(0);
+        assertTrue(runBlockingOnMainThreadWithResult(connectedGroupRoute::isConnected));
+        assertEquals(
+                StubDynamicMediaRouteProviderService.VOLUME_INITIAL_VALUE,
+                connectedGroupRoute.getVolume());
+
+        final int volumeDelta = 4;
+        final int expectedVolume =
+                StubDynamicMediaRouteProviderService.VOLUME_INITIAL_VALUE + volumeDelta;
+        getInstrumentation().runOnMainSync(() -> mRoute1.requestUpdateVolume(volumeDelta));
+        MediaRouter.RouteInfo memberRoute =
+                mCallback.waitForRouteVolume(ROUTE_ID_1, expectedVolume);
+        assertEquals(expectedVolume, memberRoute.getVolume());
+    }
+
     // Internal methods.
 
     private Map<String, MediaRouter.RouteInfo> getCurrentRoutesAsMap() {
@@ -360,8 +468,11 @@ public final class MediaRouterDynamicProviderTest {
 
     private class MediaRouterCallbackImpl extends MediaRouter.Callback {
 
-        private final ConditionVariable mPendingRoutesConditionVariable = new ConditionVariable();
         private final Set<String> mRouteIdsPending = new HashSet<>();
+        private final Map<String, Integer> mRouteVolumePending = new HashMap<>();
+        private final ConditionVariable mPendingRoutesConditionVariable = new ConditionVariable();
+        private final ConditionVariable mPendingRouteVolumeConditionVariable =
+                new ConditionVariable();
         private final ConditionVariable mRouteSelectedConditionVariable =
                 new ConditionVariable(/* state= */ true);
         private final ConditionVariable mRouteConnectedConditionVariable =
@@ -373,6 +484,8 @@ public final class MediaRouterDynamicProviderTest {
         private final ConditionVariable mMemberRouteRemovedConditionVariable =
                 new ConditionVariable(/* state= */ true);
         private final ConditionVariable mMemberRouteUpdatedConditionVariable =
+                new ConditionVariable(/* state= */ true);
+        private final ConditionVariable mGroupVolumeChangedConditionVariable =
                 new ConditionVariable(/* state= */ true);
 
         private Map<String, MediaRouter.RouteInfo> waitForRoutes(String... routeIds) {
@@ -460,6 +573,40 @@ public final class MediaRouterDynamicProviderTest {
             return runBlockingOnMainThreadWithResult(groupRoute::getSelectedRoutesInGroup);
         }
 
+        public int setGroupVolumeAndWaitForOnVolumeSet(
+                MediaRouter.GroupRouteInfo groupRoute, int volume) {
+            mGroupVolumeChangedConditionVariable.close();
+            getInstrumentation().runOnMainSync(() -> groupRoute.requestSetVolume(volume));
+            mGroupVolumeChangedConditionVariable.block();
+            return runBlockingOnMainThreadWithResult(groupRoute::getVolume);
+        }
+
+        public int updateGroupVolumeAndWaitForOnVolumeUpdated(
+                MediaRouter.GroupRouteInfo groupRoute, int delta) {
+            mGroupVolumeChangedConditionVariable.close();
+            getInstrumentation().runOnMainSync(() -> groupRoute.requestUpdateVolume(delta));
+            mGroupVolumeChangedConditionVariable.block();
+            return runBlockingOnMainThreadWithResult(groupRoute::getVolume);
+        }
+
+        private MediaRouter.RouteInfo waitForRouteVolume(String routeId, int expectedVolume) {
+            getInstrumentation()
+                    .runOnMainSync(
+                            () -> {
+                                Map<String, MediaRouter.RouteInfo> routes = getCurrentRoutesAsMap();
+                                if (!routes.containsKey(routeId)
+                                        || routes.get(routeId).getVolume() != expectedVolume) {
+                                    mPendingRouteVolumeConditionVariable.close();
+                                    mRouteVolumePending.clear();
+                                    mRouteVolumePending.put(routeId, expectedVolume);
+                                } else {
+                                    mPendingRouteVolumeConditionVariable.open();
+                                }
+                            });
+            mPendingRouteVolumeConditionVariable.block();
+            return getCurrentRoutesAsMap().get(routeId);
+        }
+
         @Override
         public void onRouteSelected(
                 @NonNull MediaRouter router,
@@ -475,6 +622,7 @@ public final class MediaRouterDynamicProviderTest {
             if (getCurrentRoutesAsMap().keySet().containsAll(mRouteIdsPending)) {
                 mPendingRoutesConditionVariable.open();
             }
+            checkPendingRouteVolume(route);
         }
 
         @Override
@@ -494,7 +642,23 @@ public final class MediaRouterDynamicProviderTest {
                 } else if (selectedRouteIds.containsAll(EXPECTED_ROUTE_IDS_AFTER_ROUTE_UPDATED)) {
                     mMemberRouteUpdatedConditionVariable.open();
                 }
+                boolean isVolumeChanged = false;
+                if (route.getVolume()
+                        != StubDynamicMediaRouteProviderService.VOLUME_INITIAL_VALUE) {
+                    isVolumeChanged = true;
+                } else {
+                    for (MediaRouter.RouteInfo memberRoute : route.getSelectedRoutesInGroup()) {
+                        if (memberRoute.getVolume()
+                                != StubDynamicMediaRouteProviderService.VOLUME_INITIAL_VALUE) {
+                            isVolumeChanged = true;
+                        }
+                    }
+                }
+                if (isVolumeChanged) {
+                    mGroupVolumeChangedConditionVariable.open();
+                }
             }
+            checkPendingRouteVolume(route);
         }
 
         @Override
@@ -519,6 +683,16 @@ public final class MediaRouterDynamicProviderTest {
             mRequestedRoute = requestedRoute;
             mRouteDisconnectedReason = reason;
             mRouteDisconnectedConditionVariable.open();
+        }
+
+        private void checkPendingRouteVolume(MediaRouter.RouteInfo route) {
+            String routeDescriptorId = route.getDescriptorId();
+            if (routeDescriptorId != null) {
+                Integer expectedVolume = mRouteVolumePending.get(routeDescriptorId);
+                if (expectedVolume != null && route.getVolume() == expectedVolume) {
+                    mPendingRouteVolumeConditionVariable.open();
+                }
+            }
         }
     }
 }

@@ -37,6 +37,8 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
     public static final String CATEGORY_DYNAMIC_PROVIDER_TEST =
             "androidx.mediarouter.media.CATEGORY_DYNAMIC_PROVIDER_TEST";
 
+    public static final int VOLUME_INITIAL_VALUE = 8;
+    public static final int VOLUME_MAX = 20;
     public static final String ROUTE_ID_GROUP = "route_id_group";
     public static final String ROUTE_NAME_GROUP = "Group route name";
     public static final String ROUTE_ID_1 = "route_id1";
@@ -67,7 +69,7 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
     private static final class Provider extends MediaRouteProvider {
         private final Map<String, MediaRouteDescriptor> mRoutes = new ArrayMap<>();
         private final Map<String, StubRouteController> mControllers = new ArrayMap<>();
-        private final MediaRouteDescriptor mGroupDescriptor;
+        private MediaRouteDescriptor mGroupDescriptor;
         private final Set<String> mCurrentSelectedRouteIds = new HashSet<>();
         private boolean mCurrentlyScanning = false;
         @Nullable private DynamicGroupRouteController mGroupController;
@@ -77,18 +79,26 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
             mGroupDescriptor =
                     new MediaRouteDescriptor.Builder(ROUTE_ID_GROUP, ROUTE_NAME_GROUP)
                             .addControlFilters(CONTROL_FILTERS_TEST)
+                            .setVolumeMax(VOLUME_MAX)
+                            .setVolume(VOLUME_INITIAL_VALUE)
                             .build();
             MediaRouteDescriptor route1 =
                     new MediaRouteDescriptor.Builder(ROUTE_ID_1, ROUTE_NAME_1)
                             .addControlFilters(CONTROL_FILTERS_TEST)
+                            .setVolumeMax(VOLUME_MAX)
+                            .setVolume(VOLUME_INITIAL_VALUE)
                             .build();
             MediaRouteDescriptor route2 =
                     new MediaRouteDescriptor.Builder(ROUTE_ID_2, ROUTE_NAME_2)
                             .addControlFilters(CONTROL_FILTERS_TEST)
+                            .setVolumeMax(VOLUME_MAX)
+                            .setVolume(VOLUME_INITIAL_VALUE)
                             .build();
             MediaRouteDescriptor route3 =
                     new MediaRouteDescriptor.Builder(ROUTE_ID_3, ROUTE_NAME_3)
                             .addControlFilters(CONTROL_FILTERS_TEST)
+                            .setVolumeMax(VOLUME_MAX)
+                            .setVolume(VOLUME_INITIAL_VALUE)
                             .build();
             mRoutes.put(route1.getId(), route1);
             mRoutes.put(route2.getId(), route2);
@@ -231,6 +241,33 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
                                 .build());
                 publishProviderState();
             }
+
+            @Override
+            public void onSetVolume(int volume) {
+                MediaRouteDescriptor route = mRoutes.get(mRouteId);
+                if (route == null) {
+                    return;
+                }
+                mRoutes.put(
+                        mRouteId,
+                        new MediaRouteDescriptor.Builder(route).setVolume(volume).build());
+                publishProviderState();
+            }
+
+            @Override
+            public void onUpdateVolume(int delta) {
+                MediaRouteDescriptor route = mRoutes.get(mRouteId);
+                if (route == null) {
+                    return;
+                }
+                int currentVolume = route.getVolume();
+                mRoutes.put(
+                        mRouteId,
+                        new MediaRouteDescriptor.Builder(route)
+                                .setVolume(currentVolume + delta)
+                                .build());
+                publishProviderState();
+            }
         }
 
         private class StubDynamicRouteController extends DynamicGroupRouteController {
@@ -265,6 +302,25 @@ public final class StubDynamicMediaRouteProviderService extends MediaRouteProvid
                         TAG,
                         "StubDynamicRouteController.onRemoveMemberRoute with routeId = " + routeId);
                 mCurrentSelectedRouteIds.remove(routeId);
+                publishState();
+            }
+
+            @Override
+            public void onSetVolume(int volume) {
+                mGroupDescriptor =
+                        new MediaRouteDescriptor.Builder(mGroupDescriptor)
+                                .setVolume(volume)
+                                .build();
+                publishState();
+            }
+
+            @Override
+            public void onUpdateVolume(int delta) {
+                int currentVolume = mGroupDescriptor.getVolume();
+                mGroupDescriptor =
+                        new MediaRouteDescriptor.Builder(mGroupDescriptor)
+                                .setVolume(currentVolume + delta)
+                                .build();
                 publishState();
             }
 
