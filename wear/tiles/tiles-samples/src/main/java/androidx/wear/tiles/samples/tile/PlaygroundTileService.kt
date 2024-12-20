@@ -27,11 +27,11 @@ import androidx.wear.protolayout.material3.appCard
 import androidx.wear.protolayout.material3.avatarImage
 import androidx.wear.protolayout.material3.materialScope
 import androidx.wear.protolayout.material3.primaryLayout
-import androidx.wear.protolayout.material3.prop
 import androidx.wear.protolayout.material3.text
 import androidx.wear.protolayout.material3.textEdgeButton
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.contentDescription
+import androidx.wear.protolayout.types.layoutString
 import androidx.wear.tiles.RequestBuilders
 import androidx.wear.tiles.TileBuilders
 import androidx.wear.tiles.TileService
@@ -101,25 +101,25 @@ private fun tileLayout(
                         ),
                     title = {
                         text(
-                            "Title Card!".prop(),
+                            "Title Card!".layoutString,
                             maxLines = 1,
                         )
                     },
                     content = {
                         text(
-                            "Content of this Card!".prop(),
+                            "Content of this Card!".layoutString,
                             maxLines = 1,
                         )
                     },
                     label = {
                         text(
-                            "Hello and welcome Tiles in AndroidX!".prop(),
+                            "Hello and welcome Tiles in AndroidX!".layoutString,
                         )
                     },
                     avatar = { avatarImage("id") },
                     time = {
                         text(
-                            "NOW".prop(),
+                            "NOW".layoutString,
                         )
                     }
                 )
@@ -129,7 +129,7 @@ private fun tileLayout(
                     onClick = EMPTY_LOAD_CLICKABLE,
                     modifier = LayoutModifier.contentDescription("EdgeButton"),
                 ) {
-                    text("Edge".prop())
+                    text("Edge".layoutString)
                 }
             }
         )

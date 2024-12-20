@@ -34,6 +34,7 @@ import androidx.wear.protolayout.testing.hasTag
 import androidx.wear.protolayout.testing.hasText
 import androidx.wear.protolayout.testing.hasWidth
 import androidx.wear.protolayout.types.argb
+import androidx.wear.protolayout.types.layoutString
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.internal.DoNotInstrument
@@ -156,7 +157,7 @@ class CardTest {
                     modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     background = { backgroundImage(IMAGE_ID) }
                 ) {
-                    text(TEXT.prop())
+                    text(TEXT.layoutString)
                 }
             }
 
@@ -174,7 +175,7 @@ class CardTest {
                     modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     backgroundColor = color.argb
                 ) {
-                    text(TEXT.prop())
+                    text(TEXT.layoutString)
                 }
             }
 
@@ -200,9 +201,9 @@ class CardTest {
                             content = contentColor.argb,
                             time = timeColor.argb
                         ),
-                    title = { text(TEXT.prop()) },
-                    content = { text(TEXT2.prop()) },
-                    time = { text(TEXT3.prop()) },
+                    title = { text(TEXT.layoutString) },
+                    content = { text(TEXT2.layoutString) },
+                    time = { text(TEXT3.layoutString) },
                 )
             }
 
@@ -235,10 +236,10 @@ class CardTest {
                             time = timeColor.argb,
                             label = labelColor.argb
                         ),
-                    title = { text(TEXT.prop()) },
-                    content = { text(TEXT2.prop()) },
-                    time = { text(TEXT3.prop()) },
-                    label = { text(TEXT4.prop()) },
+                    title = { text(TEXT.layoutString) },
+                    content = { text(TEXT2.layoutString) },
+                    time = { text(TEXT3.layoutString) },
+                    label = { text(TEXT4.layoutString) },
                 )
             }
 
@@ -265,7 +266,7 @@ class CardTest {
                     width = expand(),
                     height = height.toDp()
                 ) {
-                    text(TEXT.prop())
+                    text(TEXT.layoutString)
                 }
             }
 
@@ -303,7 +304,7 @@ class CardTest {
                     onClick = CLICKABLE,
                     modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION)
                 ) {
-                    text(TEXT.prop())
+                    text(TEXT.layoutString)
                 }
             }
 
@@ -312,9 +313,9 @@ class CardTest {
                 titleCard(
                     onClick = CLICKABLE,
                     modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
-                    title = { text(TEXT.prop()) },
-                    content = { text(TEXT2.prop()) },
-                    time = { text(TEXT3.prop()) },
+                    title = { text(TEXT.layoutString) },
+                    content = { text(TEXT2.layoutString) },
+                    time = { text(TEXT3.layoutString) },
                 )
             }
 
@@ -323,11 +324,11 @@ class CardTest {
                 appCard(
                     onClick = CLICKABLE,
                     modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
-                    title = { text(TEXT.prop()) },
-                    content = { text(TEXT2.prop()) },
-                    time = { text(TEXT3.prop()) },
+                    title = { text(TEXT.layoutString) },
+                    content = { text(TEXT2.layoutString) },
+                    time = { text(TEXT3.layoutString) },
                     avatar = { avatarImage(AVATAR_ID) },
-                    label = { text(TEXT4.prop()) }
+                    label = { text(TEXT4.layoutString) }
                 )
             }
     }

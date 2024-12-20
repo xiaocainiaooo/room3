@@ -22,8 +22,6 @@ import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
 import androidx.annotation.Dimension.Companion.SP
 import androidx.annotation.FloatRange
-import androidx.annotation.RestrictTo
-import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.DimensionBuilders.DpProp
 import androidx.wear.protolayout.DimensionBuilders.WrappedDimensionProp
 import androidx.wear.protolayout.DimensionBuilders.dp
@@ -43,7 +41,6 @@ import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.ElementMetadata
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Padding
-import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.materialcore.fontscaling.FontScaleConverterFactory
 import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.argb
@@ -94,9 +91,6 @@ internal fun horizontalSpacer(@Dimension(unit = DP) heightDp: Int): Spacer =
 /** Builds a vertical Spacer, with height set to expand and width set to the given value. */
 internal fun verticalSpacer(@Dimension(unit = DP) widthDp: Int): Spacer =
     Spacer.Builder().setWidth(widthDp.toDp()).setHeight(expand()).build()
-
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-public fun String.prop(): StringProp = StringProp.Builder(this).build()
 
 /**
  * Returns [wrap] but with minimum dimension of [MINIMUM_TAP_TARGET_SIZE] for accessibility
