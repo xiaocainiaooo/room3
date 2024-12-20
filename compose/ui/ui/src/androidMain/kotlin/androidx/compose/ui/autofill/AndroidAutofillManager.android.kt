@@ -113,8 +113,7 @@ internal class AndroidAutofillManager(
         //  so that this could be more efficient.
         val previousFocus = prevConfig?.getOrNull(SemanticsProperties.Focused)
         val currFocus = config?.getOrNull(SemanticsProperties.Focused)
-        val supportsAutofill = config?.getOrNull(SemanticsActions.OnAutofillText) != null
-        if (previousFocus != true && currFocus == true && supportsAutofill) {
+        if (previousFocus != true && currFocus == true && config.isAutofillable()) {
             previouslyFocusedId = semanticsId
             rectManager.rects.withRect(semanticsId) { left, top, right, bottom ->
                 platformAutofillManager.notifyViewEntered(
@@ -124,16 +123,15 @@ internal class AndroidAutofillManager(
                 )
             }
         }
-        val previouslySupportedAutofill = config?.getOrNull(SemanticsActions.OnAutofillText) != null
-        if (previousFocus == true && currFocus != true && previouslySupportedAutofill) {
+        if (previousFocus == true && currFocus != true && prevConfig.isAutofillable()) {
             platformAutofillManager.notifyViewExited(view, semanticsId)
         }
 
-        // Update currentlyDisplayedIDs if relevance to Autofill has changed.
-        val prevRelatedToAutofill = prevConfig?.isRelatedToAutofill() ?: false
-        val currRelatedToAutofill = config?.isRelatedToAutofill() ?: false
-        if (prevRelatedToAutofill != currRelatedToAutofill) {
-            if (currRelatedToAutofill) {
+        // Update currentlyDisplayedIDs if relevance to Autocommit has changed.
+        val prevRelatedToAutoCommit = prevConfig?.isRelatedToAutoCommit() == true
+        val currRelatedToAutoCommit = config?.isRelatedToAutoCommit() == true
+        if (prevRelatedToAutoCommit != currRelatedToAutoCommit) {
+            if (currRelatedToAutoCommit) {
                 currentlyDisplayedIDs.add(semanticsId)
             } else {
                 currentlyDisplayedIDs.remove(semanticsId)
@@ -166,8 +164,8 @@ internal class AndroidAutofillManager(
                     return@fastForEach
                 }
 
-                // TODO(b/378160001): For now we only populate autofill-able nodes. Populate the
-                //  structure for all nodes in the future.
+                // TODO(b/378160001): For now we only populate nodes that are relevant for autofill.
+                //  Populate the structure for all nodes in the future.
                 val semanticsConfigurationChild = childInfo.semanticsConfiguration
                 if (semanticsConfigurationChild?.isRelatedToAutofill() != true) {
                     populateChildren.add(childInfo)
@@ -218,7 +216,7 @@ internal class AndroidAutofillManager(
     private var pendingChangesToDisplayedIds = false
 
     internal fun onPostAttach(semanticsInfo: SemanticsInfo) {
-        if (semanticsInfo.semanticsConfiguration?.isRelatedToAutofill() == true) {
+        if (semanticsInfo.semanticsConfiguration?.isRelatedToAutoCommit() == true) {
             currentlyDisplayedIDs.add(semanticsInfo.semanticsId)
             pendingChangesToDisplayedIds = true
             // TODO(MNUZEN): Notify autofill manager that a node has been added.
@@ -231,7 +229,7 @@ internal class AndroidAutofillManager(
         if (currentlyDisplayedIDs.remove(previousSemanticsId)) {
             pendingChangesToDisplayedIds = true
         }
-        if (semanticsInfo.semanticsConfiguration?.isRelatedToAutofill() == true) {
+        if (semanticsInfo.semanticsConfiguration?.isRelatedToAutoCommit() == true) {
             currentlyDisplayedIDs.add(semanticsInfo.semanticsId)
             pendingChangesToDisplayedIds = true
         }
@@ -273,6 +271,15 @@ internal class AndroidAutofillManager(
         }
         previouslyDisplayedIDs.copyFrom(currentlyDisplayedIDs)
     }
+}
+
+private fun SemanticsConfiguration.isAutofillable(): Boolean {
+    // TODO add more actions once we add support for Toggle, List, Date etc.
+    return props.contains(SemanticsActions.OnAutofillText)
+}
+
+private fun SemanticsConfiguration.isRelatedToAutoCommit(): Boolean {
+    return props.contains(SemanticsProperties.ContentType)
 }
 
 private fun SemanticsConfiguration.isRelatedToAutofill(): Boolean {
