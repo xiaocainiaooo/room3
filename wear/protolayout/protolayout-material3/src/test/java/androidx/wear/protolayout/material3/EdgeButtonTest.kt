@@ -152,7 +152,7 @@ class EdgeButtonTest {
                         onClick = CLICKABLE,
                         modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION)
                     ) {
-                        text(dynamicLabel)
+                        this.text(dynamicLabel)
                     }
                 }
             )
