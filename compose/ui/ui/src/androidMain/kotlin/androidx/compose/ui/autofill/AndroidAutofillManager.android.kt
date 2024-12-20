@@ -227,9 +227,27 @@ internal class AndroidAutofillManager(
         }
     }
 
-    internal fun onDetach(semanticsInfo: SemanticsInfo) {
+    internal fun onPostLayoutNodeReused(semanticsInfo: SemanticsInfo, previousSemanticsId: Int) {
+        if (currentlyDisplayedIDs.remove(previousSemanticsId)) {
+            pendingChangesToDisplayedIds = true
+        }
         if (semanticsInfo.semanticsConfiguration?.isRelatedToAutofill() == true) {
-            currentlyDisplayedIDs.remove(semanticsInfo.semanticsId)
+            currentlyDisplayedIDs.add(semanticsInfo.semanticsId)
+            pendingChangesToDisplayedIds = true
+        }
+    }
+
+    internal fun onLayoutNodeDeactivated(semanticsInfo: SemanticsInfo) {
+        if (currentlyDisplayedIDs.remove(semanticsInfo.semanticsId)) {
+            pendingChangesToDisplayedIds = true
+            // TODO(MNUZEN): Notify autofill manager that a node has been removed.
+            // platformAutofillManager
+            //     .notifyViewVisibilityChanged(view, semanticsInfo.semanticsId, false)
+        }
+    }
+
+    internal fun onDetach(semanticsInfo: SemanticsInfo) {
+        if (currentlyDisplayedIDs.remove(semanticsInfo.semanticsId)) {
             pendingChangesToDisplayedIds = true
             // TODO(MNUZEN): Notify autofill manager that a node has been removed.
             // platformAutofillManager
