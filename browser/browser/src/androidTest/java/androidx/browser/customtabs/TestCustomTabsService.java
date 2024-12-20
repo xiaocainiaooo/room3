@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
+import android.support.customtabs.IAuthTabCallback;
 import android.support.customtabs.ICustomTabsCallback;
 import android.support.customtabs.ICustomTabsService;
 
@@ -150,6 +151,12 @@ public class TestCustomTabsService extends CustomTabsService {
         @Override
         public boolean isEphemeralBrowsingSupported(Bundle extras) throws RemoteException {
             return mMock.isEphemeralBrowsingSupported(extras);
+        }
+
+        @Override
+        public boolean newAuthTabSession(IAuthTabCallback callback, Bundle extras)
+                throws RemoteException {
+            return false;
         }
     };
 
