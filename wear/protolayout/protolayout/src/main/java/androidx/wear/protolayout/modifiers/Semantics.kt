@@ -25,30 +25,6 @@ import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
 import androidx.wear.protolayout.expression.RequiresSchemaVersion
 import java.util.Objects
 
-internal class BaseSemanticElement(
-    val contentDescription: StringProp? = null,
-    @SemanticsRole val semanticsRole: Int = SEMANTICS_ROLE_NONE
-) : LayoutModifier.Element {
-    @SuppressLint("ProtoLayoutMinSchema")
-    fun foldIn(initial: Semantics.Builder?): Semantics.Builder =
-        (initial ?: Semantics.Builder()).apply {
-            contentDescription?.let { setContentDescription(it) }
-            if (semanticsRole != SEMANTICS_ROLE_NONE) {
-                setRole(semanticsRole)
-            }
-        }
-
-    override fun equals(other: Any?): Boolean =
-        other is BaseSemanticElement &&
-            contentDescription == other.contentDescription &&
-            semanticsRole == other.semanticsRole
-
-    override fun hashCode(): Int = Objects.hash(contentDescription, semanticsRole)
-
-    override fun toString(): String =
-        "BaseSemanticElement[contentDescription=$contentDescription, semanticRole=$semanticsRole"
-}
-
 /**
  * Adds content description to be read by Talkback.
  *
@@ -76,3 +52,27 @@ fun LayoutModifier.contentDescription(
  */
 fun LayoutModifier.semanticsRole(@SemanticsRole semanticsRole: Int): LayoutModifier =
     this then BaseSemanticElement(semanticsRole = semanticsRole)
+
+internal class BaseSemanticElement(
+    val contentDescription: StringProp? = null,
+    @SemanticsRole val semanticsRole: Int = SEMANTICS_ROLE_NONE
+) : LayoutModifier.Element {
+    @SuppressLint("ProtoLayoutMinSchema")
+    fun foldIn(initial: Semantics.Builder?): Semantics.Builder =
+        (initial ?: Semantics.Builder()).apply {
+            contentDescription?.let { setContentDescription(it) }
+            if (semanticsRole != SEMANTICS_ROLE_NONE) {
+                setRole(semanticsRole)
+            }
+        }
+
+    override fun equals(other: Any?): Boolean =
+        other is BaseSemanticElement &&
+            contentDescription == other.contentDescription &&
+            semanticsRole == other.semanticsRole
+
+    override fun hashCode(): Int = Objects.hash(contentDescription, semanticsRole)
+
+    override fun toString(): String =
+        "BaseSemanticElement[contentDescription=$contentDescription, semanticRole=$semanticsRole"
+}

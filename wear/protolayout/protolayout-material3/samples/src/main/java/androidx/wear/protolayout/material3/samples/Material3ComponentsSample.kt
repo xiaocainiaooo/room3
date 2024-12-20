@@ -52,6 +52,8 @@ import androidx.wear.protolayout.material3.textDataCard
 import androidx.wear.protolayout.material3.textEdgeButton
 import androidx.wear.protolayout.material3.titleCard
 import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.backgroundColor
+import androidx.wear.protolayout.modifiers.clickable
 import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.types.LayoutString
 import androidx.wear.protolayout.types.asLayoutConstraint
@@ -116,7 +118,7 @@ fun edgeButtonSampleText(
     }
 
 @Sampled
-fun topLeveLayout(
+fun topLevelLayout(
     context: Context,
     deviceConfiguration: DeviceParameters,
     clickable: Clickable
@@ -144,7 +146,7 @@ fun topLeveLayout(
             },
             bottomSlot = {
                 iconEdgeButton(
-                    clickable,
+                    onClick = clickable,
                     modifier = LayoutModifier.contentDescription("Description")
                 ) {
                     icon("id")
@@ -164,10 +166,12 @@ fun cardSample(
             mainSlot = {
                 card(
                     onClick = clickable,
-                    modifier = LayoutModifier.contentDescription("Card with image background"),
+                    modifier =
+                        LayoutModifier.contentDescription("Card with image background")
+                            .clickable(id = "card"),
                     width = expand(),
                     height = expand(),
-                    background = { backgroundImage(protoLayoutResourceId = "id") }
+                    backgroundContent = { backgroundImage(protoLayoutResourceId = "id") }
                 ) {
                     text("Content of the Card!".layoutString)
                 }
@@ -314,10 +318,10 @@ fun buttonSample(
                 button(
                     onClick = clickable,
                     modifier =
-                        LayoutModifier.contentDescription("Big button with image background"),
+                        LayoutModifier.contentDescription("Big button with image background")
+                            .backgroundColor(colorScheme.primary),
                     width = expand(),
                     height = expand(),
-                    backgroundColor = colorScheme.primary,
                     content = { text("Button!".layoutString) }
                 )
             }
@@ -392,7 +396,7 @@ fun imageButtonSample(
                         LayoutModifier.contentDescription("Big button with image background"),
                     width = expand(),
                     height = expand(),
-                    background = { backgroundImage(protoLayoutResourceId = "id") }
+                    backgroundContent = { backgroundImage(protoLayoutResourceId = "id") }
                 )
             }
         )

@@ -23,6 +23,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.wear.protolayout.DeviceParametersBuilders
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.background
+import androidx.wear.protolayout.modifiers.clickable
 import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.testing.LayoutElementAssertionsProvider
 import androidx.wear.protolayout.testing.hasClickable
@@ -99,7 +101,7 @@ class CardTest {
     fun containerCard_hasClickable() {
         LayoutElementAssertionsProvider(DEFAULT_CONTAINER_CARD_WITH_TEXT)
             .onRoot()
-            .assert(hasClickable(CLICKABLE))
+            .assert(hasClickable(id = CLICKABLE.id))
             .assert(hasTag(CardDefaults.METADATA_TAG))
     }
 
@@ -222,7 +224,7 @@ class CardTest {
                 card(
                     onClick = CLICKABLE,
                     modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
-                    background = { backgroundImage(IMAGE_ID) }
+                    backgroundContent = { backgroundImage(IMAGE_ID) }
                 ) {
                     text(TEXT.layoutString)
                 }
@@ -239,8 +241,10 @@ class CardTest {
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
                 card(
                     onClick = CLICKABLE,
-                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
-                    backgroundColor = color.argb
+                    modifier =
+                        LayoutModifier.contentDescription(CONTENT_DESCRIPTION)
+                            .background(color.argb)
+                            .clickable(id = "id")
                 ) {
                     text(TEXT.layoutString)
                 }
@@ -458,7 +462,7 @@ class CardTest {
                 .setScreenHeightDp(192)
                 .build()
 
-        private val CLICKABLE = clickable("id")
+        private val CLICKABLE = clickable(id = "id")
 
         private const val CONTENT_DESCRIPTION = "This is a card"
 

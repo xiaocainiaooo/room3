@@ -16,10 +16,17 @@
 
 package androidx.wear.protolayout.modifiers
 
+import android.graphics.Color
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.wear.protolayout.ActionBuilders.LoadAction
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_NONE
+import androidx.wear.protolayout.expression.AppDataKey
 import androidx.wear.protolayout.expression.DynamicBuilders
+import androidx.wear.protolayout.expression.DynamicBuilders.DynamicInt32
+import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
+import androidx.wear.protolayout.expression.DynamicDataBuilders.DynamicDataValue
+import androidx.wear.protolayout.types.LayoutColor
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -68,8 +75,126 @@ class ModifiersTest {
         assertThat(modifiers.semantics?.role).isEqualTo(SEMANTICS_ROLE_BUTTON)
     }
 
+    @Test
+    fun background_clip_toModifier() {
+        val modifiers =
+            LayoutModifier.background(COLOR)
+                .clip(CORNER_RADIUS)
+                .clip(CORNER_RADIUS_X, CORNER_RADIUS_Y)
+                .clipTopRight(0f, 0f)
+                .toProtoLayoutModifiers()
+
+        assertThat(modifiers.background?.color?.argb).isEqualTo(COLOR.prop.argb)
+        assertThat(modifiers.background?.corner?.radius?.value).isEqualTo(CORNER_RADIUS)
+        assertThat(modifiers.background?.corner?.topLeftRadius?.x?.value).isEqualTo(CORNER_RADIUS_X)
+        assertThat(modifiers.background?.corner?.topLeftRadius?.y?.value).isEqualTo(CORNER_RADIUS_Y)
+        assertThat(modifiers.background?.corner?.topRightRadius?.x?.value).isEqualTo(0f)
+        assertThat(modifiers.background?.corner?.topRightRadius?.y?.value).isEqualTo(0f)
+        assertThat(modifiers.background?.corner?.bottomLeftRadius?.x?.value)
+            .isEqualTo(CORNER_RADIUS_X)
+        assertThat(modifiers.background?.corner?.bottomLeftRadius?.y?.value)
+            .isEqualTo(CORNER_RADIUS_Y)
+        assertThat(modifiers.background?.corner?.bottomRightRadius?.x?.value)
+            .isEqualTo(CORNER_RADIUS_X)
+        assertThat(modifiers.background?.corner?.bottomRightRadius?.y?.value)
+            .isEqualTo(CORNER_RADIUS_Y)
+    }
+
+    @Test
+    fun perCornerClip_clip_overwritesAllCorners() {
+        val modifiers =
+            LayoutModifier.clipTopLeft(0f, 1f)
+                .clipTopRight(2f, 3f)
+                .clipBottomLeft(4f, 5f)
+                .clipBottomRight(6f, 7f)
+                .clip(CORNER_RADIUS_X, CORNER_RADIUS_Y)
+                .toProtoLayoutModifiers()
+
+        assertThat(modifiers.background?.color).isNull()
+        assertThat(modifiers.background?.corner?.radius?.value).isEqualTo(null)
+        assertThat(modifiers.background?.corner?.topLeftRadius?.x?.value).isEqualTo(CORNER_RADIUS_X)
+        assertThat(modifiers.background?.corner?.topLeftRadius?.y?.value).isEqualTo(CORNER_RADIUS_Y)
+        assertThat(modifiers.background?.corner?.topRightRadius?.x?.value)
+            .isEqualTo(CORNER_RADIUS_X)
+        assertThat(modifiers.background?.corner?.topRightRadius?.y?.value)
+            .isEqualTo(CORNER_RADIUS_Y)
+        assertThat(modifiers.background?.corner?.bottomLeftRadius?.x?.value)
+            .isEqualTo(CORNER_RADIUS_X)
+        assertThat(modifiers.background?.corner?.bottomLeftRadius?.y?.value)
+            .isEqualTo(CORNER_RADIUS_Y)
+        assertThat(modifiers.background?.corner?.bottomRightRadius?.x?.value)
+            .isEqualTo(CORNER_RADIUS_X)
+        assertThat(modifiers.background?.corner?.bottomRightRadius?.y?.value)
+            .isEqualTo(CORNER_RADIUS_Y)
+    }
+
+    @Test
+    fun clickable_toModifier() {
+        val id = "ID"
+        val minTouchWidth = 51f
+        val minTouchHeight = 52f
+        val statePair1 = Pair(AppDataKey<DynamicInt32>("Int"), DynamicDataValue.fromInt(42))
+        val statePair2 =
+            Pair(AppDataKey<DynamicString>("String"), DynamicDataValue.fromString("42"))
+
+        val modifiers =
+            LayoutModifier.clickable(
+                    loadAction {
+                        addKeyToValueMapping(statePair1.first, statePair1.second)
+                        addKeyToValueMapping(statePair2.first, statePair2.second)
+                    },
+                    id
+                )
+                .minimumTouchTargetSize(minTouchWidth, minTouchHeight)
+                .toProtoLayoutModifiers()
+
+        assertThat(modifiers.clickable?.id).isEqualTo(id)
+        assertThat(modifiers.clickable?.minimumClickableWidth?.value).isEqualTo(minTouchWidth)
+        assertThat(modifiers.clickable?.minimumClickableHeight?.value).isEqualTo(minTouchHeight)
+        assertThat(modifiers.clickable?.onClick).isInstanceOf(LoadAction::class.java)
+        val action = modifiers.clickable?.onClick as LoadAction
+        assertThat(action.requestState?.keyToValueMapping)
+            .containsExactlyEntriesIn(mapOf(statePair1, statePair2))
+    }
+
+    @Test
+    fun clickable_fromProto_toModifier() {
+        val id = "ID"
+        val minTouchWidth = 51f
+        val minTouchHeight = 52f
+        val statePair1 = Pair(AppDataKey<DynamicInt32>("Int"), DynamicDataValue.fromInt(42))
+        val statePair2 =
+            Pair(AppDataKey<DynamicString>("String"), DynamicDataValue.fromString("42"))
+
+        val modifiers =
+            LayoutModifier.clickable(
+                    clickable(
+                        loadAction {
+                            addKeyToValueMapping(statePair1.first, statePair1.second)
+                            addKeyToValueMapping(statePair2.first, statePair2.second)
+                        },
+                        id = id,
+                        minClickableWidth = minTouchWidth,
+                        minClickableHeight = minTouchHeight
+                    )
+                )
+                .toProtoLayoutModifiers()
+
+        assertThat(modifiers.clickable?.id).isEqualTo(id)
+        assertThat(modifiers.clickable?.minimumClickableWidth?.value).isEqualTo(minTouchWidth)
+        assertThat(modifiers.clickable?.minimumClickableHeight?.value).isEqualTo(minTouchHeight)
+        assertThat(modifiers.clickable?.onClick).isInstanceOf(LoadAction::class.java)
+        val action = modifiers.clickable?.onClick as LoadAction
+        assertThat(action.requestState?.keyToValueMapping)
+            .containsExactlyEntriesIn(mapOf(statePair1, statePair2))
+    }
+
     companion object {
         const val STATIC_CONTENT_DESCRIPTION = "content desc"
         val DYNAMIC_CONTENT_DESCRIPTION = DynamicBuilders.DynamicString.constant("dynamic content")
+        val COLOR = LayoutColor(Color.RED)
+        const val CORNER_RADIUS_X = 1.2f
+        const val CORNER_RADIUS_Y = 3.4f
+        const val CORNER_RADIUS = 5.6f
     }
 }

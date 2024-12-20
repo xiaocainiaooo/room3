@@ -41,8 +41,9 @@ import androidx.wear.protolayout.material3.GraphicDataCardStyle.Companion.defaul
 import androidx.wear.protolayout.material3.TitleCardDefaults.buildContentForTitleCard
 import androidx.wear.protolayout.material3.TitleCardStyle.Companion.defaultTitleCardStyle
 import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.background
+import androidx.wear.protolayout.modifiers.clip
 import androidx.wear.protolayout.modifiers.contentDescription
-import androidx.wear.protolayout.types.LayoutColor
 
 /**
  * Opinionated ProtoLayout Material3 title card that offers 1 to 3 slots, usually text based.
@@ -69,7 +70,7 @@ import androidx.wear.protolayout.types.LayoutColor
  *   [CardDefaults.filledTonalCardColors] for low/medium emphasis card,
  *   [CardDefaults.imageBackgroundCardColors] for card with image as a background or custom built
  *   [CardColors].
- * @param background The background object to be used behind the content in the card. It is
+ * @param backgroundContent The background object to be used behind the content in the card. It is
  *   recommended to use the default styling that is automatically provided by only calling
  *   [backgroundImage] with the content. It can be combined with the specified [colors]'s background
  *   color behind it.
@@ -95,7 +96,7 @@ public fun MaterialScope.titleCard(
     shape: Corner =
         if (deviceConfiguration.screenWidthDp.isBreakpoint()) shapes.extraLarge else shapes.large,
     colors: CardColors = filledCardColors(),
-    background: (MaterialScope.() -> LayoutElement)? = null,
+    backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     style: TitleCardStyle = defaultTitleCardStyle(),
     contentPadding: Padding = style.innerPadding,
     @HorizontalAlignment
@@ -103,12 +104,10 @@ public fun MaterialScope.titleCard(
 ): LayoutElement =
     card(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.background(colors.background).clip(shape),
         width = expand(),
         height = height,
-        shape = shape,
-        backgroundColor = colors.background,
-        background = background,
+        backgroundContent = backgroundContent,
         contentPadding = contentPadding
     ) {
         buildContentForTitleCard(
@@ -193,7 +192,7 @@ public fun MaterialScope.titleCard(
  *   [CardDefaults.filledTonalCardColors] for low/medium emphasis card,
  *   [CardDefaults.imageBackgroundCardColors] for card with image as a background or custom built
  *   [CardColors].
- * @param background The background object to be used behind the content in the card. It is
+ * @param backgroundContent The background object to be used behind the content in the card. It is
  *   recommended to use the default styling that is automatically provided by only calling
  *   [backgroundImage] with the content. It can be combined with the specified [colors]'s background
  *   color behind it.
@@ -218,18 +217,16 @@ public fun MaterialScope.appCard(
     shape: Corner =
         if (deviceConfiguration.screenWidthDp.isBreakpoint()) shapes.extraLarge else shapes.large,
     colors: CardColors = filledCardColors(),
-    background: (MaterialScope.() -> LayoutElement)? = null,
+    backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     style: AppCardStyle = defaultAppCardStyle(),
     contentPadding: Padding = style.innerPadding,
 ): LayoutElement =
     card(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.background(colors.background).clip(shape),
         width = expand(),
         height = height,
-        shape = shape,
-        backgroundColor = colors.background,
-        background = background,
+        backgroundContent = backgroundContent,
         contentPadding = contentPadding
     ) {
         buildContentForAppCard(
@@ -321,7 +318,7 @@ public fun MaterialScope.appCard(
  *   [CardDefaults.filledTonalCardColors] for low/medium emphasis card,
  *   [CardDefaults.imageBackgroundCardColors] for card with image as a background or custom built
  *   [CardColors].
- * @param background The background object to be used behind the content in the card. It is
+ * @param backgroundContent The background object to be used behind the content in the card. It is
  *   recommended to use the default styling that is automatically provided by only calling
  *   [backgroundImage] with the content. It can be combined with the specified [colors]'s background
  *   color behind it.
@@ -349,19 +346,17 @@ public fun MaterialScope.textDataCard(
     height: ContainerDimension = wrapWithMinTapTargetDimension(),
     shape: Corner = shapes.large,
     colors: CardColors = filledCardColors(),
-    background: (MaterialScope.() -> LayoutElement)? = null,
+    backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     style: DataCardStyle =
         if (secondaryText == null) defaultCompactDataCardStyle() else defaultDataCardStyle(),
     contentPadding: Padding = style.innerPadding,
 ): LayoutElement =
     card(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.background(colors.background).clip(shape),
         width = width,
         height = height,
-        shape = shape,
-        backgroundColor = colors.background,
-        background = background,
+        backgroundContent = backgroundContent,
         contentPadding = contentPadding
     ) {
         buildContentForDataCard(
@@ -435,7 +430,7 @@ public fun MaterialScope.textDataCard(
  *   [CardDefaults.filledTonalCardColors] for low/medium emphasis card,
  *   [CardDefaults.imageBackgroundCardColors] for card with image as a background or custom built
  *   [CardColors].
- * @param background The background object to be used behind the content in the card. It is
+ * @param backgroundContent The background object to be used behind the content in the card. It is
  *   recommended to use the default styling that is automatically provided by only calling
  *   [backgroundImage] with the content. It can be combined with the specified [colors]'s background
  *   color behind it.
@@ -465,7 +460,7 @@ public fun MaterialScope.iconDataCard(
     height: ContainerDimension = wrapWithMinTapTargetDimension(),
     shape: Corner = shapes.large,
     colors: CardColors = filledCardColors(),
-    background: (MaterialScope.() -> LayoutElement)? = null,
+    backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     style: DataCardStyle =
         if (secondaryIcon == null) defaultCompactDataCardStyle() else defaultDataCardStyle(),
     titleContentPlacement: TitleContentPlacementInDataCard = TitleContentPlacementInDataCard.Bottom,
@@ -473,12 +468,10 @@ public fun MaterialScope.iconDataCard(
 ): LayoutElement =
     card(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.background(colors.background).clip(shape),
         width = width,
         height = height,
-        shape = shape,
-        backgroundColor = colors.background,
-        background = background,
+        backgroundContent = backgroundContent,
         contentPadding = contentPadding
     ) {
         buildContentForDataCard(
@@ -570,11 +563,9 @@ public fun MaterialScope.graphicDataCard(
 ): LayoutElement =
     card(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.background(colors.background).clip(shape),
         width = expand(),
         height = height,
-        shape = shape,
-        backgroundColor = colors.background,
         contentPadding = contentPadding
     ) {
         buildContentForGraphicDataCard(
@@ -628,15 +619,13 @@ public fun MaterialScope.graphicDataCard(
  * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
  *   associated action.
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
- *   description using [contentDescription].
- * @param shape Defines the card's shape, in other words the corner radius for this card.
- * @param backgroundColor The color to be used as a background of this card. If the background image
- *   is also specified, the image will be laid out on top of this color. In case of the fully opaque
- *   background image, then this background color will not be shown.
- * @param background The background object to be used behind the content in the card. It is
+ *   description using [contentDescription]. If [LayoutModifier.background] modifier is used and the
+ *   the background image is also specified, the image will be laid out on top of this color. In
+ *   case of the fully opaque background image, then the background color will not be shown.
+ * @param backgroundContent The background object to be used behind the content in the card. It is
  *   recommended to use the default styling that is automatically provided by only calling
- *   [backgroundImage] with the content. It can be combined with the specified [backgroundColor]
- *   behind it.
+ *   [backgroundImage] with the content. It can be combined with the specified
+ *   [LayoutModifier.background] behind it.
  * @param width The width of this card. It's highly recommended to set this to [expand] or [weight]
  * @param height The height of this card. It's highly recommended to set this to [expand] or
  *   [weight]
@@ -652,20 +641,16 @@ public fun MaterialScope.card(
     modifier: LayoutModifier = LayoutModifier,
     width: ContainerDimension = wrapWithMinTapTargetDimension(),
     height: ContainerDimension = wrapWithMinTapTargetDimension(),
-    shape: Corner = shapes.large,
-    backgroundColor: LayoutColor? = null,
-    background: (MaterialScope.() -> LayoutElement)? = null,
+    backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     contentPadding: Padding = Padding.Builder().setAll(DEFAULT_CONTENT_PADDING.toDp()).build(),
     content: (MaterialScope.() -> LayoutElement)
 ): LayoutElement =
     componentContainer(
         onClick = onClick,
-        modifier = modifier,
+        modifier = LayoutModifier.clip(shapes.large) then modifier,
         width = width,
         height = height,
-        shape = shape,
-        backgroundColor = backgroundColor,
-        background = background,
+        backgroundContent = backgroundContent,
         contentPadding = contentPadding,
         metadataTag = METADATA_TAG,
         content = content

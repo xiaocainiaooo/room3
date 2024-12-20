@@ -16,9 +16,12 @@
 
 package androidx.wear.protolayout.types
 
+import androidx.wear.protolayout.DimensionBuilders.DpProp
 import androidx.wear.protolayout.DimensionBuilders.EmProp
 import androidx.wear.protolayout.DimensionBuilders.SpProp
+import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.TypeBuilders.BoolProp
+import androidx.wear.protolayout.expression.RequiresSchemaVersion
 
 internal val Float.sp: SpProp
     get() = SpProp.Builder().setValue(this).build()
@@ -28,3 +31,10 @@ internal val Float.em: EmProp
 
 internal val Boolean.prop: BoolProp
     get() = BoolProp.Builder(this).build()
+
+internal val Float.dp: DpProp
+    get() = DpProp.Builder(this).build()
+
+@RequiresSchemaVersion(major = 1, minor = 400)
+internal fun cornerRadius(x: Float, y: Float) =
+    ModifiersBuilders.CornerRadius.Builder(x.dp, y.dp).build()

@@ -40,15 +40,14 @@ import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_UNDEFINE
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.LayoutElementBuilders.Spacer
 import androidx.wear.protolayout.LayoutElementBuilders.TextAlignment
-import androidx.wear.protolayout.ModifiersBuilders.Background
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
-import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.ElementMetadata
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
 import androidx.wear.protolayout.materialcore.fontscaling.FontScaleConverterFactory
 import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.clickable
 import androidx.wear.protolayout.modifiers.semanticsRole
 import androidx.wear.protolayout.modifiers.toProtoLayoutModifiersBuilder
 import androidx.wear.protolayout.types.LayoutColor
@@ -115,12 +114,6 @@ internal fun wrapWithMinTapTargetDimension(): WrappedDimensionProp =
 /** Returns the [Modifiers] object containing this padding and nothing else. */
 internal fun Padding.toModifiers(): Modifiers = Modifiers.Builder().setPadding(this).build()
 
-/** Returns the [Background] object containing this color and nothing else. */
-internal fun LayoutColor.toBackground(): Background = Background.Builder().setColor(prop).build()
-
-/** Returns the [Background] object containing this corner and nothing else. */
-internal fun Corner.toBackground(): Background = Background.Builder().setCorner(this).build()
-
 /**
  * Changes the opacity/transparency of the given color.
  *
@@ -168,37 +161,31 @@ internal fun MaterialScope.componentContainer(
     modifier: LayoutModifier,
     width: ContainerDimension,
     height: ContainerDimension,
-    shape: Corner,
-    backgroundColor: LayoutColor?,
-    background: (MaterialScope.() -> LayoutElement)?,
+    backgroundContent: (MaterialScope.() -> LayoutElement)?,
     contentPadding: Padding,
     metadataTag: String,
     content: (MaterialScope.() -> LayoutElement)?
 ): LayoutElement {
-    val backgroundBuilder = Background.Builder().setCorner(shape)
-    backgroundColor?.let { backgroundBuilder.setColor(it.prop) }
 
-    val defaultModifier = LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then modifier
-    val modifiers =
-        defaultModifier
-            .toProtoLayoutModifiersBuilder()
-            .setClickable(onClick)
-            .setMetadata(metadataTag.toElementMetadata())
-            .setBackground(backgroundBuilder.build())
+    val defaultModifier =
+        LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then modifier.clickable(onClick)
+    val modifiersBuilder =
+        defaultModifier.toProtoLayoutModifiersBuilder().setMetadata(metadataTag.toElementMetadata())
 
     val container =
         Box.Builder().setHeight(height).setWidth(width).apply {
             content?.let { addContent(content()) }
         }
 
-    if (background == null) {
-        modifiers.setPadding(contentPadding)
-        container.setModifiers(modifiers.build())
+    if (backgroundContent == null) {
+        modifiersBuilder.setPadding(contentPadding)
+        container.setModifiers(modifiersBuilder.build())
         return container.build()
     }
 
+    val modifiers = modifiersBuilder.build()
     return Box.Builder()
-        .setModifiers(modifiers.build())
+        .setModifiers(modifiers)
         .addContent(
             withStyle(
                     defaultBackgroundImageStyle =
@@ -208,11 +195,11 @@ internal fun MaterialScope.componentContainer(
                             overlayColor = colorScheme.primary.withOpacity(0.6f),
                             overlayWidth = width,
                             overlayHeight = height,
-                            shape = shape,
+                            shape = modifiers.background?.corner ?: shapes.large,
                             contentScaleMode = LayoutElementBuilders.CONTENT_SCALE_MODE_FILL_BOUNDS
                         )
                 )
-                .background()
+                .backgroundContent()
         )
         .setWidth(width)
         .setHeight(height)
