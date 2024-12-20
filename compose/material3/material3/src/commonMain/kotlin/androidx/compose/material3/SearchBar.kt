@@ -78,6 +78,7 @@ import androidx.compose.material3.internal.PredictiveBackState
 import androidx.compose.material3.internal.Strings
 import androidx.compose.material3.internal.SwipeEdge
 import androidx.compose.material3.internal.getString
+import androidx.compose.material3.internal.systemBarsForVisualComponents
 import androidx.compose.material3.internal.textFieldBackground
 import androidx.compose.material3.tokens.ElevationTokens
 import androidx.compose.material3.tokens.FilledTextFieldTokens
@@ -500,7 +501,7 @@ internal fun ExpandedFullScreenSearchBar(
     colors: SearchBarColors = SearchBarDefaults.colors(),
     tonalElevation: Dp = SearchBarDefaults.TonalElevation,
     shadowElevation: Dp = SearchBarDefaults.ShadowElevation,
-    windowInsets: @Composable () -> WindowInsets = { SearchBarDefaults.windowInsets },
+    windowInsets: @Composable () -> WindowInsets = { SearchBarDefaults.fullScreenWindowInsets },
     content: @Composable ColumnScope.() -> Unit,
 ) {
     if (!state.isExpanded) return
@@ -689,6 +690,16 @@ object SearchBarDefaults {
 
     /** Default window insets for a [SearchBar]. */
     val windowInsets: WindowInsets
+        @Composable
+        get() =
+            WindowInsets.systemBarsForVisualComponents.only(
+                WindowInsetsSides.Horizontal + WindowInsetsSides.Top
+            )
+
+    /**
+     * Default window insets used and consumed by a full screen search bar in the expanded state.
+     */
+    internal val fullScreenWindowInsets: WindowInsets
         @Composable get() = WindowInsets.safeDrawing
 
     /**
@@ -1971,6 +1982,14 @@ private fun FullScreenSearchBarLayout(
         val inputFieldPlaceable =
             inputFieldMeasurable.measure(Constraints.fixed(width, state.collapsedBounds.height))
 
+        val topPadding = unconsumedInsets.getTop(this@Layout) + SearchBarVerticalPadding.roundToPx()
+        val bottomPadding = SearchBarVerticalPadding.roundToPx()
+        val animatedTopPadding =
+            lerp(0, topPadding, min(state.progress, 1 - predictiveBackProgress))
+        val animatedBottomPadding = lerp(0, bottomPadding, state.progress)
+
+        val paddedInputFieldHeight =
+            inputFieldPlaceable.height + animatedTopPadding + animatedBottomPadding
         val contentMeasurable = measurables.fastFirst { it.layoutId == LayoutIdSearchContent }
         val contentPlaceable =
             contentMeasurable.measure(
@@ -1978,18 +1997,11 @@ private fun FullScreenSearchBarLayout(
                     minWidth = width,
                     maxWidth = width,
                     minHeight = 0,
-                    maxHeight = height,
+                    maxHeight = (height - paddedInputFieldHeight).coerceAtLeast(0),
                 )
             )
 
         layout(constraints.maxWidth, constraints.maxHeight) {
-            val topPadding =
-                unconsumedInsets.getTop(this@Layout) + SearchBarVerticalPadding.roundToPx()
-            val bottomPadding = SearchBarVerticalPadding.roundToPx()
-            val animatedTopPadding =
-                lerp(0, topPadding, min(state.progress, 1 - predictiveBackProgress))
-            val animatedBottomPadding = lerp(0, bottomPadding, state.progress)
-
             fun BackEventProgress.InProgress.endOffsetX(): Int =
                 (if (swipeEdge == SwipeEdge.Left) {
                         constraints.maxWidth -
