@@ -19,6 +19,7 @@ package androidx.pdf.view
 import android.graphics.Point
 import android.graphics.PointF
 import android.graphics.RectF
+import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import androidx.pdf.PdfDocument
 import androidx.pdf.content.PageSelection
@@ -90,9 +91,9 @@ class SelectionStateManagerTest {
     @Test
     fun maybeSelectWordAtPoint() = runTest {
         val selectionPoint = PdfPoint(pageNum = 10, PointF(150F, 265F))
-        val invalidations = mutableListOf<Unit>()
+        val uiSignals = mutableListOf<SelectionUiSignal>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            selectionStateManager.invalidationSignalFlow.toList(invalidations)
+            selectionStateManager.selectionUiSignalBus.toList(uiSignals)
         }
 
         selectionStateManager.maybeSelectWordAtPoint(selectionPoint)
@@ -121,7 +122,19 @@ class SelectionStateManagerTest {
                 "This is all the text between ${selectionPoint.pagePoint} and ${selectionPoint.pagePoint}"
             )
 
-        assertThat(invalidations.size).isEqualTo(1)
+        assertThat(uiSignals.size).isEqualTo(4)
+        // hide action mode
+        assertThat(uiSignals[0]).isInstanceOf(SelectionUiSignal.ToggleActionMode::class.java)
+        assertThat((uiSignals[0] as SelectionUiSignal.ToggleActionMode).show).isFalse()
+        // play long press haptic feedback
+        assertThat(uiSignals[1]).isInstanceOf(SelectionUiSignal.PlayHapticFeedback::class.java)
+        assertThat((uiSignals[1] as SelectionUiSignal.PlayHapticFeedback).level)
+            .isEqualTo(HapticFeedbackConstants.LONG_PRESS)
+        // invalidate
+        assertThat(uiSignals[2]).isInstanceOf(SelectionUiSignal.Invalidate::class.java)
+        // show action mode
+        assertThat(uiSignals[3]).isInstanceOf(SelectionUiSignal.ToggleActionMode::class.java)
+        assertThat((uiSignals[3] as SelectionUiSignal.ToggleActionMode).show).isTrue()
     }
 
     @Test
@@ -161,9 +174,9 @@ class SelectionStateManagerTest {
     @Test
     fun clearSelection() = runTest {
         val selectionPoint = PdfPoint(pageNum = 10, PointF(150F, 265F))
-        val invalidations = mutableListOf<Unit>()
+        val uiSignals = mutableListOf<SelectionUiSignal>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            selectionStateManager.invalidationSignalFlow.toList(invalidations)
+            selectionStateManager.selectionUiSignalBus.toList(uiSignals)
         }
 
         selectionStateManager.maybeSelectWordAtPoint(selectionPoint)
@@ -172,8 +185,14 @@ class SelectionStateManagerTest {
         selectionStateManager.clearSelection()
 
         assertThat(selectionStateManager.selectionModel).isNull()
-        // One for the selection, one for clearing it
-        assertThat(invalidations.size).isEqualTo(2)
+        // We only care about the final 2 signals that should occur as a result of cancellation
+        // hide action mode
+        assertThat(uiSignals[uiSignals.size - 2])
+            .isInstanceOf(SelectionUiSignal.ToggleActionMode::class.java)
+        assertThat((uiSignals[uiSignals.size - 2] as SelectionUiSignal.ToggleActionMode).show)
+            .isFalse()
+        // invalidate
+        assertThat(uiSignals.last()).isInstanceOf(SelectionUiSignal.Invalidate::class.java)
     }
 
     @Test

@@ -18,6 +18,7 @@ package androidx.pdf.view
 
 import android.graphics.PointF
 import android.graphics.RectF
+import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import androidx.annotation.VisibleForTesting
 import androidx.pdf.PdfDocument
@@ -39,18 +40,15 @@ internal class SelectionStateManager(
     var selectionModel: SelectionModel? = null
         @VisibleForTesting internal set
 
-    /**
-     * Replay at least 1 value in case of an invalidation signal issued while [PdfView] is not
-     * collecting
-     */
-    private val _invalidationSignalFlow = MutableSharedFlow<Unit>(replay = 1)
+    /** Replay at few values in case of an UI signal issued while [PdfView] is not collecting */
+    private val _selectionUiSignalBus = MutableSharedFlow<SelectionUiSignal>(replay = 3)
 
     /**
-     * This [SharedFlow] serves as an event bus of sorts to signal our host [PdfView] to invalidate
-     * itself in a decoupled way.
+     * This [SharedFlow] serves as an event bus of sorts to signal our host [PdfView] to update its
+     * UI in a decoupled way
      */
-    val invalidationSignalFlow: SharedFlow<Unit>
-        get() = _invalidationSignalFlow
+    val selectionUiSignalBus: SharedFlow<SelectionUiSignal>
+        get() = _selectionUiSignalBus
 
     private var setSelectionJob: Job? = null
 
@@ -80,15 +78,32 @@ internal class SelectionStateManager(
     }
 
     /** Asynchronously attempts to select the nearest block of text to [pdfPoint] */
-    fun maybeSelectWordAtPoint(pdfPoint: PdfPoint) = updateSelectionAsync(pdfPoint, pdfPoint)
+    fun maybeSelectWordAtPoint(pdfPoint: PdfPoint) {
+        _selectionUiSignalBus.tryEmit(SelectionUiSignal.ToggleActionMode(show = false))
+        _selectionUiSignalBus.tryEmit(
+            SelectionUiSignal.PlayHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        )
+        updateSelectionAsync(pdfPoint, pdfPoint)
+    }
 
     /** Synchronously resets all state of this manager */
     fun clearSelection() {
         draggingState = null
         setSelectionJob?.cancel()
         setSelectionJob = null
-        if (selectionModel != null) _invalidationSignalFlow.tryEmit(Unit)
+        _selectionUiSignalBus.tryEmit(SelectionUiSignal.ToggleActionMode(show = false))
+        _selectionUiSignalBus.tryEmit(SelectionUiSignal.Invalidate)
         selectionModel = null
+    }
+
+    fun maybeShowActionMode() {
+        if (selectionModel != null) {
+            _selectionUiSignalBus.tryEmit(SelectionUiSignal.ToggleActionMode(show = true))
+        }
+    }
+
+    fun maybeHideActionMode() {
+        _selectionUiSignalBus.tryEmit(SelectionUiSignal.ToggleActionMode(show = false))
     }
 
     private fun maybeHandleActionDown(location: PdfPoint, currentZoom: Float): Boolean {
@@ -114,6 +129,10 @@ internal class SelectionStateManager(
                         currentSelection.startBoundary,
                         location.pagePoint
                     )
+                // Play haptic feedback when the user starts dragging the handles
+                _selectionUiSignalBus.tryEmit(
+                    SelectionUiSignal.PlayHapticFeedback(HapticFeedbackConstants.TEXT_HANDLE_MOVE)
+                )
                 return true
             }
         }
@@ -134,6 +153,10 @@ internal class SelectionStateManager(
                         currentSelection.endBoundary,
                         location.pagePoint
                     )
+                // Play haptic feedback when the user starts dragging the handles
+                _selectionUiSignalBus.tryEmit(
+                    SelectionUiSignal.PlayHapticFeedback(HapticFeedbackConstants.TEXT_HANDLE_MOVE)
+                )
                 return true
             }
         }
@@ -156,12 +179,22 @@ internal class SelectionStateManager(
         val dy = location.pagePoint.y - prevDraggingState.downPoint.y
         val newEndPoint = prevDraggingState.dragging.location.translateBy(dx, dy)
         updateSelectionAsync(prevDraggingState.fixed.location, newEndPoint)
+        // Hide the action mode while the user is actively dragging the handles
+        _selectionUiSignalBus.tryEmit(SelectionUiSignal.ToggleActionMode(show = false))
         return true
     }
 
     private fun maybeHandleGestureEnd(): Boolean {
         val result = draggingState != null
         draggingState = null
+        // If this gesture actually ended a handle drag operation, trigger haptic feedback and
+        // reveal the action mode
+        if (result) {
+            _selectionUiSignalBus.tryEmit(
+                SelectionUiSignal.PlayHapticFeedback(HapticFeedbackConstants.TEXT_HANDLE_MOVE)
+            )
+            _selectionUiSignalBus.tryEmit(SelectionUiSignal.ToggleActionMode(show = true))
+        }
         return result
     }
 
@@ -183,7 +216,13 @@ internal class SelectionStateManager(
                         )
                     if (newSelection != null && newSelection.hasBounds) {
                         selectionModel = SelectionModel.fromSinglePageSelection(newSelection)
-                        _invalidationSignalFlow.emit(Unit)
+                        _selectionUiSignalBus.tryEmit(SelectionUiSignal.Invalidate)
+                        // Show the action mode if the user is not actively dragging the handles
+                        if (draggingState == null) {
+                            _selectionUiSignalBus.emit(
+                                SelectionUiSignal.ToggleActionMode(show = true)
+                            )
+                        }
                     }
                 }
                 .also { it.invokeOnCompletion { setSelectionJob = null } }
@@ -204,6 +243,23 @@ internal class SelectionStateManager(
                 this.start.point != null &&
                 this.stop.point != null
         }
+}
+
+/** Signals to [PdfView] to update the UI in regards to a change in selection state */
+internal sealed interface SelectionUiSignal {
+    /** [PdfView] should invalidate itself to reflect a change in selection */
+    object Invalidate : SelectionUiSignal
+
+    /**
+     * [PdfView] should play haptic feedback to indicate the start or end of a change in selection
+     *
+     * @param level should be a value from [android.view.HapticFeedbackConstants] indicating the
+     *   type of haptic feedback to play
+     */
+    class PlayHapticFeedback(val level: Int) : SelectionUiSignal
+
+    /** [PdfView] should show or hide the selection action mode */
+    class ToggleActionMode(val show: Boolean) : SelectionUiSignal
 }
 
 /** Value class to hold state related to dragging a selection handle */
