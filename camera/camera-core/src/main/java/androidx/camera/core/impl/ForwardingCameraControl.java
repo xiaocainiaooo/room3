@@ -52,6 +52,11 @@ public class ForwardingCameraControl implements CameraControlInternal {
     }
 
     @Override
+    public @NonNull ListenableFuture<Void> enableLowLightBoostAsync(boolean lowLightBoost) {
+        return mCameraControlInternal.enableLowLightBoostAsync(lowLightBoost);
+    }
+
+    @Override
     public @NonNull ListenableFuture<FocusMeteringResult> startFocusAndMetering(
             @NonNull FocusMeteringAction action) {
         return mCameraControlInternal.startFocusAndMetering(action);

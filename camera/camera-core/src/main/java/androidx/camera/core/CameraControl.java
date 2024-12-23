@@ -18,6 +18,7 @@ package androidx.camera.core;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.RestrictTo;
+import androidx.camera.core.impl.utils.futures.Futures;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -61,6 +62,53 @@ public interface CameraControl {
      * this future is a no-op.
      */
     @NonNull ListenableFuture<Void> enableTorch(boolean torch);
+
+    /**
+     * Enables low-light boost mode.
+     *
+     * <p>Devices running Android 15 or higher can provide support for low-light boost. This
+     * feature can automatically adjust the brightness of the preview, video or image analysis
+     * streams in low-light conditions. This is different from how the night mode camera
+     * extension creates still images, because night mode combines a burst of photos to create a
+     * single, enhanced image. While night mode works very well for creating a still image, it
+     * can't create a continuous stream of frames, but Low Light Boost can. Thus, Low Light Boost
+     * enables new camera capabilities, such as the following:
+     *
+     * <ul>
+     * <li>Providing an enhanced image preview, so users can better frame their low-light pictures.
+     * <li>Recording brighter videos in low-light conditions.
+     * <li>Scanning QR codes in low-light conditions.
+     * </ul>
+     *
+     * <p>Applications can query the low-light boost availability via
+     * {@link CameraInfo#isLowLightBoostSupported()}. If you enable Low Light Boost, it
+     * automatically turns on when there's a low light level, and turns off when there's more light.
+     *
+     * <p>If the camera device does not support low-light boost, the value obtained via
+     * {@link CameraInfo#getLowLightBoostState()} will always be {@link LowLightBoostState#OFF}.
+     *
+     * <p>Note that this mode may interact with other configurations:
+     *
+     * <ul>
+     * <li>When low-light boost is on, the flash or torch functionality may be unavailable.
+     * <li>When frame rate configuration results in an FPS exceeding 30, low-light boost will be
+     * disabled and the state will always be ({@link LowLightBoostState#OFF}).
+     * </ul>
+     *
+     * <p>Therefore, to use flash or torch functionality, low-light boost mode must be disabled.
+     * To ensure low-light boost mode functions correctly, avoid frame rate settings that result
+     * in an FPS exceeding 30.
+     *
+     * @param lowLightBoost true to turn on the low-light boost mode, false to turn it off.
+     * @return A {@link ListenableFuture} which is successful when the low-light boost mode was
+     * changed to the value specified. It fails when it is unable to change the log-light boost
+     * state. Cancellation of this future is a no-op.
+     * @see CameraInfo#isLowLightBoostSupported()
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    default @NonNull ListenableFuture<Void> enableLowLightBoostAsync(boolean lowLightBoost) {
+        return Futures.immediateFailedFuture(new OperationCanceledException("Not supported!"));
+    }
 
     /**
      * Starts a focus and metering action configured by the {@link FocusMeteringAction}.
