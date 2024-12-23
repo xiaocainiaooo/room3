@@ -287,7 +287,10 @@ public class StreamSharing extends UseCase {
                 outputEdges.put(entry.getKey(), out.get(entry.getValue()));
             }
 
-            mVirtualCameraAdapter.setChildrenEdges(outputEdges);
+            Map<UseCase, Size> selectedChildSizeMap = mVirtualCameraAdapter.getSelectedChildSizes(
+                    mSharingInputEdge, isViewportSet);
+
+            mVirtualCameraAdapter.setChildrenEdges(outputEdges, selectedChildSizeMap);
 
             return List.of(mSessionConfigBuilder.build());
         } else {
@@ -323,7 +326,11 @@ public class StreamSharing extends UseCase {
             for (Map.Entry<UseCase, DualOutConfig> entry : outConfigMap.entrySet()) {
                 outputEdges.put(entry.getKey(), out.get(entry.getValue()));
             }
-            mVirtualCameraAdapter.setChildrenEdges(outputEdges);
+
+            Map<UseCase, Size> primarySelectedChildSizes =
+                    mVirtualCameraAdapter.getSelectedChildSizes(mSharingInputEdge, isViewportSet);
+
+            mVirtualCameraAdapter.setChildrenEdges(outputEdges, primarySelectedChildSizes);
 
             return List.of(mSessionConfigBuilder.build(),
                     mSecondarySessionConfigBuilder.build());
