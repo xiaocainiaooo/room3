@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.CancellationSignal;
 import android.os.Handler;
 import android.webkit.ValueCallback;
 import android.webkit.WebResourceRequest;
@@ -29,7 +30,6 @@ import android.webkit.WebView;
 
 import androidx.annotation.RestrictTo;
 import androidx.annotation.VisibleForTesting;
-import androidx.core.os.CancellationSignal;
 import androidx.webkit.OutcomeReceiverCompat;
 import androidx.webkit.Profile;
 import androidx.webkit.ProfileStore;
@@ -650,8 +650,9 @@ public class WebViewFeatureInternal {
     /**
      * Feature for {@link WebViewFeature#isFeatureSupported(String)}.
      * This feature covers
-     * {@link androidx.webkit.Profile#prefetchUrlAsync(String, CancellationSignal, SpeculativeLoadingParameters, OutcomeReceiverCompat)}
-     * {@link androidx.webkit.Profile#clearPrefetchAsync(String, OutcomeReceiverCompat)}
+     * {@link androidx.webkit.Profile#prefetchUrlAsync(String, CancellationSignal, Executor, SpeculativeLoadingParameters, OutcomeReceiverCompat)}
+     * {@link androidx.webkit.Profile#prefetchUrlAsync(String, CancellationSignal, Executor, OutcomeReceiverCompat)}
+     * {@link androidx.webkit.Profile#clearPrefetchAsync(String, Executor, OutcomeReceiverCompat)}
      */
     public static final ApiFeature.NoFramework PROFILE_URL_PREFETCH =
             new ApiFeature.NoFramework(WebViewFeature.PROFILE_URL_PREFETCH,

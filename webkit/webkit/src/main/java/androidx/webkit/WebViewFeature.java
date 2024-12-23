@@ -19,6 +19,7 @@ package androidx.webkit;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
+import android.os.CancellationSignal;
 import android.os.Handler;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
@@ -29,7 +30,6 @@ import android.webkit.WebView;
 
 import androidx.annotation.RestrictTo;
 import androidx.annotation.StringDef;
-import androidx.core.os.CancellationSignal;
 import androidx.webkit.internal.WebViewFeatureInternal;
 
 import org.jspecify.annotations.NonNull;
@@ -634,12 +634,12 @@ public class WebViewFeature {
     /**
      * Feature for {@link #isFeatureSupported(String)}.
      * This feature covers
-     * {@link androidx.webkit.Profile#prefetchUrlAsync(String, CancellationSignal, SpeculativeLoadingParameters, OutcomeReceiverCompat)}
-     * {@link androidx.webkit.Profile#prefetchUrlAsync(String, CancellationSignal, OutcomeReceiverCompat)}
-     * {@link androidx.webkit.Profile#clearPrefetchAsync(String, OutcomeReceiverCompat)}
+     * {@link androidx.webkit.Profile#prefetchUrlAsync(String, android.os.CancellationSignal, Executor, SpeculativeLoadingParameters, OutcomeReceiverCompat)}
+     * {@link androidx.webkit.Profile#prefetchUrlAsync(String, CancellationSignal, Executor, OutcomeReceiverCompat)}
+     * {@link androidx.webkit.Profile#clearPrefetchAsync(String, Executor, OutcomeReceiverCompat)}
      */
     @Profile.ExperimentalUrlPrefetch
-    public static final String PROFILE_URL_PREFETCH = "PREFETCH_URL_V2";
+    public static final String PROFILE_URL_PREFETCH = "PREFETCH_URL_V3";
 
     /**
      * Feature for {@link #isFeatureSupported(String)}.
