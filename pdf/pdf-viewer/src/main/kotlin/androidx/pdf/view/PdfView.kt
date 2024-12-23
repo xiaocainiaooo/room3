@@ -32,6 +32,7 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import androidx.annotation.RestrictTo
+import androidx.annotation.VisibleForTesting
 import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
 import androidx.pdf.PdfDocument
@@ -168,7 +169,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     // To avoid allocations during drawing
     private val visibleAreaRect = Rect()
 
-    private var accessibilityPageHelper: AccessibilityPageHelper? = null
+    @VisibleForTesting internal var accessibilityPageHelper: AccessibilityPageHelper? = null
 
     /**
      * Scrolls to the 0-indexed [pageNum], optionally animating the scroll
@@ -697,7 +698,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         return toContentCoord(viewY, zoom, scrollY)
     }
 
-    private fun toViewCoord(contentCoord: Float, zoom: Float, scroll: Int): Float {
+    internal fun toViewCoord(contentCoord: Float, zoom: Float, scroll: Int): Float {
         return (contentCoord * zoom) - scroll
     }
 
