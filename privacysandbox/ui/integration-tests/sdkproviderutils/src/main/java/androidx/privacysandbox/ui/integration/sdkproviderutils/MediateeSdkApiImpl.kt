@@ -20,7 +20,6 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
-import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdType
 import androidx.privacysandbox.ui.integration.testaidl.IMediateeSdkApi
 import androidx.privacysandbox.ui.provider.AbstractSandboxedUiAdapter
@@ -46,20 +45,19 @@ class MediateeSdkApiImpl(private val sdkContext: Context) : IMediateeSdkApi.Stub
                 AdType.NON_WEBVIEW_VIDEO -> loadVideoAd()
                 else -> loadNonWebViewBannerAd(mediationDescription, waitInsideOnDraw)
             }
-                as AbstractSandboxedUiAdapter
         ViewabilityHandler.addObserverFactoryToAdapter(adapter, drawViewability)
         return adapter.toCoreLibInfo(sdkContext)
     }
 
-    private fun loadWebViewBannerAd(): SandboxedUiAdapter {
+    private fun loadWebViewBannerAd(): AbstractSandboxedUiAdapter {
         return testAdapters.WebViewBannerAd()
     }
 
-    private fun loadWebViewBannerAdFromLocalAssets(): SandboxedUiAdapter {
+    private fun loadWebViewBannerAdFromLocalAssets(): AbstractSandboxedUiAdapter {
         return testAdapters.WebViewAdFromLocalAssets()
     }
 
-    private fun loadVideoAd(): SandboxedUiAdapter {
+    private fun loadVideoAd(): AbstractSandboxedUiAdapter {
         val playerViewProvider = PlayerViewProvider()
         val adapter = testAdapters.VideoBannerAd(playerViewProvider)
         PlayerViewabilityHandler.addObserverFactoryToAdapter(adapter, playerViewProvider)
@@ -69,7 +67,7 @@ class MediateeSdkApiImpl(private val sdkContext: Context) : IMediateeSdkApi.Stub
     private fun loadNonWebViewBannerAd(
         text: String,
         waitInsideOnDraw: Boolean
-    ): SandboxedUiAdapter {
+    ): AbstractSandboxedUiAdapter {
         return testAdapters.TestBannerAd(text, waitInsideOnDraw)
     }
 
