@@ -207,8 +207,14 @@ public open class PdfViewerFragmentV2 : Fragment() {
                 }
                 true // IME action consumed
             }
-            findPrevButton.setOnClickListener { documentViewModel.findPreviousMatch() }
-            findNextButton.setOnClickListener { documentViewModel.findNextMatch() }
+            findPrevButton.setOnClickListener {
+                searchQueryBox.clearFocus()
+                documentViewModel.findPreviousMatch()
+            }
+            findNextButton.setOnClickListener {
+                searchQueryBox.clearFocus()
+                documentViewModel.findNextMatch()
+            }
             closeButton.setOnClickListener { isTextSearchActive = false }
         }
     }
