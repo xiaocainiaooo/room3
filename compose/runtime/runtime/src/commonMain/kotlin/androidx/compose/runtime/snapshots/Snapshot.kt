@@ -2075,12 +2075,9 @@ fun <T : StateRecord> T.readable(state: StateObject): T {
         ?: sync {
             // Readable can return null when the global snapshot has been advanced by another thread
             // and state written to the object was overwritten while this thread was paused.
-            // Repeating
-            // the read is valid here as either this will return the same result as the previous
-            // call
-            // or will find a valid record. Being in a sync block prevents other threads from
-            // writing
-            // to this state object until the read completes.
+            // Repeating the read is valid here as either this will return the same result as
+            // the previous call or will find a valid record. Being in a sync block prevents other
+            // threads from writing to this state object until the read completes.
             val syncSnapshot = Snapshot.current
             @Suppress("UNCHECKED_CAST")
             readable(state.firstStateRecord as T, syncSnapshot.snapshotId, syncSnapshot.invalid)
@@ -2088,6 +2085,7 @@ fun <T : StateRecord> T.readable(state: StateObject): T {
         }
 }
 
+// unused, still here for API compat.
 /**
  * Return the current readable state record for the [snapshot]. It is assumed that [this] is the
  * first record of [state]
@@ -2095,7 +2093,15 @@ fun <T : StateRecord> T.readable(state: StateObject): T {
 fun <T : StateRecord> T.readable(state: StateObject, snapshot: Snapshot): T {
     // invoke the observer associated with the current snapshot.
     snapshot.readObserver?.invoke(state)
-    return readable(this, snapshot.snapshotId, snapshot.invalid) ?: readError()
+    return readable(this, snapshot.snapshotId, snapshot.invalid)
+        ?: sync {
+            // Readable can return null when the global snapshot has been advanced by another thread
+            // See T.readable(state: StateObject) for more info.
+            val syncSnapshot = Snapshot.current
+            @Suppress("UNCHECKED_CAST")
+            readable(state.firstStateRecord as T, syncSnapshot.snapshotId, syncSnapshot.invalid)
+                ?: readError()
+        }
 }
 
 private fun readError(): Nothing {
@@ -2439,13 +2445,21 @@ private fun reportReadonlySnapshotWrite(): Nothing {
 /** Returns the current record without notifying any read observers. */
 @PublishedApi
 internal fun <T : StateRecord> current(r: T, snapshot: Snapshot) =
-    readable(r, snapshot.snapshotId, snapshot.invalid) ?: readError()
+    readable(r, snapshot.snapshotId, snapshot.invalid)
+        ?: sync {
+            // Global snapshot could have been advanced
+            // see StateRecord.readable for more details
+            readable(r, snapshot.snapshotId, snapshot.invalid)
+        }
+        ?: readError()
 
 @PublishedApi
 internal fun <T : StateRecord> current(r: T) =
     Snapshot.current.let { snapshot ->
         readable(r, snapshot.snapshotId, snapshot.invalid)
             ?: sync {
+                // Global snapshot could have been advanced
+                // see StateRecord.readable for more details
                 Snapshot.current.let { syncSnapshot ->
                     readable(r, syncSnapshot.snapshotId, syncSnapshot.invalid)
                 }
