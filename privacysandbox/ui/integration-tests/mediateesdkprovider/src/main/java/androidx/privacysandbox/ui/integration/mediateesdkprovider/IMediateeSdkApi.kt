@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The Android Open Source Project
+ * Copyright 2024 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,14 @@
 
 package androidx.privacysandbox.ui.integration.mediateesdkprovider
 
-import android.content.Context
 import android.os.Bundle
-import android.view.View
+import androidx.privacysandbox.tools.PrivacySandboxService
 
-class SdkProviderImpl : AbstractSandboxedSdkProviderCompat() {
-    override fun createIMediateeSdkApi(context: Context): IMediateeSdkApi =
-        MediateeSdkApiImpl(context)
-
-    override fun getView(windowContext: Context, params: Bundle, width: Int, height: Int): View {
-        throw IllegalStateException("This getView method will not be used.")
-    }
+@PrivacySandboxService
+interface IMediateeSdkApi {
+    suspend fun loadBannerAd(
+        adType: Int,
+        waitInsideOnDraw: Boolean,
+        drawViewability: Boolean
+    ): Bundle
 }

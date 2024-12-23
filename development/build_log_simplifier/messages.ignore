@@ -357,7 +357,6 @@ For more details, see: https://kotl\.in/gradle/internal\-compiler\-symbols
 # https://github.com/kythe/kythe/issues/6145
 .*com.google\.devtools\.kythe\.extractors\.java\.JavaCompilationUnitExtractor.*
 ^WARNING: Empty java source file.*
-# b/359397747 Add PrivacySandboxService to mediatee-sdk-provider
+# b/359449191
 > Transform sdk\-interface\-descriptors\.jar \(project :privacysandbox:ui:integration\-tests:testsdkproviderwrapper\) with ExtractCompileSdkShimTransform
-> Task :privacysandbox:ui:integration\-tests:mediateesdkproviderwrapper:buildModuleForBundle
-> Task :privacysandbox:ui:integration\-tests:mediateesdkproviderwrapper:bundle
+> Transform sdk\-interface\-descriptors\.jar \(project :privacysandbox:ui:integration\-tests:mediateesdkproviderwrapper\) with ExtractCompileSdkShimTransform

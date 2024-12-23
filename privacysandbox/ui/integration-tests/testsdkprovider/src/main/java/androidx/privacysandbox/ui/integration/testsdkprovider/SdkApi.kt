@@ -24,6 +24,7 @@ import android.os.Process
 import androidx.privacysandbox.sdkruntime.core.controller.SdkSandboxControllerCompat
 import androidx.privacysandbox.ui.core.DelegatingSandboxedUiAdapter
 import androidx.privacysandbox.ui.core.ExperimentalFeatures
+import androidx.privacysandbox.ui.integration.mediateesdkprovider.IMediateeSdkApiFactory
 import androidx.privacysandbox.ui.integration.sdkproviderutils.PlayerViewProvider
 import androidx.privacysandbox.ui.integration.sdkproviderutils.PlayerViewabilityHandler
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.AdType
@@ -181,7 +182,7 @@ class SdkApi(private val sdkContext: Context) : ISdkApi {
     }
 
     @OptIn(ExperimentalFeatures.DelegatingAdapterApi::class)
-    private fun loadMediatedTestAd(
+    private suspend fun loadMediatedTestAd(
         @MediationOption mediationOption: Int,
         @AdType adType: Int,
         waitInsideOnDraw: Boolean,
@@ -205,7 +206,7 @@ class SdkApi(private val sdkContext: Context) : ISdkApi {
 
     override fun requestResize(width: Int, height: Int) {}
 
-    private fun maybeGetMediateeBannerAdBundle(
+    private suspend fun maybeGetMediateeBannerAdBundle(
         mediationOption: Int,
         adType: Int,
         withSlowDraw: Boolean,
@@ -234,7 +235,11 @@ class SdkApi(private val sdkContext: Context) : ISdkApi {
             sandboxedSdks.forEach { sandboxedSdkCompat ->
                 if (sandboxedSdkCompat.getSdkInfo()?.name == MEDIATEE_SDK) {
                     val mediateeSdkApi =
-                        IMediateeSdkApi.Stub.asInterface(sandboxedSdkCompat.getInterface())
+                        IMediateeSdkApiFactory.wrapToIMediateeSdkApi(
+                            checkNotNull(sandboxedSdkCompat.getInterface()) {
+                                "Cannot find Mediatee Sdk Service!"
+                            }
+                        )
                     return mediateeSdkApi.loadBannerAd(adType, withSlowDraw, drawViewability)
                 }
             }
