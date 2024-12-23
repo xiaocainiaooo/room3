@@ -17,6 +17,7 @@
 package androidx.camera.camera2.internal;
 
 import static android.hardware.camera2.CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES;
+import static android.hardware.camera2.CameraMetadata.CONTROL_AE_MODE_ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY;
 import static android.hardware.camera2.CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_OFF;
 import static android.hardware.camera2.CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_ON;
 import static android.hardware.camera2.CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION;
@@ -62,6 +63,7 @@ import androidx.camera.core.CameraSelector;
 import androidx.camera.core.DynamicRange;
 import androidx.camera.core.ExposureState;
 import androidx.camera.core.FocusMeteringAction;
+import androidx.camera.core.LowLightBoostState;
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory;
 import androidx.camera.core.TorchState;
 import androidx.camera.core.ZoomState;
@@ -163,6 +165,7 @@ public class Camera2CameraInfoImplTest {
     private CameraManagerCompat mCameraManagerCompat;
     private ZoomControl mMockZoomControl;
     private TorchControl mMockTorchControl;
+    private LowLightBoostControl mMockLowLightBoostControl;
     private ExposureControl mExposureControl;
     private FocusMeteringControl mFocusMeteringControl;
     private Camera2CameraControlImpl mMockCameraControl;
@@ -254,6 +257,27 @@ public class Camera2CameraInfoImplTest {
         assertThat(cameraInfoInternal.hasFlashUnit()).isEqualTo(CAMERA1_FLASH_INFO_BOOLEAN);
     }
 
+    @Config(minSdk = 35)
+    @Test
+    public void cameraInfo_canReturnLowLightBoostSupported_forBackCamera()
+            throws CameraAccessExceptionCompat {
+        init(/* hasAvailableCapabilities = */ false);
+
+        CameraInfoInternal cameraInfoInternal =
+                new Camera2CameraInfoImpl(CAMERA0_ID, mCameraManagerCompat);
+        assertThat(cameraInfoInternal.isLowLightBoostSupported()).isTrue();
+    }
+
+    @Test
+    public void cameraInfo_canReturnLowLightBoostSupported_forFrontCamera()
+            throws CameraAccessExceptionCompat {
+        init(/* hasAvailableCapabilities = */ false);
+
+        CameraInfoInternal cameraInfoInternal =
+                new Camera2CameraInfoImpl(CAMERA1_ID, mCameraManagerCompat);
+        assertThat(cameraInfoInternal.isLowLightBoostSupported()).isFalse();
+    }
+
     @Test
     public void cameraInfoWithoutCameraControl_canReturnDefaultTorchState()
             throws CameraAccessExceptionCompat {
@@ -294,6 +318,46 @@ public class Camera2CameraInfoImplTest {
         // TorchState LiveData instances are the same before and after the linkWithCameraControl.
         assertThat(camera2CameraInfoImpl.getTorchState()).isSameInstanceAs(torchStateLiveData);
         assertThat(camera2CameraInfoImpl.getTorchState().getValue()).isEqualTo(TorchState.ON);
+    }
+
+    @Config(minSdk = 35)
+    @Test
+    public void cameraInfoWithCameraControl_canReturnLowLightBoostState()
+            throws CameraAccessExceptionCompat {
+        init(/* hasAvailableCapabilities = */ false);
+
+        when(mMockLowLightBoostControl.getLowLightBoostState()).thenReturn(
+                new MutableLiveData<>(LowLightBoostState.ACTIVE));
+        Camera2CameraInfoImpl camera2CameraInfoImpl =
+                new Camera2CameraInfoImpl(CAMERA0_ID, mCameraManagerCompat);
+        camera2CameraInfoImpl.linkWithCameraControl(mMockCameraControl);
+        assertThat(camera2CameraInfoImpl.getLowLightBoostState().getValue()).isEqualTo(
+                LowLightBoostState.ACTIVE);
+    }
+
+    @Config(minSdk = 35)
+    @Test
+    public void lowLightBoostStateLiveData_SameInstanceBeforeAndAfterCameraControlLink()
+            throws CameraAccessExceptionCompat {
+        init(/* hasAvailableCapabilities = */ false);
+
+        Camera2CameraInfoImpl camera2CameraInfoImpl =
+                new Camera2CameraInfoImpl(CAMERA0_ID, mCameraManagerCompat);
+
+        // Calls getLowLightBoostState() to trigger RedirectableLiveData
+        LiveData<Integer> lowLightBoostStateLiveData =
+                camera2CameraInfoImpl.getLowLightBoostState();
+
+        when(mMockLowLightBoostControl.getLowLightBoostState()).thenReturn(
+                new MutableLiveData<>(LowLightBoostState.ACTIVE));
+        camera2CameraInfoImpl.linkWithCameraControl(mMockCameraControl);
+
+        // LowLightBoostState LiveData instances are the same before and after the
+        // linkWithCameraControl.
+        assertThat(camera2CameraInfoImpl.getLowLightBoostState()).isSameInstanceAs(
+                lowLightBoostStateLiveData);
+        assertThat(camera2CameraInfoImpl.getLowLightBoostState().getValue()).isEqualTo(
+                LowLightBoostState.ACTIVE);
     }
 
     // zoom related tests just ensure it uses ZoomControl to get the value
@@ -937,12 +1001,14 @@ public class Camera2CameraInfoImplTest {
 
         mMockZoomControl = mock(ZoomControl.class);
         mMockTorchControl = mock(TorchControl.class);
+        mMockLowLightBoostControl = mock(LowLightBoostControl.class);
         mExposureControl = mock(ExposureControl.class);
         mMockCameraControl = mock(Camera2CameraControlImpl.class);
         mFocusMeteringControl = mock(FocusMeteringControl.class);
 
         when(mMockCameraControl.getZoomControl()).thenReturn(mMockZoomControl);
         when(mMockCameraControl.getTorchControl()).thenReturn(mMockTorchControl);
+        when(mMockCameraControl.getLowLightBoostControl()).thenReturn(mMockLowLightBoostControl);
         when(mMockCameraControl.getExposureControl()).thenReturn(mExposureControl);
         when(mMockCameraControl.getFocusMeteringControl()).thenReturn(mFocusMeteringControl);
     }
@@ -1020,6 +1086,16 @@ public class Camera2CameraInfoImplTest {
                             CONTROL_VIDEO_STABILIZATION_MODE_OFF,
                             CONTROL_VIDEO_STABILIZATION_MODE_ON
                     });
+        }
+
+        // Adds low-light boost support for the back camera since API 35
+        if (Build.VERSION.SDK_INT >= 35) {
+            shadowCharacteristics0.set(
+                    CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES,
+                    new int[]{
+                            CONTROL_AE_MODE_ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY
+                    }
+            );
         }
 
         // Mock the request capability
