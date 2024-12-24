@@ -27,12 +27,6 @@ class MediateeSdkApiImpl(private val sdkContext: Context) : IMediateeSdkApi {
         drawViewability: Boolean
     ): Bundle {
         return androidx.privacysandbox.ui.integration.sdkproviderutils.MediateeSdkApiImpl
-            .loadBannerAdUtil(
-                adType,
-                waitInsideOnDraw,
-                drawViewability,
-                sdkContext,
-                "Runtime Mediation"
-            )
+            .loadBannerAdUtil(adType, waitInsideOnDraw, drawViewability, sdkContext)
     }
 }
