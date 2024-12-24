@@ -26,41 +26,12 @@ import androidx.privacysandbox.ui.provider.AbstractSandboxedUiAdapter
 import androidx.privacysandbox.ui.provider.toCoreLibInfo
 
 class MediateeSdkApiImpl(private val sdkContext: Context) : IMediateeSdkApi.Stub() {
-
-    private val mediationDescription =
-        if (CompatImpl.isAppOwnedMediatee()) {
-            "App Owned Mediation"
-        } else "Runtime Mediation"
-
     override fun loadBannerAd(
         @AdType adType: Int,
         waitInsideOnDraw: Boolean,
         drawViewability: Boolean
     ): Bundle {
-        return loadBannerAdUtil(
-            adType,
-            waitInsideOnDraw,
-            drawViewability,
-            sdkContext,
-            mediationDescription
-        )
-    }
-
-    private object CompatImpl {
-        fun isAppOwnedMediatee(): Boolean {
-            return if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
-                true
-            } else {
-                Api34PlusImpl.isAppOwnedMediatee()
-            }
-        }
-
-        @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-        private object Api34PlusImpl {
-            fun isAppOwnedMediatee(): Boolean {
-                return !android.os.Process.isSdkSandbox()
-            }
-        }
+        return loadBannerAdUtil(adType, waitInsideOnDraw, drawViewability, sdkContext)
     }
 
     companion object {
@@ -68,10 +39,13 @@ class MediateeSdkApiImpl(private val sdkContext: Context) : IMediateeSdkApi.Stub
             @AdType adType: Int,
             waitInsideOnDraw: Boolean,
             drawViewability: Boolean,
-            sdkContext: Context,
-            mediationDescription: String
+            sdkContext: Context
         ): Bundle {
             val testAdapters = TestAdapters(sdkContext)
+            val mediationDescription =
+                if (CompatImpl.isAppOwnedMediatee()) {
+                    "App Owned Mediation"
+                } else "Runtime Mediation"
             val adapter: AbstractSandboxedUiAdapter =
                 when (adType) {
                     AdType.BASIC_WEBVIEW -> loadWebViewBannerAd(testAdapters)
@@ -108,6 +82,23 @@ class MediateeSdkApiImpl(private val sdkContext: Context) : IMediateeSdkApi.Stub
             waitInsideOnDraw: Boolean
         ): AbstractSandboxedUiAdapter {
             return testAdapters.TestBannerAd(text, waitInsideOnDraw)
+        }
+    }
+
+    private object CompatImpl {
+        fun isAppOwnedMediatee(): Boolean {
+            return if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU) {
+                true
+            } else {
+                Api34PlusImpl.isAppOwnedMediatee()
+            }
+        }
+
+        @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+        private object Api34PlusImpl {
+            fun isAppOwnedMediatee(): Boolean {
+                return !android.os.Process.isSdkSandbox()
+            }
         }
     }
 }
