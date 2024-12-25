@@ -87,6 +87,7 @@ import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.abs
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -474,6 +475,9 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             // unbind the use case to cancel the surface request.
             cameraProvider.unbind(preview)
         }
+
+        // Small delay to allow the SurfaceRequest to be cancelled.
+        delay(500)
 
         val surfaceRequest = surfaceRequestDeferred.await()
         instrumentation.runOnMainSync {
