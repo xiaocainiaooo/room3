@@ -16,6 +16,8 @@
 
 package androidx.camera.camera2.internal;
 
+import static android.hardware.camera2.CameraMetadata.CONTROL_AE_MODE_ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY;
+
 import static androidx.camera.core.ImageCapture.FLASH_MODE_AUTO;
 import static androidx.camera.core.ImageCapture.FLASH_MODE_OFF;
 import static androidx.camera.core.ImageCapture.FLASH_MODE_ON;
@@ -124,6 +126,7 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
     private final FocusMeteringControl mFocusMeteringControl;
     private final ZoomControl mZoomControl;
     private final TorchControl mTorchControl;
+    private final LowLightBoostControl mLowLightBoostControl;
     private final ExposureControl mExposureControl;
     @VisibleForTesting
     ZslControl mZslControl;
@@ -137,6 +140,7 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
 
     // use volatile modifier to make these variables in sync in all threads.
     private volatile boolean mIsTorchOn = false;
+    private volatile boolean mIsLowLightBoostOn = false;
     @ImageCapture.FlashMode
     private volatile int mFlashMode = FLASH_MODE_OFF;
 
@@ -201,6 +205,7 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
                 this, scheduler, mExecutor, cameraQuirks);
         mZoomControl = new ZoomControl(this, mCameraCharacteristics, mExecutor);
         mTorchControl = new TorchControl(this, mCameraCharacteristics, mExecutor);
+        mLowLightBoostControl = new LowLightBoostControl(this, mCameraCharacteristics, mExecutor);
         if (Build.VERSION.SDK_INT >= 23) {
             mZslControl = new ZslControlImpl(mCameraCharacteristics, mExecutor);
         } else {
@@ -262,6 +267,10 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
         return mTorchControl;
     }
 
+    public @NonNull LowLightBoostControl getLowLightBoostControl() {
+        return mLowLightBoostControl;
+    }
+
     public @NonNull ExposureControl getExposureControl() {
         return mExposureControl;
     }
@@ -307,6 +316,7 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
         Logger.d(TAG, "setActive: isActive = " + isActive);
         mFocusMeteringControl.setActive(isActive);
         mZoomControl.setActive(isActive);
+        mLowLightBoostControl.setActive(isActive);
         mTorchControl.setActive(isActive);
         mExposureControl.setActive(isActive);
         mCamera2CameraControl.setActive(isActive);
@@ -422,6 +432,17 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
                     new OperationCanceledException("Camera is not active."));
         }
         return Futures.nonCancellationPropagating(mTorchControl.enableTorch(torch));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public @NonNull ListenableFuture<Void> enableLowLightBoostAsync(final boolean lowLightBoost) {
+        if (!isControlInUse()) {
+            return Futures.immediateFailedFuture(
+                    new OperationCanceledException("Camera is not active."));
+        }
+        return Futures.nonCancellationPropagating(
+                mLowLightBoostControl.enableLowLightBoost(lowLightBoost));
     }
 
     @ExecutedBy("mExecutor")
@@ -623,27 +644,63 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
     @ExecutedBy("mExecutor")
     void enableTorchInternal(boolean torch) {
+        // When low-light boost is on, any torch related operations will be ignored.
+        if (mIsLowLightBoostOn) {
+            return;
+        }
+
         mIsTorchOn = torch;
         if (!torch) {
-            // Send capture request with AE_MODE_ON + FLASH_MODE_OFF to turn off torch.
-            CaptureConfig.Builder singleRequestBuilder = new CaptureConfig.Builder();
-            singleRequestBuilder.setTemplateType(mTemplate);
-            singleRequestBuilder.setUseRepeatingSurface(true);
-            Camera2ImplConfig.Builder configBuilder = new Camera2ImplConfig.Builder();
-            configBuilder.setCaptureRequestOption(CaptureRequest.CONTROL_AE_MODE,
-                    getSupportedAeMode(CaptureRequest.CONTROL_AE_MODE_ON));
-            configBuilder.setCaptureRequestOption(CaptureRequest.FLASH_MODE,
-                    CaptureRequest.FLASH_MODE_OFF);
-            singleRequestBuilder.addImplementationOptions(configBuilder.build());
-            submitCaptureRequestsInternal(
-                    Collections.singletonList(singleRequestBuilder.build()));
+            // On some devices, needs to reset the AE/flash state to ensure that the torch can be
+            // turned off.
+            resetAeFlashState();
         }
         updateSessionConfigSynchronous();
+    }
+
+    @SuppressWarnings("WeakerAccess") /* synthetic accessor */
+    @ExecutedBy("mExecutor")
+    void enableLowLightBoostInternal(boolean lowLightBoost) {
+        if (mIsLowLightBoostOn == lowLightBoost) {
+            return;
+        }
+
+        // Forces turn off torch before enabling low-light boost.
+        if (lowLightBoost && mIsTorchOn) {
+            // On some devices, needs to reset the AE/flash state to ensure that the torch can be
+            // turned off.
+            resetAeFlashState();
+            mIsTorchOn = false;
+            mTorchControl.forceUpdateTorchStateToOff();
+        }
+
+        mIsLowLightBoostOn = lowLightBoost;
+        updateSessionConfigSynchronous();
+    }
+
+    private void resetAeFlashState() {
+        // Send capture request with AE_MODE_ON + FLASH_MODE_OFF to reset the AE/flash state.
+        CaptureConfig.Builder singleRequestBuilder = new CaptureConfig.Builder();
+        singleRequestBuilder.setTemplateType(mTemplate);
+        singleRequestBuilder.setUseRepeatingSurface(true);
+        Camera2ImplConfig.Builder configBuilder = new Camera2ImplConfig.Builder();
+        configBuilder.setCaptureRequestOption(CaptureRequest.CONTROL_AE_MODE,
+                getSupportedAeMode(CaptureRequest.CONTROL_AE_MODE_ON));
+        configBuilder.setCaptureRequestOption(CaptureRequest.FLASH_MODE,
+                CaptureRequest.FLASH_MODE_OFF);
+        singleRequestBuilder.addImplementationOptions(configBuilder.build());
+        submitCaptureRequestsInternal(
+                Collections.singletonList(singleRequestBuilder.build()));
     }
 
     @ExecutedBy("mExecutor")
     boolean isTorchOn() {
         return mIsTorchOn;
+    }
+
+    @ExecutedBy("mExecutor")
+    boolean isLowLightBoostOn() {
+        return mIsLowLightBoostOn;
     }
 
     @ExecutedBy("mExecutor")
@@ -676,7 +733,9 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
             aeMode = CaptureRequest.CONTROL_AE_MODE_ON_EXTERNAL_FLASH;
         }
 
-        if (mIsTorchOn) {
+        if (mIsLowLightBoostOn) {
+            aeMode = CONTROL_AE_MODE_ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY;
+        } else if (mIsTorchOn) {
             builder.setCaptureRequestOptionWithPriority(CaptureRequest.FLASH_MODE,
                     CaptureRequest.FLASH_MODE_TORCH, Config.OptionPriority.REQUIRED);
         } else {
