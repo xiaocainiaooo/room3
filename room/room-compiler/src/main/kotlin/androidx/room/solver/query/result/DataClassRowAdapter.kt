@@ -23,9 +23,9 @@ import androidx.room.processor.ProcessorErrors
 import androidx.room.solver.CodeGenScope
 import androidx.room.verifier.QueryResultInfo
 import androidx.room.vo.ColumnIndexVar
+import androidx.room.vo.DataClass
 import androidx.room.vo.Field
 import androidx.room.vo.FieldWithIndex
-import androidx.room.vo.Pojo
 import androidx.room.vo.RelationCollector
 import androidx.room.writer.FieldReadWriteWriter
 
@@ -34,23 +34,23 @@ import androidx.room.writer.FieldReadWriteWriter
  *
  * The info comes from the query processor so we know about the order of columns in the result etc.
  */
-class PojoRowAdapter(
+class DataClassRowAdapter(
     private val context: Context,
     private val info: QueryResultInfo?,
     private val query: ParsedQuery?,
-    val pojo: Pojo,
+    val dataClass: DataClass,
     out: XType
 ) : QueryMappedRowAdapter(out) {
-    override val mapping: PojoMapping
+    override val mapping: DataClassMapping
     val relationCollectors: List<RelationCollector>
 
-    private val indexAdapter: PojoIndexAdapter
+    private val indexAdapter: DataClassIndexAdapter
 
     // Set when statement is ready.
     private lateinit var fieldsWithIndices: List<FieldWithIndex>
 
     init {
-        val remainingFields = pojo.fields.toMutableList()
+        val remainingFields = dataClass.fields.toMutableList()
         val unusedColumns = arrayListOf<String>()
         val matchedFields: List<Field>
         if (info != null) {
@@ -68,9 +68,9 @@ class PojoRowAdapter(
             val nonNulls = remainingFields.filter { it.nonNull }
             if (nonNulls.isNotEmpty()) {
                 context.logger.e(
-                    ProcessorErrors.pojoMissingNonNull(
-                        pojoTypeName = pojo.typeName.toString(context.codeLanguage),
-                        missingPojoFields = nonNulls.map { it.name },
+                    ProcessorErrors.dataClassMissingNonNull(
+                        dataClassTypeName = dataClass.typeName.toString(context.codeLanguage),
+                        missingDataClassFields = nonNulls.map { it.name },
                         allQueryColumns = info.columns.map { it.name }
                     )
                 )
@@ -86,24 +86,24 @@ class PojoRowAdapter(
             matchedFields = remainingFields.map { it }
             remainingFields.clear()
         }
-        relationCollectors = RelationCollector.createCollectors(context, pojo.relations)
+        relationCollectors = RelationCollector.createCollectors(context, dataClass.relations)
 
         mapping =
-            PojoMapping(
-                pojo = pojo,
+            DataClassMapping(
+                dataClass = dataClass,
                 matchedFields = matchedFields,
                 unusedColumns = unusedColumns,
                 unusedFields = remainingFields
             )
 
-        indexAdapter = PojoIndexAdapter(mapping, info, query)
+        indexAdapter = DataClassIndexAdapter(mapping, info, query)
     }
 
     fun relationTableNames(): List<String> {
         return relationCollectors
             .flatMap {
                 val queryTableNames = it.loadAllQuery.tables.map { it.name }
-                if (it.rowAdapter is PojoRowAdapter) {
+                if (it.rowAdapter is DataClassRowAdapter) {
                     it.rowAdapter.relationTableNames() + queryTableNames
                 } else {
                     queryTableNames
@@ -144,7 +144,7 @@ class PojoRowAdapter(
     override fun convert(outVarName: String, stmtVarName: String, scope: CodeGenScope) {
         FieldReadWriteWriter.readFromStatement(
             outVar = outVarName,
-            outPojo = pojo,
+            outDataClass = dataClass,
             stmtVar = stmtVarName,
             fieldsWithIndices = fieldsWithIndices,
             relationCollectors = relationCollectors,
@@ -154,8 +154,8 @@ class PojoRowAdapter(
 
     override fun getDefaultIndexAdapter() = indexAdapter
 
-    data class PojoMapping(
-        val pojo: Pojo,
+    data class DataClassMapping(
+        val dataClass: DataClass,
         val matchedFields: List<Field>,
         val unusedColumns: List<String>,
         val unusedFields: List<Field>

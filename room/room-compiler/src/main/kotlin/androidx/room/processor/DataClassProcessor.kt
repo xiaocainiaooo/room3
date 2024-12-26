@@ -32,26 +32,26 @@ import androidx.room.ext.isCollection
 import androidx.room.ext.isNotVoid
 import androidx.room.processor.ProcessorErrors.CANNOT_FIND_GETTER_FOR_FIELD
 import androidx.room.processor.ProcessorErrors.CANNOT_FIND_SETTER_FOR_FIELD
-import androidx.room.processor.ProcessorErrors.POJO_FIELD_HAS_DUPLICATE_COLUMN_NAME
-import androidx.room.processor.autovalue.AutoValuePojoProcessorDelegate
+import androidx.room.processor.ProcessorErrors.DATA_CLASS_FIELD_HAS_DUPLICATE_COLUMN_NAME
+import androidx.room.processor.autovalue.AutoValueDataClassProcessorDelegate
 import androidx.room.processor.cache.Cache
 import androidx.room.vo.CallType
 import androidx.room.vo.Constructor
+import androidx.room.vo.DataClass
+import androidx.room.vo.DataClassMethod
 import androidx.room.vo.EmbeddedField
 import androidx.room.vo.Entity
 import androidx.room.vo.EntityOrView
 import androidx.room.vo.Field
 import androidx.room.vo.FieldGetter
 import androidx.room.vo.FieldSetter
-import androidx.room.vo.Pojo
-import androidx.room.vo.PojoMethod
 import androidx.room.vo.Warning
 import androidx.room.vo.columnNames
 import androidx.room.vo.findFieldByColumnName
 import com.google.auto.value.AutoValue
 
-/** Processes any class as if it is a Pojo. */
-class PojoProcessor
+/** Processes any class as if it is a data class. */
+class DataClassProcessor
 private constructor(
     baseContext: Context,
     val element: XTypeElement,
@@ -74,17 +74,17 @@ private constructor(
             bindingScope: FieldProcessor.BindingScope,
             parent: EmbeddedField?,
             referenceStack: LinkedHashSet<String> = LinkedHashSet()
-        ): PojoProcessor {
-            val (pojoElement, delegate) =
+        ): DataClassProcessor {
+            val (dataClassElement, delegate) =
                 if (element.hasAnnotation(AutoValue::class)) {
                     val processingEnv = context.processingEnv
                     val autoValueGeneratedTypeName =
-                        AutoValuePojoProcessorDelegate.getGeneratedClassName(element)
+                        AutoValueDataClassProcessorDelegate.getGeneratedClassName(element)
                     val autoValueGeneratedElement =
                         processingEnv.findTypeElement(autoValueGeneratedTypeName)
                     if (autoValueGeneratedElement != null) {
                         autoValueGeneratedElement to
-                            AutoValuePojoProcessorDelegate(context, element)
+                            AutoValueDataClassProcessorDelegate(context, element)
                     } else {
                         context.reportMissingType(autoValueGeneratedTypeName)
                         element to EmptyDelegate
@@ -93,9 +93,9 @@ private constructor(
                     element to DefaultDelegate(context)
                 }
 
-            return PojoProcessor(
+            return DataClassProcessor(
                 baseContext = context,
-                element = pojoElement,
+                element = dataClassElement,
                 bindingScope = bindingScope,
                 parent = parent,
                 referenceStack = referenceStack,
@@ -104,8 +104,8 @@ private constructor(
         }
     }
 
-    fun process(): Pojo {
-        return context.cache.pojos.get(Cache.PojoKey(element, bindingScope, parent)) {
+    fun process(): DataClass {
+        return context.cache.dataClasses.get(Cache.DataClassKey(element, bindingScope, parent)) {
             referenceStack.add(element.qualifiedName)
             try {
                 doProcess()
@@ -115,10 +115,10 @@ private constructor(
         }
     }
 
-    private fun doProcess(): Pojo {
+    private fun doProcess(): DataClass {
         if (!element.validate()) {
             context.reportMissingTypeReference(element.qualifiedName)
-            return delegate.createPojo(
+            return delegate.createDataClass(
                 element = element,
                 declaredType = element.type,
                 fields = emptyList(),
@@ -148,7 +148,7 @@ private constructor(
                     context.checker.check(
                         PROCESSED_ANNOTATIONS.count { field.hasAnnotation(it) } < 2,
                         field,
-                        ProcessorErrors.CANNOT_USE_MORE_THAN_ONE_POJO_FIELD_ANNOTATION
+                        ProcessorErrors.CANNOT_USE_MORE_THAN_ONE_DATA_CLASS_FIELD_ANNOTATION
                     )
                     if (field.hasAnnotation(Embedded::class)) {
                         Embedded::class
@@ -185,7 +185,7 @@ private constructor(
         val embeddedFields =
             unfilteredEmbeddedFields.filterNot { ignoredColumns.contains(it.field.columnName) }
 
-        val subFields = embeddedFields.flatMap { it.pojo.fields }
+        val subFields = embeddedFields.flatMap { it.dataClass.fields }
         val fields = myFields + subFields
 
         val unfilteredCombinedFields =
@@ -205,7 +205,7 @@ private constructor(
                 processRelationField(fields, declaredType, it)
             } ?: emptyList()
 
-        val subRelations = embeddedFields.flatMap { it.pojo.relations }
+        val subRelations = embeddedFields.flatMap { it.dataClass.relations }
         val relations = myRelationsList + subRelations
 
         fields
@@ -214,10 +214,13 @@ private constructor(
             .forEach {
                 context.logger.e(
                     element,
-                    ProcessorErrors.pojoDuplicateFieldNames(it.key, it.value.map(Field::getPath))
+                    ProcessorErrors.dataClassDuplicateFieldNames(
+                        it.key,
+                        it.value.map(Field::getPath)
+                    )
                 )
                 it.value.forEach {
-                    context.logger.e(it.element, POJO_FIELD_HAS_DUPLICATE_COLUMN_NAME)
+                    context.logger.e(it.element, DATA_CLASS_FIELD_HAS_DUPLICATE_COLUMN_NAME)
                 }
             }
 
@@ -227,7 +230,7 @@ private constructor(
                 .asSequence()
                 .filter { !it.isAbstract() && !it.hasAnnotation(Ignore::class) }
                 .map {
-                    PojoMethodProcessor(context = context, element = it, owner = declaredType)
+                    DataClassMethodProcessor(context = context, element = it, owner = declaredType)
                         .process()
                 }
                 .toList()
@@ -245,7 +248,7 @@ private constructor(
         // don't try to find a constructor for binding to statement.
         val constructor =
             if (bindingScope == FieldProcessor.BindingScope.BIND_TO_STMT) {
-                // we don't need to construct this POJO.
+                // we don't need to construct this data class.
                 null
             } else {
                 chooseConstructor(myFields, embeddedFields, relations)
@@ -264,7 +267,7 @@ private constructor(
             assignSetter(it.field, setterCandidates, constructor)
         }
 
-        return delegate.createPojo(
+        return delegate.createDataClass(
             element,
             declaredType,
             fields,
@@ -339,7 +342,7 @@ private constructor(
                                     context.logger.e(
                                         param,
                                         ProcessorErrors.ambiguousConstructor(
-                                            pojo = element.qualifiedName,
+                                            dataClass = element.qualifiedName,
                                             paramName = paramName,
                                             matchingFields =
                                                 matchingFields.map { it.getPath() } +
@@ -368,17 +371,18 @@ private constructor(
                     val failureMsg = failedConstructors.joinToString("\n") { entry -> entry.log() }
                     context.logger.e(
                         element,
-                        ProcessorErrors.MISSING_POJO_CONSTRUCTOR +
+                        ProcessorErrors.MISSING_DATA_CLASS_CONSTRUCTOR +
                             "\nTried the following constructors but they failed to match:" +
                             "\n$failureMsg"
                     )
                 }
-                context.logger.e(element, ProcessorErrors.MISSING_POJO_CONSTRUCTOR)
+                context.logger.e(element, ProcessorErrors.MISSING_DATA_CLASS_CONSTRUCTOR)
                 return null
             }
             goodConstructors.size > 1 -> {
-                // if the Pojo is a Kotlin data class then pick its primary constructor. This is
-                // better than picking the no-arg constructor and forcing users to define fields as
+                // if the class is a Kotlin data class (not a POJO) then pick its primary
+                // constructor. This is better than picking the no-arg constructor and forcing
+                // users to define fields as
                 // vars.
                 val primaryConstructor =
                     element.findPrimaryConstructor()?.let { primary ->
@@ -395,12 +399,12 @@ private constructor(
                     context.logger.w(
                         Warning.DEFAULT_CONSTRUCTOR,
                         element,
-                        ProcessorErrors.TOO_MANY_POJO_CONSTRUCTORS_CHOOSING_NO_ARG
+                        ProcessorErrors.TOO_MANY_DATA_CLASS_CONSTRUCTORS_CHOOSING_NO_ARG
                     )
                     return noArg
                 }
                 goodConstructors.forEach {
-                    context.logger.e(it.element, ProcessorErrors.TOO_MANY_POJO_CONSTRUCTORS)
+                    context.logger.e(it.element, ProcessorErrors.TOO_MANY_DATA_CLASS_CONSTRUCTORS)
                 }
                 return null
             }
@@ -442,7 +446,7 @@ private constructor(
                 prefix = inheritedPrefix + fieldPrefix,
                 parent = parent
             )
-        subParent.pojo =
+        subParent.dataClass =
             createFor(
                     context = context.fork(variableElement),
                     element = asTypeElement,
@@ -653,7 +657,7 @@ private constructor(
         // if types don't match, row adapter prints a warning
         return androidx.room.vo.Relation(
             entity = entity,
-            pojoType = asType,
+            dataClassType = asType,
             field = field,
             parentField = parentField,
             entityField = entityField,
@@ -686,7 +690,7 @@ private constructor(
      * if entity field in the annotation is not specified, it is the method return type if it is
      * specified in the annotation: still check the method return type, if the same, use it if not,
      * check to see if we can find a column Adapter, if so use the childField last resort, try to
-     * parse it as a pojo to infer it.
+     * parse it as a data class to infer it.
      */
     private fun createRelationshipProjection(
         inferEntity: Boolean,
@@ -703,8 +707,8 @@ private constructor(
                 // nice, there is a column adapter for this, assume single column response
                 listOf(entityField.name)
             } else {
-                // last resort, it needs to be a pojo
-                val pojo =
+                // last resort, it needs to be a data class
+                val dataClass =
                     createFor(
                             context = context,
                             element = typeArgElement,
@@ -713,7 +717,7 @@ private constructor(
                             referenceStack = referenceStack
                         )
                         .process()
-                pojo.columnNames
+                dataClass.columnNames
             }
         }
     }
@@ -744,11 +748,11 @@ private constructor(
         return referenceRecursionList.joinToString(" -> ")
     }
 
-    private fun assignGetters(fields: List<Field>, getterCandidates: List<PojoMethod>) {
+    private fun assignGetters(fields: List<Field>, getterCandidates: List<DataClassMethod>) {
         fields.forEach { field -> assignGetter(field, getterCandidates) }
     }
 
-    private fun assignGetter(field: Field, getterCandidates: List<PojoMethod>) {
+    private fun assignGetter(field: Field, getterCandidates: List<DataClassMethod>) {
         val success =
             chooseAssignment(
                 field = field,
@@ -814,7 +818,7 @@ private constructor(
 
     private fun assignSetters(
         fields: List<Field>,
-        setterCandidates: List<PojoMethod>,
+        setterCandidates: List<DataClassMethod>,
         constructor: Constructor?
     ) {
         fields.forEach { field -> assignSetter(field, setterCandidates, constructor) }
@@ -822,7 +826,7 @@ private constructor(
 
     private fun assignSetter(
         field: Field,
-        setterCandidates: List<PojoMethod>,
+        setterCandidates: List<DataClassMethod>,
         constructor: Constructor?
     ) {
         if (constructor != null && constructor.hasField(field)) {
@@ -906,11 +910,11 @@ private constructor(
      */
     private fun chooseAssignment(
         field: Field,
-        candidates: List<PojoMethod>,
+        candidates: List<DataClassMethod>,
         nameVariations: List<String>,
-        getType: (PojoMethod) -> XType,
+        getType: (DataClassMethod) -> XType,
         assignFromField: () -> Unit,
-        assignFromMethod: (PojoMethod) -> Unit,
+        assignFromMethod: (DataClassMethod) -> Unit,
         reportAmbiguity: (List<String>) -> Unit
     ): Boolean {
         if (field.element.isPublic()) {
@@ -951,9 +955,9 @@ private constructor(
     }
 
     private fun verifyAndChooseOneFrom(
-        candidates: List<PojoMethod>?,
+        candidates: List<DataClassMethod>?,
         reportAmbiguity: (List<String>) -> Unit
-    ): PojoMethod? {
+    ): DataClassMethod? {
         if (candidates == null) {
             return null
         }
@@ -973,21 +977,21 @@ private constructor(
          */
         fun findConstructors(element: XTypeElement): List<XExecutableElement>
 
-        fun createPojo(
+        fun createDataClass(
             element: XTypeElement,
             declaredType: XType,
             fields: List<Field>,
             embeddedFields: List<EmbeddedField>,
             relations: List<androidx.room.vo.Relation>,
             constructor: Constructor?
-        ): Pojo
+        ): DataClass
     }
 
     private class DefaultDelegate(private val context: Context) : Delegate {
         override fun onPreProcess(element: XTypeElement) {
-            // If POJO is not a record then check that certain Room annotations with @Target(METHOD)
-            // are not used since the POJO is not annotated with AutoValue where Room column
-            // annotations are allowed in methods.
+            // If data class is not a record then check that certain Room annotations with
+            // @Target(METHOD) are not used since the data class is not annotated with AutoValue
+            // where Room column annotations are allowed in methods.
             if (!element.isRecordClass()) {
                 element
                     .getAllMethods()
@@ -1015,15 +1019,15 @@ private constructor(
                 it.hasAnnotation(Ignore::class) || it.isPrivate()
             }
 
-        override fun createPojo(
+        override fun createDataClass(
             element: XTypeElement,
             declaredType: XType,
             fields: List<Field>,
             embeddedFields: List<EmbeddedField>,
             relations: List<androidx.room.vo.Relation>,
             constructor: Constructor?
-        ): Pojo {
-            return Pojo(
+        ): DataClass {
+            return DataClass(
                 element = element,
                 type = declaredType,
                 fields = fields,
@@ -1039,15 +1043,15 @@ private constructor(
 
         override fun findConstructors(element: XTypeElement): List<XExecutableElement> = emptyList()
 
-        override fun createPojo(
+        override fun createDataClass(
             element: XTypeElement,
             declaredType: XType,
             fields: List<Field>,
             embeddedFields: List<EmbeddedField>,
             relations: List<androidx.room.vo.Relation>,
             constructor: Constructor?
-        ): Pojo {
-            return Pojo(
+        ): DataClass {
+            return DataClass(
                 element = element,
                 type = declaredType,
                 fields = emptyList(),
