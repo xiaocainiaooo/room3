@@ -1108,7 +1108,7 @@ class DaoKotlinCodeGenTest : BaseDaoKotlinCodeGenTest() {
     }
 
     @Test
-    fun transactionMethodAdapter_interface(
+    fun transactionFunctionAdapter_interface(
         @TestParameter("disable", "all-compatibility", "all") jvmDefaultMode: String
     ) {
         // For parametrized tests, use method name from reflection
@@ -1180,7 +1180,7 @@ class DaoKotlinCodeGenTest : BaseDaoKotlinCodeGenTest() {
     }
 
     @Test
-    fun transactionMethodAdapter_abstractClass() {
+    fun transactionFunctionAdapter_abstractClass() {
         val src =
             Source.kotlin(
                 "MyDao.kt",
@@ -1235,7 +1235,7 @@ class DaoKotlinCodeGenTest : BaseDaoKotlinCodeGenTest() {
     }
 
     @Test
-    fun deleteOrUpdateMethodAdapter() {
+    fun deleteOrUpdateFunctionAdapter() {
         val src =
             Source.kotlin(
                 "MyDao.kt",
@@ -1273,7 +1273,7 @@ class DaoKotlinCodeGenTest : BaseDaoKotlinCodeGenTest() {
     }
 
     @Test
-    fun insertOrUpsertMethodAdapter() {
+    fun insertOrUpsertFunctionAdapter() {
         val src =
             Source.kotlin(
                 "MyDao.kt",

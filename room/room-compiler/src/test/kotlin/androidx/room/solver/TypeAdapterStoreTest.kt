@@ -61,10 +61,10 @@ import androidx.room.solver.binderprovider.RxQueryResultBinderProvider
 import androidx.room.solver.query.parameter.CollectionQueryParameterAdapter
 import androidx.room.solver.query.result.MultiTypedPagingSourceQueryResultBinder
 import androidx.room.solver.query.result.Paging3PagingSourceQueryResultBinder
-import androidx.room.solver.shortcut.binderprovider.GuavaListenableFutureDeleteOrUpdateMethodBinderProvider
-import androidx.room.solver.shortcut.binderprovider.GuavaListenableFutureInsertOrUpsertMethodBinderProvider
-import androidx.room.solver.shortcut.binderprovider.RxCallableDeleteOrUpdateMethodBinderProvider
-import androidx.room.solver.shortcut.binderprovider.RxCallableInsertOrUpsertMethodBinderProvider
+import androidx.room.solver.shortcut.binderprovider.GuavaListenableFutureDeleteOrUpdateFunctionBinderProvider
+import androidx.room.solver.shortcut.binderprovider.GuavaListenableFutureInsertOrUpsertFunctionBinderProvider
+import androidx.room.solver.shortcut.binderprovider.RxCallableDeleteOrUpdateFunctionBinderProvider
+import androidx.room.solver.shortcut.binderprovider.RxCallableInsertOrUpsertFunctionBinderProvider
 import androidx.room.solver.types.BoxedPrimitiveColumnTypeAdapter
 import androidx.room.solver.types.ByteBufferColumnTypeAdapter
 import androidx.room.solver.types.ColumnTypeAdapter
@@ -79,7 +79,7 @@ import androidx.room.solver.types.UuidColumnTypeAdapter
 import androidx.room.solver.types.ValueClassConverterWrapper
 import androidx.room.testing.context
 import androidx.room.vo.BuiltInConverterFlags
-import androidx.room.vo.ReadQueryMethod
+import androidx.room.vo.ReadQueryFunction
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
@@ -880,7 +880,7 @@ class TypeAdapterStoreTest {
                     val single = invocation.processingEnv.requireTypeElement(rxTypeClassName)
                     assertThat(single, notNullValue())
                     assertThat(
-                        RxCallableInsertOrUpsertMethodBinderProvider.getAll(invocation.context)
+                        RxCallableInsertOrUpsertFunctionBinderProvider.getAll(invocation.context)
                             .any { it.matches(single.type) },
                         `is`(true)
                     )
@@ -898,7 +898,7 @@ class TypeAdapterStoreTest {
                 runProcessorTestWithK1(sources = listOf(rxTypeSrc)) { invocation ->
                     val maybe = invocation.processingEnv.requireTypeElement(rxTypeClassName)
                     assertThat(
-                        RxCallableInsertOrUpsertMethodBinderProvider.getAll(invocation.context)
+                        RxCallableInsertOrUpsertFunctionBinderProvider.getAll(invocation.context)
                             .any { it.matches(maybe.type) },
                         `is`(true)
                     )
@@ -916,7 +916,7 @@ class TypeAdapterStoreTest {
                 runProcessorTestWithK1(sources = listOf(rxTypeSrc)) { invocation ->
                     val completable = invocation.processingEnv.requireTypeElement(rxTypeClassName)
                     assertThat(
-                        RxCallableInsertOrUpsertMethodBinderProvider.getAll(invocation.context)
+                        RxCallableInsertOrUpsertFunctionBinderProvider.getAll(invocation.context)
                             .any { it.matches(completable.type) },
                         `is`(true)
                     )
@@ -932,7 +932,7 @@ class TypeAdapterStoreTest {
                     GuavaUtilConcurrentTypeNames.LISTENABLE_FUTURE
                 )
             assertThat(
-                GuavaListenableFutureInsertOrUpsertMethodBinderProvider(invocation.context)
+                GuavaListenableFutureInsertOrUpsertFunctionBinderProvider(invocation.context)
                     .matches(future.type),
                 `is`(true)
             )
@@ -945,7 +945,7 @@ class TypeAdapterStoreTest {
             val single = invocation.processingEnv.requireTypeElement(RxJava2TypeNames.SINGLE)
             assertThat(single, notNullValue())
             assertThat(
-                RxCallableDeleteOrUpdateMethodBinderProvider.getAll(invocation.context).any {
+                RxCallableDeleteOrUpdateFunctionBinderProvider.getAll(invocation.context).any {
                     it.matches(single.type)
                 },
                 `is`(true)
@@ -959,7 +959,7 @@ class TypeAdapterStoreTest {
             val maybe = invocation.processingEnv.requireTypeElement(RxJava2TypeNames.MAYBE)
             assertThat(maybe, notNullValue())
             assertThat(
-                RxCallableDeleteOrUpdateMethodBinderProvider.getAll(invocation.context).any {
+                RxCallableDeleteOrUpdateFunctionBinderProvider.getAll(invocation.context).any {
                     it.matches(maybe.type)
                 },
                 `is`(true)
@@ -974,7 +974,7 @@ class TypeAdapterStoreTest {
                 invocation.processingEnv.requireTypeElement(RxJava2TypeNames.COMPLETABLE)
             assertThat(completable, notNullValue())
             assertThat(
-                RxCallableDeleteOrUpdateMethodBinderProvider.getAll(invocation.context).any {
+                RxCallableDeleteOrUpdateFunctionBinderProvider.getAll(invocation.context).any {
                     it.matches(completable.type)
                 },
                 `is`(true)
@@ -991,7 +991,7 @@ class TypeAdapterStoreTest {
                 )
             assertThat(future, notNullValue())
             assertThat(
-                GuavaListenableFutureDeleteOrUpdateMethodBinderProvider(invocation.context)
+                GuavaListenableFutureDeleteOrUpdateFunctionBinderProvider(invocation.context)
                     .matches(future.type),
                 `is`(true)
             )
@@ -1009,7 +1009,9 @@ class TypeAdapterStoreTest {
                     val single = invocation.processingEnv.requireTypeElement(rxTypeClassName)
                     assertThat(single).isNotNull()
                     assertThat(
-                            RxCallableInsertOrUpsertMethodBinderProvider.getAll(invocation.context)
+                            RxCallableInsertOrUpsertFunctionBinderProvider.getAll(
+                                    invocation.context
+                                )
                                 .any { it.matches(single.type) }
                         )
                         .isTrue()
@@ -1027,7 +1029,9 @@ class TypeAdapterStoreTest {
                 runProcessorTestWithK1(sources = listOf(rxTypeSrc)) { invocation ->
                     val maybe = invocation.processingEnv.requireTypeElement(rxTypeClassName)
                     assertThat(
-                            RxCallableInsertOrUpsertMethodBinderProvider.getAll(invocation.context)
+                            RxCallableInsertOrUpsertFunctionBinderProvider.getAll(
+                                    invocation.context
+                                )
                                 .any { it.matches(maybe.type) }
                         )
                         .isTrue()
@@ -1045,7 +1049,9 @@ class TypeAdapterStoreTest {
                 runProcessorTestWithK1(sources = listOf(rxTypeSrc)) { invocation ->
                     val completable = invocation.processingEnv.requireTypeElement(rxTypeClassName)
                     assertThat(
-                            RxCallableInsertOrUpsertMethodBinderProvider.getAll(invocation.context)
+                            RxCallableInsertOrUpsertFunctionBinderProvider.getAll(
+                                    invocation.context
+                                )
                                 .any { it.matches(completable.type) }
                         )
                         .isTrue()
@@ -1061,7 +1067,7 @@ class TypeAdapterStoreTest {
                     GuavaUtilConcurrentTypeNames.LISTENABLE_FUTURE
                 )
             assertThat(
-                    GuavaListenableFutureInsertOrUpsertMethodBinderProvider(invocation.context)
+                    GuavaListenableFutureInsertOrUpsertFunctionBinderProvider(invocation.context)
                         .matches(future.type)
                 )
                 .isTrue()
@@ -1427,7 +1433,10 @@ class TypeAdapterStoreTest {
                 )
             val parsedDao = parser.process()
             val binder =
-                parsedDao.queryMethods.filterIsInstance<ReadQueryMethod>().first().queryResultBinder
+                parsedDao.queryFunctions
+                    .filterIsInstance<ReadQueryFunction>()
+                    .first()
+                    .queryResultBinder
             assertThat(binder is Paging3PagingSourceQueryResultBinder).isTrue()
 
             val pagingSourceXRawType: XRawType? =
@@ -1435,8 +1444,8 @@ class TypeAdapterStoreTest {
                     .findType(PagingTypeNames.PAGING_SOURCE.canonicalName)
                     ?.rawType
             val returnedXRawType =
-                parsedDao.queryMethods
-                    .filterIsInstance<ReadQueryMethod>()
+                parsedDao.queryFunctions
+                    .filterIsInstance<ReadQueryFunction>()
                     .first()
                     .returnType
                     .rawType
@@ -1490,7 +1499,10 @@ class TypeAdapterStoreTest {
                 )
             val parsedDao = parser.process()
             val binder =
-                parsedDao.queryMethods.filterIsInstance<ReadQueryMethod>().first().queryResultBinder
+                parsedDao.queryFunctions
+                    .filterIsInstance<ReadQueryFunction>()
+                    .first()
+                    .queryResultBinder
 
             // assert that room correctly binds to ListenableFuturePagingSource instead of
             // its supertype PagingSource. ListenableFuturePagingSourceBinderProvider
@@ -1502,8 +1514,8 @@ class TypeAdapterStoreTest {
                     .findType(PagingTypeNames.LISTENABLE_FUTURE_PAGING_SOURCE.canonicalName)
                     ?.rawType
             val returnedXRawType =
-                parsedDao.queryMethods
-                    .filterIsInstance<ReadQueryMethod>()
+                parsedDao.queryFunctions
+                    .filterIsInstance<ReadQueryFunction>()
                     .first()
                     .returnType
                     .rawType
@@ -1550,7 +1562,10 @@ class TypeAdapterStoreTest {
                 )
             val parsedDao = parser.process()
             val binder =
-                parsedDao.queryMethods.filterIsInstance<ReadQueryMethod>().first().queryResultBinder
+                parsedDao.queryFunctions
+                    .filterIsInstance<ReadQueryFunction>()
+                    .first()
+                    .queryResultBinder
 
             assertThat(binder is MultiTypedPagingSourceQueryResultBinder).isTrue()
             val rxPagingSourceXRawType: XRawType? =
@@ -1558,8 +1573,8 @@ class TypeAdapterStoreTest {
                     .findType(PagingTypeNames.RX2_PAGING_SOURCE.canonicalName)
                     ?.rawType
             val returnedXRawType =
-                parsedDao.queryMethods
-                    .filterIsInstance<ReadQueryMethod>()
+                parsedDao.queryFunctions
+                    .filterIsInstance<ReadQueryFunction>()
                     .first()
                     .returnType
                     .rawType
@@ -1606,7 +1621,10 @@ class TypeAdapterStoreTest {
                 )
             val parsedDao = parser.process()
             val binder =
-                parsedDao.queryMethods.filterIsInstance<ReadQueryMethod>().first().queryResultBinder
+                parsedDao.queryFunctions
+                    .filterIsInstance<ReadQueryFunction>()
+                    .first()
+                    .queryResultBinder
 
             assertThat(binder is MultiTypedPagingSourceQueryResultBinder).isTrue()
             val rxPagingSourceXRawType: XRawType? =
@@ -1614,8 +1632,8 @@ class TypeAdapterStoreTest {
                     .findType(PagingTypeNames.RX3_PAGING_SOURCE.canonicalName)
                     ?.rawType
             val returnedXRawType =
-                parsedDao.queryMethods
-                    .filterIsInstance<ReadQueryMethod>()
+                parsedDao.queryFunctions
+                    .filterIsInstance<ReadQueryFunction>()
                     .first()
                     .returnType
                     .rawType

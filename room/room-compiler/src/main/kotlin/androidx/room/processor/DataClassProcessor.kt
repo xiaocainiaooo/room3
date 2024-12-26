@@ -38,7 +38,7 @@ import androidx.room.processor.cache.Cache
 import androidx.room.vo.CallType
 import androidx.room.vo.Constructor
 import androidx.room.vo.DataClass
-import androidx.room.vo.DataClassMethod
+import androidx.room.vo.DataClassFunction
 import androidx.room.vo.EmbeddedField
 import androidx.room.vo.Entity
 import androidx.room.vo.EntityOrView
@@ -230,7 +230,11 @@ private constructor(
                 .asSequence()
                 .filter { !it.isAbstract() && !it.hasAnnotation(Ignore::class) }
                 .map {
-                    DataClassMethodProcessor(context = context, element = it, owner = declaredType)
+                    DataClassFunctionProcessor(
+                            context = context,
+                            element = it,
+                            owner = declaredType
+                        )
                         .process()
                 }
                 .toList()
@@ -748,11 +752,11 @@ private constructor(
         return referenceRecursionList.joinToString(" -> ")
     }
 
-    private fun assignGetters(fields: List<Field>, getterCandidates: List<DataClassMethod>) {
+    private fun assignGetters(fields: List<Field>, getterCandidates: List<DataClassFunction>) {
         fields.forEach { field -> assignGetter(field, getterCandidates) }
     }
 
-    private fun assignGetter(field: Field, getterCandidates: List<DataClassMethod>) {
+    private fun assignGetter(field: Field, getterCandidates: List<DataClassFunction>) {
         val success =
             chooseAssignment(
                 field = field,
@@ -818,7 +822,7 @@ private constructor(
 
     private fun assignSetters(
         fields: List<Field>,
-        setterCandidates: List<DataClassMethod>,
+        setterCandidates: List<DataClassFunction>,
         constructor: Constructor?
     ) {
         fields.forEach { field -> assignSetter(field, setterCandidates, constructor) }
@@ -826,7 +830,7 @@ private constructor(
 
     private fun assignSetter(
         field: Field,
-        setterCandidates: List<DataClassMethod>,
+        setterCandidates: List<DataClassFunction>,
         constructor: Constructor?
     ) {
         if (constructor != null && constructor.hasField(field)) {
@@ -910,11 +914,11 @@ private constructor(
      */
     private fun chooseAssignment(
         field: Field,
-        candidates: List<DataClassMethod>,
+        candidates: List<DataClassFunction>,
         nameVariations: List<String>,
-        getType: (DataClassMethod) -> XType,
+        getType: (DataClassFunction) -> XType,
         assignFromField: () -> Unit,
-        assignFromMethod: (DataClassMethod) -> Unit,
+        assignFromMethod: (DataClassFunction) -> Unit,
         reportAmbiguity: (List<String>) -> Unit
     ): Boolean {
         if (field.element.isPublic()) {
@@ -955,9 +959,9 @@ private constructor(
     }
 
     private fun verifyAndChooseOneFrom(
-        candidates: List<DataClassMethod>?,
+        candidates: List<DataClassFunction>?,
         reportAmbiguity: (List<String>) -> Unit
-    ): DataClassMethod? {
+    ): DataClassFunction? {
         if (candidates == null) {
             return null
         }
