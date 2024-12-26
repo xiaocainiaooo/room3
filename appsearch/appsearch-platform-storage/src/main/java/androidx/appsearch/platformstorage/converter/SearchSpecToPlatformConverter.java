@@ -17,6 +17,7 @@
 package androidx.appsearch.platformstorage.converter;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Build;
 
 import androidx.annotation.DoNotInline;
@@ -53,7 +54,9 @@ public final class SearchSpecToPlatformConverter {
     @SuppressLint("WrongConstant")
     @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public static android.app.appsearch.@NonNull SearchSpec toPlatformSearchSpec(
+            @NonNull Context context,
             @NonNull SearchSpec jetpackSearchSpec) {
+        Preconditions.checkNotNull(context);
         Preconditions.checkNotNull(jetpackSearchSpec);
 
         android.app.appsearch.SearchSpec.Builder platformBuilder =
@@ -93,9 +96,17 @@ public final class SearchSpecToPlatformConverter {
                     jetpackSearchSpec.getResultGroupingTypeFlags(),
                     jetpackSearchSpec.getResultGroupingLimit());
         }
-        for (Map.Entry<String, List<String>> projection :
-                jetpackSearchSpec.getProjections().entrySet()) {
-            platformBuilder.addProjection(projection.getKey(), projection.getValue());
+
+        // Only translate projection for versions after Android U.
+        // Projection will be manually applied for earlier versions in SearchResultsImpl.
+        // This is a workaround in Jetpack code for a pre-existing projection bug.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+                || AppSearchVersionUtil.getAppSearchVersionCode(context)
+                >= AppSearchVersionUtil.APPSEARCH_U_BASE_VERSION_CODE) {
+            for (Map.Entry<String, List<String>> projection :
+                    jetpackSearchSpec.getProjections().entrySet()) {
+                platformBuilder.addProjection(projection.getKey(), projection.getValue());
+            }
         }
 
         if (!jetpackSearchSpec.getPropertyWeights().isEmpty()) {
@@ -159,7 +170,7 @@ public final class SearchSpecToPlatformConverter {
                 throw new UnsupportedOperationException("JoinSpec is not available on this "
                         + "AppSearch implementation.");
             }
-            ApiHelperForU.setJoinSpec(platformBuilder, jetpackSearchSpec.getJoinSpec());
+            ApiHelperForU.setJoinSpec(context, platformBuilder, jetpackSearchSpec.getJoinSpec());
         }
 
         if (!jetpackSearchSpec.getFilterProperties().isEmpty()) {
@@ -214,9 +225,11 @@ public final class SearchSpecToPlatformConverter {
         }
 
         @DoNotInline
-        static void setJoinSpec(android.app.appsearch.SearchSpec.@NonNull Builder builder,
+        static void setJoinSpec(@NonNull Context context,
+                android.app.appsearch.SearchSpec.@NonNull Builder builder,
                 JoinSpec jetpackJoinSpec) {
-            builder.setJoinSpec(JoinSpecToPlatformConverter.toPlatformJoinSpec(jetpackJoinSpec));
+            builder.setJoinSpec(JoinSpecToPlatformConverter.toPlatformJoinSpec(context,
+                    jetpackJoinSpec));
         }
 
         @DoNotInline
