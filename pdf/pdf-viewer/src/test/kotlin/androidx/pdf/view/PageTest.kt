@@ -93,7 +93,7 @@ class PageTest {
     fun draw_withoutBitmap() {
         // Notably we don't call testDispatcher.scheduler.runCurrent(), so we start, but do not
         // finish, fetching a Bitmap
-        page.setVisible(zoom = 1.5F)
+        page.updateState(zoom = 1.5F)
         val locationInView = Rect(-60, 125, -60 + PAGE_SIZE.x, 125 + PAGE_SIZE.y)
 
         page.draw(canvasSpy, locationInView, listOf())
@@ -103,7 +103,7 @@ class PageTest {
 
     @Test
     fun draw_withBitmap() {
-        page.setVisible(zoom = 1.5F)
+        page.updateState(zoom = 1.5F)
         testDispatcher.scheduler.runCurrent()
         val locationInView = Rect(50, -100, 50 + PAGE_SIZE.x, -100 + PAGE_SIZE.y)
 
@@ -123,7 +123,7 @@ class PageTest {
 
     @Test
     fun draw_withHighlight() {
-        page.setVisible(zoom = 1.5F)
+        page.updateState(zoom = 1.5F)
         testDispatcher.scheduler.runCurrent()
         val leftEdgeInView = 650
         val topEdgeInView = -320
@@ -153,21 +153,21 @@ class PageTest {
     }
 
     @Test
-    fun setVisible_fetchesPageText() {
-        page.setVisible(zoom = 1.0f)
+    fun updateState_fetchesPageText() {
+        page.updateState(zoom = 1.0f)
         testDispatcher.scheduler.runCurrent()
         assertThat(page.pageText).isEqualTo("SampleText")
         assertThat(pageTextReadyCounter).isEqualTo(1)
     }
 
     @Test
-    fun setVisible_doesNotFetchPageTextIfAlreadyFetched() {
-        page.setVisible(zoom = 1.0f)
+    fun updateState_doesNotFetchPageTextIfAlreadyFetched() {
+        page.updateState(zoom = 1.0f)
         testDispatcher.scheduler.runCurrent()
         assertThat(page.pageText).isEqualTo("SampleText")
         assertThat(pageTextReadyCounter).isEqualTo(1)
 
-        page.setVisible(zoom = 1.0f)
+        page.updateState(zoom = 1.0f)
         testDispatcher.scheduler.runCurrent()
         assertThat(page.pageText).isEqualTo("SampleText")
         assertThat(pageTextReadyCounter).isEqualTo(1)
@@ -175,7 +175,7 @@ class PageTest {
 
     @Test
     fun setInvisible_cancelsPageTextFetch() {
-        page.setVisible(zoom = 1.0f)
+        page.updateState(zoom = 1.0f)
         page.setInvisible()
         testDispatcher.scheduler.runCurrent()
         assertThat(page.pageText).isNull()

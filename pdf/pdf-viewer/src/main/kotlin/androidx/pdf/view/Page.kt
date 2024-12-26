@@ -28,6 +28,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.pdf.PdfDocument
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 /** A single PDF page that knows how to render and draw itself */
@@ -70,18 +71,23 @@ internal class Page(
     private val highlightPaint = Paint().apply { style = Style.FILL }
     private val highlightRect = RectF()
     private val tileLocationRect = RectF()
-    internal var fetchPageTextJob: Job? = null
+
+    private var fetchPageTextJob: Job? = null
     internal var pageText: String? = null
+        private set
+
+    private var fetchLinksJob: Job? = null
     internal var links: PdfDocument.PdfPageLinks? = null
         private set
 
-    fun setVisible(zoom: Float) {
+    fun updateState(zoom: Float, isFlinging: Boolean = false) {
         bitmapFetcher.isActive = true
         bitmapFetcher.onScaleChanged(zoom)
-        if (links == null) {
-            fetchLinks()
+
+        if (!isFlinging) {
+            fetchPageLinks()
+            fetchPageText()
         }
-        fetchPageText()
     }
 
     fun setInvisible() {
@@ -90,19 +96,36 @@ internal class Page(
         pageText = null
         fetchPageTextJob?.cancel()
         fetchPageTextJob = null
+
+        links = null
+        fetchLinksJob?.cancel()
+        fetchLinksJob = null
     }
 
-    fun fetchPageText() {
-        if (fetchPageTextJob?.isActive == true || pageText != null) {
-            return
-        }
+    private fun fetchPageText() {
+        if (fetchPageTextJob?.isActive == true || pageText != null) return
 
         fetchPageTextJob =
-            backgroundScope.launch {
-                pageText =
-                    pdfDocument.getPageContent(pageNum)?.textContents?.joinToString { it.text }
-                onPageTextReady.invoke(pageNum)
-            }
+            backgroundScope
+                .launch {
+                    ensureActive()
+                    pageText =
+                        pdfDocument.getPageContent(pageNum)?.textContents?.joinToString { it.text }
+                    onPageTextReady.invoke(pageNum)
+                }
+                .also { it.invokeOnCompletion { fetchPageTextJob = null } }
+    }
+
+    private fun fetchPageLinks() {
+        if (fetchLinksJob?.isActive == true || links != null) return
+
+        fetchLinksJob =
+            backgroundScope
+                .launch {
+                    ensureActive()
+                    links = pdfDocument.getPageLinks(pageNum)
+                }
+                .also { it.invokeOnCompletion { fetchPageTextJob = null } }
     }
 
     fun draw(canvas: Canvas, locationInView: Rect, highlights: List<Highlight>) {
@@ -124,10 +147,6 @@ internal class Page(
             highlightPaint.color = highlight.color
             canvas.drawRect(highlightRect, highlightPaint)
         }
-    }
-
-    private fun fetchLinks() {
-        backgroundScope.launch { links = pdfDocument.getPageLinks(pageNum) }
     }
 
     private fun draw(fullPageBitmap: FullPageBitmap, canvas: Canvas, locationInView: Rect) {
