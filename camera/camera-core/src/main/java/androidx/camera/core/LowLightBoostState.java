@@ -16,6 +16,9 @@
 
 package androidx.camera.core;
 
+import android.hardware.camera2.CameraMetadata;
+import android.hardware.camera2.CaptureResult;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.RestrictTo;
 
@@ -28,14 +31,34 @@ import java.lang.annotation.RetentionPolicy;
  *
  * <p>These states indicate whether the camera device supports low light boost and if it is
  * currently active.
+ *
+ * @see CaptureResult#CONTROL_LOW_LIGHT_BOOST_STATE
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public class LowLightBoostState {
-    /** Low-light boost is off. */
+    /**
+     * Low-light boost is off.
+     *
+     * <p>This is the default state if low-light boost is unavailable. This may be because your
+     * camera doesn't support it or there's a settings conflict.
+     */
     public static final int OFF = -1;
-    /** Low-light boost is on but inactive. */
+    /**
+     * Low-light boost is on but inactive.
+     *
+     * <p>This state indicates that the camera device supports low-light boost but it is not
+     * currently active. This can happen if the camera device is not in low-light conditions.
+     *
+     * @see CameraMetadata#CONTROL_LOW_LIGHT_BOOST_STATE_INACTIVE
+     */
     public static final int INACTIVE = 0;
-    /** Low-light boost is on and active. */
+    /**
+     * Low-light boost is on and active.
+     *
+     * <p>This state indicates that the camera device is currently applying low-light boost to
+     * the image stream.
+     *
+     * @see CameraMetadata#CONTROL_LOW_LIGHT_BOOST_STATE_ACTIVE
+     */
     public static final int ACTIVE = 1;
 
     private LowLightBoostState() {

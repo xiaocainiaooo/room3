@@ -93,19 +93,27 @@ public interface CameraControl {
      * <li>When low-light boost is on, the flash or torch functionality may be unavailable.
      * <li>When frame rate configuration results in an FPS exceeding 30, low-light boost will be
      * disabled and the state will always be ({@link LowLightBoostState#OFF}).
+     * <li>Low-light boost is not currently supported for HDR 10-bit capture sessions. If the
+     * dynamic range configuration results in a 10-bit capture session, low-light boost will be
+     * disabled and the state will always be ({@link LowLightBoostState#OFF}).
      * </ul>
      *
      * <p>Therefore, to use flash or torch functionality, low-light boost mode must be disabled.
-     * To ensure low-light boost mode functions correctly, avoid frame rate settings that result
-     * in an FPS exceeding 30.
+     * To ensure low-light boost mode functions correctly, the following conditions must be met:
+     * <ul>
+     * <li> The frame rate must not exceed 30 FPS.
+     * <li> The dynamic range setting must not be 10-bit.
+     * </ul>
      *
      * @param lowLightBoost true to turn on the low-light boost mode, false to turn it off.
      * @return A {@link ListenableFuture} which is successful when the low-light boost mode was
-     * changed to the value specified. It fails when it is unable to change the log-light boost
-     * state. Cancellation of this future is a no-op.
+     * changed to the value specified. It fails with {@link IllegalStateException} when low-light
+     * boost is not available due to the device does not support it or there is a settings
+     * conflict. It fails with {@link OperationCanceledException} if a newer value is set or
+     * camera is closed. The failure reason will be provided in the exception' message.
+     * Cancellation of this future is a no-op.
      * @see CameraInfo#isLowLightBoostSupported()
      */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     default @NonNull ListenableFuture<Void> enableLowLightBoostAsync(boolean lowLightBoost) {
         return Futures.immediateFailedFuture(new OperationCanceledException("Not supported!"));
     }
