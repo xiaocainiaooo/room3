@@ -479,12 +479,6 @@ class ColorScheme(
 
     @OptIn(ExperimentalMaterial3Api::class)
     internal var defaultTopAppBarColorsCached: TopAppBarColors? = null
-    @OptIn(ExperimentalMaterial3Api::class)
-    internal var defaultCenterAlignedTopAppBarColorsCached: TopAppBarColors? = null
-    @OptIn(ExperimentalMaterial3Api::class)
-    internal var defaultMediumTopAppBarColorsCached: TopAppBarColors? = null
-    @OptIn(ExperimentalMaterial3Api::class)
-    internal var defaultLargeTopAppBarColorsCached: TopAppBarColors? = null
 
     internal var defaultCheckboxColorsCached: CheckboxColors? = null
 
