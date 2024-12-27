@@ -4880,10 +4880,10 @@ public abstract class AppSearchSessionCtsTestBase {
                 + "Another nonsense word that’s used a lot is bar");
         assertThat(matchInfo.getExactMatchRange()).isEqualTo(
             new SearchResult.MatchRange(/*start=*/29,  /*end=*/32));
-        assertThat(matchInfo.getExactMatch()).isEqualTo("foo");
+        assertThat(matchInfo.getExactMatch().toString()).isEqualTo("foo");
         assertThat(matchInfo.getSnippetRange()).isEqualTo(
             new SearchResult.MatchRange(/*start=*/26,  /*end=*/33));
-        assertThat(matchInfo.getSnippet()).isEqualTo("is foo.");
+        assertThat(matchInfo.getSnippet().toString()).isEqualTo("is foo.");
         assertThat(matchInfo.getPropertyPath()).isEqualTo("subject");
 
         if (!mDb1.getFeatures().isFeatureSupported(
@@ -4893,7 +4893,7 @@ public abstract class AppSearchSessionCtsTestBase {
         } else {
             assertThat(matchInfo.getSubmatchRange()).isEqualTo(
                 new SearchResult.MatchRange(/*start=*/29,  /*end=*/31));
-            assertThat(matchInfo.getSubmatch()).isEqualTo("fo");
+            assertThat(matchInfo.getSubmatch().toString()).isEqualTo("fo");
         }
     }
 
@@ -5565,10 +5565,10 @@ public abstract class AppSearchSessionCtsTestBase {
                 + "Another nonsense word that’s used a lot is bar");
         assertThat(matchInfo.getExactMatchRange()).isEqualTo(
                 new SearchResult.MatchRange(/*start=*/29,  /*end=*/32));
-        assertThat(matchInfo.getExactMatch()).isEqualTo("foo");
+        assertThat(matchInfo.getExactMatch().toString()).isEqualTo("foo");
         assertThat(matchInfo.getSnippetRange()).isEqualTo(
                 new SearchResult.MatchRange(/*start=*/26,  /*end=*/33));
-        assertThat(matchInfo.getSnippet()).isEqualTo("is foo.");
+        assertThat(matchInfo.getSnippet().toString()).isEqualTo("is foo.");
 
         if (!mDb1.getFeatures().isFeatureSupported(
                 Features.SEARCH_RESULT_MATCH_INFO_SUBMATCH)) {
@@ -5577,7 +5577,7 @@ public abstract class AppSearchSessionCtsTestBase {
         } else {
             assertThat(matchInfo.getSubmatchRange()).isEqualTo(
                     new SearchResult.MatchRange(/*start=*/29,  /*end=*/31));
-            assertThat(matchInfo.getSubmatch()).isEqualTo("fo");
+            assertThat(matchInfo.getSubmatch().toString()).isEqualTo("fo");
         }
     }
 
