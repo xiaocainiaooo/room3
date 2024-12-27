@@ -76,8 +76,8 @@ class PdfViewStateChangeTest {
             onActivity { activity ->
                 activity.findViewById<PdfView>(PDF_VIEW_ID)?.also { it.pdfDocument = pdfDocument }
             }
-            pdfDocument.waitForLayout(untilPage = 4)
             Espresso.onView(withId(PDF_VIEW_ID)).scrollToPage(3)
+            pdfDocument.waitForLayout(untilPage = 4)
             Espresso.onView(withId(PDF_VIEW_ID))
                 .checkPagesAreVisible(firstVisiblePage = 3, visiblePages = 1)
 
@@ -114,8 +114,8 @@ class PdfViewStateChangeTest {
             onActivity { activity ->
                 activity.findViewById<PdfView>(PDF_VIEW_ID)?.also { it.pdfDocument = pdfDocument }
             }
-            pdfDocument.waitForLayout(untilPage = 4)
             Espresso.onView(withId(PDF_VIEW_ID)).scrollToPage(3)
+            pdfDocument.waitForLayout(untilPage = 4)
             Espresso.onView(withId(PDF_VIEW_ID))
                 .checkPagesAreVisible(firstVisiblePage = 3, visiblePages = 1)
 
@@ -155,8 +155,8 @@ class PdfViewStateChangeTest {
                 activity.findViewById<PdfView>(PDF_VIEW_ID)?.also { it.pdfDocument = pdfDocument }
             }
 
-            pdfDocument.waitForLayout(untilPage = 4)
             Espresso.onView(withId(PDF_VIEW_ID)).scrollToPage(3)
+            pdfDocument.waitForLayout(untilPage = 4)
             Espresso.onView(withId(PDF_VIEW_ID))
                 .checkPagesAreVisible(firstVisiblePage = 3, visiblePages = 1)
             close()
@@ -174,8 +174,8 @@ class PdfViewStateChangeTest {
 
         with(ActivityScenario.launch(PdfViewTestActivity::class.java)) {
             // Scroll to page 3, and make sure it's visible
-            pdfDocument.waitForLayout(untilPage = 4)
             Espresso.onView(withId(PDF_VIEW_ID)).scrollToPage(3)
+            pdfDocument.waitForLayout(untilPage = 4)
             Espresso.onView(withId(PDF_VIEW_ID))
                 .checkPagesAreVisible(firstVisiblePage = 3, visiblePages = 1)
 
@@ -194,8 +194,8 @@ class PdfViewStateChangeTest {
             Espresso.onView(withId(PDF_VIEW_ID)).checkPagesAreVisible(firstVisiblePage = 0)
             // Then, make sure we can interact with the new document: scroll to page 3, and make
             // sure it's visible
-            pdfDocument.waitForLayout(untilPage = 3)
             Espresso.onView(withId(PDF_VIEW_ID)).scrollToPage(3)
+            pdfDocument.waitForLayout(untilPage = 3)
             Espresso.onView(withId(PDF_VIEW_ID))
                 .checkPagesAreVisible(firstVisiblePage = 3, visiblePages = 1)
 

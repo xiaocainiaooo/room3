@@ -38,6 +38,8 @@ import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
 import androidx.pdf.PdfDocument
 import androidx.pdf.util.Accessibility
+import androidx.pdf.util.MathUtils
+import androidx.pdf.util.Screen
 import androidx.pdf.util.ZoomUtils
 import java.util.LinkedList
 import java.util.Queue
@@ -160,6 +162,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private var awaitingFirstLayout: Boolean = true
     private var scrollPositionToRestore: PointF? = null
     private var zoomToRestore: Float? = null
+    /**
+     * The width of the PdfView before the last layout change (e.g., before rotation). Used to
+     * preserve the zoom level when the device is rotated.
+     */
+    private var oldWidth: Int? = width
 
     private val gestureHandler = ZoomScrollGestureHandler()
     private val gestureTracker = GestureTracker(context).apply { delegate = gestureHandler }
@@ -337,9 +344,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        val localScrollPositionToRestore = scrollPositionToRestore
-        if (awaitingFirstLayout && localScrollPositionToRestore != null) {
-            scrollToRestoredPosition(localScrollPositionToRestore, zoomToRestore ?: zoom)
+        if (changed) {
+            val localScrollPositionToRestore = scrollPositionToRestore
+            if (awaitingFirstLayout && localScrollPositionToRestore != null) {
+                var newZoom = (zoomToRestore ?: zoom) * (width.toFloat() / (oldWidth ?: width))
+                newZoom = MathUtils.clamp(newZoom, minZoom, maxZoom)
+                this.zoom = newZoom
+                scrollToRestoredPosition(localScrollPositionToRestore, zoom)
+            }
         }
         awaitingFirstLayout = false
     }
@@ -365,9 +377,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     override fun onSaveInstanceState(): Parcelable? {
         val superState = super.onSaveInstanceState()
         val state = PdfViewSavedState(superState)
-        state.contentCenterX = scrollX.toFloat() + width / 2
-        state.contentCenterY = scrollY.toFloat() + height / 2
         state.zoom = zoom
+        state.viewWidth = width
+        state.contentCenterX = toContentX(viewportWidth.toFloat() / 2f)
+        state.contentCenterY = toContentY(viewportHeight.toFloat() / 2f)
+        // Keep scroll at top if previously at top.
+        if (scrollY <= 0) {
+            state.contentCenterY = 0F
+        }
         state.documentUri = pdfDocument?.uri
         state.paginationModel = pageLayoutManager?.paginationModel
         return state
@@ -442,6 +459,21 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
     }
 
+    private fun getDefaultZoom(): Float {
+        if (contentWidth == 0 || viewportWidth == 0) return DEFAULT_INIT_ZOOM
+        val screenUtils = Screen(context)
+        val screenWidthPx = context.resources.displayMetrics.widthPixels
+        val screenWidthDp = screenUtils.dpFromPx(screenWidthPx)
+        val effectiveViewportWidth =
+            if (screenWidthDp >= 840) {
+                viewportWidth - screenUtils.pxFromDp(80)
+            } else {
+                viewportWidth
+            }
+        val widthZoom = effectiveViewportWidth.toFloat() / contentWidth
+        return MathUtils.clamp(widthZoom, minZoom, maxZoom)
+    }
+
     /**
      * Returns true if we are able to restore a previous state from savedInstanceState
      *
@@ -466,11 +498,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                     paginationModel = localStateToRestore.paginationModel!!
                 )
                 .apply { onViewportChanged(scrollY, height, zoom) }
+
         val positionToRestore =
             PointF(localStateToRestore.contentCenterX, localStateToRestore.contentCenterY)
         if (awaitingFirstLayout) {
             scrollPositionToRestore = positionToRestore
             zoomToRestore = localStateToRestore.zoom
+            oldWidth = localStateToRestore.viewWidth
         } else {
             scrollToRestoredPosition(positionToRestore, localStateToRestore.zoom)
         }
@@ -482,7 +516,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     private fun scrollToRestoredPosition(position: PointF, zoom: Float) {
         this.zoom = zoom
-        scrollTo(round(position.x - width / 2f).toInt(), round(position.y - height / 2f).toInt())
+        val scrollX = round(position.x * zoom - viewportWidth / 2f).toInt()
+        val scrollY = round(position.y * zoom - viewportHeight / 2f).toInt()
+        scrollTo(scrollX, scrollY)
         scrollPositionToRestore = null
         zoomToRestore = null
     }
@@ -594,7 +630,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     private fun reset() {
         scrollTo(0, 0)
-        zoom = DEFAULT_INIT_ZOOM
+        zoom = getDefaultZoom()
         pageManager = null
         pageLayoutManager = null
         backgroundScope.coroutineContext.cancelChildren()
@@ -623,6 +659,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         // centering if it's needed. It doesn't override any restored state because we're scrolling
         // to the current scroll position.
         if (pageNum == 0) {
+            this.zoom = getDefaultZoom()
             scrollTo(scrollX, scrollY)
         }
 
