@@ -29,9 +29,9 @@ import androidx.room.verifier.QueryResultInfo
 import androidx.room.vo.ColumnIndexVar
 import java.util.Locale
 
-/** Creates the index variables to retrieve columns from a cursor for a [PojoRowAdapter]. */
-class PojoIndexAdapter(
-    private val mapping: PojoRowAdapter.PojoMapping,
+/** Creates the index variables to retrieve columns from a cursor for a [DataClassRowAdapter]. */
+class DataClassIndexAdapter(
+    private val mapping: DataClassRowAdapter.DataClassMapping,
     private val info: QueryResultInfo?,
     private val query: ParsedQuery?,
 ) : IndexAdapter {

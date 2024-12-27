@@ -18,16 +18,16 @@ package androidx.room.processor
 
 import androidx.room.compiler.processing.XMethodElement
 import androidx.room.compiler.processing.XType
-import androidx.room.vo.PojoMethod
+import androidx.room.vo.DataClassMethod
 
 /** processes an executable element as member of the owning class */
-class PojoMethodProcessor(
+class DataClassMethodProcessor(
     private val context: Context,
     private val element: XMethodElement,
     private val owner: XType
 ) {
-    fun process(): PojoMethod {
+    fun process(): DataClassMethod {
         val asMember = element.asMemberOf(owner)
-        return PojoMethod(element = element, resolvedType = asMember)
+        return DataClassMethod(element = element, resolvedType = asMember)
     }
 }
