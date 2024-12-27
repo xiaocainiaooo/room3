@@ -247,6 +247,16 @@ public class AdvancedVendorExtender implements VendorExtender {
     }
 
     @Override
+    public @NonNull List<Pair<CameraCharacteristics.Key, Object>>
+        getAvailableCharacteristicsKeyValues() {
+        if (ClientVersion.isMinimumCompatibleVersion(Version.VERSION_1_5)
+                && ExtensionVersion.isMinimumCompatibleVersion(Version.VERSION_1_5)) {
+            return mAdvancedExtenderImpl.getAvailableCharacteristicsKeyValues();
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
     public @Nullable SessionProcessor createSessionProcessor(@NonNull Context context) {
         Preconditions.checkNotNull(mCameraId, "VendorExtender#init() must be called first");
         return new AdvancedSessionProcessor(

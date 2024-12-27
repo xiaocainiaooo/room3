@@ -16,8 +16,11 @@
 
 package androidx.camera.core.impl;
 
+import android.hardware.camera2.CameraCharacteristics;
 import android.media.ImageReader;
+import android.os.Build;
 import android.util.Pair;
+import android.util.Range;
 import android.util.Size;
 
 import androidx.camera.core.CameraInfo;
@@ -148,6 +151,28 @@ public interface SessionProcessor {
     default @AdapterCameraInfo.CameraOperation @NonNull Set<Integer>
             getSupportedCameraOperations() {
         return Collections.emptySet();
+    }
+
+    default @NonNull List<Pair<CameraCharacteristics.Key, Object>>
+            getAvailableCharacteristicsKeyValues() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Returns the extensions-specific zoom range
+     */
+    @SuppressWarnings("unchecked")
+    default @Nullable Range<Float> getExtensionZoomRange() {
+        if (Build.VERSION.SDK_INT >= 30) {
+            List<Pair<CameraCharacteristics.Key, Object>> keyValues =
+                    getAvailableCharacteristicsKeyValues();
+            for (Pair<CameraCharacteristics.Key, Object> keyValue : keyValues) {
+                if (keyValue.first.equals(CameraCharacteristics.CONTROL_ZOOM_RATIO_RANGE)) {
+                    return (Range<Float>) keyValue.second;
+                }
+            }
+        }
+        return null;
     }
 
     /**
