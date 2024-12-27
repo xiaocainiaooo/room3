@@ -26,11 +26,11 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class PojoProcessorTargetMethodTest {
+class DataClassProcessorTargetMethodTest {
 
     companion object {
-        val MY_POJO = XClassName.get("foo.bar", "MyPojo")
-        val AUTOVALUE_MY_POJO = XClassName.get("foo.bar", "AutoValue_MyPojo")
+        val MY_DATA_CLASS = XClassName.get("foo.bar", "MyDataClass")
+        val AUTOVALUE_MY_DATA_CLASS = XClassName.get("foo.bar", "AutoValue_MyDataClass")
         const val HEADER =
             """
             package foo.bar;
@@ -40,7 +40,7 @@ class PojoProcessorTargetMethodTest {
             import com.google.auto.value.*;
 
             @AutoValue
-            public abstract class MyPojo {
+            public abstract class MyDataClass {
             """
         const val AUTO_VALUE_HEADER =
             """
@@ -50,7 +50,7 @@ class PojoProcessorTargetMethodTest {
             import java.util.*;
             import com.google.auto.value.*;
 
-            public final class AutoValue_MyPojo extends MyPojo {
+            public final class AutoValue_MyDataClass extends MyDataClass {
             """
         const val FOOTER = "\n}"
     }
@@ -59,13 +59,13 @@ class PojoProcessorTargetMethodTest {
     fun invalidAnnotationInMethod() {
         val source =
             Source.java(
-                MY_POJO.canonicalName,
+                MY_DATA_CLASS.canonicalName,
                 """
             package foo.bar;
 
             import androidx.room.*;
 
-            class MyPojo {
+            class MyDataClass {
                 @PrimaryKey
                 void someRandomMethod() { }
             }
@@ -87,13 +87,13 @@ class PojoProcessorTargetMethodTest {
     fun invalidAnnotationInStaticMethod() {
         val source =
             Source.java(
-                MY_POJO.canonicalName,
+                MY_DATA_CLASS.canonicalName,
                 """
             package foo.bar;
 
             import androidx.room.*;
 
-            class MyPojo {
+            class MyDataClass {
                 @PrimaryKey
                 static void someRandomMethod() { }
             }
@@ -115,13 +115,13 @@ class PojoProcessorTargetMethodTest {
     fun invalidAnnotationInAbstractMethod() {
         val source =
             Source.java(
-                MY_POJO.canonicalName,
+                MY_DATA_CLASS.canonicalName,
                 """
             package foo.bar;
 
             import androidx.room.*;
 
-            abstract class MyPojo {
+            abstract class MyDataClass {
                 @PrimaryKey
                 abstract void someRandomMethod();
             }
@@ -148,12 +148,12 @@ class PojoProcessorTargetMethodTest {
                 abstract long getId();
                 @ColumnInfo(name = "column_name")
                 void someRandomMethod() { }
-                static MyPojo create(long id) { return new AutoValue_MyPojo(id); }
+                static MyDataClass create(long id) { return new AutoValue_MyDataClass(id); }
                 """,
             """
                 @PrimaryKey
                 private final long id;
-                AutoValue_MyPojo(long id) { this.id = id; }
+                AutoValue_MyDataClass(long id) { this.id = id; }
                 @PrimaryKey
                 long getId() { return this.id; }
                 """
@@ -177,7 +177,7 @@ class PojoProcessorTargetMethodTest {
 
             import androidx.room.*;
 
-            public abstract class ParentPojo {
+            public abstract class ParentDataClass {
                 @ColumnInfo(name = "column_name")
                 abstract String getValue();
                 @ColumnInfo(name = "another_column_name")
@@ -193,11 +193,11 @@ class PojoProcessorTargetMethodTest {
                 import com.google.auto.value.*;
 
                 @AutoValue
-                public abstract class MyPojo extends ParentPojo {
+                public abstract class MyDataClass extends ParentDataClass {
                     @PrimaryKey
                     abstract long getId();
-                    static MyPojo create(long id, String value) {
-                        return new AutoValue_MyPojo(id, value);
+                    static MyDataClass create(long id, String value) {
+                        return new AutoValue_MyDataClass(id, value);
                     }
                 $FOOTER
                 """,
@@ -205,14 +205,14 @@ class PojoProcessorTargetMethodTest {
                 $AUTO_VALUE_HEADER
                     private final long id;
                     private final String value;
-                    AutoValue_MyPojo(long id, String value) { this.id = id; this.value = value; }
+                    AutoValue_MyDataClass(long id, String value) { this.id = id; this.value = value; }
                     @PrimaryKey
                     long getId() { return this.id; }
                     @ColumnInfo(name = "column_name")
                     String getValue() { return this.value; };
                 $FOOTER
                 """,
-            Source.java("foo.bar.ParentPojo", parent)
+            Source.java("foo.bar.ParentDataClass", parent)
         ) { invocation ->
             invocation.assertCompilationResult {
                 hasErrorContaining(
@@ -229,13 +229,13 @@ class PojoProcessorTargetMethodTest {
     fun validAnnotationInField() {
         val source =
             Source.java(
-                MY_POJO.canonicalName,
+                MY_DATA_CLASS.canonicalName,
                 """
             package foo.bar;
 
             import androidx.room.*;
 
-            class MyPojo {
+            class MyDataClass {
                 @PrimaryKey
                 int someRandomField;
             }
@@ -248,13 +248,13 @@ class PojoProcessorTargetMethodTest {
     fun validAnnotationInStaticField() {
         val source =
             Source.java(
-                MY_POJO.canonicalName,
+                MY_DATA_CLASS.canonicalName,
                 """
             package foo.bar;
 
             import androidx.room.*;
 
-            class MyPojo {
+            class MyDataClass {
                 @PrimaryKey
                 static final int SOME_RANDOM_CONSTANT = 42;
             }
@@ -270,12 +270,12 @@ class PojoProcessorTargetMethodTest {
                 @AutoValue.CopyAnnotations
                 @PrimaryKey
                 abstract long getId();
-                static MyPojo create(long id) { return new AutoValue_MyPojo(id); }
+                static MyDataClass create(long id) { return new AutoValue_MyDataClass(id); }
                 """,
             """
                 @PrimaryKey
                 private final long id;
-                AutoValue_MyPojo(long id) { this.id = id; }
+                AutoValue_MyDataClass(long id) { this.id = id; }
                 @PrimaryKey
                 long getId() { return this.id; }
                 """
@@ -290,7 +290,7 @@ class PojoProcessorTargetMethodTest {
 
             import androidx.room.*;
 
-            public abstract class ParentPojo {
+            public abstract class ParentDataClass {
                 @ColumnInfo(name = "column_name")
                 abstract String getValue();
             }
@@ -304,11 +304,11 @@ class PojoProcessorTargetMethodTest {
                 import com.google.auto.value.*;
 
                 @AutoValue
-                public abstract class MyPojo extends ParentPojo {
+                public abstract class MyDataClass extends ParentDataClass {
                     @PrimaryKey
                     abstract long getId();
-                    static MyPojo create(long id, String value) {
-                        return new AutoValue_MyPojo(id, value);
+                    static MyDataClass create(long id, String value) {
+                        return new AutoValue_MyDataClass(id, value);
                     }
                 $FOOTER
                 """,
@@ -316,14 +316,14 @@ class PojoProcessorTargetMethodTest {
                 $AUTO_VALUE_HEADER
                     private final long id;
                     private final String value;
-                    AutoValue_MyPojo(long id, String value) { this.id = id; this.value = value; }
+                    AutoValue_MyDataClass(long id, String value) { this.id = id; this.value = value; }
                     @PrimaryKey
                     long getId() { return this.id; }
                     @ColumnInfo(name = "column_name")
                     String getValue() { return this.value; };
                 $FOOTER
                 """,
-            Source.java("foo.bar.ParentPojo", parent)
+            Source.java("foo.bar.ParentDataClass", parent)
         )
     }
 
@@ -335,7 +335,7 @@ class PojoProcessorTargetMethodTest {
 
             import androidx.room.*;
 
-            public interface InterfacePojo {
+            public interface InterfaceDataClass {
                 @ColumnInfo(name = "column_name")
                 String getValue();
             }
@@ -349,11 +349,11 @@ class PojoProcessorTargetMethodTest {
                 import com.google.auto.value.*;
 
                 @AutoValue
-                public abstract class MyPojo implements InterfacePojo {
+                public abstract class MyDataClass implements InterfaceDataClass {
                     @PrimaryKey
                     abstract long getId();
-                    static MyPojo create(long id, String value) {
-                        return new AutoValue_MyPojo(id, value);
+                    static MyDataClass create(long id, String value) {
+                        return new AutoValue_MyDataClass(id, value);
                     }
                 $FOOTER
                 """,
@@ -361,26 +361,26 @@ class PojoProcessorTargetMethodTest {
                 $AUTO_VALUE_HEADER
                     private final long id;
                     private final String value;
-                    AutoValue_MyPojo(long id, String value) { this.id = id; this.value = value; }
+                    AutoValue_MyDataClass(long id, String value) { this.id = id; this.value = value; }
                     @PrimaryKey
                     long getId() { return this.id; }
                     @ColumnInfo(name = "column_name")
                     public String getValue() { return this.value; };
                 $FOOTER
                 """,
-            Source.java("foo.bar.InterfacePojo", parent)
+            Source.java("foo.bar.InterfaceDataClass", parent)
         )
     }
 
     @Test
     fun validEmbeddedAnnotationInAutoValueAbstractMethod() {
-        val embeddedPojo =
+        val embeddedDataClass =
             """
             package foo.bar;
 
-            public class EmbeddedPojo {
+            public class EmbeddedDataClass {
                 private final String value;
-                public EmbeddedPojo(String value) { this.value = value; }
+                public EmbeddedDataClass(String value) { this.value = value; }
                 String getValue() { return this.value; }
             }
             """
@@ -391,42 +391,42 @@ class PojoProcessorTargetMethodTest {
                 abstract long getId();
                 @AutoValue.CopyAnnotations
                 @Embedded
-                abstract EmbeddedPojo getEmbedded();
-                static MyPojo create(long id, EmbeddedPojo embedded) {
-                    return new AutoValue_MyPojo(id, embedded);
+                abstract EmbeddedDataClass getEmbedded();
+                static MyDataClass create(long id, EmbeddedDataClass embedded) {
+                    return new AutoValue_MyDataClass(id, embedded);
                 }
                 """,
             """
                 @PrimaryKey
                 private final long id;
                 @Embedded
-                private final EmbeddedPojo embedded;
-                AutoValue_MyPojo(long id, EmbeddedPojo embedded) {
+                private final EmbeddedDataClass embedded;
+                AutoValue_MyDataClass(long id, EmbeddedDataClass embedded) {
                     this.id = id;
                     this.embedded = embedded;
                 }
                 @PrimaryKey
                 long getId() { return this.id; }
                 @Embedded
-                EmbeddedPojo getEmbedded() { return this.embedded; }
+                EmbeddedDataClass getEmbedded() { return this.embedded; }
                 """,
-            Source.java("foo.bar.EmbeddedPojo", embeddedPojo)
+            Source.java("foo.bar.EmbeddedDataClass", embeddedDataClass)
         )
     }
 
     @Test
     fun validRelationAnnotationInAutoValueAbstractMethod() {
-        val embeddedPojo =
+        val embeddedDataClass =
             """
             package foo.bar;
 
             import androidx.room.*;
 
             @Entity
-            public class RelationPojo {
+            public class RelationDataClass {
                 @PrimaryKey
                 private final long parentId;
-                public RelationPojo(long parentId) { this.parentId = parentId; }
+                public RelationDataClass(long parentId) { this.parentId = parentId; }
                 long getParentId() { return this.parentId; }
             }
             """
@@ -437,34 +437,34 @@ class PojoProcessorTargetMethodTest {
                 abstract long getId();
                 @AutoValue.CopyAnnotations
                 @Relation(parentColumn = "id", entityColumn = "parentId")
-                abstract List<RelationPojo> getRelations();
-                static MyPojo create(long id, List<RelationPojo> relations) {
-                    return new AutoValue_MyPojo(id, relations);
+                abstract List<RelationDataClass> getRelations();
+                static MyDataClass create(long id, List<RelationDataClass> relations) {
+                    return new AutoValue_MyDataClass(id, relations);
                 }
                 """,
             """
                 @PrimaryKey
                 private final long id;
                 @Relation(parentColumn = "id", entityColumn = "parentId")
-                private final List<RelationPojo> relations;
-                AutoValue_MyPojo(long id, List<RelationPojo> relations) {
+                private final List<RelationDataClass> relations;
+                AutoValue_MyDataClass(long id, List<RelationDataClass> relations) {
                     this.id = id;
                     this.relations = relations;
                 }
                 @PrimaryKey
                 long getId() { return this.id; }
                 @Relation(parentColumn = "id", entityColumn = "parentId")
-                List<RelationPojo> getRelations() { return this.relations; }
+                List<RelationDataClass> getRelations() { return this.relations; }
                 """,
-            Source.java("foo.bar.RelationPojo", embeddedPojo)
+            Source.java("foo.bar.RelationDataClass", embeddedDataClass)
         )
     }
 
     private fun singleRun(vararg sources: Source, handler: ((XTestInvocation) -> Unit)? = null) {
         runProcessorTestWithK1(sources = sources.toList()) { invocation ->
-            PojoProcessor.createFor(
+            DataClassProcessor.createFor(
                     context = invocation.context,
-                    element = invocation.processingEnv.requireTypeElement(MY_POJO),
+                    element = invocation.processingEnv.requireTypeElement(MY_DATA_CLASS),
                     bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                     parent = null
                 )
@@ -474,22 +474,22 @@ class PojoProcessorTargetMethodTest {
     }
 
     private fun singleRun(
-        pojoCode: String,
-        autoValuePojoCode: String,
+        dataClassCode: String,
+        autoValueDataClassCode: String,
         vararg sources: Source,
         handler: ((XTestInvocation) -> Unit)? = null
     ) {
         singleRunFullClass(
-            pojoCode =
+            dataClassCode =
                 """
                     $HEADER
-                    $pojoCode
+                    $dataClassCode
                     $FOOTER
                     """,
-            autoValuePojoCode =
+            autoValueDataClassCode =
                 """
                     $AUTO_VALUE_HEADER
-                    $autoValuePojoCode
+                    $autoValueDataClassCode
                     $FOOTER
                     """,
             handler = handler,
@@ -498,18 +498,19 @@ class PojoProcessorTargetMethodTest {
     }
 
     private fun singleRunFullClass(
-        pojoCode: String,
-        autoValuePojoCode: String,
+        dataClassCode: String,
+        autoValueDataClassCode: String,
         vararg sources: Source,
         handler: ((XTestInvocation) -> Unit)? = null
     ) {
-        val pojoSource = Source.java(MY_POJO.canonicalName, pojoCode)
-        val autoValuePojoSource = Source.java(AUTOVALUE_MY_POJO.canonicalName, autoValuePojoCode)
-        val all = sources.toList() + pojoSource + autoValuePojoSource
+        val dataClassSource = Source.java(MY_DATA_CLASS.canonicalName, dataClassCode)
+        val autoValueDataClassSource =
+            Source.java(AUTOVALUE_MY_DATA_CLASS.canonicalName, autoValueDataClassCode)
+        val all = sources.toList() + dataClassSource + autoValueDataClassSource
         return runProcessorTestWithK1(sources = all) { invocation ->
-            PojoProcessor.createFor(
+            DataClassProcessor.createFor(
                     context = invocation.context,
-                    element = invocation.processingEnv.requireTypeElement(MY_POJO),
+                    element = invocation.processingEnv.requireTypeElement(MY_DATA_CLASS),
                     bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
                     parent = null
                 )

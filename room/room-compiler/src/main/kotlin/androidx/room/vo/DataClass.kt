@@ -23,8 +23,8 @@ import androidx.room.compiler.processing.XTypeElement
 import androidx.room.processor.DatabaseViewProcessor
 import androidx.room.processor.EntityProcessor
 
-/** A class is turned into a Pojo if it is used in a query response. */
-open class Pojo(
+/** A class is turned into a data class if it is used in a query response. */
+open class DataClass(
     val element: XTypeElement,
     val type: XType,
     fields: List<Field>,
@@ -38,8 +38,8 @@ open class Pojo(
     override val fields = Fields(fields)
 
     /**
-     * All table or view names that are somehow accessed by this Pojo. Might be via Embedded or
-     * Relation.
+     * All table or view names that are somehow accessed by this data class. Might be via Embedded
+     * or Relation.
      */
     fun accessedTableNames(): List<String> {
         val entityAnnotation = element.getAnnotation(androidx.room.Entity::class)
@@ -52,7 +52,7 @@ open class Pojo(
             } else {
                 emptyList()
             } +
-                embeddedFields.flatMap { it.pojo.accessedTableNames() } +
+                embeddedFields.flatMap { it.dataClass.accessedTableNames() } +
                 relations.map { it.entity.tableName }
         }
     }

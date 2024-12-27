@@ -21,21 +21,21 @@ import androidx.room.compiler.processing.XExecutableElement
 import androidx.room.compiler.processing.XType
 import androidx.room.compiler.processing.XTypeElement
 import androidx.room.processor.Context
-import androidx.room.processor.PojoProcessor
-import androidx.room.processor.PojoProcessor.Companion.TARGET_METHOD_ANNOTATIONS
+import androidx.room.processor.DataClassProcessor
+import androidx.room.processor.DataClassProcessor.Companion.TARGET_METHOD_ANNOTATIONS
 import androidx.room.processor.ProcessorErrors
 import androidx.room.vo.Constructor
+import androidx.room.vo.DataClass
 import androidx.room.vo.EmbeddedField
 import androidx.room.vo.Field
-import androidx.room.vo.Pojo
 import androidx.room.vo.Warning
 import com.google.auto.value.AutoValue.CopyAnnotations
 
-/** Delegate to process generated AutoValue class as a Pojo. */
-class AutoValuePojoProcessorDelegate(
+/** Delegate to process generated AutoValue class as a data class. */
+class AutoValueDataClassProcessorDelegate(
     private val context: Context,
     private val autoValueElement: XTypeElement
-) : PojoProcessor.Delegate {
+) : DataClassProcessor.Delegate {
 
     private val autoValueDeclaredType: XType by lazy { autoValueElement.type }
 
@@ -79,15 +79,15 @@ class AutoValuePojoProcessorDelegate(
         }
     }
 
-    override fun createPojo(
+    override fun createDataClass(
         element: XTypeElement,
         declaredType: XType,
         fields: List<Field>,
         embeddedFields: List<EmbeddedField>,
         relations: List<androidx.room.vo.Relation>,
         constructor: Constructor?
-    ): Pojo {
-        return Pojo(
+    ): DataClass {
+        return DataClass(
             element = element,
             type = autoValueDeclaredType,
             fields = fields,
