@@ -17,11 +17,14 @@
 package androidx.pdf.view
 
 import android.graphics.Point
-import android.graphics.Rect
 import android.graphics.RectF
+import android.net.Uri
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.pdf.PdfDocument
+import androidx.pdf.content.PdfPageGotoLinkContent
+import androidx.pdf.content.PdfPageLinkContent
 import androidx.pdf.content.PdfPageTextContent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso
@@ -52,7 +55,33 @@ class AccessibilityPageHelperTest {
                         bounds = listOf(RectF(0f, 0f, 100f, 200f)),
                         text = "Sample text for page ${index + 1}"
                     )
-                }
+                },
+            pageLinks =
+                mapOf(
+                    0 to
+                        PdfDocument.PdfPageLinks(
+                            gotoLinks =
+                                listOf(
+                                    PdfPageGotoLinkContent(
+                                        bounds = listOf(RectF(25f, 30f, 75f, 50f)),
+                                        destination =
+                                            PdfPageGotoLinkContent.Destination(
+                                                pageNumber = VALID_PAGE_NUMBER,
+                                                xCoordinate = 10f,
+                                                yCoordinate = 40f,
+                                                zoom = 1f
+                                            )
+                                    )
+                                ),
+                            externalLinks =
+                                listOf(
+                                    PdfPageLinkContent(
+                                        bounds = listOf(RectF(25f, 60f, 75f, 80f)),
+                                        uri = Uri.parse(URI_WITH_VALID_SCHEME)
+                                    )
+                                ),
+                        )
+                )
         )
 
     @Before
@@ -86,6 +115,32 @@ class AccessibilityPageHelperTest {
     }
 
     @Test
+    fun getVirtualViewAt_returnsCorrectLink() = runTest {
+        val accessibilityPageHelper =
+            requireNotNull(pdfView.accessibilityPageHelper) {
+                "AccessibilityPageHelper must not be null."
+            }
+
+        // Wait until layout completes for the required pages
+        pdfDocument.waitForLayout(untilPage = 2)
+
+        // Test cases with content coordinates and expected page indices
+        val testCases =
+            listOf(
+                Triple(50f, 40f, 10), // Goto Link
+                Triple(50f, 70f, 11) // External Link
+            )
+
+        testCases.forEach { (x, y, expectedLinkId) ->
+            val adjustedX = pdfView.toViewCoord(x, pdfView.zoom, pdfView.scrollX)
+            val adjustedY = pdfView.toViewCoord(y, pdfView.zoom, pdfView.scrollY)
+
+            assertThat(accessibilityPageHelper.getVirtualViewAt(adjustedX, adjustedY))
+                .isEqualTo(expectedLinkId)
+        }
+    }
+
+    @Test
     fun getVirtualViewAt_returnsCorrectPage() = runTest {
         val accessibilityPageHelper =
             requireNotNull(pdfView.accessibilityPageHelper) {
@@ -116,7 +171,7 @@ class AccessibilityPageHelperTest {
     }
 
     @Test
-    fun getVisibleVirtualViews_returnsCorrectPages() = runTest {
+    fun getVisibleVirtualViews_returnsCorrectPagesAndLinks() = runTest {
         val accessibilityPageHelper =
             requireNotNull(pdfView.accessibilityPageHelper) {
                 "AccessibilityPageHelper must not be null."
@@ -127,9 +182,9 @@ class AccessibilityPageHelperTest {
         Espresso.onView(withId(PDF_VIEW_ID))
             .checkPagesAreVisible(firstVisiblePage = 0, visiblePages = 5)
 
-        val visiblePages = mutableListOf<Int>()
-        accessibilityPageHelper.getVisibleVirtualViews(visiblePages)
-        assertThat(visiblePages).isEqualTo(listOf(0, 1, 2, 3, 4))
+        val visiblePagesAndLinks = mutableListOf<Int>()
+        accessibilityPageHelper.getVisibleVirtualViews(visiblePagesAndLinks)
+        assertThat(visiblePagesAndLinks).isEqualTo(listOf(0, 1, 2, 3, 4, 10, 11))
     }
 
     @Test
@@ -144,13 +199,19 @@ class AccessibilityPageHelperTest {
         Espresso.onView(withId(PDF_VIEW_ID))
             .checkPagesAreVisible(firstVisiblePage = 0, visiblePages = 5)
 
-        val node = mock(AccessibilityNodeInfoCompat::class.java)
-        val virtualViewId = 1 // Page 2
+        val testCases =
+            listOf(
+                1 to "Page 2: Sample text for page 2",
+                10 to "Go to page 5",
+                11 to "Link: www.example.com"
+            )
+        testCases.forEach { (virtualViewId, expectedDescription) ->
+            val node = mock(AccessibilityNodeInfoCompat::class.java)
+            accessibilityPageHelper.onPopulateNodeForVirtualView(virtualViewId, node)
 
-        accessibilityPageHelper.onPopulateNodeForVirtualView(virtualViewId, node)
-        val expectedDescription = "Page 2: Sample text for page 2"
-        verify(node).contentDescription = expectedDescription
-        verify(node).isFocusable = true
+            verify(node).contentDescription = expectedDescription
+            verify(node).isFocusable = true
+        }
     }
 
     @Test
@@ -163,17 +224,22 @@ class AccessibilityPageHelperTest {
         // Wait until layout completes for the required pages
         pdfDocument.waitForLayout(untilPage = 0)
 
-        val node = mock(AccessibilityNodeInfoCompat::class.java)
-        val virtualViewId = 0 // Page 1
+        val testCases =
+            listOf(
+                0 to RectF(0f, 0f, 100f, 200f),
+                10 to RectF(25f, 30f, 75f, 50f),
+                11 to RectF(25f, 60f, 75f, 80f)
+            )
 
-        accessibilityPageHelper.onPopulateNodeForVirtualView(virtualViewId, node)
+        testCases.forEach { (virtualViewId, boundsInParent) ->
+            val node = mock(AccessibilityNodeInfoCompat::class.java)
+            val expectedBounds =
+                accessibilityPageHelper.scalePageBounds(boundsInParent, pdfView.zoom)
 
-        // Verify that bounds are set correctly.
-        val boundsInParent = Rect(0, 0, 100, 200)
-        val expectedBounds = accessibilityPageHelper.scalePageBounds(boundsInParent, pdfView.zoom)
-
-        verify(node).let {
-            accessibilityPageHelper.setBoundsInScreenFromBoundsInParent(node, expectedBounds)
+            accessibilityPageHelper.onPopulateNodeForVirtualView(virtualViewId, node)
+            verify(node).let {
+                accessibilityPageHelper.setBoundsInScreenFromBoundsInParent(node, expectedBounds)
+            }
         }
     }
 
@@ -205,3 +271,5 @@ class AccessibilityPageHelperTest {
 
 /** Arbitrary fixed ID for PdfView */
 private const val PDF_VIEW_ID = 123456789
+private const val URI_WITH_VALID_SCHEME = "https://www.example.com"
+private const val VALID_PAGE_NUMBER = 4
