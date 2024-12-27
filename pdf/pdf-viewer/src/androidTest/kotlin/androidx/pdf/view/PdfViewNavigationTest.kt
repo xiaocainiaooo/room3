@@ -57,23 +57,24 @@ class PdfViewNavigationTest {
             FakePdfDocument(
                 pages = List(2) { Point(1000, 1000) },
                 pageLinks =
-                    listOf(
-                        PdfDocument.PdfPageLinks(
-                            gotoLinks =
-                                listOf(
-                                    PdfPageGotoLinkContent(
-                                        bounds = listOf(RectF(0f, 0f, 1000f, 1000f)),
-                                        destination =
-                                            PdfPageGotoLinkContent.Destination(
-                                                pageNumber = 1,
-                                                xCoordinate = 100f,
-                                                yCoordinate = 1400f,
-                                                zoom = 1f
-                                            )
-                                    )
-                                ),
-                            externalLinks = emptyList()
-                        )
+                    mapOf(
+                        0 to
+                            PdfDocument.PdfPageLinks(
+                                gotoLinks =
+                                    listOf(
+                                        PdfPageGotoLinkContent(
+                                            bounds = listOf(RectF(0f, 0f, 1000f, 1000f)),
+                                            destination =
+                                                PdfPageGotoLinkContent.Destination(
+                                                    pageNumber = VALID_PAGE_NUMBER,
+                                                    xCoordinate = 10f,
+                                                    yCoordinate = 40f,
+                                                    zoom = 1f
+                                                )
+                                        )
+                                    ),
+                                externalLinks = emptyList()
+                            )
                     )
             )
         PdfViewTestActivity.onCreateCallback = { activity ->
@@ -115,17 +116,18 @@ class PdfViewNavigationTest {
             FakePdfDocument(
                 pages = List(5) { Point(1000, 1000) },
                 pageLinks =
-                    listOf(
-                        PdfDocument.PdfPageLinks(
-                            gotoLinks = emptyList(),
-                            externalLinks =
-                                listOf(
-                                    PdfPageLinkContent(
-                                        bounds = listOf(RectF(0f, 0f, 200f, 200f)),
-                                        uri = Uri.parse("https://www.example.com")
-                                    )
-                                )
-                        )
+                    mapOf(
+                        0 to
+                            PdfDocument.PdfPageLinks(
+                                gotoLinks = emptyList(),
+                                externalLinks =
+                                    listOf(
+                                        PdfPageLinkContent(
+                                            bounds = listOf(RectF(25f, 60f, 75f, 80f)),
+                                            uri = Uri.parse(URI_WITH_VALID_SCHEME)
+                                        )
+                                    ),
+                            )
                     )
             )
 
@@ -159,3 +161,5 @@ class PdfViewNavigationTest {
 
 /** Arbitrary fixed ID for PdfView */
 private const val PDF_VIEW_ID = 123456789
+private const val URI_WITH_VALID_SCHEME = "https://www.example.com"
+private const val VALID_PAGE_NUMBER = 4
