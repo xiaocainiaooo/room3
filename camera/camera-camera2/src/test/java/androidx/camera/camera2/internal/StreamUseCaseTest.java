@@ -240,7 +240,8 @@ public class StreamUseCaseTest {
                 CameraMode.CONCURRENT_CAMERA,
                 BIT_DEPTH_8_BIT,
                 /*isPreviewStabilizationOn=*/false,
-                /*isUltraHdrOn=*/ false
+                /*isUltraHdrOn=*/ false,
+                /*isHighSpeedOn=*/ false
         );
         assertFalse(shouldUseStreamUseCase(featureSettings));
     }
@@ -251,7 +252,8 @@ public class StreamUseCaseTest {
                 CameraMode.DEFAULT,
                 BIT_DEPTH_10_BIT,
                 /*isPreviewStabilizationOn=*/false,
-                /*isUltraHdrOn=*/ false
+                /*isUltraHdrOn=*/ false,
+                /*isHighSpeedOn=*/ false
         );
         assertFalse(shouldUseStreamUseCase(featureSettings));
     }
