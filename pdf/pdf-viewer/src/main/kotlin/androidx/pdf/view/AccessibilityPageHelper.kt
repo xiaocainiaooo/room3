@@ -20,6 +20,7 @@ import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
 import androidx.annotation.NonNull
+import androidx.annotation.VisibleForTesting
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.customview.widget.ExploreByTouchHelper
 import androidx.pdf.R
@@ -36,7 +37,7 @@ internal class AccessibilityPageHelper(
     private val pageManager: PageManager
 ) : ExploreByTouchHelper(pdfView) {
 
-    override fun getVirtualViewAt(x: Float, y: Float): Int {
+    public override fun getVirtualViewAt(x: Float, y: Float): Int {
         val visiblePages = pageLayoutManager.visiblePages.value
 
         val contentX = pdfView.toContentX(x).toInt()
@@ -49,12 +50,12 @@ internal class AccessibilityPageHelper(
         } ?: HOST_ID
     }
 
-    override fun getVisibleVirtualViews(virtualViewIds: MutableList<Int>) {
+    public override fun getVisibleVirtualViews(virtualViewIds: MutableList<Int>) {
         val visiblePages = pageLayoutManager.visiblePages.value
         virtualViewIds.addAll(visiblePages.lower..visiblePages.upper)
     }
 
-    override fun onPopulateNodeForVirtualView(
+    public override fun onPopulateNodeForVirtualView(
         virtualViewId: Int,
         @NonNull node: AccessibilityNodeInfoCompat
     ) {
@@ -85,7 +86,8 @@ internal class AccessibilityPageHelper(
         return false
     }
 
-    private fun scalePageBounds(bounds: Rect, zoom: Float): Rect {
+    @VisibleForTesting
+    fun scalePageBounds(bounds: Rect, zoom: Float): Rect {
         return Rect(
             (bounds.left * zoom).toInt(),
             (bounds.top * zoom).toInt(),
