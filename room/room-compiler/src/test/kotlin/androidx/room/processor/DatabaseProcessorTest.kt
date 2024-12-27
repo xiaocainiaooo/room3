@@ -1693,7 +1693,7 @@ class DatabaseProcessorTest {
                             ),
                         type = mock(XType::class.java),
                         fields = emptyList(),
-                        embeddedFields = emptyList(),
+                        embeddedProperties = emptyList(),
                         constructor = null
                     )
                 }

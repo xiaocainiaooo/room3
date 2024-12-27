@@ -221,7 +221,7 @@ abstract class BaseRoomConnectionManager {
                         "Please provide the necessary Migration path via " +
                         "RoomDatabase.Builder.addMigration(...) or allow for " +
                         "destructive migrations via one of the " +
-                        "RoomDatabase.Builder.fallbackToDestructiveMigration* methods."
+                        "RoomDatabase.Builder.fallbackToDestructiveMigration* functions."
                 )
             }
             dropAllTables(connection)

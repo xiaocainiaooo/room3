@@ -22,21 +22,22 @@ import androidx.room.compiler.processing.XFieldElement
 import androidx.room.compiler.processing.XType
 import androidx.room.parser.Collate
 import androidx.room.parser.SQLTypeAffinity
-import androidx.room.vo.EmbeddedField
-import androidx.room.vo.Field
+import androidx.room.vo.EmbeddedProperty
+import androidx.room.vo.Property
 import java.util.Locale
 
-class FieldProcessor(
+class PropertyProcessor(
     baseContext: Context,
     val containing: XType,
     val element: XFieldElement,
     val bindingScope: BindingScope,
-    val fieldParent: EmbeddedField?, // pass only if this is processed as a child of Embedded field
-    val onBindingError: (field: Field, errorMsg: String) -> Unit
+    val propertyParent:
+        EmbeddedProperty?, // pass only if this is processed as a child of Embedded property
+    val onBindingError: (property: Property, errorMsg: String) -> Unit
 ) {
     val context = baseContext.fork(element)
 
-    fun process(): Field {
+    fun process(): Property {
         val member = element.asMemberOf(containing)
         val columnInfoAnnotation = element.getAnnotation(ColumnInfo::class)
         val elementName = element.name
@@ -50,7 +51,7 @@ class FieldProcessor(
             } else {
                 elementName
             }
-        val columnName = (fieldParent?.prefix ?: "") + rawCName
+        val columnName = (propertyParent?.prefix ?: "") + rawCName
         val affinity =
             try {
                 val affinityInt =
@@ -64,7 +65,7 @@ class FieldProcessor(
         context.checker.notUnbound(
             member,
             element,
-            ProcessorErrors.CANNOT_USE_UNBOUND_GENERICS_IN_ENTITY_FIELDS
+            ProcessorErrors.CANNOT_USE_UNBOUND_GENERICS_IN_ENTITY_PROPERTIES
         )
 
         val adapter =
@@ -74,10 +75,10 @@ class FieldProcessor(
                 skipDefaultConverter = false
             )
         val adapterAffinity = adapter?.typeAffinity ?: affinity
-        val nonNull = Field.calcNonNull(member, fieldParent)
+        val nonNull = Property.calcNonNull(member, propertyParent)
         val collateInt = columnInfoAnnotation?.get("collate")?.asInt() ?: ColumnInfo.UNSPECIFIED
-        val field =
-            Field(
+        val property =
+            Property(
                 name = elementName,
                 type = member,
                 element = element,
@@ -90,7 +91,7 @@ class FieldProcessor(
                         adapterAffinity,
                         nonNull
                     ),
-                parent = fieldParent,
+                parent = propertyParent,
                 indexed = columnInfoAnnotation?.get("index")?.asBoolean() == true,
                 nonNull = nonNull
             )
@@ -100,41 +101,47 @@ class FieldProcessor(
             member.typeElement?.isValueClass() == true &&
                 context.codeLanguage != CodeLanguage.KOTLIN
         ) {
-            onBindingError(field, ProcessorErrors.VALUE_CLASS_ONLY_SUPPORTED_IN_KSP)
+            onBindingError(property, ProcessorErrors.VALUE_CLASS_ONLY_SUPPORTED_IN_KSP)
         }
 
         when (bindingScope) {
             BindingScope.TWO_WAY -> {
-                field.statementBinder = adapter
-                field.statementValueReader = adapter
-                field.affinity = adapterAffinity
+                property.statementBinder = adapter
+                property.statementValueReader = adapter
+                property.affinity = adapterAffinity
                 if (adapter == null) {
-                    onBindingError(field, ProcessorErrors.CANNOT_FIND_COLUMN_TYPE_ADAPTER)
+                    onBindingError(property, ProcessorErrors.CANNOT_FIND_COLUMN_TYPE_ADAPTER)
                 }
             }
             BindingScope.BIND_TO_STMT -> {
-                field.statementBinder =
-                    context.typeAdapterStore.findStatementValueBinder(field.type, field.affinity)
-                if (field.statementBinder == null) {
-                    onBindingError(field, ProcessorErrors.CANNOT_FIND_STMT_BINDER)
+                property.statementBinder =
+                    context.typeAdapterStore.findStatementValueBinder(
+                        property.type,
+                        property.affinity
+                    )
+                if (property.statementBinder == null) {
+                    onBindingError(property, ProcessorErrors.CANNOT_FIND_STMT_BINDER)
                 }
             }
             BindingScope.READ_FROM_STMT -> {
-                field.statementValueReader =
-                    context.typeAdapterStore.findStatementValueReader(field.type, field.affinity)
-                if (field.statementValueReader == null) {
-                    onBindingError(field, ProcessorErrors.CANNOT_FIND_STMT_READER)
+                property.statementValueReader =
+                    context.typeAdapterStore.findStatementValueReader(
+                        property.type,
+                        property.affinity
+                    )
+                if (property.statementValueReader == null) {
+                    onBindingError(property, ProcessorErrors.CANNOT_FIND_STMT_READER)
                 }
             }
         }
 
-        return field
+        return property
     }
 
     private fun extractDefaultValue(
         value: String?,
         affinity: SQLTypeAffinity?,
-        fieldNonNull: Boolean
+        propertyNonNull: Boolean
     ): String? {
         if (value == null) {
             return null
@@ -156,7 +163,7 @@ class FieldProcessor(
                     value
                 }
             }
-        if (trimmed == "null" && fieldNonNull) {
+        if (trimmed == "null" && propertyNonNull) {
             context.logger.e(element, ProcessorErrors.DEFAULT_VALUE_NULLABILITY)
         }
         return defaultValue

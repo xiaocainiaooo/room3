@@ -293,14 +293,14 @@ private class InternalQueryProcessor(
                     }
             if (unusedColumns.isNotEmpty() || pojoUnusedFields.isNotEmpty()) {
                 val warningMsg =
-                    ProcessorErrors.queryFieldDataClassMismatch(
+                    ProcessorErrors.queryPropertyDataClassMismatch(
                         dataClassTypeNames =
                             dataClassMappings.map {
                                 it.dataClass.typeName.toString(context.codeLanguage)
                             },
                         unusedColumns = unusedColumns,
                         allColumns = columnNames,
-                        dataClassUnusedFields = pojoUnusedFields,
+                        dataClassUnusedProperties = pojoUnusedFields,
                     )
                 context.logger.w(Warning.QUERY_MISMATCH, executableElement, warningMsg)
             }

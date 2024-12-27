@@ -80,7 +80,7 @@ class DatabaseViewProcessor(
             DataClassProcessor.createFor(
                     context = context,
                     element = element,
-                    bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
+                    bindingScope = PropertyProcessor.BindingScope.READ_FROM_STMT,
                     parent = null,
                     referenceStack = referenceStack
                 )
@@ -91,8 +91,8 @@ class DatabaseViewProcessor(
             viewName = viewName,
             query = query,
             type = pojo.type,
-            fields = pojo.fields,
-            embeddedFields = pojo.embeddedFields,
+            fields = pojo.properties,
+            embeddedProperties = pojo.embeddedProperties,
             constructor = pojo.constructor
         )
     }

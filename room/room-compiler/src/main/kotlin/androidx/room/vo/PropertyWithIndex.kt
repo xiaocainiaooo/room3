@@ -17,17 +17,25 @@
 package androidx.room.vo
 
 /**
- * A common value object when we need to associate a Field with an Index variable.
+ * A common value object when we need to associate a Property with an Index variable.
  *
  * <p>
- * If we are sure that the field will be there at compile time, we set it to always Exists so that
- * the generated code does not check for -1 column indices.
+ * If we are sure that the property will be there at compile time, we set it to always Exists so
+ * that the generated code does not check for -1 column indices.
  */
-data class FieldWithIndex(val field: Field, val indexVar: String, val alwaysExists: Boolean) {
+data class PropertyWithIndex(
+    val property: Property,
+    val indexVar: String,
+    val alwaysExists: Boolean
+) {
     companion object {
-        fun byOrder(fields: List<Field>): List<FieldWithIndex> {
-            return fields.mapIndexed { index, field ->
-                FieldWithIndex(field = field, indexVar = "${index + 1}", alwaysExists = true)
+        fun byOrder(properties: List<Property>): List<PropertyWithIndex> {
+            return properties.mapIndexed { index, property ->
+                PropertyWithIndex(
+                    property = property,
+                    indexVar = "${index + 1}",
+                    alwaysExists = true
+                )
             }
         }
     }

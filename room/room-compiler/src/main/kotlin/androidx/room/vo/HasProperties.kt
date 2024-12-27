@@ -16,20 +16,21 @@
 
 package androidx.room.vo
 
-interface HasFields {
-    val fields: Fields
+interface HasProperties {
+    val properties: Properties
 }
 
 // we need to make it class to enable caching (see columnNames by lazy), extension properties
 // and functions don't have a way to store calculated value.
-data class Fields(private val fields: List<Field> = emptyList()) : List<Field> by fields {
-    constructor(field: Field) : this(listOf(field))
+data class Properties(private val properties: List<Property> = emptyList()) :
+    List<Property> by properties {
+    constructor(property: Property) : this(listOf(property))
 
     internal val columnNames by lazy(LazyThreadSafetyMode.NONE) { map { it.columnName } }
 }
 
-val HasFields.columnNames
-    get() = fields.columnNames
+val HasProperties.columnNames
+    get() = properties.columnNames
 
-fun HasFields.findFieldByColumnName(columnName: String) =
-    fields.find { it.columnName == columnName }
+fun HasProperties.findPropertyByColumnName(columnName: String) =
+    properties.find { it.columnName == columnName }
