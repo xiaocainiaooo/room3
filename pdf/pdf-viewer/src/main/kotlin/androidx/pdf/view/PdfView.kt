@@ -17,6 +17,8 @@
 package androidx.pdf.view
 
 import android.animation.ValueAnimator
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
@@ -432,6 +434,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
         state.documentUri = pdfDocument?.uri
         state.paginationModel = pageLayoutManager?.paginationModel
+        state.selectionModel = selectionStateManager?.selectionModel
         return state
     }
 
@@ -542,9 +545,16 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                     localPdfDocument,
                     backgroundScope,
                     DEFAULT_PAGE_PREFETCH_RADIUS,
-                    paginationModel = localStateToRestore.paginationModel!!
+                    paginationModel = requireNotNull(localStateToRestore.paginationModel)
                 )
                 .apply { onViewportChanged(scrollY, height, zoom) }
+        selectionStateManager =
+            SelectionStateManager(
+                localPdfDocument,
+                backgroundScope,
+                resources.getDimensionPixelSize(R.dimen.text_select_handle_touch_size),
+                localStateToRestore.selectionModel
+            )
 
         val positionToRestore =
             PointF(localStateToRestore.contentCenterX, localStateToRestore.contentCenterY)
@@ -670,17 +680,18 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 Point(maxBitmapDimensionPx, maxBitmapDimensionPx),
                 isTouchExplorationEnabled
             )
-        selectionStateManager =
-            SelectionStateManager(
-                localPdfDocument,
-                backgroundScope,
-                resources.getDimensionPixelSize(R.dimen.text_select_handle_touch_size)
-            )
-        // We'll either create our layout manager from restored state, or instantiate a new one
+        // We'll either create our layout and selection managers from restored state, or
+        // instantiate new ones
         if (!maybeRestoreState()) {
             pageLayoutManager =
                 PageLayoutManager(localPdfDocument, backgroundScope, DEFAULT_PAGE_PREFETCH_RADIUS)
                     .apply { onViewportChanged(scrollY, height, zoom) }
+            selectionStateManager =
+                SelectionStateManager(
+                    localPdfDocument,
+                    backgroundScope,
+                    resources.getDimensionPixelSize(R.dimen.text_select_handle_touch_size)
+                )
             setAccessibility()
         }
         // If not, we'll start doing this when we _are_ attached to a visible window
@@ -927,8 +938,28 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             return false
         }
 
+        @CallSuper
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            TODO("Not yet implemented")
+            if (item.itemId == R.id.action_selectAll) {
+                // We can't select all if we don't know what page the selection is on, or if
+                // we don't know the size of that page
+                val page = currentSelection?.bounds?.first()?.pageNum ?: return false
+                val pageSize = pageLayoutManager?.getPageSize(page) ?: return false
+                selectionStateManager?.selectAllTextOnPageAsync(page, pageSize)
+                return true
+            } else if (item.itemId == R.id.action_copy) {
+                // We can't copy the current selection if no text is selected
+                val text = (currentSelection as? TextSelection)?.text ?: return false
+                copyToClipboard(text)
+                return true
+            }
+            return false
+        }
+
+        private fun copyToClipboard(text: String) {
+            val manager = context.getSystemService(ClipboardManager::class.java)
+            val clip = ClipData.newPlainText(context.getString(R.string.clipboard_label), text)
+            manager.setPrimaryClip(clip)
         }
 
         override fun onDestroyActionMode(mode: ActionMode) {

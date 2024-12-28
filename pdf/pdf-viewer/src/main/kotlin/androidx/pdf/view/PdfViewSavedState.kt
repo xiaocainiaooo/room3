@@ -17,10 +17,10 @@
 package androidx.pdf.view
 
 import android.net.Uri
-import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import android.os.Parcelable.ClassLoaderCreator
+import androidx.core.os.ParcelCompat
 import androidx.customview.view.AbsSavedState
 
 /** [AbsSavedState] implementation for [PdfView] */
@@ -35,6 +35,7 @@ internal class PdfViewSavedState : AbsSavedState {
      * preserve the zoom level when the device is rotated.
      */
     var viewWidth: Int = 0
+    var selectionModel: SelectionModel? = null
 
     /**
      * If we don't know what document this state belongs to, we cannot restore it. If we do not have
@@ -57,18 +58,9 @@ internal class PdfViewSavedState : AbsSavedState {
         contentCenterX = parcel.readFloat()
         contentCenterY = parcel.readFloat()
         zoom = parcel.readFloat()
-        documentUri =
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
-                parcel.readParcelable(loader, Uri::class.java)
-            } else {
-                parcel.readParcelable(loader)
-            }
-        paginationModel =
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
-                parcel.readParcelable(loader, PaginationModel::class.java)
-            } else {
-                parcel.readParcelable(loader)
-            }
+        documentUri = ParcelCompat.readParcelable(parcel, loader, Uri::class.java)
+        paginationModel = ParcelCompat.readParcelable(parcel, loader, PaginationModel::class.java)
+        selectionModel = ParcelCompat.readParcelable(parcel, loader, SelectionModel::class.java)
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
@@ -78,6 +70,7 @@ internal class PdfViewSavedState : AbsSavedState {
         dest.writeFloat(zoom)
         dest.writeParcelable(documentUri, flags)
         dest.writeParcelable(paginationModel, flags)
+        dest.writeParcelable(selectionModel, flags)
     }
 
     companion object {

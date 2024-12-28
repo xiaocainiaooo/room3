@@ -16,19 +16,52 @@
 
 package androidx.pdf.view
 
+import android.annotation.SuppressLint
 import android.graphics.PointF
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.annotation.VisibleForTesting
+import androidx.core.os.ParcelCompat
 import androidx.pdf.PdfDocument
 import androidx.pdf.content.PageSelection
 
 /** Value class containing all data necessary to display UI related to content selection */
+@SuppressLint("BanParcelableUsage")
 internal class SelectionModel
 @VisibleForTesting
 internal constructor(
     val selection: Selection,
     val startBoundary: UiSelectionBoundary,
     val endBoundary: UiSelectionBoundary
-) {
+) : Parcelable {
+    constructor(
+        parcel: Parcel
+    ) : this(
+        textSelectionFromParcel(parcel, TextSelection::class.java.classLoader),
+        requireNotNull(
+            ParcelCompat.readParcelable(
+                parcel,
+                UiSelectionBoundary::class.java.classLoader,
+                UiSelectionBoundary::class.java
+            )
+        ),
+        requireNotNull(
+            ParcelCompat.readParcelable(
+                parcel,
+                UiSelectionBoundary::class.java.classLoader,
+                UiSelectionBoundary::class.java
+            )
+        ),
+    )
+
+    override fun describeContents(): Int = 0
+
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        (selection as TextSelection).writeToParcel(dest, flags)
+        startBoundary.writeToParcel(dest, flags)
+        endBoundary.writeToParcel(dest, flags)
+    }
+
     companion object {
         /** Produces a [SelectionModel] from a single [PageSelection] on a single page */
         // TODO(b/386398335) Add support for creating a SelectionModel from selections on 2 pages
@@ -66,6 +99,18 @@ internal constructor(
             val concatenatedText = this.selectedTextContents.joinToString(" ") { it.text }
             return TextSelection(concatenatedText, flattenedBounds)
         }
+
+        @JvmField
+        val CREATOR =
+            object : Parcelable.Creator<SelectionModel> {
+                override fun createFromParcel(parcel: Parcel): SelectionModel {
+                    return SelectionModel(parcel)
+                }
+
+                override fun newArray(size: Int): Array<SelectionModel?> {
+                    return arrayOfNulls(size)
+                }
+            }
     }
 }
 
@@ -74,4 +119,29 @@ internal constructor(
  * it exists (as [PdfPoint]), as well as the direction of the selection ([isRtl] is true if the
  * selection was made in a right-to-left direction).
  */
-internal class UiSelectionBoundary(val location: PdfPoint, val isRtl: Boolean)
+@SuppressLint("BanParcelableUsage")
+internal class UiSelectionBoundary(val location: PdfPoint, val isRtl: Boolean) : Parcelable {
+    constructor(
+        parcel: Parcel
+    ) : this(
+        pdfPointFromParcel(parcel, PdfPoint::class.java.classLoader),
+        parcel.readBoolean(),
+    )
+
+    override fun describeContents(): Int = 0
+
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        location.writeToParcel(dest, flags)
+        dest.writeBoolean(isRtl)
+    }
+
+    companion object CREATOR : Parcelable.Creator<UiSelectionBoundary> {
+        override fun createFromParcel(parcel: Parcel): UiSelectionBoundary {
+            return UiSelectionBoundary(parcel)
+        }
+
+        override fun newArray(size: Int): Array<UiSelectionBoundary?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
