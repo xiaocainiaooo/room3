@@ -21,6 +21,8 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Paint.Style
 import android.graphics.Point
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
 import android.graphics.RectF
 import androidx.annotation.RestrictTo
@@ -68,7 +70,14 @@ internal class Page(
         )
 
     // Pre-allocated values to avoid allocations at drawing time
-    private val highlightPaint = Paint().apply { style = Style.FILL }
+    private val highlightPaint =
+        Paint().apply {
+            style = Style.FILL
+            xfermode = PorterDuffXfermode(PorterDuff.Mode.MULTIPLY)
+            alpha = 255
+            isAntiAlias = true
+            isDither = true
+        }
     private val highlightRect = RectF()
     private val tileLocationRect = RectF()
 
