@@ -56,6 +56,8 @@ dependencies {
     testImplementation(libs.guavaTestlib)
 
     annotationProcessor(project(":versionedparcelable:versionedparcelable-compiler"))
+
+    compileOnly files("../../wear_sdk/wear-sdk.jar")
 }
 
 android {
