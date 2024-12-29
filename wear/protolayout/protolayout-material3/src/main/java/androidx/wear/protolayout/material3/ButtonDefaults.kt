@@ -17,6 +17,8 @@
 package androidx.wear.protolayout.material3
 
 import android.graphics.Color
+import androidx.annotation.Dimension
+import androidx.annotation.Dimension.Companion.DP
 import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.argb
@@ -74,4 +76,8 @@ public object ButtonDefaults {
             icon = theme.colorScheme.onPrimaryContainer,
             label = theme.colorScheme.onPrimaryContainer
         )
+
+    internal const val METADATA_TAG_BUTTON: String = "BTN"
+    @Dimension(DP) internal const val DEFAULT_CONTENT_PADDING_DP: Int = 8
+    @Dimension(DP) internal const val IMAGE_BUTTON_DEFAULT_SIZE_DP = 52
 }

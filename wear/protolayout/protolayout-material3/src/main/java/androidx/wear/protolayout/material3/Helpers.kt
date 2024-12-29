@@ -22,28 +22,35 @@ import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
 import androidx.annotation.Dimension.Companion.SP
 import androidx.annotation.FloatRange
-import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.DimensionBuilders
+import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
 import androidx.wear.protolayout.DimensionBuilders.DpProp
 import androidx.wear.protolayout.DimensionBuilders.WrappedDimensionProp
 import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.DimensionBuilders.wrap
 import androidx.wear.protolayout.LayoutElementBuilders
+import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_END
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_LEFT
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_RIGHT
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_START
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_UNDEFINED
+import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.LayoutElementBuilders.Spacer
 import androidx.wear.protolayout.LayoutElementBuilders.TextAlignment
 import androidx.wear.protolayout.ModifiersBuilders.Background
+import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.ElementMetadata
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Padding
+import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
 import androidx.wear.protolayout.materialcore.fontscaling.FontScaleConverterFactory
+import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.semanticsRole
+import androidx.wear.protolayout.modifiers.toProtoLayoutModifiersBuilder
 import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.argb
 import java.nio.charset.StandardCharsets
@@ -150,3 +157,70 @@ internal fun Int.horizontalAlignToTextAlign(): Int =
 internal fun Int.isBreakpoint() = this >= SCREEN_SIZE_BREAKPOINT_DP
 
 internal fun Int.toPadding(): Padding = Padding.Builder().setAll(this.toDp()).build()
+
+/**
+ * Builds [Box] that represents a clickable container with the given [content] inside, and
+ * [SEMANTICS_ROLE_BUTTON], that can be used to create container or more opinionated card or button
+ * variants.
+ */
+internal fun MaterialScope.componentContainer(
+    onClick: Clickable,
+    modifier: LayoutModifier,
+    width: ContainerDimension,
+    height: ContainerDimension,
+    shape: Corner,
+    backgroundColor: LayoutColor?,
+    background: (MaterialScope.() -> LayoutElement)?,
+    contentPadding: Padding,
+    metadataTag: String,
+    content: (MaterialScope.() -> LayoutElement)?
+): LayoutElement {
+    val backgroundBuilder = Background.Builder().setCorner(shape)
+    backgroundColor?.let { backgroundBuilder.setColor(it.prop) }
+
+    val defaultModifier = LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then modifier
+    val modifiers =
+        defaultModifier
+            .toProtoLayoutModifiersBuilder()
+            .setClickable(onClick)
+            .setMetadata(metadataTag.toElementMetadata())
+            .setBackground(backgroundBuilder.build())
+
+    val container =
+        Box.Builder().setHeight(height).setWidth(width).apply {
+            content?.let { addContent(content()) }
+        }
+
+    if (background == null) {
+        modifiers.setPadding(contentPadding)
+        container.setModifiers(modifiers.build())
+        return container.build()
+    }
+
+    return Box.Builder()
+        .setModifiers(modifiers.build())
+        .addContent(
+            withStyle(
+                    defaultBackgroundImageStyle =
+                        BackgroundImageStyle(
+                            width = expand(),
+                            height = expand(),
+                            overlayColor = colorScheme.primary.withOpacity(0.6f),
+                            overlayWidth = width,
+                            overlayHeight = height,
+                            shape = shape,
+                            contentScaleMode = LayoutElementBuilders.CONTENT_SCALE_MODE_FILL_BOUNDS
+                        )
+                )
+                .background()
+        )
+        .setWidth(width)
+        .setHeight(height)
+        .addContent(
+            container
+                // Padding in this case is needed on the inner content, not the whole card.
+                .setModifiers(contentPadding.toModifiers())
+                .build()
+        )
+        .build()
+}

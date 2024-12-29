@@ -19,19 +19,15 @@ package androidx.wear.protolayout.material3
 import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.DimensionBuilders.weight
-import androidx.wear.protolayout.LayoutElementBuilders
-import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_END
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_START
 import androidx.wear.protolayout.LayoutElementBuilders.HorizontalAlignment
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.LayoutElementBuilders.TEXT_ALIGN_START
-import androidx.wear.protolayout.ModifiersBuilders.Background
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.Padding
-import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
 import androidx.wear.protolayout.material3.AppCardDefaults.buildContentForAppCard
 import androidx.wear.protolayout.material3.AppCardStyle.Companion.defaultAppCardStyle
 import androidx.wear.protolayout.material3.CardDefaults.DEFAULT_CONTENT_PADDING
@@ -46,8 +42,6 @@ import androidx.wear.protolayout.material3.TitleCardDefaults.buildContentForTitl
 import androidx.wear.protolayout.material3.TitleCardStyle.Companion.defaultTitleCardStyle
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.contentDescription
-import androidx.wear.protolayout.modifiers.semanticsRole
-import androidx.wear.protolayout.modifiers.toProtoLayoutModifiersBuilder
 import androidx.wear.protolayout.types.LayoutColor
 
 /**
@@ -663,51 +657,16 @@ public fun MaterialScope.card(
     background: (MaterialScope.() -> LayoutElement)? = null,
     contentPadding: Padding = Padding.Builder().setAll(DEFAULT_CONTENT_PADDING.toDp()).build(),
     content: (MaterialScope.() -> LayoutElement)
-): LayoutElement {
-    val backgroundBuilder = Background.Builder().setCorner(shape)
-
-    backgroundColor?.let { backgroundBuilder.setColor(it.prop) }
-
-    val defaultModifier = LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then modifier
-    val modifiers =
-        defaultModifier
-            .toProtoLayoutModifiersBuilder()
-            .setClickable(onClick)
-            .setMetadata(METADATA_TAG.toElementMetadata())
-            .setBackground(backgroundBuilder.build())
-
-    val cardContainer = Box.Builder().setHeight(height).setWidth(width).addContent(content())
-
-    if (background == null) {
-        modifiers.setPadding(contentPadding)
-        cardContainer.setModifiers(modifiers.build())
-        return cardContainer.build()
-    }
-
-    return Box.Builder()
-        .setModifiers(modifiers.build())
-        .addContent(
-            withStyle(
-                    defaultBackgroundImageStyle =
-                        BackgroundImageStyle(
-                            width = expand(),
-                            height = expand(),
-                            overlayColor = colorScheme.primary.withOpacity(0.6f),
-                            overlayWidth = width,
-                            overlayHeight = height,
-                            shape = shape,
-                            contentScaleMode = LayoutElementBuilders.CONTENT_SCALE_MODE_FILL_BOUNDS
-                        )
-                )
-                .background()
-        )
-        .setWidth(width)
-        .setHeight(height)
-        .addContent(
-            cardContainer
-                // Padding in this case is needed on the inner content, not the whole card.
-                .setModifiers(contentPadding.toModifiers())
-                .build()
-        )
-        .build()
-}
+): LayoutElement =
+    componentContainer(
+        onClick = onClick,
+        modifier = modifier,
+        width = width,
+        height = height,
+        shape = shape,
+        backgroundColor = backgroundColor,
+        background = background,
+        contentPadding = contentPadding,
+        metadataTag = METADATA_TAG,
+        content = content
+    )

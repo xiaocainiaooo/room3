@@ -36,6 +36,7 @@ import androidx.wear.protolayout.material3.TitleCardStyle.Companion.largeTitleCa
 import androidx.wear.protolayout.material3.Typography
 import androidx.wear.protolayout.material3.appCard
 import androidx.wear.protolayout.material3.backgroundImage
+import androidx.wear.protolayout.material3.button
 import androidx.wear.protolayout.material3.buttonGroup
 import androidx.wear.protolayout.material3.card
 import androidx.wear.protolayout.material3.graphicDataCard
@@ -294,6 +295,49 @@ fun graphicDataCardSample(
                     content = { icon("steps") },
                     // TODO: b/368272767 - Use CPI here
                     graphic = { text("Run".layoutString) },
+                )
+            }
+        )
+    }
+
+@Sampled
+fun buttonSample(
+    context: Context,
+    deviceConfiguration: DeviceParameters,
+    clickable: Clickable
+): LayoutElement =
+    materialScope(context, deviceConfiguration) {
+        primaryLayout(
+            mainSlot = {
+                button(
+                    onClick = clickable,
+                    modifier =
+                        LayoutModifier.contentDescription("Big button with image background"),
+                    width = expand(),
+                    height = expand(),
+                    backgroundColor = colorScheme.primary,
+                    content = { text("Button!".layoutString) }
+                )
+            }
+        )
+    }
+
+@Sampled
+fun imageButtonSample(
+    context: Context,
+    deviceConfiguration: DeviceParameters,
+    clickable: Clickable
+): LayoutElement =
+    materialScope(context, deviceConfiguration) {
+        primaryLayout(
+            mainSlot = {
+                button(
+                    onClick = clickable,
+                    modifier =
+                        LayoutModifier.contentDescription("Big button with image background"),
+                    width = expand(),
+                    height = expand(),
+                    background = { backgroundImage(protoLayoutResourceId = "id") }
                 )
             }
         )
