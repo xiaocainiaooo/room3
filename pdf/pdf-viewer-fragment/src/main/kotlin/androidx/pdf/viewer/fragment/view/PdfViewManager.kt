@@ -51,12 +51,23 @@ internal class PdfViewManager(
                 /* select starting bound of the match, as this is a reference point where user
                 should be scrolled to. */
                 val selectedBounds = selectedHighlight.pageMatchBounds.bounds.first()
-                pdfView.scrollToPosition(
-                    PdfPoint(
-                        selectedHighlight.pageNum,
-                        PointF(selectedBounds.left, selectedBounds.top)
+                /**
+                 * There could be a potential race condition between [PdfView.onLayout] and
+                 * [PdfView.scrollToPosition] in scenarios such as fragment(and view) recreation.
+                 *
+                 * To ensure that the view is properly laid out before attempting to scroll, we post
+                 * the scroll action to the message queue. This will allow the layout pass to
+                 * complete before the scroll position is applied.
+                 */
+                pdfView.post {
+                    pdfView.scrollToPosition(
+                        position =
+                            PdfPoint(
+                                selectedHighlight.pageNum,
+                                PointF(selectedBounds.left, selectedBounds.top)
+                            )
                     )
-                )
+                }
             }
         }
     }
