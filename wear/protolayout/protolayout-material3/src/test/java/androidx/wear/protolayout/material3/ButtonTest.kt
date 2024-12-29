@@ -52,6 +52,15 @@ class ButtonTest {
     }
 
     @Test
+    fun iconButton_size_default() {
+        LayoutElementAssertionsProvider(DEFAULT_ICON_BUTTON)
+            .onRoot()
+            .assert(hasWidth(wrapWithMinTapTargetDimension()))
+            .assert(hasHeight(wrapWithMinTapTargetDimension()))
+            .assert(hasTag(ButtonDefaults.METADATA_TAG_BUTTON))
+    }
+
+    @Test
     fun imageButton_size_default() {
         LayoutElementAssertionsProvider(
                 materialScope(CONTEXT, DEVICE_CONFIGURATION) {
@@ -86,6 +95,13 @@ class ButtonTest {
     fun containerButton_hasContent_asText() {
         LayoutElementAssertionsProvider(DEFAULT_CONTAINER_BUTTON_WITH_TEXT)
             .onElement(hasText(TEXT))
+            .assertExists()
+    }
+
+    @Test
+    fun iconButton_hasContent_asIcon() {
+        LayoutElementAssertionsProvider(DEFAULT_ICON_BUTTON)
+            .onElement(hasImage(ICON_ID))
             .assertExists()
     }
 
@@ -163,6 +179,8 @@ class ButtonTest {
 
         private const val IMAGE_ID = "image"
 
+        private const val ICON_ID = "id"
+
         private const val TEXT = "Container button"
 
         private val DEFAULT_CONTAINER_BUTTON_WITH_TEXT =
@@ -171,6 +189,15 @@ class ButtonTest {
                     onClick = CLICKABLE,
                     modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     content = { text(TEXT.layoutString) }
+                )
+            }
+
+        private val DEFAULT_ICON_BUTTON =
+            materialScope(CONTEXT, DEVICE_CONFIGURATION) {
+                iconButton(
+                    onClick = CLICKABLE,
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
+                    iconContent = { icon(ICON_ID) }
                 )
             }
     }

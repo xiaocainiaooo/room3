@@ -26,9 +26,78 @@ import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.material3.ButtonDefaults.DEFAULT_CONTENT_PADDING_DP
 import androidx.wear.protolayout.material3.ButtonDefaults.IMAGE_BUTTON_DEFAULT_SIZE_DP
 import androidx.wear.protolayout.material3.ButtonDefaults.METADATA_TAG_BUTTON
+import androidx.wear.protolayout.material3.ButtonDefaults.filledButtonColors
+import androidx.wear.protolayout.material3.IconButtonStyle.Companion.defaultIconButtonStyle
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.types.LayoutColor
+
+/**
+ * Opinionated ProtoLayout Material3 icon button that offers a single slot to take content
+ * representing icon, for example [icon].
+ *
+ * The button is usually either a circular shape with the same [width] and [height], or highly
+ * recommended stadium shape occupying available space with [width] and [height] set to [expand] or
+ * [weight], usually used in the [buttonGroup] to arrange them
+ *
+ * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
+ *   the associated action.
+ * @param modifier Modifiers to set to this element. It's highly recommended to set a content
+ *   description using [contentDescription].
+ * @param shape Defines the button's shape, in other words the corner radius for this button.
+ * @param width The width of this button. It's highly recommended to set this to [expand] or
+ *   [weight]
+ * @param height The height of this button. It's highly recommended to set this to [expand] or
+ *   [weight]
+ * @param colors The colors used for this button. If not set, [ButtonDefaults.filledButtonColors]
+ *   will be used as high emphasis button. Other recommended colors are
+ *   [ButtonDefaults.filledTonalButtonColors] and [ButtonDefaults.filledVariantButtonColors]. If
+ *   using custom colors, it is important to choose a color pair from same role to ensure
+ *   accessibility with sufficient color contrast.
+ * @param background The background object to be used behind the content in the button. It is
+ *   recommended to use the default styling that is automatically provided by only calling
+ *   [backgroundImage] with the content. It can be combined with the specified
+ *   [ButtonColors.container] behind it.
+ * @param style The style which provides the attribute values required for constructing this icon
+ *   button its inner content. It also provides default style for the inner content, that can be
+ *   overridden by each content slot.
+ * @param contentPadding The inner padding used to prevent inner content from being too close to the
+ *   button's edge. It's highly recommended to keep the default.
+ * @param iconContent The icon slot for content displayed in this button. It is recommended to use
+ *   default styling that is automatically provided by only calling [icon] with the resource ID.
+ * @sample androidx.wear.protolayout.material3.samples.oneSlotButtonsSample
+ */
+// TODO: b/346958146 - Link Button visuals in DAC
+// TODO: b/373578620 - Add how corners affects margins in the layout.
+public fun MaterialScope.iconButton(
+    onClick: Clickable,
+    iconContent: (MaterialScope.() -> LayoutElement),
+    modifier: LayoutModifier = LayoutModifier,
+    width: ContainerDimension = wrapWithMinTapTargetDimension(),
+    height: ContainerDimension = wrapWithMinTapTargetDimension(),
+    shape: Corner = shapes.full,
+    colors: ButtonColors = filledButtonColors(),
+    background: (MaterialScope.() -> LayoutElement)? = null,
+    style: IconButtonStyle = defaultIconButtonStyle(),
+    contentPadding: Padding = Padding.Builder().setAll(DEFAULT_CONTENT_PADDING_DP.toDp()).build()
+): LayoutElement =
+    button(
+        onClick = onClick,
+        modifier = modifier,
+        width = width,
+        height = height,
+        shape = shape,
+        backgroundColor = colors.container,
+        background = background,
+        contentPadding = contentPadding,
+        content = {
+            withStyle(
+                    defaultIconStyle =
+                        IconStyle(size = style.iconSize.toDp(), tintColor = colors.icon)
+                )
+                .iconContent()
+        }
+    )
 
 /**
  * ProtoLayout Material3 clickable component button that offers a single slot to take any content.

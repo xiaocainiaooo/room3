@@ -41,6 +41,7 @@ import androidx.wear.protolayout.material3.buttonGroup
 import androidx.wear.protolayout.material3.card
 import androidx.wear.protolayout.material3.graphicDataCard
 import androidx.wear.protolayout.material3.icon
+import androidx.wear.protolayout.material3.iconButton
 import androidx.wear.protolayout.material3.iconDataCard
 import androidx.wear.protolayout.material3.iconEdgeButton
 import androidx.wear.protolayout.material3.materialScope
@@ -318,6 +319,46 @@ fun buttonSample(
                     backgroundColor = colorScheme.primary,
                     content = { text("Button!".layoutString) }
                 )
+            }
+        )
+    }
+
+@Sampled
+fun oneSlotButtonsSample(
+    context: Context,
+    deviceConfiguration: DeviceParameters,
+    clickable: Clickable
+): LayoutElement =
+    materialScope(context, deviceConfiguration) {
+        primaryLayout(
+            mainSlot = {
+                buttonGroup {
+                    buttonGroupItem {
+                        iconButton(
+                            onClick = clickable,
+                            modifier =
+                                LayoutModifier.contentDescription(
+                                    "Big button with image background"
+                                ),
+                            width = expand(),
+                            height = expand(),
+                            iconContent = { icon("id1") }
+                        )
+                    }
+                    buttonGroupItem {
+                        iconButton(
+                            onClick = clickable,
+                            modifier =
+                                LayoutModifier.contentDescription(
+                                    "Big button with image background"
+                                ),
+                            width = expand(),
+                            height = expand(),
+                            shape = shapes.large,
+                            iconContent = { icon("id2") }
+                        )
+                    }
+                }
             }
         )
     }

@@ -20,6 +20,8 @@ import android.graphics.Color
 import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
 import androidx.wear.protolayout.ColorBuilders.argb
+import androidx.wear.protolayout.ModifiersBuilders.Padding
+import androidx.wear.protolayout.material3.ButtonDefaults.DEFAULT_CONTENT_PADDING_DP
 import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.argb
 
@@ -80,4 +82,25 @@ public object ButtonDefaults {
     internal const val METADATA_TAG_BUTTON: String = "BTN"
     @Dimension(DP) internal const val DEFAULT_CONTENT_PADDING_DP: Int = 8
     @Dimension(DP) internal const val IMAGE_BUTTON_DEFAULT_SIZE_DP = 52
+}
+
+/** Provides style values for the icon button component. */
+public class IconButtonStyle
+internal constructor(
+    @Dimension(unit = DP) internal val iconSize: Int,
+    internal val innerPadding: Padding = DEFAULT_CONTENT_PADDING_DP.toPadding()
+) {
+    public companion object {
+        /**
+         * Default style variation for the [iconButton] where all opinionated inner content is
+         * displayed in a medium size.
+         */
+        public fun defaultIconButtonStyle(): IconButtonStyle = IconButtonStyle(26)
+
+        /**
+         * Default style variation for the [iconButton] where all opinionated inner content is
+         * displayed in a large size.
+         */
+        public fun largeIconButtonStyle(): IconButtonStyle = IconButtonStyle(32)
+    }
 }
