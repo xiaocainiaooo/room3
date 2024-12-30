@@ -251,7 +251,13 @@ public class AdvancedVendorExtender implements VendorExtender {
         getAvailableCharacteristicsKeyValues() {
         if (ClientVersion.isMinimumCompatibleVersion(Version.VERSION_1_5)
                 && ExtensionVersion.isMinimumCompatibleVersion(Version.VERSION_1_5)) {
-            return mAdvancedExtenderImpl.getAvailableCharacteristicsKeyValues();
+            List<Pair<CameraCharacteristics.Key, Object>> result =
+                    mAdvancedExtenderImpl.getAvailableCharacteristicsKeyValues();
+            // In case OEMs implements it incorrectly by returning a null.
+            if (result == null) {
+                return Collections.emptyList();
+            }
+            return result;
         }
         return Collections.emptyList();
     }

@@ -176,6 +176,23 @@ public interface SessionProcessor {
     }
 
     /**
+     * Returns the extensions-specific available stabilization modes.
+     */
+    @SuppressWarnings("unchecked")
+    default int @Nullable [] getExtensionAvailableStabilizationModes() {
+        List<Pair<CameraCharacteristics.Key, Object>> keyValues =
+                getAvailableCharacteristicsKeyValues();
+        for (Pair<CameraCharacteristics.Key, Object> keyValue : keyValues) {
+            if (keyValue.first.equals(
+                    CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES)) {
+                return (int[]) keyValue.second;
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Returns the dynamically calculated capture latency pair in milliseconds.
      *
      * The measurement is expected to take in to account dynamic parameters such as the current

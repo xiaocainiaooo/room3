@@ -16,6 +16,9 @@
 
 package androidx.camera.core.impl;
 
+import static android.hardware.camera2.CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_ON;
+import static android.hardware.camera2.CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION;
+
 import android.util.Range;
 import android.util.Rational;
 
@@ -262,5 +265,37 @@ public class AdapterCameraInfo extends ForwardingCameraInfo {
     @Override
     public boolean isCaptureProcessProgressSupported() {
         return mIsCaptureProcessProgressSupported;
+    }
+
+    @Override
+    public boolean isVideoStabilizationSupported() {
+        if (mSessionProcessor != null) {
+            int[] stabilizationModes = mSessionProcessor.getExtensionAvailableStabilizationModes();
+            if (stabilizationModes != null) {
+                for (int mode : stabilizationModes) {
+                    if (mode == CONTROL_VIDEO_STABILIZATION_MODE_ON) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+        return super.isVideoStabilizationSupported();
+    }
+
+    @Override
+    public boolean isPreviewStabilizationSupported() {
+        if (mSessionProcessor != null) {
+            int[] stabilizationModes = mSessionProcessor.getExtensionAvailableStabilizationModes();
+            if (stabilizationModes != null) {
+                for (int mode : stabilizationModes) {
+                    if (mode == CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+        return super.isPreviewStabilizationSupported();
     }
 }

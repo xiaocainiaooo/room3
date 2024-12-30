@@ -88,7 +88,9 @@ class CameraControlDeviceTest(
 
     @After
     fun tearDown() {
-        cameraProvider.shutdownAsync()[10000, TimeUnit.MILLISECONDS]
+        if (::cameraProvider.isInitialized) {
+            cameraProvider.shutdownAsync()[10000, TimeUnit.MILLISECONDS]
+        }
     }
 
     @Test
