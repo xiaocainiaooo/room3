@@ -45,8 +45,8 @@ import androidx.compose.runtime.mock.revalidate
 import androidx.compose.runtime.mock.skip
 import androidx.compose.runtime.mock.validate
 import androidx.compose.runtime.snapshots.Snapshot
-import java.lang.Integer.min
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.min
 import kotlin.random.Random
 import kotlin.reflect.KProperty
 import kotlin.test.Ignore
@@ -56,6 +56,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -67,7 +68,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -4259,9 +4259,9 @@ class CompositionTests {
         }
     }
 
-    @Test(timeout = 10000)
+    @Test
     fun testCompositionAndRecomposerDeadlock() {
-        runBlocking {
+        runTest(timeout = 10.seconds) {
             withGlobalSnapshotManager {
                 repeat(100) {
                     val job = Job(parent = coroutineContext[Job])
