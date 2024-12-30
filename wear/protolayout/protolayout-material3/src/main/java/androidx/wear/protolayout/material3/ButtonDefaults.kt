@@ -22,6 +22,7 @@ import androidx.annotation.Dimension.Companion.DP
 import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.material3.ButtonDefaults.DEFAULT_CONTENT_PADDING_DP
+import androidx.wear.protolayout.material3.Typography.TypographyToken
 import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.argb
 
@@ -102,5 +103,42 @@ internal constructor(
          * displayed in a large size.
          */
         public fun largeIconButtonStyle(): IconButtonStyle = IconButtonStyle(32)
+    }
+}
+
+/** Provides style values for the text button component. */
+public class TextButtonStyle
+internal constructor(
+    @TypographyToken internal val labelTypography: Int,
+    internal val innerPadding: Padding = DEFAULT_CONTENT_PADDING_DP.toPadding()
+) {
+    public companion object {
+        /**
+         * Default style variation for the [textButton] where all opinionated inner content is
+         * displayed in a small size.
+         */
+        public fun smallTextButtonStyle(): TextButtonStyle =
+            TextButtonStyle(Typography.LABEL_MEDIUM)
+
+        /**
+         * Default style variation for the [textButton] where all opinionated inner content is
+         * displayed in a medium size.
+         */
+        public fun defaultTextButtonStyle(): TextButtonStyle =
+            TextButtonStyle(Typography.LABEL_LARGE)
+
+        /**
+         * Default style variation for the [textButton] where all opinionated inner content is
+         * displayed in a large size.
+         */
+        public fun largeTextButtonStyle(): TextButtonStyle =
+            TextButtonStyle(Typography.DISPLAY_SMALL)
+
+        /**
+         * Default style variation for the [textButton] where all opinionated inner content is
+         * displayed in an extra large size.
+         */
+        public fun extraLargeTextButtonStyle(): TextButtonStyle =
+            TextButtonStyle(Typography.DISPLAY_MEDIUM)
     }
 }

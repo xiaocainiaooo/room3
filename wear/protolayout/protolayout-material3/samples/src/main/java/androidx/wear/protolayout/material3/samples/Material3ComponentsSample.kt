@@ -47,6 +47,7 @@ import androidx.wear.protolayout.material3.iconEdgeButton
 import androidx.wear.protolayout.material3.materialScope
 import androidx.wear.protolayout.material3.primaryLayout
 import androidx.wear.protolayout.material3.text
+import androidx.wear.protolayout.material3.textButton
 import androidx.wear.protolayout.material3.textDataCard
 import androidx.wear.protolayout.material3.textEdgeButton
 import androidx.wear.protolayout.material3.titleCard
@@ -356,6 +357,19 @@ fun oneSlotButtonsSample(
                             height = expand(),
                             shape = shapes.large,
                             iconContent = { icon("id2") }
+                        )
+                    }
+                    buttonGroupItem {
+                        textButton(
+                            onClick = clickable,
+                            modifier =
+                                LayoutModifier.contentDescription(
+                                    "Big button with image background"
+                                ),
+                            width = expand(),
+                            height = expand(),
+                            shape = shapes.large,
+                            labelContent = { text("Dec".layoutString) }
                         )
                     }
                 }

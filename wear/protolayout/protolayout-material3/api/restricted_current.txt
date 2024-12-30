@@ -48,6 +48,7 @@ package androidx.wear.protolayout.material3 {
   public final class ButtonKt {
     method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement button(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.ModifiersBuilders.Clickable onClick, optional androidx.wear.protolayout.modifiers.LayoutModifier modifier, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? content, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension width, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension height, optional androidx.wear.protolayout.ModifiersBuilders.Corner shape, optional androidx.wear.protolayout.types.LayoutColor? backgroundColor, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? background, optional androidx.wear.protolayout.ModifiersBuilders.Padding contentPadding);
     method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement iconButton(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.ModifiersBuilders.Clickable onClick, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> iconContent, optional androidx.wear.protolayout.modifiers.LayoutModifier modifier, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension width, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension height, optional androidx.wear.protolayout.ModifiersBuilders.Corner shape, optional androidx.wear.protolayout.material3.ButtonColors colors, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? background, optional androidx.wear.protolayout.material3.IconButtonStyle style, optional androidx.wear.protolayout.ModifiersBuilders.Padding contentPadding);
+    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement textButton(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.ModifiersBuilders.Clickable onClick, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> labelContent, optional androidx.wear.protolayout.modifiers.LayoutModifier modifier, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension width, optional androidx.wear.protolayout.DimensionBuilders.ContainerDimension height, optional androidx.wear.protolayout.ModifiersBuilders.Corner shape, optional androidx.wear.protolayout.material3.ButtonColors colors, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? background, optional androidx.wear.protolayout.material3.TextButtonStyle style, optional androidx.wear.protolayout.ModifiersBuilders.Padding contentPadding);
   }
 
   public final class CardColors {
@@ -248,6 +249,17 @@ package androidx.wear.protolayout.material3 {
     property public final androidx.wear.protolayout.ModifiersBuilders.Corner medium;
     property public final androidx.wear.protolayout.ModifiersBuilders.Corner none;
     property public final androidx.wear.protolayout.ModifiersBuilders.Corner small;
+  }
+
+  public final class TextButtonStyle {
+    field public static final androidx.wear.protolayout.material3.TextButtonStyle.Companion Companion;
+  }
+
+  public static final class TextButtonStyle.Companion {
+    method public androidx.wear.protolayout.material3.TextButtonStyle defaultTextButtonStyle();
+    method public androidx.wear.protolayout.material3.TextButtonStyle extraLargeTextButtonStyle();
+    method public androidx.wear.protolayout.material3.TextButtonStyle largeTextButtonStyle();
+    method public androidx.wear.protolayout.material3.TextButtonStyle smallTextButtonStyle();
   }
 
   public final class TextKt {
