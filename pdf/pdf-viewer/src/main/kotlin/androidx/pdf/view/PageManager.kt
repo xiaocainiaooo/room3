@@ -45,6 +45,7 @@ internal class PageManager(
      * threshold for tiled rendering
      */
     private val maxBitmapSizePx: Point,
+    private val isTouchExplorationEnabled: Boolean
 ) {
     /**
      * Replay at least 1 value in case of an invalidation signal issued while [PdfView] is not
@@ -123,6 +124,7 @@ internal class PageManager(
                     pdfDocument,
                     backgroundScope,
                     maxBitmapSizePx,
+                    isTouchExplorationEnabled,
                     onPageUpdate = { _invalidationSignalFlow.tryEmit(Unit) },
                     onPageTextReady = { pageNumber -> _pageTextReadyFlow.tryEmit(pageNumber) }
                 )

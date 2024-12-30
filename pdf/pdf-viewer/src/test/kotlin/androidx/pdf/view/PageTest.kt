@@ -70,6 +70,19 @@ class PageTest {
 
     private lateinit var page: Page
 
+    private fun createPage(isTouchExplorationEnabled: Boolean): Page {
+        return Page(
+            0,
+            pageSizePx = PAGE_SIZE,
+            pdfDocument,
+            testScope,
+            MAX_BITMAP_SIZE,
+            isTouchExplorationEnabled = isTouchExplorationEnabled,
+            invalidationTracker,
+            onPageTextReady
+        )
+    }
+
     @Before
     fun setup() {
         // Cancel any work from previous tests, and reset tracking variables
@@ -77,16 +90,7 @@ class PageTest {
         invalidationCounter = 0
         pageTextReadyCounter = 0
 
-        page =
-            Page(
-                0,
-                pageSizePx = PAGE_SIZE,
-                pdfDocument,
-                testScope,
-                MAX_BITMAP_SIZE,
-                invalidationTracker,
-                onPageTextReady
-            )
+        page = createPage(isTouchExplorationEnabled = true)
     }
 
     @Test
@@ -153,11 +157,21 @@ class PageTest {
     }
 
     @Test
-    fun updateState_fetchesPageText() {
+    fun updateState_withTouchExplorationEnabled_fetchesPageText() {
         page.updateState(zoom = 1.0f)
         testDispatcher.scheduler.runCurrent()
         assertThat(page.pageText).isEqualTo("SampleText")
         assertThat(pageTextReadyCounter).isEqualTo(1)
+    }
+
+    @Test
+    fun setVisible_withTouchExplorationDisabled_doesNotFetchPageText() {
+        page = createPage(isTouchExplorationEnabled = false)
+        page.updateState(zoom = 1.0f)
+        testDispatcher.scheduler.runCurrent()
+
+        assertThat(page.pageText).isEqualTo(null)
+        assertThat(pageTextReadyCounter).isEqualTo(0)
     }
 
     @Test

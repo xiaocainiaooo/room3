@@ -36,6 +36,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
 import androidx.pdf.PdfDocument
+import androidx.pdf.util.Accessibility
 import androidx.pdf.util.ZoomUtils
 import java.util.LinkedList
 import java.util.Queue
@@ -170,6 +171,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private val visibleAreaRect = Rect()
 
     @VisibleForTesting internal var accessibilityPageHelper: AccessibilityPageHelper? = null
+    @VisibleForTesting
+    internal var isTouchExplorationEnabled: Boolean =
+        Accessibility.get().isTouchExplorationEnabled(context)
+        set(value) {
+            field = value
+        }
 
     /**
      * Scrolls to the 0-indexed [pageNum], optionally animating the scroll
@@ -537,12 +544,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         but reasonable threshold to use that does not depend on volatile state like the current
         screen orientation or the current size of our application's Window. */
         val maxBitmapDimensionPx = max(context.display.width, context.display.height)
+
         pageManager =
             PageManager(
                 localPdfDocument,
                 backgroundScope,
                 DEFAULT_PAGE_PREFETCH_RADIUS,
-                Point(maxBitmapDimensionPx, maxBitmapDimensionPx)
+                Point(maxBitmapDimensionPx, maxBitmapDimensionPx),
+                isTouchExplorationEnabled
             )
         // We'll either create our layout manager from restored state, or instantiate a new one
         if (!maybeRestoreState()) {
