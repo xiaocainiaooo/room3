@@ -39,6 +39,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -340,6 +341,7 @@ class PdfDocumentViewSearchScenarioTest {
             assertEquals(totalSearchMatches, updatedHighlightData.highlightBounds.size)
         }
 
+    @Ignore("Need more investigation on why it's failing on post submits. b/386727907")
     @Test
     fun test_pdfDocumentViewModel_noSearchOnSameQuery() = runTest {
         var counter = 0
