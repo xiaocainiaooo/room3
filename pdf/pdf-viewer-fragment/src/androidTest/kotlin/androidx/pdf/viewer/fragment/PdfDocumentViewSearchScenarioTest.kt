@@ -33,6 +33,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -338,6 +339,59 @@ class PdfDocumentViewSearchScenarioTest {
                     .totalMatches
             assertEquals(totalSearchMatches, updatedHighlightData.highlightBounds.size)
         }
+
+    @Test
+    fun test_pdfDocumentViewModel_noSearchOnSameQuery() = runTest {
+        var counter = 0
+        val collectorJob = launch { pdfDocumentViewModel.searchViewUiState.collect { counter++ } }
+
+        val fakeResults = createFakeSearchResults(0, 1, 2, 2, 5, 5, 10, 10, 10, 10)
+        setupViewModel(fakeResults)
+        pdfDocumentViewModel.loadDocument(uri = documentUri, password = null)
+        // wait for document to load
+        advanceUntilIdle()
+        // turn on search
+        pdfDocumentViewModel.updateSearchState(true)
+        // assert search view Init state is collected
+        assertEquals(1, counter)
+        assertTrue(pdfDocumentViewModel.searchViewUiState.value is SearchViewUiState.Init)
+
+        // start search
+        pdfDocumentViewModel.searchDocument(query = SEARCH_QUERY, visiblePageRange = IntRange(0, 1))
+        // wait for search operation to complete
+        advanceUntilIdle()
+        // assert new state emitted after search completion
+        assertEquals(2, counter)
+
+        // search with the same query again
+        pdfDocumentViewModel.searchDocument(query = SEARCH_QUERY, visiblePageRange = IntRange(0, 1))
+        advanceUntilIdle()
+        // Assert no new state is emitted
+        assertEquals(2, counter)
+
+        collectorJob.cancel()
+    }
+
+    @Test
+    fun test_pdfDocumentViewModel_isTextSearchActive_turnedOff() = runTest {
+        setupViewModel()
+        pdfDocumentViewModel.loadDocument(uri = documentUri, password = null)
+        // wait for document to load
+        advanceUntilIdle()
+
+        pdfDocumentViewModel.updateSearchState(true)
+        assertTrue(pdfDocumentViewModel.searchViewUiState.value is SearchViewUiState.Init)
+
+        // Pass same doc uri, this will not re-trigger document load.
+        pdfDocumentViewModel.loadDocument(uri = documentUri, password = null)
+        // Assert search session is preserved
+        assertTrue(pdfDocumentViewModel.searchViewUiState.value is SearchViewUiState.Init)
+
+        // Pass a different uri, this will load  a new document
+        pdfDocumentViewModel.loadDocument(uri = Uri.parse("content://test1.pdf"), password = null)
+        // Assert search is reset.
+        assertTrue(pdfDocumentViewModel.searchViewUiState.value is SearchViewUiState.Closed)
+    }
 
     companion object {
         private const val SEARCH_QUERY = "ipsum"

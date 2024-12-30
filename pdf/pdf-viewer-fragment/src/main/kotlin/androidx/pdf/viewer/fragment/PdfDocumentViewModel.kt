@@ -180,6 +180,10 @@ internal class PdfDocumentViewModel(
                 // Ensure we don't schedule duplicate loading by canceling previous one.
                 if (documentLoadJob?.isActive == true) documentLoadJob?.cancel()
 
+                // Loading a new document should not persist a search session from previous
+                // document.
+                updateSearchState(isTextSearchActive = false)
+
                 documentLoadJob = viewModelScope.launch { openDocument(uri, password) }
             }
         }
@@ -303,6 +307,11 @@ internal class PdfDocumentViewModel(
          * enabled.
          */
         if (!isTextSearchActiveFromState) return
+
+        val queryResults = searchRepository.queryResults.value
+        // Return early if the query is unchanged from the previous search to avoid redundant
+        // operations.
+        if (queryResults is QueryResults && queryResults.query == query) return
 
         // Cancel any on-going search operation(s) as the results will not be valid anymore.
         searchJob.children.forEach { it.cancel() }
