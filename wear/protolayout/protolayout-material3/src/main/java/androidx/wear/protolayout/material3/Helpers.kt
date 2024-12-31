@@ -42,14 +42,15 @@ import androidx.wear.protolayout.LayoutElementBuilders.Spacer
 import androidx.wear.protolayout.LayoutElementBuilders.TextAlignment
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.ModifiersBuilders.ElementMetadata
-import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
 import androidx.wear.protolayout.materialcore.fontscaling.FontScaleConverterFactory
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.clickable
+import androidx.wear.protolayout.modifiers.padding
 import androidx.wear.protolayout.modifiers.semanticsRole
-import androidx.wear.protolayout.modifiers.toProtoLayoutModifiersBuilder
+import androidx.wear.protolayout.modifiers.tag
+import androidx.wear.protolayout.modifiers.toProtoLayoutModifiers
 import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.argb
 import java.nio.charset.StandardCharsets
@@ -90,8 +91,6 @@ internal fun Float.dpToSp(fontScale: Float): Float =
 
 internal fun Int.toDp() = dp(this.toFloat())
 
-internal fun String.toElementMetadata() = ElementMetadata.Builder().setTagData(toTagBytes()).build()
-
 /** Builds a horizontal Spacer, with width set to expand and height set to the given value. */
 internal fun horizontalSpacer(@Dimension(unit = DP) heightDp: Int): Spacer =
     Spacer.Builder().setWidth(expand()).setHeight(heightDp.toDp()).build()
@@ -110,9 +109,6 @@ internal fun verticalSpacer(width: DimensionBuilders.ExpandedDimensionProp): Spa
  */
 internal fun wrapWithMinTapTargetDimension(): WrappedDimensionProp =
     WrappedDimensionProp.Builder().setMinimumSize(MINIMUM_TAP_TARGET_SIZE).build()
-
-/** Returns the [Modifiers] object containing this padding and nothing else. */
-internal fun Padding.toModifiers(): Modifiers = Modifiers.Builder().setPadding(this).build()
 
 /**
  * Changes the opacity/transparency of the given color.
@@ -149,8 +145,6 @@ internal fun Int.horizontalAlignToTextAlign(): Int =
  */
 internal fun Int.isBreakpoint() = this >= SCREEN_SIZE_BREAKPOINT_DP
 
-internal fun Int.toPadding(): Padding = Padding.Builder().setAll(this.toDp()).build()
-
 /**
  * Builds [Box] that represents a clickable container with the given [content] inside, and
  * [SEMANTICS_ROLE_BUTTON], that can be used to create container or more opinionated card or button
@@ -167,10 +161,9 @@ internal fun MaterialScope.componentContainer(
     content: (MaterialScope.() -> LayoutElement)?
 ): LayoutElement {
 
-    val defaultModifier =
-        LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then modifier.clickable(onClick)
-    val modifiersBuilder =
-        defaultModifier.toProtoLayoutModifiersBuilder().setMetadata(metadataTag.toElementMetadata())
+    val mod =
+        LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then
+            modifier.clickable(onClick).tag(metadataTag)
 
     val container =
         Box.Builder().setHeight(height).setWidth(width).apply {
@@ -178,14 +171,13 @@ internal fun MaterialScope.componentContainer(
         }
 
     if (backgroundContent == null) {
-        modifiersBuilder.setPadding(contentPadding)
-        container.setModifiers(modifiersBuilder.build())
+        container.setModifiers(mod.padding(contentPadding).toProtoLayoutModifiers())
         return container.build()
     }
 
-    val modifiers = modifiersBuilder.build()
+    val protoLayoutModifiers = mod.toProtoLayoutModifiers()
     return Box.Builder()
-        .setModifiers(modifiers)
+        .setModifiers(protoLayoutModifiers)
         .addContent(
             withStyle(
                     defaultBackgroundImageStyle =
@@ -195,7 +187,7 @@ internal fun MaterialScope.componentContainer(
                             overlayColor = colorScheme.primary.withOpacity(0.6f),
                             overlayWidth = width,
                             overlayHeight = height,
-                            shape = modifiers.background?.corner ?: shapes.large,
+                            shape = protoLayoutModifiers.background?.corner ?: shapes.large,
                             contentScaleMode = LayoutElementBuilders.CONTENT_SCALE_MODE_FILL_BOUNDS
                         )
                 )
@@ -206,7 +198,7 @@ internal fun MaterialScope.componentContainer(
         .addContent(
             container
                 // Padding in this case is needed on the inner content, not the whole card.
-                .setModifiers(contentPadding.toModifiers())
+                .setModifiers(LayoutModifier.padding(contentPadding).toProtoLayoutModifiers())
                 .build()
         )
         .build()

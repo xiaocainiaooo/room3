@@ -1534,6 +1534,16 @@ package androidx.wear.protolayout.modifiers {
     method public static androidx.wear.protolayout.ModifiersBuilders.Modifiers toProtoLayoutModifiers(androidx.wear.protolayout.modifiers.LayoutModifier);
   }
 
+  public final class PaddingKt {
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier padding(androidx.wear.protolayout.modifiers.LayoutModifier, androidx.wear.protolayout.ModifiersBuilders.Padding padding);
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier padding(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float all);
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier padding(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float horizontal, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float vertical);
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier padding(androidx.wear.protolayout.modifiers.LayoutModifier, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float start, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float top, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float end, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float bottom, optional boolean rtlAware);
+    method public static androidx.wear.protolayout.ModifiersBuilders.Padding padding(@Dimension(unit=androidx.annotation.Dimension.Companion.DP) float all);
+    method public static androidx.wear.protolayout.ModifiersBuilders.Padding padding(@Dimension(unit=androidx.annotation.Dimension.Companion.DP) float horizontal, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float vertical);
+    method public static androidx.wear.protolayout.ModifiersBuilders.Padding padding(optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float start, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float top, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float end, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float bottom, optional boolean rtlAware);
+  }
+
   public final class SemanticsKt {
     method public static androidx.wear.protolayout.modifiers.LayoutModifier contentDescription(androidx.wear.protolayout.modifiers.LayoutModifier, String staticValue, optional @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) androidx.wear.protolayout.expression.DynamicBuilders.DynamicString? dynamicValue);
     method public static androidx.wear.protolayout.modifiers.LayoutModifier semanticsRole(androidx.wear.protolayout.modifiers.LayoutModifier, int semanticsRole);

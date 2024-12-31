@@ -24,6 +24,7 @@ import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.material3.TitleContentPlacementInDataCard.Companion.Bottom
 import androidx.wear.protolayout.material3.TitleContentPlacementInDataCard.Companion.Top
 import androidx.wear.protolayout.material3.Typography.TypographyToken
+import androidx.wear.protolayout.modifiers.padding
 
 internal object DataCardDefaults {
     /**
@@ -127,13 +128,13 @@ internal constructor(
 
         @Dimension(unit = DP) private const val ICON_SIZE_LARGE_DP: Int = 32
 
-        @Dimension(unit = DP) private const val PADDING_SMALL_DP: Int = 8
+        @Dimension(unit = DP) private const val PADDING_SMALL_DP = 8f
 
-        @Dimension(unit = DP) private const val PADDING_DEFAULT_DP: Int = 10
+        @Dimension(unit = DP) private const val PADDING_DEFAULT_DP = 10f
 
-        @Dimension(unit = DP) private const val PADDING_LARGE_DP: Int = 14
+        @Dimension(unit = DP) private const val PADDING_LARGE_DP = 14f
 
-        @Dimension(unit = DP) private const val PADDING_EXTRA_LARGE_DP: Int = 16
+        @Dimension(unit = DP) private const val PADDING_EXTRA_LARGE_DP = 16f
 
         /**
          * Default style variation for the [iconDataCard] or [textDataCard] where all opinionated
@@ -141,7 +142,7 @@ internal constructor(
          */
         public fun smallDataCardStyle(): DataCardStyle =
             DataCardStyle(
-                innerPadding = PADDING_SMALL_DP.toPadding(),
+                innerPadding = padding(PADDING_SMALL_DP),
                 titleToContentSpaceDp = SMALL_SPACE_DP,
                 titleTypography = Typography.LABEL_MEDIUM,
                 contentTypography = Typography.BODY_SMALL,
@@ -155,7 +156,7 @@ internal constructor(
          */
         public fun defaultDataCardStyle(): DataCardStyle =
             DataCardStyle(
-                innerPadding = PADDING_DEFAULT_DP.toPadding(),
+                innerPadding = padding(PADDING_DEFAULT_DP),
                 titleToContentSpaceDp = SMALL_SPACE_DP,
                 titleTypography = Typography.LABEL_LARGE,
                 contentTypography = Typography.BODY_SMALL,
@@ -169,7 +170,7 @@ internal constructor(
          */
         public fun largeDataCardStyle(): DataCardStyle =
             DataCardStyle(
-                innerPadding = PADDING_DEFAULT_DP.toPadding(),
+                innerPadding = padding(PADDING_DEFAULT_DP),
                 titleToContentSpaceDp = EMPTY_SPACE_DP,
                 titleTypography = Typography.DISPLAY_SMALL,
                 contentTypography = Typography.BODY_SMALL,
@@ -184,12 +185,7 @@ internal constructor(
         public fun extraLargeDataCardStyle(): DataCardStyle =
             DataCardStyle(
                 innerPadding =
-                    Padding.Builder()
-                        .setStart(PADDING_DEFAULT_DP.toDp())
-                        .setEnd(PADDING_DEFAULT_DP.toDp())
-                        .setTop(PADDING_EXTRA_LARGE_DP.toDp())
-                        .setBottom(PADDING_EXTRA_LARGE_DP.toDp())
-                        .build(),
+                    padding(horizontal = PADDING_DEFAULT_DP, vertical = PADDING_EXTRA_LARGE_DP),
                 titleToContentSpaceDp = EMPTY_SPACE_DP,
                 titleTypography = Typography.DISPLAY_MEDIUM,
                 contentTypography = Typography.BODY_SMALL,
@@ -204,13 +200,7 @@ internal constructor(
          */
         public fun smallCompactDataCardStyle(): DataCardStyle =
             DataCardStyle(
-                innerPadding =
-                    Padding.Builder()
-                        .setTop(PADDING_SMALL_DP.toDp())
-                        .setBottom(PADDING_SMALL_DP.toDp())
-                        .setStart(PADDING_LARGE_DP.toDp())
-                        .setEnd(PADDING_LARGE_DP.toDp())
-                        .build(),
+                innerPadding = padding(horizontal = PADDING_LARGE_DP, vertical = PADDING_SMALL_DP),
                 titleToContentSpaceDp = DEFAULT_SPACE_DP,
                 titleTypography = Typography.NUMERAL_MEDIUM,
                 contentTypography = Typography.LABEL_MEDIUM,
@@ -225,13 +215,7 @@ internal constructor(
          */
         public fun defaultCompactDataCardStyle(): DataCardStyle =
             DataCardStyle(
-                innerPadding =
-                    Padding.Builder()
-                        .setTop(PADDING_SMALL_DP.toDp())
-                        .setBottom(PADDING_SMALL_DP.toDp())
-                        .setStart(PADDING_LARGE_DP.toDp())
-                        .setEnd(PADDING_LARGE_DP.toDp())
-                        .build(),
+                innerPadding = padding(horizontal = PADDING_LARGE_DP, vertical = PADDING_SMALL_DP),
                 titleToContentSpaceDp = EMPTY_SPACE_DP,
                 titleTypography = Typography.NUMERAL_LARGE,
                 contentTypography = Typography.LABEL_LARGE,
@@ -246,13 +230,7 @@ internal constructor(
          */
         public fun largeCompactDataCardStyle(): DataCardStyle =
             DataCardStyle(
-                innerPadding =
-                    Padding.Builder()
-                        .setTop(PADDING_SMALL_DP.toDp())
-                        .setBottom(PADDING_SMALL_DP.toDp())
-                        .setStart(PADDING_LARGE_DP.toDp())
-                        .setEnd(PADDING_LARGE_DP.toDp())
-                        .build(),
+                innerPadding = padding(horizontal = PADDING_LARGE_DP, vertical = PADDING_SMALL_DP),
                 titleToContentSpaceDp = EMPTY_SPACE_DP,
                 titleTypography = Typography.NUMERAL_EXTRA_LARGE,
                 contentTypography = Typography.LABEL_LARGE,

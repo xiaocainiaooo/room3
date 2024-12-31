@@ -16,25 +16,22 @@
 
 package androidx.wear.protolayout.modifiers
 
-import androidx.annotation.RestrictTo
 import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ModifiersBuilders.Background
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.ModifiersBuilders.Corner
+import androidx.wear.protolayout.ModifiersBuilders.ElementMetadata
+import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.ModifiersBuilders.Semantics
 
 /** Creates a [ModifiersBuilders.Modifiers] from a [LayoutModifier]. */
-fun LayoutModifier.toProtoLayoutModifiers(): ModifiersBuilders.Modifiers =
-    toProtoLayoutModifiersBuilder().build()
-
-// TODO: b/384921198 - Remove when M3 elements can use LayoutModifier chain for everything.
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-/** Creates a [ModifiersBuilders.Modifiers.Builder] from a [LayoutModifier]. */
-fun LayoutModifier.toProtoLayoutModifiersBuilder(): ModifiersBuilders.Modifiers.Builder {
+fun LayoutModifier.toProtoLayoutModifiers(): ModifiersBuilders.Modifiers {
     var semantics: Semantics.Builder? = null
     var background: Background.Builder? = null
     var corners: Corner.Builder? = null
     var clickable: Clickable.Builder? = null
+    var padding: Padding.Builder? = null
+    var metadata: ElementMetadata.Builder? = null
 
     this.foldIn(Unit) { _, e ->
         when (e) {
@@ -42,14 +39,20 @@ fun LayoutModifier.toProtoLayoutModifiersBuilder(): ModifiersBuilders.Modifiers.
             is BaseBackgroundElement -> background = e.foldIn(background)
             is BaseCornerElement -> corners = e.foldIn(corners)
             is BaseClickableElement -> clickable = e.foldIn(clickable)
+            is BasePaddingElement -> padding = e.foldIn(padding)
+            is BaseMetadataElement -> metadata = e.foldIn(metadata)
         }
     }
 
     corners?.let { background = (background ?: Background.Builder()).setCorner(it.build()) }
 
-    return ModifiersBuilders.Modifiers.Builder().apply {
-        semantics?.let { setSemantics(it.build()) }
-        background?.let { setBackground(it.build()) }
-        clickable?.let { setClickable(it.build()) }
-    }
+    return ModifiersBuilders.Modifiers.Builder()
+        .apply {
+            semantics?.let { setSemantics(it.build()) }
+            background?.let { setBackground(it.build()) }
+            clickable?.let { setClickable(it.build()) }
+            padding?.let { setPadding(it.build()) }
+            metadata?.let { setMetadata(it.build()) }
+        }
+        .build()
 }
