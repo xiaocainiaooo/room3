@@ -593,6 +593,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     }
 
     private fun reset() {
+        // Stop any in progress fling when we open a new document
+        scroller.forceFinished(true)
         scrollTo(0, 0)
         zoom = DEFAULT_INIT_ZOOM
         pageManager = null
