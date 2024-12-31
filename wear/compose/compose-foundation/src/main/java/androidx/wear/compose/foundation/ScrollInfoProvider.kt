@@ -138,9 +138,8 @@ private class ScalingLazyListStateScrollInfoProvider(val state: ScalingLazyListS
     override val anchorItemOffset: Float
         get() {
             val layoutInfo = state.layoutInfo
-            val autoCentering = state.config.value?.autoCentering
             return layoutInfo.visibleItemsInfo
-                .fastFirstOrNull { it.index == (autoCentering?.itemIndex ?: 1) }
+                .fastFirstOrNull { it.index == 1 }
                 ?.let {
                     val startOffset = it.startOffset(ScalingLazyListAnchorType.ItemStart)
                     if (initialStartOffset == null || startOffset > initialStartOffset!!) {
