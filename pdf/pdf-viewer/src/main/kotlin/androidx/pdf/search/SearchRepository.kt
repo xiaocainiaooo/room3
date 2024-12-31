@@ -63,13 +63,20 @@ public class SearchRepository(
     /**
      * Initiates search over pdf document
      *
-     * @param query: The search query string.
-     * @param currentVisiblePage: Provides current visible document page, which is required to
-     *   search from specific page and to calculate initial QueryResultsIndex.
+     * @param query The search query string.
+     * @param currentVisiblePage Provides current visible document page, which is required to search
+     *   from specific page and to calculate initial QueryResultsIndex.
+     * @param resultIndex (optional) The index of the selected result when restoring from a previous
+     *   session. If not provided, the first matching result on the page will be selected by
+     *   default.
      *
      * Results would be updated to [queryResults] in the coroutine collecting the flow.
      */
-    public suspend fun produceSearchResults(query: String, currentVisiblePage: Int) {
+    public suspend fun produceSearchResults(
+        query: String,
+        currentVisiblePage: Int,
+        resultIndex: Int = 0
+    ) {
         if (query.isBlank()) {
             clearSearchResults()
             return
@@ -90,7 +97,14 @@ public class SearchRepository(
                  When search results are available for a query, we initialize a cyclic iterator.
                  This iterator is used to traverse the results when `findPrev()` and `findNext()` are called.
                 */
-                cyclicIterator = CyclicSparseArrayIterator(searchResults, currentVisiblePage)
+                cyclicIterator =
+                    CyclicSparseArrayIterator(
+                        searchData = searchResults,
+                        visiblePage = currentVisiblePage
+                    )
+
+                // Restores the current index if required, or selects the first index of the page.
+                cyclicIterator.moveToIndex(index = resultIndex)
 
                 QueryResults.Matched(
                     query = query,
