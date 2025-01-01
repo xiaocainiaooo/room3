@@ -438,6 +438,9 @@ class AdvancedSessionProcessorTest {
         override fun isCaptureProcessProgressAvailable(): Boolean = false
 
         override fun isPostviewAvailable(): Boolean = false
+
+        override fun getAvailableCharacteristicsKeyValues():
+            List<Pair<CameraCharacteristics.Key<*>?, in Any>?> = emptyList()
     }
 
     @Test
