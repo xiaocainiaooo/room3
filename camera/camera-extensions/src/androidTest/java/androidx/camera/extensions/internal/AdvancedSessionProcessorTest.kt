@@ -393,9 +393,52 @@ class AdvancedSessionProcessorTest {
         assertThat(advancedSessionProcessor.isExtensionStrengthAvailable).isTrue()
     }
 
+    @Test
+    @SdkSuppress(minSdkVersion = 30)
+    fun getAvailableCharacteristicsKeyValuesIsReflected(): Unit = runBlocking {
+        assumeTrue(ExtensionVersion.isMinimumCompatibleVersion(Version.VERSION_1_5))
+        ClientVersion.setCurrentVersion(ClientVersion("1.5.0"))
+
+        val availableStabilizationModes =
+            intArrayOf(CameraCharacteristics.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION)
+        val zoomRatioRange = Range(1f, 3f)
+
+        val availableCharacteristicsKeyValues: List<Pair<CameraCharacteristics.Key<*>?, in Any>?> =
+            listOf(
+                Pair(
+                    CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES,
+                    availableStabilizationModes
+                ),
+                Pair(CameraCharacteristics.CONTROL_ZOOM_RATIO_RANGE, zoomRatioRange)
+            )
+
+        val advancedVendorExtender =
+            AdvancedVendorExtender(
+                FakeAdvancedExtenderImpl(
+                    testAvailableCharacteristics = availableCharacteristicsKeyValues
+                )
+            )
+
+        val advancedSessionProcessor =
+            AdvancedSessionProcessor(
+                FakeSessionProcessImpl(),
+                emptyList(),
+                advancedVendorExtender,
+                context
+            )
+
+        assertThat(advancedSessionProcessor.availableCharacteristicsKeyValues)
+            .isEqualTo(availableCharacteristicsKeyValues)
+        assertThat(advancedSessionProcessor.extensionAvailableStabilizationModes)
+            .isEqualTo(availableStabilizationModes)
+        assertThat(advancedSessionProcessor.extensionZoomRange).isEqualTo(zoomRatioRange)
+    }
+
     private class FakeAdvancedExtenderImpl(
         val testCaptureRequestKeys: MutableList<CaptureRequest.Key<Any>> = mutableListOf(),
         val testCaptureResultKeys: MutableList<CaptureResult.Key<Any>> = mutableListOf(),
+        val testAvailableCharacteristics: List<Pair<CameraCharacteristics.Key<*>?, in Any>?> =
+            emptyList()
     ) : AdvancedExtenderImpl {
         override fun isExtensionAvailable(
             cameraId: String,
@@ -439,8 +482,7 @@ class AdvancedSessionProcessorTest {
 
         override fun isPostviewAvailable(): Boolean = false
 
-        override fun getAvailableCharacteristicsKeyValues():
-            List<Pair<CameraCharacteristics.Key<*>?, in Any>?> = emptyList()
+        override fun getAvailableCharacteristicsKeyValues() = testAvailableCharacteristics
     }
 
     @Test
