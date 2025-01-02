@@ -124,7 +124,6 @@ androidx {
     inceptionYear = "2020"
     description = "Material ripple used to build interactive components"
     legacyDisableKotlinStrictApiMode = true
-    metalavaK2UastEnabled = false
     kotlinTarget = KotlinTarget.KOTLIN_1_9
 }
 
