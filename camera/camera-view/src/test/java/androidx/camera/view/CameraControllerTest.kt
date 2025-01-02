@@ -18,6 +18,7 @@ package androidx.camera.view
 
 import android.content.Context
 import android.graphics.Matrix
+import android.graphics.PointF
 import android.os.Build
 import android.os.Looper.getMainLooper
 import android.util.Range
@@ -742,12 +743,49 @@ class CameraControllerTest {
     }
 
     @Test
-    fun getTapToFocusState_defaultValueIsTapToFocusNotStarted() {
-        assertThat(controller.tapToFocusState.value).isEqualTo(TAP_TO_FOCUS_NOT_STARTED)
+    fun getTapToFocusInfoState_defaultStateIsTapToFocusNotStarted() {
+        assertThat(controller.tapToFocusInfoState.value?.focusState)
+            .isEqualTo(TAP_TO_FOCUS_NOT_STARTED)
     }
 
     @Test
-    fun getTapToFocusState_valueIsTapToFocusStarted_whenOnTapToFocusIsCalled() {
+    fun getTapToFocusInfoState_tapPointIsSameAsOriginal_whenOnTapToFocusIsCalled() {
+        val tapPoint = PointF(1F, 2F)
+        completeCameraInitialization()
+
+        controller.onTapToFocus(pointFactory, tapPoint.x, tapPoint.y)
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusInfoState.value?.tapPoint).isEqualTo(tapPoint)
+    }
+
+    @Test
+    fun getTapToFocusInfoState_tapPointIsSameAsLastOne_whenOnTapToFocusIsCalledTwice() {
+        val tapPoint1 = PointF(1F, 2F)
+        val tapPoint2 = PointF(1F, 2F)
+        completeCameraInitialization()
+
+        controller.onTapToFocus(pointFactory, tapPoint1.x, tapPoint1.y)
+        controller.onTapToFocus(pointFactory, tapPoint2.x, tapPoint2.y)
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusInfoState.value?.tapPoint).isEqualTo(tapPoint2)
+    }
+
+    @Test
+    fun getTapToFocusInfoState_stateIsTapToFocusStarted_whenOnTapToFocusIsCalled() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusInfoState.value?.focusState).isEqualTo(TAP_TO_FOCUS_STARTED)
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun getTapToFocusState_stateIsTapToFocusStarted_whenOnTapToFocusIsCalled() {
         completeCameraInitialization()
         fakeCameraControl.disableFocusMeteringAutoComplete(true)
 
@@ -758,7 +796,20 @@ class CameraControllerTest {
     }
 
     @Test
-    fun getTapToFocusState_valueIsTapToFocusFocused_whenSuccessfulResultIsSubmitted() {
+    fun getTapToFocusInfoState_stateIsTapToFocusFocused_whenSuccessfulResultIsSubmitted() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+        fakeCameraControl.submitFocusMeteringResult(FocusMeteringResult.create(true))
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusInfoState.value?.focusState).isEqualTo(TAP_TO_FOCUS_FOCUSED)
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun getTapToFocusState_stateIsTapToFocusFocused_whenSuccessfulResultIsSubmitted() {
         completeCameraInitialization()
         fakeCameraControl.disableFocusMeteringAutoComplete(true)
 
@@ -770,7 +821,21 @@ class CameraControllerTest {
     }
 
     @Test
-    fun getTapToFocusState_valueIsTapToFocusNotFocused_whenUnsuccessfulResultIsSubmitted() {
+    fun getTapToFocusInfoState_stateIsTapToFocusNotFocused_whenUnsuccessfulResultIsSubmitted() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+        fakeCameraControl.submitFocusMeteringResult(FocusMeteringResult.create(false))
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusInfoState.value?.focusState)
+            .isEqualTo(TAP_TO_FOCUS_NOT_FOCUSED)
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun getTapToFocusState_stateIsTapToFocusNotFocused_whenUnsuccessfulResultIsSubmitted() {
         completeCameraInitialization()
         fakeCameraControl.disableFocusMeteringAutoComplete(true)
 
@@ -782,7 +847,20 @@ class CameraControllerTest {
     }
 
     @Test
-    fun getTapToFocusState_valueIsTapToFocusStarted_beforeAutoCancelDurationIsElapsed() {
+    fun getTapToFocusInfoState_stateIsTapToFocusStarted_beforeAutoCancelDurationIsElapsed() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS - 1, TimeUnit.MILLISECONDS)
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusInfoState.value?.focusState).isEqualTo(TAP_TO_FOCUS_STARTED)
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun getTapToFocusState_stateIsTapToFocusStarted_beforeAutoCancelDurationIsElapsed() {
         completeCameraInitialization()
         fakeCameraControl.disableFocusMeteringAutoComplete(true)
 
@@ -794,7 +872,25 @@ class CameraControllerTest {
     }
 
     @Test
-    fun getTapToFocusState_valueIsNotStarted_whenAutoCancelDurationIsElapsedAfterStarted() {
+    fun getTapToFocusInfoState_stateIsNotStarted_whenAutoCancelDurationIsElapsedAfterStarted() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+
+        shadowOf(getMainLooper()).idle()
+        assumeTrue(controller.tapToFocusInfoState.value?.focusState == TAP_TO_FOCUS_STARTED)
+
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusInfoState.value?.focusState)
+            .isEqualTo(TAP_TO_FOCUS_NOT_STARTED)
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun getTapToFocusState_stateIsNotStarted_whenAutoCancelDurationIsElapsedAfterStarted() {
         completeCameraInitialization()
         fakeCameraControl.disableFocusMeteringAutoComplete(true)
 
@@ -810,7 +906,25 @@ class CameraControllerTest {
     }
 
     @Test
-    fun getTapToFocusState_valueIsNotStarted_whenAutoCancelDurationIsElapsedAfterFocused() {
+    fun getTapToFocusInfoState_stateIsNotStarted_whenAutoCancelDurationIsElapsedAfterFocused() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+        fakeCameraControl.submitFocusMeteringResult(FocusMeteringResult.create(true))
+        shadowOf(getMainLooper()).idle()
+        assumeTrue(controller.tapToFocusInfoState.value?.focusState == TAP_TO_FOCUS_FOCUSED)
+
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusInfoState.value?.focusState)
+            .isEqualTo(TAP_TO_FOCUS_NOT_STARTED)
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun getTapToFocusState_stateIsNotStarted_whenAutoCancelDurationIsElapsedAfterFocused() {
         completeCameraInitialization()
         fakeCameraControl.disableFocusMeteringAutoComplete(true)
 
@@ -826,7 +940,25 @@ class CameraControllerTest {
     }
 
     @Test
-    fun getTapToFocusState_valueIsNotStarted_whenAutoCancelDurationIsElapsedAfterNotFocused() {
+    fun getTapToFocusInfoState_stateIsNotStarted_whenAutoCancelDurationIsElapsedAfterNotFocused() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+        fakeCameraControl.submitFocusMeteringResult(FocusMeteringResult.create(false))
+        shadowOf(getMainLooper()).idle()
+        assumeTrue(controller.tapToFocusInfoState.value?.focusState == TAP_TO_FOCUS_NOT_FOCUSED)
+
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusInfoState.value?.focusState)
+            .isEqualTo(TAP_TO_FOCUS_NOT_STARTED)
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun getTapToFocusState_stateIsNotStarted_whenAutoCancelDurationIsElapsedAfterNotFocused() {
         completeCameraInitialization()
         fakeCameraControl.disableFocusMeteringAutoComplete(true)
 
