@@ -38,7 +38,7 @@
          <trust group="com.google.ar" reason="b/378946732"/>
          <trust group="com.google.devsite" reason="developed by our own team, not signed yet"/>
          <trust group="com.google.firebase" reason="b/223907608"/>
-         <trust group="com.google.guava" reasons="b/325084664 https://github.com/gradle/gradle/issues/28862"/>
+         <trust group="com.google.guava" reason="b/325084664 https://github.com/gradle/gradle/issues/28862"/>
          <trust group="com.google.ar" reason="b/378946732"/>
          <trust group="com.google.mlkit" reason="b/223907608"/>
          <trust group="com.google.prefab" reason="https://github.com/google/prefab/issues/157"/>
@@ -188,6 +188,7 @@
          <trusted-key id="3D11126EA77E4E07FBABB38614A84C976D265B25" group="com.google.protobuf"/>
          <trusted-key id="3DBC5D7DC2FB8DD68AA429BD353A436E043E3145" group="com.google.code.findbugs"/>
          <trusted-key id="3EB3846B3DC004C13883753CEEF9ECC7D5D90518" group="com.google.dagger"/>
+         <trusted-key id="4021EEEAFF5DE8404DCD0A270AA3E5C3D232E79B" group="jakarta.inject" name="jakarta.inject-api" />
          <trusted-key id="41A1A08C62FCA78B79D3081164A16FAAEC16A4BE" group="org.apache.commons" name="commons-math3"/>
          <trusted-key id="41CD49B4EF5876F9E9F691DABAC30622339994C4">
             <trusting group="com.google.testing.compile"/>
