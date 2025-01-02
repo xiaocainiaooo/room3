@@ -20,6 +20,7 @@ import androidx.build.KotlinTarget
 import androidx.build.OperatingSystem
 import androidx.build.addToBuildOnServer
 import androidx.build.checkapi.CompilationInputs
+import androidx.build.checkapi.MultiplatformCompilationInputs
 import androidx.build.getCheckoutRoot
 import androidx.build.getOperatingSystem
 import androidx.build.getPrebuiltsRoot
@@ -209,7 +210,10 @@ constructor(private val execOperations: ExecOperations) : DefaultTask() {
                             )
                         )
                         sourcePaths.setFrom(compilationInputs.sourcePaths)
-                        commonModuleSourcePaths.from(compilationInputs.commonModuleSourcePaths)
+                        commonModuleSourcePaths.from(
+                            (compilationInputs as? MultiplatformCompilationInputs)
+                                ?.commonModuleSourcePaths
+                        )
                         vnamesJson.set(project.getVnamesJson())
                         dependencyClasspath.setFrom(
                             compilationInputs.dependencyClasspath + compilationInputs.bootClasspath
