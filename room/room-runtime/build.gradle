@@ -23,6 +23,7 @@
  */
 
 
+import androidx.build.KotlinTarget
 import androidx.build.LibraryType
 import androidx.build.PlatformIdentifier
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
@@ -227,4 +228,9 @@ androidx {
     metalavaK2UastEnabled = false
     // TODO: b/326456246
     optOutJSpecify = true
+    kotlinTarget = KotlinTarget.KOTLIN_2_0
+}
+
+ksp {
+    useKsp2 = true
 }
