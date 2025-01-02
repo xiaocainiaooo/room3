@@ -248,6 +248,7 @@ class DatabaseKotlinCodeGenTest {
         runKspTestWithK1(
             sources = sources,
             options = mapOf(Context.BooleanProcessorOptions.GENERATE_KOTLIN.argName to "true"),
+            kotlincArguments = listOf("-jvm-target=11")
         ) {
             val databaseFqn = "androidx.room.Database"
             DatabaseProcessingStep()
