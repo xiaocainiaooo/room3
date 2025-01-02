@@ -1371,17 +1371,21 @@ class SnapshotTests {
         }
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun throwInWithMutableSnapshot() {
-        Snapshot.withMutableSnapshot { error("Test error") }
+        assertFailsWith<IllegalStateException> {
+            Snapshot.withMutableSnapshot { error("Test error") }
+        }
     }
 
-    @Test(expected = SnapshotApplyConflictException::class)
+    @Test
     fun throwInApplyWithMutableSnapshot() {
-        val state = mutableStateOf(0)
-        Snapshot.withMutableSnapshot {
-            Snapshot.global { state.value = 1 }
-            state.value = 2
+        assertFailsWith<SnapshotApplyConflictException> {
+            val state = mutableStateOf(0)
+            Snapshot.withMutableSnapshot {
+                Snapshot.global { state.value = 1 }
+                state.value = 2
+            }
         }
     }
 

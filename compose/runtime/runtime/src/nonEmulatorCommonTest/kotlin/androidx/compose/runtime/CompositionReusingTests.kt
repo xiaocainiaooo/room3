@@ -856,7 +856,7 @@ class CompositionReusingTests {
     }
 
     @Test
-    fun reusableContentHost_movableContent(): Unit = compositionTest {
+    fun reusableContentHost_movableContent() = compositionTest {
         var active by mutableStateOf(true)
         var state by mutableIntStateOf(0)
         var subcomposition: Composition? = null

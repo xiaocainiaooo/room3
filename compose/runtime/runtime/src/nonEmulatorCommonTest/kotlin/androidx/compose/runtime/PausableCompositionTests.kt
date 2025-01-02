@@ -415,7 +415,7 @@ private inline fun recordTest(block: () -> Unit): String {
 }
 
 private fun report(message: String) {
-    synchronized(recorder) { recorder.log(message) }
+    recorder.log(message)
 }
 
 private inline fun report(message: String, block: () -> Unit) {
