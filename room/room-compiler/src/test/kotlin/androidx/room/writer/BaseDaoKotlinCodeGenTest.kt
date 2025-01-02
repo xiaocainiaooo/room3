@@ -41,7 +41,7 @@ abstract class BaseDaoKotlinCodeGenTest {
             sources = sources,
             classpath = compiledFiles,
             options = mapOf(Context.BooleanProcessorOptions.GENERATE_KOTLIN.argName to "true"),
-            kotlincArguments = listOf("-Xjvm-default=${jvmDefaultMode}")
+            kotlincArguments = listOf("-jvm-target=11", "-Xjvm-default=${jvmDefaultMode}")
         ) {
             val databaseFqn = "androidx.room.Database"
             DatabaseProcessingStep()
