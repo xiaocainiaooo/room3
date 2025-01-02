@@ -41,6 +41,9 @@ import androidx.camera.camera2.pipe.compat.Camera2MetadataCache
 import androidx.camera.camera2.pipe.compat.Camera2MetadataProvider
 import androidx.camera.camera2.pipe.compat.CameraAvailabilityMonitor
 import androidx.camera.camera2.pipe.compat.CameraOpener
+import androidx.camera.camera2.pipe.compat.PruningCamera2DeviceManager
+import androidx.camera.camera2.pipe.compat.RetryingCameraStateOpener
+import androidx.camera.camera2.pipe.compat.RetryingCameraStateOpenerImpl
 import androidx.camera.camera2.pipe.compat.StandardCamera2CaptureSequenceProcessorFactory
 import androidx.camera.camera2.pipe.core.Threads
 import androidx.camera.camera2.pipe.graph.GraphListener
@@ -62,12 +65,12 @@ internal abstract class Camera2Module {
     @DefaultCameraBackend
     abstract fun bindCameraPipeCameraBackend(camera2Backend: Camera2Backend): CameraBackend
 
-    @Binds
-    abstract fun bindCamera2DeviceManager(
-        camera2DeviceManager: Camera2DeviceManagerImpl
-    ): Camera2DeviceManager
-
     @Binds abstract fun bindCameraOpener(camera2CameraOpener: Camera2CameraOpener): CameraOpener
+
+    @Binds
+    abstract fun bindRetryingCameraStateOpener(
+        retryingCameraStateOpenerImpl: RetryingCameraStateOpenerImpl
+    ): RetryingCameraStateOpener
 
     @Binds
     abstract fun bindCameraMetadataProvider(
@@ -93,6 +96,22 @@ internal abstract class Camera2Module {
     abstract fun bindAudioRestrictionController(
         audioRestrictionController: AudioRestrictionControllerImpl
     ): AudioRestrictionController
+
+    companion object {
+        const val ENABLE_PRUNING_DEVICE_MANAGER = false
+
+        @Provides
+        fun provideCamera2DeviceManager(
+            camera2DeviceManager: Provider<Camera2DeviceManagerImpl>,
+            pruningCamera2DeviceManager: Provider<PruningCamera2DeviceManager>,
+        ): Camera2DeviceManager {
+            return if (ENABLE_PRUNING_DEVICE_MANAGER) {
+                pruningCamera2DeviceManager.get()
+            } else {
+                camera2DeviceManager.get()
+            }
+        }
+    }
 }
 
 @Scope internal annotation class Camera2ControllerScope

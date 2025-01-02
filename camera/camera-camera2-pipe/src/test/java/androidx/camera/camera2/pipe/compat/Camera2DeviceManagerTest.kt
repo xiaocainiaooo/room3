@@ -1,0 +1,510 @@
+/*
+ * Copyright 2025 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package androidx.camera.camera2.pipe.compat
+
+import android.content.Context
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.hardware.camera2.CameraDevice
+import android.os.Build
+import androidx.camera.camera2.pipe.CameraId
+import androidx.camera.camera2.pipe.core.Permissions
+import androidx.camera.camera2.pipe.core.TimeSource
+import androidx.camera.camera2.pipe.core.TimestampNs
+import androidx.camera.camera2.pipe.graph.GraphListener
+import androidx.camera.camera2.pipe.internal.CameraErrorListener
+import androidx.camera.camera2.pipe.testing.FakeCamera2MetadataProvider
+import androidx.camera.camera2.pipe.testing.FakeCameraMetadata
+import androidx.camera.camera2.pipe.testing.FakeThreads
+import androidx.camera.camera2.pipe.testing.RobolectricCameraPipeTestRunner
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertIsNot
+import kotlin.test.assertNotNull
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+import org.robolectric.annotation.Config
+
+@RunWith(RobolectricCameraPipeTestRunner::class)
+@Config(minSdk = Build.VERSION_CODES.M)
+@OptIn(ExperimentalCoroutinesApi::class)
+internal class PruningCamera2DeviceManagerImplTest {
+    private val testScope = TestScope()
+
+    private val fakeContext: Context = mock()
+    private val fakePermissions = Permissions(fakeContext)
+    private val fakeCamera2DeviceCloser: Camera2DeviceCloser = mock()
+    private val fakeThreads =
+        FakeThreads.fromDispatcher(StandardTestDispatcher(testScope.testScheduler))
+    private val cameraId0 = CameraId("0")
+    private val cameraId1 = CameraId("1")
+    private val fakeCameraDevice0: CameraDevice = mock()
+    private val fakeCameraDevice1: CameraDevice = mock()
+    private val fakeTimeSource: TimeSource = mock()
+    private val fakeCameraErrorListener: CameraErrorListener = mock()
+    val fakeAudioRestrictionController: AudioRestrictionController = mock()
+
+    private val fakeRetryingCameraStateOpener =
+        object : RetryingCameraStateOpener {
+            var androidCameraStates = mutableListOf<AndroidCameraState>()
+
+            override suspend fun openCameraWithRetry(
+                cameraId: CameraId,
+                camera2DeviceCloser: Camera2DeviceCloser,
+                isForegroundObserver: (Unit) -> Boolean
+            ): OpenCameraResult {
+                val fakeCameraMetadata = FakeCameraMetadata(cameraId = cameraId)
+                val fakeCamera2MetadataProvider =
+                    FakeCamera2MetadataProvider(mapOf(cameraId to fakeCameraMetadata))
+                val fakeCamera2Quirks = Camera2Quirks(fakeCamera2MetadataProvider)
+                val fakeAndroidCameraState =
+                    AndroidCameraState(
+                        cameraId,
+                        fakeCameraMetadata,
+                        1,
+                        TimestampNs(0L),
+                        fakeTimeSource,
+                        fakeCameraErrorListener,
+                        fakeCamera2DeviceCloser,
+                        fakeCamera2Quirks,
+                        fakeThreads,
+                        fakeAudioRestrictionController,
+                    )
+                androidCameraStates.add(fakeAndroidCameraState)
+                return OpenCameraResult(fakeAndroidCameraState, null)
+            }
+
+            override fun openAndAwaitCameraWithRetry(
+                cameraId: CameraId,
+                camera2DeviceCloser: Camera2DeviceCloser
+            ): AwaitOpenCameraResult {
+                TODO("Not yet implemented")
+            }
+        }
+    private val fakeCamera2ErrorProcessor = Camera2ErrorProcessor()
+
+    private val deviceManager =
+        PruningCamera2DeviceManager(
+            fakePermissions,
+            fakeRetryingCameraStateOpener,
+            fakeCamera2DeviceCloser,
+            fakeCamera2ErrorProcessor,
+            fakeThreads,
+        )
+
+    private val fakeGraphListener1: GraphListener = mock()
+    private val fakeGraphListener2: GraphListener = mock()
+    private val fakeGraphListener3: GraphListener = mock()
+
+    init {
+        whenever(fakeContext.checkSelfPermission(any())).thenReturn(PERMISSION_GRANTED)
+        whenever(fakeCameraDevice0.id).thenReturn(cameraId0.value)
+        whenever(fakeCameraDevice1.id).thenReturn(cameraId1.value)
+    }
+
+    @Test
+    fun canOpenAndCloseCamera() =
+        testScope.runTest {
+            deviceManager.open(cameraId0, emptyList(), fakeGraphListener1, false) { true }
+            advanceUntilIdle()
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+            val androidCameraState = fakeRetryingCameraStateOpener.androidCameraStates.first()
+
+            deviceManager.close(cameraId0)
+            advanceUntilIdle()
+
+            assertIs<CameraStateClosed>(androidCameraState.state.value)
+        }
+
+    @Test
+    fun cameraIsClosedAfterDisconnect() =
+        testScope.runTest {
+            val virtualCamera =
+                deviceManager.open(cameraId0, emptyList(), fakeGraphListener1, false) { true }
+            assertNotNull(virtualCamera)
+            advanceUntilIdle()
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+            val androidCameraState = fakeRetryingCameraStateOpener.androidCameraStates.first()
+
+            virtualCamera.disconnect()
+            advanceUntilIdle()
+
+            assertIs<CameraStateClosed>(androidCameraState.state.value)
+        }
+
+    @Test
+    fun cameraIsReusedWhenTheSameCameraIsOpened() =
+        testScope.runTest {
+            val virtualCamera1 =
+                deviceManager.open(cameraId0, emptyList(), fakeGraphListener1, false) { true }
+            assertNotNull(virtualCamera1)
+            advanceUntilIdle()
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+
+            // Simulate camera graph close by disconnecting the virtual camera.
+            virtualCamera1.disconnect()
+
+            // Simulate a small delay for capture session switching, but short enough to keep the
+            // camera opened.
+            advanceTimeBy(100)
+
+            // Now open the same camera again.
+            val virtualCamera2 =
+                deviceManager.open(cameraId0, emptyList(), fakeGraphListener2, false) { true }
+            assertNotNull(virtualCamera2)
+            advanceUntilIdle()
+
+            // The first virtual camera should be disconnected.
+            val virtualCameraState1 = virtualCamera1.value
+            assertIs<CameraStateClosed>(virtualCameraState1)
+
+            // There shouldn't be any new camera open calls, and thus we should be reusing the same
+            // Android camera state.
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+        }
+
+    @Test
+    fun cameraIsNotReusedWhenTheSameCameraIsOpenedAfterLongDelay() =
+        testScope.runTest {
+            val virtualCamera1 =
+                deviceManager.open(cameraId0, emptyList(), fakeGraphListener1, false) { true }
+            assertNotNull(virtualCamera1)
+            advanceUntilIdle()
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+
+            // Simulate camera graph close by disconnecting the virtual camera.
+            virtualCamera1.disconnect()
+
+            // Simulate a long delay such that the camera should be closed.
+            advanceTimeBy(3000)
+
+            // Now open the same camera again.
+            val virtualCamera2 =
+                deviceManager.open(cameraId0, emptyList(), fakeGraphListener2, false) { true }
+            assertNotNull(virtualCamera2)
+            advanceUntilIdle()
+
+            // The first virtual camera should be disconnected.
+            val virtualCameraState = virtualCamera1.value
+            assertIs<CameraStateClosed>(virtualCameraState)
+
+            // Given the long delay, we should be reopening the camera, and thus we would have 2
+            // camera open calls with 2 Android camera states.
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 2)
+        }
+
+    @Test
+    fun cameraIsClosedOnlyOnceWhenMultipleRequestClose() =
+        testScope.runTest {
+            val virtualCamera =
+                deviceManager.open(cameraId0, emptyList(), fakeGraphListener1, false) { true }
+            assertNotNull(virtualCamera)
+            advanceUntilIdle()
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+            val androidCameraState = fakeRetryingCameraStateOpener.androidCameraStates.first()
+            androidCameraState.onOpened(fakeCameraDevice0)
+            advanceUntilIdle()
+
+            deviceManager.close(cameraId0)
+            advanceUntilIdle()
+
+            deviceManager.closeAll()
+            advanceUntilIdle()
+
+            deviceManager.close(cameraId0)
+            advanceUntilIdle()
+
+            verify(fakeCamera2DeviceCloser, times(1))
+                .closeCamera(
+                    any(),
+                    eq(fakeCameraDevice0),
+                    eq(androidCameraState),
+                    any(),
+                    any(),
+                    any()
+                )
+        }
+
+    @Test
+    fun closingUnopenedCameraIsIgnored() =
+        testScope.runTest {
+            val virtualCamera =
+                deviceManager.open(cameraId0, emptyList(), fakeGraphListener1, false) { true }
+            assertNotNull(virtualCamera)
+            advanceUntilIdle()
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+            val androidCameraState = fakeRetryingCameraStateOpener.androidCameraStates.first()
+            androidCameraState.onOpened(fakeCameraDevice0)
+            advanceUntilIdle()
+
+            assertIs<CameraStateOpen>(androidCameraState.state.value)
+            assertIs<CameraStateOpen>(virtualCamera.value)
+
+            // Close camera 1, which was never opened.
+            deviceManager.close(cameraId1)
+            advanceUntilIdle()
+
+            // Camera 0 should remain open.
+            assertIs<CameraStateOpen>(androidCameraState.state.value)
+            assertIs<CameraStateOpen>(virtualCamera.value)
+        }
+
+    @Test
+    fun openingDifferentCameraClosesThePreviousOne() =
+        testScope.runTest {
+            val virtualCamera1 =
+                deviceManager.open(cameraId0, emptyList(), fakeGraphListener1, false) { true }
+            assertNotNull(virtualCamera1)
+            advanceUntilIdle()
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+            val androidCameraState1 = fakeRetryingCameraStateOpener.androidCameraStates.first()
+            assertEquals(androidCameraState1.cameraId, cameraId0)
+
+            // Now open a different camera. To do so, the previous camera would have to be closed.
+            val virtualCamera2 =
+                deviceManager.open(cameraId1, emptyList(), fakeGraphListener2, false) { true }
+            assertNotNull(virtualCamera2)
+            advanceUntilIdle()
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 2)
+            val androidCameraState2 = fakeRetryingCameraStateOpener.androidCameraStates.last()
+            assertEquals(androidCameraState2.cameraId, cameraId1)
+
+            // The previous camera should be closed.
+            assertIs<CameraStateClosed>(androidCameraState1.state.value)
+        }
+
+    @Test
+    fun allCamerasShouldBeOpenedBeforeConnectingWhenOpeningConcurrentCameras() =
+        testScope.runTest {
+            val virtualCamera1 =
+                deviceManager.open(cameraId0, listOf(cameraId1), fakeGraphListener1, false) { true }
+            assertNotNull(virtualCamera1)
+            // Advance time by just a bit to allow coroutines to finish but not closing the camera.
+            advanceTimeBy(100)
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+            val androidCameraState1 = fakeRetryingCameraStateOpener.androidCameraStates.first()
+            androidCameraState1.onOpened(fakeCameraDevice0)
+            advanceTimeBy(100)
+
+            // Since camera 1 is not yet opened, the virtual camera should not be connected yet.
+            var virtualCameraState1 = virtualCamera1.value
+            assertIsNot<CameraStateOpen>(virtualCameraState1)
+
+            val virtualCamera2 =
+                deviceManager.open(cameraId1, listOf(cameraId0), fakeGraphListener2, false) { true }
+            assertNotNull(virtualCamera2)
+            advanceTimeBy(100)
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 2)
+            val androidCameraState2 = fakeRetryingCameraStateOpener.androidCameraStates.last()
+            androidCameraState2.onOpened(fakeCameraDevice1)
+            advanceUntilIdle()
+
+            virtualCameraState1 = virtualCamera1.value
+            assertIs<CameraStateOpen>(virtualCameraState1)
+            val virtualCameraState2 = virtualCamera2.value
+            assertIs<CameraStateOpen>(virtualCameraState2)
+        }
+
+    @Test
+    fun singleCameraShouldBeClosedWhenConcurrentCamerasAreRequested() =
+        testScope.runTest {
+            // First open camera 0 in regular (single) camera mode.
+            val virtualCamera1 =
+                deviceManager.open(cameraId0, emptyList(), fakeGraphListener1, false) { true }
+            assertNotNull(virtualCamera1)
+            advanceUntilIdle()
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+            val androidCameraState1 = fakeRetryingCameraStateOpener.androidCameraStates.first()
+            assertEquals(androidCameraState1.cameraId, cameraId0)
+
+            // Now open camera 0, with camera 1 as a shared camera.
+            val virtualCamera2 =
+                deviceManager.open(cameraId0, listOf(cameraId1), fakeGraphListener2, false) { true }
+            assertNotNull(virtualCamera2)
+            advanceTimeBy(100)
+
+            // Even though we request the same camera, the single camera 0 cannot be reused, and
+            // should thus be closed.
+            assertIs<CameraStateClosed>(androidCameraState1.state.value)
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 2)
+            val androidCameraState2 = fakeRetryingCameraStateOpener.androidCameraStates.last()
+            androidCameraState2.onOpened(fakeCameraDevice0)
+            advanceTimeBy(100)
+
+            val virtualCamera3 =
+                deviceManager.open(cameraId1, listOf(cameraId0), fakeGraphListener3, false) { true }
+            assertNotNull(virtualCamera3)
+            advanceTimeBy(100)
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 3)
+            val androidCameraState3 = fakeRetryingCameraStateOpener.androidCameraStates.last()
+            androidCameraState3.onOpened(fakeCameraDevice1)
+            advanceUntilIdle()
+
+            // We should still succeed in opening the concurrent cameras.
+            val virtualCameraState2 = virtualCamera2.value
+            assertIs<CameraStateOpen>(virtualCameraState2)
+            val virtualCameraState3 = virtualCamera3.value
+            assertIs<CameraStateOpen>(virtualCameraState3)
+        }
+
+    @Test
+    fun onlyOneCameraIsClosedWhenGoingFromConcurrentCameraToSingleCamera() =
+        testScope.runTest {
+            // First, open concurrent cameras with camera 0 and camera1.
+            val virtualCamera1 =
+                deviceManager.open(cameraId0, listOf(cameraId1), fakeGraphListener1, false) { true }
+            assertNotNull(virtualCamera1)
+            // Advance time by just a bit to allow coroutines to finish but not closing the camera.
+            advanceTimeBy(100)
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+            val androidCameraState1 = fakeRetryingCameraStateOpener.androidCameraStates.first()
+            androidCameraState1.onOpened(fakeCameraDevice0)
+            advanceTimeBy(100)
+
+            val virtualCamera2 =
+                deviceManager.open(cameraId1, listOf(cameraId0), fakeGraphListener2, false) { true }
+            assertNotNull(virtualCamera2)
+            advanceTimeBy(100)
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 2)
+            val androidCameraState2 = fakeRetryingCameraStateOpener.androidCameraStates.last()
+            androidCameraState2.onOpened(fakeCameraDevice1)
+            advanceUntilIdle()
+
+            // Then, open camera 1 in regular (single) camera mode.
+            val virtualCamera3 =
+                deviceManager.open(cameraId1, emptyList(), fakeGraphListener3, false) { true }
+            assertNotNull(virtualCamera3)
+            advanceUntilIdle()
+            assertIs<CameraStateOpen>(virtualCamera3.value)
+
+            // No new cameras should be opened
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 2)
+
+            // Camera 0 should be closed, while camera 1 should remain open.
+            assertIs<CameraStateClosed>(androidCameraState1.state.value)
+            assertIs<CameraStateOpen>(androidCameraState2.state.value)
+        }
+
+    @Test
+    fun prunePrioritizesRequestCloseAndOrdersAreRetained() =
+        testScope.runTest {
+            val requestOpen1 = createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener1)
+            val requestClose1 = createFakeRequestClose(cameraId0)
+            var requestList =
+                mutableListOf<CameraRequest>(
+                    RequestCloseById(cameraId0),
+                    requestClose1,
+                )
+            deviceManager.prune(requestList)
+            assertEquals(requestList.first(), requestClose1)
+
+            val requestOpen2 = createFakeRequestOpen(cameraId1, emptyList(), fakeGraphListener2)
+            val requestClose2 = createFakeRequestClose(cameraId1)
+            requestList =
+                mutableListOf<CameraRequest>(
+                    requestOpen1,
+                    RequestCloseById(cameraId0),
+                    RequestCloseById(cameraId1),
+                    requestOpen2,
+                    requestClose1,
+                    requestClose2,
+                )
+            deviceManager.prune(requestList)
+            assertEquals(requestList[0], requestClose1)
+            assertEquals(requestList[1], requestClose2)
+        }
+
+    @Test
+    fun pruneRequestCloseAllSupersedesAllRequests() =
+        testScope.runTest {
+            val requestList =
+                mutableListOf<CameraRequest>(
+                    createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener1),
+                    RequestCloseById(cameraId0),
+                    createFakeRequestOpen(cameraId1, emptyList(), fakeGraphListener2),
+                    createFakeRequestClose(cameraId1),
+                    RequestCloseAll,
+                    RequestCloseAll,
+                    createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener1),
+                )
+            deviceManager.prune(requestList)
+            assertIs<RequestCloseAll>(requestList[0])
+            // The former RequestCloseAll should be superseded, and thus we should only have one.
+            assertIsNot<RequestCloseAll>(requestList[1])
+        }
+
+    private fun createFakeRequestOpen(
+        cameraId: CameraId,
+        sharedCameraIds: List<CameraId>,
+        graphListener: GraphListener,
+    ): RequestOpen {
+        val virtualCamera = VirtualCameraState(cameraId, graphListener, fakeThreads.globalScope)
+        return RequestOpen(virtualCamera, sharedCameraIds, graphListener, false, { true })
+    }
+
+    private fun createFakeRequestClose(
+        cameraId: CameraId,
+        allCameraIds: Set<CameraId> = setOf(cameraId),
+    ): RequestClose {
+        val fakeCameraMetadata = FakeCameraMetadata(cameraId = cameraId)
+        val fakeCamera2MetadataProvider =
+            FakeCamera2MetadataProvider(mapOf(cameraId to fakeCameraMetadata))
+        val fakeCamera2Quirks = Camera2Quirks(fakeCamera2MetadataProvider)
+        val fakeAndroidCameraState =
+            AndroidCameraState(
+                cameraId,
+                fakeCameraMetadata,
+                1,
+                TimestampNs(0),
+                fakeTimeSource,
+                fakeCameraErrorListener,
+                fakeCamera2DeviceCloser,
+                fakeCamera2Quirks,
+                fakeThreads,
+                fakeAudioRestrictionController,
+            )
+        val fakeActiveCamera =
+            ActiveCamera(fakeAndroidCameraState, allCameraIds, fakeThreads.globalScope) {}
+        return RequestClose(fakeActiveCamera)
+    }
+}
