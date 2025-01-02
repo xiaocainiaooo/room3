@@ -43,8 +43,12 @@ import androidx.wear.compose.foundation.samples.SimpleScalingLazyColumnWithSnap
 import androidx.wear.compose.foundation.samples.SimpleSwipeToDismissBox
 import androidx.wear.compose.foundation.samples.SimpleVerticalPagerSample
 import androidx.wear.compose.foundation.samples.StatefulSwipeToDismissBox
+import androidx.wear.compose.foundation.samples.SwipeToRevealSample
+import androidx.wear.compose.foundation.samples.SwipeToRevealWithDelayedText
+import androidx.wear.compose.foundation.samples.SwipeToRevealWithExpandables
 import androidx.wear.compose.foundation.samples.TransformingLazyColumnAnimateItemSample
 import androidx.wear.compose.foundation.samples.TransformingLazyColumnLettersSample
+import androidx.wear.compose.integration.demos.common.Centralize
 import androidx.wear.compose.integration.demos.common.ComposableDemo
 import androidx.wear.compose.integration.demos.common.DemoCategory
 
@@ -179,6 +183,18 @@ val WearFoundationDemos =
                 ),
             ),
             SwipeToDismissDemos,
+            DemoCategory(
+                "Swipe To Reveal",
+                listOf(
+                    ComposableDemo("S2R") { Centralize { SwipeToRevealSample() } },
+                    ComposableDemo("S2R With Delayed Text") {
+                        Centralize { SwipeToRevealWithDelayedText() }
+                    },
+                    ComposableDemo("S2R With Expandables") {
+                        Centralize { SwipeToRevealWithExpandables() }
+                    },
+                )
+            ),
             DemoCategory(
                 "TransformingLazyColumn",
                 listOf(

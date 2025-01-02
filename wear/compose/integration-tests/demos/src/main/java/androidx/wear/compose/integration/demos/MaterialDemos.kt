@@ -607,17 +607,17 @@ val WearMaterialDemos =
                     DemoCategory(
                         "Samples",
                         listOf(
-                            ComposableDemo("Material S2R Chip") { params ->
+                            ComposableDemo("S2R Chip") { params ->
                                 Centralize {
                                     SwipeToRevealChipSample(params.swipeToDismissBoxState)
                                 }
                             },
-                            ComposableDemo("Material S2R Card") { params ->
+                            ComposableDemo("S2R Card") { params ->
                                 Centralize {
                                     SwipeToRevealCardSample(params.swipeToDismissBoxState)
                                 }
                             },
-                            ComposableDemo("Material S2R Cards Inside SLC") { params ->
+                            ComposableDemo("S2R Cards Inside SLC") { params ->
                                 Centralize {
                                     ScalingLazyColumn {
                                         item {
