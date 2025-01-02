@@ -182,6 +182,5 @@ androidx {
     inceptionYear = "2018"
     description = "Android Lifecycle ViewModel"
     samples(project(":lifecycle:lifecycle-viewmodel-savedstate-samples"))
-    metalavaK2UastEnabled = false // TODO(b/324624680)
     kotlinTarget = KotlinTarget.KOTLIN_1_9
 }
