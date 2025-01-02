@@ -59,7 +59,6 @@ constructor(workerExecutor: WorkerExecutor) : SourceMetalavaTask(workerExecutor)
                 dependencyClasspath,
                 createProjectXmlFile(),
                 sourcePaths.files.filter { it.exists() },
-                commonModuleSourcePaths.files.filter { it.exists() },
                 null,
                 GenerateApiMode.PublicApi,
                 ApiLintMode.CheckBaseline(baselineFile, targetsJavaConsumers.get()),
