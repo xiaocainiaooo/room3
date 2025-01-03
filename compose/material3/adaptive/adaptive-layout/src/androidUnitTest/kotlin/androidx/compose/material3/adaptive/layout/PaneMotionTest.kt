@@ -83,12 +83,21 @@ class PaneMotionTest {
         expectedEnterTransition: EnterTransition,
         expectedExitTransition: ExitTransition
     ) {
+        mockPaneScaffoldMotionDataProvider.updateMotions(this, NoMotion, NoMotion)
         // Can't compare equality directly because of lambda. Check string representation instead
         assertWithMessage("Enter transition of $this: ")
-            .that(mockPaneScaffoldMotionDataProvider.enterTransition.toString())
+            .that(
+                mockPaneScaffoldMotionDataProvider
+                    .calculateDefaultEnterTransition(ThreePaneScaffoldRole.Primary)
+                    .toString()
+            )
             .isEqualTo(expectedEnterTransition.toString())
         assertWithMessage("Exit transition of $this: ")
-            .that(mockPaneScaffoldMotionDataProvider.exitTransition.toString())
+            .that(
+                mockPaneScaffoldMotionDataProvider
+                    .calculateDefaultExitTransition(ThreePaneScaffoldRole.Primary)
+                    .toString()
+            )
             .isEqualTo(expectedExitTransition.toString())
     }
 
