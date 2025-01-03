@@ -22,6 +22,7 @@
  * modifying its settings.
  */
 
+import androidx.build.AndroidXConfig
 import androidx.build.LibraryType
 import androidx.build.KotlinTarget
 
@@ -63,6 +64,15 @@ dependencies {
     testImplementation(project(":xr:scenecore:scenecore-testing"))
     testImplementation(project(":xr:runtime:runtime-testing"))
 
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.testExtJunit)
+    androidTestImplementation(libs.testExtTruth)
+    androidTestImplementation(libs.testRunner)
+    androidTestImplementation(libs.truth)
+    androidTestImplementation(libs.mockitoAndroid5)
+    androidTestImplementation("androidx.appcompat:appcompat:1.2.0")
+    androidTestImplementation(project(":xr:scenecore:scenecore-testing"))
+
     // For androidx.xr.extensions.
     compileOnly(project(':xr:xr-stubs'))
     testImplementation(project(':xr:xr-stubs'))
@@ -80,6 +90,9 @@ android {
             assets {
                 srcDirs += ["src/test/java/androidx/xr/scenecore/impl/fake_assets"]
             }
+        }
+        androidTest {
+            jniLibs.srcDirs += new File(AndroidXConfig.getPrebuiltsRoot(project), "androidx/xr/androidTest")
         }
     }
     namespace "androidx.xr.scenecore"
