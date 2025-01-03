@@ -22,6 +22,7 @@ import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraMetadata.CONTROL_AE_MODE_OFF
 import android.hardware.camera2.CaptureRequest
 import android.os.Build
+import android.os.Looper
 import android.util.Size
 import android.view.Surface
 import androidx.camera.camera2.pipe.CameraGraph
@@ -52,6 +53,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.internal.DoNotInstrument
 
@@ -168,6 +170,7 @@ class RequestProcessorAdapterTest {
         val callback: RequestProcessor.Callback = mock()
 
         requestProcessorAdapter!!.setRepeating(requestToSet, callback)
+        shadowOf(Looper.getMainLooper()).idle()
         advanceUntilIdle()
 
         val frame = cameraGraphSimulator!!.simulateNextFrame()
