@@ -27,7 +27,6 @@ import androidx.room.paging.CommonLimitOffsetImpl.Companion.BUG_LINK
 import androidx.room.paging.util.getClippedRefreshKey
 import androidx.room.util.performSuspending
 import androidx.sqlite.db.SupportSQLiteQuery
-import androidx.sqlite.use
 
 /**
  * An implementation of [PagingSource] to perform a LIMIT OFFSET query

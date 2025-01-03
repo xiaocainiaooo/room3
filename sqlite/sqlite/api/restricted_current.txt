@@ -4,7 +4,6 @@ package androidx.sqlite {
   public final class SQLite {
     method public static void execSQL(androidx.sqlite.SQLiteConnection, String sql);
     method public static Void throwSQLiteException(int errorCode, String? errorMsg);
-    method public static inline <R> R use(androidx.sqlite.SQLiteStatement, kotlin.jvm.functions.Function1<? super androidx.sqlite.SQLiteStatement,? extends R> block);
     property public static final int SQLITE_DATA_BLOB;
     property public static final int SQLITE_DATA_FLOAT;
     property public static final int SQLITE_DATA_INTEGER;
@@ -17,7 +16,7 @@ package androidx.sqlite {
     field public static final int SQLITE_DATA_TEXT = 3; // 0x3
   }
 
-  public interface SQLiteConnection {
+  public interface SQLiteConnection extends java.lang.AutoCloseable {
     method public void close();
     method public androidx.sqlite.SQLiteStatement prepare(String sql);
   }
@@ -26,7 +25,7 @@ package androidx.sqlite {
     method public androidx.sqlite.SQLiteConnection open(String fileName);
   }
 
-  public interface SQLiteStatement {
+  public interface SQLiteStatement extends java.lang.AutoCloseable {
     method public void bindBlob(@IntRange(from=1L) int index, byte[] value);
     method public default void bindBoolean(@IntRange(from=1L) int index, boolean value);
     method public void bindDouble(@IntRange(from=1L) int index, double value);

@@ -25,7 +25,6 @@ import androidx.room.util.isMigrationRequired
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.SQLiteDriver
 import androidx.sqlite.execSQL
-import androidx.sqlite.use
 
 /** Expect implementation declaration of Room's connection manager. */
 internal expect class RoomConnectionManager
