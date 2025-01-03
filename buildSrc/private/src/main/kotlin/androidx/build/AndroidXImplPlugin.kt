@@ -234,6 +234,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
             if (androidXExtension.shouldPublish()) {
                 project.validatePublishedMultiplatformHasDefault()
                 project.addLicensesToPublishedArtifacts(androidXExtension.license)
+                project.registerValidateRelocatedDependenciesTask()
             }
             project.registerValidateMultiplatformSourceSetNamingTask()
             project.validateLintVersionTestExists(androidXExtension)
@@ -1490,6 +1491,10 @@ private fun Project.validateLintVersionTestExists(androidXExtension: AndroidXExt
 
 /** Returns whether the configuration is used for testing. */
 private fun Configuration.isTest(): Boolean = name.lowercase().contains("test")
+
+/** Returns whether the configuration is part of publication. */
+internal fun Configuration.isPublished(): Boolean =
+    !isTest() && !name.lowercase().contains("metadata") && !name.endsWith("CInterop")
 
 /**
  * Hides a project's Javadoc tasks from the output of `./gradlew tasks` by setting their group to
