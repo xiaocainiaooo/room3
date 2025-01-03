@@ -361,3 +361,5 @@ For more details, see: https://kotl\.in/gradle/internal\-compiler\-symbols
 # b/359449191
 > Transform sdk\-interface\-descriptors\.jar \(project :privacysandbox:ui:integration\-tests:testsdkproviderwrapper\) with ExtractCompileSdkShimTransform
 > Transform sdk\-interface\-descriptors\.jar \(project :privacysandbox:ui:integration\-tests:mediateesdkproviderwrapper\) with ExtractCompileSdkShimTransform
+# b/387450651 :sqlite:sqlite-bundled:compileCommonMainKotlinMetadata task emits this
+.*This code uses error suppression for 'ABSTRACT_MEMBER_NOT_IMPLEMENTED'.*

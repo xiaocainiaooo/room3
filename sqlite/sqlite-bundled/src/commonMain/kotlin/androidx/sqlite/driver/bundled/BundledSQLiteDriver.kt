@@ -24,6 +24,7 @@ import androidx.sqlite.SQLiteDriver
  * A [SQLiteDriver] that uses a bundled version of SQLite included as a native component of this
  * library.
  */
+@Suppress("ABSTRACT_MEMBER_NOT_IMPLEMENTED")
 public expect class BundledSQLiteDriver() : SQLiteDriver {
 
     /**
