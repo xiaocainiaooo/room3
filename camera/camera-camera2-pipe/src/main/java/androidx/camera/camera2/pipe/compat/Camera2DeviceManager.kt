@@ -225,6 +225,7 @@ constructor(
 
     @VisibleForTesting
     internal fun prune(requests: MutableList<CameraRequest>) {
+        // Step 1: Prioritize RequestClose - place them at the front of the queue.
         val requestCloses = requests.filter { it is RequestClose }
         requests.removeAll(requestCloses)
         // Move the RequestCloses to the front of the queue (in order) to be processed first.
@@ -232,12 +233,55 @@ constructor(
             requests.add(0, request)
         }
 
+        // Step 2: Handle RequestCloseAll. The last one would nullify all preceding requests.
         val numRequestsBeforeCloseAll = requests.indexOfLast { it is RequestCloseAll }
         if (numRequestsBeforeCloseAll > 0) {
             repeat(numRequestsBeforeCloseAll) { requests.removeAt(0).onRemoved() }
         }
 
-        // TODO: b/388054983 - Implement active pruning
+        // Step 3: Handle RequestOpen and RequestCloseById pruning.
+        val prunedIndices = mutableSetOf<Int>()
+        for ((idx, request) in requests.withIndex()) {
+            val prunedByIdx =
+                when (request) {
+                    is RequestOpen -> {
+                        // There are 2 cases where a RequestOpen can be pruned by a latter request:
+                        //
+                        // 1. RequestCloseById: If any of its cameras (including itself and the
+                        //    shared cameras) would be closed by it, then this RequestOpen could be
+                        //    pruned.
+                        // 2. RequestOpen: If the latter RequestOpen requests the same camera, or
+                        //    it requests a different camera and it doesn't need the camera to be
+                        //    opened by the current RequestOpen.
+                        val cameraId = request.virtualCamera.cameraId
+                        val allCameraIds = (request.sharedCameraIds + cameraId).toSet()
+
+                        requests.firstFromIndexOrNull(idx + 1) {
+                            when (it) {
+                                is RequestCloseById -> allCameraIds.contains(it.activeCameraId)
+                                is RequestOpen -> {
+                                    val cameraId2 = it.virtualCamera.cameraId
+                                    val allCameraIds2 = (it.sharedCameraIds + cameraId2).toSet()
+                                    cameraId == cameraId2 || allCameraIds != allCameraIds2
+                                }
+                                else -> false
+                            }
+                        }
+                    }
+                    is RequestCloseById ->
+                        // If there are several RequestCloseByIds with identical camera IDs, we can
+                        // just leave the latter one.
+                        requests.firstFromIndexOrNull(idx + 1) {
+                            it is RequestCloseById && it.activeCameraId == request.activeCameraId
+                        }
+                    else -> null
+                }
+            if (prunedByIdx != null) {
+                Log.debug { "$request is pruned by ${requests[prunedByIdx]}" }
+                prunedIndices.add(idx)
+            }
+        }
+        requests.removeIndices(prunedIndices).forEach { it.onRemoved() }
     }
 
     private fun CameraRequest.onRemoved() {
@@ -437,6 +481,26 @@ constructor(
             requestOpensToRemove.add(request)
         }
         pendingRequestOpens.removeAll(requestOpensToRemove)
+    }
+
+    private inline fun <T> List<T>.firstFromIndexOrNull(
+        index: Int,
+        predicate: (T) -> Boolean
+    ): Int? {
+        for (i in index..size - 1) {
+            if (predicate(get(i))) {
+                return i
+            }
+        }
+        return null
+    }
+
+    private fun <T> MutableList<T>.removeIndices(indices: Set<Int>): List<T> {
+        val removedElements = mutableListOf<T>()
+        for (idx in indices.sorted()) {
+            removedElements.add(removeAt(idx - removedElements.size))
+        }
+        return removedElements
     }
 
     private sealed interface OpenVirtualCameraResult {

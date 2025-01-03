@@ -120,6 +120,7 @@ internal class PruningCamera2DeviceManagerImplTest {
     private val fakeGraphListener1: GraphListener = mock()
     private val fakeGraphListener2: GraphListener = mock()
     private val fakeGraphListener3: GraphListener = mock()
+    private val fakeGraphListener4: GraphListener = mock()
 
     init {
         whenever(fakeContext.checkSelfPermission(any())).thenReturn(PERMISSION_GRANTED)
@@ -471,6 +472,79 @@ internal class PruningCamera2DeviceManagerImplTest {
             assertIs<RequestCloseAll>(requestList[0])
             // The former RequestCloseAll should be superseded, and thus we should only have one.
             assertIsNot<RequestCloseAll>(requestList[1])
+        }
+
+    @Test
+    fun pruneMultipleRequestOpensWithSameCameraId() =
+        testScope.runTest {
+            val requestOpen1 = createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener1)
+            val requestOpen2 =
+                createFakeRequestOpen(cameraId0, listOf(cameraId1), fakeGraphListener2)
+            val requestOpen3 = createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener3)
+            var requestList =
+                mutableListOf<CameraRequest>(
+                    RequestCloseById(cameraId1),
+                    requestOpen1,
+                    createFakeRequestClose(cameraId1),
+                    requestOpen2,
+                    requestOpen3,
+                )
+            deviceManager.prune(requestList)
+            val remainingRequestOpens = requestList.filterIsInstance<RequestOpen>()
+            assertEquals(remainingRequestOpens.size, 1)
+            assertEquals(remainingRequestOpens.first(), requestOpen3)
+        }
+
+    @Test
+    fun pruneMultipleRequestOpensWithDifferentCameraId() =
+        testScope.runTest {
+            val requestOpen1 = createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener1)
+            val requestOpen2 = createFakeRequestOpen(cameraId1, emptyList(), fakeGraphListener2)
+            val requestOpen3 =
+                createFakeRequestOpen(cameraId1, listOf(cameraId0), fakeGraphListener3)
+            val requestOpen4 =
+                createFakeRequestOpen(cameraId0, listOf(cameraId1), fakeGraphListener4)
+            val requestList =
+                mutableListOf<CameraRequest>(
+                    RequestCloseById(cameraId1),
+                    requestOpen1,
+                    createFakeRequestClose(cameraId1),
+                    requestOpen2,
+                    requestOpen3,
+                    requestOpen4,
+                )
+            deviceManager.prune(requestList)
+            val remainingRequestOpens = requestList.filterIsInstance<RequestOpen>()
+            // 1. requestOpen1 should be pruned by requestOpen2 since their camera IDs are
+            //    different, and they don't share the set of concurrent cameras.
+            // 2. requestOpen2 should be pruned by requestOpen3 since their camera IDs are the same.
+            // 3. requestOpen3 and requestOpen4 should both be kept since they same the set of
+            //    concurrent cameras.
+            assertEquals(remainingRequestOpens.size, 2)
+            assertEquals(remainingRequestOpens[0], requestOpen3)
+            assertEquals(remainingRequestOpens[1], requestOpen4)
+        }
+
+    @Test
+    fun pruneRequestCloseById() =
+        testScope.runTest {
+            val requestList =
+                mutableListOf<CameraRequest>(
+                    createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener1),
+                    RequestCloseById(cameraId0),
+                    createFakeRequestOpen(cameraId1, listOf(cameraId0), fakeGraphListener2),
+                    createFakeRequestOpen(cameraId0, listOf(cameraId1), fakeGraphListener3),
+                    RequestCloseById(cameraId1),
+                )
+            deviceManager.prune(requestList)
+            // 1. The first RequestOpen should be pruned by RequestCloseById(cameraId0)
+            // 2. The latter RequestOpen for concurrent cameras should be pruned altogether by
+            //    RequestCloseById(cameraId1), because by closing cameraId1, neither would succeed.
+            assertEquals(requestList.size, 2)
+            assertIs<RequestCloseById>(requestList[0])
+            assertEquals((requestList[0] as RequestCloseById).activeCameraId, cameraId0)
+            assertIs<RequestCloseById>(requestList[1])
+            assertEquals((requestList[1] as RequestCloseById).activeCameraId, cameraId1)
         }
 
     private fun createFakeRequestOpen(
