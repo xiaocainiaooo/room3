@@ -24,7 +24,6 @@ import androidx.sqlite.SQLiteDriver
  * A [SQLiteDriver] that uses a bundled version of SQLite included as a native component of this
  * library.
  */
-@Suppress("ABSTRACT_MEMBER_NOT_IMPLEMENTED")
 public expect class BundledSQLiteDriver() : SQLiteDriver {
 
     /**
@@ -33,6 +32,8 @@ public expect class BundledSQLiteDriver() : SQLiteDriver {
      * See also [SQLite In Multi-Threaded Applications](https://www.sqlite.org/threadsafe.html)
      */
     @get:RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public val threadingMode: Int
+
+    override fun open(fileName: String): SQLiteConnection
 
     /**
      * Opens a new database connection.
