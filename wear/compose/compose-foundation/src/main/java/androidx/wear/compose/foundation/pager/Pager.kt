@@ -301,8 +301,7 @@ public object PagerDefaults {
         state: PagerState,
         pagerSnapDistance: PagerSnapDistance = PagerSnapDistance.atMost(1),
         decayAnimationSpec: DecayAnimationSpec<Float> = rememberSplineBasedDecay(),
-        snapAnimationSpec: AnimationSpec<Float> =
-            spring(Spring.DampingRatioNoBouncy, PagerDefaults.Stiffness),
+        snapAnimationSpec: AnimationSpec<Float> = PagerDefaults.snapAnimationSpec,
         @FloatRange(from = 0.0, to = 1.0) snapPositionalThreshold: Float = 0.5f
     ): TargetedFlingBehavior {
         return ComposePagerDefaults.flingBehavior(
@@ -315,23 +314,30 @@ public object PagerDefaults {
     }
 
     /**
+     * The recommended medium-high stiffness used by default for the spring stiffness parameter in
+     * the Pager's snap animation.
+     */
+    private val MediumHighStiffness: Float = 2000f
+
+    /**
+     * The default spring animation used for the Pager's snap animation spec - a spring based
+     * animation with medium-high stiffness and no bounce.
+     */
+    public val snapAnimationSpec: AnimationSpec<Float> =
+        spring(Spring.DampingRatioNoBouncy, MediumHighStiffness)
+
+    /**
      * The default value of swipeToDismissEdgeZoneFraction used to configure the size of the edge
      * zone in a [HorizontalPager].
      */
-    public const val SwipeToDismissEdgeZoneFraction: Float = 0.15f
+    public val SwipeToDismissEdgeZoneFraction: Float = 0.15f
 
     /**
      * The default value of beyondViewportPageCount used to specify the number of pages to compose
      * and layout before and after the visible pages. It does not include the pages automatically
      * composed and laid out by the pre-fetcher in the direction of the scroll during scroll events.
      */
-    public const val BeyondViewportPageCount: Int = 0
-
-    /**
-     * The recommended medium-high stiffness used by default for the spring stiffness parameter in
-     * the Pager's snap animation
-     */
-    public const val Stiffness: Float = 2000f
+    public val BeyondViewportPageCount: Int = 0
 }
 
-internal const val CustomTouchSlopMultiplier = 1.10f
+internal val CustomTouchSlopMultiplier = 1.10f
