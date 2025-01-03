@@ -110,12 +110,28 @@ package androidx.compose.material3.adaptive.layout {
     property @androidx.compose.runtime.Composable public abstract String description;
   }
 
-  public static final class PaneExpansionAnchor.Offset extends androidx.compose.material3.adaptive.layout.PaneExpansionAnchor {
-    ctor public PaneExpansionAnchor.Offset(float offset);
-    method @androidx.compose.runtime.Composable public String getDescription();
-    method public float getOffset();
-    property @androidx.compose.runtime.Composable public String description;
+  public abstract static class PaneExpansionAnchor.Offset extends androidx.compose.material3.adaptive.layout.PaneExpansionAnchor {
+    method public final int getDirection();
+    method public final float getOffset();
+    property public final int direction;
     property public final float offset;
+    field public static final androidx.compose.material3.adaptive.layout.PaneExpansionAnchor.Offset.Companion Companion;
+  }
+
+  public static final class PaneExpansionAnchor.Offset.Companion {
+    method public androidx.compose.material3.adaptive.layout.PaneExpansionAnchor.Offset fromEnd(float offset);
+    method public androidx.compose.material3.adaptive.layout.PaneExpansionAnchor.Offset fromStart(float offset);
+  }
+
+  @kotlin.jvm.JvmInline public static final value class PaneExpansionAnchor.Offset.Direction {
+    field public static final androidx.compose.material3.adaptive.layout.PaneExpansionAnchor.Offset.Direction.Companion Companion;
+  }
+
+  public static final class PaneExpansionAnchor.Offset.Direction.Companion {
+    method public int getFromEnd();
+    method public int getFromStart();
+    property public final int FromEnd;
+    property public final int FromStart;
   }
 
   public static final class PaneExpansionAnchor.Proportion extends androidx.compose.material3.adaptive.layout.PaneExpansionAnchor {
