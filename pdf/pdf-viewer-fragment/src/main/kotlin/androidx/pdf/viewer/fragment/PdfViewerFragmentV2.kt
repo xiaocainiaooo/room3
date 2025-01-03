@@ -16,6 +16,7 @@
 
 package androidx.pdf.viewer.fragment
 
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
@@ -23,6 +24,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout.GONE
 import android.widget.LinearLayout.VISIBLE
@@ -30,6 +32,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -37,6 +41,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.pdf.view.PdfView
 import androidx.pdf.view.search.PdfSearchView
+import androidx.pdf.viewer.fragment.insets.TranslateInsetsAnimationCallback
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.DocumentError
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.DocumentLoaded
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.Loading
@@ -217,7 +222,23 @@ public open class PdfViewerFragmentV2 : Fragment() {
      */
     protected fun onPdfSearchViewCreated(pdfSearchView: PdfSearchView) {
         setupSearchViewListeners(pdfSearchView)
-        // TODO(b/382307165): add animator to align with keyboard
+        val windowManager = activity?.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+
+        activity?.let {
+            // Attach the callback to the decorView to reliably receive insets animation events,
+            // such as those triggered by soft keyboard input.
+            ViewCompat.setWindowInsetsAnimationCallback(
+                it.window.decorView,
+                TranslateInsetsAnimationCallback(
+                    view = pdfSearchView,
+                    windowManager = windowManager,
+                    pdfContainer = view,
+                    // As the decorView is a top-level view, insets must not be consumed here.
+                    // They must be propagated to child views for adjustments at their level.
+                    dispatchMode = DISPATCH_MODE_CONTINUE_ON_SUBTREE
+                )
+            )
+        }
     }
 
     private fun setupSearchViewListeners(pdfSearchView: PdfSearchView) {
