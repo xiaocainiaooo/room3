@@ -16,6 +16,8 @@
 
 package androidx.camera.camera2.internal;
 
+import static android.hardware.camera2.params.DynamicRangeProfiles.STANDARD;
+
 import static androidx.camera.core.concurrent.CameraCoordinator.CAMERA_OPERATING_MODE_CONCURRENT;
 
 import android.annotation.SuppressLint;
@@ -24,7 +26,9 @@ import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.params.DynamicRangeProfiles;
 import android.media.CamcorderProfile;
+import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.text.TextUtils;
@@ -40,6 +44,7 @@ import androidx.camera.camera2.internal.compat.ApiCompat;
 import androidx.camera.camera2.internal.compat.CameraAccessExceptionCompat;
 import androidx.camera.camera2.internal.compat.CameraCharacteristicsCompat;
 import androidx.camera.camera2.internal.compat.CameraManagerCompat;
+import androidx.camera.camera2.internal.compat.params.DynamicRangeConversions;
 import androidx.camera.camera2.internal.compat.params.DynamicRangesCompat;
 import androidx.camera.camera2.internal.compat.quirk.DeviceQuirks;
 import androidx.camera.camera2.internal.compat.quirk.LegacyCameraOutputConfigNullPointerQuirk;
@@ -48,6 +53,7 @@ import androidx.camera.camera2.internal.compat.workaround.CloseCameraBeforeCreat
 import androidx.camera.camera2.interop.ExperimentalCamera2Interop;
 import androidx.camera.core.CameraState;
 import androidx.camera.core.CameraUnavailableException;
+import androidx.camera.core.DynamicRange;
 import androidx.camera.core.Logger;
 import androidx.camera.core.Preview;
 import androidx.camera.core.UseCase;
@@ -982,6 +988,9 @@ final class Camera2CameraImpl implements CameraInternal {
 
         // Update Zsl disabled status by iterating all attached use cases.
         updateZslDisabledByUseCaseConfigStatus();
+        // Update low-light boost disabled status by the session config generated from all
+        // attached use cases.
+        updateLowLightBoostDisabledByUseCaseSessionConfigStatus();
 
         updateCaptureSessionConfig();
         resetCaptureSession(/*abortInFlightCaptures=*/false);
@@ -1103,8 +1112,10 @@ final class Camera2CameraImpl implements CameraInternal {
         // attached use cases.
         if (mUseCaseAttachState.getAttachedUseCaseConfigs().isEmpty()) {
             mCameraControlInternal.setZslDisabledByUserCaseConfig(false);
+            mCameraControlInternal.setLowLightBoostDisabledByUseCaseSessionConfig(false);
         } else {
             updateZslDisabledByUseCaseConfigStatus();
+            updateLowLightBoostDisabledByUseCaseSessionConfigStatus();
         }
 
         boolean allUseCasesDetached = mUseCaseAttachState.getAttachedSessionConfigs().isEmpty();
@@ -1135,6 +1146,51 @@ final class Camera2CameraImpl implements CameraInternal {
             isZslDisabledByUseCaseConfig |= useCaseConfig.isZslDisabled(false);
         }
         mCameraControlInternal.setZslDisabledByUserCaseConfig(isZslDisabledByUseCaseConfig);
+    }
+
+    private void updateLowLightBoostDisabledByUseCaseSessionConfigStatus() {
+        if (!mCameraInfoInternal.isLowLightBoostSupported()) {
+            return;
+        }
+
+        ValidatingBuilder validatingBuilder = mUseCaseAttachState.getActiveAndAttachedBuilder();
+
+        SessionConfig useCaseSessionConfig;
+
+        if (validatingBuilder.isValid()) {
+            useCaseSessionConfig = validatingBuilder.build();
+        } else {
+            return;
+        }
+
+        // Low-light boost should be disabled when expected frame rate range exceeds 30.
+        if (useCaseSessionConfig.getExpectedFrameRateRange().getUpper() > 30) {
+            mCameraControlInternal.setLowLightBoostDisabledByUseCaseSessionConfig(true);
+            return;
+        }
+
+        // HDR 10-bit can be supported since API level 33
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return;
+        }
+
+        for (SessionConfig.OutputConfig outputConfig : useCaseSessionConfig.getOutputConfigs()) {
+            DynamicRangeProfiles dynamicRangeProfiles =
+                    mDynamicRangesCompat.toDynamicRangeProfiles();
+            if (dynamicRangeProfiles != null) {
+                DynamicRange requestedDynamicRange = outputConfig.getDynamicRange();
+                Long dynamicRangeProfileOrNull =
+                        DynamicRangeConversions.dynamicRangeToFirstSupportedProfile(
+                                requestedDynamicRange, dynamicRangeProfiles);
+                // Low-light boost should be disabled when HDR 10-bit is enabled.
+                if (dynamicRangeProfileOrNull != null && dynamicRangeProfileOrNull != STANDARD) {
+                    mCameraControlInternal.setLowLightBoostDisabledByUseCaseSessionConfig(true);
+                    return;
+                }
+            }
+        }
+
+        mCameraControlInternal.setLowLightBoostDisabledByUseCaseSessionConfig(false);
     }
 
     // Check if it need the repeating surface for ImageCapture only use case.

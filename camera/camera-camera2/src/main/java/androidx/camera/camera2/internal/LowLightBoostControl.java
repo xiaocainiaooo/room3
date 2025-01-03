@@ -23,6 +23,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CaptureRequest;
 import android.os.Build;
 
+import androidx.annotation.GuardedBy;
 import androidx.annotation.VisibleForTesting;
 import androidx.camera.camera2.internal.annotation.CameraExecutor;
 import androidx.camera.camera2.internal.compat.CameraCharacteristicsCompat;
@@ -60,6 +61,9 @@ final class LowLightBoostControl {
     private final Camera2CameraControlImpl mCamera2CameraControlImpl;
     private final MutableLiveData<Integer> mLowLightBoostState;
     private final boolean mIsLowLightBoostSupported;
+    private final Object mLock = new Object();
+    @GuardedBy("mLock")
+    private boolean mLowLightBoostDisabledByUseCaseSessionConfig = false;
     @CameraExecutor
     private final Executor mExecutor;
 
@@ -158,6 +162,36 @@ final class LowLightBoostControl {
         }
     }
 
+    @ExecutedBy("mExecutor")
+    void setLowLightBoostDisabledByUseCaseSessionConfig(boolean disabled) {
+        synchronized (mLock) {
+            mLowLightBoostDisabledByUseCaseSessionConfig = disabled;
+
+            if (!mLowLightBoostDisabledByUseCaseSessionConfig) {
+                return;
+            }
+        }
+
+        if (mTargetLlbEnabled) {
+            mTargetLlbEnabled = false;
+            mCamera2CameraControlImpl.enableLowLightBoostInternal(false);
+            setLiveDataValue(mLowLightBoostState, LowLightBoostState.OFF);
+
+            if (mEnableLlbCompleter != null) {
+                mEnableLlbCompleter.setException(new IllegalStateException(
+                        "Low-light boost is disabled when expected frame rate range exceeds 30 or"
+                                + " HDR 10-bit is on."));
+                mEnableLlbCompleter = null;
+            }
+        }
+    }
+
+    boolean isLowLightBoostDisabledByUseCaseSessionConfig() {
+        synchronized (mLock) {
+            return mLowLightBoostDisabledByUseCaseSessionConfig;
+        }
+    }
+
     /**
      * Enable or disable the low-light boost.
      *
@@ -212,6 +246,18 @@ final class LowLightBoostControl {
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
     @ExecutedBy("mExecutor")
     void enableLowLightBoostInternal(@Nullable Completer<Void> completer, boolean enabled) {
+        synchronized (mLock) {
+            if (mLowLightBoostDisabledByUseCaseSessionConfig) {
+                setLiveDataValue(mLowLightBoostState, LowLightBoostState.OFF);
+                if (completer != null) {
+                    completer.setException(new IllegalStateException(
+                            "Low-light boost is disabled when expected frame rate range exceeds "
+                                    + "30 or HDR 10-bit is on."));
+                }
+                return;
+            }
+        }
+
         if (!mIsActive) {
             setLiveDataValue(mLowLightBoostState, LowLightBoostState.OFF);
             if (completer != null) {
