@@ -26,6 +26,7 @@ import android.graphics.Point
 import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Looper
 import android.os.Parcelable
@@ -49,6 +50,10 @@ import androidx.pdf.R
 import androidx.pdf.util.Accessibility
 import androidx.pdf.util.MathUtils
 import androidx.pdf.util.ZoomUtils
+import androidx.pdf.view.fastscroll.FastScrollCalculator
+import androidx.pdf.view.fastscroll.FastScrollDrawer
+import androidx.pdf.view.fastscroll.FastScrollGestureDetector
+import androidx.pdf.view.fastscroll.FastScroller
 import java.util.LinkedList
 import java.util.Queue
 import java.util.concurrent.Executors
@@ -79,6 +84,22 @@ public open class PdfView
 @JvmOverloads
 constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     View(context, attrs, defStyle) {
+
+    private val fastScrollVerticalThumbDrawable: Drawable?
+    private val fastScrollVerticalTrackDrawable: Drawable?
+    private val fastScrollPageIndicatorBackgroundDrawable: Drawable?
+
+    init {
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.PdfView)
+        fastScrollVerticalThumbDrawable =
+            typedArray.getDrawable(R.styleable.PdfView_fastScrollVerticalThumbDrawable)
+        fastScrollVerticalTrackDrawable =
+            typedArray.getDrawable(R.styleable.PdfView_fastScrollVerticalTrackDrawable)
+        fastScrollPageIndicatorBackgroundDrawable =
+            typedArray.getDrawable(R.styleable.PdfView_fastScrollPageIndicatorBackgroundDrawable)
+        typedArray.recycle()
+    }
+
     /** Supply a [PdfDocument] to process the PDF content for rendering */
     public var pdfDocument: PdfDocument? = null
         set(value) {
@@ -108,7 +129,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             checkMainThread()
             field = value
             onZoomChanged()
-            invalidate()
         }
 
     /**
@@ -187,6 +207,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      */
     private var oldWidth: Int? = width
 
+    private var fastScroller: FastScroller? = null
+    private var fastScrollGestureDetector: FastScrollGestureDetector? = null
+
     private val gestureHandler = ZoomScrollGestureHandler()
     private val gestureTracker = GestureTracker(context).apply { delegate = gestureHandler }
 
@@ -196,6 +219,18 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     // To avoid allocations during drawing
     private val visibleAreaRect = Rect()
+
+    private val fastScrollGestureHandler =
+        object : FastScrollGestureDetector.FastScrollGestureHandler {
+            override fun onFastScrollDetected(scrollY: Float) {
+                fastScroller?.let {
+                    val updatedY =
+                        it.viewScrollPositionFromFastScroller(scrollY, zoom, height, contentHeight)
+                    scrollTo(scrollX, updatedY)
+                    invalidate()
+                }
+            }
+        }
 
     @VisibleForTesting internal var accessibilityPageHelper: AccessibilityPageHelper? = null
     @VisibleForTesting
@@ -359,10 +394,21 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             }
         }
         canvas.restore()
+
+        fastScroller?.drawScroller(
+            canvas,
+            scrollY,
+            zoom,
+            height,
+            visibleArea = getVisibleAreaInContentCoords(),
+            visiblePages,
+            contentHeight
+        )
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        var handled = maybeDragSelectionHandle(event)
+        var handled = event?.let { fastScrollGestureDetector?.handleEvent(it, width) } ?: false
+        handled = handled || maybeDragSelectionHandle(event)
         handled = handled || event?.let { gestureTracker.feed(it) } ?: false
         return handled || super.onTouchEvent(event)
     }
@@ -670,6 +716,29 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 Point(maxBitmapDimensionPx, maxBitmapDimensionPx),
                 isTouchExplorationEnabled
             )
+
+        if (
+            fastScrollVerticalThumbDrawable != null &&
+                fastScrollVerticalTrackDrawable != null &&
+                fastScrollPageIndicatorBackgroundDrawable != null
+        ) {
+
+            val fastScrollCalculator = FastScrollCalculator(context)
+            val fastScrollDrawer =
+                FastScrollDrawer(
+                    context,
+                    localPdfDocument,
+                    fastScrollVerticalThumbDrawable,
+                    fastScrollVerticalTrackDrawable,
+                    fastScrollPageIndicatorBackgroundDrawable
+                )
+
+            val localFastScroller = FastScroller(fastScrollDrawer, fastScrollCalculator)
+            fastScroller = localFastScroller
+            fastScrollGestureDetector =
+                FastScrollGestureDetector(localFastScroller, fastScrollGestureHandler)
+        }
+
         // We'll either create our layout and selection managers from restored state, or
         // instantiate new ones
         if (!maybeRestoreState()) {
@@ -684,6 +753,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 )
             setAccessibility()
         }
+
         // If not, we'll start doing this when we _are_ attached to a visible window
         if (isAttachedToVisibleWindow) {
             startCollectingData()
@@ -892,10 +962,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     /** Converts a Y coordinate in View space to a Y coordinate in content space */
     internal fun toContentY(viewY: Float): Float {
         return toContentCoord(viewY, zoom, scrollY)
-    }
-
-    internal fun toViewCoord(contentCoord: Float, zoom: Float, scroll: Int): Float {
-        return (contentCoord * zoom) - scroll
     }
 
     /**
@@ -1272,6 +1338,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             check(Looper.myLooper() == Looper.getMainLooper()) {
                 "Property must be set on the main thread"
             }
+        }
+
+        internal fun toViewCoord(contentCoord: Float, zoom: Float, scroll: Int): Float {
+            return (contentCoord * zoom) - scroll
         }
     }
 }
