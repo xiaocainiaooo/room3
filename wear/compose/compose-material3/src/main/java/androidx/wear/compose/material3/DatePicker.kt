@@ -19,7 +19,12 @@ package androidx.wear.compose.material3
 import android.os.Build
 import android.text.format.DateFormat
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -56,6 +61,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -246,25 +252,42 @@ public fun DatePicker(
 
     BoxWithConstraints(modifier = modifier.fillMaxSize().alpha(fullyDrawn.value)) {
         val boxConstraints = this
+        val heading =
+            selectedIndex?.let {
+                when (datePickerOptions.getOrNull(it)) {
+                    DatePickerOption.Day -> dayString
+                    DatePickerOption.Month -> monthString
+                    DatePickerOption.Year -> yearString
+                    else -> ""
+                }
+            } ?: ""
+        val headingAnimationSpec: FiniteAnimationSpec<Float> =
+            MaterialTheme.motionScheme.defaultEffectsSpec()
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.height(14.dp))
-            Text(
-                text =
-                    selectedIndex?.let {
-                        when (datePickerOptions.getOrNull(it)) {
-                            DatePickerOption.Day -> dayString
-                            DatePickerOption.Month -> monthString
-                            DatePickerOption.Year -> yearString
-                            else -> ""
-                        }
-                    } ?: "",
-                color = colors.pickerLabelColor,
-                style = labelTextStyle,
-                maxLines = 1,
-            )
+            AnimatedContent(
+                targetState = heading,
+                transitionSpec = {
+                    ContentTransform(
+                        targetContentEnter =
+                            fadeIn(animationSpec = headingAnimationSpec.delayMillis(200)),
+                        initialContentExit = fadeOut(animationSpec = headingAnimationSpec),
+                        sizeTransform = null
+                    )
+                }
+            ) { targetText ->
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = targetText,
+                    color = colors.pickerLabelColor,
+                    textAlign = TextAlign.Center,
+                    style = labelTextStyle,
+                    maxLines = 1,
+                )
+            }
             Spacer(Modifier.height(if (isLargeScreen) 6.dp else 4.dp))
             FontScaleIndependent {
                 val measurer = rememberTextMeasurer()
