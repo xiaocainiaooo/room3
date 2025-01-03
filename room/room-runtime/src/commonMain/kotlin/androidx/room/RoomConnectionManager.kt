@@ -28,7 +28,7 @@ import androidx.sqlite.execSQL
 import androidx.sqlite.use
 
 /** Expect implementation declaration of Room's connection manager. */
-internal expect class RoomConnectionManager : BaseRoomConnectionManager
+internal expect class RoomConnectionManager
 
 /**
  * Base class for Room's database connection manager, responsible for opening and managing such

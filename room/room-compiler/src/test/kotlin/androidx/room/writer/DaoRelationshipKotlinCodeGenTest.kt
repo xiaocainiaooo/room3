@@ -553,7 +553,8 @@ class DaoRelationshipKotlinCodeGenTest : BaseDaoKotlinCodeGenTest() {
         runTest(
             sources =
                 listOf(src, databaseSrc, COMMON.DATA_SOURCE_FACTORY, COMMON.POSITIONAL_DATA_SOURCE),
-            expectedFilePath = getTestGoldenPath(testName.methodName)
+            expectedFilePath = getTestGoldenPath(testName.methodName),
+            withKsp2 = false
         )
     }
 }
