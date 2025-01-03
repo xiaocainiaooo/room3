@@ -32,7 +32,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Objects;
 
 /**
  * Builders for fixed value primitive types that can be used in dynamic expressions and in for state
@@ -132,7 +131,7 @@ final class FixedValueBuilders {
 
         @Override
         public int hashCode() {
-            return Objects.hash(mImpl.getValue());
+            return Integer.hashCode(mImpl.getValue());
         }
 
         @Override
@@ -264,7 +263,7 @@ final class FixedValueBuilders {
 
         @Override
         public int hashCode() {
-            return Objects.hash(mImpl.getValue());
+            return mImpl.getValue().hashCode();
         }
 
         @Override
@@ -402,7 +401,7 @@ final class FixedValueBuilders {
 
         @Override
         public int hashCode() {
-            return Objects.hash(mImpl.getValue());
+            return Float.hashCode(mImpl.getValue());
         }
 
         @Override
@@ -538,7 +537,7 @@ final class FixedValueBuilders {
 
         @Override
         public int hashCode() {
-            return Objects.hash(mImpl.getValue());
+            return Boolean.hashCode(mImpl.getValue());
         }
 
         @Override
@@ -672,7 +671,7 @@ final class FixedValueBuilders {
 
         @Override
         public int hashCode() {
-            return Objects.hash(mImpl.getArgb());
+            return Integer.hashCode(mImpl.getArgb());
         }
 
         @Override
@@ -754,7 +753,7 @@ final class FixedValueBuilders {
 
         @Override
         public int hashCode() {
-            return Objects.hash(mImpl.getEpochSeconds());
+            return Long.hashCode(mImpl.getEpochSeconds());
         }
 
         @Override
@@ -888,7 +887,7 @@ final class FixedValueBuilders {
 
         @Override
         public int hashCode() {
-            return Objects.hash(mImpl.getSeconds());
+            return Long.hashCode(mImpl.getSeconds());
         }
 
         @Override
