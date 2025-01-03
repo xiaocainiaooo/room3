@@ -17,7 +17,12 @@
 package androidx.wear.protolayout.material3
 
 import android.graphics.Color
+import androidx.annotation.Dimension
+import androidx.annotation.Dimension.Companion.DP
 import androidx.wear.protolayout.ColorBuilders.argb
+import androidx.wear.protolayout.ModifiersBuilders.Padding
+import androidx.wear.protolayout.material3.ButtonDefaults.DEFAULT_CONTENT_PADDING_DP
+import androidx.wear.protolayout.material3.Typography.TypographyToken
 import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.argb
 
@@ -74,4 +79,66 @@ public object ButtonDefaults {
             icon = theme.colorScheme.onPrimaryContainer,
             label = theme.colorScheme.onPrimaryContainer
         )
+
+    internal const val METADATA_TAG_BUTTON: String = "BTN"
+    @Dimension(DP) internal const val DEFAULT_CONTENT_PADDING_DP: Int = 8
+    @Dimension(DP) internal const val IMAGE_BUTTON_DEFAULT_SIZE_DP = 52
+}
+
+/** Provides style values for the icon button component. */
+public class IconButtonStyle
+internal constructor(
+    @Dimension(unit = DP) internal val iconSize: Int,
+    internal val innerPadding: Padding = DEFAULT_CONTENT_PADDING_DP.toPadding()
+) {
+    public companion object {
+        /**
+         * Default style variation for the [iconButton] where all opinionated inner content is
+         * displayed in a medium size.
+         */
+        public fun defaultIconButtonStyle(): IconButtonStyle = IconButtonStyle(26)
+
+        /**
+         * Default style variation for the [iconButton] where all opinionated inner content is
+         * displayed in a large size.
+         */
+        public fun largeIconButtonStyle(): IconButtonStyle = IconButtonStyle(32)
+    }
+}
+
+/** Provides style values for the text button component. */
+public class TextButtonStyle
+internal constructor(
+    @TypographyToken internal val labelTypography: Int,
+    internal val innerPadding: Padding = DEFAULT_CONTENT_PADDING_DP.toPadding()
+) {
+    public companion object {
+        /**
+         * Default style variation for the [textButton] where all opinionated inner content is
+         * displayed in a small size.
+         */
+        public fun smallTextButtonStyle(): TextButtonStyle =
+            TextButtonStyle(Typography.LABEL_MEDIUM)
+
+        /**
+         * Default style variation for the [textButton] where all opinionated inner content is
+         * displayed in a medium size.
+         */
+        public fun defaultTextButtonStyle(): TextButtonStyle =
+            TextButtonStyle(Typography.LABEL_LARGE)
+
+        /**
+         * Default style variation for the [textButton] where all opinionated inner content is
+         * displayed in a large size.
+         */
+        public fun largeTextButtonStyle(): TextButtonStyle =
+            TextButtonStyle(Typography.DISPLAY_SMALL)
+
+        /**
+         * Default style variation for the [textButton] where all opinionated inner content is
+         * displayed in an extra large size.
+         */
+        public fun extraLargeTextButtonStyle(): TextButtonStyle =
+            TextButtonStyle(Typography.DISPLAY_MEDIUM)
+    }
 }
