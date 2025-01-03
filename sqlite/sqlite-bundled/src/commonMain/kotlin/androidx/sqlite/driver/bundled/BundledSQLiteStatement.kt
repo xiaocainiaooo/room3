@@ -21,4 +21,5 @@ import androidx.sqlite.SQLiteStatement
 
 // Restricted instead of internal due to KT-37316
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@Suppress("ABSTRACT_MEMBER_NOT_IMPLEMENTED")
 public expect class BundledSQLiteStatement : SQLiteStatement
