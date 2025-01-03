@@ -33,14 +33,18 @@ import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.extraLargeDataCardStyle
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.smallCompactDataCardStyle
 import androidx.wear.protolayout.material3.MaterialScope
+import androidx.wear.protolayout.material3.TextButtonStyle.Companion.smallTextButtonStyle
 import androidx.wear.protolayout.material3.appCard
 import androidx.wear.protolayout.material3.avatarImage
 import androidx.wear.protolayout.material3.buttonGroup
 import androidx.wear.protolayout.material3.graphicDataCard
+import androidx.wear.protolayout.material3.icon
+import androidx.wear.protolayout.material3.iconButton
 import androidx.wear.protolayout.material3.iconDataCard
 import androidx.wear.protolayout.material3.materialScope
 import androidx.wear.protolayout.material3.primaryLayout
 import androidx.wear.protolayout.material3.text
+import androidx.wear.protolayout.material3.textButton
 import androidx.wear.protolayout.material3.textDataCard
 import androidx.wear.protolayout.material3.textEdgeButton
 import androidx.wear.protolayout.modifiers.LayoutModifier
@@ -66,15 +70,28 @@ class PlaygroundTileService : TileService() {
     ): ListenableFuture<TileBuilders.Tile> = tile(requestParams, this)
 }
 
+private const val AVATAR_ID = "id"
+private const val ICON_ID = "icon"
+
 private fun resources() =
     Futures.immediateFuture(
         ResourceBuilders.Resources.Builder()
             .addIdToImageMapping(
-                "id",
+                AVATAR_ID,
                 ImageResource.Builder()
                     .setAndroidResourceByResId(
                         AndroidImageResourceByResId.Builder()
                             .setResourceId(R.drawable.avatar)
+                            .build()
+                    )
+                    .build()
+            )
+            .addIdToImageMapping(
+                ICON_ID,
+                ImageResource.Builder()
+                    .setAndroidResourceByResId(
+                        AndroidImageResourceByResId.Builder()
+                            .setResourceId(R.drawable.baseline_blender_24)
                             .build()
                     )
                     .build()
@@ -102,7 +119,7 @@ private fun tileLayout(
 ): LayoutElementBuilders.LayoutElement =
     materialScope(context = context, deviceConfiguration = requestParams.deviceConfiguration) {
         primaryLayout(
-            mainSlot = { graphicDataCardSample() },
+            mainSlot = { oneSlotButtons() },
             bottomSlot = {
                 textEdgeButton(
                     onClick = EMPTY_LOAD_CLICKABLE,
@@ -113,6 +130,36 @@ private fun tileLayout(
             }
         )
     }
+
+private fun MaterialScope.oneSlotButtons() = buttonGroup {
+    buttonGroupItem {
+        iconButton(
+            onClick = EMPTY_LOAD_CLICKABLE,
+            modifier = LayoutModifier.contentDescription("Icon button"),
+            width = expand(),
+            iconContent = { icon(ICON_ID) }
+        )
+    }
+    buttonGroupItem {
+        iconButton(
+            onClick = EMPTY_LOAD_CLICKABLE,
+            modifier = LayoutModifier.contentDescription("Icon button"),
+            width = expand(),
+            shape = shapes.large,
+            iconContent = { icon(ICON_ID) }
+        )
+    }
+    buttonGroupItem {
+        textButton(
+            onClick = EMPTY_LOAD_CLICKABLE,
+            modifier = LayoutModifier.contentDescription("Text button"),
+            width = expand(),
+            style = smallTextButtonStyle(),
+            shape = shapes.large,
+            labelContent = { text("Dec".layoutString) }
+        )
+    }
+}
 
 private fun MaterialScope.appCardSample() =
     appCard(
@@ -142,7 +189,7 @@ private fun MaterialScope.appCardSample() =
                 "Hello and welcome Tiles in AndroidX!".layoutString,
             )
         },
-        avatar = { avatarImage("id") },
+        avatar = { avatarImage(AVATAR_ID) },
         time = {
             text(
                 "NOW".layoutString,
@@ -194,7 +241,7 @@ private fun MaterialScope.dataCards() = buttonGroup {
             colors = filledTonalCardColors(),
             style = extraLargeDataCardStyle(),
             title = { this.text("1km".layoutString) },
-            secondaryText = { this.text("id".layoutString) },
+            secondaryText = { this.text(AVATAR_ID.layoutString) },
             content = { this.text("Run".layoutString) },
         )
     }
