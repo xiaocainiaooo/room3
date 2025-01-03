@@ -260,14 +260,23 @@ abstract class StudioTask : DefaultTask() {
                     // Studio-initiated Gradle tasks are run against the same version of AGP that
                     // was
                     // used to start Studio, which prevents version mismatch after repo sync.
-                    "EXPECTED_AGP_VERSION" to ANDROID_GRADLE_PLUGIN_VERSION
-                ) + additionalEnvironmentProperties
+                    "EXPECTED_AGP_VERSION" to ANDROID_GRADLE_PLUGIN_VERSION,
+                ) + additionalEnvironmentProperties + platformSpecificEnvironmentProperties()
 
             // Append to the existing environment variables set by gradlew and the user.
             environment().putAll(additionalStudioEnvironmentProperties)
             start()
         }
         println("Studio log at $logFile")
+    }
+
+    private fun platformSpecificEnvironmentProperties(): Map<String, String> {
+        return if (System.getenv("QT_QPA_PLATFORM") == "wayland") {
+            // Emulators don't work on Wayland natively, make them go through XWayland
+            mapOf("QT_QPA_PLATFORM" to "xcb")
+        } else {
+            emptyMap()
+        }
     }
 
     private fun checkLicenseAgreement(services: ServiceRegistry): Boolean {
