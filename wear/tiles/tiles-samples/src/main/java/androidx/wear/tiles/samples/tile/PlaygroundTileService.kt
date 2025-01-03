@@ -37,6 +37,7 @@ import androidx.wear.protolayout.material3.MaterialScope
 import androidx.wear.protolayout.material3.TextButtonStyle.Companion.smallTextButtonStyle
 import androidx.wear.protolayout.material3.appCard
 import androidx.wear.protolayout.material3.avatarImage
+import androidx.wear.protolayout.material3.button
 import androidx.wear.protolayout.material3.buttonGroup
 import androidx.wear.protolayout.material3.graphicDataCard
 import androidx.wear.protolayout.material3.icon
@@ -132,6 +133,16 @@ private fun tileLayout(
             }
         )
     }
+
+private fun MaterialScope.pillShapeButton() =
+    button(
+        onClick = clickable(),
+        modifier = LayoutModifier.contentDescription("Pill button"),
+        width = expand(),
+        iconContent = { icon(ICON_ID) },
+        labelContent = { text("Primary label".layoutString) },
+        secondaryLabelContent = { text("Secondary label".layoutString) },
+    )
 
 private fun MaterialScope.oneSlotButtons() = buttonGroup {
     buttonGroupItem {

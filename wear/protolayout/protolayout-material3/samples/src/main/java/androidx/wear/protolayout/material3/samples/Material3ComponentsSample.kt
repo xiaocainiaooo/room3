@@ -23,6 +23,7 @@ import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.DimensionBuilders.weight
 import androidx.wear.protolayout.LayoutElementBuilders
+import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
@@ -49,6 +50,7 @@ import androidx.wear.protolayout.material3.icon
 import androidx.wear.protolayout.material3.iconButton
 import androidx.wear.protolayout.material3.iconDataCard
 import androidx.wear.protolayout.material3.iconEdgeButton
+import androidx.wear.protolayout.material3.imageButton
 import androidx.wear.protolayout.material3.materialScope
 import androidx.wear.protolayout.material3.primaryLayout
 import androidx.wear.protolayout.material3.text
@@ -312,7 +314,7 @@ fun graphicDataCardSample(
     }
 
 @Sampled
-fun buttonSample(
+fun customButtonSample(
     context: Context,
     deviceConfiguration: DeviceParameters,
     clickable: Clickable
@@ -320,6 +322,7 @@ fun buttonSample(
     materialScope(context, deviceConfiguration) {
         primaryLayout(
             mainSlot = {
+                // Button with custom content inside
                 button(
                     onClick = clickable,
                     modifier =
@@ -327,7 +330,10 @@ fun buttonSample(
                             .backgroundColor(colorScheme.primary),
                     width = expand(),
                     height = expand(),
-                    content = { text("Button!".layoutString) }
+                    labelContent = {
+                        // This can be further built.
+                        Box.Builder().build()
+                    }
                 )
             }
         )
@@ -395,7 +401,7 @@ fun imageButtonSample(
     materialScope(context, deviceConfiguration) {
         primaryLayout(
             mainSlot = {
-                button(
+                imageButton(
                     onClick = clickable,
                     modifier =
                         LayoutModifier.contentDescription("Big button with image background"),
@@ -424,5 +430,27 @@ fun singleSegmentCircularProgressIndicator(
             endAngleDegrees = 520F,
             colors = filledVariantProgressIndicatorColors(),
             size = dp(85F)
+        )
+    }
+
+@Sampled
+fun pillShapeButtonsSample(
+    context: Context,
+    deviceConfiguration: DeviceParameters,
+    clickable: Clickable
+): LayoutElement =
+    materialScope(context, deviceConfiguration) {
+        primaryLayout(
+            mainSlot = {
+                button(
+                    onClick = clickable,
+                    modifier = LayoutModifier.contentDescription("Pill shape button"),
+                    width = expand(),
+                    height = expand(),
+                    labelContent = { text("First label".layoutString) },
+                    secondaryLabelContent = { text("Second label".layoutString) },
+                    iconContent = { icon("id") }
+                )
+            }
         )
     }
