@@ -87,6 +87,13 @@ internal class PdfSearchViewManager(private val pdfSearchView: PdfSearchView) {
             }
 
             matchStatusTextView.visibility = View.VISIBLE
+
+            // Restores the search query in the EditText, if needed (e.g., after process death).
+            if (searchQueryBox.text.toString() != results.query) {
+                searchQueryBox.setText(results.query)
+                searchQueryBox.setSelection(results.query.length)
+            }
+
             visibility = View.VISIBLE
         }
     }

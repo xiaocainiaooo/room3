@@ -142,9 +142,26 @@ internal class PdfDocumentViewModel(
             This is required as [SearchRepository] depends on [PdfDocument] which is created in
             [PdfFragmentUiState.DocumentLoaded] state.
             */
-            documentLoadJob?.invokeOnCompletion {
-                updateSearchState(isTextSearchActive = state[TEXT_SEARCH_STATE_KEY] ?: false)
-                // TODO: Restore SearchRepository using data in SSH. b/382307355
+            documentLoadJob?.invokeOnCompletion { maybeRestoreSearchState() }
+        }
+    }
+
+    private fun maybeRestoreSearchState() {
+        // Return early if search is disabled, as there's no result to restore.
+        if (!isTextSearchActiveFromState) return
+
+        // Restore search session from last state saved
+        updateSearchState(isTextSearchActive = isTextSearchActiveFromState)
+        val query = state.get<String>(SEARCH_QUERY_KEY)
+        val pageNum = state.get<Int>(QUERY_RESULT_PAGE_NUM_KEY) ?: 0
+        val resultIndex = state.get<Int>(QUERY_RESULT_INDEX_KEY) ?: 0
+        query?.let {
+            viewModelScope.launch(searchJob) {
+                searchRepository.produceSearchResults(
+                    query = query,
+                    currentVisiblePage = pageNum,
+                    resultIndex = resultIndex
+                )
             }
         }
     }
@@ -215,6 +232,12 @@ internal class PdfDocumentViewModel(
 
             _searchViewUiState.update { SearchViewUiState.Closed }
             _highlightsFlow.update { EMPTY_HIGHLIGHTS }
+            // Remove search params set in state on disabling search.
+            state.apply {
+                remove<String>(SEARCH_QUERY_KEY)
+                remove<Int>(QUERY_RESULT_PAGE_NUM_KEY)
+                remove<Int>(QUERY_RESULT_INDEX_KEY)
+            }
         }
     }
 
@@ -233,15 +256,28 @@ internal class PdfDocumentViewModel(
                 _highlightsFlow.update { EMPTY_HIGHLIGHTS }
             }
             is QueryResults.NoMatch -> {
+                state[SEARCH_QUERY_KEY] = queryResults.query
+
                 _searchViewUiState.update {
-                    SearchViewUiState.Active(currentMatch = 0, totalMatches = 0)
+                    SearchViewUiState.Active(
+                        query = queryResults.query,
+                        currentMatch = 0,
+                        totalMatches = 0
+                    )
                 }
                 _highlightsFlow.update { EMPTY_HIGHLIGHTS }
             }
             is QueryResults.Matched -> {
+                with(queryResults) {
+                    state[SEARCH_QUERY_KEY] = query
+                    state[QUERY_RESULT_PAGE_NUM_KEY] = queryResultsIndex.pageNum
+                    state[QUERY_RESULT_INDEX_KEY] = queryResultsIndex.resultBoundsIndex
+                }
+
                 val (currentIndex, totalMatches) = queryResults.fetchCounterData()
                 _searchViewUiState.update {
                     SearchViewUiState.Active(
+                        query = queryResults.query,
                         // The UI displays the search result counter starting from 1,
                         // so we add 1 to the current index.
                         currentMatch = if (totalMatches > 0) currentIndex + 1 else 0,
@@ -303,10 +339,10 @@ internal class PdfDocumentViewModel(
     /** Intent triggered when user submits a search query. */
     fun searchDocument(query: String, visiblePageRange: IntRange) {
         /**
-         * Cannot start searching document before [PdfViewerFragmentV2.isTextSearchActive] is
-         * enabled.
+         * Cannot start searching document before it's loaded, i.e. fragment is moved to
+         * [PdfFragmentUiState.DocumentLoaded] state.
          */
-        if (!isTextSearchActiveFromState) return
+        if (fragmentUiScreenState.value !is PdfFragmentUiState.DocumentLoaded) return
 
         val queryResults = searchRepository.queryResults.value
         // Return early if the query is unchanged from the previous search to avoid redundant
@@ -345,6 +381,9 @@ internal class PdfDocumentViewModel(
         private const val DOCUMENT_URI_KEY = "documentUri"
         private const val TEXT_SEARCH_STATE_KEY = "textSearchState"
         private const val TOOLBOX_STATE_KEY = "toolboxState"
+        private const val SEARCH_QUERY_KEY = "searchQuery"
+        private const val QUERY_RESULT_INDEX_KEY = "queryResultIndex"
+        private const val QUERY_RESULT_PAGE_NUM_KEY = "queryResultPageNum"
         private val EMPTY_HIGHLIGHTS = HighlightData(currentIndex = -1, highlightBounds = listOf())
 
         val Factory: ViewModelProvider.Factory =
