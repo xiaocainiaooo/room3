@@ -300,9 +300,13 @@ internal class PdfDocumentViewModel(
      * This function ensures that the toolbox view is properly displayed and ready for user input
      * when triggered.
      */
-    fun onToolboxViewToggle(isToolboxActive: Boolean) {
+    fun updateToolboxState(isToolboxActive: Boolean) {
+        /**
+         * Toolbox state should be updated only after document is loaded. else it will be a No-Op.
+         */
+        // TODO b/385288421 - Applying toolbox state and handling visibility
+        if (fragmentUiScreenState.value !is PdfFragmentUiState.DocumentLoaded) return
         state[TOOLBOX_STATE_KEY] = isToolboxActive
-        // TODO: add implementation after integrating Toolbox view b/379052981
     }
 
     private suspend fun openDocument(uri: Uri, password: String? = null) {

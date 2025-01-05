@@ -19,8 +19,7 @@ package androidx.pdf.view
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.RestrictTo
 import androidx.pdf.PdfDocument
 import androidx.pdf.R
@@ -33,14 +32,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 public open class ToolBoxView
 @JvmOverloads
 constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
-    View(context, attrs, defStyleAttr) {
+    ViewGroup(context, attrs, defStyleAttr) {
 
     private val editButton: FloatingActionButton
     private var pdfDocument: PdfDocument? = null
     private var editClickListener: OnClickListener? = null
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.toolbox_view, null, false)
+        inflate(context, R.layout.tool_box_view, this)
         editButton = findViewById(R.id.edit_fab)
 
         editButton.setOnClickListener {
@@ -74,6 +73,40 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 }
             startActivity(context, "", intent)
         }
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val child = getChildAt(0)
+        if (child == null) {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+            return
+        }
+
+        // subtract paddings for calculating available width for child views
+        val width = maxOf(0, MeasureSpec.getSize(widthMeasureSpec) - paddingLeft - paddingRight)
+        val height = maxOf(0, MeasureSpec.getSize(heightMeasureSpec) - paddingTop - paddingBottom)
+        // Create measure spec
+        child.measure(
+            MeasureSpec.makeMeasureSpec(width, MeasureSpec.getMode(widthMeasureSpec)),
+            MeasureSpec.makeMeasureSpec(height, MeasureSpec.getMode(heightMeasureSpec)),
+        )
+        // Set measurements
+        setMeasuredDimension(
+            child.measuredWidth + paddingLeft + paddingRight,
+            child.measuredHeight + paddingTop + paddingBottom
+        )
+    }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+
+        var child = getChildAt(0) ?: return // Return if there's no child
+        if (child.visibility == GONE) return // Return if the child is not visible
+        child.layout(
+            paddingLeft,
+            paddingTop,
+            (right - paddingRight) - left,
+            (bottom - paddingBottom) - top,
+        )
     }
 
     public companion object {
