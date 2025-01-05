@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -110,6 +111,51 @@ class PdfDocumentViewModelTest {
 
         // Assert fragmentUiState never set to Loading
         assertTrue(pdfViewModel.fragmentUiScreenState.value !is PdfFragmentUiState.Loading)
+    }
+
+    @Test
+    fun test_pdfDocumentViewModel_toogleToolboxInLoadingState() = runTest {
+        val savedState = SavedStateHandle()
+        // Not Providing document uri, so the state should be loading
+        val pdfViewModel =
+            PdfDocumentViewModel(savedState, SandboxedPdfLoader(appContext, dispatcher))
+
+        // Assert fragmentUiState is set to Loading
+        assertTrue(pdfViewModel.fragmentUiScreenState.value is PdfFragmentUiState.Loading)
+
+        pdfViewModel.updateToolboxState(true)
+
+        // Assert toolboxState never set to visible
+        assertFalse(pdfViewModel.isToolboxVisibleFromState)
+    }
+
+    @Test
+    fun test_pdfDocumentViewModel_toogleToolboxInDocumentErrorState() = runTest {
+        val documentUri = openFileAsUri(appContext, CORRUPTED_PDF)
+
+        val collectJob = launch {
+            pdfDocumentViewModel.fragmentUiScreenState.collectTill(
+                mutableListOf<PdfFragmentUiState>()
+            ) { state ->
+                state is PdfFragmentUiState.DocumentError
+            }
+        }
+
+        // load pdf document
+        pdfDocumentViewModel.loadDocument(uri = documentUri, password = null)
+
+        // wait till collection is completed
+        collectJob.join()
+
+        // Assert fragmentUiState is set to DocumentError
+        assertTrue(
+            pdfDocumentViewModel.fragmentUiScreenState.value is PdfFragmentUiState.DocumentError
+        )
+
+        pdfDocumentViewModel.updateToolboxState(true)
+
+        // Assert toolboxState never set to visible
+        assertFalse(pdfDocumentViewModel.isToolboxVisibleFromState)
     }
 
     @Test
