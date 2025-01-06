@@ -39,10 +39,7 @@ abstract class VerifyRelocatedDependenciesTask : DefaultTask() {
 
     @TaskAction
     fun check() {
-        if (
-            projectPath == ":benchmark:benchmark-baseline-profile-gradle-plugin" ||
-                projectPath == ":privacysandbox:tools:tools-core"
-        ) {
+        if (projectPath == ":benchmark:benchmark-baseline-profile-gradle-plugin") {
             return
         }
         val violations =
