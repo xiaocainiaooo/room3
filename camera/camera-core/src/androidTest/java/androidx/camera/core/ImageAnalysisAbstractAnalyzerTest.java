@@ -35,6 +35,7 @@ import static org.mockito.Mockito.verify;
 
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.util.Size;
 
 import androidx.camera.core.impl.ImageReaderProxy;
 import androidx.camera.core.impl.utils.executor.CameraXExecutors;
@@ -551,6 +552,8 @@ public class ImageAnalysisAbstractAnalyzerTest {
 
         @Override
         ListenableFuture<Void> analyzeImage(@NonNull ImageProxy imageProxy) {
+            mImageAnalysisNonBlockingAnalyzer.setAnalyzerImageResolution(
+                    new Size(imageProxy.getWidth(), imageProxy.getHeight()));
             return mImageAnalysisNonBlockingAnalyzer.analyzeImage(imageProxy);
         }
 

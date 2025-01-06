@@ -30,6 +30,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.ImageWriter;
 import android.os.Build;
+import android.util.Size;
 
 import androidx.annotation.GuardedBy;
 import androidx.annotation.IntRange;
@@ -122,6 +123,8 @@ abstract class ImageAnalysisAbstractAnalyzer implements ImageReaderProxy.OnImage
 
     // Flag that reflects the attaching state of the holding ImageAnalysis object.
     protected boolean mIsAttached = true;
+    @GuardedBy("mAnalyzerLock")
+    private Size mAnalyzerImageResolution = null;
 
     @Override
     public void onImageAvailable(@NonNull ImageReaderProxy imageReaderProxy) {
@@ -184,6 +187,16 @@ abstract class ImageAnalysisAbstractAnalyzer implements ImageReaderProxy.OnImage
         synchronized (mAnalyzerLock) {
             executor = mUserExecutor;
             analyzer = mSubscribedAnalyzer;
+
+            // Checks whether the image proxy size is mismatched.
+            boolean isImageProxySizeMismatched = mAnalyzerImageResolution == null || (
+                    imageProxy.getWidth() != mAnalyzerImageResolution.getWidth()
+                            || imageProxy.getHeight() != mAnalyzerImageResolution.getHeight());
+            if (isImageProxySizeMismatched) {
+                return Futures.immediateFailedFuture(new OperationCanceledException(
+                        "ImageProxy size mismatched. This might be caused by unbinding and "
+                                + "rebinding the UseCase quickly."));
+            }
 
             // Set dirty flag to indicate the output image transform matrix (for both YUV and RGB)
             // and image reader proxy (for YUV) needs to be recreated.
@@ -399,11 +412,33 @@ abstract class ImageAnalysisAbstractAnalyzer implements ImageReaderProxy.OnImage
         mIsAttached = true;
     }
 
+    void setAnalyzerImageResolution(@NonNull Size resolution) {
+        synchronized (mAnalyzerLock) {
+            mAnalyzerImageResolution = resolution;
+        }
+    }
+
     /**
      * Closes the callback so that it will stop posting to analyzer.
      */
     void detach() {
         mIsAttached = false;
+        // Clears all buffers so that they can be recreated according to the new resolution and
+        // setting when the ImageAnalysis is bound next time.
+        synchronized (mAnalyzerLock) {
+            if (mProcessedImageReaderProxy != null) {
+                mProcessedImageReaderProxy.safeClose();
+                mProcessedImageReaderProxy = null;
+            }
+            mAnalyzerImageResolution = null;
+            mPrevBufferRotationDegrees = 0;
+            mYRotatedBuffer = null;
+            mURotatedBuffer = null;
+            mVRotatedBuffer = null;
+            mRGBConvertedBuffer = null;
+            mNV21YDelegatedBuffer = null;
+            mNV21UVDelegatedBuffer = null;
+        }
         clearCache();
     }
 
