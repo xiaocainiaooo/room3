@@ -31,6 +31,7 @@ import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.LayoutElementBuilders.Row
 import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.material3.Typography.TypographyToken
+import androidx.wear.protolayout.modifiers.padding
 
 internal object GraphicDataCardDefaults {
     @FloatRange(from = 0.0, to = 100.0) private const val GRAPHIC_SPACE_PERCENTAGE: Float = 40f
@@ -135,7 +136,7 @@ internal constructor(
         /** The default smaller spacer width or height that should be between different elements. */
         @Dimension(unit = DP) private const val SMALL_SPACE_DP: Int = 2
 
-        private const val DEFAULT_VERTICAL_PADDING_DP = 8
+        private const val DEFAULT_VERTICAL_PADDING_DP = 8f
 
         /**
          * Default style variation for the [graphicDataCard] where all opinionated inner content is
@@ -144,10 +145,10 @@ internal constructor(
         public fun defaultGraphicDataCardStyle(): GraphicDataCardStyle =
             GraphicDataCardStyle(
                 innerPadding =
-                    Padding.Builder()
-                        .setTop(DEFAULT_VERTICAL_PADDING_DP.toDp())
-                        .setBottom(DEFAULT_VERTICAL_PADDING_DP.toDp())
-                        .build(),
+                    padding(
+                        top = DEFAULT_VERTICAL_PADDING_DP,
+                        bottom = DEFAULT_VERTICAL_PADDING_DP
+                    ),
                 titleToContentSpaceDp = SMALL_SPACE_DP,
                 titleTypography = Typography.DISPLAY_SMALL,
                 contentTypography = Typography.LABEL_SMALL,
@@ -162,10 +163,10 @@ internal constructor(
         public fun largeGraphicDataCardStyle(): GraphicDataCardStyle =
             GraphicDataCardStyle(
                 innerPadding =
-                    Padding.Builder()
-                        .setTop(DEFAULT_VERTICAL_PADDING_DP.toDp())
-                        .setBottom(DEFAULT_VERTICAL_PADDING_DP.toDp())
-                        .build(),
+                    padding(
+                        top = DEFAULT_VERTICAL_PADDING_DP,
+                        bottom = DEFAULT_VERTICAL_PADDING_DP
+                    ),
                 titleToContentSpaceDp = 0,
                 titleTypography = Typography.DISPLAY_MEDIUM,
                 contentTypography = Typography.LABEL_MEDIUM,

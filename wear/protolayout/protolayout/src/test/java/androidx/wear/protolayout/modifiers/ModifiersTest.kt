@@ -22,7 +22,6 @@ import androidx.wear.protolayout.ActionBuilders.LoadAction
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_NONE
 import androidx.wear.protolayout.expression.AppDataKey
-import androidx.wear.protolayout.expression.DynamicBuilders
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicInt32
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicString
 import androidx.wear.protolayout.expression.DynamicDataBuilders.DynamicDataValue
@@ -189,12 +188,60 @@ class ModifiersTest {
             .containsExactlyEntriesIn(mapOf(statePair1, statePair2))
     }
 
+    @Test
+    fun padding_toModifier() {
+        val modifiers =
+            LayoutModifier.padding(PADDING_ALL)
+                .padding(bottom = BOTTOM_PADDING, rtlAware = false)
+                .toProtoLayoutModifiers()
+
+        assertThat(modifiers.padding?.start?.value).isEqualTo(PADDING_ALL)
+        assertThat(modifiers.padding?.top?.value).isEqualTo(PADDING_ALL)
+        assertThat(modifiers.padding?.end?.value).isEqualTo(PADDING_ALL)
+        assertThat(modifiers.padding?.bottom?.value).isEqualTo(BOTTOM_PADDING)
+        assertThat(modifiers.padding?.rtlAware?.value).isFalse()
+    }
+
+    @Test
+    fun perSidePadding_padding_overwritesAllSides() {
+        val modifiers =
+            LayoutModifier.padding(
+                    start = START_PADDING,
+                    top = TOP_PADDING,
+                    end = END_PADDING,
+                    bottom = BOTTOM_PADDING,
+                    rtlAware = true
+                )
+                .padding(PADDING_ALL)
+                .toProtoLayoutModifiers()
+
+        assertThat(modifiers.padding?.start?.value).isEqualTo(PADDING_ALL)
+        assertThat(modifiers.padding?.top?.value).isEqualTo(PADDING_ALL)
+        assertThat(modifiers.padding?.end?.value).isEqualTo(PADDING_ALL)
+        assertThat(modifiers.padding?.bottom?.value).isEqualTo(PADDING_ALL)
+        assertThat(modifiers.padding?.rtlAware?.value).isFalse()
+    }
+
+    @Test
+    fun metadata_toModifier() {
+        val modifiers = LayoutModifier.tag(METADATA).toProtoLayoutModifiers()
+
+        assertThat(modifiers.metadata?.tagData).isEqualTo(METADATA_BYTE_ARRAY)
+    }
+
     companion object {
         const val STATIC_CONTENT_DESCRIPTION = "content desc"
-        val DYNAMIC_CONTENT_DESCRIPTION = DynamicBuilders.DynamicString.constant("dynamic content")
+        val DYNAMIC_CONTENT_DESCRIPTION = DynamicString.constant("dynamic content")
         val COLOR = LayoutColor(Color.RED)
         const val CORNER_RADIUS_X = 1.2f
         const val CORNER_RADIUS_Y = 3.4f
         const val CORNER_RADIUS = 5.6f
+        const val START_PADDING = 1f
+        const val TOP_PADDING = 2f
+        const val END_PADDING = 3f
+        const val BOTTOM_PADDING = 4f
+        const val PADDING_ALL = 5f
+        const val METADATA = "metadata"
+        val METADATA_BYTE_ARRAY = METADATA.toByteArray()
     }
 }

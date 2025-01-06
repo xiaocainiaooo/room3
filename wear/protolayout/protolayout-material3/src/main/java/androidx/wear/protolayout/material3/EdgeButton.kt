@@ -26,7 +26,6 @@ import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.LayoutElementBuilders.VERTICAL_ALIGN_CENTER
 import androidx.wear.protolayout.LayoutElementBuilders.VerticalAlignment
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
-import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
 import androidx.wear.protolayout.material3.ButtonDefaults.filledButtonColors
@@ -48,8 +47,10 @@ import androidx.wear.protolayout.modifiers.clip
 import androidx.wear.protolayout.modifiers.clipBottomLeft
 import androidx.wear.protolayout.modifiers.clipBottomRight
 import androidx.wear.protolayout.modifiers.contentDescription
+import androidx.wear.protolayout.modifiers.padding
 import androidx.wear.protolayout.modifiers.semanticsRole
-import androidx.wear.protolayout.modifiers.toProtoLayoutModifiersBuilder
+import androidx.wear.protolayout.modifiers.tag
+import androidx.wear.protolayout.modifiers.toProtoLayoutModifiers
 
 /**
  * ProtoLayout Material3 component edge button that offers a single slot to take an icon or similar
@@ -175,14 +176,15 @@ private fun MaterialScope.edgeButton(
     val bottomCornerRadiusX = edgeButtonWidth / 2f
     val bottomCornerRadiusY = EDGE_BUTTON_HEIGHT_DP - TOP_CORNER_RADIUS
 
-    val modifiers =
+    var mod =
         (LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then modifier)
             .clickable(onClick)
             .background(colors.container)
             .clip(TOP_CORNER_RADIUS)
             .clipBottomLeft(bottomCornerRadiusX, bottomCornerRadiusY)
             .clipBottomRight(bottomCornerRadiusX, bottomCornerRadiusY)
-            .toProtoLayoutModifiersBuilder()
+
+    style.padding?.let { mod = mod.padding(it) }
 
     val button = Box.Builder().setHeight(EDGE_BUTTON_HEIGHT_DP.toDp()).setWidth(dp(edgeButtonWidth))
     button
@@ -190,15 +192,13 @@ private fun MaterialScope.edgeButton(
         .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
         .addContent(content())
 
-    style.padding?.let { modifiers.setPadding(it) }
-
     return Box.Builder()
         .setHeight((EDGE_BUTTON_HEIGHT_DP + BOTTOM_MARGIN_DP).toDp())
         .setWidth(containerWidth)
         .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_TOP)
         .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
-        .addContent(button.setModifiers(modifiers.build()).build())
-        .setModifiers(Modifiers.Builder().setMetadata(METADATA_TAG.toElementMetadata()).build())
+        .addContent(button.setModifiers(mod.toProtoLayoutModifiers()).build())
+        .setModifiers(LayoutModifier.tag(METADATA_TAG).toProtoLayoutModifiers())
         .build()
 }
 
@@ -220,11 +220,11 @@ private constructor(
             EdgeButtonStyle(
                 verticalAlignment = LayoutElementBuilders.VERTICAL_ALIGN_TOP,
                 padding =
-                    Padding.Builder()
-                        .setTop(TEXT_TOP_PADDING_DP.toDp())
-                        .setStart(TEXT_SIDE_PADDING_DP.toDp())
-                        .setEnd(TEXT_SIDE_PADDING_DP.toDp())
-                        .build()
+                    padding(
+                        start = TEXT_SIDE_PADDING_DP,
+                        top = TEXT_TOP_PADDING_DP,
+                        end = TEXT_SIDE_PADDING_DP
+                    )
             )
 
         /**
@@ -247,8 +247,8 @@ internal object EdgeButtonDefaults {
     internal const val EDGE_BUTTON_HEIGHT_DP: Int = 46
     internal const val METADATA_TAG: String = "EB"
     internal const val ICON_SIZE_DP = 24
-    internal const val TEXT_TOP_PADDING_DP = 12
-    internal const val TEXT_SIDE_PADDING_DP = 8
+    internal const val TEXT_TOP_PADDING_DP = 12f
+    internal const val TEXT_SIDE_PADDING_DP = 8f
 }
 
 internal fun LayoutElement.isSlotEdgeButton(): Boolean =
