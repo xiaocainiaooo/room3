@@ -334,6 +334,13 @@ package androidx.webkit {
   @SuppressCompatibility @RequiresOptIn(level=androidx.annotation.RequiresOptIn.Level.ERROR) @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.CLASS) @java.lang.annotation.Target({java.lang.annotation.ElementType.METHOD, java.lang.annotation.ElementType.FIELD, java.lang.annotation.ElementType.TYPE}) public static @interface WebSettingsCompat.ExperimentalSpeculativeLoading {
   }
 
+  public final class WebStorageCompat {
+    method @RequiresFeature(name=androidx.webkit.WebViewFeature.DELETE_BROWSING_DATA, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") @UiThread public static void deleteBrowsingData(android.webkit.WebStorage, Runnable);
+    method @RequiresFeature(name=androidx.webkit.WebViewFeature.DELETE_BROWSING_DATA, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") @UiThread public static void deleteBrowsingData(android.webkit.WebStorage, java.util.concurrent.Executor, Runnable);
+    method @RequiresFeature(name=androidx.webkit.WebViewFeature.DELETE_BROWSING_DATA, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") @UiThread public static String deleteBrowsingDataForSite(android.webkit.WebStorage, String, Runnable);
+    method @RequiresFeature(name=androidx.webkit.WebViewFeature.DELETE_BROWSING_DATA, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") @UiThread public static String deleteBrowsingDataForSite(android.webkit.WebStorage, String, java.util.concurrent.Executor, Runnable);
+  }
+
   public final class WebViewAssetLoader {
     method @WorkerThread public android.webkit.WebResourceResponse? shouldInterceptRequest(android.net.Uri);
     field public static final String DEFAULT_DOMAIN = "appassets.androidplatform.net";
@@ -425,6 +432,7 @@ package androidx.webkit {
     field public static final String BACK_FORWARD_CACHE = "BACK_FORWARD_CACHE";
     field public static final String CREATE_WEB_MESSAGE_CHANNEL = "CREATE_WEB_MESSAGE_CHANNEL";
     field public static final String DEFAULT_TRAFFICSTATS_TAGGING = "DEFAULT_TRAFFICSTATS_TAGGING";
+    field public static final String DELETE_BROWSING_DATA = "DELETE_BROWSING_DATA";
     field public static final String DISABLED_ACTION_MODE_MENU_ITEMS = "DISABLED_ACTION_MODE_MENU_ITEMS";
     field public static final String DOCUMENT_START_SCRIPT = "DOCUMENT_START_SCRIPT";
     field public static final String ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY = "ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY";
