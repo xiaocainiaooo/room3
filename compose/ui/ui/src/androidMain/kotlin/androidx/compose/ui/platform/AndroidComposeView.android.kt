@@ -1247,6 +1247,13 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         }
     }
 
+    override fun requestAutofill(node: LayoutNode) {
+        @OptIn(ExperimentalComposeUiApi::class)
+        if (autofillSupported() && ComposeUiFlags.isSemanticAutofillEnabled) {
+            _autofillManager?.requestAutofill(node)
+        }
+    }
+
     fun requestClearInvalidObservations() {
         observationClearRequested = true
     }
