@@ -30,6 +30,7 @@ import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.lazy.layout.LazyLayoutIntervalContent
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.getDefaultLazyLayoutKey
+import androidx.compose.foundation.overscroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidableCompositionLocal
@@ -228,6 +229,8 @@ internal fun TransformingLazyColumnImpl(
             reverseScrolling = false
         )
     val semanticState = remember(state) { TransformingLazyColumnSemanticState(state = state) }
+    // TODO: b/388191915 - Migrate to use rememberOverscrollEffect when updated to 1.8.0.
+    @Suppress("DEPRECATION") val overscrollEffect = ScrollableDefaults.overscrollEffect()
 
     LazyLayout(
         itemProvider = itemProviderLambda,
@@ -250,12 +253,14 @@ internal fun TransformingLazyColumnImpl(
                     userScrollEnabled = userScrollEnabled,
                     reverseScrolling = false,
                 )
+                .overscroll(overscrollEffect)
                 .scrollable(
                     state = state,
                     reverseDirection = reverseDirection,
                     enabled = userScrollEnabled,
                     orientation = Orientation.Vertical,
                     flingBehavior = flingBehavior,
+                    overscrollEffect = overscrollEffect,
                 ),
         measurePolicy = measurePolicy
     )
