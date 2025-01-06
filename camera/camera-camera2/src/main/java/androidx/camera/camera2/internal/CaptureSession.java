@@ -27,6 +27,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.DynamicRangeProfiles;
 import android.hardware.camera2.params.MultiResolutionStreamInfo;
 import android.hardware.camera2.params.OutputConfiguration;
+import android.hardware.camera2.params.SessionConfiguration;
 import android.os.Build;
 import android.view.Surface;
 
@@ -226,7 +227,6 @@ final class CaptureSession implements CaptureSessionInterface {
             }
         }
     }
-
 
     /**
      * {@inheritDoc}
@@ -705,8 +705,15 @@ final class CaptureSession implements CaptureSessionInterface {
                         mRequestMonitor.createMonitorListener(createCamera2CaptureCallback(
                                 captureConfig.getCameraCaptureCallbacks()));
 
-                return mSynchronizedCaptureSession.setSingleRepeatingRequest(captureRequest,
-                        comboCaptureCallback);
+                if (sessionConfig.getSessionType() == SessionConfiguration.SESSION_HIGH_SPEED) {
+                    List<CaptureRequest> requests =
+                            mSynchronizedCaptureSession.createHighSpeedRequestList(captureRequest);
+                    return mSynchronizedCaptureSession.setRepeatingBurstRequests(requests,
+                            comboCaptureCallback);
+                } else {  // SessionConfiguration.SESSION_REGULAR
+                    return mSynchronizedCaptureSession.setSingleRepeatingRequest(captureRequest,
+                            comboCaptureCallback);
+                }
             } catch (CameraAccessException e) {
                 Logger.e(TAG, "Unable to access camera: " + e.getMessage());
                 Thread.dumpStack();
@@ -857,8 +864,13 @@ final class CaptureSession implements CaptureSessionInterface {
                                     }
                                 }));
                     }
-                    return mSynchronizedCaptureSession.captureBurstRequests(captureRequests,
-                            callbackAggregator);
+                    if (mSessionConfig != null && mSessionConfig.getSessionType()
+                            == SessionConfiguration.SESSION_HIGH_SPEED) {
+                        return captureHighSpeedBurst(captureRequests, callbackAggregator);
+                    } else {  // SessionConfiguration.SESSION_REGULAR
+                        return mSynchronizedCaptureSession.captureBurstRequests(captureRequests,
+                                callbackAggregator);
+                    }
                 } else {
                     Logger.d(TAG,
                             "Skipping issuing burst request due to no valid request elements");
@@ -870,6 +882,40 @@ final class CaptureSession implements CaptureSessionInterface {
 
             return -1;
         }
+    }
+
+    @GuardedBy("mSessionLock")
+    private int captureHighSpeedBurst(@NonNull List<CaptureRequest> captureRequests,
+            @NonNull CameraBurstCaptureCallback callbackAggregator)
+            throws CameraAccessException {
+        // Create a new CameraBurstCaptureCallback to handle callbacks from high-speed requests.
+        // This is necessary because high-speed capture sessions generate multiple requests for
+        // each original request, and we need to map the callbacks back to the original requests.
+        CameraBurstCaptureCallback highSpeedCallbackAggregator = new CameraBurstCaptureCallback();
+
+        int sequenceId = -1;
+
+        for (CaptureRequest captureRequest : captureRequests) {
+            List<CaptureRequest> highSpeedRequests =
+                    Objects.requireNonNull(mSynchronizedCaptureSession)
+                            .createHighSpeedRequestList(captureRequest);
+
+            // For each high-speed request, create a forwarding callback that maps the high-speed
+            // request back to the original request and forwards the callback to the original
+            // callback aggregator.
+            for (CaptureRequest highSpeedRequest : highSpeedRequests) {
+                CaptureCallback forwardingCallback = new RequestForwardingCaptureCallback(
+                        captureRequest, callbackAggregator);
+                highSpeedCallbackAggregator.addCamera2Callbacks(highSpeedRequest,
+                        Collections.singletonList(forwardingCallback));
+            }
+
+            sequenceId = mSynchronizedCaptureSession.captureBurstRequests(
+                    highSpeedRequests, highSpeedCallbackAggregator);
+        }
+
+        // Return the sequence ID of the last burst capture as a representative ID.
+        return sequenceId;
     }
 
     /**
