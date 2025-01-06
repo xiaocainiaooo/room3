@@ -189,6 +189,7 @@ public final class Camera2DeviceSurfaceManager implements CameraDeviceSurfaceMan
                 existingSurfaces,
                 newUseCaseConfigsSupportedSizeMap,
                 isPreviewStabilizationOn,
-                hasVideoCapture);
+                hasVideoCapture,
+                null);
     }
 }
