@@ -275,7 +275,8 @@ internal class ScrollableNode(
         orientationLock = orientation
     ),
     KeyInputModifierNode,
-    SemanticsModifierNode {
+    SemanticsModifierNode,
+    CompositionLocalConsumerModifierNode {
 
     override val shouldAutoInvalidate: Boolean = false
 
@@ -309,7 +310,7 @@ internal class ScrollableNode(
     private var scrollByAction: ((x: Float, y: Float) -> Boolean)? = null
     private var scrollByOffsetAction: (suspend (Offset) -> Offset)? = null
 
-    private var mouseWheelScrollNode: MouseWheelScrollNode? = null
+    private var mouseWheelScrollingLogic: MouseWheelScrollingLogic? = null
 
     init {
         /** Nested scrolling */
@@ -352,15 +353,17 @@ internal class ScrollableNode(
     }
 
     private fun ensureMouseWheelScrollNodeInitialized() {
-        if (mouseWheelScrollNode != null) return
-        mouseWheelScrollNode =
-            delegate(
-                MouseWheelScrollNode(
+        if (mouseWheelScrollingLogic == null) {
+            mouseWheelScrollingLogic =
+                MouseWheelScrollingLogic(
                     scrollingLogic = scrollingLogic,
+                    mouseWheelScrollConfig = platformScrollConfig(),
                     onScrollStopped = ::onWheelScrollStopped,
-                    enabled = enabled,
+                    density = requireDensity()
                 )
-            )
+        }
+
+        mouseWheelScrollingLogic?.startReceivingMouseWheelEvents(coroutineScope)
     }
 
     fun update(
@@ -392,7 +395,6 @@ internal class ScrollableNode(
                 nestedScrollDispatcher = nestedScrollDispatcher
             )
         contentInViewNode.update(orientation, reverseDirection, bringIntoViewSpec)
-        mouseWheelScrollNode?.update(enabled = enabled)
 
         this.overscrollEffect = overscrollEffect
         this.flingBehavior = flingBehavior
@@ -414,6 +416,7 @@ internal class ScrollableNode(
 
     override fun onAttach() {
         updateDefaultFlingBehavior()
+        mouseWheelScrollingLogic?.updateDensity(requireDensity())
     }
 
     private fun updateDefaultFlingBehavior() {
@@ -425,7 +428,7 @@ internal class ScrollableNode(
     override fun onDensityChange() {
         onCancelPointerInput()
         updateDefaultFlingBehavior()
-        mouseWheelScrollNode?.pointerInputNode?.onDensityChange()
+        mouseWheelScrollingLogic?.updateDensity(requireDensity())
     }
 
     // Key handler for Page up/down scrolling behavior.
@@ -492,10 +495,12 @@ internal class ScrollableNode(
         if (pointerEvent.changes.fastAny { canDrag.invoke(it) }) {
             super.onPointerEvent(pointerEvent, pass, bounds)
         }
-        if (pass == PointerEventPass.Initial && pointerEvent.type == PointerEventType.Scroll) {
-            ensureMouseWheelScrollNodeInitialized()
+        if (enabled) {
+            if (pass == PointerEventPass.Initial && pointerEvent.type == PointerEventType.Scroll) {
+                ensureMouseWheelScrollNodeInitialized()
+            }
+            mouseWheelScrollingLogic?.onPointerEvent(pointerEvent, pass, bounds)
         }
-        mouseWheelScrollNode?.pointerInputNode?.onPointerEvent(pointerEvent, pass, bounds)
     }
 
     override fun SemanticsPropertyReceiver.applySemantics() {
@@ -520,16 +525,6 @@ internal class ScrollableNode(
     private fun clearScrollSemanticsActions() {
         scrollByAction = null
         scrollByOffsetAction = null
-    }
-
-    override fun onCancelPointerInput() {
-        super.onCancelPointerInput()
-        mouseWheelScrollNode?.pointerInputNode?.onCancelPointerInput()
-    }
-
-    override fun onViewConfigurationChange() {
-        super.onViewConfigurationChange()
-        mouseWheelScrollNode?.pointerInputNode?.onViewConfigurationChange()
     }
 }
 
