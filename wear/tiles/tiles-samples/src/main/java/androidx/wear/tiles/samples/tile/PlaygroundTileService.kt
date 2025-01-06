@@ -39,6 +39,7 @@ import androidx.wear.protolayout.material3.appCard
 import androidx.wear.protolayout.material3.avatarImage
 import androidx.wear.protolayout.material3.button
 import androidx.wear.protolayout.material3.buttonGroup
+import androidx.wear.protolayout.material3.compactButton
 import androidx.wear.protolayout.material3.graphicDataCard
 import androidx.wear.protolayout.material3.icon
 import androidx.wear.protolayout.material3.iconButton
@@ -142,6 +143,15 @@ private fun MaterialScope.pillShapeButton() =
         iconContent = { icon(ICON_ID) },
         labelContent = { text("Primary label".layoutString) },
         secondaryLabelContent = { text("Secondary label".layoutString) },
+    )
+
+private fun MaterialScope.compactShapeButton() =
+    compactButton(
+        onClick = clickable(),
+        modifier = LayoutModifier.contentDescription("Compact button"),
+        width = expand(),
+        iconContent = { icon(ICON_ID) },
+        labelContent = { text("Overflowing compact button".layoutString) },
     )
 
 private fun MaterialScope.oneSlotButtons() = buttonGroup {

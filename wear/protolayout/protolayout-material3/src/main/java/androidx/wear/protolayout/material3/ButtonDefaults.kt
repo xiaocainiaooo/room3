@@ -19,13 +19,17 @@ package androidx.wear.protolayout.material3
 import android.graphics.Color
 import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
+import androidx.wear.protolayout.DimensionBuilders
 import androidx.wear.protolayout.DimensionBuilders.expand
+import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.Column
+import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_START
 import androidx.wear.protolayout.LayoutElementBuilders.HorizontalAlignment
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.LayoutElementBuilders.Row
 import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.material3.ButtonDefaults.DEFAULT_CONTENT_PADDING
+import androidx.wear.protolayout.material3.CompactButtonStyle.COMPACT_BUTTON_ICON_LABEL_SPACE_DP
 import androidx.wear.protolayout.material3.Typography.TypographyToken
 import androidx.wear.protolayout.modifiers.padding
 import androidx.wear.protolayout.types.LayoutColor
@@ -77,6 +81,39 @@ public object ButtonDefaults {
     }
 
     /**
+     * Returns [LayoutElement] describing the inner content for the compact button.
+     *
+     * This is a [Row] wrapped inside of the Box for alignment, containing the following:
+     * * icon
+     * * spacing if icon is present
+     * * label
+     */
+    internal fun buildContentForCompactButton(
+        label: LayoutElement?,
+        icon: LayoutElement?,
+        @HorizontalAlignment horizontalAlignment: Int,
+        width: DimensionBuilders.ContainerDimension
+    ): LayoutElement {
+        val row: Row.Builder = Row.Builder()
+
+        // Icon can be placed on start or on end position, so we need to figure our which is first
+        // and which is second element.
+        val firstElement = if (horizontalAlignment == HORIZONTAL_ALIGN_START) icon else label
+        val secondElement = if (horizontalAlignment == HORIZONTAL_ALIGN_START) label else icon
+
+        ContainerWithSpacersBuilder<LayoutElement>(row::addContent, firstElement)
+            .addElement(secondElement, verticalSpacer(COMPACT_BUTTON_ICON_LABEL_SPACE_DP))
+
+        return Box.Builder()
+            // No need to set height specifically as that is done by the container that has it
+            // fixed.
+            .setWidth(width)
+            .addContent(row.build())
+            .setHorizontalAlignment(horizontalAlignment)
+            .build()
+    }
+
+    /**
      * [ButtonColors] for the high-emphasis button representing the primary, most important or most
      * common action on a screen.
      *
@@ -122,6 +159,16 @@ public object ButtonDefaults {
     internal const val METADATA_TAG_BUTTON: String = "BTN"
     internal val DEFAULT_CONTENT_PADDING = padding(8f)
     @Dimension(DP) internal const val IMAGE_BUTTON_DEFAULT_SIZE_DP = 52
+}
+
+/** Provides style values for the compact button component. */
+internal object CompactButtonStyle {
+    @Dimension(DP) internal const val COMPACT_BUTTON_HEIGHT_DP: Float = 32f
+    @Dimension(DP) internal const val COMPACT_BUTTON_ICON_SIZE_SMALL_DP: Float = 20f
+    @Dimension(DP) internal const val COMPACT_BUTTON_ICON_SIZE_LARGE_DP: Float = 24f
+    @Dimension(DP) internal const val COMPACT_BUTTON_DEFAULT_CONTENT_PADDING_DP: Int = 12
+    @Dimension(DP) internal const val COMPACT_BUTTON_ICON_LABEL_SPACE_DP = 6
+    @TypographyToken internal const val COMPACT_BUTTON_LABEL_TYPOGRAPHY = Typography.LABEL_SMALL
 }
 
 /** Provides style values for the icon button component. */
