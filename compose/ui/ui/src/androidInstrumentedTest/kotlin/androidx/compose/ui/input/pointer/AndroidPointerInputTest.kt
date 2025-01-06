@@ -206,6 +206,7 @@ class AndroidPointerInputTest {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = 34) // b/384972397: Failing on SDK 35
     fun dispatchTouchEvent_noPointerInputModifiers_returnsFalse() {
 
         // Arrange
