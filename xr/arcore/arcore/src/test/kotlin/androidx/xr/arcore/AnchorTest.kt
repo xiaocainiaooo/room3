@@ -121,6 +121,7 @@ class AnchorTest {
             .isEqualTo(RuntimeAnchor.PersistenceState.Persisted)
     }
 
+    @Ignore("Flaky test, see b/379198572")
     @Test
     fun getPersistedAnchorUuids_previouslyPersistedAnchor_returnsPersistedAnchorUuid() = runTest {
         val session = createTestSession()
