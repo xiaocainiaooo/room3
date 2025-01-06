@@ -1451,7 +1451,10 @@ class Camera2CapturePipelineTest {
             val imageProxy = FakeImageProxy(CameraCaptureResultImageInfo(captureResult))
             imageProxy.image = mock(Image::class.java)
             zslControl.mImageRingBuffer.enqueue(imageProxy)
-            zslControl.mReprocessingImageWriter = mock(ImageWriter::class.java)
+            zslControl.mReprocessingImageWriterHolder =
+                ZslControlImpl.ImageWriterHolder(executorService).apply {
+                    onImageWriterCreated(mock(ImageWriter::class.java))
+                }
         }
 
         zslControl.isZslDisabledByFlashMode = isZslDisabledByFlashMode

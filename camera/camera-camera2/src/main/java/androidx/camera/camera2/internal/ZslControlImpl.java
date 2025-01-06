@@ -29,7 +29,6 @@ import android.hardware.camera2.params.InputConfiguration;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageWriter;
-import android.os.Build;
 import android.util.Size;
 import android.view.Surface;
 
@@ -47,6 +46,7 @@ import androidx.camera.core.SafeCloseImageReaderProxy;
 import androidx.camera.core.impl.DeferrableSurface;
 import androidx.camera.core.impl.ImmediateSurface;
 import androidx.camera.core.impl.SessionConfig;
+import androidx.camera.core.impl.annotation.ExecutedBy;
 import androidx.camera.core.impl.utils.CompareSizesByArea;
 import androidx.camera.core.impl.utils.executor.CameraXExecutors;
 import androidx.camera.core.internal.compat.ImageWriterCompat;
@@ -61,6 +61,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Implementation for {@link ZslControl}.
@@ -93,7 +94,7 @@ final class ZslControlImpl implements ZslControl {
     SafeCloseImageReaderProxy mReprocessingImageReader;
     private DeferrableSurface mReprocessingImageDeferrableSurface;
 
-    @Nullable ImageWriter mReprocessingImageWriter;
+    @Nullable ImageWriterHolder mReprocessingImageWriterHolder;
 
     ZslControlImpl(@NonNull CameraCharacteristicsCompat cameraCharacteristicsCompat,
             @NonNull Executor executor) {
@@ -177,9 +178,11 @@ final class ZslControlImpl implements ZslControl {
                 new Size(reprocessingImageReaderProxy.getWidth(),
                         reprocessingImageReaderProxy.getHeight()),
                 reprocessingImageFormat);
+        ImageWriterHolder imageWriterHolder = new ImageWriterHolder(mExecutor);
 
         mReprocessingImageReader = reprocessingImageReaderProxy;
         mReprocessingImageDeferrableSurface = reprocessingImageDeferrableSurface;
+        mReprocessingImageWriterHolder = imageWriterHolder;
 
         reprocessingImageReaderProxy.setOnImageAvailableListener(
                 imageReader -> {
@@ -195,9 +198,10 @@ final class ZslControlImpl implements ZslControl {
 
                 }, CameraXExecutors.ioExecutor());
 
-        reprocessingImageDeferrableSurface.getTerminationFuture().addListener(
-                reprocessingImageReaderProxy::safeClose,
-                CameraXExecutors.mainThreadExecutor());
+        reprocessingImageDeferrableSurface.getTerminationFuture().addListener(() -> {
+            reprocessingImageReaderProxy.safeClose();
+            imageWriterHolder.release();
+        }, mExecutor);
         sessionConfigBuilder.addSurface(reprocessingImageDeferrableSurface);
 
         // Init capture and session state callback and enqueue the total capture result
@@ -210,8 +214,8 @@ final class ZslControlImpl implements ZslControl {
                             @NonNull CameraCaptureSession cameraCaptureSession) {
                         Surface surface = cameraCaptureSession.getInputSurface();
                         if (surface != null) {
-                            mReprocessingImageWriter =
-                                    ImageWriterCompat.newInstance(surface, 1);
+                            imageWriterHolder.onImageWriterCreated(
+                                    ImageWriterCompat.newInstance(surface, 1));
                         }
                     }
 
@@ -239,32 +243,30 @@ final class ZslControlImpl implements ZslControl {
         return imageProxy;
     }
 
+    @ExecutedBy("mExecutor")
     @Override
     public boolean enqueueImageToImageWriter(@NonNull ImageProxy imageProxy) {
-        @OptIn(markerClass = ExperimentalGetImage.class)
-        Image image = imageProxy.getImage();
-
-        if (Build.VERSION.SDK_INT >= 23 && mReprocessingImageWriter != null && image != null) {
-            try {
-                ImageWriterCompat.queueInputImage(mReprocessingImageWriter, image);
-                // It's essential to call ImageProxy#close().
-                // Add an OnImageReleasedListener to ensure the ImageProxy is closed after
-                // the image is written to the output surface. This is crucial to prevent
-                // resource leaks, where images might not be closed properly if CameraX fails
-                // to propagate close events to its internal components.
-                ImageWriterCompat.setOnImageReleasedListener(mReprocessingImageWriter,
-                        writer -> imageProxy.close(), mExecutor);
-            } catch (IllegalStateException e) {
-                Logger.e(TAG, "enqueueImageToImageWriter throws IllegalStateException = "
-                        + e.getMessage());
-                return false;
-            }
-            return true;
+        if (mReprocessingImageWriterHolder != null) {
+            return mReprocessingImageWriterHolder.enqueueImageToImageWriter(imageProxy);
         }
         return false;
     }
 
     private void cleanup() {
+        if (mReprocessingImageReader != null) {
+            // Remove the onImageAvailable listener to prevent new images from being
+            // added to the ring buffer. The ImageReader itself will be closed
+            // automatically when the associated DeferrableSurface is terminated.
+            mReprocessingImageReader.clearOnImageAvailableListener();
+            mReprocessingImageReader = null;
+        }
+        if (mReprocessingImageWriterHolder != null) {
+            // The ImageWriter will be released when the associated
+            // DeferrableSurface is terminated.
+            mReprocessingImageWriterHolder.deactivate();
+            mReprocessingImageWriterHolder = null;
+        }
+
         // We might need synchronization here when clearing ring buffer while image is enqueued
         // at the same time. Will test this case.
         ZslRingBuffer imageRingBuffer = mImageRingBuffer;
@@ -273,23 +275,10 @@ final class ZslControlImpl implements ZslControl {
             imageProxy.close();
         }
 
-        DeferrableSurface reprocessingImageDeferrableSurface = mReprocessingImageDeferrableSurface;
-        if (reprocessingImageDeferrableSurface != null) {
-            SafeCloseImageReaderProxy reprocessingImageReaderProxy = mReprocessingImageReader;
-            if (reprocessingImageReaderProxy != null) {
-                reprocessingImageDeferrableSurface.getTerminationFuture().addListener(
-                        reprocessingImageReaderProxy::safeClose,
-                        CameraXExecutors.mainThreadExecutor());
-                mReprocessingImageReader = null;
-            }
-            reprocessingImageDeferrableSurface.close();
+        if (mReprocessingImageDeferrableSurface != null) {
+            // Termination is triggered when the use count reaches 0.
+            mReprocessingImageDeferrableSurface.close();
             mReprocessingImageDeferrableSurface = null;
-        }
-
-        ImageWriter reprocessingImageWriter = mReprocessingImageWriter;
-        if (reprocessingImageWriter != null) {
-            reprocessingImageWriter.close();
-            mReprocessingImageWriter = null;
         }
     }
 
@@ -345,5 +334,96 @@ final class ZslControlImpl implements ZslControl {
             }
         }
         return false;
+    }
+
+    /**
+     * A holder for an {@link ImageWriter} which takes care of the creation and release of the
+     * {@link ImageWriter}.
+     */
+    @VisibleForTesting
+    static class ImageWriterHolder {
+        @Nullable
+        private ImageWriter mImageWriter;
+        private final AtomicBoolean mIsOpened = new AtomicBoolean(true);
+        private final Executor mExecutor;
+
+        ImageWriterHolder(Executor executor) {
+            mExecutor = executor;
+        }
+
+        /**
+         * Called when the {@link ImageWriter} is created.
+         *
+         * <p>This method is used to set the {@link ImageWriter} that will be used by this
+         * ImageWriterHolder.  If an {@link ImageWriter} already exists when this method is called,
+         * the previous one will be closed and replaced with the new one.
+         *
+         * <p>If this method is called after {@link #deactivate()}, the provided
+         * {@link ImageWriter} will be ignored, and the internal {@link ImageWriter} will
+         * remain null.
+         *
+         * @param imageWriter The newly created {@link ImageWriter}.
+         */
+        @ExecutedBy("mExecutor")
+        public void onImageWriterCreated(@NonNull ImageWriter imageWriter) {
+            if (mIsOpened.get()) {
+                if (mImageWriter != null) {
+                    Logger.w(TAG, "ImageWriter already existed in the ImageWriter holder. "
+                            + "Closing the previous one.");
+                    mImageWriter.close();
+                }
+                mImageWriter = imageWriter;
+            }
+        }
+
+        /**
+         * Enqueues the {@link ImageProxy} to the {@link ImageWriter}.
+         *
+         * @param imageProxy The {@link ImageProxy} to be enqueued.
+         * @return True if the {@link ImageProxy} is enqueued successfully.
+         */
+        @ExecutedBy("mExecutor")
+        public boolean enqueueImageToImageWriter(@NonNull ImageProxy imageProxy) {
+            @OptIn(markerClass = ExperimentalGetImage.class)
+            Image image = imageProxy.getImage();
+            if (mIsOpened.get() && mImageWriter != null && image != null) {
+                try {
+                    ImageWriterCompat.queueInputImage(mImageWriter, image);
+                    // It's essential to call ImageProxy#close().
+                    // Add an OnImageReleasedListener to ensure the ImageProxy is closed after
+                    // the image is written to the output surface. This is crucial to prevent
+                    // resource leaks, where images might not be closed properly if CameraX fails
+                    // to propagate close events to its internal components.
+                    ImageWriterCompat.setOnImageReleasedListener(
+                            mImageWriter, writer -> imageProxy.close(), mExecutor);
+                } catch (IllegalStateException e) {
+                    Logger.e(TAG, "enqueueImageToImageWriter throws IllegalStateException = "
+                            + e.getMessage());
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Deactivates the {@link ImageWriterHolder}.
+         *
+         * <p>Once deactivated, the {@link ImageWriterHolder} will no longer accept new images.
+         */
+        public void deactivate() {
+            mIsOpened.set(false);
+        }
+
+        /**
+         * Releases the {@link ImageWriter}.
+         */
+        @ExecutedBy("mExecutor")
+        public void release() {
+            deactivate();
+            if (mImageWriter != null) {
+                mImageWriter.close();
+            }
+        }
     }
 }
