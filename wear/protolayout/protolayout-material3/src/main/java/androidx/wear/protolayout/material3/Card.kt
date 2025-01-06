@@ -44,6 +44,7 @@ import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.background
 import androidx.wear.protolayout.modifiers.clip
 import androidx.wear.protolayout.modifiers.contentDescription
+import androidx.wear.protolayout.modifiers.padding
 
 /**
  * Opinionated ProtoLayout Material3 title card that offers 1 to 3 slots, usually text based.
@@ -642,7 +643,7 @@ public fun MaterialScope.card(
     width: ContainerDimension = wrapWithMinTapTargetDimension(),
     height: ContainerDimension = wrapWithMinTapTargetDimension(),
     backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
-    contentPadding: Padding = Padding.Builder().setAll(DEFAULT_CONTENT_PADDING.toDp()).build(),
+    contentPadding: Padding = padding(DEFAULT_CONTENT_PADDING),
     content: (MaterialScope.() -> LayoutElement)
 ): LayoutElement =
     componentContainer(

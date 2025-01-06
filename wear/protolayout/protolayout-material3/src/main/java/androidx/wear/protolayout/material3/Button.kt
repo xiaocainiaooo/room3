@@ -23,7 +23,7 @@ import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.Padding
-import androidx.wear.protolayout.material3.ButtonDefaults.DEFAULT_CONTENT_PADDING_DP
+import androidx.wear.protolayout.material3.ButtonDefaults.DEFAULT_CONTENT_PADDING
 import androidx.wear.protolayout.material3.ButtonDefaults.IMAGE_BUTTON_DEFAULT_SIZE_DP
 import androidx.wear.protolayout.material3.ButtonDefaults.METADATA_TAG_BUTTON
 import androidx.wear.protolayout.material3.ButtonDefaults.filledButtonColors
@@ -81,7 +81,7 @@ public fun MaterialScope.iconButton(
     colors: ButtonColors = filledButtonColors(),
     backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     style: IconButtonStyle = defaultIconButtonStyle(),
-    contentPadding: Padding = Padding.Builder().setAll(DEFAULT_CONTENT_PADDING_DP.toDp()).build()
+    contentPadding: Padding = DEFAULT_CONTENT_PADDING
 ): LayoutElement =
     button(
         onClick = onClick,
@@ -147,7 +147,7 @@ public fun MaterialScope.textButton(
     colors: ButtonColors = filledButtonColors(),
     backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     style: TextButtonStyle = defaultTextButtonStyle(),
-    contentPadding: Padding = Padding.Builder().setAll(DEFAULT_CONTENT_PADDING_DP.toDp()).build()
+    contentPadding: Padding = DEFAULT_CONTENT_PADDING
 ): LayoutElement =
     button(
         onClick = onClick,
@@ -211,7 +211,7 @@ public fun MaterialScope.button(
         if (content == null) IMAGE_BUTTON_DEFAULT_SIZE_DP.toDp()
         else wrapWithMinTapTargetDimension(),
     backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
-    contentPadding: Padding = Padding.Builder().setAll(DEFAULT_CONTENT_PADDING_DP.toDp()).build()
+    contentPadding: Padding = DEFAULT_CONTENT_PADDING
 ): LayoutElement =
     componentContainer(
         onClick = onClick,

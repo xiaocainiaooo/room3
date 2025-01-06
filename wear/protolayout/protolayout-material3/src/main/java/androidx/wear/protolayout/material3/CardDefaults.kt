@@ -94,5 +94,5 @@ public object CardDefaults {
         )
 
     internal const val METADATA_TAG: String = "CR"
-    internal const val DEFAULT_CONTENT_PADDING: Int = 4
+    internal const val DEFAULT_CONTENT_PADDING = 4f
 }

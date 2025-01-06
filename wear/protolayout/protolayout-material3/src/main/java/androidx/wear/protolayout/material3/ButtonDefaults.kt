@@ -19,10 +19,10 @@ package androidx.wear.protolayout.material3
 import android.graphics.Color
 import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
-import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.ModifiersBuilders.Padding
-import androidx.wear.protolayout.material3.ButtonDefaults.DEFAULT_CONTENT_PADDING_DP
+import androidx.wear.protolayout.material3.ButtonDefaults.DEFAULT_CONTENT_PADDING
 import androidx.wear.protolayout.material3.Typography.TypographyToken
+import androidx.wear.protolayout.modifiers.padding
 import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.argb
 
@@ -81,7 +81,7 @@ public object ButtonDefaults {
         )
 
     internal const val METADATA_TAG_BUTTON: String = "BTN"
-    @Dimension(DP) internal const val DEFAULT_CONTENT_PADDING_DP: Int = 8
+    internal val DEFAULT_CONTENT_PADDING = padding(8f)
     @Dimension(DP) internal const val IMAGE_BUTTON_DEFAULT_SIZE_DP = 52
 }
 
@@ -89,7 +89,7 @@ public object ButtonDefaults {
 public class IconButtonStyle
 internal constructor(
     @Dimension(unit = DP) internal val iconSize: Int,
-    internal val innerPadding: Padding = DEFAULT_CONTENT_PADDING_DP.toPadding()
+    internal val innerPadding: Padding = DEFAULT_CONTENT_PADDING
 ) {
     public companion object {
         /**
@@ -110,7 +110,7 @@ internal constructor(
 public class TextButtonStyle
 internal constructor(
     @TypographyToken internal val labelTypography: Int,
-    internal val innerPadding: Padding = DEFAULT_CONTENT_PADDING_DP.toPadding()
+    internal val innerPadding: Padding = DEFAULT_CONTENT_PADDING
 ) {
     public companion object {
         /**
