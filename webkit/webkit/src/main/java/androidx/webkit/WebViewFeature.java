@@ -25,6 +25,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
+import android.webkit.WebStorage;
 import android.webkit.WebView;
 
 import androidx.annotation.RestrictTo;
@@ -49,9 +50,11 @@ import java.util.concurrent.Executor;
  */
 public class WebViewFeature {
 
-    private WebViewFeature() {}
+    private WebViewFeature() {
+    }
 
     /**
+     *
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     @StringDef(value = {
@@ -118,9 +121,11 @@ public class WebViewFeature {
     })
     @Retention(RetentionPolicy.SOURCE)
     @Target({ElementType.PARAMETER, ElementType.METHOD})
-    public @interface WebViewSupportFeature {}
+    public @interface WebViewSupportFeature {
+    }
 
     /**
+     *
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     @StringDef(value = {
@@ -130,7 +135,8 @@ public class WebViewFeature {
     })
     @Retention(RetentionPolicy.SOURCE)
     @Target({ElementType.PARAMETER, ElementType.METHOD})
-    public @interface WebViewStartupFeature {}
+    public @interface WebViewStartupFeature {
+    }
 
     /**
      * Feature for {@link #isFeatureSupported(String)}.
@@ -138,7 +144,7 @@ public class WebViewFeature {
      * {@link androidx.webkit.WebViewCompat#postVisualStateCallback(android.webkit.WebView, long,
      * WebViewCompat.VisualStateCallback)}, and {@link
      * WebViewClientCompat#onPageCommitVisible(
-     * android.webkit.WebView, String)}.
+     *android.webkit.WebView, String)}.
      */
     public static final String VISUAL_STATE_CALLBACK = "VISUAL_STATE_CALLBACK";
 
@@ -373,7 +379,7 @@ public class WebViewFeature {
      * Feature for {@link #isFeatureSupported(String)}.
      * This feature covers
      * {@link androidx.webkit.WebMessagePortCompat#setWebMessageCallback(
-     * WebMessagePortCompat.WebMessageCallbackCompat)}, and
+     *WebMessagePortCompat.WebMessageCallbackCompat)}, and
      * {@link androidx.webkit.WebMessagePortCompat#setWebMessageCallback(Handler,
      * WebMessagePortCompat.WebMessageCallbackCompat)}.
      */
@@ -428,7 +434,7 @@ public class WebViewFeature {
     public static final String WEB_VIEW_RENDERER_TERMINATE = "WEB_VIEW_RENDERER_TERMINATE";
 
     /**
-     i* Feature for {@link #isFeatureSupported(String)}.
+     * Feature for {@link #isFeatureSupported(String)}.
      * This feature covers
      * {@link androidx.webkit.WebViewCompat#getWebViewRenderProcessClient(WebView)},
      * {@link androidx.webkit.WebViewCompat#setWebViewRenderProcessClient(WebView, WebViewRenderProcessClient)},
@@ -507,7 +513,6 @@ public class WebViewFeature {
      * This feature covers
      * {@link WebSettingsCompat#setEnterpriseAuthenticationAppLinkPolicyEnabled(WebSettings, boolean)}and
      * {@link WebSettingsCompat#getEnterpriseAuthenticationAppLinkPolicyEnabled(WebSettings)}.
-     *
      */
     public static final String ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY =
             "ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY";
@@ -546,10 +551,10 @@ public class WebViewFeature {
     /**
      * Feature for {@link #isFeatureSupported(String)}.
      * This feature covers
-     * {@link androidx.webkit.WebSettingsCompat#getRequestedWithHeaderOriginAllowList(WebSettings)],
-     * {@link androidx.webkit.WebSettingsCompat#setRequestedWithHeaderAllowList(WebSettings, Set)},
-     * {@link androidx.webkit.ServiceWorkerWebSettingsCompat#getRequestedWithHeaderAllowList(WebSettings)}, and
-     * {@link androidx.webkit.ServiceWorkerWebSettingsCompat#setRequestedWithHeaderAllowList(WebSettings, Set)}.
+     * {@link androidx.webkit.WebSettingsCompat#getRequestedWithHeaderOriginAllowList(WebSettings)},
+     * {@link androidx.webkit.WebSettingsCompat#setRequestedWithHeaderOriginAllowList(WebSettings, Set)},
+     * {@link androidx.webkit.ServiceWorkerWebSettingsCompat#getRequestedWithHeaderOriginAllowList()},
+     * {@link androidx.webkit.ServiceWorkerWebSettingsCompat#setRequestedWithHeaderOriginAllowList(Set)}
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public static final String REQUESTED_WITH_HEADER_ALLOW_LIST =
@@ -647,7 +652,14 @@ public class WebViewFeature {
      */
     public static final String DEFAULT_TRAFFICSTATS_TAGGING = "DEFAULT_TRAFFICSTATS_TAGGING";
 
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    /**
+     * Feature for {@link #isFeatureSupported(String)}.
+     * This feature covers
+     * {@link androidx.webkit.WebStorageCompat#deleteBrowsingData(WebStorage, Executor, Runnable)},
+     * {@link androidx.webkit.WebStorageCompat#deleteBrowsingData(WebStorage, Runnable)},
+     * {@link androidx.webkit.WebStorageCompat#deleteBrowsingDataForSite(WebStorage, String, Executor, Runnable)},
+     * {@link androidx.webkit.WebStorageCompat#deleteBrowsingDataForSite(WebStorage, String, Runnable)}
+     */
     public static final String DELETE_BROWSING_DATA = "DELETE_BROWSING_DATA";
 
     /**
@@ -656,9 +668,9 @@ public class WebViewFeature {
      * device, and the WebView APK on the device.
      *
      * <p class="note"><b>Note:</b> This method is different from
-     * {@link WebViewFeature#isStartupFeatureSupported(Context, String)} and this method only accepts
-     * certain features. Please verify that the correct feature checking method is used for a
-     * particular feature.
+     * {@link WebViewFeature#isStartupFeatureSupported(Context, String)} and this method only
+     * accepts certain features. Please verify that the correct feature checking method is used for
+     * a particular feature.
      *
      * <p class="note"><b>Note:</b> If this method returns {@code false}, it is not safe to invoke
      * the methods requiring the desired feature. Furthermore, if this method returns {@code false}
@@ -685,7 +697,7 @@ public class WebViewFeature {
      * the methods requiring the desired feature. Furthermore, if this method returns {@code false}
      * for a particular feature, any callback guarded by that feature will not be invoked.
      *
-     * @param context a Context to access application assets This value cannot be null.
+     * @param context        a Context to access application assets This value cannot be null.
      * @param startupFeature the startup feature to be checked
      * @return whether the feature is supported given the current platform SDK and WebView version
      */
