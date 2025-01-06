@@ -540,7 +540,6 @@ public class WebViewFeature {
      * This feature covers
      * {@link androidx.webkit.ProcessGlobalConfig#setDirectoryBasePaths(Context, File, File)}
      */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public static final String STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES =
             "STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES";
 
