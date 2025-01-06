@@ -1492,6 +1492,30 @@ package androidx.wear.protolayout.layout {
 
 package androidx.wear.protolayout.modifiers {
 
+  public final class BackgroundKt {
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier background(androidx.wear.protolayout.modifiers.LayoutModifier, androidx.wear.protolayout.types.LayoutColor color, optional androidx.wear.protolayout.ModifiersBuilders.Corner? corner);
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier backgroundColor(androidx.wear.protolayout.modifiers.LayoutModifier, androidx.wear.protolayout.types.LayoutColor color);
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier clip(androidx.wear.protolayout.modifiers.LayoutModifier, androidx.wear.protolayout.ModifiersBuilders.Corner corner);
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier clip(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float cornerRadius);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=400) public static androidx.wear.protolayout.modifiers.LayoutModifier clip(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float x, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float y);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=400) public static androidx.wear.protolayout.modifiers.LayoutModifier clipBottomLeft(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float x, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float y);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=400) public static androidx.wear.protolayout.modifiers.LayoutModifier clipBottomRight(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float x, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float y);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=400) public static androidx.wear.protolayout.modifiers.LayoutModifier clipTopLeft(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float x, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float y);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=400) public static androidx.wear.protolayout.modifiers.LayoutModifier clipTopRight(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float x, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float y);
+  }
+
+  public final class ClickableKt {
+    method public static androidx.wear.protolayout.ModifiersBuilders.Clickable clickable();
+    method public static androidx.wear.protolayout.ModifiersBuilders.Clickable clickable(optional androidx.wear.protolayout.ActionBuilders.Action action);
+    method public static androidx.wear.protolayout.ModifiersBuilders.Clickable clickable(optional androidx.wear.protolayout.ActionBuilders.Action action, optional String? id);
+    method public static androidx.wear.protolayout.ModifiersBuilders.Clickable clickable(optional androidx.wear.protolayout.ActionBuilders.Action action, optional String? id, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=300) float minClickableWidth);
+    method public static androidx.wear.protolayout.ModifiersBuilders.Clickable clickable(optional androidx.wear.protolayout.ActionBuilders.Action action, optional String? id, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=300) float minClickableWidth, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=300) float minClickableHeight);
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier clickable(androidx.wear.protolayout.modifiers.LayoutModifier, optional androidx.wear.protolayout.ActionBuilders.Action action, optional String? id);
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier clickable(androidx.wear.protolayout.modifiers.LayoutModifier, androidx.wear.protolayout.ModifiersBuilders.Clickable clickable);
+    method public static androidx.wear.protolayout.ActionBuilders.LoadAction loadAction(optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.StateBuilders.State.Builder,kotlin.Unit>? requestedState);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=300) public static androidx.wear.protolayout.modifiers.LayoutModifier minimumTouchTargetSize(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float minWidth, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float minHeight);
+  }
+
   public interface LayoutModifier {
     method public <R> R foldIn(R initial, kotlin.jvm.functions.Function2<? super R,? super androidx.wear.protolayout.modifiers.LayoutModifier.Element,? extends R> operation);
     method public default infix androidx.wear.protolayout.modifiers.LayoutModifier then(androidx.wear.protolayout.modifiers.LayoutModifier other);

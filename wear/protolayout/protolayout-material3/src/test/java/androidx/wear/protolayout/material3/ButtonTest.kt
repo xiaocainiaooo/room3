@@ -23,6 +23,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.wear.protolayout.DeviceParametersBuilders
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.backgroundColor
+import androidx.wear.protolayout.modifiers.clickable
 import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.testing.LayoutElementAssertionsProvider
 import androidx.wear.protolayout.testing.hasClickable
@@ -96,7 +98,7 @@ class ButtonTest {
     fun containerButton_hasClickable() {
         LayoutElementAssertionsProvider(DEFAULT_CONTAINER_BUTTON_WITH_TEXT)
             .onRoot()
-            .assert(hasClickable(CLICKABLE))
+            .assert(hasClickable(id = CLICKABLE.id))
             .assert(hasTag(ButtonDefaults.METADATA_TAG_BUTTON))
     }
 
@@ -126,7 +128,7 @@ class ButtonTest {
                 button(
                     onClick = CLICKABLE,
                     modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
-                    background = { backgroundImage(IMAGE_ID) }
+                    backgroundContent = { backgroundImage(IMAGE_ID) }
                 )
             }
 
@@ -143,8 +145,9 @@ class ButtonTest {
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
                 button(
                     onClick = CLICKABLE,
-                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
-                    backgroundColor = color.argb,
+                    modifier =
+                        LayoutModifier.contentDescription(CONTENT_DESCRIPTION)
+                            .backgroundColor(color.argb),
                     content = { text(TEXT.layoutString) }
                 )
             }
@@ -187,7 +190,7 @@ class ButtonTest {
                 .setScreenHeightDp(192)
                 .build()
 
-        private val CLICKABLE = clickable("id")
+        private val CLICKABLE = clickable(id = "id")
 
         private const val CONTENT_DESCRIPTION = "This is a button"
 

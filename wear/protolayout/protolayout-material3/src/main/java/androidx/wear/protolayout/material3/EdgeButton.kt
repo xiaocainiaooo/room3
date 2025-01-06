@@ -16,16 +16,16 @@
 
 package androidx.wear.protolayout.material3
 
-import androidx.wear.protolayout.DimensionBuilders.DpProp
+import android.R.attr.clickable
+import androidx.annotation.Dimension
+import androidx.annotation.Dimension.Companion.DP
 import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.LayoutElementBuilders.VERTICAL_ALIGN_CENTER
 import androidx.wear.protolayout.LayoutElementBuilders.VerticalAlignment
-import androidx.wear.protolayout.ModifiersBuilders.Background
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
-import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
@@ -42,6 +42,11 @@ import androidx.wear.protolayout.material3.EdgeButtonDefaults.TOP_CORNER_RADIUS
 import androidx.wear.protolayout.material3.EdgeButtonStyle.Companion.DEFAULT
 import androidx.wear.protolayout.material3.EdgeButtonStyle.Companion.TOP_ALIGN
 import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.background
+import androidx.wear.protolayout.modifiers.clickable
+import androidx.wear.protolayout.modifiers.clip
+import androidx.wear.protolayout.modifiers.clipBottomLeft
+import androidx.wear.protolayout.modifiers.clipBottomRight
 import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.modifiers.semanticsRole
 import androidx.wear.protolayout.modifiers.toProtoLayoutModifiersBuilder
@@ -167,26 +172,17 @@ private fun MaterialScope.edgeButton(
         else HORIZONTAL_MARGIN_PERCENT_SMALL
     val edgeButtonWidth: Float =
         (100f - 2f * horizontalMarginPercent) * deviceConfiguration.screenWidthDp / 100f
-    val bottomCornerRadiusX = dp(edgeButtonWidth / 2f)
-    val bottomCornerRadiusY = dp(EDGE_BUTTON_HEIGHT_DP - TOP_CORNER_RADIUS.value)
+    val bottomCornerRadiusX = edgeButtonWidth / 2f
+    val bottomCornerRadiusY = EDGE_BUTTON_HEIGHT_DP - TOP_CORNER_RADIUS
 
-    val defaultModifier = LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then modifier
     val modifiers =
-        defaultModifier
+        (LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then modifier)
+            .clickable(onClick)
+            .background(colors.container)
+            .clip(TOP_CORNER_RADIUS)
+            .clipBottomLeft(bottomCornerRadiusX, bottomCornerRadiusY)
+            .clipBottomRight(bottomCornerRadiusX, bottomCornerRadiusY)
             .toProtoLayoutModifiersBuilder()
-            .setClickable(onClick)
-            .setBackground(
-                Background.Builder()
-                    .setColor(colors.container.prop)
-                    .setCorner(
-                        Corner.Builder()
-                            .setRadius(TOP_CORNER_RADIUS)
-                            .setBottomLeftRadius(bottomCornerRadiusX, bottomCornerRadiusY)
-                            .setBottomRightRadius(bottomCornerRadiusX, bottomCornerRadiusY)
-                            .build()
-                    )
-                    .build()
-            )
 
     val button = Box.Builder().setHeight(EDGE_BUTTON_HEIGHT_DP.toDp()).setWidth(dp(edgeButtonWidth))
     button
@@ -242,7 +238,7 @@ private constructor(
 }
 
 internal object EdgeButtonDefaults {
-    @JvmField internal val TOP_CORNER_RADIUS: DpProp = dp(17f)
+    @Dimension(DP) internal const val TOP_CORNER_RADIUS: Float = 17f
     /** The horizontal margin used for width of the EdgeButton, below the 225dp breakpoint. */
     internal const val HORIZONTAL_MARGIN_PERCENT_SMALL: Float = 24f
     /** The horizontal margin used for width of the EdgeButton, above the 225dp breakpoint. */
