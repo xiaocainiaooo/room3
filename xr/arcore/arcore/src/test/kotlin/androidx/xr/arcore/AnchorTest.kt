@@ -159,6 +159,7 @@ class AnchorTest {
         assertThat(Anchor.load(session, uuid!!)).isInstanceOf(AnchorCreateSuccess::class.java)
     }
 
+    @Ignore("Flaky test, see b/384999184")
     @Test
     fun loadFromNativePointer_returnsAnchorCreateSuccess() = runTest {
         val session = createTestSession()
