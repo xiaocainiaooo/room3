@@ -131,10 +131,13 @@ package androidx.compose.material3.adaptive.layout {
   }
 
   @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi @androidx.compose.runtime.Stable public final class PaneExpansionState {
+    method public suspend Object? animateTo(androidx.compose.material3.adaptive.layout.PaneExpansionAnchor anchor, optional float initialVelocity, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public void clear();
+    method public androidx.compose.material3.adaptive.layout.PaneExpansionAnchor? getCurrentAnchor();
     method public boolean isUnspecified();
     method public void setFirstPaneProportion(@FloatRange(from=0.0, to=1.0) float firstPaneProportion);
     method public void setFirstPaneWidth(int firstPaneWidth);
+    property public final androidx.compose.material3.adaptive.layout.PaneExpansionAnchor? currentAnchor;
     field public static final androidx.compose.material3.adaptive.layout.PaneExpansionState.Companion Companion;
     field public static final int Unspecified = -1; // 0xffffffff
   }
