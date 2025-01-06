@@ -52,3 +52,7 @@
 -keepnames class androidx.compose.ui.input.pointer.PointerInputEventHandler {
     *;
 }
+
+-keepclassmembers class * {
+    @dalvik.annotation.optimization.NeverInline *;
+}
