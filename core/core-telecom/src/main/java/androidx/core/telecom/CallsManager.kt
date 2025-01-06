@@ -18,9 +18,6 @@ package androidx.core.telecom
 
 import android.content.ComponentName
 import android.content.Context
-import android.media.AudioDeviceCallback
-import android.media.AudioDeviceInfo
-import android.media.AudioManager
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.os.OutcomeReceiver
@@ -44,15 +41,15 @@ import androidx.core.telecom.extensions.CallsManagerExtensions
 import androidx.core.telecom.extensions.ExtensionInitializationScope
 import androidx.core.telecom.extensions.ExtensionInitializationScopeImpl
 import androidx.core.telecom.internal.AddCallResult
+import androidx.core.telecom.internal.AudioDeviceListener
+import androidx.core.telecom.internal.BluetoothProfileListener
 import androidx.core.telecom.internal.CallChannels
 import androidx.core.telecom.internal.CallEndpointUuidTracker
 import androidx.core.telecom.internal.CallSession
 import androidx.core.telecom.internal.CallSessionLegacy
 import androidx.core.telecom.internal.CallStateEvent
 import androidx.core.telecom.internal.JetpackConnectionService
-import androidx.core.telecom.internal.PreCallEndpoints
-import androidx.core.telecom.internal.utils.AudioManagerUtil.Companion.getAvailableAudioDevices
-import androidx.core.telecom.internal.utils.EndpointUtils.Companion.getEndpointsFromAudioDeviceInfo
+import androidx.core.telecom.internal.PreCallEndpointsUpdater
 import androidx.core.telecom.internal.utils.Utils
 import androidx.core.telecom.internal.utils.Utils.Companion.remapJetpackCapsToPlatformCaps
 import androidx.core.telecom.util.ExperimentalAppActions
@@ -356,56 +353,38 @@ public class CallsManager(context: Context) : CallsManagerExtensions {
     }
 
     /**
-     * Continuously stream the available call audio endpoints that can be used for a new call
-     * session. The [callbackFlow] should be cleaned up client-side by calling cancel() from the
-     * same [kotlinx.coroutines.CoroutineScope] the [callbackFlow] is collecting in.
+     * Continuously streams available call audio endpoints that can be used for a new call session.
+     * This API leverages [callbackFlow] to emit updates as the available audio endpoints change.
      *
-     * Note: The endpoints emitted will be sorted by the [CallEndpointCompat.type] . See
-     * [CallEndpointCompat.compareTo] for the ordering. The first element in the list will be the
-     * recommended call endpoint to default to for the user.
+     * **Bluetooth Permissions:** The [android.Manifest.permission.BLUETOOTH_CONNECT] runtime
+     * permission is essential when multiple bluetooth devices are connected. Granting this
+     * permission allows the API to display the names of multiple connected Bluetooth devices.
+     * Without this permission, only the active Bluetooth device will be surfaced.
      *
-     * @return a flow of [CallEndpointCompat]s that can be used for a new call session
+     * **Coroutine Usage and Cleanup:** The returned [Flow] from this [callbackFlow] should be
+     * collected within a [kotlinx.coroutines.CoroutineScope]. To properly manage resources and
+     * prevent leaks, ensure that the [Flow] is cancelled when it's no longer needed. This can be
+     * achieved by calling `cancel()` on the [kotlinx.coroutines.Job] of the collecting
+     * [kotlinx.coroutines.CoroutineScope]. Ideally, this cleanup should occur within the same scope
+     * where the [Flow] is being collected.
+     *
+     * @return A [Flow] that continuously emits a list of available [CallEndpointCompat]s.
      */
     public fun getAvailableStartingCallEndpoints(): Flow<List<CallEndpointCompat>> = callbackFlow {
         val id: Int = CallEndpointUuidTracker.startSession()
-        val audioManager = mContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        // [AudioDeviceInfo] <-- AudioManager / platform
-        val initialAudioDevices = getAvailableAudioDevices(audioManager)
-        // [CallEndpoints]   <-- [AudioDeviceInfo]
-        val initialEndpoints = getEndpointsFromAudioDeviceInfo(mContext, id, initialAudioDevices)
         // The emitted endpoints need to be tracked so that when the device list changes,
         // the added or removed endpoints can be re-emitted as a whole list.  Otherwise, only
         // the added or removed endpoints will be emitted.
-        val preCallEndpoints = PreCallEndpoints(initialEndpoints.toMutableList(), this.channel)
+        val callEndpointsUpdater = PreCallEndpointsUpdater(mSendChannel = this.channel)
         // register an audio callback that will listen for updates
-        val audioDeviceCallback =
-            object : AudioDeviceCallback() {
-                override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>?) {
-                    if (addedDevices != null) {
-                        preCallEndpoints.endpointsAddedUpdate(
-                            getEndpointsFromAudioDeviceInfo(mContext, id, addedDevices.toList())
-                        )
-                    }
-                }
-
-                override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>?) {
-                    if (removedDevices != null) {
-                        preCallEndpoints.endpointsRemovedUpdate(
-                            getEndpointsFromAudioDeviceInfo(mContext, id, removedDevices.toList())
-                        )
-                    }
-                }
-            }
-        // The following callback is needed in the event the user connects or disconnects
-        // and audio device after this API is called.
-        audioManager.registerAudioDeviceCallback(audioDeviceCallback, null /*handler*/)
-        // Send the initial list of pre-call [CallEndpointCompat]s out to the client. They
-        // will be emitted and cached in the Flow & only consumed once the client has
-        // collected it.
-        trySend(initialEndpoints)
+        val audioDeviceListener = AudioDeviceListener(mContext, callEndpointsUpdater, id)
+        // register a bluetooth listener to surface connected bluetooth devices instead of just
+        // the active bluetooth device
+        val bluetoothProfileListener = BluetoothProfileListener(mContext, callEndpointsUpdater, id)
         awaitClose {
             Log.i(TAG, "getAvailableStartingCallEndpoints: awaitClose")
-            audioManager.unregisterAudioDeviceCallback(audioDeviceCallback)
+            bluetoothProfileListener.close()
+            audioDeviceListener.close()
             CallEndpointUuidTracker.endSession(id)
         }
     }

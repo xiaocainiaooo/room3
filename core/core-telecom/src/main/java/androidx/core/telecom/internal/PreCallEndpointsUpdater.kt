@@ -24,18 +24,17 @@ import androidx.core.telecom.CallEndpointCompat
 import kotlinx.coroutines.channels.SendChannel
 
 @RequiresApi(Build.VERSION_CODES.O)
-internal class PreCallEndpoints(
-    var mCurrentDevices: MutableList<CallEndpointCompat>,
+internal class PreCallEndpointsUpdater(
+    var mCurrentDevices: MutableList<CallEndpointCompat> = mutableListOf(),
     var mSendChannel: SendChannel<List<CallEndpointCompat>>
 ) {
     // earpiece, speaker, unknown, wired_headset
     val mNonBluetoothEndpoints: HashMap<Int, CallEndpointCompat> = HashMap()
-
     // all bt endpoints
     val mBluetoothEndpoints: HashMap<String, CallEndpointCompat> = HashMap()
 
     companion object {
-        private val TAG: String = PreCallEndpoints::class.java.simpleName.toString()
+        private val TAG: String = PreCallEndpointsUpdater::class.java.simpleName.toString()
 
         // endpoints added constants
         const val ALREADY_TRACKING_ENDPOINT: Int = 0
