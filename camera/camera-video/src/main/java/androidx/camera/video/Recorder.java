@@ -508,6 +508,7 @@ public final class Recorder implements VideoOutput {
     private @Nullable SetupVideoTask mSetupVideoTask = null;
     private @Nullable OutputStorage mOutputStorage = null;
     private long mAvailableBytesAboveRequired = Long.MAX_VALUE;
+    private boolean mHasGlProcessing = false;
     //--------------------------------------------------------------------------------------------//
 
     Recorder(@Nullable Executor executor, @NonNull MediaSpec mediaSpec,
@@ -538,12 +539,13 @@ public final class Recorder implements VideoOutput {
 
     @Override
     public void onSurfaceRequested(@NonNull SurfaceRequest request) {
-        onSurfaceRequested(request, Timebase.UPTIME);
+        onSurfaceRequested(request, Timebase.UPTIME, false);
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     @Override
-    public void onSurfaceRequested(@NonNull SurfaceRequest request, @NonNull Timebase timebase) {
+    public void onSurfaceRequested(@NonNull SurfaceRequest request, @NonNull Timebase timebase,
+            boolean hasGlProcessing) {
         synchronized (mLock) {
             Logger.d(TAG, "Surface is requested in state: " + mState + ", Current surface: "
                     + mStreamId);
@@ -551,7 +553,8 @@ public final class Recorder implements VideoOutput {
                 setState(State.CONFIGURING);
             }
         }
-        mSequentialExecutor.execute(() -> onSurfaceRequestedInternal(request, timebase));
+        mSequentialExecutor.execute(
+                () -> onSurfaceRequestedInternal(request, timebase, hasGlProcessing));
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -1055,10 +1058,11 @@ public final class Recorder implements VideoOutput {
 
     @ExecutedBy("mSequentialExecutor")
     private void onSurfaceRequestedInternal(@NonNull SurfaceRequest request,
-            @NonNull Timebase timebase) {
+            @NonNull Timebase timebase, boolean hasGlProcessing) {
         if (mLatestSurfaceRequest != null && !mLatestSurfaceRequest.isServiced()) {
             mLatestSurfaceRequest.willNotProvideSurface();
         }
+        mHasGlProcessing = hasGlProcessing;
         configureInternal(mLatestSurfaceRequest = request, mVideoSourceTimebase = timebase, true);
     }
 
@@ -1206,7 +1210,7 @@ public final class Recorder implements VideoOutput {
         if (mSetupVideoTask != null) {
             mSetupVideoTask.cancelFailedRetry();
         }
-        mSetupVideoTask = new SetupVideoTask(surfaceRequest, videoSourceTimebase,
+        mSetupVideoTask = new SetupVideoTask(surfaceRequest, videoSourceTimebase, mHasGlProcessing,
                 enableRetrySetupVideo ? sRetrySetupVideoMaxCount : 0);
         mSetupVideoTask.start();
     }
@@ -1222,9 +1226,10 @@ public final class Recorder implements VideoOutput {
         private @Nullable ScheduledFuture<?> mRetryFuture = null;
 
         SetupVideoTask(@NonNull SurfaceRequest surfaceRequest, @NonNull Timebase timebase,
-                int maxRetryCount) {
+                boolean hasGlProcessing, int maxRetryCount) {
             mSurfaceRequest = surfaceRequest;
             mTimebase = timebase;
+            mHasGlProcessing = hasGlProcessing;
             mMaxRetryCount = maxRetryCount;
         }
 
@@ -1266,7 +1271,7 @@ public final class Recorder implements VideoOutput {
                 MediaSpec mediaSpec = getObservableData(mMediaSpec);
                 ListenableFuture<Encoder> configureFuture =
                         videoEncoderSession.configure(request, timebase, mediaSpec,
-                                mResolvedEncoderProfiles);
+                                mHasGlProcessing, mResolvedEncoderProfiles);
                 mVideoEncoderSession = videoEncoderSession;
                 Futures.addCallback(configureFuture, new FutureCallback<Encoder>() {
                     @Override
