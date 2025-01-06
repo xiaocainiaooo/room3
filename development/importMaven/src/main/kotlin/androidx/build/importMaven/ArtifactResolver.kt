@@ -213,9 +213,9 @@ ${
             val artifacts = resolutionList.flatMap { resolution ->
                 resolution.artifacts
             }
-            val dependenciesPassedVerification = resolutionList.map { resolution ->
+            val dependenciesPassedVerification = resolutionList.all { resolution ->
                 resolution.dependenciesPassedVerification
-            }.all { it == true }
+            }
             return ArtifactsResolutionResult(artifacts, dependenciesPassedVerification)
         }
 
