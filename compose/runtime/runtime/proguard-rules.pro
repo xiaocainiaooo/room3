@@ -31,3 +31,7 @@
     static void compose*RuntimeError(...);
     static java.lang.Void compose*RuntimeError(...);
 }
+
+-keepclassmembers class * {
+    @dalvik.annotation.optimization.NeverInline *;
+}
