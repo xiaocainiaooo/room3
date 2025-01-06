@@ -45,8 +45,11 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.internal.AnchoredDraggableState
+import androidx.compose.material3.internal.BackEventCompat
 import androidx.compose.material3.internal.DraggableAnchors
 import androidx.compose.material3.internal.FloatProducer
+import androidx.compose.material3.internal.PredictiveBack
+import androidx.compose.material3.internal.PredictiveBackHandler
 import androidx.compose.material3.internal.Strings
 import androidx.compose.material3.internal.anchoredDraggable
 import androidx.compose.material3.internal.getString
@@ -58,6 +61,7 @@ import androidx.compose.material3.tokens.NavigationDrawerTokens
 import androidx.compose.material3.tokens.ScrimTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
@@ -934,11 +938,70 @@ private fun GraphicsLayerScope.calculatePredictiveBackScaleY(
     }
 }
 
+/**
+ * Registers a [PredictiveBackHandler] and provides animation values in [DrawerPredictiveBackState]
+ * based on back progress.
+ *
+ * @param drawerState state of the drawer
+ * @param content content of the rest of the UI
+ */
 @Composable
-internal expect fun DrawerPredictiveBackHandler(
+internal fun DrawerPredictiveBackHandler(
     drawerState: DrawerState,
     content: @Composable (DrawerPredictiveBackState) -> Unit
-)
+) {
+    val drawerPredictiveBackState = remember { DrawerPredictiveBackState() }
+    val scope = rememberCoroutineScope()
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val maxScaleXDistanceGrow: Float
+    val maxScaleXDistanceShrink: Float
+    val maxScaleYDistance: Float
+    with(LocalDensity.current) {
+        maxScaleXDistanceGrow = PredictiveBackDrawerMaxScaleXDistanceGrow.toPx()
+        maxScaleXDistanceShrink = PredictiveBackDrawerMaxScaleXDistanceShrink.toPx()
+        maxScaleYDistance = PredictiveBackDrawerMaxScaleYDistance.toPx()
+    }
+
+    PredictiveBackHandler(enabled = drawerState.isOpen) { progress ->
+        try {
+            progress.collect { backEvent ->
+                drawerPredictiveBackState.update(
+                    PredictiveBack.transform(backEvent.progress),
+                    backEvent.swipeEdge == BackEventCompat.EDGE_LEFT,
+                    isRtl,
+                    maxScaleXDistanceGrow,
+                    maxScaleXDistanceShrink,
+                    maxScaleYDistance
+                )
+            }
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+            drawerPredictiveBackState.clear()
+        } finally {
+            if (drawerPredictiveBackState.swipeEdgeMatchesDrawer) {
+                // If swipe edge matches drawer gravity and we've stretched the drawer horizontally,
+                // un-stretch it smoothly so that it hides completely during the drawer close.
+                scope.launch {
+                    animate(
+                        initialValue = drawerPredictiveBackState.scaleXDistance,
+                        targetValue = 0f
+                    ) { value, _ ->
+                        drawerPredictiveBackState.scaleXDistance = value
+                    }
+                    drawerPredictiveBackState.clear()
+                }
+            }
+            drawerState.close()
+        }
+    }
+
+    LaunchedEffect(drawerState.isClosed) {
+        if (drawerState.isClosed) {
+            drawerPredictiveBackState.clear()
+        }
+    }
+
+    content(drawerPredictiveBackState)
+}
 
 /** Object to hold default values for [ModalNavigationDrawer] */
 object DrawerDefaults {
@@ -1251,6 +1314,10 @@ private fun Scrim(open: Boolean, onClose: () -> Unit, fraction: () -> Float, col
 private val DrawerPositionalThreshold = 0.5f
 private val DrawerVelocityThreshold = 400.dp
 private val MinimumDrawerWidth = 240.dp
+
+internal val PredictiveBackDrawerMaxScaleXDistanceGrow = 12.dp
+internal val PredictiveBackDrawerMaxScaleXDistanceShrink = 24.dp
+internal val PredictiveBackDrawerMaxScaleYDistance = 48.dp
 
 // TODO: b/177571613 this should be a proper decay settling
 // this is taken from the DrawerLayout's DragViewHelper as a min duration.
