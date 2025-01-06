@@ -30,6 +30,9 @@ import android.content.Context;
 import android.graphics.Matrix;
 import android.hardware.camera2.CaptureResult;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.util.Range;
 import android.util.Rational;
 import android.util.Size;
@@ -318,6 +321,7 @@ public abstract class CameraController {
 
     private boolean mPinchToZoomEnabled = true;
     private boolean mTapToFocusEnabled = true;
+    private long mLatestFocusCancelTimeMillis;
 
     private final ForwardingLiveData<ZoomState> mZoomState = new ForwardingLiveData<>();
     private final ForwardingLiveData<Integer> mTorchState = new ForwardingLiveData<>();
@@ -2193,6 +2197,26 @@ public abstract class CameraController {
                         mTapToFocusState.postValue(TAP_TO_FOCUS_FAILED);
                     }
                 }, directExecutor());
+
+        mLatestFocusCancelTimeMillis = 0; // reset to default first
+        long cancelDuration = focusMeteringAction.getAutoCancelDurationInMillis();
+        if (cancelDuration > 0L) {
+            mLatestFocusCancelTimeMillis = SystemClock.elapsedRealtime() + cancelDuration;
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                long currentTime = SystemClock.elapsedRealtime();
+                if (mLatestFocusCancelTimeMillis != 0
+                        && currentTime < mLatestFocusCancelTimeMillis) {
+                    Logger.d(TAG, "Ignoring current focus cancel event due to this not"
+                            + " being the latest cancel time, probably a new focus event arrived: "
+                            + "mLatestFocusCancelTimeMillis = " + mLatestFocusCancelTimeMillis
+                            + ", current time = " + currentTime);
+                    // There's a new focus event that came after this cancel event was scheduled.
+                    return;
+                }
+                mTapToFocusState.postValue(TAP_TO_FOCUS_NOT_STARTED);
+                mLatestFocusCancelTimeMillis = 0;
+            }, cancelDuration);
+        }
     }
 
     /**
@@ -2242,12 +2266,12 @@ public abstract class CameraController {
      *     <td>TAP_TO_FOCUS_STARTED</td>
      * </tr>
      * <tr>
-     *     <td>TAP_TO_FOCUS_SUCCESSFUL</td>
+     *     <td>TAP_TO_FOCUS_FOCUSED</td>
      *     <td>User taps on {@link PreviewView}</td>
      *     <td>TAP_TO_FOCUS_STARTED</td>
      * </tr>
      * <tr>
-     *     <td>TAP_TO_FOCUS_UNSUCCESSFUL</td>
+     *     <td>TAP_TO_FOCUS_NOT_FOCUSED</td>
      *     <td>User taps on {@link PreviewView}</td>
      *     <td>TAP_TO_FOCUS_STARTED</td>
      * </tr>
@@ -2259,15 +2283,30 @@ public abstract class CameraController {
      * <tr>
      *     <td rowspan="3">TAP_TO_FOCUS_STARTED</td>
      *     <td>Focusing succeeded</td>
-     *     <td>TAP_TO_FOCUS_SUCCESSFUL</td>
+     *     <td>TAP_TO_FOCUS_FOCUSED</td>
      * </tr>
      * <tr>
      *     <td>Focusing failed due to lighting and/or camera distance</td>
-     *     <td>TAP_TO_FOCUS_UNSUCCESSFUL</td>
+     *     <td>TAP_TO_FOCUS_NOT_FOCUSED</td>
      * </tr>
      * <tr>
      *     <td>Focusing failed due to device constraints</td>
      *     <td>TAP_TO_FOCUS_FAILED</td>
+     * </tr>
+     * <tr>
+     *     <td>TAP_TO_FOCUS_FOCUSED</td>
+     *     <td>Auto-cancel duration elapses</td>
+     *     <td>TAP_TO_FOCUS_NOT_STARTED</td>
+     * </tr>
+     * <tr>
+     *     <td>TAP_TO_FOCUS_NOT_FOCUSED</td>
+     *     <td>Auto-cancel duration elapses</td>
+     *     <td>TAP_TO_FOCUS_NOT_STARTED</td>
+     * </tr>
+     * <tr>
+     *     <td>TAP_TO_FOCUS_FAILED</td>
+     *     <td>Auto-cancel duration elapses</td>
+     *     <td>TAP_TO_FOCUS_NOT_STARTED</td>
      * </tr>
      * </table>
      *

@@ -28,6 +28,7 @@ import androidx.camera.core.AspectRatio.RATIO_16_9
 import androidx.camera.core.AspectRatio.RATIO_4_3
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.DynamicRange
+import androidx.camera.core.FocusMeteringResult
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.COORDINATE_SYSTEM_ORIGINAL
 import androidx.camera.core.ImageAnalysis.COORDINATE_SYSTEM_VIEW_REFERENCED
@@ -37,6 +38,7 @@ import androidx.camera.core.ImageCapture.ScreenFlash
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.MirrorMode
 import androidx.camera.core.Preview.SurfaceProvider
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.core.TorchState
 import androidx.camera.core.ViewPort
 import androidx.camera.core.impl.ImageAnalysisConfig
@@ -53,6 +55,10 @@ import androidx.camera.testing.impl.fakes.FakeSurfaceEffect
 import androidx.camera.testing.impl.fakes.FakeSurfaceProcessor
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
+import androidx.camera.view.CameraController.TAP_TO_FOCUS_FOCUSED
+import androidx.camera.view.CameraController.TAP_TO_FOCUS_NOT_FOCUSED
+import androidx.camera.view.CameraController.TAP_TO_FOCUS_NOT_STARTED
+import androidx.camera.view.CameraController.TAP_TO_FOCUS_STARTED
 import androidx.camera.view.internal.ScreenFlashUiInfo
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.test.annotation.UiThreadTest
@@ -60,7 +66,9 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.google.common.util.concurrent.MoreExecutors
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import org.junit.Assert
+import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -68,16 +76,21 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.internal.DoNotInstrument
+import org.robolectric.shadows.ShadowSystemClock
 
 /** Unit tests for [CameraController]. */
 @RunWith(RobolectricTestRunner::class)
 @DoNotInstrument
-@Config(minSdk = Build.VERSION_CODES.LOLLIPOP)
+@Config(
+    minSdk = Build.VERSION_CODES.LOLLIPOP,
+    instrumentedPackages = ["androidx.camera.view"], // required for shadow clock to work
+)
 class CameraControllerTest {
     companion object {
         const val LINEAR_ZOOM = .1F
         const val ZOOM_RATIO = .5F
         const val TORCH_ENABLED = true
+        const val FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS = 5000L
     }
 
     private val previewViewTransform = Matrix().also { it.postRotate(90F) }
@@ -100,6 +113,8 @@ class CameraControllerTest {
     private val processCameraProviderWrapper = FakeProcessCameraProviderWrapper(fakeCamera)
     private lateinit var lifecycleCameraProviderCompleter:
         CallbackToFutureAdapter.Completer<ProcessCameraProviderWrapper>
+
+    private val pointFactory = SurfaceOrientedMeteringPointFactory(1f, 1f)
 
     @Before
     fun setUp() {
@@ -716,5 +731,113 @@ class CameraControllerTest {
         assertThat(imageCaptureConfig.getResolutionSelector(null)).isNull()
         val imageAnalysisConfig = controller.mImageAnalysis.currentConfig as ImageOutputConfig
         assertThat(imageAnalysisConfig.getResolutionSelector(null)).isNull()
+    }
+
+    @Test
+    fun onTapToFocus_focusMeteringActionSubmittedToCamera() {
+        completeCameraInitialization()
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+        assertThat(fakeCameraControl.lastSubmittedFocusMeteringAction).isNotNull()
+    }
+
+    @Test
+    fun getTapToFocusState_defaultValueIsTapToFocusNotStarted() {
+        assertThat(controller.tapToFocusState.value).isEqualTo(TAP_TO_FOCUS_NOT_STARTED)
+    }
+
+    @Test
+    fun getTapToFocusState_valueIsTapToFocusStarted_whenOnTapToFocusIsCalled() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusState.value).isEqualTo(TAP_TO_FOCUS_STARTED)
+    }
+
+    @Test
+    fun getTapToFocusState_valueIsTapToFocusFocused_whenSuccessfulResultIsSubmitted() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+        fakeCameraControl.submitFocusMeteringResult(FocusMeteringResult.create(true))
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusState.value).isEqualTo(TAP_TO_FOCUS_FOCUSED)
+    }
+
+    @Test
+    fun getTapToFocusState_valueIsTapToFocusNotFocused_whenUnsuccessfulResultIsSubmitted() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+        fakeCameraControl.submitFocusMeteringResult(FocusMeteringResult.create(false))
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusState.value).isEqualTo(TAP_TO_FOCUS_NOT_FOCUSED)
+    }
+
+    @Test
+    fun getTapToFocusState_valueIsTapToFocusStarted_beforeAutoCancelDurationIsElapsed() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS - 1, TimeUnit.MILLISECONDS)
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusState.value).isEqualTo(TAP_TO_FOCUS_STARTED)
+    }
+
+    @Test
+    fun getTapToFocusState_valueIsNotStarted_whenAutoCancelDurationIsElapsedAfterStarted() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+
+        shadowOf(getMainLooper()).idle()
+        assumeTrue(controller.tapToFocusState.value == TAP_TO_FOCUS_STARTED)
+
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusState.value).isEqualTo(TAP_TO_FOCUS_NOT_STARTED)
+    }
+
+    @Test
+    fun getTapToFocusState_valueIsNotStarted_whenAutoCancelDurationIsElapsedAfterFocused() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+        fakeCameraControl.submitFocusMeteringResult(FocusMeteringResult.create(true))
+        shadowOf(getMainLooper()).idle()
+        assumeTrue(controller.tapToFocusState.value == TAP_TO_FOCUS_FOCUSED)
+
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusState.value).isEqualTo(TAP_TO_FOCUS_NOT_STARTED)
+    }
+
+    @Test
+    fun getTapToFocusState_valueIsNotStarted_whenAutoCancelDurationIsElapsedAfterNotFocused() {
+        completeCameraInitialization()
+        fakeCameraControl.disableFocusMeteringAutoComplete(true)
+
+        controller.onTapToFocus(pointFactory, 0f, 0f)
+        fakeCameraControl.submitFocusMeteringResult(FocusMeteringResult.create(false))
+        shadowOf(getMainLooper()).idle()
+        assumeTrue(controller.tapToFocusState.value == TAP_TO_FOCUS_NOT_FOCUSED)
+
+        ShadowSystemClock.advanceBy(FOCUS_AUTO_CANCEL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+
+        shadowOf(getMainLooper()).idle()
+        assertThat(controller.tapToFocusState.value).isEqualTo(TAP_TO_FOCUS_NOT_STARTED)
     }
 }
