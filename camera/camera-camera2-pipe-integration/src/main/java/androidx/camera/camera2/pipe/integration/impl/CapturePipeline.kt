@@ -412,7 +412,7 @@ constructor(
                             it.lock3AForCapture(
                                     timeLimitNs = timeLimitNs,
                                     triggerAf = captureMode == CAPTURE_MODE_MAXIMIZE_QUALITY,
-                                    waitForAwb = true,
+                                    waitForAwb = captureMode == CAPTURE_MODE_MAXIMIZE_QUALITY,
                                 )
                                 .await()
                         }
@@ -489,7 +489,8 @@ constructor(
                     debug { "CapturePipeline#aePreCaptureApplyCapture: Locking 3A for capture" }
                     it.lock3AForCapture(
                             timeLimitNs = timeLimitNs,
-                            triggerAf = captureMode == CAPTURE_MODE_MAXIMIZE_QUALITY
+                            triggerAf = captureMode == CAPTURE_MODE_MAXIMIZE_QUALITY,
+                            waitForAwb = captureMode == CAPTURE_MODE_MAXIMIZE_QUALITY,
                         )
                         .join()
                     debug {
