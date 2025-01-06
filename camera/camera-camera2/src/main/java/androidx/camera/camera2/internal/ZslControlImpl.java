@@ -44,7 +44,6 @@ import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Logger;
 import androidx.camera.core.MetadataImageReader;
 import androidx.camera.core.SafeCloseImageReaderProxy;
-import androidx.camera.core.impl.CameraCaptureCallback;
 import androidx.camera.core.impl.DeferrableSurface;
 import androidx.camera.core.impl.ImmediateSurface;
 import androidx.camera.core.impl.SessionConfig;
@@ -60,6 +59,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 
 /**
@@ -91,7 +91,6 @@ final class ZslControlImpl implements ZslControl {
 
     @SuppressWarnings("WeakerAccess")
     SafeCloseImageReaderProxy mReprocessingImageReader;
-    private CameraCaptureCallback mMetadataMatchingCaptureCallback;
     private DeferrableSurface mReprocessingImageDeferrableSurface;
 
     @Nullable ImageWriter mReprocessingImageWriter;
@@ -169,9 +168,20 @@ final class ZslControlImpl implements ZslControl {
                 resolution.getHeight(),
                 reprocessingImageFormat,
                 MAX_IMAGES);
-        mMetadataMatchingCaptureCallback = metadataImageReader.getCameraCaptureCallback();
-        mReprocessingImageReader = new SafeCloseImageReaderProxy(metadataImageReader);
-        metadataImageReader.setOnImageAvailableListener(
+
+        // Init the reprocessing image reader surface and add into the target surfaces of capture
+        SafeCloseImageReaderProxy reprocessingImageReaderProxy =
+                new SafeCloseImageReaderProxy(metadataImageReader);
+        DeferrableSurface reprocessingImageDeferrableSurface = new ImmediateSurface(
+                Objects.requireNonNull(reprocessingImageReaderProxy.getSurface()),
+                new Size(reprocessingImageReaderProxy.getWidth(),
+                        reprocessingImageReaderProxy.getHeight()),
+                reprocessingImageFormat);
+
+        mReprocessingImageReader = reprocessingImageReaderProxy;
+        mReprocessingImageDeferrableSurface = reprocessingImageDeferrableSurface;
+
+        reprocessingImageReaderProxy.setOnImageAvailableListener(
                 imageReader -> {
                     try {
                         ImageProxy imageProxy = imageReader.acquireLatestImage();
@@ -185,21 +195,14 @@ final class ZslControlImpl implements ZslControl {
 
                 }, CameraXExecutors.ioExecutor());
 
-        // Init the reprocessing image reader surface and add into the target surfaces of capture
-        mReprocessingImageDeferrableSurface = new ImmediateSurface(
-                mReprocessingImageReader.getSurface(),
-                new Size(mReprocessingImageReader.getWidth(),
-                        mReprocessingImageReader.getHeight()),
-                reprocessingImageFormat);
-
-        SafeCloseImageReaderProxy reprocessingImageReaderProxy = mReprocessingImageReader;
-        mReprocessingImageDeferrableSurface.getTerminationFuture().addListener(
+        reprocessingImageDeferrableSurface.getTerminationFuture().addListener(
                 reprocessingImageReaderProxy::safeClose,
                 CameraXExecutors.mainThreadExecutor());
-        sessionConfigBuilder.addSurface(mReprocessingImageDeferrableSurface);
+        sessionConfigBuilder.addSurface(reprocessingImageDeferrableSurface);
 
         // Init capture and session state callback and enqueue the total capture result
-        sessionConfigBuilder.addCameraCaptureCallback(mMetadataMatchingCaptureCallback);
+        sessionConfigBuilder.addCameraCaptureCallback(
+                metadataImageReader.getCameraCaptureCallback());
         sessionConfigBuilder.addSessionStateCallback(
                 new CameraCaptureSession.StateCallback() {
                     @Override
@@ -219,9 +222,9 @@ final class ZslControlImpl implements ZslControl {
 
         // Set input configuration for reprocessing capture request
         sessionConfigBuilder.setInputConfiguration(new InputConfiguration(
-                mReprocessingImageReader.getWidth(),
-                mReprocessingImageReader.getHeight(),
-                mReprocessingImageReader.getImageFormat()));
+                reprocessingImageReaderProxy.getWidth(),
+                reprocessingImageReaderProxy.getHeight(),
+                reprocessingImageReaderProxy.getImageFormat()));
     }
 
     @Override
