@@ -26,6 +26,7 @@ import android.hardware.camera2.CameraCharacteristics.REQUEST_RECOMMENDED_TEN_BI
 import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CameraMetadata
 import android.hardware.camera2.CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
+import android.hardware.camera2.CameraMetadata.REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO
 import android.hardware.camera2.CameraMetadata.REQUEST_AVAILABLE_CAPABILITIES_DYNAMIC_RANGE_TEN_BIT
 import android.hardware.camera2.params.DynamicRangeProfiles
 import android.hardware.camera2.params.StreamConfigurationMap
@@ -81,11 +82,16 @@ import androidx.camera.core.impl.EncoderProfilesProxy.VideoProfileProxy
 import androidx.camera.core.impl.ImageFormatConstants
 import androidx.camera.core.impl.ImageInputConfig
 import androidx.camera.core.impl.StreamSpec
+import androidx.camera.core.impl.SurfaceCombination
 import androidx.camera.core.impl.SurfaceConfig
+import androidx.camera.core.impl.SurfaceConfig.ConfigSize
+import androidx.camera.core.impl.SurfaceConfig.ConfigType
 import androidx.camera.core.impl.UseCaseConfig
 import androidx.camera.core.impl.UseCaseConfigFactory
 import androidx.camera.core.impl.UseCaseConfigFactory.CaptureType
+import androidx.camera.core.impl.utils.CompareSizesByArea
 import androidx.camera.core.internal.utils.SizeUtil
+import androidx.camera.core.internal.utils.SizeUtil.RESOLUTION_1080P
 import androidx.camera.core.internal.utils.SizeUtil.RESOLUTION_1440P
 import androidx.camera.core.internal.utils.SizeUtil.RESOLUTION_720P
 import androidx.camera.core.internal.utils.SizeUtil.RESOLUTION_VGA
@@ -174,6 +180,25 @@ class SupportedSurfaceCombinationTest {
             Size(7200, 4050), // 16:9
         )
     private val maximumResolutionHighResolutionSupportedSizes = arrayOf(Size(8000, 6000))
+    private val commonHighSpeedSupportedSizeFpsMap =
+        mapOf(
+            RESOLUTION_1080P to
+                listOf(
+                    Range.create(30, 120),
+                    Range.create(120, 120),
+                    Range.create(30, 240),
+                    Range.create(240, 240),
+                ),
+            RESOLUTION_720P to
+                listOf(
+                    Range.create(30, 120),
+                    Range.create(120, 120),
+                    Range.create(30, 240),
+                    Range.create(240, 240),
+                    Range.create(30, 480),
+                    Range.create(480, 480)
+                )
+        )
 
     private val streamUseCaseOverrideValue = 3L
     private val context = InstrumentationRegistry.getInstrumentation().context
@@ -540,6 +565,69 @@ class SupportedSurfaceCombinationTest {
                     )
                 )
                 .isTrue()
+        }
+    }
+
+    @Config(minSdk = Build.VERSION_CODES.M)
+    @Test
+    fun checkSurfaceCombinationSupportForHighSpeed() {
+        setupCamera(
+            capabilities = intArrayOf(REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO),
+            supportedHighSpeedSizeAndFpsMap = commonHighSpeedSupportedSizeFpsMap
+        )
+        val supportedSurfaceCombination =
+            SupportedSurfaceCombination(context, fakeCameraMetadata, mockEncoderProfilesAdapter)
+        val featureSettings =
+            SupportedSurfaceCombination.FeatureSettings(
+                CameraMode.DEFAULT,
+                DynamicRange.BIT_DEPTH_8_BIT,
+                isHighSpeedOn = true
+            )
+
+        // The expected SurfaceConfig is PRIV + RECORD because the max high speed size 1920x1080 is
+        // between PREVIEW and RECORD size.
+        val shouldSupportCombinations =
+            listOf(
+                SurfaceCombination().apply {
+                    addSurfaceConfig(SurfaceConfig.create(ConfigType.PRIV, ConfigSize.RECORD))
+                },
+                SurfaceCombination().apply {
+                    addSurfaceConfig(SurfaceConfig.create(ConfigType.PRIV, ConfigSize.PREVIEW))
+                    addSurfaceConfig(SurfaceConfig.create(ConfigType.PRIV, ConfigSize.PREVIEW))
+                }
+            )
+        shouldSupportCombinations.forEach {
+            assertThat(
+                    supportedSurfaceCombination.checkSupported(
+                        featureSettings,
+                        it.surfaceConfigList
+                    )
+                )
+                .isTrue()
+        }
+
+        val shouldNotSupportCombinations =
+            listOf(
+                SurfaceCombination().apply {
+                    addSurfaceConfig(SurfaceConfig.create(ConfigType.PRIV, ConfigSize.MAXIMUM))
+                },
+                SurfaceCombination().apply {
+                    addSurfaceConfig(SurfaceConfig.create(ConfigType.PRIV, ConfigSize.PREVIEW))
+                    addSurfaceConfig(SurfaceConfig.create(ConfigType.JPEG, ConfigSize.MAXIMUM))
+                },
+                SurfaceCombination().apply {
+                    addSurfaceConfig(SurfaceConfig.create(ConfigType.PRIV, ConfigSize.PREVIEW))
+                    addSurfaceConfig(SurfaceConfig.create(ConfigType.YUV, ConfigSize.PREVIEW))
+                }
+            )
+        shouldNotSupportCombinations.forEach {
+            assertThat(
+                    supportedSurfaceCombination.checkSupported(
+                        featureSettings,
+                        it.surfaceConfigList
+                    )
+                )
+                .isFalse()
         }
     }
 
@@ -1506,6 +1594,7 @@ class SupportedSurfaceCombinationTest {
 
     private fun getSuggestedSpecsAndVerify(
         useCasesExpectedResultMap: Map<UseCase, Size>,
+        useCasesOutputSizesMap: Map<UseCase, List<Size>>? = null,
         attachedSurfaceInfoList: List<AttachedSurfaceInfo> = emptyList(),
         hardwareLevel: Int = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY,
         capabilities: IntArray? = null,
@@ -1514,31 +1603,37 @@ class SupportedSurfaceCombinationTest {
         cameraMode: Int = CameraMode.DEFAULT,
         useCasesExpectedDynamicRangeMap: Map<UseCase, DynamicRange> = emptyMap(),
         supportedOutputFormats: IntArray? = null,
+        supportedHighSpeedSizeAndFpsMap: Map<Size, List<Range<Int>>>? = null,
         dynamicRangeProfiles: DynamicRangeProfiles? = null,
         default10BitProfile: Long? = null,
         isPreviewStabilizationOn: Boolean = false,
-        hasVideoCapture: Boolean = false
+        hasVideoCapture: Boolean = false,
+        targetHighSpeedFpsRange: Range<Int>? = null
     ): Pair<Map<UseCaseConfig<*>, StreamSpec>, Map<AttachedSurfaceInfo, StreamSpec>> {
         setupCamera(
             hardwareLevel = hardwareLevel,
             capabilities = capabilities,
             dynamicRangeProfiles = dynamicRangeProfiles,
             default10BitProfile = default10BitProfile,
-            supportedFormats = supportedOutputFormats
+            supportedFormats = supportedOutputFormats,
+            supportedHighSpeedSizeAndFpsMap = supportedHighSpeedSizeAndFpsMap,
         )
         val supportedSurfaceCombination =
             SupportedSurfaceCombination(context, fakeCameraMetadata, mockEncoderProfilesAdapter)
 
         val useCaseConfigMap = getUseCaseToConfigMap(useCasesExpectedResultMap.keys.toList())
         val useCaseConfigToOutputSizesMap =
-            getUseCaseConfigToOutputSizesMap(useCaseConfigMap.values.toList())
+            useCaseConfigMap.entries.associate { (useCase, config) ->
+                config to (useCasesOutputSizesMap?.get(useCase) ?: supportedSizes.toList())
+            }
         val resultPair =
             supportedSurfaceCombination.getSuggestedStreamSpecifications(
                 cameraMode,
                 attachedSurfaceInfoList,
                 useCaseConfigToOutputSizesMap,
                 isPreviewStabilizationOn,
-                hasVideoCapture
+                hasVideoCapture,
+                targetHighSpeedFpsRange
             )
         val suggestedStreamSpecsForNewUseCases = resultPair.first
         val suggestedStreamSpecsForOldSurfaces = resultPair.second
@@ -1610,17 +1705,6 @@ class SupportedSurfaceCombinationTest {
                 useCases.forEach { put(it, it.currentConfig) }
             }
         return useCaseConfigMap
-    }
-
-    private fun getUseCaseConfigToOutputSizesMap(
-        useCaseConfigs: List<UseCaseConfig<*>>
-    ): Map<UseCaseConfig<*>, List<Size>> {
-        val resultMap =
-            mutableMapOf<UseCaseConfig<*>, List<Size>>().apply {
-                useCaseConfigs.forEach { put(it, supportedSizes.toList()) }
-            }
-
-        return resultMap
     }
 
     /** Helper function that returns whether size is <= maxSize */
@@ -3242,6 +3326,137 @@ class SupportedSurfaceCombinationTest {
             .isFalse()
     }
 
+    @Config(minSdk = Build.VERSION_CODES.M)
+    @Test
+    fun getSuggestedStreamSpec_highSpeed_returnsCorrectSizeAndFpsRange() {
+        val previewUseCase = createUseCase(CaptureType.PREVIEW, surfaceOccupancyPriority = 2)
+        val videoUseCase = createUseCase(CaptureType.VIDEO_CAPTURE, surfaceOccupancyPriority = 5)
+        val useCasesOutputSizesMap =
+            mapOf(
+                previewUseCase to listOf(RESOLUTION_VGA, RESOLUTION_1080P, RESOLUTION_720P),
+                videoUseCase to listOf(RESOLUTION_1440P, RESOLUTION_720P, RESOLUTION_1080P)
+            )
+        // videoUseCase has higher surface priority so the expected size should be the first
+        // common size of videoUseCases. i.e. RESOLUTION_720P.
+        val useCaseExpectedResultMap =
+            mapOf(previewUseCase to RESOLUTION_720P, videoUseCase to RESOLUTION_720P)
+        getSuggestedSpecsAndVerify(
+            useCaseExpectedResultMap,
+            capabilities = intArrayOf(REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO),
+            useCasesOutputSizesMap = useCasesOutputSizesMap,
+            supportedHighSpeedSizeAndFpsMap = commonHighSpeedSupportedSizeFpsMap,
+            targetHighSpeedFpsRange = Range.create(240, 240),
+            compareExpectedFps = Range.create(240, 240)
+        )
+    }
+
+    @Config(minSdk = Build.VERSION_CODES.M)
+    @Test
+    fun getSuggestedStreamSpec_highSpeed_singleSurface_returnsCorrectSizeAndClosestFps() {
+        val previewUseCase = createUseCase(CaptureType.PREVIEW)
+        val useCasesOutputSizesMap = mapOf(previewUseCase to listOf(RESOLUTION_1080P))
+        val useCaseExpectedResultMap = mapOf(previewUseCase to RESOLUTION_1080P)
+        getSuggestedSpecsAndVerify(
+            useCaseExpectedResultMap,
+            capabilities = intArrayOf(REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO),
+            useCasesOutputSizesMap = useCasesOutputSizesMap,
+            supportedHighSpeedSizeAndFpsMap = commonHighSpeedSupportedSizeFpsMap,
+            targetHighSpeedFpsRange = Range.create(30, 480),
+            compareExpectedFps = Range.create(30, 240) // Find the closest supported fps.
+        )
+    }
+
+    @Config(minSdk = Build.VERSION_CODES.M)
+    @Test
+    fun getSuggestedStreamSpec_highSpeed_multipleSurfaces_returnsCorrectSizeAndClosetMaxFps() {
+        val previewUseCase = createUseCase(CaptureType.PREVIEW)
+        val videoUseCase = createUseCase(CaptureType.VIDEO_CAPTURE)
+        val useCasesOutputSizesMap =
+            mapOf(
+                previewUseCase to listOf(RESOLUTION_1080P),
+                videoUseCase to listOf(RESOLUTION_1080P)
+            )
+        val useCaseExpectedResultMap =
+            mapOf(previewUseCase to RESOLUTION_1080P, videoUseCase to RESOLUTION_1080P)
+        getSuggestedSpecsAndVerify(
+            useCaseExpectedResultMap,
+            capabilities = intArrayOf(REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO),
+            useCasesOutputSizesMap = useCasesOutputSizesMap,
+            supportedHighSpeedSizeAndFpsMap = commonHighSpeedSupportedSizeFpsMap,
+            targetHighSpeedFpsRange = Range.create(30, 480),
+            compareExpectedFps = Range.create(240, 240) // Find the closest max supported fps.
+        )
+    }
+
+    @Config(minSdk = 21, maxSdk = 22)
+    @Test
+    fun getSuggestedStreamSpec_highSpeed_unsupportedSdkVersion_throwException() {
+        val useCase = createUseCase(CaptureType.PREVIEW)
+        val useCaseExpectedResultMap = mapOf(useCase to RESOLUTION_1080P)
+        assertThrows(IllegalArgumentException::class.java) {
+            getSuggestedSpecsAndVerify(
+                useCaseExpectedResultMap,
+                capabilities =
+                    intArrayOf(REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO),
+                targetHighSpeedFpsRange = Range.create(240, 240),
+            )
+        }
+    }
+
+    @Config(minSdk = Build.VERSION_CODES.M)
+    @Test
+    fun getSuggestedStreamSpec_highSpeed_noCommonSize_throwException() {
+        val previewUseCase = createUseCase(CaptureType.PREVIEW)
+        val videoUseCase = createUseCase(CaptureType.VIDEO_CAPTURE)
+        val useCasesOutputSizesMap =
+            mapOf(
+                previewUseCase to listOf(RESOLUTION_VGA, RESOLUTION_720P),
+                videoUseCase to listOf(RESOLUTION_1440P, RESOLUTION_1080P)
+            )
+        val useCaseExpectedResultMap =
+            mapOf(previewUseCase to RESOLUTION_VGA, videoUseCase to RESOLUTION_1440P)
+        assertThrows(IllegalArgumentException::class.java) {
+            getSuggestedSpecsAndVerify(
+                useCaseExpectedResultMap,
+                capabilities =
+                    intArrayOf(REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO),
+                useCasesOutputSizesMap = useCasesOutputSizesMap,
+                supportedHighSpeedSizeAndFpsMap = commonHighSpeedSupportedSizeFpsMap,
+                targetHighSpeedFpsRange = Range.create(240, 240),
+            )
+        }
+    }
+
+    @Config(minSdk = Build.VERSION_CODES.M)
+    @Test
+    fun getSuggestedStreamSpec_highSpeed_tooManyUseCases_throwException() {
+        val previewUseCase1 = createUseCase(CaptureType.PREVIEW)
+        val previewUseCase2 = createUseCase(CaptureType.PREVIEW)
+        val videoUseCase = createUseCase(CaptureType.VIDEO_CAPTURE)
+        val useCasesOutputSizesMap =
+            mapOf(
+                previewUseCase1 to listOf(RESOLUTION_1080P),
+                previewUseCase2 to listOf(RESOLUTION_1080P),
+                videoUseCase to listOf(RESOLUTION_1080P)
+            )
+        val useCaseExpectedResultMap =
+            mapOf(
+                previewUseCase1 to RESOLUTION_1080P,
+                previewUseCase2 to RESOLUTION_1080P,
+                videoUseCase to RESOLUTION_1080P
+            )
+        assertThrows(IllegalArgumentException::class.java) {
+            getSuggestedSpecsAndVerify(
+                useCaseExpectedResultMap,
+                capabilities =
+                    intArrayOf(REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO),
+                useCasesOutputSizesMap = useCasesOutputSizesMap,
+                supportedHighSpeedSizeAndFpsMap = commonHighSpeedSupportedSizeFpsMap,
+                targetHighSpeedFpsRange = Range.create(240, 240),
+            )
+        }
+    }
+
     private fun setupCamera(
         hardwareLevel: Int = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY,
         sensorOrientation: Int = sensorOrientation90,
@@ -3249,6 +3464,7 @@ class SupportedSurfaceCombinationTest {
         supportedSizes: Array<Size> = this.supportedSizes,
         supportedFormats: IntArray? = null,
         highResolutionSupportedSizes: Array<Size>? = null,
+        supportedHighSpeedSizeAndFpsMap: Map<Size, List<Range<Int>>>? = null,
         maximumResolutionSupportedSizes: Array<Size>? = null,
         maximumResolutionHighResolutionSupportedSizes: Array<Size>? = null,
         dynamicRangeProfiles: DynamicRangeProfiles? = null,
@@ -3371,6 +3587,36 @@ class SupportedSurfaceCombinationTest {
             if (Build.VERSION.SDK_INT >= 23) {
                 whenever(mockMap.getHighResolutionOutputSizes(ArgumentMatchers.anyInt()))
                     .thenReturn(it)
+            }
+        }
+
+        if (
+            supportedHighSpeedSizeAndFpsMap != null &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+        ) {
+            // Mock highSpeedVideoSizes
+            whenever(mockMap.highSpeedVideoSizes)
+                .thenReturn(supportedHighSpeedSizeAndFpsMap.keys.toTypedArray())
+
+            // Mock highSpeedVideoFpsRanges
+            val allFpsRanges = supportedHighSpeedSizeAndFpsMap.values.flatten().distinct()
+            whenever(mockMap.highSpeedVideoFpsRanges).thenReturn(allFpsRanges.toTypedArray())
+
+            // Mock getHighSpeedVideoSizesFor
+            allFpsRanges.forEach { fpsRange ->
+                val sizesForRange =
+                    supportedHighSpeedSizeAndFpsMap.entries
+                        .filter { (_, fpsRanges) -> fpsRanges.contains(fpsRange) }
+                        .map { it.key }
+                        .sortedWith(CompareSizesByArea(false)) // Descending order
+                        .toTypedArray()
+                whenever(mockMap.getHighSpeedVideoSizesFor(fpsRange)).thenReturn(sizesForRange)
+            }
+
+            // Mock getHighSpeedVideoFpsRangesFor
+            supportedHighSpeedSizeAndFpsMap.forEach { (size, fpsRanges) ->
+                whenever(mockMap.getHighSpeedVideoFpsRangesFor(size))
+                    .thenReturn(fpsRanges.toTypedArray())
             }
         }
 
@@ -3528,9 +3774,16 @@ class SupportedSurfaceCombinationTest {
     private fun createUseCase(
         captureType: UseCaseConfigFactory.CaptureType,
         targetFrameRate: Range<Int>? = null,
-        dynamicRange: DynamicRange = DynamicRange.UNSPECIFIED
+        dynamicRange: DynamicRange = DynamicRange.UNSPECIFIED,
+        surfaceOccupancyPriority: Int? = null
     ): UseCase {
-        return createUseCase(captureType, targetFrameRate, dynamicRange, false)
+        return createUseCase(
+            captureType,
+            targetFrameRate,
+            dynamicRange,
+            streamUseCaseOverride = false,
+            surfaceOccupancyPriority = surfaceOccupancyPriority
+        )
     }
 
     private fun createUseCase(
@@ -3538,7 +3791,8 @@ class SupportedSurfaceCombinationTest {
         targetFrameRate: Range<Int>? = null,
         dynamicRange: DynamicRange? = DynamicRange.UNSPECIFIED,
         streamUseCaseOverride: Boolean = false,
-        imageFormat: Int? = null
+        imageFormat: Int? = null,
+        surfaceOccupancyPriority: Int? = null,
     ): UseCase {
         val builder =
             FakeUseCaseConfig.Builder(
@@ -3560,6 +3814,9 @@ class SupportedSurfaceCombinationTest {
         if (streamUseCaseOverride) {
             builder.mutableConfig.insertOption(streamUseCaseOption, streamUseCaseOverrideValue)
         }
+
+        surfaceOccupancyPriority?.let { builder.setSurfaceOccupancyPriority(it) }
+
         return builder.build()
     }
 
