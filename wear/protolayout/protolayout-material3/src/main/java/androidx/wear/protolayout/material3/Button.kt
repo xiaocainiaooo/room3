@@ -30,8 +30,9 @@ import androidx.wear.protolayout.material3.ButtonDefaults.filledButtonColors
 import androidx.wear.protolayout.material3.IconButtonStyle.Companion.defaultIconButtonStyle
 import androidx.wear.protolayout.material3.TextButtonStyle.Companion.defaultTextButtonStyle
 import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.background
+import androidx.wear.protolayout.modifiers.clip
 import androidx.wear.protolayout.modifiers.contentDescription
-import androidx.wear.protolayout.types.LayoutColor
 
 /**
  * Opinionated ProtoLayout Material3 icon button that offers a single slot to take content
@@ -55,7 +56,7 @@ import androidx.wear.protolayout.types.LayoutColor
  *   [ButtonDefaults.filledTonalButtonColors] and [ButtonDefaults.filledVariantButtonColors]. If
  *   using custom colors, it is important to choose a color pair from same role to ensure
  *   accessibility with sufficient color contrast.
- * @param background The background object to be used behind the content in the button. It is
+ * @param backgroundContent The background object to be used behind the content in the button. It is
  *   recommended to use the default styling that is automatically provided by only calling
  *   [backgroundImage] with the content. It can be combined with the specified
  *   [ButtonColors.container] behind it.
@@ -78,18 +79,16 @@ public fun MaterialScope.iconButton(
     height: ContainerDimension = wrapWithMinTapTargetDimension(),
     shape: Corner = shapes.full,
     colors: ButtonColors = filledButtonColors(),
-    background: (MaterialScope.() -> LayoutElement)? = null,
+    backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     style: IconButtonStyle = defaultIconButtonStyle(),
     contentPadding: Padding = Padding.Builder().setAll(DEFAULT_CONTENT_PADDING_DP.toDp()).build()
 ): LayoutElement =
     button(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.background(color = colors.container, corner = shape),
         width = width,
         height = height,
-        shape = shape,
-        backgroundColor = colors.container,
-        background = background,
+        backgroundContent = backgroundContent,
         contentPadding = contentPadding,
         content = {
             withStyle(
@@ -122,7 +121,7 @@ public fun MaterialScope.iconButton(
  *   [ButtonDefaults.filledTonalButtonColors] and [ButtonDefaults.filledVariantButtonColors]. If
  *   using custom colors, it is important to choose a color pair from same role to ensure
  *   accessibility with sufficient color contrast.
- * @param background The background object to be used behind the content in the button. It is
+ * @param backgroundContent The background object to be used behind the content in the button. It is
  *   recommended to use the default styling that is automatically provided by only calling
  *   [backgroundImage] with the content. It can be combined with the specified
  *   [ButtonColors.container] behind it.
@@ -146,18 +145,16 @@ public fun MaterialScope.textButton(
     height: ContainerDimension = wrapWithMinTapTargetDimension(),
     shape: Corner = shapes.full,
     colors: ButtonColors = filledButtonColors(),
-    background: (MaterialScope.() -> LayoutElement)? = null,
+    backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     style: TextButtonStyle = defaultTextButtonStyle(),
     contentPadding: Padding = Padding.Builder().setAll(DEFAULT_CONTENT_PADDING_DP.toDp()).build()
 ): LayoutElement =
     button(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.background(color = colors.container, corner = shape),
         width = width,
         height = height,
-        shape = shape,
-        backgroundColor = colors.container,
-        background = background,
+        backgroundContent = backgroundContent,
         contentPadding = contentPadding,
         content = {
             withStyle(
@@ -184,15 +181,13 @@ public fun MaterialScope.textButton(
  * @param onClick Associated [Clickable] for click events. When the button is clicked it will fire
  *   the associated action.
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
- *   description using [contentDescription].
- * @param shape Defines the button's shape, in other words the corner radius for this button.
- * @param backgroundColor The color to be used as a background of this button. If the background
- *   image is also specified, the image will be laid out on top of this color. In case of the fully
- *   opaque background image, then this background color will not be shown.
- * @param background The background object to be used behind the content in the button. It is
+ *   description using [contentDescription]. If [LayoutModifier.background] modifier is used and the
+ *   the background image is also specified, the image will be laid out on top of this color. In
+ *   case of the fully opaque background image, then the background color will not be shown.
+ * @param backgroundContent The background object to be used behind the content in the button. It is
  *   recommended to use the default styling that is automatically provided by only calling
- *   [backgroundImage] with the content. It can be combined with the specified [backgroundColor]
- *   behind it.
+ *   [backgroundImage] with the content. It can be combined with the specified
+ *   [LayoutModifier.background] behind it.
  * @param width The width of this button. It's highly recommended to set this to [expand] or
  *   [weight]
  * @param height The height of this button. It's highly recommended to set this to [expand] or
@@ -215,19 +210,15 @@ public fun MaterialScope.button(
     height: ContainerDimension =
         if (content == null) IMAGE_BUTTON_DEFAULT_SIZE_DP.toDp()
         else wrapWithMinTapTargetDimension(),
-    shape: Corner = shapes.full,
-    backgroundColor: LayoutColor? = null,
-    background: (MaterialScope.() -> LayoutElement)? = null,
+    backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     contentPadding: Padding = Padding.Builder().setAll(DEFAULT_CONTENT_PADDING_DP.toDp()).build()
 ): LayoutElement =
     componentContainer(
         onClick = onClick,
-        modifier = modifier,
+        modifier = LayoutModifier.clip(shapes.full) then modifier,
         width = width,
         height = height,
-        shape = shape,
-        backgroundColor = backgroundColor,
-        background = background,
+        backgroundContent = backgroundContent,
         contentPadding = contentPadding,
         metadataTag = METADATA_TAG_BUTTON,
         content = content

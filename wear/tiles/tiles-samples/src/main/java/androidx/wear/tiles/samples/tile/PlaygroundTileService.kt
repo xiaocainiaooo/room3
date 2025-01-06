@@ -48,6 +48,7 @@ import androidx.wear.protolayout.material3.textButton
 import androidx.wear.protolayout.material3.textDataCard
 import androidx.wear.protolayout.material3.textEdgeButton
 import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.clickable
 import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.types.layoutString
 import androidx.wear.tiles.RequestBuilders
@@ -122,7 +123,7 @@ private fun tileLayout(
             mainSlot = { oneSlotButtons() },
             bottomSlot = {
                 textEdgeButton(
-                    onClick = EMPTY_LOAD_CLICKABLE,
+                    onClick = clickable(),
                     modifier = LayoutModifier.contentDescription("EdgeButton"),
                 ) {
                     text("Edge".layoutString)
@@ -134,7 +135,7 @@ private fun tileLayout(
 private fun MaterialScope.oneSlotButtons() = buttonGroup {
     buttonGroupItem {
         iconButton(
-            onClick = EMPTY_LOAD_CLICKABLE,
+            onClick = clickable(),
             modifier = LayoutModifier.contentDescription("Icon button"),
             width = expand(),
             iconContent = { icon(ICON_ID) }
@@ -142,7 +143,7 @@ private fun MaterialScope.oneSlotButtons() = buttonGroup {
     }
     buttonGroupItem {
         iconButton(
-            onClick = EMPTY_LOAD_CLICKABLE,
+            onClick = clickable(),
             modifier = LayoutModifier.contentDescription("Icon button"),
             width = expand(),
             shape = shapes.large,
@@ -151,7 +152,7 @@ private fun MaterialScope.oneSlotButtons() = buttonGroup {
     }
     buttonGroupItem {
         textButton(
-            onClick = EMPTY_LOAD_CLICKABLE,
+            onClick = clickable(),
             modifier = LayoutModifier.contentDescription("Text button"),
             width = expand(),
             style = smallTextButtonStyle(),
@@ -163,7 +164,7 @@ private fun MaterialScope.oneSlotButtons() = buttonGroup {
 
 private fun MaterialScope.appCardSample() =
     appCard(
-        onClick = EMPTY_LOAD_CLICKABLE,
+        onClick = clickable(),
         modifier = LayoutModifier.contentDescription("Sample Card"),
         colors =
             CardColors(
@@ -199,7 +200,7 @@ private fun MaterialScope.appCardSample() =
 
 private fun MaterialScope.graphicDataCardSample() =
     graphicDataCard(
-        onClick = EMPTY_LOAD_CLICKABLE,
+        onClick = clickable(),
         modifier = LayoutModifier.contentDescription("Graphic Data Card"),
         height = expand(),
         horizontalAlignment = LayoutElementBuilders.HORIZONTAL_ALIGN_END,
@@ -234,7 +235,7 @@ private fun MaterialScope.graphicDataCardSample() =
 private fun MaterialScope.dataCards() = buttonGroup {
     buttonGroupItem {
         textDataCard(
-            onClick = EMPTY_LOAD_CLICKABLE,
+            onClick = clickable(),
             modifier = LayoutModifier.contentDescription("Data Card with icon"),
             width = weight(1f),
             height = expand(),
@@ -247,7 +248,7 @@ private fun MaterialScope.dataCards() = buttonGroup {
     }
     buttonGroupItem {
         iconDataCard(
-            onClick = EMPTY_LOAD_CLICKABLE,
+            onClick = clickable(),
             modifier =
                 LayoutModifier.contentDescription(
                     "Compact Data Card without icon or secondary label"

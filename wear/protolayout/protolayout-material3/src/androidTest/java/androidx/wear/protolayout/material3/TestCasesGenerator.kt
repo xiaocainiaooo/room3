@@ -18,12 +18,10 @@ package androidx.wear.protolayout.material3
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.wear.protolayout.ActionBuilders
 import androidx.wear.protolayout.DeviceParametersBuilders
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.Box
-import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ModifiersBuilders.Background
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
@@ -36,6 +34,7 @@ import androidx.wear.protolayout.material3.DataCardStyle.Companion.smallCompactD
 import androidx.wear.protolayout.material3.MaterialGoldenTest.Companion.pxToDp
 import androidx.wear.protolayout.material3.TitleContentPlacementInDataCard.Companion.Bottom
 import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.clickable
 import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.layoutString
@@ -69,11 +68,7 @@ object TestCasesGenerator {
                 .setFontScale(1f)
                 .setScreenShape(DeviceParametersBuilders.SCREEN_SHAPE_RECT)
                 .build()
-        val clickable: ModifiersBuilders.Clickable =
-            ModifiersBuilders.Clickable.Builder()
-                .setOnClick(ActionBuilders.LaunchAction.Builder().build())
-                .setId("action_id")
-                .build()
+        val clickable = clickable(id = "action_id")
         val testCases: HashMap<String, LayoutElementBuilders.LayoutElement> = HashMap()
 
         testCases["primarylayout_edgebuttonfilled_buttongroup_iconoverride_golden$goldenSuffix"] =
@@ -217,7 +212,9 @@ object TestCasesGenerator {
                             modifier = LayoutModifier.contentDescription("Card"),
                             width = expand(),
                             height = expand(),
-                            background = { backgroundImage(protoLayoutResourceId = IMAGE_ID) }
+                            backgroundContent = {
+                                backgroundImage(protoLayoutResourceId = IMAGE_ID)
+                            }
                         ) {
                             text(
                                 "Card with image background".layoutString,

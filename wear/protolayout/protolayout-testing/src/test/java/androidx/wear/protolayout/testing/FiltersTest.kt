@@ -18,7 +18,6 @@ package androidx.wear.protolayout.testing
 
 import android.graphics.Color
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.wear.protolayout.ActionBuilders.LoadAction
 import androidx.wear.protolayout.ColorBuilders.ColorProp
 import androidx.wear.protolayout.DimensionBuilders.ProportionalDimensionProp
 import androidx.wear.protolayout.DimensionBuilders.dp
@@ -36,10 +35,10 @@ import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.ModifiersBuilders.ElementMetadata
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ModifiersBuilders.Semantics
-import androidx.wear.protolayout.StateBuilders
 import androidx.wear.protolayout.TypeBuilders.StringProp
 import androidx.wear.protolayout.expression.DynamicBuilders
 import androidx.wear.protolayout.layout.basicText
+import androidx.wear.protolayout.modifiers.loadAction
 import androidx.wear.protolayout.types.LayoutString
 import androidx.wear.protolayout.types.asLayoutConstraint
 import androidx.wear.protolayout.types.layoutString
@@ -70,32 +69,25 @@ class FiltersTest {
 
     @Test
     fun hasClickable_matches() {
-        val clickable = Clickable.Builder().setOnClick(LoadAction.Builder().build()).build()
+        val clickable = Clickable.Builder().setOnClick(loadAction()).build()
         val testElement =
             Column.Builder()
                 .setModifiers(Modifiers.Builder().setClickable(clickable).build())
                 .build()
 
-        assertThat(hasClickable(clickable).matches(testElement)).isTrue()
+        assertThat(hasClickable().matches(testElement)).isTrue()
     }
 
     @Test
     fun hasClickable_doesNotMatch() {
-        val clickable = Clickable.Builder().setOnClick(LoadAction.Builder().build()).build()
-        val otherClickable =
-            Clickable.Builder()
-                .setOnClick(
-                    LoadAction.Builder()
-                        .setRequestState(StateBuilders.State.Builder().build())
-                        .build()
-                )
-                .build()
+        val clickable = Clickable.Builder().setOnClick(loadAction()).build()
+        val action = loadAction {}
         val testElement =
             Column.Builder()
                 .setModifiers(Modifiers.Builder().setClickable(clickable).build())
                 .build()
 
-        assertThat(hasClickable(otherClickable).matches(testElement)).isFalse()
+        assertThat(hasClickable(action = action).matches(testElement)).isFalse()
     }
 
     @Test

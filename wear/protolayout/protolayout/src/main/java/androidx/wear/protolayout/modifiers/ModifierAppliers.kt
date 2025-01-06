@@ -18,6 +18,9 @@ package androidx.wear.protolayout.modifiers
 
 import androidx.annotation.RestrictTo
 import androidx.wear.protolayout.ModifiersBuilders
+import androidx.wear.protolayout.ModifiersBuilders.Background
+import androidx.wear.protolayout.ModifiersBuilders.Clickable
+import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.Semantics
 
 /** Creates a [ModifiersBuilders.Modifiers] from a [LayoutModifier]. */
@@ -28,17 +31,25 @@ fun LayoutModifier.toProtoLayoutModifiers(): ModifiersBuilders.Modifiers =
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 /** Creates a [ModifiersBuilders.Modifiers.Builder] from a [LayoutModifier]. */
 fun LayoutModifier.toProtoLayoutModifiersBuilder(): ModifiersBuilders.Modifiers.Builder {
-    data class AccumulatingModifier(val semantics: Semantics.Builder? = null)
+    var semantics: Semantics.Builder? = null
+    var background: Background.Builder? = null
+    var corners: Corner.Builder? = null
+    var clickable: Clickable.Builder? = null
 
-    val accumulatingModifier =
-        this.foldIn(AccumulatingModifier()) { acc, e ->
-            when (e) {
-                is BaseSemanticElement -> AccumulatingModifier(semantics = e.foldIn(acc.semantics))
-                else -> acc
-            }
+    this.foldIn(Unit) { _, e ->
+        when (e) {
+            is BaseSemanticElement -> semantics = e.foldIn(semantics)
+            is BaseBackgroundElement -> background = e.foldIn(background)
+            is BaseCornerElement -> corners = e.foldIn(corners)
+            is BaseClickableElement -> clickable = e.foldIn(clickable)
         }
+    }
+
+    corners?.let { background = (background ?: Background.Builder()).setCorner(it.build()) }
 
     return ModifiersBuilders.Modifiers.Builder().apply {
-        accumulatingModifier.semantics?.let { setSemantics(it.build()) }
+        semantics?.let { setSemantics(it.build()) }
+        background?.let { setBackground(it.build()) }
+        clickable?.let { setClickable(it.build()) }
     }
 }

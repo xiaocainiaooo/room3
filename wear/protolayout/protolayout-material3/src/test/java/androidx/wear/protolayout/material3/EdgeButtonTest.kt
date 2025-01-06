@@ -16,18 +16,19 @@
 
 package androidx.wear.protolayout.material3
 
+import android.content.ComponentName
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.wear.protolayout.ActionBuilders.LaunchAction
+import androidx.wear.protolayout.ActionBuilders.launchAction
 import androidx.wear.protolayout.DeviceParametersBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.Image
-import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.expression.AppDataKey
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicInt32
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.BOTTOM_MARGIN_DP
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.EDGE_BUTTON_HEIGHT_DP
 import androidx.wear.protolayout.modifiers.LayoutModifier
+import androidx.wear.protolayout.modifiers.clickable
 import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.testing.LayoutElementAssertionsProvider
 import androidx.wear.protolayout.testing.LayoutElementMatcher
@@ -173,10 +174,7 @@ class EdgeButtonTest {
                 .build()
 
         private val CLICKABLE =
-            Clickable.Builder()
-                .setOnClick(LaunchAction.Builder().build())
-                .setId("action_id")
-                .build()
+            clickable(action = launchAction(ComponentName("pkg", "cls")), id = "action_id")
 
         private const val CONTENT_DESCRIPTION = "it is an edge button"
 
