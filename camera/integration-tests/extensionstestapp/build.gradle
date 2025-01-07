@@ -31,6 +31,8 @@ plugins {
 }
 
 android {
+    compileSdk 35
+
     defaultConfig {
         applicationId = "androidx.camera.integration.extensions"
     }

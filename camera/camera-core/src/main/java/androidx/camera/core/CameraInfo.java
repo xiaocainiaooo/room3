@@ -17,6 +17,7 @@
 package androidx.camera.core;
 
 import android.graphics.ImageFormat;
+import android.hardware.camera2.CaptureRequest;
 import android.media.MediaActionSound;
 import android.util.Range;
 import android.view.Surface;
@@ -30,6 +31,7 @@ import androidx.camera.core.impl.ImageOutputConfig;
 import androidx.camera.core.internal.compat.MediaActionSoundCompat;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import org.jspecify.annotations.NonNull;
@@ -429,5 +431,39 @@ public interface CameraInfo {
     @Retention(RetentionPolicy.SOURCE)
     @RestrictTo(Scope.LIBRARY_GROUP)
     @interface ImplementationType {
+    }
+
+    /**
+     * Returns if low-light boost is supported on the device. Low-light boost can be turned on via
+     * {@link CameraControl#enableLowLightBoostAsync(boolean)}.
+     *
+     * @return true if
+     * {@link CaptureRequest#CONTROL_AE_MODE_ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY} is supported,
+     * otherwise false.
+     * @see CameraControl#enableLowLightBoostAsync(boolean)
+     * @see CaptureRequest#CONTROL_AE_MODE_ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY
+     */
+    @RestrictTo(Scope.LIBRARY_GROUP)
+    default boolean isLowLightBoostSupported() {
+        return false;
+    }
+
+    /**
+     * Returns a {@link LiveData} of current {@link LowLightBoostState}.
+     *
+     * <p>Low-light boost can be turned on via
+     * {@link CameraControl#enableLowLightBoostAsync(boolean)} which will trigger the change
+     * event to the returned {@link LiveData}. Apps can either get immediate value via
+     * {@link LiveData#getValue()} or observe it via
+     * {@link LiveData#observe(LifecycleOwner, Observer)} to update low-light boost UI accordingly.
+     *
+     * <p>If the camera doesn't support low-light boost, then the state will always be
+     * {@link LowLightBoostState#OFF}.
+     *
+     * @return a {@link LiveData} containing current low-light boost state.
+     */
+    @RestrictTo(Scope.LIBRARY_GROUP)
+    default @NonNull LiveData<Integer> getLowLightBoostState() {
+        return new MutableLiveData<>(LowLightBoostState.OFF);
     }
 }
