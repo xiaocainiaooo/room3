@@ -1802,12 +1802,23 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         if (ComposeUiFlags.isRectTrackingEnabled) {
             rectManager.remove(layoutNode)
         }
+        @OptIn(ExperimentalComposeUiApi::class)
+        if (autofillSupported() && ComposeUiFlags.isSemanticAutofillEnabled) {
+            _autofillManager?.onLayoutNodeDeactivated(layoutNode)
+        }
     }
 
-    override fun onLayoutNodeReused(layoutNode: LayoutNode, oldSemanticsId: Int) {
+    override fun onPreLayoutNodeReused(layoutNode: LayoutNode, oldSemanticsId: Int) {
         // Keep the mapping up to date when the semanticsId changes
         layoutNodes.remove(oldSemanticsId)
         layoutNodes[layoutNode.semanticsId] = layoutNode
+    }
+
+    override fun onPostLayoutNodeReused(layoutNode: LayoutNode, oldSemanticsId: Int) {
+        @OptIn(ExperimentalComposeUiApi::class)
+        if (autofillSupported() && ComposeUiFlags.isSemanticAutofillEnabled) {
+            _autofillManager?.onPostLayoutNodeReused(layoutNode, oldSemanticsId)
+        }
     }
 
     override fun onInteropViewLayoutChange(view: InteropView) {

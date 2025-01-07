@@ -289,8 +289,18 @@ internal interface Owner : PositionCalculator {
 
     fun onLayoutNodeDeactivated(layoutNode: LayoutNode)
 
-    /** Called to do internal upkeep when a [layoutNode] is reused. */
-    fun onLayoutNodeReused(layoutNode: LayoutNode, oldSemanticsId: Int) {}
+    /**
+     * Called to do internal upkeep when a [layoutNode] is reused. The modifier nodes of this layout
+     * node have not been attached by the time this method finishes running.
+     */
+    fun onPreLayoutNodeReused(layoutNode: LayoutNode, oldSemanticsId: Int) {}
+
+    /**
+     * Called to do internal upkeep when a [layoutNode] is reused. This is only called after
+     * [onPreLayoutNodeReused], at which point the modifier nodes of this layout node have been
+     * attached.
+     */
+    fun onPostLayoutNodeReused(layoutNode: LayoutNode, oldSemanticsId: Int) {}
 
     /**
      * The position and/or size of an interop view (typically, an android.view.View) has changed. On
