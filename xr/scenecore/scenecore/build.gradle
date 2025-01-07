@@ -78,7 +78,7 @@ android {
             }
         }
     }
-    namespace "androidx.xr.scenecore"
+    namespace = "androidx.xr.scenecore"
 }
 
 androidx {

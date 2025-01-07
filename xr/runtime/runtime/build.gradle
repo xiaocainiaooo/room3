@@ -55,7 +55,7 @@ dependencies {
 }
 
 android {
-    namespace "androidx.xr.runtime"
+    namespace = "androidx.xr.runtime"
     testOptions.unitTests.includeAndroidResources = true
     defaultConfig {
         consumerProguardFiles 'proguard-rules.pro'

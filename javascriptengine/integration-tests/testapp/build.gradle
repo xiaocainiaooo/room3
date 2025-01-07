@@ -42,7 +42,7 @@ dependencies {
 
 android {
     defaultConfig {
-        minSdk 28
+        minSdk = 28
     }
     lintOptions {
         disable "UnusedResources"
@@ -52,7 +52,7 @@ android {
             minifyEnabled true
         }
     }
-    namespace "com.example.androidx.javascriptengine"
+    namespace = "com.example.androidx.javascriptengine"
 }
 
 androidx {

@@ -68,7 +68,7 @@ android {
         //       Address API calls that require higher versions.
         minSdkVersion 30
     }
-    namespace "androidx.xr.compose"
+    namespace = "androidx.xr.compose"
 }
 
 androidx {
