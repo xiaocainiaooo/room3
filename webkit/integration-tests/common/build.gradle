@@ -39,7 +39,7 @@ dependencies {
 }
 
 android {
-    namespace "androidx.webkit.test.common"
+    namespace = "androidx.webkit.test.common"
 }
 
 androidx {
