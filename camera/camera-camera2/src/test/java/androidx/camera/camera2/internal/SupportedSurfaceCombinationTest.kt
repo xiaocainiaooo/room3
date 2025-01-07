@@ -123,7 +123,6 @@ private val PREVIEW_SIZE = Size(1280, 720)
 private val RECORD_SIZE = Size(3840, 2160)
 private val MAXIMUM_SIZE = Size(4032, 3024)
 private val LEGACY_VIDEO_MAXIMUM_SIZE = Size(1920, 1080)
-private val VIDEO_MAXIMUM_SIZE = Size(3840, 2160)
 private val DEFAULT_SUPPORTED_SIZES =
     arrayOf(
         Size(4032, 3024), // 4:3
@@ -310,9 +309,7 @@ class SupportedSurfaceCombinationTest {
 
     @Test
     fun checkLimitedSurfaceCombinationSupportedInLimitedDevice() {
-        setupCameraAndInitCameraX(
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
-        )
+        setupCameraAndInitCameraX(hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED)
         val supportedSurfaceCombination =
             SupportedSurfaceCombination(
                 context,
@@ -333,9 +330,7 @@ class SupportedSurfaceCombinationTest {
 
     @Test
     fun checkFullSurfaceCombinationNotSupportedInLimitedDevice() {
-        setupCameraAndInitCameraX(
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
-        )
+        setupCameraAndInitCameraX(hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED)
         val supportedSurfaceCombination =
             SupportedSurfaceCombination(
                 context,
@@ -356,9 +351,7 @@ class SupportedSurfaceCombinationTest {
 
     @Test
     fun checkLevel3SurfaceCombinationNotSupportedInLimitedDevice() {
-        setupCameraAndInitCameraX(
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
-        )
+        setupCameraAndInitCameraX(hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED)
         val supportedSurfaceCombination =
             SupportedSurfaceCombination(
                 context,
@@ -1154,7 +1147,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
         )
     }
 
@@ -1170,7 +1163,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
         )
     }
 
@@ -1186,7 +1179,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
         )
     }
 
@@ -1204,7 +1197,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
         )
     }
 
@@ -1222,7 +1215,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
         )
     }
 
@@ -1240,7 +1233,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
         )
     }
 
@@ -1259,7 +1252,7 @@ class SupportedSurfaceCombinationTest {
         assertThrows(IllegalArgumentException::class.java) {
             getSuggestedSpecsAndVerify(
                 useCaseExpectedResultMap,
-                hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
+                hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
             )
         }
     }
@@ -1389,7 +1382,7 @@ class SupportedSurfaceCombinationTest {
         assertThrows(IllegalArgumentException::class.java) {
             getSuggestedSpecsAndVerify(
                 useCaseExpectedResultMap,
-                hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
+                hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
             )
         }
     }
@@ -1482,7 +1475,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             capabilities =
                 intArrayOf(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE)
         )
@@ -1500,7 +1493,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             capabilities =
                 intArrayOf(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE)
         )
@@ -1518,7 +1511,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             capabilities =
                 intArrayOf(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE)
         )
@@ -1538,7 +1531,7 @@ class SupportedSurfaceCombinationTest {
             mutableMapOf<UseCase, Size>().apply { put(rawUseCase, MAXIMUM_SIZE) }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             capabilities = intArrayOf(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)
         )
     }
@@ -1555,7 +1548,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             capabilities = intArrayOf(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)
         )
     }
@@ -1574,7 +1567,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             capabilities = intArrayOf(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)
         )
     }
@@ -1593,7 +1586,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             capabilities = intArrayOf(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)
         )
     }
@@ -1612,7 +1605,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             capabilities = intArrayOf(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)
         )
     }
@@ -1631,7 +1624,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             capabilities = intArrayOf(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)
         )
     }
@@ -1650,7 +1643,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             capabilities = intArrayOf(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)
         )
     }
@@ -2047,7 +2040,7 @@ class SupportedSurfaceCombinationTest {
         assertThrows(IllegalArgumentException::class.java) {
             getSuggestedSpecsAndVerify(
                 useCaseExpectedSizeMap,
-                cameraMode = CameraMode.ULTRA_HIGH_RESOLUTION_CAMERA,
+                cameraMode = ULTRA_HIGH_RESOLUTION_CAMERA,
                 dynamicRangeProfiles = HLG10_CONSTRAINED
             )
         }
@@ -2604,7 +2597,7 @@ class SupportedSurfaceCombinationTest {
             mutableMapOf<UseCase, Size>().apply { put(useCase, Size(3840, 2160)) }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
         )
     }
 
@@ -2616,7 +2609,7 @@ class SupportedSurfaceCombinationTest {
             mutableMapOf<UseCase, Size>().apply { put(useCase, Size(800, 450)) }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
         )
     }
 
@@ -2651,7 +2644,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             compareWithAtMost = true
         )
     }
@@ -2670,7 +2663,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             compareWithAtMost = true
         )
     }
@@ -2688,7 +2681,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             compareWithAtMost = true
         )
     }
@@ -2706,7 +2699,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             compareWithAtMost = true
         )
     }
@@ -2734,7 +2727,7 @@ class SupportedSurfaceCombinationTest {
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
             attachedSurfaceInfoList = listOf(attachedSurfaceInfo),
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             compareWithAtMost = true
         )
     }
@@ -2762,7 +2755,7 @@ class SupportedSurfaceCombinationTest {
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
             attachedSurfaceInfoList = listOf(attachedSurfaceInfo),
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             compareWithAtMost = true
         )
     }
@@ -2790,7 +2783,7 @@ class SupportedSurfaceCombinationTest {
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
             attachedSurfaceInfoList = listOf(attachedSurfaceInfo),
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
             compareWithAtMost = true
         )
     }
@@ -3082,7 +3075,7 @@ class SupportedSurfaceCombinationTest {
             }
         getSuggestedSpecsAndVerify(
             useCaseExpectedResultMap,
-            hardwareLevel = CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
+            hardwareLevel = INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED
         )
     }
 
@@ -3242,7 +3235,7 @@ class SupportedSurfaceCombinationTest {
         val resultPair =
             getSuggestedSpecsAndVerify(
                 useCaseExpectedResultMap,
-                cameraMode = CameraMode.ULTRA_HIGH_RESOLUTION_CAMERA,
+                cameraMode = ULTRA_HIGH_RESOLUTION_CAMERA,
             )
         assertThat(resultPair.first.size).isEqualTo(2)
         assertThat(
@@ -3641,7 +3634,7 @@ class SupportedSurfaceCombinationTest {
             Mockito.mock(StreamConfigurationMap::class.java).also { map ->
                 supportedSizes?.let {
                     // Sets up the supported sizes
-                    Mockito.`when`(map.getOutputSizes(ArgumentMatchers.anyInt())).thenReturn(it)
+                    Mockito.`when`(map.getOutputSizes(anyInt())).thenReturn(it)
                     // ImageFormat.PRIVATE was supported since API level 23. Before that, the
                     // supported
                     // output sizes need to be retrieved via SurfaceTexture.class.
@@ -3657,7 +3650,7 @@ class SupportedSurfaceCombinationTest {
                 // minimum frame durations were designated only for the purpose of testing
                 Mockito.`when`(
                         map.getOutputMinFrameDuration(
-                            ArgumentMatchers.anyInt(),
+                            anyInt(),
                             ArgumentMatchers.eq(Size(4032, 3024))
                         )
                     )
@@ -3665,7 +3658,7 @@ class SupportedSurfaceCombinationTest {
 
                 Mockito.`when`(
                         map.getOutputMinFrameDuration(
-                            ArgumentMatchers.anyInt(),
+                            anyInt(),
                             ArgumentMatchers.eq(Size(3840, 2160))
                         )
                     )
@@ -3673,7 +3666,7 @@ class SupportedSurfaceCombinationTest {
 
                 Mockito.`when`(
                         map.getOutputMinFrameDuration(
-                            ArgumentMatchers.anyInt(),
+                            anyInt(),
                             ArgumentMatchers.eq(Size(1920, 1440))
                         )
                     )
@@ -3681,7 +3674,7 @@ class SupportedSurfaceCombinationTest {
 
                 Mockito.`when`(
                         map.getOutputMinFrameDuration(
-                            ArgumentMatchers.anyInt(),
+                            anyInt(),
                             ArgumentMatchers.eq(Size(1920, 1080))
                         )
                     )
@@ -3689,7 +3682,7 @@ class SupportedSurfaceCombinationTest {
 
                 Mockito.`when`(
                         map.getOutputMinFrameDuration(
-                            ArgumentMatchers.anyInt(),
+                            anyInt(),
                             ArgumentMatchers.eq(Size(1280, 960))
                         )
                     )
@@ -3697,39 +3690,30 @@ class SupportedSurfaceCombinationTest {
 
                 Mockito.`when`(
                         map.getOutputMinFrameDuration(
-                            ArgumentMatchers.anyInt(),
+                            anyInt(),
                             ArgumentMatchers.eq(Size(1280, 720))
                         )
                     )
                     .thenReturn(22222222L) // 45, size preview/display
 
                 Mockito.`when`(
-                        map.getOutputMinFrameDuration(
-                            ArgumentMatchers.anyInt(),
-                            ArgumentMatchers.eq(Size(960, 544))
-                        )
+                        map.getOutputMinFrameDuration(anyInt(), ArgumentMatchers.eq(Size(960, 544)))
                     )
                     .thenReturn(20000000L) // 50
 
                 Mockito.`when`(
-                        map.getOutputMinFrameDuration(
-                            ArgumentMatchers.anyInt(),
-                            ArgumentMatchers.eq(Size(800, 450))
-                        )
+                        map.getOutputMinFrameDuration(anyInt(), ArgumentMatchers.eq(Size(800, 450)))
                     )
                     .thenReturn(16666666L) // 60fps
 
                 Mockito.`when`(
-                        map.getOutputMinFrameDuration(
-                            ArgumentMatchers.anyInt(),
-                            ArgumentMatchers.eq(Size(640, 480))
-                        )
+                        map.getOutputMinFrameDuration(anyInt(), ArgumentMatchers.eq(Size(640, 480)))
                     )
                     .thenReturn(16666666L) // 60fps
 
                 // Sets up the supported high resolution sizes
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    Mockito.`when`(map.getHighResolutionOutputSizes(ArgumentMatchers.anyInt()))
+                    Mockito.`when`(map.getHighResolutionOutputSizes(anyInt()))
                         .thenReturn(supportedHighResolutionSizes)
                 }
 
@@ -3773,11 +3757,11 @@ class SupportedSurfaceCombinationTest {
                         maximumResolutionHighResolutionSupportedSizes != null)
             ) {
                 Mockito.mock(StreamConfigurationMap::class.java).also {
-                    Mockito.`when`(it.getOutputSizes(ArgumentMatchers.anyInt()))
+                    Mockito.`when`(it.getOutputSizes(anyInt()))
                         .thenReturn(maximumResolutionSupportedSizes)
                     Mockito.`when`(it.getOutputSizes(SurfaceTexture::class.java))
                         .thenReturn(maximumResolutionSupportedSizes)
-                    Mockito.`when`(it.getHighResolutionOutputSizes(ArgumentMatchers.anyInt()))
+                    Mockito.`when`(it.getHighResolutionOutputSizes(anyInt()))
                         .thenReturn(maximumResolutionHighResolutionSupportedSizes)
                 }
             } else {
@@ -3839,21 +3823,19 @@ class SupportedSurfaceCombinationTest {
                 set(CameraCharacteristics.SCALER_AVAILABLE_STREAM_USE_CASES, uc)
             }
 
-            val vs: IntArray
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                vs =
+            val vs: IntArray =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     intArrayOf(
                         CameraCharacteristics.CONTROL_VIDEO_STABILIZATION_MODE_OFF,
                         CameraCharacteristics.CONTROL_VIDEO_STABILIZATION_MODE_ON,
                         CameraCharacteristics.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION
                     )
-            } else {
-                vs =
+                } else {
                     intArrayOf(
                         CameraCharacteristics.CONTROL_VIDEO_STABILIZATION_MODE_OFF,
                         CameraCharacteristics.CONTROL_VIDEO_STABILIZATION_MODE_ON
                     )
-            }
+                }
             set(CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES, vs)
 
             capabilities?.let { set(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES, it) }
@@ -3889,9 +3871,9 @@ class SupportedSurfaceCombinationTest {
         val cameraX: CameraX =
             try {
                 CameraXUtil.getOrCreateInstance(context) { cameraXConfig }.get()
-            } catch (e: ExecutionException) {
+            } catch (_: ExecutionException) {
                 throw IllegalStateException("Unable to initialize CameraX for test.")
-            } catch (e: InterruptedException) {
+            } catch (_: InterruptedException) {
                 throw IllegalStateException("Unable to initialize CameraX for test.")
             }
         useCaseConfigFactory = cameraX.defaultConfigFactory
