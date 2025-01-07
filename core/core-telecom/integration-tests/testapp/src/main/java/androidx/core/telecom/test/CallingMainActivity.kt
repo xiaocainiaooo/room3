@@ -79,6 +79,8 @@ class CallingMainActivity : Activity() {
     private lateinit var mNotificationManager: NotificationManager
     private val mNotificationActionInfoFlow: MutableStateFlow<NotificationActionInfo> =
         MutableStateFlow(NotificationActionInfo(-1, false))
+    // Files
+    private lateinit var mFileProvider: VoipAppFileProvider
 
     /**
      * NotificationActionInfo couples information propagated from the Call-Style notification on
@@ -94,6 +96,7 @@ class CallingMainActivity : Activity() {
         mContext = applicationContext
         initNotifications(mContext)
         mCallsManager = CallsManager(this)
+        mFileProvider = VoipAppFileProvider().init(applicationContext)
 
         val raiseHandCheckBox = findViewById<CheckBox>(R.id.RaiseHandCheckbox)
         val kickParticipantCheckBox = findViewById<CheckBox>(R.id.KickPartCheckbox)
@@ -154,7 +157,7 @@ class CallingMainActivity : Activity() {
         }
 
         // setup the adapters which hold the endpoint and call rows
-        mAdapter = CallListAdapter(mCallObjects, null)
+        mAdapter = CallListAdapter(mCallObjects, null, mFileProvider)
         mPreCallEndpointAdapter = PreCallEndpointsAdapter(mCurrentPreCallEndpoints)
 
         // set up the view holders
@@ -224,13 +227,13 @@ class CallingMainActivity : Activity() {
         isKickParticipantEnabled: Boolean
     ) {
         Log.i(TAG, "addCallWithAttributes: attributes=$attributes")
-        val callObject = VoipCall(this, attributes)
-        callObject.setNotificationId(mNextNotificationId++)
+        val callObject = VoipCall(this, attributes, mNextNotificationId++)
+        mFileProvider.writeCallIconBitMapToFile(callObject)
 
         try {
             val handler = CoroutineExceptionHandler { _, exception ->
                 Log.i(TAG, "CoroutineExceptionHandler: handling e=$exception")
-                NotificationsUtilities.clearNotification(mContext, callObject.mNotificationId)
+                NotificationsUtilities.clearNotification(mContext, callObject.notificationId)
             }
             val job =
                 mScope.launch(handler) {
@@ -248,7 +251,7 @@ class CallingMainActivity : Activity() {
                     } finally {
                         NotificationsUtilities.clearNotification(
                             mContext,
-                            callObject.mNotificationId
+                            callObject.notificationId
                         )
                         Log.i(TAG, "addCallWithAttributes: finally block")
                     }
@@ -256,7 +259,7 @@ class CallingMainActivity : Activity() {
             callObject.setJob(job)
         } catch (e: Exception) {
             logException(e, "addCallWithAttributes: catch outer")
-            NotificationsUtilities.clearNotification(mContext, callObject.mNotificationId)
+            NotificationsUtilities.clearNotification(mContext, callObject.notificationId)
         }
     }
 
@@ -283,7 +286,7 @@ class CallingMainActivity : Activity() {
 
             launch {
                 mNotificationActionInfoFlow.collect {
-                    if (it.id == callObject.mNotificationId) {
+                    if (it.id == callObject.notificationId) {
                         if (it.isAnswer) {
                             answer(CallAttributesCompat.CALL_TYPE_AUDIO_CALL)
                         } else {
@@ -311,12 +314,12 @@ class CallingMainActivity : Activity() {
         if (it.isAnswer) {
             NotificationsUtilities.updateNotificationToOngoing(
                 mContext,
-                callObject.mNotificationId,
+                callObject.notificationId,
                 NOTIFICATION_CHANNEL_ID,
                 attributes.displayName.toString()
             )
         } else {
-            NotificationsUtilities.clearNotification(mContext, callObject.mNotificationId)
+            NotificationsUtilities.clearNotification(mContext, callObject.notificationId)
         }
     }
 
@@ -382,7 +385,7 @@ class CallingMainActivity : Activity() {
                 addCallRow(callObject)
                 launch {
                     mNotificationActionInfoFlow.collect {
-                        if (it.id == callObject.mNotificationId) {
+                        if (it.id == callObject.notificationId) {
                             if (it.isAnswer) {
                                 answer(CallAttributesCompat.CALL_TYPE_AUDIO_CALL)
                             } else {
@@ -453,12 +456,12 @@ class CallingMainActivity : Activity() {
         val notification =
             NotificationsUtilities.createInitialCallStyleNotification(
                 mContext,
-                voipCall.mNotificationId,
+                voipCall.notificationId,
                 NOTIFICATION_CHANNEL_ID,
                 attributes.displayName.toString(),
                 attributes.direction == DIRECTION_OUTGOING
             )
-        mNotificationManager.notify(voipCall.mNotificationId, notification)
+        mNotificationManager.notify(voipCall.notificationId, notification)
     }
 
     private fun logException(e: Exception, prefix: String) {
