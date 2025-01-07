@@ -27,6 +27,7 @@ import androidx.wear.protolayout.ResourceBuilders
 import androidx.wear.protolayout.ResourceBuilders.AndroidImageResourceByResId
 import androidx.wear.protolayout.ResourceBuilders.ImageResource
 import androidx.wear.protolayout.TimelineBuilders
+import androidx.wear.protolayout.material3.ButtonDefaults.filledVariantButtonColors
 import androidx.wear.protolayout.material3.CardColors
 import androidx.wear.protolayout.material3.CardDefaults.filledTonalCardColors
 import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
@@ -138,6 +139,7 @@ private fun MaterialScope.oneSlotButtons() = buttonGroup {
             onClick = clickable(),
             modifier = LayoutModifier.contentDescription("Icon button"),
             width = expand(),
+            height = expand(),
             iconContent = { icon(ICON_ID) }
         )
     }
@@ -146,7 +148,8 @@ private fun MaterialScope.oneSlotButtons() = buttonGroup {
             onClick = clickable(),
             modifier = LayoutModifier.contentDescription("Icon button"),
             width = expand(),
-            shape = shapes.large,
+            height = expand(),
+            shape = shapes.none,
             iconContent = { icon(ICON_ID) }
         )
     }
@@ -155,8 +158,10 @@ private fun MaterialScope.oneSlotButtons() = buttonGroup {
             onClick = clickable(),
             modifier = LayoutModifier.contentDescription("Text button"),
             width = expand(),
+            height = expand(),
             style = smallTextButtonStyle(),
-            shape = shapes.large,
+            shape = shapes.extraSmall,
+            colors = filledVariantButtonColors(),
             labelContent = { text("Dec".layoutString) }
         )
     }
