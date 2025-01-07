@@ -56,6 +56,7 @@ import static androidx.camera.video.internal.utils.DynamicRangeUtil.videoProfile
 import static androidx.camera.video.internal.utils.DynamicRangeUtil.videoProfileHdrFormatsToDynamicRangeEncoding;
 import static androidx.core.util.Preconditions.checkState;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 
@@ -145,6 +146,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -195,6 +197,7 @@ public final class VideoCapture<T extends VideoOutput> extends UseCase {
     private boolean mHasCompensatingTransformation = false;
     private @Nullable SourceStreamRequirementObserver mSourceStreamRequirementObserver;
     private SessionConfig.@Nullable CloseableErrorListener mCloseableErrorListener;
+    private Map<Quality, List<Size>> mQualityToCustomSizesMap = emptyMap();
 
     /**
      * Create a VideoCapture associated with the given {@link VideoOutput}.
@@ -336,6 +339,44 @@ public final class VideoCapture<T extends VideoOutput> extends UseCase {
      */
     public @Nullable ResolutionInfo getResolutionInfo() {
         return getResolutionInfoInternal();
+    }
+
+    /**
+     * Returns the selected Quality.
+     *
+     * <p>The selected Quality represents the final quality level chosen for the stream. The
+     * selected Quality will be one of the specified qualities from the {@link QualitySelector}
+     * provided by the associated {@link VideoOutput}. If {@link Quality#HIGHEST} or
+     * {@link Quality#LOWEST} is specified in the selector, it will be resolved to an actual
+     * Quality value. Even if the stream is later cropped (e.g., by using a {@link ViewPort}), this
+     * value represents the original quality level of the stream.
+     *
+     * <p>This method will return the selected Quality only after the use case is bound using
+     * {@link androidx.camera.lifecycle.ProcessCameraProvider#bindToLifecycle}. Otherwise, it
+     * will return null. The selected Quality may change if the use case is unbound and then
+     * rebound.
+     *
+     * @return The selected Quality if the use case is bound, or null otherwise.
+     */
+    public @Nullable Quality getSelectedQuality() {
+        StreamSpec streamSpec = getAttachedStreamSpec();
+        if (streamSpec == null) {
+            return null;
+        }
+        // In the general case, there should be an exact match from configured resolution to
+        // Quality.
+        Size configuredResolution = streamSpec.getOriginalConfiguredResolution();
+        for (Map.Entry<Quality, List<Size>> entry : mQualityToCustomSizesMap.entrySet()) {
+            if (entry.getValue().contains(configuredResolution)) {
+                return entry.getKey(); // Found exact match, no need to check further
+            }
+        }
+        Logger.w(TAG, "Can't find matched Quality for " + configuredResolution);
+
+        // Fallback to find the nearest available quality. This can occur when StreamSharing
+        // is unable to downscale/crop the camera stream according to the UseCase's preferred
+        // resolution and instead returns the original camera stream resolution.
+        return findNearestSizeFor(mQualityToCustomSizesMap, configuredResolution);
     }
 
     @RestrictTo(Scope.LIBRARY_GROUP)
@@ -1456,64 +1497,83 @@ public final class VideoCapture<T extends VideoOutput> extends UseCase {
                 requestedDynamicRange);
         QualityRatioToResolutionsTable qualityRatioTable = new QualityRatioToResolutionsTable(
                 cameraInfo.getSupportedResolutions(getImageFormat()), supportedQualityToSizeMap);
-        List<Size> customOrderedResolutions = new ArrayList<>();
+        // Use LinkedHashMap to maintain the order.
+        LinkedHashMap<Quality, List<Size>> orderedQualityToSizesMap = new LinkedHashMap<>();
         for (Quality selectedQuality : selectedQualities) {
-            customOrderedResolutions.addAll(
+            orderedQualityToSizesMap.put(selectedQuality,
                     qualityRatioTable.getResolutions(selectedQuality, aspectRatio));
         }
-        List<Size> filteredCustomOrderedResolutions = filterOutEncoderUnsupportedResolutions(
-                (VideoCaptureConfig<T>) builder.getUseCaseConfig(), mediaSpec,
-                requestedDynamicRange, videoCapabilities, customOrderedResolutions,
-                supportedQualityToSizeMap);
+        LinkedHashMap<Quality, List<Size>> filteredOrderedQualityToSizesMap =
+                filterOutEncoderUnsupportedResolutions(
+                        (VideoCaptureConfig<T>) builder.getUseCaseConfig(), mediaSpec,
+                        requestedDynamicRange, videoCapabilities, orderedQualityToSizesMap,
+                        supportedQualityToSizeMap);
+        List<Size> filteredCustomOrderedResolutions = new ArrayList<>();
+        for (List<Size> resolutions : filteredOrderedQualityToSizesMap.values()) {
+            filteredCustomOrderedResolutions.addAll(resolutions);
+        }
         Logger.d(TAG, "Set custom ordered resolutions = " + filteredCustomOrderedResolutions);
         builder.getMutableConfig().insertOption(OPTION_CUSTOM_ORDERED_RESOLUTIONS,
                 filteredCustomOrderedResolutions);
+        mQualityToCustomSizesMap = filteredOrderedQualityToSizesMap;
     }
 
-    private static @NonNull List<Size> filterOutEncoderUnsupportedResolutions(
+    private static @NonNull LinkedHashMap<Quality, List<Size>>
+            filterOutEncoderUnsupportedResolutions(
             @NonNull VideoCaptureConfig<?> config,
             @NonNull MediaSpec mediaSpec,
             @NonNull DynamicRange dynamicRange,
             @NonNull VideoCapabilities videoCapabilities,
-            @NonNull List<Size> resolutions,
+            @NonNull LinkedHashMap<Quality, List<Size>> qualityToSizesOrderedMap,
             @NonNull Map<Quality, Size> supportedQualityToSizeMap
     ) {
-        if (resolutions.isEmpty()) {
-            return resolutions;
+        if (qualityToSizesOrderedMap.isEmpty()) {
+            return new LinkedHashMap<>();
         }
 
-        Iterator<Size> iterator = resolutions.iterator();
-        while (iterator.hasNext()) {
-            Size resolution = iterator.next();
-            // To improve performance, there is no need to check for supported qualities'
-            // resolutions because the encoder should support them.
-            if (supportedQualityToSizeMap.containsValue(resolution)) {
-                continue;
+        LinkedHashMap<Quality, List<Size>> filteredQualityToSizesOrderedMap = new LinkedHashMap<>();
+        for (Map.Entry<Quality, List<Size>> entry : qualityToSizesOrderedMap.entrySet()) {
+            // Copy the size list first and filter out the unsupported resolutions.
+            List<Size> filteredSizeList = new ArrayList<>(entry.getValue());
+            Iterator<Size> sizeIterator = filteredSizeList.iterator();
+            while (sizeIterator.hasNext()) {
+                Size resolution = sizeIterator.next();
+                // To improve performance, there is no need to check for supported qualities'
+                // resolutions because the encoder should support them.
+                if (supportedQualityToSizeMap.containsValue(resolution)) {
+                    continue;
+                }
+                // We must find EncoderProfiles for each resolution because the EncoderProfiles
+                // found by resolution may contain different video mine type which leads to
+                // different codec.
+                VideoValidatedEncoderProfilesProxy encoderProfiles =
+                        videoCapabilities.findNearestHigherSupportedEncoderProfilesFor(resolution,
+                                dynamicRange);
+                if (encoderProfiles == null) {
+                    continue;
+                }
+                // If the user set a non-fully specified target DynamicRange, there could be
+                // multiple videoProfiles that matches to the DynamicRange. Find the one with the
+                // largest supported size as a workaround.
+                // If the suggested StreamSpec(i.e. DynamicRange + resolution) is unfortunately over
+                // codec supported size, then rely on surface processing (OpenGL) to resize the
+                // camera stream.
+                VideoEncoderInfo videoEncoderInfo = findLargestSupportedSizeVideoEncoderInfo(
+                        config.getVideoEncoderInfoFinder(), encoderProfiles, dynamicRange,
+                        mediaSpec, resolution,
+                        requireNonNull(config.getTargetFrameRate(Defaults.DEFAULT_FPS_RANGE)));
+                if (videoEncoderInfo != null && !videoEncoderInfo.isSizeSupportedAllowSwapping(
+                        resolution.getWidth(), resolution.getHeight())) {
+                    sizeIterator.remove();
+                }
             }
-            // We must find EncoderProfiles for each resolution because the EncoderProfiles found
-            // by resolution may contain different video mine type which leads to different codec.
-            VideoValidatedEncoderProfilesProxy encoderProfiles =
-                    videoCapabilities.findNearestHigherSupportedEncoderProfilesFor(resolution,
-                            dynamicRange);
-            if (encoderProfiles == null) {
-                continue;
-            }
-            // If the user set a non-fully specified target DynamicRange, there could be multiple
-            // videoProfiles that matches to the DynamicRange. Find the one with the largest
-            // supported size as a workaround.
-            // If the suggested StreamSpec(i.e. DynamicRange + resolution) is unfortunately over
-            // codec supported size, then rely on surface processing (OpenGL) to resize the
-            // camera stream.
-            VideoEncoderInfo videoEncoderInfo = findLargestSupportedSizeVideoEncoderInfo(
-                    config.getVideoEncoderInfoFinder(), encoderProfiles, dynamicRange,
-                    mediaSpec, resolution,
-                    requireNonNull(config.getTargetFrameRate(Defaults.DEFAULT_FPS_RANGE)));
-            if (videoEncoderInfo != null && !videoEncoderInfo.isSizeSupportedAllowSwapping(
-                    resolution.getWidth(), resolution.getHeight())) {
-                iterator.remove();
+
+            // Put the filtered size list only when it is not empty.
+            if (!filteredSizeList.isEmpty()) {
+                filteredQualityToSizesOrderedMap.put(entry.getKey(), filteredSizeList);
             }
         }
-        return resolutions;
+        return filteredQualityToSizesOrderedMap;
     }
 
     private static @Nullable VideoEncoderInfo findLargestSupportedSizeVideoEncoderInfo(
@@ -1553,6 +1613,32 @@ public final class VideoCapture<T extends VideoOutput> extends UseCase {
             }
         }
         return sizeLargestVideoEncoderInfo;
+    }
+
+    /**
+     * Finds the Quality with the size closest to the target size based on area.
+     *
+     * @param sizeMap The map of Quality to a list of Size`s.
+     * @param targetSize The target size to compare against.
+     * @return The Quality with the closest size, or `null` if no match is found.
+     */
+    private static @Nullable Quality findNearestSizeFor(
+            @NonNull Map<Quality, List<Size>> sizeMap, @NonNull Size targetSize) {
+        int targetArea = getArea(targetSize);
+        Quality nearestQuality = null;
+        int minAreaDiff = Integer.MAX_VALUE;
+
+        for (Map.Entry<Quality, List<Size>> entry : sizeMap.entrySet()) {
+            for (Size size : entry.getValue()) {
+                int areaDiff = Math.abs(getArea(size) - targetArea);
+                if (areaDiff < minAreaDiff) {
+                    minAreaDiff = areaDiff;
+                    nearestQuality = entry.getKey();
+                }
+            }
+        }
+
+        return nearestQuality;
     }
 
     /**
