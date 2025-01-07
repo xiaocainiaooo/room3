@@ -37,6 +37,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -83,19 +85,29 @@ fun Surface(
     glow: Glow = SurfaceDefaults.glow,
     content: @Composable (BoxScope.() -> Unit)
 ) {
-    SurfaceImpl(
-        modifier = modifier,
-        selected = false,
-        enabled = true,
-        tonalElevation = tonalElevation,
-        shape = shape,
-        color = colors.containerColor,
-        contentColor = colors.contentColor,
-        scale = 1.0f,
-        border = border,
-        glow = glow,
-        content = content
-    )
+    val absoluteElevation = LocalAbsoluteTonalElevation.current + tonalElevation
+
+    CompositionLocalProvider(
+        LocalContentColor provides colors.contentColor,
+        LocalAbsoluteTonalElevation provides absoluteElevation
+    ) {
+        val backgroundColorByState =
+            surfaceColorAtElevation(
+                color = colors.containerColor,
+                elevation = LocalAbsoluteTonalElevation.current
+            )
+
+        Box(
+            modifier =
+                modifier
+                    .ifElse(API_28_OR_ABOVE, Modifier.tvSurfaceGlow(shape, glow))
+                    .ifElse(border != Border.None, Modifier.tvSurfaceBorder(shape, border))
+                    .background(backgroundColorByState, shape)
+                    .clip(shape),
+            propagateMinConstraints = true,
+            content = content
+        )
+    }
 }
 
 /**
