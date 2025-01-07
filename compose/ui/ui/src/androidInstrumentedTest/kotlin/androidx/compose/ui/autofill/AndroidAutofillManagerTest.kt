@@ -18,11 +18,22 @@ package androidx.compose.ui.autofill
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ComposeUiFlags
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -48,6 +59,8 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlin.test.Ignore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -740,6 +753,103 @@ class AndroidAutofillManagerTest {
         // `requestAutofill` is always called after an element is focused
         rule.runOnIdle { hasFocus = true }
         rule.runOnIdle { verifyNoMoreInteractions(am) }
+    }
+
+    @Test
+    @SmallTest
+    fun autofillManager_lazyColumnScroll_callsCommit() {
+        lateinit var state: LazyListState
+        lateinit var coroutineScope: CoroutineScope
+        val am: PlatformAutofillManager = mock()
+        val count = 100
+
+        rule.setContent {
+            coroutineScope = rememberCoroutineScope()
+            state = rememberLazyListState()
+            (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
+
+            LazyColumn(Modifier.fillMaxWidth().height(50.dp), state) {
+                item {
+                    Box(
+                        Modifier.semantics {
+                                contentType = ContentType.Username
+                                contentDataType = ContentDataType.Text
+                            }
+                            .size(10.dp)
+                    )
+                }
+                items(count) { Box(Modifier.size(10.dp)) }
+            }
+        }
+
+        rule.runOnIdle { coroutineScope.launch { state.scrollToItem(10) } }
+
+        rule.runOnIdle { verify(am).commit() }
+    }
+
+    @Test
+    @SmallTest
+    fun autofillManager_columnScroll_doesNotCallCommit() {
+        lateinit var scrollState: ScrollState
+        lateinit var coroutineScope: CoroutineScope
+        val am: PlatformAutofillManager = mock()
+
+        rule.setContent {
+            coroutineScope = rememberCoroutineScope()
+            scrollState = rememberScrollState()
+            (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
+
+            Column(Modifier.fillMaxWidth().height(50.dp).verticalScroll(scrollState)) {
+                Row {
+                    Box(
+                        Modifier.semantics {
+                                contentType = ContentType.Username
+                                contentDataType = ContentDataType.Text
+                            }
+                            .size(10.dp)
+                    )
+                }
+                repeat(50) { Box(Modifier.size(10.dp)) }
+            }
+        }
+
+        rule.runOnIdle { coroutineScope.launch { scrollState.scrollTo(scrollState.maxValue / 2) } }
+
+        // Scrolling past an element in a column is not enough to call commit
+        rule.runOnIdle { verify(am, never()).commit() }
+    }
+
+    @Test
+    @SmallTest
+    fun autofillManager_column_nodesDisappearingCallsCommit() {
+        lateinit var scrollState: ScrollState
+        val am: PlatformAutofillManager = mock()
+        var autofillComponentsVisible by mutableStateOf(true)
+
+        rule.setContent {
+            (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
+            scrollState = rememberScrollState()
+
+            Column(Modifier.fillMaxWidth().height(50.dp).verticalScroll(scrollState)) {
+                if (autofillComponentsVisible) {
+                    Row {
+                        Box(
+                            Modifier.semantics {
+                                    contentType = ContentType.Username
+                                    contentDataType = ContentDataType.Text
+                                }
+                                .size(10.dp)
+                        )
+                    }
+                }
+                repeat(50) { Box(Modifier.size(10.dp)) }
+            }
+        }
+
+        rule.runOnIdle { autofillComponentsVisible = false }
+
+        // A column disappearing will call commit
+        rule.runOnIdle { verify(am).commit() }
     }
 
     // ============================================================================================

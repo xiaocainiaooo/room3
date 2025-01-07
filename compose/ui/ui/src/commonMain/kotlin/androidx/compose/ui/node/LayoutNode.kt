@@ -1377,7 +1377,7 @@ internal class LayoutNode(
         }
         val oldSemanticsId = semanticsId
         semanticsId = generateSemanticsId()
-        owner?.onLayoutNodeReused(this, oldSemanticsId)
+        owner?.onPreLayoutNodeReused(this, oldSemanticsId)
         // resetModifierState detaches all nodes, so we need to re-attach them upon reuse.
         nodes.markAsAttached()
         nodes.runAttachLifecycle()
@@ -1386,6 +1386,7 @@ internal class LayoutNode(
             invalidateSemantics()
         }
         rescheduleRemeasureOrRelayout(this)
+        owner?.onPostLayoutNodeReused(this, oldSemanticsId)
     }
 
     override fun onDeactivate() {
