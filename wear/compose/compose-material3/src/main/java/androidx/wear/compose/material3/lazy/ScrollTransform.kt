@@ -93,7 +93,7 @@ public fun Modifier.scrollTransform(
  * [TransformingLazyColumnItemScope]. It adjusts the height, position, applies scaling and morphing
  * effects as the item scrolls.
  *
- * @sample androidx.wear.compose.material3.samples.TransformingLazyColumnScalingMorphingEffectSample
+ * @sample androidx.wear.compose.material3.samples.TransformingLazyColumnScrollingSample
  * @param scope The [TransformingLazyColumnItemScope] provides access to the item's index and key.
  * @param shape [Shape] of the background.
  * @param painter [Painter] to use for the background.
@@ -137,7 +137,7 @@ public fun Modifier.scrollTransform(
  * [Shape] and background [Color] (or [Painter]) so the modifier can do the background drawing and
  * apply specific effects to background and content, as in the Material spec.
  *
- * @sample androidx.wear.compose.material3.samples.TransformingLazyColumnScalingMorphingEffectSample
+ * @sample androidx.wear.compose.material3.samples.TransformingLazyColumnScrollingSample
  * @param scope The [TransformingLazyColumnItemScope] provides access to the item's index and key.
  */
 @Composable
