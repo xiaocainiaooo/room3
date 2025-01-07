@@ -25,7 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 
 // The presence of an ActionBar follows from the theme set in AndroidManifest.xml
-class CustomComposeHostActivity : ComponentActivity() {
+class ActivityWithActionBar : ComponentActivity() {
     private lateinit var composeHolder: ComposeView
 
     override fun onCreate(savedInstanceState: Bundle?) {
