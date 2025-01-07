@@ -18,6 +18,7 @@ package androidx.pdf.viewer.fragment
 
 import android.net.Uri
 import androidx.annotation.RestrictTo
+import androidx.core.os.OperationCanceledException
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -330,7 +331,7 @@ internal class PdfDocumentViewModel(
             _fragmentUiScreenState.update { PdfFragmentUiState.PasswordRequested(passwordFailed) }
 
             /** Enable [passwordFailed] for subsequent password attempts. */
-            if (!passwordFailed) passwordFailed = true
+            passwordFailed = true
         } catch (exception: Exception) {
             /** Generic exception handling, move to [PdfFragmentUiState.DocumentError] state. */
             _fragmentUiScreenState.update { PdfFragmentUiState.DocumentError(exception) }
@@ -377,6 +378,16 @@ internal class PdfDocumentViewModel(
     private fun IntRange.getCenterPage(): Int {
         val size = endInclusive - first + 1
         return first + size / 2
+    }
+
+    fun passwordDialogCancelled() {
+        /** Resets the [passwordFailed] state after a password dialog is cancelled. */
+        passwordFailed = false
+        _fragmentUiScreenState.update {
+            PdfFragmentUiState.DocumentError(
+                OperationCanceledException("Password cancelled. Cannot open PDF.")
+            )
+        }
     }
 
     @Suppress("UNCHECKED_CAST")

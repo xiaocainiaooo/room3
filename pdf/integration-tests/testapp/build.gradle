@@ -21,6 +21,11 @@ android {
     viewBinding {
         enabled = true
     }
+
+    testOptions {
+        // speed up execution and improve flakiness of instrumented tests.
+        animationsDisabled = true
+    }
 }
 
 dependencies {
