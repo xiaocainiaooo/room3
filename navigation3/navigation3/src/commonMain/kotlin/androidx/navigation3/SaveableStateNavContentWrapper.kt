@@ -72,7 +72,12 @@ public class SaveableStateNavContentWrapper : NavContentWrapper {
         DisposableEffect(key1 = key) {
             refCount[key] = refCount.getOrDefault(key, 0).plus(1)
             onDispose {
-                if (refCount[key] == 0) {
+                // We need to check to make sure that the refcount has been cleared here because
+                // when we are using animations, if the entire back stack is changed, we will
+                // execute the onDispose above that clears all of the counts before we finish the
+                // transition and run this onDispose so our count will already be gone and we
+                // should just remove the state.
+                if (!refCount.contains(key) || refCount[key] == 0) {
                     savedStateHolder?.removeState(key)
                 } else {
                     refCount[key] =

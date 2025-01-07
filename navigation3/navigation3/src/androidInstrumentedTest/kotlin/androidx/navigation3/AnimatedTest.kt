@@ -27,7 +27,7 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.kruth.assertThat
-import androidx.navigation3.AnimatedNavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
+import androidx.navigation3.NavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import kotlin.test.Test
@@ -36,7 +36,7 @@ import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class AnimatedNavDisplayTest {
+class AnimatedTest {
     @get:Rule val composeTestRule = createComposeRule()
 
     @Test
@@ -48,7 +48,7 @@ class AnimatedNavDisplayTest {
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first) }
             val manager = rememberNavWrapperManager(emptyList())
-            AnimatedNavDisplay(backstack, wrapperManager = manager) {
+            NavDisplay(backstack, wrapperManager = manager) {
                 when (it) {
                     first -> NavRecord(first) { Text(first) }
                     second -> NavRecord(second) { Text(second) }
@@ -92,7 +92,7 @@ class AnimatedNavDisplayTest {
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first) }
             val manager = rememberNavWrapperManager(emptyList())
-            AnimatedNavDisplay(backstack, wrapperManager = manager) {
+            NavDisplay(backstack, wrapperManager = manager) {
                 when (it) {
                     first ->
                         NavRecord(
@@ -104,7 +104,7 @@ class AnimatedNavDisplayTest {
                         NavRecord(
                             second,
                             featureMap =
-                                AnimatedNavDisplay.transition(
+                                NavDisplay.transition(
                                     enter = fadeIn(tween(customDuration)),
                                     exit = fadeOut(tween(customDuration))
                                 )

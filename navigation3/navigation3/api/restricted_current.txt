@@ -1,16 +1,6 @@
 // Signature format: 4.0
 package androidx.navigation3 {
 
-  public final class AnimatedNavDisplay {
-    method public java.util.Map<java.lang.String,java.lang.Object> isDialog(boolean boolean);
-    method public java.util.Map<java.lang.String,java.lang.Object> transition(androidx.compose.animation.EnterTransition? enter, androidx.compose.animation.ExitTransition? exit);
-    field public static final androidx.navigation3.AnimatedNavDisplay INSTANCE;
-  }
-
-  public final class AnimatedNavDisplay_androidKt {
-    method @androidx.compose.runtime.Composable public static <T> void AnimatedNavDisplay(java.util.List<? extends T> backstack, androidx.navigation3.NavWrapperManager wrapperManager, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.Alignment contentAlignment, optional androidx.compose.animation.SizeTransform? sizeTransform, optional androidx.compose.animation.EnterTransition enterTransition, optional androidx.compose.animation.ExitTransition exitTransition, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavRecord<? extends T>> recordProvider);
-  }
-
   public interface NavContentWrapper {
     method @androidx.compose.runtime.Composable public default void WrapBackStack(java.util.List<?> backStack);
     method @androidx.compose.runtime.Composable public <T> void WrapContent(androidx.navigation3.NavRecord<T> record);
@@ -18,11 +8,12 @@ package androidx.navigation3 {
 
   public final class NavDisplay {
     method public java.util.Map<java.lang.String,java.lang.Object> isDialog(boolean boolean);
+    method public java.util.Map<java.lang.String,java.lang.Object> transition(androidx.compose.animation.EnterTransition? enter, androidx.compose.animation.ExitTransition? exit);
     field public static final androidx.navigation3.NavDisplay INSTANCE;
   }
 
   public final class NavDisplay_androidKt {
-    method @androidx.compose.runtime.Composable public static <T> void NavDisplay(java.util.List<? extends T> backstack, androidx.navigation3.NavWrapperManager wrapperManager, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavRecord<? extends T>> recordProvider);
+    method @androidx.compose.runtime.Composable public static <T> void NavDisplay(java.util.List<? extends T> backstack, androidx.navigation3.NavWrapperManager wrapperManager, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.Alignment contentAlignment, optional androidx.compose.animation.SizeTransform? sizeTransform, optional androidx.compose.animation.EnterTransition enterTransition, optional androidx.compose.animation.ExitTransition exitTransition, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavRecord<? extends T>> recordProvider);
   }
 
   public final class NavRecord<T> {
