@@ -89,14 +89,14 @@ interface HealthConnectFeatures {
             mapOf(
                 FEATURE_READ_HEALTH_DATA_IN_BACKGROUND to
                     HealthConnectVersionInfo(
-                        apkVersionCode = 165072,
+                        apkVersionCode = 171302,
                         platformVersion = SDK_EXT_13_PLATFORM_VERSION
                     ),
                 FEATURE_SKIN_TEMPERATURE to
                     HealthConnectVersionInfo(platformVersion = SDK_EXT_13_PLATFORM_VERSION),
                 FEATURE_READ_HEALTH_DATA_HISTORY to
                     HealthConnectVersionInfo(
-                        apkVersionCode = 165072,
+                        apkVersionCode = 171302,
                         platformVersion = SDK_EXT_13_PLATFORM_VERSION
                     ),
                 FEATURE_PLANNED_EXERCISE to
