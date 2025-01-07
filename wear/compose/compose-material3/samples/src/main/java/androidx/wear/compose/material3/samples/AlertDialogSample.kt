@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.AlertDialog
 import androidx.wear.compose.material3.AlertDialogDefaults
@@ -39,6 +40,7 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.SwitchButton
 import androidx.wear.compose.material3.Text
 
+@Preview
 @Sampled
 @Composable
 fun AlertDialogWithConfirmAndDismissSample() {
@@ -83,6 +85,7 @@ fun AlertDialogWithConfirmAndDismissSample() {
     )
 }
 
+@Preview
 @Sampled
 @Composable
 fun AlertDialogWithEdgeButtonSample() {
@@ -119,6 +122,7 @@ fun AlertDialogWithEdgeButtonSample() {
     )
 }
 
+@Preview
 @Sampled
 @Composable
 fun AlertDialogWithContentGroupsSample() {

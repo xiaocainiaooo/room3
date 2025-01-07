@@ -31,7 +31,7 @@ import androidx.wear.compose.material3.samples.EdgeButtonSample
 import androidx.wear.compose.material3.samples.EdgeSwipeForSwipeToDismiss
 import androidx.wear.compose.material3.samples.HorizontalPagerScaffoldSample
 import androidx.wear.compose.material3.samples.ListHeaderSample
-import androidx.wear.compose.material3.samples.ScaffoldSample
+import androidx.wear.compose.material3.samples.ScaffoldWithEdgeButtonSample
 import androidx.wear.compose.material3.samples.SimpleSwipeToDismissBox
 import androidx.wear.compose.material3.samples.StatefulSwipeToDismissBox
 import androidx.wear.compose.material3.samples.SwipeToRevealNonAnchoredSample
@@ -74,7 +74,7 @@ val WearMaterial3Demos =
                 Material3DemoCategory(
                     "Scaffold",
                     listOf(
-                        ComposableDemo("Screen Scaffold") { ScaffoldSample() },
+                        ComposableDemo("Screen Scaffold") { ScaffoldWithEdgeButtonSample() },
                         ComposableDemo("Horizontal Pager Scaffold") {
                             HorizontalPagerScaffoldSample()
                         },
