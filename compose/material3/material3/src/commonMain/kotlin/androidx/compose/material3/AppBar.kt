@@ -106,7 +106,6 @@ import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.util.fastFirst
 import androidx.compose.ui.util.fastMaxOfOrNull
 import androidx.compose.ui.util.fastSumBy
-import kotlin.jvm.JvmInline
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -224,7 +223,7 @@ fun TopAppBar(
         titleTextStyle = AppBarSmallTokens.TitleFont.value,
         subtitle = null,
         subtitleTextStyle = TextStyle.Default,
-        titleHorizontalAlignment = TopAppBarTitleAlignment.Start,
+        titleHorizontalAlignment = Alignment.Start,
         navigationIcon = navigationIcon,
         actions = actions,
         expandedHeight =
@@ -349,7 +348,7 @@ fun CenterAlignedTopAppBar(
         titleTextStyle = AppBarSmallTokens.TitleFont.value,
         subtitle = null,
         subtitleTextStyle = TextStyle.Default,
-        titleHorizontalAlignment = TopAppBarTitleAlignment.Center,
+        titleHorizontalAlignment = Alignment.CenterHorizontally,
         navigationIcon = navigationIcon,
         actions = actions,
         expandedHeight =
@@ -408,7 +407,7 @@ fun TopAppBar(
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
-    titleHorizontalAlignment: TopAppBarTitleAlignment = TopAppBarTitleAlignment.Start,
+    titleHorizontalAlignment: Alignment.Horizontal = Alignment.Start,
     expandedHeight: Dp = TopAppBarDefaults.TopAppBarExpandedHeight,
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
@@ -563,7 +562,7 @@ fun MediumTopAppBar(
         subtitleTextStyle = TextStyle.Default,
         smallSubtitle = null,
         smallSubtitleTextStyle = TextStyle.Default,
-        titleHorizontalAlignment = TopAppBarTitleAlignment.Start,
+        titleHorizontalAlignment = Alignment.Start,
         navigationIcon = navigationIcon,
         actions = actions,
         collapsedHeight =
@@ -639,7 +638,7 @@ fun MediumFlexibleTopAppBar(
     subtitle: (@Composable () -> Unit)? = null,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
-    titleHorizontalAlignment: TopAppBarTitleAlignment = TopAppBarTitleAlignment.Start,
+    titleHorizontalAlignment: Alignment.Horizontal = Alignment.Start,
     collapsedHeight: Dp = TopAppBarDefaults.MediumAppBarCollapsedHeight,
     expandedHeight: Dp =
         if (subtitle != null) {
@@ -815,7 +814,7 @@ fun LargeTopAppBar(
         subtitleTextStyle = TextStyle.Default,
         smallSubtitle = null,
         smallSubtitleTextStyle = TextStyle.Default,
-        titleHorizontalAlignment = TopAppBarTitleAlignment.Start,
+        titleHorizontalAlignment = Alignment.Start,
         navigationIcon = navigationIcon,
         actions = actions,
         collapsedHeight =
@@ -891,7 +890,7 @@ fun LargeFlexibleTopAppBar(
     subtitle: (@Composable () -> Unit)? = null,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
-    titleHorizontalAlignment: TopAppBarTitleAlignment = TopAppBarTitleAlignment.Start,
+    titleHorizontalAlignment: Alignment.Horizontal = Alignment.Start,
     collapsedHeight: Dp = TopAppBarDefaults.LargeAppBarCollapsedHeight,
     expandedHeight: Dp =
         if (subtitle != null) {
@@ -2006,22 +2005,6 @@ class TopAppBarColors(
     }
 }
 
-/** This class defines ways title and subtitle can be aligned along a TopAppBar's main axis. */
-@ExperimentalMaterial3ExpressiveApi
-@JvmInline
-value class TopAppBarTitleAlignment private constructor(internal val value: Int) {
-    companion object {
-        /** Start align the title and subtitle if present */
-        val Start = TopAppBarTitleAlignment(-1)
-
-        /** Center align the title and subtitle if present */
-        val Center = TopAppBarTitleAlignment(0)
-
-        /** End align the title and subtitle if present */
-        val End = TopAppBarTitleAlignment(1)
-    }
-}
-
 /**
  * A BottomAppBarScrollBehavior defines how a bottom app bar should behave when the content under it
  * is scrolled.
@@ -2403,7 +2386,7 @@ private fun SingleRowTopAppBar(
     titleTextStyle: TextStyle,
     subtitle: (@Composable () -> Unit)?,
     subtitleTextStyle: TextStyle,
-    titleHorizontalAlignment: TopAppBarTitleAlignment,
+    titleHorizontalAlignment: Alignment.Horizontal,
     navigationIcon: @Composable () -> Unit,
     actions: @Composable RowScope.() -> Unit,
     expandedHeight: Dp,
@@ -2525,7 +2508,7 @@ private fun TwoRowsTopAppBar(
     subtitleTextStyle: TextStyle,
     smallSubtitle: (@Composable () -> Unit)?,
     smallSubtitleTextStyle: TextStyle,
-    titleHorizontalAlignment: TopAppBarTitleAlignment,
+    titleHorizontalAlignment: Alignment.Horizontal,
     navigationIcon: @Composable () -> Unit,
     actions: @Composable RowScope.() -> Unit,
     collapsedHeight: Dp,
@@ -2708,7 +2691,7 @@ private fun TopAppBarLayout(
     subtitleTextStyle: TextStyle,
     titleAlpha: () -> Float,
     titleVerticalArrangement: Arrangement.Vertical,
-    titleHorizontalAlignment: TopAppBarTitleAlignment,
+    titleHorizontalAlignment: Alignment.Horizontal,
     titleBottomPadding: Int,
     hideTitleSemantics: Boolean,
     navigationIcon: @Composable () -> Unit,
@@ -2733,12 +2716,7 @@ private fun TopAppBarLayout(
                                 else Modifier
                             )
                             .graphicsLayer { alpha = titleAlpha() },
-                    horizontalAlignment =
-                        when (titleHorizontalAlignment) {
-                            TopAppBarTitleAlignment.Start -> Alignment.Start
-                            TopAppBarTitleAlignment.Center -> Alignment.CenterHorizontally
-                            else -> Alignment.End
-                        }
+                    horizontalAlignment = titleHorizontalAlignment
                 ) {
                     ProvideContentColorTextStyle(
                         contentColor = titleContentColor,
@@ -2800,7 +2778,7 @@ private fun TopAppBarLayout(
 private class TopAppBarMeasurePolicy(
     val scrolledOffset: FloatProducer,
     val titleVerticalArrangement: Arrangement.Vertical,
-    val titleHorizontalAlignment: TopAppBarTitleAlignment,
+    val titleHorizontalAlignment: Alignment.Horizontal,
     val titleBottomPadding: Int,
     val expandedHeight: Dp
 ) : MeasurePolicy {
@@ -2911,7 +2889,7 @@ private class TopAppBarMeasurePolicy(
             titlePlaceable.placeRelative(
                 x =
                     when (titleHorizontalAlignment) {
-                        TopAppBarTitleAlignment.Center -> {
+                        Alignment.CenterHorizontally -> {
                             var baseX = (constraints.maxWidth - titlePlaceable.width) / 2
                             if (baseX < navigationIconPlaceable.width) {
                                 // May happen if the navigation is wider than the actions and the
@@ -2930,10 +2908,10 @@ private class TopAppBarMeasurePolicy(
                             }
                             baseX
                         }
-                        TopAppBarTitleAlignment.End ->
+                        Alignment.End ->
                             constraints.maxWidth - titlePlaceable.width - actionIconsPlaceable.width
-                        // TopAppBarTitleAlignment.Start
-                        // An TopAppBarTitleInset will make sure the title is offset in case the
+                        // Fallback to Alignment.Start.
+                        // A TopAppBarTitleInset will make sure the title is offset in case the
                         // navigation icon is missing.
                         else -> max(TopAppBarTitleInset.roundToPx(), navigationIconPlaceable.width)
                     },
