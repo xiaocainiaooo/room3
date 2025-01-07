@@ -16,8 +16,6 @@
 
 package androidx.wear.compose.material3
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
@@ -96,7 +94,6 @@ import java.time.temporal.ChronoField
  *   whether to show seconds or AM/PM selector as well as hours and minutes.
  * @param colors [TimePickerColors] be applied to the TimePicker.
  */
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 public fun TimePicker(
     initialTime: LocalTime,
@@ -595,7 +592,6 @@ private fun getTimePickerStyles(
 }
 
 /* Returns the picker data for the third column (AM/PM or seconds) based on the time picker type. */
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun getOptionalThirdPicker(
     timePickerType: TimePickerType,
