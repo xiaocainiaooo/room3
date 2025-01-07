@@ -1442,13 +1442,13 @@ public object ButtonDefaults {
             bottom = ButtonVerticalPadding
         )
 
-    /** The size of the icon when used with text inside a "[CompactButton]. */
+    /** The recommended icon size when used in [CompactButton]s containing both icon and text. */
     public val ExtraSmallIconSize: Dp = CompactButtonTokens.IconSize
 
-    /** The icon size for use with a CompactButton that has icon-only content. */
+    /** The recommended icon size when used in [CompactButton]s containing icon-only content. */
     public val SmallIconSize: Dp = CompactButtonTokens.IconOnlyIconSize
 
-    /** The default size of the icon when used inside a [Button]. */
+    /** The recommended default size for icons when used inside a [Button]. */
     public val IconSize: Dp = FilledButtonTokens.IconSize
 
     /** The recommended icon size when used in [Button]s for icons such as an app icon */
@@ -1494,7 +1494,7 @@ public object ButtonDefaults {
 
     /**
      * The default size of the spacing between an icon and a text when they are used inside a
-     * [Button].
+     * [Button] or [CompactButton].
      */
     public val IconSpacing: Dp = 6.dp
 
