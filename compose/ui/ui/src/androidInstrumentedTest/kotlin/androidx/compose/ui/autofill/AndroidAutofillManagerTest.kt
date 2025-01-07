@@ -20,6 +20,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,19 +40,23 @@ import androidx.compose.ui.ComposeUiFlags
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.platform.LocalAutofillManager
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDataType
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.editableText
-import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.onAutofillText
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -67,11 +72,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.verifyZeroInteractions
 
 @SdkSuppress(minSdkVersion = 26)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -135,30 +142,31 @@ class AndroidAutofillManagerTest {
         rule.runOnIdle { isVisible = true }
 
         // `commit` should not be called when an autofillable component appears onscreen.
-        rule.runOnIdle { verify(am, times(0)).commit() }
+        rule.runOnIdle { verify(am, never()).commit() }
     }
 
     @Test
     @SmallTest
     fun autofillManager_doNotCallCommit_autofillTagsAdded() {
         val am: PlatformAutofillManager = mock()
-        var isRelatedToAutofill by mutableStateOf(false)
+        var hasContentType by mutableStateOf(false)
 
         rule.setContent {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             Box(
                 modifier =
-                    if (isRelatedToAutofill)
-                        Modifier.semantics {
-                                contentType = ContentType.Username
-                                contentDataType = ContentDataType.Text
+                    Modifier.then(
+                            if (hasContentType) {
+                                Modifier.semantics { contentType = ContentType.Username }
+                            } else {
+                                Modifier
                             }
-                            .size(height, width)
-                    else Modifier.size(height, width)
+                        )
+                        .size(height, width)
             )
         }
 
-        rule.runOnIdle { isRelatedToAutofill = true }
+        rule.runOnIdle { hasContentType = true }
 
         // `commit` should not be called a component becomes relevant to autofill.
         rule.runOnIdle { verify(am, times(0)).commit() }
@@ -179,7 +187,7 @@ class AndroidAutofillManagerTest {
 
         rule.runOnIdle { revealFirstUsername = false }
 
-        // `commit` should be called when an autofillable component leaves the screen.
+        // `commit` should be called when an autofill-able component leaves the screen.
         rule.runOnIdle { verify(am, times(1)).commit() }
     }
 
@@ -203,8 +211,8 @@ class AndroidAutofillManagerTest {
         rule.runOnIdle { revealFirstUsername = false }
         rule.runOnIdle { revealSecondUsername = true }
 
-        // `commit` should be called when an autofillable component leaves onscreen, even when
-        // another, different autofillable component is added.
+        // `commit` should be called when an autofill-able component leaves onscreen, even when
+        // another, different autofill-able component is added.
         rule.runOnIdle { verify(am, times(1)).commit() }
     }
 
@@ -221,10 +229,13 @@ class AndroidAutofillManagerTest {
                 Box(
                     modifier =
                         Modifier.then(
-                            if (semanticsExist)
-                                Modifier.semantics { contentDescription = "contentDescription" }
-                            else Modifier.size(height, width)
-                        )
+                                if (semanticsExist) {
+                                    Modifier.semantics { contentDescription = "contentDescription" }
+                                } else {
+                                    Modifier
+                                }
+                            )
+                            .size(height, width)
                 )
             }
         }
@@ -241,25 +252,26 @@ class AndroidAutofillManagerTest {
     fun autofillManager_callCommit_nodesBecomeAutofillRelatedAndDisappear() {
         val am: PlatformAutofillManager = mock()
         var isVisible by mutableStateOf(true)
-        var isRelatedToAutofill by mutableStateOf(false)
+        var hasContentType by mutableStateOf(false)
 
         rule.setContent {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             if (isVisible) {
                 Box(
                     modifier =
-                        if (isRelatedToAutofill)
-                            Modifier.semantics {
-                                    contentType = ContentType.Username
-                                    contentDataType = ContentDataType.Text
+                        Modifier.then(
+                                if (hasContentType) {
+                                    Modifier.semantics { contentType = ContentType.Username }
+                                } else {
+                                    Modifier
                                 }
-                                .size(height, width)
-                        else Modifier.size(height, width)
+                            )
+                            .size(height, width)
                 )
             }
         }
 
-        rule.runOnIdle { isRelatedToAutofill = true }
+        rule.runOnIdle { hasContentType = true }
         rule.runOnIdle { isVisible = false }
 
         // `commit` should be called when component becomes autofillable, then leaves the screen.
@@ -445,22 +457,19 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notifyViewEntered_previousFocusFalse() {
         val am: PlatformAutofillManager = mock()
-        var hasFocus by mutableStateOf(false)
-
         rule.setContent {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             Box(
                 Modifier.semantics {
-                        contentType = ContentType.Username
-                        contentDataType = ContentDataType.Text
-                        focused = hasFocus
+                        testTag = "username"
                         onAutofillText { true }
                     }
                     .size(height, width)
+                    .focusable()
             )
         }
 
-        rule.runOnIdle { hasFocus = true }
+        rule.onNodeWithTag("username").requestFocus()
 
         rule.runOnIdle { verify(am).notifyViewEntered(any(), any(), any()) }
     }
@@ -470,21 +479,20 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notAutofillable_notifyViewEntered_previousFocusFalse() {
         val am: PlatformAutofillManager = mock()
-        var hasFocus by mutableStateOf(false)
-
         rule.setContent {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             Box(
                 Modifier.semantics {
+                        testTag = "username"
                         contentType = ContentType.Username
                         contentDataType = ContentDataType.Text
-                        focused = hasFocus
                     }
                     .size(height, width)
+                    .focusable()
             )
         }
 
-        rule.runOnIdle { hasFocus = true }
+        rule.onNodeWithTag("username").requestFocus()
 
         rule.runOnIdle { verifyNoMoreInteractions(am) }
     }
@@ -494,25 +502,20 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notifyViewEntered_previousFocusNull() {
         val am: PlatformAutofillManager = mock()
-        var hasFocus by mutableStateOf(false)
-
         rule.setContent {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             Box(
                 modifier =
-                    if (hasFocus)
-                        Modifier.semantics {
-                                contentType = ContentType.Username
-                                contentDataType = ContentDataType.Text
-                                focused = hasFocus
-                                onAutofillText { true }
-                            }
-                            .size(height, width)
-                    else plainVisibleModifier("usernameTag")
+                    Modifier.semantics {
+                            testTag = "username"
+                            onAutofillText { true }
+                        }
+                        .size(height, width)
+                        .focusable()
             )
         }
 
-        rule.runOnIdle { hasFocus = true }
+        rule.onNodeWithTag("username").requestFocus()
 
         rule.runOnIdle { verify(am).notifyViewEntered(any(), any(), any()) }
     }
@@ -520,51 +523,25 @@ class AndroidAutofillManagerTest {
     @Test
     @SmallTest
     @SdkSuppress(minSdkVersion = 26)
-    fun autofillManager_notifyViewEntered_itemNotAutofillable() {
-        val am: PlatformAutofillManager = mock()
-        var hasFocus by mutableStateOf(false)
-
-        rule.setContent {
-            (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
-            Box(
-                modifier =
-                    if (hasFocus)
-                        Modifier.semantics {
-                                contentType = ContentType.Username
-                                contentDataType = ContentDataType.Text
-                                focused = hasFocus
-                            }
-                            .size(height, width)
-                    else plainVisibleModifier("usernameTag")
-            )
-        }
-
-        rule.runOnIdle { hasFocus = true }
-
-        rule.runOnIdle { verifyNoMoreInteractions(am) }
-    }
-
-    @Test
-    @SmallTest
-    @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notifyViewExited_previousFocusTrue() {
         val am: PlatformAutofillManager = mock()
-        var hasFocus by mutableStateOf(true)
-
+        lateinit var focusManager: FocusManager
         rule.setContent {
+            focusManager = LocalFocusManager.current
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             Box(
                 Modifier.semantics {
-                        contentType = ContentType.Username
-                        contentDataType = ContentDataType.Text
-                        focused = hasFocus
+                        testTag = "username"
                         onAutofillText { true }
                     }
                     .size(height, width)
+                    .focusable()
             )
         }
+        rule.onNodeWithTag("username").requestFocus()
+        rule.runOnIdle { clearInvocations(am) }
 
-        rule.runOnIdle { hasFocus = false }
+        rule.runOnIdle { focusManager.clearFocus() }
 
         rule.runOnIdle { verify(am).notifyViewExited(any(), any()) }
     }
@@ -574,23 +551,17 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 26)
     fun autofillManager_notifyViewExited_previouslyFocusedItemNotAutofillable() {
         val am: PlatformAutofillManager = mock()
-        var hasFocus by mutableStateOf(true)
-
+        lateinit var focusManager: FocusManager
         rule.setContent {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
-            Box(
-                Modifier.semantics {
-                        contentType = ContentType.Username
-                        contentDataType = ContentDataType.Text
-                        focused = hasFocus
-                    }
-                    .size(height, width)
-            )
+            focusManager = LocalFocusManager.current
+            Box(Modifier.semantics { testTag = "username" }.size(height, width).focusable())
         }
 
-        rule.runOnIdle { hasFocus = false }
+        rule.onNodeWithTag("username").requestFocus()
+        rule.runOnIdle { focusManager.clearFocus() }
 
-        rule.runOnIdle { verifyNoMoreInteractions(am) }
+        rule.runOnIdle { verifyZeroInteractions(am) }
     }
 
     @Ignore // TODO(b/383198004): Add support for notifyVisibilityChanged.
@@ -599,15 +570,16 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 27)
     fun autofillManager_notifyVisibilityChanged_disappeared() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "usernameTag"
         var isVisible by mutableStateOf(true)
 
         rule.setContent {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             Box(
                 modifier =
-                    if (isVisible) plainVisibleModifier(usernameTag)
-                    else invisibleModifier(usernameTag)
+                    Modifier.then(if (isVisible) Modifier else Modifier.alpha(0f))
+                        .semantics { onAutofillText { true } }
+                        .size(width, height)
+                        .focusable()
             )
         }
 
@@ -622,15 +594,16 @@ class AndroidAutofillManagerTest {
     @SdkSuppress(minSdkVersion = 27)
     fun autofillManager_notifyVisibilityChanged_appeared() {
         val am: PlatformAutofillManager = mock()
-        val usernameTag = "username_tag"
         var isVisible by mutableStateOf(false)
 
         rule.setContent {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
             Box(
                 modifier =
-                    if (isVisible) plainVisibleModifier(usernameTag)
-                    else invisibleModifier(usernameTag)
+                    Modifier.then(if (isVisible) Modifier else Modifier.alpha(0f))
+                        .semantics { onAutofillText { true } }
+                        .size(width, height)
+                        .focusable()
             )
         }
 
@@ -693,29 +666,24 @@ class AndroidAutofillManagerTest {
         val am: PlatformAutofillManager = mock()
         val contextMenuTag = "menu_tag"
         var autofillManager: AutofillManager?
-        var hasFocus by mutableStateOf(false)
 
         rule.setContent {
             autofillManager = LocalAutofillManager.current
             (autofillManager as AndroidAutofillManager).platformAutofillManager = am
             Box(
                 modifier =
-                    if (hasFocus)
-                        Modifier.semantics {
-                                contentType = ContentType.Username
-                                contentDataType = ContentDataType.Text
-                                focused = hasFocus
-                                onAutofillText { true }
-                            }
-                            .clickable { autofillManager?.requestAutofillForActiveElement() }
-                            .size(height, width)
-                            .testTag(contextMenuTag)
-                    else plainVisibleModifier(contextMenuTag)
+                    Modifier.semantics {
+                            testTag = contextMenuTag
+                            onAutofillText { true }
+                        }
+                        .focusProperties { canFocus = true }
+                        .clickable { autofillManager?.requestAutofillForActiveElement() }
+                        .size(height, width)
             )
         }
 
         // `requestAutofill` is always called after an element is focused
-        rule.runOnIdle { hasFocus = true }
+        rule.onNodeWithTag(contextMenuTag).requestFocus()
         rule.runOnIdle { verify(am).notifyViewEntered(any(), any(), any()) }
 
         // then `requestAutofill` is called on that same previously focused element
@@ -730,28 +698,25 @@ class AndroidAutofillManagerTest {
         val am: PlatformAutofillManager = mock()
         val contextMenuTag = "menu_tag"
         var autofillManager: AutofillManager?
-        var hasFocus by mutableStateOf(false)
 
         rule.setContent {
             autofillManager = LocalAutofillManager.current
             (autofillManager as AndroidAutofillManager).platformAutofillManager = am
             Box(
                 modifier =
-                    if (hasFocus)
-                        Modifier.semantics {
-                                contentType = ContentType.Username
-                                contentDataType = ContentDataType.Text
-                                focused = hasFocus
-                            }
-                            .clickable { autofillManager?.requestAutofillForActiveElement() }
-                            .size(height, width)
-                            .testTag(contextMenuTag)
-                    else plainVisibleModifier(contextMenuTag)
+                    Modifier.semantics { testTag = contextMenuTag }
+                        .focusProperties { canFocus = true }
+                        .clickable { autofillManager?.requestAutofillForActiveElement() }
+                        .size(height, width)
             )
         }
 
         // `requestAutofill` is always called after an element is focused
-        rule.runOnIdle { hasFocus = true }
+        rule.onNodeWithTag(contextMenuTag).requestFocus()
+        rule.runOnIdle { verifyZeroInteractions(am) }
+
+        // then `requestAutofill` is called on that same previously focused element
+        rule.onNodeWithTag(contextMenuTag).performClick()
         rule.runOnIdle { verifyNoMoreInteractions(am) }
     }
 
@@ -769,15 +734,7 @@ class AndroidAutofillManagerTest {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
 
             LazyColumn(Modifier.fillMaxWidth().height(50.dp), state) {
-                item {
-                    Box(
-                        Modifier.semantics {
-                                contentType = ContentType.Username
-                                contentDataType = ContentDataType.Text
-                            }
-                            .size(10.dp)
-                    )
-                }
+                item { Box(Modifier.semantics { contentType = ContentType.Username }.size(10.dp)) }
                 items(count) { Box(Modifier.size(10.dp)) }
             }
         }
@@ -800,15 +757,7 @@ class AndroidAutofillManagerTest {
             (LocalAutofillManager.current as AndroidAutofillManager).platformAutofillManager = am
 
             Column(Modifier.fillMaxWidth().height(50.dp).verticalScroll(scrollState)) {
-                Row {
-                    Box(
-                        Modifier.semantics {
-                                contentType = ContentType.Username
-                                contentDataType = ContentDataType.Text
-                            }
-                            .size(10.dp)
-                    )
-                }
+                Row { Box(Modifier.semantics { contentType = ContentType.Username }.size(10.dp)) }
                 repeat(50) { Box(Modifier.size(10.dp)) }
             }
         }
@@ -833,13 +782,7 @@ class AndroidAutofillManagerTest {
             Column(Modifier.fillMaxWidth().height(50.dp).verticalScroll(scrollState)) {
                 if (autofillComponentsVisible) {
                     Row {
-                        Box(
-                            Modifier.semantics {
-                                    contentType = ContentType.Username
-                                    contentDataType = ContentDataType.Text
-                                }
-                                .size(10.dp)
-                        )
+                        Box(Modifier.semantics { contentType = ContentType.Username }.size(10.dp))
                     }
                 }
                 repeat(50) { Box(Modifier.size(10.dp)) }
@@ -850,28 +793,5 @@ class AndroidAutofillManagerTest {
 
         // A column disappearing will call commit
         rule.runOnIdle { verify(am).commit() }
-    }
-
-    // ============================================================================================
-    // Helper functions
-    // ============================================================================================
-
-    private fun plainVisibleModifier(testTag: String): Modifier {
-        return Modifier.semantics {
-                contentType = ContentType.Username
-                contentDataType = ContentDataType.Text
-            }
-            .size(width, height)
-            .testTag(testTag)
-    }
-
-    private fun invisibleModifier(testTag: String): Modifier {
-        return Modifier.alpha(0f) // this will make the component invisible
-            .semantics {
-                contentType = ContentType.Username
-                contentDataType = ContentDataType.Text
-            }
-            .size(width, height)
-            .testTag(testTag)
     }
 }
