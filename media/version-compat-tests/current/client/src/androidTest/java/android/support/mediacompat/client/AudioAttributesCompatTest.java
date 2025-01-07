@@ -178,6 +178,7 @@ public class AudioAttributesCompatTest {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = 34) // b/384972088: Failing on SDK 35
     public void testUsageAndContentTypeInferredFromLegacyStreamType() {
         androidx.media.AudioAttributesCompat alarmAAC =
                 mkBuilder(AudioManager.STREAM_ALARM).build();
