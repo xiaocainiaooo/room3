@@ -73,6 +73,16 @@ public class ForwardingCameraInfo implements CameraInfoInternal {
     }
 
     @Override
+    public boolean isLowLightBoostSupported() {
+        return mCameraInfoInternal.isLowLightBoostSupported();
+    }
+
+    @Override
+    public @NonNull LiveData<Integer> getLowLightBoostState() {
+        return mCameraInfoInternal.getLowLightBoostState();
+    }
+
+    @Override
     public @NonNull LiveData<ZoomState> getZoomState() {
         return mCameraInfoInternal.getZoomState();
     }

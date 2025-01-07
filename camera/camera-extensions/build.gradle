@@ -76,6 +76,8 @@ dependencies {
 }
 
 android {
+    compileSdk 35
+
     buildTypes.configureEach {
         consumerProguardFiles "proguard-rules.pro"
     }

@@ -81,6 +81,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }
 android {
+    compileSdk 35
+
     buildTypes.configureEach {
         consumerProguardFiles("proguard-rules.pro")
     }

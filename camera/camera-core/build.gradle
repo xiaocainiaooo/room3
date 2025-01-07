@@ -85,6 +85,8 @@ dependencies {
 }
 
 android {
+    compileSdk 35
+
     defaultConfig {
         externalNativeBuild {
             def versionScript = file("src/main/cpp/jni.lds").getAbsolutePath()

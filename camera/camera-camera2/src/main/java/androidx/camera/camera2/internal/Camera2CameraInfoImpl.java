@@ -110,6 +110,8 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
     @GuardedBy("mLock")
     private @Nullable RedirectableLiveData<Integer> mRedirectTorchStateLiveData = null;
     @GuardedBy("mLock")
+    private @Nullable RedirectableLiveData<Integer> mRedirectLowLightBoostStateLiveData = null;
+    @GuardedBy("mLock")
     private @Nullable RedirectableLiveData<ZoomState> mRedirectZoomStateLiveData = null;
     private final @NonNull RedirectableLiveData<CameraState> mCameraStateLiveData;
     @GuardedBy("mLock")
@@ -157,6 +159,11 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
             if (mRedirectTorchStateLiveData != null) {
                 mRedirectTorchStateLiveData.redirectTo(
                         mCamera2CameraControlImpl.getTorchControl().getTorchState());
+            }
+
+            if (mRedirectLowLightBoostStateLiveData != null) {
+                mRedirectLowLightBoostStateLiveData.redirectTo(mCamera2CameraControlImpl
+                        .getLowLightBoostControl().getLowLightBoostState());
             }
 
             if (mCameraCaptureCallbacks != null) {
@@ -287,6 +294,31 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
             }
 
             return mCamera2CameraControlImpl.getTorchControl().getTorchState();
+        }
+    }
+
+    @Override
+    public boolean isLowLightBoostSupported() {
+        return LowLightBoostControl.checkLowLightBoostAvailability(mCameraCharacteristicsCompat);
+    }
+
+    @Override
+    public @NonNull LiveData<Integer> getLowLightBoostState() {
+        synchronized (mLock) {
+            if (mCamera2CameraControlImpl == null) {
+                if (mRedirectLowLightBoostStateLiveData == null) {
+                    mRedirectLowLightBoostStateLiveData =
+                            new RedirectableLiveData<>(LowLightBoostControl.DEFAULT_LLB_STATE);
+                }
+                return mRedirectLowLightBoostStateLiveData;
+            }
+
+            // if RedirectableLiveData exists,  use it directly.
+            if (mRedirectLowLightBoostStateLiveData != null) {
+                return mRedirectLowLightBoostStateLiveData;
+            }
+
+            return mCamera2CameraControlImpl.getLowLightBoostControl().getLowLightBoostState();
         }
     }
 

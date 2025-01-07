@@ -61,9 +61,9 @@ final class TorchControl {
 
     private boolean mIsActive;
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
-    CallbackToFutureAdapter.Completer<Void> mEnableTorchCompleter;
+            CallbackToFutureAdapter.Completer<Void> mEnableTorchCompleter;
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
-    boolean mTargetTorchEnabled;
+            boolean mTargetTorchEnabled;
 
     /**
      * Constructs a TorchControl.
@@ -193,6 +193,14 @@ final class TorchControl {
             return;
         }
 
+        if (mCamera2CameraControlImpl.isLowLightBoostOn()) {
+            if (completer != null) {
+                completer.setException(new IllegalStateException(
+                        "Torch can not be enabled when low-light boost is on!"));
+            }
+            return;
+        }
+
         mTargetTorchEnabled = enabled;
         mCamera2CameraControlImpl.enableTorchInternal(enabled);
         setLiveDataValue(mTorchState, enabled ? TorchState.ON : TorchState.OFF);
@@ -201,6 +209,23 @@ final class TorchControl {
                     "There is a new enableTorch being set"));
         }
         mEnableTorchCompleter = completer;
+    }
+
+    /**
+     * Force update the torch state to OFF.
+     *
+     * <p>This can be invoked when low-light boost is turned on. The torch state will also be
+     * updated as {@link TorchState#OFF}.
+     */
+    @ExecutedBy("mExecutor")
+    void forceUpdateTorchStateToOff() {
+        // Directly return if torch is originally off
+        if (!mTargetTorchEnabled) {
+            return;
+        }
+
+        mTargetTorchEnabled = false;
+        setLiveDataValue(mTorchState, TorchState.OFF);
     }
 
     private <T> void setLiveDataValue(@NonNull MutableLiveData<T> liveData, T value) {

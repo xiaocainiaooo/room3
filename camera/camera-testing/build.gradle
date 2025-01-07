@@ -79,6 +79,8 @@ dependencies {
 }
 
 android {
+    compileSdk 35
+
     defaultConfig {
         externalNativeBuild {
             cmake {
