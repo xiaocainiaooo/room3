@@ -28,7 +28,7 @@ java {
 
 androidx {
     name = "Performance - Unsafe"
-    type = LibraryType.UNSET
+    type = LibraryType.PUBLISHED_LIBRARY
     inceptionYear = "2024"
     description = "Compile-time support for sun.misc.Unsafe."
 }
