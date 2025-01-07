@@ -42,6 +42,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.pdf.view.PdfView
 import androidx.pdf.view.ToolBoxView
 import androidx.pdf.view.search.PdfSearchView
+import androidx.pdf.viewer.PdfPasswordDialog
+import androidx.pdf.viewer.PdfPasswordDialog.KEY_CANCELABLE
 import androidx.pdf.viewer.fragment.insets.TranslateInsetsAnimationCallback
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.DocumentError
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.DocumentLoaded
@@ -300,6 +302,44 @@ public open class PdfViewerFragmentV2 : Fragment() {
         highlightStateCollector = null
     }
 
+    private fun getPasswordDialog(): PdfPasswordDialog {
+        return (childFragmentManager.findFragmentByTag(PASSWORD_DIALOG_TAG) as? PdfPasswordDialog)
+            ?: PdfPasswordDialog().apply {
+                arguments = Bundle().apply { putBoolean(KEY_CANCELABLE, false) }
+            }
+    }
+
+    private fun dismissPasswordDialog() {
+        val passwordDialog =
+            childFragmentManager.findFragmentByTag(PASSWORD_DIALOG_TAG) as? PdfPasswordDialog
+        passwordDialog?.dismiss()
+    }
+
+    private fun requestPassword(isPasswordIncorrectRetry: Boolean) {
+
+        val passwordDialog = getPasswordDialog()
+        if (!passwordDialog.isAdded) {
+            passwordDialog.show(childFragmentManager, PASSWORD_DIALOG_TAG)
+        }
+        if (isPasswordIncorrectRetry) {
+            passwordDialog.showIncorrectMessage()
+        }
+
+        passwordDialog.setListener(
+            object : PdfPasswordDialog.PasswordDialogEventsListener {
+                override fun onPasswordSubmit(password: String) {
+                    documentViewModel.loadDocument(uri = documentUri, password = password)
+                }
+
+                override fun onDialogCancelled() {
+                    documentViewModel.passwordDialogCancelled()
+                }
+
+                override fun onDialogShown() {}
+            }
+        )
+    }
+
     /**
      * Collects the UI state of the fragment and updates the views accordingly.
      *
@@ -311,7 +351,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
         documentViewModel.fragmentUiScreenState.collect { uiState ->
             when (uiState) {
                 is Loading -> handleLoading()
-                is PasswordRequested -> handlePasswordRequested()
+                is PasswordRequested -> handlePasswordRequested(uiState)
                 is DocumentLoaded -> handleDocumentLoaded(uiState)
                 is DocumentError -> handleDocumentError(uiState)
             }
@@ -330,12 +370,14 @@ public open class PdfViewerFragmentV2 : Fragment() {
         cancelViewStateCollection()
     }
 
-    private fun handlePasswordRequested() {
+    private fun handlePasswordRequested(uiState: PasswordRequested) {
+        requestPassword(uiState.passwordFailed)
         setViewVisibility(pdfView = GONE, loadingView = GONE, errorView = GONE, toolboxView = GONE)
         // Utilize retry param to show incorrect password on PasswordDialog
     }
 
     private fun handleDocumentLoaded(uiState: DocumentLoaded) {
+        dismissPasswordDialog()
         onLoadDocumentSuccess()
         pdfView.pdfDocument = uiState.pdfDocument
         toolboxView.setPdfDocument(uiState.pdfDocument)
@@ -350,6 +392,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
     }
 
     private fun handleDocumentError(uiState: DocumentError) {
+        dismissPasswordDialog()
         onLoadDocumentError(uiState.exception)
         setViewVisibility(
             pdfView = GONE,
@@ -379,5 +422,9 @@ public open class PdfViewerFragmentV2 : Fragment() {
              */
             repeatOnLifecycle(Lifecycle.State.STARTED) { block() }
         }
+    }
+
+    private companion object {
+        private const val PASSWORD_DIALOG_TAG = "password-dialog"
     }
 }

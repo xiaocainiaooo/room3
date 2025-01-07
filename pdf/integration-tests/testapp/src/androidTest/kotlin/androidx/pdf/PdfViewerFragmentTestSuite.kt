@@ -271,7 +271,6 @@ class PdfViewerFragmentTestSuite {
         private const val TEST_PROTECTED_DOCUMENT_FILE = "sample-protected.pdf"
         private const val TEST_CORRUPTED_DOCUMENT_FILE = "corrupted.pdf"
         private const val PROTECTED_DOCUMENT_PASSWORD = "abcd1234"
-        private const val DELAY_TIME_MS = 500L
         private const val SEARCH_QUERY = "ipsum"
         private const val KEYBOARD_CONTENT_DESC = "keyboard"
     }
