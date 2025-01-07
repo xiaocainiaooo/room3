@@ -30,7 +30,7 @@ plugins {
 }
 
 android {
-    namespace "androidx.benchmark.samples"
+    namespace = "androidx.benchmark.samples"
     defaultConfig {
         minSdk = 23
     }

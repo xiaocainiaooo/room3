@@ -91,7 +91,7 @@ android {
             jniLibs.srcDirs += new File(AndroidXConfig.getPrebuiltsRoot(project), "androidx/xr/androidTest")
         }
     }
-    namespace "androidx.xr.scenecore"
+    namespace = "androidx.xr.scenecore"
 }
 
 androidx {
