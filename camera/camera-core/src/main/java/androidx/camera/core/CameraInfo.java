@@ -23,6 +23,7 @@ import android.util.Range;
 import android.view.Surface;
 
 import androidx.annotation.FloatRange;
+import androidx.annotation.IntRange;
 import androidx.annotation.RestrictTo;
 import androidx.annotation.RestrictTo.Scope;
 import androidx.annotation.StringDef;
@@ -423,6 +424,29 @@ public interface CameraInfo {
      */
     default @NonNull Set<CameraInfo> getPhysicalCameraInfos() {
         return Collections.emptySet();
+    }
+
+    /**
+     * Returns the maximum torch strength level.
+     *
+     * @return The maximum strength level. If the device doesn't support configuring torch
+     * strength, returns {@code 1}.
+     */
+    @RestrictTo(Scope.LIBRARY_GROUP)
+    @IntRange(from = 1)
+    default int getMaxTorchStrengthLevel() {
+        return 1;
+    }
+
+    /**
+     * Returns the {@link LiveData} of the torch strength level.
+     *
+     * <p>The value of the {@link LiveData} will be the default torch strength level of this
+     * device if {@link CameraControl#setTorchStrengthLevelAsync(int)} hasn't been called.
+     */
+    @RestrictTo(Scope.LIBRARY_GROUP)
+    default @NonNull LiveData<Integer> getTorchStrengthLevel() {
+        return new MutableLiveData<>(1);
     }
 
     @StringDef(open = true, value = {IMPLEMENTATION_TYPE_UNKNOWN,

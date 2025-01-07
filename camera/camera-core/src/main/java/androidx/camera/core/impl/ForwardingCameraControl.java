@@ -18,6 +18,7 @@ package androidx.camera.core.impl;
 
 import android.graphics.Rect;
 
+import androidx.annotation.IntRange;
 import androidx.annotation.VisibleForTesting;
 import androidx.camera.core.FocusMeteringAction;
 import androidx.camera.core.FocusMeteringResult;
@@ -80,6 +81,12 @@ public class ForwardingCameraControl implements CameraControlInternal {
     @Override
     public @NonNull ListenableFuture<Integer> setExposureCompensationIndex(int value) {
         return mCameraControlInternal.setExposureCompensationIndex(value);
+    }
+
+    @Override
+    public @NonNull ListenableFuture<Void> setTorchStrengthLevelAsync(
+            @IntRange(from = 1) int torchStrengthLevel) {
+        return mCameraControlInternal.setTorchStrengthLevelAsync(torchStrengthLevel);
     }
 
     @Override
