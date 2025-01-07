@@ -18,6 +18,7 @@ package androidx.core.telecom.test
 
 import android.media.AudioManager.AudioRecordingCallback
 import android.media.AudioRecord
+import android.os.Build
 import android.telecom.CallEndpoint
 import android.telecom.DisconnectCause
 import android.view.LayoutInflater
@@ -35,10 +36,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @ExperimentalAppActions
-@RequiresApi(34)
+@RequiresApi(Build.VERSION_CODES.S)
 class CallListAdapter(
     private var mList: ArrayList<CallRow>?,
-    private var mAudioRecord: AudioRecord? = null
+    private var mAudioRecord: AudioRecord? = null,
+    private val mFileProvider: VoipAppFileProvider,
 ) : RecyclerView.Adapter<CallListAdapter.ViewHolder>() {
     var mCallIdToViewHolder: MutableMap<String, ViewHolder> = mutableMapOf()
     private val CONTROL_ACTION_FAILED_MSG = "[FAILED-T]"
@@ -52,6 +54,8 @@ class CallListAdapter(
         val currentEndpoint: TextView = itemView.findViewById(R.id.endpointStateTextView)
         val participants: TextView = itemView.findViewById(R.id.participantsTextView)
         val localCallSilenceIcon: ImageView = itemView.findViewById(R.id.LocalCallSilenceImage)
+        val fileProviderIconImage: ImageView = itemView.findViewById(R.id.FileProviderImage)
+        val fileProviderIconButton: Button = itemView.findViewById(R.id.ToggleFileProviderImage)
 
         // Call State Buttons
         val activeButton: Button = itemView.findViewById(R.id.activeButton)
@@ -223,6 +227,29 @@ class CallListAdapter(
                 CoroutineScope(Dispatchers.Main).launch {
                     ItemsViewModel.callObject.toggleLocalCallSilence()
                 }
+            }
+
+            // set the initial call icon image if non-null
+            setFileProviderIconImage(holder.fileProviderIconImage, ItemsViewModel.callObject)
+            // setup the button action
+            holder.fileProviderIconButton.setOnClickListener {
+                // generate the next icon
+                val nextIconBitmap = CallIconGenerator.generateNextBitmap()
+                ItemsViewModel.callObject.setIconBitmap(nextIconBitmap)
+                // write to file
+                mFileProvider.writeCallIconBitMapToFile(call = ItemsViewModel.callObject)
+                // read from the file and re-render ui
+                setFileProviderIconImage(holder.fileProviderIconImage, ItemsViewModel.callObject)
+            }
+        }
+    }
+
+    fun setFileProviderIconImage(imageView: ImageView, callObject: VoipCall) {
+        val iconUri = callObject.getIconUri()
+        if (iconUri != null) {
+            val iconBitmap = mFileProvider.readCallIconUriFromFile(iconUri)
+            if (iconBitmap != null) {
+                CoroutineScope(Dispatchers.Main).launch { imageView.setImageBitmap(iconBitmap) }
             }
         }
     }
