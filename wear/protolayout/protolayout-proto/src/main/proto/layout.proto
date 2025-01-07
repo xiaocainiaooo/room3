@@ -689,6 +689,8 @@ message ArcLine {
 
   // A brush used to draw this line. If set, the brush will be used instead of
   // the color provided in {@code setColor()}.
+  //
+  // Only SweepGradient is supported.
   Brush brush = 7;
 
   // Modifiers for this element.
