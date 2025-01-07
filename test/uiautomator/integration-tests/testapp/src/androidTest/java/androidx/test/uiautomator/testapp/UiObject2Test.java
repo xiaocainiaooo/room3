@@ -359,6 +359,7 @@ public class UiObject2Test extends BaseTest {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = 34) // b/384973122: Failing on SDK 35
     public void testGetVisibleBounds() {
         launchTestActivity(VisibleBoundsTestActivity.class);
 
@@ -376,7 +377,6 @@ public class UiObject2Test extends BaseTest {
     }
 
     @Test
-    @SdkSuppress(maxSdkVersion = 34) // b/384973122: Failing on SDK 35
     public void testGetVisibleCenter() {
         launchTestActivity(VisibleBoundsTestActivity.class);
 
