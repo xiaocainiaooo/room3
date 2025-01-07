@@ -1570,7 +1570,7 @@ class DatabaseProcessorTest {
             symbolProcessorProviders = listOf(RoomKspProcessor.Provider()),
             options = mapOf("room.exportSchemaResource" to "true"),
         ) {
-            it.generatedResourceFileWithPath("schemas/foo.bar.MyDb/1.json")
+            it.generatedTextResourceFileWithPath("schemas/foo.bar.MyDb/1.json").isNotEmpty()
         }
     }
 
