@@ -665,9 +665,9 @@ public open class NavDestination(
             val argType = _arguments[argName]?.type
             val argValue =
                 if (argType == NavType.ReferenceType) {
-                    context.getString(/* resId= */ args[argName] as Int)
+                    context.getString(/* resId= */ NavType.ReferenceType[bundle!!, argName] as Int)
                 } else {
-                    args[argName].toString()
+                    argType!![bundle!!, argName].toString()
                 }
             builder.append(argValue)
         }
