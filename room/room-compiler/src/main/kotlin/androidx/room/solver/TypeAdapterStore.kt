@@ -90,18 +90,18 @@ import androidx.room.solver.query.result.RowAdapter
 import androidx.room.solver.query.result.SingleColumnRowAdapter
 import androidx.room.solver.query.result.SingleItemQueryResultAdapter
 import androidx.room.solver.query.result.SingleNamedColumnRowAdapter
-import androidx.room.solver.shortcut.binder.DeleteOrUpdateMethodBinder
-import androidx.room.solver.shortcut.binder.InsertOrUpsertMethodBinder
-import androidx.room.solver.shortcut.binderprovider.DeleteOrUpdateMethodBinderProvider
-import androidx.room.solver.shortcut.binderprovider.GuavaListenableFutureDeleteOrUpdateMethodBinderProvider
-import androidx.room.solver.shortcut.binderprovider.GuavaListenableFutureInsertOrUpsertMethodBinderProvider
-import androidx.room.solver.shortcut.binderprovider.InsertOrUpsertMethodBinderProvider
-import androidx.room.solver.shortcut.binderprovider.InstantDeleteOrUpdateMethodBinderProvider
-import androidx.room.solver.shortcut.binderprovider.InstantInsertOrUpsertMethodBinderProvider
-import androidx.room.solver.shortcut.binderprovider.RxCallableDeleteOrUpdateMethodBinderProvider
-import androidx.room.solver.shortcut.binderprovider.RxCallableInsertOrUpsertMethodBinderProvider
-import androidx.room.solver.shortcut.result.DeleteOrUpdateMethodAdapter
-import androidx.room.solver.shortcut.result.InsertOrUpsertMethodAdapter
+import androidx.room.solver.shortcut.binder.DeleteOrUpdateFunctionBinder
+import androidx.room.solver.shortcut.binder.InsertOrUpsertFunctionBinder
+import androidx.room.solver.shortcut.binderprovider.DeleteOrUpdateFunctionBinderProvider
+import androidx.room.solver.shortcut.binderprovider.GuavaListenableFutureDeleteOrUpdateFunctionBinderProvider
+import androidx.room.solver.shortcut.binderprovider.GuavaListenableFutureInsertOrUpsertFunctionBinderProvider
+import androidx.room.solver.shortcut.binderprovider.InsertOrUpsertFunctionBinderProvider
+import androidx.room.solver.shortcut.binderprovider.InstantDeleteOrUpdateFunctionBinderProvider
+import androidx.room.solver.shortcut.binderprovider.InstantInsertOrUpsertFunctionBinderProvider
+import androidx.room.solver.shortcut.binderprovider.RxCallableDeleteOrUpdateFunctionBinderProvider
+import androidx.room.solver.shortcut.binderprovider.RxCallableInsertOrUpsertFunctionBinderProvider
+import androidx.room.solver.shortcut.result.DeleteOrUpdateFunctionAdapter
+import androidx.room.solver.shortcut.result.InsertOrUpsertFunctionAdapter
 import androidx.room.solver.types.BoxedBooleanToBoxedIntConverter
 import androidx.room.solver.types.BoxedPrimitiveColumnTypeAdapter
 import androidx.room.solver.types.ByteArrayColumnTypeAdapter
@@ -229,18 +229,18 @@ private constructor(
             add(InstantPreparedQueryResultBinderProvider(context))
         }
 
-    private val insertOrUpsertBinderProviders: List<InsertOrUpsertMethodBinderProvider> =
-        mutableListOf<InsertOrUpsertMethodBinderProvider>().apply {
-            addAll(RxCallableInsertOrUpsertMethodBinderProvider.getAll(context))
-            add(GuavaListenableFutureInsertOrUpsertMethodBinderProvider(context))
-            add(InstantInsertOrUpsertMethodBinderProvider(context))
+    private val insertOrUpsertBinderProviders: List<InsertOrUpsertFunctionBinderProvider> =
+        mutableListOf<InsertOrUpsertFunctionBinderProvider>().apply {
+            addAll(RxCallableInsertOrUpsertFunctionBinderProvider.getAll(context))
+            add(GuavaListenableFutureInsertOrUpsertFunctionBinderProvider(context))
+            add(InstantInsertOrUpsertFunctionBinderProvider(context))
         }
 
-    private val deleteOrUpdateBinderProvider: List<DeleteOrUpdateMethodBinderProvider> =
-        mutableListOf<DeleteOrUpdateMethodBinderProvider>().apply {
-            addAll(RxCallableDeleteOrUpdateMethodBinderProvider.getAll(context))
-            add(GuavaListenableFutureDeleteOrUpdateMethodBinderProvider(context))
-            add(InstantDeleteOrUpdateMethodBinderProvider(context))
+    private val deleteOrUpdateBinderProvider: List<DeleteOrUpdateFunctionBinderProvider> =
+        mutableListOf<DeleteOrUpdateFunctionBinderProvider>().apply {
+            addAll(RxCallableDeleteOrUpdateFunctionBinderProvider.getAll(context))
+            add(GuavaListenableFutureDeleteOrUpdateFunctionBinderProvider(context))
+            add(InstantDeleteOrUpdateFunctionBinderProvider(context))
         }
 
     /** Searches 1 way to bind a value into a statement. */
@@ -419,23 +419,23 @@ private constructor(
         }
     }
 
-    fun findDeleteOrUpdateMethodBinder(typeMirror: XType): DeleteOrUpdateMethodBinder {
+    fun findDeleteOrUpdateFunctionBinder(typeMirror: XType): DeleteOrUpdateFunctionBinder {
         return deleteOrUpdateBinderProvider.first { it.matches(typeMirror) }.provide(typeMirror)
     }
 
-    fun findInsertMethodBinder(
+    fun findInsertFunctionBinder(
         typeMirror: XType,
         params: List<ShortcutQueryParameter>
-    ): InsertOrUpsertMethodBinder {
+    ): InsertOrUpsertFunctionBinder {
         return insertOrUpsertBinderProviders
             .first { it.matches(typeMirror) }
             .provide(typeMirror, params, false)
     }
 
-    fun findUpsertMethodBinder(
+    fun findUpsertFunctionBinder(
         typeMirror: XType,
         params: List<ShortcutQueryParameter>
-    ): InsertOrUpsertMethodBinder {
+    ): InsertOrUpsertFunctionBinder {
         return insertOrUpsertBinderProviders
             .first { it.matches(typeMirror) }
             .provide(typeMirror, params, true)
@@ -471,22 +471,22 @@ private constructor(
     fun findPreparedQueryResultAdapter(typeMirror: XType, query: ParsedQuery) =
         PreparedQueryResultAdapter.create(typeMirror, query.type)
 
-    fun findDeleteOrUpdateAdapter(typeMirror: XType): DeleteOrUpdateMethodAdapter? {
-        return DeleteOrUpdateMethodAdapter.create(typeMirror)
+    fun findDeleteOrUpdateAdapter(typeMirror: XType): DeleteOrUpdateFunctionAdapter? {
+        return DeleteOrUpdateFunctionAdapter.create(typeMirror)
     }
 
     fun findInsertAdapter(
         typeMirror: XType,
         params: List<ShortcutQueryParameter>
-    ): InsertOrUpsertMethodAdapter? {
-        return InsertOrUpsertMethodAdapter.createInsert(context, typeMirror, params)
+    ): InsertOrUpsertFunctionAdapter? {
+        return InsertOrUpsertFunctionAdapter.createInsert(context, typeMirror, params)
     }
 
     fun findUpsertAdapter(
         typeMirror: XType,
         params: List<ShortcutQueryParameter>
-    ): InsertOrUpsertMethodAdapter? {
-        return InsertOrUpsertMethodAdapter.createUpsert(context, typeMirror, params)
+    ): InsertOrUpsertFunctionAdapter? {
+        return InsertOrUpsertFunctionAdapter.createUpsert(context, typeMirror, params)
     }
 
     fun findQueryResultAdapter(
@@ -772,7 +772,7 @@ private constructor(
         if (collectionType.nullability != XNullability.NONNULL) {
             context.logger.w(
                 Warning.UNNECESSARY_NULLABILITY_IN_DAO_RETURN_TYPE,
-                ProcessorErrors.nullableCollectionOrArrayReturnTypeInDaoMethod(
+                ProcessorErrors.nullableCollectionOrArrayReturnTypeInDaoFunction(
                     searchingType.asTypeName().toString(context.codeLanguage),
                     typeKeyword
                 )
@@ -783,7 +783,7 @@ private constructor(
         if (arrayComponentType != null && arrayComponentType.nullability != XNullability.NONNULL) {
             context.logger.w(
                 Warning.UNNECESSARY_NULLABILITY_IN_DAO_RETURN_TYPE,
-                ProcessorErrors.nullableComponentInDaoMethodReturnType(
+                ProcessorErrors.nullableComponentInDaoFunctionReturnType(
                     searchingType.asTypeName().toString(context.codeLanguage)
                 )
             )
@@ -794,7 +794,7 @@ private constructor(
             if (typeArg.nullability != XNullability.NONNULL) {
                 context.logger.w(
                     Warning.UNNECESSARY_NULLABILITY_IN_DAO_RETURN_TYPE,
-                    ProcessorErrors.nullableComponentInDaoMethodReturnType(
+                    ProcessorErrors.nullableComponentInDaoFunctionReturnType(
                         searchingType.asTypeName().toString(context.codeLanguage)
                     )
                 )

@@ -40,7 +40,7 @@ import androidx.room.solver.query.result.EntityRowAdapter
 import androidx.room.testing.context
 import androidx.room.vo.Database
 import androidx.room.vo.DatabaseView
-import androidx.room.vo.ReadQueryMethod
+import androidx.room.vo.ReadQueryFunction
 import androidx.room.vo.Warning
 import com.google.auto.service.processor.AutoServiceProcessor
 import com.google.testing.junit.testparameterinjector.TestParameter
@@ -247,7 +247,7 @@ class DatabaseProcessorTest {
             USER,
             USER_DAO
         ) { db, _ ->
-            assertThat(db.daoMethods.size, `is`(1))
+            assertThat(db.daoFunctions.size, `is`(1))
             assertThat(db.entities.size, `is`(1))
         }
     }
@@ -267,9 +267,12 @@ class DatabaseProcessorTest {
             BOOK,
             BOOK_DAO
         ) { db, _ ->
-            assertThat(db.daoMethods.size, `is`(2))
+            assertThat(db.daoFunctions.size, `is`(2))
             assertThat(db.entities.size, `is`(2))
-            assertThat(db.daoMethods.map { it.element.jvmName }, `is`(listOf("userDao", "bookDao")))
+            assertThat(
+                db.daoFunctions.map { it.element.jvmName },
+                `is`(listOf("userDao", "bookDao"))
+            )
             assertThat(
                 db.entities.map { it.type.asTypeName().toString(CodeLanguage.JAVA) },
                 `is`(listOf("foo.bar.User", "foo.bar.Book"))
@@ -536,7 +539,7 @@ class DatabaseProcessorTest {
             USER_DAO
         ) { _, invocation ->
             invocation.assertCompilationResult {
-                hasErrorContaining(ProcessorErrors.DAO_METHOD_CONFLICTS_WITH_OTHERS)
+                hasErrorContaining(ProcessorErrors.DAO_FUNCTION_CONFLICTS_WITH_OTHERS)
                 hasErrorContaining(
                     ProcessorErrors.duplicateDao("foo.bar.UserDao", listOf("userDao", "userDao2"))
                 )
@@ -924,11 +927,11 @@ class DatabaseProcessorTest {
             USER,
             USER_DAO
         ) { db, _ ->
-            val userDao = db.daoMethods.first().dao
-            val insertionMethod = userDao.insertMethods.find { it.element.jvmName == "insert" }
+            val userDao = db.daoFunctions.first().dao
+            val insertionMethod = userDao.insertFunctions.find { it.element.jvmName == "insert" }
             assertThat(insertionMethod, notNullValue())
             val loadOne =
-                userDao.queryMethods.filterIsInstance<ReadQueryMethod>().find {
+                userDao.queryFunctions.filterIsInstance<ReadQueryFunction>().find {
                     it.element.jvmName == "loadOne"
                 }
             assertThat(loadOne, notNullValue())
@@ -941,7 +944,7 @@ class DatabaseProcessorTest {
             )
 
             val withConverter =
-                userDao.queryMethods.filterIsInstance<ReadQueryMethod>().find {
+                userDao.queryFunctions.filterIsInstance<ReadQueryFunction>().find {
                     it.element.jvmName == "loadWithConverter"
                 }
             assertThat(withConverter, notNullValue())
@@ -970,9 +973,9 @@ class DatabaseProcessorTest {
             USER,
             USER_DAO
         ) { db, _ ->
-            val userDao = db.daoMethods.first().dao
+            val userDao = db.daoFunctions.first().dao
             val loadOne =
-                userDao.queryMethods.filterIsInstance<ReadQueryMethod>().find {
+                userDao.queryFunctions.filterIsInstance<ReadQueryFunction>().find {
                     it.element.jvmName == "loadOneDataClass"
                 }
             assertThat(loadOne, notNullValue())
@@ -981,7 +984,7 @@ class DatabaseProcessorTest {
             val adapterDataClass = (adapter as DataClassRowAdapter).dataClass
 
             val loadAll =
-                userDao.queryMethods.filterIsInstance<ReadQueryMethod>().find {
+                userDao.queryFunctions.filterIsInstance<ReadQueryFunction>().find {
                     it.element.jvmName == "loadAllDataClasses"
                 }
             assertThat(loadAll, notNullValue())
@@ -992,7 +995,7 @@ class DatabaseProcessorTest {
             assertThat(adapterDataClass, sameInstance(loadAllDataClass))
 
             val withConverter =
-                userDao.queryMethods.filterIsInstance<ReadQueryMethod>().find {
+                userDao.queryFunctions.filterIsInstance<ReadQueryFunction>().find {
                     it.element.jvmName == "loadDataClassWithConverter"
                 }
             assertThat(withConverter, notNullValue())
@@ -1261,9 +1264,9 @@ class DatabaseProcessorTest {
             val element = invocation.processingEnv.requireTypeElement("foo.bar.MyDb")
             val result =
                 DatabaseProcessor(baseContext = invocation.context, element = element).process()
-            assertThat(result.daoMethods).hasSize(0)
+            assertThat(result.daoFunctions).hasSize(0)
             invocation.assertCompilationResult {
-                hasErrorContaining(ProcessorErrors.DATABASE_INVALID_DAO_METHOD_RETURN_TYPE)
+                hasErrorContaining(ProcessorErrors.DATABASE_INVALID_DAO_FUNCTION_RETURN_TYPE)
             }
         }
     }
@@ -1598,7 +1601,7 @@ class DatabaseProcessorTest {
             val element = invocation.processingEnv.requireTypeElement("foo.bar.MyDb")
             DatabaseProcessor(baseContext = invocation.context, element = element).process()
             invocation.assertCompilationResult {
-                hasWarningContaining(ProcessorErrors.JVM_NAME_ON_OVERRIDDEN_METHOD)
+                hasWarningContaining(ProcessorErrors.JVM_NAME_ON_OVERRIDDEN_FUNCTION)
             }
         }
     }

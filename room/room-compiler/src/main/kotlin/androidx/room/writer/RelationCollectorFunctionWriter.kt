@@ -56,7 +56,7 @@ class RelationCollectorFunctionWriter(private val collector: RelationCollector) 
 
     override fun getUniqueKey(): String {
         val relation = collector.relation
-        return "RelationCollectorMethodWriter" +
+        return "RelationCollectorFunctionWriter" +
             "-${collector.mapTypeName}" +
             "-${relation.entity.typeName.toString(CodeLanguage.JAVA)}" +
             "-${relation.entityField.columnName}" +
@@ -207,7 +207,7 @@ class RelationCollectorFunctionWriter(private val collector: RelationCollector) 
 
     private fun XCodeBlock.Builder.addRecursiveFetchCall(
         scope: CodeGenScope,
-        methodName: String,
+        functionName: String,
     ) {
         val utilFunction =
             RELATION_UTIL.let {
@@ -239,7 +239,7 @@ class RelationCollectorFunctionWriter(private val collector: RelationCollector) 
                             val recursiveCall =
                                 XCodeBlock.of(
                                     "%L(%L, %L)",
-                                    methodName,
+                                    functionName,
                                     PARAM_CONNECTION_VARIABLE,
                                     paramName
                                 )
