@@ -205,8 +205,10 @@ public inline fun <T> TransformingLazyColumnScope.itemsIndexed(
 
 internal class TransformingLazyColumnItemScopeImpl(
     val index: Int,
-    val state: TransformingLazyColumnState
+    val state: TransformingLazyColumnState,
+    val reduceMotionEnabled: Boolean
 ) : TransformingLazyColumnItemScope {
+
     private val _scrollProgress: TransformingLazyColumnItemScrollProgress?
         get() = state.layoutInfo.visibleItems.fastFirstOrNull { it.index == index }?.scrollProgress
 
@@ -218,14 +220,18 @@ internal class TransformingLazyColumnItemScopeImpl(
 
     override fun Modifier.transformedHeight(
         heightProvider: (Int, TransformingLazyColumnItemScrollProgress) -> Int
-    ): Modifier = this then TransformingLazyColumnCompositeParentDataModifier(heightProvider)
+    ): Modifier =
+        if (reduceMotionEnabled) this
+        else this then TransformingLazyColumnCompositeParentDataModifier(heightProvider)
 
     override fun Modifier.animateItem(
         fadeInSpec: FiniteAnimationSpec<Float>?,
         placementSpec: FiniteAnimationSpec<IntOffset>?,
         fadeOutSpec: FiniteAnimationSpec<Float>?,
     ): Modifier =
-        if (fadeInSpec == null && placementSpec == null && fadeOutSpec == null) {
+        if (reduceMotionEnabled) {
+            this
+        } else if (fadeInSpec == null && placementSpec == null && fadeOutSpec == null) {
             this
         } else {
             this then LazyLayoutAnimateItemElement(fadeInSpec, placementSpec, fadeOutSpec)

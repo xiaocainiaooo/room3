@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,11 +46,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.foundation.LocalReduceMotion
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
+import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.EdgeButton
+import androidx.wear.compose.material3.EdgeButtonSize
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
@@ -288,6 +292,48 @@ fun TransformingLazyColumnTargetMorphingHeightSample() {
                         )
                         // Price is revealed after the morph.
                         Text("$${notification.price}")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Sampled
+@Preview
+@Composable
+fun TransformingLazyColumnReducedMotionSample() {
+    var enableReduceMotion by remember { mutableStateOf(true) }
+    val state = rememberTransformingLazyColumnState()
+    AppScaffold {
+        ScreenScaffold(
+            state,
+            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 20.dp),
+            modifier = Modifier.background(MaterialTheme.colorScheme.background),
+            edgeButton = {
+                EdgeButton(
+                    onClick = { enableReduceMotion = !enableReduceMotion },
+                    buttonSize = EdgeButtonSize.Large
+                ) {
+                    Text("Toggle reduce motion")
+                }
+            }
+        ) { contentPadding ->
+            CompositionLocalProvider(LocalReduceMotion provides { enableReduceMotion }) {
+                TransformingLazyColumn(
+                    state = state,
+                    contentPadding = contentPadding,
+                ) {
+                    items(count = 5) {
+                        Text(
+                            "Text item $it",
+                            modifier = Modifier.scrollTransform(this).animateItem()
+                        )
+                    }
+                    items(count = 5) {
+                        Button(onClick = {}, modifier = Modifier.fillMaxWidth().animateItem()) {
+                            Text("Item $it")
+                        }
                     }
                 }
             }

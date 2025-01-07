@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.foundation.LocalReduceMotion
 import androidx.wear.compose.foundation.lazy.layout.LazyLayoutKeyIndexMap
 import androidx.wear.compose.foundation.rememberActiveFocusRequester
 import androidx.wear.compose.foundation.rotary.RotaryScrollableBehavior
@@ -277,8 +278,15 @@ internal class TransformingLazyColumnItemProvider(
 
     @Composable
     override fun Item(index: Int, key: Any) {
+        val reduceMotionEnabled = LocalReduceMotion.current.enabled()
         val itemScope =
-            remember(index) { TransformingLazyColumnItemScopeImpl(index, state = state) }
+            remember(index, reduceMotionEnabled) {
+                TransformingLazyColumnItemScopeImpl(
+                    index,
+                    state = state,
+                    reduceMotionEnabled = reduceMotionEnabled
+                )
+            }
         CompositionLocalProvider(LocalTransformingLazyColumnItemScope provides itemScope) {
             intervalContent.withInterval(index) { localIndex, content ->
                 content.item(itemScope, localIndex)
