@@ -61,7 +61,7 @@ android {
 
 androidx {
     name = "Performance - Annotation"
-    type = LibraryType.UNSET
+    type = LibraryType.PUBLISHED_LIBRARY
     inceptionYear = "2024"
     description = "Provides source annotations for performance optimizations."
     kotlinTarget = KotlinTarget.KOTLIN_1_9
