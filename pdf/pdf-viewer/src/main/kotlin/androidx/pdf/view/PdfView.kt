@@ -148,6 +148,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private val visiblePages: Range<Int>
         get() = pageLayoutManager?.visiblePages?.value ?: Range(0, 0)
 
+    private val fullyVisiblePages: Range<Int>
+        get() = pageLayoutManager?.fullyVisiblePages?.value ?: Range(0, 0)
+
     /** The first page in the viewport, including partially-visible pages. 0-indexed. */
     public val firstVisiblePage: Int
         get() = visiblePages.lower
@@ -400,8 +403,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             scrollY,
             zoom,
             height,
-            visibleArea = getVisibleAreaInContentCoords(),
-            visiblePages,
+            /* visibleArea= */ getVisibleAreaInContentCoords(),
+            fullyVisiblePages,
             contentHeight
         )
     }
