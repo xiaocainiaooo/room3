@@ -571,7 +571,7 @@ public open class NavController(
         inclusive: Boolean,
         saveState: Boolean = false
     ): Boolean {
-        val id = route.serializer().generateHashCode().also { println("pop hashcode:$it") }
+        val id = route.serializer().generateHashCode()
         requireNotNull(graph.findDestinationComprehensive(id, true)) {
             "Destination with route ${route.simpleName} cannot be found in navigation " +
                 "graph $graph"
