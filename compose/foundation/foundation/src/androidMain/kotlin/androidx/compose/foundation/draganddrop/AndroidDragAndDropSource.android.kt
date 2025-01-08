@@ -19,13 +19,15 @@
 
 package androidx.compose.foundation.draganddrop
 
+import android.graphics.Picture
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.draw.CacheDrawScope
 import androidx.compose.ui.draw.DrawResult
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.layer.GraphicsLayer
-import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.drawscope.draw
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 
 @Immutable
 internal actual object DragAndDropSourceDefaults {
@@ -35,24 +37,39 @@ internal actual object DragAndDropSourceDefaults {
 }
 
 internal actual class CacheDrawScopeDragShadowCallback {
-    private var graphicsLayer: GraphicsLayer? = null
+    private var cachedPicture: Picture? = null
 
     actual fun drawDragShadow(drawScope: DrawScope) =
         with(drawScope) {
-            when (val layer = graphicsLayer) {
+            when (val picture = cachedPicture) {
                 null ->
                     throw IllegalArgumentException(
                         "No cached drag shadow. Check if Modifier.cacheDragShadow(painter) was called."
                     )
-                else -> {
-                    if (!layer.isReleased) drawLayer(layer)
-                }
+                else -> drawIntoCanvas { canvas -> canvas.nativeCanvas.drawPicture(picture) }
             }
         }
 
     actual fun cachePicture(scope: CacheDrawScope): DrawResult =
         with(scope) {
-            graphicsLayer = scope.obtainGraphicsLayer().apply { record { drawContent() } }
-            onDrawWithContent { drawLayer(graphicsLayer!!) }
+            val picture = Picture()
+            cachedPicture = picture
+            val width = this.size.width.toInt()
+            val height = this.size.height.toInt()
+            onDrawWithContent {
+                val pictureCanvas =
+                    androidx.compose.ui.graphics.Canvas(picture.beginRecording(width, height))
+                draw(
+                    density = this,
+                    layoutDirection = this.layoutDirection,
+                    canvas = pictureCanvas,
+                    size = this.size
+                ) {
+                    this@onDrawWithContent.drawContent()
+                }
+                picture.endRecording()
+
+                drawIntoCanvas { canvas -> canvas.nativeCanvas.drawPicture(picture) }
+            }
         }
 }
