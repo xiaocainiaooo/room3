@@ -35,11 +35,13 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
+import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.RegularFile
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 sealed class ApiTaskConfig
 
@@ -203,6 +205,21 @@ internal fun Project.createReleaseApiConfiguration(): Configuration {
                     ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE,
                     ArtifactTypeDefinition.JAR_TYPE
                 )
+                // If this is a KMP project targeting android, make sure to select the android
+                // compilation and not a different jvm target compilation
+                multiplatformExtension?.let { extension ->
+                    if (
+                        extension.targets.any { it.platformType == KotlinPlatformType.androidJvm }
+                    ) {
+                        it.attributes.attribute(
+                            Attribute.of(
+                                "org.jetbrains.kotlin.platform.type",
+                                KotlinPlatformType::class.java
+                            ),
+                            KotlinPlatformType.androidJvm
+                        )
+                    }
+                }
             }
             .apply { project.dependencies.add(name, project.project(path)) }
 }
