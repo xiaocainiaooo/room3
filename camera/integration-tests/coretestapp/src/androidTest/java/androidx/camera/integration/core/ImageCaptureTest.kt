@@ -49,6 +49,7 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCapture.OUTPUT_FORMAT_JPEG
 import androidx.camera.core.ImageCapture.OUTPUT_FORMAT_JPEG_ULTRA_HDR
 import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageCaptureLatencyEstimate
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.core.UseCase
@@ -1976,10 +1977,6 @@ class ImageCaptureTest(private val implName: String, private val cameraXConfig: 
     @SdkSuppress(minSdkVersion = 28)
     fun getRealtimeCaptureLatencyEstimate_whenSessionProcessorSupportsRealtimeLatencyEstimate() =
         runBlocking {
-            implName.ignoreTestForCameraPipe(
-                "TODO(b/275493663, b/328022142): Enable when camera-pipe has extensions support"
-            )
-
             val expectedCaptureLatencyMillis = 1000L
             val expectedProcessingLatencyMillis = 100L
             val sessionProcessor =
@@ -2017,6 +2014,56 @@ class ImageCaptureTest(private val implName: String, private val cameraXConfig: 
             assertThat(latencyEstimate.processingLatencyMillis)
                 .isEqualTo(expectedProcessingLatencyMillis)
         }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 28)
+    fun getRealtimeCaptureLatencyEstimate_whenSessionProcessorNotSupportsRealtimeLatencyEstimate() =
+        runBlocking {
+            val sessionProcessor =
+                object :
+                    SessionProcessor by FakeSessionProcessor(
+                        inputFormatPreview = null, // null means using the same output surface
+                        inputFormatCapture = null
+                    ) {
+                    override fun getRealtimeCaptureLatency(): Pair<Long, Long>? = null
+                }
+
+            val imageCapture = ImageCapture.Builder().build()
+            val preview = Preview.Builder().build()
+
+            withContext(Dispatchers.Main) {
+                preview.setSurfaceProvider(SurfaceTextureProvider.createSurfaceTextureProvider())
+                val cameraSelector =
+                    ExtensionsUtil.getCameraSelectorWithSessionProcessor(
+                        cameraProvider,
+                        BACK_SELECTOR,
+                        sessionProcessor
+                    )
+                cameraProvider.bindToLifecycle(
+                    fakeLifecycleOwner,
+                    cameraSelector,
+                    imageCapture,
+                    preview
+                )
+            }
+
+            assertThat(imageCapture.realtimeCaptureLatencyEstimate)
+                .isEqualTo(ImageCaptureLatencyEstimate.UNDEFINED_IMAGE_CAPTURE_LATENCY)
+        }
+
+    @Test
+    fun getRealtimeCaptureLatencyEstimate_whenNoSessionProcessor() = runBlocking {
+        val imageCapture = ImageCapture.Builder().build()
+        val preview = Preview.Builder().build()
+
+        withContext(Dispatchers.Main) {
+            preview.setSurfaceProvider(SurfaceTextureProvider.createSurfaceTextureProvider())
+            cameraProvider.bindToLifecycle(fakeLifecycleOwner, BACK_SELECTOR, imageCapture, preview)
+        }
+
+        assertThat(imageCapture.realtimeCaptureLatencyEstimate)
+            .isEqualTo(ImageCaptureLatencyEstimate.UNDEFINED_IMAGE_CAPTURE_LATENCY)
+    }
 
     @Test
     fun resolutionSelectorConfigCorrectlyMerged_afterBindToLifecycle() = runBlocking {

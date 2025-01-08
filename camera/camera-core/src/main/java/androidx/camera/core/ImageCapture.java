@@ -1661,6 +1661,13 @@ public final class ImageCapture extends UseCase {
      * configuration change.
      *
      * <p>The processing estimate can vary based on device processing load.
+     *
+     * <p>If this method returns
+     * {@link ImageCaptureLatencyEstimate#UNDEFINED_IMAGE_CAPTURE_LATENCY}, it means that the
+     * camera HAL doesn't provide latency information. In this case, this method will
+     * consistently return {@link ImageCaptureLatencyEstimate#UNDEFINED_IMAGE_CAPTURE_LATENCY}
+     * for the current camera configuration, as long as the UseCase and camera configuration
+     * remain unchanged (e.g., extensions mode and camera settings are kept the same).
      */
     public @NonNull ImageCaptureLatencyEstimate getRealtimeCaptureLatencyEstimate() {
         final CameraInternal camera = getCamera();
@@ -1669,8 +1676,9 @@ public final class ImageCapture extends UseCase {
         }
 
         final CameraConfig config = camera.getExtendedConfig();
-        final SessionProcessor sessionProcessor = config.getSessionProcessor();
-        final Pair<Long, Long> latencyEstimate = sessionProcessor.getRealtimeCaptureLatency();
+        final SessionProcessor sessionProcessor = config.getSessionProcessor(null);
+        final Pair<Long, Long> latencyEstimate =
+                sessionProcessor != null ? sessionProcessor.getRealtimeCaptureLatency() : null;
         if (latencyEstimate == null) {
             return ImageCaptureLatencyEstimate.UNDEFINED_IMAGE_CAPTURE_LATENCY;
         }
