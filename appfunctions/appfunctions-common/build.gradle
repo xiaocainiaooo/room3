@@ -36,6 +36,7 @@ dependencies {
 
     // Internal dependencies
     implementation("androidx.annotation:annotation:1.8.1")
+    implementation("androidx.core:core:1.1.0")
 
     // Compile only dependencies
     compileOnly(project(":appfunctions:appfunctions-stubs"))

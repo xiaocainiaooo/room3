@@ -1,6 +1,14 @@
 // Signature format: 4.0
 package androidx.appfunctions {
 
+  public final class AppFunctionAppUnknownException extends androidx.appfunctions.AppFunctionException {
+    ctor public AppFunctionAppUnknownException(optional String? errorMessage);
+  }
+
+  public final class AppFunctionCancelledException extends androidx.appfunctions.AppFunctionException {
+    ctor public AppFunctionCancelledException(optional String? errorMessage);
+  }
+
   public interface AppFunctionContext {
     method public String getCallingPackageName();
     method public android.content.pm.SigningInfo getCallingPackageSigningInfo();
@@ -10,11 +18,27 @@ package androidx.appfunctions {
     property public abstract android.content.Context context;
   }
 
-  public final class AppFunctionException {
+  public final class AppFunctionDeniedException extends androidx.appfunctions.AppFunctionException {
+    ctor public AppFunctionDeniedException(optional String? errorMessage);
+  }
+
+  public final class AppFunctionDisabledException extends androidx.appfunctions.AppFunctionException {
+    ctor public AppFunctionDisabledException(optional String? errorMessage);
+  }
+
+  public final class AppFunctionElementAlreadyExistsException extends androidx.appfunctions.AppFunctionException {
+    ctor public AppFunctionElementAlreadyExistsException(optional String? errorMessage);
+  }
+
+  public final class AppFunctionElementNotFoundException extends androidx.appfunctions.AppFunctionException {
+    ctor public AppFunctionElementNotFoundException(optional String? errorMessage);
+  }
+
+  public class AppFunctionException extends java.lang.Exception {
     ctor public AppFunctionException(int errorCode, optional String? errorMessage);
-    method public int getErrorCategory();
-    method public int getErrorCode();
-    method public String? getErrorMessage();
+    method public final int getErrorCategory();
+    method public final int getErrorCode();
+    method public final String? getErrorMessage();
     property public final int errorCategory;
     property public final int errorCode;
     property public final String? errorMessage;
@@ -56,7 +80,31 @@ package androidx.appfunctions {
     property public static final int ERROR_SYSTEM_ERROR;
   }
 
+  public final class AppFunctionFunctionNotFoundException extends androidx.appfunctions.AppFunctionException {
+    ctor public AppFunctionFunctionNotFoundException(optional String? errorMessage);
+  }
+
+  public final class AppFunctionInvalidArgumentException extends androidx.appfunctions.AppFunctionException {
+    ctor public AppFunctionInvalidArgumentException(optional String? errorMessage);
+  }
+
+  public final class AppFunctionLimitExceededException extends androidx.appfunctions.AppFunctionException {
+    ctor public AppFunctionLimitExceededException(optional String? errorMessage);
+  }
+
+  public final class AppFunctionNotSupportedException extends androidx.appfunctions.AppFunctionException {
+    ctor public AppFunctionNotSupportedException(optional String? errorMessage);
+  }
+
+  public final class AppFunctionPermissionRequiredException extends androidx.appfunctions.AppFunctionException {
+    ctor public AppFunctionPermissionRequiredException(optional String? errorMessage);
+  }
+
   @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.SOURCE) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface AppFunctionSerializable {
+  }
+
+  public final class AppFunctionSystemException extends androidx.appfunctions.AppFunctionException {
+    ctor public AppFunctionSystemException(optional String? errorMessage);
   }
 
 }

@@ -17,7 +17,7 @@
 package androidx.appfunctions
 
 import android.os.Bundle
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.junit.AssumptionViolatedException
 import org.junit.Test
 
@@ -26,18 +26,18 @@ class AppFunctionExceptionTest {
     fun testConstructor_withoutMessageAndExtras() {
         val exception = AppFunctionException(AppFunctionException.ERROR_DENIED)
 
-        Truth.assertThat(exception.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
-        Truth.assertThat(exception.errorMessage).isNull()
-        Truth.assertThat(exception.extras).isEqualTo(Bundle.EMPTY)
+        assertThat(exception.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
+        assertThat(exception.errorMessage).isNull()
+        assertThat(exception.extras).isEqualTo(Bundle.EMPTY)
     }
 
     @Test
     fun testConstructor_withoutExtras() {
         val exception = AppFunctionException(AppFunctionException.ERROR_DENIED, "testMessage")
 
-        Truth.assertThat(exception.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
-        Truth.assertThat(exception.errorMessage).isEqualTo("testMessage")
-        Truth.assertThat(exception.extras).isEqualTo(Bundle.EMPTY)
+        assertThat(exception.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
+        assertThat(exception.errorMessage).isEqualTo("testMessage")
+        assertThat(exception.extras).isEqualTo(Bundle.EMPTY)
     }
 
     @Test
@@ -46,34 +46,30 @@ class AppFunctionExceptionTest {
         val exception =
             AppFunctionException(AppFunctionException.ERROR_DENIED, "testMessage", extras)
 
-        Truth.assertThat(exception.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
-        Truth.assertThat(exception.errorMessage).isEqualTo("testMessage")
-        Truth.assertThat(exception.extras.getString("testKey")).isEqualTo("testValue")
+        assertThat(exception.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
+        assertThat(exception.errorMessage).isEqualTo("testMessage")
+        assertThat(exception.extras.getString("testKey")).isEqualTo("testValue")
     }
 
     @Test
     fun testErrorCategory_RequestError() {
-        Truth.assertThat(AppFunctionException(AppFunctionException.ERROR_DENIED).errorCategory)
+        assertThat(AppFunctionException(AppFunctionException.ERROR_DENIED).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
-        Truth.assertThat(
-                AppFunctionException(AppFunctionException.ERROR_INVALID_ARGUMENT).errorCategory
-            )
+        assertThat(AppFunctionException(AppFunctionException.ERROR_INVALID_ARGUMENT).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
-        Truth.assertThat(AppFunctionException(AppFunctionException.ERROR_DISABLED).errorCategory)
+        assertThat(AppFunctionException(AppFunctionException.ERROR_DISABLED).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
-        Truth.assertThat(
+        assertThat(
                 AppFunctionException(AppFunctionException.ERROR_FUNCTION_NOT_FOUND).errorCategory
             )
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
-        Truth.assertThat(
+        assertThat(
                 AppFunctionException(AppFunctionException.ERROR_RESOURCE_NOT_FOUND).errorCategory
             )
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
-        Truth.assertThat(
-                AppFunctionException(AppFunctionException.ERROR_LIMIT_EXCEEDED).errorCategory
-            )
+        assertThat(AppFunctionException(AppFunctionException.ERROR_LIMIT_EXCEEDED).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
-        Truth.assertThat(
+        assertThat(
                 AppFunctionException(AppFunctionException.ERROR_RESOURCE_ALREADY_EXISTS)
                     .errorCategory
             )
@@ -82,27 +78,21 @@ class AppFunctionExceptionTest {
 
     @Test
     fun testErrorCategory_SystemError() {
-        Truth.assertThat(
-                AppFunctionException(AppFunctionException.ERROR_SYSTEM_ERROR).errorCategory
-            )
+        assertThat(AppFunctionException(AppFunctionException.ERROR_SYSTEM_ERROR).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_SYSTEM)
-        Truth.assertThat(AppFunctionException(AppFunctionException.ERROR_CANCELLED).errorCategory)
+        assertThat(AppFunctionException(AppFunctionException.ERROR_CANCELLED).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_SYSTEM)
     }
 
     @Test
     fun testErrorCategory_AppError() {
-        Truth.assertThat(
-                AppFunctionException(AppFunctionException.ERROR_APP_UNKNOWN_ERROR).errorCategory
-            )
+        assertThat(AppFunctionException(AppFunctionException.ERROR_APP_UNKNOWN_ERROR).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_APP)
-        Truth.assertThat(
+        assertThat(
                 AppFunctionException(AppFunctionException.ERROR_PERMISSION_REQUIRED).errorCategory
             )
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_APP)
-        Truth.assertThat(
-                AppFunctionException(AppFunctionException.ERROR_NOT_SUPPORTED).errorCategory
-            )
+        assertThat(AppFunctionException(AppFunctionException.ERROR_NOT_SUPPORTED).errorCategory)
             .isEqualTo(AppFunctionException.ERROR_CATEGORY_APP)
     }
 
@@ -115,9 +105,9 @@ class AppFunctionExceptionTest {
 
         val platformException = exception.toPlatformExtensionsClass()
 
-        Truth.assertThat(platformException.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
-        Truth.assertThat(platformException.errorMessage).isEqualTo("testMessage")
-        Truth.assertThat(platformException.extras.getString("testKey")).isEqualTo("testValue")
+        assertThat(platformException.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
+        assertThat(platformException.errorMessage).isEqualTo("testMessage")
+        assertThat(platformException.extras.getString("testKey")).isEqualTo("testValue")
     }
 
     @Test
@@ -132,9 +122,11 @@ class AppFunctionExceptionTest {
             )
 
         val exception = AppFunctionException.fromPlatformExtensionsClass(platformException)
-        Truth.assertThat(exception.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
-        Truth.assertThat(exception.errorMessage).isEqualTo("testMessage")
-        Truth.assertThat(exception.extras.getString("testKey")).isEqualTo("testValue")
+
+        assertThat(exception).isInstanceOf(AppFunctionDeniedException::class.java)
+        assertThat(exception.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
+        assertThat(exception.errorMessage).isEqualTo("testMessage")
+        assertThat(exception.extras.getString("testKey")).isEqualTo("testValue")
     }
 
     private fun assumeAppFunctionExtensionLibraryAvailable(): Boolean {
