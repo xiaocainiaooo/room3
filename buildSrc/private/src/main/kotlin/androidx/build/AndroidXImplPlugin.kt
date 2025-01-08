@@ -1322,7 +1322,9 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
     // If this project wants other project in the same group to have the same version,
     // this function configures those constraints.
     private fun Project.configureConstraintsWithinGroup(androidXExtension: AndroidXExtension) {
-        if (!project.shouldAddGroupConstraints().get()) {
+        if (
+            !project.shouldAddGroupConstraints().get() || buildFeatures.isIsolatedProjectsEnabled()
+        ) {
             return
         }
         project.afterEvaluate {
