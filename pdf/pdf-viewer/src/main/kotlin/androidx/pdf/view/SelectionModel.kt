@@ -31,6 +31,7 @@ internal constructor(
 ) {
     companion object {
         /** Produces a [SelectionModel] from a single [PageSelection] on a single page */
+        // TODO(b/386398335) Add support for creating a SelectionModel from selections on 2 pages
         fun fromSinglePageSelection(pageSelection: PageSelection): SelectionModel {
             val startPoint =
                 requireNotNull(pageSelection.start.point) { "PageSelection is missing start point" }
