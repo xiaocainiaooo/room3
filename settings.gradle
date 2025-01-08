@@ -1250,6 +1250,8 @@ includeProject(":external:libyuv", [BuildType.CAMERA])
 includeProject(":noto-emoji-compat-font", new File(externalRoot, "noto-fonts/emoji-compat"), [BuildType.MAIN])
 includeProject(":noto-emoji-compat-flatbuffers", new File(externalRoot, "noto-fonts/emoji-compat-flatbuffers"), [BuildType.MAIN, BuildType.COMPOSE])
 
+includeProject(":compose-hero-benchmarks", new File(externalRoot, "compose-hero-benchmarks"), [BuildType.COMPOSE])
+includeProject(":compose-hero-benchmarks:poxedex-compose", new File(externalRoot, "compose-hero-benchmarks/poxedex-compose"), [BuildType.COMPOSE])
 includeProject(":compose-hero-benchmarks:poxedex-compose:app", new File(externalRoot, "compose-hero-benchmarks/poxedex-compose/app"), [BuildType.COMPOSE])
 
 if (isAllProjects()) {
