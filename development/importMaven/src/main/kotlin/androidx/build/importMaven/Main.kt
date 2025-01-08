@@ -426,6 +426,11 @@ internal fun createCliCommands() = ImportArtifact()
     )
 
 fun main(args: Array<String>) {
-    createCliCommands().main(args)
-    exitProcess(0)
+    try {
+        createCliCommands().main(args)
+        exitProcess(0)
+    } catch (e: Throwable) {
+        e.printStackTrace()
+        exitProcess(1)
+    }
 }
