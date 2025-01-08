@@ -94,7 +94,7 @@ final class FeaturesImpl implements Features {
             case Features.ENTERPRISE_GLOBAL_SEARCH_SESSION:
                 return Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM;
 
-
+            // TODO(b/275592563): rearrange this part after fixing the merge conflict.
             // Beyond Android V Features
             case Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG:
                 // TODO(b/326656531) : Update when feature is ready in service-appsearch.
