@@ -37,7 +37,11 @@ fun LayoutModifier.backgroundColor(color: LayoutColor): LayoutModifier =
  * @param corner to use for clipping the background
  */
 fun LayoutModifier.background(color: LayoutColor, corner: Corner? = null): LayoutModifier =
-    this then BaseBackgroundElement(color).apply { corner?.let { clip(it) } }
+    if (corner == null) {
+        this then BaseBackgroundElement(color)
+    } else {
+        this then BaseBackgroundElement(color).clip(corner)
+    }
 
 /** Clips the element to a rounded rectangle with four corners with [cornerRadius] radius. */
 fun LayoutModifier.clip(@Dimension(DP) cornerRadius: Float): LayoutModifier =
