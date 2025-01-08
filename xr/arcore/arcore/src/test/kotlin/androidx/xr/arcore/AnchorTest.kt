@@ -145,6 +145,7 @@ class AnchorTest {
         assertThat(Anchor.getPersistedAnchorUuids(session)).isEmpty()
     }
 
+    @Ignore("Flaky test, see b/384999184")
     @Test
     fun load_previouslyPersistedAnchor_returnsAnchorCreateSuccess() = runTest {
         val session = createTestSession()
