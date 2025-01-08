@@ -1372,7 +1372,8 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                     continue
                 }
                 // We only emit constraints referring to projects that will release
-                val otherFilepath = File(otherProject.filePath, "build.gradle")
+                val otherFilepath =
+                    getSupportRootFolder().resolve(File(otherProject.filePath, "build.gradle"))
                 val parsed = parseBuildFile(otherFilepath)
                 if (!parsed.shouldRelease()) {
                     continue
