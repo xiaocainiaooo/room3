@@ -686,6 +686,16 @@ public class WebViewFeatureInternal {
             new ApiFeature.NoFramework(WebViewFeature.DEFAULT_TRAFFICSTATS_TAGGING,
                     Features.DEFAULT_TRAFFICSTATS_TAGGING);
 
+    /**
+     * Feature for {@link WebViewFeature#isFeatureSupported(String)}.
+     * This feature covers {@link androidx.webkit.WebViewCompat#prerenderUrlAsync(WebView, String,
+     * SpeculativeLoadingParameters, CancellationSignal, PrerenderOperationCallback)}}
+     */
+    public static final ApiFeature.NoFramework PRERENDER_WITH_URL =
+            new ApiFeature.NoFramework(WebViewFeature.PRERENDER_WITH_URL,
+                    Features.PRERENDER_WITH_URL);
+
+
     // --- Add new feature constants above this line ---
 
     private WebViewFeatureInternal() {

@@ -118,6 +118,7 @@ public class WebViewFeature {
             BACK_FORWARD_CACHE,
             DEFAULT_TRAFFICSTATS_TAGGING,
             DELETE_BROWSING_DATA,
+            PRERENDER_WITH_URL,
     })
     @Retention(RetentionPolicy.SOURCE)
     @Target({ElementType.PARAMETER, ElementType.METHOD})
@@ -648,6 +649,15 @@ public class WebViewFeature {
      * {@link WebStorageCompat#deleteBrowsingDataForSite(WebStorage, String, Runnable)}
      */
     public static final String DELETE_BROWSING_DATA = "DELETE_BROWSING_DATA";
+
+    /**
+     * Feature for {@link #isFeatureSupported(String)}.
+     * This feature covers
+     * {@link androidx.webkit.WebViewCompat#prerenderUrlAsync(WebView, String,
+     * SpeculativeLoadingParameters, CancellationSignal, PrerenderOperationCallback)}}
+     */
+    @WebViewCompat.ExperimentalUrlPrerender
+    public static final String PRERENDER_WITH_URL = "PRERENDER_URL";
 
     /**
      * Return whether a feature is supported at run-time. This will check whether a feature is
