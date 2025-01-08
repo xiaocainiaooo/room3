@@ -418,13 +418,23 @@ internal constructor(
                 velocity >= AnchoringVelocityThreshold -> {
                     { anchorPosition: Int ->
                         val delta = anchorPosition - currentPosition
-                        if (delta < 0) Int.MAX_VALUE else delta
+                        if (delta < 0) {
+                            // If there's no anchor on the swiping direction, use the closet anchor
+                            maxExpansionWidth - delta
+                        } else {
+                            delta
+                        }
                     }
                 }
                 velocity <= -AnchoringVelocityThreshold -> {
                     { anchorPosition: Int ->
                         val delta = currentPosition - anchorPosition
-                        if (delta < 0) Int.MAX_VALUE else delta
+                        if (delta < 0) {
+                            // If there's no anchor on the swiping direction, use the closet anchor
+                            maxExpansionWidth - delta
+                        } else {
+                            delta
+                        }
                     }
                 }
                 else -> {
