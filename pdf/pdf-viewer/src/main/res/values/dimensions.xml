@@ -40,7 +40,7 @@
     <dimen name="page_indicator_text_offset">9dp</dimen>
     <dimen name="page_indicator_text_offset_x">1dp</dimen>
     <dimen name="page_indicator_text_offset_y">20dp</dimen>
-    <dimen name="page_indicator_text_size">4.5dp</dimen>
+    <dimen name="page_indicator_text_size">4.8dp</dimen>
     <dimen name="scroller_top_margin">2dp</dimen>
     <dimen name="scroller_bottom_margin">2dp</dimen>
 </resources>

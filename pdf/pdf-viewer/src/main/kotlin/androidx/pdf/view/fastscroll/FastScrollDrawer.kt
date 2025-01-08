@@ -24,9 +24,11 @@ import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.util.Range
+import androidx.core.content.ContextCompat
 import androidx.pdf.PdfDocument
 import androidx.pdf.R
 import androidx.pdf.view.PdfView
+import com.google.android.material.color.MaterialColors
 
 /**
  * Draws the visual elements of the fast scroller.
@@ -67,10 +69,18 @@ internal class FastScrollDrawer(
 
     private val textPaint: TextPaint =
         TextPaint().apply {
-            color = Color.BLACK
+            color =
+                MaterialColors.getColor(
+                    context,
+                    com.google.android.material.R.attr.colorOnSurface,
+                    Color.BLACK
+                )
             textSize = pageIndicatorTextSize.dpToPx(context)
             textAlign = Paint.Align.CENTER
         }
+
+    private val thumbShadowDrawable: Drawable? =
+        ContextCompat.getDrawable(context, R.drawable.drag_indicator_shadow)
 
     internal val thumbWidthPx = thumbWidthDp.dpToPx(context)
     internal val thumbHeightPx = thumbHeightDp.dpToPx(context)
@@ -106,6 +116,14 @@ internal class FastScrollDrawer(
         val thumbRightPx =
             PdfView.toViewCoord(visibleAreaPx.right.toFloat(), zoom, scroll = 0).toInt() +
                 scrubberEdgeOffsetDp.dpToPx(context)
+
+        thumbShadowDrawable?.setBounds(
+            thumbLeftPx - SHADOW_OFFSET_FROM_SCRUBBER_DP.dpToPx(context),
+            thumbTopPx - SHADOW_OFFSET_FROM_SCRUBBER_DP.dpToPx(context),
+            thumbRightPx + SHADOW_OFFSET_FROM_SCRUBBER_DP.dpToPx(context),
+            thumbBottomPx + SHADOW_OFFSET_FROM_SCRUBBER_DP.dpToPx(context)
+        )
+        thumbShadowDrawable?.draw(canvas)
 
         thumbDrawable.setBounds(thumbLeftPx, thumbTopPx, thumbRightPx, thumbBottomPx)
         thumbDrawable.draw(canvas)
@@ -176,5 +194,9 @@ internal class FastScrollDrawer(
                 pdfDocument.pageCount
             )
         }
+    }
+
+    companion object {
+        private const val SHADOW_OFFSET_FROM_SCRUBBER_DP = 2
     }
 }
