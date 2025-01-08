@@ -94,13 +94,17 @@ final class FeaturesImpl implements Features {
             case Features.ENTERPRISE_GLOBAL_SEARCH_SESSION:
                 return Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM;
 
+            // Android B Features
+            case Features.INDEXER_MOBILE_APPLICATIONS:
+                // fall through
+            case Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG:
+                // fall through
+            case Features.SEARCH_SPEC_ADD_INFORMATIONAL_RANKING_EXPRESSIONS:
+                return AppSearchVersionUtil.isAtLeastB();
 
-            // Beyond Android V Features
+            // Pending Android B Features
             case Features.SCHEMA_EMBEDDING_QUANTIZATION:
                 // TODO(b/359959345) : Update when feature is ready in service-appsearch.
-                // fall through
-            case Features.SCHEMA_SET_DESCRIPTION:
-                // TODO(b/326987971) : Update when feature is ready in service-appsearch.
                 // fall through
             case Features.SEARCH_SPEC_SEARCH_STRING_PARAMETERS:
                 // TODO(b/332620561) : Update when feature is ready in service-appsearch.
@@ -116,19 +120,16 @@ final class FeaturesImpl implements Features {
                 // fall through
             case Features.SEARCH_RESULT_PARENT_TYPES:
                 // TODO(b/371610934) : Update when feature is ready in service-appsearch.
-                // fall through
-            case Features.SCHEMA_STRING_PROPERTY_CONFIG_DELETE_PROPAGATION_TYPE_PROPAGATE_FROM:
-                // TODO(b/376913014) : Update when feature is ready in service-appsearch.
-                // fall through
                 return false;
 
-            // Android B Features
-            case Features.INDEXER_MOBILE_APPLICATIONS:
+            // Beyond Android B Features
+            case Features.SCHEMA_SET_DESCRIPTION:
+                // TODO(b/326987971) : Update when feature is ready in service-appsearch.
                 // fall through
-            case Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG:
-                // fall through
-            case Features.SEARCH_SPEC_ADD_INFORMATIONAL_RANKING_EXPRESSIONS:
-                return AppSearchVersionUtil.isAtLeastB();
+            case Features.SCHEMA_STRING_PROPERTY_CONFIG_DELETE_PROPAGATION_TYPE_PROPAGATE_FROM:
+                // TODO(b/384947619) : Update when feature is ready in service-appsearch.
+                return false;
+
             default:
                 return false;
         }
