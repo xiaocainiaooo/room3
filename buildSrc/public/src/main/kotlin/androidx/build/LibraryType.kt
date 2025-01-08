@@ -89,6 +89,7 @@ sealed class LibraryType(
 
     companion object {
         // Host-only tooling libraries
+        @JvmStatic
         val ANNOTATION_PROCESSOR =
             ConfigurableLibrary(
                 name = "ANNOTATION_PROCESSOR",
@@ -97,6 +98,7 @@ sealed class LibraryType(
                 compilationTarget = CompilationTarget.HOST
             )
 
+        @JvmStatic
         val ANNOTATION_PROCESSOR_UTILS =
             ConfigurableLibrary(
                 name = "ANNOTATION_PROCESSOR_UTILS",
@@ -105,6 +107,7 @@ sealed class LibraryType(
                 compilationTarget = CompilationTarget.HOST
             )
 
+        @JvmStatic
         val GRADLE_PLUGIN =
             ConfigurableLibrary(
                 name = "GRADLE_PLUGIN",
@@ -113,6 +116,7 @@ sealed class LibraryType(
                 compilationTarget = CompilationTarget.HOST
             )
 
+        @JvmStatic
         val OTHER_CODE_PROCESSOR =
             ConfigurableLibrary(
                 name = "OTHER_CODE_PROCESSOR",
@@ -122,6 +126,7 @@ sealed class LibraryType(
             )
 
         // Lint libraries
+        @JvmStatic
         val LINT =
             ConfigurableLibrary(
                 name = "LINT",
@@ -129,6 +134,7 @@ sealed class LibraryType(
                 compilationTarget = CompilationTarget.HOST
             )
 
+        @JvmStatic
         val STANDALONE_PUBLISHED_LINT =
             ConfigurableLibrary(
                 name = "STANDALONE_PUBLISHED_LINT",
@@ -138,6 +144,7 @@ sealed class LibraryType(
             )
 
         // Published libraries
+        @JvmStatic
         val PUBLISHED_LIBRARY =
             ConfigurableLibrary(
                 name = "PUBLISHED_LIBRARY",
@@ -145,6 +152,7 @@ sealed class LibraryType(
                 checkApi = RunApiTasks.Yes()
             )
 
+        @JvmStatic
         val PUBLISHED_PROTO_LIBRARY =
             ConfigurableLibrary(
                 name = "PUBLISHED_PROTO_LIBRARY",
@@ -153,6 +161,7 @@ sealed class LibraryType(
                     RunApiTasks.No("Metalava doesn't properly parse the proto sources b/180579063")
             )
 
+        @JvmStatic
         val PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS =
             ConfigurableLibrary(
                 name = "PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS",
@@ -162,6 +171,7 @@ sealed class LibraryType(
             )
 
         // Published test libraries
+        @JvmStatic
         val PUBLISHED_TEST_LIBRARY =
             ConfigurableLibrary(
                 name = "PUBLISHED_TEST_LIBRARY",
@@ -170,6 +180,7 @@ sealed class LibraryType(
                 allowCallingVisibleForTestsApis = true
             )
 
+        @JvmStatic
         val PUBLISHED_KOTLIN_ONLY_TEST_LIBRARY =
             ConfigurableLibrary(
                 name = "PUBLISHED_KOTLIN_ONLY_TEST_LIBRARY",
@@ -180,6 +191,7 @@ sealed class LibraryType(
             )
 
         // Snapshot-only libraries
+        @JvmStatic
         val SNAPSHOT_ONLY_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS =
             ConfigurableLibrary(
                 name = "SNAPSHOT_ONLY_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS",
@@ -188,6 +200,7 @@ sealed class LibraryType(
                 targetsKotlinConsumersOnly = true
             )
 
+        @JvmStatic
         val SNAPSHOT_ONLY_TEST_LIBRARY_WITH_API_TASKS =
             ConfigurableLibrary(
                 name = "SNAPSHOT_ONLY_TEST_LIBRARY_WITH_API_TASKS",
@@ -196,6 +209,7 @@ sealed class LibraryType(
                 allowCallingVisibleForTestsApis = true
             )
 
+        @JvmStatic
         val SNAPSHOT_ONLY_LIBRARY_WITH_API_TASKS =
             ConfigurableLibrary(
                 name = "SNAPSHOT_ONLY_LIBRARY_WITH_API_TASKS",
@@ -203,6 +217,7 @@ sealed class LibraryType(
                 checkApi = RunApiTasks.Yes("Snapshot-only library that runs API tasks")
             )
 
+        @JvmStatic
         val SNAPSHOT_ONLY_LIBRARY =
             ConfigurableLibrary(
                 name = "SNAPSHOT_ONLY_LIBRARY",
@@ -211,6 +226,7 @@ sealed class LibraryType(
             )
 
         // Samples library
+        @JvmStatic
         val SAMPLES =
             ConfigurableLibrary(
                 name = "SAMPLES",
@@ -219,6 +235,7 @@ sealed class LibraryType(
             )
 
         // IDE libraries
+        @JvmStatic
         val IDE_PLUGIN =
             ConfigurableLibrary(
                 name = "IDE_PLUGIN",
@@ -227,6 +244,7 @@ sealed class LibraryType(
             )
 
         // Internal libraries
+        @JvmStatic
         val INTERNAL_GRADLE_PLUGIN =
             ConfigurableLibrary(
                 name = "INTERNAL_GRADLE_PLUGIN",
@@ -234,6 +252,7 @@ sealed class LibraryType(
                 compilationTarget = CompilationTarget.HOST
             )
 
+        @JvmStatic
         val INTERNAL_HOST_TEST_LIBRARY =
             ConfigurableLibrary(
                 name = "INTERNAL_HOST_TEST_LIBRARY",
@@ -241,12 +260,14 @@ sealed class LibraryType(
                 compilationTarget = CompilationTarget.HOST
             )
 
+        @JvmStatic
         val INTERNAL_LIBRARY_WITH_API_TASKS =
             ConfigurableLibrary(
                 name = "INTERNAL_LIBRARY_WITH_API_TASKS",
                 checkApi = RunApiTasks.Yes("Always run API tasks even if not published")
             )
 
+        @JvmStatic
         val INTERNAL_OTHER_CODE_PROCESSOR =
             ConfigurableLibrary(
                 name = "INTERNAL_OTHER_CODE_PROCESSOR",
@@ -254,6 +275,7 @@ sealed class LibraryType(
                 compilationTarget = CompilationTarget.HOST
             )
 
+        @JvmStatic
         val INTERNAL_TEST_LIBRARY =
             ConfigurableLibrary(
                 name = "INTERNAL_TEST_LIBRARY",
@@ -262,6 +284,7 @@ sealed class LibraryType(
             )
 
         // Misc libraries
+        @JvmStatic
         val BENCHMARK =
             ConfigurableLibrary(
                 name = "BENCHMARK",
@@ -269,6 +292,7 @@ sealed class LibraryType(
                 allowCallingVisibleForTestsApis = true
             )
 
+        @JvmStatic
         val TEST_APPLICATION =
             ConfigurableLibrary(name = "TEST_APPLICATION", checkApi = RunApiTasks.No("Test App"))
 
