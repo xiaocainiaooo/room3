@@ -108,3 +108,39 @@ public class Highlight(public val area: PdfRect, @ColorInt public val color: Int
         return "Highlight: area $area color $color"
     }
 }
+
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+/** Represents PDF content that has been selected */
+public interface Selection {
+    /**
+     * The [PdfRect] bounds of this selection. May contain multiple [PdfRect] if this selection
+     * spans multiple discrete areas within the PDF. Consider for example any selection spanning
+     * multiple pages, or a text selection spanning multiple lines on the same page.
+     */
+    public val bounds: List<PdfRect>
+}
+
+/** Represents text content that has been selected */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+public class TextSelection(public val text: String, override val bounds: List<PdfRect>) :
+    Selection {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is TextSelection) return false
+
+        if (other.text != this.text) return false
+        if (other.bounds != this.bounds) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = text.hashCode()
+        result = 31 * result + bounds.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "TextSelection: text $text bounds $bounds"
+    }
+}
