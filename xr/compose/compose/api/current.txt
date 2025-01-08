@@ -6,9 +6,9 @@ package androidx.xr.compose.unit {
     method public float getDepth();
     method public float getHeight();
     method public float getWidth();
-    property public float depth;
-    property public float height;
-    property public float width;
+    property public final float depth;
+    property public final float height;
+    property public final float width;
     field public static final androidx.xr.compose.unit.DpVolumeSize.Companion Companion;
   }
 
@@ -59,28 +59,28 @@ package androidx.xr.compose.unit {
 
   public static final class Meter.Companion {
     method public inline float fromPixel(float px, androidx.compose.ui.unit.Density density);
-    method public float getCentimeters();
-    method public float getCentimeters();
-    method public float getCentimeters();
+    method public float getCentimeters(double);
+    method public float getCentimeters(float);
+    method public float getCentimeters(int);
     method public float getInfinity();
-    method public float getMeters();
-    method public float getMeters();
-    method public float getMeters();
-    method public float getMillimeters();
-    method public float getMillimeters();
-    method public float getMillimeters();
+    method public float getMeters(double);
+    method public float getMeters(float);
+    method public float getMeters(int);
+    method public float getMillimeters(double);
+    method public float getMillimeters(float);
+    method public float getMillimeters(int);
     method public float getNaN();
-    property public float Infinity;
-    property public float NaN;
-    property public float centimeters;
-    property public float centimeters;
-    property public float centimeters;
-    property public float meters;
-    property public float meters;
-    property public float meters;
-    property public float millimeters;
-    property public float millimeters;
-    property public float millimeters;
+    property public final float Infinity;
+    property public final float NaN;
+    property public final float centimeters;
+    property public final float centimeters;
+    property public final float centimeters;
+    property public final float meters;
+    property public final float meters;
+    property public final float meters;
+    property public final float millimeters;
+    property public final float millimeters;
+    property public final float millimeters;
   }
 
   public final class MeterKt {
