@@ -53,6 +53,7 @@ class PlaneTest {
     private lateinit var xrResourcesManager: XrResourcesManager
     private lateinit var testDispatcher: TestDispatcher
     private lateinit var testScope: TestScope
+    private lateinit var session: Session
 
     @get:Rule
     val grantPermissionRule = GrantPermissionRule.grant("android.permission.SCENE_UNDERSTANDING")
@@ -105,20 +106,21 @@ class PlaneTest {
 
     @Test
     fun subscribe_collectReturnsPlane() =
-        runTest(testDispatcher) {
-            val session = createTestSession(testDispatcher)
-            val perceptionManager = session.runtime.perceptionManager as FakePerceptionManager
-            val runtimePlane = FakeRuntimePlane()
-            perceptionManager.addTrackable(runtimePlane)
-            awaitNewCoreState(session, testScope)
+        createTestSessionAndRunTest(testDispatcher) {
+            runTest(testDispatcher) {
+                val perceptionManager = session.runtime.perceptionManager as FakePerceptionManager
+                val runtimePlane = FakeRuntimePlane()
+                perceptionManager.addTrackable(runtimePlane)
+                awaitNewCoreState(session, testScope)
 
-            var underTest = emptyList<Plane>()
-            testScope.backgroundScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                underTest = Plane.subscribe(session).first().toList()
+                var underTest = emptyList<Plane>()
+                testScope.backgroundScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                    underTest = Plane.subscribe(session).first().toList()
+                }
+
+                assertThat(underTest.size).isEqualTo(1)
+                assertThat(underTest.first().runtimePlane).isEqualTo(runtimePlane)
             }
-
-            assertThat(underTest.size).isEqualTo(1)
-            assertThat(underTest.first().runtimePlane).isEqualTo(runtimePlane)
         }
 
     @Test
@@ -245,17 +247,18 @@ class PlaneTest {
         assertThat(Plane.Type.Vertical.toString()).isEqualTo("Vertical")
     }
 
-    private fun createTestSession(
-        coroutineDispatcher: CoroutineDispatcher = StandardTestDispatcher()
-    ): Session {
-        var session: Session? = null
+    private fun createTestSessionAndRunTest(
+        coroutineDispatcher: CoroutineDispatcher = StandardTestDispatcher(),
+        testBody: () -> Unit,
+    ) {
         ActivityScenario.launch(Activity::class.java).use {
             it.onActivity { activity ->
                 session =
                     (Session.create(activity, coroutineDispatcher) as SessionCreateSuccess).session
+
+                testBody()
             }
         }
-        return checkNotNull(session) { "Session must not be null." }
     }
 
     /** Resumes and pauses the session just enough to emit a new CoreState. */

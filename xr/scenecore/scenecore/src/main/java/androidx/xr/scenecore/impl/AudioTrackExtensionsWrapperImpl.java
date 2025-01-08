@@ -29,26 +29,26 @@ import androidx.xr.scenecore.JxrPlatformAdapter.SoundFieldAttributes;
 /** Implementation of the {@link AudioTrackExtensionsWrapper} */
 final class AudioTrackExtensionsWrapperImpl implements AudioTrackExtensionsWrapper {
 
-    private final AudioTrackExtensions extensions;
+    private final AudioTrackExtensions mExtensions;
 
-    private final EntityManager entityManager;
+    private final EntityManager mEntityManager;
 
     AudioTrackExtensionsWrapperImpl(AudioTrackExtensions extensions, EntityManager entityManager) {
-        this.extensions = extensions;
-        this.entityManager = entityManager;
+        mExtensions = extensions;
+        mEntityManager = entityManager;
     }
 
     @Nullable
     @Override
     public PointSourceAttributes getPointSourceAttributes(@NonNull AudioTrack audioTrack) {
         androidx.xr.extensions.media.PointSourceAttributes extAttributes =
-                extensions.getPointSourceAttributes(audioTrack);
+                mExtensions.getPointSourceAttributes(audioTrack);
 
         if (extAttributes == null) {
             return null;
         }
 
-        Entity entity = entityManager.getEntityForNode(extAttributes.getNode());
+        Entity entity = mEntityManager.getEntityForNode(extAttributes.getNode());
 
         if (entity == null) {
             return null;
@@ -61,7 +61,7 @@ final class AudioTrackExtensionsWrapperImpl implements AudioTrackExtensionsWrapp
     @Override
     public SoundFieldAttributes getSoundFieldAttributes(@NonNull AudioTrack audioTrack) {
         androidx.xr.extensions.media.SoundFieldAttributes extAttributes =
-                extensions.getSoundFieldAttributes(audioTrack);
+                mExtensions.getSoundFieldAttributes(audioTrack);
 
         if (extAttributes == null) {
             return null;
@@ -72,7 +72,8 @@ final class AudioTrackExtensionsWrapperImpl implements AudioTrackExtensionsWrapp
 
     @Override
     public int getSpatialSourceType(@NonNull AudioTrack audioTrack) {
-        return extensions.getSpatialSourceType(audioTrack);
+        return MediaUtils.convertExtensionsToSourceType(
+                mExtensions.getSpatialSourceType(audioTrack));
     }
 
     @Override
@@ -82,7 +83,7 @@ final class AudioTrackExtensionsWrapperImpl implements AudioTrackExtensionsWrapp
         androidx.xr.extensions.media.PointSourceAttributes extAttributes =
                 MediaUtils.convertPointSourceAttributesToExtensions(attributes);
 
-        return extensions.setPointSourceAttributes(builder, extAttributes);
+        return mExtensions.setPointSourceAttributes(builder, extAttributes);
     }
 
     @Override
@@ -92,6 +93,6 @@ final class AudioTrackExtensionsWrapperImpl implements AudioTrackExtensionsWrapp
         androidx.xr.extensions.media.SoundFieldAttributes extAttributes =
                 MediaUtils.convertSoundFieldAttributesToExtensions(attributes);
 
-        return extensions.setSoundFieldAttributes(builder, extAttributes);
+        return mExtensions.setSoundFieldAttributes(builder, extAttributes);
     }
 }

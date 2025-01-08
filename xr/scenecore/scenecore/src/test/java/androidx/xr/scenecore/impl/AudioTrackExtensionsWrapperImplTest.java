@@ -43,23 +43,23 @@ import org.robolectric.RobolectricTestRunner;
 @RunWith(RobolectricTestRunner.class)
 public class AudioTrackExtensionsWrapperImplTest {
 
-    FakeXrExtensions fakeXrExtensions;
-    FakeSpatialAudioExtensions fakeSpatialAudioExtensions;
-    FakeAudioTrackExtensions fakeAudioTrackExtensions;
+    FakeXrExtensions mFakeXrExtensions;
+    FakeSpatialAudioExtensions mFakeSpatialAudioExtensions;
+    FakeAudioTrackExtensions mFakeAudioTrackExtensions;
 
-    private EntityManager entityManager;
+    private EntityManager mEntityManager;
 
-    @Mock private AudioTrack.Builder builder;
+    @Mock private AudioTrack.Builder mBuilder;
 
     @Before
     public void setUp() {
-        fakeXrExtensions = new FakeXrExtensions();
-        fakeSpatialAudioExtensions = fakeXrExtensions.fakeSpatialAudioExtensions;
-        fakeAudioTrackExtensions = new FakeAudioTrackExtensions();
+        mFakeXrExtensions = new FakeXrExtensions();
+        mFakeSpatialAudioExtensions = mFakeXrExtensions.fakeSpatialAudioExtensions;
+        mFakeAudioTrackExtensions = new FakeAudioTrackExtensions();
 
-        fakeSpatialAudioExtensions.setFakeAudioTrackExtensions(fakeAudioTrackExtensions);
+        mFakeSpatialAudioExtensions.setFakeAudioTrackExtensions(mFakeAudioTrackExtensions);
 
-        entityManager = new EntityManager();
+        mEntityManager = new EntityManager();
     }
 
     @Test
@@ -72,11 +72,11 @@ public class AudioTrackExtensionsWrapperImplTest {
                 new JxrPlatformAdapter.PointSourceAttributes(entity);
 
         AudioTrackExtensionsWrapper wrapper =
-                new AudioTrackExtensionsWrapperImpl(fakeAudioTrackExtensions, entityManager);
-        AudioTrack.Builder actual = wrapper.setPointSourceAttributes(builder, expectedRtAttr);
+                new AudioTrackExtensionsWrapperImpl(mFakeAudioTrackExtensions, mEntityManager);
+        AudioTrack.Builder actual = wrapper.setPointSourceAttributes(mBuilder, expectedRtAttr);
 
-        assertThat(actual).isEqualTo(builder);
-        assertThat(fakeAudioTrackExtensions.getPointSourceAttributes().getNode())
+        assertThat(actual).isEqualTo(mBuilder);
+        assertThat(mFakeAudioTrackExtensions.getPointSourceAttributes().getNode())
                 .isEqualTo(fakeNode);
     }
 
@@ -88,12 +88,12 @@ public class AudioTrackExtensionsWrapperImplTest {
                         JxrPlatformAdapter.SpatializerConstants.AMBISONICS_ORDER_THIRD_ORDER);
 
         AudioTrackExtensionsWrapper wrapper =
-                new AudioTrackExtensionsWrapperImpl(fakeAudioTrackExtensions, entityManager);
+                new AudioTrackExtensionsWrapperImpl(mFakeAudioTrackExtensions, mEntityManager);
 
-        AudioTrack.Builder actual = wrapper.setSoundFieldAttributes(builder, expectedRtAttr);
+        AudioTrack.Builder actual = wrapper.setSoundFieldAttributes(mBuilder, expectedRtAttr);
 
-        assertThat(actual).isEqualTo(builder);
-        assertThat(fakeAudioTrackExtensions.getSoundFieldAttributes().getAmbisonicsOrder())
+        assertThat(actual).isEqualTo(mBuilder);
+        assertThat(mFakeAudioTrackExtensions.getSoundFieldAttributes().getAmbisonicsOrder())
                 .isEqualTo(expectedAmbisonicOrder);
     }
 
@@ -104,15 +104,15 @@ public class AudioTrackExtensionsWrapperImplTest {
         Node fakeNode = new FakeXrExtensions().createNode();
         AndroidXrEntity entity = mock(AndroidXrEntity.class);
         when(entity.getNode()).thenReturn(fakeNode);
-        entityManager.setEntityForNode(fakeNode, entity);
+        mEntityManager.setEntityForNode(fakeNode, entity);
 
-        fakeAudioTrackExtensions.setPointSourceAttributes(
+        mFakeAudioTrackExtensions.setPointSourceAttributes(
                 new PointSourceAttributes.Builder().setNode(fakeNode).build());
 
         JxrPlatformAdapter.PointSourceAttributes expectedRtAttr =
                 new JxrPlatformAdapter.PointSourceAttributes(entity);
         AudioTrackExtensionsWrapper wrapper =
-                new AudioTrackExtensionsWrapperImpl(fakeAudioTrackExtensions, entityManager);
+                new AudioTrackExtensionsWrapperImpl(mFakeAudioTrackExtensions, mEntityManager);
 
         JxrPlatformAdapter.PointSourceAttributes actual = wrapper.getPointSourceAttributes(track);
 
@@ -124,7 +124,7 @@ public class AudioTrackExtensionsWrapperImplTest {
         AudioTrack track = mock(AudioTrack.class);
 
         AudioTrackExtensionsWrapper wrapper =
-                new AudioTrackExtensionsWrapperImpl(fakeAudioTrackExtensions, entityManager);
+                new AudioTrackExtensionsWrapperImpl(mFakeAudioTrackExtensions, mEntityManager);
 
         JxrPlatformAdapter.PointSourceAttributes actual = wrapper.getPointSourceAttributes(track);
 
@@ -135,7 +135,7 @@ public class AudioTrackExtensionsWrapperImplTest {
     public void getSoundFieldAttributes_callsExtensionsGetSoundFieldAttributes() {
         AudioTrack track = mock(AudioTrack.class);
 
-        fakeAudioTrackExtensions.setSoundFieldAttributes(
+        mFakeAudioTrackExtensions.setSoundFieldAttributes(
                 new SoundFieldAttributes.Builder()
                         .setAmbisonicsOrder(SpatializerExtensions.AMBISONICS_ORDER_THIRD_ORDER)
                         .build());
@@ -144,7 +144,7 @@ public class AudioTrackExtensionsWrapperImplTest {
                 new JxrPlatformAdapter.SoundFieldAttributes(
                         SpatializerConstants.AMBISONICS_ORDER_THIRD_ORDER);
         AudioTrackExtensionsWrapper wrapper =
-                new AudioTrackExtensionsWrapperImpl(fakeAudioTrackExtensions, entityManager);
+                new AudioTrackExtensionsWrapperImpl(mFakeAudioTrackExtensions, mEntityManager);
 
         JxrPlatformAdapter.SoundFieldAttributes actual = wrapper.getSoundFieldAttributes(track);
 
@@ -156,7 +156,7 @@ public class AudioTrackExtensionsWrapperImplTest {
         AudioTrack track = mock(AudioTrack.class);
 
         AudioTrackExtensionsWrapper wrapper =
-                new AudioTrackExtensionsWrapperImpl(fakeAudioTrackExtensions, entityManager);
+                new AudioTrackExtensionsWrapperImpl(mFakeAudioTrackExtensions, mEntityManager);
 
         JxrPlatformAdapter.SoundFieldAttributes actual = wrapper.getSoundFieldAttributes(track);
 
@@ -169,9 +169,9 @@ public class AudioTrackExtensionsWrapperImplTest {
 
         int expected = SpatializerConstants.SOURCE_TYPE_SOUND_FIELD;
 
-        fakeAudioTrackExtensions.setSourceType(expected);
+        mFakeAudioTrackExtensions.setSourceType(expected);
         AudioTrackExtensionsWrapper wrapper =
-                new AudioTrackExtensionsWrapperImpl(fakeAudioTrackExtensions, entityManager);
+                new AudioTrackExtensionsWrapperImpl(mFakeAudioTrackExtensions, mEntityManager);
 
         int actualSourceType = wrapper.getSpatialSourceType(track);
         assertThat(actualSourceType).isEqualTo(expected);

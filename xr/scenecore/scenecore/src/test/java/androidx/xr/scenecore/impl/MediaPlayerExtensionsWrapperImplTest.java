@@ -38,16 +38,16 @@ import org.robolectric.RobolectricTestRunner;
 
 @RunWith(RobolectricTestRunner.class)
 public class MediaPlayerExtensionsWrapperImplTest {
-    FakeXrExtensions fakeXrExtensions;
-    XrSpatialAudioExtensions spatialAudioExtensions;
-    FakeMediaPlayerExtensions fakeMediaPlayerExtensions;
+    FakeXrExtensions mFakeXrExtensions;
+    XrSpatialAudioExtensions mSpatialAudioExtensions;
+    FakeMediaPlayerExtensions mFakeMediaPlayerExtensions;
 
     @Before
     public void setUp() {
-        fakeXrExtensions = new FakeXrExtensions();
-        spatialAudioExtensions = fakeXrExtensions.fakeSpatialAudioExtensions;
-        fakeMediaPlayerExtensions =
-                (FakeMediaPlayerExtensions) spatialAudioExtensions.getMediaPlayerExtensions();
+        mFakeXrExtensions = new FakeXrExtensions();
+        mSpatialAudioExtensions = mFakeXrExtensions.fakeSpatialAudioExtensions;
+        mFakeMediaPlayerExtensions =
+                (FakeMediaPlayerExtensions) mSpatialAudioExtensions.getMediaPlayerExtensions();
     }
 
     @Test
@@ -62,10 +62,10 @@ public class MediaPlayerExtensionsWrapperImplTest {
                 new JxrPlatformAdapter.PointSourceAttributes(entity);
 
         MediaPlayerExtensionsWrapper wrapper =
-                new MediaPlayerExtensionsWrapperImpl(fakeMediaPlayerExtensions);
+                new MediaPlayerExtensionsWrapperImpl(mFakeMediaPlayerExtensions);
         wrapper.setPointSourceAttributes(mediaPlayer, expectedRtAttr);
 
-        assertThat(fakeMediaPlayerExtensions.getPointSourceAttributes().getNode())
+        assertThat(mFakeMediaPlayerExtensions.getPointSourceAttributes().getNode())
                 .isEqualTo(fakeNode);
     }
 
@@ -79,10 +79,10 @@ public class MediaPlayerExtensionsWrapperImplTest {
                         JxrPlatformAdapter.SpatializerConstants.AMBISONICS_ORDER_THIRD_ORDER);
 
         MediaPlayerExtensionsWrapper wrapper =
-                new MediaPlayerExtensionsWrapperImpl(fakeMediaPlayerExtensions);
+                new MediaPlayerExtensionsWrapperImpl(mFakeMediaPlayerExtensions);
         wrapper.setSoundFieldAttributes(mediaPlayer, expectedRtAttr);
 
-        assertThat(fakeMediaPlayerExtensions.getSoundFieldAttributes().getAmbisonicsOrder())
+        assertThat(mFakeMediaPlayerExtensions.getSoundFieldAttributes().getAmbisonicsOrder())
                 .isEqualTo(expectedAmbisonicOrder);
     }
 }

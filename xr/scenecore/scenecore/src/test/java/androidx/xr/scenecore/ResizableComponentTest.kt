@@ -186,6 +186,87 @@ class ResizableComponentTest {
     }
 
     @Test
+    fun resizableComponent_setFixedAspectRatioInvokesRuntimeResizableComponentSetFixedAspectRatio() {
+        val entity = session.createEntity("test")
+        assertThat(entity).isNotNull()
+
+        val mockRtResizableComponent = mock<JxrPlatformAdapter.ResizableComponent>()
+        whenever(mockRuntime.createResizableComponent(any(), any()))
+            .thenReturn(mockRtResizableComponent)
+        whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
+        val resizableComponent = ResizableComponent.create(mockRuntime)
+        assertThat(entity.addComponent(resizableComponent)).isTrue()
+
+        val testAspectRatio = 1.23f
+        resizableComponent.fixedAspectRatio = testAspectRatio
+
+        assertThat(resizableComponent.fixedAspectRatio).isEqualTo(testAspectRatio)
+        val captor = ArgumentCaptor.forClass(Float::class.java)
+        verify(mockRtResizableComponent).setFixedAspectRatio(captor.capture())
+        assertThat(captor.value).isEqualTo(testAspectRatio)
+    }
+
+    @Test
+    fun resizableComponent_setAutoHideContentInvokesRuntimeResizableComponentSetAutoHideContent() {
+        val entity = session.createEntity("test")
+        assertThat(entity).isNotNull()
+
+        val mockRtResizableComponent = mock<JxrPlatformAdapter.ResizableComponent>()
+        whenever(mockRuntime.createResizableComponent(any(), any()))
+            .thenReturn(mockRtResizableComponent)
+        whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
+        val resizableComponent = ResizableComponent.create(mockRuntime)
+        assertThat(entity.addComponent(resizableComponent)).isTrue()
+
+        resizableComponent.autoHideContent = false // default is true
+
+        assertThat(resizableComponent.autoHideContent).isFalse()
+        val captor = ArgumentCaptor.forClass(Boolean::class.java)
+        verify(mockRtResizableComponent).setAutoHideContent(captor.capture())
+        assertThat(captor.value).isFalse()
+    }
+
+    @Test
+    fun resizableComponent_setAutoUpdateSizeInvokesRuntimeResizableComponentSetAutoUpdateSize() {
+        val entity = session.createEntity("test")
+        assertThat(entity).isNotNull()
+
+        val mockRtResizableComponent = mock<JxrPlatformAdapter.ResizableComponent>()
+        whenever(mockRuntime.createResizableComponent(any(), any()))
+            .thenReturn(mockRtResizableComponent)
+        whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
+        val resizableComponent = ResizableComponent.create(mockRuntime)
+        assertThat(entity.addComponent(resizableComponent)).isTrue()
+
+        resizableComponent.autoUpdateSize = false // default is true
+
+        assertThat(resizableComponent.autoUpdateSize).isFalse()
+        val captor = ArgumentCaptor.forClass(Boolean::class.java)
+        verify(mockRtResizableComponent).setAutoUpdateSize(captor.capture())
+        assertThat(captor.value).isFalse()
+    }
+
+    @Test
+    fun resizableComponent_setForceShowResizeOverlayInvokesRuntimeResizableComponentSetForceShowResizeOverlay() {
+        val entity = session.createEntity("test")
+        assertThat(entity).isNotNull()
+
+        val mockRtResizableComponent = mock<JxrPlatformAdapter.ResizableComponent>()
+        whenever(mockRuntime.createResizableComponent(any(), any()))
+            .thenReturn(mockRtResizableComponent)
+        whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
+        val resizableComponent = ResizableComponent.create(mockRuntime)
+        assertThat(entity.addComponent(resizableComponent)).isTrue()
+
+        resizableComponent.forceShowResizeOverlay = true // default is false
+
+        assertThat(resizableComponent.forceShowResizeOverlay).isTrue()
+        val captor = ArgumentCaptor.forClass(Boolean::class.java)
+        verify(mockRtResizableComponent).setForceShowResizeOverlay(captor.capture())
+        assertThat(captor.value).isTrue()
+    }
+
+    @Test
     fun addResizeListener_invokesRuntimeAddResizeEventListener() {
         val entity = session.createEntity("test")
         assertThat(entity).isNotNull()

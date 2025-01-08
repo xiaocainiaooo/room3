@@ -89,8 +89,7 @@ private class RotationElement(private val quaternion: Quaternion) :
     }
 }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-public class RotationNode(public var quaternion: Quaternion) :
+internal class RotationNode(public var quaternion: Quaternion) :
     SubspaceLayoutModifierNode, SubspaceModifier.Node() {
     override fun MeasureScope.measure(
         measurable: Measurable,

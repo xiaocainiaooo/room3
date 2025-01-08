@@ -38,6 +38,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -141,8 +142,8 @@ public fun Orbiter(
  * @param position The edge of the orbiter. Use [OrbiterEdge.Top] or [OrbiterEdge.Bottom].
  * @param offset The offset of the orbiter based on the inner or outer edge of the orbiter. Use
  *   [EdgeOffset.outer] to create an [EdgeOffset] aligned to the outer edge of the orbiter or
- *   [innerEdge] or [EdgeOffset.overlap] to create an [EdgeOffset] aligned to the inner edge of the
- *   orbiter.
+ *   [EdgeOffset.inner] or [EdgeOffset.overlap] to create an [EdgeOffset] aligned to the inner edge
+ *   of the orbiter.
  * @param alignment The alignment of the orbiter. Use [Alignment.CenterHorizontally] or
  *   [Alignment.Start] or [Alignment.End].
  * @param settings The settings for the orbiter.
@@ -224,8 +225,8 @@ public fun Orbiter(
  * @param position The edge of the orbiter. Use [OrbiterEdge.Start] or [OrbiterEdge.End].
  * @param offset The offset of the orbiter based on the inner or outer edge of the orbiter. Use
  *   [EdgeOffset.outer] to create an [EdgeOffset] aligned to the outer edge of the orbiter or
- *   [innerEdge] or [EdgeOffset.overlap] to create an [EdgeOffset] aligned to the inner edge of the
- *   orbiter.
+ *   [EdgeOffset.inner] or [EdgeOffset.overlap] to create an [EdgeOffset] aligned to the inner edge
+ *   of the orbiter.
  * @param alignment The alignment of the orbiter. Use [Alignment.CenterVertically] or
  *   [Alignment.Top] or [Alignment.Bottom].
  * @param settings The settings for the orbiter.
@@ -278,6 +279,7 @@ internal fun PositionedOrbiter(data: OrbiterData) {
     var panelSize by remember { mutableStateOf(panelEntity.getPixelDimensions()) }
     var contentSize: IntSize? by remember { mutableStateOf(null) }
     val dialogManager = LocalDialogManager.current
+    val density = LocalDensity.current
 
     DisposableEffect(view) {
         val listener =
@@ -291,7 +293,7 @@ internal fun PositionedOrbiter(data: OrbiterData) {
     ElevatedPanel(
         spatialElevationLevel = SpatialElevationLevel.Level1,
         contentSize = contentSize ?: IntSize.Zero,
-        contentOffset = contentSize?.let { data.calculateOffset(panelSize, it) },
+        contentOffset = contentSize?.let { data.calculateOffset(panelSize, it, density) },
         shape = data.shape,
     ) {
         Box(
@@ -366,13 +368,13 @@ public value class OrbiterOffsetType private constructor(private val value: Int)
 /**
  * Represents the offset of an orbiter from the main panel.
  *
- * @property amount the magnitude of the offset in pixels.
+ * @property amount the magnitude of the offset in Dp.
  * @property type the type of offset ([OrbiterOffsetType.OuterEdge] or
  *   [OrbiterOffsetType.InnerEdge]).
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class EdgeOffset
-internal constructor(public val amount: Float, public val type: OrbiterOffsetType) {
+internal constructor(public val amount: Dp, public val type: OrbiterOffsetType) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is EdgeOffset) return false
@@ -393,7 +395,7 @@ internal constructor(public val amount: Float, public val type: OrbiterOffsetTyp
         return "EdgeOffset(amount=$amount, type=$type)"
     }
 
-    public fun copy(amount: Float = this.amount, type: OrbiterOffsetType = this.type): EdgeOffset =
+    public fun copy(amount: Dp = this.amount, type: OrbiterOffsetType = this.type): EdgeOffset =
         EdgeOffset(amount = amount, type = type)
 
     public companion object {
@@ -407,9 +409,7 @@ internal constructor(public val amount: Float, public val type: OrbiterOffsetTyp
          * @param offset the offset value in [Dp].
          * @return an [EdgeOffset] with the specified offset and type [OrbiterOffsetType.OuterEdge].
          */
-        @Composable
-        public fun outer(offset: Dp): EdgeOffset =
-            with(LocalDensity.current) { EdgeOffset(offset.toPx(), OrbiterOffsetType.OuterEdge) }
+        public fun outer(offset: Dp): EdgeOffset = EdgeOffset(offset, OrbiterOffsetType.OuterEdge)
 
         /**
          * Creates an [EdgeOffset] representing an offset from the inner edge of an orbiter.
@@ -421,9 +421,7 @@ internal constructor(public val amount: Float, public val type: OrbiterOffsetTyp
          * @param offset the offset value in [Dp].
          * @return an [EdgeOffset] with the specified offset and type [OrbiterOffsetType.InnerEdge].
          */
-        @Composable
-        public fun inner(offset: Dp): EdgeOffset =
-            with(LocalDensity.current) { EdgeOffset(offset.toPx(), OrbiterOffsetType.InnerEdge) }
+        public fun inner(offset: Dp): EdgeOffset = EdgeOffset(offset, OrbiterOffsetType.InnerEdge)
 
         /**
          * Creates an [EdgeOffset] representing an overlap of an orbiter into the main panel
@@ -436,9 +434,8 @@ internal constructor(public val amount: Float, public val type: OrbiterOffsetTyp
          * @return an [EdgeOffset] with the [offset]'s pixel value and
          *   [OrbiterOffsetType.InnerEdge].
          */
-        @Composable
         public fun overlap(offset: Dp): EdgeOffset =
-            with(LocalDensity.current) { EdgeOffset(-offset.toPx(), OrbiterOffsetType.InnerEdge) }
+            EdgeOffset(-offset, OrbiterOffsetType.InnerEdge)
     }
 }
 
@@ -454,20 +451,25 @@ internal data class OrbiterData(
 
 /**
  * Calculates the offset that should be applied to the orbiter given its settings, the panel size,
- * and the size of the orbiter content.
+ * and the size of the orbiter content, using the specified density to convert Dp to pixels.
  */
-private fun OrbiterData.calculateOffset(viewSize: PixelDimensions, contentSize: IntSize): Offset {
+private fun OrbiterData.calculateOffset(
+    viewSize: PixelDimensions,
+    contentSize: IntSize,
+    density: Density,
+): Offset {
+
     if (position is OrbiterEdge.Vertical) {
         val y = verticalAlignment.align(contentSize.height, viewSize.height)
 
-        val xOffset =
+        val xOffset: Float =
             when (offset.type) {
-                OrbiterOffsetType.OuterEdge -> -offset.amount
-                OrbiterOffsetType.InnerEdge -> -contentSize.width - offset.amount
+                OrbiterOffsetType.OuterEdge -> -offset.amount.toPx(density)
+                OrbiterOffsetType.InnerEdge -> -contentSize.width - offset.amount.toPx(density)
                 else -> error("Unexpected OrbiterOffsetType: ${offset.type}")
             }
 
-        val x =
+        val x: Float =
             when (position) {
                 OrbiterEdge.Start -> xOffset
                 OrbiterEdge.End -> viewSize.width - contentSize.width - xOffset
@@ -479,14 +481,14 @@ private fun OrbiterData.calculateOffset(viewSize: PixelDimensions, contentSize: 
         // adjust
         val x = horizontalAlignment.align(contentSize.width, viewSize.width, LayoutDirection.Ltr)
 
-        val yOffset =
+        val yOffset: Float =
             when (offset.type) {
-                OrbiterOffsetType.OuterEdge -> -offset.amount
-                OrbiterOffsetType.InnerEdge -> -contentSize.height - offset.amount
+                OrbiterOffsetType.OuterEdge -> -offset.amount.toPx(density)
+                OrbiterOffsetType.InnerEdge -> -contentSize.height - offset.amount.toPx(density)
                 else -> error("Unexpected OrbiterOffsetType: ${offset.type}")
             }
 
-        val y =
+        val y: Float =
             when (position) {
                 OrbiterEdge.Top -> yOffset
                 OrbiterEdge.Bottom -> viewSize.height - contentSize.height - yOffset
@@ -495,3 +497,5 @@ private fun OrbiterData.calculateOffset(viewSize: PixelDimensions, contentSize: 
         return Offset(x.toFloat(), y)
     }
 }
+
+private fun Dp.toPx(density: Density): Float = with(density) { toPx() }

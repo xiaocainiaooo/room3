@@ -673,7 +673,7 @@ private constructor(
         public const val SIDE_BY_SIDE: Int = 2
     }
 
-    internal companion object {
+    public companion object {
         private fun getRtStereoMode(stereoMode: Int): Int {
             return when (stereoMode) {
                 StereoMode.MONO -> JxrPlatformAdapter.StereoSurfaceEntity.StereoMode.MONO
@@ -708,6 +708,34 @@ private constructor(
                     adapter.activitySpaceRootImpl,
                 ),
                 entityManager,
+            )
+
+        /**
+         * Public factory function for a StereoSurfaceEntity.
+         *
+         * This method must be called from the main thread.
+         * https://developer.android.com/guide/components/processes-and-threads
+         *
+         * @param session Session to create the StereoSurfaceEntity in.
+         * @param stereoMode Stereo mode for the surface.
+         * @param dimensions Dimensions for the surface.
+         * @param pose Pose of this entity relative to its parent, default value is Identity.
+         * @return a StereoSurfaceEntity instance
+         */
+        @MainThread
+        @JvmOverloads
+        public fun create(
+            session: Session,
+            stereoMode: Int = StereoSurfaceEntity.StereoMode.SIDE_BY_SIDE,
+            dimensions: Dimensions = Dimensions(1.0f, 1.0f, 1.0f),
+            pose: Pose = Pose.Identity,
+        ): StereoSurfaceEntity =
+            StereoSurfaceEntity.create(
+                session.platformAdapter,
+                session.entityManager,
+                stereoMode,
+                dimensions,
+                pose,
             )
     }
 

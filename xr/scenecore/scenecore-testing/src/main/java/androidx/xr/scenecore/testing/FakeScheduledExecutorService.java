@@ -66,21 +66,21 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
         return Duration.ofMillis(durationClockUnit);
     }
 
-    private final Clock clock;
-    private final Queue<Runnable> executeQueue = new ConcurrentLinkedQueue<>();
-    private final PriorityBlockingQueue<DelayedFuture<?>> scheduledQueue =
+    private final Clock mClock;
+    private final Queue<Runnable> mExecuteQueue = new ConcurrentLinkedQueue<>();
+    private final PriorityBlockingQueue<DelayedFuture<?>> mScheduledQueue =
             new PriorityBlockingQueue<>();
 
-    private final AtomicLong nextSequenceId = new AtomicLong(0);
-    private volatile boolean running = true;
+    private final AtomicLong mNextSequenceId = new AtomicLong(0);
+    private volatile boolean mRunning = true;
 
     public FakeScheduledExecutorService() {
-        this.clock = new Clock();
+        mClock = new Clock();
     }
 
     @Override
     public boolean isShutdown() {
-        return !running;
+        return !mRunning;
     }
 
     @Override
@@ -90,7 +90,7 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
 
     @Override
     public void shutdown() {
-        running = false;
+        mRunning = false;
     }
 
     @Override
@@ -101,19 +101,19 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
     @Override
     @NonNull
     public List<Runnable> shutdownNow() {
-        running = false;
+        mRunning = false;
         List<Runnable> commands = Lists.newArrayList();
-        commands.addAll(executeQueue);
-        commands.addAll(scheduledQueue);
-        executeQueue.clear();
-        scheduledQueue.clear();
+        commands.addAll(mExecuteQueue);
+        commands.addAll(mScheduledQueue);
+        mExecuteQueue.clear();
+        mScheduledQueue.clear();
         return commands;
     }
 
     @Override
     public boolean awaitTermination(long timeout, @Nullable TimeUnit unit) {
-        checkState(!running);
-        while (!executeQueue.isEmpty()) {
+        checkState(!mRunning);
+        while (!mExecuteQueue.isEmpty()) {
             runNext();
         }
         simulateSleepExecutingAllTasks(durationFromClockUnit(timeout));
@@ -123,11 +123,11 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
     @Override
     public void execute(@Nullable Runnable command) {
         assertRunning();
-        executeQueue.add(command);
+        mExecuteQueue.add(command);
     }
 
     private void assertRunning() {
-        if (!running) {
+        if (!mRunning) {
             throw new RejectedExecutionException();
         }
     }
@@ -138,7 +138,7 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
             @Nullable Runnable command, long delay, @Nullable TimeUnit unit) {
         assertRunning();
         DelayedFuture<?> future = new DelayedFuture<>(command, delay, unit);
-        scheduledQueue.add(future);
+        mScheduledQueue.add(future);
         return future;
     }
 
@@ -148,7 +148,7 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
             @Nullable Callable<V> callable, long delay, @Nullable TimeUnit unit) {
         assertRunning();
         DelayedFuture<V> future = new DelayedCallable<V>(callable, delay, unit);
-        scheduledQueue.add(future);
+        mScheduledQueue.add(future);
         return future;
     }
 
@@ -168,13 +168,13 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
 
     /** Returns true if the {@link #execute} queue contains at least one runnable. */
     public boolean hasNext() {
-        return !executeQueue.isEmpty();
+        return !mExecuteQueue.isEmpty();
     }
 
     /** Runs the next runnable in the {@link #execute} queue. */
     public void runNext() {
-        checkState(!executeQueue.isEmpty(), "execute queue must not be empty");
-        Runnable runnable = executeQueue.remove();
+        checkState(!mExecuteQueue.isEmpty(), "execute queue must not be empty");
+        Runnable runnable = mExecuteQueue.remove();
         runTaskWithInterruptIsolation(runnable);
     }
 
@@ -188,7 +188,7 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
     /** Returns whether any runnable is in the {@link #execute} or {@link #schedule} queue. */
     @CheckReturnValue
     public boolean isEmpty() {
-        return executeQueue.isEmpty() && scheduledQueue.isEmpty();
+        return mExecuteQueue.isEmpty() && mScheduledQueue.isEmpty();
     }
 
     /**
@@ -199,11 +199,11 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
         long timeout = toClockUnit(duration);
         checkArgument(timeout >= 0, "timeout (%s) cannot be negative", timeout);
 
-        long stopTime = clock.currentTimeMillis() + CLOCK_UNIT.toMillis(timeout);
+        long stopTime = mClock.currentTimeMillis() + CLOCK_UNIT.toMillis(timeout);
         boolean done = false;
 
         while (!done) {
-            long delay = (stopTime - clock.currentTimeMillis());
+            long delay = (stopTime - mClock.currentTimeMillis());
             if (delay >= 0 && simulateSleepExecutingAtMostOneTask(durationFromClockUnit(delay))) {
                 continue;
             } else {
@@ -219,20 +219,20 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
     public boolean simulateSleepExecutingAtMostOneTask(@NonNull Duration duration) {
         long timeout = toClockUnit(duration);
         checkArgument(timeout >= 0, "timeout (%s) cannot be negative", timeout);
-        if (scheduledQueue.isEmpty()) {
-            clock.advanceBy(duration);
+        if (mScheduledQueue.isEmpty()) {
+            mClock.advanceBy(duration);
             return false;
         }
 
-        DelayedFuture<?> future = scheduledQueue.peek();
+        DelayedFuture<?> future = mScheduledQueue.peek();
         long delay = future.getDelay(CLOCK_UNIT);
         if (delay > timeout) {
             // Next event is too far in the future; delay the entire time
-            clock.advanceBy(duration);
+            mClock.advanceBy(duration);
             return false;
         }
 
-        scheduledQueue.poll();
+        mScheduledQueue.poll();
         runTaskWithInterruptIsolation(future);
 
         return true;
@@ -243,63 +243,63 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
      * nothing if the {@link #schedule} queue is empty.
      */
     public boolean simulateSleepExecutingAtMostOneTask() {
-        if (scheduledQueue.isEmpty()) {
+        if (mScheduledQueue.isEmpty()) {
             return false;
         }
 
-        DelayedFuture<?> future = scheduledQueue.poll();
+        DelayedFuture<?> future = mScheduledQueue.poll();
         runTaskWithInterruptIsolation(future);
         return true;
     }
 
     private class DelayedFuture<T> implements ScheduledFuture<T>, Runnable {
-        protected final long timeToRun;
-        private final long sequenceId;
-        private final Runnable command;
-        private boolean cancelled;
-        private boolean done;
+        protected final long mTimeToRun;
+        private final long mSequenceId;
+        private final Runnable mCommand;
+        private boolean mCancelled;
+        private boolean mDone;
 
-        public DelayedFuture(Runnable command, long delay, TimeUnit unit) {
+        DelayedFuture(Runnable command, long delay, TimeUnit unit) {
             checkArgument(delay >= 0, "delay (%s) cannot be negative", delay);
 
-            this.command = command;
-            timeToRun = clock.currentTimeMillis() + unit.toMillis(delay);
-            sequenceId = nextSequenceId.getAndIncrement();
+            mCommand = command;
+            mTimeToRun = mClock.currentTimeMillis() + unit.toMillis(delay);
+            mSequenceId = mNextSequenceId.getAndIncrement();
         }
 
         @Override
         public long getDelay(TimeUnit unit) {
-            return unit.convert(timeToRun - clock.currentTimeMillis(), MILLISECONDS);
+            return unit.convert(mTimeToRun - mClock.currentTimeMillis(), MILLISECONDS);
         }
 
         protected void maybeReschedule() {
-            done = true;
+            mDone = true;
         }
 
         @Override
         public void run() {
-            if (clock.currentTimeMillis() < timeToRun) {
-                clock.advanceBy(durationFromClockUnit(timeToRun - clock.currentTimeMillis()));
+            if (mClock.currentTimeMillis() < mTimeToRun) {
+                mClock.advanceBy(durationFromClockUnit(mTimeToRun - mClock.currentTimeMillis()));
             }
-            command.run();
+            mCommand.run();
             maybeReschedule();
         }
 
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
-            cancelled = true;
-            done = true;
-            return scheduledQueue.remove(this);
+            mCancelled = true;
+            mDone = true;
+            return mScheduledQueue.remove(this);
         }
 
         @Override
         public boolean isCancelled() {
-            return cancelled;
+            return mCancelled;
         }
 
         @Override
         public boolean isDone() {
-            return done;
+            return mDone;
         }
 
         @Override
@@ -319,12 +319,12 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
                 return 0;
             }
             DelayedFuture<?> that = (DelayedFuture<?>) other;
-            long diff = timeToRun - that.timeToRun;
+            long diff = mTimeToRun - that.mTimeToRun;
             if (diff < 0) {
                 return -1;
             } else if (diff > 0) {
                 return 1;
-            } else if (sequenceId < that.sequenceId) {
+            } else if (mSequenceId < that.mSequenceId) {
                 return -1;
             } else {
                 return 1;
@@ -333,52 +333,52 @@ public class FakeScheduledExecutorService extends AbstractExecutorService
     }
 
     private class DelayedCallable<T> extends DelayedFuture<T> {
-        private final FutureTask<T> task;
+        private final FutureTask<T> mTask;
 
         private DelayedCallable(FutureTask<T> task, long delay, TimeUnit unit) {
             super(task, delay, unit);
-            this.task = task;
+            mTask = task;
         }
 
-        public DelayedCallable(Callable<T> callable, long delay, TimeUnit unit) {
+        DelayedCallable(Callable<T> callable, long delay, TimeUnit unit) {
             this(new FutureTask<T>(callable), delay, unit);
         }
 
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
-            task.cancel(mayInterruptIfRunning);
+            mTask.cancel(mayInterruptIfRunning);
             return super.cancel(mayInterruptIfRunning);
         }
 
         @Override
         public T get() throws InterruptedException, ExecutionException {
-            return task.get();
+            return mTask.get();
         }
 
         @Override
         public T get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException, TimeoutException {
-            return task.get(timeout, unit);
+            return mTask.get(timeout, unit);
         }
     }
 
     private static class Clock {
-        private final AtomicReference<Instant> nowReference = new AtomicReference<>();
+        private final AtomicReference<Instant> mNowReference = new AtomicReference<>();
 
-        public Clock() {
+        Clock() {
             setTo(Instant.EPOCH);
         }
 
         public long currentTimeMillis() {
-            return nowReference.get().toEpochMilli();
+            return mNowReference.get().toEpochMilli();
         }
 
         public void advanceBy(Duration duration) {
-            nowReference.getAndUpdate(now -> now.plus(duration));
+            mNowReference.getAndUpdate(now -> now.plus(duration));
         }
 
         public void setTo(Instant instant) {
-            nowReference.set(instant);
+            mNowReference.set(instant);
         }
     }
 

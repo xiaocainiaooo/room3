@@ -28,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,14 +57,8 @@ internal object ElevatedPanelDefaults {
 }
 
 /**
- * Defines the "root view" of this ElevatedPanel such that nested ElevatedPanels can all reference
- * the root view that they are attached to.
- */
-internal val LocalRootView = compositionLocalOf<View?> { null }
-
-/**
- * This is the base panel underlying the implementations of ElevatedSurface, ElevatedPopup, and
- * ElevatedDialog. It allows creating a panel at a specific size and offset.
+ * This is the base panel underlying the implementations of SpatialElevation, SpatialPopup, and
+ * SpatialDialog. It allows creating a panel at a specific size and offset.
  */
 @Composable
 internal fun ElevatedPanel(
@@ -81,7 +74,7 @@ internal fun ElevatedPanel(
         },
     content: @Composable () -> Unit,
 ) {
-    val parentView = LocalRootView.current ?: LocalView.current
+    val parentView = LocalView.current
     val zDepth by
         updateTransition(targetState = spatialElevationLevel, label = "restingLevelTransition")
             .animateFloat(transitionSpec = transitionSpec, label = "zDepth") { state ->
@@ -107,8 +100,8 @@ internal fun ElevatedPanel(
 }
 
 /**
- * This is the base panel underlying the implementations of ElevatedSurface, ElevatedPopup, and
- * ElevatedDialog. It allows creating a panel at a specific size and [Pose].
+ * This is the base panel underlying the implementations of SpatialElevation, SpatialPopup, and
+ * SpatialDialog. It allows creating a panel at a specific size and [Pose].
  */
 @Composable
 internal fun ElevatedPanel(
@@ -117,7 +110,6 @@ internal fun ElevatedPanel(
     pose: Pose? = null,
     content: @Composable () -> Unit,
 ) {
-    val parentView = LocalRootView.current ?: LocalView.current
     val session = checkNotNull(LocalSession.current) { "session must be initialized" }
     val parentPanelEntity = LocalPanelEntity.current ?: session.mainPanelEntity
     val density = LocalDensity.current
@@ -125,10 +117,7 @@ internal fun ElevatedPanel(
     val meterSize = contentSize.toMeterSize(density)
 
     val view = rememberComposeView {
-        CompositionLocalProvider(
-            LocalRootView provides parentView,
-            LocalPanelEntity provides panelEntity,
-        ) {
+        CompositionLocalProvider(LocalPanelEntity provides panelEntity) {
             Box(Modifier.alpha(if (pose == null) 0.0f else 1.0f)) { content() }
         }
     }
@@ -139,7 +128,7 @@ internal fun ElevatedPanel(
                 view = view,
                 surfaceDimensionsPx = meterSize.toCorePixelDimensions(density),
                 dimensions = meterSize.toCoreMeterDimensions(),
-                name = "ElevatedSurface:${view.id}",
+                name = "ElevatedPanel:${view.id}",
             )
         onDispose {
             panelEntity?.dispose()

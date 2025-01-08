@@ -58,41 +58,41 @@ public class PointerCaptureComponentImplTest {
         }
     }
 
-    private final FakeStateListener stateListener = new FakeStateListener();
+    private final FakeStateListener mStateListener = new FakeStateListener();
 
-    private final FakeInputEventListener inputListener = new FakeInputEventListener();
+    private final FakeInputEventListener mInputListener = new FakeInputEventListener();
 
-    private final FakeXrExtensions fakeExtensions = new FakeXrExtensions();
-    private final FakeScheduledExecutorService fakeScheduler = new FakeScheduledExecutorService();
-    private final FakeNode fakeNode = (FakeNode) fakeExtensions.createNode();
+    private final FakeXrExtensions mFakeExtensions = new FakeXrExtensions();
+    private final FakeScheduledExecutorService mFakeScheduler = new FakeScheduledExecutorService();
+    private final FakeNode mFakeNode = (FakeNode) mFakeExtensions.createNode();
 
-    private final Entity entity =
-            new AndroidXrEntity(fakeNode, fakeExtensions, new EntityManager(), fakeScheduler) {};
+    private final Entity mEntity =
+            new AndroidXrEntity(mFakeNode, mFakeExtensions, new EntityManager(), mFakeScheduler) {};
 
     @Test
     public void onAttach_enablesPointerCapture() {
         PointerCaptureComponentImpl component =
-                new PointerCaptureComponentImpl(directExecutor(), stateListener, inputListener);
+                new PointerCaptureComponentImpl(directExecutor(), mStateListener, mInputListener);
 
-        assertThat(component.onAttach(entity)).isTrue();
+        assertThat(component.onAttach(mEntity)).isTrue();
 
-        assertThat(fakeNode.getPointerCaptureStateCallback()).isNotNull();
+        assertThat(mFakeNode.getPointerCaptureStateCallback()).isNotNull();
     }
 
     @Test
     public void onAttach_setsUpInputEventPropagation() {
         PointerCaptureComponentImpl component =
-                new PointerCaptureComponentImpl(directExecutor(), stateListener, inputListener);
-        assertThat(component.onAttach(entity)).isTrue();
+                new PointerCaptureComponentImpl(directExecutor(), mStateListener, mInputListener);
+        assertThat(component.onAttach(mEntity)).isTrue();
 
         FakeInputEvent fakeInput = new FakeInputEvent();
         fakeInput.setDispatchFlags(InputEvent.DISPATCH_FLAG_CAPTURED_POINTER);
         fakeInput.setOrigin(new Vec3(0, 0, 0));
         fakeInput.setDirection(new Vec3(1, 1, 1));
-        fakeNode.sendInputEvent(fakeInput);
-        fakeScheduler.runAll();
+        mFakeNode.sendInputEvent(fakeInput);
+        mFakeScheduler.runAll();
 
-        assertThat(inputListener.lastEvent).isNotNull();
+        assertThat(mInputListener.lastEvent).isNotNull();
     }
 
     // This should really be a test on AndroidXrEntity, but that does not have tests so it is here
@@ -101,8 +101,8 @@ public class PointerCaptureComponentImplTest {
     @Test
     public void onAttach_onlyPropagatesCapturedEvents() {
         PointerCaptureComponentImpl component =
-                new PointerCaptureComponentImpl(directExecutor(), stateListener, inputListener);
-        assertThat(component.onAttach(entity)).isTrue();
+                new PointerCaptureComponentImpl(directExecutor(), mStateListener, mInputListener);
+        assertThat(component.onAttach(mEntity)).isTrue();
 
         FakeInputEvent fakeCapturedInput = new FakeInputEvent();
         fakeCapturedInput.setDispatchFlags(InputEvent.DISPATCH_FLAG_CAPTURED_POINTER);
@@ -115,21 +115,22 @@ public class PointerCaptureComponentImplTest {
         fakeInput.setOrigin(new Vec3(0, 0, 0));
         fakeInput.setDirection(new Vec3(1, 1, 1));
 
-        fakeNode.sendInputEvent(fakeCapturedInput);
-        fakeNode.sendInputEvent(fakeInput);
+        mFakeNode.sendInputEvent(fakeCapturedInput);
+        mFakeNode.sendInputEvent(fakeInput);
 
-        fakeScheduler.runAll();
+        mFakeScheduler.runAll();
 
-        assertThat(inputListener.lastEvent).isNotNull();
-        assertThat(inputListener.lastEvent.timestamp).isEqualTo(fakeCapturedInput.getTimestamp());
+        assertThat(mInputListener.lastEvent).isNotNull();
+        assertThat(mInputListener.lastEvent.timestamp).isEqualTo(fakeCapturedInput.getTimestamp());
     }
 
     @Test
     public void onAttach_propagatesInputOnCorrectThread() {
         FakeScheduledExecutorService propagationExecutor = new FakeScheduledExecutorService();
         PointerCaptureComponentImpl component =
-                new PointerCaptureComponentImpl(propagationExecutor, stateListener, inputListener);
-        assertThat(component.onAttach(entity)).isTrue();
+                new PointerCaptureComponentImpl(
+                        propagationExecutor, mStateListener, mInputListener);
+        assertThat(component.onAttach(mEntity)).isTrue();
 
         FakeInputEvent fakeCapturedInput = new FakeInputEvent();
         fakeCapturedInput.setDispatchFlags(InputEvent.DISPATCH_FLAG_CAPTURED_POINTER);
@@ -137,13 +138,13 @@ public class PointerCaptureComponentImplTest {
         fakeCapturedInput.setOrigin(new Vec3(0, 0, 0));
         fakeCapturedInput.setDirection(new Vec3(1, 1, 1));
 
-        fakeNode.sendInputEvent(fakeCapturedInput);
+        mFakeNode.sendInputEvent(fakeCapturedInput);
 
         assertThat(propagationExecutor.hasNext()).isFalse();
         // Run the scheduler associated with the Entity so that the component's executor has the
         // task
         // scheduled on it.
-        fakeScheduler.runAll();
+        mFakeScheduler.runAll();
 
         assertThat(propagationExecutor.hasNext()).isTrue();
     }
@@ -151,60 +152,60 @@ public class PointerCaptureComponentImplTest {
     @Test
     public void onAttach_setsUpCorrectStatePropagation() {
         PointerCaptureComponentImpl component =
-                new PointerCaptureComponentImpl(directExecutor(), stateListener, inputListener);
-        assertThat(component.onAttach(entity)).isTrue();
+                new PointerCaptureComponentImpl(directExecutor(), mStateListener, mInputListener);
+        assertThat(component.onAttach(mEntity)).isTrue();
 
-        fakeNode.getPointerCaptureStateCallback().accept(Node.POINTER_CAPTURE_STATE_PAUSED);
-        assertThat(stateListener.lastState)
+        mFakeNode.getPointerCaptureStateCallback().accept(Node.POINTER_CAPTURE_STATE_PAUSED);
+        assertThat(mStateListener.lastState)
                 .isEqualTo(PointerCaptureComponent.POINTER_CAPTURE_STATE_PAUSED);
 
-        fakeNode.getPointerCaptureStateCallback().accept(Node.POINTER_CAPTURE_STATE_ACTIVE);
-        assertThat(stateListener.lastState)
+        mFakeNode.getPointerCaptureStateCallback().accept(Node.POINTER_CAPTURE_STATE_ACTIVE);
+        assertThat(mStateListener.lastState)
                 .isEqualTo(PointerCaptureComponent.POINTER_CAPTURE_STATE_ACTIVE);
 
-        fakeNode.getPointerCaptureStateCallback().accept(Node.POINTER_CAPTURE_STATE_STOPPED);
-        assertThat(stateListener.lastState)
+        mFakeNode.getPointerCaptureStateCallback().accept(Node.POINTER_CAPTURE_STATE_STOPPED);
+        assertThat(mStateListener.lastState)
                 .isEqualTo(PointerCaptureComponent.POINTER_CAPTURE_STATE_STOPPED);
     }
 
     @Test
     public void onAttach_failsIfAlreadyAttached() {
         PointerCaptureComponentImpl component =
-                new PointerCaptureComponentImpl(directExecutor(), stateListener, inputListener);
-        assertThat(component.onAttach(entity)).isTrue();
-        assertThat(component.onAttach(entity)).isFalse();
+                new PointerCaptureComponentImpl(directExecutor(), mStateListener, mInputListener);
+        assertThat(component.onAttach(mEntity)).isTrue();
+        assertThat(component.onAttach(mEntity)).isFalse();
     }
 
     @Test
     public void onAttach_failesIfEntityAlreadyHasAnAttachedPointerCaptureComponent() {
         PointerCaptureComponentImpl component =
-                new PointerCaptureComponentImpl(directExecutor(), stateListener, inputListener);
-        assertThat(component.onAttach(entity)).isTrue();
+                new PointerCaptureComponentImpl(directExecutor(), mStateListener, mInputListener);
+        assertThat(component.onAttach(mEntity)).isTrue();
 
         PointerCaptureComponentImpl component2 =
-                new PointerCaptureComponentImpl(directExecutor(), stateListener, inputListener);
-        assertThat(component2.onAttach(entity)).isFalse();
+                new PointerCaptureComponentImpl(directExecutor(), mStateListener, mInputListener);
+        assertThat(component2.onAttach(mEntity)).isFalse();
     }
 
     @Test
     public void onDetach_stopsPointerCapture() {
         PointerCaptureComponentImpl component =
-                new PointerCaptureComponentImpl(directExecutor(), stateListener, inputListener);
-        assertThat(component.onAttach(entity)).isTrue();
+                new PointerCaptureComponentImpl(directExecutor(), mStateListener, mInputListener);
+        assertThat(component.onAttach(mEntity)).isTrue();
 
-        component.onDetach(entity);
+        component.onDetach(mEntity);
 
-        assertThat(fakeNode.getPointerCaptureStateCallback()).isNull();
+        assertThat(mFakeNode.getPointerCaptureStateCallback()).isNull();
     }
 
     @Test
     public void onDetach_removesInputListener() {
         PointerCaptureComponentImpl component =
-                new PointerCaptureComponentImpl(directExecutor(), stateListener, inputListener);
-        assertThat(component.onAttach(entity)).isTrue();
+                new PointerCaptureComponentImpl(directExecutor(), mStateListener, mInputListener);
+        assertThat(component.onAttach(mEntity)).isTrue();
 
-        component.onDetach(entity);
+        component.onDetach(mEntity);
 
-        assertThat(fakeNode.getListener()).isNull();
+        assertThat(mFakeNode.getListener()).isNull();
     }
 }

@@ -24,7 +24,7 @@ import android.os.IBinder;
  */
 final class PerceptionLibraryTestHelper {
 
-    public PerceptionLibraryTestHelper() {}
+    PerceptionLibraryTestHelper() {}
 
     public native void reset();
 

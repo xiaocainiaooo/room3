@@ -262,6 +262,7 @@ package androidx.xr.scenecore.testing {
     method public void setProposedOrientation(androidx.xr.extensions.node.Quatf);
     method public void setProposedPosition(androidx.xr.extensions.node.Vec3);
     method public void setProposedScale(androidx.xr.extensions.node.Vec3);
+    method public void setProposedSize(androidx.xr.extensions.node.Vec3);
     method public void setState(int);
     method public void setType(int);
   }

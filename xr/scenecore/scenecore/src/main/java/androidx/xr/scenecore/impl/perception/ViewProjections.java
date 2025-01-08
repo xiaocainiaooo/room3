@@ -22,37 +22,37 @@ import androidx.annotation.RestrictTo;
 /** Contains the view projections for both eyes */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public final class ViewProjections {
-    private final ViewProjection leftEye;
-    private final ViewProjection rightEye;
+    private final ViewProjection mLeftEye;
+    private final ViewProjection mRightEye;
 
     public ViewProjections(@NonNull ViewProjection leftEye, @NonNull ViewProjection rightEye) {
-        this.leftEye = leftEye;
-        this.rightEye = rightEye;
+        mLeftEye = leftEye;
+        mRightEye = rightEye;
     }
 
     // Returns the left eye view projection.
     @NonNull
     public ViewProjection getLeftEye() {
-        return leftEye;
+        return mLeftEye;
     }
 
     // Returns the right eye view projection.
     @NonNull
     public ViewProjection getRightEye() {
-        return rightEye;
+        return mRightEye;
     }
 
     @Override
     public boolean equals(Object object) {
         if (object instanceof ViewProjections) {
             ViewProjections that = (ViewProjections) object;
-            return this.leftEye.equals(that.leftEye) && this.rightEye.equals(that.rightEye);
+            return mLeftEye.equals(that.mLeftEye) && mRightEye.equals(that.mRightEye);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return leftEye.hashCode() + rightEye.hashCode();
+        return mLeftEye.hashCode() + mRightEye.hashCode();
     }
 }

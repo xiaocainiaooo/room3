@@ -37,7 +37,7 @@ public class SpatialAudioTrack {
         @JvmStatic
         @SpatializerConstants.SourceType
         public fun getSpatialSourceType(session: Session, track: AudioTrack): Int {
-            return session.runtime.audioTrackExtensionsWrapper
+            return session.platformAdapter.audioTrackExtensionsWrapper
                 .getSpatialSourceType(track)
                 .sourceTypeToJxr()
         }
@@ -55,7 +55,7 @@ public class SpatialAudioTrack {
             track: AudioTrack,
         ): PointSourceAttributes? {
             val rtAttributes =
-                session.runtime.audioTrackExtensionsWrapper.getPointSourceAttributes(track)
+                session.platformAdapter.audioTrackExtensionsWrapper.getPointSourceAttributes(track)
             return rtAttributes?.toPointSourceAttributes(session)
         }
 
@@ -72,7 +72,7 @@ public class SpatialAudioTrack {
             track: AudioTrack
         ): SoundFieldAttributes? {
             val rtAttributes =
-                session.runtime.audioTrackExtensionsWrapper.getSoundFieldAttributes(track)
+                session.platformAdapter.audioTrackExtensionsWrapper.getSoundFieldAttributes(track)
             return rtAttributes?.toSoundFieldAttributes()
         }
     }
@@ -100,7 +100,7 @@ public class SpatialAudioTrackBuilder private constructor() {
             attributes: PointSourceAttributes,
         ): AudioTrack.Builder {
 
-            return session.runtime.audioTrackExtensionsWrapper.setPointSourceAttributes(
+            return session.platformAdapter.audioTrackExtensionsWrapper.setPointSourceAttributes(
                 builder,
                 attributes.rtPointSourceAttributes,
             )
@@ -121,7 +121,7 @@ public class SpatialAudioTrackBuilder private constructor() {
             builder: AudioTrack.Builder,
             attributes: SoundFieldAttributes,
         ): AudioTrack.Builder {
-            return session.runtime.audioTrackExtensionsWrapper.setSoundFieldAttributes(
+            return session.platformAdapter.audioTrackExtensionsWrapper.setSoundFieldAttributes(
                 builder,
                 attributes.rtSoundFieldAttributes,
             )

@@ -38,17 +38,17 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 final class StereoSurfaceEntitySplitEngineImpl extends AndroidXrEntity
         implements StereoSurfaceEntity {
-    private final ImpressApi impressApi;
-    private final SplitEngineSubspaceManager splitEngineSubspaceManager;
-    private final SubspaceNode subspace;
+    private final ImpressApi mImpressApi;
+    private final SplitEngineSubspaceManager mSplitEngineSubspaceManager;
+    private final SubspaceNode mSubspace;
     // TODO: b/362520810 - Wrap impress nodes w/ Java class.
-    private final int panelImpressNode;
-    private final int subspaceImpressNode;
-    @StereoMode private int stereoMode = StereoSurfaceEntity.StereoMode.SIDE_BY_SIDE;
+    private final int mPanelImpressNode;
+    private final int mSubspaceImpressNode;
+    @StereoMode private int mStereoMode = StereoSurfaceEntity.StereoMode.SIDE_BY_SIDE;
     // This are the default dimensions Impress starts with for the Quad mesh used as the canvas
-    private Dimensions dimensions = new Dimensions(2.0f, 2.0f, 2.0f);
+    private Dimensions mDimensions = new Dimensions(2.0f, 2.0f, 2.0f);
 
-    public StereoSurfaceEntitySplitEngineImpl(
+    StereoSurfaceEntitySplitEngineImpl(
             Entity parentEntity,
             ImpressApi impressApi,
             SplitEngineSubspaceManager splitEngineSubspaceManager,
@@ -57,28 +57,27 @@ final class StereoSurfaceEntitySplitEngineImpl extends AndroidXrEntity
             ScheduledExecutorService executor,
             @StereoMode int stereoMode) {
         super(extensions.createNode(), extensions, entityManager, executor);
-        this.impressApi = impressApi;
-        this.splitEngineSubspaceManager = splitEngineSubspaceManager;
-        this.stereoMode = stereoMode;
+        mImpressApi = impressApi;
+        mSplitEngineSubspaceManager = splitEngineSubspaceManager;
+        mStereoMode = stereoMode;
         setParent(parentEntity);
 
         // TODO(b/377906324): - Punt this logic to the UI thread, so that applications can create
         // StereoSurface entities from any thread.
 
         // System will only render Impress nodes that are parented by this subspace node.
-        this.subspaceImpressNode = impressApi.createImpressNode();
-        String subspaceName = "stereo_surface_panel_entity_subspace_" + subspaceImpressNode;
+        mSubspaceImpressNode = impressApi.createImpressNode();
+        String subspaceName = "stereo_surface_panel_entity_subspace_" + mSubspaceImpressNode;
 
-        this.subspace =
-                splitEngineSubspaceManager.createSubspace(subspaceName, subspaceImpressNode);
+        mSubspace = splitEngineSubspaceManager.createSubspace(subspaceName, mSubspaceImpressNode);
 
         try (NodeTransaction transaction = extensions.createNodeTransaction()) {
             // Make the Entity node a parent of the subspace node.
-            transaction.setParent(subspace.subspaceNode, this.node).apply();
+            transaction.setParent(mSubspace.subspaceNode, mNode).apply();
         }
         // The CPM node hierarchy is: Entity CPM node --- parent of ---> Subspace CPM node.
-        this.panelImpressNode = impressApi.createStereoSurface(stereoMode);
-        impressApi.setImpressNodeParent(panelImpressNode, subspaceImpressNode);
+        mPanelImpressNode = impressApi.createStereoSurface(stereoMode);
+        impressApi.setImpressNodeParent(mPanelImpressNode, mSubspaceImpressNode);
     }
 
     @SuppressWarnings("ObjectToString")
@@ -86,35 +85,35 @@ final class StereoSurfaceEntitySplitEngineImpl extends AndroidXrEntity
     public void dispose() {
         // TODO(b/377906324): - Punt this logic to the UI thread, so that applications can destroy
         // StereoSurface entities from any thread.
-        splitEngineSubspaceManager.deleteSubspace(subspace.subspaceId);
-        impressApi.destroyImpressNode(subspaceImpressNode);
+        mSplitEngineSubspaceManager.deleteSubspace(mSubspace.subspaceId);
+        mImpressApi.destroyImpressNode(mSubspaceImpressNode);
         super.dispose();
     }
 
     @Override
     public void setStereoMode(@StereoMode int mode) {
-        stereoMode = mode;
-        impressApi.setStereoModeForStereoSurface(panelImpressNode, mode);
+        mStereoMode = mode;
+        mImpressApi.setStereoModeForStereoSurface(mPanelImpressNode, mode);
     }
 
     @Override
     public void setDimensions(Dimensions dimensions) {
         // TODO(b/377906324): - Punt this logic to the UI thread, so that applications can call this
         // method from any thread.
-        this.dimensions = dimensions;
-        impressApi.setCanvasDimensionsForStereoSurface(
-                panelImpressNode, dimensions.width, dimensions.height);
+        mDimensions = dimensions;
+        mImpressApi.setCanvasDimensionsForStereoSurface(
+                mPanelImpressNode, dimensions.width, dimensions.height);
     }
 
     @Override
     public Dimensions getDimensions() {
-        return dimensions;
+        return mDimensions;
     }
 
     @Override
     @StereoMode
     public int getStereoMode() {
-        return stereoMode;
+        return mStereoMode;
     }
 
     @Override
@@ -122,6 +121,6 @@ final class StereoSurfaceEntitySplitEngineImpl extends AndroidXrEntity
         // TODO(b/377906324) - Either cache the surface in the constructor, or change this interface
         // to
         // return a Future.
-        return impressApi.getSurfaceFromStereoSurface(panelImpressNode);
+        return mImpressApi.getSurfaceFromStereoSurface(mPanelImpressNode);
     }
 }

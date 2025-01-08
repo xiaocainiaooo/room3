@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @SuppressWarnings("BanConcurrentHashMap")
 final class EntityManager {
-    private final Map<Node, Entity> nodeEntityMap = new ConcurrentHashMap<>();
+    private final Map<Node, Entity> mNodeEntityMap = new ConcurrentHashMap<>();
 
     /**
      * Returns the {@link Entity} associated with the given {@link Node}.
@@ -46,7 +46,7 @@ final class EntityManager {
      */
     @Nullable
     Entity getEntityForNode(@NonNull Node node) {
-        return nodeEntityMap.get(node);
+        return mNodeEntityMap.get(node);
     }
 
     /**
@@ -56,7 +56,7 @@ final class EntityManager {
      * @param entity the {@link Entity} to associate with the given {@link Node}.
      */
     void setEntityForNode(@NonNull Node node, @NonNull Entity entity) {
-        nodeEntityMap.put(node, entity);
+        mNodeEntityMap.put(node, entity);
     }
 
     /**
@@ -66,7 +66,7 @@ final class EntityManager {
      * @return a list of all {@link Entity}s of type {@code T} (including subtypes of {@code T}).
      */
     <T extends Entity> List<T> getEntitiesOfType(@NonNull Class<T> entityClass) {
-        return nodeEntityMap.values().stream()
+        return mNodeEntityMap.values().stream()
                 .filter(entityClass::isInstance)
                 .map(entityClass::cast)
                 .collect(toCollection(ArrayList::new));
@@ -74,16 +74,16 @@ final class EntityManager {
 
     /** Returns a collection of all {@link Entity}s. */
     Collection<Entity> getAllEntities() {
-        return nodeEntityMap.values();
+        return mNodeEntityMap.values();
     }
 
     /** Removes the given {@link Node} from the map. */
     void removeEntityForNode(@NonNull Node node) {
-        nodeEntityMap.remove(node);
+        mNodeEntityMap.remove(node);
     }
 
     /** Clears the EntityManager. */
     void clear() {
-        nodeEntityMap.clear();
+        mNodeEntityMap.clear();
     }
 }

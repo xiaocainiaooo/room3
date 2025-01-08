@@ -27,10 +27,10 @@ import androidx.xr.scenecore.JxrPlatformAdapter.SoundFieldAttributes;
 /** Implementation of the {@link MediaPlayerExtensionsWrapper}. */
 final class MediaPlayerExtensionsWrapperImpl implements MediaPlayerExtensionsWrapper {
 
-    private final MediaPlayerExtensions extensions;
+    private final MediaPlayerExtensions mExtensions;
 
-    public MediaPlayerExtensionsWrapperImpl(@NonNull MediaPlayerExtensions extensions) {
-        this.extensions = extensions;
+    MediaPlayerExtensionsWrapperImpl(@NonNull MediaPlayerExtensions extensions) {
+        mExtensions = extensions;
     }
 
     @Override
@@ -39,7 +39,7 @@ final class MediaPlayerExtensionsWrapperImpl implements MediaPlayerExtensionsWra
         androidx.xr.extensions.media.PointSourceAttributes extAttributes =
                 MediaUtils.convertPointSourceAttributesToExtensions(attributes);
 
-        extensions.setPointSourceAttributes(mediaPlayer, extAttributes);
+        mExtensions.setPointSourceAttributes(mediaPlayer, extAttributes);
     }
 
     @Override
@@ -48,6 +48,6 @@ final class MediaPlayerExtensionsWrapperImpl implements MediaPlayerExtensionsWra
         androidx.xr.extensions.media.SoundFieldAttributes extAttributes =
                 MediaUtils.convertSoundFieldAttributesToExtensions(attributes);
 
-        extensions.setSoundFieldAttributes(mediaPlayer, extAttributes);
+        mExtensions.setSoundFieldAttributes(mediaPlayer, extAttributes);
     }
 }

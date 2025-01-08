@@ -51,38 +51,42 @@ import org.robolectric.android.controller.ActivityController;
 
 @RunWith(RobolectricTestRunner.class)
 public class ActivityPanelEntityImplTest {
-    private final FakeXrExtensions fakeExtensions = new FakeXrExtensions();
-    private final FakeImpressApi fakeImpressApi = new FakeImpressApi();
-    private final ActivityController<Activity> activityController =
+    private final FakeXrExtensions mFakeExtensions = new FakeXrExtensions();
+    private final FakeImpressApi mFakeImpressApi = new FakeImpressApi();
+    private final ActivityController<Activity> mActivityController =
             Robolectric.buildActivity(Activity.class);
-    private final Activity hostActivity = activityController.create().start().get();
-    private final PixelDimensions windowBoundsPx = new PixelDimensions(640, 480);
-    private final FakeScheduledExecutorService fakeExecutor = new FakeScheduledExecutorService();
-    private final PerceptionLibrary perceptionLibrary = Mockito.mock(PerceptionLibrary.class);
-    private final SplitEngineSubspaceManager splitEngineSubspaceManager =
+    private final Activity mHostActivity = mActivityController.create().start().get();
+    private final PixelDimensions mWindowBoundsPx = new PixelDimensions(640, 480);
+    private final FakeScheduledExecutorService mFakeExecutor = new FakeScheduledExecutorService();
+    private final PerceptionLibrary mPerceptionLibrary = Mockito.mock(PerceptionLibrary.class);
+    private final SplitEngineSubspaceManager mSplitEngineSubspaceManager =
             Mockito.mock(SplitEngineSubspaceManager.class);
-    private final ImpSplitEngineRenderer splitEngineRenderer =
+    private final ImpSplitEngineRenderer mSplitEngineRenderer =
             Mockito.mock(ImpSplitEngineRenderer.class);
 
     private ActivityPanelEntity createActivityPanelEntity() {
-        when(perceptionLibrary.initSession(eq(hostActivity), anyInt(), eq(fakeExecutor)))
+        when(mPerceptionLibrary.initSession(eq(mHostActivity), anyInt(), eq(mFakeExecutor)))
                 .thenReturn(immediateFuture(Mockito.mock(Session.class)));
 
         JxrPlatformAdapter fakeRuntime =
                 JxrPlatformAdapterAxr.create(
-                        hostActivity,
-                        fakeExecutor,
-                        fakeExtensions,
-                        fakeImpressApi,
+                        mHostActivity,
+                        mFakeExecutor,
+                        mFakeExtensions,
+                        mFakeImpressApi,
                         new EntityManager(),
-                        perceptionLibrary,
-                        splitEngineSubspaceManager,
-                        splitEngineRenderer,
+                        mPerceptionLibrary,
+                        mSplitEngineSubspaceManager,
+                        mSplitEngineRenderer,
                         /* useSplitEngine= */ false);
-        Pose pose = new Pose();
+        Pose mPose = new Pose();
 
         return fakeRuntime.createActivityPanelEntity(
-                pose, windowBoundsPx, "test", hostActivity, fakeRuntime.getActivitySpaceRootImpl());
+                mPose,
+                mWindowBoundsPx,
+                "test",
+                mHostActivity,
+                fakeRuntime.getActivitySpaceRootImpl());
     }
 
     @Test
@@ -95,28 +99,28 @@ public class ActivityPanelEntityImplTest {
     @Test
     public void activityPanelEntityLaunchActivity_callsActivityPanel() {
         ActivityPanelEntity activityPanelEntity = createActivityPanelEntity();
-        Intent launchIntent = activityController.getIntent();
+        Intent launchIntent = mActivityController.getIntent();
         activityPanelEntity.launchActivity(launchIntent, null);
 
-        FakeActivityPanel fakePanel = fakeExtensions.getActivityPanelForHost(hostActivity);
+        FakeActivityPanel fakePanel = mFakeExtensions.getActivityPanelForHost(mHostActivity);
 
         assertThat(fakePanel.getLaunchIntent()).isEqualTo(launchIntent);
         assertThat(fakePanel.getBundle()).isNull();
         assertThat(fakePanel.getBounds())
-                .isEqualTo(new Rect(0, 0, windowBoundsPx.width, windowBoundsPx.height));
+                .isEqualTo(new Rect(0, 0, mWindowBoundsPx.width, mWindowBoundsPx.height));
     }
 
     @Test
     public void activityPanelEntityMoveActivity_callActivityPanel() {
         ActivityPanelEntity activityPanelEntity = createActivityPanelEntity();
-        activityPanelEntity.moveActivity(hostActivity);
+        activityPanelEntity.moveActivity(mHostActivity);
 
-        FakeActivityPanel fakePanel = fakeExtensions.getActivityPanelForHost(hostActivity);
+        FakeActivityPanel fakePanel = mFakeExtensions.getActivityPanelForHost(mHostActivity);
 
-        assertThat(fakePanel.getActivity()).isEqualTo(hostActivity);
+        assertThat(fakePanel.getActivity()).isEqualTo(mHostActivity);
 
         assertThat(fakePanel.getBounds())
-                .isEqualTo(new Rect(0, 0, windowBoundsPx.width, windowBoundsPx.height));
+                .isEqualTo(new Rect(0, 0, mWindowBoundsPx.width, mWindowBoundsPx.height));
     }
 
     @Test
@@ -125,7 +129,7 @@ public class ActivityPanelEntityImplTest {
         Dimensions dimensions = new Dimensions(400f, 300f, 0f);
         activityPanelEntity.setSize(dimensions);
 
-        FakeActivityPanel fakePanel = fakeExtensions.getActivityPanelForHost(hostActivity);
+        FakeActivityPanel fakePanel = mFakeExtensions.getActivityPanelForHost(mHostActivity);
 
         assertThat(fakePanel.getBounds())
                 .isEqualTo(new Rect(0, 0, (int) dimensions.width, (int) dimensions.height));
@@ -142,7 +146,7 @@ public class ActivityPanelEntityImplTest {
         PixelDimensions dimensions = new PixelDimensions(400, 300);
         activityPanelEntity.setPixelDimensions(dimensions);
 
-        FakeActivityPanel fakePanel = fakeExtensions.getActivityPanelForHost(hostActivity);
+        FakeActivityPanel fakePanel = mFakeExtensions.getActivityPanelForHost(mHostActivity);
 
         assertThat(fakePanel.getBounds())
                 .isEqualTo(new Rect(0, 0, dimensions.width, dimensions.height));
@@ -157,7 +161,7 @@ public class ActivityPanelEntityImplTest {
         ActivityPanelEntity activityPanelEntity = createActivityPanelEntity();
         activityPanelEntity.dispose();
 
-        FakeActivityPanel fakePanel = fakeExtensions.getActivityPanelForHost(hostActivity);
+        FakeActivityPanel fakePanel = mFakeExtensions.getActivityPanelForHost(mHostActivity);
 
         assertThat(fakePanel.isDeleted()).isTrue();
     }

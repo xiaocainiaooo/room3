@@ -29,47 +29,46 @@ import androidx.xr.scenecore.impl.perception.Session;
  * the user's head.
  */
 class HeadActivityPoseImpl extends BaseActivityPose implements HeadActivityPose {
-    private final PerceptionLibrary perceptionLibrary;
-    private final OpenXrActivityPoseHelper openXrActivityPoseHelper;
+    private final PerceptionLibrary mPerceptionLibrary;
+    private final OpenXrActivityPoseHelper mOpenXrActivityPoseHelper;
     // Default the pose to null. A null pose indicates that the head is not ready yet.
-    private Pose lastOpenXrPose = null;
+    private Pose mLastOpenXrPose = null;
 
-    public HeadActivityPoseImpl(
+    HeadActivityPoseImpl(
             ActivitySpaceImpl activitySpace,
             AndroidXrEntity activitySpaceRoot,
             PerceptionLibrary perceptionLibrary) {
-        this.perceptionLibrary = perceptionLibrary;
-        this.openXrActivityPoseHelper =
-                new OpenXrActivityPoseHelper(activitySpace, activitySpaceRoot);
+        mPerceptionLibrary = perceptionLibrary;
+        mOpenXrActivityPoseHelper = new OpenXrActivityPoseHelper(activitySpace, activitySpaceRoot);
     }
 
     @Override
     public Pose getPoseInActivitySpace() {
-        return openXrActivityPoseHelper.getPoseInActivitySpace(getPoseInOpenXrReferenceSpace());
+        return mOpenXrActivityPoseHelper.getPoseInActivitySpace(getPoseInOpenXrReferenceSpace());
     }
 
     @Override
     public Pose getActivitySpacePose() {
-        return openXrActivityPoseHelper.getActivitySpacePose(getPoseInOpenXrReferenceSpace());
+        return mOpenXrActivityPoseHelper.getActivitySpacePose(getPoseInOpenXrReferenceSpace());
     }
 
     @Override
     public Vector3 getActivitySpaceScale() {
         // This WorldPose is assumed to always have a scale of 1.0f in the OpenXR reference space.
-        return openXrActivityPoseHelper.getActivitySpaceScale(new Vector3(1f, 1f, 1f));
+        return mOpenXrActivityPoseHelper.getActivitySpaceScale(new Vector3(1f, 1f, 1f));
     }
 
     /** Gets the pose in the OpenXR reference space. Can be null if it is not yet ready. */
     @Nullable
     public Pose getPoseInOpenXrReferenceSpace() {
-        final Session session = perceptionLibrary.getSession();
+        final Session session = mPerceptionLibrary.getSession();
         if (session == null) {
-            return lastOpenXrPose;
+            return mLastOpenXrPose;
         }
         androidx.xr.scenecore.impl.perception.Pose perceptionHeadPose = session.getHeadPose();
         if (perceptionHeadPose != null) {
-            lastOpenXrPose = RuntimeUtils.fromPerceptionPose(perceptionHeadPose);
+            mLastOpenXrPose = RuntimeUtils.fromPerceptionPose(perceptionHeadPose);
         }
-        return lastOpenXrPose;
+        return mLastOpenXrPose;
     }
 }

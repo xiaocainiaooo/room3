@@ -24,16 +24,16 @@ import androidx.annotation.RestrictTo;
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public final class Fov {
-    private final float angleLeft;
-    private final float angleRight;
-    private final float angleUp;
-    private final float angleDown;
+    private final float mAngleLeft;
+    private final float mAngleRight;
+    private final float mAngleUp;
+    private final float mAngleDown;
 
     public Fov(float angleLeft, float angleRight, float angleUp, float angleDown) {
-        this.angleLeft = angleLeft;
-        this.angleRight = angleRight;
-        this.angleUp = angleUp;
-        this.angleDown = angleDown;
+        mAngleLeft = angleLeft;
+        mAngleRight = angleRight;
+        mAngleUp = angleUp;
+        mAngleDown = angleDown;
     }
 
     /**
@@ -41,17 +41,17 @@ public final class Fov {
      * value is negative. *
      */
     public float getAngleLeft() {
-        return angleLeft;
+        return mAngleLeft;
     }
 
     /** Returns the angle of the right part of the field of view. */
     public float getAngleRight() {
-        return angleRight;
+        return mAngleRight;
     }
 
     /** Returns the angle of the top part of the field of view. */
     public float getAngleUp() {
-        return angleUp;
+        return mAngleUp;
     }
 
     /**
@@ -59,17 +59,17 @@ public final class Fov {
      * this value is negative. *
      */
     public float getAngleDown() {
-        return angleDown;
+        return mAngleDown;
     }
 
     @Override
     public boolean equals(Object object) {
         if (object instanceof Fov) {
             Fov that = (Fov) object;
-            return this.angleLeft == that.angleLeft
-                    && this.angleRight == that.angleRight
-                    && this.angleUp == that.angleUp
-                    && this.angleDown == that.angleDown;
+            return mAngleLeft == that.mAngleLeft
+                    && mAngleRight == that.mAngleRight
+                    && mAngleUp == that.mAngleUp
+                    && mAngleDown == that.mAngleDown;
         }
         return false;
     }
@@ -77,10 +77,10 @@ public final class Fov {
     @Override
     public int hashCode() {
         int result = 1;
-        result = 31 * result + Float.floatToIntBits(angleLeft);
-        result = 31 * result + Float.floatToIntBits(angleRight);
-        result = 31 * result + Float.floatToIntBits(angleUp);
-        result = 31 * result + Float.floatToIntBits(angleDown);
+        result = 31 * result + Float.floatToIntBits(mAngleLeft);
+        result = 31 * result + Float.floatToIntBits(mAngleRight);
+        result = 31 * result + Float.floatToIntBits(mAngleUp);
+        result = 31 * result + Float.floatToIntBits(mAngleDown);
         return result;
     }
 }

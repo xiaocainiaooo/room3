@@ -31,8 +31,8 @@ import java.util.concurrent.ScheduledExecutorService;
 /** BasePanelEntity provides implementations of capabilities common to PanelEntities. */
 @SuppressWarnings("deprecation") // TODO(b/373435470): Remove
 abstract class BasePanelEntity extends AndroidXrEntity implements PanelEntity {
-    protected PixelDimensions pixelDimensions;
-    private float cornerRadius;
+    protected PixelDimensions mPixelDimensions;
+    private float mCornerRadius;
 
     BasePanelEntity(
             Node node,
@@ -43,7 +43,7 @@ abstract class BasePanelEntity extends AndroidXrEntity implements PanelEntity {
     }
 
     private float getDefaultPixelDensity() {
-        return extensions
+        return mExtensions
                 .getConfig()
                 .defaultPixelsPerMeter(Resources.getSystem().getDisplayMetrics().density);
     }
@@ -62,8 +62,8 @@ abstract class BasePanelEntity extends AndroidXrEntity implements PanelEntity {
     public Dimensions getSize() {
         Vector3 pixelDensity = getPixelDensity();
         return new Dimensions(
-                pixelDimensions.width / pixelDensity.getX(),
-                pixelDimensions.height / pixelDensity.getY(),
+                mPixelDimensions.width / pixelDensity.getX(),
+                mPixelDimensions.height / pixelDensity.getY(),
                 0);
     }
 
@@ -75,12 +75,12 @@ abstract class BasePanelEntity extends AndroidXrEntity implements PanelEntity {
 
     @Override
     public PixelDimensions getPixelDimensions() {
-        return pixelDimensions;
+        return mPixelDimensions;
     }
 
     @Override
     public void setPixelDimensions(PixelDimensions dimensions) {
-        pixelDimensions = dimensions;
+        mPixelDimensions = dimensions;
     }
 
     @Override
@@ -88,14 +88,14 @@ abstract class BasePanelEntity extends AndroidXrEntity implements PanelEntity {
         if (value < 0.0f) {
             throw new IllegalArgumentException("Corner radius can't be negative: " + value);
         }
-        try (NodeTransaction transaction = extensions.createNodeTransaction()) {
-            transaction.setCornerRadius(node, value).apply();
-            cornerRadius = value;
+        try (NodeTransaction transaction = mExtensions.createNodeTransaction()) {
+            transaction.setCornerRadius(mNode, value).apply();
+            mCornerRadius = value;
         }
     }
 
     @Override
     public float getCornerRadius() {
-        return cornerRadius;
+        return mCornerRadius;
     }
 }

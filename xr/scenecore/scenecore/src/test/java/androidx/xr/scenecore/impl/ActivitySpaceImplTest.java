@@ -58,84 +58,84 @@ import org.robolectric.android.controller.ActivityController;
 public final class ActivitySpaceImplTest extends SystemSpaceEntityImplTest {
     // TODO(b/329902726): Move this boilerplate for creating a TestJxrPlatformAdapter into a test
     // util
-    private final ActivityController<Activity> activityController =
+    private final ActivityController<Activity> mActivityController =
             Robolectric.buildActivity(Activity.class);
-    private final Activity activity = activityController.create().start().get();
-    private final FakeScheduledExecutorService fakeExecutor = new FakeScheduledExecutorService();
-    private final PerceptionLibrary perceptionLibrary = Mockito.mock(PerceptionLibrary.class);
-    private final SplitEngineSubspaceManager splitEngineSubspaceManager =
+    private final Activity mActivity = mActivityController.create().start().get();
+    private final FakeScheduledExecutorService mFakeExecutor = new FakeScheduledExecutorService();
+    private final PerceptionLibrary mPerceptionLibrary = Mockito.mock(PerceptionLibrary.class);
+    private final SplitEngineSubspaceManager mSplitEngineSubspaceManager =
             Mockito.mock(SplitEngineSubspaceManager.class);
-    private final ImpSplitEngineRenderer splitEngineRenderer =
+    private final ImpSplitEngineRenderer mSplitEngineRenderer =
             Mockito.mock(ImpSplitEngineRenderer.class);
 
-    private FakeXrExtensions fakeExtensions;
-    private FakeImpressApi fakeImpressApi;
-    private JxrPlatformAdapter testRuntime;
-    private ActivitySpace activitySpace;
+    private FakeXrExtensions mFakeExtensions;
+    private FakeImpressApi mFakeImpressApi;
+    private JxrPlatformAdapter mTestRuntime;
+    private ActivitySpace mActivitySpace;
 
     @Before
     public void setUp() {
-        fakeExtensions = new FakeXrExtensions();
-        fakeImpressApi = new FakeImpressApi();
-        when(perceptionLibrary.initSession(eq(activity), anyInt(), eq(fakeExecutor)))
+        mFakeExtensions = new FakeXrExtensions();
+        mFakeImpressApi = new FakeImpressApi();
+        when(mPerceptionLibrary.initSession(eq(mActivity), anyInt(), eq(mFakeExecutor)))
                 .thenReturn(immediateFuture(Mockito.mock(Session.class)));
 
-        testRuntime =
+        mTestRuntime =
                 JxrPlatformAdapterAxr.create(
-                        activity,
-                        fakeExecutor,
-                        fakeExtensions,
-                        fakeImpressApi,
+                        mActivity,
+                        mFakeExecutor,
+                        mFakeExtensions,
+                        mFakeImpressApi,
                         new EntityManager(),
-                        perceptionLibrary,
-                        splitEngineSubspaceManager,
-                        splitEngineRenderer,
+                        mPerceptionLibrary,
+                        mSplitEngineSubspaceManager,
+                        mSplitEngineRenderer,
                         /* useSplitEngine= */ false);
 
-        activitySpace = testRuntime.getActivitySpace();
+        mActivitySpace = mTestRuntime.getActivitySpace();
 
         // This is slightly hacky. We're grabbing the singleton instance of the ActivitySpaceImpl
         // that
         // was created by the RuntimeImpl. Ideally we'd have an interface to inject the
         // ActivitySpace
         // for testing.  For now this is fine since there isn't an interface difference (yet).
-        assertThat(activitySpace).isInstanceOf(ActivitySpaceImpl.class);
-        assertThat(activitySpace).isNotNull();
+        assertThat(mActivitySpace).isInstanceOf(ActivitySpaceImpl.class);
+        assertThat(mActivitySpace).isNotNull();
     }
 
     @Override
     protected SystemSpaceEntityImpl getSystemSpaceEntityImpl() {
-        return (SystemSpaceEntityImpl) activitySpace;
+        return (SystemSpaceEntityImpl) mActivitySpace;
     }
 
     @Override
     protected FakeScheduledExecutorService getDefaultFakeExecutor() {
-        return fakeExecutor;
+        return mFakeExecutor;
     }
 
     @Override
     protected AndroidXrEntity createChildAndroidXrEntity() {
-        return (AndroidXrEntity) testRuntime.createEntity(new Pose(), "child", activitySpace);
+        return (AndroidXrEntity) mTestRuntime.createEntity(new Pose(), "child", mActivitySpace);
     }
 
     @Override
     protected ActivitySpaceImpl getActivitySpaceEntity() {
-        return (ActivitySpaceImpl) activitySpace;
+        return (ActivitySpaceImpl) mActivitySpace;
     }
 
     @Test
     public void getBounds_returnsBounds() {
-        assertThat(activitySpace.getBounds().width).isPositiveInfinity();
-        assertThat(activitySpace.getBounds().height).isPositiveInfinity();
-        assertThat(activitySpace.getBounds().depth).isPositiveInfinity();
+        assertThat(mActivitySpace.getBounds().width).isPositiveInfinity();
+        assertThat(mActivitySpace.getBounds().height).isPositiveInfinity();
+        assertThat(mActivitySpace.getBounds().depth).isPositiveInfinity();
 
         FakeSpatialState spatialState = new FakeSpatialState();
         spatialState.setBounds(new Bounds(100.0f, 200.0f, 300.0f));
-        fakeExtensions.sendSpatialState(spatialState);
+        mFakeExtensions.sendSpatialState(spatialState);
 
-        assertThat(activitySpace.getBounds().width).isEqualTo(100f);
-        assertThat(activitySpace.getBounds().height).isEqualTo(200f);
-        assertThat(activitySpace.getBounds().depth).isEqualTo(300f);
+        assertThat(mActivitySpace.getBounds().width).isEqualTo(100f);
+        assertThat(mActivitySpace.getBounds().height).isEqualTo(200f);
+        assertThat(mActivitySpace.getBounds().depth).isEqualTo(300f);
     }
 
     @Test
@@ -145,8 +145,8 @@ public final class ActivitySpaceImplTest extends SystemSpaceEntityImplTest {
 
         FakeSpatialState spatialState = new FakeSpatialState();
         spatialState.setBounds(new Bounds(100.0f, 200.0f, 300.0f));
-        activitySpace.addOnBoundsChangedListener(listener);
-        fakeExtensions.sendSpatialState(spatialState);
+        mActivitySpace.addOnBoundsChangedListener(listener);
+        mFakeExtensions.sendSpatialState(spatialState);
 
         verify(listener).onBoundsChanged(Mockito.refEq(new Dimensions(100.0f, 200.0f, 300.0f)));
     }
@@ -156,25 +156,25 @@ public final class ActivitySpaceImplTest extends SystemSpaceEntityImplTest {
         JxrPlatformAdapter.ActivitySpace.OnBoundsChangedListener listener =
                 Mockito.mock(JxrPlatformAdapter.ActivitySpace.OnBoundsChangedListener.class);
 
-        activitySpace.addOnBoundsChangedListener(listener);
-        activitySpace.removeOnBoundsChangedListener(listener);
+        mActivitySpace.addOnBoundsChangedListener(listener);
+        mActivitySpace.removeOnBoundsChangedListener(listener);
         FakeSpatialState spatialState = new FakeSpatialState();
         spatialState.setBounds(new Bounds(100.0f, 200.0f, 300.0f));
-        fakeExtensions.sendSpatialState(spatialState);
+        mFakeExtensions.sendSpatialState(spatialState);
 
         verify(listener, Mockito.never()).onBoundsChanged(Mockito.any());
     }
 
     @Test
     public void getPoseInActivitySpace_returnsIdentity() {
-        ActivitySpaceImpl activitySpaceImpl = (ActivitySpaceImpl) activitySpace;
+        ActivitySpaceImpl activitySpaceImpl = (ActivitySpaceImpl) mActivitySpace;
 
         assertPose(activitySpaceImpl.getPoseInActivitySpace(), new Pose());
     }
 
     @Test
     public void getActivitySpaceScale_returnsUnitScale() {
-        ActivitySpaceImpl activitySpaceImpl = (ActivitySpaceImpl) activitySpace;
+        ActivitySpaceImpl activitySpaceImpl = (ActivitySpaceImpl) mActivitySpace;
         activitySpaceImpl.setOpenXrReferenceSpacePose(Matrix4.fromScale(5f));
         assertVector3(activitySpaceImpl.getActivitySpaceScale(), new Vector3(1f, 1f, 1f));
     }
@@ -182,12 +182,12 @@ public final class ActivitySpaceImplTest extends SystemSpaceEntityImplTest {
     @Test
     public void setScale_doesNothing() throws Exception {
         Vector3 scale = new Vector3(1, 1, 9999);
-        activitySpace.setScale(scale);
+        mActivitySpace.setScale(scale);
 
         // The returned scale(s) here should be the identity scale despite the setScale call.
-        assertThat(activitySpace.getScale().getX()).isWithin(1e-5f).of(1.0f);
-        assertThat(activitySpace.getScale().getY()).isWithin(1e-5f).of(1.0f);
-        assertThat(activitySpace.getScale().getZ()).isWithin(1e-5f).of(1.0f);
+        assertThat(mActivitySpace.getScale().getX()).isWithin(1e-5f).of(1.0f);
+        assertThat(mActivitySpace.getScale().getY()).isWithin(1e-5f).of(1.0f);
+        assertThat(mActivitySpace.getScale().getZ()).isWithin(1e-5f).of(1.0f);
 
         // Note that there's no exception thrown.
     }

@@ -118,9 +118,9 @@ package androidx.xr.compose.spatial {
   }
 
   public static final class EdgeOffset.Companion {
-    method @androidx.compose.runtime.Composable public androidx.xr.compose.spatial.EdgeOffset inner(float offset);
-    method @androidx.compose.runtime.Composable public androidx.xr.compose.spatial.EdgeOffset outer(float offset);
-    method @androidx.compose.runtime.Composable public androidx.xr.compose.spatial.EdgeOffset overlap(float offset);
+    method public androidx.xr.compose.spatial.EdgeOffset inner(float offset);
+    method public androidx.xr.compose.spatial.EdgeOffset outer(float offset);
+    method public androidx.xr.compose.spatial.EdgeOffset overlap(float offset);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class OrbiterDefaults {
@@ -376,13 +376,6 @@ package androidx.xr.compose.subspace.layout {
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static androidx.xr.compose.subspace.layout.SubspaceModifier onGloballyPositioned(androidx.xr.compose.subspace.layout.SubspaceModifier, kotlin.jvm.functions.Function1<? super androidx.xr.compose.subspace.layout.SubspaceLayoutCoordinates,kotlin.Unit> onGloballyPositioned);
   }
 
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class OnGloballyPositionedNode extends androidx.xr.compose.subspace.layout.SubspaceModifier.Node {
-    ctor public OnGloballyPositionedNode(kotlin.jvm.functions.Function1<? super androidx.xr.compose.subspace.layout.SubspaceLayoutCoordinates,kotlin.Unit> callback);
-    method public kotlin.jvm.functions.Function1<androidx.xr.compose.subspace.layout.SubspaceLayoutCoordinates,kotlin.Unit> getCallback();
-    method public void setCallback(kotlin.jvm.functions.Function1<? super androidx.xr.compose.subspace.layout.SubspaceLayoutCoordinates,kotlin.Unit>);
-    property public final kotlin.jvm.functions.Function1<androidx.xr.compose.subspace.layout.SubspaceLayoutCoordinates,kotlin.Unit> callback;
-  }
-
   public final class PaddingKt {
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static androidx.xr.compose.subspace.layout.SubspaceModifier padding(androidx.xr.compose.subspace.layout.SubspaceModifier, float all);
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static androidx.xr.compose.subspace.layout.SubspaceModifier padding(androidx.xr.compose.subspace.layout.SubspaceModifier, optional float horizontal, optional float vertical, optional float depth);
@@ -425,14 +418,6 @@ package androidx.xr.compose.subspace.layout {
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static androidx.xr.compose.subspace.layout.SubspaceModifier rotate(androidx.xr.compose.subspace.layout.SubspaceModifier, androidx.xr.runtime.math.Quaternion quaternion);
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static androidx.xr.compose.subspace.layout.SubspaceModifier rotate(androidx.xr.compose.subspace.layout.SubspaceModifier, androidx.xr.runtime.math.Vector3 axisAngle, float rotation);
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static androidx.xr.compose.subspace.layout.SubspaceModifier rotate(androidx.xr.compose.subspace.layout.SubspaceModifier, float pitch, float yaw, float roll);
-  }
-
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class RotationNode extends androidx.xr.compose.subspace.layout.SubspaceModifier.Node implements androidx.xr.compose.subspace.node.SubspaceLayoutModifierNode {
-    ctor public RotationNode(androidx.xr.runtime.math.Quaternion quaternion);
-    method public androidx.xr.runtime.math.Quaternion getQuaternion();
-    method public androidx.xr.compose.subspace.layout.MeasureResult measure(androidx.xr.compose.subspace.layout.MeasureScope, androidx.xr.compose.subspace.layout.Measurable measurable, androidx.xr.compose.unit.VolumeConstraints constraints);
-    method public void setQuaternion(androidx.xr.runtime.math.Quaternion);
-    property public final androidx.xr.runtime.math.Quaternion quaternion;
   }
 
   public final class ScaleKt {

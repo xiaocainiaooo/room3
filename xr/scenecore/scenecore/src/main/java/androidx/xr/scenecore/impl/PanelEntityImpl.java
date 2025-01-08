@@ -38,12 +38,12 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 final class PanelEntityImpl extends BasePanelEntity implements PanelEntity {
     private static final String TAG = "PanelEntity";
-    private final SurfaceControlViewHost surfaceControlViewHost;
+    private final SurfaceControlViewHost mSurfaceControlViewHost;
 
     // TODO(b/352630140): Create a static factory method for PanelEntityImpl and move the Extensions
     //                    init there (out of JxrPlatformAdapterAxr)
 
-    public PanelEntityImpl(
+    PanelEntityImpl(
             Node node,
             XrExtensions extensions,
             EntityManager entityManager,
@@ -55,7 +55,7 @@ final class PanelEntityImpl extends BasePanelEntity implements PanelEntity {
         // Extensions
         // are initialized in the factory method. (ext.setWindowBounds, etc)
         super.setPixelDimensions(windowBoundsPx);
-        this.surfaceControlViewHost = surfaceControlViewHost;
+        mSurfaceControlViewHost = surfaceControlViewHost;
     }
 
     // TODO(b/352827267): Enforce minSDK API strategy - go/androidx-api-guidelines#compat-newapi
@@ -64,10 +64,10 @@ final class PanelEntityImpl extends BasePanelEntity implements PanelEntity {
         super.setPixelDimensions(dimensions);
 
         SurfacePackage surfacePackage =
-                Objects.requireNonNull(surfaceControlViewHost.getSurfacePackage());
+                Objects.requireNonNull(mSurfaceControlViewHost.getSurfacePackage());
 
-        surfaceControlViewHost.relayout(dimensions.width, dimensions.height);
-        try (NodeTransaction transaction = extensions.createNodeTransaction()) {
+        mSurfaceControlViewHost.relayout(dimensions.width, dimensions.height);
+        try (NodeTransaction transaction = mExtensions.createNodeTransaction()) {
             transaction
                     .setWindowBounds(surfacePackage, dimensions.width, dimensions.height)
                     .apply();
@@ -79,7 +79,7 @@ final class PanelEntityImpl extends BasePanelEntity implements PanelEntity {
     @Override
     public void dispose() {
         Log.i(TAG, "Disposing " + this);
-        surfaceControlViewHost.release();
+        mSurfaceControlViewHost.release();
         super.dispose();
     }
 }

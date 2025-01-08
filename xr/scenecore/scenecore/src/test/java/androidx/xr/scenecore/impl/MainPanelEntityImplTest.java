@@ -46,50 +46,50 @@ import org.robolectric.android.controller.ActivityController;
 
 @RunWith(RobolectricTestRunner.class)
 public class MainPanelEntityImplTest {
-    private final FakeXrExtensions fakeExtensions = new FakeXrExtensions();
-    private final FakeImpressApi fakeImpressApi = new FakeImpressApi();
-    private final ActivityController<Activity> activityController =
+    private final FakeXrExtensions mFakeExtensions = new FakeXrExtensions();
+    private final FakeImpressApi mFakeImpressApi = new FakeImpressApi();
+    private final ActivityController<Activity> mActivityController =
             Robolectric.buildActivity(Activity.class);
-    private final Activity hostActivity = activityController.create().start().get();
-    private final FakeScheduledExecutorService fakeExecutor = new FakeScheduledExecutorService();
-    private final PerceptionLibrary perceptionLibrary = Mockito.mock(PerceptionLibrary.class);
-    SplitEngineSubspaceManager splitEngineSubspaceManager =
+    private final Activity mHostActivity = mActivityController.create().start().get();
+    private final FakeScheduledExecutorService mFakeExecutor = new FakeScheduledExecutorService();
+    private final PerceptionLibrary mPerceptionLibrary = Mockito.mock(PerceptionLibrary.class);
+    SplitEngineSubspaceManager mSplitEngineSubspaceManager =
             Mockito.mock(SplitEngineSubspaceManager.class);
-    ImpSplitEngineRenderer splitEngineRenderer = Mockito.mock(ImpSplitEngineRenderer.class);
-    private JxrPlatformAdapterAxr testRuntime;
-    private MainPanelEntityImpl mainPanelEntity;
+    ImpSplitEngineRenderer mSplitEngineRenderer = Mockito.mock(ImpSplitEngineRenderer.class);
+    private JxrPlatformAdapterAxr mTestRuntime;
+    private MainPanelEntityImpl mMainPanelEntity;
 
     @Before
     public void setUp() {
-        when(perceptionLibrary.initSession(eq(hostActivity), anyInt(), eq(fakeExecutor)))
+        when(mPerceptionLibrary.initSession(eq(mHostActivity), anyInt(), eq(mFakeExecutor)))
                 .thenReturn(immediateFuture(Mockito.mock(Session.class)));
 
-        testRuntime =
+        mTestRuntime =
                 JxrPlatformAdapterAxr.create(
-                        hostActivity,
-                        fakeExecutor,
-                        fakeExtensions,
-                        fakeImpressApi,
+                        mHostActivity,
+                        mFakeExecutor,
+                        mFakeExtensions,
+                        mFakeImpressApi,
                         new EntityManager(),
-                        perceptionLibrary,
-                        splitEngineSubspaceManager,
-                        splitEngineRenderer,
+                        mPerceptionLibrary,
+                        mSplitEngineSubspaceManager,
+                        mSplitEngineRenderer,
                         /* useSplitEngine= */ false);
 
-        mainPanelEntity = (MainPanelEntityImpl) testRuntime.getMainPanelEntity();
+        mMainPanelEntity = (MainPanelEntityImpl) mTestRuntime.getMainPanelEntity();
     }
 
     @Test
     public void runtimeGetMainPanelEntity_returnsPanelEntityImpl() {
-        assertThat(mainPanelEntity).isNotNull();
+        assertThat(mMainPanelEntity).isNotNull();
     }
 
     @Test
     public void mainPanelEntitySetPixelDimensions_callsExtensions() {
         PixelDimensions kTestPixelDimensions = new PixelDimensions(14, 14);
-        mainPanelEntity.setPixelDimensions(kTestPixelDimensions);
-        assertThat(fakeExtensions.getMainWindowWidth()).isEqualTo(kTestPixelDimensions.width);
-        assertThat(fakeExtensions.getMainWindowHeight()).isEqualTo(kTestPixelDimensions.height);
+        mMainPanelEntity.setPixelDimensions(kTestPixelDimensions);
+        assertThat(mFakeExtensions.getMainWindowWidth()).isEqualTo(kTestPixelDimensions.width);
+        assertThat(mFakeExtensions.getMainWindowHeight()).isEqualTo(kTestPixelDimensions.height);
     }
 
     @Test
@@ -98,8 +98,8 @@ public class MainPanelEntityImplTest {
         // This should have the same effect as setPixelDimensions, except that it has to convert
         // from Dimensions to PixelDimensions, so it casts float to int.
         Dimensions kTestDimensions = new Dimensions(123.0f, 123.0f, 123.0f);
-        mainPanelEntity.setSize(kTestDimensions);
-        assertThat(fakeExtensions.getMainWindowWidth()).isEqualTo((int) kTestDimensions.width);
-        assertThat(fakeExtensions.getMainWindowWidth()).isEqualTo((int) kTestDimensions.height);
+        mMainPanelEntity.setSize(kTestDimensions);
+        assertThat(mFakeExtensions.getMainWindowWidth()).isEqualTo((int) kTestDimensions.width);
+        assertThat(mFakeExtensions.getMainWindowWidth()).isEqualTo((int) kTestDimensions.height);
     }
 }

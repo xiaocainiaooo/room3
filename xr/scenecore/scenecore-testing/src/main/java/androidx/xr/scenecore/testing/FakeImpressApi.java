@@ -49,18 +49,18 @@ public class FakeImpressApi implements ImpressApi {
     }
 
     // Map of model tokens to the list of impress nodes that are instances of that model.
-    private final Map<Long, List<Integer>> gltfModels = new HashMap<>();
+    private final Map<Long, List<Integer>> mGltfModels = new HashMap<>();
     // Map of impress nodes to their parent impress nodes.
-    private final Map<Integer, Integer> impressNodes = new HashMap<>();
+    private final Map<Integer, Integer> mImpressNodes = new HashMap<>();
 
     // Map of impress nodes and animations that are currently playing (non looping)
-    final Map<Integer, AnimationInProgress> impressAnimatedNodes = new HashMap<>();
+    final Map<Integer, AnimationInProgress> mImpressAnimatedNodes = new HashMap<>();
 
     // Map of impress nodes and animations that are currently playing (looping)
-    final Map<Integer, AnimationInProgress> impressLoopAnimatedNodes = new HashMap<>();
+    final Map<Integer, AnimationInProgress> mImpressLoopAnimatedNodes = new HashMap<>();
 
-    private int nextModelId = 1;
-    private int nextNodeId = 1;
+    private int mNextModelId = 1;
+    private int mNextNodeId = 1;
 
     @Override
     public void setup(@NonNull View view) {}
@@ -75,8 +75,8 @@ public class FakeImpressApi implements ImpressApi {
     @NonNull
     @SuppressWarnings({"RestrictTo", "AsyncSuffixFuture"})
     public ListenableFuture<Long> loadGltfModel(@NonNull String name) {
-        long modelToken = nextModelId++;
-        gltfModels.put(modelToken, new ArrayList<>());
+        long modelToken = mNextModelId++;
+        mGltfModels.put(modelToken, new ArrayList<>());
         // TODO(b/352827267): Enforce minSDK API strategy - go/androidx-api-guidelines#compat-newapi
         ResolvableFuture<Long> ret = ResolvableFuture.create();
         ret.set(modelToken);
@@ -86,10 +86,10 @@ public class FakeImpressApi implements ImpressApi {
 
     @Override
     public void releaseGltfModel(long modelToken) {
-        if (!gltfModels.containsKey(modelToken)) {
+        if (!mGltfModels.containsKey(modelToken)) {
             throw new IllegalArgumentException("Model token not found");
         }
-        gltfModels.remove(modelToken);
+        mGltfModels.remove(modelToken);
     }
 
     @Override
@@ -99,12 +99,12 @@ public class FakeImpressApi implements ImpressApi {
 
     @Override
     public int instanceGltfModel(long modelToken, boolean enableCollider) {
-        if (!gltfModels.containsKey(modelToken)) {
+        if (!mGltfModels.containsKey(modelToken)) {
             throw new IllegalArgumentException("Model token not found");
         }
-        int entityId = nextNodeId++;
-        gltfModels.get(modelToken).add(entityId);
-        impressNodes.put(entityId, null);
+        int entityId = mNextNodeId++;
+        mGltfModels.get(modelToken).add(entityId);
+        mImpressNodes.put(entityId, null);
         return entityId;
     }
 
@@ -119,7 +119,7 @@ public class FakeImpressApi implements ImpressApi {
     public ListenableFuture<Void> animateGltfModel(
             int impressNode, @Nullable String animationName, boolean loop) {
         ResolvableFuture<Void> future = ResolvableFuture.create();
-        if (impressNodes.get(impressNode) == null) {
+        if (mImpressNodes.get(impressNode) == null) {
             future.setException(new IllegalArgumentException("Impress node not found"));
             return future;
         }
@@ -128,81 +128,85 @@ public class FakeImpressApi implements ImpressApi {
         animationInProgress.name = animationName;
         animationInProgress.fireOnDone = future;
         if (loop) {
-            impressLoopAnimatedNodes.put(impressNode, animationInProgress);
+            mImpressLoopAnimatedNodes.put(impressNode, animationInProgress);
         } else {
-            impressAnimatedNodes.put(impressNode, animationInProgress);
+            mImpressAnimatedNodes.put(impressNode, animationInProgress);
         }
         return future;
     }
 
     @Override
     public void stopGltfModelAnimation(int impressNode) {
-        if (impressNodes.get(impressNode) == null) {
+        if (mImpressNodes.get(impressNode) == null) {
             throw new IllegalArgumentException("Impress node not found");
-        } else if (!impressAnimatedNodes.containsKey(impressNode)
-                && !impressLoopAnimatedNodes.containsKey(impressNode)) {
+        } else if (!mImpressAnimatedNodes.containsKey(impressNode)
+                && !mImpressLoopAnimatedNodes.containsKey(impressNode)) {
             throw new IllegalArgumentException("Impress node is not animating");
-        } else if (impressAnimatedNodes.containsKey(impressNode)) {
-            impressAnimatedNodes.remove(impressNode);
-        } else if (impressLoopAnimatedNodes.containsKey(impressNode)) {
-            impressLoopAnimatedNodes.remove(impressNode);
+        } else if (mImpressAnimatedNodes.containsKey(impressNode)) {
+            mImpressAnimatedNodes.remove(impressNode);
+        } else if (mImpressLoopAnimatedNodes.containsKey(impressNode)) {
+            mImpressLoopAnimatedNodes.remove(impressNode);
         }
     }
 
     @Override
     public int createImpressNode() {
-        int entityId = nextNodeId++;
-        impressNodes.put(entityId, null);
+        int entityId = mNextNodeId++;
+        mImpressNodes.put(entityId, null);
         return entityId;
     }
 
     @Override
     public void destroyImpressNode(int impressNode) {
-        if (!impressNodes.containsKey(impressNode)) {
+        if (!mImpressNodes.containsKey(impressNode)) {
             throw new IllegalArgumentException("Impress node not found");
         }
-        for (Map.Entry<Long, List<Integer>> pair : gltfModels.entrySet()) {
+        for (Map.Entry<Long, List<Integer>> pair : mGltfModels.entrySet()) {
             if (pair.getValue().contains(impressNode)) {
-                pair.getValue().remove(impressNode);
+                pair.getValue().remove(Integer.valueOf(impressNode));
             }
         }
-        for (Map.Entry<Integer, Integer> pair : impressNodes.entrySet()) {
+        for (Map.Entry<Integer, Integer> pair : mImpressNodes.entrySet()) {
             if (pair.getValue() != null && pair.getValue().equals((Integer) impressNode)) {
                 pair.setValue(null);
             }
         }
-        impressNodes.remove(impressNode);
+        mImpressNodes.remove(impressNode);
     }
 
     @Override
     public void setImpressNodeParent(int impressNodeChild, int impressNodeParent) {
-        if (!impressNodes.containsKey(impressNodeChild)
-                || !impressNodes.containsKey(impressNodeParent)) {
+        if (!mImpressNodes.containsKey(impressNodeChild)
+                || !mImpressNodes.containsKey(impressNodeParent)) {
             throw new IllegalArgumentException("Impress node(s) not found");
         }
-        impressNodes.put(impressNodeChild, impressNodeParent);
+        mImpressNodes.put(impressNodeChild, impressNodeParent);
     }
 
+    /** Gets the impress nodes for glTF models that match the given token. */
     @NonNull
     public List<Integer> getImpressNodesForToken(long modelToken) {
-        return gltfModels.get(modelToken);
+        return mGltfModels.get(modelToken);
     }
 
+    /** Returns true if the given impress node has a parent. */
     public boolean impressNodeHasParent(int impressNode) {
-        return impressNodes.containsKey(impressNode) && impressNodes.get(impressNode) != null;
+        return mImpressNodes.containsKey(impressNode) && mImpressNodes.get(impressNode) != null;
     }
 
+    /** Returns the number of impress nodes that are currently animating. */
     public int impressNodeAnimatingSize() {
-        return impressAnimatedNodes.size();
+        return mImpressAnimatedNodes.size();
     }
 
+    /** Returns the number of impress nodes that looping animations. */
     public int impressNodeLoopAnimatingSize() {
-        return impressLoopAnimatedNodes.size();
+        return mImpressLoopAnimatedNodes.size();
     }
 
     @Override
     public int createStereoSurface(@StereoMode int mode) {
-        return nextNodeId++;
+        return mNextNodeId++;
     }
 
     @Override

@@ -41,7 +41,7 @@ public class SpatialMediaPlayer {
             mediaPlayer: MediaPlayer,
             attributes: PointSourceAttributes,
         ) {
-            session.runtime.mediaPlayerExtensionsWrapper.setPointSourceAttributes(
+            session.platformAdapter.mediaPlayerExtensionsWrapper.setPointSourceAttributes(
                 mediaPlayer,
                 attributes.rtPointSourceAttributes,
             )
@@ -64,7 +64,7 @@ public class SpatialMediaPlayer {
             mediaPlayer: MediaPlayer,
             attributes: SoundFieldAttributes,
         ) {
-            session.runtime.mediaPlayerExtensionsWrapper.setSoundFieldAttributes(
+            session.platformAdapter.mediaPlayerExtensionsWrapper.setSoundFieldAttributes(
                 mediaPlayer,
                 attributes.rtSoundFieldAttributes,
             )

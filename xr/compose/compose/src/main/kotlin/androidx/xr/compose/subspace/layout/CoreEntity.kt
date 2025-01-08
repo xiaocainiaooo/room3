@@ -18,6 +18,7 @@ package androidx.xr.compose.subspace.layout
 
 import android.content.res.Resources
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.unit.Density
 import androidx.xr.compose.subspace.node.SubspaceLayoutModifierNode
 import androidx.xr.compose.subspace.node.SubspaceLayoutNode
@@ -99,15 +100,18 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
                 ?.findInstance<SubspaceLayoutModifierNode>()
                 ?.coordinator ?: layout?.parentCoordinatesInParentEntity
 
-    override var size: IntVolumeSize = IntVolumeSize.Zero
+    private val _size = mutableStateOf(IntVolumeSize.Zero)
+
+    override var size: IntVolumeSize
+        get() = _size.value
         set(value) {
             val proposedSize = resizable?.userSize ?: value
-            if (field == proposedSize) {
+            if (_size.value == proposedSize) {
                 return
             }
 
             setEntitySize(proposedSize)
-            field = proposedSize
+            _size.value = proposedSize
 
             movable?.setComponentSize(proposedSize)
             resizable?.setComponentSize(proposedSize)
@@ -229,7 +233,7 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
             // Here we create the component and pass in false to systemMovable since Compose is
             // going to
             // handle the move events.
-            session.createMovableComponent(systemMovable = false)
+            MovableComponent.create(session, systemMovable = false)
         }
 
         /**
@@ -403,7 +407,7 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
         private var isAttached: Boolean = false
 
         private val component: ResizableComponent by lazy {
-            session.createResizableComponent().apply {
+            ResizableComponent.create(session).apply {
                 addResizeListener(
                     LocalExecutor,
                     object : ResizeListener {

@@ -61,7 +61,7 @@ class InteractableComponentTest {
         whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
         val mockListener = mock<InputEventListener>()
         val executor = directExecutor()
-        val interactableComponent = session.createInteractableComponent(executor, mockListener)
+        val interactableComponent = InteractableComponent.create(session, executor, mockListener)
 
         assertThat(entity.addComponent(interactableComponent)).isTrue()
         verify(mockRuntime).createInteractableComponent(any(), anyOrNull())
@@ -76,7 +76,7 @@ class InteractableComponentTest {
         whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
         val mockListener = mock<InputEventListener>()
         val executor = directExecutor()
-        val interactableComponent = session.createInteractableComponent(executor, mockListener)
+        val interactableComponent = InteractableComponent.create(session, executor, mockListener)
 
         assertThat(entity.addComponent(interactableComponent)).isTrue()
 
@@ -93,7 +93,7 @@ class InteractableComponentTest {
         whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
         val mockListener = mock<InputEventListener>()
         val executor = directExecutor()
-        val interactableComponent = session.createInteractableComponent(executor, mockListener)
+        val interactableComponent = InteractableComponent.create(session, executor, mockListener)
 
         assertThat(entity.addComponent(interactableComponent)).isTrue()
         assertThat(entity2.addComponent(interactableComponent)).isFalse()
@@ -107,7 +107,7 @@ class InteractableComponentTest {
         whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
         val mockListener = mock<InputEventListener>()
         val executor = directExecutor()
-        val interactableComponent = session.createInteractableComponent(executor, mockListener)
+        val interactableComponent = InteractableComponent.create(session, executor, mockListener)
 
         assertThat(entity.addComponent(interactableComponent)).isTrue()
         entity.removeComponent(interactableComponent)
@@ -122,7 +122,7 @@ class InteractableComponentTest {
         whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
         val mockListener = mock<InputEventListener>()
         val interactableComponent =
-            session.createInteractableComponent(directExecutor(), mockListener)
+            InteractableComponent.create(session, directExecutor(), mockListener)
         assertThat(entity.addComponent(interactableComponent)).isTrue()
         val listenerCaptor = argumentCaptor<JxrPlatformAdapter.InputEventListener>()
         verify(mockRuntime).createInteractableComponent(any(), listenerCaptor.capture())

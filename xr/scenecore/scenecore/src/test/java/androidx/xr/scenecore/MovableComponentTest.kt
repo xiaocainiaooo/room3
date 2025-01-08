@@ -81,7 +81,8 @@ class MovableComponentTest {
             AnchorPlacement.createForPlanes(setOf(PlaneType.HORIZONTAL), setOf(PlaneSemantic.WALL))
 
         val movableComponent =
-            session.createMovableComponent(
+            MovableComponent.create(
+                session,
                 systemMovable = false,
                 scaleInZ = false,
                 anchorPlacement = setOf(anchorPlacement),
@@ -99,7 +100,7 @@ class MovableComponentTest {
         assertThat(entity).isNotNull()
         whenever(mockRuntime.createMovableComponent(any(), any(), any(), any())).thenReturn(mock())
         whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
-        val movableComponent = session.createMovableComponent()
+        val movableComponent = MovableComponent.create(session)
 
         assertThat(entity.addComponent(movableComponent)).isTrue()
         verify(mockRuntime)
@@ -118,7 +119,7 @@ class MovableComponentTest {
         assertThat(entity).isNotNull()
         whenever(mockRuntime.createMovableComponent(any(), any(), any(), any())).thenReturn(mock())
         whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
-        val movableComponent = session.createMovableComponent()
+        val movableComponent = MovableComponent.create(session)
         assertThat(entity.addComponent(movableComponent)).isTrue()
 
         entity.removeComponent(movableComponent)
@@ -132,7 +133,7 @@ class MovableComponentTest {
         assertThat(entity).isNotNull()
         whenever(mockRuntime.createMovableComponent(any(), any(), any(), any())).thenReturn(mock())
         whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
-        val movableComponent = session.createMovableComponent()
+        val movableComponent = MovableComponent.create(session)
 
         assertThat(entity.addComponent(movableComponent)).isTrue()
         assertThat(entity2.addComponent(movableComponent)).isFalse()
@@ -147,7 +148,7 @@ class MovableComponentTest {
         whenever(mockRuntime.createMovableComponent(any(), any(), any(), any()))
             .thenReturn(mockRtMovableComponent)
         whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
-        val movableComponent = session.createMovableComponent()
+        val movableComponent = MovableComponent.create(session)
         assertThat(entity.addComponent(movableComponent)).isTrue()
 
         val testSize = Dimensions(2f, 2f, 0f)
@@ -165,7 +166,7 @@ class MovableComponentTest {
         whenever(mockRuntime.createMovableComponent(any(), any(), any(), any()))
             .thenReturn(mockRtMovableComponent)
         whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
-        val movableComponent = session.createMovableComponent()
+        val movableComponent = MovableComponent.create(session)
         assertThat(entity.addComponent(movableComponent)).isTrue()
         val mockMoveListener = mock<MoveListener>()
         movableComponent.addMoveListener(directExecutor(), mockMoveListener)
@@ -233,7 +234,7 @@ class MovableComponentTest {
         whenever(mockRuntime.createMovableComponent(any(), any(), any(), any()))
             .thenReturn(mockRtMovableComponent)
         whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
-        val movableComponent = session.createMovableComponent()
+        val movableComponent = MovableComponent.create(session)
         assertThat(entity.addComponent(movableComponent)).isTrue()
         val mockMoveListener = mock<MoveListener>()
         movableComponent.addMoveListener(directExecutor(), mockMoveListener)
@@ -273,7 +274,7 @@ class MovableComponentTest {
         whenever(mockRuntime.createMovableComponent(any(), any(), any(), any()))
             .thenReturn(mockRtMovableComponent)
         whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
-        val movableComponent = session.createMovableComponent()
+        val movableComponent = MovableComponent.create(session)
         assertThat(entity.addComponent(movableComponent)).isTrue()
         val mockMoveListener = mock<MoveListener>()
         movableComponent.addMoveListener(directExecutor(), mockMoveListener)
@@ -322,7 +323,7 @@ class MovableComponentTest {
         assertThat(entity).isNotNull()
         whenever(mockRuntime.createMovableComponent(any(), any(), any(), any())).thenReturn(mock())
         whenever(mockContentlessEntity.addComponent(any())).thenReturn(true)
-        val movableComponent = session.createMovableComponent()
+        val movableComponent = MovableComponent.create(session)
 
         assertThat(entity.addComponent(movableComponent)).isTrue()
         entity.removeComponent(movableComponent)
