@@ -104,44 +104,28 @@ internal class PageLayoutManager(
     }
 
     /**
-     * Returns the page number containing the specified PDF coordinates within the given viewport.
-     * If no page contains the coordinates, returns [INVALID_ID].
+     * Returns the [PdfPoint] that exists at [contentCoordinates], or null if no page content is
+     * laid out at [contentCoordinates].
      *
-     * @param pdfCoordinates The PDF coordinates to check.
-     * @param viewport The visible area of the PDF.
-     * @return The page number or [INVALID_ID].
+     * @param contentCoordinates the content coordinates to check (View coordinates that are scaled
+     *   up or down by the current zoom level)
+     * @param viewport the current viewport in content coordinates
      */
-    fun getPageNumberAt(pdfCoordinates: PointF, viewport: Rect): Int {
+    fun getPdfPointAt(contentCoordinates: PointF, viewport: Rect): PdfPoint? {
         val visiblePages = visiblePages.value
         for (pageIndex in visiblePages.lower..visiblePages.upper) {
             val pageBounds = paginationModel.getPageLocation(pageIndex, viewport)
-            if (RectF(pageBounds).contains(pdfCoordinates.x, pdfCoordinates.y)) {
-                return pageIndex
+            if (RectF(pageBounds).contains(contentCoordinates.x, contentCoordinates.y)) {
+                return PdfPoint(
+                    pageIndex,
+                    PointF(
+                        contentCoordinates.x - pageBounds.left,
+                        contentCoordinates.y - pageBounds.top,
+                    )
+                )
             }
         }
-        return INVALID_ID
-    }
-
-    /**
-     * Converts tap coordinates (relative to the viewport) to content coordinates relative to the
-     * specified page.
-     *
-     * @param pageNum The 0-indexed page number.
-     * @param viewport The current viewport's dimensions.
-     * @param tapCoordinates The tap coordinates relative to the visible pages.
-     * @return The coordinates relative to the clicked page.
-     */
-    fun getPageCoordinatesRelativeToTappedPage(
-        pageNum: Int,
-        viewport: Rect,
-        tapCoordinates: PointF
-    ): PointF {
-        val pageLocation = getPageLocation(pageNum, viewport)
-
-        val contentX = tapCoordinates.x - pageLocation.left
-        val contentY = tapCoordinates.y - pageLocation.top
-
-        return PointF(contentX, contentY)
+        return null
     }
 
     /**

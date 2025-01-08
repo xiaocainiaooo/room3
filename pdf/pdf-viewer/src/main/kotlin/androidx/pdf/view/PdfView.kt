@@ -141,11 +141,17 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     /** The listener that is notified when a link in the PDF is clicked. */
     public var linkClickListener: LinkClickListener? = null
 
+    /** The currently selected PDF content, as [Selection] */
+    public val currentSelection: Selection?
+        get() {
+            return selectionStateManager?.selectionModel?.selection
+        }
+
     /**
      * The [CoroutineScope] used to make suspending calls to [PdfDocument]. The size of the fixed
      * thread pool is arbitrary and subject to tuning.
      */
-    internal val backgroundScope: CoroutineScope =
+    private val backgroundScope: CoroutineScope =
         CoroutineScope(Executors.newFixedThreadPool(5).asCoroutineDispatcher() + SupervisorJob())
 
     private var pageLayoutManager: PageLayoutManager? = null
@@ -153,6 +159,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private var visiblePagesCollector: Job? = null
     private var dimensionsCollector: Job? = null
     private var invalidationCollector: Job? = null
+    private var selectionStateCollector: Job? = null
 
     private var deferredScrollPage: Int? = null
     private var deferredScrollPosition: PdfPoint? = null
@@ -185,6 +192,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         set(value) {
             field = value
         }
+
+    private var selectionStateManager: SelectionStateManager? = null
+    private val selectionRenderer = SelectionRenderer(context)
 
     /**
      * Scrolls to the 0-indexed [pageNum], optionally animating the scroll
@@ -264,6 +274,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         scrollTo(x.toInt(), y.toInt())
     }
 
+    /** Clears the current selection, if one exists. No-op if there is no current [Selection] */
+    public fun clearSelection() {
+        selectionStateManager?.clearSelection()
+    }
+
     private fun gotoPoint(position: PdfPoint) {
         checkMainThread()
         val localPageLayoutManager =
@@ -315,12 +330,19 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         val localPaginationManager = pageLayoutManager ?: return
         canvas.save()
         canvas.scale(zoom, zoom)
+        val selectionModel = selectionStateManager?.selectionModel
         for (i in visiblePages.lower..visiblePages.upper) {
-            pageManager?.drawPage(
-                i,
-                canvas,
-                localPaginationManager.getPageLocation(i, getVisibleAreaInContentCoords())
-            )
+            val pageLoc = localPaginationManager.getPageLocation(i, getVisibleAreaInContentCoords())
+            pageManager?.drawPage(i, canvas, pageLoc)
+            selectionModel?.let {
+                selectionRenderer.drawSelectionOnPage(
+                    model = it,
+                    pageNum = i,
+                    canvas,
+                    pageLoc,
+                    zoom
+                )
+            }
         }
         canvas.restore()
     }
@@ -523,6 +545,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         zoomToRestore = null
     }
 
+    /**
+     * Launches a tree of coroutines to collect data from helper classes while we're attached to a
+     * visible window
+     */
     private fun startCollectingData() {
         val mainScope =
             CoroutineScope(HandlerCompat.createAsync(handler.looper).asCoroutineDispatcher())
@@ -562,12 +588,22 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                     }
                 }
         }
+        selectionStateManager?.let { manager ->
+            val selectionToJoin = selectionStateCollector?.apply { cancel() }
+            selectionStateCollector =
+                mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                    // Prevent 2 copies from running concurrently
+                    selectionToJoin?.join()
+                    manager.invalidationSignalFlow.collect { invalidate() }
+                }
+        }
     }
 
     private fun stopCollectingData() {
         dimensionsCollector?.cancel()
         visiblePagesCollector?.cancel()
         invalidationCollector?.cancel()
+        selectionStateCollector?.cancel()
     }
 
     /** Start using the [PdfDocument] to present PDF content */
@@ -589,6 +625,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 DEFAULT_PAGE_PREFETCH_RADIUS,
                 Point(maxBitmapDimensionPx, maxBitmapDimensionPx),
                 isTouchExplorationEnabled
+            )
+        selectionStateManager =
+            SelectionStateManager(
+                localPdfDocument,
+                backgroundScope,
             )
         // We'll either create our layout manager from restored state, or instantiate a new one
         if (!maybeRestoreState()) {
@@ -784,6 +825,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
          */
         private val linearScaleSpanMultiplier: Float =
             2f / maxOf(resources.displayMetrics.heightPixels, resources.displayMetrics.widthPixels)
+
         /** The maximum scroll distance used to determine if the direction is vertical. */
         private val maxScrollWindow =
             (resources.displayMetrics.density * MAX_SCROLL_WINDOW_DP).toInt()
@@ -881,6 +923,18 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             return true
         }
 
+        override fun onLongPress(e: MotionEvent) {
+            super.onLongPress(e)
+            val pageLayoutManager = pageLayoutManager ?: return super.onLongPress(e)
+            val touchPoint =
+                pageLayoutManager.getPdfPointAt(
+                    PointF(toContentX(e.x), toContentY(e.y)),
+                    getVisibleAreaInContentCoords()
+                ) ?: return super.onLongPress(e)
+
+            selectionStateManager?.maybeSelectWordAtPoint(touchPoint)
+        }
+
         override fun onDoubleTap(e: MotionEvent): Boolean {
 
             val currentZoom = zoom
@@ -932,27 +986,17 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
 
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-            val contentX = toContentX(e.x)
-            val contentY = toContentY(e.y)
-
+            selectionStateManager?.clearSelection()
             val pageLayoutManager = pageLayoutManager ?: return super.onSingleTapConfirmed(e)
-            val pageNum =
-                pageLayoutManager.getPageNumberAt(
-                    PointF(contentX, contentY),
+            val touchPoint =
+                pageLayoutManager.getPdfPointAt(
+                    PointF(toContentX(e.x), toContentY(e.y)),
                     getVisibleAreaInContentCoords()
-                )
-            if (pageNum == INVALID_ID) return super.onSingleTapConfirmed(e)
+                ) ?: return super.onSingleTapConfirmed(e)
 
-            val pdfCoordinates =
-                pageLayoutManager.getPageCoordinatesRelativeToTappedPage(
-                    pageNum,
-                    getVisibleAreaInContentCoords(),
-                    PointF(contentX, contentY)
-                )
-
-            pageManager?.getLinkAtTapPoint(PdfPoint(pageNum, pdfCoordinates))?.let { links ->
-                if (handleGotoLinks(links, pdfCoordinates)) return true
-                if (handleExternalLinks(links, pdfCoordinates)) return true
+            pageManager?.getLinkAtTapPoint(touchPoint)?.let { links ->
+                if (handleGotoLinks(links, touchPoint.pagePoint)) return true
+                if (handleExternalLinks(links, touchPoint.pagePoint)) return true
             }
             return super.onSingleTapConfirmed(e)
         }
@@ -972,6 +1016,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                                     gotoLink.destination.yCoordinate
                                 )
                         )
+
                     scrollToPosition(destination)
                     return true
                 }
@@ -1005,8 +1050,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
         /** The ratio of vertical to horizontal scroll that is assumed to be vertical only */
         private const val SCROLL_CORRECTION_RATIO = 1.5f
+
         /** The maximum scroll distance used to determine if the direction is vertical */
         private const val MAX_SCROLL_WINDOW_DP = 70
+
         /** The smallest scroll distance that can switch mode to "free scrolling" */
         private const val MIN_SCROLL_TO_SWITCH_DP = 30
 
