@@ -402,10 +402,8 @@ public class AuthTabIntent {
 
             // Put a null EXTRA_SESSION as a fallback so that this is interpreted as a Custom Tab
             // intent by browser implementations that don't support Auth Tab.
-            {
-                Bundle bundle = new Bundle();
-                bundle.putBinder(EXTRA_SESSION, null);
-                mIntent.putExtras(bundle);
+            if (!mIntent.hasExtra(EXTRA_SESSION)) {
+                setSessionParameters(null, null);
             }
 
             mIntent.putExtras(mDefaultColorSchemeBuilder.build().toBundle());
