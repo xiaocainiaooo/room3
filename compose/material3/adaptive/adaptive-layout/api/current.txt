@@ -371,10 +371,6 @@ package androidx.compose.material3.adaptive.layout {
     property public int size;
   }
 
-  public final class ThreePaneScaffoldHorizontalOrderKt {
-    method @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi public static androidx.compose.material3.adaptive.layout.ThreePaneScaffoldHorizontalOrder toLtrOrder(androidx.compose.material3.adaptive.layout.ThreePaneScaffoldHorizontalOrder, androidx.compose.ui.unit.LayoutDirection layoutDirection);
-  }
-
   public final class ThreePaneScaffoldKt {
     method @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveComponentOverrideApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.adaptive.layout.ThreePaneScaffoldOverride> getLocalThreePaneScaffoldOverride();
     property @SuppressCompatibility @androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveComponentOverrideApi public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material3.adaptive.layout.ThreePaneScaffoldOverride> LocalThreePaneScaffoldOverride;
