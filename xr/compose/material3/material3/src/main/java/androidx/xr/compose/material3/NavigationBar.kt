@@ -35,13 +35,17 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.xr.compose.material3.XrNavigationBarComponentOverride.NavigationBar
 import androidx.xr.compose.spatial.EdgeOffset
 import androidx.xr.compose.spatial.Orbiter
+import androidx.xr.compose.spatial.OrbiterDefaults
 import androidx.xr.compose.spatial.OrbiterEdge
 
 /**
@@ -81,7 +85,9 @@ public fun NavigationBar(
     tonalElevation: Dp = NavigationBarDefaults.Elevation,
     content: @Composable RowScope.() -> Unit
 ) {
-    Orbiter(position = OrbiterEdge.Bottom, offset = XrNavigationBarTokens.OrbiterEdgeOffset) {
+    val orbiterProperties =
+        LocalNavigationBarOrbiterProperties.current ?: DefaultNavigationBarOrbiterProperties
+    HorizontalOrbiter(orbiterProperties) {
         Surface(
             shape = CircleShape,
             color = containerColor,
@@ -130,3 +136,37 @@ internal object XrNavigationBarComponentOverride : NavigationBarComponentOverrid
         )
     }
 }
+
+/**
+ * The default [HorizontalOrbiterProperties] used by [NavigationBar] if none is specified in
+ * [LocalNavigationBarOrbiterProperties].
+ */
+@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+@get:ExperimentalMaterial3XrApi
+@ExperimentalMaterial3XrApi
+public val DefaultNavigationBarOrbiterProperties: HorizontalOrbiterProperties
+    @Composable
+    get() =
+        HorizontalOrbiterProperties(
+            position = OrbiterEdge.Horizontal.Bottom,
+            offset = XrNavigationBarTokens.OrbiterEdgeOffset,
+            alignment = Alignment.CenterHorizontally,
+            settings = OrbiterDefaults.orbiterSettings,
+            shape = OrbiterDefaults.shape,
+        )
+
+/**
+ * The [HorizontalOrbiterProperties] used by [NavigationBar].
+ *
+ * If `null`, [DefaultNavigationBarOrbiterProperties] will be used.
+ *
+ * TODO(b/387339197): Make this non-null and default to DefaultNavigationBarXrProperties
+ */
+@Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+@get:ExperimentalMaterial3XrApi
+@ExperimentalMaterial3XrApi
+public val LocalNavigationBarOrbiterProperties:
+    ProvidableCompositionLocal<HorizontalOrbiterProperties?> =
+    compositionLocalOf {
+        null
+    }
