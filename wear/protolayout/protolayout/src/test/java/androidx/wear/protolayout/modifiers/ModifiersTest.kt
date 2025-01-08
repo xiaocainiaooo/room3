@@ -19,6 +19,8 @@ package androidx.wear.protolayout.modifiers
 import android.graphics.Color
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.wear.protolayout.ActionBuilders.LoadAction
+import androidx.wear.protolayout.DimensionBuilders.dp
+import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_NONE
 import androidx.wear.protolayout.expression.AppDataKey
@@ -97,6 +99,16 @@ class ModifiersTest {
             .isEqualTo(CORNER_RADIUS_X)
         assertThat(modifiers.background?.corner?.bottomRightRadius?.y?.value)
             .isEqualTo(CORNER_RADIUS_Y)
+    }
+
+    @Test
+    fun background_withCorner_toModifier() {
+        val modifiers =
+            LayoutModifier.background(COLOR, Corner.Builder().setRadius(dp(CORNER_RADIUS)).build())
+                .toProtoLayoutModifiers()
+
+        assertThat(modifiers.background?.color?.argb).isEqualTo(COLOR.prop.argb)
+        assertThat(modifiers.background?.corner?.radius?.value).isEqualTo(CORNER_RADIUS)
     }
 
     @Test
