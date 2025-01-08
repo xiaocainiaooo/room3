@@ -45,8 +45,10 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumFlexibleTopAppBar
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -448,19 +450,19 @@ fun ExitUntilCollapsedMediumTopAppBar() {
 }
 
 /**
- * A sample for a [MediumTopAppBar] that collapses when the content is scrolled up, and appears when
- * the content is completely scrolled back down, centered with subtitle.
+ * A sample for a [MediumFlexibleTopAppBar] that collapses when the content is scrolled up, and
+ * appears when the content is completely scrolled back down, centered with subtitle.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Preview
 @Sampled
 @Composable
-fun ExitUntilCollapsedCenterAlignedMediumTopAppBarWithSubtitle() {
+fun ExitUntilCollapsedCenterAlignedMediumFlexibleTopAppBar() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            MediumTopAppBar(
+            MediumFlexibleTopAppBar(
                 title = {
                     Text("Medium TopAppBar", maxLines = 1, overflow = TextOverflow.Ellipsis)
                 },
@@ -556,19 +558,19 @@ fun ExitUntilCollapsedLargeTopAppBar() {
 }
 
 /**
- * A sample for a [LargeTopAppBar] that collapses when the content is scrolled up, and appears when
- * the content is completely scrolled back down, centered with subtitle.
+ * A sample for a [LargeFlexibleTopAppBar] that collapses when the content is scrolled up, and
+ * appears when the content is completely scrolled back down, centered with subtitle.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Preview
 @Sampled
 @Composable
-fun ExitUntilCollapsedCenterAlignedLargeTopAppBarWithSubtitle() {
+fun ExitUntilCollapsedCenterAlignedLargeFlexibleTopAppBar() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            LargeTopAppBar(
+            LargeFlexibleTopAppBar(
                 title = { Text("Large TopAppBar", maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 subtitle = { Text("Subtitle", maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 titleHorizontalAlignment = TopAppBarTitleAlignment.Center,
