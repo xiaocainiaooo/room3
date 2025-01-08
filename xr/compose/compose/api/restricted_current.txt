@@ -53,10 +53,10 @@ package androidx.xr.compose.platform {
     method public int getHome();
     method public int getNotApplicable();
     method public int getUnspecified();
-    property public int Full;
-    property public int Home;
-    property public int NotApplicable;
-    property public int Unspecified;
+    property public final int Full;
+    property public final int Home;
+    property public final int NotApplicable;
+    property public final int Unspecified;
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface SpatialCapabilities {
@@ -113,7 +113,7 @@ package androidx.xr.compose.spatial {
     method public float getAmount();
     method public int getType();
     property public final float amount;
-    property public int type;
+    property public final int type;
     field public static final androidx.xr.compose.spatial.EdgeOffset.Companion Companion;
   }
 
@@ -140,10 +140,10 @@ package androidx.xr.compose.spatial {
     method public int getEnd();
     method public int getStart();
     method public int getTop();
-    property public int Bottom;
-    property public int End;
-    property public int Start;
-    property public int Top;
+    property public final int Bottom;
+    property public final int End;
+    property public final int Start;
+    property public final int Top;
   }
 
   @kotlin.jvm.JvmInline public static final value class OrbiterEdge.Horizontal implements androidx.xr.compose.spatial.OrbiterEdge {
@@ -153,8 +153,8 @@ package androidx.xr.compose.spatial {
   public static final class OrbiterEdge.Horizontal.Companion {
     method public int getBottom();
     method public int getTop();
-    property public int Bottom;
-    property public int Top;
+    property public final int Bottom;
+    property public final int Top;
   }
 
   @kotlin.jvm.JvmInline public static final value class OrbiterEdge.Vertical implements androidx.xr.compose.spatial.OrbiterEdge {
@@ -164,8 +164,8 @@ package androidx.xr.compose.spatial {
   public static final class OrbiterEdge.Vertical.Companion {
     method public int getEnd();
     method public int getStart();
-    property public int End;
-    property public int Start;
+    property public final int End;
+    property public final int Start;
   }
 
   public final class OrbiterKt {
@@ -182,15 +182,15 @@ package androidx.xr.compose.spatial {
   public static final class OrbiterOffsetType.Companion {
     method public int getInnerEdge();
     method public int getOuterEdge();
-    property public int InnerEdge;
-    property public int OuterEdge;
+    property public final int InnerEdge;
+    property public final int OuterEdge;
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class OrbiterSettings {
     ctor public OrbiterSettings();
     ctor public OrbiterSettings(optional boolean shouldRenderInNonSpatial);
     method public androidx.xr.compose.spatial.OrbiterSettings copy(optional boolean shouldRenderInNonSpatial);
-    method public boolean shouldRenderInNonSpatial();
+    method public boolean getShouldRenderInNonSpatial();
     property public final boolean shouldRenderInNonSpatial;
   }
 
@@ -210,7 +210,7 @@ package androidx.xr.compose.spatial {
     property public final boolean dismissOnBackPress;
     property public final boolean dismissOnClickOutside;
     property public final androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float> restingLevelAnimationSpec;
-    property public float spatialElevationLevel;
+    property public final float spatialElevationLevel;
     property public final boolean usePlatformDefaultWidth;
   }
 
@@ -231,12 +231,12 @@ package androidx.xr.compose.spatial {
     method public float getLevel3();
     method public float getLevel4();
     method public float getLevel5();
-    property public float Level0;
-    property public float Level1;
-    property public float Level2;
-    property public float Level3;
-    property public float Level4;
-    property public float Level5;
+    property public final float Level0;
+    property public final float Level1;
+    property public final float Level2;
+    property public final float Level3;
+    property public final float Level4;
+    property public final float Level5;
   }
 
   public final class SpatialPopupKt {
@@ -257,7 +257,7 @@ package androidx.xr.compose.spatial {
     property public final boolean dismissOnBackPress;
     property public final boolean dismissOnClickOutside;
     property public final boolean focusable;
-    property public float spatialElevationLevel;
+    property public final float spatialElevationLevel;
   }
 
   public final class SubspaceKt {
@@ -713,9 +713,9 @@ package androidx.xr.compose.unit {
     method public float getDepth();
     method public float getHeight();
     method public float getWidth();
-    property public float depth;
-    property public float height;
-    property public float width;
+    property public final float depth;
+    property public final float height;
+    property public final float width;
     field public static final androidx.xr.compose.unit.DpVolumeSize.Companion Companion;
   }
 
@@ -767,29 +767,29 @@ package androidx.xr.compose.unit {
 
   public static final class Meter.Companion {
     method public inline float fromPixel(float px, androidx.compose.ui.unit.Density density);
-    method public float getCentimeters();
-    method public float getCentimeters();
-    method public float getCentimeters();
+    method public float getCentimeters(double);
+    method public float getCentimeters(float);
+    method public float getCentimeters(int);
     method public float getInfinity();
-    method public float getMeters();
-    method public float getMeters();
-    method public float getMeters();
-    method public float getMillimeters();
-    method public float getMillimeters();
-    method public float getMillimeters();
+    method public float getMeters(double);
+    method public float getMeters(float);
+    method public float getMeters(int);
+    method public float getMillimeters(double);
+    method public float getMillimeters(float);
+    method public float getMillimeters(int);
     method public float getNaN();
     property @kotlin.PublishedApi internal final float DP_PER_METER;
-    property public float Infinity;
-    property public float NaN;
-    property public float centimeters;
-    property public float centimeters;
-    property public float centimeters;
-    property public float meters;
-    property public float meters;
-    property public float meters;
-    property public float millimeters;
-    property public float millimeters;
-    property public float millimeters;
+    property public final float Infinity;
+    property public final float NaN;
+    property public final float centimeters;
+    property public final float centimeters;
+    property public final float centimeters;
+    property public final float meters;
+    property public final float meters;
+    property public final float meters;
+    property public final float millimeters;
+    property public final float millimeters;
+    property public final float millimeters;
   }
 
   public final class MeterKt {
