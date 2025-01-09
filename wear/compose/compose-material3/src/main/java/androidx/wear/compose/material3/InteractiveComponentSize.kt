@@ -92,8 +92,8 @@ internal class MinimumInteractiveModifierNode :
             }
 
         return layout(width, height) {
-            val centerX = ((width - placeable.width) / 2f).roundToInt()
-            val centerY = ((height - placeable.height) / 2f).roundToInt()
+            val centerX = ((width - placeable.width - 1) / 2f).roundToInt()
+            val centerY = ((height - placeable.height - 1) / 2f).roundToInt()
             placeable.place(centerX, centerY)
         }
     }
