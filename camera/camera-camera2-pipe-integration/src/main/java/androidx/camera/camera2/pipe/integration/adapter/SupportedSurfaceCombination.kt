@@ -46,6 +46,8 @@ import androidx.camera.core.impl.AttachedSurfaceInfo
 import androidx.camera.core.impl.CameraMode
 import androidx.camera.core.impl.EncoderProfilesProvider
 import androidx.camera.core.impl.ImageFormatConstants
+import androidx.camera.core.impl.SessionConfig.SESSION_TYPE_HIGH_SPEED
+import androidx.camera.core.impl.SessionConfig.SESSION_TYPE_REGULAR
 import androidx.camera.core.impl.StreamSpec
 import androidx.camera.core.impl.StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED
 import androidx.camera.core.impl.SurfaceCombination
@@ -909,6 +911,9 @@ public class SupportedSurfaceCombination(
                 bestSizesAndMaxFps.bestSizes[useCasesPriorityOrder.indexOf(index)]
             val streamSpecBuilder =
                 StreamSpec.builder(resolutionForUseCase)
+                    .setSessionType(
+                        if (isHighSpeedOn) SESSION_TYPE_HIGH_SPEED else SESSION_TYPE_REGULAR
+                    )
                     .setDynamicRange(checkNotNull(resolvedDynamicRanges[useCaseConfig]))
                     .setImplementationOptions(
                         StreamUseCaseUtil.getStreamSpecImplementationOptions(useCaseConfig)

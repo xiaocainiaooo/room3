@@ -66,6 +66,8 @@ import androidx.camera.core.impl.MutableOptionsBundle
 import androidx.camera.core.impl.MutableStateObservable
 import androidx.camera.core.impl.Observable
 import androidx.camera.core.impl.Quirk
+import androidx.camera.core.impl.SessionConfig.DEFAULT_SESSION_TYPE
+import androidx.camera.core.impl.SessionConfig.SESSION_TYPE_HIGH_SPEED
 import androidx.camera.core.impl.StreamSpec
 import androidx.camera.core.impl.Timebase
 import androidx.camera.core.impl.utils.CameraOrientationUtil.surfaceRotationToDegrees
@@ -1304,6 +1306,14 @@ class VideoCaptureTest {
         )
     }
 
+    @Test
+    fun suggestedStreamSpecSessionType_isPropagatedToSurfaceRequest() {
+        testSurfaceRequestContainsExpected(
+            sessionType = SESSION_TYPE_HIGH_SPEED,
+            expectedSessionType = SESSION_TYPE_HIGH_SPEED
+        )
+    }
+
     private fun testSetTargetRotation_transformationInfoUpdated(
         lensFacing: Int = LENS_FACING_BACK,
         sensorRotationDegrees: Int = 0,
@@ -1615,6 +1625,27 @@ class VideoCaptureTest {
             cropRect = cropRect,
             expectedCropRect = expectedCropRect
         )
+    }
+
+    @Test
+    fun sessionConfigMatchesStreamSpec() {
+        // Arrange.
+        setupCamera()
+        createCameraUseCaseAdapter()
+        val videoCapture = createVideoCapture(createVideoOutput())
+        setSuggestedStreamSpec(
+            resolution = ANY_SIZE,
+            sessionType = SESSION_TYPE_HIGH_SPEED,
+            expectedFrameRate = FRAME_RATE_RANGE_FIXED_30
+        )
+
+        // Act.
+        addAndAttachUseCases(videoCapture)
+
+        // Assert.
+        val sessionConfig = videoCapture.sessionConfig
+        assertThat(sessionConfig.sessionType).isEqualTo(SESSION_TYPE_HIGH_SPEED)
+        assertThat(sessionConfig.expectedFrameRateRange).isEqualTo(FRAME_RATE_RANGE_FIXED_30)
     }
 
     @Test
@@ -1959,6 +1990,8 @@ class VideoCaptureTest {
         videoEncoderInfo: VideoEncoderInfo = createVideoEncoderInfo(),
         cropRect: Rect? = null,
         expectedCropRect: Rect? = null,
+        sessionType: Int? = null,
+        expectedSessionType: Int? = null,
         targetFrameRate: Range<Int>? = null,
         expectedFrameRate: Range<Int> = SurfaceRequest.FRAME_RATE_RANGE_UNSPECIFIED,
         requestedDynamicRange: DynamicRange? = null,
@@ -1969,6 +2002,7 @@ class VideoCaptureTest {
         createCameraUseCaseAdapter()
         setSuggestedStreamSpec(
             resolution = resolution,
+            sessionType = sessionType,
             expectedFrameRate = expectedFrameRate,
             dynamicRange = expectedDynamicRange
         )
@@ -1998,6 +2032,10 @@ class VideoCaptureTest {
         expectedCropRect?.let {
             assertThat(surfaceRequest!!.resolution).isEqualTo(rectToSize(it))
             assertThat(videoCapture.cropRect).isEqualTo(it)
+        }
+
+        expectedSessionType?.let {
+            assertThat(surfaceRequest!!.sessionType).isEqualTo(expectedSessionType)
         }
 
         if (expectedFrameRate != StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED) {
@@ -2173,12 +2211,14 @@ class VideoCaptureTest {
     private fun setSuggestedStreamSpec(
         resolution: Size,
         originalConfiguredResolution: Size? = null,
+        sessionType: Int? = DEFAULT_SESSION_TYPE,
         expectedFrameRate: Range<Int> = StreamSpec.FRAME_RATE_RANGE_UNSPECIFIED,
         dynamicRange: DynamicRange? = null
     ) {
         setSuggestedStreamSpec(
             StreamSpec.builder(resolution)
                 .apply {
+                    sessionType?.let { setSessionType(sessionType) }
                     setExpectedFrameRateRange(expectedFrameRate)
                     dynamicRange?.let { setDynamicRange(dynamicRange) }
                     originalConfiguredResolution?.let {
