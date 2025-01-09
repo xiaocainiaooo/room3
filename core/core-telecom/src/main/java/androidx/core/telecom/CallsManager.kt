@@ -51,6 +51,7 @@ import androidx.core.telecom.internal.CallStateEvent
 import androidx.core.telecom.internal.JetpackConnectionService
 import androidx.core.telecom.internal.PreCallEndpointsUpdater
 import androidx.core.telecom.internal.utils.Utils
+import androidx.core.telecom.internal.utils.Utils.Companion.hasBluetoothPermissions
 import androidx.core.telecom.internal.utils.Utils.Companion.remapJetpackCapsToPlatformCaps
 import androidx.core.telecom.util.ExperimentalAppActions
 import java.util.UUID
@@ -356,10 +357,17 @@ public class CallsManager(context: Context) : CallsManagerExtensions {
      * Continuously streams available call audio endpoints that can be used for a new call session.
      * This API leverages [callbackFlow] to emit updates as the available audio endpoints change.
      *
-     * **Bluetooth Permissions:** The [android.Manifest.permission.BLUETOOTH_CONNECT] runtime
-     * permission is essential when multiple bluetooth devices are connected. Granting this
-     * permission allows the API to display the names of multiple connected Bluetooth devices.
-     * Without this permission, only the active Bluetooth device will be surfaced.
+     * **Bluetooth Permissions**:
+     * * For API level 31 and above: The [android.Manifest.permission.BLUETOOTH_CONNECT] runtime
+     *   permission is highly recommended.
+     * * For API levels 28-30: The following runtime permissions are highly recommended:
+     *     * [android.Manifest.permission.BLUETOOTH] - Allows apps to view Bluetooth information.
+     *     * [android.Manifest.permission.BLUETOOTH_ADMIN] - Allows apps to connect to paired
+     *       devices.
+     *
+     * For all API levels: Granting these permissions allows the API to display the names of
+     * multiple connected Bluetooth devices. Without these permissions, only the active Bluetooth
+     * device will be surfaced.
      *
      * **Coroutine Usage and Cleanup:** The returned [Flow] from this [callbackFlow] should be
      * collected within a [kotlinx.coroutines.CoroutineScope]. To properly manage resources and
@@ -380,10 +388,15 @@ public class CallsManager(context: Context) : CallsManagerExtensions {
         val audioDeviceListener = AudioDeviceListener(mContext, callEndpointsUpdater, id)
         // register a bluetooth listener to surface connected bluetooth devices instead of just
         // the active bluetooth device
-        val bluetoothProfileListener = BluetoothProfileListener(mContext, callEndpointsUpdater, id)
+        var bluetoothProfileListener =
+            if (hasBluetoothPermissions(mContext)) {
+                BluetoothProfileListener(mContext, callEndpointsUpdater, id)
+            } else {
+                null
+            }
         awaitClose {
             Log.i(TAG, "getAvailableStartingCallEndpoints: awaitClose")
-            bluetoothProfileListener.close()
+            bluetoothProfileListener?.close()
             audioDeviceListener.close()
             CallEndpointUuidTracker.endSession(id)
         }
