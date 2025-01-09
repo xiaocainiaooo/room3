@@ -915,6 +915,13 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                 it.buildTypes.configureEach { buildType ->
                     if (buildType.name == buildTypeForTests && !project.hasBenchmarkPlugin())
                         (buildType as TestBuildType).isDebuggable = true
+                    val blankProguardRules =
+                        project
+                            .getSupportRootFolder()
+                            .resolve("buildSrc/blank-proguard-rules/proguard-rules.pro")
+                    if (buildType.consumerProguardFiles.isEmpty()) {
+                        buildType.consumerProguardFiles.add(blankProguardRules)
+                    }
                 }
             }
             beforeVariants(selector().withBuildType("debug")) { variant -> variant.enable = false }
