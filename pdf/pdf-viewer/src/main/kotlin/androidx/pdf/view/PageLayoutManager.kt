@@ -103,6 +103,13 @@ internal class PageLayoutManager(
         return paginationModel.getPageLocation(pageNum, viewport)
     }
 
+    /** Returns the size of the page at [pageNum], or null if we don't know that page's size yet */
+    fun getPageSize(pageNum: Int): Point? {
+        val size = paginationModel.getPageSize(pageNum)
+        if (size == PaginationModel.UNKNOWN_SIZE) return null
+        return size
+    }
+
     /**
      * Returns the [PdfPoint] that exists at [contentCoordinates], or null if no page content is
      * laid out at [contentCoordinates].
