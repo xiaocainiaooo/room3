@@ -2200,13 +2200,16 @@ package androidx.compose.material3 {
     method public void dispatchRawDelta(float delta);
     method public suspend Object? drag(androidx.compose.foundation.MutatePriority dragPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.DragScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,? extends java.lang.Object?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public float getCoercedValueAsFraction();
+    method public kotlin.jvm.functions.Function1<java.lang.Float,kotlin.Unit>? getOnValueChange();
     method public kotlin.jvm.functions.Function0<kotlin.Unit>? getOnValueChangeFinished();
     method public int getSteps();
     method public float getValue();
     method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> getValueRange();
+    method public void setOnValueChange(kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit>?);
     method public void setOnValueChangeFinished(kotlin.jvm.functions.Function0<kotlin.Unit>?);
     method public void setValue(float);
     property public final float coercedValueAsFraction;
+    property public final kotlin.jvm.functions.Function1<java.lang.Float,kotlin.Unit>? onValueChange;
     property public final kotlin.jvm.functions.Function0<kotlin.Unit>? onValueChangeFinished;
     property @IntRange(from=0L) public final int steps;
     property public final float value;
