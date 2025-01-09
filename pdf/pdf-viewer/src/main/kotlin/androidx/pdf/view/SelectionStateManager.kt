@@ -16,6 +16,7 @@
 
 package androidx.pdf.view
 
+import android.graphics.Point
 import android.graphics.PointF
 import android.graphics.RectF
 import android.view.HapticFeedbackConstants
@@ -35,9 +36,10 @@ internal class SelectionStateManager(
     private val pdfDocument: PdfDocument,
     private val backgroundScope: CoroutineScope,
     private val handleTouchTargetSizePx: Int,
+    initialSelection: SelectionModel? = null,
 ) {
     /** The current [Selection] */
-    var selectionModel: SelectionModel? = null
+    var selectionModel: SelectionModel? = initialSelection
         @VisibleForTesting internal set
 
     /** Replay at few values in case of an UI signal issued while [PdfView] is not collecting */
@@ -104,6 +106,21 @@ internal class SelectionStateManager(
 
     fun maybeHideActionMode() {
         _selectionUiSignalBus.tryEmit(SelectionUiSignal.ToggleActionMode(show = false))
+    }
+
+    /**
+     * Updates the selection to include all text on the 0-indexed [pageNum]. [pageSize] is used to
+     * tell [PdfDocument] to select the whole page.
+     */
+    // TODO(b/386398335) Update this to accept a range of pages for select all, once we support
+    // multi-page selections
+    // TODO(b/386417152) Update this to use index-based selection once that's supported by
+    // PdfDocument
+    fun selectAllTextOnPageAsync(pageNum: Int, pageSize: Point) {
+        updateSelectionAsync(
+            PdfPoint(pageNum, PointF(0F, 0F)),
+            PdfPoint(pageNum, PointF(pageSize.x.toFloat(), pageSize.y.toFloat()))
+        )
     }
 
     private fun maybeHandleActionDown(location: PdfPoint, currentZoom: Float): Boolean {
@@ -208,6 +225,8 @@ internal class SelectionStateManager(
             backgroundScope
                 .launch {
                     prevJob?.cancelAndJoin()
+                    // TODO(b/386398335) Adapt this logic to support selections that span multiple
+                    // pages
                     val newSelection =
                         pdfDocument.getSelectionBounds(
                             start.pageNum,
