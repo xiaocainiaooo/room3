@@ -2449,7 +2449,7 @@ class SliderState(
     }
 
     /** callback in which value should be updated */
-    internal var onValueChange: ((Float) -> Unit)? = null
+    var onValueChange: ((Float) -> Unit)? = null
 
     internal val tickFractions = stepsToTickFractions(steps)
     private var totalWidth by mutableIntStateOf(0)
