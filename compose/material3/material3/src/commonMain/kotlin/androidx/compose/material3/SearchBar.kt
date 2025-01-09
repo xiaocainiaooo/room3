@@ -344,12 +344,20 @@ internal fun ExpandedFullScreenSearchBar(
         onDismissRequest = { coroutineScope.launch { state.animateToCollapsed() } },
         properties = properties,
     ) { predictiveBackState ->
+        val focusRequester = remember { FocusRequester() }
         val softwareKeyboardController = LocalSoftwareKeyboardController.current
         SideEffect { state.softwareKeyboardController = softwareKeyboardController }
         FullScreenSearchBarLayout(
             state = state,
             predictiveBackState = predictiveBackState,
-            inputField = inputField,
+            inputField = {
+                Box(
+                    modifier = Modifier.focusRequester(focusRequester),
+                    propagateMinConstraints = true,
+                ) {
+                    inputField()
+                }
+            },
             modifier = modifier,
             collapsedShape = collapsedShape,
             colors = colors,
@@ -358,6 +366,10 @@ internal fun ExpandedFullScreenSearchBar(
             windowInsets = windowInsets(),
             content = content,
         )
+
+        // Focus the input field on the first expansion,
+        // but no need to re-focus if the focus gets cleared.
+        LaunchedEffect(state.isExpanded) { focusRequester.requestFocus() }
     }
 }
 
@@ -563,13 +575,7 @@ fun DockedSearchBar(
     BackHandler(enabled = expanded) { onExpandedChange(false) }
 }
 
-/**
- * The state of a search bar.
- *
- * @property focusRequester The [FocusRequester] to request focus on the search bar.
- *   [SearchBarDefaults.InputField] applies this automatically. Custom input fields must attach this
- *   focus requester using [Modifier.focusRequester].
- */
+/** The state of a search bar. */
 @ExperimentalMaterial3Api
 @Stable
 internal class SearchBarState
@@ -577,7 +583,6 @@ private constructor(
     private val animatable: Animatable<Float, AnimationVector1D>,
     private val animationSpecForExpand: AnimationSpec<Float>,
     private val animationSpecForCollapse: AnimationSpec<Float>,
-    val focusRequester: FocusRequester,
 ) {
     /**
      * Construct a [SearchBarState].
@@ -585,18 +590,15 @@ private constructor(
      * @param initialExpanded the initial value of whether the search bar is expanded.
      * @param animationSpecForExpand the animation spec used when the search bar expands.
      * @param animationSpecForCollapse the animation spec used when the search bar collapses.
-     * @param focusRequester the focus requester to be applied to the search bar's input field.
      */
     constructor(
         initialExpanded: Boolean,
         animationSpecForExpand: AnimationSpec<Float>,
         animationSpecForCollapse: AnimationSpec<Float>,
-        focusRequester: FocusRequester = FocusRequester(),
     ) : this(
         animatable = Animatable(if (initialExpanded) 1f else 0f),
         animationSpecForExpand = animationSpecForExpand,
         animationSpecForCollapse = animationSpecForCollapse,
-        focusRequester = focusRequester,
     )
 
     /**
@@ -621,7 +623,6 @@ private constructor(
     /** Animate the search bar to its expanded state. */
     suspend fun animateToExpanded() {
         animatable.animateTo(targetValue = 1f, animationSpec = animationSpecForExpand)
-        focusRequester.requestFocus()
     }
 
     /** Animate the search bar to its collapsed state. */
@@ -639,7 +640,6 @@ private constructor(
         fun Saver(
             animationSpecForExpand: AnimationSpec<Float>,
             animationSpecForCollapse: AnimationSpec<Float>,
-            focusRequester: FocusRequester,
         ): Saver<SearchBarState, *> =
             listSaver(
                 save = { listOf(it.progress) },
@@ -648,7 +648,6 @@ private constructor(
                         animatable = Animatable(it[0], Float.VectorConverter),
                         animationSpecForExpand = animationSpecForExpand,
                         animationSpecForCollapse = animationSpecForCollapse,
-                        focusRequester = focusRequester,
                     )
                 },
             )
@@ -661,7 +660,6 @@ private constructor(
  * @param initialExpanded the initial value of whether the search bar is expanded.
  * @param animationSpecForExpand the animation spec used when the search bar expands.
  * @param animationSpecForCollapse the animation spec used when the search bar collapses.
- * @param focusRequester the focus requester to be applied to the search bar's input field.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -669,26 +667,21 @@ internal fun rememberSearchBarState(
     initialExpanded: Boolean = false,
     animationSpecForExpand: AnimationSpec<Float> = MotionSchemeKeyTokens.SlowSpatial.value(),
     animationSpecForCollapse: AnimationSpec<Float> = MotionSchemeKeyTokens.DefaultSpatial.value(),
-    focusRequester: FocusRequester? = null,
 ): SearchBarState {
-    @Suppress("NAME_SHADOWING") val focusRequester = focusRequester ?: remember { FocusRequester() }
     return rememberSaveable(
         initialExpanded,
         animationSpecForExpand,
         animationSpecForCollapse,
-        focusRequester,
         saver =
             SearchBarState.Saver(
                 animationSpecForExpand = animationSpecForExpand,
                 animationSpecForCollapse = animationSpecForCollapse,
-                focusRequester = focusRequester,
             )
     ) {
         SearchBarState(
             initialExpanded = initialExpanded,
             animationSpecForExpand = animationSpecForExpand,
             animationSpecForCollapse = animationSpecForCollapse,
-            focusRequester = focusRequester,
         )
     }
 }
@@ -1175,6 +1168,7 @@ object SearchBarDefaults {
 
         val focused = interactionSource.collectIsFocusedAsState().value
         val focusManager = LocalFocusManager.current
+        val focusRequester = remember { FocusRequester() }
 
         val searchSemantics = getString(Strings.SearchBarSearch)
         val suggestionsAvailableSemantics = getString(Strings.SuggestionsAvailable)
@@ -1196,7 +1190,7 @@ object SearchBarDefaults {
                         maxWidth = SearchBarMaxWidth,
                         minHeight = InputFieldHeight,
                     )
-                    .focusRequester(searchBarState.focusRequester)
+                    .focusRequester(focusRequester)
                     .onFocusChanged {
                         if (it.isFocused) {
                             coroutineScope.launch { searchBarState.animateToExpanded() }
@@ -1208,7 +1202,7 @@ object SearchBarDefaults {
                             stateDescription = suggestionsAvailableSemantics
                         }
                         onClick {
-                            searchBarState.focusRequester.requestFocus()
+                            focusRequester.requestFocus()
                             true
                         }
                     },
@@ -2459,7 +2453,7 @@ private const val LayoutIdSurface = "Surface"
 private const val LayoutIdSearchContent = "Content"
 
 // Measurement specs
-private val SearchBarAsTopBarPadding = 8.dp
+internal val SearchBarAsTopBarPadding = 8.dp
 @OptIn(ExperimentalMaterial3Api::class) private val SearchBarCornerRadius: Dp = InputFieldHeight / 2
 internal val DockedExpandedTableMinHeight: Dp = 240.dp
 private const val DockedExpandedTableMaxHeightScreenRatio: Float = 2f / 3f
