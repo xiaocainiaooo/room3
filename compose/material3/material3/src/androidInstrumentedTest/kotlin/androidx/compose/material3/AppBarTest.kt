@@ -89,6 +89,7 @@ import androidx.compose.ui.unit.DpRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -1756,6 +1757,77 @@ class AppBarTest {
     }
 
     @Test
+    fun topAppBar_customTwoRows_expanded() {
+        val collapsedHeightDp = 36.dp
+        val expandedHeightDp = 112.dp
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(Modifier.testTag(TopAppBarTestTag)) {
+                TwoRowsTopAppBar(
+                    title = { expanded ->
+                        if (expanded) {
+                            Text("Expanded Title", Modifier.testTag(TitleTestTag))
+                        } else {
+                            Text("Collapsed Title", Modifier.testTag(TitleTestTag))
+                        }
+                    },
+                    navigationIcon = { FakeIcon(Modifier.testTag(NavigationIconTestTag)) },
+                    actions = { FakeIcon(Modifier.testTag(ActionsTestTag)) },
+                    height = { expanded ->
+                        if (expanded) {
+                            expandedHeightDp
+                        } else {
+                            collapsedHeightDp
+                        }
+                    }
+                )
+            }
+        }
+
+        assertMediumOrLargeDefaultPositioning(
+            appBarCollapsedHeight = collapsedHeightDp,
+            appBarExpandedHeight = expandedHeightDp
+        )
+    }
+
+    @Test
+    fun topAppBar_customTwoRows_scrolled_positioning() {
+        val collapsedHeightDp = 40.dp
+        val expandedHeightDp = 120.dp
+        val windowInsets = WindowInsets(13.dp, 13.dp, 13.dp, 13.dp)
+        val content =
+            @Composable { scrollBehavior: TopAppBarScrollBehavior? ->
+                Box(Modifier.testTag(TopAppBarTestTag)) {
+                    TwoRowsTopAppBar(
+                        title = { expanded ->
+                            if (expanded) {
+                                Text("Expanded Title", Modifier.testTag(TitleTestTag))
+                            } else {
+                                Text("Collapsed Title", Modifier.testTag(TitleTestTag))
+                            }
+                        },
+                        navigationIcon = { FakeIcon(Modifier.testTag(NavigationIconTestTag)) },
+                        actions = { FakeIcon(Modifier.testTag(ActionsTestTag)) },
+                        height = { expanded ->
+                            if (expanded) {
+                                expandedHeightDp
+                            } else {
+                                collapsedHeightDp
+                            }
+                        },
+                        windowInsets = windowInsets,
+                        scrollBehavior = scrollBehavior,
+                    )
+                }
+            }
+        assertMediumOrLargeScrolledHeight(
+            appBarMaxHeight = expandedHeightDp,
+            appBarMinHeight = collapsedHeightDp,
+            windowInsets,
+            content
+        )
+    }
+
+    @Test
     fun bottomAppBarWithFAB_heightIsFromSpec() {
         rule
             .setMaterialContentForSizeAssertions {
@@ -2159,13 +2231,13 @@ class AppBarTest {
     }
 
     /**
-     * Checks the app bar's components positioning when it's a [MediumTopAppBar] or a
-     * [LargeTopAppBar].
+     * Checks the app bar's components positioning when it's a [MediumTopAppBar], [LargeTopAppBar],
+     * or a [TwoRowsTopAppBar].
      */
     private fun assertMediumOrLargeDefaultPositioning(
         appBarCollapsedHeight: Dp,
         appBarExpandedHeight: Dp,
-        bottomTextPadding: Dp
+        bottomTextPadding: Dp = Dp.Unspecified
     ) {
         val appBarBounds = rule.onNodeWithTag(TopAppBarTestTag).getUnclippedBoundsInRoot()
         appBarBounds.height.assertIsEqualTo(appBarExpandedHeight, "top app bar height")
@@ -2213,18 +2285,21 @@ class AppBarTest {
             // Bottom title should be 16.dp from the start.
             .assertLeftPositionInRootIsEqualTo(16.dp)
 
-        // Check if the bottom text baseline is at the expected distance from the bottom of the
-        // app bar.
-        val bottomTextBaselineY = bottomTitleBounds.top + bottomTitleNode.getLastBaselinePosition()
-        (bottomAppBarBottomEdgeY - bottomTextBaselineY).assertIsEqualTo(
-            bottomTextPadding,
-            "text baseline distance from the bottom"
-        )
+        if (bottomTextPadding.isSpecified) {
+            // Check if the bottom text baseline is at the expected distance from the bottom of the
+            // app bar.
+            val bottomTextBaselineY =
+                bottomTitleBounds.top + bottomTitleNode.getLastBaselinePosition()
+            (bottomAppBarBottomEdgeY - bottomTextBaselineY).assertIsEqualTo(
+                bottomTextPadding,
+                "text baseline distance from the bottom"
+            )
+        }
     }
 
     /**
-     * Checks that changing values at a [MediumTopAppBar] or a [LargeTopAppBar] scroll behavior
-     * affects the height of the app bar.
+     * Checks that changing values at a [MediumTopAppBar], [LargeTopAppBar], or [TwoRowsTopAppBar]
+     * scroll behavior affects the height of the app bar.
      *
      * This check partially and fully collapses the app bar to test its height.
      *
