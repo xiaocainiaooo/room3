@@ -50,6 +50,7 @@ import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.DocumentLoaded
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.Loading
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.PasswordRequested
 import androidx.pdf.viewer.fragment.search.PdfSearchViewManager
+import androidx.pdf.viewer.fragment.util.getCenter
 import androidx.pdf.viewer.fragment.view.PdfViewManager
 import com.google.android.material.color.MaterialColors
 import kotlinx.coroutines.Job
@@ -220,6 +221,8 @@ public open class PdfViewerFragmentV2 : Fragment() {
         onPdfSearchViewCreated(pdfSearchView)
 
         collectFlowOnLifecycleScope { collectFragmentUiScreenState() }
+
+        toolboxView.setOnCurrentPageRequested { pdfView.visiblePages.getCenter() }
     }
 
     /**

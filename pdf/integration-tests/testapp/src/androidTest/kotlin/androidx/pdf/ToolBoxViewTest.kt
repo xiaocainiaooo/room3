@@ -25,6 +25,8 @@ import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
 import androidx.pdf.util.AnnotationUtils
+import androidx.pdf.view.ToolBoxView
+import androidx.pdf.view.ToolBoxView.Companion.EXTRA_STARTING_PAGE
 import androidx.pdf.viewer.fragment.PdfViewerFragmentV2
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.UiController
@@ -34,6 +36,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasFlags
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
@@ -114,6 +117,41 @@ class PdfViewerFragmentV2TestSuite {
             allOf(
                 hasAction(AnnotationUtils.ACTION_ANNOTATE_PDF),
                 hasFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION),
+            )
+        intended(expectedIntent)
+    }
+
+    @Test
+    fun testEditButtonOnClickListener_onSpecificPage() {
+        scenarioLoadDocument(
+            TEST_DOCUMENT_FILE,
+            Lifecycle.State.STARTED,
+            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        )
+
+        // TODO(b/387444890): Remove this once IdlingResources is used
+        onView(isRoot()).perform(waitFor(2000))
+
+        val pageNum = 3
+        scenario.onFragment { fragment ->
+            fragment.view?.let {
+                var toolBoxView: ToolBoxView? =
+                    it.findViewById(androidx.pdf.viewer.fragment.R.id.toolBoxView) as ToolBoxView
+                toolBoxView?.setOnCurrentPageRequested { pageNum }
+            }
+        }
+
+        // Ensure the toolbox view is displayed
+        onView(withId(androidx.pdf.viewer.fragment.R.id.toolBoxView)).check(matches(isDisplayed()))
+
+        onView(withId(androidx.pdf.viewer.fragment.R.id.toolBoxView)).perform(click())
+
+        // Verify that the action was performed (e.g., intent was launched)
+        val expectedIntent =
+            allOf(
+                hasAction(AnnotationUtils.ACTION_ANNOTATE_PDF),
+                hasFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION),
+                hasExtra(EXTRA_STARTING_PAGE, pageNum)
             )
         intended(expectedIntent)
     }

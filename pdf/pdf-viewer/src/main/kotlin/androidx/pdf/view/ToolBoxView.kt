@@ -38,6 +38,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private var pdfDocument: PdfDocument? = null
     private var editClickListener: OnClickListener? = null
 
+    /** A callback to get the current page number. */
+    private var onCurrentPageRequested: (() -> Int)? = null
+
     init {
         inflate(context, R.layout.tool_box_view, this)
         editButton = findViewById(R.id.edit_fab)
@@ -48,14 +51,38 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
     }
 
+    /**
+     * Sets a callback to get the current page number from the [PdfView].
+     *
+     * @param callback A callback to get the current page number.
+     */
+    public fun setOnCurrentPageRequested(callback: (() -> Int)?) {
+        this.onCurrentPageRequested = callback
+    }
+
+    /**
+     * Sets the [PdfDocument] that the [ToolBoxView] should use.
+     *
+     * @param pdfDocument The [PdfDocument] that the [ToolBoxView] should use.
+     */
     public fun setPdfDocument(pdfDocument: PdfDocument?) {
         this.pdfDocument = pdfDocument
     }
 
+    /**
+     * Sets the drawable that should be used for the edit icon.
+     *
+     * @param drawable The drawable that should be used for the edit icon.
+     */
     public fun setEditIconDrawable(drawable: Drawable?) {
         editButton.setImageDrawable(drawable)
     }
 
+    /**
+     * Sets a [OnClickListener] that will be called when the edit FAB is clicked.
+     *
+     * @param listener The [OnClickListener] that will be called when the edit FAB is clicked.
+     */
     public fun setOnEditClickListener(listener: OnClickListener) {
         editClickListener = listener
     }
@@ -69,7 +96,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 AnnotationUtils.getAnnotationIntent(uri).apply {
                     setData(uri)
                     putExtra(EXTRA_PDF_FILE_NAME, Uris.extractName(uri, context.contentResolver))
-                    putExtra(EXTRA_STARTING_PAGE, 0)
+                    val pageNum = onCurrentPageRequested?.invoke() ?: 0
+                    putExtra(EXTRA_STARTING_PAGE, pageNum)
                 }
             startActivity(context, "", intent)
         }

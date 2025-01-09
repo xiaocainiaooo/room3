@@ -57,8 +57,6 @@
         android:id="@+id/toolBoxView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/viewer_edit_fab_margin_right"
-        android:layout_marginBottom="@dimen/viewer_edit_fab_margin_bottom"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
