@@ -56,7 +56,7 @@ public fun rememberComposeView(content: @Composable () -> Unit): ComposeView {
                 setParentCompositionContext(compositionContext)
                 // Set unique id for AbstractComposeView. This allows state restoration for the
                 // state
-                // defined inside the ElevatedSurface via rememberSaveable()
+                // defined inside the SpatialElevation via rememberSaveable()
                 setTag(
                     androidx.compose.ui.R.id.compose_view_saveable_id_tag,
                     "ComposeView:$localId"

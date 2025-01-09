@@ -27,13 +27,13 @@ import androidx.xr.scenecore.JxrPlatformAdapter.GltfModelResource;
 // TODO: b/362368652 - Add an interface which returns an integer animation IDX given a string
 //                     animation name for a loaded GLTF.
 final class GltfModelResourceImplSplitEngine implements GltfModelResource {
-    private final long token;
+    private final long mToken;
 
-    public GltfModelResourceImplSplitEngine(long token) {
-        this.token = token;
+    GltfModelResourceImplSplitEngine(long token) {
+        mToken = token;
     }
 
     public long getExtensionModelToken() {
-        return token;
+        return mToken;
     }
 }

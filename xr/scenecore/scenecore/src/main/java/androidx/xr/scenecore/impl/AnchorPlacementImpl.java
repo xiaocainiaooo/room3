@@ -32,8 +32,8 @@ import java.util.Set;
  * will not be anchored.
  */
 class AnchorPlacementImpl implements AnchorPlacement {
-    protected Set<PlaneType> planeTypeFilter = new HashSet<>();
-    protected Set<PlaneSemantic> planeSemanticFilter = new HashSet<>();
+    protected Set<PlaneType> mPlaneTypeFilter = new HashSet<>();
+    protected Set<PlaneSemantic> mPlaneSemanticFilter = new HashSet<>();
 
     AnchorPlacementImpl() {}
 }

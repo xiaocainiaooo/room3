@@ -45,15 +45,15 @@ public final class SoundPoolExtensionsWrapperImplTest {
     private static final int TEST_LOOP = 0;
     private static final float TEST_RATE = 0F;
 
-    FakeXrExtensions fakeXrExtensions;
-    FakeSpatialAudioExtensions fakeSpatialAudioExtensions;
-    FakeSoundPoolExtensions fakeSoundPoolExtensions;
+    FakeXrExtensions mFakeXrExtensions;
+    FakeSpatialAudioExtensions mFakeSpatialAudioExtensions;
+    FakeSoundPoolExtensions mFakeSoundPoolExtensions;
 
     @Before
     public void setUp() {
-        fakeXrExtensions = new FakeXrExtensions();
-        fakeSpatialAudioExtensions = fakeXrExtensions.fakeSpatialAudioExtensions;
-        fakeSoundPoolExtensions = fakeSpatialAudioExtensions.soundPoolExtensions;
+        mFakeXrExtensions = new FakeXrExtensions();
+        mFakeSpatialAudioExtensions = mFakeXrExtensions.fakeSpatialAudioExtensions;
+        mFakeSoundPoolExtensions = mFakeSpatialAudioExtensions.soundPoolExtensions;
     }
 
     @Test
@@ -68,9 +68,9 @@ public final class SoundPoolExtensionsWrapperImplTest {
 
         SoundPool soundPool = new SoundPool.Builder().build();
 
-        fakeSoundPoolExtensions.setPlayAsPointSourceResult(expected);
+        mFakeSoundPoolExtensions.setPlayAsPointSourceResult(expected);
         SoundPoolExtensionsWrapper wrapper =
-                new SoundPoolExtensionsWrapperImpl(fakeSoundPoolExtensions);
+                new SoundPoolExtensionsWrapperImpl(mFakeSoundPoolExtensions);
         int actual =
                 wrapper.play(
                         soundPool,
@@ -90,9 +90,9 @@ public final class SoundPoolExtensionsWrapperImplTest {
 
         SoundPool soundPool = new SoundPool.Builder().build();
 
-        fakeSoundPoolExtensions.setPlayAsSoundFieldResult(expected);
+        mFakeSoundPoolExtensions.setPlayAsSoundFieldResult(expected);
         SoundPoolExtensionsWrapper wrapper =
-                new SoundPoolExtensionsWrapperImpl(fakeSoundPoolExtensions);
+                new SoundPoolExtensionsWrapperImpl(mFakeSoundPoolExtensions);
         JxrPlatformAdapter.SoundFieldAttributes attributes =
                 new JxrPlatformAdapter.SoundFieldAttributes(
                         JxrPlatformAdapter.SpatializerConstants.AMBISONICS_ORDER_THIRD_ORDER);
@@ -115,9 +115,9 @@ public final class SoundPoolExtensionsWrapperImplTest {
         int expected = SpatializerConstants.SOURCE_TYPE_SOUND_FIELD;
         SoundPool soundPool = new SoundPool.Builder().build();
 
-        fakeSoundPoolExtensions.setSourceType(expected);
+        mFakeSoundPoolExtensions.setSourceType(expected);
         SoundPoolExtensionsWrapper wrapper =
-                new SoundPoolExtensionsWrapperImpl(fakeSoundPoolExtensions);
+                new SoundPoolExtensionsWrapperImpl(mFakeSoundPoolExtensions);
         int actualSourceType = wrapper.getSpatialSourceType(soundPool, /* streamId= */ 0);
         assertThat(actualSourceType).isEqualTo(SpatializerConstants.SOURCE_TYPE_SOUND_FIELD);
     }

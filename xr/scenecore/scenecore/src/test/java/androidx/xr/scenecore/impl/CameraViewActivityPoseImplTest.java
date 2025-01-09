@@ -45,23 +45,23 @@ import org.robolectric.RobolectricTestRunner;
 @RunWith(RobolectricTestRunner.class)
 public final class CameraViewActivityPoseImplTest {
 
-    private final AndroidXrEntity activitySpaceRoot = Mockito.mock(AndroidXrEntity.class);
-    private final FakeXrExtensions fakeExtensions = new FakeXrExtensions();
-    private final PerceptionLibrary perceptionLibrary = Mockito.mock(PerceptionLibrary.class);
-    private final Session session = Mockito.mock(Session.class);
-    private final FakeScheduledExecutorService executor = new FakeScheduledExecutorService();
-    private final ActivitySpaceImpl activitySpace =
+    private final AndroidXrEntity mActivitySpaceRoot = Mockito.mock(AndroidXrEntity.class);
+    private final FakeXrExtensions mFakeExtensions = new FakeXrExtensions();
+    private final PerceptionLibrary mPerceptionLibrary = Mockito.mock(PerceptionLibrary.class);
+    private final Session mSession = Mockito.mock(Session.class);
+    private final FakeScheduledExecutorService mExecutor = new FakeScheduledExecutorService();
+    private final ActivitySpaceImpl mActivitySpace =
             new ActivitySpaceImpl(
-                    fakeExtensions.createNode(),
-                    fakeExtensions,
+                    mFakeExtensions.createNode(),
+                    mFakeExtensions,
                     new EntityManager(),
-                    () -> fakeExtensions.fakeSpatialState,
-                    executor);
+                    () -> mFakeExtensions.fakeSpatialState,
+                    mExecutor);
 
     /** Creates a CameraViewActivityPoseImpl. */
     private CameraViewActivityPoseImpl createCameraViewActivityPose(@CameraType int cameraType) {
         return new CameraViewActivityPoseImpl(
-                cameraType, activitySpace, activitySpaceRoot, perceptionLibrary);
+                cameraType, mActivitySpace, mActivitySpaceRoot, mPerceptionLibrary);
     }
 
     @Test
@@ -82,7 +82,7 @@ public final class CameraViewActivityPoseImplTest {
         Fov fovLeft = new Fov(1, 2, 3, 4);
         Fov fovRight = new Fov(5, 6, 7, 8);
 
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
         ViewProjection viewProjectionLeft =
                 new ViewProjection(
                         RuntimeUtils.poseToPerceptionPose(new Pose()),
@@ -91,7 +91,7 @@ public final class CameraViewActivityPoseImplTest {
                 new ViewProjection(
                         RuntimeUtils.poseToPerceptionPose(new Pose()),
                         RuntimeUtils.perceptionFovFromFov(fovRight));
-        when(session.getStereoViews())
+        when(mSession.getStereoViews())
                 .thenReturn(new ViewProjections(viewProjectionLeft, viewProjectionRight));
 
         CameraViewActivityPoseImpl cameraActivityPoseLeft =
@@ -112,12 +112,12 @@ public final class CameraViewActivityPoseImplTest {
     @Test
     public void transformPoseTo_returnsCorrectPose() {
         // Set the activity space to the root of the underlying OpenXR reference space.
-        this.activitySpace.setOpenXrReferenceSpacePose(Matrix4.Identity);
+        mActivitySpace.setOpenXrReferenceSpacePose(Matrix4.Identity);
         Pose poseLeft = new Pose(new Vector3(1, 2, 3), new Quaternion(1, 0, 0, 0));
         Pose poseRight = new Pose(new Vector3(4, 5, 6), new Quaternion(0, 1, 0, 0));
         Fov fov = new Fov(0, 0, 0, 0);
 
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
         ViewProjection viewProjectionLeft =
                 new ViewProjection(
                         RuntimeUtils.poseToPerceptionPose(poseLeft),
@@ -126,24 +126,24 @@ public final class CameraViewActivityPoseImplTest {
                 new ViewProjection(
                         RuntimeUtils.poseToPerceptionPose(poseRight),
                         RuntimeUtils.perceptionFovFromFov(fov));
-        when(session.getStereoViews())
+        when(mSession.getStereoViews())
                 .thenReturn(new ViewProjections(viewProjectionLeft, viewProjectionRight));
 
         CameraViewActivityPoseImpl cameraActivityPoseLeft =
                 createCameraViewActivityPose(CameraViewActivityPose.CAMERA_TYPE_LEFT_EYE);
 
-        assertPose(cameraActivityPoseLeft.transformPoseTo(new Pose(), activitySpace), poseLeft);
+        assertPose(cameraActivityPoseLeft.transformPoseTo(new Pose(), mActivitySpace), poseLeft);
 
         CameraViewActivityPoseImpl cameraActivityPoseRight =
                 createCameraViewActivityPose(CameraViewActivityPose.CAMERA_TYPE_RIGHT_EYE);
 
-        assertPose(cameraActivityPoseRight.transformPoseTo(new Pose(), activitySpace), poseRight);
+        assertPose(cameraActivityPoseRight.transformPoseTo(new Pose(), mActivitySpace), poseRight);
     }
 
     @Test
     public void getActivitySpaceScale_returnsInverseOfActivitySpaceWorldScale() throws Exception {
         float activitySpaceScale = 5f;
-        this.activitySpace.setOpenXrReferenceSpacePose(Matrix4.fromScale(activitySpaceScale));
+        mActivitySpace.setOpenXrReferenceSpacePose(Matrix4.fromScale(activitySpaceScale));
         CameraViewActivityPoseImpl cameraActivityPoseLeft =
                 createCameraViewActivityPose(CameraViewActivityPose.CAMERA_TYPE_LEFT_EYE);
         assertVector3(

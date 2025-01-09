@@ -39,35 +39,36 @@ import org.robolectric.RobolectricTestRunner;
 @RunWith(RobolectricTestRunner.class)
 public final class PerceptionSpaceActivityPoseImplTest {
 
-    private final AndroidXrEntity activitySpaceRoot = Mockito.mock(AndroidXrEntity.class);
-    private final FakeXrExtensions fakeExtensions = new FakeXrExtensions();
-    private final FakeScheduledExecutorService executor = new FakeScheduledExecutorService();
-    private final EntityManager entityManager = new EntityManager();
-    private final ActivitySpaceImpl activitySpace =
+    private final AndroidXrEntity mActivitySpaceRoot = Mockito.mock(AndroidXrEntity.class);
+    private final FakeXrExtensions mFakeExtensions = new FakeXrExtensions();
+    private final FakeScheduledExecutorService mExecutor = new FakeScheduledExecutorService();
+    private final EntityManager mEntityManager = new EntityManager();
+    private final ActivitySpaceImpl mActivitySpace =
             new ActivitySpaceImpl(
-                    fakeExtensions.createNode(),
-                    fakeExtensions,
-                    entityManager,
-                    () -> fakeExtensions.fakeSpatialState,
-                    executor);
+                    mFakeExtensions.createNode(),
+                    mFakeExtensions,
+                    mEntityManager,
+                    () -> mFakeExtensions.fakeSpatialState,
+                    mExecutor);
 
-    private PerceptionSpaceActivityPoseImpl perceptionSpaceActivityPose;
+    private PerceptionSpaceActivityPoseImpl mPerceptionSpaceActivityPose;
 
     private FakeNode getActivitySpaceNode() {
-        return (FakeNode) activitySpace.getNode();
+        return (FakeNode) mActivitySpace.getNode();
     }
 
     /** Creates a generic glTF entity. */
     private GltfEntityImpl createGltfEntity() {
         FakeGltfModelToken modelToken = new FakeGltfModelToken("model");
         GltfModelResourceImpl model = new GltfModelResourceImpl(modelToken);
-        return new GltfEntityImpl(model, activitySpace, fakeExtensions, entityManager, executor);
+        return new GltfEntityImpl(
+                model, mActivitySpace, mFakeExtensions, mEntityManager, mExecutor);
     }
 
     @Before
     public void setUp() {
-        perceptionSpaceActivityPose =
-                new PerceptionSpaceActivityPoseImpl(activitySpace, activitySpaceRoot);
+        mPerceptionSpaceActivityPose =
+                new PerceptionSpaceActivityPoseImpl(mActivitySpace, mActivitySpaceRoot);
     }
 
     @Test
@@ -80,9 +81,9 @@ public final class PerceptionSpaceActivityPoseImplTest {
         getActivitySpaceNode()
                 .sendTransformEvent(
                         new FakeNodeTransform(new Mat4f(activitySpaceMatrix.getData())));
-        executor.runAll();
+        mExecutor.runAll();
 
-        Pose poseInActivitySpace = perceptionSpaceActivityPose.getPoseInActivitySpace();
+        Pose poseInActivitySpace = mPerceptionSpaceActivityPose.getPoseInActivitySpace();
 
         Pose expectedPose = activitySpaceMatrix.getInverse().getPose();
         assertPose(poseInActivitySpace, expectedPose);
@@ -98,10 +99,10 @@ public final class PerceptionSpaceActivityPoseImplTest {
         getActivitySpaceNode()
                 .sendTransformEvent(
                         new FakeNodeTransform(new Mat4f(activitySpaceMatrix.getData())));
-        executor.runAll();
+        mExecutor.runAll();
 
         Pose transformedPose =
-                perceptionSpaceActivityPose.transformPoseTo(new Pose(), activitySpace);
+                mPerceptionSpaceActivityPose.transformPoseTo(new Pose(), mActivitySpace);
 
         Pose expectedPose = activitySpaceMatrix.getInverse().getPose();
         assertPose(transformedPose, expectedPose);
@@ -117,11 +118,11 @@ public final class PerceptionSpaceActivityPoseImplTest {
         getActivitySpaceNode()
                 .sendTransformEvent(
                         new FakeNodeTransform(new Mat4f(activitySpaceMatrix.getData())));
-        executor.runAll();
+        mExecutor.runAll();
         GltfEntityImpl gltfEntity = createGltfEntity();
         gltfEntity.setScale(new Vector3(2.0f, 2.0f, 2.0f));
 
-        Pose transformedPose = perceptionSpaceActivityPose.transformPoseTo(new Pose(), gltfEntity);
+        Pose transformedPose = mPerceptionSpaceActivityPose.transformPoseTo(new Pose(), gltfEntity);
 
         Pose unscaledPose = activitySpaceMatrix.getInverse().getPose();
         Pose expectedPose =
@@ -134,9 +135,9 @@ public final class PerceptionSpaceActivityPoseImplTest {
     @Test
     public void getActivitySpaceScale_returnsInverseOfActivitySpaceWorldScale() throws Exception {
         float activitySpaceScale = 5f;
-        this.activitySpace.setOpenXrReferenceSpacePose(Matrix4.fromScale(activitySpaceScale));
+        mActivitySpace.setOpenXrReferenceSpacePose(Matrix4.fromScale(activitySpaceScale));
         assertVector3(
-                perceptionSpaceActivityPose.getActivitySpaceScale(),
+                mPerceptionSpaceActivityPose.getActivitySpaceScale(),
                 new Vector3(1f, 1f, 1f).div(activitySpaceScale));
     }
 }

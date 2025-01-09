@@ -50,7 +50,7 @@ import java.util.function.Consumer
  * changed.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-public class SpatialEnvironment(runtime: JxrPlatformAdapter) {
+public class SpatialEnvironment(private val runtime: JxrPlatformAdapter) {
 
     private val TAG = "SpatialEnvironment"
 
@@ -384,6 +384,18 @@ public class SpatialEnvironment(runtime: JxrPlatformAdapter) {
     public fun removeOnSpatialEnvironmentChangedListener(listener: Consumer<Boolean>) {
         rtEnvironment.removeOnSpatialEnvironmentChangedListener(listener)
     }
+
+    /**
+     * If the primary Activity in a [Session] spatial environment has focus, causes the [Session] to
+     * be placed in FullSpace Mode. Otherwise, this call does nothing.
+     */
+    public fun requestFullSpaceMode(): Unit = runtime.requestFullSpaceMode()
+
+    /**
+     * If the primary Activity in a [Session] spatial environment has focus, causes the [Session] to
+     * be placed in HomeSpace Mode. Otherwise, this call does nothing.
+     */
+    public fun requestHomeSpaceMode(): Unit = runtime.requestHomeSpaceMode()
 
     /** Result values for calls to [setPassthroughOpacityPreference] */
     public sealed class SetPassthroughOpacityPreferenceResult()

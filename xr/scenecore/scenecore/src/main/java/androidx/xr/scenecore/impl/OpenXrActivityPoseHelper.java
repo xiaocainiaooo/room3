@@ -27,13 +27,12 @@ import androidx.xr.runtime.math.Vector3;
  */
 final class OpenXrActivityPoseHelper {
     private static final String TAG = "OpenXrPoseHelper";
-    private final ActivitySpaceImpl activitySpace;
-    private final AndroidXrEntity activitySpaceRoot;
+    private final ActivitySpaceImpl mActivitySpace;
+    private final AndroidXrEntity mActivitySpaceRoot;
 
-    public OpenXrActivityPoseHelper(
-            ActivitySpaceImpl activitySpace, AndroidXrEntity activitySpaceRoot) {
-        this.activitySpace = activitySpace;
-        this.activitySpaceRoot = activitySpaceRoot;
+    OpenXrActivityPoseHelper(ActivitySpaceImpl activitySpace, AndroidXrEntity activitySpaceRoot) {
+        mActivitySpace = activitySpace;
+        mActivitySpaceRoot = activitySpaceRoot;
     }
 
     /**
@@ -42,7 +41,7 @@ final class OpenXrActivityPoseHelper {
      * identity pose.
      */
     public Pose getPoseInActivitySpace(Pose openXrToPose) {
-        if (activitySpace == null) {
+        if (mActivitySpace == null) {
             Log.e(TAG, "Cannot get pose in Activity Space with a null Activity Space.");
             return new Pose();
         }
@@ -50,7 +49,7 @@ final class OpenXrActivityPoseHelper {
         // ActivitySpace and the ActivityPose should have unit scale and the ActivityPose should
         // have no
         // direct parent so we can just compose the two poses without scaling.
-        final Pose openXrToActivitySpace = activitySpace.getPoseInOpenXrReferenceSpace();
+        final Pose openXrToActivitySpace = mActivitySpace.getPoseInOpenXrReferenceSpace();
         // TODO: b/353575470 throw an exception here instead of returning identity pose.
         if (openXrToActivitySpace == null || openXrToPose == null) {
             Log.e(
@@ -66,7 +65,7 @@ final class OpenXrActivityPoseHelper {
 
     /** Returns the ActivityPose's pose in the activity space. */
     public Pose getActivitySpacePose(Pose openXrToPose) {
-        if (activitySpaceRoot == null) {
+        if (mActivitySpaceRoot == null) {
             Log.e(TAG, "Cannot get pose in World Space Pose with a null World Space Entity.");
             return new Pose();
         }
@@ -76,16 +75,16 @@ final class OpenXrActivityPoseHelper {
         // parent so we can just compose the two poses without scaling.
         final Pose activitySpaceToPose = this.getPoseInActivitySpace(openXrToPose);
         final Pose worldSpaceToActivitySpace =
-                activitySpaceRoot.getPoseInActivitySpace().getInverse();
+                mActivitySpaceRoot.getPoseInActivitySpace().getInverse();
         return worldSpaceToActivitySpace.compose(activitySpaceToPose);
     }
 
     /** Returns the scale of the WorldPose with respect to the activity space. */
     public Vector3 getActivitySpaceScale(Vector3 openXrScale) {
-        if (activitySpace == null) {
+        if (mActivitySpace == null) {
             Log.e(TAG, "Cannot get scale in Activity Space with a null Activity Space Entity.");
             return new Vector3(1f, 1f, 1f);
         }
-        return openXrScale.div(activitySpace.getWorldSpaceScale());
+        return openXrScale.div(mActivitySpace.getWorldSpaceScale());
     }
 }

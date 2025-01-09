@@ -88,7 +88,7 @@ class SpatialElevationTest {
     fun spatialElevation_homeSpaceMode_doesNotElevate() {
         composeTestRule.setContent {
             TestSetup {
-                requestHomeSpaceMode()
+                this.spatialEnvironment.requestHomeSpaceMode()
                 Parent { SpatialElevation { Text("Main Content") } }
             }
         }
@@ -100,7 +100,7 @@ class SpatialElevationTest {
     fun spatialElevation_fullSpaceMode_doesElevate() {
         composeTestRule.setContent {
             TestSetup {
-                requestFullSpaceMode()
+                this.spatialEnvironment.requestFullSpaceMode()
                 Parent { SpatialElevation { Text("Main Content") } }
             }
         }

@@ -25,28 +25,27 @@ import androidx.xr.scenecore.common.BaseActivityPose;
 final class PerceptionSpaceActivityPoseImpl extends BaseActivityPose
         implements PerceptionSpaceActivityPose {
 
-    private final OpenXrActivityPoseHelper openXrActivityPoseHelper;
+    private final OpenXrActivityPoseHelper mOpenXrActivityPoseHelper;
 
-    public PerceptionSpaceActivityPoseImpl(
+    PerceptionSpaceActivityPoseImpl(
             ActivitySpaceImpl activitySpace, AndroidXrEntity activitySpaceRoot) {
-        this.openXrActivityPoseHelper =
-                new OpenXrActivityPoseHelper(activitySpace, activitySpaceRoot);
+        mOpenXrActivityPoseHelper = new OpenXrActivityPoseHelper(activitySpace, activitySpaceRoot);
     }
 
     @Override
     public Pose getPoseInActivitySpace() {
-        return openXrActivityPoseHelper.getPoseInActivitySpace(new Pose());
+        return mOpenXrActivityPoseHelper.getPoseInActivitySpace(new Pose());
     }
 
     @Override
     public Pose getActivitySpacePose() {
-        return openXrActivityPoseHelper.getActivitySpacePose(new Pose());
+        return mOpenXrActivityPoseHelper.getActivitySpacePose(new Pose());
     }
 
     @Override
     public Vector3 getActivitySpaceScale() {
         // This ActivityPose is assumed to always have a scale of 1.0f in the OpenXR reference
         // space.
-        return openXrActivityPoseHelper.getActivitySpaceScale(new Vector3(1f, 1f, 1f));
+        return mOpenXrActivityPoseHelper.getActivitySpaceScale(new Vector3(1f, 1f, 1f));
     }
 }

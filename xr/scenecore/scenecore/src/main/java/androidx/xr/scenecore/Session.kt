@@ -54,7 +54,7 @@ import java.util.function.Consumer
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class Session(
     public val activity: Activity,
-    public val runtime: JxrPlatformAdapter,
+    public val platformAdapter: JxrPlatformAdapter,
     public val spatialEnvironment: SpatialEnvironment,
 ) {
     internal val entityManager by lazy { EntityManager() }
@@ -69,10 +69,10 @@ public class Session(
      *
      * The ActivitySpace is created automatically when the Session is created.
      */
-    public val activitySpace: ActivitySpace = ActivitySpace.create(runtime, entityManager)
+    public val activitySpace: ActivitySpace = ActivitySpace.create(platformAdapter, entityManager)
 
     /** The SpatialUser contains information about the user. */
-    public val spatialUser: SpatialUser = SpatialUser.create(runtime)
+    public val spatialUser: SpatialUser = SpatialUser.create(platformAdapter)
 
     /**
      * A spatialized PanelEntity associated with the "main window" for the Activity. When in
@@ -81,18 +81,18 @@ public class Session(
      * If called multiple times, this will return the same PanelEntity.
      */
     public val mainPanelEntity: PanelEntity =
-        PanelEntity.createMainPanelEntity(runtime, entityManager)
+        PanelEntity.createMainPanelEntity(platformAdapter, entityManager)
 
     /**
      * The PerceptionSpace represents the origin of the space in which the ARCore for XR API
      * provides tracking info. The transformations provided by the PerceptionSpace are only valid
      * for the call frame, as the transformation can be changed by the system at any time.
      */
-    public val perceptionSpace: PerceptionSpace = PerceptionSpace.create(runtime)
+    public val perceptionSpace: PerceptionSpace = PerceptionSpace.create(platformAdapter)
 
     // TODO: 378706624 - Remove this method once we have a better way to handle the root entity.
     public val activitySpaceRoot: Entity by lazy {
-        entityManager.getEntityForRtEntity(runtime.activitySpaceRootImpl)!!
+        entityManager.getEntityForRtEntity(platformAdapter.activitySpaceRootImpl)!!
     }
 
     public companion object {
@@ -107,10 +107,12 @@ public class Session(
          * For our Alpha release, we just directly instantiate the Android XR PlatformAdapter.
          */
         // TODO(b/326748782): Change the returned Session here to be nullable or asynchronous.
-        // TODO: b/372299691 - Rename the runtime parameter to platformAdapter.
         @JvmStatic
         @JvmOverloads
-        public fun create(activity: Activity, runtime: JxrPlatformAdapter? = null): Session {
+        public fun create(
+            activity: Activity,
+            platformAdapter: JxrPlatformAdapter? = null
+        ): Session {
             // TODO(bhavsar): Rethink moving this check when integration with Spatial Activity
             // happens.
             if (
@@ -128,9 +130,9 @@ public class Session(
             return activitySessionMap.computeIfAbsent(activity) {
                 Log.i(TAG, "Creating session for activity $activity")
                 val session =
-                    when (runtime) {
+                    when (platformAdapter) {
                         null -> {
-                            val runtimeImpl =
+                            val platformAdapterImpl =
                                 JxrPlatformAdapterAxr.create(
                                     activity,
                                     Executors.newSingleThreadScheduledExecutor(
@@ -141,9 +143,14 @@ public class Session(
                                         }
                                     ),
                                 )
-                            Session(activity, runtimeImpl, SpatialEnvironment(runtimeImpl))
+                            Session(
+                                activity,
+                                platformAdapterImpl,
+                                SpatialEnvironment(platformAdapterImpl)
+                            )
                         }
-                        else -> Session(activity, runtime, SpatialEnvironment(runtime))
+                        else ->
+                            Session(activity, platformAdapter, SpatialEnvironment(platformAdapter))
                     }
                 activity.registerActivityLifecycleCallbacks(
                     object : ActivityLifecycleCallbacks {
@@ -155,11 +162,11 @@ public class Session(
                         override fun onActivityStarted(activity: Activity) {}
 
                         override fun onActivityResumed(activity: Activity) {
-                            session.runtime.startRenderer()
+                            session.platformAdapter.startRenderer()
                         }
 
                         override fun onActivityPaused(activity: Activity) {
-                            session.runtime.stopRenderer()
+                            session.platformAdapter.stopRenderer()
                         }
 
                         override fun onActivityStopped(activity: Activity) {}
@@ -172,7 +179,7 @@ public class Session(
                         override fun onActivityDestroyed(activity: Activity) {
                             activitySessionMap.remove(activity)
                             session.entityManager.clear()
-                            session.runtime.dispose()
+                            session.platformAdapter.dispose()
                         }
                     }
                 )
@@ -196,7 +203,7 @@ public class Session(
      * should be called again to get the latest set of capabilities.
      */
     public fun getSpatialCapabilities(): SpatialCapabilities =
-        runtime.spatialCapabilities.toSpatialCapabilities()
+        platformAdapter.spatialCapabilities.toSpatialCapabilities()
 
     /**
      * Adds the given [Consumer] as a listener to be invoked when this Session's current
@@ -216,7 +223,7 @@ public class Session(
         callbackExecutor: Executor,
         listener: Consumer<SpatialCapabilities>,
     ): Unit {
-        // wrap the client's listener in a callback that receives & converts the runtime
+        // wrap the client's listener in a callback that receives & converts the platformAdapter
         // SpatialCapabilities type.
         val rtListener: Consumer<RtSpatialCapabilities> =
             Consumer<RtSpatialCapabilities> { rtCaps: RtSpatialCapabilities ->
@@ -225,7 +232,7 @@ public class Session(
         spatialCapabilitiesListeners.compute(
             listener,
             { _, _ ->
-                runtime.addSpatialCapabilitiesChangedListener(callbackExecutor, rtListener)
+                platformAdapter.addSpatialCapabilitiesChangedListener(callbackExecutor, rtListener)
                 rtListener
             },
         )
@@ -242,23 +249,11 @@ public class Session(
         spatialCapabilitiesListeners.computeIfPresent(
             listener,
             { _, rtListener ->
-                runtime.removeSpatialCapabilitiesChangedListener(rtListener)
+                platformAdapter.removeSpatialCapabilitiesChangedListener(rtListener)
                 null
             },
         )
     }
-
-    /**
-     * If the primary Activity for this Session has focus, causes it to be placed in FullSpace Mode.
-     * Otherwise, this call does nothing.
-     */
-    public fun requestFullSpaceMode(): Unit = runtime.requestFullSpaceMode()
-
-    /**
-     * If the primary Activity for this Session has focus, causes it to be placed in HomeSpace Mode.
-     * Otherwise, this call does nothing.
-     */
-    public fun requestHomeSpaceMode(): Unit = runtime.requestHomeSpaceMode()
 
     /**
      * Public factory function for a [GltfModel], where the glTF is asynchronously loaded.
@@ -275,7 +270,7 @@ public class Session(
      */
     @MainThread
     public fun createGltfResourceAsync(name: String): ListenableFuture<GltfModel> {
-        return GltfModel.createAsync(runtime, name)
+        return GltfModel.createAsync(platformAdapter, name)
     }
 
     /**
@@ -284,7 +279,8 @@ public class Session(
      * @param name The path for an EXR image to be loaded
      * @return an EXRImage instance.
      */
-    public fun createExrImageResource(name: String): ExrImage = ExrImage.create(runtime, name)
+    public fun createExrImageResource(name: String): ExrImage =
+        ExrImage.create(platformAdapter, name)
 
     /**
      * Public factory function for a [GltfModelEntity].
@@ -300,29 +296,7 @@ public class Session(
     @JvmOverloads
     @MainThread
     public fun createGltfEntity(model: GltfModel, pose: Pose = Pose.Identity): GltfModelEntity =
-        GltfModelEntity.create(runtime, entityManager, model, pose)
-
-    /**
-     * Public factory function for a StereoSurfaceEntity.
-     *
-     * This method must be called from the main thread.
-     * https://developer.android.com/guide/components/processes-and-threads
-     *
-     * @param stereoMode Stereo mode for the surface.
-     * @param dimensions Dimensions for the surface.
-     * @param pose Pose of this entity relative to its parent, default value is Identity.
-     * @return a StereoSurfaceEntity instance
-     */
-    @MainThread
-    @JvmOverloads
-    public fun createStereoSurfaceEntity(
-        @StereoSurfaceEntity.StereoModeValue
-        stereoMode: Int = StereoSurfaceEntity.StereoMode.SIDE_BY_SIDE,
-        dimensions: Dimensions = Dimensions(1.0f, 1.0f, 1.0f),
-        pose: Pose = Pose.Identity,
-    ): StereoSurfaceEntity {
-        return StereoSurfaceEntity.create(runtime, entityManager, stereoMode, dimensions, pose)
-    }
+        GltfModelEntity.create(platformAdapter, entityManager, model, pose)
 
     // TODO(b/352629832): Update surfaceDimensionsPx to be a PixelDimensions
     /**
@@ -344,7 +318,7 @@ public class Session(
         pose: Pose = Pose.Identity,
     ): PanelEntity =
         PanelEntity.create(
-            runtime,
+            platformAdapter,
             entityManager,
             view,
             surfaceDimensionsPx,
@@ -378,7 +352,7 @@ public class Session(
         pose: Pose = Pose.Identity,
     ): ActivityPanelEntity =
         ActivityPanelEntity.create(
-            runtime,
+            platformAdapter,
             entityManager,
             PixelDimensions(windowBoundsPx.width(), windowBoundsPx.height()),
             name,
@@ -411,12 +385,12 @@ public class Session(
         timeout: Duration = Duration.ZERO,
     ): AnchorEntity {
         return AnchorEntity.create(
-            runtime,
+            platformAdapter,
             entityManager,
             bounds,
             planeType,
             planeSemantic,
-            timeout
+            timeout,
         )
     }
 
@@ -426,7 +400,7 @@ public class Session(
      * @param anchor The PerceptionAnchor to use for this AnchorEntity.
      */
     public fun createAnchorEntity(anchor: Anchor): AnchorEntity {
-        return AnchorEntity.create(runtime, entityManager, anchor)
+        return AnchorEntity.create(platformAdapter, entityManager, anchor)
     }
 
     /**
@@ -436,7 +410,7 @@ public class Session(
      * @param uuid UUID of the anchor to unpersist.
      */
     public fun unpersistAnchor(uuid: UUID): Boolean {
-        return runtime.unpersistAnchor(uuid)
+        return platformAdapter.unpersistAnchor(uuid)
     }
 
     /**
@@ -449,7 +423,7 @@ public class Session(
      */
     @JvmOverloads
     public fun createEntity(name: String, pose: Pose = Pose.Identity): Entity =
-        ContentlessEntity.create(runtime, entityManager, name, pose)
+        ContentlessEntity.create(platformAdapter, entityManager, name, pose)
 
     /**
      * Public factory function for a persisted AnchorEntity using UUID. Note that the system keeps a
@@ -460,83 +434,8 @@ public class Session(
      * @return a persisted AnchorEntity instance.
      */
     public fun createPersistedAnchorEntity(uuid: UUID): AnchorEntity {
-        return AnchorEntity.create(runtime, entityManager, uuid)
+        return AnchorEntity.create(platformAdapter, entityManager, uuid)
     }
-
-    /**
-     * Public factory for creating an [InteractableComponent]. It enables access to raw input
-     * events.
-     *
-     * @param executor Executor for invoking [InputEventListener].
-     * @param inputEventListener [InputEventListener] that accepts [InputEvent]s.
-     * @return [InteractableComponent] instance.
-     */
-    @Suppress("ExecutorRegistration")
-    public fun createInteractableComponent(
-        executor: Executor,
-        inputEventListener: InputEventListener,
-    ): InteractableComponent =
-        InteractableComponent.create(runtime, entityManager, executor, inputEventListener)
-
-    /**
-     * Public factory function for creating a MovableComponent. This component can be attached to a
-     * single instance of any non-Anchor Entity.
-     *
-     * When attached, this Component will enable the user to translate the Entity by pointing and
-     * dragging on it.
-     *
-     * @param systemMovable A [Boolean] which causes the system to automatically apply transform
-     *   updates to the entity in response to user interaction.
-     * @param scaleInZ A [Boolean] which tells the system to update the scale of the Entity as the
-     *   user moves it closer and further away. This is mostly useful for Panel auto-rescaling with
-     *   Distance
-     * @param anchorPlacement A Set containing different [AnchorPlacement] for how to anchor the
-     *   [Entity] movable component. If this is not empty the movement semantics will be slightly
-     *   different from the system as it will add the ability to anchor to nearby planes.
-     * @param shouldDisposeParentAnchor A [Boolean], which if set to true, when an entity is moved
-     *   off of an [AnchorEntity] that was created by the underlying [MovableComponent], and the
-     *   [AnchorEntity] has no other children, the AnchorEntity will be disposed, and the underlying
-     *   Anchor will be detached.
-     * @return [MovableComponent] instance.
-     */
-    @JvmOverloads
-    public fun createMovableComponent(
-        systemMovable: Boolean = true,
-        scaleInZ: Boolean = true,
-        anchorPlacement: Set<AnchorPlacement> = emptySet(),
-        shouldDisposeParentAnchor: Boolean = true,
-    ): MovableComponent =
-        MovableComponent.create(
-            runtime = runtime,
-            entityManager = entityManager,
-            systemMovable = systemMovable,
-            scaleInZ = scaleInZ,
-            anchorPlacement = anchorPlacement,
-            shouldDisposeParentAnchor = shouldDisposeParentAnchor,
-        )
-
-    /**
-     * Public factory function for creating a ResizableComponent. This component can be attached to
-     * a single instance of any non-Anchor Entity.
-     *
-     * When attached, this Component will enable the user to resize the Entity by dragging along the
-     * boundaries of the interaction highlight.
-     *
-     * @param minimumSize A lower bound for the User's resize actions, in meters. This value is used
-     *   to set constraints on how small the user can resize the bounding box of the entity down to.
-     *   The size of the content inside that bounding box is fully controlled by the application.
-     *   The default value for this param is 0 meters.
-     * @param maximumSize An upper bound for the User's resize actions, in meters. This value is
-     *   used to set constraints on how large the user can resize the bounding box of the entity up
-     *   to. The size of the content inside that bounding box is fully controlled by the
-     *   application. The default value for this param is 10 meters.
-     * @return [ResizableComponent] instance.
-     */
-    @JvmOverloads
-    public fun createResizableComponent(
-        minimumSize: Dimensions = ResizableComponent.kMinimumSize,
-        maximumSize: Dimensions = ResizableComponent.kMaximumSize,
-    ): ResizableComponent = ResizableComponent.create(runtime, minimumSize, maximumSize)
 
     /**
      * Sets the full space mode flag to the given [android.os.Bundle].
@@ -557,7 +456,7 @@ public class Session(
      * @param bundle the input bundle to set with the full space mode flag.
      * @return the input bundle with the full space mode flag set.
      */
-    public fun setFullSpaceMode(bundle: Bundle): Bundle = runtime.setFullSpaceMode(bundle)
+    public fun setFullSpaceMode(bundle: Bundle): Bundle = platformAdapter.setFullSpaceMode(bundle)
 
     /**
      * Sets the inherit full space mode environvment flag to the given [android.os.Bundle].
@@ -586,13 +485,13 @@ public class Session(
      *
      * For security reasons, Z testing for the new activity is disabled, and the activity is always
      * drawn on top of the inherited environment. Because Z testing is disabled, the activity should
-     * not spatialize itself, and should not curve its panel too much either.
+     * not spatialize itself.
      *
      * @param bundle the input bundle to set with the inherit full space mode environment flag.
      * @return the input bundle with the inherit full space mode flag set.
      */
     public fun setFullSpaceModeWithEnvironmentInherited(bundle: Bundle): Bundle =
-        runtime.setFullSpaceModeWithEnvironmentInherited(bundle)
+        platformAdapter.setFullSpaceModeWithEnvironmentInherited(bundle)
 
     /**
      * Sets a preferred main panel aspect ratio for home space mode.
@@ -601,12 +500,17 @@ public class Session(
      * same task, the ratio is not applied to the new activity. Also, while the activity is in full
      * space mode, the preference is temporarily removed.
      *
+     * If the activity's current aspect ratio differs from the preferredRatio, the panel is
+     * automatically resized. This resizing preserves the panel's area. To avoid runtime resizing,
+     * consider specifying the desired aspect ratio in your AndroidManifest.xml. This ensures your
+     * activity launches with the preferred aspect ratio from the start.
+     *
      * @param activity the activity to set the preference.
      * @param preferredRatio the aspect ratio determined by taking the panel's width over its
      *   height. A value <= 0.0f means there are no preferences.
      */
     public fun setPreferredAspectRatio(activity: Activity, preferredRatio: Float): Unit =
-        runtime.setPreferredAspectRatio(activity, preferredRatio)
+        platformAdapter.setPreferredAspectRatio(activity, preferredRatio)
 
     /**
      * Returns all [Entity]s of the given type or its subtypes.

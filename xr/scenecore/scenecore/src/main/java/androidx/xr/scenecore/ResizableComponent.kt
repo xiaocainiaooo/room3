@@ -31,7 +31,7 @@ import java.util.concurrent.Executor
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class ResizableComponent
 private constructor(
-    private val runtime: JxrPlatformAdapter,
+    private val platformAdapter: JxrPlatformAdapter,
     minimumSize: Dimensions,
     maximumSize: Dimensions,
 ) : Component {
@@ -97,8 +97,51 @@ private constructor(
             }
         }
 
+    /**
+     * Whether the content of the entity (and all child entities) should be automatically hidden
+     * while it is being resized.
+     */
+    @get:Suppress("GetterSetterNames")
+    public var autoHideContent: Boolean = true
+        set(value) {
+            if (field != value) {
+                field = value
+                rtResizableComponent.setAutoHideContent(value)
+            }
+        }
+
+    /**
+     * Whether the size of the ResizableComponent should be automatically updated to match during an
+     * ongoing resize (to match the proposed size as resize events are received).
+     */
+    @get:Suppress("GetterSetterNames")
+    public var autoUpdateSize: Boolean = true
+        set(value) {
+            if (field != value) {
+                field = value
+                rtResizableComponent.setAutoUpdateSize(value)
+            }
+        }
+
+    /**
+     * Whether the resize overlay should be shown even if the entity is not being resized.
+     *
+     * This is useful for resizing multiple panels at once.
+     */
+    @get:Suppress("GetterSetterNames")
+    public var forceShowResizeOverlay: Boolean = false
+        set(value) {
+            if (field != value) {
+                field = value
+                rtResizableComponent.setForceShowResizeOverlay(value)
+            }
+        }
+
     private val rtResizableComponent by lazy {
-        runtime.createResizableComponent(minimumSize.toRtDimensions(), maximumSize.toRtDimensions())
+        platformAdapter.createResizableComponent(
+            minimumSize.toRtDimensions(),
+            maximumSize.toRtDimensions(),
+        )
     }
 
     private var entity: Entity? = null
@@ -162,6 +205,18 @@ private constructor(
     }
 
     /**
+     * Adds the listener to the set of listeners that are invoked through the resize operation, such
+     * as start, ongoing and end.
+     *
+     * The listener is invoked on the main thread.
+     *
+     * @param resizeListener The listener to be invoked when a resize event occurs.
+     */
+    public fun addResizeListener(resizeListener: ResizeListener) {
+        addResizeListener(HandlerExecutor.mainThreadExecutor, resizeListener)
+    }
+
+    /**
      * Removes a listener from the set listening to resize events.
      *
      * @param resizeListener The listener to be removed.
@@ -173,7 +228,7 @@ private constructor(
         }
     }
 
-    internal companion object {
+    public companion object {
         private val kDimensionsOneMeter = Dimensions(1f, 1f, 1f)
         /** Defaults min and max sizes in meters. */
         internal val kMinimumSize: Dimensions = Dimensions(0f, 0f, 0f)
@@ -181,11 +236,38 @@ private constructor(
 
         /** Factory function for creating [ResizableComponent] instance. */
         internal fun create(
-            runtime: JxrPlatformAdapter,
+            platformAdapter: JxrPlatformAdapter,
             minimumSize: Dimensions = kMinimumSize,
             maximumSize: Dimensions = kMaximumSize,
         ): ResizableComponent {
-            return ResizableComponent(runtime, minimumSize, maximumSize)
+            return ResizableComponent(platformAdapter, minimumSize, maximumSize)
         }
+
+        /**
+         * Public factory function for creating a ResizableComponent. This component can be attached
+         * to a single instance of any non-Anchor Entity.
+         *
+         * When attached, this Component will enable the user to resize the Entity by dragging along
+         * the boundaries of the interaction highlight.
+         *
+         * @param session The Session to create the ResizableComponent in.
+         * @param minimumSize A lower bound for the User's resize actions, in meters. This value is
+         *   used to set constraints on how small the user can resize the bounding box of the entity
+         *   down to. The size of the content inside that bounding box is fully controlled by the
+         *   application. The default value for this param is 0 meters.
+         * @param maximumSize An upper bound for the User's resize actions, in meters. This value is
+         *   used to set constraints on how large the user can resize the bounding box of the entity
+         *   up to. The size of the content inside that bounding box is fully controlled by the
+         *   application. The default value for this param is 10 meters.
+         * @return [ResizableComponent] instance.
+         */
+        @JvmOverloads
+        @JvmStatic
+        public fun create(
+            session: Session,
+            minimumSize: Dimensions = ResizableComponent.kMinimumSize,
+            maximumSize: Dimensions = ResizableComponent.kMaximumSize,
+        ): ResizableComponent =
+            ResizableComponent.create(session.platformAdapter, minimumSize, maximumSize)
     }
 }

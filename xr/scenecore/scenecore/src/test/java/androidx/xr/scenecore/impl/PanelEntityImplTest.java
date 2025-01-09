@@ -59,41 +59,42 @@ import java.util.Objects;
 public class PanelEntityImplTest {
     private static final Dimensions kVgaResolutionPx = new Dimensions(640f, 480f, 0f);
     private static final Dimensions kHdResolutionPx = new Dimensions(1280f, 720f, 0f);
-    private final FakeXrExtensions fakeExtensions = new FakeXrExtensions();
-    FakeImpressApi fakeImpressApi = new FakeImpressApi();
-    private final ActivityController<Activity> activityController =
+    private final FakeXrExtensions mFakeExtensions = new FakeXrExtensions();
+    FakeImpressApi mFakeImpressApi = new FakeImpressApi();
+    private final ActivityController<Activity> mActivityController =
             Robolectric.buildActivity(Activity.class);
-    private final Activity activity = activityController.create().start().get();
-    private final FakeScheduledExecutorService fakeExecutor = new FakeScheduledExecutorService();
-    private final PerceptionLibrary perceptionLibrary = mock(PerceptionLibrary.class);
-    private final EntityManager entityManager = new EntityManager();
-    private JxrPlatformAdapterAxr testRuntime;
+    private final Activity mActivity = mActivityController.create().start().get();
+    private final FakeScheduledExecutorService mMakeFakeExecutor =
+            new FakeScheduledExecutorService();
+    private final PerceptionLibrary mPerceptionLibrary = mock(PerceptionLibrary.class);
+    private final EntityManager mEntityManager = new EntityManager();
+    private JxrPlatformAdapterAxr mTestRuntime;
 
-    SplitEngineSubspaceManager splitEngineSubspaceManager =
+    SplitEngineSubspaceManager mSplitEngineSubspaceManager =
             Mockito.mock(SplitEngineSubspaceManager.class);
-    ImpSplitEngineRenderer splitEngineRenderer = Mockito.mock(ImpSplitEngineRenderer.class);
+    ImpSplitEngineRenderer mSplitEngineRenderer = Mockito.mock(ImpSplitEngineRenderer.class);
 
     @Before
     public void setUp() {
-        when(perceptionLibrary.initSession(eq(activity), anyInt(), eq(fakeExecutor)))
+        when(mPerceptionLibrary.initSession(eq(mActivity), anyInt(), eq(mMakeFakeExecutor)))
                 .thenReturn(immediateFuture(Mockito.mock(Session.class)));
 
-        testRuntime =
+        mTestRuntime =
                 JxrPlatformAdapterAxr.create(
-                        activity,
-                        fakeExecutor,
-                        fakeExtensions,
-                        fakeImpressApi,
+                        mActivity,
+                        mMakeFakeExecutor,
+                        mFakeExtensions,
+                        mFakeImpressApi,
                         new EntityManager(),
-                        perceptionLibrary,
-                        splitEngineSubspaceManager,
-                        splitEngineRenderer,
+                        mPerceptionLibrary,
+                        mSplitEngineSubspaceManager,
+                        mSplitEngineRenderer,
                         /* useSplitEngine= */ false);
     }
 
     private PanelEntityImpl createPanelEntity(Dimensions surfaceDimensionsPx) {
-        Display display = activity.getSystemService(DisplayManager.class).getDisplays()[0];
-        Context displayContext = activity.createDisplayContext(display);
+        Display display = mActivity.getSystemService(DisplayManager.class).getDisplays()[0];
+        Context displayContext = mActivity.createDisplayContext(display);
         View view = new View(displayContext);
         view.setLayoutParams(new LayoutParams(640, 480));
         SurfaceControlViewHost surfaceControlViewHost =
@@ -103,20 +104,20 @@ public class PanelEntityImplTest {
                         new Binder());
         surfaceControlViewHost.setView(
                 view, (int) surfaceDimensionsPx.width, (int) surfaceDimensionsPx.height);
-        Node node = fakeExtensions.createNode();
+        Node node = mFakeExtensions.createNode();
 
         PanelEntityImpl panelEntity =
                 new PanelEntityImpl(
                         node,
-                        fakeExtensions,
-                        entityManager,
+                        mFakeExtensions,
+                        mEntityManager,
                         surfaceControlViewHost,
                         new PixelDimensions(
                                 (int) surfaceDimensionsPx.width, (int) surfaceDimensionsPx.height),
-                        fakeExecutor);
+                        mMakeFakeExecutor);
 
         // TODO(b/352829122): introduce a TestRootEntity which can serve as a parent
-        panelEntity.setParent(testRuntime.getActivitySpaceRootImpl());
+        panelEntity.setParent(mTestRuntime.getActivitySpaceRootImpl());
         return panelEntity;
     }
 

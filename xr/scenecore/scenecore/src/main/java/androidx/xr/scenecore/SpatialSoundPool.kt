@@ -52,7 +52,7 @@ public class SpatialSoundPool private constructor() {
             rate: Float,
         ): Int {
 
-            return session.runtime.soundPoolExtensionsWrapper.play(
+            return session.platformAdapter.soundPoolExtensionsWrapper.play(
                 soundPool,
                 soundID,
                 attributes.rtPointSourceAttributes,
@@ -88,7 +88,7 @@ public class SpatialSoundPool private constructor() {
             rate: Float,
         ): Int {
 
-            return session.runtime.soundPoolExtensionsWrapper.play(
+            return session.platformAdapter.soundPoolExtensionsWrapper.play(
                 soundPool,
                 soundID,
                 attributes.rtSoundFieldAttributes,
@@ -113,7 +113,7 @@ public class SpatialSoundPool private constructor() {
             soundPool: SoundPool,
             streamId: Int
         ): Int {
-            return session.runtime.soundPoolExtensionsWrapper
+            return session.platformAdapter.soundPoolExtensionsWrapper
                 .getSpatialSourceType(soundPool, streamId)
                 .sourceTypeToJxr()
         }

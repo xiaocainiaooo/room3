@@ -38,14 +38,14 @@ import java.util.concurrent.ScheduledExecutorService;
 abstract class SystemSpaceEntityImpl extends AndroidXrEntity
         implements JxrPlatformAdapter.SystemSpaceEntity {
 
-    protected Pose openXrReferenceSpacePose;
-    protected Vector3 worldSpaceScale = new Vector3(1f, 1f, 1f);
+    protected Pose mOpenXrReferenceSpacePose;
+    protected Vector3 mWorldSpaceScale = new Vector3(1f, 1f, 1f);
     // Visible for testing.
-    Closeable nodeTransformCloseable;
-    private OnSpaceUpdatedListener spaceUpdatedListener;
-    private Executor spaceUpdatedExecutor;
+    Closeable mNodeTransformCloseable;
+    private OnSpaceUpdatedListener mSpaceUpdatedListener;
+    private Executor mSpaceUpdatedExecutor;
 
-    public SystemSpaceEntityImpl(
+    SystemSpaceEntityImpl(
             Node node,
             XrExtensions extensions,
             EntityManager entityManager,
@@ -60,8 +60,8 @@ abstract class SystemSpaceEntityImpl extends AndroidXrEntity
 
     /** Called when the underlying space has changed. */
     public void onSpaceUpdated() {
-        if (spaceUpdatedListener != null) {
-            this.spaceUpdatedExecutor.execute(() -> spaceUpdatedListener.onSpaceUpdated());
+        if (mSpaceUpdatedListener != null) {
+            mSpaceUpdatedExecutor.execute(() -> mSpaceUpdatedListener.onSpaceUpdated());
         }
     }
 
@@ -69,8 +69,8 @@ abstract class SystemSpaceEntityImpl extends AndroidXrEntity
     @Override
     public void setOnSpaceUpdatedListener(
             @Nullable OnSpaceUpdatedListener listener, @Nullable Executor executor) {
-        this.spaceUpdatedListener = listener;
-        this.spaceUpdatedExecutor = executor == null ? this.executor : executor;
+        mSpaceUpdatedListener = listener;
+        mSpaceUpdatedExecutor = executor == null ? mExecutor : executor;
     }
 
     /**
@@ -80,7 +80,7 @@ abstract class SystemSpaceEntityImpl extends AndroidXrEntity
      * XrExtensions#getOpenXrActivitySpaceType()}
      */
     public Pose getPoseInOpenXrReferenceSpace() {
-        return openXrReferenceSpacePose;
+        return mOpenXrReferenceSpacePose;
     }
 
     /**
@@ -93,8 +93,7 @@ abstract class SystemSpaceEntityImpl extends AndroidXrEntity
      */
     protected void setOpenXrReferenceSpacePose(Matrix4 openXrReferenceSpaceTransform) {
         // TODO: b/353511649 - Make SystemSpaceEntityImpl thread safe.
-        this.openXrReferenceSpacePose =
-                Matrix4Ext.getUnscaled(openXrReferenceSpaceTransform).getPose();
+        mOpenXrReferenceSpacePose = Matrix4Ext.getUnscaled(openXrReferenceSpaceTransform).getPose();
 
         // TODO: b/367780918 - Consider using Matrix4.scale when it is fixed.
         // Retrieve the scale from the matrix. The scale can be retrieved from the matrix by getting
@@ -106,7 +105,7 @@ abstract class SystemSpaceEntityImpl extends AndroidXrEntity
         float data01 = openXrReferenceSpaceTransform.getData()[1];
         float data02 = openXrReferenceSpaceTransform.getData()[2];
         float scale = (float) Math.sqrt(data00 * data00 + data01 * data01 + data02 * data02);
-        this.worldSpaceScale = new Vector3(scale, scale, scale);
+        mWorldSpaceScale = new Vector3(scale, scale, scale);
         this.setScaleInternal(new Vector3(scale, scale, scale));
         onSpaceUpdated();
     }
@@ -119,7 +118,7 @@ abstract class SystemSpaceEntityImpl extends AndroidXrEntity
      * @param executor The executor to run the callback on.
      */
     private void subscribeToNodeTransform(Node node, Executor executor) {
-        this.nodeTransformCloseable =
+        mNodeTransformCloseable =
                 node.subscribeToTransform(
                         (transform) ->
                                 setOpenXrReferenceSpacePose(
@@ -129,13 +128,13 @@ abstract class SystemSpaceEntityImpl extends AndroidXrEntity
 
     @Override
     public Vector3 getWorldSpaceScale() {
-        return this.worldSpaceScale;
+        return mWorldSpaceScale;
     }
 
     /** Unsubscribes from the node's transform update events. */
     private void unsubscribeFromNodeTransform() {
         try {
-            this.nodeTransformCloseable.close();
+            mNodeTransformCloseable.close();
         } catch (Exception e) {
             Log.w(
                     "SystemSpaceEntity",

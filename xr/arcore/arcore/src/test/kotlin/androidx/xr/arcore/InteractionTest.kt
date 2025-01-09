@@ -35,7 +35,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlin.time.TestTimeSource
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,50 +51,47 @@ class InteractionTest {
     @get:Rule
     val grantPermissionRule = GrantPermissionRule.grant("android.permission.SCENE_UNDERSTANDING")
 
-    @Before
-    fun setUp() {
-        session = createTestSession()
-        timeSource = (session.runtime as FakeRuntime).lifecycleManager.timeSource
-        perceptionStateExtender =
-            session.stateExtenders.filterIsInstance<PerceptionStateExtender>().first()
-        perceptionManager = perceptionStateExtender.perceptionManager as FakePerceptionManager
-    }
-
     @Test
-    fun hitTest_successWithOneHitResult() = runTest {
-        val runtimePlane = FakeRuntimePlane()
-        perceptionManager.addTrackable(runtimePlane)
-        // Mock the behavior of session update.
-        val timeMark = timeSource.markNow()
-        val state = CoreState(timeMark)
-        perceptionStateExtender.extend(state)
-        check(state.perceptionState?.trackables?.size == 1)
-        val expectedTrackable = state.perceptionState?.trackables?.first()
-        val runtimeHitResult: RuntimeHitResult =
-            RuntimeHitResult(
-                distance = 1f,
-                hitPose = Pose(Vector3(1f, 2f, 3f), Quaternion(4f, 5f, 6f, 7f)),
-                trackable = runtimePlane,
-            )
-        perceptionManager.addHitResult(runtimeHitResult)
+    fun hitTest_successWithOneHitResult() = createTestSessionAndRunTest {
+        runTest {
+            timeSource = (session.runtime as FakeRuntime).lifecycleManager.timeSource
+            perceptionStateExtender =
+                session.stateExtenders.filterIsInstance<PerceptionStateExtender>().first()
+            perceptionManager = perceptionStateExtender.perceptionManager as FakePerceptionManager
+            val runtimePlane = FakeRuntimePlane()
+            perceptionManager.addTrackable(runtimePlane)
+            // Mock the behavior of session update.
+            val timeMark = timeSource.markNow()
+            val state = CoreState(timeMark)
+            perceptionStateExtender.extend(state)
+            check(state.perceptionState?.trackables?.size == 1)
+            val expectedTrackable = state.perceptionState?.trackables?.first()
+            val runtimeHitResult: RuntimeHitResult =
+                RuntimeHitResult(
+                    distance = 1f,
+                    hitPose = Pose(Vector3(1f, 2f, 3f), Quaternion(4f, 5f, 6f, 7f)),
+                    trackable = runtimePlane,
+                )
+            perceptionManager.addHitResult(runtimeHitResult)
 
-        val hitResults = hitTest(session, Ray(Vector3(0f, 0f, 0f), Vector3(0f, 0f, 1f)))
+            val hitResults = hitTest(session, Ray(Vector3(0f, 0f, 0f), Vector3(0f, 0f, 1f)))
 
-        assertThat(hitResults.size).isEqualTo(1)
-        assertThat(hitResults[0].distance).isEqualTo(runtimeHitResult.distance)
-        assertThat(hitResults[0].hitPose).isEqualTo(runtimeHitResult.hitPose)
-        assertThat(hitResults[0].trackable).isEqualTo(expectedTrackable)
+            assertThat(hitResults.size).isEqualTo(1)
+            assertThat(hitResults[0].distance).isEqualTo(runtimeHitResult.distance)
+            assertThat(hitResults[0].hitPose).isEqualTo(runtimeHitResult.hitPose)
+            assertThat(hitResults[0].trackable).isEqualTo(expectedTrackable)
+        }
     }
 
-    private fun createTestSession(): Session {
-        var session: Session? = null
+    private fun createTestSessionAndRunTest(testBody: () -> Unit) {
         ActivityScenario.launch(Activity::class.java).use {
             it.onActivity { activity ->
                 session =
                     (Session.create(activity, StandardTestDispatcher()) as SessionCreateSuccess)
                         .session
+
+                testBody()
             }
         }
-        return checkNotNull(session) { "Session must not be null." }
     }
 }

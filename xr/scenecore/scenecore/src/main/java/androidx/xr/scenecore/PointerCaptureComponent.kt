@@ -32,7 +32,7 @@ import java.util.concurrent.Executor
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class PointerCaptureComponent
 private constructor(
-    private val runtime: JxrPlatformAdapter,
+    private val platformAdapter: JxrPlatformAdapter,
     private val entityManager: EntityManager,
     private val executor: Executor,
     private val stateListener: StateListener,
@@ -63,7 +63,11 @@ private constructor(
         }
 
     private val rtComponent by lazy {
-        runtime.createPointerCaptureComponent(executor, rtStateListener, rtInputEventListener)
+        platformAdapter.createPointerCaptureComponent(
+            executor,
+            rtStateListener,
+            rtInputEventListener
+        )
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -123,7 +127,7 @@ private constructor(
             inputListener: InputEventListener,
         ): PointerCaptureComponent =
             PointerCaptureComponent(
-                session.runtime,
+                session.platformAdapter,
                 session.entityManager,
                 executor,
                 stateListener,

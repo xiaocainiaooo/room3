@@ -69,7 +69,7 @@ class OrbiterTest {
     fun orbiter_homeSpaceMode_contentIsInline() {
         composeTestRule.setContent {
             TestSetup {
-                requestHomeSpaceMode()
+                this.spatialEnvironment.requestHomeSpaceMode()
                 Parent { Orbiter(OrbiterEdge.Top) { Text("Main Content") } }
             }
         }
@@ -81,7 +81,7 @@ class OrbiterTest {
     fun orbiter_nonSpatial_doesNotRenderContent() {
         composeTestRule.setContent {
             TestSetup {
-                requestHomeSpaceMode()
+                this.spatialEnvironment.requestHomeSpaceMode()
                 Parent {
                     Orbiter(
                         OrbiterEdge.Top,
@@ -116,9 +116,9 @@ class OrbiterTest {
     fun orbiter_afterSwitchToFullSpaceMode_isSpatial() {
         composeTestRule.setContent {
             TestSetup {
-                requestHomeSpaceMode()
+                this.spatialEnvironment.requestHomeSpaceMode()
                 Parent { Orbiter(position = OrbiterEdge.Bottom) { Text("Bottom") } }
-                requestFullSpaceMode()
+                this.spatialEnvironment.requestFullSpaceMode()
             }
         }
 
@@ -169,7 +169,7 @@ class OrbiterTest {
     fun orbiter_orbiterRendered() {
         composeTestRule.setContent {
             TestSetup {
-                requestHomeSpaceMode()
+                this.spatialEnvironment.requestHomeSpaceMode()
                 Box {
                     Text("Main Content")
                     Orbiter(OrbiterEdge.Start) { Text("Orbiter Content") }
@@ -187,7 +187,7 @@ class OrbiterTest {
 
         composeTestRule.setContent {
             TestSetup {
-                requestHomeSpaceMode()
+                this.spatialEnvironment.requestHomeSpaceMode()
                 Box(modifier = Modifier.size(100.dp)) {
                     Text("Main Content")
                     if (showOrbiter) {
@@ -210,9 +210,9 @@ class OrbiterTest {
             TestSetup {
                 LaunchedEffect(isFullSpaceMode) {
                     if (isFullSpaceMode) {
-                        requestFullSpaceMode()
+                        this@TestSetup.spatialEnvironment.requestFullSpaceMode()
                     } else {
-                        requestHomeSpaceMode()
+                        this@TestSetup.spatialEnvironment.requestHomeSpaceMode()
                     }
                 }
 

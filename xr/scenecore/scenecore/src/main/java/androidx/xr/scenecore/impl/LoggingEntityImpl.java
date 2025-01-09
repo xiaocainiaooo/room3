@@ -34,7 +34,7 @@ class LoggingEntityImpl extends BaseEntity implements LoggingEntity {
 
     private static final String TAG = "RealityCoreRuntime";
 
-    public LoggingEntityImpl() {
+    LoggingEntityImpl() {
         Log.i(TAG, "Creating LoggingEntity.");
     }
 

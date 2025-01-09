@@ -64,14 +64,14 @@ public abstract class SystemSpaceEntityImplTest {
         FakeNode node = (FakeNode) systemSpaceEntity.getNode();
         assertThat(node.getTransformListener()).isNotNull();
         assertThat(node.getTransformExecutor()).isEqualTo(fakeExecutor);
-        assertThat(systemSpaceEntity.nodeTransformCloseable).isNotNull();
+        assertThat(systemSpaceEntity.mNodeTransformCloseable).isNotNull();
     }
 
     @Test
     public void dispose_closesNodeTransformSubscription() {
         SystemSpaceEntityImpl systemSpaceEntity = getSystemSpaceEntityImpl();
         FakeCloseable nodeTransformCloseable =
-                (FakeCloseable) systemSpaceEntity.nodeTransformCloseable;
+                (FakeCloseable) systemSpaceEntity.mNodeTransformCloseable;
         assertThat(nodeTransformCloseable.isClosed()).isFalse();
 
         systemSpaceEntity.dispose();

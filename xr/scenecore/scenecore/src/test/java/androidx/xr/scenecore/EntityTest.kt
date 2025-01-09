@@ -47,7 +47,7 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class EntityTest {
     private val activity = Robolectric.buildActivity(Activity::class.java).create().start().get()
-    private val mockRuntime = mock<JxrPlatformAdapter>()
+    private val mockPlatformAdapter = mock<JxrPlatformAdapter>()
     private val mockGltfModelEntityImpl = mock<JxrPlatformAdapter.GltfEntity>()
     private val mockPanelEntityImpl = mock<JxrPlatformAdapter.PanelEntity>()
     private val mockAnchorEntityImpl = mock<JxrPlatformAdapter.AnchorEntity>()
@@ -197,34 +197,45 @@ class EntityTest {
 
     @Before
     fun setUp() {
-        whenever(mockRuntime.spatialEnvironment).thenReturn(mock())
-        whenever(mockRuntime.activitySpace).thenReturn(testActivitySpace)
-        whenever(mockRuntime.activitySpaceRootImpl).thenReturn(mock())
-        whenever(mockRuntime.headActivityPose).thenReturn(mock())
-        whenever(mockRuntime.perceptionSpaceActivityPose).thenReturn(mock())
-        whenever(mockRuntime.loadGltfByAssetNameSplitEngine(Mockito.anyString()))
+        whenever(mockPlatformAdapter.spatialEnvironment).thenReturn(mock())
+        whenever(mockPlatformAdapter.activitySpace).thenReturn(testActivitySpace)
+        whenever(mockPlatformAdapter.activitySpaceRootImpl).thenReturn(mock())
+        whenever(mockPlatformAdapter.headActivityPose).thenReturn(mock())
+        whenever(mockPlatformAdapter.perceptionSpaceActivityPose).thenReturn(mock())
+        whenever(mockPlatformAdapter.loadGltfByAssetNameSplitEngine(Mockito.anyString()))
             .thenReturn(Futures.immediateFuture(mock()))
-        whenever(mockRuntime.createGltfEntity(any(), any(), any()))
+        whenever(mockPlatformAdapter.createGltfEntity(any(), any(), any()))
             .thenReturn(mockGltfModelEntityImpl)
-        whenever(mockRuntime.createPanelEntity(any(), any(), any(), any(), any(), any(), any()))
+        whenever(
+                mockPlatformAdapter.createPanelEntity(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            )
             .thenReturn(mockPanelEntityImpl)
-        whenever(mockRuntime.createAnchorEntity(any(), any(), any(), any()))
+        whenever(mockPlatformAdapter.createAnchorEntity(any(), any(), any(), any()))
             .thenReturn(mockAnchorEntityImpl)
         whenever(mockAnchorEntityImpl.state)
             .thenReturn(JxrPlatformAdapter.AnchorEntity.State.UNANCHORED)
         whenever(mockAnchorEntityImpl.persistState)
             .thenReturn(JxrPlatformAdapter.AnchorEntity.PersistState.PERSIST_NOT_REQUESTED)
-        whenever(mockRuntime.createActivityPanelEntity(any(), any(), any(), any(), any()))
+        whenever(mockPlatformAdapter.createActivityPanelEntity(any(), any(), any(), any(), any()))
             .thenReturn(mockActivityPanelEntity)
-        whenever(mockRuntime.createEntity(any(), any(), any())).thenReturn(mockContentlessEntity)
-        whenever(mockRuntime.getMainPanelEntity()).thenReturn(mockPanelEntityImpl)
-        session = Session.create(activity, mockRuntime)
-        activitySpace = ActivitySpace.create(mockRuntime, entityManager)
+        whenever(mockPlatformAdapter.createEntity(any(), any(), any()))
+            .thenReturn(mockContentlessEntity)
+        whenever(mockPlatformAdapter.getMainPanelEntity()).thenReturn(mockPanelEntityImpl)
+        session = Session.create(activity, mockPlatformAdapter)
+        activitySpace = ActivitySpace.create(mockPlatformAdapter, entityManager)
         gltfModel = session.createGltfResourceAsync("test.glb").get()
-        gltfModelEntity = GltfModelEntity.create(mockRuntime, entityManager, gltfModel)
+        gltfModelEntity = GltfModelEntity.create(mockPlatformAdapter, entityManager, gltfModel)
         panelEntity =
             PanelEntity.create(
-                mockRuntime,
+                mockPlatformAdapter,
                 entityManager = entityManager,
                 TextView(activity),
                 Dimensions(720f, 480f),
@@ -234,7 +245,7 @@ class EntityTest {
             )
         anchorEntity =
             AnchorEntity.create(
-                mockRuntime,
+                mockPlatformAdapter,
                 entityManager,
                 Dimensions(),
                 PlaneType.ANY,
@@ -243,22 +254,22 @@ class EntityTest {
             )
         activityPanelEntity =
             ActivityPanelEntity.create(
-                mockRuntime,
+                mockPlatformAdapter,
                 entityManager = entityManager,
                 PixelDimensions(640, 480),
                 "test",
                 activity,
             )
-        contentlessEntity = ContentlessEntity.create(mockRuntime, entityManager, "test")
+        contentlessEntity = ContentlessEntity.create(mockPlatformAdapter, entityManager, "test")
     }
 
     @Test
     fun anchorEntityCreateWithNullTimeout_passesNullToImpl() {
-        whenever(mockRuntime.createAnchorEntity(any(), any(), any(), any()))
+        whenever(mockPlatformAdapter.createAnchorEntity(any(), any(), any(), any()))
             .thenReturn(mockAnchorEntityImpl)
         anchorEntity =
             AnchorEntity.create(
-                mockRuntime,
+                mockPlatformAdapter,
                 entityManager,
                 Dimensions(),
                 PlaneType.ANY,
@@ -275,10 +286,10 @@ class EntityTest {
         anchorEntity.setParent(activitySpace)
         activityPanelEntity.setParent(activitySpace)
 
-        verify(mockPanelEntityImpl).parent = session.runtime.activitySpace
-        verify(mockGltfModelEntityImpl).parent = session.runtime.activitySpace
-        verify(mockAnchorEntityImpl).parent = session.runtime.activitySpace
-        verify(mockActivityPanelEntity).parent = session.runtime.activitySpace
+        verify(mockPanelEntityImpl).parent = session.platformAdapter.activitySpace
+        verify(mockGltfModelEntityImpl).parent = session.platformAdapter.activitySpace
+        verify(mockAnchorEntityImpl).parent = session.platformAdapter.activitySpace
+        verify(mockActivityPanelEntity).parent = session.platformAdapter.activitySpace
     }
 
     @Test
@@ -296,7 +307,7 @@ class EntityTest {
 
     @Test
     fun allEntityGetParent_callsRuntimeEntityImplGetParent() {
-        val rtActivitySpace = session.runtime.activitySpace
+        val rtActivitySpace = session.platformAdapter.activitySpace
         whenever(mockActivityPanelEntity.parent).thenReturn(rtActivitySpace)
         whenever(mockPanelEntityImpl.parent).thenReturn(mockActivityPanelEntity)
         whenever(mockGltfModelEntityImpl.parent).thenReturn(mockPanelEntityImpl)
@@ -683,7 +694,7 @@ class EntityTest {
 
     @Test
     fun activitySpaceGetBounds_callsImplGetBounds() {
-        val activitySpace = ActivitySpace.create(mockRuntime, entityManager)
+        val activitySpace = ActivitySpace.create(mockPlatformAdapter, entityManager)
         val bounds = activitySpace.getBounds()
         assertThat(bounds).isNotNull()
         assertThat(testActivitySpace.getBoundsCalled).isTrue()
@@ -691,7 +702,7 @@ class EntityTest {
 
     @Test
     fun activitySpaceSetBoundsListener_receivesBoundsChangedCallback() {
-        val activitySpace = ActivitySpace.create(mockRuntime, entityManager)
+        val activitySpace = ActivitySpace.create(mockPlatformAdapter, entityManager)
         var called = false
         val boundsChangedListener =
             Consumer<Dimensions> { newBounds ->
@@ -714,8 +725,8 @@ class EntityTest {
     @Test
     fun setOnSpaceUpdatedListener_withNullParams_callsRuntimeSetOnSpaceUpdatedListener() {
         val mockRtActivitySpace = mock<JxrPlatformAdapter.ActivitySpace>()
-        whenever(mockRuntime.activitySpace).thenReturn(mockRtActivitySpace)
-        val activitySpace = ActivitySpace.create(mockRuntime, entityManager)
+        whenever(mockPlatformAdapter.activitySpace).thenReturn(mockRtActivitySpace)
+        val activitySpace = ActivitySpace.create(mockPlatformAdapter, entityManager)
 
         activitySpace.setOnSpaceUpdatedListener(null)
         verify(mockRtActivitySpace).setOnSpaceUpdatedListener(null, null)
@@ -724,8 +735,8 @@ class EntityTest {
     @Test
     fun setOnSpaceUpdatedListener_receivesRuntimeSetOnSpaceUpdatedListenerCallbacks() {
         val mockRtActivitySpace = mock<JxrPlatformAdapter.ActivitySpace>()
-        whenever(mockRuntime.activitySpace).thenReturn(mockRtActivitySpace)
-        val activitySpace = ActivitySpace.create(mockRuntime, entityManager)
+        whenever(mockPlatformAdapter.activitySpace).thenReturn(mockRtActivitySpace)
+        val activitySpace = ActivitySpace.create(mockPlatformAdapter, entityManager)
 
         var listenerCalled = false
         val captor = argumentCaptor<JxrPlatformAdapter.SystemSpaceEntity.OnSpaceUpdatedListener>()
@@ -765,7 +776,7 @@ class EntityTest {
         val mainPanelEntity2 = session.mainPanelEntity
 
         assertThat(mainPanelEntity2).isSameInstanceAs(mainPanelEntity)
-        verify(mockRuntime, times(1)).mainPanelEntity
+        verify(mockPlatformAdapter, times(1)).mainPanelEntity
     }
 
     @Test
@@ -1041,9 +1052,10 @@ class EntityTest {
 
     @Test
     fun anchorEntity_createPersistAnchorSuccess() {
-        whenever(mockRuntime.createPersistedAnchorEntity(any(), any()))
+        whenever(mockPlatformAdapter.createPersistedAnchorEntity(any(), any()))
             .thenReturn(mockAnchorEntityImpl)
-        val persistAnchorEntity = AnchorEntity.create(mockRuntime, entityManager, UUID.randomUUID())
+        val persistAnchorEntity =
+            AnchorEntity.create(mockPlatformAdapter, entityManager, UUID.randomUUID())
         assertThat(persistAnchorEntity).isNotNull()
     }
 

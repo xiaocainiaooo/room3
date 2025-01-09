@@ -82,8 +82,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.truth.Expect;
 
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -97,56 +97,63 @@ import java.util.Objects;
 
 @RunWith(RobolectricTestRunner.class)
 public class MovableComponentImplTest {
-    private final ActivityController<Activity> activityController =
+    private final ActivityController<Activity> mActivityController =
             Robolectric.buildActivity(Activity.class);
-    private final Activity activity = activityController.create().start().get();
-    private final FakeScheduledExecutorService fakeExecutor = new FakeScheduledExecutorService();
-    private final PerceptionLibrary perceptionLibrary = mock(PerceptionLibrary.class);
-    private final FakeXrExtensions fakeExtensions = new FakeXrExtensions();
-    private final FakeImpressApi fakeImpressApi = new FakeImpressApi();
-    private final EntityManager entityManager = new EntityManager();
+    private final Activity mActivity = mActivityController.create().start().get();
+    private final FakeScheduledExecutorService mFakeExecutor = new FakeScheduledExecutorService();
+    private final PerceptionLibrary mPerceptionLibrary = mock(PerceptionLibrary.class);
+    private final FakeXrExtensions mFakeExtensions = new FakeXrExtensions();
+    private final FakeImpressApi mFakeImpressApi = new FakeImpressApi();
+    private final EntityManager mEntityManager = new EntityManager();
 
-    private final SplitEngineSubspaceManager splitEngineSubspaceManager =
+    private final SplitEngineSubspaceManager mSplitEngineSubspaceManager =
             Mockito.mock(SplitEngineSubspaceManager.class);
-    private final ImpSplitEngineRenderer splitEngineRenderer =
+    private final ImpSplitEngineRenderer mSplitEngineRenderer =
             Mockito.mock(ImpSplitEngineRenderer.class);
-    private JxrPlatformAdapter fakeRuntime;
-    private ActivitySpaceImpl activitySpaceImpl;
-    private Node activitySpaceNode;
-    private final AndroidXrEntity activitySpaceRoot = Mockito.mock(AndroidXrEntity.class);
-    private PerceptionSpaceActivityPoseImpl perceptionSpaceActivityPose;
-    private final PanelShadowRenderer panelShadowRenderer = Mockito.mock(PanelShadowRenderer.class);
+    private JxrPlatformAdapter mFakeRuntime;
+    private ActivitySpaceImpl mActivitySpaceImpl;
+    private Node mActivitySpaceNode;
+    private final AndroidXrEntity mActivitySpaceRoot = Mockito.mock(AndroidXrEntity.class);
+    private PerceptionSpaceActivityPoseImpl mPerceptionSpaceActivityPose;
+    private final PanelShadowRenderer mPanelShadowRenderer =
+            Mockito.mock(PanelShadowRenderer.class);
 
     @Rule public final Expect expect = Expect.create();
 
     @Before
     public void setUp() {
-        when(perceptionLibrary.initSession(eq(activity), anyInt(), eq(fakeExecutor)))
+        when(mPerceptionLibrary.initSession(eq(mActivity), anyInt(), eq(mFakeExecutor)))
                 .thenReturn(immediateFuture(mock(Session.class)));
-        fakeRuntime =
+        mFakeRuntime =
                 JxrPlatformAdapterAxr.create(
-                        activity,
-                        fakeExecutor,
-                        fakeExtensions,
-                        fakeImpressApi,
-                        entityManager,
-                        perceptionLibrary,
-                        splitEngineSubspaceManager,
-                        splitEngineRenderer,
+                        mActivity,
+                        mFakeExecutor,
+                        mFakeExtensions,
+                        mFakeImpressApi,
+                        mEntityManager,
+                        mPerceptionLibrary,
+                        mSplitEngineSubspaceManager,
+                        mSplitEngineRenderer,
                         /* useSplitEngine= */ false);
-        activitySpaceImpl = (ActivitySpaceImpl) fakeRuntime.getActivitySpace();
-        activitySpaceNode = activitySpaceImpl.getNode();
-        perceptionSpaceActivityPose =
-                (PerceptionSpaceActivityPoseImpl) fakeRuntime.getPerceptionSpaceActivityPose();
+        mActivitySpaceImpl = (ActivitySpaceImpl) mFakeRuntime.getActivitySpace();
+        mActivitySpaceNode = mActivitySpaceImpl.getNode();
+        mPerceptionSpaceActivityPose =
+                (PerceptionSpaceActivityPoseImpl) mFakeRuntime.getPerceptionSpaceActivityPose();
+    }
+
+    @After
+    public void tearDown() {
+        // Dispose the runtime between test cases to clean up lingering references.
+        mFakeRuntime.dispose();
     }
 
     private Entity createTestEntity() {
-        return fakeRuntime.createEntity(new Pose(), "test", fakeRuntime.getActivitySpace());
+        return mFakeRuntime.createEntity(new Pose(), "test", mFakeRuntime.getActivitySpace());
     }
 
     private PanelEntity createTestPanelEntity() {
-        Display display = activity.getSystemService(DisplayManager.class).getDisplays()[0];
-        Context displayContext = activity.createDisplayContext(display);
+        Display display = mActivity.getSystemService(DisplayManager.class).getDisplays()[0];
+        Context displayContext = mActivity.createDisplayContext(display);
         View view = new View(displayContext);
         view.setLayoutParams(new LayoutParams(640, 480));
         SurfaceControlViewHost surfaceControlViewHost =
@@ -155,17 +162,17 @@ public class MovableComponentImplTest {
                         Objects.requireNonNull(displayContext.getDisplay()),
                         new Binder());
         surfaceControlViewHost.setView(view, 10, 10);
-        Node node = fakeExtensions.createNode();
+        Node node = mFakeExtensions.createNode();
 
         PanelEntityImpl panelEntity =
                 new PanelEntityImpl(
                         node,
-                        fakeExtensions,
-                        entityManager,
+                        mFakeExtensions,
+                        mEntityManager,
                         surfaceControlViewHost,
                         new PixelDimensions(10, 10),
-                        fakeExecutor);
-        panelEntity.setParent(activitySpaceImpl);
+                        mFakeExecutor);
+        panelEntity.setParent(mActivitySpaceImpl);
         return panelEntity;
     }
 
@@ -176,19 +183,18 @@ public class MovableComponentImplTest {
         Mat4f mat4f = new Mat4f(scaledPoseMatrix.getData());
         FakeNodeTransform nodeTransformEvent = new FakeNodeTransform(mat4f);
 
-        ((FakeNode) activitySpaceNode).sendTransformEvent(nodeTransformEvent);
-        fakeExecutor.runAll();
+        ((FakeNode) mActivitySpaceNode).sendTransformEvent(nodeTransformEvent);
+        mFakeExecutor.runAll();
     }
 
     private ImmutableSet<JxrPlatformAdapter.AnchorPlacement> createAnyAnchorPlacement() {
         JxrPlatformAdapter.AnchorPlacement anchorPlacement =
-                fakeRuntime.createAnchorPlacementForPlanes(
+                mFakeRuntime.createAnchorPlacementForPlanes(
                         ImmutableSet.of(PlaneType.ANY), ImmutableSet.of(PlaneSemantic.ANY));
         return ImmutableSet.of(anchorPlacement);
     }
 
     @Test
-    @Ignore
     public void addMovableComponent_addsReformOptionsToNode() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -197,14 +203,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ false,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -217,7 +223,6 @@ public class MovableComponentImplTest {
     }
 
     @Test
-    @Ignore
     public void addMovableComponent_addsSystemMovableFlagToNode() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -226,14 +231,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ false,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -246,7 +251,6 @@ public class MovableComponentImplTest {
     }
 
     @Test
-    @Ignore
     public void addMovableComponent_addsScaleInZFlagToNode() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -255,14 +259,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -275,7 +279,6 @@ public class MovableComponentImplTest {
     }
 
     @Test
-    @Ignore
     public void addMovableComponent_addsAllFlagsToNode() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -284,14 +287,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -305,7 +308,6 @@ public class MovableComponentImplTest {
     }
 
     @Test
-    @Ignore
     public void setSystemMovableFlag_alsoUpdatesEntityPoseAndScale() {
         AndroidXrEntity entity = (AndroidXrEntity) createTestEntity();
         MovableComponentImpl movableComponent =
@@ -314,14 +316,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(entity.addComponent(movableComponent)).isTrue();
         Pose expectedPose =
                 new Pose(new Vector3(2f, 2f, 2f), new Quaternion(0.5f, 0.5f, 0.5f, 0.5f));
@@ -339,15 +341,14 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
 
         expect.that(entity.getPose()).isEqualTo(expectedPose);
         expect.that(entity.getScale()).isEqualTo(expectedScale);
     }
 
     @Test
-    @Ignore
     public void systemMovableFlagNotSet_doesNotUpdateEntityPoseAndScale() {
         AndroidXrEntity entity = (AndroidXrEntity) createTestEntity();
         MovableComponent movableComponent =
@@ -356,14 +357,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(entity.addComponent(movableComponent)).isTrue();
         Pose expectedPose = new Pose(new Vector3(1f, 1f, 1f), new Quaternion(0f, 0f, 0f, 1f));
         Vector3 expectedScale = new Vector3(1f, 1f, 1f);
@@ -379,15 +380,14 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
 
         expect.that(entity.getPose()).isEqualTo(expectedPose);
         expect.that(entity.getScale()).isEqualTo(expectedScale);
     }
 
     @Test
-    @Ignore
     public void setSizeOnMovableComponent_setsSizeOnNodeReformOptions() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -396,14 +396,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -415,7 +415,6 @@ public class MovableComponentImplTest {
     }
 
     @Test
-    @Ignore
     public void scaleWithDistanceOnMovableComponent_defaultsToDefaultMode() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -424,14 +423,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
 
         // Default value for scaleWithDistanceMode is DEFAULT.
@@ -443,7 +442,6 @@ public class MovableComponentImplTest {
     }
 
     @Test
-    @Ignore
     public void setScaleWithDistanceOnMovableComponent_setsScaleWithDistanceOnNodeReformOptions() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -452,14 +450,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
         assertThat(entity.addComponent(movableComponent)).isTrue();
 
@@ -472,7 +470,6 @@ public class MovableComponentImplTest {
     }
 
     @Test
-    @Ignore
     public void setPropertiesOnMovableComponentAttachLater_setsPropertiesOnNodeReformOptions() {
         AndroidXrEntity entity = (AndroidXrEntity) createTestEntity();
         MovableComponentImpl movableComponent =
@@ -481,19 +478,19 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         movableComponent.setSize(new Dimensions(2f, 2f, 2f));
         MoveEventListener mockMoveEventListener = mock(MoveEventListener.class);
         movableComponent.addMoveEventListener(directExecutor(), mockMoveEventListener);
-        assertThat(movableComponent.reformEventConsumer).isNotNull();
+        assertThat(movableComponent.mReformEventConsumer).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) entity.getNode();
 
@@ -502,11 +499,10 @@ public class MovableComponentImplTest {
         assertThat(node.getReformOptions().getCurrentSize().z).isEqualTo(2f);
         assertThat(node.getReformOptions().getEventCallback()).isNotNull();
         assertThat(node.getReformOptions().getEventExecutor()).isNotNull();
-        assertThat(entity.reformEventConsumerMap).isNotEmpty();
+        assertThat(entity.mReformEventConsumerMap).isNotEmpty();
     }
 
     @Test
-    @Ignore
     public void addMoveEventListener_onlyInvokedOnMoveEvent() {
         AndroidXrEntity entity = (AndroidXrEntity) createTestEntity();
         Vector3 initialTranslation = new Vector3(1f, 2f, 3f);
@@ -519,14 +515,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) entity.getNode();
@@ -535,23 +531,23 @@ public class MovableComponentImplTest {
         movableComponent.addMoveEventListener(directExecutor(), mockMoveEventListener);
         assertThat(node.getReformOptions().getEventCallback()).isNotNull();
         assertThat(node.getReformOptions().getEventExecutor()).isNotNull();
-        assertThat(entity.reformEventConsumerMap).isNotEmpty();
+        assertThat(entity.mReformEventConsumerMap).isNotEmpty();
 
         FakeReformEvent reformEvent = new FakeReformEvent();
         reformEvent.setType(ReformEvent.REFORM_TYPE_RESIZE);
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         verify(mockMoveEventListener, never()).onMoveEvent(any());
 
         reformEvent.setType(ReformEvent.REFORM_TYPE_MOVE);
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         ArgumentCaptor<MoveEvent> moveEventCaptor = ArgumentCaptor.forClass(MoveEvent.class);
         verify(mockMoveEventListener).onMoveEvent(moveEventCaptor.capture());
         MoveEvent moveEvent = moveEventCaptor.getValue();
@@ -560,7 +556,6 @@ public class MovableComponentImplTest {
     }
 
     @Test
-    @Ignore
     public void addMoveEventListenerWithExecutor_invokesListenerOnGivenExecutor() {
         Entity entity = createTestEntity();
         MovableComponent movableComponent =
@@ -569,14 +564,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -592,15 +587,14 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
         verify(mockMoveEventListener).onMoveEvent(any());
     }
 
     @Test
-    @Ignore
     public void addMoveEventListenerMultiple_invokesAllListeners() {
         Entity entity = createTestEntity();
         MovableComponentImpl movableComponent =
@@ -609,14 +603,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
         MoveEventListener mockMoveEventListener1 = mock(MoveEventListener.class);
@@ -630,8 +624,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -640,7 +634,6 @@ public class MovableComponentImplTest {
     }
 
     @Test
-    @Ignore
     public void removeMoveEventListenerMultiple_removesGivenListener() {
         Entity entity = createTestEntity();
         MovableComponentImpl movableComponent =
@@ -649,14 +642,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
         MoveEventListener mockMoveEventListener1 = mock(MoveEventListener.class);
@@ -670,7 +663,7 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        fakeExecutor.runAll();
+        mFakeExecutor.runAll();
         executorService.runAll();
 
         // Verify both listeners are invoked.
@@ -681,8 +674,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -692,7 +685,6 @@ public class MovableComponentImplTest {
     }
 
     @Test
-    @Ignore
     public void removeMovableComponent_clearsMoveReformOptionsAndMoveEventListeners() {
         Entity entity = createTestEntity();
         MovableComponentImpl movableComponent =
@@ -701,22 +693,22 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
         MoveEventListener mockMoveEventListener = mock(MoveEventListener.class);
 
         movableComponent.addMoveEventListener(directExecutor(), mockMoveEventListener);
-        assertThat(movableComponent.reformEventConsumer).isNotNull();
-        assertThat(((AndroidXrEntity) entity).reformEventConsumerMap).isNotEmpty();
+        assertThat(movableComponent.mReformEventConsumer).isNotNull();
+        assertThat(((AndroidXrEntity) entity).mReformEventConsumerMap).isNotEmpty();
 
         entity.removeComponent(movableComponent);
         assertThat(node.getReformOptions().getEnabledReform() & ReformOptions.ALLOW_MOVE)
@@ -726,12 +718,11 @@ public class MovableComponentImplTest {
                                 & (ReformOptions.FLAG_SCALE_WITH_DISTANCE
                                         | ReformOptions.FLAG_ALLOW_SYSTEM_MOVEMENT))
                 .isEqualTo(0);
-        assertThat(movableComponent.reformEventConsumer).isNull();
-        assertThat(((AndroidXrEntity) entity).reformEventConsumerMap).isEmpty();
+        assertThat(movableComponent.mReformEventConsumer).isNull();
+        assertThat(((AndroidXrEntity) entity).mReformEventConsumerMap).isEmpty();
     }
 
     @Test
-    @Ignore
     public void movableComponent_canAttachAgainAfterDetach() {
         Entity entity = createTestEntity();
         assertThat(entity).isNotNull();
@@ -741,14 +732,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         /* anchorPlacement= */ ImmutableSet.of(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         entity.removeComponent(movableComponent);
@@ -756,14 +747,13 @@ public class MovableComponentImplTest {
     }
 
     @Test
-    @Ignore
     public void anchorable_updatesThePoseBasedOnPlanes() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
                 new Pose(new Vector3(-1f, -1f, 0f), new Quaternion(0f, 0f, 0f, 1f)), 1f);
         Session session = Mockito.mock(Session.class);
         Plane plane = mock(Plane.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
 
         // Create a perception plane that is 2 units above the origin.
@@ -786,14 +776,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ false,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -816,8 +806,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -827,28 +817,27 @@ public class MovableComponentImplTest {
         // units
         // above it.
         Pose expectedPosition = new Pose(new Vector3(1f, 3f, 1f), new Quaternion(0f, 0f, 0f, 1f));
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isNull();
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isNull();
 
         // The panel shadow renderer should have no interaction.
-        verify(panelShadowRenderer, never()).updatePanelPose(any(), any(), any());
-        verify(panelShadowRenderer, never()).destroy();
-        verify(panelShadowRenderer, never()).hidePlane();
+        verify(mPanelShadowRenderer, never()).updatePanelPose(any(), any(), any());
+        verify(mPanelShadowRenderer, never()).destroy();
+        verify(mPanelShadowRenderer, never()).hidePlane();
 
         // The pose should have moved since the systemMovable is true.
         assertPose(entity.getPose(), expectedPosition);
     }
 
     @Test
-    @Ignore
     public void anchorable_nullParent_updatesThePoseBasedOnPlanes() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
                 new Pose(new Vector3(-1f, -1f, 0f), new Quaternion(0f, 0f, 0f, 1f)), 1f);
         Session session = Mockito.mock(Session.class);
         Plane plane = mock(Plane.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
 
         // Create a perception plane that is 2 units above the origin.
@@ -872,14 +861,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ false,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -902,8 +891,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -913,23 +902,22 @@ public class MovableComponentImplTest {
         // units
         // above it.
         Pose expectedPosition = new Pose(new Vector3(1f, 3f, 1f), new Quaternion(0f, 0f, 0f, 1f));
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isNull();
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isNull();
 
         // The pose should have moved since the systemMovable is true.
         assertPose(entity.getPose(), expectedPosition);
     }
 
     @Test
-    @Ignore
     public void anchorable_updatesPoseButDoesNotMove_ifNotSystemMovable() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
                 new Pose(new Vector3(-1f, -1f, 0f), new Quaternion(0f, 0f, 0f, 1f)), 1f);
         Session session = Mockito.mock(Session.class);
         Plane plane = mock(Plane.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
 
         // Create a perception plane that is 2 units above the origin.
@@ -952,14 +940,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -983,8 +971,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -995,27 +983,26 @@ public class MovableComponentImplTest {
         // above it.
         Pose expectedPosition = new Pose(new Vector3(1f, 3f, 1f), new Quaternion(0f, 0f, 0f, 1f));
 
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isNull();
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isNull();
 
         // The panel shadow renderer should have no interaction if it is not system movable.
-        verify(panelShadowRenderer, never()).updatePanelPose(any(), any(), any());
-        verify(panelShadowRenderer, never()).destroy();
-        verify(panelShadowRenderer, never()).hidePlane();
+        verify(mPanelShadowRenderer, never()).updatePanelPose(any(), any(), any());
+        verify(mPanelShadowRenderer, never()).destroy();
+        verify(mPanelShadowRenderer, never()).hidePlane();
 
         // The pose should not have moved since the systemMovable is false.
         assertPose(entity.getPose(), Pose.Identity);
     }
 
     @Test
-    @Ignore
     public void anchorable_withNonActivityParent_updatesPoseBasedOnPlanesAndParent() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
                 new Pose(new Vector3(-1f, -1f, 0f), new Quaternion(0f, 0f, 0f, 1f)), 1f);
         Session session = Mockito.mock(Session.class);
         Plane plane = mock(Plane.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
 
         // Create a perception plane that is 2 units above the origin.
@@ -1042,14 +1029,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -1073,8 +1060,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -1086,23 +1073,22 @@ public class MovableComponentImplTest {
         // should
         // be 4 units above the parent.
         Pose expectedPosition = new Pose(new Vector3(1f, 4f, 1f), new Quaternion(0f, 0f, 0f, 1f));
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isNull();
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isNull();
 
         // The pose should have moved since the systemMovable is true.
         assertPose(entity.getPose(), expectedPosition);
     }
 
     @Test
-    @Ignore
     public void anchorableAndScaledParent_updatesThePoseBasedOnPlanes() {
         // Set the activity space pose to be 1 unit to the left of the origin. with a scale of 2.
         setActivitySpacePose(
                 new Pose(new Vector3(-1f, -1f, 0f), new Quaternion(0f, 0f, 0f, 1f)), 2f);
         Session session = Mockito.mock(Session.class);
         Plane plane = mock(Plane.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
 
         // Create a perception plane that is 2 units above the origin.
@@ -1125,14 +1111,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -1156,8 +1142,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -1167,13 +1153,12 @@ public class MovableComponentImplTest {
         // units above it and the activity space is scaled by 2.
         Pose expectedPosition =
                 new Pose(new Vector3(.5f, 1.5f, .5f), new Quaternion(0f, 0f, 0f, 1f));
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isNull();
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isNull();
     }
 
     @Test
-    @Ignore
     public void anchorable_withinAnchorDistance_setsAnchorEntity() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -1182,7 +1167,7 @@ public class MovableComponentImplTest {
         Plane plane = mock(Plane.class);
         Anchor anchor = mock(Anchor.class);
         IBinder sharedAnchorToken = Mockito.mock(IBinder.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
         when(plane.createAnchor(any(), any())).thenReturn(anchor);
         when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
@@ -1207,14 +1192,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -1239,8 +1224,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -1253,15 +1238,14 @@ public class MovableComponentImplTest {
         Pose expectedPosition =
                 new Pose(new Vector3(0f, 0f, 1f), new Quaternion(-0.707f, 0f, 0f, 0.707f));
 
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         // Check that the anchor entity was set.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(entity.getParent());
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(entity.getParent());
     }
 
     @Test
-    @Ignore
     public void anchorable_withinAnchorDistanceAboveAnchor_resetsPose() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -1270,7 +1254,7 @@ public class MovableComponentImplTest {
         Plane plane = mock(Plane.class);
         Anchor anchor = mock(Anchor.class);
         IBinder sharedAnchorToken = Mockito.mock(IBinder.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
         when(plane.createAnchor(any(), any())).thenReturn(anchor);
         when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
@@ -1295,14 +1279,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -1329,8 +1313,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -1343,15 +1327,14 @@ public class MovableComponentImplTest {
         Pose expectedPosition =
                 new Pose(new Vector3(0f, 0f, 1f), new Quaternion(-0.707f, 0f, 0f, 0.707f));
 
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         // Check that the anchor entity was set.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(entity.getParent());
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(entity.getParent());
     }
 
     @Test
-    @Ignore
     public void anchorable_withIncorrectPlaneType_doesNotCreateAnchor() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -1360,7 +1343,7 @@ public class MovableComponentImplTest {
         Plane plane = mock(Plane.class);
         Anchor anchor = mock(Anchor.class);
         IBinder sharedAnchorToken = Mockito.mock(IBinder.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
         when(plane.createAnchor(any(), any())).thenReturn(anchor);
         when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
@@ -1379,7 +1362,7 @@ public class MovableComponentImplTest {
 
         // Set the anchor placement to be a table.
         AnchorPlacement anchorPlacement =
-                fakeRuntime.createAnchorPlacementForPlanes(
+                mFakeRuntime.createAnchorPlacementForPlanes(
                         ImmutableSet.of(PlaneType.ANY), ImmutableSet.of(PlaneSemantic.TABLE));
         ImmutableSet<AnchorPlacement> anchorPlacementSet = ImmutableSet.of(anchorPlacement);
 
@@ -1391,14 +1374,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         anchorPlacementSet,
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -1423,8 +1406,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -1435,14 +1418,13 @@ public class MovableComponentImplTest {
         // above it. However, since the plane is not a table plane, the anchor should not be
         // created.
         Pose expectedPosition = new Pose(new Vector3(1f, 3f, 1f), new Quaternion(0f, 0f, 0f, 1f));
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         // Check that the anchor entity was not set.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isNull();
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isNull();
     }
 
     @Test
-    @Ignore
     public void anchorable_withinAnchorDistanceAndScale_setsAnchorEntityAndScales() {
         // Set the activity space pose to be 1 unit to the left of the OpenXR origin and add a scale
         // of
@@ -1454,7 +1436,7 @@ public class MovableComponentImplTest {
         Plane plane = mock(Plane.class);
         Anchor anchor = mock(Anchor.class);
         IBinder sharedAnchorToken = Mockito.mock(IBinder.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
         when(plane.createAnchor(any(), any())).thenReturn(anchor);
         when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
@@ -1481,14 +1463,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -1513,8 +1495,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -1527,22 +1509,21 @@ public class MovableComponentImplTest {
         Pose expectedPosition =
                 new Pose(new Vector3(0f, 0f, 1f), new Quaternion(-0.707f, 0f, 0f, 0.707f));
 
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         // Check that the anchor entity was set.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(entity.getParent());
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(entity.getParent());
         assertVector3(entity.getWorldSpaceScale(), entityScale.times(activityScale));
     }
 
     @Test
-    @Ignore
     public void anchorable_noPlanes_keepsProposedPose() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
                 new Pose(new Vector3(-1f, -1f, 0f), new Quaternion(0f, 0f, 0f, 1f)), 1f);
         Session session = Mockito.mock(Session.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of());
 
         PanelEntity entity = createTestPanelEntity();
@@ -1553,14 +1534,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -1581,26 +1562,25 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
         // The expected position should be unchanged from the proposed event
         Pose expectedPosition = new Pose(new Vector3(1f, 1f, 1f), new Quaternion(0f, 0f, 0f, 1f));
 
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
-        assertThat(moveEventListener.callCount).isEqualTo(1);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
     }
 
     @Test
-    @Ignore
     public void anchorable_noPlaneData_keepsProposedPose() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
                 new Pose(new Vector3(-1f, -1f, 0f), new Quaternion(0f, 0f, 0f, 1f)), 1f);
         Session session = Mockito.mock(Session.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         Plane plane = mock(Plane.class);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
         when(plane.getData(any())).thenReturn(null);
@@ -1613,14 +1593,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -1641,27 +1621,26 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
         // The expected position should be unchanged from the proposed event
         Pose expectedPosition = new Pose(new Vector3(1f, 1f, 1f), new Quaternion(0f, 0f, 0f, 1f));
 
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertThat(moveEventListener.callCount).isEqualTo(1);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
     }
 
     @Test
-    @Ignore
     public void anchorable_outsideExtents_keepsProposedPose() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
                 new Pose(new Vector3(-1f, -1f, 0f), new Quaternion(0f, 0f, 0f, 1f)), 1f);
         Session session = Mockito.mock(Session.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         Plane plane = mock(Plane.class);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
 
@@ -1685,14 +1664,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -1713,21 +1692,20 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
         // The expected position should be unchanged from the proposed event
         Pose expectedPosition = new Pose(new Vector3(1f, 1f, 1f), new Quaternion(0f, 0f, 0f, 1f));
 
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertThat(moveEventListener.callCount).isEqualTo(1);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
     }
 
     @Test
-    @Ignore
     public void anchorable_resetsToActivityPoseAfterAnchoring() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -1736,7 +1714,7 @@ public class MovableComponentImplTest {
         Plane plane = mock(Plane.class);
         Anchor anchor = mock(Anchor.class);
         IBinder sharedAnchorToken = Mockito.mock(IBinder.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
         when(plane.createAnchor(any(), any())).thenReturn(anchor);
         when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
@@ -1761,14 +1739,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -1793,8 +1771,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -1807,11 +1785,11 @@ public class MovableComponentImplTest {
         Pose expectedPosition =
                 new Pose(new Vector3(0f, 0f, 1f), new Quaternion(-0.707f, 0f, 0f, 0.707f));
 
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         // Check that the anchor entity was set.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(entity.getParent());
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(entity.getParent());
 
         // Put the proposed position at 4 above the origin so it would be off the plane. It should
         // reset to the activity space pose and rotation.
@@ -1821,8 +1799,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -1831,16 +1809,15 @@ public class MovableComponentImplTest {
         // anchor and it should be reparented to the activity space.
         expectedPosition = new Pose(new Vector3(1f, 4f, 1f), new Quaternion(0f, 0f, 0f, 1f));
 
-        assertThat(moveEventListener.callCount).isEqualTo(2);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(2);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         assertPose(entity.getPose(), expectedPosition);
         // Check that parent was updated to the activity space.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(activitySpaceImpl);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(entity.getParent());
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(mActivitySpaceImpl);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(entity.getParent());
     }
 
     @Test
-    @Ignore
     public void anchorable_resetsAndScaleToActivityPoseAfterAnchoring() {
         // Set the activity space pose to be 1 unit to the left of the OpenXR origin and add a scale
         // of
@@ -1852,7 +1829,7 @@ public class MovableComponentImplTest {
         Plane plane = mock(Plane.class);
         Anchor anchor = mock(Anchor.class);
         IBinder sharedAnchorToken = Mockito.mock(IBinder.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
         when(plane.createAnchor(any(), any())).thenReturn(anchor);
         when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
@@ -1879,14 +1856,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -1911,8 +1888,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -1925,13 +1902,13 @@ public class MovableComponentImplTest {
         Pose expectedPosition =
                 new Pose(new Vector3(0f, 0f, 1f), new Quaternion(-0.707f, 0f, 0f, 0.707f));
 
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         assertPose(entity.getPose(), expectedPosition);
         assertVector3(entity.getScale(), entityScale.times(activityScale));
         // Check that the anchor entity was set.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(entity.getParent());
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(entity.getParent());
         assertVector3(entity.getWorldSpaceScale(), entityScale.times(activityScale));
 
         // Put the proposed position at 4 above the activity space so it would be off the plane. It
@@ -1942,8 +1919,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -1952,18 +1929,17 @@ public class MovableComponentImplTest {
         // anchor and it should be reparented to the activity space.
         expectedPosition = new Pose(new Vector3(1f, 4f, 1f), new Quaternion(0f, 0f, 0f, 1f));
 
-        assertThat(moveEventListener.callCount).isEqualTo(2);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(2);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         assertPose(entity.getPose(), expectedPosition);
         // Check that parent was updated to the activity space.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(activitySpaceImpl);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(entity.getParent());
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(mActivitySpaceImpl);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(entity.getParent());
         // Check that the scale was updated to the original scale.
         assertVector3(entity.getScale(), entityScale);
     }
 
     @Test
-    @Ignore
     public void anchorableChildOfEntity_resetsToActivityPoseAfterAnchoring() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -1972,7 +1948,7 @@ public class MovableComponentImplTest {
         Plane plane = mock(Plane.class);
         Anchor anchor = mock(Anchor.class);
         IBinder sharedAnchorToken = Mockito.mock(IBinder.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
         when(plane.createAnchor(any(), any())).thenReturn(anchor);
         when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
@@ -2002,14 +1978,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -2035,8 +2011,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -2049,11 +2025,11 @@ public class MovableComponentImplTest {
         Pose expectedPosition =
                 new Pose(new Vector3(0f, 0f, 1f), new Quaternion(-0.707f, 0f, 0f, 0.707f));
 
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         // Check that the anchor entity was set.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(entity.getParent());
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(entity.getParent());
 
         // Put the proposed position at 4 above the origin so it would be off the plane. It should
         // reset to the activity space pose and rotation.
@@ -2063,8 +2039,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -2073,16 +2049,15 @@ public class MovableComponentImplTest {
         // anchor and it should be reparented to the activity space not the original parent..
         expectedPosition = new Pose(new Vector3(1f, 4f, 1f), new Quaternion(0f, 0f, 0f, 1f));
 
-        assertThat(moveEventListener.callCount).isEqualTo(2);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(2);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         assertPose(entity.getPose(), expectedPosition);
         // Check that parent was updated to the activity space.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(activitySpaceImpl);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(entity.getParent());
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(mActivitySpaceImpl);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(entity.getParent());
     }
 
     @Test
-    @Ignore
     public void anchorable_shouldDispose_disposesAnchorAfterUnparenting() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -2091,7 +2066,7 @@ public class MovableComponentImplTest {
         Plane plane = mock(Plane.class);
         Anchor anchor = mock(Anchor.class);
         IBinder sharedAnchorToken = Mockito.mock(IBinder.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
         when(plane.createAnchor(any(), any())).thenReturn(anchor);
         when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
@@ -2116,14 +2091,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ true,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -2148,8 +2123,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -2162,13 +2137,13 @@ public class MovableComponentImplTest {
         Pose expectedPosition =
                 new Pose(new Vector3(0f, 0f, 1f), new Quaternion(-0.707f, 0f, 0f, 0.707f));
 
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         // Check that the anchor entity was set.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(entity.getParent());
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(entity.getParent());
         // Cache the anchor entity.
-        Entity anchorEntity = moveEventListener.lastMoveEvent.updatedParent;
+        Entity anchorEntity = moveEventListener.mLastMoveEvent.updatedParent;
 
         // Put the proposed position at 4 above the origin so it would be off the plane. It should
         // reset to the activity space pose and rotation.
@@ -2178,8 +2153,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -2188,20 +2163,19 @@ public class MovableComponentImplTest {
         // anchor and it should be reparented to the activity space.
         expectedPosition = new Pose(new Vector3(1f, 4f, 1f), new Quaternion(0f, 0f, 0f, 1f));
 
-        assertThat(moveEventListener.callCount).isEqualTo(2);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(2);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         // Check that the anchor entity was set.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(activitySpaceImpl);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(entity.getParent());
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(mActivitySpaceImpl);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(entity.getParent());
 
         // Verify that the anchor entity was disposed by checking that it is no longer in the entity
         // manager.
-        assertThat(entityManager.getEntityForNode(((AndroidXrEntity) anchorEntity).getNode()))
+        assertThat(mEntityManager.getEntityForNode(((AndroidXrEntity) anchorEntity).getNode()))
                 .isNull();
     }
 
     @Test
-    @Ignore
     public void anchorable_shouldDispose_doeNotDisposeIfAnchorHasChildren() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
@@ -2210,7 +2184,7 @@ public class MovableComponentImplTest {
         Plane plane = mock(Plane.class);
         Anchor anchor = mock(Anchor.class);
         IBinder sharedAnchorToken = Mockito.mock(IBinder.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
         when(plane.createAnchor(any(), any())).thenReturn(anchor);
         when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
@@ -2235,14 +2209,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ true,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ true,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -2267,8 +2241,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -2281,13 +2255,13 @@ public class MovableComponentImplTest {
         Pose expectedPosition =
                 new Pose(new Vector3(0f, 0f, 1f), new Quaternion(-0.707f, 0f, 0f, 0.707f));
 
-        assertThat(moveEventListener.callCount).isEqualTo(1);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(1);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         // Check that the anchor entity was set.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(entity.getParent());
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isInstanceOf(AnchorEntity.class);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(entity.getParent());
         // Cache the anchor entity.
-        Entity anchorEntity = moveEventListener.lastMoveEvent.updatedParent;
+        Entity anchorEntity = moveEventListener.mLastMoveEvent.updatedParent;
 
         Entity child = createTestEntity();
         anchorEntity.addChild(child);
@@ -2300,8 +2274,8 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
         assertThat(executorService.hasNext()).isTrue();
         executorService.runAll();
 
@@ -2310,27 +2284,26 @@ public class MovableComponentImplTest {
         // anchor and it should be reparented to the activity space.
         expectedPosition = new Pose(new Vector3(1f, 4f, 1f), new Quaternion(0f, 0f, 0f, 1f));
 
-        assertThat(moveEventListener.callCount).isEqualTo(2);
-        assertPose(moveEventListener.lastMoveEvent.currentPose, expectedPosition);
+        assertThat(moveEventListener.mCallCount).isEqualTo(2);
+        assertPose(moveEventListener.mLastMoveEvent.currentPose, expectedPosition);
         // Check that the anchor entity was set.
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(activitySpaceImpl);
-        assertThat(moveEventListener.lastMoveEvent.updatedParent).isEqualTo(entity.getParent());
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(mActivitySpaceImpl);
+        assertThat(moveEventListener.mLastMoveEvent.updatedParent).isEqualTo(entity.getParent());
 
         // Verify that the anchor entity wasn't disposed by checking that it is in the entity
         // manager.
-        assertThat(entityManager.getEntityForNode(((AndroidXrEntity) anchorEntity).getNode()))
+        assertThat(mEntityManager.getEntityForNode(((AndroidXrEntity) anchorEntity).getNode()))
                 .isEqualTo(anchorEntity);
     }
 
     @Test
-    @Ignore
     public void anchorablePanelEntity_nearPlane_rendersShadow() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
                 new Pose(new Vector3(-1f, -1f, 0f), new Quaternion(0f, 0f, 0f, 1f)), 1f);
         Session session = Mockito.mock(Session.class);
         Plane plane = mock(Plane.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
 
         // Create a perception plane that is 2 units above the origin.
@@ -2353,14 +2326,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ false,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -2375,11 +2348,11 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
 
         // Since it is by the plane a call should be made to the panel shadow renderer.
-        verify(panelShadowRenderer)
+        verify(mPanelShadowRenderer)
                 .updatePanelPose(
                         new Pose(new Vector3(0f, 2f, 1f), new Quaternion(0f, 0f, 0f, 1f)),
                         RuntimeUtils.fromPerceptionPose(perceptionPose),
@@ -2387,14 +2360,13 @@ public class MovableComponentImplTest {
     }
 
     @Test
-    @Ignore
     public void anchorablePanelEntity_awayFromPlane_hidesShadow() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
                 new Pose(new Vector3(-1f, -1f, 0f), new Quaternion(0f, 0f, 0f, 1f)), 1f);
         Session session = Mockito.mock(Session.class);
         Plane plane = mock(Plane.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
 
         // Create a perception plane that is 2 units above the origin.
@@ -2417,14 +2389,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ false,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -2438,22 +2410,21 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
 
         // Since it is by the plane a call should be made to the panel shadow renderer.
-        verify(panelShadowRenderer).hidePlane();
+        verify(mPanelShadowRenderer).hidePlane();
     }
 
     @Test
-    @Ignore
     public void anchorablePanelEntity_endMovement_callsDestroy() {
         // Set the activity space pose to be 1 unit to the left of the origin.
         setActivitySpacePose(
                 new Pose(new Vector3(-1f, -1f, 0f), new Quaternion(0f, 0f, 0f, 1f)), 1f);
         Session session = Mockito.mock(Session.class);
         Plane plane = mock(Plane.class);
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(session);
         when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
 
         // Create a perception plane that is 2 units above the origin.
@@ -2476,14 +2447,14 @@ public class MovableComponentImplTest {
                         /* scaleInZ= */ false,
                         createAnyAnchorPlacement(),
                         /* shouldDisposeParentAnchor= */ false,
-                        perceptionLibrary,
-                        fakeExtensions,
-                        activitySpaceImpl,
-                        activitySpaceRoot,
-                        perceptionSpaceActivityPose,
-                        entityManager,
-                        panelShadowRenderer,
-                        fakeExecutor);
+                        mPerceptionLibrary,
+                        mFakeExtensions,
+                        mActivitySpaceImpl,
+                        mActivitySpaceRoot,
+                        mPerceptionSpaceActivityPose,
+                        mEntityManager,
+                        mPanelShadowRenderer,
+                        mFakeExecutor);
         assertThat(movableComponent).isNotNull();
         assertThat(entity.addComponent(movableComponent)).isTrue();
         FakeNode node = (FakeNode) ((AndroidXrEntity) entity).getNode();
@@ -2497,21 +2468,21 @@ public class MovableComponentImplTest {
         node.getReformOptions()
                 .getEventExecutor()
                 .execute(() -> node.getReformOptions().getEventCallback().accept(reformEvent));
-        assertThat(fakeExecutor.hasNext()).isTrue();
-        fakeExecutor.runAll();
+        assertThat(mFakeExecutor.hasNext()).isTrue();
+        mFakeExecutor.runAll();
 
         // Since it is by the plane a call should be made to the panel shadow renderer.
-        verify(panelShadowRenderer).destroy();
+        verify(mPanelShadowRenderer).destroy();
     }
 
     static class TestMoveEventListener implements MoveEventListener {
-        int callCount = 0;
-        MoveEvent lastMoveEvent = null;
+        int mCallCount = 0;
+        MoveEvent mLastMoveEvent = null;
 
         @Override
         public void onMoveEvent(MoveEvent event) {
-            lastMoveEvent = event;
-            callCount++;
+            mLastMoveEvent = event;
+            mCallCount++;
         }
     }
 }

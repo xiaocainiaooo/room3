@@ -46,13 +46,13 @@ final class ActivitySpaceImpl extends SystemSpaceEntityImpl implements ActivityS
 
     private static final String TAG = "ActivitySpaceImpl";
 
-    private final Set<OnBoundsChangedListener> boundsListeners =
+    private final Set<OnBoundsChangedListener> mBoundsListeners =
             Collections.synchronizedSet(new HashSet<>());
 
-    private final Supplier<SpatialState> spatialStateProvider;
-    private final AtomicReference<Dimensions> bounds = new AtomicReference<>();
+    private final Supplier<SpatialState> mSpatialStateProvider;
+    private final AtomicReference<Dimensions> mBounds = new AtomicReference<>();
 
-    public ActivitySpaceImpl(
+    ActivitySpaceImpl(
             Node taskNode,
             XrExtensions extensions,
             EntityManager entityManager,
@@ -60,7 +60,7 @@ final class ActivitySpaceImpl extends SystemSpaceEntityImpl implements ActivityS
             ScheduledExecutorService executor) {
         super(taskNode, extensions, entityManager, executor);
 
-        this.spatialStateProvider = spatialStateProvider;
+        mSpatialStateProvider = spatialStateProvider;
     }
 
     /** Returns the identity pose since this entity defines the origin of the activity space. */
@@ -104,10 +104,10 @@ final class ActivitySpaceImpl extends SystemSpaceEntityImpl implements ActivityS
         // The bounds are kept in sync with the Extensions in the onBoundsChangedEvent callback. We
         // only
         // invoke getSpatialState if they've never been set.
-        return bounds.updateAndGet(
+        return mBounds.updateAndGet(
                 oldBounds -> {
                     if (oldBounds == null) {
-                        Bounds bounds = spatialStateProvider.get().getBounds();
+                        Bounds bounds = mSpatialStateProvider.get().getBounds();
                         return new Dimensions(bounds.width, bounds.height, bounds.depth);
                     }
                     return oldBounds;
@@ -116,12 +116,12 @@ final class ActivitySpaceImpl extends SystemSpaceEntityImpl implements ActivityS
 
     @Override
     public void addOnBoundsChangedListener(@NonNull OnBoundsChangedListener listener) {
-        this.boundsListeners.add(listener);
+        mBoundsListeners.add(listener);
     }
 
     @Override
     public void removeOnBoundsChangedListener(@NonNull OnBoundsChangedListener listener) {
-        this.boundsListeners.remove(listener);
+        mBoundsListeners.remove(listener);
     }
 
     /**
@@ -133,10 +133,10 @@ final class ActivitySpaceImpl extends SystemSpaceEntityImpl implements ActivityS
      */
     public void onBoundsChanged(Bounds newBounds) {
         Dimensions newDimensions =
-                bounds.updateAndGet(
+                mBounds.updateAndGet(
                         oldBounds ->
                                 new Dimensions(newBounds.width, newBounds.height, newBounds.depth));
-        for (OnBoundsChangedListener listener : boundsListeners) {
+        for (OnBoundsChangedListener listener : mBoundsListeners) {
             listener.onBoundsChanged(newDimensions);
         }
     }

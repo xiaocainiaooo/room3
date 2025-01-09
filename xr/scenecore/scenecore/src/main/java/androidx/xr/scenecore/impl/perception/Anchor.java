@@ -35,32 +35,32 @@ public class Anchor {
      * anchorId is an ID used as a reference to this anchor. It is equal to the XrSpace handle for
      * anchor in the OpenXR session managed by the perception library.
      */
-    private final long anchorId;
+    private final long mAnchorId;
 
     /**
      * anchorToken is a Binder reference of the anchor, it can be used to import the anchor by an
      * OpenXR session.
      */
-    private final IBinder anchorToken;
+    private final IBinder mAnchorToken;
 
     /* UUID of the anchor.*/
-    private UUID uuid;
+    private UUID mUuid;
 
     public Anchor(long anchorId, @NonNull IBinder anchorToken) {
-        this.anchorId = anchorId;
-        this.anchorToken = anchorToken;
-        this.uuid = null;
+        mAnchorId = anchorId;
+        mAnchorToken = anchorToken;
+        mUuid = null;
     }
 
     Anchor(AnchorData anchorData) {
-        this.anchorToken = anchorData.anchorToken;
-        this.anchorId = anchorData.anchorId;
-        this.uuid = null;
+        mAnchorToken = anchorData.mAnchorToken;
+        mAnchorId = anchorData.mAnchorId;
+        mUuid = null;
     }
 
     /** Returns the anchorId(native pointer) of the anchor. */
     public long getAnchorId() {
-        return anchorId;
+        return mAnchorId;
     }
 
     /**
@@ -69,7 +69,7 @@ public class Anchor {
      */
     @NonNull
     public IBinder getAnchorToken() {
-        return anchorToken;
+        return mAnchorToken;
     }
 
     /**
@@ -77,7 +77,7 @@ public class Anchor {
      * untracked.
      */
     public boolean detach() {
-        return detachAnchor(anchorId);
+        return detachAnchor(mAnchorId);
     }
 
     /**
@@ -90,15 +90,15 @@ public class Anchor {
      */
     @Nullable
     public UUID persist() {
-        byte[] uuidBytes = persistAnchor(anchorId);
+        byte[] uuidBytes = persistAnchor(mAnchorId);
         if (uuidBytes == null) {
             return null;
         }
         ByteBuffer byteBuffer = ByteBuffer.wrap(uuidBytes);
         long high = byteBuffer.getLong();
         long low = byteBuffer.getLong();
-        this.uuid = new UUID(high, low);
-        return this.uuid;
+        mUuid = new UUID(high, low);
+        return mUuid;
     }
 
     private native boolean detachAnchor(long anchorId);
@@ -114,11 +114,11 @@ public class Anchor {
      */
     @NonNull
     public PersistState getPersistState() {
-        if (uuid == null) {
+        if (mUuid == null) {
             return PersistState.PERSIST_NOT_REQUESTED;
         }
         PersistState state =
-                getPersistState(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
+                getPersistState(mUuid.getMostSignificantBits(), mUuid.getLeastSignificantBits());
         if (state == null) {
             return PersistState.NOT_VALID;
         }
@@ -137,7 +137,7 @@ public class Anchor {
 
     /** Data returned from native OpenXR layer when creating an anchor. */
     static class AnchorData {
-        long anchorId;
-        IBinder anchorToken;
+        long mAnchorId;
+        IBinder mAnchorToken;
     }
 }
