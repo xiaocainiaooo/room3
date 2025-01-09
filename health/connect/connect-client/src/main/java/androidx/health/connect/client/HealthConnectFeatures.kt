@@ -53,6 +53,7 @@ interface HealthConnectFeatures {
         @RestrictTo(RestrictTo.Scope.LIBRARY) const val FEATURE_MINDFULNESS_SESSION = 5
 
         /** Feature constant for Personal Health Records (PHR) APIs. */
+        // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
         @RestrictTo(RestrictTo.Scope.LIBRARY) const val FEATURE_PERSONAL_HEALTH_RECORD = 100
 
         @Retention(AnnotationRetention.SOURCE)

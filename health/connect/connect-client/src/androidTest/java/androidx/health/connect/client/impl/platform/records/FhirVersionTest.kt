@@ -35,6 +35,42 @@ import org.junit.runner.RunWith
 @SmallTest
 class FhirVersionTest {
     @Test
+    fun compareTo_sameVersion_returnsZero() {
+        val version1 = FhirVersion(1, 0, 0)
+        val version2 = FhirVersion(1, 0, 0)
+
+        assertThat(version1.compareTo(version2)).isEqualTo(0)
+        assertThat(version2.compareTo(version1)).isEqualTo(0)
+    }
+
+    @Test
+    fun compareTo_differentMajor_returnsCorrectValue() {
+        val version1 = FhirVersion(2, 0, 0)
+        val version2 = FhirVersion(1, 0, 0)
+
+        assertThat(version1.compareTo(version2)).isGreaterThan(0)
+        assertThat(version2.compareTo(version1)).isLessThan(0)
+    }
+
+    @Test
+    fun compareTo_differentMinor_returnsCorrectValue() {
+        val version1 = FhirVersion(1, 1, 0)
+        val version2 = FhirVersion(1, 0, 0)
+
+        assertThat(version1.compareTo(version2)).isGreaterThan(0)
+        assertThat(version2.compareTo(version1)).isLessThan(0)
+    }
+
+    @Test
+    fun compareTo_differentPatch_returnsCorrectValue() {
+        val version1 = FhirVersion(1, 0, 1)
+        val version2 = FhirVersion(1, 0, 0)
+
+        assertThat(version1.compareTo(version2)).isGreaterThan(0)
+        assertThat(version2.compareTo(version1)).isLessThan(0)
+    }
+
+    @Test
     fun validFhirVersion_equals() {
         val fhirVersion1 = FhirVersion(major = 1, minor = 2, patch = 3)
         val fhirVersion2 = FhirVersion(major = 1, minor = 2, patch = 3)
@@ -69,7 +105,7 @@ class FhirVersionTest {
 
     @OptIn(ExperimentalFeatureAvailabilityApi::class)
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.UPSIDE_DOWN_CAKE, codeName = "Baklava")
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.UPSIDE_DOWN_CAKE, codeName = "UpsideDownCake")
     fun isSupportedVersion_notSupportedVersion_expectFalse() {
         assumeTrue(
             HealthConnectFeaturesPlatformImpl.getFeatureStatus(

@@ -17,7 +17,7 @@ package androidx.health.connect.client.records
 
 import android.annotation.SuppressLint
 import androidx.annotation.RestrictTo
-import androidx.health.connect.client.feature.requireFeaturePersonalHealthRecordAvailable
+import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.impl.platform.records.toPlatformFhirVersion
 
 /**
@@ -26,10 +26,25 @@ import androidx.health.connect.client.impl.platform.records.toPlatformFhirVersio
  * Healthcare Interoperability Resources (FHIR) standard. "label", which represents a 'working'
  * version, is not supported for now.
  *
- * The versions R4 (4.0.1) and R4B (4.3.0) are supported in Health Connect.
+ * The versions R4 (4.0.1) and R4B (4.3.0) are supported in Health Connect. Use
+ * [isSupportedFhirVersion] to check whether a FHIR version is supported.
  */
+// TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-class FhirVersion(val major: Int, val minor: Int, val patch: Int) {
+class FhirVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<FhirVersion> {
+    override fun compareTo(other: FhirVersion): Int {
+        if (major != other.major) {
+            return if (major > other.major) 1 else -1
+        }
+        if (minor != other.minor) {
+            return if (minor > other.minor) 1 else -1
+        }
+        if (patch != other.patch) {
+            return if (patch > other.patch) 1 else -1
+        }
+        return 0
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is FhirVersion) return false
@@ -57,10 +72,15 @@ class FhirVersion(val major: Int, val minor: Int, val patch: Int) {
         return "${this.javaClass.simpleName}: ${toFhirVersionString()}"
     }
 
-    /** Returns `true` if this [FhirVersion] is supported, `false` otherwise. */
+    /**
+     * Returns `true` if this [FhirVersion] is supported, `false` otherwise.
+     *
+     * This method is dependent on the version of HealthConnect installed on the device. To check if
+     * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
+     * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     */
     @SuppressLint("NewApi") // checked by `getFeatureStatus()`
     fun isSupportedFhirVersion(): Boolean {
-        requireFeaturePersonalHealthRecordAvailable()
         return toPlatformFhirVersion().isSupportedFhirVersion
     }
 
