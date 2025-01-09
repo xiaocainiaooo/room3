@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,34 @@
 
 package androidx.camera.core.impl.utils
 
+import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.testutils.MainDispatcherRule
+import com.google.common.truth.Truth.assertThat
+import com.google.common.util.concurrent.MoreExecutors
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertThrows
+import org.junit.Assert
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
-import org.mockito.Mockito.verifyZeroInteractions
+import org.mockito.Mockito.verifyNoMoreInteractions
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.internal.DoNotInstrument
 
-@RunWith(JUnit4::class)
+@RunWith(RobolectricTestRunner::class)
+@DoNotInstrument
+@Config(minSdk = Build.VERSION_CODES.LOLLIPOP)
 class LiveDataUtilTest {
+    @get:Rule
+    val dispatcherRule = MainDispatcherRule(MoreExecutors.directExecutor().asCoroutineDispatcher())
+
     private lateinit var sourceLiveData: MutableLiveData<Int>
     private lateinit var redirectableLiveData: RedirectableLiveData<Int>
 
@@ -47,7 +59,7 @@ class LiveDataUtilTest {
             sourceLiveData.value = 5
             val mappedLiveData = LiveDataUtil.map(sourceLiveData) { it * 2 }
 
-            assertEquals(10, mappedLiveData.value)
+            assertThat(mappedLiveData.value).isEqualTo(10)
         }
 
     @Test
@@ -67,7 +79,7 @@ class LiveDataUtilTest {
 
     @Test
     fun redirectableLiveData_initialValue_isReturnedBeforeRedirection() =
-        runBlocking(Dispatchers.Main) { assertEquals(0, redirectableLiveData.value) }
+        runBlocking(Dispatchers.Main) { assertThat(redirectableLiveData.value).isEqualTo(0) }
 
     @Test
     fun redirectableLiveData_reflectsSourceValueAfterRedirection() =
@@ -75,7 +87,7 @@ class LiveDataUtilTest {
             sourceLiveData.value = 5
             redirectableLiveData.redirectTo(sourceLiveData)
 
-            assertEquals(5, redirectableLiveData.value)
+            assertThat(redirectableLiveData.value).isEqualTo(5)
         }
 
     @Test
@@ -94,19 +106,23 @@ class LiveDataUtilTest {
         }
 
     @Test
-    fun redirectableLiveData_withMapping_returnsMappedValueWithoutObservers() =
+    fun mappingRedirectableLiveData_returnsMappedValueWithoutObservers() =
         runBlocking(Dispatchers.Main) {
             sourceLiveData.value = 5
-            redirectableLiveData.redirectToWithMapping(sourceLiveData) { it * 2 }
+            val redirectableLiveData =
+                MappingRedirectableLiveData<Int, Int>(0) { it * 2 }
+                    .apply { redirectTo(sourceLiveData) }
 
-            assertEquals(10, redirectableLiveData.value)
+            assertThat(redirectableLiveData.value).isEqualTo(10)
         }
 
     @Test
-    fun redirectableLiveData_withMapping_propagatesMappedChangesToObservers() =
+    fun mappingRedirectableLiveData_propagatesMappedChangesToObservers() =
         runBlocking(Dispatchers.Main) {
             sourceLiveData.value = 5
-            redirectableLiveData.redirectToWithMapping(sourceLiveData) { it * 2 }
+            val redirectableLiveData =
+                MappingRedirectableLiveData<Int, Int>(0) { it * 2 }
+                    .apply { redirectTo(sourceLiveData) }
 
             @Suppress("UNCHECKED_CAST") val observer = mock(Observer::class.java) as Observer<Int>
             redirectableLiveData.observeForever(observer)
@@ -123,38 +139,41 @@ class LiveDataUtilTest {
             sourceLiveData.value = 5
             redirectableLiveData.redirectTo(sourceLiveData)
 
-            assertEquals(5, redirectableLiveData.value)
+            assertThat(redirectableLiveData.value).isEqualTo(5)
 
             sourceLiveData.value = 10
 
-            assertEquals(10, redirectableLiveData.value)
+            assertThat(redirectableLiveData.value).isEqualTo(10)
         }
 
     @Test
-    fun redirectableLiveData_getValueReflectsLatestSourceValueWithMappingEvenWithoutObservers() =
+    fun mappingRedirectableLiveData_getValueReflectsLatestSourceValueEvenWithoutObservers() =
         runBlocking(Dispatchers.Main) {
             sourceLiveData.value = 5
-            redirectableLiveData.redirectToWithMapping(sourceLiveData) { it * 2 }
+            val redirectableLiveData =
+                MappingRedirectableLiveData<Int, Int>(0) { it * 2 }
+                    .apply { redirectTo(sourceLiveData) }
 
-            assertEquals(10, redirectableLiveData.value)
+            assertThat(redirectableLiveData.value).isEqualTo(10)
 
             sourceLiveData.value = 10
 
-            assertEquals(20, redirectableLiveData.value)
+            assertThat(redirectableLiveData.value).isEqualTo(20)
         }
 
     @Test
     fun redirectableLiveData_addSource_throwsUnsupportedOperationException() =
         runBlocking(Dispatchers.Main) {
             val otherLiveData = MutableLiveData<String>()
+
             @Suppress("UNCHECKED_CAST")
             val observer = mock(Observer::class.java) as Observer<String>
 
-            assertThrows(UnsupportedOperationException::class.java) {
+            Assert.assertThrows(UnsupportedOperationException::class.java) {
                 redirectableLiveData.addSource(otherLiveData, observer)
             }
 
-            verifyZeroInteractions(observer)
+            verifyNoMoreInteractions(observer)
         }
 
     @Test
@@ -178,22 +197,28 @@ class LiveDataUtilTest {
             verify(observer).onChanged(100)
             verify(observer).onChanged(200)
 
-            assertEquals(200, redirectableLiveData.value)
+            assertThat(redirectableLiveData.value).isEqualTo(200)
         }
 
     @Test
-    fun redirectableLiveData_redirectToWithMapping_switchToNewSourceWithMapping_correctly() =
+    fun mappingRedirectableLiveData_redirectTo_switchToNewSourceWithMapping_correctly() =
         runBlocking(Dispatchers.Main) {
             val sourceLiveData2 = MutableLiveData<Int>()
             sourceLiveData.value = 1
             sourceLiveData2.value = 100
-            redirectableLiveData.redirectTo(sourceLiveData)
+            var redirectableLiveData =
+                MappingRedirectableLiveData<Int, Int>(0) { it }.apply { redirectTo(sourceLiveData) }
 
             @Suppress("UNCHECKED_CAST") val observer = mock(Observer::class.java) as Observer<Int>
             redirectableLiveData.observeForever(observer)
 
             sourceLiveData.value = 2
-            redirectableLiveData.redirectToWithMapping(sourceLiveData2) { it + 1000 }
+            redirectableLiveData =
+                MappingRedirectableLiveData<Int, Int>(0) { it + 1000 }
+                    .apply {
+                        redirectTo(sourceLiveData2)
+                        observeForever(observer)
+                    }
             sourceLiveData.value = 3 // Should not be observed
             sourceLiveData2.value = 200
 
@@ -202,6 +227,20 @@ class LiveDataUtilTest {
             verify(observer).onChanged(1100)
             verify(observer).onChanged(1200)
 
-            assertEquals(1200, redirectableLiveData.value)
+            assertThat(redirectableLiveData.value).isEqualTo(1200)
+        }
+
+    @Test
+    fun mappingRedirectableLiveData_returnsNullWhenSetAfterNonNullInitialValue() =
+        runBlocking(Dispatchers.Main) {
+            val sourceLiveData = MutableLiveData<Int?>()
+            sourceLiveData.value = 0
+            var redirectableLiveData =
+                MappingRedirectableLiveData<Int?, Int?>(0) { it }
+                    .apply { redirectTo(sourceLiveData) }
+
+            sourceLiveData.value = null
+
+            assertThat(redirectableLiveData.value).isNull()
         }
 }
