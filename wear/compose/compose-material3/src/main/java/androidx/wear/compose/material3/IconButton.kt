@@ -383,7 +383,7 @@ public object IconButtonDefaults {
         @Composable get() = MaterialTheme.shapes.small
 
     /** Recommended alpha to apply to an IconButton with Image content with disabled */
-    public val disabledImageOpacity: Float = DisabledContentAlpha
+    public val DisabledImageOpacity: Float = DisabledContentAlpha
 
     /**
      * Creates a [IconButtonShapes] with a static [shape].
