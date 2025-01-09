@@ -14,32 +14,17 @@
  * limitations under the License.
  */
 
-package androidx.appfunctions.common.metadata
+package androidx.appfunctions.metadata
 
 import androidx.annotation.RestrictTo
 import androidx.appsearch.annotation.Document
 import java.util.Objects
 
 // TODO: Make it public once API surface is finalize
-/**
- * Represents an item type metadata.
- * *
- * For examples:
- * ```
- * val property: List<Int?>
- * ```
- *
- * `Int?` is an item type that can be represented as:
- * ```
- * AppFunctionItemTypeMetadata(
- *   isNullable = true,
- *   dataType = AppFunctionDataTypeMetadata(AppFunctionDataTypes.INT),
- * )
- * ```
- */
+/** Represents an AppFunction response's metadata. */
 @Document
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-public class AppFunctionItemTypeMetadata
+public class AppFunctionResponseMetadata
 internal constructor(
     @Document.Namespace public val namespace: String,
     @Document.Id public val id: String,
@@ -63,7 +48,7 @@ internal constructor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is AppFunctionItemTypeMetadata) return false
+        if (other !is AppFunctionResponseMetadata) return false
 
         return this.namespace == other.namespace &&
             this.id == other.id &&
@@ -77,7 +62,7 @@ internal constructor(
     }
 
     override fun toString(): String {
-        return "AppFunctionTypeParameterMetadata(namespace=$namespace, " +
+        return "AppFunctionResponseMetadata(namespace=$namespace, " +
             "id=$id, " +
             "isNullable=$isNullable, " +
             "dataType=$dataType, " +

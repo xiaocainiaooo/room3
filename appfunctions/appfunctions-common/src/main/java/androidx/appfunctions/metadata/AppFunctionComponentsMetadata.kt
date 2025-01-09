@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.appfunctions.common.metadata
+package androidx.appfunctions.metadata
 
 import androidx.annotation.RestrictTo
 import androidx.appsearch.annotation.Document
