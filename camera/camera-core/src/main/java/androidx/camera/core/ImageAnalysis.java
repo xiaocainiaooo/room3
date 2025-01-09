@@ -411,8 +411,6 @@ public final class ImageAnalysis extends UseCase {
                 && ((getCamera() != null && getRelativeRotation(getCamera()) != 0)
                 || Boolean.TRUE.equals(getOnePixelShiftEnabled()));
 
-        mImageAnalysisAbstractAnalyzer.setAnalyzerImageResolution(resolution);
-
         // TODO(b/195021586): to support RGB format input for image analysis for devices already
         // supporting RGB natively. The logic here will check if the specific configured size is
         // available in RGB and if not, fall back to YUV-RGB conversion.
