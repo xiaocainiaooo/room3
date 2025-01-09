@@ -32,27 +32,27 @@ import java.util.List;
 /** Implementation of a subset of core RealityCore Entity functionality. */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public abstract class BaseEntity extends BaseActivityPose implements Entity {
-    private final List<Entity> children = new ArrayList<>();
-    private final List<Component> componentList = new ArrayList<>();
-    private BaseEntity parent;
-    private Pose pose = new Pose();
-    private Vector3 scale = new Vector3(1.0f, 1.0f, 1.0f);
-    private float alpha = 1.0f;
-    private boolean hidden = false;
+    private final List<Entity> mChildren = new ArrayList<>();
+    private final List<Component> mComponentList = new ArrayList<>();
+    private BaseEntity mParent;
+    private Pose mPose = new Pose();
+    private Vector3 mScale = new Vector3(1.0f, 1.0f, 1.0f);
+    private float mAlpha = 1.0f;
+    private boolean mHidden = false;
 
     protected void addChildInternal(@NonNull Entity child) {
-        if (children.contains(child)) {
+        if (mChildren.contains(child)) {
             Log.w("RealityCoreRuntime", "Trying to add child who is already a child.");
         }
-        children.add(child);
+        mChildren.add(child);
     }
 
     protected void removeChildInternal(@NonNull Entity child) {
-        if (!children.contains(child)) {
+        if (!mChildren.contains(child)) {
             Log.w("RealityCoreRuntime", "Trying to remove child who is not a child.");
             return;
         }
-        children.remove(child);
+        mChildren.remove(child);
     }
 
     @Override
@@ -61,8 +61,8 @@ public abstract class BaseEntity extends BaseActivityPose implements Entity {
     }
 
     @Override
-    public void addChildren(@NonNull List<Entity> children) {
-        for (Entity child : children) {
+    public void addChildren(@NonNull List<Entity> mChildren) {
+        for (Entity child : mChildren) {
             child.setParent(this);
         }
     }
@@ -70,7 +70,7 @@ public abstract class BaseEntity extends BaseActivityPose implements Entity {
     @Override
     @Nullable
     public Entity getParent() {
-        return parent;
+        return mParent;
     }
 
     @Override
@@ -79,19 +79,19 @@ public abstract class BaseEntity extends BaseActivityPose implements Entity {
             Log.e("RealityCoreRuntime", "Cannot set non-BaseEntity as a parent of a BaseEntity");
             return;
         }
-        if (this.parent != null) {
-            this.parent.removeChildInternal(this);
+        if (this.mParent != null) {
+            this.mParent.removeChildInternal(this);
         }
-        this.parent = (BaseEntity) parent;
-        if (this.parent != null) {
-            this.parent.addChildInternal(this);
+        this.mParent = (BaseEntity) parent;
+        if (this.mParent != null) {
+            this.mParent.addChildInternal(this);
         }
     }
 
     @Override
     @NonNull
     public List<Entity> getChildren() {
-        return children;
+        return mChildren;
     }
 
     @Override
@@ -103,12 +103,12 @@ public abstract class BaseEntity extends BaseActivityPose implements Entity {
     @Override
     @NonNull
     public Pose getPose() {
-        return pose;
+        return mPose;
     }
 
     @Override
     public void setPose(@NonNull Pose pose) {
-        this.pose = pose;
+        this.mPose = pose;
     }
 
     @Override
@@ -116,80 +116,80 @@ public abstract class BaseEntity extends BaseActivityPose implements Entity {
     public Pose getActivitySpacePose() {
         // Any parentless "space" entities (such as the root and anchor entities) are expected to
         // override this method non-recursively so that this error is never thrown.
-        if (parent == null) {
+        if (mParent == null) {
             throw new IllegalStateException("Cannot get pose in ActivitySpace with a null parent");
         }
 
-        return parent.getActivitySpacePose()
+        return mParent.getActivitySpacePose()
                 .compose(
                         new Pose(
-                                this.pose.getTranslation().times(parent.getWorldSpaceScale()),
-                                this.pose.getRotation()));
+                                this.mPose.getTranslation().times(mParent.getWorldSpaceScale()),
+                                this.mPose.getRotation()));
     }
 
     @Override
     @NonNull
     public Vector3 getScale() {
-        return scale;
+        return mScale;
     }
 
     @Override
     public void setScale(@NonNull Vector3 scale) {
-        this.scale = scale;
+        this.mScale = scale;
     }
 
     // Purely sets the value of the scale.
     protected final void setScaleInternal(@NonNull Vector3 scale) {
-        this.scale = scale;
+        this.mScale = scale;
     }
 
     @Override
     public float getAlpha() {
-        return alpha;
+        return mAlpha;
     }
 
     @Override
     public void setAlpha(float alpha) {
-        this.alpha = alpha;
+        this.mAlpha = alpha;
     }
 
     @Override
     public float getActivitySpaceAlpha() {
-        if (parent == null) {
-            return alpha;
+        if (mParent == null) {
+            return mAlpha;
         }
-        return parent.getActivitySpaceAlpha() * alpha;
+        return mParent.getActivitySpaceAlpha() * mAlpha;
     }
 
     @Override
     @NonNull
     public Vector3 getWorldSpaceScale() {
-        if (parent == null) {
+        if (mParent == null) {
             throw new IllegalStateException("Cannot get scale in WorldSpace with a null parent");
         }
-        return parent.getWorldSpaceScale().times(this.scale);
+        return mParent.getWorldSpaceScale().times(this.mScale);
     }
 
     @Override
     @NonNull
     public Vector3 getActivitySpaceScale() {
-        if (parent == null) {
+        if (mParent == null) {
             throw new IllegalStateException("Cannot get scale in ActivitySpace with a null parent");
         }
-        return parent.getActivitySpaceScale().times(this.scale);
+        return mParent.getActivitySpaceScale().times(this.mScale);
     }
 
     @Override
     public boolean isHidden(boolean includeParents) {
-        if (!includeParents || parent == null) {
-            return hidden;
+        if (!includeParents || mParent == null) {
+            return mHidden;
         }
-        return hidden || parent.isHidden(true);
+        return mHidden || mParent.isHidden(true);
     }
 
     @Override
     public void setHidden(boolean hidden) {
-        this.hidden = hidden;
+        this.mHidden = hidden;
     }
 
     @Override
@@ -197,7 +197,7 @@ public abstract class BaseEntity extends BaseActivityPose implements Entity {
         // Create a copy to avoid concurrent modification issues since the children detach
         // themselves
         // from their parents as they are disposed.
-        List<Entity> childrenToDispose = new ArrayList<>(children);
+        List<Entity> childrenToDispose = new ArrayList<>(mChildren);
         for (Entity child : childrenToDispose) {
             child.dispose();
         }
@@ -206,7 +206,7 @@ public abstract class BaseEntity extends BaseActivityPose implements Entity {
     @Override
     public boolean addComponent(@NonNull Component component) {
         if (component.onAttach(this)) {
-            componentList.add(component);
+            mComponentList.add(component);
             return true;
         }
         return false;
@@ -214,17 +214,17 @@ public abstract class BaseEntity extends BaseActivityPose implements Entity {
 
     @Override
     public void removeComponent(@NonNull Component component) {
-        if (componentList.contains(component)) {
+        if (mComponentList.contains(component)) {
             component.onDetach(this);
-            componentList.remove(component);
+            mComponentList.remove(component);
         }
     }
 
     @Override
     public void removeAllComponents() {
-        for (Component component : componentList) {
+        for (Component component : mComponentList) {
             component.onDetach(this);
         }
-        componentList.clear();
+        mComponentList.clear();
     }
 }

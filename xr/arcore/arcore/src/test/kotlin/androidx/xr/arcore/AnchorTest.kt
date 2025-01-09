@@ -38,7 +38,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,6 +46,7 @@ import org.junit.runner.RunWith
 class AnchorTest {
 
     private lateinit var xrResourcesManager: XrResourcesManager
+    private lateinit var session: Session
 
     @get:Rule
     val grantPermissionRule = GrantPermissionRule.grant("android.permission.SCENE_UNDERSTANDING")
@@ -121,69 +121,70 @@ class AnchorTest {
             .isEqualTo(RuntimeAnchor.PersistenceState.Persisted)
     }
 
-    @Ignore("Flaky test, see b/379198572")
     @Test
-    fun getPersistedAnchorUuids_previouslyPersistedAnchor_returnsPersistedAnchorUuid() = runTest {
-        val session = createTestSession()
-        val runtimeAnchor =
-            FakeRuntimeAnchor(Pose(), session.runtime.perceptionManager as FakePerceptionManager)
-        val underTest = Anchor(runtimeAnchor, xrResourcesManager)
-        var uuid: UUID? = null
-        val persistJob = launch { uuid = underTest.persist() }
-        val updateJob = launch { underTest.update() }
-        updateJob.join()
-        persistJob.join()
+    fun getPersistedAnchorUuids_previouslyPersistedAnchor_returnsPersistedAnchorUuid() =
+        createTestSessionAndRunTest {
+            runTest {
+                val runtimeAnchor =
+                    FakeRuntimeAnchor(
+                        Pose(),
+                        session.runtime.perceptionManager as FakePerceptionManager
+                    )
+                val underTest = Anchor(runtimeAnchor, xrResourcesManager)
+                var uuid: UUID? = null
+                val persistJob = launch { uuid = underTest.persist() }
+                val updateJob = launch { underTest.update() }
+                updateJob.join()
+                persistJob.join()
 
-        assertThat(Anchor.getPersistedAnchorUuids(session)).containsExactly(uuid)
+                assertThat(Anchor.getPersistedAnchorUuids(session)).containsExactly(uuid)
+            }
+        }
+
+    @Test
+    fun getPersistedAnchorUuids_noPreviouslyPersistedAnchors_returnsEmptyList() =
+        createTestSessionAndRunTest {
+            assertThat(Anchor.getPersistedAnchorUuids(session)).isEmpty()
+        }
+
+    @Test
+    fun load_previouslyPersistedAnchor_returnsAnchorCreateSuccess() = createTestSessionAndRunTest {
+        runTest {
+            val runtimeAnchor =
+                FakeRuntimeAnchor(
+                    Pose(),
+                    session.runtime.perceptionManager as FakePerceptionManager
+                )
+            val underTest = Anchor(runtimeAnchor, xrResourcesManager)
+            var uuid: UUID? = null
+            val persistJob = launch { uuid = underTest.persist() }
+            val updateJob = launch { underTest.update() }
+            updateJob.join()
+            persistJob.join()
+
+            assertThat(Anchor.load(session, uuid!!)).isInstanceOf(AnchorCreateSuccess::class.java)
+        }
     }
 
     @Test
-    @Ignore("Flaky test, see b/380269912")
-    fun getPersistedAnchorUuids_noPreviouslyPersistedAnchors_returnsEmptyList() = runTest {
-        val session = createTestSession()
+    fun unpersist_removesAnchorFromStorage() = createTestSessionAndRunTest {
+        runTest {
+            val runtimeAnchor =
+                FakeRuntimeAnchor(
+                    Pose(),
+                    session.runtime.perceptionManager as FakePerceptionManager
+                )
+            val underTest = Anchor(runtimeAnchor, xrResourcesManager)
+            var uuid: UUID? = null
+            val persistJob = launch { uuid = underTest.persist() }
+            val updateJob = launch { underTest.update() }
+            updateJob.join()
+            persistJob.join()
 
-        assertThat(Anchor.getPersistedAnchorUuids(session)).isEmpty()
-    }
+            Anchor.unpersist(session, uuid!!)
 
-    @Ignore("Flaky test, see b/384999184")
-    @Test
-    fun load_previouslyPersistedAnchor_returnsAnchorCreateSuccess() = runTest {
-        val session = createTestSession()
-        val runtimeAnchor =
-            FakeRuntimeAnchor(Pose(), session.runtime.perceptionManager as FakePerceptionManager)
-        val underTest = Anchor(runtimeAnchor, xrResourcesManager)
-        var uuid: UUID? = null
-        val persistJob = launch { uuid = underTest.persist() }
-        val updateJob = launch { underTest.update() }
-        updateJob.join()
-        persistJob.join()
-
-        assertThat(Anchor.load(session, uuid!!)).isInstanceOf(AnchorCreateSuccess::class.java)
-    }
-
-    @Ignore("Flaky test, see b/384999184")
-    @Test
-    fun loadFromNativePointer_returnsAnchorCreateSuccess() = runTest {
-        val session = createTestSession()
-
-        assertThat(Anchor.loadFromNativePointer(session, 123L)).isNotNull()
-    }
-
-    @Test
-    fun unpersist_removesAnchorFromStorage() = runTest {
-        val session = createTestSession()
-        val runtimeAnchor =
-            FakeRuntimeAnchor(Pose(), session.runtime.perceptionManager as FakePerceptionManager)
-        val underTest = Anchor(runtimeAnchor, xrResourcesManager)
-        var uuid: UUID? = null
-        val persistJob = launch { uuid = underTest.persist() }
-        val updateJob = launch { underTest.update() }
-        updateJob.join()
-        persistJob.join()
-
-        Anchor.unpersist(session, uuid!!)
-
-        assertThat(Anchor.getPersistedAnchorUuids(session)).doesNotContain(uuid)
+            assertThat(Anchor.getPersistedAnchorUuids(session)).doesNotContain(uuid)
+        }
     }
 
     @Test
@@ -242,15 +243,15 @@ class AnchorTest {
         assertThat(underTest1.hashCode()).isNotEqualTo(underTest2.hashCode())
     }
 
-    private fun createTestSession(): Session {
-        var session: Session? = null
+    private fun createTestSessionAndRunTest(testBody: () -> Unit) {
         ActivityScenario.launch(Activity::class.java).use {
             it.onActivity { activity ->
                 session =
                     (Session.create(activity, StandardTestDispatcher()) as SessionCreateSuccess)
                         .session
+
+                testBody()
             }
         }
-        return checkNotNull(session) { "Session must not be null." }
     }
 }

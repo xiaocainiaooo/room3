@@ -27,34 +27,34 @@ import java.util.concurrent.Executor;
 /** Implementation of PointerCaptureComponent. */
 final class PointerCaptureComponentImpl implements PointerCaptureComponent {
 
-    private final Executor executor;
-    private final StateListener stateListener;
-    private final InputEventListener inputListener;
+    private final Executor mExecutor;
+    private final StateListener mStateListener;
+    private final InputEventListener mInputListener;
 
-    private AndroidXrEntity attachedEntity;
+    private AndroidXrEntity mAttachedEntity;
 
-    public PointerCaptureComponentImpl(
+    PointerCaptureComponentImpl(
             @NonNull Executor executor,
             @NonNull StateListener stateListener,
             @NonNull InputEventListener inputListener) {
-        this.executor = executor;
-        this.stateListener = stateListener;
-        this.inputListener = inputListener;
+        mExecutor = executor;
+        mStateListener = stateListener;
+        mInputListener = inputListener;
     }
 
     @Override
     public boolean onAttach(Entity entity) {
-        if (!(entity instanceof AndroidXrEntity) || attachedEntity != null) {
+        if (!(entity instanceof AndroidXrEntity) || mAttachedEntity != null) {
             return false;
         }
 
-        attachedEntity = (AndroidXrEntity) entity;
-        return attachedEntity.requestPointerCapture(executor, inputListener, stateListener);
+        mAttachedEntity = (AndroidXrEntity) entity;
+        return mAttachedEntity.requestPointerCapture(mExecutor, mInputListener, mStateListener);
     }
 
     @Override
     public void onDetach(Entity entity) {
-        attachedEntity.stopPointerCapture();
-        attachedEntity = null;
+        mAttachedEntity.stopPointerCapture();
+        mAttachedEntity = null;
     }
 }

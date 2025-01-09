@@ -35,7 +35,7 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 @SuppressWarnings("deprecation") // TODO(b/373435470): Remove
 final class MainPanelEntityImpl extends BasePanelEntity implements PanelEntity {
-    Activity runtimeActivity;
+    Activity mRuntimeActivity;
 
     // Note that we expect the Node supplied here to be the WindowLeash node.
     MainPanelEntityImpl(
@@ -45,7 +45,7 @@ final class MainPanelEntityImpl extends BasePanelEntity implements PanelEntity {
             EntityManager entityManager,
             ScheduledExecutorService executor) {
         super(node, extensions, entityManager, executor);
-        runtimeActivity = activity;
+        mRuntimeActivity = activity;
 
         // Read the Pixel dimensions for the primary panel off the Activity's WindowManager.
         //   Note that this requires MinAPI 30.
@@ -55,7 +55,7 @@ final class MainPanelEntityImpl extends BasePanelEntity implements PanelEntity {
     }
 
     private Rect getBoundsFromWindowManager() {
-        return runtimeActivity.getWindowManager().getCurrentWindowMetrics().getBounds();
+        return mRuntimeActivity.getWindowManager().getCurrentWindowMetrics().getBounds();
     }
 
     @Override
@@ -83,8 +83,8 @@ final class MainPanelEntityImpl extends BasePanelEntity implements PanelEntity {
         // called.
         super.setPixelDimensions(dimensions);
         // TODO: b/376934871 - Check async results.
-        extensions.setMainWindowSize(
-                runtimeActivity,
+        mExtensions.setMainWindowSize(
+                mRuntimeActivity,
                 dimensions.width,
                 dimensions.height,
                 (result) -> {},

@@ -32,15 +32,15 @@ import java.util.List;
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class Plane implements Trackable {
     private static final String TAG = "PerceptionPlane";
-    ArrayList<Anchor> attachedAnchors = new ArrayList<>();
-    Long planeId = 0L;
-    @PerceptionLibraryConstants.OpenXrSpaceType int referenceSpaceType = 0;
+    ArrayList<Anchor> mAttachedAnchors = new ArrayList<>();
+    Long mPlaneId = 0L;
+    @PerceptionLibraryConstants.OpenXrSpaceType int mReferenceSpaceType = 0;
 
     public Plane(
             @SuppressWarnings("AutoBoxing") @NonNull Long planeId,
             @PerceptionLibraryConstants.OpenXrSpaceType int referenceSpaceType) {
-        this.planeId = planeId;
-        this.referenceSpaceType = referenceSpaceType;
+        mPlaneId = planeId;
+        mReferenceSpaceType = referenceSpaceType;
     }
 
     /**
@@ -56,14 +56,14 @@ public class Plane implements Trackable {
     public Anchor createAnchor(
             @NonNull Pose pose, @SuppressWarnings("AutoBoxing") @Nullable Long timeNs) {
         Anchor.AnchorData anchorData =
-                createAnchorOnPlane(planeId, pose, timeNs == null ? -1 : timeNs);
+                createAnchorOnPlane(mPlaneId, pose, timeNs == null ? -1 : timeNs);
         if (anchorData == null) {
             Log.i(TAG, "Failed to create an anchor.");
             return null;
         }
-        Log.i(TAG, "Creating an anchor result:" + anchorData.anchorToken);
+        Log.i(TAG, "Creating an anchor result:" + anchorData.mAnchorToken);
         Anchor anchor = new Anchor(anchorData);
-        attachedAnchors.add(anchor);
+        mAttachedAnchors.add(anchor);
         return anchor;
     }
 
@@ -76,14 +76,14 @@ public class Plane implements Trackable {
      */
     @Nullable
     public PlaneData getData(@SuppressWarnings("AutoBoxing") @Nullable Long timeNs) {
-        return getPlaneData(planeId, referenceSpaceType, timeNs == null ? -1 : timeNs);
+        return getPlaneData(mPlaneId, mReferenceSpaceType, timeNs == null ? -1 : timeNs);
     }
 
     /** Returns all anchors attached to this trackable. */
     @NonNull
     @Override
     public List<Anchor> getAnchors() {
-        return attachedAnchors;
+        return mAttachedAnchors;
     }
 
     private native PlaneData getPlaneData(

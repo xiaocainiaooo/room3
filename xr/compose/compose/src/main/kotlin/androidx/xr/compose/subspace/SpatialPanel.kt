@@ -23,6 +23,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.RestrictTo
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -32,7 +36,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.UiComposable
+import androidx.compose.ui.graphics.Color as UiColor
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.xr.compose.platform.LocalDialogManager
@@ -44,7 +51,9 @@ import androidx.xr.compose.subspace.layout.SpatialShape
 import androidx.xr.compose.subspace.layout.SubspaceLayout
 import androidx.xr.compose.subspace.layout.SubspaceModifier
 import androidx.xr.compose.unit.IntVolumeSize
+import androidx.xr.compose.unit.Meter.Companion.millimeters
 import androidx.xr.runtime.math.Pose
+import androidx.xr.runtime.math.Vector3
 import androidx.xr.scenecore.Dimensions
 import androidx.xr.scenecore.PanelEntity
 
@@ -168,15 +177,64 @@ public fun SpatialPanel(
     name: String = "ActivityPanel-${intent.action}",
     shape: SpatialShape = SpatialPanelDefaults.shape,
 ) {
-    LayoutPanelEntity(
-        rememberCorePanelEntity {
-            val rect = Rect(0, 0, DEFAULT_SIZE_PX, DEFAULT_SIZE_PX)
-            createActivityPanelEntity(rect, name).also { it.launchActivity(intent) }
-        },
-        name,
-        shape,
-        modifier,
-    )
+
+    val session = checkNotNull(LocalSession.current) { "session must be initialized" }
+    val dialogManager = LocalDialogManager.current
+
+    val minimumPanelDimension = Dimensions(10f, 10f, 10f)
+    val rect = Rect(0, 0, DEFAULT_SIZE_PX, DEFAULT_SIZE_PX)
+    val activityPanelEntity = rememberCorePanelEntity {
+        session.createActivityPanelEntity(rect, name).also { it.launchActivity(intent) }
+    }
+
+    SpatialBox {
+        LayoutPanelEntity(activityPanelEntity, name, shape, modifier)
+
+        if (dialogManager.isSpatialDialogActive.value) {
+            val scrimView = rememberComposeView {
+                Box(
+                    modifier =
+                        Modifier.fillMaxSize()
+                            .background(UiColor.Black.copy(alpha = 0.5f))
+                            .pointerInput(Unit) {
+                                detectTapGestures {
+                                    dialogManager.isSpatialDialogActive.value = false
+                                }
+                            }
+                ) {}
+            }
+
+            val scrimPanelEntity = rememberCorePanelEntity {
+                createPanelEntity(
+                        view = scrimView,
+                        surfaceDimensionsPx = minimumPanelDimension,
+                        dimensions = minimumPanelDimension,
+                        name = "scrim view",
+                        pose = Pose.Identity,
+                    )
+                    .also {
+                        it.setParent(activityPanelEntity.entity)
+                        it.setPose(Pose(translation = Vector3(0f, 0f, 3.millimeters.toM())))
+                    }
+            }
+
+            val density = LocalDensity.current
+            LaunchedEffect(activityPanelEntity.size) {
+                val size = activityPanelEntity.size
+                scrimPanelEntity.size = size
+                if (shape is SpatialRoundedCornerShape) {
+                    scrimPanelEntity.setCornerRadius(
+                        shape.computeCornerRadius(
+                            size.width.toFloat(),
+                            size.height.toFloat(),
+                            density
+                        ),
+                        density,
+                    )
+                }
+            }
+        }
+    }
 }
 
 /**

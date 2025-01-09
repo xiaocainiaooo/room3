@@ -28,6 +28,7 @@ import androidx.xr.compose.platform.LocalHasXrSpatialFeature
 import androidx.xr.compose.platform.LocalSession
 import androidx.xr.scenecore.JxrPlatformAdapter
 import androidx.xr.scenecore.Session
+import androidx.xr.scenecore.SpatialEnvironment
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
@@ -52,9 +53,9 @@ public fun TestSetup(
         if (isXrEnabled) {
             createFakeSession(activity, runtime).apply {
                 if (isFullSpace) {
-                    requestFullSpaceMode()
+                    spatialEnvironment.requestFullSpaceMode()
                 } else {
-                    requestHomeSpaceMode()
+                    spatialEnvironment.requestHomeSpaceMode()
                 }
             }
         } else {

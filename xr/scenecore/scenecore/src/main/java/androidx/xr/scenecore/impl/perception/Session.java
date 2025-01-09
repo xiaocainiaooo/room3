@@ -39,22 +39,22 @@ public class Session {
     public static final long XR_NULL_HANDLE = 0;
 
     private static final String TAG = "PerceptionSession";
-    Activity activity;
-    @PerceptionLibraryConstants.OpenXrSpaceType int openXrReferenceSpaceType;
-    Executor executor;
-    HashMap<Long, Plane> foundPlanes = new HashMap<>();
+    Activity mActivity;
+    @PerceptionLibraryConstants.OpenXrSpaceType int mOpenXrReferenceSpaceType;
+    Executor mExecutor;
+    HashMap<Long, Plane> mFoundPlanes = new HashMap<>();
 
     Session(
             Activity activity,
             @PerceptionLibraryConstants.OpenXrSpaceType int openXrReferenceSpaceType,
             Executor executor) {
-        this.activity = activity;
-        this.openXrReferenceSpaceType = openXrReferenceSpaceType;
-        this.executor = executor;
+        mActivity = activity;
+        mOpenXrReferenceSpaceType = openXrReferenceSpaceType;
+        mExecutor = executor;
     }
 
     boolean initSession() {
-        boolean xrLoaded = createOpenXrSession(activity, openXrReferenceSpaceType);
+        boolean xrLoaded = createOpenXrSession(mActivity, mOpenXrReferenceSpaceType);
         if (!xrLoaded) {
             Log.e(TAG, "Failed to load OpenXR session.");
             return false;
@@ -72,7 +72,7 @@ public class Session {
             Log.i(TAG, "Failed to create an anchor.");
             return null;
         }
-        Log.i(TAG, "Creating an anchor result:" + anchorData.anchorToken);
+        Log.i(TAG, "Creating an anchor result:" + anchorData.mAnchorToken);
         return new Anchor(anchorData);
     }
 
@@ -94,7 +94,7 @@ public class Session {
             Log.i(TAG, "Failed to create a persisted anchor.");
             return null;
         }
-        Log.i(TAG, "Creating a persisted anchor result:" + anchorData.anchorToken);
+        Log.i(TAG, "Creating a persisted anchor result:" + anchorData.mAnchorToken);
         return new Anchor(anchorData);
     }
 
@@ -107,9 +107,9 @@ public class Session {
         return getPlanes().stream()
                 .map(
                         nativeId ->
-                                foundPlanes.computeIfAbsent(
+                                mFoundPlanes.computeIfAbsent(
                                         nativeId,
-                                        id -> new Plane(nativeId, openXrReferenceSpaceType)))
+                                        id -> new Plane(nativeId, mOpenXrReferenceSpaceType)))
                 .collect(toCollection(ArrayList::new));
     }
 

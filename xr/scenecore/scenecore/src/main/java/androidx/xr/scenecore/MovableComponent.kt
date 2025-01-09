@@ -32,7 +32,7 @@ import java.util.concurrent.Executor
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class MovableComponent
 private constructor(
-    private val runtime: JxrPlatformAdapter,
+    private val platformAdapter: JxrPlatformAdapter,
     private val entityManager: EntityManager,
     private val systemMovable: Boolean = true,
     private val scaleInZ: Boolean = true,
@@ -40,10 +40,10 @@ private constructor(
     private val shouldDisposeParentAnchor: Boolean = true,
 ) : Component {
     private val rtMovableComponent by lazy {
-        runtime.createMovableComponent(
+        platformAdapter.createMovableComponent(
             systemMovable,
             scaleInZ,
-            anchorPlacement.toRtAnchorPlacement(runtime),
+            anchorPlacement.toRtAnchorPlacement(platformAdapter),
             shouldDisposeParentAnchor,
         )
     }
@@ -136,6 +136,18 @@ private constructor(
     }
 
     /**
+     * Adds a listener to the set of active listeners for the move events. The listener will be
+     * invoked regardless of whether the entity is being moved by the system or the user.
+     *
+     * <p>The listener is invoked on the main thread.
+     *
+     * @param moveListener The move event listener to set.
+     */
+    public fun addMoveListener(moveListener: MoveListener) {
+        addMoveListener(HandlerExecutor.mainThreadExecutor, moveListener)
+    }
+
+    /**
      * Removes a listener from the set of active listeners for the move events.
      *
      * @param moveListener The move event listener to remove.
@@ -147,12 +159,12 @@ private constructor(
         }
     }
 
-    internal companion object {
+    public companion object {
         private val kDimensionsOneMeter = Dimensions(1f, 1f, 1f)
 
         /** Factory function for creating a MovableComponent. */
         internal fun create(
-            runtime: JxrPlatformAdapter,
+            platformAdapter: JxrPlatformAdapter,
             entityManager: EntityManager,
             systemMovable: Boolean = true,
             scaleInZ: Boolean = true,
@@ -160,7 +172,7 @@ private constructor(
             shouldDisposeParentAnchor: Boolean = true,
         ): MovableComponent {
             return MovableComponent(
-                runtime,
+                platformAdapter,
                 entityManager,
                 systemMovable,
                 scaleInZ,
@@ -168,5 +180,46 @@ private constructor(
                 shouldDisposeParentAnchor,
             )
         }
+
+        /**
+         * Public factory function for creating a MovableComponent. This component can be attached
+         * to a single instance of any non-Anchor Entity.
+         *
+         * When attached, this Component will enable the user to translate the Entity by pointing
+         * and dragging on it.
+         *
+         * @param session The [Session] instance.
+         * @param systemMovable A [Boolean] which causes the system to automatically apply transform
+         *   updates to the entity in response to user interaction.
+         * @param scaleInZ A [Boolean] which tells the system to update the scale of the Entity as
+         *   the user moves it closer and further away. This is mostly useful for Panel
+         *   auto-rescaling with Distance
+         * @param anchorPlacement A Set containing different [AnchorPlacement] for how to anchor the
+         *   [Entity] movable component. If this is not empty the movement semantics will be
+         *   slightly different from the system as it will add the ability to anchor to nearby
+         *   planes.
+         * @param shouldDisposeParentAnchor A [Boolean], which if set to true, when an entity is
+         *   moved off of an [AnchorEntity] that was created by the underlying [MovableComponent],
+         *   and the [AnchorEntity] has no other children, the AnchorEntity will be disposed, and
+         *   the underlying Anchor will be detached.
+         * @return [MovableComponent] instance.
+         */
+        @JvmOverloads
+        @JvmStatic
+        public fun create(
+            session: Session,
+            systemMovable: Boolean = true,
+            scaleInZ: Boolean = true,
+            anchorPlacement: Set<AnchorPlacement> = emptySet(),
+            shouldDisposeParentAnchor: Boolean = true,
+        ): MovableComponent =
+            MovableComponent.create(
+                platformAdapter = session.platformAdapter,
+                entityManager = session.entityManager,
+                systemMovable = systemMovable,
+                scaleInZ = scaleInZ,
+                anchorPlacement = anchorPlacement,
+                shouldDisposeParentAnchor = shouldDisposeParentAnchor,
+            )
     }
 }

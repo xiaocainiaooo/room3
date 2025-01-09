@@ -34,7 +34,7 @@ import java.util.concurrent.ScheduledExecutorService;
 // TODO: b/321782625 - Add tests when the Extensions can be faked.
 @SuppressWarnings("deprecation") // TODO(b/373435470): Remove
 final class GltfEntityImpl extends AndroidXrEntity implements GltfEntity {
-    public GltfEntityImpl(
+    GltfEntityImpl(
             GltfModelResourceImpl gltfModelResource,
             Entity parentEntity,
             XrExtensions extensions,
@@ -44,7 +44,7 @@ final class GltfEntityImpl extends AndroidXrEntity implements GltfEntity {
         setParent(parentEntity);
 
         try (NodeTransaction transaction = extensions.createNodeTransaction()) {
-            transaction.setGltfModel(node, gltfModelResource.getExtensionModelToken()).apply();
+            transaction.setGltfModel(mNode, gltfModelResource.getExtensionModelToken()).apply();
         }
     }
 

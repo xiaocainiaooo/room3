@@ -78,9 +78,9 @@ private fun XrModeButton() {
         enabled = isDeviceXr,
         onClick = {
             if (isFullSpaceMode) {
-                session?.requestHomeSpaceMode()
+                session?.spatialEnvironment?.requestHomeSpaceMode()
             } else {
-                session?.requestFullSpaceMode()
+                session?.spatialEnvironment?.requestFullSpaceMode()
             }
         },
     ) {

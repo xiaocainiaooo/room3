@@ -387,7 +387,7 @@ public interface JxrPlatformAdapter {
      *
      * <p>For security reasons, Z testing for the new activity is disabled, and the activity is
      * always drawn on top of the inherited environment. Because Z testing is disabled, the activity
-     * should not spatialize itself, and should not curve its panel too much either.
+     * should not spatialize itself.
      *
      * @param bundle the input bundle to set with the inherit full space mode environment flag.
      * @return the input {@code bundle} with the inherit full space mode flag set.
@@ -401,6 +401,11 @@ public interface JxrPlatformAdapter {
      * <p>The ratio is only applied to the activity. If the activity launches another activity in
      * the same task, the ratio is not applied to the new activity. Also, while the activity is in
      * full space mode, the preference is temporarily removed.
+     *
+     * <p>If the activity's current aspect ratio differs from the {@code preferredRatio}, the panel
+     * is automatically resized. This resizing preserves the panel's area. To avoid runtime
+     * resizing, consider specifying the desired aspect ratio in your {@code AndroidManifest.xml}.
+     * This ensures your activity launches with the preferred aspect ratio from the start.
      *
      * @param activity the activity to set the preference.
      * @param preferredRatio the aspect ratio determined by taking the panel's width over its
@@ -470,7 +475,7 @@ public interface JxrPlatformAdapter {
                     ScaleWithDistanceMode.DEFAULT,
                     ScaleWithDistanceMode.DMM,
                 })
-        public @interface ScaleWithDistanceMode {
+        @interface ScaleWithDistanceMode {
             int DEFAULT = 3;
             int DMM = 2;
         }
@@ -575,6 +580,32 @@ public interface JxrPlatformAdapter {
         void setFixedAspectRatio(float fixedAspectRatio);
 
         /**
+         * Sets whether or not content (including content of all child nodes) is auto-hidden during
+         * resizing. Defaults to true.
+         *
+         * @param autoHideContent Whether or not content is auto-hidden during resizing.
+         */
+        void setAutoHideContent(boolean autoHideContent);
+
+        /**
+         * Sets whether the size of the ResizableComponent is automatically updated to match during
+         * an ongoing resize (to match the proposed size as resize events are received). Defaults to
+         * true.
+         *
+         * @param autoUpdateSize Whether or not the size of the ResizableComponent is automatically
+         *     updated during resizing.
+         */
+        void setAutoUpdateSize(boolean autoUpdateSize);
+
+        /**
+         * Sets whether to force showing the resize overlay even when this entity is not being
+         * resized. Defaults to false.
+         *
+         * @param show Whether or not to force show the resize overlay.
+         */
+        void setForceShowResizeOverlay(boolean show);
+
+        /**
          * Adds the listener to the set of listeners that are invoked through the resize operation,
          * such as start, ongoing and end.
          *
@@ -602,9 +633,9 @@ public interface JxrPlatformAdapter {
 
     /** Component to enable pointer capture. */
     interface PointerCaptureComponent extends Component {
-        public static final int POINTER_CAPTURE_STATE_PAUSED = 0;
-        public static final int POINTER_CAPTURE_STATE_ACTIVE = 1;
-        public static final int POINTER_CAPTURE_STATE_STOPPED = 2;
+        int POINTER_CAPTURE_STATE_PAUSED = 0;
+        int POINTER_CAPTURE_STATE_ACTIVE = 1;
+        int POINTER_CAPTURE_STATE_STOPPED = 2;
 
         /** The possible states of pointer capture. */
         @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -615,10 +646,15 @@ public interface JxrPlatformAdapter {
                     POINTER_CAPTURE_STATE_ACTIVE,
                     POINTER_CAPTURE_STATE_STOPPED,
                 })
-        public @interface PointerCaptureState {}
+        @interface PointerCaptureState {}
 
         /** Functional interface for receiving updates about the state of pointer capture. */
         interface StateListener {
+            /**
+             * Called when the state of pointer capture changes.
+             *
+             * @param newState The new state of pointer capture.
+             */
             void onStateChanged(@PointerCaptureState int newState);
         }
     }
@@ -639,6 +675,11 @@ public interface JxrPlatformAdapter {
     @SuppressWarnings("AndroidJdkLibsChecker")
     @FunctionalInterface
     interface InputEventListener {
+        /**
+         * Called when an input event occurs.
+         *
+         * @param event The input event that occurred.
+         */
         void onInputEvent(@NonNull InputEvent event);
     }
 
@@ -646,14 +687,24 @@ public interface JxrPlatformAdapter {
     @SuppressWarnings("AndroidJdkLibsChecker")
     @FunctionalInterface
     interface MoveEventListener {
-        void onMoveEvent(@NonNull final MoveEvent event);
+        /**
+         * Called when a move event occurs.
+         *
+         * @param event The move event that occurred.
+         */
+        void onMoveEvent(@NonNull MoveEvent event);
     }
 
     /** Interface for ResizeEvent listener. */
     @SuppressWarnings("AndroidJdkLibsChecker")
     @FunctionalInterface
     interface ResizeEventListener {
-        void onResizeEvent(@NonNull final ResizeEvent event);
+        /**
+         * Called when a resize event occurs.
+         *
+         * @param event The resize event that occurred.
+         */
+        void onResizeEvent(@NonNull ResizeEvent event);
     }
 
     /** Interface for a SceneCore ActivityPose */
@@ -705,20 +756,20 @@ public interface JxrPlatformAdapter {
      * <p>The camera's field of view can be retrieved from this CameraViewActivityPose.
      */
     interface CameraViewActivityPose extends ActivityPose {
-        public static final int CAMERA_TYPE_UNKNOWN = 0;
-        public static final int CAMERA_TYPE_LEFT_EYE = 1;
-        public static final int CAMERA_TYPE_RIGHT_EYE = 2;
+        int CAMERA_TYPE_UNKNOWN = 0;
+        int CAMERA_TYPE_LEFT_EYE = 1;
+        int CAMERA_TYPE_RIGHT_EYE = 2;
 
         /** Returns the type of camera that this space represents. */
         @CameraType
-        public int getCameraType();
+        int getCameraType();
 
         /**
          * The angles (in radians) representing the sides of the view frustum. These are not
          * expected to change over the lifetime of the session but in rare cases may change due to
          * updated camera settings
          */
-        static class Fov {
+        class Fov {
 
             public final float angleLeft;
             public final float angleRight;
@@ -733,6 +784,7 @@ public interface JxrPlatformAdapter {
             }
         }
 
+        /** Returns the field of view for this camera. */
         @NonNull
         Fov getFov();
 
@@ -745,7 +797,7 @@ public interface JxrPlatformAdapter {
                     CAMERA_TYPE_LEFT_EYE,
                     CAMERA_TYPE_RIGHT_EYE,
                 })
-        public @interface CameraType {}
+        @interface CameraType {}
     }
 
     /**
@@ -790,21 +842,25 @@ public interface JxrPlatformAdapter {
          */
         void addChild(@NonNull Entity child);
 
-        // Sets the provided Entities to be children of the Entity.
+        /** Sets the provided Entities to be children of the Entity. */
         void addChildren(@NonNull List<Entity> children);
 
-        // Returns the parent entity for this Entity.
+        /** Returns the parent entity for this Entity. */
         @Nullable
         Entity getParent();
 
-        // Sets the parent Entity for this Entity. The child Entity's pose will be relative to the
-        // pose of its parent.
+        /**
+         * Sets the parent Entity for this Entity. The child Entity's pose will be relative to the
+         * pose of its parent.
+         *
+         * @param parent The parent entity.
+         */
         void setParent(@Nullable Entity parent);
 
-        // Sets context-text for this entity to be consumed by Accessibility systems.
+        /** Sets context-text for this entity to be consumed by Accessibility systems. */
         void setContentDescription(@NonNull String text);
 
-        // Returns the all child entities of this Entity.
+        /** Returns the all child entities of this Entity. */
         @NonNull
         List<Entity> getChildren();
 
@@ -976,7 +1032,7 @@ public interface JxrPlatformAdapter {
          * <p>This value can be overwritten by user-enabled or system-enabled passthrough and will
          * not always match the opacity value returned by [getPassthroughOpacityPreference].
          */
-        public float getCurrentPassthroughOpacity();
+        float getCurrentPassthroughOpacity();
 
         /**
          * Gets the last passthrough opacity requested through [setPassthroughOpacityPreference].
@@ -991,17 +1047,17 @@ public interface JxrPlatformAdapter {
          */
         @SuppressWarnings("AutoBoxing")
         @Nullable
-        public Float getPassthroughOpacityPreference();
+        Float getPassthroughOpacityPreference();
 
         /**
          * Notifies an application when the passthrough state changes, such as when the application
          * enters or exits passthrough or when the passthrough opacity changes. This [listener] will
          * be called on the Application's UI thread.
          */
-        public void addOnPassthroughOpacityChangedListener(@NonNull Consumer<Float> listener);
+        void addOnPassthroughOpacityChangedListener(@NonNull Consumer<Float> listener);
 
         /** Remove a listener previously added by [addOnPassthroughOpacityChangedListener]. */
-        public void removeOnPassthroughOpacityChangedListener(@NonNull Consumer<Float> listener);
+        void removeOnPassthroughOpacityChangedListener(@NonNull Consumer<Float> listener);
 
         /**
          * Returns true if the environment set by [setSpatialEnvironmentPreference] is active.
@@ -1119,6 +1175,7 @@ public interface JxrPlatformAdapter {
         @SuppressWarnings("AndroidJdkLibsChecker")
         @FunctionalInterface
         interface OnSpaceUpdatedListener {
+            /** Called by the system when the underlying space has changed. */
             void onSpaceUpdated();
         }
     }
@@ -1173,9 +1230,9 @@ public interface JxrPlatformAdapter {
         @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef({AnimationState.PLAYING, AnimationState.STOPPED})
-        public @interface AnimationState {
-            public static final int PLAYING = 0;
-            public static final int STOPPED = 1;
+        @interface AnimationState {
+            int PLAYING = 0;
+            int STOPPED = 1;
         }
 
         /**
@@ -1272,13 +1329,13 @@ public interface JxrPlatformAdapter {
         @RestrictTo(RestrictTo.Scope.LIBRARY)
         @Retention(RetentionPolicy.SOURCE)
         @IntDef({StereoMode.MONO, StereoMode.TOP_BOTTOM, StereoMode.SIDE_BY_SIDE})
-        public @interface StereoMode {
+        @interface StereoMode {
             // Each eye will see the entire surface (no separation)
-            public static final int MONO = 0;
+            int MONO = 0;
             // The [top, bottom] halves of the surface will map to [left, right] eyes
-            public static final int TOP_BOTTOM = 1;
+            int TOP_BOTTOM = 1;
             // The [left, right] halves of the surface will map to [left, right] eyes
-            public static final int SIDE_BY_SIDE = 2;
+            int SIDE_BY_SIDE = 2;
         }
 
         /**
@@ -1328,7 +1385,7 @@ public interface JxrPlatformAdapter {
 
     /** Interface for Anchor entity. */
     interface AnchorEntity extends SystemSpaceEntity {
-        /* Returns the current state of the anchor synchronously.*/
+        /** Returns the current state of the anchor synchronously. */
         @NonNull
         State getState();
 
@@ -1393,11 +1450,21 @@ public interface JxrPlatformAdapter {
 
         /** Interface for listening to Anchor state changes. */
         interface OnStateChangedListener {
+            /**
+             * Called when the state of the anchor changes.
+             *
+             * @param newState The new state of the anchor.
+             */
             void onStateChanged(@NonNull State newState);
         }
 
         /** Interface for listening to Anchor persist state changes. */
         interface PersistStateChangeListener {
+            /**
+             * Called when the persist state of the anchor changes.
+             *
+             * @param newPersistState The new persist state of the anchor.
+             */
             void onPersistStateChanged(@NonNull PersistState newPersistState);
         }
     }
@@ -1881,6 +1948,7 @@ public interface JxrPlatformAdapter {
                 })
         public @interface SpatialCapability {}
 
+        /** The set of capabilities enabled for the platform. */
         @SuppressWarnings("MutableBareField")
         @SpatialCapability
         public int capabilities;
@@ -1889,6 +1957,12 @@ public interface JxrPlatformAdapter {
             this.capabilities = capabilities;
         }
 
+        /**
+         * Returns true if the given capability is enabled.
+         *
+         * @param capability The capability to check.
+         * @return True if the capability is enabled, false otherwise.
+         */
         public boolean hasCapability(@SpatialCapability int capability) {
             return (capabilities & capability) != 0;
         }
@@ -1897,6 +1971,18 @@ public interface JxrPlatformAdapter {
     /** Interface for a SceneCore SoundPoolExtensionsWrapper. */
     interface SoundPoolExtensionsWrapper {
 
+        /**
+         * Plays a sound as a point source.
+         *
+         * @param soundPool The SoundPool to use.
+         * @param soundId The ID of the sound to play.
+         * @param attributes The PointSourceAttributes to use.
+         * @param volume The volume of the sound.
+         * @param priority The priority of the sound.
+         * @param loop Whether to loop the sound.
+         * @param rate The playback rate of the sound.
+         * @return The result of the play operation.
+         */
         int play(
                 @NonNull SoundPool soundPool,
                 int soundId,
@@ -1906,6 +1992,18 @@ public interface JxrPlatformAdapter {
                 int loop,
                 float rate);
 
+        /**
+         * Plays a sound as a sound field.
+         *
+         * @param soundPool The SoundPool to use.
+         * @param soundId The ID of the sound to play.
+         * @param attributes The SoundFieldAttributes to use.
+         * @param volume The volume of the sound.
+         * @param priority The priority of the sound.
+         * @param loop Whether to loop the sound.
+         * @param rate The playback rate of the sound.
+         * @return The result of the play operation.
+         */
         int play(
                 @NonNull SoundPool soundPool,
                 int soundId,
@@ -1915,6 +2013,13 @@ public interface JxrPlatformAdapter {
                 int loop,
                 float rate);
 
+        /**
+         * Returns the spatial source type of the sound.
+         *
+         * @param soundPool The SoundPool to use.
+         * @param streamId The stream ID of the sound.
+         * @return The spatial source type of the sound.
+         */
         @SpatializerConstants.SourceType
         int getSpatialSourceType(@NonNull SoundPool soundPool, int streamId);
     }
@@ -1922,18 +2027,51 @@ public interface JxrPlatformAdapter {
     /** Interface for a SceneCore AudioTrackExtensionsWrapper */
     interface AudioTrackExtensionsWrapper {
 
+        /**
+         * Returns the PointSourceAttributes of the AudioTrack.
+         *
+         * @param track The AudioTrack to get the PointSourceAttributes from.
+         * @return The PointSourceAttributes of the AudioTrack.
+         */
         @Nullable
         PointSourceAttributes getPointSourceAttributes(@NonNull AudioTrack track);
 
+        /**
+         * Returns the SoundFieldAttributes of the AudioTrack.
+         *
+         * @param track The AudioTrack to get the SoundFieldAttributes from.
+         * @return The SoundFieldAttributes of the AudioTrack.
+         */
         @Nullable
         SoundFieldAttributes getSoundFieldAttributes(@NonNull AudioTrack track);
 
+        /**
+         * Returns the spatial source type of the AudioTrack.
+         *
+         * @param track The AudioTrack to get the spatial source type from.
+         * @return The spatial source type of the AudioTrack.
+         */
+        @SpatializerConstants.SourceType
         int getSpatialSourceType(@NonNull AudioTrack track);
 
+        /**
+         * Sets the PointSourceAttributes of the AudioTrack.
+         *
+         * @param builder The AudioTrack.Builder to set the PointSourceAttributes on.
+         * @param attributes The PointSourceAttributes to set.
+         * @return The AudioTrack.Builder with the PointSourceAttributes set.
+         */
         @NonNull
         AudioTrack.Builder setPointSourceAttributes(
                 @NonNull AudioTrack.Builder builder, @NonNull PointSourceAttributes attributes);
 
+        /**
+         * Sets the SoundFieldAttributes of the AudioTrack.
+         *
+         * @param builder The AudioTrack.Builder to set the SoundFieldAttributes on.
+         * @param attributes The SoundFieldAttributes to set.
+         * @return The AudioTrack.Builder with the SoundFieldAttributes set.
+         */
         @NonNull
         AudioTrack.Builder setSoundFieldAttributes(
                 @NonNull AudioTrack.Builder builder, @NonNull SoundFieldAttributes attributes);
@@ -1942,39 +2080,51 @@ public interface JxrPlatformAdapter {
     /** Interface for a SceneCore MediaPlayerExtensionsWrapper */
     interface MediaPlayerExtensionsWrapper {
 
+        /**
+         * Sets the PointSourceAttributes of the MediaPlayer.
+         *
+         * @param mediaPlayer The MediaPlayer to set the PointSourceAttributes on.
+         * @param attributes The PointSourceAttributes to set.
+         */
         void setPointSourceAttributes(
                 @NonNull MediaPlayer mediaPlayer, @NonNull PointSourceAttributes attributes);
 
+        /**
+         * Sets the SoundFieldAttributes of the MediaPlayer.
+         *
+         * @param mediaPlayer The MediaPlayer to set the SoundFieldAttributes on.
+         * @param attributes The SoundFieldAttributes to set.
+         */
         void setSoundFieldAttributes(
                 @NonNull MediaPlayer mediaPlayer, @NonNull SoundFieldAttributes attributes);
     }
 
     /** Represents a SceneCore PointSourceAttributes */
     class PointSourceAttributes {
-        private final Entity entity;
+        private final Entity mEntity;
 
         public PointSourceAttributes(@NonNull Entity entity) {
-            this.entity = entity;
+            this.mEntity = entity;
         }
 
         /** Gets the SceneCore {@link Entity} for this instance. */
         @NonNull
         public Entity getEntity() {
-            return this.entity;
+            return this.mEntity;
         }
     }
 
     /** Represents a SceneCore SoundFieldAttributes */
     class SoundFieldAttributes {
 
-        @SpatializerConstants.AmbisonicsOrder private final int ambisonicsOrder;
+        @SpatializerConstants.AmbisonicsOrder private final int mAmbisonicsOrder;
 
         public SoundFieldAttributes(int ambisonicsOrder) {
-            this.ambisonicsOrder = ambisonicsOrder;
+            this.mAmbisonicsOrder = ambisonicsOrder;
         }
 
         public int getAmbisonicsOrder() {
-            return ambisonicsOrder;
+            return mAmbisonicsOrder;
         }
     }
 
@@ -2026,13 +2176,13 @@ public interface JxrPlatformAdapter {
 
     /** Returns a [SoundPoolExtensionsWrapper] instance. */
     @NonNull
-    public SoundPoolExtensionsWrapper getSoundPoolExtensionsWrapper();
+    SoundPoolExtensionsWrapper getSoundPoolExtensionsWrapper();
 
     /** Returns an [AudioTrackExtensionssWrapper] instance. */
     @NonNull
-    public AudioTrackExtensionsWrapper getAudioTrackExtensionsWrapper();
+    AudioTrackExtensionsWrapper getAudioTrackExtensionsWrapper();
 
     /** Returns a [MediaPlayerExtensionsWrapper] instance. */
     @NonNull
-    public MediaPlayerExtensionsWrapper getMediaPlayerExtensionsWrapper();
+    MediaPlayerExtensionsWrapper getMediaPlayerExtensionsWrapper();
 }

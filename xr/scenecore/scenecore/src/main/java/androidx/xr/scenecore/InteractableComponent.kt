@@ -66,7 +66,7 @@ private constructor(
         this.entity = null
     }
 
-    internal companion object {
+    public companion object {
         /** Factory for Interactable component. */
         internal fun create(
             runtime: JxrPlatformAdapter,
@@ -76,5 +76,28 @@ private constructor(
         ): InteractableComponent {
             return InteractableComponent(runtime, entityManager, executor, inputEventListener)
         }
+
+        /**
+         * Public factory for creating an [InteractableComponent]. It enables access to raw input
+         * events.
+         *
+         * @param session [Session] to create the [InteractableComponent] in.
+         * @param executor Executor for invoking [InputEventListener].
+         * @param inputEventListener [InputEventListener] that accepts [InputEvent]s.
+         * @return [InteractableComponent] instance.
+         */
+        @JvmStatic
+        @Suppress("ExecutorRegistration")
+        public fun create(
+            session: Session,
+            executor: Executor,
+            inputEventListener: InputEventListener,
+        ): InteractableComponent =
+            InteractableComponent.create(
+                session.platformAdapter,
+                session.entityManager,
+                executor,
+                inputEventListener,
+            )
     }
 }

@@ -80,17 +80,17 @@ private constructor(
 ) : BaseActivityPose<JxrPlatformAdapter.CameraViewActivityPose>(rtCameraViewActivityPose) {
 
     internal companion object {
-        internal fun createLeft(runtime: JxrPlatformAdapter): CameraView? {
+        internal fun createLeft(platformAdapter: JxrPlatformAdapter): CameraView? {
             val cameraViewActivityPose =
-                runtime.getCameraViewActivityPose(
+                platformAdapter.getCameraViewActivityPose(
                     JxrPlatformAdapter.CameraViewActivityPose.CAMERA_TYPE_LEFT_EYE
                 )
             return cameraViewActivityPose?.let { CameraView(it) }
         }
 
-        internal fun createRight(runtime: JxrPlatformAdapter): CameraView? {
+        internal fun createRight(platformAdapter: JxrPlatformAdapter): CameraView? {
             val cameraViewActivityPose =
-                runtime.getCameraViewActivityPose(
+                platformAdapter.getCameraViewActivityPose(
                     JxrPlatformAdapter.CameraViewActivityPose.CAMERA_TYPE_RIGHT_EYE
                 )
             return cameraViewActivityPose?.let { CameraView(it) }
@@ -121,7 +121,7 @@ private constructor(
 
 /**
  * Head is a ActivityPose used to track the position of the user's head. If there is a left and
- * right camera it is calculated as the position bettween the two.
+ * right camera it is calculated as the position between the two.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class Head private constructor(rtActivityPose: JxrPlatformAdapter.HeadActivityPose) :
@@ -130,8 +130,8 @@ public class Head private constructor(rtActivityPose: JxrPlatformAdapter.HeadAct
     internal companion object {
 
         /** Factory function for creating [Head] instance. */
-        internal fun create(runtime: JxrPlatformAdapter): Head? {
-            return runtime.headActivityPose?.let { Head(it) }
+        internal fun create(platformAdapter: JxrPlatformAdapter): Head? {
+            return platformAdapter.headActivityPose?.let { Head(it) }
         }
     }
 }
@@ -148,7 +148,7 @@ private constructor(rtActivityPose: JxrPlatformAdapter.PerceptionSpaceActivityPo
     internal companion object {
 
         /** Factory function for creating [PerceptionSpace] instance. */
-        internal fun create(runtime: JxrPlatformAdapter): PerceptionSpace =
-            PerceptionSpace(runtime.perceptionSpaceActivityPose)
+        internal fun create(platformAdapter: JxrPlatformAdapter): PerceptionSpace =
+            PerceptionSpace(platformAdapter.perceptionSpaceActivityPose)
     }
 }

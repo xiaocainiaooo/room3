@@ -98,9 +98,9 @@ public class FakeXrExtensions implements XrExtensions {
 
     @NonNull public final Map<Activity, FakeActivityPanel> activityPanelMap = new HashMap<>();
 
-    FakeNode fakeTaskNode = null;
-    FakeNode fakeEnvironmentNode = null;
-    FakeNode fakeNodeForMainWindow = null;
+    FakeNode mFakeTaskNode = null;
+    FakeNode mFakeEnvironmentNode = null;
+    FakeNode mFakeNodeForMainWindow = null;
 
     // TODO: b/370033054 - fakeSpatialState should be updated according to some fake extensions
     // calls
@@ -109,16 +109,16 @@ public class FakeXrExtensions implements XrExtensions {
 
     // Technically this could be set per-activity, but we're assuming that there's a single activity
     // associated with each JXRCore session, so we're only tracking it once for now.
-    SpaceMode spaceMode = SpaceMode.NONE;
+    SpaceMode mSpaceMode = SpaceMode.NONE;
 
-    int mainWindowWidth = 0;
-    int mainWindowHeight = 0;
+    int mMainWindowWidth = 0;
+    int mMainWindowHeight = 0;
 
-    Consumer<SpatialState> spatialStateCallback = null;
+    Consumer<SpatialState> mSpatialStateCallback = null;
 
-    float preferredAspectRatioHsm = 0.0f;
-    int openXrWorldSpaceType = 0;
-    FakeNodeTransaction lastFakeNodeTransaction = null;
+    float mPreferredAspectRatioHsm = 0.0f;
+    int mOpenXrWorldSpaceType = 0;
+    FakeNodeTransaction mLastFakeNodeTransaction = null;
 
     @NonNull
     public final FakeSpatialAudioExtensions fakeSpatialAudioExtensions =
@@ -126,12 +126,12 @@ public class FakeXrExtensions implements XrExtensions {
 
     @Nullable
     public FakeNode getFakeEnvironmentNode() {
-        return fakeEnvironmentNode;
+        return mFakeEnvironmentNode;
     }
 
     @Nullable
     public FakeNode getFakeNodeForMainWindow() {
-        return fakeNodeForMainWindow;
+        return mFakeNodeForMainWindow;
     }
 
     @Override
@@ -151,8 +151,8 @@ public class FakeXrExtensions implements XrExtensions {
     @Override
     @NonNull
     public NodeTransaction createNodeTransaction() {
-        lastFakeNodeTransaction = new FakeNodeTransaction();
-        return lastFakeNodeTransaction;
+        mLastFakeNodeTransaction = new FakeNodeTransaction();
+        return mLastFakeNodeTransaction;
     }
 
     @Override
@@ -179,7 +179,7 @@ public class FakeXrExtensions implements XrExtensions {
 
     @NonNull
     public SpaceMode getSpaceMode() {
-        return spaceMode;
+        return mSpaceMode;
     }
 
     /**
@@ -198,8 +198,8 @@ public class FakeXrExtensions implements XrExtensions {
             int height,
             @NonNull Consumer<XrExtensionResult> callback,
             @NonNull Executor executor) {
-        mainWindowWidth = width;
-        mainWindowHeight = height;
+        mMainWindowWidth = width;
+        mMainWindowHeight = height;
         executor.execute(() -> callback.accept(createAsyncResult()));
     }
 
@@ -213,11 +213,11 @@ public class FakeXrExtensions implements XrExtensions {
     }
 
     public int getMainWindowWidth() {
-        return mainWindowWidth;
+        return mMainWindowWidth;
     }
 
     public int getMainWindowHeight() {
-        return mainWindowHeight;
+        return mMainWindowHeight;
     }
 
     @Override
@@ -226,7 +226,7 @@ public class FakeXrExtensions implements XrExtensions {
             @NonNull Consumer<Bounds> callback,
             @NonNull Executor executor) {
         callback.accept(
-                (spaceMode == SpaceMode.FULL_SPACE
+                (mSpaceMode == SpaceMode.FULL_SPACE
                         ? new Bounds(
                                 Float.POSITIVE_INFINITY,
                                 Float.POSITIVE_INFINITY,
@@ -282,16 +282,16 @@ public class FakeXrExtensions implements XrExtensions {
             @NonNull Consumer<XrExtensionResult> callback,
             @NonNull Executor executor) {
         FakeSpatialState spatialState = new FakeSpatialState();
-        spatialState.bounds =
+        spatialState.mBounds =
                 requestEnter
                         ? new Bounds(
                                 Float.POSITIVE_INFINITY,
                                 Float.POSITIVE_INFINITY,
                                 Float.POSITIVE_INFINITY)
                         : new Bounds(10f, 10f, 10f);
-        spatialState.capabilities = getCapabilities(requestEnter);
+        spatialState.mCapabilities = getCapabilities(requestEnter);
         sendSpatialState(spatialState);
-        spaceMode = requestEnter ? SpaceMode.FULL_SPACE : SpaceMode.HOME_SPACE;
+        mSpaceMode = requestEnter ? SpaceMode.FULL_SPACE : SpaceMode.HOME_SPACE;
 
         executor.execute(() -> callback.accept(createAsyncResult()));
     }
@@ -325,25 +325,27 @@ public class FakeXrExtensions implements XrExtensions {
             @NonNull Executor executor) {
         // note that we assume this is only called for the (single) primary activity associated with
         // the JXRCore session and we also don't honor the executor here
-        spatialStateCallback = callback;
+        mSpatialStateCallback = callback;
     }
 
     @Override
     public void clearSpatialStateCallback(@NonNull Activity activity) {
-        spatialStateCallback = null;
+        mSpatialStateCallback = null;
     }
 
-    // Method for tests to call to trigger the spatial state callback.
-    // This should probably be called on the provided executor.
+    /**
+     * Tests can use this method to trigger the spatial state callback. It is invoked on the calling
+     * thread.
+     */
     public void sendSpatialState(@NonNull SpatialState spatialState) {
-        if (spatialStateCallback != null) {
-            spatialStateCallback.accept(spatialState);
+        if (mSpatialStateCallback != null) {
+            mSpatialStateCallback.accept(spatialState);
         }
     }
 
     @Nullable
     public Consumer<SpatialState> getSpatialStateCallback() {
-        return spatialStateCallback;
+        return mSpatialStateCallback;
     }
 
     private XrExtensionResult createAsyncResult() {
@@ -372,11 +374,11 @@ public class FakeXrExtensions implements XrExtensions {
             @NonNull Node windowNode,
             @NonNull Consumer<XrExtensionResult> callback,
             @NonNull Executor executor) {
-        fakeTaskNode = (FakeNode) sceneNode;
-        fakeTaskNode.name = "taskNode";
+        mFakeTaskNode = (FakeNode) sceneNode;
+        mFakeTaskNode.mName = "taskNode";
 
-        fakeNodeForMainWindow = (FakeNode) windowNode;
-        fakeNodeForMainWindow.name = "nodeForMainWindow";
+        mFakeNodeForMainWindow = (FakeNode) windowNode;
+        mFakeNodeForMainWindow.mName = "nodeForMainWindow";
 
         executor.execute(() -> callback.accept(createAsyncResult()));
     }
@@ -395,15 +397,15 @@ public class FakeXrExtensions implements XrExtensions {
             @NonNull Activity activity,
             @NonNull Consumer<XrExtensionResult> callback,
             @NonNull Executor executor) {
-        fakeTaskNode = null;
-        fakeNodeForMainWindow = null;
+        mFakeTaskNode = null;
+        mFakeNodeForMainWindow = null;
 
         executor.execute(() -> callback.accept(createAsyncResult()));
     }
 
     @Nullable
     public FakeNode getFakeTaskNode() {
-        return fakeTaskNode;
+        return mFakeTaskNode;
     }
 
     /**
@@ -422,8 +424,8 @@ public class FakeXrExtensions implements XrExtensions {
             @NonNull Node environmentNode,
             @NonNull Consumer<XrExtensionResult> callback,
             @NonNull Executor executor) {
-        fakeEnvironmentNode = (FakeNode) environmentNode;
-        fakeEnvironmentNode.name = "environmentNode";
+        mFakeEnvironmentNode = (FakeNode) environmentNode;
+        mFakeEnvironmentNode.mName = "environmentNode";
 
         executor.execute(() -> callback.accept(createAsyncResult()));
     }
@@ -442,7 +444,7 @@ public class FakeXrExtensions implements XrExtensions {
             @NonNull Activity activity,
             @NonNull Consumer<XrExtensionResult> callback,
             @NonNull Executor executor) {
-        fakeEnvironmentNode = null;
+        mFakeEnvironmentNode = null;
 
         executor.execute(() -> callback.accept(createAsyncResult()));
     }
@@ -490,7 +492,7 @@ public class FakeXrExtensions implements XrExtensions {
     @Override
     @NonNull
     @Deprecated
-    //  public ListenableFuture</* @Nullable */ androidx.xr.extensions.asset.EnvironmentToken>
+    //  public ListenableFuture</* @Nullable */ EnvironmentToken>
     // loadEnvironment(
     public CompletableFuture</* @Nullable */ androidx.xr.extensions.asset.EnvironmentToken>
             loadEnvironment(
@@ -554,7 +556,7 @@ public class FakeXrExtensions implements XrExtensions {
     public FakeNode testGetNodeWithGltfToken(
             @NonNull androidx.xr.extensions.asset.GltfModelToken token) {
         for (FakeNode node : createdNodes) {
-            if (node.gltfModel != null && node.gltfModel.equals(token)) {
+            if (node.mGltfModel != null && node.mGltfModel.equals(token)) {
                 return node;
             }
         }
@@ -571,7 +573,7 @@ public class FakeXrExtensions implements XrExtensions {
     public FakeNode testGetNodeWithEnvironmentToken(
             @NonNull androidx.xr.extensions.asset.EnvironmentToken token) {
         for (FakeNode node : createdNodes) {
-            if (node.environment != null && node.environment.equals(token)) {
+            if (node.mEnvironment != null && node.mEnvironment.equals(token)) {
                 return node;
             }
         }
@@ -587,6 +589,7 @@ public class FakeXrExtensions implements XrExtensions {
         return fakeActivityPanel;
     }
 
+    /** Returns the FakeActivityPanel for the given Activity. */
     @NonNull
     public FakeActivityPanel getActivityPanelForHost(@NonNull Activity host) {
         return activityPanelMap.get(host);
@@ -622,16 +625,17 @@ public class FakeXrExtensions implements XrExtensions {
             @NonNull Vec3 direction,
             @NonNull Consumer<HitTestResult> callback,
             @NonNull Executor executor) {
-        throw new UnsupportedOperationException(NOT_IMPLEMENTED_IN_FAKE);
+        HitTestResult fakeHitTestResult = new HitTestResult();
+        executor.execute(() -> callback.accept(fakeHitTestResult));
     }
 
     @Override
     public int getOpenXrWorldSpaceType() {
-        return openXrWorldSpaceType;
+        return mOpenXrWorldSpaceType;
     }
 
     public void setOpenXrWorldSpaceType(int openXrWorldSpaceType) {
-        this.openXrWorldSpaceType = openXrWorldSpaceType;
+        mOpenXrWorldSpaceType = openXrWorldSpaceType;
     }
 
     @Override
@@ -657,13 +661,13 @@ public class FakeXrExtensions implements XrExtensions {
             float preferredRatio,
             @NonNull Consumer<XrExtensionResult> callback,
             @NonNull Executor executor) {
-        preferredAspectRatioHsm = preferredRatio;
+        mPreferredAspectRatioHsm = preferredRatio;
 
         executor.execute(() -> callback.accept(createAsyncResult()));
     }
 
     public float getPreferredAspectRatio() {
-        return preferredAspectRatioHsm;
+        return mPreferredAspectRatioHsm;
     }
 
     @NonNull
@@ -692,63 +696,63 @@ public class FakeXrExtensions implements XrExtensions {
     /** A fake implementation of Closeable. */
     @SuppressWarnings("NotCloseable")
     public static class FakeCloseable implements Closeable {
-        boolean closed = false;
+        boolean mClosed = false;
 
         @Override
         public void close() {
-            closed = true;
+            mClosed = true;
         }
 
         public boolean isClosed() {
-            return closed;
+            return mClosed;
         }
     }
 
     /** A fake implementation of the XR extensions Node. */
     @SuppressWarnings("ParcelCreator")
     public static final class FakeNode implements Node {
-        FakeNode parent = null;
-        float xPosition = 0.0f;
-        float yPosition = 0.0f;
-        float zPosition = 0.0f;
-        float xOrientation = 0.0f;
-        float yOrientation = 0.0f;
-        float zOrientation = 0.0f;
-        float wOrientation = 1.0f;
-        float xScale = 1.0f;
-        float yScale = 1.0f;
-        float zScale = 1.0f;
-        float cornerRadius = 0.0f;
-        boolean isVisible = false;
-        float alpha = 1.0f;
-        androidx.xr.extensions.asset.GltfModelToken gltfModel = null;
-        IBinder anchorId = null;
-        String name = null;
-        float passthroughOpacity = 1.0f;
-        @PassthroughState.Mode int passthroughMode = 0;
-        SurfaceControlViewHost.SurfacePackage surfacePackage = null;
-        androidx.xr.extensions.asset.EnvironmentToken environment = null;
-        Consumer<InputEvent> listener = null;
-        Consumer<NodeTransform> transformListener = null;
-        Consumer<Integer> pointerCaptureStateCallback = null;
+        FakeNode mParent = null;
+        float mXPosition = 0.0f;
+        float mYPosition = 0.0f;
+        float mZPosition = 0.0f;
+        float mXOrientation = 0.0f;
+        float mYOrientation = 0.0f;
+        float mZOrientation = 0.0f;
+        float mWOrientation = 1.0f;
+        float mXScale = 1.0f;
+        float mYScale = 1.0f;
+        float mZScale = 1.0f;
+        float mCornerRadius = 0.0f;
+        boolean mIsVisible = false;
+        float mAlpha = 1.0f;
+        androidx.xr.extensions.asset.GltfModelToken mGltfModel = null;
+        IBinder mAnchorId = null;
+        String mName = null;
+        float mPassthroughOpacity = 1.0f;
+        @PassthroughState.Mode int mPassthroughMode = 0;
+        SurfaceControlViewHost.SurfacePackage mSurfacePackage = null;
+        androidx.xr.extensions.asset.EnvironmentToken mEnvironment = null;
+        Consumer<InputEvent> mListener = null;
+        Consumer<NodeTransform> mTransformListener = null;
+        Consumer<Integer> mPointerCaptureStateCallback = null;
 
-        Executor executor = null;
-        ReformOptions reformOptions;
-        Executor transformExecutor = null;
+        Executor mExecutor = null;
+        ReformOptions mReformOptions;
+        Executor mTransformExecutor = null;
 
         private FakeNode() {}
 
         @Override
         public void listenForInput(
                 @NonNull Consumer<InputEvent> listener, @NonNull Executor executor) {
-            this.listener = listener;
-            this.executor = executor;
+            mListener = listener;
+            mExecutor = executor;
         }
 
         @Override
         public void stopListeningForInput() {
-            listener = null;
-            executor = null;
+            mListener = null;
+            mExecutor = null;
         }
 
         @Override
@@ -757,39 +761,47 @@ public class FakeXrExtensions implements XrExtensions {
         @Override
         public void requestPointerCapture(
                 @NonNull Consumer<Integer> stateCallback, @NonNull Executor executor) {
-            pointerCaptureStateCallback = stateCallback;
+            mPointerCaptureStateCallback = stateCallback;
         }
 
         @Override
         public void stopPointerCapture() {
-            pointerCaptureStateCallback = null;
+            mPointerCaptureStateCallback = null;
         }
 
+        /**
+         * Fires the InputEvent callback with the given event. It is invoked on the executor
+         * provided in listenForInput.
+         */
         public void sendInputEvent(@NonNull InputEvent event) {
-            executor.execute(() -> listener.accept(event));
+            mExecutor.execute(() -> mListener.accept(event));
         }
 
+        /**
+         * Fires the nodeTransform callback with the given transform. It is invoked on the executor
+         * provided in listenForInput.
+         */
         public void sendTransformEvent(@NonNull FakeNodeTransform nodeTransform) {
-            transformExecutor.execute(() -> transformListener.accept(nodeTransform));
+            mTransformExecutor.execute(() -> mTransformListener.accept(nodeTransform));
         }
 
         @Override
         @NonNull
         public Closeable subscribeToTransform(
                 @NonNull Consumer<NodeTransform> transformCallback, @NonNull Executor executor) {
-            this.transformListener = transformCallback;
-            this.transformExecutor = executor;
+            mTransformListener = transformCallback;
+            mTransformExecutor = executor;
             return new FakeCloseable();
         }
 
         @Nullable
         public Consumer<NodeTransform> getTransformListener() {
-            return transformListener;
+            return mTransformListener;
         }
 
         @Nullable
         public Executor getTransformExecutor() {
-            return transformExecutor;
+            return mTransformExecutor;
         }
 
         @Override
@@ -802,43 +814,43 @@ public class FakeXrExtensions implements XrExtensions {
 
         @Nullable
         public FakeNode getParent() {
-            return parent;
+            return mParent;
         }
 
         public float getXPosition() {
-            return xPosition;
+            return mXPosition;
         }
 
         public float getYPosition() {
-            return yPosition;
+            return mYPosition;
         }
 
         public float getZPosition() {
-            return zPosition;
+            return mZPosition;
         }
 
         public float getXOrientation() {
-            return xOrientation;
+            return mXOrientation;
         }
 
         public float getYOrientation() {
-            return yOrientation;
+            return mYOrientation;
         }
 
         public float getZOrientation() {
-            return zOrientation;
+            return mZOrientation;
         }
 
         public float getWOrientation() {
-            return wOrientation;
+            return mWOrientation;
         }
 
         public boolean isVisible() {
-            return isVisible;
+            return mIsVisible;
         }
 
         public float getAlpha() {
-            return alpha;
+            return mAlpha;
         }
 
         /**
@@ -847,22 +859,22 @@ public class FakeXrExtensions implements XrExtensions {
         @Nullable
         @Deprecated
         public androidx.xr.extensions.asset.GltfModelToken getGltfModel() {
-            return gltfModel;
+            return mGltfModel;
         }
 
         @Nullable
         public IBinder getAnchorId() {
-            return anchorId;
+            return mAnchorId;
         }
 
         @Nullable
         public String getName() {
-            return name;
+            return mName;
         }
 
         @Nullable
         public SurfaceControlViewHost.SurfacePackage getSurfacePackage() {
-            return surfacePackage;
+            return mSurfacePackage;
         }
 
         /**
@@ -871,27 +883,27 @@ public class FakeXrExtensions implements XrExtensions {
         @Nullable
         @Deprecated
         public androidx.xr.extensions.asset.EnvironmentToken getEnvironment() {
-            return environment;
+            return mEnvironment;
         }
 
         @Nullable
         public Consumer<InputEvent> getListener() {
-            return listener;
+            return mListener;
         }
 
         @Nullable
         public Consumer<Integer> getPointerCaptureStateCallback() {
-            return pointerCaptureStateCallback;
+            return mPointerCaptureStateCallback;
         }
 
         @Nullable
         public Executor getExecutor() {
-            return executor;
+            return mExecutor;
         }
 
         @Nullable
         public ReformOptions getReformOptions() {
-            return reformOptions;
+            return mReformOptions;
         }
     }
 
@@ -902,16 +914,16 @@ public class FakeXrExtensions implements XrExtensions {
      */
     @SuppressWarnings("NotCloseable")
     public static class FakeNodeTransaction implements NodeTransaction {
-        FakeNode lastFakeNode = null;
-        boolean applied = false;
+        FakeNode mLastFakeNode = null;
+        boolean mApplied = false;
 
         private FakeNodeTransaction() {}
 
         @Override
         @NonNull
         public NodeTransaction setParent(@NonNull Node node, @Nullable Node parent) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).parent = (FakeNode) parent;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mParent = (FakeNode) parent;
             return this;
         }
 
@@ -923,18 +935,18 @@ public class FakeXrExtensions implements XrExtensions {
         @Deprecated
         public NodeTransaction setEnvironment(
                 @NonNull Node node, @Nullable androidx.xr.extensions.asset.EnvironmentToken token) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).environment = token;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mEnvironment = token;
             return this;
         }
 
         @Override
         @NonNull
         public NodeTransaction setPosition(@NonNull Node node, float x, float y, float z) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).xPosition = x;
-            ((FakeNode) node).yPosition = y;
-            ((FakeNode) node).zPosition = z;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mXPosition = x;
+            ((FakeNode) node).mYPosition = y;
+            ((FakeNode) node).mZPosition = z;
             return this;
         }
 
@@ -942,11 +954,11 @@ public class FakeXrExtensions implements XrExtensions {
         @NonNull
         public NodeTransaction setOrientation(
                 @NonNull Node node, float x, float y, float z, float w) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).xOrientation = x;
-            ((FakeNode) node).yOrientation = y;
-            ((FakeNode) node).zOrientation = z;
-            ((FakeNode) node).wOrientation = w;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mXOrientation = x;
+            ((FakeNode) node).mYOrientation = y;
+            ((FakeNode) node).mZOrientation = z;
+            ((FakeNode) node).mWOrientation = w;
             return this;
         }
 
@@ -954,26 +966,26 @@ public class FakeXrExtensions implements XrExtensions {
         @NonNull
         // TODO(b/354731545): Cover this with an AndroidXREntity test
         public NodeTransaction setScale(@NonNull Node node, float sx, float sy, float sz) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).xScale = sx;
-            ((FakeNode) node).yScale = sy;
-            ((FakeNode) node).zScale = sz;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mXScale = sx;
+            ((FakeNode) node).mYScale = sy;
+            ((FakeNode) node).mZScale = sz;
             return this;
         }
 
         @Override
         @NonNull
         public NodeTransaction setVisibility(@NonNull Node node, boolean isVisible) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).isVisible = isVisible;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mIsVisible = isVisible;
             return this;
         }
 
         @Override
         @NonNull
         public NodeTransaction setAlpha(@NonNull Node node, float value) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).alpha = value;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mAlpha = value;
             return this;
         }
 
@@ -986,16 +998,16 @@ public class FakeXrExtensions implements XrExtensions {
         public NodeTransaction setGltfModel(
                 @NonNull Node node,
                 @NonNull androidx.xr.extensions.asset.GltfModelToken gltfModelToken) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).gltfModel = gltfModelToken;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mGltfModel = gltfModelToken;
             return this;
         }
 
         @Override
         @NonNull
         public NodeTransaction setName(@NonNull Node node, @NonNull String name) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).name = name;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mName = name;
             return this;
         }
 
@@ -1005,9 +1017,9 @@ public class FakeXrExtensions implements XrExtensions {
                 @NonNull Node node,
                 float passthroughOpacity,
                 @PassthroughState.Mode int passthroughMode) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).passthroughOpacity = passthroughOpacity;
-            ((FakeNode) node).passthroughMode = passthroughMode;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mPassthroughOpacity = passthroughOpacity;
+            ((FakeNode) node).mPassthroughMode = passthroughMode;
             return this;
         }
 
@@ -1016,8 +1028,8 @@ public class FakeXrExtensions implements XrExtensions {
         public NodeTransaction setSurfacePackage(
                 @Nullable Node node,
                 @NonNull SurfaceControlViewHost.SurfacePackage surfacePackage) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).surfacePackage = surfacePackage;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mSurfacePackage = surfacePackage;
             return this;
         }
 
@@ -1033,47 +1045,47 @@ public class FakeXrExtensions implements XrExtensions {
         @Override
         @NonNull
         public NodeTransaction setAnchorId(@NonNull Node node, @Nullable IBinder anchorId) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).anchorId = anchorId;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mAnchorId = anchorId;
             return this;
         }
 
         @Override
         @NonNull
         public NodeTransaction enableReform(@NonNull Node node, @NonNull ReformOptions options) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).reformOptions = options;
-            ((FakeReformOptions) options).optionsApplied = true;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mReformOptions = options;
+            ((FakeReformOptions) options).mOptionsApplied = true;
             return this;
         }
 
         @Override
         @NonNull
         public NodeTransaction setReformSize(@NonNull Node node, @NonNull Vec3 reformSize) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).reformOptions.setCurrentSize(reformSize);
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mReformOptions.setCurrentSize(reformSize);
             return this;
         }
 
         @Override
         @NonNull
         public NodeTransaction disableReform(@NonNull Node node) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).reformOptions = new FakeReformOptions(null, null);
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mReformOptions = new FakeReformOptions(null, null);
             return this;
         }
 
         @Override
         @NonNull
         public NodeTransaction setCornerRadius(@NonNull Node node, float cornerRadius) {
-            lastFakeNode = (FakeNode) node;
-            ((FakeNode) node).cornerRadius = cornerRadius;
+            mLastFakeNode = (FakeNode) node;
+            ((FakeNode) node).mCornerRadius = cornerRadius;
             return this;
         }
 
         @Override
         public void apply() {
-            applied = true;
+            mApplied = true;
         }
 
         @Override
@@ -1082,16 +1094,16 @@ public class FakeXrExtensions implements XrExtensions {
 
     /** A fake implementation of the XR extensions NodeTransform. */
     public static class FakeNodeTransform implements NodeTransform {
-        Mat4f transform;
+        Mat4f mTransform;
 
         public FakeNodeTransform(@NonNull Mat4f transform) {
-            this.transform = transform;
+            mTransform = transform;
         }
 
         @Override
         @NonNull
         public Mat4f getTransform() {
-            return transform;
+            return mTransform;
         }
 
         @Override
@@ -1102,261 +1114,261 @@ public class FakeXrExtensions implements XrExtensions {
 
     /** A fake implementation of the XR extensions GltfModelToken. */
     public static class FakeGltfModelToken implements androidx.xr.extensions.asset.GltfModelToken {
-        String url;
+        String mUrl;
 
         public FakeGltfModelToken(@NonNull String url) {
-            this.url = url;
+            mUrl = url;
         }
 
         @NonNull
         public String getUrl() {
-            return url;
+            return mUrl;
         }
     }
 
     /** A fake implementation of the XR extensions EnvironmentToken. */
     public static class FakeEnvironmentToken
             implements androidx.xr.extensions.asset.EnvironmentToken {
-        String url;
+        String mUrl;
 
         private FakeEnvironmentToken(@NonNull String url) {
-            this.url = url;
+            this.mUrl = url;
         }
 
         @NonNull
         public String getUrl() {
-            return url;
+            return mUrl;
         }
     }
 
     /** A fake implementation of the XR extensions EnvironmentVisibilityState. */
     public static class FakeEnvironmentVisibilityState implements EnvironmentVisibilityState {
-        @EnvironmentVisibilityState.State int state;
+        @EnvironmentVisibilityState.State int mState;
 
         public FakeEnvironmentVisibilityState(@EnvironmentVisibilityState.State int state) {
-            this.state = state;
+            this.mState = state;
         }
 
         @Override
         @EnvironmentVisibilityState.State
         public int getCurrentState() {
-            return state;
+            return mState;
         }
     }
 
     /** A fake implementation of the XR extensions EnvironmentVisibilityState. */
     public static class FakePassthroughVisibilityState implements PassthroughVisibilityState {
-        @PassthroughVisibilityState.State int state;
-        float opacity;
+        @PassthroughVisibilityState.State int mState;
+        float mOpacity;
 
         public FakePassthroughVisibilityState(
                 @PassthroughVisibilityState.State int state, float opacity) {
-            this.state = state;
-            this.opacity = opacity;
+            this.mState = state;
+            this.mOpacity = opacity;
         }
 
         @Override
         @PassthroughVisibilityState.State
         public int getCurrentState() {
-            return state;
+            return mState;
         }
 
         @Override
         public float getOpacity() {
-            return opacity;
+            return mOpacity;
         }
     }
 
     /** Creates fake activity panel. */
     public static class FakeActivityPanel implements ActivityPanel {
-        Intent launchIntent;
-        Bundle bundle;
-        Activity activity;
-        Rect bounds;
-        boolean isDeleted = false;
-        Node node;
+        Intent mLaunchIntent;
+        Bundle mBundle;
+        Activity mActivity;
+        Rect mBounds;
+        boolean mIsDeleted = false;
+        Node mNode;
 
         FakeActivityPanel(@NonNull Node node) {
-            this.node = node;
+            mNode = node;
         }
 
         @Override
         public void launchActivity(@NonNull Intent intent, @Nullable Bundle options) {
-            launchIntent = intent;
-            this.bundle = options;
+            mLaunchIntent = intent;
+            mBundle = options;
         }
 
         @Nullable
         public Intent getLaunchIntent() {
-            return launchIntent;
+            return mLaunchIntent;
         }
 
         @NonNull
         public Bundle getBundle() {
-            return bundle;
+            return mBundle;
         }
 
         @Override
         public void moveActivity(@NonNull Activity activity) {
-            this.activity = activity;
+            mActivity = activity;
         }
 
         @Nullable
         public Activity getActivity() {
-            return activity;
+            return mActivity;
         }
 
         @NonNull
         @Override
         public Node getNode() {
-            return node;
+            return mNode;
         }
 
         @Override
         public void setWindowBounds(@NonNull Rect windowBounds) {
-            bounds = windowBounds;
+            mBounds = windowBounds;
         }
 
         @Nullable
         public Rect getBounds() {
-            return bounds;
+            return mBounds;
         }
 
         @Override
         public void delete() {
-            isDeleted = true;
+            mIsDeleted = true;
         }
 
         public boolean isDeleted() {
-            return isDeleted;
+            return mIsDeleted;
         }
     }
 
     /** Fake input event. */
     public static class FakeInputEvent implements InputEvent {
-        int source;
-        int pointerType;
-        long timestamp;
-        Vec3 origin;
-        Vec3 direction;
-        FakeHitInfo hitInfo;
-        FakeHitInfo secondaryHitInfo;
-        int dispatchFlags;
-        int action;
+        int mSource;
+        int mPointerType;
+        long mTimestamp;
+        Vec3 mOrigin;
+        Vec3 mDirection;
+        FakeHitInfo mHitInfo;
+        FakeHitInfo mSecondaryHitInfo;
+        int mDispatchFlags;
+        int mAction;
 
         @Override
         public int getSource() {
-            return source;
+            return mSource;
         }
 
         @Override
         public int getPointerType() {
-            return pointerType;
+            return mPointerType;
         }
 
         @Override
         public long getTimestamp() {
-            return timestamp;
+            return mTimestamp;
         }
 
         @Override
         @NonNull
         public Vec3 getOrigin() {
-            return origin;
+            return mOrigin;
         }
 
         @Override
         @NonNull
         public Vec3 getDirection() {
-            return direction;
+            return mDirection;
         }
 
         @Override
         @Nullable
         public HitInfo getHitInfo() {
-            return hitInfo;
+            return mHitInfo;
         }
 
         @Override
         @Nullable
         public HitInfo getSecondaryHitInfo() {
-            return secondaryHitInfo;
+            return mSecondaryHitInfo;
         }
 
         @Override
         public int getDispatchFlags() {
-            return dispatchFlags;
+            return mDispatchFlags;
         }
 
         @Override
         public int getAction() {
-            return action;
+            return mAction;
         }
 
         public void setDispatchFlags(int dispatchFlags) {
-            this.dispatchFlags = dispatchFlags;
+            mDispatchFlags = dispatchFlags;
         }
 
         public void setOrigin(@NonNull Vec3 origin) {
-            this.origin = origin;
+            mOrigin = origin;
         }
 
         public void setDirection(@NonNull Vec3 direction) {
-            this.direction = direction;
+            mDirection = direction;
         }
 
         public void setFakeHitInfo(@NonNull FakeHitInfo hitInfo) {
-            this.hitInfo = hitInfo;
+            mHitInfo = hitInfo;
         }
 
         public void setTimestamp(long timestamp) {
-            this.timestamp = timestamp;
+            mTimestamp = timestamp;
         }
 
         /** Fake hit info. */
         public static class FakeHitInfo implements InputEvent.HitInfo {
-            int subspaceImpressNodeId;
-            Node inputNode;
-            Vec3 hitPosition;
-            Mat4f transform;
+            int mSubspaceImpressNodeId;
+            Node mInputNode;
+            Vec3 mHitPosition;
+            Mat4f mTransform;
 
             @Override
             public int getSubspaceImpressNodeId() {
-                return subspaceImpressNodeId;
+                return mSubspaceImpressNodeId;
             }
 
             @Override
             @NonNull
             public Node getInputNode() {
-                return inputNode;
+                return mInputNode;
             }
 
             @Override
             @Nullable
             public Vec3 getHitPosition() {
-                return hitPosition;
+                return mHitPosition;
             }
 
             @Override
             @NonNull
             public Mat4f getTransform() {
-                return transform;
+                return mTransform;
             }
 
             public void setSubspaceImpressNodeId(int subspaceImpressNodeId) {
-                this.subspaceImpressNodeId = subspaceImpressNodeId;
+                mSubspaceImpressNodeId = subspaceImpressNodeId;
             }
 
             public void setInputNode(@NonNull Node inputNode) {
-                this.inputNode = inputNode;
+                mInputNode = inputNode;
             }
 
             public void setHitPosition(@Nullable Vec3 hitPosition) {
-                this.hitPosition = hitPosition;
+                mHitPosition = hitPosition;
             }
 
             public void setTransform(@NonNull Mat4f transform) {
-                this.transform = transform;
+                mTransform = transform;
             }
         }
     }
@@ -1364,138 +1376,151 @@ public class FakeXrExtensions implements XrExtensions {
     /** Fake ReformOptions. */
     public static class FakeReformOptions implements ReformOptions {
 
-        int enabledReforms;
-        int reformFlags;
-        int scaleWithDistanceMode = SCALE_WITH_DISTANCE_MODE_DEFAULT;
-        Vec3 currentSize;
-        Vec3 minimumSize;
-        Vec3 maximumSize;
-        float fixedAspectRatio;
-        Consumer<ReformEvent> consumer;
-        Executor executor;
+        int mEnabledReforms;
+        int mReformFlags;
+        int mScaleWithDistanceMode = SCALE_WITH_DISTANCE_MODE_DEFAULT;
+        Vec3 mCurrentSize;
+        Vec3 mMinimumSize;
+        Vec3 mMaximumSize;
+        float mFixedAspectRatio;
+        boolean mForceShowResizeOverlay;
+        Consumer<ReformEvent> mConsumer;
+        Executor mExecutor;
 
-        boolean optionsApplied = true;
+        boolean mOptionsApplied = true;
 
         FakeReformOptions(Consumer<ReformEvent> consumer, Executor executor) {
-            this.consumer = consumer;
-            this.executor = executor;
+            this.mConsumer = consumer;
+            this.mExecutor = executor;
         }
 
         @Override
         public int getEnabledReform() {
-            return enabledReforms;
+            return mEnabledReforms;
         }
 
         @Override
         @NonNull
         public ReformOptions setEnabledReform(int i) {
-            enabledReforms = i;
+            mEnabledReforms = i;
             return this;
         }
 
         @Override
         public int getFlags() {
-            return reformFlags;
+            return mReformFlags;
         }
 
         @Override
         @NonNull
         public ReformOptions setFlags(int i) {
-            optionsApplied = false;
-            reformFlags = i;
+            mOptionsApplied = false;
+            mReformFlags = i;
             return this;
         }
 
         @NonNull
         @Override
         public Vec3 getCurrentSize() {
-            return currentSize;
+            return mCurrentSize;
         }
 
         @Override
         @NonNull
         public ReformOptions setCurrentSize(@NonNull Vec3 vec3) {
-            optionsApplied = false;
-            currentSize = vec3;
+            mOptionsApplied = false;
+            mCurrentSize = vec3;
             return this;
         }
 
         @NonNull
         @Override
         public Vec3 getMinimumSize() {
-            return minimumSize;
+            return mMinimumSize;
         }
 
         @Override
         @NonNull
         public ReformOptions setMinimumSize(@NonNull Vec3 vec3) {
-            optionsApplied = false;
-            minimumSize = vec3;
+            mOptionsApplied = false;
+            mMinimumSize = vec3;
             return this;
         }
 
         @NonNull
         @Override
         public Vec3 getMaximumSize() {
-            return maximumSize;
+            return mMaximumSize;
         }
 
         @Override
         @NonNull
         public ReformOptions setMaximumSize(@NonNull Vec3 vec3) {
-            optionsApplied = false;
-            maximumSize = vec3;
+            mOptionsApplied = false;
+            mMaximumSize = vec3;
             return this;
         }
 
         @Override
         public float getFixedAspectRatio() {
-            return fixedAspectRatio;
+            return mFixedAspectRatio;
         }
 
         @Override
         @NonNull
         public ReformOptions setFixedAspectRatio(float fixedAspectRatio) {
-            this.fixedAspectRatio = fixedAspectRatio;
+            mFixedAspectRatio = fixedAspectRatio;
+            return this;
+        }
+
+        @Override
+        public boolean getForceShowResizeOverlay() {
+            return mForceShowResizeOverlay;
+        }
+
+        @Override
+        @NonNull
+        public ReformOptions setForceShowResizeOverlay(boolean show) {
+            mForceShowResizeOverlay = show;
             return this;
         }
 
         @NonNull
         @Override
         public Consumer<ReformEvent> getEventCallback() {
-            return consumer;
+            return mConsumer;
         }
 
         @Override
         @NonNull
         @SuppressLint("InvalidNullabilityOverride")
         public ReformOptions setEventCallback(@NonNull Consumer<ReformEvent> consumer) {
-            this.consumer = consumer;
+            mConsumer = consumer;
             return this;
         }
 
         @NonNull
         @Override
         public Executor getEventExecutor() {
-            return executor;
+            return mExecutor;
         }
 
         @Override
         @NonNull
         public ReformOptions setEventExecutor(@NonNull Executor executor) {
-            this.executor = executor;
+            mExecutor = executor;
             return this;
         }
 
         @Override
         public int getScaleWithDistanceMode() {
-            return scaleWithDistanceMode;
+            return mScaleWithDistanceMode;
         }
 
         @Override
         @NonNull
         public ReformOptions setScaleWithDistanceMode(int scaleWithDistanceMode) {
-            this.scaleWithDistanceMode = scaleWithDistanceMode;
+            mScaleWithDistanceMode = scaleWithDistanceMode;
             return this;
         }
     }
@@ -1503,174 +1528,178 @@ public class FakeXrExtensions implements XrExtensions {
     /** Fake ReformEvent. */
     public static class FakeReformEvent implements ReformEvent {
 
-        int type;
-        int state;
-        int id;
-        Vec3 origin = new Vec3(0f, 0f, 0f);
-        Vec3 initialRayOrigin = origin;
-        Vec3 proposedPosition = origin;
-        Vec3 ones = new Vec3(1f, 1f, 1f);
-        Vec3 initialRayDirection = ones;
-        Vec3 proposedScale = ones;
-        Vec3 proposedSize = ones;
-        Vec3 twos = new Vec3(2f, 2f, 2f);
-        Vec3 currentRayOrigin = twos;
-        Vec3 threes = new Vec3(3f, 3f, 3f);
-        Vec3 currentRayDirection = threes;
-        Quatf identity = new Quatf(0f, 0f, 0f, 1f);
-        Quatf proposedOrientation = identity;
+        int mType;
+        int mState;
+        int mId;
+        Vec3 mOrigin = new Vec3(0f, 0f, 0f);
+        Vec3 mInitialRayOrigin = mOrigin;
+        Vec3 mProposedPosition = mOrigin;
+        Vec3 mOnes = new Vec3(1f, 1f, 1f);
+        Vec3 mInitialRayDirection = mOnes;
+        Vec3 mProposedScale = mOnes;
+        Vec3 mProposedSize = mOnes;
+        Vec3 mTwos = new Vec3(2f, 2f, 2f);
+        Vec3 mCurrentRayOrigin = mTwos;
+        Vec3 mThrees = new Vec3(3f, 3f, 3f);
+        Vec3 mCurrentRayDirection = mThrees;
+        Quatf mIdentity = new Quatf(0f, 0f, 0f, 1f);
+        Quatf mProposedOrientation = mIdentity;
 
         public void setType(int type) {
-            this.type = type;
+            mType = type;
         }
 
         public void setState(int state) {
-            this.state = state;
+            mState = state;
         }
 
         public void setProposedPosition(@NonNull Vec3 proposedPosition) {
-            this.proposedPosition = proposedPosition;
+            mProposedPosition = proposedPosition;
         }
 
         public void setProposedScale(@NonNull Vec3 proposedScale) {
-            this.proposedScale = proposedScale;
+            mProposedScale = proposedScale;
         }
 
         public void setProposedOrientation(@NonNull Quatf proposedOrientation) {
-            this.proposedOrientation = proposedOrientation;
+            mProposedOrientation = proposedOrientation;
+        }
+
+        public void setProposedSize(@NonNull Vec3 proposedSize) {
+            mProposedSize = proposedSize;
         }
 
         @Override
         public int getType() {
-            return type;
+            return mType;
         }
 
         @Override
         public int getState() {
-            return state;
+            return mState;
         }
 
         @Override
         public int getId() {
-            return id;
+            return mId;
         }
 
         @NonNull
         @Override
         public Vec3 getInitialRayOrigin() {
-            return initialRayOrigin;
+            return mInitialRayOrigin;
         }
 
         @NonNull
         @Override
         public Vec3 getInitialRayDirection() {
-            return initialRayDirection;
+            return mInitialRayDirection;
         }
 
         @NonNull
         @Override
         public Vec3 getCurrentRayOrigin() {
-            return currentRayOrigin;
+            return mCurrentRayOrigin;
         }
 
         @NonNull
         @Override
         public Vec3 getCurrentRayDirection() {
-            return currentRayDirection;
+            return mCurrentRayDirection;
         }
 
         @NonNull
         @Override
         public Vec3 getProposedPosition() {
-            return proposedPosition;
+            return mProposedPosition;
         }
 
         @NonNull
         @Override
         public Quatf getProposedOrientation() {
-            return proposedOrientation;
+            return mProposedOrientation;
         }
 
         @NonNull
         @Override
         public Vec3 getProposedScale() {
-            return proposedScale;
+            return mProposedScale;
         }
 
         @NonNull
         @Override
         public Vec3 getProposedSize() {
-            return proposedSize;
+            return mProposedSize;
         }
     }
 
     /** A fake implementation of the XR extensions SpatialState. */
     public static class FakeSpatialState implements SpatialState {
-        Bounds bounds;
-        SpatialCapabilities capabilities;
-        EnvironmentVisibilityState environmentVisibilityState;
-        PassthroughVisibilityState passthroughVisibilityState;
+        Bounds mBounds;
+        SpatialCapabilities mCapabilities;
+        EnvironmentVisibilityState mEnvironmentVisibilityState;
+        PassthroughVisibilityState mPassthroughVisibilityState;
 
         public FakeSpatialState() {
             // Initialize params to any non-null values
             // TODO: b/370033054 - Revisit the default values for the bounds and capabilities.
-            this.bounds =
+            mBounds =
                     new Bounds(
                             Float.POSITIVE_INFINITY,
                             Float.POSITIVE_INFINITY,
                             Float.POSITIVE_INFINITY);
             this.setAllSpatialCapabilities(true);
-            this.environmentVisibilityState =
+            mEnvironmentVisibilityState =
                     new FakeEnvironmentVisibilityState(EnvironmentVisibilityState.INVISIBLE);
-            this.passthroughVisibilityState =
+            mPassthroughVisibilityState =
                     new FakePassthroughVisibilityState(PassthroughVisibilityState.DISABLED, 0.0f);
         }
 
         @Override
         @NonNull
         public Bounds getBounds() {
-            return bounds;
+            return mBounds;
         }
 
         public void setBounds(@NonNull Bounds bounds) {
-            this.bounds = bounds;
+            mBounds = bounds;
         }
 
         @Override
         @NonNull
         public SpatialCapabilities getSpatialCapabilities() {
-            return capabilities;
+            return mCapabilities;
         }
 
         @Override
         @NonNull
         public EnvironmentVisibilityState getEnvironmentVisibility() {
-            return environmentVisibilityState;
+            return mEnvironmentVisibilityState;
         }
 
         public void setEnvironmentVisibility(
                 @NonNull EnvironmentVisibilityState environmentVisibilityState) {
-            this.environmentVisibilityState = environmentVisibilityState;
+            mEnvironmentVisibilityState = environmentVisibilityState;
         }
 
         @Override
         @NonNull
         public PassthroughVisibilityState getPassthroughVisibility() {
-            return passthroughVisibilityState;
+            return mPassthroughVisibilityState;
         }
 
         public void setPassthroughVisibility(
                 @NonNull PassthroughVisibilityState passthroughVisibilityState) {
-            this.passthroughVisibilityState = passthroughVisibilityState;
+            mPassthroughVisibilityState = passthroughVisibilityState;
         }
 
         // Methods for tests to set the capabilities.
         public void setSpatialCapabilities(@NonNull SpatialCapabilities capabilities) {
-            this.capabilities = capabilities;
+            mCapabilities = capabilities;
         }
 
         public void setAllSpatialCapabilities(boolean allowAll) {
-            this.capabilities =
+            mCapabilities =
                     new SpatialCapabilities() {
                         @Override
                         public boolean get(int capQuery) {
@@ -1686,7 +1715,7 @@ public class FakeXrExtensions implements XrExtensions {
         @NonNull
         public final FakeSoundPoolExtensions soundPoolExtensions = new FakeSoundPoolExtensions();
 
-        FakeAudioTrackExtensions audioTrackExtensions = new FakeAudioTrackExtensions();
+        FakeAudioTrackExtensions mAudioTrackExtensions = new FakeAudioTrackExtensions();
 
         @NonNull
         public final FakeMediaPlayerExtensions mediaPlayerExtensions =
@@ -1701,12 +1730,12 @@ public class FakeXrExtensions implements XrExtensions {
         @NonNull
         @Override
         public AudioTrackExtensions getAudioTrackExtensions() {
-            return audioTrackExtensions;
+            return mAudioTrackExtensions;
         }
 
         public void setFakeAudioTrackExtensions(
                 @NonNull FakeAudioTrackExtensions audioTrackExtensions) {
-            this.audioTrackExtensions = audioTrackExtensions;
+            mAudioTrackExtensions = audioTrackExtensions;
         }
 
         @NonNull
@@ -1719,20 +1748,20 @@ public class FakeXrExtensions implements XrExtensions {
     /** Fake SoundPoolExtensions. */
     public static class FakeSoundPoolExtensions implements SoundPoolExtensions {
 
-        int playAsPointSourceResult = 0;
-        int playAsSoundFieldResult = 0;
-        int sourceType = SpatializerExtensions.SOURCE_TYPE_BYPASS;
+        int mPlayAsPointSourceResult = 0;
+        int mPlayAsSoundFieldResult = 0;
+        int mSourceType = SpatializerExtensions.SOURCE_TYPE_BYPASS;
 
         public void setPlayAsPointSourceResult(int result) {
-            playAsPointSourceResult = result;
+            mPlayAsPointSourceResult = result;
         }
 
         public void setPlayAsSoundFieldResult(int result) {
-            playAsSoundFieldResult = result;
+            mPlayAsSoundFieldResult = result;
         }
 
         public void setSourceType(@SpatializerExtensions.SourceType int sourceType) {
-            this.sourceType = sourceType;
+            mSourceType = sourceType;
         }
 
         @Override
@@ -1744,7 +1773,7 @@ public class FakeXrExtensions implements XrExtensions {
                 int priority,
                 int loop,
                 float rate) {
-            return playAsPointSourceResult;
+            return mPlayAsPointSourceResult;
         }
 
         @Override
@@ -1756,37 +1785,37 @@ public class FakeXrExtensions implements XrExtensions {
                 int priority,
                 int loop,
                 float rate) {
-            return playAsSoundFieldResult;
+            return mPlayAsSoundFieldResult;
         }
 
         @Override
         @SpatializerExtensions.SourceType
         public int getSpatialSourceType(@NonNull SoundPool soundPool, int streamID) {
-            return sourceType;
+            return mSourceType;
         }
     }
 
     /** Fake AudioTrackExtensions. */
     public static class FakeAudioTrackExtensions implements AudioTrackExtensions {
 
-        PointSourceAttributes pointSourceAttributes;
+        PointSourceAttributes mPointSourceAttributes;
 
-        SoundFieldAttributes soundFieldAttributes;
+        SoundFieldAttributes mSoundFieldAttributes;
 
-        @SpatializerExtensions.SourceType int sourceType;
+        @SpatializerExtensions.SourceType int mSourceType;
 
         @CanIgnoreReturnValue
         @Override
         @NonNull
         public AudioTrack.Builder setPointSourceAttributes(
                 @NonNull AudioTrack.Builder builder, @Nullable PointSourceAttributes attributes) {
-            this.pointSourceAttributes = attributes;
+            mPointSourceAttributes = attributes;
             return builder;
         }
 
         public void setPointSourceAttributes(
                 @Nullable PointSourceAttributes pointSourceAttributes) {
-            this.pointSourceAttributes = pointSourceAttributes;
+            mPointSourceAttributes = pointSourceAttributes;
         }
 
         @CanIgnoreReturnValue
@@ -1794,59 +1823,59 @@ public class FakeXrExtensions implements XrExtensions {
         @NonNull
         public AudioTrack.Builder setSoundFieldAttributes(
                 @NonNull AudioTrack.Builder builder, @Nullable SoundFieldAttributes attributes) {
-            this.soundFieldAttributes = attributes;
+            mSoundFieldAttributes = attributes;
             return builder;
         }
 
         public void setSoundFieldAttributes(@Nullable SoundFieldAttributes soundFieldAttributes) {
-            this.soundFieldAttributes = soundFieldAttributes;
+            mSoundFieldAttributes = soundFieldAttributes;
         }
 
         @Override
         @Nullable
         public PointSourceAttributes getPointSourceAttributes(@NonNull AudioTrack track) {
-            return pointSourceAttributes;
+            return mPointSourceAttributes;
         }
 
         @Nullable
         public PointSourceAttributes getPointSourceAttributes() {
-            return pointSourceAttributes;
+            return mPointSourceAttributes;
         }
 
         @Override
         @Nullable
         public SoundFieldAttributes getSoundFieldAttributes(@NonNull AudioTrack track) {
-            return soundFieldAttributes;
+            return mSoundFieldAttributes;
         }
 
         @Nullable
         public SoundFieldAttributes getSoundFieldAttributes() {
-            return soundFieldAttributes;
+            return mSoundFieldAttributes;
         }
 
         @Override
         public int getSpatialSourceType(@NonNull AudioTrack track) {
-            return sourceType;
+            return mSourceType;
         }
 
         public void setSourceType(@SpatializerExtensions.SourceType int sourceType) {
-            this.sourceType = sourceType;
+            mSourceType = sourceType;
         }
     }
 
     /** Fake MediaPlayerExtensions. */
     public static class FakeMediaPlayerExtensions implements MediaPlayerExtensions {
 
-        PointSourceAttributes pointSourceAttributes;
+        PointSourceAttributes mPointSourceAttributes;
 
-        SoundFieldAttributes soundFieldAttributes;
+        SoundFieldAttributes mSoundFieldAttributes;
 
         @CanIgnoreReturnValue
         @Override
         @NonNull
         public MediaPlayer setPointSourceAttributes(
                 @NonNull MediaPlayer mediaPlayer, @Nullable PointSourceAttributes attributes) {
-            this.pointSourceAttributes = attributes;
+            mPointSourceAttributes = attributes;
             return mediaPlayer;
         }
 
@@ -1855,18 +1884,18 @@ public class FakeXrExtensions implements XrExtensions {
         @NonNull
         public MediaPlayer setSoundFieldAttributes(
                 @NonNull MediaPlayer mediaPlayer, @Nullable SoundFieldAttributes attributes) {
-            this.soundFieldAttributes = attributes;
+            mSoundFieldAttributes = attributes;
             return mediaPlayer;
         }
 
         @Nullable
         public PointSourceAttributes getPointSourceAttributes() {
-            return pointSourceAttributes;
+            return mPointSourceAttributes;
         }
 
         @Nullable
         public SoundFieldAttributes getSoundFieldAttributes() {
-            return soundFieldAttributes;
+            return mSoundFieldAttributes;
         }
     }
 }

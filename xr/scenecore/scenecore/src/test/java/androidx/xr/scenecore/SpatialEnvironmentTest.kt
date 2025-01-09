@@ -315,4 +315,16 @@ class SpatialEnvironmentTest {
         verify(mockRtEnvironment!!).removeOnSpatialEnvironmentChangedListener(captor.capture())
         assertThat(listener).isEqualTo(captor.firstValue)
     }
+
+    @Test
+    fun requestFullSpaceMode_callsThrough() {
+        environment!!.requestFullSpaceMode()
+        verify(mockRuntime).requestFullSpaceMode()
+    }
+
+    @Test
+    fun requestHomeSpaceMode_callsThrough() {
+        environment!!.requestHomeSpaceMode()
+        verify(mockRuntime).requestHomeSpaceMode()
+    }
 }

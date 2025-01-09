@@ -42,8 +42,8 @@ public class GltfModel internal constructor(public val model: RtGltfModel) : Mod
             message = "This function is deprecated, use createAsync() instead",
             replaceWith = ReplaceWith("createAsync()"),
         )
-        internal fun create(runtime: JxrPlatformAdapter, name: String): GltfModel {
-            val gltfResourceFuture = runtime.loadGltfByAssetName(name)
+        internal fun create(platformAdapter: JxrPlatformAdapter, name: String): GltfModel {
+            val gltfResourceFuture = platformAdapter.loadGltfByAssetName(name)
             // TODO: b/320858652 - Implement async loading of GltfModel.
             return GltfModel(gltfResourceFuture!!.get())
         }
@@ -54,10 +54,10 @@ public class GltfModel internal constructor(public val model: RtGltfModel) : Mod
         // warning, however, we get a build error - go/bugpattern/RestrictTo.
         @SuppressWarnings("RestrictTo")
         internal fun createAsync(
-            runtime: JxrPlatformAdapter,
+            platformAdapter: JxrPlatformAdapter,
             name: String,
         ): ListenableFuture<GltfModel> {
-            val gltfResourceFuture = runtime.loadGltfByAssetNameSplitEngine(name)
+            val gltfResourceFuture = platformAdapter.loadGltfByAssetNameSplitEngine(name)
             val modelFuture = ResolvableFuture.create<GltfModel>()
 
             // TODO: b/375070346 - remove this `!!` when we're sure the future is non-null.

@@ -165,10 +165,10 @@ private class SessionSpatialConfiguration(
         get() = boundsState.toDpVolumeSize()
 
     override fun requestHomeSpaceMode() {
-        session.requestHomeSpaceMode()
+        session.spatialEnvironment.requestHomeSpaceMode()
     }
 
     override fun requestFullSpaceMode() {
-        session.requestFullSpaceMode()
+        session.spatialEnvironment.requestFullSpaceMode()
     }
 }

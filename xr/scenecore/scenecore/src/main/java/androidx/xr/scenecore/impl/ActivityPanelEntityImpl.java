@@ -35,7 +35,7 @@ import java.util.concurrent.ScheduledExecutorService;
 /** Implementation of {@link ActivityPanelEntity}. */
 class ActivityPanelEntityImpl extends BasePanelEntity implements ActivityPanelEntity {
     private static final String TAG = ActivityPanelEntityImpl.class.getSimpleName();
-    private final ActivityPanel activityPanel;
+    private final ActivityPanel mActivityPanel;
 
     // TODO(b/352630140): Add a static factory method and remove the business logic from
     //                    JxrPlatformAdapterAxr.
@@ -51,7 +51,7 @@ class ActivityPanelEntityImpl extends BasePanelEntity implements ActivityPanelEn
         // We need to notify our base class of the pixelDimensions, even though the Extensions are
         // initialized in the factory method. (ext.ActivityPanel.setWindowBounds, etc)
         super.setPixelDimensions(windowBoundsPx);
-        this.activityPanel = activityPanel;
+        mActivityPanel = activityPanel;
     }
 
     @Override
@@ -61,7 +61,7 @@ class ActivityPanelEntityImpl extends BasePanelEntity implements ActivityPanelEn
         // launching an Activity into it. The Activity will then render into the size the
         // application
         // specified, and the system will apply letterboxing if necessary.
-        activityPanel.launchActivity(intent, bundle);
+        mActivityPanel.launchActivity(intent, bundle);
     }
 
     @Override
@@ -69,12 +69,12 @@ class ActivityPanelEntityImpl extends BasePanelEntity implements ActivityPanelEn
         // Note that moving an Activity into the Panel doesn't actually update the size. The
         // application
         // should explicitly call setPixelDimensions() to update the size of an ActivityPanel.
-        activityPanel.moveActivity(activity);
+        mActivityPanel.moveActivity(activity);
     }
 
     @Override
     public void setPixelDimensions(PixelDimensions dimensions) {
-        PixelDimensions oldDimensions = this.pixelDimensions;
+        PixelDimensions oldDimensions = mPixelDimensions;
         super.setPixelDimensions(dimensions);
 
         // Avoid updating the bounds if we were called with the same values.
@@ -83,7 +83,7 @@ class ActivityPanelEntityImpl extends BasePanelEntity implements ActivityPanelEn
             return;
         }
 
-        activityPanel.setWindowBounds(new Rect(0, 0, dimensions.width, dimensions.height));
+        mActivityPanel.setWindowBounds(new Rect(0, 0, dimensions.width, dimensions.height));
     }
 
     /**
@@ -93,7 +93,7 @@ class ActivityPanelEntityImpl extends BasePanelEntity implements ActivityPanelEn
      */
     @Override
     public void dispose() {
-        activityPanel.delete();
+        mActivityPanel.delete();
         super.dispose();
     }
 }

@@ -26,10 +26,10 @@ import androidx.xr.scenecore.JxrPlatformAdapter.SoundPoolExtensionsWrapper;
 /** Implementation of {@link SoundPoolExtensionsWrapper}. */
 final class SoundPoolExtensionsWrapperImpl implements SoundPoolExtensionsWrapper {
 
-    private final SoundPoolExtensions extensions;
+    private final SoundPoolExtensions mExtensions;
 
     SoundPoolExtensionsWrapperImpl(SoundPoolExtensions extensions) {
-        this.extensions = extensions;
+        mExtensions = extensions;
     }
 
     @Override
@@ -43,7 +43,7 @@ final class SoundPoolExtensionsWrapperImpl implements SoundPoolExtensionsWrapper
             float rate) {
         androidx.xr.extensions.media.PointSourceAttributes extAttributes =
                 MediaUtils.convertPointSourceAttributesToExtensions(attributes);
-        return extensions.playAsPointSource(
+        return mExtensions.playAsPointSource(
                 soundPool, soundId, extAttributes, volume, priority, loop, rate);
     }
 
@@ -59,13 +59,13 @@ final class SoundPoolExtensionsWrapperImpl implements SoundPoolExtensionsWrapper
         androidx.xr.extensions.media.SoundFieldAttributes extAttributes =
                 MediaUtils.convertSoundFieldAttributesToExtensions(attributes);
 
-        return extensions.playAsSoundField(
+        return mExtensions.playAsSoundField(
                 soundPool, soundId, extAttributes, volume, priority, loop, rate);
     }
 
     @Override
     public int getSpatialSourceType(SoundPool soundPool, int streamId) {
         return MediaUtils.convertExtensionsToSourceType(
-                extensions.getSpatialSourceType(soundPool, streamId));
+                mExtensions.getSpatialSourceType(soundPool, streamId));
     }
 }

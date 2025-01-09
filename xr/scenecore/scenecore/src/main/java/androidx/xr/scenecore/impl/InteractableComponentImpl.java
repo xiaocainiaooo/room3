@@ -26,27 +26,27 @@ import java.util.concurrent.Executor;
 
 /** Implementation of [JxrPlatformAdapter.InteractableComponent]. */
 class InteractableComponentImpl implements InteractableComponent {
-    final InputEventListener consumer;
-    final Executor executor;
-    Entity entity;
+    final InputEventListener mConsumer;
+    final Executor mExecutor;
+    Entity mEntity;
 
     InteractableComponentImpl(Executor executor, InputEventListener consumer) {
-        this.consumer = consumer;
-        this.executor = executor;
+        mConsumer = consumer;
+        mExecutor = executor;
     }
 
     @Override
     public boolean onAttach(Entity entity) {
-        if (this.entity != null) {
-            Log.e("Runtime", "Already attached to entity " + this.entity);
+        if (mEntity != null) {
+            Log.e("Runtime", "Already attached to entity " + mEntity);
             return false;
         }
-        this.entity = entity;
+        mEntity = entity;
         if (entity instanceof GltfEntityImplSplitEngine) {
             ((GltfEntityImplSplitEngine) entity).setColliderEnabled(true);
         }
         // InputEvent type translation happens here.
-        entity.addInputEventListener(executor, consumer);
+        entity.addInputEventListener(mExecutor, mConsumer);
         return true;
     }
 
@@ -55,7 +55,7 @@ class InteractableComponentImpl implements InteractableComponent {
         if (entity instanceof GltfEntityImplSplitEngine) {
             ((GltfEntityImplSplitEngine) entity).setColliderEnabled(false);
         }
-        entity.removeInputEventListener(consumer);
-        this.entity = null;
+        entity.removeInputEventListener(mConsumer);
+        mEntity = null;
     }
 }

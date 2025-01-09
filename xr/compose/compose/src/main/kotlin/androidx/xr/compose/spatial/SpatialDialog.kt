@@ -152,7 +152,7 @@ private fun LayoutSpatialDialog(
     properties: SpatialDialogProperties = SpatialDialogProperties(),
     content: @Composable () -> Unit,
 ) {
-    val view = LocalRootView.current ?: LocalView.current
+    val view = LocalView.current
     val scope = rememberCoroutineScope()
     val session = checkNotNull(LocalSession.current) { "session must be initialized" }
     // Start elevation at Level0 to prevent effects where the dialog flashes behind its parent.

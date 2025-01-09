@@ -60,6 +60,5 @@ private class OnGloballyPositionedVolumeElement(
 }
 
 /** Node associated with [onGloballyPositioned]. */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
-public class OnGloballyPositionedNode(public var callback: (SubspaceLayoutCoordinates) -> Unit) :
+internal class OnGloballyPositionedNode(public var callback: (SubspaceLayoutCoordinates) -> Unit) :
     SubspaceModifier.Node()

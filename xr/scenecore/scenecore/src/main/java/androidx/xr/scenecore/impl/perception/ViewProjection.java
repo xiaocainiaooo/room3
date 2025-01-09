@@ -25,37 +25,37 @@ import androidx.annotation.RestrictTo;
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class ViewProjection {
-    private final Pose pose;
-    private final Fov fov;
+    private final Pose mPose;
+    private final Fov mFov;
 
     public ViewProjection(@NonNull Pose pose, @NonNull Fov fov) {
-        this.pose = pose;
-        this.fov = fov;
+        mPose = pose;
+        mFov = fov;
     }
 
     /** Returns the location and orientation of the camera/eye pose. */
     @NonNull
     public Pose getPose() {
-        return pose;
+        return mPose;
     }
 
     /** Returns the four sides of the projection / view frustum. */
     @NonNull
     public Fov getFov() {
-        return fov;
+        return mFov;
     }
 
     @Override
     public boolean equals(Object object) {
         if (object instanceof ViewProjection) {
             ViewProjection that = (ViewProjection) object;
-            return this.pose.equals(that.pose) && this.fov.equals(that.fov);
+            return mPose.equals(that.mPose) && mFov.equals(that.mFov);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return pose.hashCode() + fov.hashCode();
+        return mPose.hashCode() + mFov.hashCode();
     }
 }

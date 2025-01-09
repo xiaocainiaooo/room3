@@ -34,42 +34,41 @@ import androidx.xr.scenecore.impl.perception.ViewProjections;
  */
 final class CameraViewActivityPoseImpl extends BaseActivityPose implements CameraViewActivityPose {
     private static final String TAG = "CameraViewActivityPose";
-    private final PerceptionLibrary perceptionLibrary;
-    @CameraType private final int cameraType;
-    private final OpenXrActivityPoseHelper openXrActivityPoseHelper;
+    private final PerceptionLibrary mPerceptionLibrary;
+    @CameraType private final int mCameraType;
+    private final OpenXrActivityPoseHelper mOpenXrActivityPoseHelper;
     // Default the pose to null. A null pose indicates that the camera is not ready yet.
-    private Pose lastOpenXrPose = null;
+    private Pose mLastOpenXrPose = null;
 
-    public CameraViewActivityPoseImpl(
+    CameraViewActivityPoseImpl(
             @CameraType int cameraType,
             ActivitySpaceImpl activitySpace,
             AndroidXrEntity activitySpaceRoot,
             PerceptionLibrary perceptionLibrary) {
-        this.cameraType = cameraType;
-        this.perceptionLibrary = perceptionLibrary;
-        this.openXrActivityPoseHelper =
-                new OpenXrActivityPoseHelper(activitySpace, activitySpaceRoot);
+        mCameraType = cameraType;
+        mPerceptionLibrary = perceptionLibrary;
+        mOpenXrActivityPoseHelper = new OpenXrActivityPoseHelper(activitySpace, activitySpaceRoot);
     }
 
     @Override
     public Pose getPoseInActivitySpace() {
-        return openXrActivityPoseHelper.getPoseInActivitySpace(getPoseInOpenXrReferenceSpace());
+        return mOpenXrActivityPoseHelper.getPoseInActivitySpace(getPoseInOpenXrReferenceSpace());
     }
 
     @Override
     public Pose getActivitySpacePose() {
-        return openXrActivityPoseHelper.getActivitySpacePose(getPoseInOpenXrReferenceSpace());
+        return mOpenXrActivityPoseHelper.getActivitySpacePose(getPoseInOpenXrReferenceSpace());
     }
 
     @Override
     public Vector3 getActivitySpaceScale() {
         // This WorldPose is assumed to always have a scale of 1.0f in the OpenXR reference space.
-        return openXrActivityPoseHelper.getActivitySpaceScale(new Vector3(1f, 1f, 1f));
+        return mOpenXrActivityPoseHelper.getActivitySpaceScale(new Vector3(1f, 1f, 1f));
     }
 
     @Nullable
     private ViewProjection getViewProjection() {
-        final Session session = perceptionLibrary.getSession();
+        final Session session = mPerceptionLibrary.getSession();
         if (session == null) {
             Log.w(TAG, "Cannot retrieve the camera pose with a null perception session.");
             return null;
@@ -79,12 +78,12 @@ final class CameraViewActivityPoseImpl extends BaseActivityPose implements Camer
             Log.e(TAG, "Error retrieving the camera.");
             return null;
         }
-        if (cameraType == CameraViewActivityPose.CAMERA_TYPE_LEFT_EYE) {
+        if (mCameraType == CameraViewActivityPose.CAMERA_TYPE_LEFT_EYE) {
             return perceptionViews.getLeftEye();
-        } else if (cameraType == CameraViewActivityPose.CAMERA_TYPE_RIGHT_EYE) {
+        } else if (mCameraType == CameraViewActivityPose.CAMERA_TYPE_RIGHT_EYE) {
             return perceptionViews.getRightEye();
         } else {
-            Log.w(TAG, "Unsupported camera type: " + cameraType);
+            Log.w(TAG, "Unsupported camera type: " + mCameraType);
             return null;
         }
     }
@@ -94,15 +93,15 @@ final class CameraViewActivityPoseImpl extends BaseActivityPose implements Camer
     public Pose getPoseInOpenXrReferenceSpace() {
         ViewProjection viewProjection = getViewProjection();
         if (viewProjection != null) {
-            lastOpenXrPose = RuntimeUtils.fromPerceptionPose(viewProjection.getPose());
+            mLastOpenXrPose = RuntimeUtils.fromPerceptionPose(viewProjection.getPose());
         }
-        return lastOpenXrPose;
+        return mLastOpenXrPose;
     }
 
     @Override
     @CameraType
     public int getCameraType() {
-        return cameraType;
+        return mCameraType;
     }
 
     @Override

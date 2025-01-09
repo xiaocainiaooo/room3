@@ -59,34 +59,34 @@ import java.util.concurrent.ScheduledExecutorService;
 class MovableComponentImpl implements MovableComponent {
     private static final String TAG = "MovableComponentImpl";
     static final float MIN_PLANE_ANCHOR_DISTANCE = .2f;
-    private final boolean systemMovable;
-    private final boolean scaleInZ;
-    private final boolean shouldDisposeParentAnchor;
-    private final PerceptionLibrary perceptionLibrary;
-    private final XrExtensions extensions;
-    private final ActivitySpaceImpl activitySpaceImpl;
-    private final AndroidXrEntity activitySpaceEntity;
-    private final PerceptionSpaceActivityPoseImpl perceptionSpaceActivityPose;
-    private final EntityManager entityManager;
-    private final PanelShadowRenderer panelShadowRenderer;
-    private final ScheduledExecutorService runtimeExecutor;
-    private final ConcurrentHashMap<MoveEventListener, Executor> moveEventListenersMap =
+    private final boolean mSystemMovable;
+    private final boolean mScaleInZ;
+    private final boolean mShouldDisposeParentAnchor;
+    private final PerceptionLibrary mPerceptionLibrary;
+    private final XrExtensions mExtensions;
+    private final ActivitySpaceImpl mActivitySpaceImpl;
+    private final AndroidXrEntity mActivitySpaceEntity;
+    private final PerceptionSpaceActivityPoseImpl mPerceptionSpaceActivityPose;
+    private final EntityManager mEntityManager;
+    private final PanelShadowRenderer mPanelShadowRenderer;
+    private final ScheduledExecutorService mRuntimeExecutor;
+    private final ConcurrentHashMap<MoveEventListener, Executor> mMoveEventListenersMap =
             new ConcurrentHashMap<>();
-    private final Map<PlaneType, Map<PlaneSemantic, AnchorPlacementImpl>> anchorableFilters =
+    private final Map<PlaneType, Map<PlaneSemantic, AnchorPlacementImpl>> mAnchorableFilters =
             new EnumMap<>(PlaneType.class);
     // Visible for testing.
-    Consumer<ReformEvent> reformEventConsumer;
-    private Entity entity;
-    private Entity initialParent;
-    private Pose lastPose = new Pose();
-    private Vector3 lastScale = new Vector3(1f, 1f, 1f);
-    private Dimensions currentSize;
-    private boolean userAnchorable = false;
-    private AnchorEntity createdAnchorEntity;
-    private AnchorPlacementImpl createdAnchorPlacement;
-    @ScaleWithDistanceMode private int scaleWithDistanceMode = ScaleWithDistanceMode.DEFAULT;
+    Consumer<ReformEvent> mReformEventConsumer;
+    private Entity mEntity;
+    private Entity mInitialParent;
+    private Pose mLastPose = new Pose();
+    private Vector3 mLastScale = new Vector3(1f, 1f, 1f);
+    private Dimensions mCurrentSize;
+    private boolean mUserAnchorable = false;
+    private AnchorEntity mCreatedAnchorEntity;
+    private AnchorPlacementImpl mCreatedAnchorPlacement;
+    @ScaleWithDistanceMode private int mScaleWithDistanceMode = ScaleWithDistanceMode.DEFAULT;
 
-    public MovableComponentImpl(
+    MovableComponentImpl(
             boolean systemMovable,
             boolean scaleInZ,
             Set<AnchorPlacement> anchorPlacement,
@@ -99,60 +99,62 @@ class MovableComponentImpl implements MovableComponent {
             EntityManager entityManager,
             PanelShadowRenderer panelShadowRenderer,
             ScheduledExecutorService runtimeExecutor) {
-        this.systemMovable = systemMovable;
-        this.scaleInZ = scaleInZ;
-        this.shouldDisposeParentAnchor = shouldDisposeParentAnchor;
-        this.perceptionLibrary = perceptionLibrary;
-        this.extensions = extensions;
-        this.activitySpaceImpl = activitySpaceImpl;
-        this.activitySpaceEntity = activitySpaceEntity;
-        this.perceptionSpaceActivityPose = perceptionSpaceActivityPose;
-        this.entityManager = entityManager;
-        this.panelShadowRenderer = panelShadowRenderer;
-        this.runtimeExecutor = runtimeExecutor;
+        mSystemMovable = systemMovable;
+        mScaleInZ = scaleInZ;
+        mShouldDisposeParentAnchor = shouldDisposeParentAnchor;
+        mPerceptionLibrary = perceptionLibrary;
+        mExtensions = extensions;
+        mActivitySpaceImpl = activitySpaceImpl;
+        mActivitySpaceEntity = activitySpaceEntity;
+        mPerceptionSpaceActivityPose = perceptionSpaceActivityPose;
+        mEntityManager = entityManager;
+        mPanelShadowRenderer = panelShadowRenderer;
+        mRuntimeExecutor = runtimeExecutor;
         setUpAnchorPlacement(anchorPlacement);
     }
 
     @Override
     public boolean onAttach(Entity entity) {
-        if (this.entity != null) {
-            Log.e(TAG, "Already attached to entity " + this.entity);
+        if (mEntity != null) {
+            Log.e(TAG, "Already attached to entity " + mEntity);
             return false;
         }
-        this.entity = entity;
+        mEntity = entity;
         ReformOptions reformOptions = ((AndroidXrEntity) entity).getReformOptions();
         // The math for anchoring uses the pose relative to the activity space so we should not set
         // the reform options to be relative to the parent if the entity is anchorable.
-        int reformFlags = userAnchorable ? 0 : ReformOptions.FLAG_POSE_RELATIVE_TO_PARENT;
+        int reformFlags = mUserAnchorable ? 0 : ReformOptions.FLAG_POSE_RELATIVE_TO_PARENT;
         reformFlags =
-                (systemMovable && !userAnchorable)
+                (mSystemMovable && !mUserAnchorable)
                         ? reformFlags | ReformOptions.FLAG_ALLOW_SYSTEM_MOVEMENT
                         : reformFlags;
-        reformFlags = scaleInZ ? reformFlags | ReformOptions.FLAG_SCALE_WITH_DISTANCE : reformFlags;
+        reformFlags =
+                mScaleInZ ? reformFlags | ReformOptions.FLAG_SCALE_WITH_DISTANCE : reformFlags;
         reformOptions.setFlags(reformFlags);
         reformOptions.setEnabledReform(reformOptions.getEnabledReform() | ReformOptions.ALLOW_MOVE);
         reformOptions.setScaleWithDistanceMode(
-                translateScaleWithDistanceMode(scaleWithDistanceMode));
+                translateScaleWithDistanceMode(mScaleWithDistanceMode));
 
         // TODO: b/348037292 - Remove this special case for PanelEntityImpl.
-        if (entity instanceof PanelEntityImpl && currentSize == null) {
-            currentSize = ((PanelEntityImpl) entity).getSize();
+        if (entity instanceof PanelEntityImpl && mCurrentSize == null) {
+            mCurrentSize = ((PanelEntityImpl) entity).getSize();
         }
-        if (currentSize != null) {
+        if (mCurrentSize != null) {
             reformOptions.setCurrentSize(
-                    new Vec3(currentSize.width, currentSize.height, currentSize.depth));
+                    new Vec3(mCurrentSize.width, mCurrentSize.height, mCurrentSize.depth));
         }
-        if (userAnchorable && systemMovable && reformEventConsumer == null) {
-            reformEventConsumer =
+        if (mUserAnchorable && mSystemMovable && mReformEventConsumer == null) {
+            mReformEventConsumer =
                     reformEvent -> {
                         Pair<Pose, Entity> unused = getUpdatedReformEventPoseAndParent(reformEvent);
                     };
         }
-        lastPose = entity.getPose();
-        lastScale = entity.getScale();
+        mLastPose = entity.getPose();
+        mLastScale = entity.getScale();
         ((AndroidXrEntity) entity).updateReformOptions();
-        if (reformEventConsumer != null) {
-            ((AndroidXrEntity) entity).addReformEventConsumer(reformEventConsumer, runtimeExecutor);
+        if (mReformEventConsumer != null) {
+            ((AndroidXrEntity) entity)
+                    .addReformEventConsumer(mReformEventConsumer, mRuntimeExecutor);
         }
         return true;
     }
@@ -165,70 +167,70 @@ class MovableComponentImpl implements MovableComponent {
         // Clear any flags that were set by this component.
         int reformFlags = reformOptions.getFlags();
         reformFlags =
-                systemMovable
+                mSystemMovable
                         ? reformFlags & ~ReformOptions.FLAG_ALLOW_SYSTEM_MOVEMENT
                         : reformFlags;
         reformFlags =
-                scaleInZ ? reformFlags & ~ReformOptions.FLAG_SCALE_WITH_DISTANCE : reformFlags;
+                mScaleInZ ? reformFlags & ~ReformOptions.FLAG_SCALE_WITH_DISTANCE : reformFlags;
         reformOptions.setFlags(reformFlags);
         ((AndroidXrEntity) entity).updateReformOptions();
-        if (reformEventConsumer != null) {
-            ((AndroidXrEntity) entity).removeReformEventConsumer(reformEventConsumer);
-            reformEventConsumer = null;
+        if (mReformEventConsumer != null) {
+            ((AndroidXrEntity) entity).removeReformEventConsumer(mReformEventConsumer);
+            mReformEventConsumer = null;
         }
-        this.entity = null;
+        mEntity = null;
     }
 
     @Override
     public void setSize(Dimensions dimensions) {
-        currentSize = dimensions;
-        if (entity == null) {
+        mCurrentSize = dimensions;
+        if (mEntity == null) {
             Log.i(TAG, "setSize called before component is attached to an Entity.");
             return;
         }
-        ReformOptions reformOptions = ((AndroidXrEntity) entity).getReformOptions();
+        ReformOptions reformOptions = ((AndroidXrEntity) mEntity).getReformOptions();
         reformOptions.setCurrentSize(
                 new Vec3(dimensions.width, dimensions.height, dimensions.depth));
-        ((AndroidXrEntity) entity).updateReformOptions();
+        ((AndroidXrEntity) mEntity).updateReformOptions();
     }
 
     @Override
     @ScaleWithDistanceMode
     public int getScaleWithDistanceMode() {
-        return scaleWithDistanceMode;
+        return mScaleWithDistanceMode;
     }
 
     @Override
     public void setScaleWithDistanceMode(@ScaleWithDistanceMode int scaleWithDistanceMode) {
-        this.scaleWithDistanceMode = scaleWithDistanceMode;
-        if (entity == null) {
+        mScaleWithDistanceMode = scaleWithDistanceMode;
+        if (mEntity == null) {
             Log.w(
                     TAG,
                     "setScaleWithDistanceMode called before component is attached to an Entity.");
             return;
         }
-        ReformOptions reformOptions = ((AndroidXrEntity) entity).getReformOptions();
+        ReformOptions reformOptions = ((AndroidXrEntity) mEntity).getReformOptions();
         reformOptions.setScaleWithDistanceMode(
                 translateScaleWithDistanceMode(scaleWithDistanceMode));
-        ((AndroidXrEntity) entity).updateReformOptions();
+        ((AndroidXrEntity) mEntity).updateReformOptions();
     }
 
     @Override
     public void addMoveEventListener(Executor executor, MoveEventListener moveEventListener) {
-        if (reformEventConsumer != null) {
-            ((AndroidXrEntity) entity).removeReformEventConsumer(reformEventConsumer);
+        if (mReformEventConsumer != null) {
+            ((AndroidXrEntity) mEntity).removeReformEventConsumer(mReformEventConsumer);
         }
-        reformEventConsumer =
+        mReformEventConsumer =
                 reformEvent -> {
                     if (reformEvent.getType() != ReformEvent.REFORM_TYPE_MOVE) {
                         return;
                     }
                     if (reformEvent.getState() == ReformEvent.REFORM_STATE_START) {
-                        initialParent = entity.getParent();
+                        mInitialParent = mEntity.getParent();
                     }
                     Pose newPose;
                     Entity updatedParent = null;
-                    if (userAnchorable) {
+                    if (mUserAnchorable) {
                         Pair<Pose, Entity> updatedPoseParentPair =
                                 getUpdatedReformEventPoseAndParent(reformEvent);
                         newPose = updatedPoseParentPair.first;
@@ -243,7 +245,7 @@ class MovableComponentImpl implements MovableComponent {
                     Entity disposeEntity = null;
 
                     Entity parent = updatedParent;
-                    moveEventListenersMap.forEach(
+                    mMoveEventListenersMap.forEach(
                             (listener, listenerExecutor) ->
                                     executor.execute(
                                             () ->
@@ -264,22 +266,22 @@ class MovableComponentImpl implements MovableComponent {
                                                                             RuntimeUtils.getVector3(
                                                                                     reformEvent
                                                                                             .getCurrentRayDirection())),
-                                                                    lastPose,
+                                                                    mLastPose,
                                                                     newPose,
-                                                                    lastScale,
+                                                                    mLastScale,
                                                                     newScale,
-                                                                    initialParent,
+                                                                    mInitialParent,
                                                                     parent,
                                                                     disposeEntity))));
-                    lastPose = newPose;
-                    lastScale = newScale;
+                    mLastPose = newPose;
+                    mLastScale = newScale;
                 };
-        moveEventListenersMap.put(moveEventListener, executor);
-        if (entity == null) {
+        mMoveEventListenersMap.put(moveEventListener, executor);
+        if (mEntity == null) {
             Log.i(TAG, "setMoveEventListener called before component is attached to an Entity.");
             return;
         }
-        ((AndroidXrEntity) entity).addReformEventConsumer(reformEventConsumer, executor);
+        ((AndroidXrEntity) mEntity).addReformEventConsumer(mReformEventConsumer, executor);
     }
 
     private void setUpAnchorPlacement(Set<AnchorPlacement> anchorPlacement) {
@@ -291,39 +293,39 @@ class MovableComponentImpl implements MovableComponent {
             AnchorPlacementImpl placementImpl = (AnchorPlacementImpl) placement;
             Map<PlaneSemantic, AnchorPlacementImpl> anchorablePlaneSemantic =
                     new EnumMap<>(PlaneSemantic.class);
-            for (PlaneSemantic planeSemantic : placementImpl.planeSemanticFilter) {
+            for (PlaneSemantic planeSemantic : placementImpl.mPlaneSemanticFilter) {
                 anchorablePlaneSemantic.put(planeSemantic, placementImpl);
             }
-            for (PlaneType planeType : placementImpl.planeTypeFilter) {
-                this.anchorableFilters.put(planeType, anchorablePlaneSemantic);
+            for (PlaneType planeType : placementImpl.mPlaneTypeFilter) {
+                mAnchorableFilters.put(planeType, anchorablePlaneSemantic);
             }
         }
-        if (!anchorableFilters.isEmpty()) {
-            this.userAnchorable = true;
+        if (!mAnchorableFilters.isEmpty()) {
+            mUserAnchorable = true;
         }
     }
 
     @Override
     public void removeMoveEventListener(MoveEventListener moveEventListener) {
-        moveEventListenersMap.remove(moveEventListener);
+        mMoveEventListenersMap.remove(moveEventListener);
     }
 
     private Pair<Pose, Entity> getUpdatedReformEventPoseAndParent(ReformEvent reformEvent) {
         if (reformEvent.getState() == ReformEvent.REFORM_STATE_END && shouldRenderPlaneShadow()) {
-            panelShadowRenderer.destroy();
+            mPanelShadowRenderer.destroy();
         }
         Pose proposedPose =
                 RuntimeUtils.getPose(
                         reformEvent.getProposedPosition(), reformEvent.getProposedOrientation());
         Pair<Pose, Entity> updatedEntity = updatePoseWithPlanes(proposedPose, reformEvent);
-        if (systemMovable) {
-            entity.setPose(updatedEntity.first);
+        if (mSystemMovable) {
+            mEntity.setPose(updatedEntity.first);
         }
         return updatedEntity;
     }
 
     private Pair<Pose, Entity> updatePoseWithPlanes(Pose proposedPose, ReformEvent reformEvent) {
-        Session session = perceptionLibrary.getSession();
+        Session session = mPerceptionLibrary.getSession();
         if (session == null) {
             Log.w(TAG, "Unable to load perception session, cannot anchor object to a plane.");
             return Pair.create(proposedPose, null);
@@ -336,7 +338,7 @@ class MovableComponentImpl implements MovableComponent {
         // The proposed pose is relative to the activity space, it needs to be updated to be in the
         // perception reference space to be compared against the planes..
         Pose updatedPoseInOpenXr =
-                activitySpaceImpl.transformPoseTo(proposedPose, perceptionSpaceActivityPose);
+                mActivitySpaceImpl.transformPoseTo(proposedPose, mPerceptionSpaceActivityPose);
 
         // Create variables to store the plane in case we need to anchor to it later.
         Plane anchorablePlane = null;
@@ -385,53 +387,53 @@ class MovableComponentImpl implements MovableComponent {
             }
         } else if (shouldRenderPlaneShadow()) {
             // If there is nothing to anchor to, hide the plane shadow.
-            panelShadowRenderer.hidePlane();
+            mPanelShadowRenderer.hidePlane();
         }
 
         // If the entity was anchored and the reform is complete, update the entity to be in the
         // activity space and remove the previously created anchor data. If
         // shouldDisposeParentAnchor is
         // true dispose the previously created anchor entity.
-        if (createdAnchorEntity != null
-                && entity.getParent() == createdAnchorEntity
+        if (mCreatedAnchorEntity != null
+                && mEntity.getParent() == mCreatedAnchorEntity
                 && reformEvent.getState() == ReformEvent.REFORM_STATE_END) {
 
-            entity.setScale(
-                    entity.getWorldSpaceScale().div(activitySpaceImpl.getWorldSpaceScale()));
-            entity.setParent(activitySpaceImpl);
+            mEntity.setScale(
+                    mEntity.getWorldSpaceScale().div(mActivitySpaceImpl.getWorldSpaceScale()));
+            mEntity.setParent(mActivitySpaceImpl);
             checkAndDisposeAnchorEntity();
-            createdAnchorEntity = null;
-            createdAnchorPlacement = null;
+            mCreatedAnchorEntity = null;
+            mCreatedAnchorPlacement = null;
 
             // Move the updated pose back to the activity space.
             Pose updatedPoseInActivitySpace =
-                    perceptionSpaceActivityPose.transformPoseTo(
-                            updatedPoseInOpenXr, activitySpaceImpl);
-            return Pair.create(updatedPoseInActivitySpace, activitySpaceImpl);
+                    mPerceptionSpaceActivityPose.transformPoseTo(
+                            updatedPoseInOpenXr, mActivitySpaceImpl);
+            return Pair.create(updatedPoseInActivitySpace, mActivitySpaceImpl);
         }
 
         // If the entity has a parent, transform the pose to the parent's space.
-        Entity parent = entity.getParent();
-        if (parent == null || parent == activitySpaceImpl) {
+        Entity parent = mEntity.getParent();
+        if (parent == null || parent == mActivitySpaceImpl) {
             return Pair.create(
-                    perceptionSpaceActivityPose.transformPoseTo(
-                            updatedPoseInOpenXr, activitySpaceImpl),
+                    mPerceptionSpaceActivityPose.transformPoseTo(
+                            updatedPoseInOpenXr, mActivitySpaceImpl),
                     null);
         }
 
         return Pair.create(
-                perceptionSpaceActivityPose.transformPoseTo(updatedPoseInOpenXr, parent), null);
+                mPerceptionSpaceActivityPose.transformPoseTo(updatedPoseInOpenXr, parent), null);
     }
 
     // Gets the anchor placement settings for the given plane data, if it is null the entity should
     // not be anchored to this plane.
     @Nullable
     private AnchorPlacementImpl getAnchorPlacementIfAnchorable(PlaneData planeData) {
-        if (!userAnchorable || !systemMovable) {
+        if (!mUserAnchorable || !mSystemMovable) {
             return null;
         }
         Map<PlaneSemantic, AnchorPlacementImpl> anchorablePlaneSemantic =
-                anchorableFilters.get(RuntimeUtils.getPlaneType(planeData.type));
+                mAnchorableFilters.get(RuntimeUtils.getPlaneType(planeData.type));
         if (anchorablePlaneSemantic != null) {
             if (anchorablePlaneSemantic.containsKey(
                     RuntimeUtils.getPlaneSemantic(planeData.label))) {
@@ -440,7 +442,7 @@ class MovableComponentImpl implements MovableComponent {
                 return anchorablePlaneSemantic.get(PlaneSemantic.ANY);
             }
         }
-        anchorablePlaneSemantic = anchorableFilters.get(PlaneType.ANY);
+        anchorablePlaneSemantic = mAnchorableFilters.get(PlaneType.ANY);
         if (anchorablePlaneSemantic != null) {
             if (anchorablePlaneSemantic.containsKey(
                     RuntimeUtils.getPlaneSemantic(planeData.label))) {
@@ -460,16 +462,16 @@ class MovableComponentImpl implements MovableComponent {
             Long dataTimeNs) {
         AnchorEntityImpl anchorEntity =
                 AnchorEntityImpl.createAnchorFromPlane(
-                        extensions.createNode(),
+                        mExtensions.createNode(),
                         plane,
                         new Pose(),
                         dataTimeNs,
-                        activitySpaceImpl,
-                        activitySpaceEntity,
-                        extensions,
-                        entityManager,
-                        runtimeExecutor,
-                        perceptionLibrary);
+                        mActivitySpaceImpl,
+                        mActivitySpaceEntity,
+                        mExtensions,
+                        mEntityManager,
+                        mRuntimeExecutor,
+                        mPerceptionLibrary);
         if (anchorEntity.getState() != AnchorEntityImpl.State.ANCHORED) {
             return Pair.create(updatedPose, null);
         }
@@ -479,8 +481,8 @@ class MovableComponentImpl implements MovableComponent {
         // AnchorEntity. Note the AnchorEntity has a scale of 1 so we don't need to also scale by
         // the
         // anchor entity's scale.
-        Vector3 entityScale = entity.getWorldSpaceScale();
-        entity.setScale(entityScale);
+        Vector3 entityScale = mEntity.getWorldSpaceScale();
+        mEntity.setScale(entityScale);
         Quaternion planeRotation =
                 RuntimeUtils.fromPerceptionPose(anchorablePlaneData.centerPose).getRotation();
         Pose rotatedPose =
@@ -497,13 +499,13 @@ class MovableComponentImpl implements MovableComponent {
                                 0f,
                                 poseToAnchor.getTranslation().getZ()),
                         poseToAnchor.getRotation());
-        entity.setParent(anchorEntity);
+        mEntity.setParent(anchorEntity);
         // If the anchor placement settings specify that the anchor should be disposed, dispose of
         // the
         // previously created anchor entity.
         checkAndDisposeAnchorEntity();
-        createdAnchorEntity = anchorEntity;
-        createdAnchorPlacement = anchorPlacement;
+        mCreatedAnchorEntity = anchorEntity;
+        mCreatedAnchorPlacement = anchorPlacement;
         return Pair.create(poseToAnchor, anchorEntity);
     }
 
@@ -546,22 +548,22 @@ class MovableComponentImpl implements MovableComponent {
         if (!shouldRenderPlaneShadow()) {
             return;
         }
-        panelShadowRenderer.updatePanelPose(proposedPose, planePose, (PanelEntityImpl) entity);
+        mPanelShadowRenderer.updatePanelPose(proposedPose, planePose, (PanelEntityImpl) mEntity);
     }
 
     private boolean shouldRenderPlaneShadow() {
-        return entity instanceof PanelEntityImpl && systemMovable;
+        return mEntity instanceof PanelEntityImpl && mSystemMovable;
     }
 
     // Checks if there is a created anchor entity and if it should be disposed. If so, disposes of
     // the
     // anchor entity. Resets the createdAnchorEntity and createdAnchorPlacement to null.
     private void checkAndDisposeAnchorEntity() {
-        if (createdAnchorEntity != null
-                && createdAnchorEntity.getChildren().isEmpty()
-                && createdAnchorPlacement != null
-                && shouldDisposeParentAnchor) {
-            createdAnchorEntity.dispose();
+        if (mCreatedAnchorEntity != null
+                && mCreatedAnchorEntity.getChildren().isEmpty()
+                && mCreatedAnchorPlacement != null
+                && mShouldDisposeParentAnchor) {
+            mCreatedAnchorEntity.dispose();
         }
     }
 

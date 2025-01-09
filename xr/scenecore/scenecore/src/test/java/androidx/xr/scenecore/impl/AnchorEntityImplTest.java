@@ -73,12 +73,12 @@ import java.util.UUID;
 @RunWith(RobolectricTestRunner.class)
 public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     private static class FakeExportableAnchor implements ExportableAnchor {
-        private final long nativePointer;
-        private final IBinder anchorToken;
-        private final Pose pose;
-        private final TrackingState trackingState;
-        private final PersistenceState persistenceState;
-        private final UUID uuid;
+        private final long mNativePointer;
+        private final IBinder mAnchorToken;
+        private final Pose mPose;
+        private final TrackingState mTrackingState;
+        private final PersistenceState mPersistenceState;
+        private final UUID mUuid;
 
         public FakeExportableAnchor(
                 long nativePointer,
@@ -87,42 +87,42 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
                 TrackingState trackingState,
                 PersistenceState persistenceState,
                 UUID uuid) {
-            this.nativePointer = nativePointer;
-            this.anchorToken = anchorToken;
-            this.pose = pose;
-            this.trackingState = trackingState;
-            this.persistenceState = persistenceState;
-            this.uuid = uuid;
+            mNativePointer = nativePointer;
+            mAnchorToken = anchorToken;
+            mPose = pose;
+            mTrackingState = trackingState;
+            mPersistenceState = persistenceState;
+            mUuid = uuid;
         }
 
         @Override
         public long getNativePointer() {
-            return nativePointer;
+            return mNativePointer;
         }
 
         @Override
         public IBinder getAnchorToken() {
-            return anchorToken;
+            return mAnchorToken;
         }
 
         @Override
         public Pose getPose() {
-            return pose;
+            return mPose;
         }
 
         @Override
         public TrackingState getTrackingState() {
-            return trackingState;
+            return mTrackingState;
         }
 
         @Override
         public PersistenceState getPersistenceState() {
-            return persistenceState;
+            return mPersistenceState;
         }
 
         @Override
         public UUID getUuid() {
-            return uuid;
+            return mUuid;
         }
 
         @Override
@@ -136,38 +136,38 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     private static final Plane.Type PLANE_TYPE = Plane.Type.VERTICAL;
     private static final Plane.Label PLANE_LABEL = Plane.Label.WALL;
     private static final long NATIVE_POINTER = 1234567890L;
-    private final AndroidXrEntity activitySpaceRoot = Mockito.mock(AndroidXrEntity.class);
-    private final FakeXrExtensions fakeExtensions = new FakeXrExtensions();
-    private final PerceptionLibrary perceptionLibrary = Mockito.mock(PerceptionLibrary.class);
-    private final Session session = Mockito.mock(Session.class);
-    private final Plane plane = mock(Plane.class);
-    private final Anchor anchor = Mockito.mock(Anchor.class);
-    private final OnStateChangedListener anchorStateListener =
+    private final AndroidXrEntity mActivitySpaceRoot = Mockito.mock(AndroidXrEntity.class);
+    private final FakeXrExtensions mFakeExtensions = new FakeXrExtensions();
+    private final PerceptionLibrary mPerceptionLibrary = Mockito.mock(PerceptionLibrary.class);
+    private final Session mSession = Mockito.mock(Session.class);
+    private final Plane mPlane = mock(Plane.class);
+    private final Anchor mAnchor = Mockito.mock(Anchor.class);
+    private final OnStateChangedListener mAnchorStateListener =
             Mockito.mock(OnStateChangedListener.class);
-    private final IBinder sharedAnchorToken = Mockito.mock(IBinder.class);
-    private final FakeScheduledExecutorService executor = new FakeScheduledExecutorService();
-    private final EntityManager entityManager = new EntityManager();
-    private final PersistStateChangeListener persistStateChangeListener =
+    private final IBinder mSharedAnchorToken = Mockito.mock(IBinder.class);
+    private final FakeScheduledExecutorService mExecutor = new FakeScheduledExecutorService();
+    private final EntityManager mEntityManager = new EntityManager();
+    private final PersistStateChangeListener mPersistStateChangeListener =
             Mockito.mock(PersistStateChangeListener.class);
-    private final androidx.xr.scenecore.impl.perception.Pose perceptionIdentityPose =
+    private final androidx.xr.scenecore.impl.perception.Pose mPerceptionIdentityPose =
             androidx.xr.scenecore.impl.perception.Pose.identity();
-    private long currentTimeMillis = 1000000000L;
-    private ActivitySpaceImpl activitySpace;
+    private long mCurrentTimeMillis = 1000000000L;
+    private ActivitySpaceImpl mActivitySpace;
 
     @Before
     public void doBeforeEachTest() {
-        Node taskNode = fakeExtensions.createNode();
-        this.activitySpace =
+        Node taskNode = mFakeExtensions.createNode();
+        mActivitySpace =
                 new ActivitySpaceImpl(
                         taskNode,
-                        fakeExtensions,
-                        entityManager,
-                        () -> fakeExtensions.fakeSpatialState,
-                        executor);
-        SystemClock.setCurrentTimeMillis(currentTimeMillis);
+                        mFakeExtensions,
+                        mEntityManager,
+                        () -> mFakeExtensions.fakeSpatialState,
+                        mExecutor);
+        SystemClock.setCurrentTimeMillis(mCurrentTimeMillis);
 
         // By default, set the activity space to the root of the underlying OpenXR reference space.
-        this.activitySpace.setOpenXrReferenceSpacePose(Matrix4.Identity);
+        mActivitySpace.setOpenXrReferenceSpacePose(Matrix4.Identity);
     }
 
     /**
@@ -181,7 +181,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
 
     @Override
     protected FakeScheduledExecutorService getDefaultFakeExecutor() {
-        return executor;
+        return mExecutor;
     }
 
     @Override
@@ -191,16 +191,16 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
 
     @Override
     protected ActivitySpaceImpl getActivitySpaceEntity() {
-        return this.activitySpace;
+        return mActivitySpace;
     }
 
     // Advances the clock and the executor. The fake executor is not based on the clock because we
     // are
     // using the SystemClock but they can be advanced together.
     void advanceClock(Duration duration) {
-        currentTimeMillis += duration.toMillis();
-        SystemClock.setCurrentTimeMillis(currentTimeMillis);
-        executor.simulateSleepExecutingAllTasks(duration);
+        mCurrentTimeMillis += duration.toMillis();
+        SystemClock.setCurrentTimeMillis(mCurrentTimeMillis);
+        mExecutor.simulateSleepExecutingAllTasks(duration);
     }
 
     /** Creates an AnchorEntityImpl instance. */
@@ -210,19 +210,19 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
 
     /** Creates an AnchorEntityImpl instance with a timeout. */
     private AnchorEntityImpl createAnchorEntityWithTimeout(Duration anchorSearchTimeout) {
-        Node node = fakeExtensions.createNode();
+        Node node = mFakeExtensions.createNode();
         return AnchorEntityImpl.createSemanticAnchor(
                 node,
                 ANCHOR_DIMENSIONS,
                 PlaneType.VERTICAL,
                 PlaneSemantic.WALL,
                 anchorSearchTimeout,
-                activitySpace,
-                activitySpaceRoot,
-                fakeExtensions,
-                entityManager,
-                executor,
-                perceptionLibrary);
+                mActivitySpace,
+                mActivitySpaceRoot,
+                mFakeExtensions,
+                mEntityManager,
+                mExecutor,
+                mPerceptionLibrary);
     }
 
     /**
@@ -231,126 +231,127 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
      */
     private AnchorEntityImpl createPersistedAnchorEntityWithTimeout(
             UUID uuid, Duration anchorSearchTimeout) {
-        Node node = fakeExtensions.createNode();
+        Node node = mFakeExtensions.createNode();
         return AnchorEntityImpl.createPersistedAnchor(
                 node,
                 uuid,
                 anchorSearchTimeout,
-                activitySpace,
-                activitySpaceRoot,
-                fakeExtensions,
-                entityManager,
-                executor,
-                perceptionLibrary);
+                mActivitySpace,
+                mActivitySpaceRoot,
+                mFakeExtensions,
+                mEntityManager,
+                mExecutor,
+                mPerceptionLibrary);
     }
 
     /** Creates an AnchorEntityImpl instance and initializes it with a persisted anchor. */
     private AnchorEntityImpl createInitializedPersistedAnchorEntity(Anchor anchor, UUID uuid) {
-        when(perceptionLibrary.getSession()).thenReturn(session);
-        when(session.createAnchorFromUuid(uuid)).thenReturn(anchor);
-        when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.createAnchorFromUuid(uuid)).thenReturn(anchor);
+        when(anchor.getAnchorToken()).thenReturn(mSharedAnchorToken);
 
-        Node node = fakeExtensions.createNode();
+        Node node = mFakeExtensions.createNode();
         return AnchorEntityImpl.createPersistedAnchor(
                 node,
                 uuid,
                 /* anchorSearchTimeout= */ null,
-                activitySpace,
-                activitySpaceRoot,
-                fakeExtensions,
-                entityManager,
-                executor,
-                perceptionLibrary);
+                mActivitySpace,
+                mActivitySpaceRoot,
+                mFakeExtensions,
+                mEntityManager,
+                mExecutor,
+                mPerceptionLibrary);
     }
 
     /**
      * Creates an AnchorEntityImpl and initializes it with an anchor from the perception library.
      */
     private AnchorEntityImpl createAndInitAnchorEntity() {
-        when(perceptionLibrary.getSession()).thenReturn(session);
-        when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
-        when(plane.getData(any()))
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.getAllPlanes()).thenReturn(ImmutableList.of(mPlane));
+        when(mPlane.getData(any()))
                 .thenReturn(
                         new Plane.PlaneData(
-                                perceptionIdentityPose,
+                                mPerceptionIdentityPose,
                                 ANCHOR_DIMENSIONS.width,
                                 ANCHOR_DIMENSIONS.height,
                                 PLANE_TYPE.intValue,
                                 PLANE_LABEL.intValue));
-        when(plane.createAnchor(eq(perceptionIdentityPose), any())).thenReturn(anchor);
-        when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
+        when(mPlane.createAnchor(eq(mPerceptionIdentityPose), any())).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(mSharedAnchorToken);
 
         return createSemanticAnchorEntity();
     }
 
     private AnchorEntityImpl createInitAndPersistAnchorEntity() {
-        when(anchor.persist()).thenReturn(UUID.randomUUID());
+        when(mAnchor.persist()).thenReturn(UUID.randomUUID());
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
-        anchorEntity.registerPersistStateChangeListener(persistStateChangeListener);
+        anchorEntity.registerPersistStateChangeListener(mPersistStateChangeListener);
         UUID unused = anchorEntity.persist();
         return anchorEntity;
     }
 
     private AnchorEntityImpl createAnchorEntityFromPlane() {
-        when(anchor.persist()).thenReturn(UUID.randomUUID());
+        when(mAnchor.persist()).thenReturn(UUID.randomUUID());
 
-        Node node = fakeExtensions.createNode();
+        Node node = mFakeExtensions.createNode();
         return AnchorEntityImpl.createAnchorFromPlane(
                 node,
-                plane,
+                mPlane,
                 new Pose(),
-                MILLISECONDS.toNanos(currentTimeMillis),
-                activitySpace,
-                activitySpaceRoot,
-                fakeExtensions,
-                entityManager,
-                executor,
-                perceptionLibrary);
+                MILLISECONDS.toNanos(mCurrentTimeMillis),
+                mActivitySpace,
+                mActivitySpaceRoot,
+                mFakeExtensions,
+                mEntityManager,
+                mExecutor,
+                mPerceptionLibrary);
     }
 
     private AnchorEntityImpl createAnchorEntityFromPerceptionAnchor(
             androidx.xr.arcore.Anchor perceptionAnchor) {
-        Node node = fakeExtensions.createNode();
+        Node node = mFakeExtensions.createNode();
 
         return AnchorEntityImpl.createAnchorFromPerceptionAnchor(
                 node,
                 perceptionAnchor,
-                activitySpace,
-                activitySpaceRoot,
-                fakeExtensions,
-                entityManager,
-                executor,
-                perceptionLibrary);
+                mActivitySpace,
+                mActivitySpaceRoot,
+                mFakeExtensions,
+                mEntityManager,
+                mExecutor,
+                mPerceptionLibrary);
     }
 
     /** Creates a generic glTF entity. */
     private GltfEntityImpl createGltfEntity() {
         FakeGltfModelToken modelToken = new FakeGltfModelToken("model");
         GltfModelResourceImpl model = new GltfModelResourceImpl(modelToken);
-        return new GltfEntityImpl(model, activitySpace, fakeExtensions, entityManager, executor);
+        return new GltfEntityImpl(
+                model, mActivitySpace, mFakeExtensions, mEntityManager, mExecutor);
     }
 
     @Test
     public void createAnchorEntityWithPersistedAnchor_returnsAnchored() throws Exception {
         AnchorEntityImpl anchorEntity =
-                createInitializedPersistedAnchorEntity(anchor, UUID.randomUUID());
+                createInitializedPersistedAnchorEntity(mAnchor, UUID.randomUUID());
         assertThat(anchorEntity).isNotNull();
         assertThat(anchorEntity.getState()).isEqualTo(State.ANCHORED);
         assertThat(((FakeNode) anchorEntity.getNode()).getName())
                 .isEqualTo(AnchorEntityImpl.ANCHOR_NODE_NAME);
-        assertThat(((FakeNode) anchorEntity.getNode()).getAnchorId()).isEqualTo(sharedAnchorToken);
+        assertThat(((FakeNode) anchorEntity.getNode()).getAnchorId()).isEqualTo(mSharedAnchorToken);
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSISTED);
     }
 
     @Test
     public void createAnchorEntityWithPersistedAnchor_persistAnchor_returnsUuid() throws Exception {
         UUID uuid = UUID.randomUUID();
-        AnchorEntityImpl anchorEntity = createInitializedPersistedAnchorEntity(anchor, uuid);
+        AnchorEntityImpl anchorEntity = createInitializedPersistedAnchorEntity(mAnchor, uuid);
         assertThat(anchorEntity).isNotNull();
         assertThat(anchorEntity.getState()).isEqualTo(State.ANCHORED);
         assertThat(((FakeNode) anchorEntity.getNode()).getName())
                 .isEqualTo(AnchorEntityImpl.ANCHOR_NODE_NAME);
-        assertThat(((FakeNode) anchorEntity.getNode()).getAnchorId()).isEqualTo(sharedAnchorToken);
+        assertThat(((FakeNode) anchorEntity.getNode()).getAnchorId()).isEqualTo(mSharedAnchorToken);
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSISTED);
 
         UUID returnedUuid = anchorEntity.persist();
@@ -359,7 +360,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
 
     @Test
     public void createPersistedAnchorEntity_sessionNotReady_keepUnanchored() throws Exception {
-        when(perceptionLibrary.getSession()).thenReturn(null);
+        when(mPerceptionLibrary.getSession()).thenReturn(null);
         AnchorEntityImpl anchorEntity =
                 createPersistedAnchorEntityWithTimeout(
                         UUID.randomUUID(), /* anchorSearchTimeout= */ null);
@@ -372,8 +373,8 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void createPersistedAnchorEntity_persistedAnchorNotFound_keepUnanchored()
             throws Exception {
         UUID uuid = UUID.randomUUID();
-        when(perceptionLibrary.getSession()).thenReturn(session);
-        when(session.createAnchorFromUuid(uuid)).thenReturn(null);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.createAnchorFromUuid(uuid)).thenReturn(null);
         AnchorEntityImpl anchorEntity =
                 createPersistedAnchorEntityWithTimeout(uuid, /* anchorSearchTimeout= */ null);
 
@@ -387,9 +388,9 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void createPersistedAnchorEntity_persistedAnchorHasNoToken_keepUnanchored()
             throws Exception {
         UUID uuid = UUID.randomUUID();
-        when(perceptionLibrary.getSession()).thenReturn(session);
-        when(session.createAnchorFromUuid(uuid)).thenReturn(anchor);
-        when(anchor.getAnchorToken()).thenReturn(null);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.createAnchorFromUuid(uuid)).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(null);
         AnchorEntityImpl anchorEntity =
                 createPersistedAnchorEntityWithTimeout(uuid, /* anchorSearchTimeout= */ null);
 
@@ -400,23 +401,23 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     @Test
     public void createPersistedAnchorEntity_delayedSession_callsCallback() throws Exception {
         // This will return an error on the first attempt so will need to be called twice.
-        when(perceptionLibrary.getSession()).thenReturn(null).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(null).thenReturn(mSession);
         UUID uuid = UUID.randomUUID();
-        when(session.createAnchorFromUuid(uuid)).thenReturn(anchor);
-        when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
+        when(mSession.createAnchorFromUuid(uuid)).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(mSharedAnchorToken);
 
         AnchorEntityImpl anchorEntity =
                 createPersistedAnchorEntityWithTimeout(uuid, /* anchorSearchTimeout= */ null);
-        anchorEntity.setOnStateChangedListener(anchorStateListener);
+        anchorEntity.setOnStateChangedListener(mAnchorStateListener);
 
-        verify(anchorStateListener, never()).onStateChanged(State.ANCHORED);
+        verify(mAnchorStateListener, never()).onStateChanged(State.ANCHORED);
         assertThat(anchorEntity).isNotNull();
         assertThat(anchorEntity.getState()).isEqualTo(State.UNANCHORED);
 
         // The anchor starts as unanchored. Advance the executor to try again successfully and get a
         // callback for the anchor to be anchored.
         advanceClock(AnchorEntityImpl.ANCHOR_SEARCH_DELAY);
-        verify(anchorStateListener).onStateChanged(State.ANCHORED);
+        verify(mAnchorStateListener).onStateChanged(State.ANCHORED);
         assertThat(anchorEntity.getState()).isEqualTo(State.ANCHORED);
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSISTED);
     }
@@ -424,23 +425,23 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     @Test
     public void createPersistedAnchorEntity_delayedAnchor_callsCallback() throws Exception {
         // This will return an error on the first attempt so will need to be called twice.
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
         UUID uuid = UUID.randomUUID();
-        when(session.createAnchorFromUuid(uuid)).thenReturn(anchor).thenReturn(anchor);
-        when(anchor.getAnchorToken()).thenReturn(null).thenReturn(sharedAnchorToken);
+        when(mSession.createAnchorFromUuid(uuid)).thenReturn(mAnchor).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(null).thenReturn(mSharedAnchorToken);
 
         AnchorEntityImpl anchorEntity =
                 createPersistedAnchorEntityWithTimeout(uuid, /* anchorSearchTimeout= */ null);
-        anchorEntity.setOnStateChangedListener(anchorStateListener);
+        anchorEntity.setOnStateChangedListener(mAnchorStateListener);
 
-        verify(anchorStateListener, never()).onStateChanged(State.ANCHORED);
+        verify(mAnchorStateListener, never()).onStateChanged(State.ANCHORED);
         assertThat(anchorEntity).isNotNull();
         assertThat(anchorEntity.getState()).isEqualTo(State.UNANCHORED);
 
         // The anchor starts as unanchored. Advance the executor to try again successfully and get a
         // callback for the anchor to be anchored.
         advanceClock(AnchorEntityImpl.ANCHOR_SEARCH_DELAY);
-        verify(anchorStateListener).onStateChanged(State.ANCHORED);
+        verify(mAnchorStateListener).onStateChanged(State.ANCHORED);
         assertThat(anchorEntity.getState()).isEqualTo(State.ANCHORED);
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSISTED);
     }
@@ -448,20 +449,20 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     @Test
     public void createPersistedAnchorEntity_delayedSession_timeout_noCallback() throws Exception {
         // This will return an error on the first attempt so will need to be called twice.
-        when(perceptionLibrary.getSession()).thenReturn(null).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(null).thenReturn(mSession);
         UUID uuid = UUID.randomUUID();
-        when(session.createAnchorFromUuid(uuid)).thenReturn(anchor);
-        when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
+        when(mSession.createAnchorFromUuid(uuid)).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(mSharedAnchorToken);
 
         AnchorEntityImpl anchorEntity =
                 createPersistedAnchorEntityWithTimeout(
                         uuid, AnchorEntityImpl.ANCHOR_SEARCH_DELAY.dividedBy(2));
-        anchorEntity.setOnStateChangedListener(anchorStateListener);
+        anchorEntity.setOnStateChangedListener(mAnchorStateListener);
 
         advanceClock(AnchorEntityImpl.ANCHOR_SEARCH_DELAY);
 
-        verify(anchorStateListener, never()).onStateChanged(State.ANCHORED);
-        verify(anchorStateListener).onStateChanged(State.TIMED_OUT);
+        verify(mAnchorStateListener, never()).onStateChanged(State.ANCHORED);
+        verify(mAnchorStateListener).onStateChanged(State.TIMED_OUT);
         assertThat(anchorEntity).isNotNull();
         assertThat(anchorEntity.getState()).isEqualTo(State.TIMED_OUT);
     }
@@ -482,13 +483,13 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
         assertThat(anchorEntity.getState()).isEqualTo(State.ANCHORED);
         assertThat(((FakeNode) anchorEntity.getNode()).getName())
                 .isEqualTo(AnchorEntityImpl.ANCHOR_NODE_NAME);
-        assertThat(((FakeNode) anchorEntity.getNode()).getAnchorId()).isEqualTo(sharedAnchorToken);
+        assertThat(((FakeNode) anchorEntity.getNode()).getAnchorId()).isEqualTo(mSharedAnchorToken);
     }
 
     @Test
     public void createAndInitAnchor_noPlanes_remainsUnanchored() throws Exception {
-        when(perceptionLibrary.getSession()).thenReturn(session);
-        when(session.getAllPlanes()).thenReturn(ImmutableList.of());
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.getAllPlanes()).thenReturn(ImmutableList.of());
 
         AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
 
@@ -499,12 +500,12 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
 
     @Test
     public void createAndInitAnchor_noViablePlane_remainsUnanchored() throws Exception {
-        when(perceptionLibrary.getSession()).thenReturn(session);
-        when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
-        when(plane.getData(any()))
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.getAllPlanes()).thenReturn(ImmutableList.of(mPlane));
+        when(mPlane.getData(any()))
                 .thenReturn(
                         new Plane.PlaneData(
-                                perceptionIdentityPose,
+                                mPerceptionIdentityPose,
                                 ANCHOR_DIMENSIONS.width - 1,
                                 ANCHOR_DIMENSIONS.height,
                                 PLANE_TYPE.intValue,
@@ -520,62 +521,62 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     @Test
     public void createAndInitAnchor_delayedSession_callsCallback() throws Exception {
         // This will return an error on the first attempt so will need to be called twice.
-        when(perceptionLibrary.getSession()).thenReturn(null).thenReturn(session);
-        when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
-        when(plane.getData(any()))
+        when(mPerceptionLibrary.getSession()).thenReturn(null).thenReturn(mSession);
+        when(mSession.getAllPlanes()).thenReturn(ImmutableList.of(mPlane));
+        when(mPlane.getData(any()))
                 .thenReturn(
                         new Plane.PlaneData(
-                                perceptionIdentityPose,
+                                mPerceptionIdentityPose,
                                 ANCHOR_DIMENSIONS.width,
                                 ANCHOR_DIMENSIONS.height,
                                 PLANE_TYPE.intValue,
                                 PLANE_LABEL.intValue));
-        when(plane.createAnchor(eq(perceptionIdentityPose), any())).thenReturn(anchor);
-        when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
+        when(mPlane.createAnchor(eq(mPerceptionIdentityPose), any())).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(mSharedAnchorToken);
 
         AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
-        anchorEntity.setOnStateChangedListener(anchorStateListener);
+        anchorEntity.setOnStateChangedListener(mAnchorStateListener);
 
-        verify(anchorStateListener, never()).onStateChanged(State.ANCHORED);
+        verify(mAnchorStateListener, never()).onStateChanged(State.ANCHORED);
         assertThat(anchorEntity).isNotNull();
         assertThat(anchorEntity.getState()).isEqualTo(State.UNANCHORED);
 
         // The anchor starts as unanchored. Advance the executor to try again successfully and get a
         // callback for the anchor to be anchored.
         advanceClock(AnchorEntityImpl.ANCHOR_SEARCH_DELAY);
-        verify(anchorStateListener).onStateChanged(State.ANCHORED);
+        verify(mAnchorStateListener).onStateChanged(State.ANCHORED);
         assertThat(anchorEntity.getState()).isEqualTo(State.ANCHORED);
     }
 
     @Test
     public void createAndInitAnchor_delayedAnchor_callsCallback() throws Exception {
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
         // This will return no planes on the first attempt so will need to be called twice.
-        when(session.getAllPlanes())
+        when(mSession.getAllPlanes())
                 .thenReturn(ImmutableList.of())
-                .thenReturn(ImmutableList.of(plane));
-        when(plane.getData(any()))
+                .thenReturn(ImmutableList.of(mPlane));
+        when(mPlane.getData(any()))
                 .thenReturn(
                         new Plane.PlaneData(
-                                perceptionIdentityPose,
+                                mPerceptionIdentityPose,
                                 ANCHOR_DIMENSIONS.width,
                                 ANCHOR_DIMENSIONS.height,
                                 PLANE_TYPE.intValue,
                                 PLANE_LABEL.intValue));
-        when(plane.createAnchor(eq(perceptionIdentityPose), any())).thenReturn(anchor);
-        when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
+        when(mPlane.createAnchor(eq(mPerceptionIdentityPose), any())).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(mSharedAnchorToken);
 
         AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
-        anchorEntity.setOnStateChangedListener(anchorStateListener);
+        anchorEntity.setOnStateChangedListener(mAnchorStateListener);
 
-        verify(anchorStateListener, never()).onStateChanged(State.ANCHORED);
+        verify(mAnchorStateListener, never()).onStateChanged(State.ANCHORED);
         assertThat(anchorEntity).isNotNull();
         assertThat(anchorEntity.getState()).isEqualTo(State.UNANCHORED);
 
         // The anchor starts as unanchored. Advance the executor to try again successfully and get a
         // callback for the anchor to be anchored.
         advanceClock(AnchorEntityImpl.ANCHOR_SEARCH_DELAY);
-        verify(anchorStateListener).onStateChanged(State.ANCHORED);
+        verify(mAnchorStateListener).onStateChanged(State.ANCHORED);
         assertThat(anchorEntity.getState()).isEqualTo(State.ANCHORED);
     }
 
@@ -583,28 +584,28 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void createAndInitAnchor_delayedSessionAndAnchor_callsCallback() throws Exception {
         // This will return an error on the first attempt then it will find no planes on the
         // second attempt. So it will need to be called three times.
-        when(perceptionLibrary.getSession())
+        when(mPerceptionLibrary.getSession())
                 .thenReturn(null)
-                .thenReturn(session)
-                .thenReturn(session);
-        when(session.getAllPlanes())
+                .thenReturn(mSession)
+                .thenReturn(mSession);
+        when(mSession.getAllPlanes())
                 .thenReturn(ImmutableList.of())
-                .thenReturn(ImmutableList.of(plane));
-        when(plane.getData(any()))
+                .thenReturn(ImmutableList.of(mPlane));
+        when(mPlane.getData(any()))
                 .thenReturn(
                         new Plane.PlaneData(
-                                perceptionIdentityPose,
+                                mPerceptionIdentityPose,
                                 ANCHOR_DIMENSIONS.width,
                                 ANCHOR_DIMENSIONS.height,
                                 PLANE_TYPE.intValue,
                                 PLANE_LABEL.intValue));
-        when(plane.createAnchor(eq(perceptionIdentityPose), any())).thenReturn(anchor);
-        when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
+        when(mPlane.createAnchor(eq(mPerceptionIdentityPose), any())).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(mSharedAnchorToken);
 
         AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
-        anchorEntity.setOnStateChangedListener(anchorStateListener);
+        anchorEntity.setOnStateChangedListener(mAnchorStateListener);
 
-        verify(anchorStateListener, never()).onStateChanged(State.ANCHORED);
+        verify(mAnchorStateListener, never()).onStateChanged(State.ANCHORED);
         assertThat(anchorEntity).isNotNull();
         assertThat(anchorEntity.getState()).isEqualTo(State.UNANCHORED);
 
@@ -616,24 +617,24 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
         // anchor
         // to be anchored.
         advanceClock(AnchorEntityImpl.ANCHOR_SEARCH_DELAY);
-        verify(anchorStateListener).onStateChanged(State.ANCHORED);
+        verify(mAnchorStateListener).onStateChanged(State.ANCHORED);
         assertThat(anchorEntity.getState()).isEqualTo(State.ANCHORED);
     }
 
     @Test
     public void createAndInitAnchor_noToken_returnsUnanchored() throws Exception {
-        when(perceptionLibrary.getSession()).thenReturn(session);
-        when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
-        when(plane.getData(any()))
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.getAllPlanes()).thenReturn(ImmutableList.of(mPlane));
+        when(mPlane.getData(any()))
                 .thenReturn(
                         new Plane.PlaneData(
-                                perceptionIdentityPose,
+                                mPerceptionIdentityPose,
                                 ANCHOR_DIMENSIONS.width,
                                 ANCHOR_DIMENSIONS.height,
                                 PLANE_TYPE.intValue,
                                 PLANE_LABEL.intValue));
-        when(plane.createAnchor(eq(perceptionIdentityPose), any())).thenReturn(anchor);
-        when(anchor.getAnchorToken()).thenReturn(null);
+        when(mPlane.createAnchor(eq(mPerceptionIdentityPose), any())).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(null);
 
         AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
 
@@ -645,38 +646,38 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void createAndInitAnchor_withinTimeout_success() throws Exception {
         // The anchor creation will return an error so that it is called again on the executor. The
         // timeout will happen after the second attempt so it will still succeed.
-        when(perceptionLibrary.getSession()).thenReturn(session);
-        when(session.getAllPlanes())
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.getAllPlanes())
                 .thenReturn(ImmutableList.of())
-                .thenReturn(ImmutableList.of(plane));
-        when(plane.getData(any()))
+                .thenReturn(ImmutableList.of(mPlane));
+        when(mPlane.getData(any()))
                 .thenReturn(
                         new Plane.PlaneData(
-                                perceptionIdentityPose,
+                                mPerceptionIdentityPose,
                                 ANCHOR_DIMENSIONS.width,
                                 ANCHOR_DIMENSIONS.height,
                                 PLANE_TYPE.intValue,
                                 PLANE_LABEL.intValue));
-        when(plane.createAnchor(eq(perceptionIdentityPose), any())).thenReturn(anchor);
-        when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
+        when(mPlane.createAnchor(eq(mPerceptionIdentityPose), any())).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(mSharedAnchorToken);
 
         // Create an anchor entity with a timeout of 1ms above the normal search delay.
         Duration timeout = AnchorEntityImpl.ANCHOR_SEARCH_DELAY.plusMillis(1);
         AnchorEntityImpl anchorEntity = createAnchorEntityWithTimeout(timeout);
-        anchorEntity.setOnStateChangedListener(anchorStateListener);
+        anchorEntity.setOnStateChangedListener(mAnchorStateListener);
 
-        verify(anchorStateListener, never()).onStateChanged(State.ANCHORED);
+        verify(mAnchorStateListener, never()).onStateChanged(State.ANCHORED);
         assertThat(anchorEntity).isNotNull();
         assertThat(anchorEntity.getState()).isEqualTo(State.UNANCHORED);
 
         // Advance the executor to try again it should now be anchored.
         advanceClock(AnchorEntityImpl.ANCHOR_SEARCH_DELAY);
-        verify(anchorStateListener).onStateChanged(State.ANCHORED);
+        verify(mAnchorStateListener).onStateChanged(State.ANCHORED);
         assertThat(anchorEntity.getState()).isEqualTo(State.ANCHORED);
 
         // Advance the clock past the timeout and verify that nothing changed.
         advanceClock(timeout.minus(AnchorEntityImpl.ANCHOR_SEARCH_DELAY));
-        verify(anchorStateListener, never()).onStateChanged(State.TIMED_OUT);
+        verify(mAnchorStateListener, never()).onStateChanged(State.TIMED_OUT);
         assertThat(anchorEntity.getState()).isEqualTo(State.ANCHORED);
     }
 
@@ -684,16 +685,16 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void createAndInitAnchor_passedTimeout_error() throws Exception {
         // The anchor creation will return an error so that it is called again on the executor. The
         // timeout will happen before the next call.
-        when(perceptionLibrary.getSession()).thenReturn(session);
-        when(session.getAllPlanes()).thenReturn(ImmutableList.of());
-        when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.getAllPlanes()).thenReturn(ImmutableList.of());
+        when(mAnchor.getAnchorToken()).thenReturn(mSharedAnchorToken);
 
         // Create an anchor entity with a timeout of 1ms below the normal search delay.
         Duration timeout = AnchorEntityImpl.ANCHOR_SEARCH_DELAY.minusMillis(1);
         AnchorEntityImpl anchorEntity = createAnchorEntityWithTimeout(timeout);
-        anchorEntity.setOnStateChangedListener(anchorStateListener);
+        anchorEntity.setOnStateChangedListener(mAnchorStateListener);
 
-        verify(anchorStateListener, never()).onStateChanged(State.ERROR);
+        verify(mAnchorStateListener, never()).onStateChanged(State.ERROR);
         assertThat(anchorEntity).isNotNull();
         assertThat(anchorEntity.getState()).isEqualTo(State.UNANCHORED);
 
@@ -711,17 +712,17 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
         // The anchor creation will return an error so that it is called again on the executor. The
         // timeout will happen after the second attempt so it will still succeed.
         int anchorAttempts = 100;
-        when(perceptionLibrary.getSession()).thenReturn(session);
-        when(session.getAllPlanes()).thenReturn(ImmutableList.of());
-        when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mSession.getAllPlanes()).thenReturn(ImmutableList.of());
+        when(mAnchor.getAnchorToken()).thenReturn(mSharedAnchorToken);
 
         // Create an anchor entity with a zero duration it should be search for indefinitely..
         AnchorEntityImpl anchorEntity = createAnchorEntityWithTimeout(Duration.ZERO);
-        anchorEntity.setOnStateChangedListener(anchorStateListener);
+        anchorEntity.setOnStateChangedListener(mAnchorStateListener);
 
         for (int i = 0; i < anchorAttempts - 1; i++) {
             advanceClock(AnchorEntityImpl.ANCHOR_SEARCH_DELAY);
-            verify(anchorStateListener, never()).onStateChanged(any());
+            verify(mAnchorStateListener, never()).onStateChanged(any());
             assertThat(anchorEntity).isNotNull();
             assertThat(anchorEntity.getState()).isEqualTo(State.UNANCHORED);
         }
@@ -780,7 +781,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     @Test
     public void anchorEntityGetActivitySpaceScale_returnsInverseOfActivitySpace() throws Exception {
         float activitySpaceScale = 5f;
-        this.activitySpace.setOpenXrReferenceSpacePose(Matrix4.fromScale(activitySpaceScale));
+        mActivitySpace.setOpenXrReferenceSpacePose(Matrix4.fromScale(activitySpaceScale));
         AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
         assertVector3(
                 anchorEntity.getActivitySpaceScale(),
@@ -791,7 +792,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void getPoseInActivitySpace_unanchored_returnsIdentityPose() {
         AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
         Pose pose = new Pose(new Vector3(1, 1, 1), new Quaternion(0, 1, 0, 1));
-        activitySpace.setOpenXrReferenceSpacePose(Matrix4.Identity);
+        mActivitySpace.setOpenXrReferenceSpacePose(Matrix4.Identity);
         anchorEntity.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
 
         assertPose(anchorEntity.getPoseInActivitySpace(), new Pose());
@@ -802,7 +803,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
             getPoseInActivitySpace_noActivitySpaceOpenXrReferenceSpacePose_returnsIdentityPose() {
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
         Pose pose = new Pose(new Vector3(1, 1, 1), new Quaternion(0, 1, 0, 1));
-        activitySpace.openXrReferenceSpacePose = null;
+        mActivitySpace.mOpenXrReferenceSpacePose = null;
         anchorEntity.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
         assertPose(anchorEntity.getPoseInActivitySpace(), new Pose());
     }
@@ -811,7 +812,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void getPoseInActivitySpace_noAnchorOpenXrReferenceSpacePose_returnsIdentityPose() {
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
         Pose pose = new Pose(new Vector3(1, 1, 1), new Quaternion(0, 1, 0, 1));
-        activitySpace.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
+        mActivitySpace.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
         // anchorEntity.setOpenXrReferenceSpacePose(..) is not called to set the underlying pose.
 
         assertPose(anchorEntity.getPoseInActivitySpace(), new Pose());
@@ -821,7 +822,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void getPoseInActivitySpace_whenAtSamePose_returnsIdentityPose() {
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
         Pose pose = new Pose(new Vector3(1, 1, 1), new Quaternion(0, 1, 0, 1).toNormalized());
-        activitySpace.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
+        mActivitySpace.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
         anchorEntity.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
 
         assertPose(anchorEntity.getPoseInActivitySpace(), new Pose());
@@ -831,7 +832,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void getPoseInActivitySpace_returnsDifferencePose() {
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
         Pose pose = new Pose(new Vector3(1, 1, 1), new Quaternion(0, 1, 0, 1).toNormalized());
-        activitySpace.setOpenXrReferenceSpacePose(Matrix4.Identity);
+        mActivitySpace.setOpenXrReferenceSpacePose(Matrix4.Identity);
         anchorEntity.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
 
         assertPose(anchorEntity.getPoseInActivitySpace(), pose);
@@ -839,7 +840,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
 
     @Test
     public void getPoseInActivitySpace_withNoActivitySpace_throwsException() throws Exception {
-        Node node = fakeExtensions.createNode();
+        Node node = mFakeExtensions.createNode();
         AnchorEntityImpl anchorEntity =
                 AnchorEntityImpl.createSemanticAnchor(
                         node,
@@ -848,11 +849,11 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
                         /* planeSemantic= */ null,
                         /* anchorSearchTimeout= */ null,
                         /* activitySpace= */ null,
-                        activitySpaceRoot,
-                        fakeExtensions,
-                        entityManager,
-                        executor,
-                        perceptionLibrary);
+                        mActivitySpaceRoot,
+                        mFakeExtensions,
+                        mEntityManager,
+                        mExecutor,
+                        mPerceptionLibrary);
 
         assertThat(anchorEntity.getState()).isEqualTo(State.ERROR);
         assertThrows(IllegalStateException.class, anchorEntity::getPoseInActivitySpace);
@@ -862,7 +863,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void getActivitySpacePose_whenAtSamePose_returnsIdentityPose() {
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
         Pose pose = new Pose(new Vector3(1, 1, 1), new Quaternion(0, 1, 0, 1).toNormalized());
-        when(activitySpaceRoot.getPoseInActivitySpace()).thenReturn(pose);
+        when(mActivitySpaceRoot.getPoseInActivitySpace()).thenReturn(pose);
 
         anchorEntity.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
 
@@ -873,7 +874,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void getActivitySpacePose_returnsDifferencePose() {
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
         Pose pose = new Pose(new Vector3(1, 1, 1), new Quaternion(0, 1, 0, 1).toNormalized());
-        when(activitySpaceRoot.getPoseInActivitySpace()).thenReturn(new Pose());
+        when(mActivitySpaceRoot.getPoseInActivitySpace()).thenReturn(new Pose());
 
         anchorEntity.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
 
@@ -883,7 +884,7 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     @Test
     public void getActivitySpacePose_withNonAndroidXrActivitySpaceRoot_throwsException()
             throws Exception {
-        Node node = fakeExtensions.createNode();
+        Node node = mFakeExtensions.createNode();
         AnchorEntityImpl anchorEntity =
                 AnchorEntityImpl.createSemanticAnchor(
                         node,
@@ -891,12 +892,12 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
                         /* planeType= */ null,
                         /* planeSemantic= */ null,
                         /* anchorSearchTimeout= */ null,
-                        activitySpace,
+                        mActivitySpace,
                         /* activitySpaceRoot= */ null,
-                        fakeExtensions,
-                        entityManager,
-                        executor,
-                        perceptionLibrary);
+                        mFakeExtensions,
+                        mEntityManager,
+                        mExecutor,
+                        mPerceptionLibrary);
 
         assertThat(anchorEntity.getState()).isEqualTo(State.ERROR);
         assertThrows(IllegalStateException.class, anchorEntity::getActivitySpacePose);
@@ -906,14 +907,14 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void transformPoseTo_withActivitySpace_returnsTransformedPose() {
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
         Pose pose = new Pose(new Vector3(1f, 2f, 3f), Quaternion.Identity);
-        activitySpace.setOpenXrReferenceSpacePose(Matrix4.Identity);
+        mActivitySpace.setOpenXrReferenceSpacePose(Matrix4.Identity);
         anchorEntity.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
 
         Pose anchorOffset =
                 new Pose(
                         new Vector3(10f, 0f, 0f),
                         Quaternion.fromEulerAngles(new Vector3(0f, 0f, 90f)));
-        Pose transformedPose = anchorEntity.transformPoseTo(anchorOffset, activitySpace);
+        Pose transformedPose = anchorEntity.transformPoseTo(anchorOffset, mActivitySpace);
 
         assertPose(
                 transformedPose,
@@ -929,13 +930,13 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
         Pose pose = new Pose(new Vector3(1f, 2f, 3f), Quaternion.Identity);
         Pose childPose = new Pose(new Vector3(-1f, -2f, -3f), Quaternion.Identity);
 
-        activitySpace.setOpenXrReferenceSpacePose(Matrix4.Identity);
-        activitySpace.addChild(childEntity1);
+        mActivitySpace.setOpenXrReferenceSpacePose(Matrix4.Identity);
+        mActivitySpace.addChild(childEntity1);
         childEntity1.setPose(childPose);
         anchorEntity.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
 
         assertPose(
-                activitySpace.transformPoseTo(new Pose(), anchorEntity),
+                mActivitySpace.transformPoseTo(new Pose(), anchorEntity),
                 new Pose(new Vector3(-1f, -2f, -3f), Quaternion.Identity));
 
         Pose transformedPose = childEntity1.transformPoseTo(new Pose(), anchorEntity);
@@ -945,25 +946,25 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     @Test
     public void anchorEntity_setsParentAfterAnchoring() throws Exception {
         // This will return an error on the first attempt so will need to be called twice.
-        when(perceptionLibrary.getSession()).thenReturn(null).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(null).thenReturn(mSession);
 
-        when(session.getAllPlanes()).thenReturn(ImmutableList.of(plane));
-        when(plane.getData(any()))
+        when(mSession.getAllPlanes()).thenReturn(ImmutableList.of(mPlane));
+        when(mPlane.getData(any()))
                 .thenReturn(
                         new Plane.PlaneData(
-                                perceptionIdentityPose,
+                                mPerceptionIdentityPose,
                                 ANCHOR_DIMENSIONS.width,
                                 ANCHOR_DIMENSIONS.height,
                                 PLANE_TYPE.intValue,
                                 PLANE_LABEL.intValue));
-        when(plane.createAnchor(eq(perceptionIdentityPose), any())).thenReturn(anchor);
-        when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
+        when(mPlane.createAnchor(eq(mPerceptionIdentityPose), any())).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(mSharedAnchorToken);
 
         AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
         assertThat(anchorEntity.getState()).isEqualTo(State.UNANCHORED);
 
         FakeNode anchorNode = (FakeNode) anchorEntity.getNode();
-        FakeNode rootNode = (FakeNode) activitySpace.getNode();
+        FakeNode rootNode = (FakeNode) mActivitySpace.getNode();
         assertThat(anchorNode.getParent()).isNull();
 
         // The anchor starts as unanchored. Advance the executor to wait for it to become anchored
@@ -976,22 +977,22 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
 
     @Test
     public void disposeAnchor_detachesAnchor() throws Exception {
-        when(anchor.detach()).thenReturn(true);
+        when(mAnchor.detach()).thenReturn(true);
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
-        anchorEntity.setOnStateChangedListener(anchorStateListener);
-        verify(anchorStateListener, never()).onStateChanged(State.ERROR);
+        anchorEntity.setOnStateChangedListener(mAnchorStateListener);
+        verify(mAnchorStateListener, never()).onStateChanged(State.ERROR);
         assertThat(anchorEntity.getState()).isEqualTo(State.ANCHORED);
 
         // Verify the parent of the anchor is the root node (ActivitySpace) before disposing it.
         FakeNode anchorNode = (FakeNode) anchorEntity.getNode();
-        FakeNode rootNode = (FakeNode) activitySpace.getNode();
+        FakeNode rootNode = (FakeNode) mActivitySpace.getNode();
         assertThat(anchorNode.getParent()).isEqualTo(rootNode);
-        assertThat(anchorNode.getAnchorId()).isEqualTo(sharedAnchorToken);
+        assertThat(anchorNode.getAnchorId()).isEqualTo(mSharedAnchorToken);
 
         // Dispose the entity and verify that the state was updated.
         anchorEntity.dispose();
 
-        verify(anchorStateListener).onStateChanged(State.ERROR);
+        verify(mAnchorStateListener).onStateChanged(State.ERROR);
         assertThat(anchorEntity.getState()).isEqualTo(State.ERROR);
         assertThat(anchorNode.getParent()).isNull();
         assertThat(anchorNode.getAnchorId()).isNull();
@@ -999,13 +1000,13 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
 
     @Test
     public void disposeAnchorUnanchered_stopsSearching() throws Exception {
-        when(perceptionLibrary.getSession()).thenReturn(null);
+        when(mPerceptionLibrary.getSession()).thenReturn(null);
 
         AnchorEntityImpl anchorEntity = createSemanticAnchorEntity();
-        anchorEntity.setOnStateChangedListener(anchorStateListener);
+        anchorEntity.setOnStateChangedListener(mAnchorStateListener);
 
-        verify(perceptionLibrary).getSession();
-        verify(anchorStateListener, never()).onStateChanged(State.ERROR);
+        verify(mPerceptionLibrary).getSession();
+        verify(mAnchorStateListener, never()).onStateChanged(State.ERROR);
         assertThat(anchorEntity.getState()).isEqualTo(State.UNANCHORED);
 
         // Dispose the anchor entity before it was anchored.
@@ -1018,25 +1019,25 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
         // again
         // once disposed.
         advanceClock(AnchorEntityImpl.ANCHOR_SEARCH_DELAY);
-        verify(perceptionLibrary).getSession();
+        verify(mPerceptionLibrary).getSession();
     }
 
     @Test
     public void disposeAnchorTwice_callsCalbackOnce() throws Exception {
-        when(anchor.detach()).thenReturn(true);
+        when(mAnchor.detach()).thenReturn(true);
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
-        anchorEntity.setOnStateChangedListener(anchorStateListener);
-        verify(anchorStateListener, never()).onStateChanged(State.ERROR);
+        anchorEntity.setOnStateChangedListener(mAnchorStateListener);
+        verify(mAnchorStateListener, never()).onStateChanged(State.ERROR);
 
         // Dispose the entity and verify that the state was updated.
         anchorEntity.dispose();
 
-        verify(anchorStateListener).onStateChanged(State.ERROR);
+        verify(mAnchorStateListener).onStateChanged(State.ERROR);
 
         // Dispose anchor again and verify onStateChanged was called only once.
         anchorEntity.dispose();
 
-        verify(anchorStateListener).onStateChanged(State.ERROR);
+        verify(mAnchorStateListener).onStateChanged(State.ERROR);
     }
 
     @Test
@@ -1057,29 +1058,29 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     @Test
     public void persistAnchor_returnsUuid() throws Exception {
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
-        when(anchor.persist()).thenReturn(UUID.randomUUID());
-        anchorEntity.registerPersistStateChangeListener(persistStateChangeListener);
+        when(mAnchor.persist()).thenReturn(UUID.randomUUID());
+        anchorEntity.registerPersistStateChangeListener(mPersistStateChangeListener);
         assertThat(anchorEntity.persist()).isNotNull();
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSIST_PENDING);
-        verify(persistStateChangeListener).onPersistStateChanged(PersistState.PERSIST_PENDING);
+        verify(mPersistStateChangeListener).onPersistStateChanged(PersistState.PERSIST_PENDING);
     }
 
     @Test
     public void persistAnchor_returnsNull() throws Exception {
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
-        when(anchor.persist()).thenReturn(null);
-        anchorEntity.registerPersistStateChangeListener(persistStateChangeListener);
+        when(mAnchor.persist()).thenReturn(null);
+        anchorEntity.registerPersistStateChangeListener(mPersistStateChangeListener);
         assertThat(anchorEntity.persist()).isNull();
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSIST_NOT_REQUESTED);
-        verify(persistStateChangeListener, never()).onPersistStateChanged(any());
+        verify(mPersistStateChangeListener, never()).onPersistStateChanged(any());
     }
 
     @Test
     public void persistAnchor_secondPersist_returnsSameUuid_updatesPersistStateOnce()
             throws Exception {
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
-        when(anchor.persist()).thenReturn(UUID.randomUUID());
-        anchorEntity.registerPersistStateChangeListener(persistStateChangeListener);
+        when(mAnchor.persist()).thenReturn(UUID.randomUUID());
+        anchorEntity.registerPersistStateChangeListener(mPersistStateChangeListener);
         UUID firstUuid = anchorEntity.persist();
         assertThat(firstUuid).isNotNull();
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSIST_PENDING);
@@ -1087,34 +1088,34 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
         UUID secondUuid = anchorEntity.persist();
         assertThat(firstUuid).isEquivalentAccordingToCompareTo(secondUuid);
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSIST_PENDING);
-        verify(persistStateChangeListener).onPersistStateChanged(PersistState.PERSIST_PENDING);
+        verify(mPersistStateChangeListener).onPersistStateChanged(PersistState.PERSIST_PENDING);
     }
 
     @Test
     public void persistAnchor_updatesPersistStateToPersisted() throws Exception {
         AnchorEntityImpl anchorEntity = createInitAndPersistAnchorEntity();
-        when(anchor.getPersistState()).thenReturn(Anchor.PersistState.PERSISTED);
+        when(mAnchor.getPersistState()).thenReturn(Anchor.PersistState.PERSISTED);
 
-        executor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
+        mExecutor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSISTED);
-        verify(persistStateChangeListener).onPersistStateChanged(PersistState.PERSISTED);
+        verify(mPersistStateChangeListener).onPersistStateChanged(PersistState.PERSISTED);
     }
 
     @Test
     public void updatePersistState_delayedPersistedState_callsCallback() throws Exception {
         AnchorEntityImpl anchorEntity = createInitAndPersistAnchorEntity();
 
-        when(anchor.getPersistState())
+        when(mAnchor.getPersistState())
                 .thenReturn(Anchor.PersistState.PERSIST_PENDING)
                 .thenReturn(Anchor.PersistState.PERSISTED);
-        verify(persistStateChangeListener, never()).onPersistStateChanged(PersistState.PERSISTED);
+        verify(mPersistStateChangeListener, never()).onPersistStateChanged(PersistState.PERSISTED);
 
-        executor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
-        verify(persistStateChangeListener, never()).onPersistStateChanged(PersistState.PERSISTED);
+        mExecutor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
+        verify(mPersistStateChangeListener, never()).onPersistStateChanged(PersistState.PERSISTED);
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSIST_PENDING);
 
-        executor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
-        verify(persistStateChangeListener).onPersistStateChanged(PersistState.PERSISTED);
+        mExecutor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
+        verify(mPersistStateChangeListener).onPersistStateChanged(PersistState.PERSISTED);
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSISTED);
     }
 
@@ -1122,40 +1123,40 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void updatePersistState_noCallbackAfterStateBecomesPersisted() throws Exception {
         AnchorEntityImpl anchorEntity = createInitAndPersistAnchorEntity();
 
-        when(anchor.getPersistState()).thenReturn(Anchor.PersistState.PERSISTED);
-        executor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
+        when(mAnchor.getPersistState()).thenReturn(Anchor.PersistState.PERSISTED);
+        mExecutor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
 
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSISTED);
-        verify(persistStateChangeListener).onPersistStateChanged(PersistState.PERSISTED);
-        Mockito.clearInvocations(anchor);
-        Mockito.clearInvocations(persistStateChangeListener);
+        verify(mPersistStateChangeListener).onPersistStateChanged(PersistState.PERSISTED);
+        Mockito.clearInvocations(mAnchor);
+        Mockito.clearInvocations(mPersistStateChangeListener);
 
-        executor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
-        verify(anchor, never()).getPersistState();
-        verify(persistStateChangeListener, never()).onPersistStateChanged(any());
+        mExecutor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
+        verify(mAnchor, never()).getPersistState();
+        verify(mPersistStateChangeListener, never()).onPersistStateChanged(any());
     }
 
     @Test
     public void updatePersistState_noQueryForPersistStateAfterDispose() throws Exception {
         AnchorEntityImpl anchorEntity = createInitAndPersistAnchorEntity();
-        when(anchor.getPersistState()).thenReturn(Anchor.PersistState.PERSIST_PENDING);
-        executor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
-        verify(anchor).getPersistState();
+        when(mAnchor.getPersistState()).thenReturn(Anchor.PersistState.PERSIST_PENDING);
+        mExecutor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
+        verify(mAnchor).getPersistState();
 
-        executor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
-        verify(anchor, times(2)).getPersistState();
+        mExecutor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
+        verify(mAnchor, times(2)).getPersistState();
 
-        Mockito.clearInvocations(anchor);
+        Mockito.clearInvocations(mAnchor);
         anchorEntity.dispose();
-        executor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
-        verify(anchor, never()).getPersistState();
+        mExecutor.simulateSleepExecutingAllTasks(AnchorEntityImpl.PERSIST_STATE_CHECK_DELAY);
+        verify(mAnchor, never()).getPersistState();
     }
 
     @Test
     public void createAnchorEntityFromPlane_returnsAnchorEntity() throws Exception {
-        when(perceptionLibrary.getSession()).thenReturn(session);
-        when(plane.createAnchor(any(), any())).thenReturn(anchor);
-        when(anchor.getAnchorToken()).thenReturn(sharedAnchorToken);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mPlane.createAnchor(any(), any())).thenReturn(mAnchor);
+        when(mAnchor.getAnchorToken()).thenReturn(mSharedAnchorToken);
 
         AnchorEntityImpl anchorEntity = createAnchorEntityFromPlane();
 
@@ -1163,16 +1164,16 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
         assertThat(anchorEntity.getState()).isEqualTo(State.ANCHORED);
         assertThat(((FakeNode) anchorEntity.getNode()).getName())
                 .isEqualTo(AnchorEntityImpl.ANCHOR_NODE_NAME);
-        assertThat(((FakeNode) anchorEntity.getNode()).getAnchorId()).isEqualTo(sharedAnchorToken);
+        assertThat(((FakeNode) anchorEntity.getNode()).getAnchorId()).isEqualTo(mSharedAnchorToken);
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSIST_NOT_REQUESTED);
         assertThat(((FakeNode) anchorEntity.getNode()).getParent())
-                .isEqualTo(activitySpace.getNode());
+                .isEqualTo(mActivitySpace.getNode());
     }
 
     @Test
     public void createAnchorEntityFromPlane_failureToAnchor_hasErrorState() throws Exception {
-        when(perceptionLibrary.getSession()).thenReturn(session);
-        when(plane.createAnchor(any(), any())).thenReturn(null);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
+        when(mPlane.createAnchor(any(), any())).thenReturn(null);
 
         AnchorEntityImpl anchorEntity = createAnchorEntityFromPlane();
         assertThat(anchorEntity).isNotNull();
@@ -1182,11 +1183,11 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
 
     @Test
     public void createAnchorEntityFromPerceptionAnchor_nativePointerMatches() throws Exception {
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
         FakeExportableAnchor fakeAnchor =
                 new FakeExportableAnchor(
                         NATIVE_POINTER,
-                        sharedAnchorToken,
+                        mSharedAnchorToken,
                         new Pose(),
                         TrackingState.Tracking,
                         PersistenceState.NotPersisted,
@@ -1201,12 +1202,12 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
 
     @Test
     public void createAnchorEntityFromPerceptionAnchor_returnsAnchorEntity() throws Exception {
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
 
         FakeExportableAnchor fakeAnchor =
                 new FakeExportableAnchor(
                         NATIVE_POINTER,
-                        sharedAnchorToken,
+                        mSharedAnchorToken,
                         new Pose(),
                         TrackingState.Tracking,
                         PersistenceState.NotPersisted,
@@ -1218,16 +1219,16 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
         assertThat(anchorEntity.getState()).isEqualTo(State.ANCHORED);
         assertThat(((FakeNode) anchorEntity.getNode()).getName())
                 .isEqualTo(AnchorEntityImpl.ANCHOR_NODE_NAME);
-        assertThat(((FakeNode) anchorEntity.getNode()).getAnchorId()).isEqualTo(sharedAnchorToken);
+        assertThat(((FakeNode) anchorEntity.getNode()).getAnchorId()).isEqualTo(mSharedAnchorToken);
         assertThat(anchorEntity.getPersistState()).isEqualTo(PersistState.PERSIST_NOT_REQUESTED);
         assertThat(((FakeNode) anchorEntity.getNode()).getParent())
-                .isEqualTo(activitySpace.getNode());
+                .isEqualTo(mActivitySpace.getNode());
     }
 
     @Test
     public void createAnchorEntityFromPerceptionAnchor_failureToAnchor_hasErrorState()
             throws Exception {
-        when(perceptionLibrary.getSession()).thenReturn(session);
+        when(mPerceptionLibrary.getSession()).thenReturn(mSession);
 
         FakeExportableAnchor fakeAnchor =
                 new FakeExportableAnchor(

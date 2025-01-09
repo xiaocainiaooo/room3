@@ -48,29 +48,29 @@ import java.util.concurrent.ScheduledExecutorService;
 @SuppressWarnings({"BanSynchronizedMethods", "BanConcurrentHashMap"})
 abstract class AndroidXrEntity extends BaseEntity implements Entity {
 
-    protected final Node node;
-    protected final XrExtensions extensions;
-    protected final ScheduledExecutorService executor;
+    protected final Node mNode;
+    protected final XrExtensions mExtensions;
+    protected final ScheduledExecutorService mExecutor;
     // Visible for testing
-    final ConcurrentHashMap<InputEventListener, Executor> inputEventListenerMap =
+    final ConcurrentHashMap<InputEventListener, Executor> mInputEventListenerMap =
             new ConcurrentHashMap<>();
-    Optional<InputEventListener> pointerCaptureInputEventListener = Optional.empty();
-    Optional<Executor> pointerCaptureExecutor = Optional.empty();
-    final ConcurrentHashMap<Consumer<ReformEvent>, Executor> reformEventConsumerMap =
+    Optional<InputEventListener> mPointerCaptureInputEventListener = Optional.empty();
+    Optional<Executor> mPointerCaptureExecutor = Optional.empty();
+    final ConcurrentHashMap<Consumer<ReformEvent>, Executor> mReformEventConsumerMap =
             new ConcurrentHashMap<>();
-    private final EntityManager entityManager;
-    private ReformOptions reformOptions;
+    private final EntityManager mEntityManager;
+    private ReformOptions mReformOptions;
 
     AndroidXrEntity(
             Node node,
             XrExtensions extensions,
             EntityManager entityManager,
             ScheduledExecutorService executor) {
-        this.node = node;
-        this.extensions = extensions;
-        this.entityManager = entityManager;
-        this.executor = executor;
-        entityManager.setEntityForNode(node, this);
+        mNode = node;
+        mExtensions = extensions;
+        mEntityManager = entityManager;
+        mExecutor = executor;
+        mEntityManager.setEntityForNode(node, this);
     }
 
     @Override
@@ -78,15 +78,15 @@ abstract class AndroidXrEntity extends BaseEntity implements Entity {
         // TODO: b/321268237 - Minimize the number of node transactions
         super.setPose(pose);
 
-        try (NodeTransaction transaction = extensions.createNodeTransaction()) {
+        try (NodeTransaction transaction = mExtensions.createNodeTransaction()) {
             transaction
                     .setPosition(
-                            node,
+                            mNode,
                             pose.getTranslation().getX(),
                             pose.getTranslation().getY(),
                             pose.getTranslation().getZ())
                     .setOrientation(
-                            node,
+                            mNode,
                             pose.getRotation().getX(),
                             pose.getRotation().getY(),
                             pose.getRotation().getZ(),
@@ -98,8 +98,8 @@ abstract class AndroidXrEntity extends BaseEntity implements Entity {
     @Override
     public void setScale(Vector3 scale) {
         super.setScale(scale);
-        try (NodeTransaction transaction = extensions.createNodeTransaction()) {
-            transaction.setScale(node, scale.getX(), scale.getY(), scale.getZ()).apply();
+        try (NodeTransaction transaction = mExtensions.createNodeTransaction()) {
+            transaction.setScale(mNode, scale.getX(), scale.getY(), scale.getZ()).apply();
         }
     }
 
@@ -136,7 +136,7 @@ abstract class AndroidXrEntity extends BaseEntity implements Entity {
 
     // Returns the underlying extension Node for the Entity.
     public Node getNode() {
-        return node;
+        return mNode;
     }
 
     @Override
@@ -151,11 +151,11 @@ abstract class AndroidXrEntity extends BaseEntity implements Entity {
 
         AndroidXrEntity xrParent = (AndroidXrEntity) parent;
 
-        try (NodeTransaction transaction = extensions.createNodeTransaction()) {
+        try (NodeTransaction transaction = mExtensions.createNodeTransaction()) {
             if (xrParent == null) {
-                transaction.setVisibility(node, false).setParent(node, null);
+                transaction.setVisibility(mNode, false).setParent(mNode, null);
             } else {
-                transaction.setParent(node, xrParent.getNode());
+                transaction.setParent(mNode, xrParent.getNode());
             }
             transaction.apply();
         }
@@ -164,8 +164,8 @@ abstract class AndroidXrEntity extends BaseEntity implements Entity {
     @Override
     public void setSize(Dimensions dimensions) {
         // TODO: b/326479171: Uncomment when extensions implement setSize.
-        // try (NodeTransaction transaction = extensions.createNodeTransaction()) {
-        //   transaction.setSize(node, dimensions.width, dimensions.height,
+        // try (NodeTransaction transaction = mExtensions.createNodeTransaction()) {
+        //   transaction.setSize(mNode, dimensions.width, dimensions.height,
         // dimensions.depth).apply();
         // }
     }
@@ -174,8 +174,8 @@ abstract class AndroidXrEntity extends BaseEntity implements Entity {
     public void setAlpha(float alpha) {
         super.setAlpha(alpha);
 
-        try (NodeTransaction transaction = extensions.createNodeTransaction()) {
-            transaction.setAlpha(node, alpha).apply();
+        try (NodeTransaction transaction = mExtensions.createNodeTransaction()) {
+            transaction.setAlpha(mNode, alpha).apply();
         }
     }
 
@@ -183,25 +183,25 @@ abstract class AndroidXrEntity extends BaseEntity implements Entity {
     public void setHidden(boolean hidden) {
         super.setHidden(hidden);
 
-        try (NodeTransaction transaction = extensions.createNodeTransaction()) {
-            if (reformOptions != null) {
+        try (NodeTransaction transaction = mExtensions.createNodeTransaction()) {
+            if (mReformOptions != null) {
                 if (hidden) {
                     // Since this entity is being hidden, disable reform and the highlights around
                     // the node.
-                    transaction.disableReform(node);
+                    transaction.disableReform(mNode);
                 } else {
                     // Enables reform and the highlights around the node.
-                    transaction.enableReform(node, reformOptions);
+                    transaction.enableReform(mNode, mReformOptions);
                 }
             }
-            transaction.setVisibility(node, !hidden).apply();
+            transaction.setVisibility(mNode, !hidden).apply();
         }
     }
 
     @Override
     public void addInputEventListener(Executor executor, InputEventListener eventListener) {
         maybeSetupInputListeners();
-        inputEventListenerMap.put(eventListener, executor == null ? this.executor : executor);
+        mInputEventListenerMap.put(eventListener, executor == null ? mExecutor : executor);
     }
 
     /**
@@ -216,7 +216,7 @@ abstract class AndroidXrEntity extends BaseEntity implements Entity {
             Executor executor,
             InputEventListener eventListener,
             PointerCaptureComponent.StateListener stateListener) {
-        if (pointerCaptureInputEventListener.isPresent()) {
+        if (mPointerCaptureInputEventListener.isPresent()) {
             return false;
         }
         getNode()
@@ -244,76 +244,76 @@ abstract class AndroidXrEntity extends BaseEntity implements Entity {
     private void addPointerCaptureInputListener(
             Executor executor, InputEventListener eventListener) {
         maybeSetupInputListeners();
-        pointerCaptureInputEventListener = Optional.of(eventListener);
-        pointerCaptureExecutor = Optional.ofNullable(executor);
+        mPointerCaptureInputEventListener = Optional.of(eventListener);
+        mPointerCaptureExecutor = Optional.ofNullable(executor);
     }
 
     private void maybeSetupInputListeners() {
-        if (inputEventListenerMap.isEmpty() && pointerCaptureInputEventListener.isEmpty()) {
-            node.listenForInput(
+        if (mInputEventListenerMap.isEmpty() && mPointerCaptureInputEventListener.isEmpty()) {
+            mNode.listenForInput(
                     (xrInputEvent) -> {
                         if (xrInputEvent.getDispatchFlags()
                                 == InputEvent.DISPATCH_FLAG_CAPTURED_POINTER) {
-                            pointerCaptureInputEventListener.ifPresent(
+                            mPointerCaptureInputEventListener.ifPresent(
                                     (listener) ->
-                                            pointerCaptureExecutor
-                                                    .orElse(this.executor)
+                                            mPointerCaptureExecutor
+                                                    .orElse(mExecutor)
                                                     .execute(
                                                             () ->
                                                                     listener.onInputEvent(
                                                                             RuntimeUtils
                                                                                     .getInputEvent(
                                                                                             xrInputEvent,
-                                                                                            entityManager))));
+                                                                                            mEntityManager))));
                         } else {
-                            inputEventListenerMap.forEach(
+                            mInputEventListenerMap.forEach(
                                     (inputEventListener, listenerExecutor) ->
                                             listenerExecutor.execute(
                                                     () ->
                                                             inputEventListener.onInputEvent(
                                                                     RuntimeUtils.getInputEvent(
                                                                             xrInputEvent,
-                                                                            entityManager))));
+                                                                            mEntityManager))));
                         }
                     },
-                    this.executor);
+                    mExecutor);
         }
     }
 
     @Override
     public void removeInputEventListener(InputEventListener consumer) {
-        inputEventListenerMap.remove(consumer);
+        mInputEventListenerMap.remove(consumer);
         maybeStopListeningForInput();
     }
 
     /** Stop any pointer capture requests on this Entity. */
     public void stopPointerCapture() {
         getNode().stopPointerCapture();
-        pointerCaptureInputEventListener = Optional.empty();
-        pointerCaptureExecutor = Optional.empty();
+        mPointerCaptureInputEventListener = Optional.empty();
+        mPointerCaptureExecutor = Optional.empty();
         maybeStopListeningForInput();
     }
 
     private void maybeStopListeningForInput() {
-        if (inputEventListenerMap.isEmpty() && pointerCaptureInputEventListener.isEmpty()) {
-            node.stopListeningForInput();
+        if (mInputEventListenerMap.isEmpty() && mPointerCaptureInputEventListener.isEmpty()) {
+            mNode.stopListeningForInput();
         }
     }
 
     @Override
     public void dispose() {
-        inputEventListenerMap.clear();
-        node.stopListeningForInput();
-        reformEventConsumerMap.clear();
-        try (NodeTransaction transaction = extensions.createNodeTransaction()) {
-            transaction.disableReform(node);
+        mInputEventListenerMap.clear();
+        mNode.stopListeningForInput();
+        mReformEventConsumerMap.clear();
+        try (NodeTransaction transaction = mExtensions.createNodeTransaction()) {
+            transaction.disableReform(mNode);
         }
 
         // SystemSpaceEntityImpls (Anchors, ActivitySpace, etc) should have null parents.
         if (getParent() != null) {
             setParent(null);
         }
-        entityManager.removeEntityForNode(node);
+        mEntityManager.removeEntityForNode(mNode);
         super.dispose();
     }
 
@@ -323,11 +323,11 @@ abstract class AndroidXrEntity extends BaseEntity implements Entity {
      * @return The reform options for this entity.
      */
     public ReformOptions getReformOptions() {
-        if (reformOptions == null) {
+        if (mReformOptions == null) {
             Consumer<ReformEvent> reformEventConsumer =
                     reformEvent -> {
-                        if ((reformOptions.getEnabledReform() & ReformOptions.ALLOW_MOVE) != 0
-                                && (reformOptions.getFlags()
+                        if ((mReformOptions.getEnabledReform() & ReformOptions.ALLOW_MOVE) != 0
+                                && (mReformOptions.getFlags()
                                                 & ReformOptions.FLAG_ALLOW_SYSTEM_MOVEMENT)
                                         != 0) {
                             // Update the cached pose of the entity.
@@ -349,14 +349,14 @@ abstract class AndroidXrEntity extends BaseEntity implements Entity {
                                             reformEvent.getProposedScale().y,
                                             reformEvent.getProposedScale().z));
                         }
-                        reformEventConsumerMap.forEach(
+                        mReformEventConsumerMap.forEach(
                                 (eventConsumer, consumerExecutor) ->
                                         consumerExecutor.execute(
                                                 () -> eventConsumer.accept(reformEvent)));
                     };
-            reformOptions = extensions.createReformOptions(reformEventConsumer, executor);
+            mReformOptions = mExtensions.createReformOptions(reformEventConsumer, mExecutor);
         }
-        return reformOptions;
+        return mReformOptions;
     }
 
     /**
@@ -364,13 +364,13 @@ abstract class AndroidXrEntity extends BaseEntity implements Entity {
      * provided by {@link #getReformOptions()}.
      */
     public synchronized void updateReformOptions() {
-        try (NodeTransaction transaction = extensions.createNodeTransaction()) {
-            if (reformOptions.getEnabledReform() == 0) {
+        try (NodeTransaction transaction = mExtensions.createNodeTransaction()) {
+            if (mReformOptions.getEnabledReform() == 0) {
                 // Disables reform and the highlights around the node.
-                transaction.disableReform(node);
+                transaction.disableReform(mNode);
             } else {
                 // Enables reform and the highlights around the node.
-                transaction.enableReform(node, reformOptions);
+                transaction.enableReform(mNode, mReformOptions);
             }
             transaction.apply();
         }
@@ -378,11 +378,11 @@ abstract class AndroidXrEntity extends BaseEntity implements Entity {
 
     public void addReformEventConsumer(
             Consumer<ReformEvent> reformEventConsumer, Executor executor) {
-        executor = (executor == null) ? this.executor : executor;
-        reformEventConsumerMap.put(reformEventConsumer, executor);
+        executor = (executor == null) ? mExecutor : executor;
+        mReformEventConsumerMap.put(reformEventConsumer, executor);
     }
 
     public void removeReformEventConsumer(Consumer<ReformEvent> reformEventConsumer) {
-        reformEventConsumerMap.remove(reformEventConsumer);
+        mReformEventConsumerMap.remove(reformEventConsumer);
     }
 }

@@ -27,13 +27,13 @@ import androidx.xr.scenecore.JxrPlatformAdapter.ExrImageResource;
 @SuppressWarnings({"deprecation", "UnnecessarilyFullyQualified"}) // TODO(b/373435470): Remove
 final class ExrImageResourceImpl implements ExrImageResource {
     // Note: right now the "environment" format accessible through the XRExtensions layer is .EXR
-    private final androidx.xr.extensions.asset.EnvironmentToken token;
+    private final androidx.xr.extensions.asset.EnvironmentToken mToken;
 
-    public ExrImageResourceImpl(androidx.xr.extensions.asset.EnvironmentToken token) {
-        this.token = token;
+    ExrImageResourceImpl(androidx.xr.extensions.asset.EnvironmentToken token) {
+        mToken = token;
     }
 
     public androidx.xr.extensions.asset.EnvironmentToken getToken() {
-        return token;
+        return mToken;
     }
 }
