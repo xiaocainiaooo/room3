@@ -16,6 +16,7 @@
 
 package androidx.pdf.view.fastscroll
 
+import android.animation.ValueAnimator
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.util.Range
@@ -41,6 +42,8 @@ internal class FastScroller(
     // This is used to optimize performance. If the scroll position has already been updated
     // by another method the calculation is skipped.
     private var lastScrollY: Int = 0
+
+    private var hideValueAnimator: ValueAnimator? = null
 
     /**
      * Draws the fast scroller on the canvas.
@@ -113,5 +116,29 @@ internal class FastScroller(
             zoom,
             estimatedFullHeight
         )
+    }
+
+    fun show(onAnimationUpdate: () -> Unit) {
+        hideValueAnimator?.cancel()
+        fastScrollDrawer.alpha = FastScrollDrawer.VISIBLE_ALPHA
+        animate(onAnimationUpdate)
+    }
+
+    private fun animate(onAnimationUpdate: () -> Unit) {
+        hideValueAnimator =
+            ValueAnimator.ofInt(FastScrollDrawer.VISIBLE_ALPHA, FastScrollDrawer.GONE_ALPHA).apply {
+                startDelay = HIDE_DELAY_MS
+                duration = HIDE_ANIMATION_DURATION_MILLIS
+                addUpdateListener { animation ->
+                    fastScrollDrawer.alpha = animation.animatedValue as Int
+                    onAnimationUpdate()
+                }
+                start()
+            }
+    }
+
+    companion object {
+        private const val HIDE_ANIMATION_DURATION_MILLIS = 200L
+        private const val HIDE_DELAY_MS = 1300L
     }
 }

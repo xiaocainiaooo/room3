@@ -85,6 +85,15 @@ internal class FastScrollDrawer(
     internal val thumbWidthPx = thumbWidthDp.dpToPx(context)
     internal val thumbHeightPx = thumbHeightDp.dpToPx(context)
 
+    internal var alpha: Int = VISIBLE_ALPHA
+        set(value) {
+            thumbDrawable.alpha = value
+            trackDrawable.alpha = value
+            pageIndicatorBackground.alpha = value
+            thumbShadowDrawable?.alpha = value
+            textPaint.alpha = value
+        }
+
     /**
      * Draws the fast scroller on the canvas.
      *
@@ -198,5 +207,7 @@ internal class FastScrollDrawer(
 
     companion object {
         private const val SHADOW_OFFSET_FROM_SCRUBBER_DP = 2
+        internal const val VISIBLE_ALPHA = 255
+        internal const val GONE_ALPHA = 0
     }
 }

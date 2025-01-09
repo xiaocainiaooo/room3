@@ -398,15 +398,18 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
         canvas.restore()
 
-        fastScroller?.drawScroller(
-            canvas,
-            scrollY,
-            zoom,
-            height,
-            /* visibleArea= */ getVisibleAreaInContentCoords(),
-            fullyVisiblePages,
-            contentHeight
-        )
+        val documentPageCount = pdfDocument?.pageCount ?: 0
+        if (documentPageCount > 1) {
+            fastScroller?.drawScroller(
+                canvas,
+                scrollY,
+                zoom,
+                height,
+                /* visibleArea= */ getVisibleAreaInContentCoords(),
+                fullyVisiblePages,
+                contentHeight
+            )
+        }
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -414,6 +417,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         handled = handled || maybeDragSelectionHandle(event)
         handled = handled || event?.let { gestureTracker.feed(it) } ?: false
         return handled || super.onTouchEvent(event)
+    }
+
+    private fun maybeShowFastScroller() {
+        fastScroller?.show { postInvalidate() }
     }
 
     private fun maybeDragSelectionHandle(event: MotionEvent?): Boolean {
@@ -434,6 +441,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
         super.onScrollChanged(l, t, oldl, oldt)
+        // TODO(b/390003204): Prevent showing of the scrubber when the document only been
+        //  translated on the x-axis
+        maybeShowFastScroller()
         onViewportChanged()
     }
 
@@ -740,6 +750,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             fastScroller = localFastScroller
             fastScrollGestureDetector =
                 FastScrollGestureDetector(localFastScroller, fastScrollGestureHandler)
+            maybeShowFastScroller()
         }
 
         // We'll either create our layout and selection managers from restored state, or
@@ -1335,7 +1346,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         private const val MIN_SCROLL_TO_SWITCH_DP = 30
 
         private const val DEFAULT_PAGE_PREFETCH_RADIUS: Int = 2
-        private const val INVALID_ID = -1
 
         private fun checkMainThread() {
             check(Looper.myLooper() == Looper.getMainLooper()) {
