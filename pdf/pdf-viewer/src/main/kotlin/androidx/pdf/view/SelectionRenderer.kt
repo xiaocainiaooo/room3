@@ -67,6 +67,11 @@ internal class SelectionRenderer(
         locationInView: Rect,
         currentZoom: Float
     ) {
+        // Draw the bounds first so the handles appear on top of them
+        model.selection.bounds
+            .filter { it.pageNum == pageNum }
+            .forEach { drawBoundsOnPage(canvas, it, locationInView) }
+
         model.startBoundary.let {
             val startLoc = it.location
             if (startLoc.pageNum == pageNum) {
@@ -75,6 +80,7 @@ internal class SelectionRenderer(
                         locationInView.left + startLoc.pagePoint.x,
                         locationInView.top + startLoc.pagePoint.y
                     )
+
                 drawHandleAtPosition(canvas, pointInView, isRight = false xor it.isRtl, currentZoom)
             }
         }
@@ -90,10 +96,6 @@ internal class SelectionRenderer(
                 drawHandleAtPosition(canvas, pointInView, isRight = true xor it.isRtl, currentZoom)
             }
         }
-
-        model.selection.bounds
-            .filter { it.pageNum == pageNum }
-            .forEach { drawBoundsOnPage(canvas, it, locationInView) }
     }
 
     private fun drawHandleAtPosition(
