@@ -384,8 +384,15 @@ which our gradlew expands into a few correctness-related flags including
 ./gradlew core:core:assemble --strict
 ```
 
-To build every module and generate the local Maven repository artifact, use the
-`createArchive` Gradle task:
+To generate a local Maven artifact for the specific module and place it in
+`out/repository`, use the `publish` Gradle task:
+
+```shell
+./gradlew core:core:publish
+```
+
+To build every module and generate the local Maven repository artifacts and
+place them in `out/repository`, use the `createArchive` Gradle task:
 
 ```shell
 ./gradlew createArchive
