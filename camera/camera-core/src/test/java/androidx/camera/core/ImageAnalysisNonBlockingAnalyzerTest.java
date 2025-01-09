@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 import static org.robolectric.Shadows.shadowOf;
 
 import android.os.Build;
+import android.util.Size;
 
 import androidx.camera.core.impl.ImageReaderProxy;
 import androidx.camera.core.impl.MutableTagBundle;
@@ -81,6 +82,8 @@ public class ImageAnalysisNonBlockingAnalyzerTest {
                 mAnalyzer);
         mImageAnalysisNonBlockingAnalyzer.setRelativeRotation(ROTATION.get());
         mImageAnalysisNonBlockingAnalyzer.attach();
+        mImageAnalysisNonBlockingAnalyzer.setAnalyzerImageResolution(
+                new Size(mImageProxy.getWidth(), mImageProxy.getHeight()));
     }
 
     @Test
