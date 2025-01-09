@@ -169,7 +169,9 @@ public @interface Document {
      * <p>The document will be automatically deleted {@link TtlMillis} milliseconds after
      * {@link CreationTimestampMillis}.
      *
-     * <p>This field is not required. If not present or not set, the document will never expire.
+     * <p>This field is not required. If not present, not set, or set to {@code 0}, the document
+     * will never expire or be auto-deleted until the app is uninstalled or
+     * {@link androidx.appsearch.app.AppSearchSession#removeAsync} is called.
      *
      * <p>If present, the field must be of type {@code long} or {@link Long}.
      *
