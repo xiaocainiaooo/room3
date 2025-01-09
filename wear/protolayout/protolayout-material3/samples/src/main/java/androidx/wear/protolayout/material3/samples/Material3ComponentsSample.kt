@@ -33,6 +33,7 @@ import androidx.wear.protolayout.material3.AppCardStyle
 import androidx.wear.protolayout.material3.CardDefaults.filledTonalCardColors
 import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults
+import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.filledTonalProgressIndicatorColors
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.filledVariantProgressIndicatorColors
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.extraLargeDataCardStyle
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.largeCompactDataCardStyle
@@ -54,6 +55,7 @@ import androidx.wear.protolayout.material3.iconEdgeButton
 import androidx.wear.protolayout.material3.imageButton
 import androidx.wear.protolayout.material3.materialScope
 import androidx.wear.protolayout.material3.primaryLayout
+import androidx.wear.protolayout.material3.segmentedCircularProgressIndicator
 import androidx.wear.protolayout.material3.text
 import androidx.wear.protolayout.material3.textButton
 import androidx.wear.protolayout.material3.textDataCard
@@ -307,8 +309,13 @@ fun graphicDataCardSample(
                     style = largeGraphicDataCardStyle(),
                     title = { text("1,234".layoutString) },
                     content = { icon("steps") },
-                    // TODO: b/368272767 - Use CPI here
-                    graphic = { text("Run".layoutString) },
+                    graphic = {
+                        segmentedCircularProgressIndicator(
+                            segmentCount = 5,
+                            staticProgress = 0.5F,
+                            colors = filledTonalProgressIndicatorColors(),
+                        )
+                    },
                 )
             }
         )
@@ -473,5 +480,26 @@ fun compactButtonsSample(
                     iconContent = { icon("id") }
                 )
             }
+        )
+    }
+
+@Sampled
+fun multipleSegmentsCircularProgressIndicator(
+    context: Context,
+    deviceParameters: DeviceParameters,
+): LayoutElement =
+    materialScope(context, deviceParameters) {
+        segmentedCircularProgressIndicator(
+            segmentCount = 5,
+            dynamicProgress =
+                DynamicFloat.animate(
+                    0.0F,
+                    1.1F,
+                    CircularProgressIndicatorDefaults.recommendedAnimationSpec
+                ),
+            startAngleDegrees = 200F,
+            endAngleDegrees = 520F,
+            colors = filledVariantProgressIndicatorColors(),
+            size = dp(85F)
         )
     }

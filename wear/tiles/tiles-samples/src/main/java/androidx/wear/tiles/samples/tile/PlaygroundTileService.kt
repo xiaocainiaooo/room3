@@ -20,17 +20,16 @@ import android.content.Context
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.DimensionBuilders.weight
 import androidx.wear.protolayout.LayoutElementBuilders
-import androidx.wear.protolayout.LayoutElementBuilders.Box
-import androidx.wear.protolayout.ModifiersBuilders.Background
-import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.ResourceBuilders
 import androidx.wear.protolayout.ResourceBuilders.AndroidImageResourceByResId
 import androidx.wear.protolayout.ResourceBuilders.ImageResource
 import androidx.wear.protolayout.TimelineBuilders
+import androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat
 import androidx.wear.protolayout.material3.ButtonDefaults.filledVariantButtonColors
 import androidx.wear.protolayout.material3.CardColors
 import androidx.wear.protolayout.material3.CardDefaults.filledTonalCardColors
 import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
+import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.recommendedAnimationSpec
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.extraLargeDataCardStyle
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.smallCompactDataCardStyle
 import androidx.wear.protolayout.material3.MaterialScope
@@ -46,6 +45,7 @@ import androidx.wear.protolayout.material3.iconButton
 import androidx.wear.protolayout.material3.iconDataCard
 import androidx.wear.protolayout.material3.materialScope
 import androidx.wear.protolayout.material3.primaryLayout
+import androidx.wear.protolayout.material3.segmentedCircularProgressIndicator
 import androidx.wear.protolayout.material3.text
 import androidx.wear.protolayout.material3.textButton
 import androidx.wear.protolayout.material3.textDataCard
@@ -123,7 +123,7 @@ private fun tileLayout(
 ): LayoutElementBuilders.LayoutElement =
     materialScope(context = context, deviceConfiguration = requestParams.deviceConfiguration) {
         primaryLayout(
-            mainSlot = { oneSlotButtons() },
+            mainSlot = { graphicDataCardSample() },
             bottomSlot = {
                 textEdgeButton(
                     onClick = clickable(),
@@ -241,20 +241,12 @@ private fun MaterialScope.graphicDataCardSample() =
             )
         },
         graphic = {
-            Box.Builder()
-                .setWidth(expand())
-                .setHeight(expand())
-                .setModifiers(
-                    Modifiers.Builder()
-                        .setBackground(
-                            Background.Builder()
-                                .setCorner(shapes.full)
-                                .setColor(colorScheme.background.prop)
-                                .build()
-                        )
-                        .build()
-                )
-                .build()
+            segmentedCircularProgressIndicator(
+                segmentCount = 6,
+                startAngleDegrees = 200F,
+                endAngleDegrees = 520F,
+                dynamicProgress = DynamicFloat.animate(0.0F, 1.5F, recommendedAnimationSpec),
+            )
         }
     )
 
