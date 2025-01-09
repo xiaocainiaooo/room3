@@ -246,7 +246,7 @@ public fun TimePicker(
                                     indexToText = { "%02d".format(if (is12hour) it + 1 else it) },
                                     optionHeight = styles.optionHeight,
                                 ),
-                            spacing = styles.optionSpacing
+                            verticalSpacing = styles.optionSpacing
                         )
 
                         // Minutes Picker
@@ -272,7 +272,7 @@ public fun TimePicker(
                                     unselectedContentColor = colors.unselectedPickerContentColor,
                                     optionHeight = styles.optionHeight,
                                 ),
-                            spacing = styles.optionSpacing
+                            verticalSpacing = styles.optionSpacing
                         )
 
                         // Seconds or Period picker
@@ -296,7 +296,7 @@ public fun TimePicker(
                                             colors.unselectedPickerContentColor,
                                         optionHeight = styles.optionHeight,
                                     ),
-                                spacing = styles.optionSpacing
+                                verticalSpacing = styles.optionSpacing
                             )
                         }
                     }
