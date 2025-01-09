@@ -46,7 +46,6 @@ import androidx.pdf.PdfDocument
 import androidx.pdf.R
 import androidx.pdf.util.Accessibility
 import androidx.pdf.util.MathUtils
-import androidx.pdf.util.Screen
 import androidx.pdf.util.ZoomUtils
 import java.util.LinkedList
 import java.util.Queue
@@ -508,16 +507,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     private fun getDefaultZoom(): Float {
         if (contentWidth == 0 || viewportWidth == 0) return DEFAULT_INIT_ZOOM
-        val screenUtils = Screen(context)
-        val screenWidthPx = context.resources.displayMetrics.widthPixels
-        val screenWidthDp = screenUtils.dpFromPx(screenWidthPx)
-        val effectiveViewportWidth =
-            if (screenWidthDp >= 840) {
-                viewportWidth - screenUtils.pxFromDp(80)
-            } else {
-                viewportWidth
-            }
-        val widthZoom = effectiveViewportWidth.toFloat() / contentWidth
+        val widthZoom = viewportWidth.toFloat() / contentWidth
         return MathUtils.clamp(widthZoom, minZoom, maxZoom)
     }
 
@@ -777,7 +767,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         // Stop any in progress fling when we open a new document
         scroller.forceFinished(true)
         scrollTo(0, 0)
-        zoom = getDefaultZoom()
+        zoom = DEFAULT_INIT_ZOOM
         pageManager = null
         pageLayoutManager = null
         backgroundScope.coroutineContext.cancelChildren()
@@ -852,10 +842,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      */
     internal fun getVisibleAreaInContentCoords(): Rect {
         visibleAreaRect.set(
-            toContentX(-paddingLeft.toFloat()).toInt(),
-            toContentY(-paddingTop.toFloat()).toInt(),
-            toContentX(viewportWidth.toFloat() + paddingRight).toInt(),
-            toContentY(viewportHeight.toFloat() + paddingBottom).toInt(),
+            toContentX(0F).toInt(),
+            toContentY(0F).toInt(),
+            toContentX(viewportWidth.toFloat() + paddingRight + paddingLeft).toInt(),
+            toContentY(viewportHeight.toFloat() + paddingBottom + paddingTop).toInt(),
         )
         return visibleAreaRect
     }
