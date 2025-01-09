@@ -193,7 +193,7 @@ fun AlertDialogWithButtonStack() {
         item {
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = {},
+                onClick = { showDialog = false },
                 label = { Text("While using app") },
                 icon = { Icon(Icons.Filled.Check, "Check") }
             )
@@ -201,7 +201,7 @@ fun AlertDialogWithButtonStack() {
         item {
             FilledTonalButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = {},
+                onClick = { showDialog = false },
                 label = { Text("Ask every time") },
                 icon = { Icon(Icons.Filled.Check, "Check") }
             )
@@ -209,7 +209,7 @@ fun AlertDialogWithButtonStack() {
         item {
             FilledTonalButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = {},
+                onClick = { showDialog = false },
                 label = { Text("Don't allow") },
                 icon = { Icon(Icons.Filled.Check, "Check") }
             )
