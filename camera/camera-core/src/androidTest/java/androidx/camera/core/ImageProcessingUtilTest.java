@@ -22,10 +22,8 @@ import static androidx.camera.core.ImageProcessingUtil.convertJpegBytesToImage;
 import static androidx.camera.core.ImageProcessingUtil.rotateYUV;
 import static androidx.camera.core.ImageProcessingUtil.rotateYUVAndConvertToNV21;
 import static androidx.camera.core.ImageProcessingUtil.writeJpegBytesToSurface;
-import static androidx.camera.core.internal.utils.SizeUtil.RESOLUTION_VGA;
 import static androidx.camera.testing.impl.IgnoreProblematicDeviceRule.Companion;
 import static androidx.camera.testing.impl.ImageProxyUtil.createYUV420ImagePlanes;
-import static androidx.camera.testing.impl.ImageProxyUtil.getDefaultYuvFormatPlaneDataType;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
@@ -44,7 +42,6 @@ import android.os.Build;
 import androidx.annotation.IntRange;
 import androidx.camera.core.impl.utils.Exif;
 import androidx.camera.core.internal.utils.ImageUtil;
-import androidx.camera.testing.impl.ImageProxyUtil;
 import androidx.camera.testing.impl.TestImageUtil;
 import androidx.camera.testing.impl.fakes.FakeImageInfo;
 import androidx.camera.testing.impl.fakes.FakeImageProxy;
@@ -75,6 +72,10 @@ public class ImageProcessingUtilTest {
 
     private static final int WIDTH = 8;
     private static final int HEIGHT = 4;
+    private static final int PIXEL_STRIDE_Y = 1;
+    private static final int PIXEL_STRIDE_UV = 1;
+    private static final int PIXEL_STRIDE_Y_UNSUPPORTED = 1;
+    private static final int PIXEL_STRIDE_UV_UNSUPPORTED = 3;
     private static final int MAX_IMAGES = 4;
     private static final int JPEG_ENCODE_ERROR_TOLERANCE = 3;
 
@@ -92,8 +93,6 @@ public class ImageProcessingUtilTest {
     private static final int[] YUV_RED_STUDIO_SWING_BT601 = {/*y=*/16, /*u=*/128, /*v=*/240};
 
     private FakeImageProxy mYUVImageProxy;
-    @ImageProxyUtil.YuvFormatPlaneDataType
-    private int mYUVImageProxyPlaneDataType;
     private SafeCloseImageReaderProxy mRGBImageReaderProxy;
     private SafeCloseImageReaderProxy mRotatedRGBImageReaderProxy;
     private SafeCloseImageReaderProxy mRotatedYUVImageReaderProxy;
@@ -101,8 +100,6 @@ public class ImageProcessingUtilTest {
 
     @Before
     public void setUp() {
-        mYUVImageProxyPlaneDataType = getDefaultYuvFormatPlaneDataType(RESOLUTION_VGA.getWidth(),
-                RESOLUTION_VGA.getHeight());
         createTestResources(WIDTH, HEIGHT, 90);
     }
 
@@ -113,7 +110,7 @@ public class ImageProcessingUtilTest {
 
     private void createTestResources(int width, int height, int rotation) {
         mYUVImageProxy = TestImageUtil.createYuvFakeImageProxy(new FakeImageInfo(), width, height,
-                mYUVImageProxyPlaneDataType, true);
+                true, true);
         mYUVImageProxy.setWidth(width);
         mYUVImageProxy.setHeight(height);
         mYUVImageProxy.setFormat(ImageFormat.YUV_420_888);
@@ -212,6 +209,14 @@ public class ImageProcessingUtilTest {
     @Test
     public void convertYuvToJpegBytesIntoSurface_sizeAndRotationAreCorrect() throws IOException {
         final int expectedRotation = 270;
+        // Arrange: create a YUV_420_888 image
+        mYUVImageProxy.setPlanes(createYUV420ImagePlanes(
+                WIDTH,
+                HEIGHT,
+                PIXEL_STRIDE_Y,
+                PIXEL_STRIDE_UV,
+                /*flipUV=*/false,
+                /*incrementValue=*/false));
 
         // Act: convert it into JPEG and write into the surface.
         ImageProcessingUtil.convertYuvToJpegBytesIntoSurface(mYUVImageProxy,
@@ -250,7 +255,41 @@ public class ImageProcessingUtilTest {
     }
 
     @Test
-    public void convertYUVToRGB_withNV12InputImageProxy() {
+    public void convertYUVToRGBWhenNotFlipUV() {
+        // Arrange.
+        mYUVImageProxy.setPlanes(createYUV420ImagePlanes(
+                WIDTH,
+                HEIGHT,
+                PIXEL_STRIDE_Y,
+                PIXEL_STRIDE_UV,
+                /*flipUV=*/false,
+                /*incrementValue=*/false));
+
+        // Act.
+        ImageProxy rgbImageProxy = ImageProcessingUtil.convertYUVToRGB(
+                mYUVImageProxy,
+                mRGBImageReaderProxy,
+                mRgbConvertedBuffer,
+                /*rotation=*/0,
+                /*onePixelShiftRequested=*/false);
+
+        // Assert.
+        assertThat(rgbImageProxy.getFormat()).isEqualTo(PixelFormat.RGBA_8888);
+        assertThat(rgbImageProxy.getPlanes().length).isEqualTo(1);
+        rgbImageProxy.close();
+    }
+
+    @Test
+    public void convertYUVToRGBWhenFlipUV() {
+        // Arrange.
+        mYUVImageProxy.setPlanes(createYUV420ImagePlanes(
+                WIDTH,
+                HEIGHT,
+                PIXEL_STRIDE_Y,
+                PIXEL_STRIDE_UV,
+                /*flipUV=*/true,
+                /*incrementValue=*/false));
+
         // Act.
         ImageProxy rgbImageProxy = ImageProcessingUtil.convertYUVToRGB(
                 mYUVImageProxy,
@@ -267,14 +306,14 @@ public class ImageProcessingUtilTest {
 
     @Test
     public void convertYUVToRGBWhenUnsupportedYUVFormat() {
-        mYUVImageProxy.close();
-        int pixelStrideY = 1;
-        int unsupportedPixelStrideUV = 3;
-        mYUVImageProxy = TestImageUtil.createYuvFakeImageProxy(new FakeImageInfo(), WIDTH, HEIGHT,
-                pixelStrideY, unsupportedPixelStrideUV, false, true);
-        mYUVImageProxy.setWidth(WIDTH);
-        mYUVImageProxy.setHeight(HEIGHT);
-        mYUVImageProxy.setFormat(ImageFormat.YUV_420_888);
+        // Arrange.
+        mYUVImageProxy.setPlanes(createYUV420ImagePlanes(
+                WIDTH,
+                HEIGHT,
+                PIXEL_STRIDE_Y_UNSUPPORTED,
+                PIXEL_STRIDE_UV_UNSUPPORTED,
+                /*flipUV=*/true,
+                /*incrementValue=*/false));
 
         // Act.
         ImageProxy rgbImageProxy = ImageProcessingUtil.convertYUVToRGB(
@@ -287,13 +326,6 @@ public class ImageProcessingUtilTest {
         // Assert.
         assertThat(rgbImageProxy.getFormat()).isEqualTo(PixelFormat.RGBA_8888);
         assertThat(rgbImageProxy.getPlanes().length).isEqualTo(1);
-
-        // Verifies the color value diff between the input image and the decoded output image proxy.
-        Bitmap inputDecodedBitmap = ImageUtil.createBitmapFromImageProxy(mYUVImageProxy);
-        Bitmap outputBitmap = ImageUtil.createBitmapFromImageProxy(rgbImageProxy);
-        assertThat(TestImageUtil.getAverageDiff(inputDecodedBitmap, outputBitmap))
-                .isEqualTo(0);
-
         rgbImageProxy.close();
     }
 
@@ -303,7 +335,9 @@ public class ImageProcessingUtilTest {
         mYUVImageProxy.setPlanes(createYUV420ImagePlanes(
                 WIDTH,
                 HEIGHT,
-                mYUVImageProxyPlaneDataType,
+                PIXEL_STRIDE_Y,
+                PIXEL_STRIDE_UV,
+                /*flipUV=*/false,
                 /*incrementValue=*/true));
 
         // Assert.
@@ -323,6 +357,15 @@ public class ImageProcessingUtilTest {
 
     @Test
     public void closeYUVImageProxyWhenRGBImageProxyClosed() {
+        // Arrange.
+        mYUVImageProxy.setPlanes(createYUV420ImagePlanes(
+                WIDTH,
+                HEIGHT,
+                PIXEL_STRIDE_Y,
+                PIXEL_STRIDE_UV,
+                /*flipUV=*/false,
+                /*incrementValue=*/false));
+
         // Act.
         ImageProxy rgbImageProxy = ImageProcessingUtil.convertYUVToRGB(
                 mYUVImageProxy,
@@ -343,6 +386,15 @@ public class ImageProcessingUtilTest {
 
     @Test
     public void rotateRGB_imageRotated() {
+        // Arrange.
+        mYUVImageProxy.setPlanes(createYUV420ImagePlanes(
+                WIDTH,
+                HEIGHT,
+                PIXEL_STRIDE_Y,
+                PIXEL_STRIDE_UV,
+                /*flipUV=*/true,
+                /*incrementValue=*/false));
+
         // Act.
         ImageProxy rgbImageProxy = ImageProcessingUtil.convertYUVToRGB(
                 mYUVImageProxy,
@@ -385,8 +437,7 @@ public class ImageProcessingUtilTest {
 
     @Test
     public void rotateYUV_imageRotated_0_outputNV21() {
-        rotateYUV_imageRotated(OUTPUT_IMAGE_FORMAT_NV21, 0,
-                ImageProcessingUtil.isNV21FormatImage(mYUVImageProxy));
+        rotateYUV_imageRotated(OUTPUT_IMAGE_FORMAT_NV21, 0, false);
     }
 
     @Test
@@ -411,8 +462,8 @@ public class ImageProcessingUtilTest {
         // Pixel2 API28 emulator has problem to run the test
         assumeFalse(Companion.isPixel2Api28Emulator());
         // Arrange.
-        int width = 64;
-        int height = 32;
+        int width = 640;
+        int height = 480;
         closeTestResources();
         createTestResources(width, height, rotation);
 
@@ -453,10 +504,6 @@ public class ImageProcessingUtilTest {
         assertThat(yuvImageProxy.getPlanes().length).isEqualTo(3);
         assertThat(yuvImageProxy.getWidth()).isEqualTo(flipWh ? height : width);
         assertThat(yuvImageProxy.getHeight()).isEqualTo(flipWh ? width : height);
-
-        if (outputImageFormat == OUTPUT_IMAGE_FORMAT_NV21) {
-            assertThat(ImageProcessingUtil.isNV21FormatImage(yuvImageProxy)).isTrue();
-        }
 
         // Verifies the color value diff between the rotated input image and the decoded output
         // image proxy.
@@ -584,7 +631,9 @@ public class ImageProcessingUtilTest {
         yuvImageProxy.setPlanes(createYUV420ImagePlanes(
                 WIDTH,
                 HEIGHT,
-                mYUVImageProxyPlaneDataType,
+                PIXEL_STRIDE_Y,
+                PIXEL_STRIDE_UV,
+                /*flipUV=*/true,
                 /*incrementValue=*/false));
 
         return yuvImageProxy;
