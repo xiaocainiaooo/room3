@@ -443,7 +443,6 @@ public interface CameraInfo {
      * @see CameraControl#enableLowLightBoostAsync(boolean)
      * @see CaptureRequest#CONTROL_AE_MODE_ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY
      */
-    @RestrictTo(Scope.LIBRARY_GROUP)
     default boolean isLowLightBoostSupported() {
         return false;
     }
@@ -462,7 +461,6 @@ public interface CameraInfo {
      *
      * @return a {@link LiveData} containing current low-light boost state.
      */
-    @RestrictTo(Scope.LIBRARY_GROUP)
     default @NonNull LiveData<Integer> getLowLightBoostState() {
         return new MutableLiveData<>(LowLightBoostState.OFF);
     }
