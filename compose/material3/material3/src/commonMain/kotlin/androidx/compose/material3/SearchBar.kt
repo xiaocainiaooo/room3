@@ -165,6 +165,7 @@ import androidx.compose.ui.unit.round
 import androidx.compose.ui.util.fastFirst
 import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.lerp
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.abs
@@ -186,16 +187,15 @@ import kotlinx.coroutines.launch
  * ![Search bar
  * image](https://developer.android.com/images/reference/androidx/compose/material3/search-bar.png)
  *
- * A search bar expands when focused to display dynamic suggestions or search results. An expanded
- * [SearchBar] displays its results in a full-screen dialog. If this expansion behavior is
- * undesirable, for example on large tablet screens, consider using [DockedSearchBar] instead.
+ * The [SearchBar] component represents a search bar in the collapsed state. It should be used in
+ * conjunction with an [ExpandedFullScreenSearchBar] to display search results when expanded.
  *
- * @param state the state of the search bar. This state should also be passed to the [inputField].
+ * @param state the state of the search bar. This state should also be passed to the [inputField]
+ *   and the expanded search bar.
  * @param inputField the input field of this search bar that allows entering a query, typically a
  *   [SearchBarDefaults.InputField].
  * @param modifier the [Modifier] to be applied to this search bar when collapsed.
- * @param shape the shape of this search bar when it is collapsed. When expanded, the shape will
- *   always be [SearchBarDefaults.fullScreenShape].
+ * @param shape the shape of this search bar when collapsed.
  * @param colors [SearchBarColors] that will be used to resolve the colors used for this search bar
  *   in different states. See [SearchBarDefaults.colors].
  * @param tonalElevation when [SearchBarColors.containerColor] is [ColorScheme.surface], a
@@ -203,8 +203,8 @@ import kotlinx.coroutines.launch
  *   value will result in a darker color in light theme and lighter color in dark theme. See also:
  *   [Surface].
  * @param shadowElevation the elevation for the shadow below this search bar.
- * @param content the content of this search bar to display search results below the [inputField].
  */
+@Suppress("ComposableLambdaParameterNaming", "ComposableLambdaParameterPosition")
 @ExperimentalMaterial3Api
 @Composable
 internal fun SearchBar(
@@ -215,27 +215,19 @@ internal fun SearchBar(
     colors: SearchBarColors = SearchBarDefaults.colors(),
     tonalElevation: Dp = SearchBarDefaults.TonalElevation,
     shadowElevation: Dp = SearchBarDefaults.ShadowElevation,
-    content: @Composable ColumnScope.() -> Unit,
 ) {
-    CollapsedSearchBar(
-        // Modifier gets passed to Collapsed because Expanded opens a separate dialog.
-        modifier = modifier,
-        state = state,
-        inputField = inputField,
-        shape = shape,
-        colors = colors,
-        tonalElevation = tonalElevation,
-        shadowElevation = shadowElevation
-    )
-    ExpandedFullScreenSearchBar(
-        state = state,
-        inputField = inputField,
-        collapsedShape = shape,
-        colors = colors,
-        tonalElevation = tonalElevation,
-        shadowElevation = shadowElevation,
-        content = content
-    )
+    // Disable when collapsed to avoid keyboard flicker when the expanded search bar opens.
+    DisableSoftKeyboard {
+        Surface(
+            modifier = modifier.onGloballyPositioned { state.collapsedCoords = it },
+            shape = shape,
+            color = colors.containerColor,
+            contentColor = contentColorFor(colors.containerColor),
+            tonalElevation = tonalElevation,
+            shadowElevation = shadowElevation,
+            content = inputField,
+        )
+    }
 }
 
 /**
@@ -245,18 +237,21 @@ internal fun SearchBar(
  * A search bar represents a field that allows users to enter a keyword or phrase and get relevant
  * information. It can be used as a way to navigate through an app via search queries.
  *
- * A [TopSearchBar] can be used in conjunction with a [Scaffold] for a search bar that remains at
- * the top of the screen.
- *
  * ![Search bar
  * image](https://developer.android.com/images/reference/androidx/compose/material3/search-bar.png)
  *
- * @param state the state of the search bar. This state should also be passed to the [inputField].
+ * A [TopSearchBar] is a [SearchBar] with additional handling for top app bar behavior, such as
+ * window insets and scrolling. Using a [TopSearchBar] as the top bar of a [Scaffold] ensures that
+ * the search bar remains at the top of the screen. Like with [SearchBar], [TopSearchBar] should be
+ * used in conjunction with an [ExpandedFullScreenSearchBar] to display search results when
+ * expanded.
+ *
+ * @param state the state of the search bar. This state should also be passed to the [inputField]
+ *   and the expanded search bar.
  * @param inputField the input field of this search bar that allows entering a query, typically a
  *   [SearchBarDefaults.InputField].
  * @param modifier the [Modifier] to be applied to this search bar when collapsed.
- * @param shape the shape of this search bar when it is collapsed. When expanded, the shape will
- *   always be [SearchBarDefaults.fullScreenShape].
+ * @param shape the shape of this search bar when collapsed.
  * @param colors [SearchBarColors] that will be used to resolve the colors used for this search bar
  *   in different states. See [SearchBarDefaults.colors].
  * @param tonalElevation when [SearchBarColors.containerColor] is [ColorScheme.surface], a
@@ -264,13 +259,12 @@ internal fun SearchBar(
  *   value will result in a darker color in light theme and lighter color in dark theme. See also:
  *   [Surface].
  * @param shadowElevation the elevation for the shadow below this search bar.
- * @param windowInsets the window insets that the search bar will respect when collapsed. When
- *   expanded, the window insets will always be [SearchBarDefaults.fullScreenWindowInsets].
+ * @param windowInsets the window insets that the search bar will respect when collapsed.
  * @param scrollBehavior a [SearchBarScrollBehavior] which works in conjunction with a scrolled
  *   content to change the search bar appearance as the content scrolls. If null, the search bar
  *   will not automatically react to scrolling.
- * @param content the content of this search bar to display search results below the [inputField].
  */
+@Suppress("ComposableLambdaParameterNaming", "ComposableLambdaParameterPosition")
 @ExperimentalMaterial3Api
 @Composable
 internal fun TopSearchBar(
@@ -283,7 +277,6 @@ internal fun TopSearchBar(
     shadowElevation: Dp = SearchBarDefaults.ShadowElevation,
     windowInsets: WindowInsets = SearchBarDefaults.windowInsets,
     scrollBehavior: SearchBarScrollBehavior? = null,
-    content: @Composable ColumnScope.() -> Unit,
 ) {
     SearchBar(
         state = state,
@@ -302,8 +295,70 @@ internal fun TopSearchBar(
         colors = colors,
         tonalElevation = tonalElevation,
         shadowElevation = shadowElevation,
-        content = content,
     )
+}
+
+/**
+ * [ExpandedFullScreenSearchBar] represents a search bar that is currently expanding or in the
+ * expanded state, showing search results. This component is displayed in a new full-screen dialog.
+ *
+ * @param state the state of the search bar. This state should also be passed to the [inputField]
+ *   and the collapsed search bar.
+ * @param inputField the input field of this search bar that allows entering a query, typically a
+ *   [SearchBarDefaults.InputField].
+ * @param modifier the [Modifier] to be applied to this expanded search bar.
+ * @param collapsedShape the shape of the search bar when it is collapsed. When fully expanded, the
+ *   shape will always be [SearchBarDefaults.fullScreenShape].
+ * @param colors [SearchBarColors] that will be used to resolve the colors used for this search bar
+ *   in different states. See [SearchBarDefaults.colors].
+ * @param tonalElevation when [SearchBarColors.containerColor] is [ColorScheme.surface], a
+ *   translucent primary color overlay is applied on top of the container. A higher tonal elevation
+ *   value will result in a darker color in light theme and lighter color in dark theme. See also:
+ *   [Surface].
+ * @param shadowElevation the elevation for the shadow below this search bar.
+ * @param windowInsets the window insets that this search bar will respect when expanded.
+ * @param properties the platform-specific properties to configure the dialog's behavior. Any
+ *   properties which limit the dialog's size (e.g. [DialogProperties.usePlatformDefaultWidth]) are
+ *   ignored.
+ * @param content the content of this search bar to display search results below the [inputField].
+ */
+@ExperimentalMaterial3Api
+@Composable
+internal fun ExpandedFullScreenSearchBar(
+    state: SearchBarState,
+    inputField: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    collapsedShape: Shape = SearchBarDefaults.inputFieldShape,
+    colors: SearchBarColors = SearchBarDefaults.colors(),
+    tonalElevation: Dp = SearchBarDefaults.TonalElevation,
+    shadowElevation: Dp = SearchBarDefaults.ShadowElevation,
+    windowInsets: @Composable () -> WindowInsets = { SearchBarDefaults.fullScreenWindowInsets },
+    properties: DialogProperties = DialogProperties(),
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    if (!state.isExpanded) return
+
+    val coroutineScope = rememberCoroutineScope()
+
+    BasicEdgeToEdgeDialog(
+        onDismissRequest = { coroutineScope.launch { state.animateToCollapsed() } },
+        properties = properties,
+    ) { predictiveBackState ->
+        val softwareKeyboardController = LocalSoftwareKeyboardController.current
+        SideEffect { state.softwareKeyboardController = softwareKeyboardController }
+        FullScreenSearchBarLayout(
+            state = state,
+            predictiveBackState = predictiveBackState,
+            inputField = inputField,
+            modifier = modifier,
+            collapsedShape = collapsedShape,
+            colors = colors,
+            tonalElevation = tonalElevation,
+            shadowElevation = shadowElevation,
+            windowInsets = windowInsets(),
+            content = content,
+        )
+    }
 }
 
 /**
@@ -509,111 +564,6 @@ fun DockedSearchBar(
 }
 
 /**
- * A building block component representing a search bar in the collapsed state.
- *
- * Unless specific customization is needed, consider using a higher level component such as
- * [SearchBar] or [DockedSearchBar] instead.
- *
- * @param state the state of the search bar. This state should also be passed to the [inputField].
- * @param inputField the input field of this search bar that allows entering a query, typically a
- *   [SearchBarDefaults.InputField].
- * @param modifier the [Modifier] to be applied to this collapsed search bar.
- * @param shape the shape of this search bar.
- * @param colors [SearchBarColors] that will be used to resolve the colors used for this search bar
- *   in different states. See [SearchBarDefaults.colors].
- * @param tonalElevation when [SearchBarColors.containerColor] is [ColorScheme.surface], a
- *   translucent primary color overlay is applied on top of the container. A higher tonal elevation
- *   value will result in a darker color in light theme and lighter color in dark theme. See also:
- *   [Surface].
- * @param shadowElevation the elevation for the shadow below this search bar.
- */
-@Suppress("ComposableLambdaParameterNaming", "ComposableLambdaParameterPosition")
-@ExperimentalMaterial3Api
-@Composable
-internal fun CollapsedSearchBar(
-    state: SearchBarState,
-    inputField: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    shape: Shape = SearchBarDefaults.inputFieldShape,
-    colors: SearchBarColors = SearchBarDefaults.colors(),
-    tonalElevation: Dp = SearchBarDefaults.TonalElevation,
-    shadowElevation: Dp = SearchBarDefaults.ShadowElevation,
-) {
-    // Disable when collapsed to avoid keyboard flicker when the expanded search bar opens.
-    DisableSoftKeyboard {
-        Surface(
-            modifier = modifier.onGloballyPositioned { state.collapsedCoords = it },
-            shape = shape,
-            color = colors.containerColor,
-            contentColor = contentColorFor(colors.containerColor),
-            tonalElevation = tonalElevation,
-            shadowElevation = shadowElevation,
-            content = inputField,
-        )
-    }
-}
-
-/**
- * A building block component representing a search bar that is currently expanding or in the
- * expanded state. This component is displayed in a new full-screen dialog.
- *
- * Unless specific customization is needed, consider using a higher level component such as
- * [SearchBar] or [DockedSearchBar] instead.
- *
- * @param state the state of the search bar. This state should also be passed to the [inputField].
- * @param inputField the input field of this search bar that allows entering a query, typically a
- *   [SearchBarDefaults.InputField].
- * @param modifier the [Modifier] to be applied to this expanded search bar.
- * @param collapsedShape the shape of the search bar when it is collapsed. When fully expanded, the
- *   shape will always be [SearchBarDefaults.fullScreenShape].
- * @param colors [SearchBarColors] that will be used to resolve the colors used for this search bar
- *   in different states. See [SearchBarDefaults.colors].
- * @param tonalElevation when [SearchBarColors.containerColor] is [ColorScheme.surface], a
- *   translucent primary color overlay is applied on top of the container. A higher tonal elevation
- *   value will result in a darker color in light theme and lighter color in dark theme. See also:
- *   [Surface].
- * @param shadowElevation the elevation for the shadow below this search bar.
- * @param windowInsets the window insets that this search bar will respect.
- * @param content the content of this search bar to display search results below the [inputField].
- */
-@ExperimentalMaterial3Api
-@Composable
-internal fun ExpandedFullScreenSearchBar(
-    state: SearchBarState,
-    inputField: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    collapsedShape: Shape = SearchBarDefaults.inputFieldShape,
-    colors: SearchBarColors = SearchBarDefaults.colors(),
-    tonalElevation: Dp = SearchBarDefaults.TonalElevation,
-    shadowElevation: Dp = SearchBarDefaults.ShadowElevation,
-    windowInsets: @Composable () -> WindowInsets = { SearchBarDefaults.fullScreenWindowInsets },
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    if (!state.isExpanded) return
-
-    val coroutineScope = rememberCoroutineScope()
-
-    BasicEdgeToEdgeDialog(
-        onDismissRequest = { coroutineScope.launch { state.animateToCollapsed() } }
-    ) { predictiveBackState ->
-        val softwareKeyboardController = LocalSoftwareKeyboardController.current
-        SideEffect { state.softwareKeyboardController = softwareKeyboardController }
-        FullScreenSearchBarLayout(
-            state = state,
-            predictiveBackState = predictiveBackState,
-            inputField = inputField,
-            modifier = modifier,
-            collapsedShape = collapsedShape,
-            colors = colors,
-            tonalElevation = tonalElevation,
-            shadowElevation = shadowElevation,
-            windowInsets = windowInsets(),
-            content = content,
-        )
-    }
-}
-
-/**
  * The state of a search bar.
  *
  * @property focusRequester The [FocusRequester] to request focus on the search bar.
@@ -649,7 +599,10 @@ private constructor(
         focusRequester = focusRequester,
     )
 
-    /** The layout coordinates, if available, of the search bar when it is collapsed. */
+    /**
+     * The layout coordinates, if available, of the search bar when it is collapsed. Used to
+     * coordinate the expansion animation.
+     */
     var collapsedCoords: LayoutCoordinates? by mutableStateOf(null)
 
     /**
@@ -660,9 +613,7 @@ private constructor(
     val progress: Float
         get() = animatable.value.coerceIn(0f, 1f)
 
-    /**
-     * Whether this search bar is expanded (showing search results), or in the process of expanding.
-     */
+    /** Whether this search bar is expanded or in the process of expanding. */
     val isExpanded: Boolean by derivedStateOf { progress > 0f }
 
     internal var softwareKeyboardController: SoftwareKeyboardController? = null
