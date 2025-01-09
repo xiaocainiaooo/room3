@@ -35,6 +35,7 @@ import androidx.compose.material3.BottomAppBarDefaults.bottomAppBarFabColor
 import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
 import androidx.compose.material3.tokens.AppBarSmallTokens
 import androidx.compose.testutils.assertAgainstGolden
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
@@ -245,7 +246,7 @@ class AppBarScreenshotTest {
                     },
                     title = { Text("Title") },
                     subtitle = { Text("Subtitle") },
-                    titleHorizontalAlignment = TopAppBarTitleAlignment.Center,
+                    titleHorizontalAlignment = Alignment.CenterHorizontally,
                     actions = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(imageVector = Icons.Filled.Favorite, contentDescription = "Like")
@@ -273,7 +274,7 @@ class AppBarScreenshotTest {
                     },
                     title = { Text("Title") },
                     subtitle = {},
-                    titleHorizontalAlignment = TopAppBarTitleAlignment.Center,
+                    titleHorizontalAlignment = Alignment.CenterHorizontally,
                     actions = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(imageVector = Icons.Filled.Favorite, contentDescription = "Like")
@@ -355,7 +356,7 @@ class AppBarScreenshotTest {
                     },
                     title = { Text("Title") },
                     subtitle = { Text("Subtitle") },
-                    titleHorizontalAlignment = TopAppBarTitleAlignment.Center,
+                    titleHorizontalAlignment = Alignment.CenterHorizontally,
                     actions = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(imageVector = Icons.Filled.Favorite, contentDescription = "Like")
@@ -384,7 +385,7 @@ class AppBarScreenshotTest {
                         }
                     },
                     title = { Text("Title") },
-                    titleHorizontalAlignment = TopAppBarTitleAlignment.Center,
+                    titleHorizontalAlignment = Alignment.CenterHorizontally,
                     actions = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(imageVector = Icons.Filled.Favorite, contentDescription = "Like")
@@ -495,7 +496,7 @@ class AppBarScreenshotTest {
                     },
                     title = { Text("Title") },
                     subtitle = { Text("Subtitle") },
-                    titleHorizontalAlignment = TopAppBarTitleAlignment.Center,
+                    titleHorizontalAlignment = Alignment.CenterHorizontally,
                     actions = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(imageVector = Icons.Filled.Favorite, contentDescription = "Like")
@@ -524,7 +525,7 @@ class AppBarScreenshotTest {
                         }
                     },
                     title = { Text("Title") },
-                    titleHorizontalAlignment = TopAppBarTitleAlignment.Center,
+                    titleHorizontalAlignment = Alignment.CenterHorizontally,
                     actions = {
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(imageVector = Icons.Filled.Favorite, contentDescription = "Like")

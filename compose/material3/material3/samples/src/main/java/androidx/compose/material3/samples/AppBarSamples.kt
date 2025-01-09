@@ -54,9 +54,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarTitleAlignment
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -243,7 +243,7 @@ fun SimpleCenterAlignedTopAppBarWithSubtitle() {
                     Text("Simple TopAppBar", maxLines = 1, overflow = TextOverflow.Ellipsis)
                 },
                 subtitle = { Text("Subtitle", maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                titleHorizontalAlignment = TopAppBarTitleAlignment.Center,
+                titleHorizontalAlignment = Alignment.CenterHorizontally,
                 navigationIcon = {
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(
@@ -467,7 +467,7 @@ fun ExitUntilCollapsedCenterAlignedMediumFlexibleTopAppBar() {
                     Text("Medium TopAppBar", maxLines = 1, overflow = TextOverflow.Ellipsis)
                 },
                 subtitle = { Text("Subtitle", maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                titleHorizontalAlignment = TopAppBarTitleAlignment.Center,
+                titleHorizontalAlignment = Alignment.CenterHorizontally,
                 navigationIcon = {
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(
@@ -573,7 +573,7 @@ fun ExitUntilCollapsedCenterAlignedLargeFlexibleTopAppBar() {
             LargeFlexibleTopAppBar(
                 title = { Text("Large TopAppBar", maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 subtitle = { Text("Subtitle", maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                titleHorizontalAlignment = TopAppBarTitleAlignment.Center,
+                titleHorizontalAlignment = Alignment.CenterHorizontally,
                 navigationIcon = {
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(
