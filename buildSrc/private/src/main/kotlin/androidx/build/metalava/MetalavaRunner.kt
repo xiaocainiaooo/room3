@@ -187,6 +187,12 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
                 )
                 .joinToString()
         )
+    // Acronyms that can be used in their all-caps form. "SQ" is included to allow "SQLite".
+    val allowedAcronyms = listOf("SQL", "SQ", "URL", "EGL", "GL", "KHR")
+    for (acronym in allowedAcronyms) {
+        args.add("--api-lint-allowed-acronym")
+        args.add(acronym)
+    }
     val javaOnlyIssues = listOf("MissingJvmstatic", "ArrayReturn", "ValueClassDefinition")
     val javaOnlyErrorLevel =
         if (targetsJavaConsumers) {
