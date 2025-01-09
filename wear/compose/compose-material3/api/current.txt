@@ -1126,9 +1126,11 @@ package androidx.wear.compose.material3 {
   }
 
   public final class SliderDefaults {
-    method @androidx.compose.runtime.Composable public void DecreaseIcon(optional androidx.compose.ui.Modifier modifier);
-    method @androidx.compose.runtime.Composable public void IncreaseIcon(optional androidx.compose.ui.Modifier modifier);
+    method @androidx.compose.runtime.Composable public void DecreaseIcon(optional androidx.compose.ui.Modifier modifier, optional String contentDescription);
+    method @androidx.compose.runtime.Composable public void IncreaseIcon(optional androidx.compose.ui.Modifier modifier, optional String contentDescription);
+    method @androidx.compose.runtime.Composable public String getDecreaseIconContentDescription();
     method public float getIconSize();
+    method @androidx.compose.runtime.Composable public String getIncreaseIconContentDescription();
     method public int getMaxSegmentSteps();
     method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getShape();
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.SliderColors sliderColors();
@@ -1137,6 +1139,8 @@ package androidx.wear.compose.material3 {
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.SliderColors variantSliderColors(optional long containerColor, optional long buttonIconColor, optional long selectedBarColor, optional long unselectedBarColor, optional long selectedBarSeparatorColor, optional long unselectedBarSeparatorColor, optional long disabledContainerColor, optional long disabledButtonIconColor, optional long disabledSelectedBarColor, optional long disabledUnselectedBarColor, optional long disabledSelectedBarSeparatorColor, optional long disabledUnselectedBarSeparatorColor);
     property public final float IconSize;
     property public final int MaxSegmentSteps;
+    property @androidx.compose.runtime.Composable public final String decreaseIconContentDescription;
+    property @androidx.compose.runtime.Composable public final String increaseIconContentDescription;
     property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape shape;
     field public static final androidx.wear.compose.material3.SliderDefaults INSTANCE;
   }
