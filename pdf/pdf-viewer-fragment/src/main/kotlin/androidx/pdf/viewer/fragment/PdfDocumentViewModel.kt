@@ -38,6 +38,7 @@ import androidx.pdf.viewer.fragment.model.HighlightData
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState
 import androidx.pdf.viewer.fragment.model.SearchViewUiState
 import androidx.pdf.viewer.fragment.util.fetchCounterData
+import androidx.pdf.viewer.fragment.util.getCenter
 import androidx.pdf.viewer.fragment.util.toHighlightsData
 import java.util.concurrent.Executors
 import kotlinx.coroutines.Job
@@ -360,7 +361,7 @@ internal class PdfDocumentViewModel(
         viewModelScope.launch(searchJob) {
             searchRepository.produceSearchResults(
                 query = query,
-                currentVisiblePage = visiblePageRange.getCenterPage()
+                currentVisiblePage = visiblePageRange.getCenter()
             )
         }
     }
