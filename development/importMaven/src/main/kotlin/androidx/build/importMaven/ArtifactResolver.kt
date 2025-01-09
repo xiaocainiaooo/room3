@@ -226,7 +226,6 @@ ${
         private fun resolveArtifacts(
             configuration: Configuration,
         ): ArtifactsResolutionResult {
-            configuration.resolutionStrategy.disableDependencyVerification()
             val artifacts = configuration.incoming.artifactView {
                 // We need to be lenient because we are requesting files that might not exist.
                 // For example source.jar or .asc.
