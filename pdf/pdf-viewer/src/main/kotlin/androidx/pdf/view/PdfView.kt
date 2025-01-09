@@ -23,17 +23,23 @@ import android.graphics.Canvas
 import android.graphics.Point
 import android.graphics.PointF
 import android.graphics.Rect
+import android.graphics.RectF
 import android.net.Uri
 import android.os.Looper
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.util.Range
+import android.view.ActionMode
 import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
+import androidx.core.graphics.toRectF
 import androidx.core.os.HandlerCompat
 import androidx.core.view.ViewCompat
 import androidx.pdf.PdfDocument
@@ -142,6 +148,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     /** The listener that is notified when a link in the PDF is clicked. */
     public var linkClickListener: LinkClickListener? = null
 
+    /** The [ActionMode.Callback2] for selection */
+    public var selectionActionModeCallback: DefaultSelectionActionModeCallback =
+        DefaultSelectionActionModeCallback()
+
     /** The currently selected PDF content, as [Selection] */
     public val currentSelection: Selection?
         get() {
@@ -196,6 +206,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     private var selectionStateManager: SelectionStateManager? = null
     private val selectionRenderer = SelectionRenderer(context)
+    private var selectionActionMode: ActionMode? = null
+    private var gestureInProgress = false
 
     /**
      * Scrolls to the 0-indexed [pageNum], optionally animating the scroll
@@ -367,14 +379,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
-        accessibilityPageHelper?.invalidateRoot()
+        onViewportChanged()
     }
 
     override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
         super.onScrollChanged(l, t, oldl, oldt)
-        pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
-        accessibilityPageHelper?.invalidateRoot()
+        onViewportChanged()
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -447,6 +457,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             // Once the fling has ended, prompt the page manager to start fetching data for pages
             // that we don't fetch during a fling
             pageManager?.maybeUpdatePageState(visiblePages, zoom, isFling)
+            // We hide the action mode during a fling, so reveal it when the fling is over
+            updateSelectionActionModeVisibility()
         }
     }
 
@@ -607,7 +619,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
                     // Prevent 2 copies from running concurrently
                     selectionToJoin?.join()
-                    manager.invalidationSignalFlow.collect { invalidate() }
+                    manager.selectionUiSignalBus.collect { onSelectionUiSignal(it) }
                 }
         }
     }
@@ -617,6 +629,25 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         visiblePagesCollector?.cancel()
         invalidationCollector?.cancel()
         selectionStateCollector?.cancel()
+    }
+
+    private fun onSelectionUiSignal(signal: SelectionUiSignal) {
+        when (signal) {
+            is SelectionUiSignal.PlayHapticFeedback -> {
+                performHapticFeedback(signal.level)
+            }
+            is SelectionUiSignal.Invalidate -> {
+                invalidate()
+            }
+            is SelectionUiSignal.ToggleActionMode -> {
+                if (signal.show && selectionActionMode == null && currentSelection != null) {
+                    startActionMode(selectionActionModeCallback, ActionMode.TYPE_FLOATING)
+                } else if (!signal.show) {
+                    selectionActionMode?.finish()
+                    selectionActionMode = null
+                }
+            }
+        }
     }
 
     /** Start using the [PdfDocument] to present PDF content */
@@ -666,13 +697,72 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      * position or size changes.
      */
     private fun onZoomChanged() {
-        pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
+        onViewportChanged()
         // Don't fetch new Bitmaps while the user is actively zooming, to avoid jank and rendering
         // churn
         if (!gestureTracker.matches(GestureTracker.Gesture.ZOOM)) {
             pageManager?.maybeUpdatePageState(visiblePages, zoom, isFling)
         }
+    }
+
+    private fun onViewportChanged() {
+        pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
         accessibilityPageHelper?.invalidateRoot()
+        updateSelectionActionModeVisibility()
+    }
+
+    /**
+     * Shows or hides the selection action mode, as appropriate. If the current selection is visible
+     * and a gesture is not in progress, the action mode will be shown. Otherwise, it will be
+     * hidden.
+     */
+    private fun updateSelectionActionModeVisibility() {
+        // isFlinging != gestureInProgress. isFlinging refers to the animation that continues after
+        // the gesture stops
+        if (selectionIsVisible() && !gestureInProgress && !isFling) {
+            selectionStateManager?.maybeShowActionMode()
+            selectionActionMode?.invalidateContentRect()
+        } else {
+            selectionStateManager?.maybeHideActionMode()
+        }
+    }
+
+    private fun selectionIsVisible(): Boolean {
+        // If we don't have a selection or any way to understand the layout of our pages, the
+        // selection is not visible
+        val localSelection = currentSelection ?: return false
+        val localPageLayoutManager = pageLayoutManager ?: return false
+
+        val viewport = getVisibleAreaInContentCoords()
+        val firstPage = localSelection.bounds.minOf { it.pageNum }
+        val lastPage = localSelection.bounds.maxOf { it.pageNum }
+        // Top and bottom edge must be on the first and last page, respectively
+        // If we can't locate any edge of the selection, we consider it invisible
+        val topEdge =
+            localSelection.bounds
+                .filter { it.pageNum == firstPage }
+                .minByOrNull { it.pageRect.top }
+                ?.let { localPageLayoutManager.getViewRect(it, viewport) }
+                ?.top ?: return false
+        val bottomEdge =
+            localSelection.bounds
+                .filter { it.pageNum == lastPage }
+                .maxByOrNull { it.pageRect.bottom }
+                ?.let { localPageLayoutManager.getViewRect(it, viewport) }
+                ?.bottom ?: return false
+        // The left or right edge may be on any page
+        val leftEdge =
+            localSelection.bounds
+                .minByOrNull { it.pageRect.left }
+                ?.let { localPageLayoutManager.getViewRect(it, viewport) }
+                ?.left ?: return false
+        val rightEdge =
+            localSelection.bounds
+                .maxByOrNull { it.pageRect.right }
+                ?.let { localPageLayoutManager.getViewRect(it, viewport) }
+                ?.right ?: return false
+
+        return RectF(viewport).intersects(leftEdge, topEdge, rightEdge, bottomEdge)
     }
 
     /**
@@ -821,6 +911,83 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private val contentHeight: Int
         get() = pageLayoutManager?.paginationModel?.totalEstimatedHeight ?: 0
 
+    /** The default [ActionMode.Callback2] for selection */
+    public open inner class DefaultSelectionActionModeCallback : ActionMode.Callback2() {
+        @CallSuper
+        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+            selectionActionMode = mode
+
+            // Inflate the menu resource providing context menu items.
+            val inflater = mode.menuInflater
+            inflater.inflate(R.menu.context_menu, menu)
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+            return false
+        }
+
+        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+            TODO("Not yet implemented")
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode) {
+            // No-op
+        }
+
+        override fun onGetContentRect(mode: ActionMode, view: View, outRect: Rect) {
+            // If we don't know about page layout, defer to the default implementation
+            val localPageLayoutManager =
+                pageLayoutManager ?: return super.onGetContentRect(mode, view, outRect)
+            val viewport = getVisibleAreaInContentCoords()
+            val viewportF = viewport.toRectF()
+            val firstSelection = currentSelection?.bounds?.first()
+            val lastSelection = currentSelection?.bounds?.last()
+
+            // Try to position the context menu near the first selection if it's visible
+            if (firstSelection != null) {
+                // Copy bounds to avoid mutating the real data
+                val boundsInView = localPageLayoutManager.getViewRect(firstSelection, viewport)
+                if (
+                    boundsInView?.let {
+                        viewportF.intersects(it.left, it.top, it.right, it.bottom)
+                    } == true
+                ) {
+                    outRect.set(boundsInView.toViewRect())
+                    return
+                }
+            }
+
+            // Else, try to position the context menu near the last selection if it's visible
+            if (lastSelection != null) {
+                // Copy bounds to avoid mutating the real data
+                val boundsInView = localPageLayoutManager.getViewRect(lastSelection, viewport)
+                if (
+                    boundsInView?.let {
+                        viewportF.intersects(it.left, it.top, it.right, it.bottom)
+                    } == true
+                ) {
+                    outRect.set(boundsInView.toViewRect())
+                    return
+                }
+            }
+
+            // Else, center the context menu in view
+            val centerX = (x + width / 2).roundToInt()
+            val centerY = (x + height / 2).roundToInt()
+            outRect.set(centerX, centerY, centerX + 1, centerY + 1)
+        }
+    }
+
+    private fun RectF.toViewRect(): Rect {
+        return Rect(
+            toViewCoord(left, zoom, scrollX).roundToInt(),
+            toViewCoord(top, zoom, scrollY).roundToInt(),
+            toViewCoord(right, zoom, scrollX).roundToInt(),
+            toViewCoord(bottom, zoom, scrollY).roundToInt(),
+        )
+    }
+
     /** Adjusts the position of [PdfView] in response to gestures detected by [GestureTracker] */
     private inner class ZoomScrollGestureHandler : GestureTracker.GestureHandler() {
 
@@ -864,6 +1031,21 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         override fun onGestureStart() {
             // Stop any in-progress fling when a new gesture begins
             scroller.forceFinished(true)
+            selectionStateManager?.maybeHideActionMode()
+            gestureInProgress = true
+            // We should hide the action mode during a gesture
+            updateSelectionActionModeVisibility()
+        }
+
+        override fun onGestureEnd(gesture: GestureTracker.Gesture?) {
+            if (gesture == GestureTracker.Gesture.ZOOM) onStableZoom()
+            totalX = 0f
+            totalY = 0f
+            straightenCurrentVerticalScroll = true
+            scrollQueue.clear()
+            gestureInProgress = false
+            // We should reveal the action mode after a gesture
+            updateSelectionActionModeVisibility()
         }
 
         override fun onScroll(
@@ -988,14 +1170,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
             zoomTo(newZoom, detector.focusX, detector.focusY)
             return true
-        }
-
-        override fun onGestureEnd(gesture: GestureTracker.Gesture?) {
-            if (gesture == GestureTracker.Gesture.ZOOM) onStableZoom()
-            totalX = 0f
-            totalY = 0f
-            straightenCurrentVerticalScroll = true
-            scrollQueue.clear()
         }
 
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
