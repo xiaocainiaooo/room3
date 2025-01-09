@@ -74,12 +74,24 @@ fun CardDemo() {
         item { CardWithMultipleImagesDemo() }
         item { OutlinedCardSample() }
         item { VerticallyCenteredBaseCard() }
+    }
+}
+
+@Composable
+fun AppCardDemo() {
+    ScalingLazyDemo {
         item { ListHeader { Text("App card") } }
         item { AppCardSample() }
         item { AppCardWithIconSample() }
         item { AppCardWithImageSample() }
         item { AppCardWithMultipleImagesDemo() }
         item { OutlinedAppCardSample() }
+    }
+}
+
+@Composable
+fun TitleCardDemo() {
+    ScalingLazyDemo {
         item { ListHeader { Text("Title card") } }
         item { TitleCardSample() }
         item { TitleCardWithSubtitleDemo() }
@@ -90,6 +102,12 @@ fun CardDemo() {
         item { OutlinedTitleCardSample() }
         item { OutlinedTitleCardWithSubtitleDemo() }
         item { OutlinedTitleCardWithSubtitleAndTimeDemo() }
+    }
+}
+
+@Composable
+fun ImageCardDemo() {
+    ScalingLazyDemo {
         item { ListHeader { Text("Image card") } }
         item { TitleCardWithImageBackgroundSample() }
     }
