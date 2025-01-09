@@ -122,16 +122,24 @@ class Camera2CaptureRequestBuilder {
     @VisibleForTesting
     static void applyVideoStabilization(@NonNull CaptureConfig captureConfig,
             CaptureRequest.@NonNull Builder builder) {
+        Integer mode = getVideoStabilizationModeFromCaptureConfig(captureConfig);
+        if (mode != null) {
+            builder.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE, mode);
+        }
+    }
+
+    // null indicates the stabilization mode unspecified.
+    static Integer getVideoStabilizationModeFromCaptureConfig(
+            @NonNull CaptureConfig captureConfig) {
         if (captureConfig.getPreviewStabilizationMode() == StabilizationMode.OFF
                 || captureConfig.getVideoStabilizationMode() == StabilizationMode.OFF) {
-            builder.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE,
-                    CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_OFF);
+            return CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_OFF;
         } else if (captureConfig.getPreviewStabilizationMode() == StabilizationMode.ON) {
-            builder.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE,
-                    CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION);
+            return CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION;
         } else if (captureConfig.getVideoStabilizationMode() == StabilizationMode.ON) {
-            builder.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE,
-                    CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_ON);
+            return CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_ON;
+        } else {
+            return null;
         }
     }
 
