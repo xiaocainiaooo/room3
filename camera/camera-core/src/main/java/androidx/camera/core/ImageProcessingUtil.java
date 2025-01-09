@@ -25,7 +25,6 @@ import android.media.Image;
 import android.media.ImageWriter;
 import android.os.Build;
 import android.util.Log;
-import android.util.Pair;
 import android.view.Surface;
 
 import androidx.annotation.IntRange;
@@ -431,7 +430,7 @@ public final class ImageProcessingUtil {
         int rotatedHeight =
                 (rotationDegrees % 180 == 0) ? imageProxy.getHeight() : imageProxy.getWidth();
 
-        Pair<ByteBuffer, ByteBuffer> nv21UVByteBuffers = nativeCreateNV21ByteBuffers(
+        ByteBuffer position1ChildByteBuffer = nativeCreateByteBufferFromPosition1(
                 nv21UVDelegatedBuffer, nv21UVDelegatedBuffer.capacity());
 
         int result = nativeRotateYUV(
@@ -445,10 +444,10 @@ public final class ImageProcessingUtil {
                 nv21YDelegatedBuffer,
                 rotatedWidth,
                 1,
-                nv21UVByteBuffers.first,
+                position1ChildByteBuffer,
                 rotatedWidth,
                 2,
-                nv21UVByteBuffers.second,
+                nv21UVDelegatedBuffer,
                 rotatedWidth,
                 2,
                 yRotatedBuffer,
@@ -468,8 +467,8 @@ public final class ImageProcessingUtil {
         return new SingleCloseImageProxy(
                 new NV21ImageProxy(imageProxy,
                         nv21YDelegatedBuffer,
-                        nv21UVByteBuffers.first,
-                        nv21UVByteBuffers.second,
+                        position1ChildByteBuffer,
+                        nv21UVDelegatedBuffer,
                         rotatedWidth,
                         rotatedHeight,
                         rotationDegrees));
@@ -805,13 +804,24 @@ public final class ImageProcessingUtil {
             int height,
             @ImageOutputConfig.RotationDegreesValue int rotationDegrees);
 
-    private static native int nativeGetYUVImageVUOff(
+    /**
+     * Checks the V and U planes' ByteBuffer start position pointer distance.
+     *
+     * <p>This can be used to determine whether the YUV image is NV12 or NV21 data type.
+     */
+    public static native int nativeGetYUVImageVUOff(
             @NonNull ByteBuffer srcByteBufferV,
             @NonNull ByteBuffer srcByteBufferU
     );
 
-    private static native Pair<ByteBuffer, ByteBuffer> nativeCreateNV21ByteBuffers(
+    /**
+     * Creates ByteBuffer from position 1.
+     *
+     * Callers can arrange the original and the newly created ByteBuffers to represent the U or V
+     * plane ByteBuffers depending on whether an NV12 or NV21 image format is required.
+     */
+    public static native @NonNull ByteBuffer nativeCreateByteBufferFromPosition1(
             @NonNull ByteBuffer byteBuffer,
-            int vuDataLength
+            int capacity
     );
 }
