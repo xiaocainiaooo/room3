@@ -17,6 +17,7 @@
 package androidx.camera.camera2.pipe.config
 
 import android.hardware.camera2.CameraManager
+import android.util.Log
 import androidx.camera.camera2.pipe.CameraBackend
 import androidx.camera.camera2.pipe.CameraController
 import androidx.camera.camera2.pipe.CameraGraph
@@ -98,7 +99,9 @@ internal abstract class Camera2Module {
     ): AudioRestrictionController
 
     companion object {
-        const val ENABLE_PRUNING_DEVICE_MANAGER = false
+        // TODO: b/369684573 - Enable PruningCamera2DeviceManager for all users.
+        const val CAMERA_PIPE_MH_FLAG = "CameraPipeMH"
+        val ENABLE_PRUNING_DEVICE_MANAGER = Log.isLoggable(CAMERA_PIPE_MH_FLAG, Log.DEBUG)
 
         @Provides
         fun provideCamera2DeviceManager(
