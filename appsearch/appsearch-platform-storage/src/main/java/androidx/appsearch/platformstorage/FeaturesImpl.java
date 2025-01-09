@@ -94,16 +94,16 @@ final class FeaturesImpl implements Features {
             case Features.ENTERPRISE_GLOBAL_SEARCH_SESSION:
                 return Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM;
 
-            // TODO(b/275592563): rearrange this part after fixing the merge conflict.
-            // Beyond Android V Features
+            // Android B Features
+            case Features.INDEXER_MOBILE_APPLICATIONS:
+                return AppSearchVersionUtil.isAtLeastB();
+
+            // Pending Android B Features
             case Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG:
                 // TODO(b/326656531) : Update when feature is ready in service-appsearch.
                 // fall through
             case Features.SCHEMA_EMBEDDING_QUANTIZATION:
                 // TODO(b/359959345) : Update when feature is ready in service-appsearch.
-                // fall through
-            case Features.SCHEMA_SET_DESCRIPTION:
-                // TODO(b/326987971) : Update when feature is ready in service-appsearch.
                 // fall through
             case Features.SEARCH_SPEC_SEARCH_STRING_PARAMETERS:
                 // TODO(b/332620561) : Update when feature is ready in service-appsearch.
@@ -122,16 +122,15 @@ final class FeaturesImpl implements Features {
                 // fall through
             case Features.SEARCH_RESULT_PARENT_TYPES:
                 // TODO(b/371610934) : Update when feature is ready in service-appsearch.
-                // fall through
-            case Features.SCHEMA_STRING_PROPERTY_CONFIG_DELETE_PROPAGATION_TYPE_PROPAGATE_FROM:
-                // TODO(b/376913014) : Update when feature is ready in service-appsearch.
-                // fall through
                 return false;
 
-            // Android B Features
-            case Features.INDEXER_MOBILE_APPLICATIONS:
-                // TODO(b/275592563) : Update when B version code is available
-                return Build.VERSION.SDK_INT > Build.VERSION_CODES.VANILLA_ICE_CREAM;
+            // Beyond Android B Features
+            case Features.SCHEMA_SET_DESCRIPTION:
+                // TODO(b/326987971) : Update when feature is ready in service-appsearch.
+                // fall through
+            case Features.SCHEMA_STRING_PROPERTY_CONFIG_DELETE_PROPAGATION_TYPE_PROPAGATE_FROM:
+                // TODO(b/384947619) : Update when feature is ready in service-appsearch.
+                return false;
 
             default:
                 return false;
