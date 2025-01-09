@@ -204,6 +204,38 @@ class LowLightBoostControlTest {
         }
     }
 
+    @Test
+    fun enableLowLightBoostThrowException_stateActive_whenDisabledByUseCaseConfig() {
+        initCamera(supportedLlb = true)
+        createLowLightBoostControl().apply {
+            setActive(true)
+            setLowLightBoostDisabledByUseCaseSessionConfig(true)
+            val future = enableLowLightBoost(true)
+            shadowOf(getMainLooper()).idle()
+            assertFutureCompleteWithException(future, IllegalStateException::class.java)
+        }
+    }
+
+    @Test
+    fun lowLightBoostCanBeDisabledByUseCaseConfig() {
+        initCamera(supportedLlb = true)
+        createLowLightBoostControl().apply {
+            setActive(true)
+            enableLowLightBoost(true)
+            shadowOf(getMainLooper()).idle()
+            assertThat(lowLightBoostState.value).isEqualTo(LowLightBoostState.INACTIVE)
+
+            // Sets low-light boost disabled flag
+            setLowLightBoostDisabledByUseCaseSessionConfig(true)
+            runBlocking { delay(100) }
+            shadowOf(getMainLooper()).idle()
+
+            // Verifies that low-light boost is turned off
+            assertThat(mTargetLlbEnabled).isFalse()
+            assertThat(lowLightBoostState.value).isEqualTo(LowLightBoostState.OFF)
+        }
+    }
+
     private fun assertFutureCompleteWithException(future: ListenableFuture<Void>, clazz: Class<*>) {
         assertThat(future.isDone).isTrue()
         try {

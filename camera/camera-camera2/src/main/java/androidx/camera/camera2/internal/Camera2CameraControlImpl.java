@@ -434,6 +434,12 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
         return Futures.nonCancellationPropagating(mTorchControl.enableTorch(torch));
     }
 
+    @Override
+    @ExecutedBy("mExecutor")
+    public void setLowLightBoostDisabledByUseCaseSessionConfig(boolean disabled) {
+        mLowLightBoostControl.setLowLightBoostDisabledByUseCaseSessionConfig(disabled);
+    }
+
     /** {@inheritDoc} */
     @Override
     public @NonNull ListenableFuture<Void> enableLowLightBoostAsync(final boolean lowLightBoost) {
