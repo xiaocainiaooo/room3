@@ -110,7 +110,7 @@ public fun AlertDialog(
     content: (ScalingLazyListScope.() -> Unit)? = null
 ) {
     Dialog(
-        show = visible,
+        visible = visible,
         onDismissRequest = onDismissRequest,
         properties = properties,
     ) {
@@ -172,7 +172,7 @@ public fun AlertDialog(
     content: (ScalingLazyListScope.() -> Unit)? = null
 ) {
     Dialog(
-        show = visible,
+        visible = visible,
         onDismissRequest = onDismissRequest,
         properties = properties,
     ) {
@@ -245,7 +245,7 @@ public fun AlertDialog(
     content: (ScalingLazyListScope.() -> Unit)? = null
 ) {
     Dialog(
-        show = visible,
+        visible = visible,
         onDismissRequest = onDismissRequest,
         properties = properties,
     ) {
