@@ -43,7 +43,7 @@ dependencies {
     testImplementation(libs.truth)
 }
 
-def testGeneratedSourcesPath = "${project.buildDir}/testGeneratedSources"
+def testGeneratedSourcesPath = "${layout.buildDirectory.get().asFile}/testGeneratedSources"
 tasks.withType(Test).configureEach { test ->
     test.doFirst {
         systemProperty("test_output_dir", testGeneratedSourcesPath)
