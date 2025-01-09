@@ -72,12 +72,22 @@ class ButtonTest {
     }
 
     @Test
+    fun pillButton_size_default() {
+        LayoutElementAssertionsProvider(DEFAULT_BUTTON)
+            .onRoot()
+            .assert(hasWidth(wrapWithMinTapTargetDimension()))
+            .assert(hasHeight(wrapWithMinTapTargetDimension()))
+            .assert(hasTag(ButtonDefaults.METADATA_TAG_BUTTON))
+    }
+
+    @Test
     fun imageButton_size_default() {
         LayoutElementAssertionsProvider(
                 materialScope(CONTEXT, DEVICE_CONFIGURATION) {
-                    button(
+                    imageButton(
                         onClick = CLICKABLE,
-                        modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION)
+                        modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
+                        backgroundContent = { backgroundImage(IMAGE_ID) }
                     )
                 }
             )
@@ -122,10 +132,25 @@ class ButtonTest {
     }
 
     @Test
-    fun containerButton_hasBackgroundImage() {
+    fun pillButton_hasLabel_asText() {
+        LayoutElementAssertionsProvider(DEFAULT_BUTTON).onElement(hasText(TEXT)).assertExists()
+    }
+
+    @Test
+    fun pillButton_hasSecondaryLabel_asText() {
+        LayoutElementAssertionsProvider(DEFAULT_BUTTON).onElement(hasText(TEXT2)).assertExists()
+    }
+
+    @Test
+    fun pillButton_hasIcon_asIcon() {
+        LayoutElementAssertionsProvider(DEFAULT_BUTTON).onElement(hasImage(ICON_ID)).assertExists()
+    }
+
+    @Test
+    fun imageButton_hasBackgroundImage() {
         val button =
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
-                button(
+                imageButton(
                     onClick = CLICKABLE,
                     modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     backgroundContent = { backgroundImage(IMAGE_ID) }
@@ -143,7 +168,7 @@ class ButtonTest {
         val color = Color.YELLOW
         val button =
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
-                button(
+                buttonContainer(
                     onClick = CLICKABLE,
                     modifier =
                         LayoutModifier.contentDescription(CONTENT_DESCRIPTION)
@@ -165,7 +190,7 @@ class ButtonTest {
         val height = 12
         val button =
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
-                button(
+                buttonContainer(
                     onClick = CLICKABLE,
                     modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     width = expand(),
@@ -199,10 +224,11 @@ class ButtonTest {
         private const val ICON_ID = "id"
 
         private const val TEXT = "Container button"
+        private const val TEXT2 = "Secondary label"
 
         private val DEFAULT_CONTAINER_BUTTON_WITH_TEXT =
             materialScope(CONTEXT, DEVICE_CONFIGURATION) {
-                button(
+                buttonContainer(
                     onClick = CLICKABLE,
                     modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     content = { text(TEXT.layoutString) }
@@ -224,6 +250,17 @@ class ButtonTest {
                     onClick = CLICKABLE,
                     modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                     labelContent = { text(TEXT.layoutString) }
+                )
+            }
+
+        private val DEFAULT_BUTTON =
+            materialScope(CONTEXT, DEVICE_CONFIGURATION) {
+                button(
+                    onClick = CLICKABLE,
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
+                    labelContent = { text(TEXT.layoutString) },
+                    secondaryLabelContent = { text(TEXT2.layoutString) },
+                    iconContent = { icon(ICON_ID) }
                 )
             }
     }

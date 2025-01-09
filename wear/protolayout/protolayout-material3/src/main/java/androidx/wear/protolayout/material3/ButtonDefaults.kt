@@ -19,6 +19,11 @@ package androidx.wear.protolayout.material3
 import android.graphics.Color
 import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
+import androidx.wear.protolayout.DimensionBuilders.expand
+import androidx.wear.protolayout.LayoutElementBuilders.Column
+import androidx.wear.protolayout.LayoutElementBuilders.HorizontalAlignment
+import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
+import androidx.wear.protolayout.LayoutElementBuilders.Row
 import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.material3.ButtonDefaults.DEFAULT_CONTENT_PADDING
 import androidx.wear.protolayout.material3.Typography.TypographyToken
@@ -37,9 +42,40 @@ public class ButtonColors(
     public val icon: LayoutColor = Color.BLACK.argb,
     /** The label color to be used for a button. */
     public val label: LayoutColor = Color.BLACK.argb,
+    /** The secondary label color to be used for a button. */
+    public val secondaryLabel: LayoutColor = Color.BLACK.argb,
 )
 
 public object ButtonDefaults {
+    /**
+     * Returns [LayoutElement] describing the inner content for the pill shape button.
+     *
+     * This is a [Row] containing the following:
+     * * icon
+     * * spacing if icon is present
+     * * labels that are in [Column]
+     */
+    internal fun buildContentForPillShapeButton(
+        label: LayoutElement,
+        secondaryLabel: LayoutElement?,
+        icon: LayoutElement?,
+        @HorizontalAlignment horizontalAlignment: Int,
+        style: ButtonStyle
+    ): LayoutElement {
+        val labels: Column.Builder =
+            Column.Builder().setWidth(expand()).setHorizontalAlignment(horizontalAlignment)
+
+        val row: Row.Builder = Row.Builder()
+
+        ContainerWithSpacersBuilder<LayoutElement>(labels::addContent, label)
+            .addElement(secondaryLabel, horizontalSpacer(style.labelsSpaceDp))
+
+        ContainerWithSpacersBuilder<LayoutElement>(row::addContent, icon)
+            .addElement(labels.build(), verticalSpacer(style.iconToLabelsSpaceDp))
+
+        return row.build()
+    }
+
     /**
      * [ButtonColors] for the high-emphasis button representing the primary, most important or most
      * common action on a screen.
@@ -51,7 +87,8 @@ public object ButtonDefaults {
         ButtonColors(
             container = theme.colorScheme.primary,
             icon = theme.colorScheme.onPrimary,
-            label = theme.colorScheme.onPrimary
+            label = theme.colorScheme.onPrimary,
+            secondaryLabel = theme.colorScheme.onPrimary.withOpacity(0.8f)
         )
 
     /**
@@ -64,7 +101,8 @@ public object ButtonDefaults {
         ButtonColors(
             container = theme.colorScheme.surfaceContainer,
             icon = theme.colorScheme.primary,
-            label = theme.colorScheme.onSurface
+            label = theme.colorScheme.onSurface,
+            secondaryLabel = theme.colorScheme.onSurfaceVariant
         )
 
     /**
@@ -77,7 +115,8 @@ public object ButtonDefaults {
         ButtonColors(
             container = theme.colorScheme.primaryContainer,
             icon = theme.colorScheme.onPrimaryContainer,
-            label = theme.colorScheme.onPrimaryContainer
+            label = theme.colorScheme.onPrimaryContainer,
+            secondaryLabel = theme.colorScheme.onPrimaryContainer.withOpacity(0.9f)
         )
 
     internal const val METADATA_TAG_BUTTON: String = "BTN"
@@ -88,7 +127,7 @@ public object ButtonDefaults {
 /** Provides style values for the icon button component. */
 public class IconButtonStyle
 internal constructor(
-    @Dimension(unit = DP) internal val iconSize: Int,
+    @Dimension(unit = DP) internal val iconSize: Float,
     internal val innerPadding: Padding = DEFAULT_CONTENT_PADDING
 ) {
     public companion object {
@@ -96,13 +135,13 @@ internal constructor(
          * Default style variation for the [iconButton] where all opinionated inner content is
          * displayed in a medium size.
          */
-        public fun defaultIconButtonStyle(): IconButtonStyle = IconButtonStyle(26)
+        public fun defaultIconButtonStyle(): IconButtonStyle = IconButtonStyle(26f)
 
         /**
          * Default style variation for the [iconButton] where all opinionated inner content is
          * displayed in a large size.
          */
-        public fun largeIconButtonStyle(): IconButtonStyle = IconButtonStyle(32)
+        public fun largeIconButtonStyle(): IconButtonStyle = IconButtonStyle(32f)
     }
 }
 
@@ -140,5 +179,60 @@ internal constructor(
          */
         public fun extraLargeTextButtonStyle(): TextButtonStyle =
             TextButtonStyle(Typography.DISPLAY_MEDIUM)
+    }
+}
+
+/** Provides style values for the pill shape button component. */
+public class ButtonStyle
+internal constructor(
+    @TypographyToken internal val labelTypography: Int,
+    @TypographyToken internal val secondaryLabelTypography: Int,
+    @Dimension(DP) internal val iconSize: Float,
+    internal val innerPadding: Padding,
+    @Dimension(DP) internal val labelsSpaceDp: Int,
+    @Dimension(DP) internal val iconToLabelsSpaceDp: Int,
+) {
+    public companion object {
+        /**
+         * Default style variation for the [button] where all opinionated inner content is displayed
+         * in a small size.
+         */
+        public fun smallButtonStyle(): ButtonStyle =
+            ButtonStyle(
+                labelTypography = Typography.LABEL_MEDIUM,
+                secondaryLabelTypography = Typography.BODY_SMALL,
+                iconSize = 24f,
+                innerPadding = padding(horizontal = 14f, vertical = 10f),
+                labelsSpaceDp = 2,
+                iconToLabelsSpaceDp = 6
+            )
+
+        /**
+         * Default style variation for the [button] where all opinionated inner content is displayed
+         * in a medium size.
+         */
+        public fun defaultButtonStyle(): ButtonStyle =
+            ButtonStyle(
+                labelTypography = Typography.TITLE_MEDIUM,
+                secondaryLabelTypography = Typography.LABEL_SMALL,
+                iconSize = 26f,
+                innerPadding = padding(horizontal = 14f, vertical = 6f),
+                labelsSpaceDp = 0,
+                iconToLabelsSpaceDp = 8
+            )
+
+        /**
+         * Default style variation for the [button] where all opinionated inner content is displayed
+         * in a large size.
+         */
+        public fun largeButtonStyle(): ButtonStyle =
+            ButtonStyle(
+                labelTypography = Typography.LABEL_LARGE,
+                secondaryLabelTypography = Typography.LABEL_SMALL,
+                iconSize = 32f,
+                innerPadding = padding(horizontal = 14f, vertical = 8f),
+                labelsSpaceDp = 0,
+                iconToLabelsSpaceDp = 10
+            )
     }
 }
