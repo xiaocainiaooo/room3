@@ -16,16 +16,16 @@
 
 package androidx.health.connect.client.impl.platform.aggregate
 
+import androidx.health.connect.client.aggregate.AggregationResult
 import androidx.health.connect.client.records.Record
 
 /**
- * Interface to filter and aggregate records. Response [R] should be one of the aggregation response
- * types defined by the API.
+ * Interface to calculate aggregation taking into account every record passed into [processRecord].
  */
-internal interface Aggregator<T : Record, R> {
+internal interface AggregationProcessor<T : Record> {
 
-    /** Filters and aggregates the parts of the record that are relevant for aggregation. */
-    fun filterAndAggregate(record: T)
+    /** Processes every record that it receives into the final [AggregationResult]. */
+    fun processRecord(record: T)
 
-    fun getResult(): R
+    fun getProcessedAggregationResult(): AggregationResult
 }
