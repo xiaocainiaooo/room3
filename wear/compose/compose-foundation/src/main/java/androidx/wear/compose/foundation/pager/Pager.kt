@@ -301,7 +301,7 @@ public object PagerDefaults {
         state: PagerState,
         pagerSnapDistance: PagerSnapDistance = PagerSnapDistance.atMost(1),
         decayAnimationSpec: DecayAnimationSpec<Float> = rememberSplineBasedDecay(),
-        snapAnimationSpec: AnimationSpec<Float> = PagerDefaults.snapAnimationSpec,
+        snapAnimationSpec: AnimationSpec<Float> = PagerDefaults.SnapAnimationSpec,
         @FloatRange(from = 0.0, to = 1.0) snapPositionalThreshold: Float = 0.5f
     ): TargetedFlingBehavior {
         return ComposePagerDefaults.flingBehavior(
@@ -323,7 +323,7 @@ public object PagerDefaults {
      * The default spring animation used for the Pager's snap animation spec - a spring based
      * animation with medium-high stiffness and no bounce.
      */
-    public val snapAnimationSpec: AnimationSpec<Float> =
+    public val SnapAnimationSpec: AnimationSpec<Float> =
         spring(Spring.DampingRatioNoBouncy, MediumHighStiffness)
 
     /**
