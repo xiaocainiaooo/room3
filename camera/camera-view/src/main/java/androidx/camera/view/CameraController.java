@@ -77,6 +77,7 @@ import androidx.camera.core.impl.ImageOutputConfig;
 import androidx.camera.core.impl.StreamSpec;
 import androidx.camera.core.impl.utils.CameraOrientationUtil;
 import androidx.camera.core.impl.utils.ContextUtil;
+import androidx.camera.core.impl.utils.LiveDataUtil;
 import androidx.camera.core.impl.utils.Threads;
 import androidx.camera.core.impl.utils.futures.FutureCallback;
 import androidx.camera.core.impl.utils.futures.Futures;
@@ -326,12 +327,10 @@ public abstract class CameraController {
 
     private final ForwardingLiveData<ZoomState> mZoomState = new ForwardingLiveData<>();
     private final ForwardingLiveData<Integer> mTorchState = new ForwardingLiveData<>();
-    // Synthetic access
-    @SuppressWarnings("WeakerAccess")
-    final MutableLiveData<Integer> mTapToFocusState = new MutableLiveData<>(
-            TAP_TO_FOCUS_NOT_STARTED);
     final MutableLiveData<TapToFocusInfo> mTapToFocusInfoState = new MutableLiveData<>(
             new TapToFocusInfo(TAP_TO_FOCUS_NOT_STARTED, /* tapPoint = */ null));
+    final LiveData<Integer> mTapToFocusState = LiveDataUtil.map(mTapToFocusInfoState,
+            TapToFocusInfo::getFocusState);
 
     private final @NonNull PendingValue<Boolean> mPendingEnableTorch = new PendingValue<>();
 
@@ -2170,7 +2169,7 @@ public abstract class CameraController {
             return;
         }
         Logger.d(TAG, "Tap to focus started: " + x + ", " + y);
-        updateTapToFocusInfo(new TapToFocusInfo(TAP_TO_FOCUS_STARTED, new PointF(x, y)));
+        mTapToFocusInfoState.postValue(new TapToFocusInfo(TAP_TO_FOCUS_STARTED, new PointF(x, y)));
         MeteringPoint afPoint = meteringPointFactory.createPoint(x, y, AF_SIZE);
         MeteringPoint aePoint = meteringPointFactory.createPoint(x, y, AE_SIZE);
         FocusMeteringAction focusMeteringAction = new FocusMeteringAction
@@ -2186,7 +2185,7 @@ public abstract class CameraController {
                             return;
                         }
                         Logger.d(TAG, "Tap to focus onSuccess: " + result.isFocusSuccessful());
-                        updateTapToFocusInfo(new TapToFocusInfo(
+                        mTapToFocusInfoState.postValue(new TapToFocusInfo(
                                 result.isFocusSuccessful() ? TAP_TO_FOCUS_FOCUSED
                                         : TAP_TO_FOCUS_NOT_FOCUSED, new PointF(x, y)));
                     }
@@ -2198,7 +2197,7 @@ public abstract class CameraController {
                             return;
                         }
                         Logger.d(TAG, "Tap to focus failed.", t);
-                        updateTapToFocusInfo(
+                        mTapToFocusInfoState.postValue(
                                 new TapToFocusInfo(TAP_TO_FOCUS_FAILED, new PointF(x, y)));
                     }
                 }, directExecutor());
@@ -2218,15 +2217,10 @@ public abstract class CameraController {
                     // There's a new focus event that came after this cancel event was scheduled.
                     return;
                 }
-                updateTapToFocusInfo(new TapToFocusInfo(TAP_TO_FOCUS_NOT_STARTED, null));
+                mTapToFocusInfoState.postValue(new TapToFocusInfo(TAP_TO_FOCUS_NOT_STARTED, null));
                 mLatestFocusCancelTimeMillis = 0;
             }, cancelDuration);
         }
-    }
-
-    private void updateTapToFocusInfo(@NonNull TapToFocusInfo tapToFocusInfo) {
-        mTapToFocusInfoState.postValue(tapToFocusInfo);
-        mTapToFocusState.postValue(tapToFocusInfo.getFocusState());
     }
 
     /**
