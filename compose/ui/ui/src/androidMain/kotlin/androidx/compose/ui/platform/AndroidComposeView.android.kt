@@ -26,7 +26,6 @@ import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.M
 import android.os.Build.VERSION_CODES.N
 import android.os.Build.VERSION_CODES.O
-import android.os.Build.VERSION_CODES.P
 import android.os.Build.VERSION_CODES.Q
 import android.os.Build.VERSION_CODES.S
 import android.os.Looper
@@ -1744,8 +1743,10 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
                 return layer
             }
 
-            // enable new layers on versions supporting render nodes
-            if (isHardwareAccelerated && SDK_INT >= M && SDK_INT != P) {
+            // Prior to M ViewLayer implementation might be doing extra drawing in order
+            // to support the software rendering. This extra drawing is breaking some of tests
+            // and we can't fully migrate to it until we figure out how to solve it.
+            if (SDK_INT >= M) {
                 return GraphicsLayerOwnerLayer(
                     graphicsLayer = graphicsContext.createGraphicsLayer(),
                     context = graphicsContext,
