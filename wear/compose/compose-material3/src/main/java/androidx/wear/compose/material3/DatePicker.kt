@@ -67,6 +67,7 @@ import androidx.wear.compose.material3.internal.Strings.Companion.PickerConfirmB
 import androidx.wear.compose.material3.internal.Strings.Companion.PickerNextButtonContentDescription
 import androidx.wear.compose.material3.internal.getString
 import androidx.wear.compose.material3.tokens.DatePickerTokens
+import androidx.wear.compose.materialcore.isLargeScreen
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -134,7 +135,7 @@ public fun DatePicker(
             mutableStateOf(initiallySelectedIndex)
         }
 
-    val isLargeScreen = LocalConfiguration.current.screenWidthDp > 225
+    val isLargeScreen = isLargeScreen()
     val labelTextStyle =
         if (isLargeScreen) {
             DatePickerTokens.LabelLargeTypography.value

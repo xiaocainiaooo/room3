@@ -66,6 +66,7 @@ import androidx.wear.compose.material3.internal.getPlurals
 import androidx.wear.compose.material3.internal.getString
 import androidx.wear.compose.material3.tokens.TimePickerTokens
 import androidx.wear.compose.materialcore.is24HourFormat
+import androidx.wear.compose.materialcore.isLargeScreen
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoField
@@ -518,7 +519,7 @@ private fun getTimePickerStyles(
     timePickerType: TimePickerType,
     optionalThirdPicker: PickerData?
 ): TimePickerStyles {
-    val isLargeScreen = LocalConfiguration.current.screenWidthDp > 225
+    val isLargeScreen = isLargeScreen()
     val labelTextStyle =
         if (isLargeScreen) {
                 TimePickerTokens.LabelLargeTypography
