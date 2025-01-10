@@ -78,6 +78,11 @@ public fun screenWidthDp(): Int = LocalConfiguration.current.screenWidthDp
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @Composable
 public fun isSmallScreen(): Boolean =
-    LocalConfiguration.current.screenWidthDp <= SMALL_SCREEN_WIDTH_DP
+    LocalConfiguration.current.screenWidthDp < LARGE_SCREEN_WIDTH_DP
 
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val SMALL_SCREEN_WIDTH_DP: Int = 225
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@Composable
+public fun isLargeScreen(): Boolean =
+    LocalConfiguration.current.screenWidthDp >= LARGE_SCREEN_WIDTH_DP
+
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public const val LARGE_SCREEN_WIDTH_DP: Int = 225

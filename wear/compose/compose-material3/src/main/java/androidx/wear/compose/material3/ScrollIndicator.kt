@@ -68,6 +68,7 @@ import androidx.wear.compose.foundation.lazy.TransformingLazyColumnState
 import androidx.wear.compose.foundation.lazy.inverseLerp
 import androidx.wear.compose.material3.ScrollIndicatorDefaults.maxSizeFraction
 import androidx.wear.compose.material3.ScrollIndicatorDefaults.minSizeFraction
+import androidx.wear.compose.materialcore.isLargeScreen
 import androidx.wear.compose.materialcore.isRoundDevice
 import androidx.wear.compose.materialcore.toRadians
 import kotlin.math.asin
@@ -248,8 +249,7 @@ public object ScrollIndicatorDefaults {
     internal val indicatorWidth
         @Composable
         get(): Dp {
-            val screenHeight = LocalConfiguration.current.screenHeightDp
-            return if (screenHeight >= 225) 6.dp else 5.dp
+            return if (isLargeScreen()) 6.dp else 5.dp
         }
 
     internal val gapHeight = 3.dp
