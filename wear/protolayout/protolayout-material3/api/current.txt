@@ -335,8 +335,6 @@ package androidx.wear.protolayout.material3 {
   }
 
   public final class Typography {
-    property public static final int ARC_MEDIUM;
-    property public static final int ARC_SMALL;
     property public static final int BODY_EXTRA_SMALL;
     property public static final int BODY_LARGE;
     property public static final int BODY_MEDIUM;
@@ -355,8 +353,6 @@ package androidx.wear.protolayout.material3 {
     property public static final int TITLE_LARGE;
     property public static final int TITLE_MEDIUM;
     property public static final int TITLE_SMALL;
-    field public static final int ARC_MEDIUM = 0; // 0x0
-    field public static final int ARC_SMALL = 1; // 0x1
     field public static final int BODY_EXTRA_SMALL = 2; // 0x2
     field public static final int BODY_LARGE = 3; // 0x3
     field public static final int BODY_MEDIUM = 4; // 0x4
