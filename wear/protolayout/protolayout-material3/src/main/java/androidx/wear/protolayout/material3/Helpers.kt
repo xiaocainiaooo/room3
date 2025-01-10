@@ -157,13 +157,16 @@ internal fun MaterialScope.componentContainer(
     height: ContainerDimension,
     backgroundContent: (MaterialScope.() -> LayoutElement)?,
     contentPadding: Padding,
-    metadataTag: String,
+    metadataTag: String?,
     content: (MaterialScope.() -> LayoutElement)?
 ): LayoutElement {
-
     val mod =
         LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then
-            modifier.clickable(onClick).tag(metadataTag)
+            if (metadataTag != null) {
+                modifier.clickable(onClick).tag(metadataTag)
+            } else {
+                modifier.clickable(onClick)
+            }
 
     val container =
         Box.Builder().setHeight(height).setWidth(width).apply {

@@ -45,6 +45,7 @@ import androidx.wear.protolayout.material3.button
 import androidx.wear.protolayout.material3.buttonGroup
 import androidx.wear.protolayout.material3.card
 import androidx.wear.protolayout.material3.circularProgressIndicator
+import androidx.wear.protolayout.material3.compactButton
 import androidx.wear.protolayout.material3.graphicDataCard
 import androidx.wear.protolayout.material3.icon
 import androidx.wear.protolayout.material3.iconButton
@@ -449,6 +450,26 @@ fun pillShapeButtonsSample(
                     height = expand(),
                     labelContent = { text("First label".layoutString) },
                     secondaryLabelContent = { text("Second label".layoutString) },
+                    iconContent = { icon("id") }
+                )
+            }
+        )
+    }
+
+@Sampled
+fun compactButtonsSample(
+    context: Context,
+    deviceConfiguration: DeviceParameters,
+    clickable: Clickable
+): LayoutElement =
+    materialScope(context, deviceConfiguration) {
+        primaryLayout(
+            mainSlot = {
+                compactButton(
+                    onClick = clickable,
+                    modifier = LayoutModifier.contentDescription("Compact button"),
+                    width = expand(),
+                    labelContent = { text("Action".layoutString) },
                     iconContent = { icon("id") }
                 )
             }
