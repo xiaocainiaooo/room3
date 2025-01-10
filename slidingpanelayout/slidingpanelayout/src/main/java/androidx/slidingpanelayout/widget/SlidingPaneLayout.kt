@@ -43,6 +43,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.IntDef
 import androidx.annotation.Px
 import androidx.annotation.RequiresApi
+import androidx.annotation.RestrictTo
 import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.Insets
@@ -62,6 +63,7 @@ import androidx.customview.widget.ViewDragHelper
 import androidx.slidingpanelayout.R
 import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker
+import java.lang.reflect.Method
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.abs
 import kotlin.math.max
@@ -404,6 +406,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private val accessibilityManager: AccessibilityManager
     private var accessibilityProvider: AccessibilityProvider? = null
     private var dividerHasA11yHover = false
+
+    // Cached reflected method used by findViewByAccessibilityIdTraversal
+    private var getAccessibilityViewIdMethod: Method? = null
 
     /**
      * Set a [Drawable] to display when [isUserResizingEnabled] is `true` and multiple panes are
@@ -2087,6 +2092,66 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             }
             return super.findFocus(focus)
         }
+    }
+
+    /**
+     * This overrides an hidden method in ViewGroup. Because of the hide tag, the override keyword
+     * cannot be used, but the override works anyway because the ViewGroup method is not final. In
+     * Android P and earlier, the call path is
+     * AccessibilityInteractionController#findViewByAccessibilityId ->
+     * View#findViewByAccessibilityId -> ViewGroup#findViewByAccessibilityIdTraversal. In Android Q
+     * and later, AccessibilityInteractionController#findViewByAccessibilityId uses
+     * AccessibilityNodeIdManager and findViewByAccessibilityIdTraversal is only used by autofill.
+     */
+    @Suppress("BanHideTag")
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun findViewByAccessibilityIdTraversal(accessibilityId: Int): View? {
+        return try {
+
+            // AccessibilityInteractionController#findViewByAccessibilityId doesn't call this
+            // method in Android Q and later.
+            // Note that after Q, the original ViewGroup#findViewByAccessibilityIdTraversal returns
+            // null anyway when there is a AccessibilityNodeProvider.
+            // Autofill is using this method mainly for views that provides accessibility
+            // information but not autofill structure. It doesn't impact the autofill behavior of
+            // children views, since children views will directly talk to AutofillManager to update
+            // its status.
+            findViewByAccessibilityIdRootedAtCurrentView(accessibilityId, this)
+        } catch (e: NoSuchMethodException) {
+            null
+        }
+    }
+
+    private fun findViewByAccessibilityIdRootedAtCurrentView(
+        accessibilityId: Int,
+        currentView: View
+    ): View? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            val getAccessibilityViewIdMethod =
+                this.getAccessibilityViewIdMethod
+                    ?: View::class.java.getDeclaredMethod("getAccessibilityViewId").also {
+                        this.getAccessibilityViewIdMethod = it
+                    }
+            getAccessibilityViewIdMethod.isAccessible = true
+            if (getAccessibilityViewIdMethod.invoke(currentView) == accessibilityId) {
+                return currentView
+            }
+            if (currentView is ViewGroup) {
+                for (i in 0 until currentView.childCount) {
+                    val foundView =
+                        findViewByAccessibilityIdRootedAtCurrentView(
+                            accessibilityId,
+                            currentView.getChildAt(i)
+                        )
+                    if (foundView != null) {
+                        return foundView
+                    }
+                }
+            }
+        }
+        // After Q, ViewGroup#findViewByAccessibilityIdTraversal returns null for ViewGroup with
+        // AccessibilityNodeProvider.
+        return null
     }
 
     private fun sendAccessibilityEventForDivider(eventType: Int) {
