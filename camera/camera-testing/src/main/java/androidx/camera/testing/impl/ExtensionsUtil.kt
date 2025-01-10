@@ -26,6 +26,7 @@ import androidx.camera.core.CameraProvider
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.impl.CameraConfig
+import androidx.camera.core.impl.CameraConfig.REQUIRED_RULE_COEXISTING_PREVIEW_AND_IMAGE_CAPTURE
 import androidx.camera.core.impl.CameraInfoInternal
 import androidx.camera.core.impl.Config
 import androidx.camera.core.impl.ExtendedCameraConfigProviderStore
@@ -76,6 +77,10 @@ public object ExtensionsUtil {
 
                 override fun getSessionProcessor(): SessionProcessor {
                     return sessionProcessor
+                }
+
+                override fun getUseCaseCombinationRequiredRule(): Int {
+                    return REQUIRED_RULE_COEXISTING_PREVIEW_AND_IMAGE_CAPTURE
                 }
 
                 override fun getUseCaseConfigFactory(): UseCaseConfigFactory =

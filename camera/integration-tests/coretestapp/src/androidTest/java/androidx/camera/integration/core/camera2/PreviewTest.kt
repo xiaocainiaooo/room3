@@ -1390,6 +1390,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
 
         val previewBuilder = Preview.Builder().setPreviewStabilizationEnabled(true)
         verifyVideoStabilizationModeInResultAndFramesAvailable(
+            cameraSelector = cameraSelector,
             previewBuilder = previewBuilder,
             expectedMode = CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION
         )
@@ -1413,6 +1414,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                 .build()
 
         verifyVideoStabilizationModeInResultAndFramesAvailable(
+            cameraSelector = cameraSelector,
             previewBuilder = previewBuilder,
             videoCapture = videoCapture,
             expectedMode = CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_OFF
@@ -1438,6 +1440,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
                     .build()
 
             verifyVideoStabilizationModeInResultAndFramesAvailable(
+                cameraSelector = cameraSelector,
                 previewBuilder = previewBuilder,
                 videoCapture = videoCapture,
                 expectedMode = CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION
@@ -1497,6 +1500,38 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
             Preview.getPreviewCapabilities(cameraProvider.getCameraInfo(cameraSelector))
 
         assertThat(capabilities.isStabilizationSupported()).isTrue()
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 23)
+    fun previewStabilizationCanBeSet_whenSupportedInExtensions() = runBlocking {
+        assumeTrue(isPreviewStabilizationModeSupported(CameraSelector.DEFAULT_BACK_CAMERA))
+        val sessionProcessor =
+            FakeSessionProcessor(
+                extensionSpecificChars =
+                    listOf(
+                        android.util.Pair(
+                            CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES,
+                            intArrayOf(
+                                CameraCharacteristics
+                                    .CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION
+                            )
+                        )
+                    )
+            )
+        val cameraSelectorWithExtensions =
+            ExtensionsUtil.getCameraSelectorWithSessionProcessor(
+                cameraProvider,
+                CameraSelector.DEFAULT_BACK_CAMERA,
+                sessionProcessor
+            )
+
+        val previewBuilder = Preview.Builder().setPreviewStabilizationEnabled(true)
+        verifyVideoStabilizationModeInResultAndFramesAvailable(
+            cameraSelector = cameraSelectorWithExtensions,
+            previewBuilder = previewBuilder,
+            expectedMode = CaptureResult.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION
+        )
     }
 
     @Test
@@ -1627,6 +1662,7 @@ class PreviewTest(private val implName: String, private val cameraConfig: Camera
     }
 
     private suspend fun verifyVideoStabilizationModeInResultAndFramesAvailable(
+        cameraSelector: CameraSelector,
         previewBuilder: Preview.Builder,
         videoCapture: VideoCapture<Recorder>? = null,
         expectedMode: Int
