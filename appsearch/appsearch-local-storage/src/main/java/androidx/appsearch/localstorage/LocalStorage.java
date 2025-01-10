@@ -118,6 +118,7 @@ public class LocalStorage {
              *
              * <p>The database name cannot contain {@code '/'}.
              *
+             * @param context The context used as the parent of the created SearchContext
              * @param databaseName The name of the database.
              * @throws IllegalArgumentException if the databaseName contains {@code '/'}.
              */
