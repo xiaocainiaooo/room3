@@ -25,7 +25,7 @@ android {
     compileSdk = 35
     defaultConfig {
         applicationId = "androidx.wear.compose.integration.demos"
-        minSdk = 25
+        minSdk = 30
         versionCode = 61
         versionName = "1.61"
     }

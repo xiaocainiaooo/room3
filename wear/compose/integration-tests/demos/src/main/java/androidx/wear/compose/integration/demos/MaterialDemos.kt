@@ -16,7 +16,6 @@
 
 package androidx.wear.compose.integration.demos
 
-import android.os.Build
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -147,71 +146,65 @@ val WearMaterialDemos =
             ),
             DemoCategory(
                 "Picker",
-                if (Build.VERSION.SDK_INT > 25) {
-                    listOf(
-                        ComposableDemo("Time HH:MM:SS") { params ->
-                            var timePickerTime by remember { mutableStateOf(LocalTime.now()) }
-                            TimePicker(
-                                onTimeConfirm = {
-                                    timePickerTime = it
-                                    params.navigateBack()
-                                },
-                                time = timePickerTime,
-                            )
-                        },
-                        ComposableDemo("Time 12 Hour") { params ->
-                            var timePickerTime by remember { mutableStateOf(LocalTime.now()) }
-                            TimePickerWith12HourClock(
-                                onTimeConfirm = {
-                                    timePickerTime = it
-                                    params.navigateBack()
-                                },
-                                time = timePickerTime,
-                            )
-                        },
-                        ComposableDemo("Date Picker") { params ->
-                            var datePickerDate by remember { mutableStateOf(LocalDate.now()) }
-                            DatePicker(
-                                onDateConfirm = {
-                                    datePickerDate = it
-                                    params.navigateBack()
-                                },
-                                date = datePickerDate
-                            )
-                        },
-                        ComposableDemo("From Date Picker") { params ->
-                            var datePickerDate by remember { mutableStateOf(LocalDate.now()) }
-                            DatePicker(
-                                onDateConfirm = {
-                                    datePickerDate = it
-                                    params.navigateBack()
-                                },
-                                date = datePickerDate,
-                                fromDate = datePickerDate
-                            )
-                        },
-                        ComposableDemo("To Date Picker") { params ->
-                            var datePickerDate by remember { mutableStateOf(LocalDate.now()) }
-                            DatePicker(
-                                onDateConfirm = {
-                                    datePickerDate = it
-                                    params.navigateBack()
-                                },
-                                date = datePickerDate,
-                                toDate = datePickerDate
-                            )
-                        },
-                        ComposableDemo("Simple Picker") { SimplePicker() },
-                        ComposableDemo("No gradient") { PickerWithoutGradient() },
-                        ComposableDemo("Animate picker change") { AnimateOptionChangePicker() },
-                        ComposableDemo("Sample Picker Group") { PickerGroup24Hours() },
-                        ComposableDemo("Autocentering Picker Group") { AutoCenteringPickerGroup() }
-                    )
-                } else {
-                    listOf(
-                        ComposableDemo("Simple Picker") { SimplePicker() },
-                    )
-                }
+                listOf(
+                    ComposableDemo("Time HH:MM:SS") { params ->
+                        var timePickerTime by remember { mutableStateOf(LocalTime.now()) }
+                        TimePicker(
+                            onTimeConfirm = {
+                                timePickerTime = it
+                                params.navigateBack()
+                            },
+                            time = timePickerTime,
+                        )
+                    },
+                    ComposableDemo("Time 12 Hour") { params ->
+                        var timePickerTime by remember { mutableStateOf(LocalTime.now()) }
+                        TimePickerWith12HourClock(
+                            onTimeConfirm = {
+                                timePickerTime = it
+                                params.navigateBack()
+                            },
+                            time = timePickerTime,
+                        )
+                    },
+                    ComposableDemo("Date Picker") { params ->
+                        var datePickerDate by remember { mutableStateOf(LocalDate.now()) }
+                        DatePicker(
+                            onDateConfirm = {
+                                datePickerDate = it
+                                params.navigateBack()
+                            },
+                            date = datePickerDate
+                        )
+                    },
+                    ComposableDemo("From Date Picker") { params ->
+                        var datePickerDate by remember { mutableStateOf(LocalDate.now()) }
+                        DatePicker(
+                            onDateConfirm = {
+                                datePickerDate = it
+                                params.navigateBack()
+                            },
+                            date = datePickerDate,
+                            fromDate = datePickerDate
+                        )
+                    },
+                    ComposableDemo("To Date Picker") { params ->
+                        var datePickerDate by remember { mutableStateOf(LocalDate.now()) }
+                        DatePicker(
+                            onDateConfirm = {
+                                datePickerDate = it
+                                params.navigateBack()
+                            },
+                            date = datePickerDate,
+                            toDate = datePickerDate
+                        )
+                    },
+                    ComposableDemo("Simple Picker") { SimplePicker() },
+                    ComposableDemo("No gradient") { PickerWithoutGradient() },
+                    ComposableDemo("Animate picker change") { AnimateOptionChangePicker() },
+                    ComposableDemo("Sample Picker Group") { PickerGroup24Hours() },
+                    ComposableDemo("Autocentering Picker Group") { AutoCenteringPickerGroup() }
+                )
             ),
             DemoCategory(
                 "Slider",
