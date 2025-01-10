@@ -16,7 +16,6 @@
 
 package androidx.wear.protolayout.material3
 
-import android.R.attr.clickable
 import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
 import androidx.wear.protolayout.DimensionBuilders.dp
@@ -85,7 +84,10 @@ public fun MaterialScope.iconEdgeButton(
     iconContent: (MaterialScope.() -> LayoutElement)
 ): LayoutElement =
     edgeButton(onClick = onClick, modifier = modifier, colors = colors, style = DEFAULT) {
-        withStyle(defaultIconStyle = IconStyle(size = ICON_SIZE_DP.toDp(), tintColor = colors.icon))
+        withStyle(
+                defaultIconStyle =
+                    IconStyle(size = ICON_SIZE_DP.toDp(), tintColor = colors.iconColor)
+            )
             .iconContent()
     }
 
@@ -126,7 +128,7 @@ public fun MaterialScope.textEdgeButton(
                 defaultTextElementStyle =
                     TextElementStyle(
                         typography = Typography.LABEL_MEDIUM,
-                        color = colors.icon,
+                        color = colors.iconColor,
                         scalable = false
                     )
             )
@@ -179,7 +181,7 @@ private fun MaterialScope.edgeButton(
     var mod =
         (LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then modifier)
             .clickable(onClick)
-            .background(colors.container)
+            .background(colors.containerColor)
             .clip(TOP_CORNER_RADIUS)
             .clipBottomLeft(bottomCornerRadiusX, bottomCornerRadiusY)
             .clipBottomRight(bottomCornerRadiusX, bottomCornerRadiusY)

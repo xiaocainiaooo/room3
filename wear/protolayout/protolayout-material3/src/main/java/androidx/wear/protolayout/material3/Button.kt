@@ -96,13 +96,14 @@ public fun MaterialScope.iconButton(
 ): LayoutElement =
     buttonContainer(
         onClick = onClick,
-        modifier = modifier.background(color = colors.container, corner = shape),
+        modifier = modifier.background(color = colors.containerColor, corner = shape),
         width = width,
         height = height,
         contentPadding = contentPadding,
         content = {
             withStyle(
-                    defaultIconStyle = IconStyle(size = dp(style.iconSize), tintColor = colors.icon)
+                    defaultIconStyle =
+                        IconStyle(size = dp(style.iconSize), tintColor = colors.iconColor)
                 )
                 .iconContent()
         }
@@ -155,14 +156,17 @@ public fun MaterialScope.textButton(
 ): LayoutElement =
     buttonContainer(
         onClick = onClick,
-        modifier = modifier.background(color = colors.container, corner = shape),
+        modifier = modifier.background(color = colors.containerColor, corner = shape),
         width = width,
         height = height,
         contentPadding = contentPadding,
         content = {
             withStyle(
                     defaultTextElementStyle =
-                        TextElementStyle(typography = style.labelTypography, color = colors.label)
+                        TextElementStyle(
+                            typography = style.labelTypography,
+                            color = colors.labelColor
+                        )
                 )
                 .labelContent()
         }
@@ -195,7 +199,7 @@ public fun MaterialScope.textButton(
  * @param backgroundContent The background object to be used behind the content in the button. It is
  *   recommended to use the default styling that is automatically provided by only calling
  *   [backgroundImage] with the content. It can be combined with the specified
- *   [ButtonColors.container] behind it.
+ *   [ButtonColors.containerColor] behind it.
  * @param style The style which provides the attribute values required for constructing this pill
  *   shape button and its inner content. It also provides default style for the inner content, that
  *   can be overridden by each content slot.
@@ -230,7 +234,7 @@ public fun MaterialScope.button(
 ): LayoutElement =
     buttonContainer(
         onClick = onClick,
-        modifier = modifier.background(color = colors.container, corner = shape),
+        modifier = modifier.background(color = colors.containerColor, corner = shape),
         width = width,
         height = height,
         backgroundContent = backgroundContent,
@@ -242,7 +246,7 @@ public fun MaterialScope.button(
                             defaultTextElementStyle =
                                 TextElementStyle(
                                     typography = style.labelTypography,
-                                    color = colors.label
+                                    color = colors.labelColor
                                 )
                         )
                         .labelContent(),
@@ -252,7 +256,7 @@ public fun MaterialScope.button(
                                 defaultTextElementStyle =
                                     TextElementStyle(
                                         typography = style.secondaryLabelTypography,
-                                        color = colors.secondaryLabel
+                                        color = colors.secondaryLabelColor
                                     )
                             )
                             .secondaryLabelContent()
@@ -261,7 +265,10 @@ public fun MaterialScope.button(
                     iconContent?.let {
                         withStyle(
                                 defaultIconStyle =
-                                    IconStyle(size = dp(style.iconSize), tintColor = colors.icon)
+                                    IconStyle(
+                                        size = dp(style.iconSize),
+                                        tintColor = colors.iconColor
+                                    )
                             )
                             .iconContent()
                     },
@@ -368,7 +375,7 @@ public fun MaterialScope.compactButton(
             // The actual visible part of compact button
             componentContainer(
                 onClick = onClick,
-                modifier = modifier.background(color = colors.container, corner = shape),
+                modifier = modifier.background(color = colors.containerColor, corner = shape),
                 width = width,
                 height = dp(COMPACT_BUTTON_HEIGHT_DP),
                 contentPadding = contentPadding,
@@ -382,7 +389,7 @@ public fun MaterialScope.compactButton(
                                         defaultTextElementStyle =
                                             TextElementStyle(
                                                 typography = COMPACT_BUTTON_LABEL_TYPOGRAPHY,
-                                                color = colors.label
+                                                color = colors.labelColor
                                             )
                                     )
                                     .labelContent()
@@ -398,7 +405,7 @@ public fun MaterialScope.compactButton(
                                                             COMPACT_BUTTON_ICON_SIZE_LARGE_DP
                                                         else COMPACT_BUTTON_ICON_SIZE_SMALL_DP
                                                     ),
-                                                tintColor = colors.icon
+                                                tintColor = colors.iconColor
                                             )
                                     )
                                     .iconContent()

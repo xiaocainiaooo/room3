@@ -13,15 +13,15 @@ package androidx.wear.protolayout.material3 {
 
   public final class ButtonColors {
     ctor public ButtonColors();
-    ctor public ButtonColors(optional androidx.wear.protolayout.types.LayoutColor container, optional androidx.wear.protolayout.types.LayoutColor icon, optional androidx.wear.protolayout.types.LayoutColor label, optional androidx.wear.protolayout.types.LayoutColor secondaryLabel);
-    method public androidx.wear.protolayout.types.LayoutColor getContainer();
-    method public androidx.wear.protolayout.types.LayoutColor getIcon();
-    method public androidx.wear.protolayout.types.LayoutColor getLabel();
-    method public androidx.wear.protolayout.types.LayoutColor getSecondaryLabel();
-    property public final androidx.wear.protolayout.types.LayoutColor container;
-    property public final androidx.wear.protolayout.types.LayoutColor icon;
-    property public final androidx.wear.protolayout.types.LayoutColor label;
-    property public final androidx.wear.protolayout.types.LayoutColor secondaryLabel;
+    ctor public ButtonColors(optional androidx.wear.protolayout.types.LayoutColor containerColor, optional androidx.wear.protolayout.types.LayoutColor iconColor, optional androidx.wear.protolayout.types.LayoutColor labelColor, optional androidx.wear.protolayout.types.LayoutColor secondaryLabelColor);
+    method public androidx.wear.protolayout.types.LayoutColor getContainerColor();
+    method public androidx.wear.protolayout.types.LayoutColor getIconColor();
+    method public androidx.wear.protolayout.types.LayoutColor getLabelColor();
+    method public androidx.wear.protolayout.types.LayoutColor getSecondaryLabelColor();
+    property public final androidx.wear.protolayout.types.LayoutColor containerColor;
+    property public final androidx.wear.protolayout.types.LayoutColor iconColor;
+    property public final androidx.wear.protolayout.types.LayoutColor labelColor;
+    property public final androidx.wear.protolayout.types.LayoutColor secondaryLabelColor;
   }
 
   public final class ButtonDefaults {
@@ -66,21 +66,21 @@ package androidx.wear.protolayout.material3 {
   }
 
   public final class CardColors {
-    ctor public CardColors(androidx.wear.protolayout.types.LayoutColor background, androidx.wear.protolayout.types.LayoutColor title, androidx.wear.protolayout.types.LayoutColor content, optional androidx.wear.protolayout.types.LayoutColor time, optional androidx.wear.protolayout.types.LayoutColor label, optional androidx.wear.protolayout.types.LayoutColor secondaryIcon, optional androidx.wear.protolayout.types.LayoutColor secondaryText);
-    method public androidx.wear.protolayout.types.LayoutColor getBackground();
-    method public androidx.wear.protolayout.types.LayoutColor getContent();
-    method public androidx.wear.protolayout.types.LayoutColor getLabel();
-    method public androidx.wear.protolayout.types.LayoutColor getSecondaryIcon();
-    method public androidx.wear.protolayout.types.LayoutColor getSecondaryText();
-    method public androidx.wear.protolayout.types.LayoutColor getTime();
-    method public androidx.wear.protolayout.types.LayoutColor getTitle();
-    property public final androidx.wear.protolayout.types.LayoutColor background;
-    property public final androidx.wear.protolayout.types.LayoutColor content;
-    property public final androidx.wear.protolayout.types.LayoutColor label;
-    property public final androidx.wear.protolayout.types.LayoutColor secondaryIcon;
-    property public final androidx.wear.protolayout.types.LayoutColor secondaryText;
-    property public final androidx.wear.protolayout.types.LayoutColor time;
-    property public final androidx.wear.protolayout.types.LayoutColor title;
+    ctor public CardColors(androidx.wear.protolayout.types.LayoutColor backgroundColor, androidx.wear.protolayout.types.LayoutColor titleColor, androidx.wear.protolayout.types.LayoutColor contentColor, optional androidx.wear.protolayout.types.LayoutColor timeColor, optional androidx.wear.protolayout.types.LayoutColor labelColor, optional androidx.wear.protolayout.types.LayoutColor secondaryIconColor, optional androidx.wear.protolayout.types.LayoutColor secondaryTextColor);
+    method public androidx.wear.protolayout.types.LayoutColor getBackgroundColor();
+    method public androidx.wear.protolayout.types.LayoutColor getContentColor();
+    method public androidx.wear.protolayout.types.LayoutColor getLabelColor();
+    method public androidx.wear.protolayout.types.LayoutColor getSecondaryIconColor();
+    method public androidx.wear.protolayout.types.LayoutColor getSecondaryTextColor();
+    method public androidx.wear.protolayout.types.LayoutColor getTimeColor();
+    method public androidx.wear.protolayout.types.LayoutColor getTitleColor();
+    property public final androidx.wear.protolayout.types.LayoutColor backgroundColor;
+    property public final androidx.wear.protolayout.types.LayoutColor contentColor;
+    property public final androidx.wear.protolayout.types.LayoutColor labelColor;
+    property public final androidx.wear.protolayout.types.LayoutColor secondaryIconColor;
+    property public final androidx.wear.protolayout.types.LayoutColor secondaryTextColor;
+    property public final androidx.wear.protolayout.types.LayoutColor timeColor;
+    property public final androidx.wear.protolayout.types.LayoutColor titleColor;
   }
 
   public final class CardDefaults {
@@ -266,13 +266,13 @@ package androidx.wear.protolayout.material3 {
   }
 
   public final class ProgressIndicatorColors {
-    ctor public ProgressIndicatorColors(androidx.wear.protolayout.types.LayoutColor indicator, androidx.wear.protolayout.types.LayoutColor track, optional androidx.wear.protolayout.types.LayoutColor trackOverflow);
-    method public androidx.wear.protolayout.types.LayoutColor getIndicator();
-    method public androidx.wear.protolayout.types.LayoutColor getTrack();
-    method public androidx.wear.protolayout.types.LayoutColor getTrackOverflow();
-    property public final androidx.wear.protolayout.types.LayoutColor indicator;
-    property public final androidx.wear.protolayout.types.LayoutColor track;
-    property public final androidx.wear.protolayout.types.LayoutColor trackOverflow;
+    ctor public ProgressIndicatorColors(androidx.wear.protolayout.types.LayoutColor indicatorColor, androidx.wear.protolayout.types.LayoutColor trackColor, optional androidx.wear.protolayout.types.LayoutColor trackOverflowColor);
+    method public androidx.wear.protolayout.types.LayoutColor getIndicatorColor();
+    method public androidx.wear.protolayout.types.LayoutColor getTrackColor();
+    method public androidx.wear.protolayout.types.LayoutColor getTrackOverflowColor();
+    property public final androidx.wear.protolayout.types.LayoutColor indicatorColor;
+    property public final androidx.wear.protolayout.types.LayoutColor trackColor;
+    property public final androidx.wear.protolayout.types.LayoutColor trackOverflowColor;
   }
 
   public final class Shapes {
