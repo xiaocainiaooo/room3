@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.appfunctions.common.metadata
+package androidx.appfunctions.metadata
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth
 import org.junit.Test
 
 class AppFunctionMetadataTest {
@@ -44,11 +44,12 @@ class AppFunctionMetadataTest {
                 components = AppFunctionComponentsMetadata(dataTypes = emptyList())
             )
 
-        assertThat(appFunctionMetadata.id).isEqualTo("androidx.appfunctions.common.metadata#empty")
-        assertThat(appFunctionMetadata.isEnabledByDefault).isTrue()
-        assertThat(appFunctionMetadata.isRestrictToTrustedCaller).isFalse()
-        assertThat(appFunctionMetadata.displayNameRes).isEqualTo(100)
-        assertThat(appFunctionMetadata.schema)
+        Truth.assertThat(appFunctionMetadata.id)
+            .isEqualTo("androidx.appfunctions.common.metadata#empty")
+        Truth.assertThat(appFunctionMetadata.isEnabledByDefault).isTrue()
+        Truth.assertThat(appFunctionMetadata.isRestrictToTrustedCaller).isFalse()
+        Truth.assertThat(appFunctionMetadata.displayNameRes).isEqualTo(100)
+        Truth.assertThat(appFunctionMetadata.schema)
             .isEqualTo(
                 AppFunctionSchemaMetadata(
                     schemaCategory = "exampleCategory",
@@ -56,15 +57,15 @@ class AppFunctionMetadataTest {
                     schemaVersion = 200L
                 )
             )
-        assertThat(appFunctionMetadata.parameters).isEmpty()
-        assertThat(appFunctionMetadata.response)
+        Truth.assertThat(appFunctionMetadata.parameters).isEmpty()
+        Truth.assertThat(appFunctionMetadata.response)
             .isEqualTo(
                 AppFunctionResponseMetadata(
                     isNullable = false,
                     dataType = AppFunctionDataTypeMetadata(type = AppFunctionDataTypeMetadata.UNIT)
                 )
             )
-        assertThat(appFunctionMetadata.components)
+        Truth.assertThat(appFunctionMetadata.components)
             .isEqualTo(AppFunctionComponentsMetadata(dataTypes = emptyList()))
     }
 
@@ -181,7 +182,7 @@ class AppFunctionMetadataTest {
                     ),
             )
 
-        assertThat(appFunctionMetadata.parameters)
+        Truth.assertThat(appFunctionMetadata.parameters)
             .containsExactly(
                 AppFunctionParameterMetadata(
                     name = "requiredInt",
@@ -495,7 +496,7 @@ class AppFunctionMetadataTest {
                     )
             )
 
-        assertThat(appFunctionMetadata.parameters)
+        Truth.assertThat(appFunctionMetadata.parameters)
             .containsExactly(
                 AppFunctionParameterMetadata(
                     name = "nonNullIntList",
@@ -760,7 +761,7 @@ class AppFunctionMetadataTest {
                     )
             )
 
-        assertThat(appFunctionMetadata.components.dataTypes)
+        Truth.assertThat(appFunctionMetadata.components.dataTypes)
             .containsExactly(
                 AppFunctionDataTypeMetadata(
                     id = "androidx.appfunctions.common.TestClass",
@@ -778,7 +779,7 @@ class AppFunctionMetadataTest {
                         )
                 )
             )
-        assertThat(appFunctionMetadata.parameters)
+        Truth.assertThat(appFunctionMetadata.parameters)
             .containsExactly(
                 AppFunctionParameterMetadata(
                     name = "testClass",
@@ -834,7 +835,7 @@ class AppFunctionMetadataTest {
                     )
             )
 
-        assertThat(appFunctionMetadata.components.dataTypes)
+        Truth.assertThat(appFunctionMetadata.components.dataTypes)
             .containsExactly(
                 AppFunctionDataTypeMetadata(
                     id = "androidx.appfunctions.common.TestClass",
@@ -852,7 +853,7 @@ class AppFunctionMetadataTest {
                         )
                 )
             )
-        assertThat(appFunctionMetadata.parameters)
+        Truth.assertThat(appFunctionMetadata.parameters)
             .containsExactly(
                 AppFunctionParameterMetadata(
                     name = "testClass",

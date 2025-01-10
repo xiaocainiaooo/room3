@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.appfunctions.common.metadata
+package androidx.appfunctions.metadata
 
 import androidx.annotation.IntDef
 import androidx.annotation.RestrictTo
