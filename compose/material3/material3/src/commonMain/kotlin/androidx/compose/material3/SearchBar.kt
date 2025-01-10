@@ -1201,10 +1201,6 @@ object SearchBarDefaults {
                         if (searchBarState.isExpanded) {
                             stateDescription = suggestionsAvailableSemantics
                         }
-                        onClick {
-                            focusRequester.requestFocus()
-                            true
-                        }
                     },
             enabled = enabled,
             readOnly = readOnly,
@@ -1360,10 +1356,6 @@ object SearchBarDefaults {
                         if (expanded) {
                             stateDescription = suggestionsAvailableSemantics
                         }
-                        onClick {
-                            focusRequester.requestFocus()
-                            true
-                        }
                     },
             enabled = enabled,
             readOnly = readOnly,
@@ -1498,10 +1490,6 @@ object SearchBarDefaults {
                         contentDescription = searchSemantics
                         if (expanded) {
                             stateDescription = suggestionsAvailableSemantics
-                        }
-                        onClick {
-                            focusRequester.requestFocus()
-                            true
                         }
                     },
             enabled = enabled,
