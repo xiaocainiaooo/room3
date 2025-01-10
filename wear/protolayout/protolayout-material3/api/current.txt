@@ -248,7 +248,24 @@ package androidx.wear.protolayout.material3 {
   }
 
   public final class PrimaryLayoutKt {
-    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement primaryLayout(androidx.wear.protolayout.material3.MaterialScope, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> mainSlot, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? titleSlot, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? bottomSlot, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? labelForBottomSlot, optional androidx.wear.protolayout.ModifiersBuilders.Clickable? onClick);
+    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement primaryLayout(androidx.wear.protolayout.material3.MaterialScope, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> mainSlot, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? titleSlot, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? bottomSlot, optional kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement>? labelForBottomSlot, optional androidx.wear.protolayout.ModifiersBuilders.Clickable? onClick, optional androidx.wear.protolayout.material3.PrimaryLayoutMargins margins);
+  }
+
+  public abstract class PrimaryLayoutMargins {
+    field public static final androidx.wear.protolayout.material3.PrimaryLayoutMargins.Companion Companion;
+    field public static final androidx.wear.protolayout.material3.PrimaryLayoutMargins DEFAULT_PRIMARY_LAYOUT_MARGIN;
+    field public static final androidx.wear.protolayout.material3.PrimaryLayoutMargins MAX_PRIMARY_LAYOUT_MARGIN;
+    field public static final androidx.wear.protolayout.material3.PrimaryLayoutMargins MID_PRIMARY_LAYOUT_MARGIN;
+    field public static final androidx.wear.protolayout.material3.PrimaryLayoutMargins MIN_PRIMARY_LAYOUT_MARGIN;
+  }
+
+  public static final class PrimaryLayoutMargins.Companion {
+    method public androidx.wear.protolayout.material3.PrimaryLayoutMargins customizedPrimaryLayoutMargin(@FloatRange(from=0.0, to=1.0) float start, @FloatRange(from=0.0, to=1.0) float end);
+    method public androidx.wear.protolayout.material3.PrimaryLayoutMargins customizedPrimaryLayoutMargin(@FloatRange(from=0.0, to=1.0) float start, @FloatRange(from=0.0, to=1.0) float end, @FloatRange(from=0.0, to=1.0) float bottom);
+    property public final androidx.wear.protolayout.material3.PrimaryLayoutMargins DEFAULT_PRIMARY_LAYOUT_MARGIN;
+    property public final androidx.wear.protolayout.material3.PrimaryLayoutMargins MAX_PRIMARY_LAYOUT_MARGIN;
+    property public final androidx.wear.protolayout.material3.PrimaryLayoutMargins MID_PRIMARY_LAYOUT_MARGIN;
+    property public final androidx.wear.protolayout.material3.PrimaryLayoutMargins MIN_PRIMARY_LAYOUT_MARGIN;
   }
 
   public final class ProgressIndicatorColors {

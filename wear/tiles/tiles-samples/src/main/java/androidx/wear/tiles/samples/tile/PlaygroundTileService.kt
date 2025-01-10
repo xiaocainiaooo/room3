@@ -36,6 +36,7 @@ import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.rec
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.extraLargeDataCardStyle
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.smallCompactDataCardStyle
 import androidx.wear.protolayout.material3.MaterialScope
+import androidx.wear.protolayout.material3.PrimaryLayoutMargins.Companion.MAX_PRIMARY_LAYOUT_MARGIN
 import androidx.wear.protolayout.material3.TextButtonStyle.Companion.smallTextButtonStyle
 import androidx.wear.protolayout.material3.appCard
 import androidx.wear.protolayout.material3.avatarImage
@@ -126,7 +127,8 @@ private fun tileLayout(
 ): LayoutElementBuilders.LayoutElement =
     materialScope(context = context, deviceConfiguration = requestParams.deviceConfiguration) {
         primaryLayout(
-            mainSlot = { graphicDataCardSample() },
+            mainSlot = { oneSlotButtons() },
+            margins = MAX_PRIMARY_LAYOUT_MARGIN,
             bottomSlot = {
                 textEdgeButton(
                     onClick = clickable(),

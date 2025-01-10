@@ -42,6 +42,8 @@ import androidx.wear.protolayout.material3.CompactButtonStyle.COMPACT_BUTTON_ICO
 import androidx.wear.protolayout.material3.CompactButtonStyle.COMPACT_BUTTON_ICON_SIZE_SMALL_DP
 import androidx.wear.protolayout.material3.CompactButtonStyle.COMPACT_BUTTON_LABEL_TYPOGRAPHY
 import androidx.wear.protolayout.material3.IconButtonStyle.Companion.defaultIconButtonStyle
+import androidx.wear.protolayout.material3.PredefinedPrimaryLayoutMargins.maxPrimaryLayoutMargins
+import androidx.wear.protolayout.material3.PredefinedPrimaryLayoutMargins.minPrimaryLayoutMargins
 import androidx.wear.protolayout.material3.TextButtonStyle.Companion.defaultTextButtonStyle
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.background
@@ -62,7 +64,11 @@ import androidx.wear.protolayout.modifiers.toProtoLayoutModifiers
  *   the associated action.
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
  *   description using [contentDescription].
- * @param shape Defines the button's shape, in other words the corner radius for this button.
+ * @param shape Defines the button's shape, in other words the corner radius for this button. If
+ *   changing these to radius smaller than [Shapes.medium], it is important to adjusts the margins
+ *   of [primaryLayout] used to accommodate for more space, for example by using
+ *   [maxPrimaryLayoutMargins]. Or, if the [shape] is set to [Shapes.full], using
+ *   [minPrimaryLayoutMargins] can be considered.
  * @param width The width of this button. It's highly recommended to set this to [expand] or
  *   [weight]
  * @param height The height of this button. It's highly recommended to set this to [expand] or
@@ -82,7 +88,6 @@ import androidx.wear.protolayout.modifiers.toProtoLayoutModifiers
  * @sample androidx.wear.protolayout.material3.samples.oneSlotButtonsSample
  */
 // TODO: b/346958146 - Link Button visuals in DAC
-// TODO: b/373578620 - Add how corners affects margins in the layout.
 public fun MaterialScope.iconButton(
     onClick: Clickable,
     iconContent: (MaterialScope.() -> LayoutElement),
@@ -121,7 +126,11 @@ public fun MaterialScope.iconButton(
  *   the associated action.
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
  *   description using [contentDescription].
- * @param shape Defines the button's shape, in other words the corner radius for this button.
+ * @param shape Defines the button's shape, in other words the corner radius for this button. If
+ *   changing these to radius smaller than [Shapes.medium], it is important to adjusts the margins
+ *   of [primaryLayout] used to accommodate for more space, for example by using
+ *   [maxPrimaryLayoutMargins]. Or, if the [shape] is set to [Shapes.full], using
+ *   [minPrimaryLayoutMargins] can be considered.
  * @param width The width of this button. It's highly recommended to set this to [expand] or
  *   [weight]
  * @param height The height of this button. It's highly recommended to set this to [expand] or
@@ -142,7 +151,6 @@ public fun MaterialScope.iconButton(
  * @sample androidx.wear.protolayout.material3.samples.oneSlotButtonsSample
  */
 // TODO: b/346958146 - Link Button visuals in DAC
-// TODO: b/373578620 - Add how corners affects margins in the layout.
 public fun MaterialScope.textButton(
     onClick: Clickable,
     labelContent: (MaterialScope.() -> LayoutElement),
@@ -186,7 +194,11 @@ public fun MaterialScope.textButton(
  *   recommended to use default styling that is automatically provided by only calling [text].
  * @param iconContent The icon slot for content displayed in this button. It is recommended to use
  *   default styling that is automatically provided by only calling [icon] with the resource ID.
- * @param shape Defines the button's shape, in other words the corner radius for this button.
+ * @param shape Defines the button's shape, in other words the corner radius for this button. If
+ *   changing these to radius smaller than [Shapes.medium], it is important to adjusts the margins
+ *   of [primaryLayout] used to accommodate for more space, for example by using
+ *   [maxPrimaryLayoutMargins]. Or, if the [shape] is set to [Shapes.full], using
+ *   [minPrimaryLayoutMargins] can be considered.
  * @param width The width of this button. It's highly recommended to set this to [expand] or
  *   [weight]
  * @param height The height of this button. It's highly recommended to set this to [expand] or
@@ -331,7 +343,11 @@ public fun MaterialScope.imageButton(
  *   parameter.
  * @param iconContent The icon slot for content displayed in this button. It is recommended to use
  *   default styling that is automatically provided by only calling [icon] with the resource ID.
- * @param shape Defines the button's shape, in other words the corner radius for this button.
+ * @param shape Defines the button's shape, in other words the corner radius for this button. If
+ *   changing these to radius smaller than [Shapes.medium], it is important to adjusts the margins
+ *   of [primaryLayout] used to accommodate for more space, for example by using
+ *   [maxPrimaryLayoutMargins]. Or, if the [shape] is set to [Shapes.full], using
+ *   [minPrimaryLayoutMargins] can be considered.
  * @param width The width of this button. It's highly recommended to set this to [expand] or
  *   [weight]
  * @param colors The colors used for this button. If not set, [ButtonDefaults.filledButtonColors]

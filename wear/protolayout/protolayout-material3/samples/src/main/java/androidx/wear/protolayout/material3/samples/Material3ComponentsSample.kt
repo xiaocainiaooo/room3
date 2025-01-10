@@ -38,6 +38,7 @@ import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.fil
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.extraLargeDataCardStyle
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.largeCompactDataCardStyle
 import androidx.wear.protolayout.material3.GraphicDataCardStyle.Companion.largeGraphicDataCardStyle
+import androidx.wear.protolayout.material3.PrimaryLayoutMargins.Companion.MAX_PRIMARY_LAYOUT_MARGIN
 import androidx.wear.protolayout.material3.TitleCardStyle.Companion.largeTitleCardStyle
 import androidx.wear.protolayout.material3.Typography
 import androidx.wear.protolayout.material3.appCard
@@ -145,7 +146,7 @@ fun topLevelLayout(
                                 ModifiersBuilders.Modifiers.Builder()
                                     .setBackground(
                                         ModifiersBuilders.Background.Builder()
-                                            .setCorner(shapes.full)
+                                            .setCorner(shapes.small)
                                             .build()
                                     )
                                     .build()
@@ -154,6 +155,8 @@ fun topLevelLayout(
                     }
                 }
             },
+            // Adjust margins as the corner of the inner content is on the square side.
+            margins = MAX_PRIMARY_LAYOUT_MARGIN,
             bottomSlot = {
                 iconEdgeButton(
                     onClick = clickable,
