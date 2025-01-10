@@ -84,18 +84,18 @@ public object CircularProgressIndicatorDefaults {
             .build()
 
     /** Large stroke width for circular progress indicator. */
-    @Dimension(unit = DP) public const val LARGE_STROKE_WIDTH: Float = 8F
+    @Dimension(DP) public const val LARGE_STROKE_WIDTH: Float = 8F
 
     /** Small stroke width for circular progress indicator. */
-    @Dimension(unit = DP) public const val SMALL_STROKE_WIDTH: Float = 4F
+    @Dimension(DP) public const val SMALL_STROKE_WIDTH: Float = 4F
 
     /**
      * Returns recommended size of the gap based on [strokeWidth].
      *
      * The absolute value can be customized with `gapSize` parameter on [circularProgressIndicator].
      */
-    @Dimension(unit = DP)
-    public fun calculateRecommendedGapSize(@Dimension(unit = DP) strokeWidth: Float): Float =
+    @Dimension(DP)
+    public fun calculateRecommendedGapSize(@Dimension(DP) strokeWidth: Float): Float =
         strokeWidth / 3F
 
     internal const val METADATA_TAG: String = "M3CPI"
@@ -110,4 +110,7 @@ public object CircularProgressIndicatorDefaults {
      * top of the track arc where there are multiple segments.
      */
     internal const val INDICATOR_STROKE_WIDTH_INCREMENT_PX: Float = 1.5f
+
+    /** Default size for the fallback implementation. */
+    @Dimension(DP) internal const val CPI_DEFAULT_DP_SIZE: Float = 52F
 }
