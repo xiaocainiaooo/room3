@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.appfunctions.compiler.app
+package androidx.appfunctions.compiler
 
 import androidx.appfunctions.compiler.testings.CompilationTestHelper
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth
 import java.io.File
 import org.junit.Before
 import org.junit.Test
 
-class AppFunctionAppCompilerTest {
+class AppFunctionCompilerTest {
     private lateinit var compilationTestHelper: CompilationTestHelper
 
     @Before
@@ -31,7 +31,7 @@ class AppFunctionAppCompilerTest {
             CompilationTestHelper(
                 testFileSrcDir = File("src/test/test-data/input"),
                 goldenFileSrcDir = File("src/test/test-data/output"),
-                symbolProcessorProviders = listOf(AppFunctionAppCompiler.Provider())
+                symbolProcessorProviders = listOf(AppFunctionCompiler.Provider())
             )
     }
 
@@ -39,7 +39,7 @@ class AppFunctionAppCompilerTest {
     fun testEmpty() {
         val report = compilationTestHelper.compileAll(sourceFileNames = emptyList())
 
-        assertThat(report.isSuccess).isTrue()
+        Truth.assertThat(report.isSuccess).isTrue()
     }
 
     @Test

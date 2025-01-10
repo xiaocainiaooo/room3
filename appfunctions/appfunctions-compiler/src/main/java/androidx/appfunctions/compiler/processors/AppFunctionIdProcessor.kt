@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.appfunctions.compiler.app.processors
+package androidx.appfunctions.compiler.processors
 
-import androidx.appfunctions.compiler.app.AppFunctionAppCompiler
+import androidx.appfunctions.compiler.AppFunctionCompiler
 import androidx.appfunctions.compiler.core.AppFunctionSymbolResolver
 import androidx.appfunctions.compiler.core.AppFunctionSymbolResolver.AnnotatedAppFunctions
 import androidx.appfunctions.compiler.core.fromCamelCaseToScreamingSnakeCase
@@ -69,7 +69,7 @@ class AppFunctionIdProcessor(
         val idClassName = getAppFunctionIdClassName(originalClassName)
         val classBuilder =
             TypeSpec.objectBuilder(idClassName).apply {
-                addAnnotation(AppFunctionAppCompiler.GENERATED_ANNOTATION)
+                addAnnotation(AppFunctionCompiler.GENERATED_ANNOTATION)
                 addAppFunctionIdProperties(appFunctionClass)
             }
 

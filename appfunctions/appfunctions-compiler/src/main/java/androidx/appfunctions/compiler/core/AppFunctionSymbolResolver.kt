@@ -60,9 +60,15 @@ class AppFunctionSymbolResolver(private val resolver: Resolver) {
      * functions.
      */
     data class AnnotatedAppFunctions(
-        /** The [KSClassDeclaration] of the class that contains the annotated app functions. */
+        /**
+         * The [com.google.devtools.ksp.symbol.KSClassDeclaration] of the class that contains the
+         * annotated app functions.
+         */
         val classDeclaration: KSClassDeclaration,
-        /** The list of [KSFunctionDeclaration] that annotated as app function. */
+        /**
+         * The list of [com.google.devtools.ksp.symbol.KSFunctionDeclaration] that annotated as app
+         * function.
+         */
         val appFunctionDeclarations: List<KSFunctionDeclaration>
     ) {
         fun validate(): AnnotatedAppFunctions {

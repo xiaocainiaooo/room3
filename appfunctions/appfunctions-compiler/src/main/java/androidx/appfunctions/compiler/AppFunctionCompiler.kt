@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package androidx.appfunctions.compiler.app
+package androidx.appfunctions.compiler
 
-import androidx.appfunctions.compiler.app.processors.AppFunctionIdProcessor
 import androidx.appfunctions.compiler.core.ProcessingException
 import androidx.appfunctions.compiler.core.logException
+import androidx.appfunctions.compiler.processors.AppFunctionIdProcessor
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
@@ -29,7 +29,7 @@ import com.squareup.kotlinpoet.AnnotationSpec
 import javax.annotation.processing.Generated
 
 /** The compiler to process AppFunction implementations. */
-class AppFunctionAppCompiler(
+class AppFunctionCompiler(
     private val processors: List<SymbolProcessor>,
     private val logger: KSPLogger,
 ) : SymbolProcessor {
@@ -51,7 +51,7 @@ class AppFunctionAppCompiler(
 
         override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
             val idProcessor = AppFunctionIdProcessor(environment.codeGenerator)
-            return AppFunctionAppCompiler(
+            return AppFunctionCompiler(
                 listOf(
                     idProcessor,
                 ),
@@ -63,7 +63,7 @@ class AppFunctionAppCompiler(
     companion object {
         internal val GENERATED_ANNOTATION =
             AnnotationSpec.builder(Generated::class)
-                .addMember("%S", AppFunctionAppCompiler::class.java.canonicalName)
+                .addMember("%S", AppFunctionCompiler::class.java.canonicalName)
                 .build()
     }
 }
