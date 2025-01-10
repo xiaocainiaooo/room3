@@ -33,16 +33,20 @@ import androidx.camera.camera2.pipe.StreamId
 import androidx.camera.camera2.pipe.compat.CameraPipeKeys
 import androidx.camera.camera2.pipe.integration.config.UseCaseGraphConfig
 import androidx.camera.camera2.pipe.integration.impl.Camera2ImplConfig
+import androidx.camera.camera2.pipe.integration.impl.UseCaseThreads
 import androidx.camera.camera2.pipe.testing.CameraGraphSimulator
 import androidx.camera.camera2.pipe.testing.FakeCameraMetadata
+import androidx.camera.core.impl.CameraCaptureCallback
 import androidx.camera.core.impl.DeferrableSurface
 import androidx.camera.core.impl.RequestProcessor
 import androidx.camera.core.impl.SessionConfig
 import androidx.camera.core.impl.SessionProcessorSurface
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
+import com.google.common.util.concurrent.MoreExecutors
 import kotlin.test.Test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -87,11 +91,13 @@ class RequestProcessorAdapterTest {
     private val imageCaptureProcessorSurface =
         SessionProcessorSurface(imageCaptureSurface, imageCaptureOutputConfigId)
 
+    private val cameraCaptureCallback: CameraCaptureCallback = mock()
     private val fakeSessionConfig =
         SessionConfig.Builder()
             .apply {
                 addSurface(previewProcessorSurface)
                 addSurface(imageCaptureProcessorSurface)
+                addCameraCaptureCallback(cameraCaptureCallback)
             }
             .build()
 
@@ -140,12 +146,11 @@ class RequestProcessorAdapterTest {
         val useCaseGraphConfig =
             UseCaseGraphConfig(simulator, surfaceToStreamMap, CameraStateAdapter())
 
+        val executor = MoreExecutors.directExecutor()
+        val dispatcher = executor.asCoroutineDispatcher()
+        val useCaseThreads = UseCaseThreads(scope, executor, dispatcher)
         requestProcessorAdapter =
-            RequestProcessorAdapter(
-                    useCaseGraphConfig,
-                    sessionProcessorSurfaces,
-                    scope,
-                )
+            RequestProcessorAdapter(useCaseGraphConfig, sessionProcessorSurfaces, useCaseThreads)
                 .apply { sessionConfig = fakeSessionConfig }
         scope.advanceUntilIdle()
     }
@@ -180,9 +185,11 @@ class RequestProcessorAdapterTest {
             .isEqualTo(checkNotNull(cameraGraphSimulator!!.streams[previewStreamConfig]).id)
 
         verify(callback, times(1)).onCaptureStarted(eq(requestToSet), any(), any())
+        verify(cameraCaptureCallback, times(1)).onCaptureStarted(any())
 
         frame.simulateComplete(emptyMap())
         verify(callback, times(1)).onCaptureCompleted(eq(requestToSet), any())
+        verify(cameraCaptureCallback, times(1)).onCaptureCompleted(any(), any())
         advanceUntilIdle()
     }
 
