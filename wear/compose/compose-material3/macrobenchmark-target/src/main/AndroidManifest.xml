@@ -130,8 +130,7 @@
         <activity
             android:name=".DatePickerActivity"
             android:theme="@style/AppTheme"
-            android:exported="true"
-            tools:targetApi="o">
+            android:exported="true">
             <intent-filter>
                 <action android:name=
                     "androidx.wear.compose.material3.macrobenchmark.target.DATE_PICKER_ACTIVITY" />
@@ -270,8 +269,7 @@
         <activity
             android:name=".TimePickerActivity"
             android:theme="@style/AppTheme"
-            android:exported="true"
-            tools:targetApi="o">
+            android:exported="true">
             <intent-filter>
                 <action android:name=
                     "androidx.wear.compose.material3.macrobenchmark.target.TIME_PICKER_ACTIVITY" />

@@ -17,8 +17,6 @@
 package androidx.wear.compose.material3
 
 import android.content.res.Configuration
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -244,7 +242,6 @@ internal fun ComposeContentTestRule.verifyActualSize(
     onNodeWithTag(TEST_TAG).assertHeightIsEqualTo(expectedSize).assertWidthIsEqualTo(expectedSize)
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 internal fun ComposeContentTestRule.verifyColors(
     status: Status,
     expectedContainerColor: @Composable () -> Color,
@@ -379,7 +376,6 @@ internal fun Dp.assertIsEqualTo(expected: Dp, subject: String, tolerance: Dp = D
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 internal fun ComposeContentTestRule.verifyScreenshot(
     methodName: String,
     screenshotRule: AndroidXScreenshotTestRule,
@@ -400,7 +396,6 @@ internal fun ComposeContentTestRule.verifyScreenshot(
     onNodeWithTag(testTag).captureToImage().assertAgainstGolden(screenshotRule, methodName)
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 fun ComposeContentTestRule.verifyRoundedButtonTapAnimationEnd(
     baseShape: RoundedCornerShape,
     pressedShape: RoundedCornerShape,
