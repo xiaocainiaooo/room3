@@ -2162,7 +2162,15 @@ public final class ProtoLayoutInflater {
         return view;
     }
 
+
     private static int textAlignToAndroidGravity(TextAlignment alignment) {
+        // Vertical center alignment is usually a default and text will be centered vertically.
+        // However, we need it explicitly for cases when max lines are adjusted and shrank, so there
+        // could be a bit of extra space and text would be anchored to the top.
+        return textAlignToAndroidGravityHorizontal(alignment) | Gravity.CENTER_VERTICAL;
+    }
+
+    private static int textAlignToAndroidGravityHorizontal(TextAlignment alignment) {
         switch (alignment) {
             case TEXT_ALIGN_START:
                 return Gravity.START;
@@ -2861,7 +2869,7 @@ public final class ProtoLayoutInflater {
                 && !text.getText().hasDynamicValue()
                 // There's no need for any optimizations if max lines is already 1.
                 && textView.getMaxLines() != 1) {
-            OneOffPreDrawListener.add(textView, () -> adjustMaxLinesForEllipsize(textView));
+            OneOffLayoutChangeListener.add(textView, () -> adjustMaxLinesForEllipsize(textView));
         }
 
         // Text auto size is not supported for dynamic text.
@@ -2960,14 +2968,14 @@ public final class ProtoLayoutInflater {
      * different than what TEXT_OVERFLOW_ELLIPSIZE_END does, as that option just ellipsizes the last
      * line of text.
      */
-    private static boolean adjustMaxLinesForEllipsize(@NonNull TextView textView) {
+    private static void adjustMaxLinesForEllipsize(@NonNull TextView textView) {
         ViewParent maybeParent = textView.getParent();
         if (!(maybeParent instanceof View)) {
             Log.d(
                     TAG,
                     "Couldn't adjust max lines for ellipsizing as there's no View/ViewGroup"
                             + " parent.");
-            return true;
+            return;
         }
 
         View parent = (View) maybeParent;
@@ -2978,14 +2986,16 @@ public final class ProtoLayoutInflater {
         // Avoid having maxLines as 0 in case the space is really tight.
         int availableLines = max(availableHeight / oneLineHeight, 1);
 
-        // Update only if changed.
-        if (availableLines < maxMaxLines) {
-            textView.setMaxLines(availableLines);
-            // Cancel the current drawing pass.
-            return false;
+        // Update only if maxLines are changed.
+        if (availableLines >= maxMaxLines) {
+            return;
         }
 
-        return true;
+        textView.setMaxLines(availableLines);
+        // We need to trigger TextView to re-measure its content in order to place the ellipsis
+        // correctly at the and of {@code availableLines}th line. Using only {@code requestLayout}
+        // or {@code invalidate} isn't enough as TextView wouldn't remeasure itself.
+        textView.setText(textView.getText());
     }
 
     /**
@@ -4923,8 +4933,6 @@ public final class ProtoLayoutInflater {
         return "";
     }
 
-    // getObsoleteContentDescription is used for backward compatibility
-    @SuppressWarnings("deprecation")
     private void applySemantics(
             View view,
             Semantics semantics,
