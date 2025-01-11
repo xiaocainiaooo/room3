@@ -32,9 +32,11 @@ import androidx.camera.camera2.pipe.testing.FakeThreads
 import androidx.camera.camera2.pipe.testing.RobolectricCameraPipeTestRunner
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertIsNot
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -464,8 +466,8 @@ internal class PruningCamera2DeviceManagerImplTest {
                     RequestCloseById(cameraId0),
                     createFakeRequestOpen(cameraId1, emptyList(), fakeGraphListener2),
                     createFakeRequestClose(cameraId1),
-                    RequestCloseAll,
-                    RequestCloseAll,
+                    RequestCloseAll(),
+                    RequestCloseAll(),
                     createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener1),
                 )
             deviceManager.prune(requestList)
@@ -545,6 +547,56 @@ internal class PruningCamera2DeviceManagerImplTest {
             assertEquals((requestList[0] as RequestCloseById).activeCameraId, cameraId0)
             assertIs<RequestCloseById>(requestList[1])
             assertEquals((requestList[1] as RequestCloseById).activeCameraId, cameraId1)
+        }
+
+    @Test
+    fun deferredStillCompletesForPrunedRequests() =
+        testScope.runTest {
+            val requestCloseById1 = RequestCloseById(cameraId0)
+            val requestCloseById2 = RequestCloseById(cameraId1)
+            val requestCloseById3 = RequestCloseById(cameraId1)
+            val requestCloseById4 = RequestCloseById(cameraId1)
+            val requestCloseAll1 = RequestCloseAll()
+            val requestCloseAll2 = RequestCloseAll()
+            val requestCloseAll3 = RequestCloseAll()
+            val requestList =
+                mutableListOf<CameraRequest>(
+                    createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener1),
+                    requestCloseById1,
+                    requestCloseAll1,
+                    requestCloseAll2,
+                    requestCloseAll3,
+                    createFakeRequestOpen(cameraId1, emptyList(), fakeGraphListener1),
+                    requestCloseById2,
+                    requestCloseById3,
+                    requestCloseById4,
+                )
+            deviceManager.prune(requestList)
+            assertEquals(requestList, listOf(requestCloseAll3, requestCloseById4))
+
+            advanceUntilIdle()
+            assertFalse(requestCloseById1.deferred.isCompleted)
+            assertFalse(requestCloseById2.deferred.isCompleted)
+            assertFalse(requestCloseById3.deferred.isCompleted)
+            assertFalse(requestCloseById4.deferred.isCompleted)
+            assertFalse(requestCloseAll1.deferred.isCompleted)
+            assertFalse(requestCloseAll2.deferred.isCompleted)
+            assertFalse(requestCloseAll3.deferred.isCompleted)
+
+            // Simulate completion of requestCloseAll3, which should also complete all requests it
+            // has pruned previously.
+            requestCloseAll3.deferred.complete(Unit)
+            advanceUntilIdle()
+            assertTrue(requestCloseById1.deferred.isCompleted)
+            assertTrue(requestCloseAll1.deferred.isCompleted)
+            assertTrue(requestCloseAll2.deferred.isCompleted)
+
+            // Simulate completion of requestCloseById4, which should also complete all requests it
+            // has pruned previously.
+            requestCloseById4.deferred.complete(Unit)
+            advanceUntilIdle()
+            assertTrue(requestCloseById2.deferred.isCompleted)
+            assertTrue(requestCloseById3.deferred.isCompleted)
         }
 
     private fun createFakeRequestOpen(
