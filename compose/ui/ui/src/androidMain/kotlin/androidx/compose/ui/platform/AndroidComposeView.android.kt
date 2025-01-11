@@ -1047,7 +1047,7 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
                 focusedRect = previouslyFocusedRect?.toComposeRect()
             ) {
                 it.requestFocus(focusDirection)
-            } ?: false
+            } == true
         }
         // This view is already focused.
         if (isFocused) return true
@@ -1083,6 +1083,19 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         }
         if (foundFocusable) {
             return false // The requestFocus() from within the focusSearch was canceled
+        }
+
+        if (previouslyFocusedRect != null && !hasFocus()) {
+            // try searching, ignoring the previously focused rect. We've had a request to focus on
+            // this specific View
+            val altFocus =
+                focusOwner.focusSearch(focusDirection = focusDirection, focusedRect = null) {
+                    it.requestFocus(focusDirection)
+                }
+            if (altFocus == true) {
+                // found alternative focus
+                return true
+            }
         }
 
         // We advertised ourselves as focusable, but we aren't. Try to just move the focus to the
