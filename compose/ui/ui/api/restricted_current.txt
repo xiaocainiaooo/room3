@@ -220,9 +220,9 @@ package androidx.compose.ui {
 
 package androidx.compose.ui.autofill {
 
-  public interface Autofill {
-    method public void cancelAutofillForNode(androidx.compose.ui.autofill.AutofillNode autofillNode);
-    method public void requestAutofillForNode(androidx.compose.ui.autofill.AutofillNode autofillNode);
+  @Deprecated public interface Autofill {
+    method @Deprecated public void cancelAutofillForNode(androidx.compose.ui.autofill.AutofillNode autofillNode);
+    method @Deprecated public void requestAutofillForNode(androidx.compose.ui.autofill.AutofillNode autofillNode);
   }
 
   public abstract class AutofillManager {
@@ -230,64 +230,64 @@ package androidx.compose.ui.autofill {
     method public abstract void commit();
   }
 
-  public final class AutofillNode {
-    ctor public AutofillNode(optional java.util.List<? extends androidx.compose.ui.autofill.AutofillType> autofillTypes, optional androidx.compose.ui.geometry.Rect? boundingBox, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>? onFill);
-    method public java.util.List<androidx.compose.ui.autofill.AutofillType> getAutofillTypes();
-    method public androidx.compose.ui.geometry.Rect? getBoundingBox();
-    method public int getId();
-    method public kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit>? getOnFill();
-    method public void setBoundingBox(androidx.compose.ui.geometry.Rect?);
-    property public final java.util.List<androidx.compose.ui.autofill.AutofillType> autofillTypes;
-    property public final androidx.compose.ui.geometry.Rect? boundingBox;
-    property public final int id;
-    property public final kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit>? onFill;
+  @Deprecated public final class AutofillNode {
+    ctor @Deprecated public AutofillNode(optional java.util.List<? extends androidx.compose.ui.autofill.AutofillType> autofillTypes, optional androidx.compose.ui.geometry.Rect? boundingBox, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit>? onFill);
+    method @Deprecated public java.util.List<androidx.compose.ui.autofill.AutofillType> getAutofillTypes();
+    method @Deprecated public androidx.compose.ui.geometry.Rect? getBoundingBox();
+    method @Deprecated public int getId();
+    method @Deprecated public kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit>? getOnFill();
+    method @Deprecated public void setBoundingBox(androidx.compose.ui.geometry.Rect?);
+    property @Deprecated public final java.util.List<androidx.compose.ui.autofill.AutofillType> autofillTypes;
+    property @Deprecated public final androidx.compose.ui.geometry.Rect? boundingBox;
+    property @Deprecated public final int id;
+    property @Deprecated public final kotlin.jvm.functions.Function1<java.lang.String,kotlin.Unit>? onFill;
   }
 
-  public final class AutofillTree {
-    ctor public AutofillTree();
-    method public java.util.Map<java.lang.Integer,androidx.compose.ui.autofill.AutofillNode> getChildren();
-    method public kotlin.Unit? performAutofill(int id, String value);
-    method public operator void plusAssign(androidx.compose.ui.autofill.AutofillNode autofillNode);
-    property public final java.util.Map<java.lang.Integer,androidx.compose.ui.autofill.AutofillNode> children;
+  @Deprecated public final class AutofillTree {
+    ctor @Deprecated public AutofillTree();
+    method @Deprecated public java.util.Map<java.lang.Integer,androidx.compose.ui.autofill.AutofillNode> getChildren();
+    method @Deprecated public kotlin.Unit? performAutofill(int id, String value);
+    method @Deprecated public operator void plusAssign(androidx.compose.ui.autofill.AutofillNode autofillNode);
+    property @Deprecated public final java.util.Map<java.lang.Integer,androidx.compose.ui.autofill.AutofillNode> children;
   }
 
-  public enum AutofillType {
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressAuxiliaryDetails;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressCountry;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressLocality;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressRegion;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType AddressStreet;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType BirthDateDay;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType BirthDateFull;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType BirthDateMonth;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType BirthDateYear;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType CreditCardExpirationDate;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType CreditCardExpirationDay;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType CreditCardExpirationMonth;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType CreditCardExpirationYear;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType CreditCardNumber;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType CreditCardSecurityCode;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType EmailAddress;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType Gender;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType NewPassword;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType NewUsername;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType Password;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonFirstName;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonFullName;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonLastName;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonMiddleInitial;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonMiddleName;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonNamePrefix;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PersonNameSuffix;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PhoneCountryCode;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PhoneNumber;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PhoneNumberDevice;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PhoneNumberNational;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PostalAddress;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PostalCode;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType PostalCodeExtended;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType SmsOtpCode;
-    enum_constant public static final androidx.compose.ui.autofill.AutofillType Username;
+  @Deprecated public enum AutofillType {
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType AddressAuxiliaryDetails;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType AddressCountry;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType AddressLocality;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType AddressRegion;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType AddressStreet;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType BirthDateDay;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType BirthDateFull;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType BirthDateMonth;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType BirthDateYear;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType CreditCardExpirationDate;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType CreditCardExpirationDay;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType CreditCardExpirationMonth;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType CreditCardExpirationYear;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType CreditCardNumber;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType CreditCardSecurityCode;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType EmailAddress;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType Gender;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType NewPassword;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType NewUsername;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType Password;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PersonFirstName;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PersonFullName;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PersonLastName;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PersonMiddleInitial;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PersonMiddleName;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PersonNamePrefix;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PersonNameSuffix;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PhoneCountryCode;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PhoneNumber;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PhoneNumberDevice;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PhoneNumberNational;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PostalAddress;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PostalCode;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType PostalCodeExtended;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType SmsOtpCode;
+    enum_constant @Deprecated public static final androidx.compose.ui.autofill.AutofillType Username;
   }
 
   @kotlin.jvm.JvmInline public final value class ContentDataType {
@@ -3256,9 +3256,9 @@ package androidx.compose.ui.platform {
 
   public final class CompositionLocalsKt {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.AccessibilityManager?> getLocalAccessibilityManager();
-    method @SuppressCompatibility @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill?> getLocalAutofill();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill?> getLocalAutofill();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillManager?> getLocalAutofillManager();
-    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree> getLocalAutofillTree();
+    method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree> getLocalAutofillTree();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.Clipboard> getLocalClipboard();
     method @Deprecated public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager> getLocalClipboardManager();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> getLocalCursorBlinkEnabled();
@@ -3277,9 +3277,9 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ViewConfiguration> getLocalViewConfiguration();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.WindowInfo> getLocalWindowInfo();
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.AccessibilityManager?> LocalAccessibilityManager;
-    property @SuppressCompatibility @androidx.compose.ui.ExperimentalComposeUiApi public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill?> LocalAutofill;
+    property @Deprecated public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.Autofill?> LocalAutofill;
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillManager?> LocalAutofillManager;
-    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree> LocalAutofillTree;
+    property @Deprecated public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.autofill.AutofillTree> LocalAutofillTree;
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.Clipboard> LocalClipboard;
     property @Deprecated public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager> LocalClipboardManager;
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> LocalCursorBlinkEnabled;
