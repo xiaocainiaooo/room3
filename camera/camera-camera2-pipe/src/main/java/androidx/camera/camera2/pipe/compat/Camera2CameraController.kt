@@ -299,8 +299,8 @@ constructor(
                 graphConfig.flags.closeCameraDeviceOnClose ||
                     camera2Quirks.shouldCloseCameraBeforeCreatingCaptureSession(cameraId)
             ) {
-                Log.debug { "Quirk: Closing all camera devices" }
-                camera2DeviceManager.closeAll()
+                Log.debug { "Quirk: Closing $cameraId on camera controller close" }
+                camera2DeviceManager.close(cameraId)
             }
         }
 
