@@ -40,6 +40,8 @@ import androidx.compose.material3.samples.ButtonGroupSample
 import androidx.compose.material3.samples.ButtonSample
 import androidx.compose.material3.samples.ButtonWithIconSample
 import androidx.compose.material3.samples.CardSample
+import androidx.compose.material3.samples.CenteredHorizontalFloatingToolbarWithFabSample
+import androidx.compose.material3.samples.CenteredVerticalFloatingToolbarWithFabSample
 import androidx.compose.material3.samples.CheckboxSample
 import androidx.compose.material3.samples.CheckboxWithTextSample
 import androidx.compose.material3.samples.ChipGroupReflowSample
@@ -880,11 +882,11 @@ val FloatingToolbarsExamples =
             HorizontalFloatingToolbarWithFabSample()
         },
         Example(
-            name = "VerticalFloatingToolbarWithFabSample",
+            name = "CenteredHorizontalFloatingToolbarWithFabSample",
             description = FloatingToolbarsExampleDescription,
             sourceUrl = FloatingToolbarsExampleSourceUrl,
         ) {
-            VerticalFloatingToolbarWithFabSample()
+            CenteredHorizontalFloatingToolbarWithFabSample()
         },
         Example(
             name = "HorizontalFloatingToolbarAsScaffoldFabSample",
@@ -892,6 +894,20 @@ val FloatingToolbarsExamples =
             sourceUrl = FloatingToolbarsExampleSourceUrl,
         ) {
             HorizontalFloatingToolbarAsScaffoldFabSample()
+        },
+        Example(
+            name = "VerticalFloatingToolbarWithFabSample",
+            description = FloatingToolbarsExampleDescription,
+            sourceUrl = FloatingToolbarsExampleSourceUrl,
+        ) {
+            VerticalFloatingToolbarWithFabSample()
+        },
+        Example(
+            name = "CenteredVerticalFloatingToolbarWithFabSample",
+            description = FloatingToolbarsExampleDescription,
+            sourceUrl = FloatingToolbarsExampleSourceUrl,
+        ) {
+            CenteredVerticalFloatingToolbarWithFabSample()
         },
     )
 
