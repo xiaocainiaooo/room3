@@ -169,7 +169,7 @@ private fun MaterialScope.singleSegmentImpl(
                     anchorAngle = degrees(-startAngleDegrees),
                     anchorType = LayoutElementBuilders.ARC_ANCHOR_END,
                     arcLength = progressInDegrees,
-                    arcColor = colors.indicator.prop,
+                    arcColor = colors.indicatorColor.prop,
                     strokeWidth = strokeWidth,
                     linePattern = linePattern,
                     arcDirection = LayoutElementBuilders.ARC_DIRECTION_COUNTER_CLOCKWISE
@@ -247,14 +247,14 @@ public object CircularProgressIndicatorDefaults {
 /**
  * Represents the indicator and track colors used in progress indicator.
  *
- * @param indicator Color used to draw the indicator of progress indicator.
- * @param track Color used to draw the track of progress indicator.
- * @param trackOverflow Color used to draw the track for progress overflow (>1).
+ * @param indicatorColor Color used to draw the indicator of progress indicator.
+ * @param trackColor Color used to draw the track of progress indicator.
+ * @param trackOverflowColor Color used to draw the track for progress overflow (>1).
  */
 public class ProgressIndicatorColors(
-    public val indicator: LayoutColor,
-    public val track: LayoutColor,
-    public val trackOverflow: LayoutColor = track
+    public val indicatorColor: LayoutColor,
+    public val trackColor: LayoutColor,
+    public val trackOverflowColor: LayoutColor = trackColor
 )
 
 /**
@@ -305,14 +305,15 @@ private fun trackColor(
     colors: ProgressIndicatorColors
 ): ColorProp =
     ColorProp.Builder(
-            if (staticProgress > 1) colors.trackOverflow.prop.argb else colors.track.prop.argb
+            if (staticProgress > 1) colors.trackOverflowColor.prop.argb
+            else colors.trackColor.prop.argb
         )
         .apply {
             dynamicProgress?.let {
                 setDynamicValue(
                     DynamicColor.onCondition(it.gt(1F))
-                        .use(colors.trackOverflow.prop.argb)
-                        .elseUse(colors.track.prop.argb)
+                        .use(colors.trackOverflowColor.prop.argb)
+                        .elseUse(colors.trackColor.prop.argb)
                 )
             }
         }

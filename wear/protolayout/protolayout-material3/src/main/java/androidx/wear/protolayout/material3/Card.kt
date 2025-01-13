@@ -54,12 +54,13 @@ import androidx.wear.protolayout.modifiers.padding
  * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
  *   associated action.
  * @param title A slot for displaying the title of the card, expected to be one or two lines of
- *   text. Uses [CardColors.title] color by default.
+ *   text. Uses [CardColors.titleColor] color by default.
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
  *   description using [contentDescription].
- * @param content The optional body content of the card. Uses [CardColors.content] color by default.
+ * @param content The optional body content of the card. Uses [CardColors.contentColor] color by
+ *   default.
  * @param time An optional slot for displaying the time relevant to the contents of the card,
- *   expected to be a short piece of text. Uses [CardColors.time] color by default.
+ *   expected to be a short piece of text. Uses [CardColors.timeColor] color by default.
  * @param height The height of this card. It's highly recommended to set this to [expand] or
  *   [weight]
  * @param shape Defines the card's shape, in other words the corner radius for this card.
@@ -105,7 +106,7 @@ public fun MaterialScope.titleCard(
 ): LayoutElement =
     card(
         onClick = onClick,
-        modifier = modifier.background(colors.background).clip(shape),
+        modifier = modifier.background(colors.backgroundColor).clip(shape),
         width = expand(),
         height = height,
         backgroundContent = backgroundContent,
@@ -117,7 +118,7 @@ public fun MaterialScope.titleCard(
                         defaultTextElementStyle =
                             TextElementStyle(
                                 typography = style.titleTypography,
-                                color = colors.title,
+                                color = colors.titleColor,
                                 maxLines = 2,
                                 multilineAlignment =
                                     horizontalAlignment.horizontalAlignToTextAlign()
@@ -130,7 +131,7 @@ public fun MaterialScope.titleCard(
                             defaultTextElementStyle =
                                 TextElementStyle(
                                     typography = style.contentTypography,
-                                    color = colors.content,
+                                    color = colors.contentColor,
                                     multilineAlignment =
                                         horizontalAlignment.horizontalAlignToTextAlign()
                                 )
@@ -143,7 +144,7 @@ public fun MaterialScope.titleCard(
                             defaultTextElementStyle =
                                 TextElementStyle(
                                     typography = style.timeTypography,
-                                    color = colors.time,
+                                    color = colors.timeColor,
                                     multilineAlignment =
                                         horizontalAlignment.horizontalAlignToTextAlign()
                                 )
@@ -172,15 +173,16 @@ public fun MaterialScope.titleCard(
  * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
  *   associated action.
  * @param title A slot for displaying the title of the card, expected to be one line of text. Uses
- *   [CardColors.title] color by default.
+ *   [CardColors.titleColor] color by default.
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
  *   description using [contentDescription].
- * @param content The optional body content of the card. Uses [CardColors.content] color by default.
+ * @param content The optional body content of the card. Uses [CardColors.contentColor] color by
+ *   default.
  * @param avatar An optional slot in header for displaying small image, such as [avatarImage].
- * @param label An optional slot in header for displaying short, label text. Uses [CardColors.label]
- *   color by default.
+ * @param label An optional slot in header for displaying short, label text. Uses
+ *   [CardColors.labelColor] color by default.
  * @param time An optional slot for displaying the time relevant to the contents of the card,
- *   expected to be a short piece of text. Uses [CardColors.time] color by default.
+ *   expected to be a short piece of text. Uses [CardColors.timeColor] color by default.
  * @param height The height of this card. It's highly recommended to leave this with default value
  *   as `wrap` if there's only 1 card on the screen. If there are two cards, it is highly
  *   recommended to set this to [expand] and use the smaller styles.
@@ -224,7 +226,7 @@ public fun MaterialScope.appCard(
 ): LayoutElement =
     card(
         onClick = onClick,
-        modifier = modifier.background(colors.background).clip(shape),
+        modifier = modifier.background(colors.backgroundColor).clip(shape),
         width = expand(),
         height = height,
         backgroundContent = backgroundContent,
@@ -236,7 +238,7 @@ public fun MaterialScope.appCard(
                         defaultTextElementStyle =
                             TextElementStyle(
                                 typography = style.titleTypography,
-                                color = colors.title,
+                                color = colors.titleColor,
                                 multilineAlignment = TEXT_ALIGN_START
                             )
                     )
@@ -247,7 +249,7 @@ public fun MaterialScope.appCard(
                             defaultTextElementStyle =
                                 TextElementStyle(
                                     typography = style.contentTypography,
-                                    color = colors.content,
+                                    color = colors.contentColor,
                                     multilineAlignment = TEXT_ALIGN_START
                                 )
                         )
@@ -259,7 +261,7 @@ public fun MaterialScope.appCard(
                             defaultTextElementStyle =
                                 TextElementStyle(
                                     typography = style.timeTypography,
-                                    color = colors.time,
+                                    color = colors.timeColor,
                                 )
                         )
                         .it()
@@ -270,7 +272,7 @@ public fun MaterialScope.appCard(
                             defaultTextElementStyle =
                                 TextElementStyle(
                                     typography = style.labelTypography,
-                                    color = colors.label,
+                                    color = colors.labelColor,
                                     multilineAlignment = TEXT_ALIGN_START
                                 )
                         )
@@ -302,10 +304,11 @@ public fun MaterialScope.appCard(
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
  *   description using [contentDescription].
  * @param title A slot for displaying the title of the card, expected to be one line of text. Uses
- *   [CardColors.title] color by default.
- * @param content The optional body content of the card. Uses [CardColors.content] color by default.
+ *   [CardColors.titleColor] color by default.
+ * @param content The optional body content of the card. Uses [CardColors.contentColor] color by
+ *   default.
  * @param secondaryText An optional slot for displaying short, secondary text. Uses
- *   [CardColors.secondaryText] color by default.
+ *   [CardColors.secondaryTextColor] color by default.
  * @param width The width of this card. It's highly recommended to set this to [expand] or [weight]
  *   for the most optimal experience across different screen sizes.
  * @param height The height of this card. It's highly recommended to set this to [expand] for the
@@ -354,7 +357,7 @@ public fun MaterialScope.textDataCard(
 ): LayoutElement =
     card(
         onClick = onClick,
-        modifier = modifier.background(colors.background).clip(shape),
+        modifier = modifier.background(colors.backgroundColor).clip(shape),
         width = width,
         height = height,
         backgroundContent = backgroundContent,
@@ -366,7 +369,7 @@ public fun MaterialScope.textDataCard(
                         defaultTextElementStyle =
                             TextElementStyle(
                                 typography = style.titleTypography,
-                                color = colors.title
+                                color = colors.titleColor
                             )
                     )
                     .title(),
@@ -376,7 +379,7 @@ public fun MaterialScope.textDataCard(
                             defaultTextElementStyle =
                                 TextElementStyle(
                                     typography = style.contentTypography,
-                                    color = colors.content
+                                    color = colors.contentColor
                                 )
                         )
                         .it()
@@ -387,7 +390,7 @@ public fun MaterialScope.textDataCard(
                             defaultTextElementStyle =
                                 TextElementStyle(
                                     typography = style.secondaryLabelTypography,
-                                    color = colors.secondaryText
+                                    color = colors.secondaryTextColor
                                 )
                         )
                         .it()
@@ -414,10 +417,11 @@ public fun MaterialScope.textDataCard(
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
  *   description using [contentDescription].
  * @param title A slot for displaying the title of the card, expected to be one line of text. Uses
- *   [CardColors.title] color by default.
- * @param content The optional body content of the card. Uses [CardColors.content] color by default.
+ *   [CardColors.titleColor] color by default.
+ * @param content The optional body content of the card. Uses [CardColors.contentColor] color by
+ *   default.
  * @param secondaryIcon An optional slot for displaying small icon, such as [secondaryIcon]. Uses
- *   [CardColors.secondaryIcon] tint color by default.
+ *   [CardColors.secondaryIconColor] tint color by default.
  * @param width The width of this card. It's highly recommended to set this to [expand] or [weight]
  *   for the most optimal experience across different screen sizes.
  * @param height The height of this card. It's highly recommended to set this to [expand] for the
@@ -469,7 +473,7 @@ public fun MaterialScope.iconDataCard(
 ): LayoutElement =
     card(
         onClick = onClick,
-        modifier = modifier.background(colors.background).clip(shape),
+        modifier = modifier.background(colors.backgroundColor).clip(shape),
         width = width,
         height = height,
         backgroundContent = backgroundContent,
@@ -481,7 +485,7 @@ public fun MaterialScope.iconDataCard(
                         defaultTextElementStyle =
                             TextElementStyle(
                                 typography = style.titleTypography,
-                                color = colors.title
+                                color = colors.titleColor
                             )
                     )
                     .title(),
@@ -491,7 +495,7 @@ public fun MaterialScope.iconDataCard(
                             defaultTextElementStyle =
                                 TextElementStyle(
                                     typography = style.contentTypography,
-                                    color = colors.content
+                                    color = colors.contentColor
                                 )
                         )
                         .it()
@@ -502,7 +506,7 @@ public fun MaterialScope.iconDataCard(
                             defaultIconStyle =
                                 IconStyle(
                                     size = style.iconSize.toDp(),
-                                    tintColor = colors.secondaryIcon
+                                    tintColor = colors.secondaryIconColor
                                 )
                         )
                         .it()
@@ -520,10 +524,11 @@ public fun MaterialScope.iconDataCard(
  * @param onClick Associated [Clickable] for click events. When the card is clicked it will fire the
  *   associated action.
  * @param title A slot for displaying the title of the card, expected to be one line of text. Uses
- *   [CardColors.title] color by default.
+ *   [CardColors.titleColor] color by default.
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
  *   description using [contentDescription].
- * @param content The optional body content of the card. Uses [CardColors.content] color by default.
+ * @param content The optional body content of the card. Uses [CardColors.contentColor] color by
+ *   default.
  * @param graphic A slot for displaying graphic data, such as progress indicator.
  * @param height The width of this card. It's highly recommended to set this to [expand] for the
  *   most optimal experience across different screen sizes.
@@ -564,7 +569,7 @@ public fun MaterialScope.graphicDataCard(
 ): LayoutElement =
     card(
         onClick = onClick,
-        modifier = modifier.background(colors.background).clip(shape),
+        modifier = modifier.background(colors.backgroundColor).clip(shape),
         width = expand(),
         height = height,
         contentPadding = contentPadding
@@ -575,7 +580,7 @@ public fun MaterialScope.graphicDataCard(
                         defaultTextElementStyle =
                             TextElementStyle(
                                 typography = style.titleTypography,
-                                color = colors.title
+                                color = colors.titleColor
                             )
                     )
                     .title(),
@@ -585,7 +590,7 @@ public fun MaterialScope.graphicDataCard(
                             defaultTextElementStyle =
                                 TextElementStyle(
                                     typography = style.contentTypography,
-                                    color = colors.content
+                                    color = colors.contentColor
                                 )
                         )
                         .it()

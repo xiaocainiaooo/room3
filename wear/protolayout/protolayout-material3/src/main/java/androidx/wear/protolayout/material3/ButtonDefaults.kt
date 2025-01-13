@@ -41,13 +41,13 @@ import androidx.wear.protolayout.types.argb
  */
 public class ButtonColors(
     /** The container color to be used for a button. */
-    public val container: LayoutColor = Color.BLACK.argb,
+    public val containerColor: LayoutColor = Color.BLACK.argb,
     /** The icon tint color to be used for a button. */
-    public val icon: LayoutColor = Color.BLACK.argb,
+    public val iconColor: LayoutColor = Color.BLACK.argb,
     /** The label color to be used for a button. */
-    public val label: LayoutColor = Color.BLACK.argb,
+    public val labelColor: LayoutColor = Color.BLACK.argb,
     /** The secondary label color to be used for a button. */
-    public val secondaryLabel: LayoutColor = Color.BLACK.argb,
+    public val secondaryLabelColor: LayoutColor = Color.BLACK.argb,
 )
 
 public object ButtonDefaults {
@@ -122,10 +122,10 @@ public object ButtonDefaults {
      */
     public fun MaterialScope.filledButtonColors(): ButtonColors =
         ButtonColors(
-            container = theme.colorScheme.primary,
-            icon = theme.colorScheme.onPrimary,
-            label = theme.colorScheme.onPrimary,
-            secondaryLabel = theme.colorScheme.onPrimary.withOpacity(0.8f)
+            containerColor = theme.colorScheme.primary,
+            iconColor = theme.colorScheme.onPrimary,
+            labelColor = theme.colorScheme.onPrimary,
+            secondaryLabelColor = theme.colorScheme.onPrimary.withOpacity(0.8f)
         )
 
     /**
@@ -136,10 +136,10 @@ public object ButtonDefaults {
      */
     public fun MaterialScope.filledTonalButtonColors(): ButtonColors =
         ButtonColors(
-            container = theme.colorScheme.surfaceContainer,
-            icon = theme.colorScheme.primary,
-            label = theme.colorScheme.onSurface,
-            secondaryLabel = theme.colorScheme.onSurfaceVariant
+            containerColor = theme.colorScheme.surfaceContainer,
+            iconColor = theme.colorScheme.primary,
+            labelColor = theme.colorScheme.onSurface,
+            secondaryLabelColor = theme.colorScheme.onSurfaceVariant
         )
 
     /**
@@ -150,10 +150,10 @@ public object ButtonDefaults {
      */
     public fun MaterialScope.filledVariantButtonColors(): ButtonColors =
         ButtonColors(
-            container = theme.colorScheme.primaryContainer,
-            icon = theme.colorScheme.onPrimaryContainer,
-            label = theme.colorScheme.onPrimaryContainer,
-            secondaryLabel = theme.colorScheme.onPrimaryContainer.withOpacity(0.9f)
+            containerColor = theme.colorScheme.primaryContainer,
+            iconColor = theme.colorScheme.onPrimaryContainer,
+            labelColor = theme.colorScheme.onPrimaryContainer,
+            secondaryLabelColor = theme.colorScheme.onPrimaryContainer.withOpacity(0.9f)
         )
 
     internal const val METADATA_TAG_BUTTON: String = "BTN"

@@ -194,10 +194,10 @@ private fun MaterialScope.appCardSample() =
         modifier = LayoutModifier.contentDescription("Sample Card"),
         colors =
             CardColors(
-                background = colorScheme.tertiary,
-                title = colorScheme.onTertiary,
-                content = colorScheme.onTertiary,
-                time = colorScheme.onTertiary
+                backgroundColor = colorScheme.tertiary,
+                titleColor = colorScheme.onTertiary,
+                contentColor = colorScheme.onTertiary,
+                timeColor = colorScheme.onTertiary
             ),
         title = {
             text(
