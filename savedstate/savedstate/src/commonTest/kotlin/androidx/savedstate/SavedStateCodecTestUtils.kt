@@ -23,16 +23,30 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
 
 internal object SavedStateCodecTestUtils {
+    /* Test the following steps: 1. encode `T` to a `SavedState`, 2. parcelize it to a `Parcel`,
+     * 3. un-parcelize it back to a `SavedState`, and 4. decode it back to a `T`. Step 2 and 3
+     * are only performed on Android. Here's the whole process:
+     *
+     * (A)Serializable -1-> (B)SavedState -2-> (C)Parcel -3-> (D)SavedState -4-> (E)Serializable
+     *
+     * `checkEncoded` can be used to check the content of "B", and `checkDecoded` can be
+     *  used to compare the instances of "E" and "A".
+     */
     inline fun <reified T : Any> T.encodeDecode(
         serializer: KSerializer<T> = serializer<T>(),
-        checkContent: SavedStateReader.() -> Unit = { assertThat(size()).isEqualTo(0) }
+        checkDecoded: (T, T) -> Unit = { decoded, original ->
+            assertThat(decoded).isEqualTo(original)
+        },
+        checkEncoded: SavedStateReader.() -> Unit = { assertThat(size()).isEqualTo(0) }
     ) {
-        assertThat(
-                decodeFromSavedState(
-                    serializer,
-                    encodeToSavedState(serializer, this).apply { read { checkContent() } }
-                )
-            )
-            .isEqualTo(this)
+        val encoded = encodeToSavedState(serializer, this)
+        encoded.read { checkEncoded() }
+
+        val restored = platformEncodeDecode(encoded)
+
+        val decoded = decodeFromSavedState(serializer, restored)
+        checkDecoded(decoded, this)
     }
 }
+
+expect fun platformEncodeDecode(savedState: SavedState): SavedState

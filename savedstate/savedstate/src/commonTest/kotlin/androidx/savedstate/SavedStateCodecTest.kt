@@ -464,19 +464,24 @@ internal class SavedStateCodecTest : RobolectricTest() {
                     putSavedState("ss", savedState { putString("s", "bar") })
                 }
             )
-            .encodeDecode {
-                assertThat(size()).isEqualTo(1)
-                getSavedState("s").read {
-                    assertThat(size()).isEqualTo(4)
-                    assertThat(getInt("i")).isEqualTo(1)
-                    assertThat(getString("s")).isEqualTo("foo")
-                    assertThat(getIntArray("a")).isEqualTo(intArrayOf(1, 3, 5))
-                    getSavedState("ss").read {
-                        assertThat(size()).isEqualTo(1)
-                        assertThat(getString("s")).isEqualTo("bar")
+            .encodeDecode(
+                checkDecoded = { decoded, original ->
+                    assertThat(decoded.s.read { contentDeepEquals(original.s) })
+                },
+                checkEncoded = {
+                    assertThat(size()).isEqualTo(1)
+                    getSavedState("s").read {
+                        assertThat(size()).isEqualTo(4)
+                        assertThat(getInt("i")).isEqualTo(1)
+                        assertThat(getString("s")).isEqualTo("foo")
+                        assertThat(getIntArray("a")).isEqualTo(intArrayOf(1, 3, 5))
+                        getSavedState("ss").read {
+                            assertThat(size()).isEqualTo(1)
+                            assertThat(getString("s")).isEqualTo("bar")
+                        }
                     }
                 }
-            }
+            )
 
         val origin = savedState {
             putInt("i", 1)
