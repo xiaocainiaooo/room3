@@ -257,7 +257,7 @@ public final class SchemaToPlatformConverter {
 
     // Most stringProperty.get calls cause WrongConstant lint errors because the methods are not
     // defined as returning the same constants as the corresponding setter expects, but they do
-    @SuppressLint("WrongConstant")
+    @SuppressLint({"WrongConstant", "NewApi"}) // EmbeddingPropertyConfig incorrectly flagged
     private static AppSearchSchema.@NonNull PropertyConfig toJetpackProperty(
             android.app.appsearch.AppSearchSchema.@NonNull PropertyConfig platformProperty) {
         Preconditions.checkNotNull(platformProperty);
@@ -424,6 +424,7 @@ public final class SchemaToPlatformConverter {
     }
 
     @RequiresApi(36)
+    @SuppressLint("NewApi") // EmbeddingPropertyConfig incorrectly flagged as 34-ext16
     private static class ApiHelperForB {
         private ApiHelperForB() {
         }

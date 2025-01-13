@@ -16,6 +16,7 @@
 
 package androidx.appsearch.platformstorage.converter;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 
 import androidx.annotation.DoNotInline;
@@ -185,6 +186,7 @@ public final class GenericDocumentToPlatformConverter {
         private ApiHelperForB() {
         }
 
+        @SuppressLint("NewApi") // EmbeddingVector is incorrectly flagged as needing 34-ext16
         @DoNotInline
         static void setPlatformPropertyEmbedding(
                 android.app.appsearch.GenericDocument.@NonNull Builder<
@@ -201,6 +203,7 @@ public final class GenericDocumentToPlatformConverter {
             platformBuilder.setPropertyEmbedding(propertyName, platformEmbeddingVectors);
         }
 
+        @SuppressLint("NewApi") // getValues() is incorrectly flagged as needing 34-ext16
         @DoNotInline
         static void setJetpackPropertyEmbedding(
                 GenericDocument.@NonNull Builder<GenericDocument.Builder<?>> jetpackBuilder,

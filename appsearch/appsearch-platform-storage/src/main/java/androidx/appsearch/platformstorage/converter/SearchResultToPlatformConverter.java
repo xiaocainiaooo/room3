@@ -16,6 +16,7 @@
 
 package androidx.appsearch.platformstorage.converter;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 
 import androidx.annotation.DoNotInline;
@@ -127,6 +128,7 @@ public class SearchResultToPlatformConverter {
     }
 
     @RequiresApi(36)
+    @SuppressLint("NewApi") // getInformationalRankingSignals() incorrectly flagged as 34-ext16
     private static class ApiHelperForB {
         private ApiHelperForB() {
         }

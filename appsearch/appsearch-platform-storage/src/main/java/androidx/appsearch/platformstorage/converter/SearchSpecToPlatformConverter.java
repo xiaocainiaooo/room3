@@ -292,6 +292,7 @@ public final class SearchSpecToPlatformConverter {
     }
 
     @RequiresApi(36)
+    @SuppressLint("NewApi") // EmbeddingVector incorrectly flagged as 34-ext16
     private static class ApiHelperForB {
         private ApiHelperForB() {
         }
