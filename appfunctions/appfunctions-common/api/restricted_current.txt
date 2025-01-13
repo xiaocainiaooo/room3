@@ -21,6 +21,46 @@ package androidx.appfunctions {
     property public abstract android.content.Context context;
   }
 
+  @RequiresApi(35) public final class AppFunctionData {
+    method public androidx.appfunctions.AppFunctionData getAppFunctionData(String key);
+    method public java.util.List<androidx.appfunctions.AppFunctionData>? getAppFunctionDataList(String key);
+    method public boolean getBoolean(String key);
+    method public boolean getBoolean(String key, boolean defaultValue);
+    method public boolean[]? getBooleanArray(String key);
+    method public double getDouble(String key);
+    method public double getDouble(String key, double defaultValue);
+    method public double[]? getDoubleArray(String key);
+    method public long getLong(String key);
+    method public long getLong(String key, long defaultValue);
+    method public long[]? getLongArray(String key);
+    method public String getQualifiedName();
+    method public String getString(String key);
+    method public String getString(String key, String defaultValue);
+    method public java.util.List<java.lang.String>? getStringList(String key);
+    property public final String qualifiedName;
+    field public static final androidx.appfunctions.AppFunctionData.Companion Companion;
+    field public static final androidx.appfunctions.AppFunctionData EMPTY;
+  }
+
+  public static final class AppFunctionData.Builder {
+    ctor public AppFunctionData.Builder(String qualifiedName);
+    method public androidx.appfunctions.AppFunctionData build();
+    method public androidx.appfunctions.AppFunctionData.Builder setAppFunctionData(String key, androidx.appfunctions.AppFunctionData value);
+    method public androidx.appfunctions.AppFunctionData.Builder setAppFunctionDataList(String key, java.util.List<androidx.appfunctions.AppFunctionData> value);
+    method public androidx.appfunctions.AppFunctionData.Builder setBoolean(String key, boolean value);
+    method public androidx.appfunctions.AppFunctionData.Builder setBooleanArray(String key, boolean[] value);
+    method public androidx.appfunctions.AppFunctionData.Builder setDouble(String key, double value);
+    method public androidx.appfunctions.AppFunctionData.Builder setDoubleArray(String key, double[] value);
+    method public androidx.appfunctions.AppFunctionData.Builder setLong(String key, long value);
+    method public androidx.appfunctions.AppFunctionData.Builder setLongArray(String key, long[] value);
+    method public androidx.appfunctions.AppFunctionData.Builder setString(String key, String value);
+    method public androidx.appfunctions.AppFunctionData.Builder setStringList(String key, java.util.List<java.lang.String> value);
+  }
+
+  public static final class AppFunctionData.Companion {
+    property public final androidx.appfunctions.AppFunctionData EMPTY;
+  }
+
   public final class AppFunctionDeniedException extends androidx.appfunctions.AppFunctionRequestException {
     ctor public AppFunctionDeniedException(optional String? errorMessage);
   }
@@ -84,6 +124,32 @@ package androidx.appfunctions {
     ctor public AppFunctionUnknownException(int unknownErrorCode, optional String? errorMessage);
     method public int getUnknownErrorCode();
     property public final int unknownErrorCode;
+  }
+
+  public final class ExecuteAppFunctionRequest {
+    ctor public ExecuteAppFunctionRequest(String targetPackageName, String functionIdentifier, androidx.appfunctions.AppFunctionData functionParameters);
+    method public String getFunctionIdentifier();
+    method public androidx.appfunctions.AppFunctionData getFunctionParameters();
+    method public String getTargetPackageName();
+    property public final String functionIdentifier;
+    property public final androidx.appfunctions.AppFunctionData functionParameters;
+    property public final String targetPackageName;
+    field public static final androidx.appfunctions.ExecuteAppFunctionRequest.Companion Companion;
+  }
+
+  public static final class ExecuteAppFunctionRequest.Companion {
+  }
+
+  public final class ExecuteAppFunctionResponse {
+    ctor public ExecuteAppFunctionResponse(androidx.appfunctions.AppFunctionData result);
+    method public androidx.appfunctions.AppFunctionData getResult();
+    property public final androidx.appfunctions.AppFunctionData result;
+    field public static final androidx.appfunctions.ExecuteAppFunctionResponse.Companion Companion;
+    field public static final String PROPERTY_RETURN_VALUE = "androidAppfunctionsReturnValue";
+  }
+
+  public static final class ExecuteAppFunctionResponse.Companion {
+    property public static final String PROPERTY_RETURN_VALUE;
   }
 
 }
