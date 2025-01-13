@@ -1648,12 +1648,10 @@ package androidx.wear.compose.material3 {
   }
 
   public final class TimeTextDefaults {
-    method public float getAutoTextWeight();
     method public androidx.compose.foundation.layout.PaddingValues getContentPadding();
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.TimeSource rememberTimeSource(String timeFormat);
     method @androidx.compose.runtime.Composable public String timeFormat();
-    method @androidx.compose.runtime.Composable public androidx.compose.ui.text.TextStyle timeTextStyle(optional long background, optional long color, optional long fontSize);
-    property public final float AutoTextWeight;
+    method @androidx.compose.runtime.Composable public androidx.wear.compose.foundation.CurvedTextStyle timeTextStyle(optional long background, optional long color, optional long fontSize);
     property public final androidx.compose.foundation.layout.PaddingValues ContentPadding;
     property public static final float MaxSweepAngle;
     property public static final String TimeFormat12Hours;
@@ -1665,14 +1663,9 @@ package androidx.wear.compose.material3 {
   }
 
   public final class TimeTextKt {
-    method @androidx.compose.runtime.Composable public static void TimeText(optional androidx.compose.ui.Modifier modifier, optional androidx.wear.compose.foundation.CurvedModifier curvedModifier, optional float maxSweepAngle, optional androidx.wear.compose.material3.TimeSource timeSource, optional androidx.compose.ui.text.TextStyle timeTextStyle, optional long contentColor, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional kotlin.jvm.functions.Function1<? super androidx.wear.compose.material3.TimeTextScope,kotlin.Unit> content);
-  }
-
-  public abstract sealed class TimeTextScope {
-    method public abstract void composable(kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method public abstract void separator(optional androidx.compose.ui.text.TextStyle? style);
-    method public abstract void text(String text, optional androidx.compose.ui.text.TextStyle? style, optional float weight);
-    method public abstract void time();
+    method @androidx.compose.runtime.Composable public static void TimeText(optional androidx.compose.ui.Modifier modifier, optional androidx.wear.compose.foundation.CurvedModifier curvedModifier, optional float maxSweepAngle, optional androidx.wear.compose.material3.TimeSource timeSource, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional kotlin.jvm.functions.Function2<? super androidx.wear.compose.foundation.CurvedScope,? super java.lang.String,kotlin.Unit> content);
+    method public static void timeTextCurvedText(androidx.wear.compose.foundation.CurvedScope, String time, optional androidx.wear.compose.foundation.CurvedTextStyle? style);
+    method public static void timeTextSeparator(androidx.wear.compose.foundation.CurvedScope, optional androidx.wear.compose.foundation.CurvedTextStyle? curvedTextStyle, optional androidx.wear.compose.foundation.ArcPaddingValues contentArcPadding);
   }
 
   public final class TouchTargetAwareSizeKt {
