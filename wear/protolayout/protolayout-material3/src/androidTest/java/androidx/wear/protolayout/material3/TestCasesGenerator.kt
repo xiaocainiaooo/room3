@@ -19,6 +19,7 @@ package androidx.wear.protolayout.material3
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.wear.protolayout.DeviceParametersBuilders
+import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.Box
@@ -32,6 +33,7 @@ import androidx.wear.protolayout.material3.ButtonDefaults.filledTonalButtonColor
 import androidx.wear.protolayout.material3.ButtonDefaults.filledVariantButtonColors
 import androidx.wear.protolayout.material3.ButtonGroupDefaults.DEFAULT_SPACER_BETWEEN_BUTTON_GROUPS
 import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
+import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.filledVariantProgressIndicatorColors
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.smallCompactDataCardStyle
 import androidx.wear.protolayout.material3.IconButtonStyle.Companion.largeIconButtonStyle
 import androidx.wear.protolayout.material3.MaterialGoldenTest.Companion.pxToDp
@@ -127,23 +129,7 @@ object TestCasesGenerator {
                                     "steps".layoutString,
                                 )
                             },
-                            // TODO: b/368272767 - Update this to CPI
-                            graphic = {
-                                Box.Builder()
-                                    .setWidth(expand())
-                                    .setHeight(expand())
-                                    .setModifiers(
-                                        Modifiers.Builder()
-                                            .setBackground(
-                                                Background.Builder()
-                                                    .setCorner(shapes.full)
-                                                    .setColor(colorScheme.background.prop)
-                                                    .build()
-                                            )
-                                            .build()
-                                    )
-                                    .build()
-                            }
+                            graphic = { circularProgressIndicator(staticProgress = 0.5F) }
                         )
                     },
                 )
@@ -476,6 +462,34 @@ object TestCasesGenerator {
                             )
                             .build()
                     },
+                )
+            }
+        testCases["primarylayout_circularprogressindicators_golden$NORMAL_SCALE_SUFFIX"] =
+            materialScope(
+                ApplicationProvider.getApplicationContext(),
+                deviceParameters,
+                allowDynamicTheme = false
+            ) {
+                primaryLayout(
+                    mainSlot = {
+                        buttonGroup(height = dp(50F)) {
+                            buttonGroupItem { circularProgressIndicator() }
+                            buttonGroupItem {
+                                circularProgressIndicator(
+                                    staticProgress = 0.75F,
+                                    colors = filledVariantProgressIndicatorColors()
+                                )
+                            }
+                            buttonGroupItem {
+                                circularProgressIndicator(
+                                    staticProgress = 1.5F,
+                                    startAngleDegrees = 200F,
+                                    endAngleDegrees = 520F,
+                                    colors = filledVariantProgressIndicatorColors()
+                                )
+                            }
+                        }
+                    }
                 )
             }
 
