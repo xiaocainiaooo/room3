@@ -100,8 +100,8 @@ class EdgeButtonTest {
                         modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
                         colors =
                             ButtonColors(
-                                container = COLOR_SCHEME.tertiaryContainer,
-                                icon = COLOR_SCHEME.onTertiary
+                                containerColor = COLOR_SCHEME.tertiaryContainer,
+                                iconColor = COLOR_SCHEME.onTertiary
                             ),
                     ) {
                         icon(RES_ID)

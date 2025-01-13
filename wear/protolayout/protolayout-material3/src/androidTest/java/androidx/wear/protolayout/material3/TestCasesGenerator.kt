@@ -186,9 +186,9 @@ object TestCasesGenerator {
                                     secondaryText = { text("Label".layoutString) },
                                     colors =
                                         CardColors(
-                                            background = colorScheme.onSecondary,
-                                            title = colorScheme.secondary,
-                                            content = colorScheme.secondaryDim
+                                            backgroundColor = colorScheme.onSecondary,
+                                            titleColor = colorScheme.secondary,
+                                            contentColor = colorScheme.secondaryDim
                                         )
                                 )
                             }
@@ -286,9 +286,9 @@ object TestCasesGenerator {
                             style = smallCompactDataCardStyle(),
                             colors =
                                 CardColors(
-                                    background = colorScheme.errorContainer,
-                                    title = colorScheme.onErrorContainer,
-                                    content = colorScheme.onError
+                                    backgroundColor = colorScheme.errorContainer,
+                                    titleColor = colorScheme.onErrorContainer,
+                                    contentColor = colorScheme.onError
                                 ),
                             height = expand()
                         )
