@@ -38,7 +38,7 @@ class CompilationTestHelper(
     private val testFileSrcDir: File,
     /** The root directory containing the source golden files. */
     private val goldenFileSrcDir: File,
-    /** A list of [SymbolProcessorProvider] under test. */
+    /** A list of [com.google.devtools.ksp.processing.SymbolProcessorProvider] under test. */
     private val symbolProcessorProviders: List<SymbolProcessorProvider>,
 ) {
 
@@ -69,7 +69,10 @@ class CompilationTestHelper(
         val sources =
             sourceFileNames.map { sourceFileName ->
                 val sourceFile = getTestSourceFile(sourceFileName)
-                Source.kotlin(ensureKotlinFileNameFormat(sourceFileName), sourceFile.readText())
+                Source.Companion.kotlin(
+                    ensureKotlinFileNameFormat(sourceFileName),
+                    sourceFile.readText()
+                )
             }
 
         val workingDir =
