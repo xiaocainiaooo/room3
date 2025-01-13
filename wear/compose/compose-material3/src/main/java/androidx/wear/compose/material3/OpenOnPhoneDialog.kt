@@ -121,7 +121,7 @@ public fun OpenOnPhoneDialog(
         }
     }
     Dialog(
-        show = show,
+        visible = show,
         modifier = modifier,
         onDismissRequest = onDismissRequest,
         properties = properties,

@@ -50,7 +50,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalAccessibilityManager
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -93,8 +92,8 @@ import kotlinx.coroutines.launch
  * @param onDismissRequest A lambda function to be called when the dialog is dismissed - either by
  *   swiping right or when the [durationMillis] has passed.
  * @param curvedText A slot for displaying curved text content which will be shown along the bottom
- *   edge of the dialog. We recommend using [confirmationCurvedText] for this parameter, which will
- *   give the default sweep angle and padding.
+ *   edge of the dialog. We recommend using [confirmationDialogCurvedText] for this parameter, which
+ *   will give the default sweep angle and padding.
  * @param modifier Modifier to be applied to the confirmation content.
  * @param colors A [ConfirmationDialogColors] object for customizing the colors used in this
  *   [ConfirmationDialog].
@@ -143,8 +142,8 @@ public fun ConfirmationDialog(
  *
  * @sample androidx.wear.compose.material3.samples.ConfirmationDialogSample
  * @param curvedText A slot for displaying curved text content which will be shown along the bottom
- *   edge of the dialog. We recommend using [confirmationCurvedText] for this parameter, which will
- *   give the default sweep angle and padding.
+ *   edge of the dialog. We recommend using [confirmationDialogCurvedText] for this parameter, which
+ *   will give the default sweep angle and padding.
  * @param modifier Modifier to be applied to the confirmation content.
  * @param colors A [ConfirmationDialogColors] object for customizing the colors used in this
  *   [ConfirmationDialog].
@@ -315,9 +314,9 @@ public fun ConfirmationDialogContent(
  * @param onDismissRequest A lambda function to be called when the dialog is dismissed - either by
  *   swiping right or when the [durationMillis] has passed.
  * @param curvedText A slot for displaying curved text content which will be shown along the bottom
- *   edge of the dialog. We recommend using [confirmationCurvedText] for this parameter, which will
- *   give the default sweep angle and padding, and [ConfirmationDialogDefaults.curvedTextStyle] as
- *   the style.
+ *   edge of the dialog. We recommend using [confirmationDialogCurvedText] for this parameter, which
+ *   will give the default sweep angle and padding, and [ConfirmationDialogDefaults.curvedTextStyle]
+ *   as the style.
  * @param modifier Modifier to be applied to the confirmation content.
  * @param colors A [ConfirmationDialogColors] object for customizing the colors used in this
  *   [SuccessConfirmationDialog].
@@ -374,9 +373,9 @@ public fun SuccessConfirmationDialog(
  *
  * @sample androidx.wear.compose.material3.samples.SuccessConfirmationDialogSample
  * @param curvedText A slot for displaying curved text content which will be shown along the bottom
- *   edge of the dialog. We recommend using [confirmationCurvedText] for this parameter, which will
- *   give the default sweep angle and padding, and [ConfirmationDialogDefaults.curvedTextStyle] as
- *   the style.
+ *   edge of the dialog. We recommend using [confirmationDialogCurvedText] for this parameter, which
+ *   will give the default sweep angle and padding, and [ConfirmationDialogDefaults.curvedTextStyle]
+ *   as the style.
  * @param modifier Modifier to be applied to the confirmation content.
  * @param colors A [ConfirmationDialogColors] object for customizing the colors used in this
  *   [SuccessConfirmationDialog]. will be adjusted by the accessibility manager according to the
@@ -423,8 +422,8 @@ public fun SuccessConfirmationDialogContent(
  * @param onDismissRequest A lambda function to be called when the dialog is dismissed - either by
  *   swiping right or when the [durationMillis] has passed.
  * @param curvedText A slot for displaying curved text content which will be shown along the bottom
- *   edge of the dialog. We recommend using [confirmationCurvedText] for this parameter, which will
- *   give the default sweep angle and padding.
+ *   edge of the dialog. We recommend using [confirmationDialogCurvedText] for this parameter, which
+ *   will give the default sweep angle and padding.
  * @param modifier Modifier to be applied to the confirmation content.
  * @param colors A [ConfirmationDialogColors] object for customizing the colors used in this
  *   [FailureConfirmationDialog].
@@ -479,8 +478,8 @@ public fun FailureConfirmationDialog(
  *
  * @sample androidx.wear.compose.material3.samples.FailureConfirmationDialogSample
  * @param curvedText A slot for displaying curved text content which will be shown along the bottom
- *   edge of the dialog. We recommend using [confirmationCurvedText] for this parameter, which will
- *   give the default sweep angle and padding.
+ *   edge of the dialog. We recommend using [confirmationDialogCurvedText] for this parameter, which
+ *   will give the default sweep angle and padding.
  * @param modifier Modifier to be applied to the confirmation content.
  * @param colors A [ConfirmationDialogColors] object for customizing the colors used in this
  *   [FailureConfirmationDialog]. will be adjusted by the accessibility manager according to the
@@ -533,7 +532,7 @@ public fun FailureConfirmationDialogContent(
  * @param style It is recommended to use [ConfirmationDialogDefaults.curvedTextStyle] for curved
  *   text in Confirmation Dialogs.
  */
-public fun CurvedScope.confirmationCurvedText(
+public fun CurvedScope.confirmationDialogCurvedText(
     text: String,
     style: CurvedTextStyle,
 ): Unit =
@@ -550,18 +549,6 @@ public object ConfirmationDialogDefaults {
     /** The default style for curved text content. */
     public val curvedTextStyle: CurvedTextStyle
         @Composable get() = CurvedTextStyle(MaterialTheme.typography.titleLarge)
-
-    /** The default message for a [SuccessConfirmationDialog]. */
-    public val successText: String
-        @Composable
-        get() =
-            LocalContext.current.resources.getString(R.string.wear_m3c_confirmation_success_message)
-
-    /** The default message for a [FailureConfirmationDialog]. */
-    public val failureText: String
-        @Composable
-        get() =
-            LocalContext.current.resources.getString(R.string.wear_m3c_confirmation_failure_message)
 
     /**
      * A default composable used in [SuccessConfirmationDialog] that displays a success icon with an
@@ -819,7 +806,7 @@ private fun AnimateConfirmationDialog(
     }
 
     Dialog(
-        show = visible,
+        visible = visible,
         modifier = modifier,
         onDismissRequest = onDismissRequest,
         properties = properties,
