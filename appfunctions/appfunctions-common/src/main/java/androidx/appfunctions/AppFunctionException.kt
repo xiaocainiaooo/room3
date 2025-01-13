@@ -105,6 +105,7 @@ internal constructor(
 
     public companion object {
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+        @SuppressWarnings("WrongConstant")
         public fun fromPlatformExtensionsClass(
             exception: com.android.extensions.appfunctions.AppFunctionException
         ): AppFunctionException {

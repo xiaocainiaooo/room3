@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The Android Open Source Project
+ * Copyright (C) 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,36 +26,21 @@ import androidx.build.LibraryType
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
 }
 
 dependencies {
-    api(libs.kotlinStdlib)
-    // Public dependencies
-    api("androidx.appsearch:appsearch:1.1.0-alpha07")
-
-    // Internal dependencies
+    annotationProcessor(libs.nullaway)
+    api(libs.jspecify)
     implementation("androidx.annotation:annotation:1.8.1")
-
-    // Compile only dependencies
-    compileOnly(project(":appfunctions:appfunctions-stubs"))
-
-    // Test dependencies
-    androidTestImplementation(libs.testCore)
-    androidTestImplementation(libs.testRules)
-    androidTestImplementation(libs.truth)
-    androidTestImplementation(libs.junit)
-    androidTestCompileOnly(project(":appfunctions:appfunctions-stubs"))
 }
 
 android {
-    compileSdk = 35
-    namespace = "androidx.appfunctions.common"
+    namespace = "com.android.extensions.appfunctions"
 }
 
 androidx {
-    name = "androidx.appfunctions:appfunctions-common"
+    name = "Android AppFunctions Extensions Stub"
     type = LibraryType.PUBLISHED_LIBRARY
-    inceptionYear = "2024"
-    description = "Contains the code shared by appfunctions-app-runtime , appfunctions-agent-runtime and appfunctions-schema libraries."
+    inceptionYear = "2025"
+    description = "Stub implementation of the Android AppFunctions Extensions."
 }
