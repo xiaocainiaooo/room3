@@ -21,10 +21,10 @@ import com.squareup.kotlinpoet.ClassName
 /** Helper class to introspect AppFunction symbols. */
 object IntrospectionHelper {
     // Package names
-    private const val APP_FUNCTIONS_APP_RUNTIME_PACKAGE_NAME = "androidx.appfunctions.app"
+    private const val APP_FUNCTIONS_PACKAGE_NAME = "androidx.appfunctions"
 
     // Annotation classes
     object AppFunctionAnnotation {
-        val CLASS_NAME = ClassName(APP_FUNCTIONS_APP_RUNTIME_PACKAGE_NAME, "AppFunction")
+        val CLASS_NAME = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunction")
     }
 }

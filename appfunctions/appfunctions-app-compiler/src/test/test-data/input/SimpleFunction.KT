@@ -1,6 +1,6 @@
 package com.testdata
 
-import androidx.appfunctions.app.AppFunction
+import androidx.appfunctions.AppFunction
 
 class SimpleFunction {
     @AppFunction
