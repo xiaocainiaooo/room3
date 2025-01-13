@@ -18,6 +18,7 @@ package androidx.wear.protolayout.material3
 
 import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
+import androidx.annotation.IntRange
 import androidx.wear.protolayout.ColorBuilders.ColorProp
 import androidx.wear.protolayout.DimensionBuilders.AngularLayoutConstraint
 import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
@@ -34,20 +35,20 @@ import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.DashedArcLine
 import androidx.wear.protolayout.LayoutElementBuilders.DashedLinePattern
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
-import androidx.wear.protolayout.expression.AnimationParameterBuilders.AnimationParameters
-import androidx.wear.protolayout.expression.AnimationParameterBuilders.AnimationSpec
-import androidx.wear.protolayout.expression.AnimationParameterBuilders.Easing
+import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicColor
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat
+import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.INDICATOR_STROKE_WIDTH_INCREMENT_PX
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.LARGE_STROKE_WIDTH
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.METADATA_TAG
+import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.TRIVIAL_ARC_OFFSET
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.calculateRecommendedGapSize
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.filledProgressIndicatorColors
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.contentDescription
+import androidx.wear.protolayout.modifiers.padding
 import androidx.wear.protolayout.modifiers.tag
 import androidx.wear.protolayout.modifiers.toProtoLayoutModifiers
-import androidx.wear.protolayout.types.LayoutColor
 import kotlin.math.min
 
 /**
@@ -55,8 +56,9 @@ import kotlin.math.min
  *
  * @param staticProgress The static progress of this progress indicator where 0 represent no
  *   progress and 1 represents completion. Progress above 1 is also allowed. If [dynamicProgress] is
- *   also set, this static value will be ignored. By default it equals to 0.
- * @param dynamicProgress The static progress of this progress indicator where 0 represent no
+ *   also set, this static value will only be used when the dynamic value cannot be evaluated. By
+ *   default it equals to 0.
+ * @param dynamicProgress The dynamic progress of this progress indicator where 0 represent no
  *   progress and 1 represents completion. Progress above 1 is also allowed. If not provided, the
  *   [staticProgress] is used.
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
@@ -94,16 +96,85 @@ public fun MaterialScope.circularProgressIndicator(
     colors: ProgressIndicatorColors = filledProgressIndicatorColors(),
     size: ContainerDimension = expand(),
 ): LayoutElement {
-    if (size is WrappedDimensionProp) {
-        throw IllegalArgumentException("CircularProgressIndicator could not have size as wrap")
-    }
+    // CircularProgressIndicator could not have size as wrap
+    verifySize(size)
 
     val modifiers = (LayoutModifier.tag(METADATA_TAG) then modifier).toProtoLayoutModifiers()
-    val validEndAngleDegrees = checkAndAdjustEndAngle(startAngleDegrees, endAngleDegrees)
 
     return singleSegmentImpl(
             startAngleDegrees = startAngleDegrees,
-            endAngleDegrees = validEndAngleDegrees,
+            endAngleDegrees = checkAndAdjustEndAngle(startAngleDegrees, endAngleDegrees),
+            staticProgress = staticProgress,
+            dynamicProgress = dynamicProgress,
+            strokeWidth = strokeWidth,
+            gapSize = gapSize,
+            colors = colors
+        )
+        .setModifiers(modifiers)
+        .setWidth(size)
+        .setHeight(size)
+        .build()
+}
+
+/**
+ * Protolayout Material3 design segmented circular progress indicator.
+ *
+ * A segmented variant of [circularProgressIndicator] that is divided into equally sized segments.
+ *
+ * @param segmentCount Number of equal segments that the progress indicator should be divided into.
+ *   Has to be a number greater than or equal to 1.
+ * @param staticProgress The static progress of this progress indicator where 0 represent no
+ *   progress and 1 represents completion. Progress above 1 is also allowed. If [dynamicProgress] is
+ *   also set, this static value will only be used when the dynamic value cannot be evaluated. By
+ *   default it equals to 0.
+ * @param dynamicProgress The dynamic progress of this progress indicator where 0 represent no
+ *   progress and 1 represents completion. Progress above 1 is also allowed. If not provided, the
+ *   [staticProgress] is used.
+ * @param modifier Modifiers to set to this element. It's highly recommended to set a content
+ *   description using [contentDescription].
+ * @param startAngleDegrees The starting position of the progress arc, measured clockwise in degrees
+ *   from the 12 o'clock position.
+ * @param endAngleDegrees The ending position of the progress arc, measured clockwise in degrees
+ *   from 12 o'clock position. This value must be bigger than [startAngleDegrees], otherwise an
+ *   exception would be thrown. By default it equals to 'startAngleDegrees + 360'.
+ * @param strokeWidth The stroke width for the progress indicator. The recommended values are
+ *   [CircularProgressIndicatorDefaults.LARGE_STROKE_WIDTH] and
+ *   [CircularProgressIndicatorDefaults.SMALL_STROKE_WIDTH].
+ * @param gapSize The size in dp of the gap between the ends of the progress indicator and the
+ *   track. The stroke end caps are not included in this distance.
+ * @param colors [ProgressIndicatorColors] that will be used to resolve the indicator and track
+ *   color for this progress indicator.
+ * @param size The bounding box size of this progress indicator, applies to both width and height.
+ *   The indicator arc and track arc are located on the largest circle that can be inscribed inside.
+ *   It is highly recommended for the progress indicator in [graphicDataCard] to have its size as
+ *   [expand], which is the default, to fill the available space for the best result across
+ *   different screen sizes. Setting [size] with a [WrappedDimensionProp] instance will cause
+ *   failure and throws an [IllegalArgumentException].
+ * @throws IllegalArgumentException When [size] is set to be [WrappedDimensionProp] instance or the
+ *   provided [endAngleDegrees] is smaller than the [startAngleDegrees].
+ * @sample androidx.wear.protolayout.material3.samples.multipleSegmentsCircularProgressIndicator
+ */
+public fun MaterialScope.segmentedCircularProgressIndicator(
+    @IntRange(from = 1) segmentCount: Int,
+    staticProgress: Float = 0F,
+    dynamicProgress: DynamicFloat? = null,
+    modifier: LayoutModifier = LayoutModifier,
+    startAngleDegrees: Float = 0F,
+    endAngleDegrees: Float = startAngleDegrees + 360F,
+    @Dimension(unit = DP) strokeWidth: Float = LARGE_STROKE_WIDTH,
+    @Dimension(unit = DP) gapSize: Float = calculateRecommendedGapSize(strokeWidth),
+    colors: ProgressIndicatorColors = filledProgressIndicatorColors(),
+    size: ContainerDimension = expand(),
+): LayoutElement {
+    // CircularProgressIndicator could not have size as wrap
+    verifySize(size)
+
+    val modifiers = (LayoutModifier.tag(METADATA_TAG) then modifier).toProtoLayoutModifiers()
+
+    return multipleSegmentsImpl(
+            segmentCount = segmentCount,
+            startAngleDegrees = startAngleDegrees,
+            endAngleDegrees = checkAndAdjustEndAngle(startAngleDegrees, endAngleDegrees),
             staticProgress = staticProgress,
             dynamicProgress = dynamicProgress,
             strokeWidth = strokeWidth,
@@ -131,7 +202,12 @@ private fun MaterialScope.singleSegmentImpl(
     colors: ProgressIndicatorColors
 ): Box.Builder {
     val sweepAngle = endAngleDegrees - startAngleDegrees
-    val progressInDegrees = progressInDegrees(sweepAngle, staticProgress, dynamicProgress)
+    val progressInDegrees =
+        progressInDegrees(
+            sweepAngle = sweepAngle,
+            staticProgress = staticProgress,
+            dynamicProgress = dynamicProgress
+        )
     val trackInDegrees = trackInDegrees(sweepAngle, progressInDegrees)
 
     // Indicator: anchor end to startAngle, counter clockwise
@@ -179,89 +255,83 @@ private fun MaterialScope.singleSegmentImpl(
         )
 }
 
-public object CircularProgressIndicatorDefaults {
-    /**
-     * Returns the recommended [ProgressIndicatorColors] object to be used when placing the progress
-     * indicator inside a graphic card with [CardDefaults.filledCardColors].
-     */
-    public fun MaterialScope.filledProgressIndicatorColors(): ProgressIndicatorColors =
-        ProgressIndicatorColors(
-            theme.colorScheme.onPrimary,
-            theme.colorScheme.onPrimary.withOpacity(0.2F),
-            theme.colorScheme.onPrimary.withOpacity(0.6F)
+/**
+ * Layout the content for segmented variant of progress indicator using [DashedArcLine].
+ *
+ * Note that we require valid start and end angles for calling this method.
+ */
+private fun MaterialScope.multipleSegmentsImpl(
+    segmentCount: Int,
+    startAngleDegrees: Float,
+    endAngleDegrees: Float,
+    staticProgress: Float,
+    dynamicProgress: DynamicFloat?,
+    @Dimension(unit = DP) strokeWidth: Float,
+    @Dimension(unit = DP) gapSize: Float,
+    colors: ProgressIndicatorColors
+): Box.Builder {
+    val sweepAngle = endAngleDegrees - startAngleDegrees
+    val progressInDegrees =
+        progressInDegrees(
+            sweepAngle = sweepAngle,
+            staticProgress = staticProgress,
+            dynamicProgress = dynamicProgress
         )
-
-    /**
-     * Returns the recommended [ProgressIndicatorColors] object to be used when placing the progress
-     * indicator inside a graphic card with [CardDefaults.filledTonalCardColors].
-     */
-    public fun MaterialScope.filledTonalProgressIndicatorColors(): ProgressIndicatorColors =
-        ProgressIndicatorColors(
-            theme.colorScheme.primary,
-            theme.colorScheme.primary.withOpacity(0.2F),
-            theme.colorScheme.primary.withOpacity(0.6F)
-        )
-
-    /**
-     * Returns the recommended [ProgressIndicatorColors] object to be used when placing the progress
-     * indicator inside a graphic card with [CardDefaults.filledVariantCardColors].
-     */
-    public fun MaterialScope.filledVariantProgressIndicatorColors(): ProgressIndicatorColors =
-        ProgressIndicatorColors(
-            theme.colorScheme.onPrimaryContainer,
-            theme.colorScheme.onPrimaryContainer.withOpacity(0.2F),
-            theme.colorScheme.onPrimaryContainer.withOpacity(0.6F),
-        )
-
-    /**
-     * The recommended animation spec for animations from current progress to a new progress value.
-     */
-    public val recommendedAnimationSpec: AnimationSpec =
-        AnimationSpec.Builder()
-            .setAnimationParameters(
-                AnimationParameters.Builder()
-                    .setDurationMillis(450)
-                    .setEasing(Easing.cubicBezier(0.2f, 0f, 0f, 1f))
-                    .build()
-            )
+    val linePattern =
+        DashedLinePattern.Builder()
+            .setGapSize(gapSize)
+            .setGapInterval(sweepAngle / segmentCount)
             .build()
 
-    /** Large stroke width for circular progress indicator. */
-    @Dimension(unit = DP) public const val LARGE_STROKE_WIDTH: Float = 8F
-
-    /** Small stroke width for circular progress indicator. */
-    @Dimension(unit = DP) public const val SMALL_STROKE_WIDTH: Float = 4F
-
-    /**
-     * Returns recommended size of the gap based on [strokeWidth].
-     *
-     * The absolute value can be customized with `gapSize` parameter on [circularProgressIndicator].
-     */
-    @Dimension(unit = DP)
-    public fun calculateRecommendedGapSize(@Dimension(unit = DP) strokeWidth: Float): Float =
-        strokeWidth / 3F
-
-    internal const val METADATA_TAG: String = "M3CPI"
+    // We need to make the indicator arc a bit wider than the indicator arc to make sure the top
+    // arc covers the bottom one completely in the overlapped area.
+    val insetPadding = INDICATOR_STROKE_WIDTH_INCREMENT_PX / deviceConfiguration.screenWidthDp / 2F
+    return Box.Builder()
+        .addContent(
+            // the track
+            createArc(
+                    anchorAngle = degrees(startAngleDegrees),
+                    anchorType = LayoutElementBuilders.ARC_ANCHOR_START,
+                    arcLength = degrees(sweepAngle),
+                    arcColor = trackColor(staticProgress, dynamicProgress, colors),
+                    strokeWidth = strokeWidth,
+                    linePattern = linePattern,
+                    arcDirection = LayoutElementBuilders.ARC_DIRECTION_CLOCKWISE
+                )
+                .setModifiers(
+                    Modifiers.Builder()
+                        // Note that View#setPadding only accept integer, so this will be
+                        // rounded up to one pixel during inflation.
+                        .setPadding(padding(insetPadding))
+                        .build()
+                )
+                .build()
+        )
+        .addContent(
+            // the indicator
+            createArc(
+                    anchorAngle = degrees(startAngleDegrees),
+                    anchorType = LayoutElementBuilders.ARC_ANCHOR_START,
+                    arcLength = progressInDegrees,
+                    arcColor = colors.indicatorColor.prop,
+                    strokeWidth = strokeWidth + insetPadding * 2F,
+                    linePattern = linePattern,
+                    arcDirection = LayoutElementBuilders.ARC_DIRECTION_CLOCKWISE
+                )
+                .build()
+        )
 }
 
 /**
- * Represents the indicator and track colors used in progress indicator.
+ * Verify that it is not a size of wrap, otherwise throw an exception.
  *
- * @param indicatorColor Color used to draw the indicator of progress indicator.
- * @param trackColor Color used to draw the track of progress indicator.
- * @param trackOverflowColor Color used to draw the track for progress overflow (>1).
+ * @throws IllegalArgumentException When [size] is set to be [WrappedDimensionProp] instance.
  */
-public class ProgressIndicatorColors(
-    public val indicatorColor: LayoutColor,
-    public val trackColor: LayoutColor,
-    public val trackOverflowColor: LayoutColor = trackColor
-)
-
-/**
- * A small offset to make the progress arc remaining when the progress is 1, with the module
- * operation applied for handling overflow.
- */
-private const val TRIVIAL_ARC_OFFSET: Float = 0.05f
+private fun verifySize(size: ContainerDimension) {
+    if (size is WrappedDimensionProp) {
+        throw IllegalArgumentException("CircularProgressIndicator could not have size as wrap")
+    }
+}
 
 /*
  * Check the endAngle is valid with the provided startAngle, and adjust the sweep angle to be 360
