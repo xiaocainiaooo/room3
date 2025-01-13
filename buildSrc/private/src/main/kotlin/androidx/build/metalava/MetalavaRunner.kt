@@ -205,20 +205,21 @@ internal fun getGenerateApiLevelsArgs(
     currentVersion: Version,
     outputLocation: File
 ): List<String> {
-    val versions = getVersionsForApiLevels(apiFiles) + currentVersion
+    val versions = getVersionsForApiLevels(apiFiles)
 
-    val args =
-        listOf(
-            "--generate-api-version-history",
-            outputLocation.absolutePath,
-            "--api-version-names",
-            versions.joinToString(" ")
-        )
-
-    return if (apiFiles.isEmpty()) {
-        args
-    } else {
-        args + listOf("--api-version-signature-files", apiFiles.joinToString(":"))
+    return buildList {
+        add("--generate-api-version-history")
+        add(outputLocation.absolutePath)
+        if (versions.isNotEmpty()) {
+            add("--api-version-names")
+            add(versions.joinToString(" "))
+        }
+        add("--current-version")
+        add(currentVersion.toString())
+        if (apiFiles.isNotEmpty()) {
+            add("--api-version-signature-files")
+            add(apiFiles.joinToString(":"))
+        }
     }
 }
 
