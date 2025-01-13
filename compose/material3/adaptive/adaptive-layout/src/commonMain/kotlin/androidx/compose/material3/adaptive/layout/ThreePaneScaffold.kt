@@ -44,9 +44,11 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.roundToIntRect
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
@@ -581,7 +583,8 @@ private class ThreePaneContentMeasurePolicy(
                                 primaryMeasurables,
                                 ThreePaneScaffoldDefaults.PrimaryPanePriority,
                                 role,
-                                scaffoldDirective.defaultPanePreferredWidth.roundToPx()
+                                scaffoldDirective.defaultPanePreferredWidth.roundToPx(),
+                                this@getPanesMeasurables
                             )
                         }
                         ThreePaneScaffoldRole.Secondary -> {
@@ -589,7 +592,8 @@ private class ThreePaneContentMeasurePolicy(
                                 secondaryMeasurables,
                                 ThreePaneScaffoldDefaults.SecondaryPanePriority,
                                 role,
-                                scaffoldDirective.defaultPanePreferredWidth.roundToPx()
+                                scaffoldDirective.defaultPanePreferredWidth.roundToPx(),
+                                this@getPanesMeasurables
                             )
                         }
                         ThreePaneScaffoldRole.Tertiary -> {
@@ -597,7 +601,8 @@ private class ThreePaneContentMeasurePolicy(
                                 tertiaryMeasurables,
                                 ThreePaneScaffoldDefaults.TertiaryPanePriority,
                                 role,
-                                scaffoldDirective.defaultPanePreferredWidth.roundToPx()
+                                scaffoldDirective.defaultPanePreferredWidth.roundToPx(),
+                                this@getPanesMeasurables
                             )
                         }
                     }
@@ -610,10 +615,11 @@ private class ThreePaneContentMeasurePolicy(
         measurables: List<Measurable>,
         priority: Int,
         role: ThreePaneScaffoldRole,
-        defaultPreferredWidth: Int
+        defaultPreferredWidth: Int,
+        density: Density
     ) {
         if (measurables.isNotEmpty()) {
-            add(PaneMeasurable(measurables[0], priority, role, defaultPreferredWidth))
+            add(PaneMeasurable(measurables[0], priority, role, defaultPreferredWidth, density))
         }
     }
 
@@ -799,16 +805,17 @@ private class PaneMeasurable(
     val measurable: Measurable,
     val priority: Int,
     val role: ThreePaneScaffoldRole,
-    defaultPreferredWidth: Int
+    defaultPreferredWidth: Int,
+    density: Density
 ) {
     private val data =
         ((measurable.parentData as? PaneScaffoldParentData) ?: PaneScaffoldParentDataImpl())
 
     var measuringWidth =
-        if (data.preferredWidth.isNaN()) {
+        if (data.preferredWidth.isUnspecified) {
             defaultPreferredWidth
         } else {
-            data.preferredWidth.toInt()
+            with(density) { data.preferredWidth.roundToPx() }
         }
 
     // TODO(conradchen): uncomment it when we can expose PaneMargins
