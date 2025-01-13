@@ -195,12 +195,12 @@ package androidx.savedstate.serialization.serializers {
     property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
-  public class CharSequenceSerializer<T extends java.lang.CharSequence> implements kotlinx.serialization.KSerializer<T> {
+  public final class CharSequenceSerializer implements kotlinx.serialization.KSerializer<java.lang.CharSequence> {
     ctor public CharSequenceSerializer();
-    method public final T deserialize(kotlinx.serialization.encoding.Decoder decoder);
-    method public final kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
-    method public final void serialize(kotlinx.serialization.encoding.Encoder encoder, T value);
-    property public final kotlinx.serialization.descriptors.SerialDescriptor descriptor;
+    method public CharSequence deserialize(kotlinx.serialization.encoding.Decoder decoder);
+    method public kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
+    method public void serialize(kotlinx.serialization.encoding.Encoder encoder, CharSequence value);
+    property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
   public final class IBinderSerializer implements kotlinx.serialization.KSerializer<android.os.IBinder> {

@@ -107,10 +107,10 @@ public class SizeFSerializer : KSerializer<SizeF> {
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public open class CharSequenceSerializer<T : CharSequence> : KSerializer<T> {
-    final override val descriptor: SerialDescriptor = buildClassSerialDescriptor("CharSequence")
+public class CharSequenceSerializer : KSerializer<CharSequence> {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("CharSequence")
 
-    final override fun serialize(encoder: Encoder, value: T) {
+    override fun serialize(encoder: Encoder, value: CharSequence) {
         require(encoder is SavedStateEncoder) {
             encoderErrorMessage(descriptor.serialName, encoder)
         }
@@ -118,11 +118,11 @@ public open class CharSequenceSerializer<T : CharSequence> : KSerializer<T> {
     }
 
     @Suppress("UNCHECKED_CAST")
-    final override fun deserialize(decoder: Decoder): T {
+    override fun deserialize(decoder: Decoder): CharSequence {
         require(decoder is SavedStateDecoder) {
             decoderErrorMessage(descriptor.serialName, decoder)
         }
-        return decoder.run { savedState.read { getCharSequence(key) as T } }
+        return decoder.run { savedState.read { getCharSequence(key) } }
     }
 }
 
