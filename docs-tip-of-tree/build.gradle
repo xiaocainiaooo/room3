@@ -24,6 +24,7 @@ dependencies {
     docs(project(":appfunctions:appfunctions-app-runtime"))
     docs(project(":appfunctions:appfunctions-common"))
     docs(project(":appfunctions:appfunctions-runtime"))
+    docs(project(":appfunctions:appfunctions-stubs"))
     docs(project(":appsearch:appsearch"))
     docs(project(":appsearch:appsearch-builtin-types"))
     docs(project(":appsearch:appsearch-ktx"))
