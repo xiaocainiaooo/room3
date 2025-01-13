@@ -44,9 +44,6 @@ fun Project.configureProjectForKzipTasks(config: ApiTaskConfig, extension: Andro
                 // KSP generated folders not visible to AGP variant api (b/380363756)
                 ":privacysandbox:tools:integration-tests:testsdk",
                 ":room:room-runtime",
-                // Javac extractor throws an error: package exists in another module:
-                // jdk.unsupported
-                ":performance:performance-unsafe",
                 // Depends on the generated output of the proto project
                 // :wear:protolayout:protolayout-proto
                 // which we haven't captured for Java Kzip generation.
