@@ -72,6 +72,10 @@ final class FeaturesImpl implements Features {
             case Features.SET_SCHEMA_REQUEST_SET_PUBLICLY_VISIBLE:
                 // fall through
             case Features.SET_SCHEMA_REQUEST_ADD_SCHEMA_TYPE_VISIBLE_TO_CONFIG:
+                // fall through
+            case Features.SEARCH_SPEC_RANKING_FUNCTION_MAX_MIN_OR_DEFAULT:
+                // fall through
+            case Features.SEARCH_SPEC_RANKING_FUNCTION_FILTER_BY_RANGE:
                 return true; // AppSearch features present in GMSCore AppSearch.
 
             // RegisterObserver and UnregisterObserver are not yet supported by GMSCore AppSearch.
