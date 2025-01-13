@@ -415,6 +415,11 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
     }
 
     @Override
+    public void clearZslConfig() {
+        mZslControl.clearZslConfig();
+    }
+
+    @Override
     public void setZslDisabledByUserCaseConfig(boolean disabled) {
         mZslControl.setZslDisabledByUserCaseConfig(disabled);
     }
