@@ -354,7 +354,7 @@ public fun DatePicker(
                                                     )
                                                 }
                                             ),
-                                        spacing = spacing,
+                                        verticalSpacing = spacing,
                                     )
                                 DatePickerOption.Month ->
                                     pickerGroupItem(
@@ -382,7 +382,7 @@ public fun DatePicker(
                                                     )
                                                 }
                                             ),
-                                        spacing = spacing,
+                                        verticalSpacing = spacing,
                                     )
                                 DatePickerOption.Year ->
                                     pickerGroupItem(
@@ -409,7 +409,7 @@ public fun DatePicker(
                                                     )
                                                 }
                                             ),
-                                        spacing = spacing,
+                                        verticalSpacing = spacing,
                                     )
                             }
                         }
