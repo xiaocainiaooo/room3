@@ -34,6 +34,7 @@ import androidx.compose.foundation.gestures.DragEvent.DragDelta
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
 import androidx.compose.foundation.gestures.snapping.snapFlingBehavior
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.internal.PlatformOptimizedCancellationException
 import androidx.compose.foundation.internal.checkPrecondition
 import androidx.compose.foundation.internal.requirePrecondition
 import androidx.compose.foundation.layout.offset
@@ -1536,7 +1537,8 @@ private fun Float.coerceToTarget(target: Float): Float {
     return if (target > 0) coerceAtMost(target) else coerceAtLeast(target)
 }
 
-internal expect class AnchoredDragFinishedSignal() : CancellationException
+internal class AnchoredDragFinishedSignal :
+    PlatformOptimizedCancellationException("Anchored drag finished")
 
 private suspend fun <I> restartable(inputs: () -> I, block: suspend (I) -> Unit) {
     try {

@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.gestures
+package androidx.compose.material3.common.internal
 
-@Suppress("NOTHING_TO_INLINE")
-internal actual inline fun assertOnJvm(statement: Boolean, message: () -> String): Unit {
-    assert(statement, message)
-}
+internal actual fun identityHashCode(instance: Any?): Int = System.identityHashCode(instance)

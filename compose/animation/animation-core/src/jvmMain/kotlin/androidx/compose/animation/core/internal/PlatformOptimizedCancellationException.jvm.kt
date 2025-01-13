@@ -14,9 +14,18 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.gestures
+package androidx.compose.animation.core.internal
 
-@Suppress("NOTHING_TO_INLINE")
-internal actual inline fun assertOnJvm(statement: Boolean, message: () -> String): Unit {
-    assert(statement, message)
+import kotlinx.coroutines.CancellationException
+
+private val EmptyStackTraceElements = emptyArray<StackTraceElement>()
+
+internal actual abstract class PlatformOptimizedCancellationException
+actual constructor(message: String?) : CancellationException(message) {
+
+    override fun fillInStackTrace(): Throwable {
+        // Avoid null.clone() on Android <= 6.0 when accessing stackTrace
+        stackTrace = EmptyStackTraceElements
+        return this
+    }
 }

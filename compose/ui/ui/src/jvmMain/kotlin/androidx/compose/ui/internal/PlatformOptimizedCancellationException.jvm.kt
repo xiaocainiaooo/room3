@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.gestures
+package androidx.compose.ui.internal
 
-import androidx.compose.foundation.implementedInJetBrainsFork
 import kotlinx.coroutines.CancellationException
 
-internal actual class FlingCancellationException actual constructor() :
-    CancellationException("The fling animation was cancelled") {
-    init {
-        implementedInJetBrainsFork()
+private val EmptyStackTraceElements = emptyArray<StackTraceElement>()
+
+internal actual abstract class PlatformOptimizedCancellationException
+actual constructor(message: String?) : CancellationException(message) {
+
+    override fun fillInStackTrace(): Throwable {
+        // Avoid null.clone() on Android <= 6.0 when accessing stackTrace
+        stackTrace = EmptyStackTraceElements
+        return this
     }
 }

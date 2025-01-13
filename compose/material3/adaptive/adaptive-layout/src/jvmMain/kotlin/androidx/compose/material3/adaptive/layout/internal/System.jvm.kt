@@ -14,14 +14,6 @@
  * limitations under the License.
  */
 
-package androidx.compose.material3.internal
+package androidx.compose.material3.adaptive.layout.internal
 
-import kotlinx.coroutines.CancellationException
-
-internal actual class AnchoredDragFinishedSignal actual constructor() :
-    CancellationException("Anchored drag finished") {
-    override fun fillInStackTrace(): Throwable {
-        stackTrace = emptyArray()
-        return this
-    }
-}
+internal actual fun identityHashCode(instance: Any?): Int = System.identityHashCode(instance)

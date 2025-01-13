@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-package androidx.compose.material
+package androidx.compose.material.internal
 
-import kotlinx.coroutines.CancellationException
+import androidx.compose.material.implementedInJetBrainsFork
 
-internal actual class AnchoredDragFinishedSignal : CancellationException("Anchored drag finished") {
-    override fun fillInStackTrace(): Throwable {
-        stackTrace = emptyArray()
-        return this
-    }
-}
+internal actual fun identityHashCode(instance: Any?): Int = implementedInJetBrainsFork()
