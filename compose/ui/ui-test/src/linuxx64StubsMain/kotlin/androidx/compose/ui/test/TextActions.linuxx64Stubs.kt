@@ -23,6 +23,3 @@ internal actual inline fun <R> wrapAssertionErrorsWithNodeInfo(
     node: SemanticsNode,
     block: () -> R
 ): R = implementedInJetBrainsFork()
-
-internal actual inline fun assertOnJvm(value: Boolean, lazyMessage: () -> Any): Unit =
-    implementedInJetBrainsFork()

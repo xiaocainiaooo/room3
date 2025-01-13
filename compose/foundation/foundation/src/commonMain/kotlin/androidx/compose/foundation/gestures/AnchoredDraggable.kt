@@ -1571,7 +1571,7 @@ private class DefaultDraggableAnchors<T>(
 ) : DraggableAnchors<T> {
 
     init {
-        assertOnJvm(keys.size == anchors.size) {
+        requirePrecondition(keys.size == anchors.size) {
             "DraggableAnchors were constructed with " +
                 "inconsistent key-value sizes. Keys: $keys | Anchors: ${anchors.toList()}"
         }
@@ -1651,8 +1651,6 @@ private class DefaultDraggableAnchors<T>(
         append("})")
     }
 }
-
-internal expect inline fun assertOnJvm(statement: Boolean, message: () -> String)
 
 internal val AnchoredDraggableMinFlingVelocity = 125.dp
 
