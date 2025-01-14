@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,52 +30,47 @@ import org.junit.runner.RunWith;
 // This class tests the logic for calling listeners. The actual logic for specific listener is
 // tested separately.
 @RunWith(AndroidJUnit4.class)
-public class OneOffPreDrawListenerTest {
+public class OneOffLayoutChangeListenerTest {
     @Test
-    public void test_onPreDrawLogic_calledOnlyOnce() {
+    public void test_onLayoutChangeLogic_calledOnlyOnce() {
         TestView view = new TestView();
-        TestSupplier supplier = new TestSupplier();
+        TestRunnable runnable = new TestRunnable();
 
-        OneOffPreDrawListener listener = OneOffPreDrawListener.add(view, supplier::run);
+        OneOffLayoutChangeListener listener = OneOffLayoutChangeListener.add(view, runnable::run);
 
         assertThat(view.hasOnAttachStateListener).isTrue();
         assertThat(view.isOnAttachStateListenerRemoved).isFalse();
-        // Supplier hasn't been called yet.
-        assertThat(supplier.runCnt).isEqualTo(0);
+        // Runnable hasn't been called yet.
+        assertThat(runnable.runCnt).isEqualTo(0);
 
-        // Supplier hasn't been called yet, but we attached listener, state listener stayed
+        // Runnable hasn't been called yet, but we attached listener, state listener stayed
         // attached.
         listener.onViewAttachedToWindow(view);
         assertThat(view.isOnAttachStateListenerRemoved).isFalse();
-        assertThat(supplier.runCnt).isEqualTo(0);
+        assertThat(runnable.runCnt).isEqualTo(0);
 
-        // Now preDraw is called so should the logic.
-        supplier.preDrawReturnValue = false;
-        assertThat(listener.onPreDraw()).isFalse();
+        // Now onLayoutChange is called so should the logic.
+        listener.onLayoutChange(view, 0, 0, 0, 0, 0, 0, 0, 0);
+        assertThat(runnable.runCnt).isEqualTo(1);
         // And state listener should be removed.
         assertThat(view.isOnAttachStateListenerRemoved).isTrue();
 
-        assertThat(supplier.runCnt).isEqualTo(1);
-
         // Now it shouldn't after detach.
         listener.onViewDetachedFromWindow(view);
-        assertThat(listener.onPreDraw()).isTrue();
-        assertThat(supplier.runCnt).isEqualTo(1);
+        listener.onLayoutChange(view, 0, 0, 0, 0, 0, 0, 0, 0);
+        assertThat(runnable.runCnt).isEqualTo(1);
 
         // But with new attach it should be called.
         listener.onViewAttachedToWindow(view);
-        supplier.preDrawReturnValue = true;
-        assertThat(listener.onPreDraw()).isTrue();
-        assertThat(supplier.runCnt).isEqualTo(2);
+        listener.onLayoutChange(view, 0, 0, 0, 0, 0, 0, 0, 0);
+        assertThat(runnable.runCnt).isEqualTo(2);
     }
 
-    private static final class TestSupplier {
-        public boolean preDrawReturnValue = true;
+    private static final class TestRunnable {
         public int runCnt = 0;
 
-        boolean run() {
+        void run() {
             runCnt++;
-            return preDrawReturnValue;
         }
     }
 
