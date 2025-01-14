@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.kspApi)
     implementation(libs.kotlinPoet)
 
+    testImplementationAarAsJar(project(":appfunctions:appfunctions-common"))
     testImplementationAarAsJar(project(":appfunctions:appfunctions-runtime"))
     testImplementation(libs.googleCompileTesting)
     testImplementation(project(":room:room-compiler-processing-testing"))

@@ -16,18 +16,23 @@
 
 package androidx.appfunctions.compiler.core
 
+import com.google.devtools.ksp.symbol.KSTypeReference
 import com.squareup.kotlinpoet.ClassName
 
-/** Helper class to introspect AppFunction symbols. */
-object IntrospectionHelper {
-    // Package names
-    private const val APP_FUNCTIONS_PACKAGE_NAME = "androidx.appfunctions"
-
-    // Annotation classes
-    object AppFunctionAnnotation {
-        val CLASS_NAME = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunction")
-    }
-
-    // Classes
-    val APP_FUNCTION_CONTEXT_CLASS = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionContext")
+/**
+ * Checks if the type reference is of the given type.
+ *
+ * @param type the type to check against
+ * @return true if the type reference is of the given type
+ * @throws ProcessingException If unable to resolve the type.
+ */
+fun KSTypeReference.isOfType(type: ClassName): Boolean {
+    val ksType = this.resolve()
+    val typeName =
+        ksType.declaration.qualifiedName
+            ?: throw ProcessingException(
+                "Unable to resolve the type to check if it is of type [${type}]",
+                this
+            )
+    return typeName.asString() == type.canonicalName
 }
