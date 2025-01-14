@@ -2386,30 +2386,30 @@ private fun FullScreenSearchBarLayout(
         },
     ) { measurables, constraints ->
         val predictiveBackProgress = lastInProgressValue.value.transform()
+        val collapsedWidth =
+            state.collapsedBounds.width.takeIf { it != 0 } ?: SearchBarMinWidth.roundToPx()
+        val collapsedHeight =
+            state.collapsedBounds.height.takeIf { it != 0 } ?: InputFieldHeight.roundToPx()
 
         val predictiveBackEndWidth =
             (constraints.maxWidth * SearchBarPredictiveBackMinScale)
                 .roundToInt()
-                .coerceAtLeast(state.collapsedBounds.width)
+                .coerceAtLeast(collapsedWidth)
         val predictiveBackEndHeight =
             (constraints.maxHeight * SearchBarPredictiveBackMinScale)
                 .roundToInt()
-                .coerceAtLeast(state.collapsedBounds.height)
+                .coerceAtLeast(collapsedHeight)
         val endWidth = lerp(constraints.maxWidth, predictiveBackEndWidth, predictiveBackProgress)
         val endHeight = lerp(constraints.maxHeight, predictiveBackEndHeight, predictiveBackProgress)
-        val width =
-            constraints.constrainWidth(lerp(state.collapsedBounds.width, endWidth, state.progress))
-        val height =
-            constraints.constrainHeight(
-                lerp(state.collapsedBounds.height, endHeight, state.progress)
-            )
+        val width = constraints.constrainWidth(lerp(collapsedWidth, endWidth, state.progress))
+        val height = constraints.constrainHeight(lerp(collapsedHeight, endHeight, state.progress))
 
         val surfaceMeasurable = measurables.fastFirst { it.layoutId == LayoutIdSurface }
         val surfacePlaceable = surfaceMeasurable.measure(Constraints.fixed(width, height))
 
         val inputFieldMeasurable = measurables.fastFirst { it.layoutId == LayoutIdInputField }
         val inputFieldPlaceable =
-            inputFieldMeasurable.measure(Constraints.fixed(width, state.collapsedBounds.height))
+            inputFieldMeasurable.measure(Constraints.fixed(width, collapsedHeight))
 
         val topPadding = unconsumedInsets.getTop(this@Layout) + SearchBarVerticalPadding.roundToPx()
         val bottomPadding = SearchBarVerticalPadding.roundToPx()
