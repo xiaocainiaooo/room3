@@ -50,6 +50,7 @@ import androidx.compose.material3.samples.ClickableCardSample
 import androidx.compose.material3.samples.ClickableElevatedCardSample
 import androidx.compose.material3.samples.ClickableOutlinedCardSample
 import androidx.compose.material3.samples.ContainedLoadingIndicatorSample
+import androidx.compose.material3.samples.CustomTwoRowsTopAppBar
 import androidx.compose.material3.samples.DateInputSample
 import androidx.compose.material3.samples.DatePickerDialogSample
 import androidx.compose.material3.samples.DatePickerSample
@@ -836,6 +837,13 @@ val TopAppBarExamples =
             sourceUrl = TopAppBarExampleSourceUrl,
         ) {
             ExitUntilCollapsedCenterAlignedLargeFlexibleTopAppBar()
+        },
+        Example(
+            name = "CustomTwoRowsTopAppBar",
+            description = TopAppBarExampleDescription,
+            sourceUrl = TopAppBarExampleSourceUrl,
+        ) {
+            CustomTwoRowsTopAppBar()
         },
     )
 
