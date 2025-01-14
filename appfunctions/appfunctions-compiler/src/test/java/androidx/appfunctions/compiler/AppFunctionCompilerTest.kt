@@ -52,4 +52,32 @@ class AppFunctionCompilerTest {
             goldenFileName = "SimpleFunctionIds.KT"
         )
     }
+
+    @Test
+    fun testMissingFirstParameter() {
+        val report =
+            compilationTestHelper.compileAll(sourceFileNames = listOf("MissingFirstParameter.KT"))
+
+        compilationTestHelper.assertErrorWithMessage(
+            report,
+            "The first parameter of an app function must be " +
+                "androidx.appfunctions.AppFunctionContext\n" +
+                "    fun missingFirstParameter() {}\n" +
+                "    ^"
+        )
+    }
+
+    @Test
+    fun testIncorrectFirstParameter() {
+        val report =
+            compilationTestHelper.compileAll(sourceFileNames = listOf("IncorrectFirstParameter.KT"))
+
+        compilationTestHelper.assertErrorWithMessage(
+            report,
+            "The first parameter of an app function must be " +
+                "androidx.appfunctions.AppFunctionContext\n" +
+                "    fun incorrectFirstParameter(x: Int) {}\n" +
+                "    ^"
+        )
+    }
 }
