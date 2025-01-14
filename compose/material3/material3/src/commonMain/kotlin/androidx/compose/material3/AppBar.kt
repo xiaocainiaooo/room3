@@ -99,6 +99,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isFinite
@@ -2885,37 +2886,43 @@ private class TopAppBarMeasurePolicy(
                 y = (layoutHeight - navigationIconPlaceable.height) / 2
             )
 
-            // Title
-            titlePlaceable.placeRelative(
-                x =
-                    when (titleHorizontalAlignment) {
-                        Alignment.CenterHorizontally -> {
-                            var baseX = (constraints.maxWidth - titlePlaceable.width) / 2
-                            if (baseX < navigationIconPlaceable.width) {
-                                // May happen if the navigation is wider than the actions and the
-                                // title is long. In this case, prioritize showing more of the title
-                                // by offsetting it to the right.
-                                baseX += (navigationIconPlaceable.width - baseX)
-                            } else if (
-                                baseX + titlePlaceable.width >
-                                    constraints.maxWidth - actionIconsPlaceable.width
-                            ) {
-                                // May happen if the actions are wider than the navigation and the
-                                // title is long. In this case, offset to the left.
-                                baseX +=
-                                    ((constraints.maxWidth - actionIconsPlaceable.width) -
-                                        (baseX + titlePlaceable.width))
-                            }
-                            baseX
-                        }
-                        Alignment.End ->
-                            constraints.maxWidth - titlePlaceable.width - actionIconsPlaceable.width
-                        // Fallback to Alignment.Start.
-                        // A TopAppBarTitleInset will make sure the title is offset in case the
-                        // navigation icon is missing.
-                        else -> max(TopAppBarTitleInset.roundToPx(), navigationIconPlaceable.width)
-                    },
-                y =
+            titlePlaceable.let {
+                val navigationIconWidth =
+                    max(TopAppBarTitleInset.roundToPx(), navigationIconPlaceable.width)
+                val actionsWidth = actionIconsPlaceable.width
+
+                val start =
+                    when (layoutDirection) {
+                        LayoutDirection.Ltr -> navigationIconWidth
+                        LayoutDirection.Rtl -> actionsWidth
+                    }
+                val end =
+                    when (layoutDirection) {
+                        LayoutDirection.Ltr -> actionsWidth
+                        LayoutDirection.Rtl -> navigationIconWidth
+                    }
+
+                // Align using the maxWidth. We will adjust the position later according to the
+                // start and end. This is done to ensure that a center alignment is still maintained
+                // when the start and end have different widths. Note that the title is centered
+                // relative to the entire app bar width, and not just centered between the
+                // navigation icon and the actions.
+                var titleX =
+                    titleHorizontalAlignment.align(
+                        size = titlePlaceable.width,
+                        space = constraints.maxWidth,
+                        layoutDirection = layoutDirection
+                    )
+                // Reposition the title based on the start and the end (i.e. the navigation and
+                // action widths).
+                if (titleX < start) {
+                    titleX += (start - titleX)
+                } else if (titleX + titlePlaceable.width > constraints.maxWidth - end) {
+                    titleX += ((constraints.maxWidth - end) - (titleX + titlePlaceable.width))
+                }
+
+                // The titleVerticalArrangement is always one of Center or Bottom.
+                val titleY =
                     when (titleVerticalArrangement) {
                         Arrangement.Center -> (layoutHeight - titlePlaceable.height) / 2
                         // Apply bottom padding from the title's baseline only when the Arrangement
@@ -2943,7 +2950,9 @@ private class TopAppBarMeasurePolicy(
                         // Arrangement.Top
                         else -> 0
                     }
-            )
+
+                it.placeRelative(titleX, titleY)
+            }
 
             // Action icons
             actionIconsPlaceable.placeRelative(
