@@ -17,6 +17,7 @@
 package androidx.camera.viewfinder.core
 
 import android.view.Surface
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * A session of a [Surface] provided by a viewfinder.
@@ -32,6 +33,22 @@ import android.view.Surface
  * @property request The [ViewfinderSurfaceRequest] responsible for this session.
  */
 interface ViewfinderSurfaceSession : AutoCloseable {
+    val surface: Surface
+    val request: ViewfinderSurfaceRequest
+}
+
+/**
+ * A coroutine variant of a [ViewfinderSurfaceSession].
+ *
+ * The scope will generally be active for as long as the surface needs to be written into, so
+ * [surface] should not be used outside of this scope.
+ *
+ * @property surface The [android.view.Surface] available for this session. Users of this surface
+ *   should not call [Surface.release]. It will automatically be closed at some time after this
+ *   scope has exited.
+ * @property request The [ViewfinderSurfaceRequest] responsible for this session.
+ */
+interface ViewfinderSurfaceSessionScope : CoroutineScope {
     val surface: Surface
     val request: ViewfinderSurfaceRequest
 }

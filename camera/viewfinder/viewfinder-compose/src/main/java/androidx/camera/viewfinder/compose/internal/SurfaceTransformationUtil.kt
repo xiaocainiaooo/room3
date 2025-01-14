@@ -33,8 +33,12 @@ import androidx.camera.viewfinder.core.TransformationInfo
  */
 object SurfaceTransformationUtil {
 
-    fun getTextureViewCorrectionMatrix(displayRotationDegrees: Int, resolution: Size): Matrix {
-        val surfaceRect = RectF(0f, 0f, resolution.width.toFloat(), resolution.height.toFloat())
+    fun getTextureViewCorrectionMatrix(
+        displayRotationDegrees: Int,
+        width: Int,
+        height: Int
+    ): Matrix {
+        val surfaceRect = RectF(0f, 0f, width.toFloat(), height.toFloat())
         return TransformUtil.getRectToRect(surfaceRect, surfaceRect, -displayRotationDegrees)
     }
 

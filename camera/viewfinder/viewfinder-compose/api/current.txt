@@ -21,8 +21,12 @@ package androidx.camera.viewfinder.compose {
     property public abstract float[] transformMatrix;
   }
 
+  public interface ViewfinderInitScope {
+    method public void onSurfaceSession(kotlin.jvm.functions.Function2<? super androidx.camera.viewfinder.core.ViewfinderSurfaceSessionScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,? extends java.lang.Object?> block);
+  }
+
   public final class ViewfinderKt {
-    method @androidx.compose.runtime.Composable public static void Viewfinder(androidx.camera.viewfinder.core.ViewfinderSurfaceRequest surfaceRequest, androidx.camera.viewfinder.core.ImplementationMode implementationMode, androidx.camera.viewfinder.core.TransformationInfo transformationInfo, optional androidx.compose.ui.Modifier modifier, optional androidx.camera.viewfinder.compose.MutableCoordinateTransformer? coordinateTransformer);
+    method @androidx.compose.runtime.Composable public static void Viewfinder(androidx.camera.viewfinder.core.ViewfinderSurfaceRequest surfaceRequest, androidx.camera.viewfinder.core.TransformationInfo transformationInfo, optional androidx.compose.ui.Modifier modifier, optional androidx.camera.viewfinder.compose.MutableCoordinateTransformer? coordinateTransformer, kotlin.jvm.functions.Function1<? super androidx.camera.viewfinder.compose.ViewfinderInitScope,kotlin.Unit> onInit);
   }
 
 }

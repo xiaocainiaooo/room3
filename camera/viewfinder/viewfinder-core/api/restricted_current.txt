@@ -67,6 +67,13 @@ package androidx.camera.viewfinder.core {
     method public static androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.Builder populateFromCharacteristics(androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.Builder, android.hardware.camera2.CameraCharacteristics cameraCharacteristics);
   }
 
+  public interface ViewfinderSurfaceSessionScope extends kotlinx.coroutines.CoroutineScope {
+    method public androidx.camera.viewfinder.core.ViewfinderSurfaceRequest getRequest();
+    method public android.view.Surface getSurface();
+    property public abstract androidx.camera.viewfinder.core.ViewfinderSurfaceRequest request;
+    property public abstract android.view.Surface surface;
+  }
+
   public final class ZoomGestureDetector {
     ctor public ZoomGestureDetector(android.content.Context context, androidx.camera.viewfinder.core.ZoomGestureDetector.OnZoomGestureListener listener);
     ctor public ZoomGestureDetector(android.content.Context context, optional @Px int spanSlop, androidx.camera.viewfinder.core.ZoomGestureDetector.OnZoomGestureListener listener);
