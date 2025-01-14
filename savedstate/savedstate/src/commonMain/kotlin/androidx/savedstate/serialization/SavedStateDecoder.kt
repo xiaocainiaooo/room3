@@ -22,6 +22,7 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractDecoder
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.modules.EmptySerializersModule
@@ -73,9 +74,31 @@ internal class SavedStateDecoder(internal val savedState: SavedState) : Abstract
     private var index = 0
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
-        if (index == savedState.read { size() }) return CompositeDecoder.DECODE_DONE
-        key = descriptor.getElementName(index)
-        return index++
+        val size =
+            if (descriptor.kind == StructureKind.LIST || descriptor.kind == StructureKind.MAP) {
+                // Use the number of elements encoded for collections.
+                savedState.read { size() }
+            } else {
+                // We may skip elements when encoding so if we used `size()`
+                // here we may miss some fields.
+                descriptor.elementsCount
+            }
+        fun hasDefaultValueDefined(index: Int) = descriptor.isElementOptional(index)
+        fun presentInEncoding(index: Int) =
+            savedState.read {
+                val key = descriptor.getElementName(index)
+                contains(key)
+            }
+        // Skip elements omitted from encoding (those assigned with its default values).
+        while (index < size && hasDefaultValueDefined(index) && !presentInEncoding(index)) {
+            index++
+        }
+        if (index < size) {
+            key = descriptor.getElementName(index)
+            return index++
+        } else {
+            return CompositeDecoder.DECODE_DONE
+        }
     }
 
     override fun decodeBoolean(): Boolean = savedState.read { getBoolean(key) }
