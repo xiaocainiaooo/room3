@@ -19,6 +19,7 @@ package androidx.wear.compose.foundation.lazy
 import androidx.collection.MutableObjectIntMap
 import androidx.collection.ObjectIntMap
 import androidx.collection.emptyObjectIntMap
+import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableDefaults
@@ -77,6 +78,9 @@ import androidx.wear.compose.foundation.rotary.rotaryScrollable
  *   and the [flingBehavior] (which controls touch scroll) should produce similar scroll effect. Can
  *   be null if rotary support is not required or when it should be handled externally with a
  *   separate [Modifier.rotaryScrollable] modifier.
+ * @param overscrollEffect the [OverscrollEffect] that will be used to render overscroll for this
+ *   layout. Note that the [OverscrollEffect.node] will be applied internally as well - you do not
+ *   need to use Modifier.overscroll separately.
  * @param content The content of the list.
  */
 // TODO: b/372629395 - Default to ContentPaddingMeasurementStrategy when no contentPadding provided.
@@ -91,6 +95,7 @@ public fun TransformingLazyColumn(
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
     rotaryScrollableBehavior: RotaryScrollableBehavior? = RotaryScrollableDefaults.behavior(state),
+    overscrollEffect: OverscrollEffect? = rememberOverscrollEffect(),
     content: TransformingLazyColumnScope.() -> Unit
 ) {
     val graphicsContext = LocalGraphicsContext.current
@@ -116,6 +121,7 @@ public fun TransformingLazyColumn(
         flingBehavior = flingBehavior,
         userScrollEnabled = userScrollEnabled,
         rotaryScrollableBehavior = rotaryScrollableBehavior,
+        overscrollEffect = overscrollEffect,
         content = content,
     )
 }
@@ -138,6 +144,9 @@ public fun TransformingLazyColumn(
  *   and the [flingBehavior] (which controls touch scroll) should produce similar scroll effect. Can
  *   be null if rotary support is not required or when it should be handled externally with a
  *   separate [Modifier.rotaryScrollable] modifier.
+ * @param overscrollEffect the [OverscrollEffect] that will be used to render overscroll for this
+ *   layout. Note that the [OverscrollEffect.node] will be applied internally as well - you do not
+ *   need to use Modifier.overscroll separately.
  * @param content The content of the list.
  */
 // TODO: b/372629395 - Remove this overload without contentPadding when clients are migrated.
@@ -146,11 +155,16 @@ public fun TransformingLazyColumn(
     modifier: Modifier = Modifier,
     state: TransformingLazyColumnState = rememberTransformingLazyColumnState(),
     verticalArrangement: Arrangement.Vertical =
-        Arrangement.spacedBy(space = 4.dp, alignment = Alignment.Top),
+        Arrangement.spacedBy(
+            space = 4.dp,
+            // TODO: b/352513793 - Add support for reverseLayout.
+            alignment = Alignment.Top
+        ),
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
     rotaryScrollableBehavior: RotaryScrollableBehavior? = RotaryScrollableDefaults.behavior(state),
+    overscrollEffect: OverscrollEffect? = rememberOverscrollEffect(),
     content: TransformingLazyColumnScope.() -> Unit
 ) {
     val measurementStrategy = remember { TransformingLazyColumnCenterBoundsMeasurementStrategy() }
@@ -163,6 +177,7 @@ public fun TransformingLazyColumn(
         flingBehavior = flingBehavior,
         userScrollEnabled = userScrollEnabled,
         rotaryScrollableBehavior = rotaryScrollableBehavior,
+        overscrollEffect = overscrollEffect,
         content = content
     )
 }
@@ -178,18 +193,14 @@ public val LocalTransformingLazyColumnItemScope:
 @Composable
 internal fun TransformingLazyColumnImpl(
     modifier: Modifier = Modifier,
-    state: TransformingLazyColumnState = rememberTransformingLazyColumnState(),
-    verticalArrangement: Arrangement.Vertical =
-        Arrangement.spacedBy(
-            space = 4.dp,
-            // TODO: b/352513793 - Add support for reverseLayout.
-            alignment = Alignment.Top
-        ),
-    horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
+    state: TransformingLazyColumnState,
+    verticalArrangement: Arrangement.Vertical,
+    horizontalAlignment: Alignment.Horizontal,
     measurementStrategy: TransformingLazyColumnMeasurementStrategy,
-    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
-    userScrollEnabled: Boolean = true,
-    rotaryScrollableBehavior: RotaryScrollableBehavior? = RotaryScrollableDefaults.behavior(state),
+    flingBehavior: FlingBehavior,
+    userScrollEnabled: Boolean,
+    rotaryScrollableBehavior: RotaryScrollableBehavior?,
+    overscrollEffect: OverscrollEffect?,
     content: TransformingLazyColumnScope.() -> Unit
 ) {
     val latestContent = rememberUpdatedState(newValue = content)
@@ -230,8 +241,6 @@ internal fun TransformingLazyColumnImpl(
         )
 
     val semanticState = remember(state) { TransformingLazyColumnSemanticState(state) }
-
-    val overscrollEffect = rememberOverscrollEffect()
 
     LazyLayout(
         itemProvider = itemProviderLambda,
