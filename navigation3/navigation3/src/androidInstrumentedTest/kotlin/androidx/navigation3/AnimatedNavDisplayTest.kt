@@ -16,14 +16,18 @@
 
 package androidx.navigation3
 
-import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.kruth.assertThat
+import androidx.navigation3.AnimatedNavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import kotlin.test.Test
@@ -63,7 +67,68 @@ class AnimatedNavDisplayTest {
         composeTestRule.runOnIdle { backstack.add(second) }
 
         // advance half way between animations
-        composeTestRule.mainClock.advanceTimeBy(DefaultDurationMillis.toLong() / 2)
+        composeTestRule.mainClock.advanceTimeBy(
+            DEFAULT_TRANSITION_DURATION_MILLISECOND.toLong() / 2
+        )
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText(first).assertExists()
+        composeTestRule.onNodeWithText(second).assertExists()
+
+        composeTestRule.mainClock.autoAdvance = true
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText(first).assertDoesNotExist()
+        composeTestRule.onNodeWithText(second).assertExists()
+    }
+
+    @Test
+    fun testNavHostAnimationsCustom() {
+        lateinit var backstack: MutableList<Any>
+
+        composeTestRule.mainClock.autoAdvance = false
+        val customDuration = DEFAULT_TRANSITION_DURATION_MILLISECOND * 2
+
+        composeTestRule.setContent {
+            backstack = remember { mutableStateListOf(first) }
+            val manager = rememberNavWrapperManager(emptyList())
+            AnimatedNavDisplay(backstack, wrapperManager = manager) {
+                when (it) {
+                    first ->
+                        NavRecord(
+                            first,
+                        ) {
+                            Text(first)
+                        }
+                    second ->
+                        NavRecord(
+                            second,
+                            featureMap =
+                                AnimatedNavDisplay.transition(
+                                    enter = fadeIn(tween(customDuration)),
+                                    exit = fadeOut(tween(customDuration))
+                                )
+                        ) {
+                            Text(second)
+                        }
+                    else -> error("Invalid key passed")
+                }
+            }
+        }
+
+        composeTestRule.mainClock.autoAdvance = true
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText(first).assertIsDisplayed()
+
+        composeTestRule.mainClock.autoAdvance = false
+
+        composeTestRule.runOnIdle { backstack.add(second) }
+
+        // advance past the default duration but not the custom duration
+        composeTestRule.mainClock.advanceTimeBy(
+            ((DEFAULT_TRANSITION_DURATION_MILLISECOND * 3 / 2)).toLong()
+        )
 
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText(first).assertExists()

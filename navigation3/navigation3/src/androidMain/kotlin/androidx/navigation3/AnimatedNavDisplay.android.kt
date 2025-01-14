@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Dialog
+import androidx.navigation3.AnimatedNavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
 
 /** Object that indicates the features that can be handled by the [AnimatedNavDisplay] */
 public object AnimatedNavDisplay {
@@ -50,6 +51,7 @@ public object AnimatedNavDisplay {
     internal const val ENTER_TRANSITION_KEY = "enterTransition"
     internal const val EXIT_TRANSITION_KEY = "exitTransition"
     internal const val DIALOG_KEY = "dialog"
+    internal const val DEFAULT_TRANSITION_DURATION_MILLISECOND = 700
 }
 
 /**
@@ -65,6 +67,12 @@ public object AnimatedNavDisplay {
  * @param wrapperManager the manager that combines all of the [NavContentWrapper]s
  * @param modifier the modifier to be applied to the layout.
  * @param contentAlignment The [Alignment] of the [AnimatedContent]
+ * @param enterTransition Default [EnterTransition] for all [NavRecord]s. Can be overridden
+ *   individually for each [NavRecord] by passing in the record's transitions through
+ *   [NavRecord.featureMap].
+ * @param exitTransition Default [ExitTransition] for all [NavRecord]s. Can be overridden
+ *   individually for each [NavRecord] by passing in the record's transitions through
+ *   [NavRecord.featureMap].
  * @param onBack a callback for handling system back presses
  * @param recordProvider lambda used to construct each possible [NavRecord]
  * @sample androidx.navigation3.samples.AnimatedNav
@@ -76,6 +84,20 @@ public fun <T : Any> AnimatedNavDisplay(
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
     sizeTransform: SizeTransform? = null,
+    enterTransition: EnterTransition =
+        fadeIn(
+            animationSpec =
+                tween(
+                    DEFAULT_TRANSITION_DURATION_MILLISECOND,
+                )
+        ),
+    exitTransition: ExitTransition =
+        fadeOut(
+            animationSpec =
+                tween(
+                    DEFAULT_TRANSITION_DURATION_MILLISECOND,
+                )
+        ),
     onBack: () -> Unit = {},
     recordProvider: (key: T) -> NavRecord<out T>
 ) {
@@ -84,13 +106,13 @@ public fun <T : Any> AnimatedNavDisplay(
     val key = backstack.last()
     val record = recordProvider.invoke(key)
 
-    // Incoming record defines transitions, otherwise it defaults to a fade
-    val enterTransition =
+    // Incoming record defines transitions, otherwise it uses default transitions from NavDisplay
+    val finalEnterTransition =
         record.featureMap[AnimatedNavDisplay.ENTER_TRANSITION_KEY] as? EnterTransition
-            ?: fadeIn(animationSpec = tween(700))
-    val exitTransition =
+            ?: enterTransition
+    val finalExitTransition =
         record.featureMap[AnimatedNavDisplay.EXIT_TRANSITION_KEY] as? ExitTransition
-            ?: fadeOut(animationSpec = tween(700))
+            ?: exitTransition
 
     // if there is a dialog, we should create a transition with the next to last entry instead.
     val transition =
@@ -109,8 +131,8 @@ public fun <T : Any> AnimatedNavDisplay(
         modifier = modifier,
         transitionSpec = {
             ContentTransform(
-                targetContentEnter = enterTransition,
-                initialContentExit = exitTransition,
+                targetContentEnter = finalEnterTransition,
+                initialContentExit = finalExitTransition,
                 sizeTransform = sizeTransform
             )
         },
