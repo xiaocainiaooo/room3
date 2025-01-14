@@ -429,7 +429,11 @@ private class BinderAdapterDelegate(
             remoteSessionClient: IRemoteSessionClient
         ): SessionClientProxy {
             val surfaceControlViewHost =
-                SurfaceControlViewHost(displayContext, display, sessionConstants.windowInputToken)
+                checkNotNull(
+                    createSurfaceControlViewHost(displayContext, display, sessionConstants)
+                ) {
+                    "Failed to create SurfaceControlViewHost"
+                }
             val touchTransferringView =
                 TouchFocusTransferringView(displayContext, surfaceControlViewHost)
             return SessionClientProxy(
@@ -438,6 +442,51 @@ private class BinderAdapterDelegate(
                 isZOrderOnTop,
                 remoteSessionClient
             )
+        }
+
+        fun createSurfaceControlViewHost(
+            displayContext: Context,
+            display: Display,
+            sessionConstants: SessionConstants
+        ): SurfaceControlViewHost? {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                Api35PlusImpl.createSurfaceControlViewHost(
+                    displayContext,
+                    display,
+                    sessionConstants
+                )
+            } else
+                Api34PlusImpl.createSurfaceControlViewHost(
+                    displayContext,
+                    display,
+                    sessionConstants
+                )
+        }
+
+        @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+        private object Api35PlusImpl {
+
+            @JvmStatic
+            fun createSurfaceControlViewHost(
+                context: Context,
+                display: Display,
+                sessionConstants: SessionConstants
+            ): SurfaceControlViewHost {
+                return SurfaceControlViewHost(context, display, sessionConstants.inputTransferToken)
+            }
+        }
+
+        @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+        private object Api34PlusImpl {
+
+            @JvmStatic
+            fun createSurfaceControlViewHost(
+                context: Context,
+                display: Display,
+                sessionConstants: SessionConstants
+            ): SurfaceControlViewHost {
+                return SurfaceControlViewHost(context, display, sessionConstants.windowInputToken)
+            }
         }
     }
 }

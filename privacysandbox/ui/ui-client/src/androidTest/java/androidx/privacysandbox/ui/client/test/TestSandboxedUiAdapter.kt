@@ -18,7 +18,6 @@ package androidx.privacysandbox.ui.client.test
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.os.IBinder
 import android.os.SystemClock
 import android.view.View
 import androidx.privacysandbox.ui.core.SandboxedSdkViewUiInfo
@@ -36,7 +35,8 @@ class TestSandboxedUiAdapter(private val signalOptions: Set<String> = setOf("opt
     var internalClient: SandboxedUiAdapter.SessionClient? = null
     var testSession: TestSession? = null
     var isZOrderOnTop = true
-    var inputToken: IBinder? = null
+    var sessionConstants: SessionConstants? = null
+
     // When set to true, the onSessionOpened callback will only be invoked when specified
     // by the test. This is to test race conditions when the session is being loaded.
     var delayOpenSessionCallback = false
@@ -62,7 +62,7 @@ class TestSandboxedUiAdapter(private val signalOptions: Set<String> = setOf("opt
             }
             isSessionOpened = true
             this.isZOrderOnTop = isZOrderOnTop
-            this.inputToken = sessionConstants.windowInputToken
+            this.sessionConstants = sessionConstants
             openSessionLatch.countDown()
         }
     }

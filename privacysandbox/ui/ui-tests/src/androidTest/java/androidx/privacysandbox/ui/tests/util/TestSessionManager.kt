@@ -21,7 +21,6 @@ import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Color
-import android.os.Binder
 import android.os.Bundle
 import android.view.Display
 import android.view.View
@@ -69,7 +68,8 @@ class TestSessionManager(
         placeViewInsideFrameLayout: Boolean = false,
         viewForSession: SandboxedSdkView?,
         testSessionClient: TestSessionClient = TestSessionClient(),
-        sessionObserverFactories: List<SessionObserverFactory>? = null
+        sessionObserverFactories: List<SessionObserverFactory>? = null,
+        sessionConstants: SessionConstants = SessionConstants()
     ): TestSandboxedUiAdapter {
 
         val adapter = TestSandboxedUiAdapter(failToProvideUi, placeViewInsideFrameLayout)
@@ -81,7 +81,7 @@ class TestSessionManager(
         } else {
             adapterFromCoreLibInfo.openSession(
                 context,
-                sessionConstants = SessionConstants(windowInputToken = Binder()),
+                sessionConstants,
                 INITIAL_WIDTH,
                 INITIAL_HEIGHT,
                 isZOrderOnTop = true,

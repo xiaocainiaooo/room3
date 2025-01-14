@@ -533,7 +533,9 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
     private object CompatImpl {
 
         fun deriveInputTokenAndOpenSession(context: Context, sandboxedSdkView: SandboxedSdkView) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                Api35PlusImpl.setInputTransferTokenAndOpenSession(sandboxedSdkView)
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 Api34PlusImpl.attachTemporarySurfaceViewAndOpenSession(context, sandboxedSdkView)
             } else {
                 sandboxedSdkView.sessionConstants = SessionConstants()
@@ -555,6 +557,19 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
             }
         }
 
+        @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+        private object Api35PlusImpl {
+            @JvmStatic
+            fun setInputTransferTokenAndOpenSession(sandboxedSdkView: SandboxedSdkView) {
+                sandboxedSdkView.sessionConstants =
+                    SessionConstants(
+                        windowInputToken = null,
+                        inputTransferToken = sandboxedSdkView.rootSurfaceControl?.inputTransferToken
+                    )
+                sandboxedSdkView.checkClientOpenSession()
+            }
+        }
+
         @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
         private object Api34PlusImpl {
 
@@ -570,7 +585,11 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
                             view.removeOnAttachStateChangeListener(this)
                             @Suppress("DEPRECATION")
                             surfaceView.hostToken?.let {
-                                sandboxedSdkView.sessionConstants = SessionConstants(it)
+                                sandboxedSdkView.sessionConstants =
+                                    SessionConstants(
+                                        windowInputToken = it,
+                                        inputTransferToken = null
+                                    )
                             }
                             sandboxedSdkView.removeTemporarySurfaceView(surfaceView)
                             sandboxedSdkView.checkClientOpenSession()
