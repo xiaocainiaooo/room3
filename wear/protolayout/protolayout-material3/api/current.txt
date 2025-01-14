@@ -204,17 +204,6 @@ package androidx.wear.protolayout.material3 {
     method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement textEdgeButton(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.ModifiersBuilders.Clickable onClick, optional androidx.wear.protolayout.modifiers.LayoutModifier modifier, optional androidx.wear.protolayout.material3.ButtonColors colors, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> labelContent);
   }
 
-  public final class EdgeButtonStyle {
-    field public static final androidx.wear.protolayout.material3.EdgeButtonStyle.Companion Companion;
-    field public static final androidx.wear.protolayout.material3.EdgeButtonStyle DEFAULT;
-    field public static final androidx.wear.protolayout.material3.EdgeButtonStyle TOP_ALIGN;
-  }
-
-  public static final class EdgeButtonStyle.Companion {
-    property public final androidx.wear.protolayout.material3.EdgeButtonStyle DEFAULT;
-    property public final androidx.wear.protolayout.material3.EdgeButtonStyle TOP_ALIGN;
-  }
-
   public final class GraphicDataCardStyle {
     field public static final androidx.wear.protolayout.material3.GraphicDataCardStyle.Companion Companion;
   }

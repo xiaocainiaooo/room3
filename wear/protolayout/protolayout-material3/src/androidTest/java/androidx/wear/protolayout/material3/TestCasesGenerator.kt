@@ -83,14 +83,17 @@ object TestCasesGenerator {
         testCases["primarylayout_edgebuttonfilled_buttongroup_iconoverride_golden$goldenSuffix"] =
             materialScope(
                 ApplicationProvider.getApplicationContext(),
-                deviceParameters,
+                // renderer version 1.302 has no asymmetrical corner support, so edgebutton will use
+                // its fallback style
+                deviceParameters.copy(VersionInfo.Builder().setMajor(1).setMinor(302).build()),
                 allowDynamicTheme = false
             ) {
                 primaryLayoutWithOverrideIcon(
                     mainSlot = {
                         text(
-                            text = "Text in the main slot that overflows".layoutString,
-                            color = colorScheme.secondary
+                            text = "Overflow main text and fallback edge button".layoutString,
+                            color = colorScheme.secondary,
+                            maxLines = 3
                         )
                     },
                     bottomSlot = {
@@ -476,11 +479,23 @@ object TestCasesGenerator {
         testCases["primarylayout_circularprogressindicators_fallback__golden$NORMAL_SCALE_SUFFIX"] =
             materialScope(
                 ApplicationProvider.getApplicationContext(),
+                // renderer with version 1.302 has no DashedArcLine or asymmetrical corners support
                 deviceConfiguration =
-                    deviceParameters.copy(VersionInfo.Builder().setMajor(1).setMinor(402).build()),
+                    deviceParameters.copy(VersionInfo.Builder().setMajor(1).setMinor(302).build()),
                 allowDynamicTheme = false
             ) {
-                primaryLayout(mainSlot = { progressIndicatorGroup() })
+                primaryLayout(
+                    mainSlot = { progressIndicatorGroup() },
+                    bottomSlot = {
+                        iconEdgeButton(
+                            onClick = clickable,
+                            iconContent = { icon(ICON_ID) },
+                            modifier =
+                                LayoutModifier.contentDescription(CONTENT_DESCRIPTION_PLACEHOLDER),
+                            colors = filledTonalButtonColors()
+                        )
+                    }
+                )
             }
 
         return collectTestCases(testCases)
