@@ -8,7 +8,7 @@ package androidx.navigation3 {
   }
 
   public final class AnimatedNavDisplay_androidKt {
-    method @androidx.compose.runtime.Composable public static <T> void AnimatedNavDisplay(java.util.List<? extends T> backstack, androidx.navigation3.NavWrapperManager wrapperManager, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.Alignment contentAlignment, optional androidx.compose.animation.SizeTransform? sizeTransform, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavRecord<? extends T>> recordProvider);
+    method @androidx.compose.runtime.Composable public static <T> void AnimatedNavDisplay(java.util.List<? extends T> backstack, androidx.navigation3.NavWrapperManager wrapperManager, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.Alignment contentAlignment, optional androidx.compose.animation.SizeTransform? sizeTransform, optional androidx.compose.animation.EnterTransition enterTransition, optional androidx.compose.animation.ExitTransition exitTransition, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavRecord<? extends T>> recordProvider);
   }
 
   public interface NavContentWrapper {
