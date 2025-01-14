@@ -136,6 +136,30 @@ class CompilationTestHelper(
             .isEqualTo(goldenFile.readText())
     }
 
+    fun assertErrorWithMessage(report: CompilationReport, expectedErrorMessage: String) {
+        Truth.assertWithMessage("Compile succeed").that(report.isSuccess).isFalse()
+
+        val errorDiagnostics = report.diagnostics[Diagnostic.Kind.ERROR] ?: emptyList()
+        var foundError = false
+        for (errorDiagnostic in errorDiagnostics) {
+            if (errorDiagnostic.msg.contains(expectedErrorMessage)) {
+                foundError = true
+                break
+            }
+        }
+        Truth.assertWithMessage(
+                """
+                Unable to find the expected error message [$expectedErrorMessage] from the
+                diagnostics results:
+
+                ${report.printDiagnostics(Diagnostic.Kind.ERROR)}
+            """
+                    .trimIndent()
+            )
+            .that(foundError)
+            .isTrue()
+    }
+
     private fun ensureKotlinFileNameFormat(sourceFileName: String): String {
         val nameParts = sourceFileName.split(".")
         require(nameParts.last().lowercase() == "kt") {
