@@ -104,6 +104,11 @@ public class ForwardingCameraControl implements CameraControlInternal {
     }
 
     @Override
+    public void clearZslConfig() {
+        mCameraControlInternal.clearZslConfig();
+    }
+
+    @Override
     public void setZslDisabledByUserCaseConfig(boolean disabled) {
         mCameraControlInternal.setZslDisabledByUserCaseConfig(disabled);
     }

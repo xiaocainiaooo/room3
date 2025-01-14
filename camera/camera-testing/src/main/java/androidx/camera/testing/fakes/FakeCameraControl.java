@@ -341,6 +341,12 @@ public final class FakeCameraControl implements CameraControlInternal {
         mIsZslConfigAdded = true;
     }
 
+    @Override
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public void clearZslConfig() {
+        mIsZslConfigAdded = false;
+    }
+
     /**
      * Checks if {@link FakeCameraControl#addZslConfig(SessionConfig.Builder)} has been triggered.
      */
