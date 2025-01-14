@@ -30,6 +30,7 @@ import androidx.wear.compose.material3.samples.ButtonGroupThreeButtonsSample
 import androidx.wear.compose.material3.samples.EdgeButtonListSample
 import androidx.wear.compose.material3.samples.EdgeButtonSample
 import androidx.wear.compose.material3.samples.EdgeSwipeForSwipeToDismiss
+import androidx.wear.compose.material3.samples.FadingExpandingLabelButtonSample
 import androidx.wear.compose.material3.samples.LevelIndicatorSample
 import androidx.wear.compose.material3.samples.ListHeaderSample
 import androidx.wear.compose.material3.samples.SimpleSwipeToDismissBox
@@ -63,6 +64,10 @@ val WearMaterial3Demos =
                         ComposableDemo("Button (Image Background)") { ButtonBackgroundImageDemo() },
                         ComposableDemo("Button Stack") { ButtonStackDemo() },
                         ComposableDemo("Button Merge") { ButtonMergeDemo() },
+                        ComposableDemo("Button Update Animation") { ButtonUpdateAnimationDemo() },
+                        ComposableDemo("Fading Expending Label") {
+                            FadingExpandingLabelButtonSample()
+                        },
                     )
                 ),
                 ComposableDemo("Color Scheme") { ColorSchemeDemos() },
