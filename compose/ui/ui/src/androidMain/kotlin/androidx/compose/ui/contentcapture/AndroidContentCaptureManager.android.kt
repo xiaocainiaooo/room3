@@ -351,6 +351,9 @@ internal class AndroidContentCaptureManager(
             // Treat test tag as resourceId
             structure.setId(id, null, null, it)
         }
+        configuration.getOrNull(SemanticsProperties.IsTraversalGroup)?.let {
+            structure.setClassName("android.widget.ViewGroup")
+        }
         configuration.getOrNull(SemanticsProperties.Text)?.let {
             structure.setClassName("android.widget.TextView")
             structure.setText(it.fastJoinToString("\n"))
