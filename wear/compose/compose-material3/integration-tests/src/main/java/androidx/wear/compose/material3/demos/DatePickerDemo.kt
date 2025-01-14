@@ -34,7 +34,7 @@ import androidx.wear.compose.material3.DatePicker
 import androidx.wear.compose.material3.DatePickerType
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.samples.DatePickerMinDateMaxDateSample
+import androidx.wear.compose.material3.samples.DatePickerFutureOnlySample
 import androidx.wear.compose.material3.samples.DatePickerSample
 import androidx.wear.compose.material3.samples.DatePickerYearMonthDaySample
 import java.time.LocalDate
@@ -47,7 +47,7 @@ val DatePickerDemos =
         ComposableDemo("Date Month-Day-Year") { DatePickerDemo(DatePickerType.MonthDayYear) },
         ComposableDemo("Date Day-Month-Year") { DatePickerDemo(DatePickerType.DayMonthYear) },
         ComposableDemo("Date System date format") { DatePickerSample() },
-        ComposableDemo("Date Range") { DatePickerMinDateMaxDateSample() },
+        ComposableDemo("Future only") { DatePickerFutureOnlySample() },
         ComposableDemo("Past only") { DatePickerPastOnlyDemo() },
     )
 
