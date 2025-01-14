@@ -249,7 +249,6 @@ public interface CameraControl {
      * @return a {@link ListenableFuture} that is completed when the torch strength has been
      * applied.
      */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     default @NonNull ListenableFuture<Void> setTorchStrengthLevelAsync(
             @IntRange(from = 1) int torchStrengthLevel) {
         return Futures.immediateFailedFuture(new UnsupportedOperationException(
