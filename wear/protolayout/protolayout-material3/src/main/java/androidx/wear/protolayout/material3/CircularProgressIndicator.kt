@@ -23,13 +23,14 @@ import androidx.wear.protolayout.ColorBuilders.ColorProp
 import androidx.wear.protolayout.DimensionBuilders.AngularLayoutConstraint
 import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
 import androidx.wear.protolayout.DimensionBuilders.DegreesProp
+import androidx.wear.protolayout.DimensionBuilders.DpProp
 import androidx.wear.protolayout.DimensionBuilders.ExpandedDimensionProp
 import androidx.wear.protolayout.DimensionBuilders.WrappedDimensionProp
 import androidx.wear.protolayout.DimensionBuilders.degrees
-import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.Arc
+import androidx.wear.protolayout.LayoutElementBuilders.ArcLine
 import androidx.wear.protolayout.LayoutElementBuilders.ArcSpacer
 import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.DashedArcLine
@@ -38,6 +39,8 @@ import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicColor
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat
+import androidx.wear.protolayout.expression.VersionBuilders.VersionInfo
+import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.CPI_DEFAULT_DP_SIZE
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.INDICATOR_STROKE_WIDTH_INCREMENT_PX
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.LARGE_STROKE_WIDTH
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.METADATA_TAG
@@ -49,10 +52,16 @@ import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.modifiers.padding
 import androidx.wear.protolayout.modifiers.tag
 import androidx.wear.protolayout.modifiers.toProtoLayoutModifiers
+import androidx.wear.protolayout.types.dp
 import kotlin.math.min
 
 /**
  * Protolayout Material3 design circular progress indicator.
+ *
+ * Note that, the proper implementation of this component requires a ProtoLayout renderer with
+ * version equal to or above 1.403. When the renderer is lower than 1.403, this component will
+ * automatically fallback to an implementation with reduced features, without support for expandable
+ * size, overflow, and start/end transition.
  *
  * @param staticProgress The static progress of this progress indicator where 0 represent no
  *   progress and 1 represents completion. Progress above 1 is also allowed. If [dynamicProgress] is
@@ -91,8 +100,8 @@ public fun MaterialScope.circularProgressIndicator(
     modifier: LayoutModifier = LayoutModifier,
     startAngleDegrees: Float = 0F,
     endAngleDegrees: Float = startAngleDegrees + 360F,
-    @Dimension(unit = DP) strokeWidth: Float = LARGE_STROKE_WIDTH,
-    @Dimension(unit = DP) gapSize: Float = calculateRecommendedGapSize(strokeWidth),
+    @Dimension(DP) strokeWidth: Float = LARGE_STROKE_WIDTH,
+    @Dimension(DP) gapSize: Float = calculateRecommendedGapSize(strokeWidth),
     colors: ProgressIndicatorColors = filledProgressIndicatorColors(),
     size: ContainerDimension = expand(),
 ): LayoutElement {
@@ -100,19 +109,39 @@ public fun MaterialScope.circularProgressIndicator(
     verifySize(size)
 
     val modifiers = (LayoutModifier.tag(METADATA_TAG) then modifier).toProtoLayoutModifiers()
+    val hasDashedArcLineSupport =
+        deviceConfiguration.rendererSchemaVersion.hasDashedArcLineSupport()
+    // With the fallback implementation, expandable size is not supported, fallback to dp size.
+    val containerSize =
+        if (hasDashedArcLineSupport || size is DpProp) size else CPI_DEFAULT_DP_SIZE.dp
+    val boxBuilder =
+        if (hasDashedArcLineSupport)
+            singleSegmentImpl(
+                startAngleDegrees = startAngleDegrees,
+                endAngleDegrees = checkAndAdjustEndAngle(startAngleDegrees, endAngleDegrees),
+                staticProgress = staticProgress,
+                dynamicProgress = dynamicProgress,
+                strokeWidth = strokeWidth,
+                gapSize = gapSize,
+                colors = colors
+            )
+        else
+            circularProgressIndicatorFallbackImpl(
+                // Without DashedArcLine support, container size fell back to dp size.
+                arcContainerSize = (containerSize as DpProp).value,
+                startAngleDegrees = startAngleDegrees,
+                endAngleDegrees = checkAndAdjustEndAngle(startAngleDegrees, endAngleDegrees),
+                staticProgress = staticProgress,
+                dynamicProgress = dynamicProgress,
+                strokeWidth = strokeWidth,
+                gapSize = gapSize,
+                colors = colors
+            )
 
-    return singleSegmentImpl(
-            startAngleDegrees = startAngleDegrees,
-            endAngleDegrees = checkAndAdjustEndAngle(startAngleDegrees, endAngleDegrees),
-            staticProgress = staticProgress,
-            dynamicProgress = dynamicProgress,
-            strokeWidth = strokeWidth,
-            gapSize = gapSize,
-            colors = colors
-        )
+    return boxBuilder
         .setModifiers(modifiers)
-        .setWidth(size)
-        .setHeight(size)
+        .setWidth(containerSize)
+        .setHeight(containerSize)
         .build()
 }
 
@@ -120,6 +149,11 @@ public fun MaterialScope.circularProgressIndicator(
  * Protolayout Material3 design segmented circular progress indicator.
  *
  * A segmented variant of [circularProgressIndicator] that is divided into equally sized segments.
+ *
+ * Note that, the proper implementation of this component requires a ProtoLayout renderer with
+ * version equal to or above 1.403. When the renderer is lower than 1.403, this component will
+ * automatically fallback to an implementation with reduced features, without support for multiple
+ * segments, expandable size, overflow, and start/end transition.
  *
  * @param segmentCount Number of equal segments that the progress indicator should be divided into.
  *   Has to be a number greater than or equal to 1.
@@ -161,8 +195,8 @@ public fun MaterialScope.segmentedCircularProgressIndicator(
     modifier: LayoutModifier = LayoutModifier,
     startAngleDegrees: Float = 0F,
     endAngleDegrees: Float = startAngleDegrees + 360F,
-    @Dimension(unit = DP) strokeWidth: Float = LARGE_STROKE_WIDTH,
-    @Dimension(unit = DP) gapSize: Float = calculateRecommendedGapSize(strokeWidth),
+    @Dimension(DP) strokeWidth: Float = LARGE_STROKE_WIDTH,
+    @Dimension(DP) gapSize: Float = calculateRecommendedGapSize(strokeWidth),
     colors: ProgressIndicatorColors = filledProgressIndicatorColors(),
     size: ContainerDimension = expand(),
 ): LayoutElement {
@@ -170,20 +204,40 @@ public fun MaterialScope.segmentedCircularProgressIndicator(
     verifySize(size)
 
     val modifiers = (LayoutModifier.tag(METADATA_TAG) then modifier).toProtoLayoutModifiers()
+    val hasDashedArcLineSupport =
+        deviceConfiguration.rendererSchemaVersion.hasDashedArcLineSupport()
+    // Without using DashedArcLine, expandable size is not supported, fallback to dp size.
+    val containerSize =
+        if (hasDashedArcLineSupport || size is DpProp) size else CPI_DEFAULT_DP_SIZE.dp
+    val boxBuilder =
+        if (hasDashedArcLineSupport)
+            multipleSegmentsImpl(
+                segmentCount = segmentCount,
+                startAngleDegrees = startAngleDegrees,
+                endAngleDegrees = checkAndAdjustEndAngle(startAngleDegrees, endAngleDegrees),
+                staticProgress = staticProgress,
+                dynamicProgress = dynamicProgress,
+                strokeWidth = strokeWidth,
+                gapSize = gapSize,
+                colors = colors
+            )
+        else
+            circularProgressIndicatorFallbackImpl(
+                // Without DashedArcLine support, container size fell back to dp size.
+                arcContainerSize = (containerSize as DpProp).value,
+                startAngleDegrees = startAngleDegrees,
+                endAngleDegrees = checkAndAdjustEndAngle(startAngleDegrees, endAngleDegrees),
+                staticProgress = staticProgress,
+                dynamicProgress = dynamicProgress,
+                strokeWidth = strokeWidth,
+                gapSize = gapSize,
+                colors = colors
+            )
 
-    return multipleSegmentsImpl(
-            segmentCount = segmentCount,
-            startAngleDegrees = startAngleDegrees,
-            endAngleDegrees = checkAndAdjustEndAngle(startAngleDegrees, endAngleDegrees),
-            staticProgress = staticProgress,
-            dynamicProgress = dynamicProgress,
-            strokeWidth = strokeWidth,
-            gapSize = gapSize,
-            colors = colors
-        )
+    return boxBuilder
         .setModifiers(modifiers)
-        .setWidth(size)
-        .setHeight(size)
+        .setWidth(containerSize)
+        .setHeight(containerSize)
         .build()
 }
 
@@ -197,8 +251,8 @@ private fun MaterialScope.singleSegmentImpl(
     endAngleDegrees: Float,
     staticProgress: Float,
     dynamicProgress: DynamicFloat?,
-    @Dimension(unit = DP) strokeWidth: Float,
-    @Dimension(unit = DP) gapSize: Float,
+    @Dimension(DP) strokeWidth: Float,
+    @Dimension(DP) gapSize: Float,
     colors: ProgressIndicatorColors
 ): Box.Builder {
     val sweepAngle = endAngleDegrees - startAngleDegrees
@@ -225,7 +279,7 @@ private fun MaterialScope.singleSegmentImpl(
             .setGapLocations(0f)
             .build()
     val spacer =
-        ArcSpacer.Builder().setAngularLength(dp(gapSize / 2)).setThickness(dp(strokeWidth)).build()
+        ArcSpacer.Builder().setAngularLength((gapSize / 2F).dp).setThickness(strokeWidth.dp).build()
     return Box.Builder()
         .addContent( // the track
             createArc(
@@ -266,8 +320,8 @@ private fun MaterialScope.multipleSegmentsImpl(
     endAngleDegrees: Float,
     staticProgress: Float,
     dynamicProgress: DynamicFloat?,
-    @Dimension(unit = DP) strokeWidth: Float,
-    @Dimension(unit = DP) gapSize: Float,
+    @Dimension(DP) strokeWidth: Float,
+    @Dimension(DP) gapSize: Float,
     colors: ProgressIndicatorColors
 ): Box.Builder {
     val sweepAngle = endAngleDegrees - startAngleDegrees
@@ -333,6 +387,12 @@ private fun verifySize(size: ContainerDimension) {
     }
 }
 
+/**
+ * For renderer with version lower than 1.403, there is no [DashedArcLine] support. In this case,
+ * the progress indicator will fallback to use [ArcLine]
+ */
+private fun VersionInfo.hasDashedArcLineSupport() = major > 1 || (major == 1 && minor >= 403)
+
 /*
  * Check the endAngle is valid with the provided startAngle, and adjust the sweep angle to be 360
  * maximum.
@@ -394,11 +454,11 @@ private fun createArc(
     anchorType: Int,
     arcLength: DegreesProp,
     arcColor: ColorProp,
-    @Dimension(unit = DP) strokeWidth: Float,
+    @Dimension(DP) strokeWidth: Float,
     linePattern: DashedLinePattern,
     arcDirection: Int
-): Arc.Builder {
-    return Arc.Builder()
+): Arc.Builder =
+    Arc.Builder()
         .setAnchorAngle(anchorAngle)
         .setAnchorType(anchorType)
         .setArcDirection(arcDirection)
@@ -415,4 +475,3 @@ private fun createArc(
                 )
                 .build()
         )
-}
