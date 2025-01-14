@@ -116,7 +116,7 @@ internal fun wrapWithMinTapTargetDimension(): WrappedDimensionProp =
  * Note that this only looks at the static value of the [LayoutColor], any dynamic value will be
  * ignored.
  */
-public fun LayoutColor.withOpacity(@FloatRange(from = 0.0, to = 1.0) ratio: Float): LayoutColor {
+internal fun LayoutColor.withOpacity(@FloatRange(from = 0.0, to = 1.0) ratio: Float): LayoutColor {
     // From androidx.core.graphics.ColorUtils
     require(!(ratio < 0 || ratio > 1)) { "setOpacityForColor ratio must be between 0 and 1." }
     val fullyOpaque = 255

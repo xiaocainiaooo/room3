@@ -223,10 +223,6 @@ package androidx.wear.protolayout.material3 {
     method public androidx.wear.protolayout.material3.GraphicDataCardStyle largeGraphicDataCardStyle();
   }
 
-  public final class HelpersKt {
-    method public static androidx.wear.protolayout.types.LayoutColor withOpacity(androidx.wear.protolayout.types.LayoutColor, @FloatRange(from=0.0, to=1.0) float ratio);
-  }
-
   public final class IconButtonStyle {
     field public static final androidx.wear.protolayout.material3.IconButtonStyle.Companion Companion;
   }
