@@ -412,7 +412,8 @@ private fun progressInDegrees(
     staticProgress: Float,
     dynamicProgress: DynamicFloat?,
 ): DegreesProp =
-    DegreesProp.Builder((staticProgress * sweepAngle - TRIVIAL_ARC_OFFSET).mod(sweepAngle))
+    // Note that (-0.05) % 360 = -0.05;  while (-0.05).mod(360) = 359.95, we need to use % here.
+    DegreesProp.Builder((staticProgress * sweepAngle - TRIVIAL_ARC_OFFSET) % sweepAngle)
         .apply {
             dynamicProgress?.let {
                 setDynamicValue(it.times(sweepAngle).minus(TRIVIAL_ARC_OFFSET).rem(sweepAngle))
