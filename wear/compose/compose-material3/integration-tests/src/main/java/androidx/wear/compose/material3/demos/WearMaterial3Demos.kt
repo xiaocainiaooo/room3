@@ -104,6 +104,9 @@ val WearMaterial3Demos =
                         ComposableDemo("Edge Button Below SLC") {
                             EdgeButtonBelowScalingLazyColumnDemo()
                         },
+                        ComposableDemo("Edge Button Below TLC") {
+                            EdgeButtonBelowTransformingLazyColumnDemo()
+                        },
                     )
                 ),
                 Material3DemoCategory(
