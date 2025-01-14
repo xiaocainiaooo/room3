@@ -17,6 +17,8 @@
 package androidx.wear.tiles.samples.tile
 
 import android.content.Context
+import androidx.wear.protolayout.DeviceParametersBuilders
+import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.DimensionBuilders.weight
 import androidx.wear.protolayout.LayoutElementBuilders
@@ -25,6 +27,7 @@ import androidx.wear.protolayout.ResourceBuilders.AndroidImageResourceByResId
 import androidx.wear.protolayout.ResourceBuilders.ImageResource
 import androidx.wear.protolayout.TimelineBuilders
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat
+import androidx.wear.protolayout.expression.VersionBuilders.VersionInfo
 import androidx.wear.protolayout.material3.ButtonDefaults.filledVariantButtonColors
 import androidx.wear.protolayout.material3.CardColors
 import androidx.wear.protolayout.material3.CardDefaults.filledTonalCardColors
@@ -247,6 +250,43 @@ private fun MaterialScope.graphicDataCardSample() =
                 endAngleDegrees = 520F,
                 dynamicProgress = DynamicFloat.animate(0.0F, 1.5F, recommendedAnimationSpec),
             )
+        }
+    )
+
+private fun MaterialScope.graphicDataCardSampleWithFallbackProgressIndicator(context: Context) =
+    graphicDataCard(
+        onClick = clickable(),
+        modifier = LayoutModifier.contentDescription("Graphic Data Card"),
+        height = expand(),
+        horizontalAlignment = LayoutElementBuilders.HORIZONTAL_ALIGN_END,
+        title = {
+            text(
+                "1,234!".layoutString,
+            )
+        },
+        content = {
+            text(
+                "steps".layoutString,
+            )
+        },
+        graphic = {
+            materialScope(
+                context = context,
+                deviceConfiguration =
+                    DeviceParametersBuilders.DeviceParameters.Builder()
+                        .setRendererSchemaVersion(
+                            VersionInfo.Builder().setMajor(1).setMinor(402).build()
+                        )
+                        .build()
+            ) {
+                segmentedCircularProgressIndicator(
+                    segmentCount = 6,
+                    startAngleDegrees = 200F,
+                    endAngleDegrees = 520F,
+                    dynamicProgress = DynamicFloat.animate(0.0F, 1.0F, recommendedAnimationSpec),
+                    size = dp(75F)
+                )
+            }
         }
     )
 

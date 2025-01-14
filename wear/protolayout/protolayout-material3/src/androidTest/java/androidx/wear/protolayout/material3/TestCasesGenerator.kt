@@ -27,6 +27,7 @@ import androidx.wear.protolayout.LayoutElementBuilders.Column
 import androidx.wear.protolayout.ModifiersBuilders.Background
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
+import androidx.wear.protolayout.expression.VersionBuilders.VersionInfo
 import androidx.wear.protolayout.material3.AppCardStyle.Companion.largeAppCardStyle
 import androidx.wear.protolayout.material3.ButtonDefaults.filledButtonColors
 import androidx.wear.protolayout.material3.ButtonDefaults.filledTonalButtonColors
@@ -76,6 +77,8 @@ object TestCasesGenerator {
                 .setScreenDensity(displayMetrics.density)
                 .setFontScale(1f)
                 .setScreenShape(DeviceParametersBuilders.SCREEN_SHAPE_RECT)
+                // testing with the latest renderer version
+                .setRendererSchemaVersion(VersionInfo.Builder().setMajor(99).setMinor(999).build())
                 .build()
         val clickable = clickable(id = "action_id")
         val testCases: HashMap<String, LayoutElementBuilders.LayoutElement> = HashMap()
