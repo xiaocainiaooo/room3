@@ -42,6 +42,14 @@ public object NavDisplay {
         else mapOf(ENTER_TRANSITION_KEY to enter, EXIT_TRANSITION_KEY to exit)
 
     /**
+     * Function to be called on the [NavEntry.featureMap] to notify the [NavDisplay] that, when
+     * popping from backstack, the content should be animated using the provided transitions.
+     */
+    public fun popTransition(enter: EnterTransition?, exit: ExitTransition?): Map<String, Any> =
+        if (enter == null || exit == null) emptyMap()
+        else mapOf(POP_ENTER_TRANSITION_KEY to enter, POP_EXIT_TRANSITION_KEY to exit)
+
+    /**
      * Function to be called on the [NavEntry.featureMap] to notify the [NavDisplay] that the
      * content should be displayed inside of a [Dialog]
      */
@@ -50,6 +58,8 @@ public object NavDisplay {
 
     internal const val ENTER_TRANSITION_KEY = "enterTransition"
     internal const val EXIT_TRANSITION_KEY = "exitTransition"
+    internal const val POP_ENTER_TRANSITION_KEY = "popEnterTransition"
+    internal const val POP_EXIT_TRANSITION_KEY = "popExitTransition"
     internal const val DIALOG_KEY = "dialog"
     internal const val DEFAULT_TRANSITION_DURATION_MILLISECOND = 700
 }

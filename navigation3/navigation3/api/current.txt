@@ -47,6 +47,7 @@ package androidx.navigation3 {
 
   public final class NavDisplay {
     method public java.util.Map<java.lang.String,java.lang.Object> isDialog(boolean boolean);
+    method public java.util.Map<java.lang.String,java.lang.Object> popTransition(androidx.compose.animation.EnterTransition? enter, androidx.compose.animation.ExitTransition? exit);
     method public java.util.Map<java.lang.String,java.lang.Object> transition(androidx.compose.animation.EnterTransition? enter, androidx.compose.animation.ExitTransition? exit);
     field public static final androidx.navigation3.NavDisplay INSTANCE;
   }
