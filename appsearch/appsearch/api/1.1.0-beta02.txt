@@ -6,6 +6,11 @@ package androidx.appsearch.annotation {
     method public abstract Class<? extends java.lang.Object!>[] parent() default {};
   }
 
+  @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi @java.lang.annotation.Documented @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.CLASS) @java.lang.annotation.Target({java.lang.annotation.ElementType.FIELD, java.lang.annotation.ElementType.METHOD}) public static @interface Document.BlobHandleProperty {
+    method public abstract String name() default "";
+    method public abstract boolean required() default false;
+  }
+
   @java.lang.annotation.Documented @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.CLASS) @java.lang.annotation.Target({java.lang.annotation.ElementType.FIELD, java.lang.annotation.ElementType.METHOD}) public static @interface Document.BooleanProperty {
     method public abstract String name() default "";
     method public abstract boolean required() default false;
