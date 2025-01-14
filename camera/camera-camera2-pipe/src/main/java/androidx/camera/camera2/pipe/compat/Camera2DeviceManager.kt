@@ -30,8 +30,10 @@ import androidx.camera.camera2.pipe.graph.GraphListener
 import androidx.camera.camera2.pipe.graph.GraphRequestProcessor
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
@@ -54,9 +56,17 @@ internal data class RequestOpen(
  */
 internal data class RequestClose(val activeCamera: ActiveCamera) : CameraRequest()
 
-internal data class RequestCloseById(val activeCameraId: CameraId) : CameraRequest()
+internal class RequestCloseById(val activeCameraId: CameraId) : CameraRequest() {
+    val deferred: CompletableDeferred<Unit> = CompletableDeferred()
 
-internal object RequestCloseAll : CameraRequest()
+    override fun toString() = "RequestCloseById($activeCameraId)"
+}
+
+internal class RequestCloseAll() : CameraRequest() {
+    val deferred: CompletableDeferred<Unit> = CompletableDeferred()
+
+    override fun toString() = "RequestCloseAll"
+}
 
 internal object NoOpGraphListener : GraphListener {
     override fun onGraphStarted(requestProcessor: GraphRequestProcessor) {}
@@ -90,10 +100,10 @@ internal interface Camera2DeviceManager {
     fun prewarm(cameraId: CameraId)
 
     /** Submits a request to close the underlying camera. */
-    fun close(cameraId: CameraId)
+    fun close(cameraId: CameraId): Deferred<Unit>
 
     /** Instructs Camera2DeviceManager to close all cameras. */
-    fun closeAll()
+    fun closeAll(): Deferred<Unit>
 }
 
 internal class ActiveCamera(
@@ -211,16 +221,22 @@ constructor(
         }
     }
 
-    override fun close(cameraId: CameraId) {
-        if (!queue.tryEmit(RequestCloseById(cameraId))) {
+    override fun close(cameraId: CameraId): Deferred<Unit> {
+        val request = RequestCloseById(cameraId)
+        if (!queue.tryEmit(request)) {
             Log.error { "Camera close by ID request failed for $cameraId!" }
+            request.deferred.complete(Unit)
         }
+        return request.deferred
     }
 
-    override fun closeAll() {
-        if (!queue.tryEmit(RequestCloseAll)) {
+    override fun closeAll(): Deferred<Unit> {
+        val request = RequestCloseAll()
+        if (!queue.tryEmit(request)) {
             Log.error { "Camera close all request failed!" }
+            request.deferred.complete(Unit)
         }
+        return request.deferred
     }
 
     @VisibleForTesting
@@ -234,9 +250,28 @@ constructor(
         }
 
         // Step 2: Handle RequestCloseAll. The last one would nullify all preceding requests.
-        val numRequestsBeforeCloseAll = requests.indexOfLast { it is RequestCloseAll }
-        if (numRequestsBeforeCloseAll > 0) {
-            repeat(numRequestsBeforeCloseAll) { requests.removeAt(0).onRemoved() }
+        val lastRequestCloseAllIdx = requests.indexOfLast { it is RequestCloseAll }
+        if (lastRequestCloseAllIdx > 0) {
+            val lastRequestCloseAll = requests[lastRequestCloseAllIdx] as RequestCloseAll
+            repeat(lastRequestCloseAllIdx) {
+                val request = requests.removeAt(0)
+
+                // When RequestCloseById or RequestCloseAll is removed, make sure to complete their
+                // deferred when the latter RequestCloseAll is completed.
+                val deferredToPropagate =
+                    when (request) {
+                        is RequestCloseById -> request.deferred
+                        is RequestCloseAll -> request.deferred
+                        else -> null
+                    }
+                if (deferredToPropagate != null) {
+                    lastRequestCloseAll.deferred.invokeOnCompletion {
+                        deferredToPropagate.complete(Unit)
+                    }
+                }
+
+                request.onRemoved()
+            }
         }
 
         // Step 3: Handle RequestOpen and RequestCloseById pruning.
@@ -277,8 +312,15 @@ constructor(
                     else -> null
                 }
             if (prunedByIdx != null) {
-                Log.debug { "$request is pruned by ${requests[prunedByIdx]}" }
+                val prunedByRequest = requests[prunedByIdx]
+                Log.debug { "$request is pruned by $prunedByRequest" }
                 prunedIndices.add(idx)
+
+                // Make sure to complete the deferred of the pruned RequestCloseById when the latter
+                // RequestCloseById is completed.
+                if (request is RequestCloseById && prunedByRequest is RequestCloseById) {
+                    prunedByRequest.deferred.invokeOnCompletion { request.deferred.complete(Unit) }
+                }
             }
         }
         requests.removeIndices(prunedIndices).forEach { it.onRemoved() }
@@ -295,7 +337,7 @@ constructor(
             is RequestOpen -> processRequestOpen(request)
             is RequestClose -> processRequestClose(request)
             is RequestCloseById -> processRequestCloseById(request)
-            is RequestCloseAll -> processRequestCloseAll()
+            is RequestCloseAll -> processRequestCloseAll(request)
         }
     }
 
@@ -413,13 +455,15 @@ constructor(
             }
         }
         val activeCamera = activeCameras.firstOrNull { it.cameraId == cameraId }
-        if (activeCamera == null) return
-        activeCameras.remove(activeCamera)
-        activeCamera.close()
-        activeCamera.awaitClosed()
+        if (activeCamera != null) {
+            activeCameras.remove(activeCamera)
+            activeCamera.close()
+            activeCamera.awaitClosed()
+        }
+        request.deferred.complete(Unit)
     }
 
-    private suspend fun processRequestCloseAll() {
+    private suspend fun processRequestCloseAll(requestCloseAll: RequestCloseAll) {
         Log.info { "PruningCamera2DeviceManager#processRequestCloseAll()" }
 
         pendingRequestOpens.clear()
@@ -431,6 +475,7 @@ constructor(
             activeCamera.awaitClosed()
         }
         activeCameras.clear()
+        requestCloseAll.deferred.complete(Unit)
     }
 
     private suspend fun openCameraWithRetry(
@@ -571,15 +616,20 @@ constructor(
         }
     }
 
-    override fun close(cameraId: CameraId) {
-        offerChecked(RequestCloseById(cameraId))
+    override fun close(cameraId: CameraId): Deferred<Unit> {
+        val request = RequestCloseById(cameraId)
+        offerChecked(request)
+        request.deferred.complete(Unit)
+        return request.deferred
     }
 
-    override fun closeAll() {
-        if (!offerChecked(RequestCloseAll)) {
+    override fun closeAll(): Deferred<Unit> {
+        val request = RequestCloseAll()
+        if (!offerChecked(request)) {
             Log.warn { "Failed to close all cameras: Close request submission failed" }
-            return
         }
+        request.deferred.complete(Unit)
+        return request.deferred
     }
 
     private fun offerChecked(request: CameraRequest): Boolean {
