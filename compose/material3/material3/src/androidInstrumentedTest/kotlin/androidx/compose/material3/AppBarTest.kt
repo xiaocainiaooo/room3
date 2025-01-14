@@ -47,6 +47,7 @@ import androidx.compose.material3.tokens.BottomAppBarTokens
 import androidx.compose.material3.tokens.TypographyKeyTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertContainsColor
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -68,6 +69,7 @@ import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -83,6 +85,7 @@ import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
@@ -176,6 +179,44 @@ class AppBarTest {
             }
         }
         assertSmallPositioningWithoutNavigation()
+    }
+
+    @Test
+    fun smallTopAppBar_centeredWithSubtitle_positioning() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(Modifier.testTag(TopAppBarTestTag)) {
+                TopAppBar(
+                    navigationIcon = { FakeIcon(Modifier.testTag(NavigationIconTestTag)) },
+                    title = { Text("Title", Modifier.testTag(TitleTestTag)) },
+                    subtitle = { Text("Subtitle", Modifier.testTag(SubtitleTestTag)) },
+                    titleHorizontalAlignment = Alignment.CenterHorizontally,
+                    actions = { FakeIcon(Modifier.testTag(ActionsTestTag)) }
+                )
+            }
+        }
+        assertSmallDefaultPositioning(isCenteredTitle = true)
+    }
+
+    // Ensure that the titles are still centered even when there are more actions.
+    @Test
+    fun smallTopAppBar_centeredWithSubtitle_multiActions_positioning() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(Modifier.testTag(TopAppBarTestTag)) {
+                TopAppBar(
+                    navigationIcon = { FakeIcon(Modifier.testTag(NavigationIconTestTag)) },
+                    title = { Text("Title", Modifier.testTag(TitleTestTag)) },
+                    subtitle = { Text("Subtitle", Modifier.testTag(SubtitleTestTag)) },
+                    titleHorizontalAlignment = Alignment.CenterHorizontally,
+                    actions = {
+                        FakeIcon(Modifier)
+                        // Apply the test tag just to the action at the end. We will test its
+                        // position at the assertSmallDefaultPositioning.
+                        FakeIcon(Modifier.testTag(ActionsTestTag))
+                    }
+                )
+            }
+        }
+        assertSmallDefaultPositioning(isCenteredTitle = true)
     }
 
     @Test
@@ -2077,13 +2118,30 @@ class AppBarTest {
             )
 
         val titleNode = rule.onNodeWithTag(TitleTestTag)
+        val subtitleNode = rule.onNodeWithTag(SubtitleTestTag)
+        val subtitleBounds =
+            with(subtitleNode) {
+                if (isDisplayed()) {
+                    getUnclippedBoundsInRoot()
+                } else {
+                    DpRect(0.dp, 0.dp, 0.dp, 0.dp)
+                }
+            }
         // Title should be vertically centered
-        titleNode.assertTopPositionInRootIsEqualTo((appBarBounds.height - titleBounds.height) / 2)
+        titleNode.assertTopPositionInRootIsEqualTo(
+            (appBarBounds.height - titleBounds.height - subtitleBounds.height) / 2
+        )
         if (isCenteredTitle) {
             // Title should be horizontally centered
             titleNode.assertLeftPositionInRootIsEqualTo(
                 (appBarBounds.width - titleBounds.width) / 2
             )
+            if (subtitleNode.isDisplayed()) {
+                // Subtitle should be horizontally centered
+                subtitleNode.assertLeftPositionInRootIsEqualTo(
+                    (appBarBounds.width - subtitleBounds.width) / 2
+                )
+            }
         } else {
             // Title should be 56.dp from the start
             // 4.dp padding for the whole app bar + 48.dp icon size + 4.dp title padding.
