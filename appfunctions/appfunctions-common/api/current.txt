@@ -10,6 +10,9 @@ package androidx.appfunctions {
     property public abstract android.content.Context context;
   }
 
+  @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.SOURCE) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface AppFunctionEntity {
+  }
+
   public final class AppFunctionException {
     ctor public AppFunctionException(int errorCode, optional String? errorMessage);
     method public int getErrorCategory();
