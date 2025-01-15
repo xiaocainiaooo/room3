@@ -236,7 +236,7 @@ package androidx.savedstate.serialization.serializers {
     property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
-  public class JavaSerializableSerializer<T extends java.io.Serializable> implements kotlinx.serialization.KSerializer<T> {
+  public abstract class JavaSerializableSerializer<T extends java.io.Serializable> implements kotlinx.serialization.KSerializer<T> {
     ctor public JavaSerializableSerializer();
     method public final T deserialize(kotlinx.serialization.encoding.Decoder decoder);
     method public final kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();
@@ -260,7 +260,7 @@ package androidx.savedstate.serialization.serializers {
     property public kotlinx.serialization.descriptors.SerialDescriptor descriptor;
   }
 
-  public class ParcelableSerializer<T extends android.os.Parcelable> implements kotlinx.serialization.KSerializer<T> {
+  public abstract class ParcelableSerializer<T extends android.os.Parcelable> implements kotlinx.serialization.KSerializer<T> {
     ctor public ParcelableSerializer();
     method public final T deserialize(kotlinx.serialization.encoding.Decoder decoder);
     method public final kotlinx.serialization.descriptors.SerialDescriptor getDescriptor();

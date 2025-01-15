@@ -276,7 +276,6 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
                 .isEqualTo(myJavaSerializable)
         }
 
-        @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
         @Serializable
         data class ParcelableContainer(
             @Serializable(with = MyParcelableAsParcelableSerializer::class) val value: MyParcelable
@@ -288,10 +287,11 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
             @Serializable
             data class IBinderContainer(
-                @Serializable(with = IBinderSerializer::class) val value: Binder
+                @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
+                @Serializable(with = IBinderSerializer::class)
+                val value: Binder
             )
             val binder = Binder("foo")
             IBinderContainer(binder).encodeDecode {
@@ -405,13 +405,14 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
             }
         }
 
-        @Suppress("SERIALIZER_TYPE_INCOMPATIBLE", "ArrayInDataClass")
+        @Suppress("ArrayInDataClass")
         @Serializable
         data class ParcelableArrayContainer(
             @Serializable(with = ParcelableArraySerializer::class)
             // Here the serializer for the element is actually not used, but leaving it out leads
             // to SERIALIZER_NOT_FOUND compile error.
-            val value: Array<@Serializable(with = ParcelableSerializer::class) MyParcelable>
+            val value:
+                Array<@Serializable(with = MyParcelableAsParcelableSerializer::class) MyParcelable>
         )
         val myParcelableArray = arrayOf(MyParcelable(3, "foo", 3.14), MyParcelable(4, "bar", 1.73))
         // Even though `Bundle` does retain the actual `Parcelable` type there's no way for us to
@@ -427,8 +428,8 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
 
         @Serializable
         data class CharSequenceListContainer(
-            @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
             @Serializable(with = CharSequenceListSerializer::class)
+            @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
             val value: List<@Serializable(with = CharSequenceSerializer::class) StringBuilder>
         )
         val myCharSequenceList = arrayListOf(StringBuilder("foo"), StringBuilder("bar"))
@@ -450,13 +451,13 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
                 }
             )
 
-        @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
         @Serializable
         data class ParcelableListContainer(
             // Unlike arrays this works as `List`s can be down-casted, e.g.
             // a `List<Parcelable>` can be casted to `List<MyParcelable>`.
             @Serializable(with = ParcelableListSerializer::class)
-            val value: List<@Serializable(with = ParcelableSerializer::class) MyParcelable>
+            val value:
+                List<@Serializable(with = MyParcelableAsParcelableSerializer::class) MyParcelable>
         )
         val myParcelableList =
             arrayListOf(MyParcelable(3, "foo", 3.14), MyParcelable(4, "bar", 1.73))
@@ -465,13 +466,16 @@ internal class SavedStateCodecAndroidTest : RobolectricTest() {
             assertThat(getParcelableList<MyParcelable>("value")).isEqualTo(myParcelableList)
         }
 
-        @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
         @Serializable
         data class SparseParcelableArrayContainer(
             // Unlike arrays this works as `SparseArray`s can be down-casted, e.g.
             // a `SparseArray<Parcelable>` can be casted to `SparseArray<MyParcelable>`.
             @Serializable(with = SparseParcelableArraySerializer::class)
-            val value: SparseArray<@Serializable(with = ParcelableSerializer::class) MyParcelable>
+            val value:
+                SparseArray<
+                    @Serializable(with = MyParcelableAsParcelableSerializer::class)
+                    MyParcelable
+                >
         )
         val mySparseParcelableArray =
             SparseArray<MyParcelable>().apply {

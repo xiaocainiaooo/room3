@@ -25,7 +25,6 @@ import android.util.SizeF
 import android.util.SparseArray
 import androidx.savedstate.SavedState
 import androidx.savedstate.read
-import androidx.savedstate.savedState
 import androidx.savedstate.serialization.SavedStateDecoder
 import androidx.savedstate.serialization.SavedStateEncoder
 import androidx.savedstate.write
@@ -129,7 +128,8 @@ public class CharSequenceSerializer : KSerializer<CharSequence> {
 
 /**
  * A serializer for [java.io.Serializable]. This serializer uses [SavedState]'s API directly to
- * save/load a [java.io.Serializable].
+ * save/load a [java.io.Serializable]. You must extend this serializer for each of your
+ * [java.io.Serializable] subclasses.
  *
  * Note that this serializer should be used with [SavedStateEncoder] or [SavedStateDecoder] only.
  * Using it with other Encoders/Decoders may throw [IllegalArgumentException].
@@ -139,7 +139,7 @@ public class CharSequenceSerializer : KSerializer<CharSequence> {
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public open class JavaSerializableSerializer<T : JavaSerializable> : KSerializer<T> {
+public abstract class JavaSerializableSerializer<T : JavaSerializable> : KSerializer<T> {
     final override val descriptor: SerialDescriptor = buildClassSerialDescriptor("JavaSerializable")
 
     final override fun serialize(encoder: Encoder, value: T) {
@@ -160,7 +160,7 @@ public open class JavaSerializableSerializer<T : JavaSerializable> : KSerializer
 
 /**
  * A serializer for [Parcelable]. This serializer uses [SavedState]'s API directly to save/load a
- * [Parcelable].
+ * [Parcelable]. You must extend this serializer for each of your [Parcelable] subclasses.
  *
  * Note that this serializer should be used with [SavedStateEncoder] or [SavedStateDecoder] only.
  * Using it with other Encoders/Decoders may throw [IllegalArgumentException].
@@ -170,7 +170,7 @@ public open class JavaSerializableSerializer<T : JavaSerializable> : KSerializer
  * @see androidx.savedstate.serialization.decodeFromSavedState
  */
 @OptIn(ExperimentalSerializationApi::class)
-public open class ParcelableSerializer<T : Parcelable> : KSerializer<T> {
+public abstract class ParcelableSerializer<T : Parcelable> : KSerializer<T> {
     final override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Parcelable")
 
     final override fun serialize(encoder: Encoder, value: T) {
