@@ -19,6 +19,7 @@ package androidx.wear.protolayout.material3
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.wear.protolayout.DeviceParametersBuilders
+import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
 import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders
@@ -34,6 +35,7 @@ import androidx.wear.protolayout.material3.ButtonDefaults.filledTonalButtonColor
 import androidx.wear.protolayout.material3.ButtonDefaults.filledVariantButtonColors
 import androidx.wear.protolayout.material3.ButtonGroupDefaults.DEFAULT_SPACER_BETWEEN_BUTTON_GROUPS
 import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
+import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.filledTonalProgressIndicatorColors
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.filledVariantProgressIndicatorColors
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.smallCompactDataCardStyle
 import androidx.wear.protolayout.material3.IconButtonStyle.Companion.largeIconButtonStyle
@@ -71,7 +73,7 @@ object TestCasesGenerator {
         val scale = displayMetrics.density
 
         val deviceParameters =
-            DeviceParametersBuilders.DeviceParameters.Builder()
+            DeviceParameters.Builder()
                 .setScreenWidthDp(pxToDp(RunnerUtils.SCREEN_SIZE_SMALL, scale))
                 .setScreenHeightDp(pxToDp(RunnerUtils.SCREEN_SIZE_SMALL, scale))
                 .setScreenDensity(displayMetrics.density)
@@ -473,27 +475,17 @@ object TestCasesGenerator {
                 deviceParameters,
                 allowDynamicTheme = false
             ) {
-                primaryLayout(
-                    mainSlot = {
-                        buttonGroup(height = dp(50F)) {
-                            buttonGroupItem { circularProgressIndicator() }
-                            buttonGroupItem {
-                                circularProgressIndicator(
-                                    staticProgress = 0.75F,
-                                    colors = filledVariantProgressIndicatorColors()
-                                )
-                            }
-                            buttonGroupItem {
-                                circularProgressIndicator(
-                                    staticProgress = 1.5F,
-                                    startAngleDegrees = 200F,
-                                    endAngleDegrees = 520F,
-                                    colors = filledVariantProgressIndicatorColors()
-                                )
-                            }
-                        }
-                    }
-                )
+                primaryLayout(mainSlot = { progressIndicatorGroup() })
+            }
+
+        testCases["primarylayout_circularprogressindicators_fallback__golden$NORMAL_SCALE_SUFFIX"] =
+            materialScope(
+                ApplicationProvider.getApplicationContext(),
+                deviceConfiguration =
+                    deviceParameters.copy(VersionInfo.Builder().setMajor(1).setMinor(402).build()),
+                allowDynamicTheme = false
+            ) {
+                primaryLayout(mainSlot = { progressIndicatorGroup() })
             }
 
         return collectTestCases(testCases)
@@ -526,4 +518,72 @@ object TestCasesGenerator {
                 )
             )
     }
+
+    private fun MaterialScope.progressIndicatorGroup(): Column =
+        Column.Builder()
+            .setWidth(expand())
+            .setHeight(expand())
+            .addContent(
+                buttonGroup(height = dp(52F)) {
+                    buttonGroupItem {
+                        circularProgressIndicator(colors = filledTonalProgressIndicatorColors())
+                    }
+                    buttonGroupItem {
+                        circularProgressIndicator(
+                            staticProgress = 0.75F,
+                            colors = filledVariantProgressIndicatorColors()
+                        )
+                    }
+                    buttonGroupItem {
+                        circularProgressIndicator(
+                            staticProgress = 1.5F,
+                            startAngleDegrees = 200F,
+                            endAngleDegrees = 520F,
+                            colors = filledVariantProgressIndicatorColors()
+                        )
+                    }
+                }
+            )
+            .addContent(DEFAULT_SPACER_BETWEEN_BUTTON_GROUPS)
+            .addContent(
+                buttonGroup(height = dp(52F)) {
+                    buttonGroupItem {
+                        segmentedCircularProgressIndicator(
+                            segmentCount = 1,
+                            colors = filledTonalProgressIndicatorColors()
+                        )
+                    }
+                    buttonGroupItem {
+                        segmentedCircularProgressIndicator(
+                            segmentCount = 5,
+                            staticProgress = 0.75F,
+                            colors = filledVariantProgressIndicatorColors()
+                        )
+                    }
+                    buttonGroupItem {
+                        segmentedCircularProgressIndicator(
+                            segmentCount = 5,
+                            staticProgress = 1.5F,
+                            startAngleDegrees = 200F,
+                            endAngleDegrees = 520F,
+                            colors = filledVariantProgressIndicatorColors()
+                        )
+                    }
+                }
+            )
+            .build()
+
+    /**
+     * Make a copy of a [DeviceParameters], and update it with the provided renderer version for
+     * testing fallback features on older renderer.
+     */
+    private fun DeviceParameters.copy(rendererVersion: VersionInfo): DeviceParameters =
+        DeviceParameters.Builder()
+            .setScreenWidthDp(screenWidthDp)
+            .setScreenHeightDp(screenHeightDp)
+            .setScreenDensity(screenDensity)
+            .setFontScale(fontScale)
+            .setScreenShape(screenShape)
+            .setRendererSchemaVersion(rendererVersion)
+            .build()
 }
