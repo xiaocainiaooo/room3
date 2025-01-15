@@ -915,7 +915,8 @@ public fun ChildButton(
  * @sample androidx.wear.compose.material3.samples.FilledTonalCompactButtonSample
  *
  * Example of a [CompactButton] with an icon and label and with
- * [ButtonDefaults.outlinedButtonBorder] and [ButtonDefaults.outlinedButtonColors]
+ * [ButtonDefaults.outlinedButtonBorder] and [ButtonDefaults.outlinedButtonColors]. The example
+ * includes a [Text] that expands and collapses when the [CompactButton] is clicked.
  *
  * @sample androidx.wear.compose.material3.samples.OutlinedCompactButtonSample
  *
