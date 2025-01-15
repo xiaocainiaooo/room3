@@ -698,9 +698,14 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
             project,
             kotlinMultiplatformAndroidComponentsExtension
         )
-        // Propagate the compileSdk value into minCompileSdk.
-        kotlinMultiplatformAndroidTarget.aarMetadata.minCompileSdk =
-            kotlinMultiplatformAndroidTarget.compileSdk
+        kotlinMultiplatformAndroidComponentsExtension.apply {
+            finalizeDsl {
+                // Propagate the compileSdk value into minCompileSdk. Must be done after the DSL in
+                // build.gradle files (that sets compileSdk in the first place) is evaluated.
+                kotlinMultiplatformAndroidTarget.aarMetadata.minCompileSdk =
+                    kotlinMultiplatformAndroidTarget.compileSdk
+            }
+        }
         project.disableStrictVersionConstraints()
 
         project.configureProjectForApiTasks(AndroidMultiplatformApiTaskConfig, androidXExtension)
