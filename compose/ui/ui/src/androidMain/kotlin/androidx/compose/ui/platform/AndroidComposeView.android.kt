@@ -2037,7 +2037,10 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         viewTreeObserver.addOnTouchModeChangeListener(touchModeChangeListener)
 
         if (SDK_INT >= S) AndroidComposeViewTranslationCallbackS.setViewTranslationCallback(this)
-        if (autofillSupported()) _autofillManager?.let { semanticsOwner.listeners += it }
+        _autofillManager?.let {
+            focusOwner.listeners += it
+            semanticsOwner.listeners += it
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -2062,7 +2065,10 @@ internal class AndroidComposeView(context: Context, coroutineContext: CoroutineC
         viewTreeObserver.removeOnTouchModeChangeListener(touchModeChangeListener)
 
         if (SDK_INT >= S) AndroidComposeViewTranslationCallbackS.clearViewTranslationCallback(this)
-        if (autofillSupported()) _autofillManager?.let { semanticsOwner.listeners -= it }
+        _autofillManager?.let {
+            semanticsOwner.listeners -= it
+            focusOwner.listeners -= it
+        }
     }
 
     override fun onProvideAutofillVirtualStructure(structure: ViewStructure?, flags: Int) {
