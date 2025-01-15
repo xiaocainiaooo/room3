@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.GraphicsContext
 import androidx.compose.ui.internal.checkPrecondition
 import androidx.compose.ui.internal.checkPreconditionNotNull
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.semantics.SemanticsInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
@@ -324,6 +325,8 @@ internal fun DelegatableNode.requireLayoutNode(): LayoutNode =
             "Cannot obtain node coordinator. Is the Modifier.Node attached?"
         }
         .layoutNode
+
+internal fun DelegatableNode.requireSemanticsInfo(): SemanticsInfo = requireLayoutNode()
 
 internal fun DelegatableNode.requireOwner(): Owner =
     checkPreconditionNotNull(requireLayoutNode().owner) { "This node does not have an owner." }
