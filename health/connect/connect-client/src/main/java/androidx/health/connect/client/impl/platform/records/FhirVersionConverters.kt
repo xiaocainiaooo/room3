@@ -23,11 +23,9 @@ import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
-import androidx.health.connect.client.feature.requireFeaturePersonalHealthRecordAvailable
 import androidx.health.connect.client.records.FhirVersion
 
 @SuppressLint("NewApi") // Guarded by a feature availability check
 internal fun FhirVersion.toPlatformFhirVersion(): PlatformFhirVersion {
-    requireFeaturePersonalHealthRecordAvailable()
     return PlatformFhirVersion.parseFhirVersion(toFhirVersionString())
 }
