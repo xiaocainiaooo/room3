@@ -199,7 +199,7 @@ private class PreferredWidthElement(
 private class PreferredWidthNode(var width: Dp) : ParentDataModifierNode, Modifier.Node() {
     override fun Density.modifyParentData(parentData: Any?) =
         ((parentData as? PaneScaffoldParentDataImpl) ?: PaneScaffoldParentDataImpl()).also {
-            it.preferredWidth = with(this) { width.toPx() }
+            it.preferredWidth = width
         }
 }
 
@@ -263,7 +263,7 @@ sealed interface PaneScaffoldParentData {
      * The preferred width of the child, which is supposed to be set via
      * [PaneScaffoldScope.preferredWidth] on a pane composable, like [AnimatedPane].
      */
-    val preferredWidth: Float
+    val preferredWidth: Dp
 
     /** `true` to indicate that the child is an [AnimatedPane]; otherwise `false`. */
     val isAnimatedPane: Boolean
@@ -277,7 +277,7 @@ sealed interface PaneScaffoldParentData {
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 internal data class PaneScaffoldParentDataImpl(
-    override var preferredWidth: Float = Float.NaN,
+    override var preferredWidth: Dp = Dp.Unspecified,
     var paneMargins: PaneMargins = PaneMargins.Unspecified,
     override var isAnimatedPane: Boolean = false,
     override var minTouchTargetSize: Dp = Dp.Unspecified
