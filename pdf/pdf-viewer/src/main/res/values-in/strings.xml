@@ -25,7 +25,7 @@
     <string name="desc_password" msgid="6636473611443746739">"kolom sandi"</string>
     <string name="desc_password_incorrect" msgid="4718823067483963845">"sandi salah"</string>
     <string name="desc_password_incorrect_message" msgid="4676206571020946870">"Sandi salah. Coba lagi."</string>
-    <string name="label_page_single" msgid="456123685879261101">"<xliff:g id="PAGE">%1$d</xliff:g>/<xliff:g id="TOTAL">%2$d</xliff:g>"</string>
+    <string name="label_page_single" msgid="456123685879261101">"<xliff:g id="PAGE">%1$d</xliff:g> / <xliff:g id="TOTAL">%2$d</xliff:g>"</string>
     <string name="desc_page_single" msgid="8459583146661044094">"halaman <xliff:g id="PAGE">%1$d</xliff:g> dari <xliff:g id="TOTAL">%2$d</xliff:g>"</string>
     <string name="desc_zoom" msgid="7318480946145947242">"zoom <xliff:g id="FIRST">%1$d</xliff:g> persen"</string>
     <string name="desc_goto_link" msgid="2461368384824849714">"Buka halaman <xliff:g id="PAGE_NUMBER">%1$d</xliff:g>"</string>

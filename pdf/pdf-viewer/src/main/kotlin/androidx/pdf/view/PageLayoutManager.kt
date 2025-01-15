@@ -73,6 +73,16 @@ internal class PageLayoutManager(
     val visiblePages: StateFlow<Range<Int>>
         get() = _visiblePages
 
+    private val _fullyVisiblePages = MutableStateFlow<Range<Int>>(Range(0, 0))
+
+    /**
+     * A [StateFlow] emitting the range of pages considered to be in the viewport.
+     *
+     * Values in the range are 0-indexed.
+     */
+    val fullyVisiblePages: StateFlow<Range<Int>>
+        get() = _fullyVisiblePages
+
     /** The 0-indexed maximum page whose dimensions have been requested */
     private var requestedReach: Int = paginationModel.reach
 
@@ -157,6 +167,13 @@ internal class PageLayoutManager(
         // Try emit will always succeed for MutableStateFlow
         val prevVisiblePages = _visiblePages.value
         val newVisiblePages = paginationModel.getPagesInViewport(contentTop, contentBottom)
+
+        val fullyVisiblePageRange =
+            paginationModel.getPagesInViewport(contentTop, contentBottom, includePartial = false)
+        if (fullyVisiblePageRange != _fullyVisiblePages.value) {
+            _fullyVisiblePages.tryEmit(fullyVisiblePageRange)
+        }
+
         if (prevVisiblePages != newVisiblePages) {
             _visiblePages.tryEmit(newVisiblePages)
             increaseReach(
