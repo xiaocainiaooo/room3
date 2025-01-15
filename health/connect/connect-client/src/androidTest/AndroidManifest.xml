@@ -140,4 +140,5 @@
     <uses-permission android:name="android.permission.health.WRITE_RESPIRATORY_RATE"/>
     <uses-permission android:name="android.permission.health.WRITE_RESTING_HEART_RATE"/>
     <uses-permission android:name="android.permission.health.WRITE_SKIN_TEMPERATURE"/>
+
 </manifest>

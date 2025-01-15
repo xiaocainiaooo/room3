@@ -32,21 +32,20 @@ import kotlin.String
  *
  * The medical data is represented using the Fast Healthcare Interoperability Resources
  * ([FHIR](https://hl7.org/fhir/)) standard.
+ *
+ * @property fhirBaseUri The FHIR base URI of the data source. For data coming from a FHIR server
+ *   this should be the base URL.
+ * @property displayName The display name that describes the data source. This must be unique per
+ *   app.
+ * @property fhirVersion The FHIR version of the medical data that will be linked to this data
+ *   source. This has to be a version supported by Health Connect, as documented on the
+ *   [FhirVersion].
  */
 // TODO(b/382278995): remove @RestrictTo and internal to unhide PHR APIs
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class CreateMedicalDataSourceRequest(
-    /**
-     * The FHIR base URI of the data source. For data coming from a FHIR server this should be the
-     * base URL.
-     */
     val fhirBaseUri: Uri,
-    /** The display name that describes the data source. This must be unique per app. */
     val displayName: String,
-    /**
-     * The FHIR version of the medical data that will be linked to this data source. This has to be
-     * a version supported by Health Connect, as documented on the [FhirVersion].
-     */
     val fhirVersion: FhirVersion
 ) {
     @SuppressLint("NewApi") // already checked with a feature availability check

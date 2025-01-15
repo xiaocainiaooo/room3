@@ -50,48 +50,48 @@ class MedicalDataSourceTest {
                 MedicalDataSource(
                     id = ID,
                     packageName = PACKAGE_NAME,
-                    fhirBaseUri = fhirBaseUri,
+                    fhirBaseUri = FHIR_BASE_URI,
                     displayName = DISPLAY_NAME,
-                    fhirVersion = fhirVersion,
-                    lastDataUpdateTime = lastDataUpdateTime
+                    fhirVersion = FHIR_VERSION,
+                    lastDataUpdateTime = LAST_UPDATED_TIME
                 ),
                 MedicalDataSource(
                     id = ID,
                     packageName = PACKAGE_NAME,
-                    fhirBaseUri = fhirBaseUri,
+                    fhirBaseUri = FHIR_BASE_URI,
                     displayName = DISPLAY_NAME,
-                    fhirVersion = fhirVersion,
-                    lastDataUpdateTime = lastDataUpdateTime
+                    fhirVersion = FHIR_VERSION,
+                    lastDataUpdateTime = LAST_UPDATED_TIME
                 )
             )
             .addEqualityGroup(
                 MedicalDataSource(
                     id = ID + "2",
                     packageName = PACKAGE_NAME,
-                    fhirBaseUri = fhirBaseUri,
+                    fhirBaseUri = FHIR_BASE_URI,
                     displayName = DISPLAY_NAME,
-                    fhirVersion = fhirVersion,
-                    lastDataUpdateTime = lastDataUpdateTime
+                    fhirVersion = FHIR_VERSION,
+                    lastDataUpdateTime = LAST_UPDATED_TIME
                 )
             )
             .addEqualityGroup(
                 MedicalDataSource(
                     id = ID,
                     packageName = PACKAGE_NAME + "two",
-                    fhirBaseUri = fhirBaseUri,
+                    fhirBaseUri = FHIR_BASE_URI,
                     displayName = DISPLAY_NAME,
-                    fhirVersion = fhirVersion,
-                    lastDataUpdateTime = lastDataUpdateTime
+                    fhirVersion = FHIR_VERSION,
+                    lastDataUpdateTime = LAST_UPDATED_TIME
                 )
             )
             .addEqualityGroup(
                 MedicalDataSource(
                     id = ID,
                     packageName = PACKAGE_NAME,
-                    fhirBaseUri = fhirBaseUri.buildUpon().appendPath("2/").build(),
+                    fhirBaseUri = FHIR_BASE_URI.buildUpon().appendPath("2/").build(),
                     displayName = DISPLAY_NAME,
-                    fhirVersion = fhirVersion,
-                    lastDataUpdateTime = lastDataUpdateTime
+                    fhirVersion = FHIR_VERSION,
+                    lastDataUpdateTime = LAST_UPDATED_TIME
                 )
             )
             .testEquals()
@@ -99,10 +99,10 @@ class MedicalDataSourceTest {
                 MedicalDataSource(
                     id = ID,
                     packageName = PACKAGE_NAME,
-                    fhirBaseUri = fhirBaseUri,
+                    fhirBaseUri = FHIR_BASE_URI,
                     displayName = "$DISPLAY_NAME Two",
-                    fhirVersion = fhirVersion,
-                    lastDataUpdateTime = lastDataUpdateTime
+                    fhirVersion = FHIR_VERSION,
+                    lastDataUpdateTime = LAST_UPDATED_TIME
                 )
             )
             .testEquals()
@@ -110,10 +110,10 @@ class MedicalDataSourceTest {
                 MedicalDataSource(
                     id = ID,
                     packageName = PACKAGE_NAME,
-                    fhirBaseUri = fhirBaseUri,
+                    fhirBaseUri = FHIR_BASE_URI,
                     displayName = DISPLAY_NAME,
                     fhirVersion = FhirVersion(4, 3, 0),
-                    lastDataUpdateTime = lastDataUpdateTime
+                    lastDataUpdateTime = LAST_UPDATED_TIME
                 )
             )
             .testEquals()
@@ -121,11 +121,13 @@ class MedicalDataSourceTest {
                 MedicalDataSource(
                     id = ID,
                     packageName = PACKAGE_NAME,
-                    fhirBaseUri = fhirBaseUri,
+                    fhirBaseUri = FHIR_BASE_URI,
                     displayName = DISPLAY_NAME,
-                    fhirVersion = fhirVersion,
+                    fhirVersion = FHIR_VERSION,
                     lastDataUpdateTime =
-                        Instant.parse(LAST_DATA_UPDATE_TIME.replace("2025-01-27", "2025-01-28"))
+                        Instant.parse(
+                            LAST_DATA_UPDATE_TIMESTAMP.replace("2025-01-27", "2025-01-28")
+                        )
                 )
             )
             .testEquals()
@@ -137,10 +139,10 @@ class MedicalDataSourceTest {
             MedicalDataSource(
                 id = ID,
                 packageName = PACKAGE_NAME,
-                fhirBaseUri = fhirBaseUri,
+                fhirBaseUri = FHIR_BASE_URI,
                 displayName = DISPLAY_NAME,
-                fhirVersion = fhirVersion,
-                lastDataUpdateTime = lastDataUpdateTime
+                fhirVersion = FHIR_VERSION,
+                lastDataUpdateTime = LAST_UPDATED_TIME
             )
 
         val toString = medicalDataSource.toString()
@@ -151,7 +153,7 @@ class MedicalDataSourceTest {
         assertThat(toString).contains("displayName=Test Data Source")
         assertThat(toString).contains("fhirVersion=FhirVersion")
         assertThat(toString).contains("(4.0.1)")
-        assertThat(toString).contains("lastDataUpdateTime=$LAST_DATA_UPDATE_TIME")
+        assertThat(toString).contains("lastDataUpdateTime=$LAST_DATA_UPDATE_TIMESTAMP")
     }
 
     @SuppressLint("NewApi") // checked with feature availability check
@@ -161,10 +163,10 @@ class MedicalDataSourceTest {
             MedicalDataSource(
                 id = ID,
                 packageName = PACKAGE_NAME,
-                fhirBaseUri = fhirBaseUri,
+                fhirBaseUri = FHIR_BASE_URI,
                 displayName = DISPLAY_NAME,
-                fhirVersion = fhirVersion,
-                lastDataUpdateTime = lastDataUpdateTime
+                fhirVersion = FHIR_VERSION,
+                lastDataUpdateTime = LAST_UPDATED_TIME
             )
 
         val platformMedicalDataSource = medicalDataSource.platformMedicalDataSource
@@ -174,11 +176,11 @@ class MedicalDataSourceTest {
                 PlatformMedicalDataSourceBuilder(
                         ID,
                         PACKAGE_NAME,
-                        fhirBaseUri,
+                        FHIR_BASE_URI,
                         DISPLAY_NAME,
-                        fhirVersion.platformFhirVersion
+                        FHIR_VERSION.platformFhirVersion
                     )
-                    .setLastDataUpdateTime(lastDataUpdateTime)
+                    .setLastDataUpdateTime(LAST_UPDATED_TIME)
                     .build()
             )
     }
@@ -187,9 +189,9 @@ class MedicalDataSourceTest {
         private const val ID = "testid"
         private const val PACKAGE_NAME = "androidx.health.connect.client"
         private const val DISPLAY_NAME = "Test Data Source"
-        private const val LAST_DATA_UPDATE_TIME = "2025-01-27T08:55:29.550677Z"
-        private val fhirBaseUri = Uri.parse("https://fhir.com/oauth/api/FHIR/R4/")
-        private val lastDataUpdateTime = Instant.parse(LAST_DATA_UPDATE_TIME)
-        private val fhirVersion: FhirVersion by lazy { FhirVersion(4, 0, 1) }
+        private const val LAST_DATA_UPDATE_TIMESTAMP = "2025-01-27T08:55:29.550677Z"
+        private val FHIR_BASE_URI = Uri.parse("https://fhir.com/oauth/api/FHIR/R4/")
+        private val LAST_UPDATED_TIME = Instant.parse(LAST_DATA_UPDATE_TIMESTAMP)
+        private val FHIR_VERSION: FhirVersion by lazy { FhirVersion(4, 0, 1) }
     }
 }

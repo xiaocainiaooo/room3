@@ -527,6 +527,7 @@ interface HealthConnectClient {
      *
      * @param request request containing details of the [MedicalDataSource] to be created
      * @return the created [MedicalDataSource]
+     * @sample androidx.health.connect.client.samples.CreateMedicalDataSourceSample
      */
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -576,6 +577,7 @@ interface HealthConnectClient {
      *
      * @param request containing details of the [MedicalDataSource]s to retrieve
      * @return [MedicalDataSource]s matching the provided request
+     * @sample // TODO: b/394856391 - add sample
      */
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -627,6 +629,7 @@ interface HealthConnectClient {
      *
      * @param ids ids of the [MedicalDataSource]s to retrieve
      * @return [MedicalDataSource]s matching the provided [ids]
+     * @sample // TODO: b/394856391 - add sample
      */
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
