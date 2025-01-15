@@ -49,6 +49,7 @@ import kotlin.math.min
  */
 internal class MultiParagraphLayoutCache(
     private var text: AnnotatedString,
+    /** The style used for layout. Ensure to call [markStyleAffectedDirty] when mutating. */
     private var style: TextStyle,
     private var fontFamilyResolver: FontFamily.Resolver,
     private var overflow: TextOverflow = TextOverflow.Clip,
@@ -163,7 +164,7 @@ internal class MultiParagraphLayoutCache(
             // paragraphIntrinsics now does not match with style and needs to be set to null
             // otherwise the correct font size will not be used in layout
             style = style.copy(fontSize = optimalFontSize)
-            paragraphIntrinsics = null
+            markStyleAffectedDirty()
         }
 
         val multiParagraph = layoutText(finalConstraints, layoutDirection)
@@ -376,6 +377,13 @@ internal class MultiParagraphLayoutCache(
         _textAutoSizeLayoutScope = null
     }
 
+    private fun markStyleAffectedDirty() {
+        paragraphIntrinsics = null
+        layoutCache = null
+        cachedIntrinsicHeight = -1
+        cachedIntrinsicHeightInputWidth = -1
+    }
+
     /** The width at which increasing the width of the text no longer decreases the height. */
     fun maxIntrinsicWidth(layoutDirection: LayoutDirection): Int {
         return setLayoutDirection(layoutDirection).maxIntrinsicWidth.ceilToIntPx()
@@ -408,6 +416,7 @@ internal class MultiParagraphLayoutCache(
             val scaledFontSize = fontSize.scaledToInitialFontSize()
             if (scaledFontSize != style.fontSize) {
                 style = style.copy(fontSize = scaledFontSize)
+                markStyleAffectedDirty()
             }
 
             val layoutConstraints =
@@ -428,6 +437,8 @@ internal class MultiParagraphLayoutCache(
                     layoutConstraints,
                     multiParagraph,
                 )
+            // We're restoring the original style but purposefully not marking the style-affected
+            // caches dirty as this will be done in layoutWithConstraints after auto size if needed.
             style = styleBeforeLayout
             return layoutCache!!
         }
