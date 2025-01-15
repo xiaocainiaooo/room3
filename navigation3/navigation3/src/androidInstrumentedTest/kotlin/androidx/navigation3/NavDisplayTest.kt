@@ -116,14 +116,7 @@ class NavDisplayTest {
             onBackDispatcher = LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
             backstack = remember { mutableStateListOf(first) }
             val manager = rememberNavWrapperManager(emptyList())
-            NavDisplay(
-                backstack = backstack,
-                wrapperManager = manager,
-                onBack = {
-                    // removeLast requires API 35
-                    backstack.removeAt(backstack.size - 1)
-                }
-            ) {
+            NavDisplay(backstack = backstack, wrapperManager = manager) {
                 when (it) {
                     first -> NavRecord(first) { Text(first) }
                     second -> NavRecord(second) { Text(second) }

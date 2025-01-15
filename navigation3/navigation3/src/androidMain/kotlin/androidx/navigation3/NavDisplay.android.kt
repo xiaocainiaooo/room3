@@ -99,7 +99,7 @@ public fun <T : Any> NavDisplay(
                     DEFAULT_TRANSITION_DURATION_MILLISECOND,
                 )
         ),
-    onBack: () -> Unit = {},
+    onBack: () -> Unit = { if (backstack is MutableList) backstack.removeAt(backstack.size - 1) },
     recordProvider: (key: T) -> NavRecord<out T>
 ) {
     BackHandler(backstack.size > 1, onBack)
