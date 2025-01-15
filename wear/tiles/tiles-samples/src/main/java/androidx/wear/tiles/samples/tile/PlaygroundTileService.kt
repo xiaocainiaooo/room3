@@ -28,6 +28,7 @@ import androidx.wear.protolayout.ResourceBuilders.ImageResource
 import androidx.wear.protolayout.TimelineBuilders
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat
 import androidx.wear.protolayout.expression.VersionBuilders.VersionInfo
+import androidx.wear.protolayout.material3.AvatarButtonStyle.Companion.largeAvatarButtonStyle
 import androidx.wear.protolayout.material3.ButtonDefaults.filledVariantButtonColors
 import androidx.wear.protolayout.material3.CardColors
 import androidx.wear.protolayout.material3.CardDefaults.filledTonalCardColors
@@ -39,6 +40,7 @@ import androidx.wear.protolayout.material3.MaterialScope
 import androidx.wear.protolayout.material3.PrimaryLayoutMargins.Companion.MAX_PRIMARY_LAYOUT_MARGIN
 import androidx.wear.protolayout.material3.TextButtonStyle.Companion.smallTextButtonStyle
 import androidx.wear.protolayout.material3.appCard
+import androidx.wear.protolayout.material3.avatarButton
 import androidx.wear.protolayout.material3.avatarImage
 import androidx.wear.protolayout.material3.button
 import androidx.wear.protolayout.material3.buttonGroup
@@ -139,6 +141,17 @@ private fun tileLayout(
             }
         )
     }
+
+private fun MaterialScope.avatarButtonSample() =
+    avatarButton(
+        onClick = clickable(),
+        modifier = LayoutModifier.contentDescription("Avatar button"),
+        avatarContent = { avatarImage(AVATAR_ID) },
+        style = largeAvatarButtonStyle(),
+        horizontalAlignment = LayoutElementBuilders.HORIZONTAL_ALIGN_END,
+        labelContent = { text("Primary label overflowing".layoutString) },
+        secondaryLabelContent = { text("Secondary label overflowing".layoutString) },
+    )
 
 private fun MaterialScope.pillShapeButton() =
     button(

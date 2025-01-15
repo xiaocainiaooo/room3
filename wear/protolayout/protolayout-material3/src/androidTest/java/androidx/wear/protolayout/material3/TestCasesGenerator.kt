@@ -24,8 +24,10 @@ import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.Column
+import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_END
 import androidx.wear.protolayout.expression.VersionBuilders.VersionInfo
 import androidx.wear.protolayout.material3.AppCardStyle.Companion.largeAppCardStyle
+import androidx.wear.protolayout.material3.AvatarButtonStyle.Companion.largeAvatarButtonStyle
 import androidx.wear.protolayout.material3.ButtonDefaults.filledButtonColors
 import androidx.wear.protolayout.material3.ButtonDefaults.filledTonalButtonColors
 import androidx.wear.protolayout.material3.ButtonDefaults.filledVariantButtonColors
@@ -383,6 +385,47 @@ object TestCasesGenerator {
                                         )
                                     }
                                 }
+                            )
+                            .build()
+                    },
+                )
+            }
+        testCases["primarylayout_nobottomslotnotitle_avatarbuttons_golden$NORMAL_SCALE_SUFFIX"] =
+            materialScope(
+                ApplicationProvider.getApplicationContext(),
+                deviceParameters,
+                allowDynamicTheme = false
+            ) {
+                primaryLayout(
+                    mainSlot = {
+                        Column.Builder()
+                            .setWidth(expand())
+                            .setHeight(expand())
+                            .addContent(
+                                avatarButton(
+                                    onClick = clickable,
+                                    labelContent = { text("Primary label".layoutString) },
+                                    secondaryLabelContent = {
+                                        text("Secondary label".layoutString)
+                                    },
+                                    avatarContent = { avatarImage(IMAGE_ID) },
+                                )
+                            )
+                            .addContent(DEFAULT_SPACER_BETWEEN_BUTTON_GROUPS)
+                            .addContent(
+                                avatarButton(
+                                    onClick = clickable,
+                                    labelContent = {
+                                        text("Primary label overflowing".layoutString)
+                                    },
+                                    secondaryLabelContent = {
+                                        text("Secondary label overflowing".layoutString)
+                                    },
+                                    avatarContent = { avatarImage(IMAGE_ID) },
+                                    height = expand(),
+                                    style = largeAvatarButtonStyle(),
+                                    horizontalAlignment = HORIZONTAL_ALIGN_END
+                                )
                             )
                             .build()
                     },
