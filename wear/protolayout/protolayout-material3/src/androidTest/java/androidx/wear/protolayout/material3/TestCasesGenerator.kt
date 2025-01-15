@@ -23,11 +23,7 @@ import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
 import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders
-import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.Column
-import androidx.wear.protolayout.ModifiersBuilders.Background
-import androidx.wear.protolayout.ModifiersBuilders.Corner
-import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.expression.VersionBuilders.VersionInfo
 import androidx.wear.protolayout.material3.AppCardStyle.Companion.largeAppCardStyle
 import androidx.wear.protolayout.material3.ButtonDefaults.filledButtonColors
@@ -48,7 +44,6 @@ import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.clickable
 import androidx.wear.protolayout.modifiers.clip
 import androidx.wear.protolayout.modifiers.contentDescription
-import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.layoutString
 import com.google.common.collect.ImmutableMap
 
@@ -490,19 +485,6 @@ object TestCasesGenerator {
 
         return collectTestCases(testCases)
     }
-
-    private fun coloredBox(color: LayoutColor, shape: Corner) =
-        Box.Builder()
-            .setWidth(expand())
-            .setHeight(expand())
-            .setModifiers(
-                Modifiers.Builder()
-                    .setBackground(
-                        Background.Builder().setColor(color.prop).setCorner(shape).build()
-                    )
-                    .build()
-            )
-            .build()
 
     private fun collectTestCases(
         testCases: Map<String, LayoutElementBuilders.LayoutElement>
