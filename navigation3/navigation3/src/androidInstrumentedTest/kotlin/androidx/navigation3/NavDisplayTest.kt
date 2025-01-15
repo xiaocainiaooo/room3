@@ -45,10 +45,7 @@ class NavDisplayTest {
     @Test
     fun testContentShown() {
         composeTestRule.setContent {
-            val manager = rememberNavWrapperManager(emptyList())
-            NavDisplay(backstack = mutableStateListOf(first), wrapperManager = manager) {
-                NavRecord(first) { Text(first) }
-            }
+            NavDisplay(backstack = mutableStateListOf(first)) { NavRecord(first) { Text(first) } }
         }
 
         assertThat(composeTestRule.onNodeWithText(first).isDisplayed()).isTrue()
@@ -59,8 +56,7 @@ class NavDisplayTest {
         lateinit var backstack: MutableList<Any>
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first) }
-            val manager = rememberNavWrapperManager(emptyList())
-            NavDisplay(backstack = backstack, wrapperManager = manager) {
+            NavDisplay(backstack = backstack) {
                 when (it) {
                     first -> NavRecord(first) { Text(first) }
                     second -> NavRecord(second) { Text(second) }
@@ -82,15 +78,7 @@ class NavDisplayTest {
         lateinit var backstack: MutableList<Any>
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first) }
-            val manager = rememberNavWrapperManager(emptyList())
-            NavDisplay(
-                backstack = backstack,
-                wrapperManager = manager,
-                onBack = {
-                    // removeLast requires API 35
-                    backstack.removeAt(backstack.size - 1)
-                }
-            ) {
+            NavDisplay(backstack = backstack) {
                 when (it) {
                     first -> NavRecord(first) { Text(first) }
                     second -> NavRecord(second, NavDisplay.isDialog(true)) { Text(second) }
@@ -115,15 +103,7 @@ class NavDisplayTest {
         composeTestRule.setContent {
             onBackDispatcher = LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
             backstack = remember { mutableStateListOf(first) }
-            val manager = rememberNavWrapperManager(emptyList())
-            NavDisplay(
-                backstack = backstack,
-                wrapperManager = manager,
-                onBack = {
-                    // removeLast requires API 35
-                    backstack.removeAt(backstack.size - 1)
-                }
-            ) {
+            NavDisplay(backstack = backstack) {
                 when (it) {
                     first -> NavRecord(first) { Text(first) }
                     second -> NavRecord(second) { Text(second) }
@@ -150,8 +130,7 @@ class NavDisplayTest {
         lateinit var backstack: MutableList<Any>
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first) }
-            val manager = rememberNavWrapperManager(emptyList())
-            NavDisplay(backstack = backstack, wrapperManager = manager) {
+            NavDisplay(backstack = backstack) {
                 when (it) {
                     first -> NavRecord(first) { numberOnScreen1 = rememberSaveable { increment++ } }
                     second -> NavRecord(second) {}
@@ -226,7 +205,6 @@ class NavDisplayTest {
             backStack2 = remember { mutableStateListOf(second) }
             backStack3 = remember { mutableStateListOf(third) }
             state = remember { mutableStateOf(1) }
-            val manager = rememberNavWrapperManager(emptyList())
             NavDisplay(
                 backstack =
                     when (state.value) {
@@ -234,7 +212,6 @@ class NavDisplayTest {
                         2 -> backStack2
                         else -> backStack3
                     },
-                wrapperManager = manager,
                 recordProvider =
                     recordProvider {
                         record(first) { Text(first) }
