@@ -622,7 +622,7 @@ class SecurityPatchStateTest {
     fun testGetPatchedCves_ThrowsExceptionForInvalidComponent() {
         val spl = SecurityPatchState.DateBasedSecurityPatchLevel.fromString("2023-01-01")
 
-        securityState.getPatchedCves(SecurityPatchState.COMPONENT_WEBVIEW, spl)
+        securityState.getPatchedCves(SecurityPatchState.COMPONENT_KERNEL, spl)
     }
 
     @Test
