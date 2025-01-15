@@ -13,7 +13,7 @@ package androidx.navigation3 {
   }
 
   public final class NavDisplay_androidKt {
-    method @androidx.compose.runtime.Composable public static <T> void NavDisplay(java.util.List<? extends T> backstack, androidx.navigation3.NavWrapperManager wrapperManager, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.Alignment contentAlignment, optional androidx.compose.animation.SizeTransform? sizeTransform, optional androidx.compose.animation.EnterTransition enterTransition, optional androidx.compose.animation.ExitTransition exitTransition, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavRecord<? extends T>> recordProvider);
+    method @androidx.compose.runtime.Composable public static <T> void NavDisplay(java.util.List<? extends T> backstack, optional androidx.compose.ui.Modifier modifier, optional androidx.navigation3.NavWrapperManager wrapperManager, optional androidx.compose.ui.Alignment contentAlignment, optional androidx.compose.animation.SizeTransform? sizeTransform, optional androidx.compose.animation.EnterTransition enterTransition, optional androidx.compose.animation.ExitTransition exitTransition, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavRecord<? extends T>> recordProvider);
   }
 
   public final class NavRecord<T> {
@@ -27,7 +27,8 @@ package androidx.navigation3 {
   }
 
   public final class NavWrapperManager {
-    ctor public NavWrapperManager(java.util.List<? extends androidx.navigation3.NavContentWrapper> navContentWrappers);
+    ctor public NavWrapperManager();
+    ctor public NavWrapperManager(optional java.util.List<? extends androidx.navigation3.NavContentWrapper> navContentWrappers);
     method @androidx.compose.runtime.Composable public <T> void ContentForRecord(androidx.navigation3.NavRecord<T> record);
     method @androidx.compose.runtime.Composable public void PrepareBackStack(java.util.List<?> backStack);
   }

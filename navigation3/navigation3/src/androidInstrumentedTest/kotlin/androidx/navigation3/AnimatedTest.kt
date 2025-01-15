@@ -47,8 +47,7 @@ class AnimatedTest {
 
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first) }
-            val manager = rememberNavWrapperManager(emptyList())
-            NavDisplay(backstack, wrapperManager = manager) {
+            NavDisplay(backstack) {
                 when (it) {
                     first -> NavRecord(first) { Text(first) }
                     second -> NavRecord(second) { Text(second) }
@@ -91,8 +90,7 @@ class AnimatedTest {
 
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first) }
-            val manager = rememberNavWrapperManager(emptyList())
-            NavDisplay(backstack, wrapperManager = manager) {
+            NavDisplay(backstack) {
                 when (it) {
                     first ->
                         NavRecord(

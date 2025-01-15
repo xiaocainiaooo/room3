@@ -81,8 +81,8 @@ public object NavDisplay {
 @Composable
 public fun <T : Any> NavDisplay(
     backstack: List<T>,
-    wrapperManager: NavWrapperManager,
     modifier: Modifier = Modifier,
+    wrapperManager: NavWrapperManager = rememberNavWrapperManager(emptyList()),
     contentAlignment: Alignment = Alignment.TopStart,
     sizeTransform: SizeTransform? = null,
     enterTransition: EnterTransition =

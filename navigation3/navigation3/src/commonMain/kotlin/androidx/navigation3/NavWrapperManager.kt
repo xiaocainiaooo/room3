@@ -36,7 +36,7 @@ public fun rememberNavWrapperManager(
  *
  * @param navContentWrappers the [NavContentWrapper]s that are providing data to the content
  */
-public class NavWrapperManager(navContentWrappers: List<NavContentWrapper>) {
+public class NavWrapperManager(navContentWrappers: List<NavContentWrapper> = emptyList()) {
     /**
      * Final list of wrappers. This always adds a [SaveableStateNavContentWrapper] by default, as it
      * is required. It then filters out any duplicates to ensure there is always one instance of any
