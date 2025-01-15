@@ -190,8 +190,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * <a href="https://m3.material.io/components/time-pickers/overview" class="external"
- * target="_blank">Material Design time picker</a>.
+ * [Material Design time picker](https://m3.material.io/components/time-pickers/overview)
  *
  * Time pickers help users select and set a specific time.
  *
