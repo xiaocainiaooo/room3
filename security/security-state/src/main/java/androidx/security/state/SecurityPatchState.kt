@@ -95,9 +95,6 @@ constructor(
         /** Kernel component providing kernel version as VersionedSpl. */
         public const val COMPONENT_KERNEL: String = "KERNEL"
 
-        /** WebView component providing default WebView provider version as VersionedSpl. */
-        internal const val COMPONENT_WEBVIEW: String = "WEBVIEW"
-
         /**
          * Vendor component providing ro.vendor.build.security_patch property value as DateBasedSpl.
          */
@@ -117,7 +114,6 @@ constructor(
                 COMPONENT_SYSTEM_MODULES,
                 COMPONENT_KERNEL,
                 COMPONENT_VENDOR,
-                COMPONENT_WEBVIEW,
             ]
     )
     internal annotation class Component
@@ -572,9 +568,6 @@ constructor(
 
                 DateBasedSecurityPatchLevel.fromString(vendorSpl)
             }
-
-            // TODO(musashi): Add support for webview package
-            COMPONENT_WEBVIEW -> TODO()
             else -> throw IllegalArgumentException("Unknown component: $component")
         }
     }
@@ -614,9 +607,6 @@ constructor(
                 )
             }
             COMPONENT_KERNEL -> getPublishedKernelVersions()
-
-            // TODO(musashi): Add support for webview package
-            COMPONENT_WEBVIEW -> TODO()
             else -> throw IllegalArgumentException("Unknown component: $component")
         }
     }
@@ -740,8 +730,7 @@ constructor(
                 // These components are expected to use DateBasedSpl
                 DateBasedSecurityPatchLevel.fromString(securityPatchLevel)
             }
-            COMPONENT_KERNEL,
-            COMPONENT_WEBVIEW -> {
+            COMPONENT_KERNEL -> {
                 // These components are expected to use VersionedSpl
                 VersionedSecurityPatchLevel.fromString(securityPatchLevel)
             }
@@ -767,13 +756,10 @@ constructor(
                 COMPONENT_SYSTEM_MODULES,
                 COMPONENT_VENDOR,
                 COMPONENT_KERNEL,
-                COMPONENT_WEBVIEW
             )
 
         components.forEach { component ->
             if (component == COMPONENT_VENDOR && !USE_VENDOR_SPL) return@forEach
-            // TODO(musashi): Unblock once support for WebView is present.
-            if (component == COMPONENT_WEBVIEW) return@forEach
             val deviceSpl =
                 try {
                     getDeviceSecurityPatchLevel(component)
