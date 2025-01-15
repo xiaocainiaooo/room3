@@ -62,7 +62,7 @@ import androidx.wear.protolayout.modifiers.padding
  * @param time An optional slot for displaying the time relevant to the contents of the card,
  *   expected to be a short piece of text. Uses [CardColors.timeColor] color by default.
  * @param height The height of this card. It's highly recommended to set this to [expand] or
- *   [weight]
+ *   [weight].
  * @param shape Defines the card's shape, in other words the corner radius for this card.
  * @param colors The colors to be used for a background and inner content of this card. If the
  *   background image is also specified, the image will be laid out on top of the background color.

@@ -26,7 +26,7 @@ import androidx.wear.protolayout.expression.RequiresSchemaVersion
 import java.util.Objects
 
 /**
- * Adds content description to be read by Talkback.
+ * Adds content description to be read by accessibility services.
  *
  * @param staticValue The static content description. This value will be used if [dynamicValue] is
  *   null, or if can't be resolved.
