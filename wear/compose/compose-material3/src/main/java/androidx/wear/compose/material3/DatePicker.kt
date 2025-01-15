@@ -84,9 +84,9 @@ import java.time.format.DateTimeFormatter
  *
  * @sample androidx.wear.compose.material3.samples.DatePickerYearMonthDaySample
  *
- * Example of a [DatePicker] with minDate and maxDate:
+ * Example of a [DatePicker] with a minDate:
  *
- * @sample androidx.wear.compose.material3.samples.DatePickerMinDateMaxDateSample
+ * @sample androidx.wear.compose.material3.samples.DatePickerFutureOnlySample
  * @param initialDate The initial value to be displayed in the DatePicker.
  * @param onDatePicked The callback that is called when the user confirms the date selection. It
  *   provides the selected date as [LocalDate]
