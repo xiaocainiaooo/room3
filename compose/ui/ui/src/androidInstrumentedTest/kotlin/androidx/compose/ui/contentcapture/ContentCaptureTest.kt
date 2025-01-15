@@ -335,6 +335,12 @@ class ContentCaptureTest {
         rule.runOnIdle {
             // At least 5 times(List itself + 4 children)
             verify(contentCaptureSessionCompat, atLeast(5)).notifyViewAppeared(any())
+            with(argumentCaptor<String>()) {
+                verify(viewStructureCompat, times(5)).setClassName(capture())
+                assertThat(firstValue).isEqualTo("android.widget.ViewGroup")
+                assertThat(secondValue).isEqualTo("android.widget.TextView")
+                assertThat(thirdValue).isEqualTo("android.widget.TextView")
+            }
         }
     }
 
