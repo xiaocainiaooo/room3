@@ -2994,20 +2994,8 @@ private class TopAppBarMeasurePolicy(
             )
 
             titlePlaceable.let {
-                val navigationIconWidth =
-                    max(TopAppBarTitleInset.roundToPx(), navigationIconPlaceable.width)
-                val actionsWidth = actionIconsPlaceable.width
-
-                val start =
-                    when (layoutDirection) {
-                        LayoutDirection.Ltr -> navigationIconWidth
-                        LayoutDirection.Rtl -> actionsWidth
-                    }
-                val end =
-                    when (layoutDirection) {
-                        LayoutDirection.Ltr -> actionsWidth
-                        LayoutDirection.Rtl -> navigationIconWidth
-                    }
+                val start = max(TopAppBarTitleInset.roundToPx(), navigationIconPlaceable.width)
+                val end = actionIconsPlaceable.width
 
                 // Align using the maxWidth. We will adjust the position later according to the
                 // start and end. This is done to ensure that a center alignment is still maintained
@@ -3018,7 +3006,8 @@ private class TopAppBarMeasurePolicy(
                     titleHorizontalAlignment.align(
                         size = titlePlaceable.width,
                         space = constraints.maxWidth,
-                        layoutDirection = layoutDirection
+                        // Using Ltr as we call placeRelative later on.
+                        layoutDirection = LayoutDirection.Ltr
                     )
                 // Reposition the title based on the start and the end (i.e. the navigation and
                 // action widths).
