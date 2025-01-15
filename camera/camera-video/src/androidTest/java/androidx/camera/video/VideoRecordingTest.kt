@@ -342,6 +342,7 @@ class VideoRecordingTest(
         videoCapture.setViewPortCropRect(cropRect)
 
         checkAndBindUseCases(preview, videoCapture)
+        val calculatedCropRect = videoCapture.cropRect!!
 
         // TODO(b/264936115): In stream sharing (VirtualCameraAdapter), children's ViewPortCropRect
         //  is ignored and override to the parent size, the cropRect is also rotated. Skip the test
@@ -352,7 +353,7 @@ class VideoRecordingTest(
         val result = recordingSession.createRecording(recorder = recorder).recordAndVerify()
 
         // Verify.
-        val resolution = rectToSize(videoCapture.cropRect!!)
+        val resolution = rectToSize(calculatedCropRect)
         verifyVideoResolution(
             context,
             result.file,
