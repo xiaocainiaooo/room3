@@ -24,6 +24,7 @@ import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_END
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_START
 import androidx.wear.protolayout.LayoutElementBuilders.HorizontalAlignment
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
+import androidx.wear.protolayout.LayoutElementBuilders.TEXT_ALIGN_END
 import androidx.wear.protolayout.LayoutElementBuilders.TEXT_ALIGN_START
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.ModifiersBuilders.Corner
@@ -270,6 +271,7 @@ public fun MaterialScope.appCard(
                                 TextElementStyle(
                                     typography = style.timeTypography,
                                     color = colors.timeColor,
+                                    multilineAlignment = TEXT_ALIGN_END
                                 )
                         )
                         .it()
@@ -597,7 +599,9 @@ public fun MaterialScope.graphicDataCard(
                         defaultTextElementStyle =
                             TextElementStyle(
                                 typography = style.titleTypography,
-                                color = colors.titleColor
+                                color = colors.titleColor,
+                                multilineAlignment =
+                                    HORIZONTAL_ALIGN_START.horizontalAlignToTextAlign()
                             )
                     )
                     .title(),
@@ -607,7 +611,9 @@ public fun MaterialScope.graphicDataCard(
                             defaultTextElementStyle =
                                 TextElementStyle(
                                     typography = style.contentTypography,
-                                    color = colors.contentColor
+                                    color = colors.contentColor,
+                                    multilineAlignment =
+                                        HORIZONTAL_ALIGN_START.horizontalAlignToTextAlign()
                                 )
                         )
                         .it()
