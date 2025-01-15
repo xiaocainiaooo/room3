@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavContentWrapper
-import androidx.navigation3.AnimatedNavDisplay
 import androidx.navigation3.NavDisplay
 import androidx.navigation3.NavRecord
 import androidx.navigation3.SavedStateNavContentWrapper
@@ -32,9 +31,13 @@ import androidx.navigation3.record
 import androidx.navigation3.recordProvider
 import androidx.navigation3.rememberNavWrapperManager
 
+class ProfileViewModel : ViewModel() {
+    val name = "no user"
+}
+
 @Sampled
 @Composable
-fun BasicNav() {
+fun BaseNav() {
     val backStack = rememberMutableStateListOf(Profile)
     val manager =
         rememberNavWrapperManager(
@@ -46,54 +49,14 @@ fun BasicNav() {
         onBack = { backStack.removeLast() },
         recordProvider =
             recordProvider({ NavRecord(Unit) { Text(text = "Invalid Key") } }) {
-                record<Profile> {
-                    val viewModel = viewModel<ProfileViewModel>()
-                    Profile(viewModel, { backStack.add(it) }) { backStack.removeLast() }
-                }
-                record<Scrollable> { Scrollable({ backStack.add(it) }) { backStack.removeLast() } }
-                record<Dialog>(featureMap = NavDisplay.isDialog(true)) {
-                    DialogContent { backStack.removeLast() }
-                }
-                record<Dashboard> { dashboardArgs ->
-                    val userId = dashboardArgs.userId
-                    Dashboard(userId, onBack = { backStack.removeLast() })
-                }
-            }
-    )
-}
-
-class ProfileViewModel : ViewModel() {
-    val name = "no user"
-}
-
-@Sampled
-@Composable
-fun AnimatedNav() {
-    val backStack = rememberMutableStateListOf(Profile)
-    val manager =
-        rememberNavWrapperManager(
-            listOf(SavedStateNavContentWrapper, ViewModelStoreNavContentWrapper)
-        )
-    AnimatedNavDisplay(
-        backstack = backStack,
-        wrapperManager = manager,
-        onBack = { backStack.removeLast() },
-        recordProvider =
-            recordProvider({ NavRecord(Unit) { Text(text = "Invalid Key") } }) {
                 record<Profile>(
-                    AnimatedNavDisplay.transition(
-                        slideInHorizontally { it },
-                        slideOutHorizontally { it }
-                    )
+                    NavDisplay.transition(slideInHorizontally { it }, slideOutHorizontally { it })
                 ) {
                     val viewModel = viewModel<ProfileViewModel>()
                     Profile(viewModel, { backStack.add(it) }) { backStack.removeLast() }
                 }
                 record<Scrollable>(
-                    AnimatedNavDisplay.transition(
-                        slideInHorizontally { it },
-                        slideOutHorizontally { it }
-                    )
+                    NavDisplay.transition(slideInHorizontally { it }, slideOutHorizontally { it })
                 ) {
                     Scrollable({ backStack.add(it) }) { backStack.removeLast() }
                 }
@@ -101,10 +64,7 @@ fun AnimatedNav() {
                     DialogContent { backStack.removeLast() }
                 }
                 record<Dashboard>(
-                    AnimatedNavDisplay.transition(
-                        slideInHorizontally { it },
-                        slideOutHorizontally { it }
-                    )
+                    NavDisplay.transition(slideInHorizontally { it }, slideOutHorizontally { it })
                 ) { dashboardArgs ->
                     val userId = dashboardArgs.userId
                     Dashboard(userId, onBack = { backStack.removeLast() })
