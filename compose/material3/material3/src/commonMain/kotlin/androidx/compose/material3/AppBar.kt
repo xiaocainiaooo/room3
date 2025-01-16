@@ -1050,7 +1050,7 @@ fun TwoRowsTopAppBar(
  * <a href="https://m3.material.io/components/bottom-app-bar/overview" class="external"
  * target="_blank">Material Design bottom app bar</a>.
  *
- * A bottom app bar displays navigation and key actions at the bottom of mobile screens.
+ * A bottom app bar displays navigation and key actions at the bottom of small screens.
  *
  * ![Bottom app bar
  * image](https://developer.android.com/images/reference/androidx/compose/material3/bottom-app-bar.png)
@@ -1106,7 +1106,7 @@ fun BottomAppBar(
  * <a href="https://m3.material.io/components/bottom-app-bar/overview" class="external"
  * target="_blank">Material Design bottom app bar</a>.
  *
- * A bottom app bar displays navigation and key actions at the bottom of mobile screens.
+ * A bottom app bar displays navigation and key actions at the bottom of small screens.
  *
  * ![Bottom app bar
  * image](https://developer.android.com/images/reference/androidx/compose/material3/bottom-app-bar.png)
@@ -1186,7 +1186,7 @@ fun BottomAppBar(
  * <a href="https://m3.material.io/components/bottom-app-bar/overview" class="external"
  * target="_blank">Material Design bottom app bar</a>.
  *
- * A bottom app bar displays navigation and key actions at the bottom of mobile screens.
+ * A bottom app bar displays navigation and key actions at the bottom of small screens.
  *
  * ![Bottom app bar
  * image](https://developer.android.com/images/reference/androidx/compose/material3/bottom-app-bar.png)
@@ -1235,7 +1235,7 @@ fun BottomAppBar(
  * <a href="https://m3.material.io/components/bottom-app-bar/overview" class="external"
  * target="_blank">Material Design bottom app bar</a>.
  *
- * A bottom app bar displays navigation and key actions at the bottom of mobile screens.
+ * A bottom app bar displays navigation and key actions at the bottom of small screens.
  *
  * ![Bottom app bar
  * image](https://developer.android.com/images/reference/androidx/compose/material3/bottom-app-bar.png)
@@ -1288,14 +1288,16 @@ fun BottomAppBar(
     )
 }
 
+// TODO missing image of the flexible bottom app bar.
 /**
  * <a href="https://m3.material.io/components/bottom-app-bar/overview" class="external"
- * target="_blank">Material Design bottom app bar</a>.
+ * target="_blank">Material Design flexible bottom app bar</a>.
  *
- * A bottom app bar displays navigation and key actions at the bottom of mobile screens.
+ * A flexible bottom app bar displays navigation and key actions at the bottom of small screens.
  *
- * ![Bottom app bar
- * image](https://developer.android.com/images/reference/androidx/compose/material3/bottom-app-bar.png)
+ * This variation of the Bottom app bar has a [horizontalArrangement] parameter for controlling the
+ * way the content is arranged. Also, it allows more flexibility in controlling the bar's expanded
+ * height with an [expandedHeight] value.
  *
  * If you are interested in displaying a [FloatingActionButton], consider using another overload
  * that takes a [FloatingActionButton] parameter.
@@ -1311,7 +1313,6 @@ fun BottomAppBar(
  * @sample androidx.compose.material3.samples.ExitAlwaysBottomAppBarSpacedEvenly
  * @sample androidx.compose.material3.samples.ExitAlwaysBottomAppBarFixed
  * @sample androidx.compose.material3.samples.ExitAlwaysBottomAppBarFixedVibrant
- * @param horizontalArrangement the horizontal arrangement of the content.
  * @param modifier the [Modifier] to be applied to this BottomAppBar
  * @param containerColor the color used for the background of this BottomAppBar. Use
  *   [Color.Transparent] to have no color.
@@ -1319,6 +1320,13 @@ fun BottomAppBar(
  *   the matching content color for [containerColor], or to the current [LocalContentColor] if
  *   [containerColor] is not a color from the theme.
  * @param contentPadding the padding applied to the content of this BottomAppBar
+ * @param horizontalArrangement the horizontal arrangement of the content inside this BottomAppBar
+ * @param expandedHeight the maximum height this bottom bar can reach when fully expanded. If a
+ *   [scrollBehavior] is provided, the bar might collapse or expand based on scrolling. In that
+ *   case, this value sets the upper limit for the bar's height during expansion. This [Dp] value
+ *   must be specified, finite, and greater than zero; otherwise,
+ *   [BottomAppBarDefaults.FlexibleBottomAppBarHeight] will be used as a default. In case the
+ *   [scrollBehavior] is `null`, this value will simply be the fixed height of the bottom bar.
  * @param windowInsets a window insets that app bar will respect.
  * @param scrollBehavior a [BottomAppBarScrollBehavior] which holds various offset values that will
  *   be applied by this bottom app bar to set up its height. A scroll behavior is designed to work
@@ -1330,23 +1338,30 @@ fun BottomAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalMaterial3ExpressiveApi
 @Composable
-fun BottomAppBar(
-    horizontalArrangement: Arrangement.Horizontal,
+fun FlexibleBottomAppBar(
     modifier: Modifier = Modifier,
     containerColor: Color = BottomAppBarDefaults.containerColor,
     contentColor: Color = contentColorFor(containerColor),
-    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp), // TODO tokens
+    contentPadding: PaddingValues = BottomAppBarDefaults.FlexibleContentPadding,
+    horizontalArrangement: Arrangement.Horizontal =
+        BottomAppBarDefaults.FlexibleHorizontalArrangement,
+    expandedHeight: Dp = BottomAppBarDefaults.FlexibleBottomAppBarHeight,
     windowInsets: WindowInsets = BottomAppBarDefaults.windowInsets,
     scrollBehavior: BottomAppBarScrollBehavior? = null,
     content: @Composable RowScope.() -> Unit
 ) {
     BottomAppBarLayout(
-        containerHeight = 64.dp, // TODO tokens
+        containerHeight =
+            if (expandedHeight.isFinite && expandedHeight.isSpecified && expandedHeight > 0.dp) {
+                expandedHeight
+            } else {
+                BottomAppBarDefaults.FlexibleBottomAppBarHeight
+            },
         horizontalArrangement = horizontalArrangement,
         modifier = modifier,
         containerColor = containerColor,
         contentColor = contentColor,
-        tonalElevation = BottomAppBarDefaults.ContainerElevation,
+        tonalElevation = AppBarTokens.ContainerElevation,
         contentPadding = contentPadding,
         windowInsets = windowInsets,
         scrollBehavior = scrollBehavior,
@@ -2192,7 +2207,34 @@ object BottomAppBarDefaults {
     val bottomAppBarFabColor: Color
         @Composable get() = FabSecondaryContainerTokens.ContainerColor.value
 
-    val HorizontalArrangement =
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    /** Default padding used for [FlexibleBottomAppBar]. */
+    val FlexibleContentPadding = PaddingValues(horizontal = 16.dp) // TODO tokens
+
+    /**
+     * Default height of a flexible [FlexibleBottomAppBar]. The height here represents the height of
+     * the bottom app bar in its expanded state.
+     */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    val FlexibleBottomAppBarHeight = AppBarSmallTokens.ContainerHeight
+
+    /** A default [Arrangement] that will be used to space a [FlexibleBottomAppBar]'s content. */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    val FlexibleHorizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceBetween
+
+    /**
+     * An [Arrangement] that will be used to space [FlexibleBottomAppBar]'s with a fixed spacing.
+     */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    val FlexibleFixedHorizontalArrangement: Arrangement.Horizontal =
         Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally) // TODO tokens
 
     // TODO: note that this scroll behavior may impact assistive technologies making the component
