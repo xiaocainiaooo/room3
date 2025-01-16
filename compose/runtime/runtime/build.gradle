@@ -46,7 +46,6 @@ androidXMultiplatform {
                 implementation(libs.kotlinStdlibCommon)
                 api(libs.kotlinCoroutinesCore)
                 implementation(project(":collection:collection"))
-                implementation(project(":performance:performance-annotation"))
             }
         }
 

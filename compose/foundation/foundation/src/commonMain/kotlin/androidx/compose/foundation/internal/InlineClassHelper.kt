@@ -53,7 +53,7 @@ internal inline fun checkPrecondition(value: Boolean, lazyMessage: () -> String)
     }
 }
 
-@Suppress("NOTHING_TO_INLINE", "BanInlineOptIn", "KotlinRedundantDiagnosticSuppress")
+@Suppress("NOTHING_TO_INLINE", "BanInlineOptIn")
 @OptIn(ExperimentalContracts::class)
 internal inline fun checkPrecondition(value: Boolean) {
     contract { returns() implies value }
