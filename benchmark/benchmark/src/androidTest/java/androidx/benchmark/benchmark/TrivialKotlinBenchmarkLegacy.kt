@@ -14,32 +14,29 @@
  * limitations under the License.
  */
 
-package androidx.benchmark.junit4
+package androidx.benchmark.benchmark
 
+import android.annotation.SuppressLint
+import androidx.benchmark.junit4.BenchmarkRuleLegacy
+import androidx.benchmark.junit4.measureRepeated
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
+import androidx.test.filters.LargeTest
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@SmallTest
+@LargeTest
 @RunWith(AndroidJUnit4::class)
-class BenchmarkRuleAnnotationTest {
-    @Suppress("MemberVisibilityCanBePrivate") // intentionally public
-    // NOTE: not annotated, so will throw when state is accessed
-    val unannotatedRule = BenchmarkRule()
+class TrivialKotlinBenchmarkLegacy {
+    @get:Rule val benchmarkRule = BenchmarkRuleLegacy()
 
-    @Test(expected = IllegalStateException::class)
-    fun throwsIfNotAnnotated() {
-        unannotatedRule.getState()
-    }
+    @SuppressLint("BanThreadSleep") // intentional bad behavior / regression
+    @Test
+    fun nothing() = benchmarkRule.measureRepeated { Thread.sleep(1) }
 
-    @Test(expected = IllegalStateException::class)
-    fun throwsIfNotAnnotatedMeasure() {
-        unannotatedRule.measureRepeated {}
-    }
-
-    @Test(expected = IllegalStateException::class)
-    fun throwsIfNotAnnotatedMeasureMain() {
-        unannotatedRule.measureRepeatedOnMainThread {}
+    @Test
+    fun increment() {
+        var i = 0
+        benchmarkRule.measureRepeated { i++ }
     }
 }

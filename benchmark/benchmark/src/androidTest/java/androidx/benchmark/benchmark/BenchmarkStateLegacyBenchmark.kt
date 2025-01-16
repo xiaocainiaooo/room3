@@ -14,32 +14,25 @@
  * limitations under the License.
  */
 
-package androidx.benchmark.junit4
+package androidx.benchmark.benchmark
 
+import androidx.benchmark.BenchmarkStateLegacy
+import androidx.benchmark.ExperimentalBenchmarkStateApi
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
+import androidx.test.filters.LargeTest
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@SmallTest
+@LargeTest
 @RunWith(AndroidJUnit4::class)
-class BenchmarkRuleAnnotationTest {
-    @Suppress("MemberVisibilityCanBePrivate") // intentionally public
-    // NOTE: not annotated, so will throw when state is accessed
-    val unannotatedRule = BenchmarkRule()
-
-    @Test(expected = IllegalStateException::class)
-    fun throwsIfNotAnnotated() {
-        unannotatedRule.getState()
-    }
-
-    @Test(expected = IllegalStateException::class)
-    fun throwsIfNotAnnotatedMeasure() {
-        unannotatedRule.measureRepeated {}
-    }
-
-    @Test(expected = IllegalStateException::class)
-    fun throwsIfNotAnnotatedMeasureMain() {
-        unannotatedRule.measureRepeatedOnMainThread {}
+class BenchmarkStateLegacyBenchmark {
+    @OptIn(ExperimentalBenchmarkStateApi::class)
+    @Test
+    fun nothing() {
+        val state = BenchmarkStateLegacy(warmupCount = 10, repeatCount = 10)
+        while (state.keepRunning()) {
+            // do nothing
+        }
+        state.getMeasurementTimeNs()
     }
 }
