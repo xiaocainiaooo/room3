@@ -179,8 +179,19 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     /** The currently selected PDF content, as [Selection] */
     public val currentSelection: Selection?
         get() {
-            return selectionStateManager?.selectionModel?.selection
+            return selectionStateManager?.selectionModel?.value?.selection
         }
+
+    /** Listener interface to receive updates when the [currentSelection] changes */
+    public interface OnSelectionChangedListener {
+        /** Called when the [Selection] has changed */
+        public fun onSelectionChanged(
+            previousSelection: Selection?,
+            newSelection: Selection?,
+        )
+    }
+
+    private var onSelectionChangedListeners = mutableListOf<OnSelectionChangedListener>()
 
     /**
      * The [CoroutineScope] used to make suspending calls to [PdfDocument]. The size of the fixed
@@ -192,8 +203,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private var pageLayoutManager: PageLayoutManager? = null
     private var pageManager: PageManager? = null
     private var visiblePagesCollector: Job? = null
-    private var dimensionsCollector: Job? = null
-    private var invalidationCollector: Job? = null
+    private var layoutInfoCollector: Job? = null
+    private var pageSignalCollector: Job? = null
     private var selectionStateCollector: Job? = null
 
     private var deferredScrollPage: Int? = null
@@ -301,6 +312,33 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
     }
 
+    /**
+     * Adds the specified listener to the list of listeners that will be notified of selection
+     * change events.
+     *
+     * @param listener listener to notify when selection change events occur
+     * @see removeOnSelectionChangedListener
+     */
+    public fun addOnSelectionChangedListener(listener: OnSelectionChangedListener) {
+        onSelectionChangedListeners.add(listener)
+    }
+
+    /**
+     * Removes the specified listener from the list of listeners that will be notified of selection
+     * change events.
+     *
+     * @param listener listener to remove
+     */
+    public fun removeOnSelectionChangedListener(listener: OnSelectionChangedListener) {
+        onSelectionChangedListeners.remove(listener)
+    }
+
+    private fun dispatchSelectionChanged(old: Selection?, new: Selection?) {
+        for (listener in onSelectionChangedListeners) {
+            listener.onSelectionChanged(old, new)
+        }
+    }
+
     private fun gotoPage(pageNum: Int) {
         checkMainThread()
         val localPageLayoutManager =
@@ -386,7 +424,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         for (i in visiblePages.lower..visiblePages.upper) {
             val pageLoc = localPaginationManager.getPageLocation(i, getVisibleAreaInContentCoords())
             pageManager?.drawPage(i, canvas, pageLoc)
-            selectionModel?.let {
+            selectionModel?.value?.let {
                 selectionRenderer.drawSelectionOnPage(
                     model = it,
                     pageNum = i,
@@ -492,7 +530,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
         state.documentUri = pdfDocument?.uri
         state.paginationModel = pageLayoutManager?.paginationModel
-        state.selectionModel = selectionStateManager?.selectionModel
+        state.selectionModel = selectionStateManager?.selectionModel?.value
         return state
     }
 
@@ -638,32 +676,23 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             CoroutineScope(HandlerCompat.createAsync(handler.looper).asCoroutineDispatcher())
         pageLayoutManager?.let { manager ->
             // Don't let two copies of this run concurrently
-            val dimensionsToJoin = dimensionsCollector?.apply { cancel() }
-            dimensionsCollector =
+            val layoutInfoToJoin = layoutInfoCollector?.apply { cancel() }
+            layoutInfoCollector =
                 mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                    manager.dimensions.collect {
-                        // Prevent 2 copies from running concurrently
-                        dimensionsToJoin?.join()
-                        onPageDimensionsReceived(it.first, it.second)
+                    // Prevent 2 copies from running concurrently
+                    layoutInfoToJoin?.join()
+                    launch {
+                        manager.dimensions.collect { onPageDimensionsReceived(it.first, it.second) }
                     }
-                }
-            // Don't let two copies of this run concurrently
-            val visiblePagesToJoin = visiblePagesCollector?.apply { cancel() }
-            visiblePagesCollector =
-                mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                    manager.visiblePages.collect {
-                        // Prevent 2 copies from running concurrently
-                        visiblePagesToJoin?.join()
-                        onVisiblePagesChanged()
-                    }
+                    launch { manager.visiblePages.collect { onVisiblePagesChanged() } }
                 }
         }
         pageManager?.let { manager ->
-            val invalidationToJoin = invalidationCollector?.apply { cancel() }
-            invalidationCollector =
+            val pageSignalsToJoin = pageSignalCollector?.apply { cancel() }
+            pageSignalCollector =
                 mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
                     // Prevent 2 copies from running concurrently
-                    invalidationToJoin?.join()
+                    pageSignalsToJoin?.join()
                     launch { manager.invalidationSignalFlow.collect { invalidate() } }
                     launch {
                         manager.pageTextReadyFlow.collect { pageNum ->
@@ -678,15 +707,22 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                 mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
                     // Prevent 2 copies from running concurrently
                     selectionToJoin?.join()
-                    manager.selectionUiSignalBus.collect { onSelectionUiSignal(it) }
+                    launch { manager.selectionUiSignalBus.collect { onSelectionUiSignal(it) } }
+                    var prevSelection = currentSelection
+                    launch {
+                        manager.selectionModel.collect { newModel ->
+                            dispatchSelectionChanged(prevSelection, newModel?.selection)
+                            prevSelection = newModel?.selection
+                        }
+                    }
                 }
         }
     }
 
     private fun stopCollectingData() {
-        dimensionsCollector?.cancel()
+        layoutInfoCollector?.cancel()
         visiblePagesCollector?.cancel()
-        invalidationCollector?.cancel()
+        pageSignalCollector?.cancel()
         selectionStateCollector?.cancel()
     }
 
