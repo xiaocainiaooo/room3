@@ -25,14 +25,14 @@ import androidx.annotation.RestrictTo
  *
  * This exception can be used by the app to report errors to the caller.
  */
-public class AppFunctionException
+public open class AppFunctionException
 internal constructor(
     /** The error code. */
     @ErrorCode public val errorCode: Int,
     /** The error message. */
     public val errorMessage: String?,
     internal val extras: Bundle
-) {
+) : Exception(errorMessage) {
     /**
      * Create an [AppFunctionException].
      *
@@ -109,11 +109,38 @@ internal constructor(
         public fun fromPlatformExtensionsClass(
             exception: com.android.extensions.appfunctions.AppFunctionException
         ): AppFunctionException {
-            return AppFunctionException(
-                exception.errorCode,
-                exception.errorMessage,
-                exception.extras
-            )
+            return when (exception.errorCode) {
+                ERROR_DENIED -> AppFunctionDeniedException(exception.errorMessage, exception.extras)
+                ERROR_INVALID_ARGUMENT ->
+                    AppFunctionInvalidArgumentException(exception.errorMessage, exception.extras)
+                ERROR_DISABLED ->
+                    AppFunctionDisabledException(exception.errorMessage, exception.extras)
+                ERROR_FUNCTION_NOT_FOUND ->
+                    AppFunctionFunctionNotFoundException(exception.errorMessage, exception.extras)
+                ERROR_RESOURCE_NOT_FOUND ->
+                    AppFunctionElementNotFoundException(exception.errorMessage, exception.extras)
+                ERROR_LIMIT_EXCEEDED ->
+                    AppFunctionLimitExceededException(exception.errorMessage, exception.extras)
+                ERROR_RESOURCE_ALREADY_EXISTS ->
+                    AppFunctionElementAlreadyExistsException(
+                        exception.errorMessage,
+                        exception.extras
+                    )
+                ERROR_CANCELLED ->
+                    AppFunctionCancelledException(exception.errorMessage, exception.extras)
+                ERROR_APP_UNKNOWN_ERROR, ->
+                    AppFunctionCancelledException(exception.errorMessage, exception.extras)
+                ERROR_PERMISSION_REQUIRED ->
+                    AppFunctionPermissionRequiredException(exception.errorMessage, exception.extras)
+                ERROR_NOT_SUPPORTED ->
+                    AppFunctionNotSupportedException(exception.errorMessage, exception.extras)
+                else ->
+                    AppFunctionException(
+                        exception.errorCode,
+                        exception.errorMessage,
+                        exception.extras
+                    )
+            }
         }
 
         // Error categories
@@ -151,6 +178,9 @@ internal constructor(
         // Error codes
         /**
          * The caller does not have the permission to execute an app function.
+         *
+         * <p> This is different from [ERROR_PERMISSION_REQUIRED] in that the caller is missing this
+         * specific permission, as opposed to the target app missing a permission.
          *
          * <p>This error is in the [ERROR_CATEGORY_REQUEST_ERROR] category.
          */
@@ -235,6 +265,9 @@ internal constructor(
          * has not been provided. For example, creating a calendar event requires access to the
          * calendar content. If the user hasn't granted this permission, this error should be
          * thrown.
+         *
+         * <p> This is different from [ERROR_DENIED] in that the required permission is missing from
+         * the target app, as opposed to the caller.
          *
          * <p>This error is in the [ERROR_CATEGORY_APP] category.
          */
