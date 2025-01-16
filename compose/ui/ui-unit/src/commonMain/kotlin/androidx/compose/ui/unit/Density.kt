@@ -65,7 +65,7 @@ interface Density : FontScaling {
      */
     @Stable
     fun TextUnit.toPx(): Float {
-        checkPrecondition(type == TextUnitType.Sp) { "Only Sp can convert to Px" }
+        check(type == TextUnitType.Sp) { "Only Sp can convert to Px" }
         return toDp().toPx()
     }
 

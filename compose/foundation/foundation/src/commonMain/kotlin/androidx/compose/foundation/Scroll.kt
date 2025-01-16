@@ -443,28 +443,44 @@ internal class ScrollNode(
         measurable: IntrinsicMeasurable,
         height: Int
     ): Int {
-        return measurable.minIntrinsicWidth(if (isVertical) Constraints.Infinity else height)
+        return if (isVertical) {
+            measurable.minIntrinsicWidth(Constraints.Infinity)
+        } else {
+            measurable.minIntrinsicWidth(height)
+        }
     }
 
     override fun IntrinsicMeasureScope.minIntrinsicHeight(
         measurable: IntrinsicMeasurable,
         width: Int
     ): Int {
-        return measurable.minIntrinsicHeight(if (isVertical) width else Constraints.Infinity)
+        return if (isVertical) {
+            measurable.minIntrinsicHeight(width)
+        } else {
+            measurable.minIntrinsicHeight(Constraints.Infinity)
+        }
     }
 
     override fun IntrinsicMeasureScope.maxIntrinsicWidth(
         measurable: IntrinsicMeasurable,
         height: Int
     ): Int {
-        return measurable.maxIntrinsicWidth(if (isVertical) Constraints.Infinity else height)
+        return if (isVertical) {
+            measurable.maxIntrinsicWidth(Constraints.Infinity)
+        } else {
+            measurable.maxIntrinsicWidth(height)
+        }
     }
 
     override fun IntrinsicMeasureScope.maxIntrinsicHeight(
         measurable: IntrinsicMeasurable,
         width: Int
     ): Int {
-        return measurable.maxIntrinsicHeight(if (isVertical) width else Constraints.Infinity)
+        return if (isVertical) {
+            measurable.maxIntrinsicHeight(width)
+        } else {
+            measurable.maxIntrinsicHeight(Constraints.Infinity)
+        }
     }
 
     override fun SemanticsPropertyReceiver.applySemantics() {
