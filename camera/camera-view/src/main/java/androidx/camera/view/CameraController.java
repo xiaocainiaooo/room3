@@ -41,6 +41,7 @@ import android.view.Window;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.IntDef;
+import androidx.annotation.IntRange;
 import androidx.annotation.MainThread;
 import androidx.annotation.OptIn;
 import androidx.annotation.RequiresApi;
@@ -116,6 +117,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The abstract base camera controller class.
@@ -346,6 +348,9 @@ public abstract class CameraController {
 
     private final Map<ScreenFlashUiInfo.ProviderType, ScreenFlashUiInfo>
             mScreenFlashUiInfoMap = new HashMap<>();
+
+    private long mTapToFocusAutoCancelDurationNanos = TimeUnit.MILLISECONDS.toNanos(
+            FocusMeteringAction.DEFAULT_AUTO_CANCEL_DURATION_MILLIS);
 
     CameraController(@NonNull Context context) {
         this(context, transform(ProcessCameraProvider.getInstance(context),
@@ -2172,10 +2177,16 @@ public abstract class CameraController {
         mTapToFocusInfoState.postValue(new TapToFocusInfo(TAP_TO_FOCUS_STARTED, new PointF(x, y)));
         MeteringPoint afPoint = meteringPointFactory.createPoint(x, y, AF_SIZE);
         MeteringPoint aePoint = meteringPointFactory.createPoint(x, y, AE_SIZE);
-        FocusMeteringAction focusMeteringAction = new FocusMeteringAction
+        FocusMeteringAction.Builder focusMeteringActionBuilder = new FocusMeteringAction
                 .Builder(afPoint, FocusMeteringAction.FLAG_AF)
-                .addPoint(aePoint, FocusMeteringAction.FLAG_AE)
-                .build();
+                .addPoint(aePoint, FocusMeteringAction.FLAG_AE);
+        if (mTapToFocusAutoCancelDurationNanos > 0L) {
+            focusMeteringActionBuilder = focusMeteringActionBuilder.setAutoCancelDuration(
+                    mTapToFocusAutoCancelDurationNanos, TimeUnit.NANOSECONDS);
+        } else {
+            focusMeteringActionBuilder = focusMeteringActionBuilder.disableAutoCancel();
+        }
+        FocusMeteringAction focusMeteringAction = focusMeteringActionBuilder.build();
         Futures.addCallback(mCamera.getCameraControl().startFocusAndMetering(focusMeteringAction),
                 new FutureCallback<FocusMeteringResult>() {
 
@@ -2203,7 +2214,10 @@ public abstract class CameraController {
                 }, directExecutor());
 
         mLatestFocusCancelTimeMillis = 0; // reset to default first
-        long cancelDuration = focusMeteringAction.getAutoCancelDurationInMillis();
+
+        long cancelDuration = TimeUnit.NANOSECONDS.toMillis(mTapToFocusAutoCancelDurationNanos);
+        Logger.d(TAG, "Tap to focus auto cancel duration: " + cancelDuration + " ms");
+
         if (cancelDuration > 0L) {
             mLatestFocusCancelTimeMillis = SystemClock.elapsedRealtime() + cancelDuration;
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
@@ -2399,6 +2413,31 @@ public abstract class CameraController {
     public @NonNull LiveData<TapToFocusInfo> getTapToFocusInfoState() {
         checkMainThread();
         return mTapToFocusInfoState;
+    }
+
+    /**
+     * Sets the auto-cancel duration for tap-to-focus events.
+     *
+     * <p> By default, CameraX uses a value of 5 seconds.
+     *
+     * @param duration The duration after which CameraX automatically cancels a tap-to-focus event.
+     *   A value of 0 will disable the auto-cancellation behavior.
+     * @param timeUnit The {@link TimeUnit} for the {@code duration} parameter.
+     *
+     * @see #getTapToFocusInfoState()
+     */
+    @MainThread
+    public void setTapToFocusAutoCancelDuration(
+            @IntRange(from = 0) long duration,
+            @NonNull TimeUnit timeUnit
+    ) {
+        Preconditions.checkArgument(
+                duration >= 0,
+                "Tap-to-focus auto-cancellation duration must be at least 0"
+        );
+        mTapToFocusAutoCancelDurationNanos = timeUnit.toNanos(duration);
+        Logger.d(TAG, "setTapToFocusAutoCancelDuration: " + mTapToFocusAutoCancelDurationNanos
+                + " ns set!");
     }
 
     /**
