@@ -18,8 +18,6 @@ package androidx.benchmark
 
 import android.Manifest
 import androidx.annotation.RequiresApi
-import androidx.benchmark.BenchmarkState.Companion.ExperimentalExternalReport
-import androidx.benchmark.json.BenchmarkData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
@@ -39,7 +37,7 @@ import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class BenchmarkStateTest {
+class BenchmarkStateLegacyTest {
     private fun us2ns(ms: Long): Long = TimeUnit.MICROSECONDS.toNanos(ms)
 
     @get:Rule
@@ -63,7 +61,7 @@ class BenchmarkStateTest {
     @Test
     @FlakyTest(bugId = 187711141)
     fun validateMetrics() {
-        val state = BenchmarkState()
+        val state = BenchmarkStateLegacy()
         while (state.keepRunning()) {
             runAndSpin(durationUs = 300) {
                 // note, important here to not do too much work - this test may run on an
@@ -88,7 +86,7 @@ class BenchmarkStateTest {
 
     @Test
     fun keepRunningMissingResume() {
-        val state = BenchmarkState()
+        val state = BenchmarkStateLegacy()
 
         assertEquals(true, state.keepRunning())
         state.pauseTiming()
@@ -97,7 +95,7 @@ class BenchmarkStateTest {
 
     @Test
     fun pauseCalledTwice() {
-        val state = BenchmarkState()
+        val state = BenchmarkStateLegacy()
 
         assertEquals(true, state.keepRunning())
         state.pauseTiming()
@@ -114,7 +112,7 @@ class BenchmarkStateTest {
         )
 
         // verify priority is only bumped during loop (NOTE: lower number means higher priority)
-        val state = BenchmarkState()
+        val state = BenchmarkStateLegacy()
         while (state.keepRunning()) {
             val currentJitPriority = ThreadPriority.getJit()
             assertTrue(
@@ -136,7 +134,7 @@ class BenchmarkStateTest {
         )
 
         // verify priority is only bumped during loop (NOTE: lower number means higher priority)
-        val state = BenchmarkState()
+        val state = BenchmarkStateLegacy()
         while (state.keepRunning()) {
             val currentPriority = ThreadPriority.get()
             assertTrue(
@@ -150,7 +148,7 @@ class BenchmarkStateTest {
     private fun iterationCheck(simplifiedTimingOnlyMode: Boolean) {
         // disable thermal throttle checks, since it can cause loops to be thrown out
         // note that this bypasses allocation count
-        val state = BenchmarkState(simplifiedTimingOnlyMode = simplifiedTimingOnlyMode)
+        val state = BenchmarkStateLegacy(simplifiedTimingOnlyMode = simplifiedTimingOnlyMode)
         var total = 0
         while (state.keepRunning()) {
             total++
@@ -161,7 +159,7 @@ class BenchmarkStateTest {
         // '50' assumes we're not running in a special mode
         // that affects repeat count (dry run)
         val expectedRepeatCount =
-            50 + if (simplifiedTimingOnlyMode) 0 else BenchmarkState.REPEAT_COUNT_ALLOCATION
+            50 + if (simplifiedTimingOnlyMode) 0 else BenchmarkStateLegacy.REPEAT_COUNT_ALLOCATION
         val expectedCount =
             testResult.warmupIterations!! +
                 testResult.repeatIterations!! * expectedRepeatCount +
@@ -198,7 +196,7 @@ class BenchmarkStateTest {
     @Suppress("DEPRECATION")
     fun bundle() {
         val bundle =
-            BenchmarkState()
+            BenchmarkStateLegacy()
                 .apply {
                     while (keepRunning()) {
                         // nothing, we're ignoring numbers
@@ -236,7 +234,7 @@ class BenchmarkStateTest {
     fun notStarted() {
         val initialPriority = ThreadPriority.get()
         try {
-            BenchmarkState().peekTestResult().metrics["timeNs"]!!.median
+            BenchmarkStateLegacy().peekTestResult().metrics["timeNs"]!!.median
             fail("expected exception")
         } catch (e: IllegalStateException) {
             assertEquals(initialPriority, ThreadPriority.get())
@@ -248,7 +246,7 @@ class BenchmarkStateTest {
     fun notFinished() {
         val initialPriority = ThreadPriority.get()
         try {
-            BenchmarkState().run {
+            BenchmarkStateLegacy().run {
                 keepRunning()
                 peekTestResult().metrics["timeNs"]!!.median
             }
@@ -260,48 +258,25 @@ class BenchmarkStateTest {
         }
     }
 
-    @OptIn(ExperimentalExternalReport::class)
-    @Test
-    fun reportResult() {
-        BenchmarkState.reportData(
-            className = "className",
-            testName = "testName",
-            totalRunTimeNs = 900000000,
-            dataNs = listOf(100L, 200L, 300L),
-            warmupIterations = 1,
-            thermalThrottleSleepSeconds = 0,
-            repeatIterations = 1
-        )
-        val expectedReport =
-            BenchmarkData.TestResult(
-                className = "className",
-                name = "testName",
-                totalRunTimeNs = 900000000,
-                metrics = listOf(MetricResult(name = "timeNs", data = listOf(100.0, 200.0, 300.0))),
-                repeatIterations = 1,
-                thermalThrottleSleepSeconds = 0,
-                warmupIterations = 1,
-                profilerOutputs = null,
-            )
-        assertEquals(expectedReport, ResultWriter.reports.last())
-    }
-
     @RequiresApi(22) // 21 profiler has flaky platform crashes, see b/353716346
     private fun validateProfilerUsage(simplifiedTimingOnlyMode: Boolean?) {
         val config = MicrobenchmarkConfig(profiler = ProfilerConfig.StackSamplingLegacy())
 
-        val benchmarkState =
+        val benchmarkStateLegacy =
             if (simplifiedTimingOnlyMode != null) {
-                BenchmarkState(config = config, simplifiedTimingOnlyMode = simplifiedTimingOnlyMode)
+                BenchmarkStateLegacy(
+                    config = config,
+                    simplifiedTimingOnlyMode = simplifiedTimingOnlyMode
+                )
             } else {
-                BenchmarkState(config)
+                BenchmarkStateLegacy(config)
             }
 
         // count iters with profiler enabled vs disabled
         var profilerDisabledIterations = 0
         var profilerEnabledIterations = 0
         var profilerAllocationIterations = 0
-        while (benchmarkState.keepRunning()) {
+        while (benchmarkStateLegacy.keepRunning()) {
             if (StackSamplingLegacy.isRunning) {
                 profilerEnabledIterations++
             } else {
@@ -345,10 +320,10 @@ class BenchmarkStateTest {
     @Test
     fun experimentalConstructor() {
         // min values that don't fail
-        BenchmarkState(warmupCount = null, measurementCount = 1)
+        BenchmarkStateLegacy(warmupCount = null, measurementCount = 1)
 
         // test failures
-        assertFailsWith<IllegalArgumentException> { BenchmarkState(warmupCount = 0) }
-        assertFailsWith<IllegalArgumentException> { BenchmarkState(measurementCount = 0) }
+        assertFailsWith<IllegalArgumentException> { BenchmarkStateLegacy(warmupCount = 0) }
+        assertFailsWith<IllegalArgumentException> { BenchmarkStateLegacy(measurementCount = 0) }
     }
 }

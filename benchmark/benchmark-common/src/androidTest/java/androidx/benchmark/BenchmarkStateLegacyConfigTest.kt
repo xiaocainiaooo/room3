@@ -27,7 +27,7 @@ import org.junit.runner.RunWith
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
-class BenchmarkStateConfigTest {
+class BenchmarkStateLegacyConfigTest {
     private fun validateConfig(
         config: MicrobenchmarkPhase.Config,
         expectedWarmups: Int?,
@@ -36,7 +36,7 @@ class BenchmarkStateConfigTest {
         expectedUsesProfiler: Boolean = false,
         expectedProfilerIterations: Int = 0
     ) {
-        val state = BenchmarkState(config)
+        val state = BenchmarkStateLegacy(config)
         var count = 0
         while (state.keepRunning()) {
             // This spin loop works around an issue where nanoTime is only precise to 30us on some
