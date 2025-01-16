@@ -1309,12 +1309,14 @@ package androidx.wear.protolayout {
   @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public static final class ResourceBuilders.AndroidLottieResourceByResId {
     method public androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat? getProgress();
     method @RawRes public int getRawResourceId();
+    method public androidx.wear.protolayout.TriggerBuilders.Trigger? getStartTrigger();
   }
 
   public static final class ResourceBuilders.AndroidLottieResourceByResId.Builder {
     ctor @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public ResourceBuilders.AndroidLottieResourceByResId.Builder(@RawRes int);
     method public androidx.wear.protolayout.ResourceBuilders.AndroidLottieResourceByResId build();
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public androidx.wear.protolayout.ResourceBuilders.AndroidLottieResourceByResId.Builder setProgress(androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat);
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=500) public androidx.wear.protolayout.ResourceBuilders.AndroidLottieResourceByResId.Builder setStartTrigger(androidx.wear.protolayout.TriggerBuilders.Trigger);
   }
 
   @SuppressCompatibility @androidx.wear.protolayout.expression.ProtoLayoutExperimental @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static final class ResourceBuilders.AndroidSeekableAnimatedImageResourceByResId {
@@ -1434,6 +1436,24 @@ package androidx.wear.protolayout {
   public final class TriggerBuilders {
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TriggerBuilders.Trigger createOnConditionMetTrigger(androidx.wear.protolayout.expression.DynamicBuilders.DynamicBool);
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TriggerBuilders.Trigger createOnLoadTrigger();
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TriggerBuilders.Trigger createOnVisibleOnceTrigger();
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TriggerBuilders.Trigger createOnVisibleTrigger();
+  }
+
+  @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static final class TriggerBuilders.OnVisibleOnceTrigger implements androidx.wear.protolayout.TriggerBuilders.Trigger {
+  }
+
+  public static final class TriggerBuilders.OnVisibleOnceTrigger.Builder {
+    ctor @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public TriggerBuilders.OnVisibleOnceTrigger.Builder();
+    method public androidx.wear.protolayout.TriggerBuilders.OnVisibleOnceTrigger build();
+  }
+
+  @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static final class TriggerBuilders.OnVisibleTrigger implements androidx.wear.protolayout.TriggerBuilders.Trigger {
+  }
+
+  public static final class TriggerBuilders.OnVisibleTrigger.Builder {
+    ctor @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public TriggerBuilders.OnVisibleTrigger.Builder();
+    method public androidx.wear.protolayout.TriggerBuilders.OnVisibleTrigger build();
   }
 
   @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static interface TriggerBuilders.Trigger {
