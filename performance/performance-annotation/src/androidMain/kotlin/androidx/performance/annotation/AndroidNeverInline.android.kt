@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-@file:Suppress("RedundantVisibilityModifier")
+package androidx.performance.annotation
 
-package dalvik.annotation.optimization
+import dalvik.annotation.optimization.NeverInline
 
-@Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.CONSTRUCTOR, AnnotationTarget.FUNCTION)
-public annotation class NeverInline
+public actual typealias AndroidNeverInline = NeverInline

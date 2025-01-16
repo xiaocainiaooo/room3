@@ -1,4 +1,4 @@
-# Copyright (C) 2020 The Android Open Source Project
+# Copyright (C) 2025 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,12 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Keep all the functions created to throw an exception. We don't want these functions to be
-# inlined in any way, which R8 will do by default. The whole point of these functions is to
-# reduce the amount of code generated at the call site.
--keepclassmembers,allowshrinking,allowobfuscation class androidx.compose.**.* {
-    static void throw*Exception(...);
-    # For methods returning Nothing
-    static java.lang.Void throw*Exception(...);
+-keepclassmembers class * {
+    @dalvik.annotation.optimization.NeverInline *;
 }
-
