@@ -47,7 +47,7 @@ internal class AccessibilityPageHelper(
     private var isLinksLoaded = false
 
     public override fun getVirtualViewAt(x: Float, y: Float): Int {
-        val visiblePages = pageLayoutManager.visiblePages.value
+        val visiblePages = pageLayoutManager.visiblePages
 
         val contentX = pdfView.toContentX(x).toInt()
         val contentY = pdfView.toContentY(y).toInt()
@@ -73,7 +73,7 @@ internal class AccessibilityPageHelper(
             }
 
         // Check if the coordinates fall within the visible page bounds
-        return (visiblePages.pages.lower..visiblePages.pages.upper).firstOrNull { page ->
+        return (visiblePages.lower..visiblePages.upper).firstOrNull { page ->
             pageLayoutManager
                 .getPageLocation(page, pdfView.getVisibleAreaInContentCoords())
                 .contains(contentX, contentY)
@@ -81,11 +81,11 @@ internal class AccessibilityPageHelper(
     }
 
     public override fun getVisibleVirtualViews(virtualViewIds: MutableList<Int>) {
-        val visiblePages = pageLayoutManager.visiblePages.value
+        val visiblePages = pageLayoutManager.visiblePages
         loadPageLinks()
 
         virtualViewIds.apply {
-            addAll(visiblePages.pages.lower..visiblePages.pages.upper)
+            addAll(visiblePages.lower..visiblePages.upper)
             addAll(gotoLinks.keys)
             addAll(urlLinks.keys)
         }
@@ -209,7 +209,7 @@ internal class AccessibilityPageHelper(
      * them in the corresponding maps.
      */
     fun loadPageLinks() {
-        val visiblePages = pageLayoutManager.visiblePages.value
+        val visiblePages = pageLayoutManager.visiblePages
 
         // Clear existing links and fetch new ones for the visible pages
         gotoLinks.clear()
@@ -217,7 +217,7 @@ internal class AccessibilityPageHelper(
 
         var cumulativeId = totalPages
 
-        (visiblePages.pages.lower..visiblePages.pages.upper).forEach { pageIndex ->
+        (visiblePages.lower..visiblePages.upper).forEach { pageIndex ->
             pageManager.pages[pageIndex]?.links?.let { links ->
                 links.gotoLinks.forEach { link ->
                     gotoLinks[cumulativeId] =
