@@ -166,9 +166,10 @@ package androidx.wear.compose.material3 {
     method @androidx.compose.runtime.Composable public static void ButtonGroup(optional androidx.compose.ui.Modifier modifier, optional float spacing, optional float expansionWidth, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, kotlin.jvm.functions.Function1<? super androidx.wear.compose.material3.ButtonGroupScope,kotlin.Unit> content);
   }
 
-  public final class ButtonGroupScope {
-    ctor public ButtonGroupScope();
-    method public boolean buttonGroupItem(androidx.compose.foundation.interaction.InteractionSource interactionSource, optional float minWidth, optional float weight, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  public interface ButtonGroupScope {
+    method public androidx.compose.ui.Modifier enlargeOnPress(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource);
+    method public androidx.compose.ui.Modifier minWidth(androidx.compose.ui.Modifier, optional float minWidth);
+    method public androidx.compose.ui.Modifier weight(androidx.compose.ui.Modifier, @FloatRange(from=0.0, fromInclusive=false) float weight);
   }
 
   public final class ButtonKt {

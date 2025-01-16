@@ -39,6 +39,7 @@ import androidx.wear.compose.material3.IconToggleButtonDefaults.variantAnimatedS
 import androidx.wear.compose.material3.tokens.MotionTokens
 import androidx.wear.compose.material3.tokens.ShapeTokens
 import androidx.wear.compose.material3.tokens.TextToggleButtonTokens
+import androidx.wear.compose.materialcore.ToggleButton
 import androidx.wear.compose.materialcore.animateSelectionColor
 
 /**
@@ -110,7 +111,7 @@ public fun TextToggleButton(
             interactionSource = interactionSource
         )
 
-    androidx.wear.compose.materialcore.ToggleButton(
+    ToggleButton(
         checked = checked,
         onCheckedChange = onCheckedChange,
         modifier = modifier.minimumInteractiveComponentSize(),
