@@ -17,7 +17,6 @@
 package androidx.health.connect.client.impl.platform.records
 
 import android.annotation.SuppressLint
-import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
 import androidx.health.connect.client.feature.isPersonalHealthRecordFeatureAvailableInPlatform
 import androidx.health.connect.client.records.FhirResource
 import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_PATIENT
@@ -51,23 +50,29 @@ class FhirResourceTest {
     }
 
     @Test
+    fun validFhirResource_not_equals() {
+        val fhirResource1 = FhirResource(type = FHIR_RESOURCE_TYPE_PATIENT, id = "id1", data = "{}")
+        val fhirResource2 = FhirResource(type = FHIR_RESOURCE_TYPE_PATIENT, id = "id2", data = "{}")
+
+        assertThat(fhirResource1).isNotEqualTo(fhirResource2)
+        assertThat(fhirResource2).isNotEqualTo(fhirResource1)
+    }
+
+    @Test
     fun toString_expectCorrectString() {
         val fhirResource = FhirResource(type = FHIR_RESOURCE_TYPE_PATIENT, id = "id1", data = "{}")
 
         val toString = fhirResource.toString()
 
-        assertThat(toString).isEqualTo("FhirResource{type=9,id=id1,data={}}")
+        assertThat(toString).contains("(type=9, id=id1, data={})")
     }
 
     @SuppressLint("NewApi") // checked with feature availability check
-    @OptIn(ExperimentalFeatureAvailabilityApi::class)
     @Test
     fun toPlatformFhirResource_expectCorrectConversion() {
-        val fhirResource = FhirResource(type = FHIR_RESOURCE_TYPE_PATIENT, id = "id1", data = "{}")
+        val sdk = FhirResource(type = FHIR_RESOURCE_TYPE_PATIENT, id = "id1", data = "{}")
 
-        val platformFhirResource = fhirResource.toPlatformFhirResource()
-
-        assertThat(platformFhirResource)
+        assertThat(sdk.platformFhirResource)
             .isEqualTo(
                 PlatformFhirResourceBuilder(
                         PlatformFhirResource.FHIR_RESOURCE_TYPE_PATIENT,

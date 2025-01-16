@@ -60,24 +60,12 @@ class FhirResource(
     val data: String
 ) {
     @SuppressLint("NewApi") // already checked with a feature availability check
-    private val platformFhirResource: Any =
+    internal val platformFhirResource: PlatformFhirResource =
         withPhrFeatureCheck(FhirResource::class) {
             PlatformFhirResourceBuilder(type.toPlatformFhirResourceType(), id, data).build()
         }
 
-    @SuppressLint("NewApi") // already checked with a feature availability check
-    internal fun toPlatformFhirResource(): PlatformFhirResource =
-        withPhrFeatureCheck(FhirResource::class) { platformFhirResource as PlatformFhirResource }
-
-    override fun toString(): String {
-        val sb = StringBuilder()
-        sb.append(this.javaClass.simpleName).append("{")
-        sb.append("type=").append(this.type)
-        sb.append(",id=").append(this.id)
-        sb.append(",data=").append(this.data)
-        sb.append("}")
-        return sb.toString()
-    }
+    override fun toString() = toString(this, mapOf("type" to type, "id" to id, "data" to data))
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
