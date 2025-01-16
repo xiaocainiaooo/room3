@@ -440,3 +440,13 @@ internal typealias PlatformVelocity = android.health.connect.datatypes.units.Vel
 internal typealias PlatformVolume = android.health.connect.datatypes.units.Volume
 
 internal typealias PlatformFhirVersion = android.health.connect.datatypes.FhirVersion
+
+internal typealias PlatformFhirResource = android.health.connect.datatypes.FhirResource
+
+internal typealias PlatformFhirResourceBuilder =
+    android.health.connect.datatypes.FhirResource.Builder
+
+internal typealias PlatformMedicalDataSource = android.health.connect.datatypes.MedicalDataSource
+
+internal typealias PlatformMedicalDataSourceBuilder =
+    android.health.connect.datatypes.MedicalDataSource.Builder
