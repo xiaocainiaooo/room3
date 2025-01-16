@@ -131,6 +131,28 @@ public class CameraCharacteristicsCompat {
     }
 
     /**
+     * Returns the default torch strength level.
+     */
+    public int getDefaultTorchStrengthLevel() {
+        Integer defaultLevel = null;
+        if (Build.VERSION.SDK_INT >= 35) {
+            defaultLevel = get(CameraCharacteristics.FLASH_TORCH_STRENGTH_DEFAULT_LEVEL);
+        }
+        return defaultLevel == null ? 1 : defaultLevel;
+    }
+
+    /**
+     * Returns the maximum torch strength level.
+     */
+    public int getMaxTorchStrengthLevel() {
+        Integer maxLevel = null;
+        if (Build.VERSION.SDK_INT >= 35) {
+            maxLevel = get(CameraCharacteristics.FLASH_TORCH_STRENGTH_MAX_LEVEL);
+        }
+        return maxLevel == null ? 1 : maxLevel;
+    }
+
+    /**
      * Obtains the {@link StreamConfigurationMapCompat} which contains the output sizes related
      * workarounds in it.
      */
