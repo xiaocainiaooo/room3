@@ -143,14 +143,11 @@ class NavDisplayTest {
         composeTestRule.runOnIdle {
             assertWithMessage("Initial number should be 0").that(numberOnScreen1).isEqualTo(0)
             numberOnScreen1 = -1
+            assertWithMessage("The number should be -1").that(numberOnScreen1).isEqualTo(-1)
             backstack.add(second)
         }
 
-        composeTestRule.runOnIdle {
-            assertWithMessage("The number should be -1").that(numberOnScreen1).isEqualTo(-1)
-            // removeLast requires API 35
-            backstack.removeAt(backstack.size - 1)
-        }
+        composeTestRule.runOnIdle { backstack.removeAt(backstack.size - 1) }
 
         composeTestRule.runOnIdle {
             assertWithMessage("The number should be restored").that(numberOnScreen1).isEqualTo(0)
