@@ -17,16 +17,17 @@
 package androidx.appfunctions
 
 /**
- * Annotates a class intended to represent structured input or output for an AppFunction.
+ * Annotates a class to indicate that it can be serialized and transferred between processes using
+ * AppFunction.
  *
- * When a class is annotated with `@AppFunctionEntity` and is used as a parameter or return type
- * (directly or as a nested entity) in an AppFunction, the shape of the entity defined within its
- * primary constructor will be exposed to the caller as an
+ * When a class is annotated with `@AppFunctionSerializable` and is used as a parameter or return
+ * type (directly or as a nested entity) in an AppFunction, the shape of the entity defined within
+ * its primary constructor will be exposed to the caller as an
  * [androidx.appfunctions.metadata.AppFunctionMetadata]. This information allows the caller to
  * construct the structure input to call an AppFunction or understand what properties are provided
  * in the structured output.
  *
- * **Constraints for Classes Annotated with `@AppFunctionEntity`:**
+ * **Constraints for Classes Annotated with `@AppFunctionSerializable`:**
  * * **Primary Constructor Parameters:** Only properties declared in the primary constructor that
  *   expose a getter method are eligible for inclusion in the AppFunctionMetadata. Critically, it is
  *   a **requirement** to place properties with a getter in primary constructor. Attempting to
@@ -47,8 +48,8 @@ package androidx.appfunctions
  *     * `BooleanArray`
  *     * `ByteArray`
  *     * `List<String>`
- *     * Another class annotated with `@AppFunctionEntity` (enabling nested structures) or a list of
- *       a class annotated with `@AppFunctionEntity`
+ *     * Another class annotated with `@AppFunctionSerializable` (enabling nested structures) or a
+ *       list of a class annotated with `@AppFunctionSerializable`
  * * **Public Primary Constructor:** The primary constructor of the annotated class must have public
  *   visibility to allow instantiation.
  * * **
@@ -64,24 +65,24 @@ package androidx.appfunctions
  * **Example:**
  *
  * ```
- * @AppFunctionEntity
+ * @AppFunctionSerializable
  * class Location(val latitude: Double, val longitude: Double)
  *
- * @AppFunctionEntity
+ * @AppFunctionSerializable
  * class Place(
  *     val name: String,
- *     val location: Location, // Nested AppFunctionEntity
+ *     val location: Location, // Nested AppFunctionSerializable
  *     // Nullable String is allowed, if missing, will be null. The default value will not be used
  *     // when the value is missing
  *     val notes: String? = "default"
  * )
  *
- * @AppFunctionEntity
+ * @AppFunctionSerializable
  * class SearchPlaceResult(
  *     val places: List<Place> // If missing, will be an empty list
  * )
  *
- * @AppFunctionEntity
+ * @AppFunctionSerializable
  * class Attachment(
  *   uri: String // Putting constructor parameter without getter will result in compiler error
  * )
@@ -89,4 +90,4 @@ package androidx.appfunctions
  */
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.CLASS)
-public annotation class AppFunctionEntity
+public annotation class AppFunctionSerializable
