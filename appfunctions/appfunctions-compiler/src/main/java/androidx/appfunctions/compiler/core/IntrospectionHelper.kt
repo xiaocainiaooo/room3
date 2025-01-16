@@ -22,6 +22,8 @@ import com.squareup.kotlinpoet.ClassName
 object IntrospectionHelper {
     // Package names
     private const val APP_FUNCTIONS_PACKAGE_NAME = "androidx.appfunctions"
+    private const val APP_FUNCTIONS_INTERNAL_PACKAGE_NAME = "androidx.appfunctions.internal"
+    private const val APP_FUNCTIONS_METADATA_PACKAGE_NAME = "androidx.appfunctions.metadata"
 
     // Annotation classes
     object AppFunctionAnnotation {
@@ -30,4 +32,8 @@ object IntrospectionHelper {
 
     // Classes
     val APP_FUNCTION_CONTEXT_CLASS = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionContext")
+    val APP_FUNCTION_INVENTORY_CLASS =
+        ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "AppFunctionInventory")
+    val APP_FUNCTION_METADATA_CLASS =
+        ClassName(APP_FUNCTIONS_METADATA_PACKAGE_NAME, "AppFunctionMetadata")
 }

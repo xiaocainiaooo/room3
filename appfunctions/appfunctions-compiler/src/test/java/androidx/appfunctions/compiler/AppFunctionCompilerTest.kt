@@ -43,7 +43,7 @@ class AppFunctionCompilerTest {
     }
 
     @Test
-    fun testSimpleFunction() {
+    fun testSimpleFunction_genAppFunctionIds_success() {
         val report = compilationTestHelper.compileAll(sourceFileNames = listOf("SimpleFunction.KT"))
 
         compilationTestHelper.assertSuccessWithContent(
@@ -54,7 +54,7 @@ class AppFunctionCompilerTest {
     }
 
     @Test
-    fun testMissingFirstParameter() {
+    fun testMissingFirstParameter_hasCompileError() {
         val report =
             compilationTestHelper.compileAll(sourceFileNames = listOf("MissingFirstParameter.KT"))
 
@@ -68,7 +68,7 @@ class AppFunctionCompilerTest {
     }
 
     @Test
-    fun testIncorrectFirstParameter() {
+    fun testIncorrectFirstParameter_hasCompileError() {
         val report =
             compilationTestHelper.compileAll(sourceFileNames = listOf("IncorrectFirstParameter.KT"))
 
@@ -78,6 +78,17 @@ class AppFunctionCompilerTest {
                 "androidx.appfunctions.AppFunctionContext\n" +
                 "    fun incorrectFirstParameter(x: Int) {}\n" +
                 "    ^"
+        )
+    }
+
+    @Test
+    fun testSimpleFunction_genAppFunctionInventoryImpl_success() {
+        val report = compilationTestHelper.compileAll(sourceFileNames = listOf("SimpleFunction.KT"))
+
+        compilationTestHelper.assertSuccessWithContent(
+            report = report,
+            expectGeneratedFileName = "SimpleFunction_AppFunctionInventory_Impl.kt",
+            goldenFileName = "$%s".format("SimpleFunction_AppFunctionInventory_Impl.KT")
         )
     }
 }
