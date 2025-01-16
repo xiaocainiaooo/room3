@@ -660,6 +660,14 @@ public class WebViewFeature {
     public static final String PRERENDER_WITH_URL = "PRERENDER_URL";
 
     /**
+     * Feature for {@link #isFeatureSupported(String)}.
+     * This feature covers
+     * {@link Profile#setSpeculativeLoadingConfig(SpeculativeLoadingConfig)}
+     */
+    @Profile.ExperimentalUrlPrefetch
+    public static final String SPECULATIVE_LOADING_CONFIG = "SPECULATIVE_LOADING_CONFIG";
+
+    /**
      * Return whether a feature is supported at run-time. This will check whether a feature is
      * supported, depending on the combination of the desired feature, the Android version of
      * device, and the WebView APK on the device.
