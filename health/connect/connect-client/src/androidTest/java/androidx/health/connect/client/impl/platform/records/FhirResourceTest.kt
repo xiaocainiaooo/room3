@@ -17,11 +17,13 @@
 package androidx.health.connect.client.impl.platform.records
 
 import android.annotation.SuppressLint
+import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
 import androidx.health.connect.client.feature.isPersonalHealthRecordFeatureAvailableInPlatform
 import androidx.health.connect.client.records.FhirResource
 import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_PATIENT
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import com.google.common.testing.EqualsTester
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assume
 import org.junit.Before
@@ -42,20 +44,15 @@ class FhirResourceTest {
 
     @Test
     fun validFhirResource_equals() {
-        val fhirResource1 = FhirResource(type = FHIR_RESOURCE_TYPE_PATIENT, id = "id1", data = "{}")
-        val fhirResource2 = FhirResource(type = FHIR_RESOURCE_TYPE_PATIENT, id = "id1", data = "{}")
-
-        assertThat(fhirResource1).isEqualTo(fhirResource2)
-        assertThat(fhirResource2).isEqualTo(fhirResource1)
-    }
-
-    @Test
-    fun validFhirResource_not_equals() {
-        val fhirResource1 = FhirResource(type = FHIR_RESOURCE_TYPE_PATIENT, id = "id1", data = "{}")
-        val fhirResource2 = FhirResource(type = FHIR_RESOURCE_TYPE_PATIENT, id = "id2", data = "{}")
-
-        assertThat(fhirResource1).isNotEqualTo(fhirResource2)
-        assertThat(fhirResource2).isNotEqualTo(fhirResource1)
+        EqualsTester()
+            .addEqualityGroup(
+                FhirResource(type = FHIR_RESOURCE_TYPE_PATIENT, id = "id1", data = "{}"),
+                FhirResource(type = FHIR_RESOURCE_TYPE_PATIENT, id = "id1", data = "{}")
+            )
+            .addEqualityGroup(
+                FhirResource(type = FHIR_RESOURCE_TYPE_PATIENT, id = "id2", data = "{}")
+            )
+            .testEquals()
     }
 
     @Test
@@ -68,6 +65,7 @@ class FhirResourceTest {
     }
 
     @SuppressLint("NewApi") // checked with feature availability check
+    @OptIn(ExperimentalFeatureAvailabilityApi::class)
     @Test
     fun toPlatformFhirResource_expectCorrectConversion() {
         val sdk = FhirResource(type = FHIR_RESOURCE_TYPE_PATIENT, id = "id1", data = "{}")

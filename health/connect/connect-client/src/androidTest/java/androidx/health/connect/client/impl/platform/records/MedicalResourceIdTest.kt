@@ -18,14 +18,13 @@ package androidx.health.connect.client.impl.platform.records
 
 import android.annotation.SuppressLint
 import androidx.health.connect.client.feature.isPersonalHealthRecordFeatureAvailableInPlatform
-import androidx.health.connect.client.impl.PhrDataFactory.MEDICAL_DATA_SOURCE_ID_STRING
 import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_IMMUNIZATION
 import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_PATIENT
 import androidx.health.connect.client.records.MedicalResourceId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import com.google.common.testing.EqualsTester
 import com.google.common.truth.Truth.assertThat
-import java.util.UUID
 import org.junit.Assume
 import org.junit.Before
 import org.junit.Test
@@ -44,40 +43,27 @@ class MedicalResourceIdTest {
 
     @Test
     fun validMedicalResourceId_equals() {
-        val medicalResourceId1 =
-            MedicalResourceId(
-                MEDICAL_DATA_SOURCE_ID_STRING,
-                FHIR_RESOURCE_TYPE_PATIENT,
-                "fhir_rs_id_1"
+        EqualsTester()
+            .addEqualityGroup(
+                MedicalResourceId(
+                    MEDICAL_DATA_SOURCE_ID_STRING,
+                    FHIR_RESOURCE_TYPE_PATIENT,
+                    "fhir_rs_id_1"
+                ),
+                MedicalResourceId(
+                    MEDICAL_DATA_SOURCE_ID_STRING,
+                    FHIR_RESOURCE_TYPE_PATIENT,
+                    "fhir_rs_id_1"
+                )
             )
-        val medicalResourceId2 =
-            MedicalResourceId(
-                MEDICAL_DATA_SOURCE_ID_STRING,
-                FHIR_RESOURCE_TYPE_PATIENT,
-                "fhir_rs_id_1"
+            .addEqualityGroup(
+                MedicalResourceId(
+                    MEDICAL_DATA_SOURCE_ID_STRING,
+                    FHIR_RESOURCE_TYPE_PATIENT,
+                    "fhir_rs_id_2"
+                )
             )
-
-        assertThat(medicalResourceId1).isEqualTo(medicalResourceId2)
-        assertThat(medicalResourceId2).isEqualTo(medicalResourceId1)
-    }
-
-    @Test
-    fun validMedicalResourceId_not_equals() {
-        val medicalResourceId1 =
-            MedicalResourceId(
-                MEDICAL_DATA_SOURCE_ID_STRING,
-                FHIR_RESOURCE_TYPE_PATIENT,
-                "fhir_rs_id_1"
-            )
-        val medicalResourceId2 =
-            MedicalResourceId(
-                UUID.randomUUID().toString(),
-                FHIR_RESOURCE_TYPE_PATIENT,
-                "fhir_rs_id_1"
-            )
-
-        assertThat(medicalResourceId1).isNotEqualTo(medicalResourceId2)
-        assertThat(medicalResourceId2).isNotEqualTo(medicalResourceId1)
+            .testEquals()
     }
 
     @Test
@@ -133,5 +119,9 @@ class MedicalResourceIdTest {
                     "034-AB16.0"
                 )
             )
+    }
+
+    companion object {
+        private const val MEDICAL_DATA_SOURCE_ID_STRING = "3008de9d-8c24-4591-b58c-43eaf30fa168"
     }
 }
