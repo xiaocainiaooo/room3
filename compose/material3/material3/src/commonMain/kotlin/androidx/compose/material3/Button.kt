@@ -69,6 +69,7 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -242,7 +243,7 @@ fun Button(
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
     border: BorderStroke? = null,
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    contentPadding: PaddingValues = ButtonDefaults.contentPaddingFor(ButtonDefaults.MinHeight),
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit
 ) {
@@ -421,7 +422,7 @@ fun ElevatedButton(
     colors: ButtonColors = ButtonDefaults.elevatedButtonColors(),
     elevation: ButtonElevation? = ButtonDefaults.elevatedButtonElevation(),
     border: BorderStroke? = null,
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    contentPadding: PaddingValues = ButtonDefaults.contentPaddingFor(ButtonDefaults.MinHeight),
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit
 ) =
@@ -574,7 +575,7 @@ fun FilledTonalButton(
     colors: ButtonColors = ButtonDefaults.filledTonalButtonColors(),
     elevation: ButtonElevation? = ButtonDefaults.filledTonalButtonElevation(),
     border: BorderStroke? = null,
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    contentPadding: PaddingValues = ButtonDefaults.contentPaddingFor(ButtonDefaults.MinHeight),
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit
 ) =
@@ -725,7 +726,7 @@ fun OutlinedButton(
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
     elevation: ButtonElevation? = null,
     border: BorderStroke? = ButtonDefaults.outlinedButtonBorder(enabled),
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    contentPadding: PaddingValues = ButtonDefaults.contentPaddingFor(ButtonDefaults.MinHeight),
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit
 ) =
@@ -973,7 +974,7 @@ object ButtonDefaults {
 
     /** Default content padding for an extra small button. */
     @ExperimentalMaterial3ExpressiveApi
-    val XSmallContentPadding
+    val ExtraSmallContentPadding
         get() =
             PaddingValues(
                 // TODO update with the value from ButtonXSmallTokens.kt once it's been corrected
@@ -1007,7 +1008,7 @@ object ButtonDefaults {
 
     /** Default content padding for an extra large button. */
     @ExperimentalMaterial3ExpressiveApi
-    val XLargeContentPadding
+    val ExtraLargeContentPadding
         get() =
             PaddingValues(
                 start = ButtonXLargeTokens.LeadingSpace,
@@ -1058,7 +1059,7 @@ object ButtonDefaults {
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalMaterial3ExpressiveApi
     @ExperimentalMaterial3ExpressiveApi
-    val XSmallContainerHeight = ButtonXSmallTokens.ContainerHeight
+    val ExtraSmallContainerHeight = ButtonXSmallTokens.ContainerHeight
 
     /** The default height for a medium button container. */
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
@@ -1076,7 +1077,7 @@ object ButtonDefaults {
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalMaterial3ExpressiveApi
     @ExperimentalMaterial3ExpressiveApi
-    val XLargeContainerHeight = ButtonXLargeTokens.ContainerHeight
+    val ExtraLargeContainerHeight = ButtonXLargeTokens.ContainerHeight
 
     /** The default size of the icon when used inside a small button. */
     // TODO update with the correct value in BaselineButtonTokens when available
@@ -1086,7 +1087,13 @@ object ButtonDefaults {
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalMaterial3ExpressiveApi
     @ExperimentalMaterial3ExpressiveApi
-    val XSmallIconSize = ButtonXSmallTokens.IconSize
+    val ExtraSmallIconSize = ButtonXSmallTokens.IconSize
+
+    /** The expressive size of the icon used inside a small button. */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    val SmallIconSize = ButtonSmallTokens.IconSize
 
     /** The default size of the icon used inside of a medium button. */
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
@@ -1104,7 +1111,7 @@ object ButtonDefaults {
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalMaterial3ExpressiveApi
     @ExperimentalMaterial3ExpressiveApi
-    val XLargeIconSize = ButtonXLargeTokens.IconSize
+    val ExtraLargeIconSize = ButtonXLargeTokens.IconSize
 
     /**
      * The default size of the spacing between an icon and a text when they used inside a small
@@ -1119,7 +1126,7 @@ object ButtonDefaults {
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalMaterial3ExpressiveApi
     @ExperimentalMaterial3ExpressiveApi
-    val XSmallIconSpacing = 4.dp
+    val ExtraSmallIconSpacing = 4.dp
 
     /** The default spacing between an icon and a text when they used inside any medium button. */
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
@@ -1139,7 +1146,7 @@ object ButtonDefaults {
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalMaterial3ExpressiveApi
     @ExperimentalMaterial3ExpressiveApi
-    val XLargeIconSpacing = ButtonXLargeTokens.IconLabelSpace
+    val ExtraLargeIconSpacing = ButtonXLargeTokens.IconLabelSpace
 
     /** Square shape for default buttons. */
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
@@ -1154,6 +1161,34 @@ object ButtonDefaults {
     @ExperimentalMaterial3ExpressiveApi
     val pressedShape: Shape
         @Composable get() = ButtonSmallTokens.PressedContainerShape.value
+
+    /** Pressed shape for extra small buttons. */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    val extraSmallPressedShape: Shape
+        @Composable get() = ButtonXSmallTokens.PressedContainerShape.value
+
+    /** Pressed shape for medium buttons. */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    val mediumPressedShape: Shape
+        @Composable get() = ButtonMediumTokens.PressedContainerShape.value
+
+    /** Pressed shape for large buttons. */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    val largePressedShape: Shape
+        @Composable get() = ButtonLargeTokens.PressedContainerShape.value
+
+    /** Pressed shape for extra large buttons. */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    val extraLargePressedShape: Shape
+        @Composable get() = ButtonXLargeTokens.PressedContainerShape.value
 
     /** Default shape for a button. */
     val shape: Shape
@@ -1183,14 +1218,30 @@ object ButtonDefaults {
     @Composable
     fun shapes() = MaterialTheme.shapes.defaultButtonShapes
 
+    /**
+     * Creates a [ButtonShapes] that represents the default shape and pressedShape used in a
+     * [Button] and its variants.
+     *
+     * @param shape the unchecked shape for [ButtonShapes]
+     * @param pressedShape the unchecked shape for [ButtonShapes]
+     */
+    @Composable
+    @ExperimentalMaterial3ExpressiveApi
+    fun shapes(
+        shape: Shape? = null,
+        pressedShape: Shape? = null,
+    ): ButtonShapes =
+        MaterialTheme.shapes.defaultButtonShapes.copy(shape = shape, pressedShape = pressedShape)
+
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     internal val Shapes.defaultButtonShapes: ButtonShapes
-        @Composable
         get() {
             return defaultButtonShapesCached
-                ?: ButtonShapes(shape = shape, pressedShape = pressedShape).also {
-                    defaultButtonShapesCached = it
-                }
+                ?: ButtonShapes(
+                        shape = fromToken(ButtonSmallTokens.ContainerShapeRound),
+                        pressedShape = fromToken(ButtonSmallTokens.PressedContainerShape)
+                    )
+                    .also { defaultButtonShapesCached = it }
         }
 
     /**
@@ -1534,6 +1585,110 @@ object ButtonDefaults {
                     )
                 }
         )
+
+    /**
+     * Recommended [ButtonShapes] for a provided button height.
+     *
+     * @param buttonHeight The height of the button
+     */
+    @Composable
+    @ExperimentalMaterial3ExpressiveApi
+    fun shapesFor(buttonHeight: Dp): ButtonShapes {
+        val xSmallHeight = ExtraSmallContainerHeight
+        val smallHeight = MinHeight
+        val mediumHeight = MediumContainerHeight
+        val largeHeight = LargeContainerHeight
+        val xLargeHeight = ExtraLargeContainerHeight
+        return when {
+            buttonHeight <= (xSmallHeight + smallHeight) / 2 ->
+                shapes(shape = shape, pressedShape = extraSmallPressedShape)
+            buttonHeight <= (smallHeight + mediumHeight) / 2 -> shapes()
+            buttonHeight <= (mediumHeight + largeHeight) / 2 ->
+                shapes(shape = shape, pressedShape = mediumPressedShape)
+            buttonHeight <= (largeHeight + xLargeHeight) / 2 ->
+                shapes(shape = shape, pressedShape = largePressedShape)
+            else -> shapes(shape = shape, pressedShape = extraLargePressedShape)
+        }
+    }
+
+    /**
+     * Recommended [PaddingValues] for a provided button height.
+     *
+     * @param buttonHeight The height of the button
+     */
+    @ExperimentalMaterial3ExpressiveApi
+    fun contentPaddingFor(buttonHeight: Dp): PaddingValues {
+        val smallHeight = MinHeight
+        val mediumHeight = MediumContainerHeight
+        val largeHeight = LargeContainerHeight
+        val xLargeHeight = ExtraLargeContainerHeight
+        return when {
+            buttonHeight < smallHeight -> ExtraSmallContentPadding
+            buttonHeight < mediumHeight -> SmallContentPadding
+            buttonHeight < largeHeight -> MediumContentPadding
+            buttonHeight < xLargeHeight -> LargeContentPadding
+            else -> ExtraLargeContentPadding
+        }
+    }
+
+    /**
+     * Recommended Icon size for a provided button height.
+     *
+     * @param buttonHeight The height of the button
+     */
+    @ExperimentalMaterial3ExpressiveApi
+    fun iconSizeFor(buttonHeight: Dp): Dp {
+        val smallHeight = MinHeight
+        val mediumHeight = MediumContainerHeight
+        val largeHeight = LargeContainerHeight
+        val xLargeHeight = ExtraLargeContainerHeight
+        return when {
+            buttonHeight < smallHeight -> ExtraSmallIconSize
+            buttonHeight < mediumHeight -> SmallIconSize
+            buttonHeight < largeHeight -> MediumIconSize
+            buttonHeight < xLargeHeight -> LargeIconSize
+            else -> ExtraLargeIconSize
+        }
+    }
+
+    /**
+     * Recommended spacing after an [Icon] for a provided button height.
+     *
+     * @param buttonHeight The height of the button
+     */
+    @ExperimentalMaterial3ExpressiveApi
+    fun iconSpacingFor(buttonHeight: Dp): Dp {
+        val smallHeight = MinHeight
+        val mediumHeight = MediumContainerHeight
+        val largeHeight = LargeContainerHeight
+        val xLargeHeight = ExtraLargeContainerHeight
+        return when {
+            buttonHeight < smallHeight -> ExtraSmallIconSpacing
+            buttonHeight < mediumHeight -> IconSpacing
+            buttonHeight < largeHeight -> MediumIconSpacing
+            buttonHeight < xLargeHeight -> LargeIconSpacing
+            else -> ExtraLargeIconSpacing
+        }
+    }
+
+    /**
+     * Recommended [TextStyle] for a [Text] provided a button height.
+     *
+     * @param buttonHeight The height of the button
+     */
+    @Composable
+    @ExperimentalMaterial3ExpressiveApi
+    fun textStyleFor(buttonHeight: Dp): TextStyle {
+        val mediumHeight = MediumContainerHeight
+        val largeHeight = LargeContainerHeight
+        val xLargeHeight = ExtraLargeContainerHeight
+        return when {
+            buttonHeight < mediumHeight -> MaterialTheme.typography.labelLarge
+            buttonHeight < largeHeight -> MaterialTheme.typography.titleMedium
+            buttonHeight < xLargeHeight -> MaterialTheme.typography.headlineSmall
+            else -> MaterialTheme.typography.headlineLarge
+        }
+    }
 }
 
 /**
