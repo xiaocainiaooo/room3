@@ -80,6 +80,7 @@ package androidx.webkit {
     method @AnyThread @RequiresFeature(name=androidx.webkit.WebViewFeature.MULTI_PROFILE, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") public android.webkit.WebStorage getWebStorage();
     method @SuppressCompatibility @RequiresFeature(name=androidx.webkit.WebViewFeature.PROFILE_URL_PREFETCH, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") @UiThread @androidx.webkit.Profile.ExperimentalUrlPrefetch public void prefetchUrlAsync(String, android.os.CancellationSignal?, java.util.concurrent.Executor, androidx.webkit.OutcomeReceiverCompat<java.lang.Void!,androidx.webkit.PrefetchException!>);
     method @SuppressCompatibility @RequiresFeature(name=androidx.webkit.WebViewFeature.PROFILE_URL_PREFETCH, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") @UiThread @androidx.webkit.Profile.ExperimentalUrlPrefetch public void prefetchUrlAsync(String, android.os.CancellationSignal?, java.util.concurrent.Executor, androidx.webkit.SpeculativeLoadingParameters, androidx.webkit.OutcomeReceiverCompat<java.lang.Void!,androidx.webkit.PrefetchException!>);
+    method @SuppressCompatibility @RequiresFeature(name=androidx.webkit.WebViewFeature.SPECULATIVE_LOADING_CONFIG, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") @UiThread @androidx.webkit.Profile.ExperimentalUrlPrefetch public void setSpeculativeLoadingConfig(androidx.webkit.SpeculativeLoadingConfig);
     field public static final String DEFAULT_PROFILE_NAME = "Default";
   }
 
@@ -160,6 +161,21 @@ package androidx.webkit {
     method @RequiresFeature(name=androidx.webkit.WebViewFeature.SERVICE_WORKER_BLOCK_NETWORK_LOADS, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") public abstract void setBlockNetworkLoads(boolean);
     method @RequiresFeature(name=androidx.webkit.WebViewFeature.SERVICE_WORKER_CACHE_MODE, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") public abstract void setCacheMode(int);
     method @RequiresFeature(name="REQUESTED_WITH_HEADER_ALLOW_LIST", enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") public abstract void setRequestedWithHeaderOriginAllowList(java.util.Set<java.lang.String!>);
+  }
+
+  @SuppressCompatibility @androidx.webkit.Profile.ExperimentalUrlPrefetch public class SpeculativeLoadingConfig {
+    method @IntRange(from=1, to=androidx.webkit.SpeculativeLoadingConfig.ABSOLUTE_MAX_PREFETCHES) public int getMaxPrefetches();
+    method @IntRange(from=1, to=java.lang.Integer.MAX_VALUE) public int getPrefetchTtlSeconds();
+    field public static final int ABSOLUTE_MAX_PREFETCHES = 20; // 0x14
+    field public static final int DEFAULT_MAX_PREFETCHES = 10; // 0xa
+    field public static final int DEFAULT_TTL_SECS = 60; // 0x3c
+  }
+
+  @SuppressCompatibility @androidx.webkit.Profile.ExperimentalUrlPrefetch public static final class SpeculativeLoadingConfig.Builder {
+    ctor public SpeculativeLoadingConfig.Builder();
+    method @SuppressCompatibility @androidx.webkit.Profile.ExperimentalUrlPrefetch public androidx.webkit.SpeculativeLoadingConfig build();
+    method public androidx.webkit.SpeculativeLoadingConfig.Builder setMaxPrefetches(@IntRange(from=1, to=androidx.webkit.SpeculativeLoadingConfig.ABSOLUTE_MAX_PREFETCHES) int);
+    method public androidx.webkit.SpeculativeLoadingConfig.Builder setPrefetchTtlSeconds(@IntRange(from=1, to=java.lang.Integer.MAX_VALUE) int);
   }
 
   @SuppressCompatibility @RequiresFeature(name=androidx.webkit.WebViewFeature.PROFILE_URL_PREFETCH, enforcement="androidx.webkit.WebViewFeature#isFeatureSupported") @androidx.webkit.Profile.ExperimentalUrlPrefetch public final class SpeculativeLoadingParameters {
@@ -484,6 +500,7 @@ package androidx.webkit {
     field public static final String SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST = "SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST";
     field public static final String SHOULD_OVERRIDE_WITH_REDIRECTS = "SHOULD_OVERRIDE_WITH_REDIRECTS";
     field public static final String SPECULATIVE_LOADING = "SPECULATIVE_LOADING_STATUS";
+    field @SuppressCompatibility @androidx.webkit.Profile.ExperimentalUrlPrefetch public static final String SPECULATIVE_LOADING_CONFIG = "SPECULATIVE_LOADING_CONFIG";
     field public static final String STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES = "STARTUP_FEATURE_CONFIGURE_PARTITIONED_COOKIES";
     field public static final String STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX = "STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX";
     field public static final String STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS = "STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS";
