@@ -23,85 +23,10 @@ import org.junit.Test
 
 class AppFunctionExceptionTest {
     @Test
-    fun testConstructor_withoutMessageAndExtras() {
-        val exception = AppFunctionException(AppFunctionException.ERROR_DENIED)
-
-        assertThat(exception.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
-        assertThat(exception.errorMessage).isNull()
-        assertThat(exception.extras).isEqualTo(Bundle.EMPTY)
-    }
-
-    @Test
-    fun testConstructor_withoutExtras() {
-        val exception = AppFunctionException(AppFunctionException.ERROR_DENIED, "testMessage")
-
-        assertThat(exception.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
-        assertThat(exception.errorMessage).isEqualTo("testMessage")
-        assertThat(exception.extras).isEqualTo(Bundle.EMPTY)
-    }
-
-    @Test
-    fun testConstructor() {
-        val extras = Bundle().apply { putString("testKey", "testValue") }
-        val exception =
-            AppFunctionException(AppFunctionException.ERROR_DENIED, "testMessage", extras)
-
-        assertThat(exception.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
-        assertThat(exception.errorMessage).isEqualTo("testMessage")
-        assertThat(exception.extras.getString("testKey")).isEqualTo("testValue")
-    }
-
-    @Test
-    fun testErrorCategory_RequestError() {
-        assertThat(AppFunctionException(AppFunctionException.ERROR_DENIED).errorCategory)
-            .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
-        assertThat(AppFunctionException(AppFunctionException.ERROR_INVALID_ARGUMENT).errorCategory)
-            .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
-        assertThat(AppFunctionException(AppFunctionException.ERROR_DISABLED).errorCategory)
-            .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
-        assertThat(
-                AppFunctionException(AppFunctionException.ERROR_FUNCTION_NOT_FOUND).errorCategory
-            )
-            .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
-        assertThat(
-                AppFunctionException(AppFunctionException.ERROR_RESOURCE_NOT_FOUND).errorCategory
-            )
-            .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
-        assertThat(AppFunctionException(AppFunctionException.ERROR_LIMIT_EXCEEDED).errorCategory)
-            .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
-        assertThat(
-                AppFunctionException(AppFunctionException.ERROR_RESOURCE_ALREADY_EXISTS)
-                    .errorCategory
-            )
-            .isEqualTo(AppFunctionException.ERROR_CATEGORY_REQUEST_ERROR)
-    }
-
-    @Test
-    fun testErrorCategory_SystemError() {
-        assertThat(AppFunctionException(AppFunctionException.ERROR_SYSTEM_ERROR).errorCategory)
-            .isEqualTo(AppFunctionException.ERROR_CATEGORY_SYSTEM)
-        assertThat(AppFunctionException(AppFunctionException.ERROR_CANCELLED).errorCategory)
-            .isEqualTo(AppFunctionException.ERROR_CATEGORY_SYSTEM)
-    }
-
-    @Test
-    fun testErrorCategory_AppError() {
-        assertThat(AppFunctionException(AppFunctionException.ERROR_APP_UNKNOWN_ERROR).errorCategory)
-            .isEqualTo(AppFunctionException.ERROR_CATEGORY_APP)
-        assertThat(
-                AppFunctionException(AppFunctionException.ERROR_PERMISSION_REQUIRED).errorCategory
-            )
-            .isEqualTo(AppFunctionException.ERROR_CATEGORY_APP)
-        assertThat(AppFunctionException(AppFunctionException.ERROR_NOT_SUPPORTED).errorCategory)
-            .isEqualTo(AppFunctionException.ERROR_CATEGORY_APP)
-    }
-
-    @Test
     fun testTransformToPlatformExtensionsClass() {
         assumeAppFunctionExtensionLibraryAvailable()
         val extras = Bundle().apply { putString("testKey", "testValue") }
-        val exception =
-            AppFunctionException(AppFunctionException.ERROR_DENIED, "testMessage", extras)
+        val exception = AppFunctionDeniedException("testMessage", extras)
 
         val platformException = exception.toPlatformExtensionsClass()
 
@@ -111,20 +36,81 @@ class AppFunctionExceptionTest {
     }
 
     @Test
-    fun testCreateFromPlatformExtensionsClass() {
+    fun testCreateFromPlatformExtensionsClass_knownClasses() {
+        assumeAppFunctionExtensionLibraryAvailable()
+
+        testCreateFromPlatformExtensionsClass(
+            AppFunctionException.ERROR_APP_UNKNOWN_ERROR,
+            AppFunctionAppUnknownException::class.java
+        )
+        testCreateFromPlatformExtensionsClass(
+            AppFunctionException.ERROR_PERMISSION_REQUIRED,
+            AppFunctionPermissionRequiredException::class.java
+        )
+        testCreateFromPlatformExtensionsClass(
+            AppFunctionException.ERROR_NOT_SUPPORTED,
+            AppFunctionNotSupportedException::class.java
+        )
+
+        testCreateFromPlatformExtensionsClass(
+            AppFunctionException.ERROR_DENIED,
+            AppFunctionDeniedException::class.java
+        )
+        testCreateFromPlatformExtensionsClass(
+            AppFunctionException.ERROR_INVALID_ARGUMENT,
+            AppFunctionInvalidArgumentException::class.java
+        )
+        testCreateFromPlatformExtensionsClass(
+            AppFunctionException.ERROR_DISABLED,
+            AppFunctionDisabledException::class.java
+        )
+        testCreateFromPlatformExtensionsClass(
+            AppFunctionException.ERROR_FUNCTION_NOT_FOUND,
+            AppFunctionFunctionNotFoundException::class.java
+        )
+        testCreateFromPlatformExtensionsClass(
+            AppFunctionException.ERROR_LIMIT_EXCEEDED,
+            AppFunctionLimitExceededException::class.java
+        )
+        testCreateFromPlatformExtensionsClass(
+            AppFunctionException.ERROR_RESOURCE_ALREADY_EXISTS,
+            AppFunctionElementAlreadyExistsException::class.java
+        )
+
+        testCreateFromPlatformExtensionsClass(
+            AppFunctionException.ERROR_SYSTEM_ERROR,
+            AppFunctionSystemUnknownException::class.java
+        )
+        testCreateFromPlatformExtensionsClass(
+            AppFunctionException.ERROR_CANCELLED,
+            AppFunctionCancelledException::class.java
+        )
+    }
+
+    @Test
+    fun testCreateFromPlatformExtensionsClass_unknownErrorCode() {
+        assumeAppFunctionExtensionLibraryAvailable()
+
+        testCreateFromPlatformExtensionsClass(123456, AppFunctionUnknownException::class.java)
+    }
+
+    private fun <E : AppFunctionException> testCreateFromPlatformExtensionsClass(
+        errorCode: Int,
+        exceptionClass: Class<E>
+    ) {
         assumeAppFunctionExtensionLibraryAvailable()
         val extras = Bundle().apply { putString("testKey", "testValue") }
         val platformException =
             com.android.extensions.appfunctions.AppFunctionException(
-                AppFunctionException.ERROR_DENIED,
+                errorCode,
                 "testMessage",
                 extras
             )
 
         val exception = AppFunctionException.fromPlatformExtensionsClass(platformException)
 
-        assertThat(exception).isInstanceOf(AppFunctionDeniedException::class.java)
-        assertThat(exception.errorCode).isEqualTo(AppFunctionException.ERROR_DENIED)
+        assertThat(exception).isInstanceOf(exceptionClass)
+        assertThat(exception.errorCode).isEqualTo(errorCode)
         assertThat(exception.errorMessage).isEqualTo("testMessage")
         assertThat(exception.extras.getString("testKey")).isEqualTo("testValue")
     }

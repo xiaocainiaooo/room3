@@ -18,6 +18,23 @@ package androidx.appfunctions
 
 import android.os.Bundle
 import androidx.appfunctions.AppFunctionException.Companion.ERROR_CATEGORY_REQUEST_ERROR
+import androidx.core.util.Preconditions
+
+/**
+ * Thrown when the error is caused by the app requesting a function execution.
+ *
+ * <p>For example, the caller provided invalid parameters in the execution request e.g. an invalid
+ * function ID.
+ *
+ * <p>Reports errors of the category [ERROR_CATEGORY_REQUEST_ERROR].
+ */
+public abstract class AppFunctionRequestException
+internal constructor(errorCode: Int, errorMessage: String? = null, extras: Bundle) :
+    AppFunctionException(errorCode, errorMessage, extras) {
+    init {
+        Preconditions.checkArgument(errorCategory == ERROR_CATEGORY_REQUEST_ERROR)
+    }
+}
 
 /**
  * Thrown when the caller does not have the permission to execute an app function.
@@ -29,7 +46,7 @@ import androidx.appfunctions.AppFunctionException.Companion.ERROR_CATEGORY_REQUE
  */
 public class AppFunctionDeniedException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
-    AppFunctionException(ERROR_DENIED, errorMessage, extras) {
+    AppFunctionRequestException(ERROR_DENIED, errorMessage, extras) {
 
     public constructor(errorMessage: String? = null) : this(errorMessage, Bundle.EMPTY)
 }
@@ -44,7 +61,7 @@ internal constructor(errorMessage: String? = null, extras: Bundle) :
 // TODO(b/389738031): add reference to ExecuteAppFunctionRequest's builder when it is added.
 public class AppFunctionInvalidArgumentException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
-    AppFunctionException(ERROR_INVALID_ARGUMENT, errorMessage, extras) {
+    AppFunctionRequestException(ERROR_INVALID_ARGUMENT, errorMessage, extras) {
 
     public constructor(errorMessage: String? = null) : this(errorMessage, Bundle.EMPTY)
 }
@@ -59,7 +76,7 @@ internal constructor(errorMessage: String? = null, extras: Bundle) :
 // TODO(b/389738031): add reference to setAppFunctionEnabled and @AppFunction when they are added.
 public class AppFunctionDisabledException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
-    AppFunctionException(ERROR_DISABLED, errorMessage, extras) {
+    AppFunctionRequestException(ERROR_DISABLED, errorMessage, extras) {
 
     public constructor(errorMessage: String? = null) : this(errorMessage, Bundle.EMPTY)
 }
@@ -71,7 +88,7 @@ internal constructor(errorMessage: String? = null, extras: Bundle) :
  */
 public class AppFunctionFunctionNotFoundException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
-    AppFunctionException(ERROR_FUNCTION_NOT_FOUND, errorMessage, extras) {
+    AppFunctionRequestException(ERROR_FUNCTION_NOT_FOUND, errorMessage, extras) {
 
     public constructor(errorMessage: String? = null) : this(errorMessage, Bundle.EMPTY)
 }
@@ -83,7 +100,7 @@ internal constructor(errorMessage: String? = null, extras: Bundle) :
  */
 public class AppFunctionElementNotFoundException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
-    AppFunctionException(ERROR_RESOURCE_NOT_FOUND, errorMessage, extras) {
+    AppFunctionRequestException(ERROR_RESOURCE_NOT_FOUND, errorMessage, extras) {
 
     public constructor(errorMessage: String? = null) : this(errorMessage, Bundle.EMPTY)
 }
@@ -95,7 +112,7 @@ internal constructor(errorMessage: String? = null, extras: Bundle) :
  */
 public class AppFunctionLimitExceededException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
-    AppFunctionException(ERROR_LIMIT_EXCEEDED, errorMessage, extras) {
+    AppFunctionRequestException(ERROR_LIMIT_EXCEEDED, errorMessage, extras) {
 
     public constructor(errorMessage: String? = null) : this(errorMessage, Bundle.EMPTY)
 }
@@ -108,7 +125,7 @@ internal constructor(errorMessage: String? = null, extras: Bundle) :
  */
 public class AppFunctionElementAlreadyExistsException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
-    AppFunctionException(ERROR_RESOURCE_ALREADY_EXISTS, errorMessage, extras) {
+    AppFunctionRequestException(ERROR_RESOURCE_ALREADY_EXISTS, errorMessage, extras) {
 
     public constructor(errorMessage: String? = null) : this(errorMessage, Bundle.EMPTY)
 }
