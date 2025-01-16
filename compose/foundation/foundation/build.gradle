@@ -50,7 +50,6 @@ androidXMultiplatform {
                 implementation(project(":compose:ui:ui-text"))
                 implementation(project(":compose:ui:ui-util"))
                 implementation(project(":compose:foundation:foundation-layout"))
-                implementation(project(":performance:performance-annotation"))
             }
         }
 
@@ -81,16 +80,12 @@ androidXMultiplatform {
             dependsOn(commonMain)
         }
 
-        nonAndroidStubsMain {
+        jvmStubsMain {
             dependsOn(commonStubsMain)
         }
 
-        jvmStubsMain {
-            dependsOn(nonAndroidStubsMain)
-        }
-
         linuxx64StubsMain {
-            dependsOn(nonAndroidStubsMain)
+            dependsOn(commonStubsMain)
         }
 
         androidInstrumentedTest {

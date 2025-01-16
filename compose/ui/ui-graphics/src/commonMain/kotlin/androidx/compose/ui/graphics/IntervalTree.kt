@@ -82,7 +82,8 @@ class IntervalTree<T> {
     // structure beyond what can be found in various descriptions of binary search
     // trees and red/black trees
 
-    @JvmField internal val terminator = Node(Float.MAX_VALUE, Float.MIN_VALUE, null, TreeColorBlack)
+    @JvmField
+    internal val terminator = Node(Float.MAX_VALUE, Float.MIN_VALUE, null, TreeColor.Black)
     @JvmField internal var root = terminator
     @JvmField internal val stack = ArrayList<Node>()
 
@@ -202,7 +203,7 @@ class IntervalTree<T> {
      * @param data Data to associate with the interval
      */
     fun addInterval(start: Float, end: Float, data: T?) {
-        val node = Node(start, end, data, TreeColorRed)
+        val node = Node(start, end, data, TreeColor.Red)
 
         // Update the tree without doing any balancing
         var current = root
@@ -238,44 +239,44 @@ class IntervalTree<T> {
     private fun rebalance(target: Node) {
         var node = target
 
-        while (node !== root && node.parent.color == TreeColorRed) {
+        while (node !== root && node.parent.color == TreeColor.Red) {
             val ancestor = node.parent.parent
             if (node.parent === ancestor.left) {
                 val right = ancestor.right
-                if (right.color == TreeColorRed) {
-                    right.color = TreeColorBlack
-                    node.parent.color = TreeColorBlack
-                    ancestor.color = TreeColorRed
+                if (right.color == TreeColor.Red) {
+                    right.color = TreeColor.Black
+                    node.parent.color = TreeColor.Black
+                    ancestor.color = TreeColor.Red
                     node = ancestor
                 } else {
                     if (node === node.parent.right) {
                         node = node.parent
                         rotateLeft(node)
                     }
-                    node.parent.color = TreeColorBlack
-                    ancestor.color = TreeColorRed
+                    node.parent.color = TreeColor.Black
+                    ancestor.color = TreeColor.Red
                     rotateRight(ancestor)
                 }
             } else {
                 val left = ancestor.left
-                if (left.color == TreeColorRed) {
-                    left.color = TreeColorBlack
-                    node.parent.color = TreeColorBlack
-                    ancestor.color = TreeColorRed
+                if (left.color == TreeColor.Red) {
+                    left.color = TreeColor.Black
+                    node.parent.color = TreeColor.Black
+                    ancestor.color = TreeColor.Red
                     node = ancestor
                 } else {
                     if (node === node.parent.left) {
                         node = node.parent
                         rotateRight(node)
                     }
-                    node.parent.color = TreeColorBlack
-                    ancestor.color = TreeColorRed
+                    node.parent.color = TreeColor.Black
+                    ancestor.color = TreeColor.Red
                     rotateLeft(ancestor)
                 }
             }
         }
 
-        root.color = TreeColorBlack
+        root.color = TreeColor.Black
     }
 
     private fun rotateLeft(node: Node) {
@@ -339,6 +340,11 @@ class IntervalTree<T> {
         }
     }
 
+    internal enum class TreeColor {
+        Red,
+        Black
+    }
+
     internal inner class Node(start: Float, end: Float, data: T?, var color: TreeColor) :
         Interval<T>(start, end, data) {
         var min: Float = start
@@ -372,8 +378,3 @@ class IntervalTree<T> {
         }
     }
 }
-
-private typealias TreeColor = Int
-
-private const val TreeColorRed = 0
-private const val TreeColorBlack = 1

@@ -33,7 +33,6 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.isUnspecified
 import kotlin.math.max
 
@@ -143,14 +142,14 @@ fun Modifier.paddingFrom(
 @Stable
 fun Modifier.paddingFromBaseline(top: Dp = Dp.Unspecified, bottom: Dp = Dp.Unspecified) =
     this.then(
-            if (top.isSpecified) {
+            if (top != Dp.Unspecified) {
                 Modifier.paddingFrom(FirstBaseline, before = top)
             } else {
                 Modifier
             }
         )
         .then(
-            if (bottom.isSpecified) {
+            if (bottom != Dp.Unspecified) {
                 Modifier.paddingFrom(LastBaseline, after = bottom)
             } else {
                 Modifier
@@ -193,8 +192,8 @@ private class AlignmentLineOffsetDpElement(
 ) : ModifierNodeElement<AlignmentLineOffsetDpNode>() {
     init {
         requirePrecondition(
-            (before.value >= 0f || before.isUnspecified) and
-                (after.value >= 0f || after.isUnspecified)
+            (before.value >= 0f || before == Dp.Unspecified) &&
+                (after.value >= 0f || after == Dp.Unspecified)
         ) {
             "Padding from alignment line must be a non-negative number"
         }
@@ -320,12 +319,12 @@ private fun MeasureScope.alignmentLineOffsetMeasure(
     val axisMax = if (alignmentLine.horizontal) constraints.maxHeight else constraints.maxWidth
     // Compute padding required to satisfy the total before and after offsets.
     val paddingBefore =
-        ((if (before.isSpecified) before.roundToPx() else 0) - linePosition).coerceIn(
+        ((if (before != Dp.Unspecified) before.roundToPx() else 0) - linePosition).coerceIn(
             0,
             axisMax - axis
         )
     val paddingAfter =
-        ((if (after.isSpecified) after.roundToPx() else 0) - axis + linePosition).coerceIn(
+        ((if (after != Dp.Unspecified) after.roundToPx() else 0) - axis + linePosition).coerceIn(
             0,
             axisMax - axis - paddingBefore
         )

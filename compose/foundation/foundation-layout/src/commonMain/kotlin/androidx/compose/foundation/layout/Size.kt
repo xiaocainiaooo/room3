@@ -39,10 +39,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrain
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
-import androidx.compose.ui.unit.isSpecified
-import androidx.compose.ui.util.fastCoerceAtLeast
-import androidx.compose.ui.util.fastCoerceAtMost
-import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastRoundToInt
 
 /**
@@ -698,7 +694,7 @@ private class FillNode(var direction: Direction, var fraction: Float) :
             val width =
                 (constraints.maxWidth * fraction)
                     .fastRoundToInt()
-                    .fastCoerceIn(constraints.minWidth, constraints.maxWidth)
+                    .coerceIn(constraints.minWidth, constraints.maxWidth)
             minWidth = width
             maxWidth = width
         } else {
@@ -711,7 +707,7 @@ private class FillNode(var direction: Direction, var fraction: Float) :
             val height =
                 (constraints.maxHeight * fraction)
                     .fastRoundToInt()
-                    .fastCoerceIn(constraints.minHeight, constraints.maxHeight)
+                    .coerceIn(constraints.minHeight, constraints.maxHeight)
             minHeight = height
             maxHeight = height
         } else {
@@ -786,28 +782,28 @@ private class SizeNode(
     private val Density.targetConstraints: Constraints
         get() {
             val maxWidth =
-                if (maxWidth.isSpecified) {
-                    maxWidth.roundToPx().fastCoerceAtLeast(0)
+                if (maxWidth != Dp.Unspecified) {
+                    maxWidth.roundToPx().coerceAtLeast(0)
                 } else {
                     Constraints.Infinity
                 }
             val maxHeight =
-                if (maxHeight.isSpecified) {
-                    maxHeight.roundToPx().fastCoerceAtLeast(0)
+                if (maxHeight != Dp.Unspecified) {
+                    maxHeight.roundToPx().coerceAtLeast(0)
                 } else {
                     Constraints.Infinity
                 }
             val minWidth =
-                if (minWidth.isSpecified) {
-                    minWidth.roundToPx().fastCoerceIn(0, maxWidth).let {
+                if (minWidth != Dp.Unspecified) {
+                    minWidth.roundToPx().coerceAtMost(maxWidth).coerceAtLeast(0).let {
                         if (it != Constraints.Infinity) it else 0
                     }
                 } else {
                     0
                 }
             val minHeight =
-                if (minHeight.isSpecified) {
-                    minHeight.roundToPx().fastCoerceIn(0, maxHeight).let {
+                if (minHeight != Dp.Unspecified) {
+                    minHeight.roundToPx().coerceAtMost(maxHeight).coerceAtLeast(0).let {
                         if (it != Constraints.Infinity) it else 0
                     }
                 } else {
@@ -831,28 +827,28 @@ private class SizeNode(
                     constraints.constrain(targetConstraints)
                 } else {
                     val resolvedMinWidth =
-                        if (minWidth.isSpecified) {
+                        if (minWidth != Dp.Unspecified) {
                             targetConstraints.minWidth
                         } else {
-                            constraints.minWidth.fastCoerceAtMost(targetConstraints.maxWidth)
+                            constraints.minWidth.coerceAtMost(targetConstraints.maxWidth)
                         }
                     val resolvedMaxWidth =
-                        if (maxWidth.isSpecified) {
+                        if (maxWidth != Dp.Unspecified) {
                             targetConstraints.maxWidth
                         } else {
-                            constraints.maxWidth.fastCoerceAtLeast(targetConstraints.minWidth)
+                            constraints.maxWidth.coerceAtLeast(targetConstraints.minWidth)
                         }
                     val resolvedMinHeight =
-                        if (minHeight.isSpecified) {
+                        if (minHeight != Dp.Unspecified) {
                             targetConstraints.minHeight
                         } else {
-                            constraints.minHeight.fastCoerceAtMost(targetConstraints.maxHeight)
+                            constraints.minHeight.coerceAtMost(targetConstraints.maxHeight)
                         }
                     val resolvedMaxHeight =
-                        if (maxHeight.isSpecified) {
+                        if (maxHeight != Dp.Unspecified) {
                             targetConstraints.maxHeight
                         } else {
-                            constraints.maxHeight.fastCoerceAtLeast(targetConstraints.minHeight)
+                            constraints.maxHeight.coerceAtLeast(targetConstraints.minHeight)
                         }
                     Constraints(
                         resolvedMinWidth,
@@ -1076,14 +1072,14 @@ private class UnspecifiedConstraintsNode(
     ): MeasureResult {
         val wrappedConstraints =
             Constraints(
-                if (minWidth.isSpecified && constraints.minWidth == 0) {
-                    minWidth.roundToPx().fastCoerceIn(0, constraints.maxWidth)
+                if (minWidth != Dp.Unspecified && constraints.minWidth == 0) {
+                    minWidth.roundToPx().coerceAtMost(constraints.maxWidth).coerceAtLeast(0)
                 } else {
                     constraints.minWidth
                 },
                 constraints.maxWidth,
-                if (minHeight.isSpecified && constraints.minHeight == 0) {
-                    minHeight.roundToPx().fastCoerceIn(0, constraints.maxHeight)
+                if (minHeight != Dp.Unspecified && constraints.minHeight == 0) {
+                    minHeight.roundToPx().coerceAtMost(constraints.maxHeight).coerceAtLeast(0)
                 } else {
                     constraints.minHeight
                 },
@@ -1099,7 +1095,7 @@ private class UnspecifiedConstraintsNode(
     ) =
         measurable
             .minIntrinsicWidth(height)
-            .fastCoerceAtLeast(if (minWidth.isSpecified) minWidth.roundToPx() else 0)
+            .coerceAtLeast(if (minWidth != Dp.Unspecified) minWidth.roundToPx() else 0)
 
     override fun IntrinsicMeasureScope.maxIntrinsicWidth(
         measurable: IntrinsicMeasurable,
@@ -1107,7 +1103,7 @@ private class UnspecifiedConstraintsNode(
     ) =
         measurable
             .maxIntrinsicWidth(height)
-            .fastCoerceAtLeast(if (minWidth.isSpecified) minWidth.roundToPx() else 0)
+            .coerceAtLeast(if (minWidth != Dp.Unspecified) minWidth.roundToPx() else 0)
 
     override fun IntrinsicMeasureScope.minIntrinsicHeight(
         measurable: IntrinsicMeasurable,
@@ -1115,7 +1111,7 @@ private class UnspecifiedConstraintsNode(
     ) =
         measurable
             .minIntrinsicHeight(width)
-            .fastCoerceAtLeast(if (minHeight.isSpecified) minHeight.roundToPx() else 0)
+            .coerceAtLeast(if (minHeight != Dp.Unspecified) minHeight.roundToPx() else 0)
 
     override fun IntrinsicMeasureScope.maxIntrinsicHeight(
         measurable: IntrinsicMeasurable,
@@ -1123,7 +1119,7 @@ private class UnspecifiedConstraintsNode(
     ) =
         measurable
             .maxIntrinsicHeight(width)
-            .fastCoerceAtLeast(if (minHeight.isSpecified) minHeight.roundToPx() else 0)
+            .coerceAtLeast(if (minHeight != Dp.Unspecified) minHeight.roundToPx() else 0)
 }
 
 internal enum class Direction {

@@ -230,7 +230,7 @@ internal constructor(
                         chromaticAdaptation(
                             Adaptation.Bradford.transform,
                             srcXYZ,
-                            Illuminant.newD50Xyz()
+                            Illuminant.D50Xyz.copyOf()
                         )
                     transform = mul3x3(srcAdaptation, source.transform)
                 }
@@ -240,7 +240,7 @@ internal constructor(
                         chromaticAdaptation(
                             Adaptation.Bradford.transform,
                             dstXYZ,
-                            Illuminant.newD50Xyz()
+                            Illuminant.D50Xyz.copyOf()
                         )
                     inverseTransform = inverse3x3(mul3x3(dstAdaptation, destination.transform))
                 }

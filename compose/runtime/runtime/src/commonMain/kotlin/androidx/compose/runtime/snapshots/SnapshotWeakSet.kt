@@ -17,7 +17,6 @@
 package androidx.compose.runtime.snapshots
 
 import androidx.compose.runtime.TestOnly
-import androidx.compose.runtime.collection.fastCopyInto
 import androidx.compose.runtime.internal.WeakReference
 import androidx.compose.runtime.internal.identityHashCode
 
@@ -71,18 +70,13 @@ internal class SnapshotWeakSet<T : Any> {
             val newCapacity = capacity * 2
             val newValues = arrayOfNulls<WeakReference<T>?>(newCapacity)
             val newHashes = IntArray(newCapacity)
-            values.fastCopyInto(
+            values.copyInto(
                 destination = newValues,
                 destinationOffset = insertIndex + 1,
                 startIndex = insertIndex,
                 endIndex = size
             )
-            values.fastCopyInto(
-                destination = newValues,
-                destinationOffset = 0,
-                startIndex = 0,
-                endIndex = insertIndex
-            )
+            values.copyInto(destination = newValues, endIndex = insertIndex)
             hashes.copyInto(
                 destination = newHashes,
                 destinationOffset = insertIndex + 1,
@@ -93,7 +87,7 @@ internal class SnapshotWeakSet<T : Any> {
             values = newValues
             hashes = newHashes
         } else {
-            values.fastCopyInto(
+            values.copyInto(
                 destination = values,
                 destinationOffset = insertIndex + 1,
                 startIndex = insertIndex,

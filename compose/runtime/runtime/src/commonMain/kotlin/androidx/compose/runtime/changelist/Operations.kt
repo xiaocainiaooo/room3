@@ -24,10 +24,8 @@ import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.RememberManager
 import androidx.compose.runtime.SlotWriter
 import androidx.compose.runtime.changelist.Operation.ObjectParameter
-import androidx.compose.runtime.collection.fastCopyInto
 import androidx.compose.runtime.debugRuntimeCheck
 import androidx.compose.runtime.requirePrecondition
-import dalvik.annotation.optimization.NeverInline
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
@@ -135,12 +133,11 @@ internal class Operations : OperationsDebugStringFormattable() {
         return (currentSize + resizeAmount).coerceAtLeast(requiredSize)
     }
 
-    @NeverInline
     private fun resizeOpCodes() {
         val resizeAmount = opCodesSize.coerceAtMost(OperationsMaxResizeAmount)
         @Suppress("UNCHECKED_CAST")
         val newOpCodes = arrayOfNulls<Operation>(opCodesSize + resizeAmount) as Array<Operation>
-        opCodes = opCodes.fastCopyInto(newOpCodes, 0, 0, opCodesSize)
+        opCodes = opCodes.copyInto(newOpCodes, 0, 0, opCodesSize)
     }
 
     private inline fun ensureIntArgsSizeAtLeast(requiredSize: Int) {
@@ -150,7 +147,6 @@ internal class Operations : OperationsDebugStringFormattable() {
         }
     }
 
-    @NeverInline
     private fun resizeIntArgs(currentSize: Int, requiredSize: Int) {
         val newIntArgs = IntArray(determineNewSize(currentSize, requiredSize))
         intArgs.copyInto(newIntArgs, 0, 0, currentSize)
@@ -164,10 +160,9 @@ internal class Operations : OperationsDebugStringFormattable() {
         }
     }
 
-    @NeverInline
     private fun resizeObjectArgs(currentSize: Int, requiredSize: Int) {
         val newObjectArgs = arrayOfNulls<Any>(determineNewSize(currentSize, requiredSize))
-        objectArgs.fastCopyInto(newObjectArgs, 0, 0, currentSize)
+        objectArgs.copyInto(newObjectArgs, 0, 0, currentSize)
         objectArgs = newObjectArgs
     }
 
@@ -296,7 +291,7 @@ internal class Operations : OperationsDebugStringFormattable() {
         other.pushOp(op)
 
         // Move the objects then null out our contents
-        objectArgs.fastCopyInto(
+        objectArgs.copyInto(
             destination = other.objectArgs,
             destinationOffset = other.objectArgsSize - op.objects,
             startIndex = objectArgsSize - op.objects,
