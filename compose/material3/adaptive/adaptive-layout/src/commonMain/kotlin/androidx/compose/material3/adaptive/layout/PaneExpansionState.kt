@@ -370,13 +370,10 @@ internal constructor(
      * @param initialVelocity the initial velocity of the animation
      */
     suspend fun animateTo(anchor: PaneExpansionAnchor, initialVelocity: Float = 0F) {
-        require(Snapshot.withoutReadObservation { anchors.contains(anchor) }) {
-            "The provided $anchor is not in the anchor list!"
-        }
+        require(anchors.contains(anchor)) { "The provided $anchor is not in the anchor list!" }
         currentAnchor = anchor
         measuredDensity?.apply {
-            val position =
-                Snapshot.withoutReadObservation { anchor.positionIn(maxExpansionWidth, this) }
+            val position = anchor.positionIn(maxExpansionWidth, this)
             animateToInternal(position, initialVelocity)
         }
     }
@@ -405,11 +402,11 @@ internal constructor(
                     anchors.toPositions(
                         // When maxExpansionWidth is updated, the anchor positions will be
                         // recalculated.
-                        Snapshot.withoutReadObservation { maxExpansionWidth },
+                        maxExpansionWidth,
                         it
                     )
             }
-            if (!anchors.contains(Snapshot.withoutReadObservation { currentAnchor })) {
+            if (!anchors.contains(currentAnchor)) {
                 currentAnchor = null
             }
             this.anchoringAnimationSpec = anchoringAnimationSpec
