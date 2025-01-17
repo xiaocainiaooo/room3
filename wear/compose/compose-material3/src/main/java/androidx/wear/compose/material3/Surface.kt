@@ -20,6 +20,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -44,7 +46,48 @@ import androidx.wear.compose.foundation.lazy.LocalTransformingLazyColumnItemScop
 import androidx.wear.compose.material3.lazy.scrollTransform
 
 /**
- * Applies a container style to the current composable and Material 3 Motion if in the scope of a
+ * Applies a surface style to the current composable and Material 3 Motion if [transformation] is
+ * provided.
+ *
+ * This modifier draws a background using the given [Painter] and clips it to the given [Shape]. If
+ * a border is provided, it will be applied around the shape. If [transformation] is provided, it
+ * will change the visual presentation of the surface.
+ *
+ * @param transformation The transformation to be applied to the composable. If null, will draw the
+ *   container background using the given [Painter] and clip it to the given [Shape].
+ * @param painter The painter used to draw the background of the container.
+ * @param shape The shape of the container. Defaults to [RectangleShape].
+ * @param border The border stroke to apply to the container. If null, no border is drawn.
+ * @return A modifier that applies the transformation.
+ */
+@Composable
+internal fun Modifier.surface(
+    transformation: SurfaceTransformation?,
+    painter: Painter,
+    shape: Shape = RectangleShape,
+    border: BorderStroke? = null
+): Modifier {
+    if (transformation != null && !LocalReduceMotion.current) {
+        val backgroundPainter =
+            remember(transformation, painter, shape, border) {
+                transformation.createBackgroundPainter(painter, shape, border)
+            }
+
+        return paintBackground(painter = backgroundPainter).graphicsLayer {
+            this.shape = shape
+            with(transformation) { applyTransformation() }
+            clip = true
+        }
+    } else {
+        val borderModifier = if (border != null) border(border = border, shape = shape) else this
+        return borderModifier
+            .clip(shape = shape)
+            .paintBackground(painter = painter, contentScale = ContentScale.Crop)
+    }
+}
+
+/**
+ * Applies a surface style to the current composable and Material 3 Motion if in the scope of a
  * TransformingLazyColumn
  *
  * This modifier provides a background using the given [Painter] and clips it to the given [Shape].
@@ -60,7 +103,7 @@ import androidx.wear.compose.material3.lazy.scrollTransform
  * @return A modifier that applies the container style.
  */
 @Composable
-internal fun Modifier.container(
+internal fun Modifier.surface(
     painter: Painter,
     shape: Shape = RectangleShape,
     border: BorderStroke? = null
@@ -79,7 +122,7 @@ internal fun Modifier.container(
 }
 
 /**
- * Applies a container style to the current composable and Material 3 Motion if in the scope of a
+ * Applies a surface style to the current composable and Material 3 Motion if in the scope of a
  * TransformingLazyColumn
  *
  * This modifier provides a background using the given [Color] and clips it to the given [Shape]. If
@@ -95,7 +138,7 @@ internal fun Modifier.container(
  * @return A modifier that applies the container style.
  */
 @Composable
-internal fun Modifier.container(
+internal fun Modifier.surface(
     color: Color,
     shape: Shape = RectangleShape,
     border: BorderStroke? = null

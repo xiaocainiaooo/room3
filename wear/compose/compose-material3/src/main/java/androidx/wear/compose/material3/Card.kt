@@ -101,6 +101,8 @@ import androidx.wear.compose.materialcore.Text
  *   emitting [Interaction]s for this card. You can use this to change the card's appearance or
  *   preview the card in different states. Note that if `null` is provided, interactions will still
  *   happen internally.
+ * @param transformation Transformation to be used when card appears inside a container that needs
+ *   to dynamically change its content separately from the background.
  * @param content The main slot for a content of this card
  */
 @Composable
@@ -115,6 +117,7 @@ public fun Card(
     border: BorderStroke? = null,
     contentPadding: PaddingValues = CardDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
+    transformation: SurfaceTransformation? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     CardImpl(
@@ -127,7 +130,8 @@ public fun Card(
         border = border,
         interactionSource = interactionSource,
         contentPadding = contentPadding,
-        shape = shape
+        shape = shape,
+        transformation = transformation,
     ) {
         CompositionLocalProvider(
             LocalContentColor provides colors.titleColor,
@@ -204,6 +208,8 @@ public fun Card(
  *   emitting [Interaction]s for this card. You can use this to change the card's appearance or
  *   preview the card in different states. Note that if `null` is provided, interactions will still
  *   happen internally.
+ * @param transformation Transformation to be used when card appears inside a container that needs
+ *   to dynamically change its content separately from the background.
  * @param appImage A slot for a small ([CardDefaults.AppImageSize]x[CardDefaults.AppImageSize] )
  *   [Image] associated with the application.
  * @param time A slot for displaying the time relevant to the contents of the card, expected to be a
@@ -224,6 +230,7 @@ public fun AppCard(
     border: BorderStroke? = null,
     contentPadding: PaddingValues = CardDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
+    transformation: SurfaceTransformation? = null,
     appImage: @Composable (RowScope.() -> Unit)? = null,
     time: @Composable (RowScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
@@ -238,6 +245,7 @@ public fun AppCard(
         border = border,
         interactionSource = interactionSource,
         contentPadding = contentPadding,
+        transformation = transformation,
         shape = shape
     ) {
         // NB We are in ColumnScope, so spacing between elements will be done with Spacer using
@@ -361,6 +369,8 @@ public fun AppCard(
  *   emitting [Interaction]s for this card. You can use this to change the card's appearance or
  *   preview the card in different states. Note that if `null` is provided, interactions will still
  *   happen internally.
+ * @param transformation Transformation to be used when card appears inside a container that needs
+ *   to dynamically change its content separately from the background.
  * @param content The optional body content of the card. If not provided then title and subtitle are
  *   expected to be provided
  */
@@ -379,6 +389,7 @@ public fun TitleCard(
     border: BorderStroke? = null,
     contentPadding: PaddingValues = CardDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
+    transformation: SurfaceTransformation? = null,
     content: @Composable (() -> Unit)? = null,
 ) {
     val timeWithTextStyle: @Composable () -> Unit = {
@@ -404,7 +415,8 @@ public fun TitleCard(
         border = border,
         interactionSource = interactionSource,
         contentPadding = contentPadding,
-        shape = shape
+        shape = shape,
+        transformation = transformation,
     ) {
         // NB We are in ColumnScope, so spacing between elements will be done with Spacer using
         // Modifier.height().
@@ -490,6 +502,8 @@ public fun TitleCard(
  *   emitting [Interaction]s for this card. You can use this to change the card's appearance or
  *   preview the card in different states. Note that if `null` is provided, interactions will still
  *   happen internally.
+ * @param transformation Transformation to be used when card appears inside a container that needs
+ *   to dynamically change its content separately from the background.
  * @param content The main slot for a content of this card
  */
 @Composable
@@ -504,6 +518,7 @@ public fun OutlinedCard(
     border: BorderStroke = CardDefaults.outlinedCardBorder(),
     contentPadding: PaddingValues = CardDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
+    transformation: SurfaceTransformation? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     CardImpl(
@@ -517,6 +532,7 @@ public fun OutlinedCard(
         interactionSource = interactionSource,
         contentPadding = contentPadding,
         shape = shape,
+        transformation = transformation,
     ) {
         CompositionLocalProvider(
             LocalContentColor provides colors.contentColor,
@@ -529,7 +545,6 @@ public fun OutlinedCard(
 
 /** Contains the default values used by [Card] */
 public object CardDefaults {
-
     /**
      * Creates a [CardColors] that represents the default container and content colors used in a
      * [Card], [AppCard] or [TitleCard].
@@ -844,13 +859,19 @@ private fun CardImpl(
     border: BorderStroke?,
     contentPadding: PaddingValues,
     interactionSource: MutableInteractionSource?,
+    transformation: SurfaceTransformation?,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
         modifier =
             modifier
                 .fillMaxWidth()
-                .container(colors.containerPainter, shape, border)
+                .surface(
+                    transformation = transformation,
+                    painter = colors.containerPainter,
+                    shape = shape,
+                    border = border
+                )
                 .combinedClickable(
                     enabled = enabled,
                     onClick = onClick,

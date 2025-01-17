@@ -35,6 +35,7 @@ import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.ButtonGroup
+import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.ResponsiveTransformationSpecDefaults
 import androidx.wear.compose.material3.lazy.TransformationSpec
@@ -114,22 +115,10 @@ fun ResponsiveTransformationSpecButtonSample() {
                     onClick = {},
                     modifier =
                         Modifier.fillMaxWidth()
-                            .transformedHeight(transformationSpec::getTransformedHeight)
-                            .graphicsLayer {
-                                with(transformationSpec) {
-                                    applyContainerTransformation(scrollProgress)
-                                }
-                            },
+                            .transformedHeight(transformationSpec::getTransformedHeight),
+                    transformation = SurfaceTransformation(transformationSpec),
                 ) {
-                    Text(
-                        "Item $index",
-                        modifier =
-                            Modifier.graphicsLayer {
-                                with(transformationSpec) {
-                                    applyContentTransformation(scrollProgress)
-                                }
-                            }
-                    )
+                    Text("Item $index")
                 }
             }
         }
