@@ -352,6 +352,43 @@ internal val PaneScaffoldMotionDataProvider<*>.slideOutToRightOffset: Int
         return 0
     }
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@VisibleForTesting
+internal fun <Role> PaneScaffoldMotionDataProvider<Role>.getHiddenPaneCurrentLeft(role: Role): Int {
+    var currentLeft = 0
+    forEach { paneRole, data ->
+        // Find the right edge of the shown pane next to the left.
+        if (paneRole == role) {
+            return currentLeft
+        }
+        if (
+            data.motion.type == PaneMotion.Type.Shown || data.motion.type == PaneMotion.Type.Exiting
+        ) {
+            currentLeft = data.currentRight
+        }
+    }
+    return currentLeft
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@VisibleForTesting
+internal fun <Role> PaneScaffoldMotionDataProvider<Role>.getHidingPaneTargetLeft(role: Role): Int {
+    var targetLeft = 0
+    forEach { paneRole, data ->
+        // Find the right edge of the shown pane next to the left.
+        if (paneRole == role) {
+            return targetLeft
+        }
+        if (
+            data.motion.type == PaneMotion.Type.Shown ||
+                data.motion.type == PaneMotion.Type.Entering
+        ) {
+            targetLeft = data.targetRight
+        }
+    }
+    return targetLeft
+}
+
 /**
  * Calculates the default [EnterTransition] of the pane associated to the given role when it's
  * showing. The [PaneMotion] and pane measurement data provided by [PaneScaffoldMotionDataProvider]
@@ -374,8 +411,12 @@ fun <Role> PaneScaffoldMotionDataProvider<Role>.calculateDefaultEnterTransition(
             slideInHorizontally(PaneMotionDefaults.DelayedOffsetAnimationSpec) {
                 slideInFromRightOffset
             }
-        PaneMotion.EnterWithExpand ->
-            expandHorizontally(PaneMotionDefaults.SizeAnimationSpec, Alignment.CenterHorizontally)
+        PaneMotion.EnterWithExpand -> {
+            expandHorizontally(PaneMotionDefaults.SizeAnimationSpec, Alignment.CenterHorizontally) +
+                slideInHorizontally(PaneMotionDefaults.OffsetAnimationSpec) {
+                    getHiddenPaneCurrentLeft(role) - this[role].targetLeft
+                }
+        }
         else -> EnterTransition.None
     }
 
@@ -393,8 +434,12 @@ fun <Role> PaneScaffoldMotionDataProvider<Role>.calculateDefaultExitTransition(r
             slideOutHorizontally(PaneMotionDefaults.OffsetAnimationSpec) { slideOutToLeftOffset }
         PaneMotion.ExitToRight ->
             slideOutHorizontally(PaneMotionDefaults.OffsetAnimationSpec) { slideOutToRightOffset }
-        PaneMotion.ExitWithShrink ->
-            shrinkHorizontally(PaneMotionDefaults.SizeAnimationSpec, Alignment.CenterHorizontally)
+        PaneMotion.ExitWithShrink -> {
+            shrinkHorizontally(PaneMotionDefaults.SizeAnimationSpec, Alignment.CenterHorizontally) +
+                slideOutHorizontally(PaneMotionDefaults.OffsetAnimationSpec) {
+                    getHidingPaneTargetLeft(role) - this[role].currentLeft
+                }
+        }
         else -> ExitTransition.None
     }
 
