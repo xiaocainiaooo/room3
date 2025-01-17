@@ -18,6 +18,22 @@ package androidx.appfunctions
 
 import android.os.Bundle
 import androidx.appfunctions.AppFunctionException.Companion.ERROR_CATEGORY_SYSTEM
+import androidx.core.util.Preconditions
+
+/**
+ * Thrown when an internal unexpected error comes from the system.
+ *
+ * <p>For example, the AppFunctionService implementation is not found by the system.
+ *
+ * <p>Reports errors of the category [ERROR_CATEGORY_SYSTEM].
+ */
+public abstract class AppFunctionSystemException
+internal constructor(errorCode: Int, errorMessage: String? = null, extras: Bundle) :
+    AppFunctionException(errorCode, errorMessage, extras) {
+    init {
+        Preconditions.checkArgument(errorCategory == ERROR_CATEGORY_SYSTEM)
+    }
+}
 
 /**
  * Thrown when an internal unexpected error comes from the system.
@@ -26,9 +42,9 @@ import androidx.appfunctions.AppFunctionException.Companion.ERROR_CATEGORY_SYSTE
  *
  * <p>This error is in the [ERROR_CATEGORY_SYSTEM] category.
  */
-public class AppFunctionSystemException
+public class AppFunctionSystemUnknownException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
-    AppFunctionException(ERROR_SYSTEM_ERROR, errorMessage, extras) {
+    AppFunctionSystemException(ERROR_SYSTEM_ERROR, errorMessage, extras) {
 
     public constructor(errorMessage: String? = null) : this(errorMessage, Bundle.EMPTY)
 }
@@ -40,7 +56,7 @@ internal constructor(errorMessage: String? = null, extras: Bundle) :
  */
 public class AppFunctionCancelledException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
-    AppFunctionException(ERROR_CANCELLED, errorMessage, extras) {
+    AppFunctionSystemException(ERROR_CANCELLED, errorMessage, extras) {
 
     public constructor(errorMessage: String? = null) : this(errorMessage, Bundle.EMPTY)
 }
