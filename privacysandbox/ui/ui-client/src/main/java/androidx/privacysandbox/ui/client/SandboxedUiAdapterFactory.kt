@@ -30,14 +30,14 @@ import android.view.SurfaceView
 import android.view.View
 import android.window.SurfaceSyncGroup
 import androidx.annotation.RequiresApi
-import androidx.privacysandbox.ui.client.RemoteCallManager.addBinderDeathListener
-import androidx.privacysandbox.ui.client.RemoteCallManager.closeRemoteSession
-import androidx.privacysandbox.ui.client.RemoteCallManager.tryToCallRemoteObject
 import androidx.privacysandbox.ui.core.IDelegatingSandboxedUiAdapter
 import androidx.privacysandbox.ui.core.IRemoteSessionClient
 import androidx.privacysandbox.ui.core.IRemoteSessionController
 import androidx.privacysandbox.ui.core.ISandboxedUiAdapter
 import androidx.privacysandbox.ui.core.ProtocolConstants
+import androidx.privacysandbox.ui.core.RemoteCallManager.addBinderDeathListener
+import androidx.privacysandbox.ui.core.RemoteCallManager.closeRemoteSession
+import androidx.privacysandbox.ui.core.RemoteCallManager.tryToCallRemoteObject
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
