@@ -67,13 +67,12 @@ public object NavDisplay {
  * @param localProviders list of [NavLocalProvider] to add information to the provided records
  * @param modifier the modifier to be applied to the layout.
  * @param contentAlignment The [Alignment] of the [AnimatedContent]
- *     * @param enterTransition Default [EnterTransition] for all [NavRecord]s. Can be overridden
- *     * individually for each [NavRecord] by passing in the record's transitions through
- *     * [NavRecord.featureMap].
- *     * @param exitTransition Default [ExitTransition] for all [NavRecord]s. Can be overridden
- *     * individually for each [NavRecord] by passing in the record's transitions through
- *     * [NavRecord.featureMap].
- *
+ * @param enterTransition Default [EnterTransition] for all [NavRecord]s. Can be overridden
+ *   individually for each [NavRecord] by passing in the record's transitions through
+ *   [NavRecord.featureMap].
+ * @param exitTransition Default [ExitTransition] for all [NavRecord]s. Can be overridden
+ *   individually for each [NavRecord] by passing in the record's transitions through
+ *   [NavRecord.featureMap].
  * @param onBack a callback for handling system back presses
  * @param recordProvider lambda used to construct each possible [NavRecord]
  * @sample androidx.navigation3.samples.BaseNav
