@@ -40,6 +40,7 @@ import androidx.privacysandbox.ui.core.IRemoteSessionClient
 import androidx.privacysandbox.ui.core.IRemoteSessionController
 import androidx.privacysandbox.ui.core.ISandboxedUiAdapter
 import androidx.privacysandbox.ui.core.ProtocolConstants
+import androidx.privacysandbox.ui.core.RemoteCallManager.tryToCallRemoteObject
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import androidx.privacysandbox.ui.core.SessionObserver
 import androidx.privacysandbox.ui.core.SessionObserverContext
@@ -78,20 +79,22 @@ private class BinderDelegatingAdapter(private var adapter: DelegatingSandboxedUi
 
         override suspend fun onDelegateChanged(delegate: Bundle) {
             suspendCancellableCoroutine { continuation ->
-                binder.onDelegateChanged(
-                    delegate,
-                    object : IDelegatorCallback.Stub() {
-                        override fun onDelegateChangeResult(success: Boolean) {
-                            if (success) {
-                                continuation.resume(Unit)
-                            } else {
-                                continuation.resumeWithException(
-                                    IllegalStateException("Client failed to switch")
-                                )
+                tryToCallRemoteObject(binder) {
+                    onDelegateChanged(
+                        delegate,
+                        object : IDelegatorCallback.Stub() {
+                            override fun onDelegateChangeResult(success: Boolean) {
+                                if (success) {
+                                    continuation.resume(Unit)
+                                } else {
+                                    continuation.resumeWithException(
+                                        IllegalStateException("Client failed to switch")
+                                    )
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     }
@@ -154,7 +157,9 @@ private class BinderAdapterDelegate(
         remoteSessionClient: IRemoteSessionClient
     ) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            remoteSessionClient.onRemoteSessionError("openRemoteSession() requires API34+")
+            tryToCallRemoteObject(remoteSessionClient) {
+                onRemoteSessionError("openRemoteSession() requires API34+")
+            }
             return
         }
 
@@ -177,7 +182,11 @@ private class BinderAdapterDelegate(
                             )
                         },
                         clientInit = { it.initialize(initialWidth, initialHeight) },
-                        errorHandler = { remoteSessionClient.onRemoteSessionError(it.message) }
+                        errorHandler = {
+                            tryToCallRemoteObject(remoteSessionClient) {
+                                onRemoteSessionError(it.message)
+                            }
+                        }
                     )
 
                 openSessionInternal(
@@ -192,7 +201,9 @@ private class BinderAdapterDelegate(
 
                 deferredClient.preloadClient()
             } catch (exception: Throwable) {
-                remoteSessionClient.onRemoteSessionError(exception.message)
+                tryToCallRemoteObject(remoteSessionClient) {
+                    onRemoteSessionError(exception.message)
+                }
             }
         }
     }
@@ -280,27 +291,31 @@ private class BinderAdapterDelegate(
         }
 
         override fun onSessionError(throwable: Throwable) {
-            remoteSessionClient.onRemoteSessionError(throwable.message)
+            tryToCallRemoteObject(remoteSessionClient) { onRemoteSessionError(throwable.message) }
         }
 
         override fun onResizeRequested(width: Int, height: Int) {
-            remoteSessionClient.onResizeRequested(width, height)
+            tryToCallRemoteObject(remoteSessionClient) { onResizeRequested(width, height) }
         }
 
         private fun sendRemoteSessionOpened(session: SandboxedUiAdapter.Session) {
             val surfacePackage = surfaceControlViewHost.surfacePackage
             val remoteSessionController = RemoteSessionController(surfaceControlViewHost, session)
-            remoteSessionClient.onRemoteSessionOpened(
-                surfacePackage,
-                remoteSessionController,
-                isZOrderOnTop,
-                session.signalOptions.isNotEmpty()
-            )
+            tryToCallRemoteObject(remoteSessionClient) {
+                onRemoteSessionOpened(
+                    surfacePackage,
+                    remoteSessionController,
+                    isZOrderOnTop,
+                    session.signalOptions.isNotEmpty()
+                )
+            }
         }
 
         private fun sendSurfacePackage() {
             if (surfaceControlViewHost.surfacePackage != null) {
-                remoteSessionClient.onSessionUiFetched(surfaceControlViewHost.surfacePackage)
+                tryToCallRemoteObject(remoteSessionClient) {
+                    onSessionUiFetched(surfaceControlViewHost.surfacePackage)
+                }
             }
         }
 

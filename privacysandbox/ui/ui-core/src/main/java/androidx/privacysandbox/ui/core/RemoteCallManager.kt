@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.privacysandbox.ui.client
+package androidx.privacysandbox.ui.core
 
 import android.os.IBinder
 import android.os.RemoteException
 import android.util.Log
 import androidx.annotation.RestrictTo
-import androidx.privacysandbox.ui.core.IRemoteSessionController
 
 /** Utility class for remote objects called by the UI library adapter factories. */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
