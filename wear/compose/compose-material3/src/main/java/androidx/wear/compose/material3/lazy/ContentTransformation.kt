@@ -85,14 +85,12 @@ internal fun GraphicsLayerScope.contentTransformation(
                                 Rect(
                                     left = 0f,
                                     top = 0f,
-                                    right =
-                                        size.width - 2f * size.width * it.contentXOffsetFraction,
-                                    bottom = it.morphedHeight
+                                    right = size.width,
+                                    bottom = it.itemHeight
                                 ),
                         )
                     )
             }
-        translationX = size.width * it.contentXOffsetFraction * it.scale
         translationY = -1f * size.height * (1f - it.scale) / 2f
         alpha = it.contentAlpha
         scaleX = it.scale
