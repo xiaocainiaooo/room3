@@ -30,6 +30,7 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("AndroidXComposePlugin")
+    alias(libs.plugins.kotlinSerialization)
 }
 
 androidXMultiplatform {
@@ -45,6 +46,7 @@ androidXMultiplatform {
                 api(project(":lifecycle:lifecycle-viewmodel"))
                 api("androidx.annotation:annotation:1.8.1")
                 api("androidx.compose.runtime:runtime:1.6.0")
+                api(libs.kotlinSerializationCore)
                 implementation(libs.kotlinStdlib)
             }
         }
