@@ -50,7 +50,11 @@ androidXMultiplatform {
         }
 
         commonTest {
-            // TODO(b/330323282): Move common dependencies here.
+            dependencies {
+                implementation(project(":lifecycle:lifecycle-viewmodel-savedstate"))
+                implementation(project(":lifecycle:lifecycle-viewmodel-testing"))
+                implementation(project(":lifecycle:lifecycle-runtime-testing"))
+            }
         }
 
         androidMain {
@@ -83,9 +87,7 @@ androidXMultiplatform {
                 // but it doesn't work in androidx.
                 // See aosp/1804059
                 implementation(project(":lifecycle:lifecycle-common-java8"))
-                implementation(project(":lifecycle:lifecycle-viewmodel-savedstate"))
                 implementation(project(":activity:activity-compose"))
-                implementation(project(":lifecycle:lifecycle-runtime-testing"))
             }
         }
     }
