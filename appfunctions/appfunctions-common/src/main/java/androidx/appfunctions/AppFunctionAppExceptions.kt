@@ -18,6 +18,22 @@ package androidx.appfunctions
 
 import android.os.Bundle
 import androidx.appfunctions.AppFunctionException.Companion.ERROR_CATEGORY_APP
+import androidx.core.util.Preconditions
+
+/**
+ * Thrown when an error is caused by the app providing the function.
+ *
+ * <p>For example, the app crashed when the system is executing the request.
+ *
+ * <p>Reports errors of the category [ERROR_CATEGORY_APP].
+ */
+public abstract class AppFunctionAppException
+internal constructor(errorCode: Int, errorMessage: String? = null, extras: Bundle) :
+    AppFunctionException(errorCode, errorMessage, extras) {
+    init {
+        Preconditions.checkArgument(errorCategory == ERROR_CATEGORY_APP)
+    }
+}
 
 /**
  * Thrown when an unknown error occurred while processing the call in the AppFunctionService.
@@ -29,7 +45,7 @@ import androidx.appfunctions.AppFunctionException.Companion.ERROR_CATEGORY_APP
  */
 public class AppFunctionAppUnknownException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
-    AppFunctionException(ERROR_APP_UNKNOWN_ERROR, errorMessage, extras) {
+    AppFunctionAppException(ERROR_APP_UNKNOWN_ERROR, errorMessage, extras) {
 
     public constructor(errorMessage: String? = null) : this(errorMessage, Bundle.EMPTY)
 }
@@ -48,7 +64,7 @@ internal constructor(errorMessage: String? = null, extras: Bundle) :
  */
 public class AppFunctionPermissionRequiredException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
-    AppFunctionException(ERROR_PERMISSION_REQUIRED, errorMessage, extras) {
+    AppFunctionAppException(ERROR_PERMISSION_REQUIRED, errorMessage, extras) {
 
     public constructor(errorMessage: String? = null) : this(errorMessage, Bundle.EMPTY)
 }
@@ -63,7 +79,7 @@ internal constructor(errorMessage: String? = null, extras: Bundle) :
  */
 public class AppFunctionNotSupportedException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
-    AppFunctionException(ERROR_NOT_SUPPORTED, errorMessage, extras) {
+    AppFunctionAppException(ERROR_NOT_SUPPORTED, errorMessage, extras) {
 
     public constructor(errorMessage: String? = null) : this(errorMessage, Bundle.EMPTY)
 }
