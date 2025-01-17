@@ -222,6 +222,24 @@ final class <#A: kotlin/Any?> androidx.room/EntityUpsertAdapter { // androidx.ro
     final object Companion // androidx.room/EntityUpsertAdapter.Companion|null[0]
 }
 
+final class androidx.room.concurrent/AtomicBoolean { // androidx.room.concurrent/AtomicBoolean|null[0]
+    constructor <init>(kotlin/Boolean) // androidx.room.concurrent/AtomicBoolean.<init>|<init>(kotlin.Boolean){}[0]
+
+    final fun compareAndSet(kotlin/Boolean, kotlin/Boolean): kotlin/Boolean // androidx.room.concurrent/AtomicBoolean.compareAndSet|compareAndSet(kotlin.Boolean;kotlin.Boolean){}[0]
+    final fun get(): kotlin/Boolean // androidx.room.concurrent/AtomicBoolean.get|get(){}[0]
+}
+
+final class androidx.room.concurrent/AtomicInt { // androidx.room.concurrent/AtomicInt|null[0]
+    constructor <init>(kotlin/Int) // androidx.room.concurrent/AtomicInt.<init>|<init>(kotlin.Int){}[0]
+
+    final fun compareAndSet(kotlin/Int, kotlin/Int): kotlin/Boolean // androidx.room.concurrent/AtomicInt.compareAndSet|compareAndSet(kotlin.Int;kotlin.Int){}[0]
+    final fun decrementAndGet(): kotlin/Int // androidx.room.concurrent/AtomicInt.decrementAndGet|decrementAndGet(){}[0]
+    final fun get(): kotlin/Int // androidx.room.concurrent/AtomicInt.get|get(){}[0]
+    final fun getAndIncrement(): kotlin/Int // androidx.room.concurrent/AtomicInt.getAndIncrement|getAndIncrement(){}[0]
+    final fun incrementAndGet(): kotlin/Int // androidx.room.concurrent/AtomicInt.incrementAndGet|incrementAndGet(){}[0]
+    final fun set(kotlin/Int) // androidx.room.concurrent/AtomicInt.set|set(kotlin.Int){}[0]
+}
+
 final class androidx.room.util/ByteArrayWrapper { // androidx.room.util/ByteArrayWrapper|null[0]
     constructor <init>(kotlin/ByteArray) // androidx.room.util/ByteArrayWrapper.<init>|<init>(kotlin.ByteArray){}[0]
 

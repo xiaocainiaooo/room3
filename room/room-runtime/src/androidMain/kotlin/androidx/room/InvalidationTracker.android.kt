@@ -21,12 +21,12 @@ import androidx.annotation.RestrictTo
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.room.InvalidationTracker.Observer
+import androidx.room.concurrent.ReentrantLock
+import androidx.room.concurrent.withLock
 import androidx.room.support.AutoCloser
 import androidx.sqlite.SQLiteConnection
 import java.lang.ref.WeakReference
 import java.util.concurrent.Callable
-import kotlinx.atomicfu.locks.reentrantLock
-import kotlinx.atomicfu.locks.withLock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.runBlocking
@@ -65,7 +65,7 @@ actual constructor(
         )
 
     private val observerMap = mutableMapOf<Observer, ObserverWrapper>()
-    private val observerMapLock = reentrantLock()
+    private val observerMapLock = ReentrantLock()
 
     private var autoCloser: AutoCloser? = null
 
