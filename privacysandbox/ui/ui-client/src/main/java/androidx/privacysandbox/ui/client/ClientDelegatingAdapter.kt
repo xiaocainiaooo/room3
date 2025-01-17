@@ -21,13 +21,13 @@ import android.os.Bundle
 import android.os.IBinder
 import androidx.annotation.GuardedBy
 import androidx.core.util.Consumer
-import androidx.privacysandbox.ui.client.RemoteCallManager.tryToCallRemoteObject
 import androidx.privacysandbox.ui.client.SandboxedUiAdapterFactory.createFromCoreLibInfo
 import androidx.privacysandbox.ui.client.view.RefreshableSessionClient
 import androidx.privacysandbox.ui.core.IDelegateChangeListener
 import androidx.privacysandbox.ui.core.IDelegatingSandboxedUiAdapter
 import androidx.privacysandbox.ui.core.IDelegatorCallback
 import androidx.privacysandbox.ui.core.ISessionRefreshCallback
+import androidx.privacysandbox.ui.core.RemoteCallManager.tryToCallRemoteObject
 import androidx.privacysandbox.ui.core.SandboxedUiAdapter
 import java.util.concurrent.Executor
 import kotlin.coroutines.resume
