@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
@@ -180,9 +179,7 @@ fun TestIcon(modifier: Modifier = Modifier, iconLabel: String = "TestIcon") {
 
 @Composable
 fun CenteredText(text: String) {
-    Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
-        Text(text)
-    }
+    Column(verticalArrangement = Arrangement.Center) { Text(text) }
 }
 
 fun ComposeContentTestRule.setContentWithThemeForSizeAssertions(

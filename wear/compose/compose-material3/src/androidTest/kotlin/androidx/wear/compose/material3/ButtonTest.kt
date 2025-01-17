@@ -18,16 +18,22 @@ package androidx.wear.compose.material3
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.assertContainsColor
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
@@ -358,6 +364,50 @@ class ButtonTest {
                 )
             }
             .assertHeightIsAtLeast(minHeight)
+    }
+
+    @Test
+    fun button_animate_content_size_animates_height() {
+        val boxHeight = mutableStateOf(60.dp)
+        val frames = 14
+        val animationMillis = frames * 16
+        val buttonPadding = ButtonDefaults.ButtonVerticalPadding
+
+        rule.setContentWithTheme {
+            Button(onClick = {}, modifier = Modifier.testTag(TEST_TAG).fillMaxWidth()) {
+                Box(
+                    modifier =
+                        Modifier.animateContentSize(
+                                animationSpec = tween(animationMillis, easing = LinearEasing)
+                            )
+                            .fillMaxWidth()
+                            .requiredHeight(boxHeight.value)
+                ) {}
+            }
+        }
+        // Verify initial height
+        rule.onNodeWithTag(TEST_TAG).assertHeightIsEqualTo(60.dp + buttonPadding * 2)
+
+        // Set autoAdvance off to test the content size animation
+        rule.mainClock.autoAdvance = false
+        boxHeight.value = 100.dp
+        // Advance to the actual start of the animation
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+
+        // Advance to middle of animation
+        rule.mainClock.advanceTimeBy(animationMillis / 2L)
+        rule.waitForIdle()
+        // Verify that the animation is halfway finished
+        rule
+            .onNodeWithTag(TEST_TAG)
+            .assertHeightIsEqualTo(80.dp + buttonPadding * 2, tolerance = 2.dp)
+
+        // Set autoAdvance back on to finish the animation
+        rule.mainClock.autoAdvance = true
+        rule.waitForIdle()
+        // Verify end height is correct
+        rule.onNodeWithTag(TEST_TAG).assertHeightIsEqualTo(100.dp + buttonPadding * 2)
     }
 
     @Test
