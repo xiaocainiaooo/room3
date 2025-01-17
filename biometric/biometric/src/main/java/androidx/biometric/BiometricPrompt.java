@@ -168,9 +168,25 @@ public class BiometricPrompt {
     public static final int ERROR_SECURITY_UPDATE_REQUIRED = 15;
 
     /**
-     * The user pressed the more options button on prompt content.
+     * Identity Check is currently not active.
+     *
+     * This device either doesn't have this feature enabled, or it's not considered in a
+     * high-risk environment that requires extra security measures for accessing sensitive data.
      */
-    public static final int ERROR_MORE_OPTIONS_BUTTON = 16;
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static final int ERROR_IDENTITY_CHECK_NOT_ACTIVE = 20;
+
+    /**
+     * Biometrics is not allowed to verify the user in apps.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static final int ERROR_NOT_ENABLED_FOR_APPS = 21;
+
+    /**
+     * The user pressed the more options button on {@link PromptContentViewWithMoreOptionsButton}
+     * set by {@link PromptInfo.Builder#setContentView}
+     */
+    public static final int ERROR_CONTENT_VIEW_MORE_OPTIONS_BUTTON = 22;
 
     /**
      * An error code that may be returned during authentication.
@@ -189,7 +205,9 @@ public class BiometricPrompt {
         ERROR_HW_NOT_PRESENT,
         ERROR_NEGATIVE_BUTTON,
         ERROR_NO_DEVICE_CREDENTIAL,
-        ERROR_MORE_OPTIONS_BUTTON
+        ERROR_IDENTITY_CHECK_NOT_ACTIVE,
+        ERROR_NOT_ENABLED_FOR_APPS,
+        ERROR_CONTENT_VIEW_MORE_OPTIONS_BUTTON
     })
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     @Retention(RetentionPolicy.SOURCE)
