@@ -102,6 +102,8 @@ public fun <T : Any> NavDisplay(
     onBack: () -> Unit = { if (backstack is MutableList) backstack.removeAt(backstack.size - 1) },
     recordProvider: (key: T) -> NavRecord<out T>
 ) {
+    require(backstack.isNotEmpty()) { "NavDisplay backstack cannot be empty" }
+
     BackHandler(backstack.size > 1, onBack)
     wrapperManager.PrepareBackStack(backStack = backstack)
     val key = backstack.last()
