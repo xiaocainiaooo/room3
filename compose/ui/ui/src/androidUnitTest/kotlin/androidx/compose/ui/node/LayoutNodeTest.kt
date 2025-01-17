@@ -2542,11 +2542,7 @@ internal class MockOwner(
         }
     }
 
-    var semanticsChanged: Boolean = false
-
-    override fun onSemanticsChange() {
-        semanticsChanged = true
-    }
+    override fun onSemanticsChange() {}
 
     override fun onLayoutChange(layoutNode: LayoutNode) {
         layoutChangeCount++
