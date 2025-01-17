@@ -23,7 +23,7 @@ import androidx.compose.runtime.Composable
  * integrated with a [NavDisplay](reference/androidx/navigation/NavDisplay).
  *
  * Information can be provided to the entire back stack via [NavLocalProvider.ProvideToBackStack] or
- * to a single record via [NavLocalProvider.ProvideToRecord].
+ * to a single entry via [NavLocalProvider.ProvideToEntry].
  */
 public interface NavLocalProvider {
 
@@ -35,10 +35,10 @@ public interface NavLocalProvider {
     @Composable public fun ProvideToBackStack(backStack: List<Any>): Unit = Unit
 
     /**
-     * Allows a [NavLocalProvider] to provide information to a single record.
+     * Allows a [NavLocalProvider] to provide information to a single entry.
      *
      * This function is called by the [NavDisplay](reference/androidx/navigation/NavDisplay) and
      * should not be called directly.
      */
-    @Composable public fun <T : Any> ProvideToRecord(record: NavRecord<T>)
+    @Composable public fun <T : Any> ProvideToEntry(entry: NavEntry<T>)
 }

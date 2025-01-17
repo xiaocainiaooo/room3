@@ -33,29 +33,29 @@ import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 import androidx.savedstate.savedState
 
 /**
- * Provides the content of a [NavRecord] with a [SavedStateRegistryOwner] and provides that
+ * Provides the content of a [NavEntry] with a [SavedStateRegistryOwner] and provides that
  * [SavedStateRegistryOwner] as a [LocalSavedStateRegistryOwner] so that it is available within the
  * content.
  */
 public object SavedStateNavLocalProvider : NavLocalProvider {
 
     @Composable
-    override fun <T : Any> ProvideToRecord(record: NavRecord<T>) {
-        val key = record.key
+    override fun <T : Any> ProvideToEntry(entry: NavEntry<T>) {
+        val key = entry.key
         val childRegistry by
             rememberSaveable(
                 key,
                 stateSaver =
                     Saver(
                         save = { it.savedState },
-                        restore = { RecordSavedStateRegistry().apply { savedState = it } }
+                        restore = { EntrySavedStateRegistry().apply { savedState = it } }
                     )
             ) {
-                mutableStateOf(RecordSavedStateRegistry())
+                mutableStateOf(EntrySavedStateRegistry())
             }
 
         CompositionLocalProvider(LocalSavedStateRegistryOwner provides childRegistry) {
-            record.content.invoke(key)
+            entry.content.invoke(key)
         }
 
         DisposableEffect(key1 = key) {
@@ -70,7 +70,7 @@ public object SavedStateNavLocalProvider : NavLocalProvider {
     }
 }
 
-private class RecordSavedStateRegistry : SavedStateRegistryOwner {
+private class EntrySavedStateRegistry : SavedStateRegistryOwner {
     override val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
     val savedStateRegistryController = SavedStateRegistryController.create(this)
     override val savedStateRegistry: SavedStateRegistry =

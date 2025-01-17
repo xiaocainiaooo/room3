@@ -19,14 +19,14 @@ package androidx.navigation3
 import androidx.compose.runtime.Composable
 
 /**
- * Record maintains the store the key and the content represented by that key. Records should be
- * created as part of a [NavDisplay.recordProvider](reference/androidx/navigation/NavDisplay).
+ * Entry maintains and stores the key and the content represented by that key. Entries should be
+ * created as part of a [NavDisplay.entryProvider](reference/androidx/navigation/NavDisplay).
  *
- * @param key key for this record
+ * @param key key for this entry
  * @param featureMap map of the available features from a display
- * @param content content for this record to be displayed when this record is active
+ * @param content content for this entry to be displayed when this entry is active
  */
-public class NavRecord<T : Any>(
+public class NavEntry<T : Any>(
     public val key: T,
     public val featureMap: Map<String, Any> = emptyMap(),
     public val content: @Composable (T) -> Unit,
