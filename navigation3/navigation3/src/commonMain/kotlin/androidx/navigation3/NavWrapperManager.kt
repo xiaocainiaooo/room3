@@ -55,22 +55,18 @@ public class NavWrapperManager(navLocalProviders: List<NavLocalProvider> = empty
     }
 
     /**
-     * Calls the [NavLocalProvider.ProvideToRecord] functions on each wrapper.
+     * Calls the [NavLocalProvider.ProvideToEntry] functions on each wrapper.
      *
      * This function is called by the [NavDisplay](reference/androidx/navigation/NavDisplay) and
      * should not be called directly.
      */
     @Composable
-    public fun <T : Any> ContentForRecord(record: NavRecord<T>) {
-        val key = record.key
+    public fun <T : Any> ContentForEntry(entry: NavEntry<T>) {
+        val key = entry.key
         finalWrappers
             .distinct()
-            .foldRight(record.content) { wrapper, contentLambda ->
-                {
-                    wrapper.ProvideToRecord(
-                        NavRecord(key, record.featureMap, content = contentLambda)
-                    )
-                }
+            .foldRight(entry.content) { wrapper, contentLambda ->
+                { wrapper.ProvideToEntry(NavEntry(key, entry.featureMap, content = contentLambda)) }
             }
             .invoke(key)
     }

@@ -26,7 +26,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.NavDisplay
-import androidx.navigation3.NavRecord
+import androidx.navigation3.NavEntry
 import androidx.navigation3.SavedStateNavLocalProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -45,34 +45,34 @@ class ViewModelStoreNavLocalProviderTest {
         val viewModelWrapper = ViewModelStoreNavLocalProvider
         lateinit var viewModel1: MyViewModel
         lateinit var viewModel2: MyViewModel
-        val record1Arg = "record1 Arg"
-        val record2Arg = "record2 Arg"
-        val record1 =
-            NavRecord("key1") {
+        val entry1Arg = "entry1 Arg"
+        val entry2Arg = "entry2 Arg"
+        val entry1 =
+            NavEntry("key1") {
                 viewModel1 = viewModel<MyViewModel>()
-                viewModel1.myArg = record1Arg
+                viewModel1.myArg = entry1Arg
             }
-        val record2 =
-            NavRecord("key2") {
+        val entry2 =
+            NavEntry("key2") {
                 viewModel2 = viewModel<MyViewModel>()
-                viewModel2.myArg = record2Arg
+                viewModel2.myArg = entry2Arg
             }
         composeTestRule.setContent {
-            savedStateWrapper.ProvideToRecord(
-                NavRecord(record1.key) { viewModelWrapper.ProvideToRecord(record1) }
+            savedStateWrapper.ProvideToEntry(
+                NavEntry(entry1.key) { viewModelWrapper.ProvideToEntry(entry1) }
             )
-            savedStateWrapper.ProvideToRecord(
-                NavRecord(record2.key) { viewModelWrapper.ProvideToRecord(record2) }
+            savedStateWrapper.ProvideToEntry(
+                NavEntry(entry2.key) { viewModelWrapper.ProvideToEntry(entry2) }
             )
         }
 
         composeTestRule.runOnIdle {
-            assertWithMessage("Incorrect arg for record 1")
+            assertWithMessage("Incorrect arg for entry 1")
                 .that(viewModel1.myArg)
-                .isEqualTo(record1Arg)
-            assertWithMessage("Incorrect arg for record 2")
+                .isEqualTo(entry1Arg)
+            assertWithMessage("Incorrect arg for entry 2")
                 .that(viewModel2.myArg)
-                .isEqualTo(record2Arg)
+                .isEqualTo(entry2Arg)
         }
     }
 
@@ -80,14 +80,14 @@ class ViewModelStoreNavLocalProviderTest {
     fun testViewModelNoSavedStateNavLocalProvider() {
         val viewModelWrapper = ViewModelStoreNavLocalProvider
         lateinit var viewModel1: MyViewModel
-        val record1Arg = "record1 Arg"
-        val record1 =
-            NavRecord("key1") {
+        val entry1Arg = "entry1 Arg"
+        val entry1 =
+            NavEntry("key1") {
                 viewModel1 = viewModel<MyViewModel>()
-                viewModel1.myArg = record1Arg
+                viewModel1.myArg = entry1Arg
             }
         try {
-            composeTestRule.setContent { viewModelWrapper.ProvideToRecord(record1) }
+            composeTestRule.setContent { viewModelWrapper.ProvideToEntry(entry1) }
         } catch (e: Exception) {
             assertThat(e)
                 .hasMessageThat()
@@ -112,10 +112,10 @@ class ViewModelStoreNavLocalProviderTest {
             ) { key ->
                 when (key) {
                     "Home" -> {
-                        NavRecord(key) { viewModel<HomeViewModel>() }
+                        NavEntry(key) { viewModel<HomeViewModel>() }
                     }
                     "AnotherScreen" -> {
-                        NavRecord(key) { viewModel<HomeViewModel>() }
+                        NavEntry(key) { viewModel<HomeViewModel>() }
                     }
                     else -> error("Unknown key: $key")
                 }
@@ -162,7 +162,7 @@ class ViewModelStoreNavLocalProviderTest {
             ) { key ->
                 when (key) {
                     "Home" -> {
-                        NavRecord(key) {
+                        NavEntry(key) {
                             viewModel =
                                 viewModel<SavedStateViewModel> {
                                     val handle = createSavedStateHandle()

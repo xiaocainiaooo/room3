@@ -24,7 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 
 /**
- * Wraps the content of a [NavRecord] with a [SaveableStateHolder.SaveableStateProvider] to ensure
+ * Wraps the content of a [NavEntry] with a [SaveableStateHolder.SaveableStateProvider] to ensure
  * that calls to [rememberSaveable] within the content work properly and that state can be saved.
  *
  * This [NavLocalProvider] is the only one that is **required** as saving state is considered a
@@ -67,8 +67,8 @@ public class SaveableStateNavLocalProvider : NavLocalProvider {
     }
 
     @Composable
-    public override fun <T : Any> ProvideToRecord(record: NavRecord<T>) {
-        val key = record.key
+    public override fun <T : Any> ProvideToEntry(entry: NavEntry<T>) {
+        val key = entry.key
         DisposableEffect(key1 = key) {
             refCount[key] = refCount.getOrDefault(key, 0).plus(1)
             onDispose {
@@ -94,6 +94,6 @@ public class SaveableStateNavLocalProvider : NavLocalProvider {
         }
 
         val id: Int = rememberSaveable(key) { key.hashCode() + backstackSize }
-        savedStateHolder?.SaveableStateProvider(id) { record.content.invoke(key) }
+        savedStateHolder?.SaveableStateProvider(id) { entry.content.invoke(key) }
     }
 }

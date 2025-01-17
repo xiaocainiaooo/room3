@@ -20,40 +20,40 @@ import androidx.kruth.assertThat
 import kotlin.test.Test
 import kotlin.test.fail
 
-class RecordProviderTest {
+class EntryProviderTest {
 
     @Test
-    fun recordProvider_withUniqueInitializers_returnsRecords() {
-        val provider = recordProvider {
-            record("first") {}
-            record("second") {}
+    fun entryProvider_withUniqueInitializers_returnsEntries() {
+        val provider = entryProvider {
+            entry("first") {}
+            entry("second") {}
         }
 
-        val record1 = provider.invoke("first")
-        val record2 = provider.invoke("second")
+        val entry1 = provider.invoke("first")
+        val entry2 = provider.invoke("second")
 
-        assertThat(record1.key).isEqualTo("first")
-        assertThat(record2.key).isEqualTo("second")
+        assertThat(entry1.key).isEqualTo("first")
+        assertThat(entry2.key).isEqualTo("second")
     }
 
     @Test
-    fun recordProvider_withDuplicatedInitializers_throwsException() {
+    fun entryProvider_withDuplicatedInitializers_throwsException() {
         try {
-            recordProvider {
-                record("first") {}
-                record("first") {}
+            entryProvider {
+                entry("first") {}
+                entry("first") {}
             }
             fail("Expected `IllegalArgumentException` but no exception has been throw.")
         } catch (e: IllegalArgumentException) {
             assertThat(e)
                 .hasMessageThat()
-                .isEqualTo("A `record` with the key `key` has already been added: first.")
+                .isEqualTo("An `entry` with the key `key` has already been added: first.")
         }
     }
 
     @Test
-    fun recordProvider_noInitializers_getsInvalidRecord() {
-        val provider = recordProvider {}
+    fun entryProvider_noInitializers_getsInvalidEntry() {
+        val provider = entryProvider {}
         try {
             provider.invoke("something")
             fail("Expected `IllegalStateException` but no exception has been throw.")

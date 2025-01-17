@@ -49,8 +49,8 @@ class AnimatedTest {
             backstack = remember { mutableStateListOf(first) }
             NavDisplay(backstack) {
                 when (it) {
-                    first -> NavRecord(first) { Text(first) }
-                    second -> NavRecord(second) { Text(second) }
+                    first -> NavEntry(first) { Text(first) }
+                    second -> NavEntry(second) { Text(second) }
                     else -> error("Invalid key passed")
                 }
             }
@@ -93,13 +93,13 @@ class AnimatedTest {
             NavDisplay(backstack) {
                 when (it) {
                     first ->
-                        NavRecord(
+                        NavEntry(
                             first,
                         ) {
                             Text(first)
                         }
                     second ->
-                        NavRecord(
+                        NavEntry(
                             second,
                             featureMap =
                                 NavDisplay.transition(
