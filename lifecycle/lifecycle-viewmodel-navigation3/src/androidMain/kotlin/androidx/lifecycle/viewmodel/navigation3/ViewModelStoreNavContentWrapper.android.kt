@@ -35,44 +35,44 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.NavEntry
 import androidx.navigation3.NavLocalProvider
-import androidx.navigation3.NavRecord
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 
 /**
- * Provides the content of a [NavRecord] with a [ViewModelStoreOwner] and provides that
+ * Provides the content of a [NavEntry] with a [ViewModelStoreOwner] and provides that
  * [ViewModelStoreOwner] as a [LocalViewModelStoreOwner] so that it is available within the content.
  *
- * This requires that usage of the [SavedStateNavLocalProvider] to ensure that the [NavRecord]
- * scoped [ViewModel]s can properly provide access to [SavedStateHandle]s
+ * This requires that usage of the [SavedStateNavLocalProvider] to ensure that the [NavEntry] scoped
+ * [ViewModel]s can properly provide access to [SavedStateHandle]s
  */
 public object ViewModelStoreNavLocalProvider : NavLocalProvider {
 
     @Composable
     override fun ProvideToBackStack(backStack: List<Any>) {
-        val recordViewModelStoreProvider = viewModel { RecordViewModel() }
-        recordViewModelStoreProvider.ownerInBackStack.clear()
-        recordViewModelStoreProvider.ownerInBackStack.addAll(backStack)
+        val entryViewModelStoreProvider = viewModel { EntryViewModel() }
+        entryViewModelStoreProvider.ownerInBackStack.clear()
+        entryViewModelStoreProvider.ownerInBackStack.addAll(backStack)
     }
 
     @Composable
-    override fun <T : Any> ProvideToRecord(record: NavRecord<T>) {
-        val key = record.key
-        val recordViewModelStoreProvider = viewModel { RecordViewModel() }
-        val viewModelStore = recordViewModelStoreProvider.viewModelStoreForKey(key)
+    override fun <T : Any> ProvideToEntry(entry: NavEntry<T>) {
+        val key = entry.key
+        val entryViewModelStoreProvider = viewModel { EntryViewModel() }
+        val viewModelStore = entryViewModelStoreProvider.viewModelStoreForKey(key)
         // This ensures we always keep viewModels on config changes.
         val activity = LocalActivity.current
         remember(key, viewModelStore) {
             object : RememberObserver {
                 override fun onAbandoned() {
-                    if (!recordViewModelStoreProvider.ownerInBackStack.contains(key)) {
+                    if (!entryViewModelStoreProvider.ownerInBackStack.contains(key)) {
                         disposeIfNotChangingConfiguration()
                     }
                 }
 
                 override fun onForgotten() {
-                    if (!recordViewModelStoreProvider.ownerInBackStack.contains(key)) {
+                    if (!entryViewModelStoreProvider.ownerInBackStack.contains(key)) {
                         disposeIfNotChangingConfiguration()
                     }
                 }
@@ -81,7 +81,7 @@ public object ViewModelStoreNavLocalProvider : NavLocalProvider {
 
                 fun disposeIfNotChangingConfiguration() {
                     if (activity?.isChangingConfigurations != true) {
-                        recordViewModelStoreProvider.removeViewModelStoreOwnerForKey(key)?.clear()
+                        entryViewModelStoreProvider.removeViewModelStoreOwnerForKey(key)?.clear()
                     }
                 }
             }
@@ -118,12 +118,12 @@ public object ViewModelStoreNavLocalProvider : NavLocalProvider {
                     }
                 }
         ) {
-            record.content.invoke(key)
+            entry.content.invoke(key)
         }
     }
 }
 
-private class RecordViewModel : ViewModel() {
+private class EntryViewModel : ViewModel() {
     private val owners = mutableMapOf<Any, ViewModelStore>()
     val ownerInBackStack = mutableListOf<Any>()
 
