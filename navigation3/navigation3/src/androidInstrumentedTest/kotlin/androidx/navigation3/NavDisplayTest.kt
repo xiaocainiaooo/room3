@@ -34,6 +34,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertWithMessage
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
 import org.junit.Rule
 import org.junit.runner.RunWith
 
@@ -237,6 +238,43 @@ class NavDisplayTest {
 
         assertThat(backStack3).containsExactly(third, forth)
         assertThat(composeTestRule.onNodeWithText(forth).isDisplayed()).isTrue()
+    }
+
+    @Test
+    fun testInitEmptyBackstackThrows() {
+        lateinit var backstack: MutableList<Any>
+        val fail =
+            assertFailsWith<IllegalArgumentException> {
+                composeTestRule.setContent {
+                    backstack = remember { mutableStateListOf() }
+                    NavDisplay(backstack = backstack) { NavRecord(first) {} }
+                }
+            }
+        assertThat(fail.message).isEqualTo("NavDisplay backstack cannot be empty")
+    }
+
+    @Test
+    fun testPopToEmptyBackstackThrows() {
+        lateinit var backstack: MutableList<Any>
+        composeTestRule.setContent {
+            backstack = remember { mutableStateListOf(first) }
+            NavDisplay(backstack = backstack) {
+                when (it) {
+                    first -> NavRecord(first) { Text(first) }
+                    second -> NavRecord(second) { Text(second) }
+                    else -> error("Invalid key passed")
+                }
+            }
+        }
+
+        assertThat(composeTestRule.onNodeWithText(first).isDisplayed()).isTrue()
+
+        val fail =
+            assertFailsWith<IllegalArgumentException> {
+                composeTestRule.runOnIdle { backstack.clear() }
+                composeTestRule.waitForIdle()
+            }
+        assertThat(fail.message).isEqualTo("NavDisplay backstack cannot be empty")
     }
 }
 
