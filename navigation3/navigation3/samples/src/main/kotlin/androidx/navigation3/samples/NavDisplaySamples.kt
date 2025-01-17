@@ -23,13 +23,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavContentWrapper
+import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavLocalProvider
 import androidx.navigation3.NavDisplay
 import androidx.navigation3.NavRecord
-import androidx.navigation3.SavedStateNavContentWrapper
+import androidx.navigation3.SavedStateNavLocalProvider
 import androidx.navigation3.record
 import androidx.navigation3.recordProvider
-import androidx.navigation3.rememberNavWrapperManager
 
 class ProfileViewModel : ViewModel() {
     val name = "no user"
@@ -39,13 +38,9 @@ class ProfileViewModel : ViewModel() {
 @Composable
 fun BaseNav() {
     val backStack = rememberMutableStateListOf(Profile)
-    val manager =
-        rememberNavWrapperManager(
-            listOf(SavedStateNavContentWrapper, ViewModelStoreNavContentWrapper)
-        )
     NavDisplay(
         backstack = backStack,
-        wrapperManager = manager,
+        localProviders = listOf(SavedStateNavLocalProvider, ViewModelStoreNavLocalProvider),
         onBack = { backStack.removeLast() },
         recordProvider =
             recordProvider({ NavRecord(Unit) { Text(text = "Invalid Key") } }) {

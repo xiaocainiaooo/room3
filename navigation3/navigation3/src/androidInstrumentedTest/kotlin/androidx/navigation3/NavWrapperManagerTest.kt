@@ -35,14 +35,14 @@ class NavWrapperManagerTest {
         var calledWrapBackStack = false
         var calledWrapContent = false
         val wrapper =
-            object : NavContentWrapper {
+            object : NavLocalProvider {
                 @Composable
-                override fun WrapBackStack(backStack: List<Any>) {
+                override fun ProvideToBackStack(backStack: List<Any>) {
                     calledWrapBackStack = true
                 }
 
                 @Composable
-                override fun <T : Any> WrapContent(record: NavRecord<T>) {
+                override fun <T : Any> ProvideToRecord(record: NavRecord<T>) {
                     calledWrapContent = true
                 }
             }
@@ -63,14 +63,14 @@ class NavWrapperManagerTest {
         var calledWrapBackStackCount = 0
         var calledWrapContentCount = 0
         val wrapper =
-            object : NavContentWrapper {
+            object : NavLocalProvider {
                 @Composable
-                override fun WrapBackStack(backStack: List<Any>) {
+                override fun ProvideToBackStack(backStack: List<Any>) {
                     calledWrapBackStackCount++
                 }
 
                 @Composable
-                override fun <T : Any> WrapContent(record: NavRecord<T>) {
+                override fun <T : Any> ProvideToRecord(record: NavRecord<T>) {
                     calledWrapContentCount++
                 }
             }

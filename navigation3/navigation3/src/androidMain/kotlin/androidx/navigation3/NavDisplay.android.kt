@@ -64,7 +64,7 @@ public object NavDisplay {
  * the second to last key is a displayed in the background.
  *
  * @param backstack the collection of keys that represents the state that needs to be handled
- * @param wrapperManager the manager that combines all of the [NavContentWrapper]s
+ * @param localProviders list of [NavLocalProvider] to add information to the provided records
  * @param modifier the modifier to be applied to the layout.
  * @param contentAlignment The [Alignment] of the [AnimatedContent]
  *     * @param enterTransition Default [EnterTransition] for all [NavRecord]s. Can be overridden
@@ -82,7 +82,7 @@ public object NavDisplay {
 public fun <T : Any> NavDisplay(
     backstack: List<T>,
     modifier: Modifier = Modifier,
-    wrapperManager: NavWrapperManager = rememberNavWrapperManager(emptyList()),
+    localProviders: List<NavLocalProvider> = emptyList(),
     contentAlignment: Alignment = Alignment.TopStart,
     sizeTransform: SizeTransform? = null,
     enterTransition: EnterTransition =
@@ -104,6 +104,7 @@ public fun <T : Any> NavDisplay(
 ) {
     require(backstack.isNotEmpty()) { "NavDisplay backstack cannot be empty" }
 
+    val wrapperManager: NavWrapperManager = rememberNavWrapperManager(localProviders)
     BackHandler(backstack.size > 1, onBack)
     wrapperManager.PrepareBackStack(backStack = backstack)
     val key = backstack.last()
