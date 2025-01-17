@@ -432,10 +432,11 @@ public class Transition implements TypedValues {
      * Converts from xy drag to progress
      * This should be used till touch up
      *
-     * @param baseW parent width
-     * @param baseH parent height
-     * @param dx    change in x
-     * @param dy    change in y
+     * @param currentProgress 0...1 progress in
+     * @param baseW           parent width
+     * @param baseH           parent height
+     * @param dx              change in x
+     * @param dy              change in y
      * @return the change in progress
      */
     public float dragToProgress(float currentProgress, int baseW, int baseH, float dx, float dy) {
