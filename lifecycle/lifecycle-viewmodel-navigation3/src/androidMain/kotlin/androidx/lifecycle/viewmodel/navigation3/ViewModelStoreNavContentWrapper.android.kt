@@ -35,7 +35,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation3.NavContentWrapper
+import androidx.navigation3.NavLocalProvider
 import androidx.navigation3.NavRecord
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.compose.LocalSavedStateRegistryOwner
@@ -44,20 +44,20 @@ import androidx.savedstate.compose.LocalSavedStateRegistryOwner
  * Provides the content of a [NavRecord] with a [ViewModelStoreOwner] and provides that
  * [ViewModelStoreOwner] as a [LocalViewModelStoreOwner] so that it is available within the content.
  *
- * This requires that usage of the [SavedStateNavContentWrapper] to ensure that the [NavRecord]
+ * This requires that usage of the [SavedStateNavLocalProvider] to ensure that the [NavRecord]
  * scoped [ViewModel]s can properly provide access to [SavedStateHandle]s
  */
-public object ViewModelStoreNavContentWrapper : NavContentWrapper {
+public object ViewModelStoreNavLocalProvider : NavLocalProvider {
 
     @Composable
-    override fun WrapBackStack(backStack: List<Any>) {
+    override fun ProvideToBackStack(backStack: List<Any>) {
         val recordViewModelStoreProvider = viewModel { RecordViewModel() }
         recordViewModelStoreProvider.ownerInBackStack.clear()
         recordViewModelStoreProvider.ownerInBackStack.addAll(backStack)
     }
 
     @Composable
-    override fun <T : Any> WrapContent(record: NavRecord<T>) {
+    override fun <T : Any> ProvideToRecord(record: NavRecord<T>) {
         val key = record.key
         val recordViewModelStoreProvider = viewModel { RecordViewModel() }
         val viewModelStore = recordViewModelStoreProvider.viewModelStoreForKey(key)
@@ -110,8 +110,8 @@ public object ViewModelStoreNavContentWrapper : NavContentWrapper {
                     init {
                         require(this.lifecycle.currentState == Lifecycle.State.INITIALIZED) {
                             "The Lifecycle state is already beyond INITIALIZED. The " +
-                                "ViewModelStoreNavContentWrapper requires adding the " +
-                                "SavedStateNavContentWrapper to ensure support for " +
+                                "ViewModelStoreNavLocalProvider requires adding the " +
+                                "SavedStateNavLocalProvider to ensure support for " +
                                 "SavedStateHandles."
                         }
                         enableSavedStateHandles()

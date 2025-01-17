@@ -27,16 +27,16 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
  * Wraps the content of a [NavRecord] with a [SaveableStateHolder.SaveableStateProvider] to ensure
  * that calls to [rememberSaveable] within the content work properly and that state can be saved.
  *
- * This [NavContentWrapper] is the only one that is **required** as saving state is considered a
+ * This [NavLocalProvider] is the only one that is **required** as saving state is considered a
  * non-optional feature.
  */
-public class SaveableStateNavContentWrapper : NavContentWrapper {
+public class SaveableStateNavLocalProvider : NavLocalProvider {
     private var savedStateHolder: SaveableStateHolder? = null
     private val refCount: MutableObjectIntMap<Any> = MutableObjectIntMap()
     private var backstackSize = 0
 
     @Composable
-    override fun WrapBackStack(backStack: List<Any>) {
+    override fun ProvideToBackStack(backStack: List<Any>) {
         DisposableEffect(key1 = backStack) {
             refCount.clear()
             onDispose {}
@@ -56,7 +56,7 @@ public class SaveableStateNavContentWrapper : NavContentWrapper {
                                 .getOrElse(key) {
                                     error(
                                         "Attempting to incorrectly dispose of backstack state in " +
-                                            "SaveableStateNavContentWrapper"
+                                            "SaveableStateNavLocalProvider"
                                     )
                                 }
                                 .minus(1)
@@ -67,7 +67,7 @@ public class SaveableStateNavContentWrapper : NavContentWrapper {
     }
 
     @Composable
-    public override fun <T : Any> WrapContent(record: NavRecord<T>) {
+    public override fun <T : Any> ProvideToRecord(record: NavRecord<T>) {
         val key = record.key
         DisposableEffect(key1 = key) {
             refCount[key] = refCount.getOrDefault(key, 0).plus(1)
@@ -85,7 +85,7 @@ public class SaveableStateNavContentWrapper : NavContentWrapper {
                             .getOrElse(key) {
                                 error(
                                     "Attempting to incorrectly dispose of state associated with " +
-                                        "key $key in SaveableStateNavContentWrapper"
+                                        "key $key in SaveableStateNavLocalProvider"
                                 )
                             }
                             .minus(1)

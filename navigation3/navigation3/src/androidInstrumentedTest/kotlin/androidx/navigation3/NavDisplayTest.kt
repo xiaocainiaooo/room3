@@ -166,8 +166,7 @@ class NavDisplayTest {
         composeTestRule.setContent {
             mainRegistry = LocalSavedStateRegistryOwner.current.savedStateRegistry
             backstack = remember { mutableStateListOf(first) }
-            val manager = rememberNavWrapperManager(listOf(SavedStateNavContentWrapper))
-            NavDisplay(backstack = backstack, wrapperManager = manager) {
+            NavDisplay(backstack = backstack, localProviders = listOf(SavedStateNavLocalProvider)) {
                 when (it) {
                     first ->
                         NavRecord(first) {
