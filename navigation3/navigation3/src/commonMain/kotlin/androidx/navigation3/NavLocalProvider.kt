@@ -22,23 +22,23 @@ import androidx.compose.runtime.Composable
  * Interface that offers the ability to provide information to some Composable content that is
  * integrated with a [NavDisplay](reference/androidx/navigation/NavDisplay).
  *
- * Information can be provided to the entire back stack via [NavContentWrapper.WrapBackStack] or to
- * a single record via [NavContentWrapper.WrapContent].
+ * Information can be provided to the entire back stack via [NavLocalProvider.ProvideToBackStack] or
+ * to a single record via [NavLocalProvider.ProvideToRecord].
  */
-public interface NavContentWrapper {
+public interface NavLocalProvider {
 
     /**
-     * Allows a [NavContentWrapper] to execute on the entire backstack.
+     * Allows a [NavLocalProvider] to provide to the entire backstack.
      *
      * This function is called by the [NavWrapperManager] and should not be called directly.
      */
-    @Composable public fun WrapBackStack(backStack: List<Any>): Unit = Unit
+    @Composable public fun ProvideToBackStack(backStack: List<Any>): Unit = Unit
 
     /**
-     * Allows a [NavContentWrapper] to provide information to the content of a single record.
+     * Allows a [NavLocalProvider] to provide information to a single record.
      *
      * This function is called by the [NavDisplay](reference/androidx/navigation/NavDisplay) and
      * should not be called directly.
      */
-    @Composable public fun <T : Any> WrapContent(record: NavRecord<T>)
+    @Composable public fun <T : Any> ProvideToRecord(record: NavRecord<T>)
 }

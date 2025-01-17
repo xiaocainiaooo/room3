@@ -1,11 +1,6 @@
 // Signature format: 4.0
 package androidx.navigation3 {
 
-  public interface NavContentWrapper {
-    method @androidx.compose.runtime.Composable public default void WrapBackStack(java.util.List<?> backStack);
-    method @androidx.compose.runtime.Composable public <T> void WrapContent(androidx.navigation3.NavRecord<T> record);
-  }
-
   public final class NavDisplay {
     method public java.util.Map<java.lang.String,java.lang.Object> isDialog(boolean boolean);
     method public java.util.Map<java.lang.String,java.lang.Object> transition(androidx.compose.animation.EnterTransition? enter, androidx.compose.animation.ExitTransition? exit);
@@ -13,7 +8,12 @@ package androidx.navigation3 {
   }
 
   public final class NavDisplay_androidKt {
-    method @androidx.compose.runtime.Composable public static <T> void NavDisplay(java.util.List<? extends T> backstack, optional androidx.compose.ui.Modifier modifier, optional androidx.navigation3.NavWrapperManager wrapperManager, optional androidx.compose.ui.Alignment contentAlignment, optional androidx.compose.animation.SizeTransform? sizeTransform, optional androidx.compose.animation.EnterTransition enterTransition, optional androidx.compose.animation.ExitTransition exitTransition, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavRecord<? extends T>> recordProvider);
+    method @androidx.compose.runtime.Composable public static <T> void NavDisplay(java.util.List<? extends T> backstack, optional androidx.compose.ui.Modifier modifier, optional java.util.List<? extends androidx.navigation3.NavLocalProvider> localProviders, optional androidx.compose.ui.Alignment contentAlignment, optional androidx.compose.animation.SizeTransform? sizeTransform, optional androidx.compose.animation.EnterTransition enterTransition, optional androidx.compose.animation.ExitTransition exitTransition, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavRecord<? extends T>> recordProvider);
+  }
+
+  public interface NavLocalProvider {
+    method @androidx.compose.runtime.Composable public default void ProvideToBackStack(java.util.List<?> backStack);
+    method @androidx.compose.runtime.Composable public <T> void ProvideToRecord(androidx.navigation3.NavRecord<T> record);
   }
 
   public final class NavRecord<T> {
@@ -28,13 +28,13 @@ package androidx.navigation3 {
 
   public final class NavWrapperManager {
     ctor public NavWrapperManager();
-    ctor public NavWrapperManager(optional java.util.List<? extends androidx.navigation3.NavContentWrapper> navContentWrappers);
+    ctor public NavWrapperManager(optional java.util.List<? extends androidx.navigation3.NavLocalProvider> navLocalProviders);
     method @androidx.compose.runtime.Composable public <T> void ContentForRecord(androidx.navigation3.NavRecord<T> record);
     method @androidx.compose.runtime.Composable public void PrepareBackStack(java.util.List<?> backStack);
   }
 
   public final class NavWrapperManagerKt {
-    method @androidx.compose.runtime.Composable public static androidx.navigation3.NavWrapperManager rememberNavWrapperManager(java.util.List<? extends androidx.navigation3.NavContentWrapper> navContentWrappers);
+    method @androidx.compose.runtime.Composable public static androidx.navigation3.NavWrapperManager rememberNavWrapperManager(java.util.List<? extends androidx.navigation3.NavLocalProvider> navLocalProviders);
   }
 
   public final class RecordClassProvider<T> {
@@ -81,14 +81,14 @@ package androidx.navigation3 {
     method public static inline kotlin.jvm.functions.Function1<java.lang.Object,androidx.navigation3.NavRecord<? extends java.lang.Object?>> recordProvider(optional kotlin.jvm.functions.Function1<java.lang.Object,? extends androidx.navigation3.NavRecord<? extends java.lang.Object?>> fallback, kotlin.jvm.functions.Function1<? super androidx.navigation3.RecordProviderBuilder,kotlin.Unit> builder);
   }
 
-  public final class SaveableStateNavContentWrapper implements androidx.navigation3.NavContentWrapper {
-    ctor public SaveableStateNavContentWrapper();
-    method @androidx.compose.runtime.Composable public <T> void WrapContent(androidx.navigation3.NavRecord<T> record);
+  public final class SaveableStateNavLocalProvider implements androidx.navigation3.NavLocalProvider {
+    ctor public SaveableStateNavLocalProvider();
+    method @androidx.compose.runtime.Composable public <T> void ProvideToRecord(androidx.navigation3.NavRecord<T> record);
   }
 
-  public final class SavedStateNavContentWrapper implements androidx.navigation3.NavContentWrapper {
-    method @androidx.compose.runtime.Composable public <T> void WrapContent(androidx.navigation3.NavRecord<T> record);
-    field public static final androidx.navigation3.SavedStateNavContentWrapper INSTANCE;
+  public final class SavedStateNavLocalProvider implements androidx.navigation3.NavLocalProvider {
+    method @androidx.compose.runtime.Composable public <T> void ProvideToRecord(androidx.navigation3.NavRecord<T> record);
+    field public static final androidx.navigation3.SavedStateNavLocalProvider INSTANCE;
   }
 
 }
