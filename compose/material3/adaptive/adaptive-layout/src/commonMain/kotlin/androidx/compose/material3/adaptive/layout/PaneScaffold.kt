@@ -17,7 +17,6 @@
 package androidx.compose.material3.adaptive.layout
 
 import androidx.annotation.FloatRange
-import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.Transition
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -125,24 +124,6 @@ sealed interface PaneScaffoldTransitionScope<Role, ScaffoldValue : PaneScaffoldV
      * behavior.
      */
     val motionDataProvider: PaneScaffoldMotionDataProvider<Role>
-
-    /**
-     * A convenient function to get the given [PaneMotion]'s [EnterTransition] under the context of
-     * the current [PaneScaffoldTransitionScope].
-     *
-     * @see [PaneMotion.enterTransition]
-     */
-    val PaneMotion.enterTransition
-        get() = with(this) { motionDataProvider.enterTransition }
-
-    /**
-     * A convenient function to get the given [PaneMotion]'s [EnterTransition] under the context of
-     * the current [PaneScaffoldTransitionScope].
-     *
-     * @see [PaneMotion.exitTransition]
-     */
-    val PaneMotion.exitTransition
-        get() = with(this) { motionDataProvider.exitTransition }
 }
 
 /**
