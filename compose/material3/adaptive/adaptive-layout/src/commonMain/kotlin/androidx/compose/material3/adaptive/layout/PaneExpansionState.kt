@@ -222,8 +222,14 @@ internal constructor(
             currentMeasuredDraggingOffset = coercedValue
         }
 
-    @VisibleForTesting
-    internal var currentAnchor
+    /**
+     * The current anchor that pane expansion has been settled or is settling to. Note that this
+     * field might be `null` if:
+     * 1. No anchors have been set to the state.
+     * 2. Pane expansion is set directly via [setFirstPaneWidth] or set [setFirstPaneProportion].
+     * 3. Pane expansion is in its initial state without an initial anchor provided.
+     */
+    var currentAnchor
         get() = data.currentAnchorState
         private set(value) {
             data.currentAnchorState = value
@@ -335,6 +341,7 @@ internal constructor(
         data.firstPaneProportionState = Float.NaN
         data.currentDraggingOffsetState = Unspecified
         data.firstPaneWidthState = firstPaneWidth
+        currentAnchor = null
     }
 
     /**
@@ -351,6 +358,27 @@ internal constructor(
         data.firstPaneWidthState = Unspecified
         data.currentDraggingOffsetState = Unspecified
         data.firstPaneProportionState = firstPaneProportion
+        currentAnchor = null
+    }
+
+    /**
+     * Animate the pane expansion to the given [PaneExpansionAnchor]. Note that the given anchor
+     * must be one of the provided anchor when creating the state with [rememberPaneExpansionState];
+     * otherwise the function throws.
+     *
+     * @param anchor the anchor to animate to
+     * @param initialVelocity the initial velocity of the animation
+     */
+    suspend fun animateTo(anchor: PaneExpansionAnchor, initialVelocity: Float = 0F) {
+        require(Snapshot.withoutReadObservation { anchors.contains(anchor) }) {
+            "The provided $anchor is not in the anchor list!"
+        }
+        currentAnchor = anchor
+        measuredDensity?.apply {
+            val position =
+                Snapshot.withoutReadObservation { anchor.positionIn(maxExpansionWidth, this) }
+            animateToInternal(position, initialVelocity)
+        }
     }
 
     /**
@@ -426,27 +454,36 @@ internal constructor(
         }
 
         dragMutex.mutate(MutatePriority.PreventUserInput) {
-            isSettling = true
-            val leftVelocity = flingBehavior.run { dragScope.performFling(velocity) }
-            val anchorPosition =
-                measuredAnchorPositions.getPositionOfTheClosestAnchor(
-                    currentMeasuredDraggingOffset,
-                    leftVelocity
-                )
             try {
+                isSettling = true
+                val leftVelocity = flingBehavior.run { dragScope.performFling(velocity) }
+                val anchorPosition =
+                    measuredAnchorPositions.getPositionOfTheClosestAnchor(
+                        currentMeasuredDraggingOffset,
+                        leftVelocity
+                    )
                 currentAnchor = anchors[anchorPosition.index]
-                animate(
-                    currentMeasuredDraggingOffset.toFloat(),
-                    anchorPosition.position.toFloat(),
-                    leftVelocity,
-                    anchoringAnimationSpec,
-                ) { value, _ ->
-                    currentDraggingOffset = value.toInt()
-                }
+                animateToInternal(anchorPosition.position, leftVelocity)
             } finally {
-                currentDraggingOffset = anchorPosition.position
                 isSettling = false
             }
+        }
+    }
+
+    private suspend fun animateToInternal(offset: Int, initialVelocity: Float) {
+        try {
+            isSettling = true
+            animate(
+                currentMeasuredDraggingOffset.toFloat(),
+                offset.toFloat(),
+                initialVelocity,
+                anchoringAnimationSpec,
+            ) { value, _ ->
+                currentDraggingOffset = value.toInt()
+            }
+        } finally {
+            currentDraggingOffset = offset
+            isSettling = false
         }
     }
 
@@ -599,7 +636,7 @@ sealed class PaneExpansionAnchor {
                 getString(Strings.defaultPaneExpansionOffsetAnchorDescription, offset.value.toInt())
 
         override fun positionIn(totalSizePx: Int, density: Density) =
-            with(density) { offset.toPx() }.toInt().let { if (it < 0) totalSizePx + it else it }
+            with(density) { offset.roundToPx() }.let { if (it < 0) totalSizePx + it else it }
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
