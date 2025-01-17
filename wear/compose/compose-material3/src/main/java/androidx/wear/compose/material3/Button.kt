@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -1826,7 +1825,7 @@ constructor(
 
 @Composable
 private fun Modifier.buttonSizeModifier(): Modifier =
-    this.defaultMinSize(minHeight = ButtonDefaults.Height).height(IntrinsicSize.Min)
+    this.defaultMinSize(minHeight = ButtonDefaults.Height)
 
 @Composable
 private fun Modifier.compactButtonModifier(): Modifier =
@@ -1858,7 +1857,6 @@ private fun ButtonImpl(
         // want them to be able to fit their content
         modifier =
             modifier
-                .fillMaxHeight()
                 .width(intrinsicSize = IntrinsicSize.Max)
                 .container(colors.containerPainter(enabled = enabled), shape, border)
                 .combinedClickable(
