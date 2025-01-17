@@ -77,19 +77,6 @@ internal class AndroidAutofillManager(
         platformAutofillManager.cancel()
     }
 
-    // This will be used to request autofill when
-    // `AutofillManager.requestAutofillForActiveElement()` is called (e.g. from the text toolbar).
-    private var previouslyFocusedId = -1
-
-    override fun requestAutofillForActiveElement() {
-        if (previouslyFocusedId <= 0) return
-
-        rectManager.rects.withRect(previouslyFocusedId) { left, top, right, bottom ->
-            reusableRect.set(left, top, right, bottom)
-            platformAutofillManager.requestAutofill(view, previouslyFocusedId, reusableRect)
-        }
-    }
-
     override fun onFocusChanged(
         previous: FocusTargetModifierNode?,
         current: FocusTargetModifierNode?
@@ -105,7 +92,6 @@ internal class AndroidAutofillManager(
                 rectManager.rects.withRect(semanticsId) { l, t, r, b ->
                     platformAutofillManager.notifyViewEntered(view, semanticsId, Rect(l, t, r, b))
                 }
-                previouslyFocusedId = semanticsId
             }
         }
     }
@@ -138,7 +124,6 @@ internal class AndroidAutofillManager(
             val previousFocus = prevConfig?.getOrNull(SemanticsProperties.Focused)
             val currFocus = config?.getOrNull(SemanticsProperties.Focused)
             if (previousFocus != true && currFocus == true && config.isAutofillable()) {
-                previouslyFocusedId = semanticsId
                 rectManager.rects.withRect(semanticsId) { l, t, r, b ->
                     platformAutofillManager.notifyViewEntered(view, semanticsId, Rect(l, t, r, b))
                 }
@@ -235,6 +220,13 @@ internal class AndroidAutofillManager(
     // be needed by ContentCapture and Accessibility.
     private var currentlyDisplayedIDs = MutableIntSet()
     private var pendingChangesToDisplayedIds = false
+
+    internal fun requestAutofill(semanticsInfo: SemanticsInfo) {
+        rectManager.rects.withRect(semanticsInfo.semanticsId) { left, top, right, bottom ->
+            reusableRect.set(left, top, right, bottom)
+            platformAutofillManager.requestAutofill(view, semanticsInfo.semanticsId, reusableRect)
+        }
+    }
 
     internal fun onPostAttach(semanticsInfo: SemanticsInfo) {
         if (semanticsInfo.semanticsConfiguration?.isRelatedToAutoCommit() == true) {
