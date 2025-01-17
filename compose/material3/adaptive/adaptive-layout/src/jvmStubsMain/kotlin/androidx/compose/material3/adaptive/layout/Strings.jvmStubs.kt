@@ -39,7 +39,9 @@ internal actual value class Strings(val value: Int) {
             implementedInJetBrainsFork()
         actual val defaultPaneExpansionProportionAnchorDescription: Strings =
             implementedInJetBrainsFork()
-        actual val defaultPaneExpansionOffsetAnchorDescription: Strings =
+        actual val defaultPaneExpansionStartOffsetAnchorDescription: Strings =
+            implementedInJetBrainsFork()
+        actual val defaultPaneExpansionEndOffsetAnchorDescription: Strings =
             implementedInJetBrainsFork()
     }
 }

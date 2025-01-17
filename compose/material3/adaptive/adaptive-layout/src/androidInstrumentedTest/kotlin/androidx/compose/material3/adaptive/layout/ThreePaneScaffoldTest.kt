@@ -303,7 +303,7 @@ class ThreePaneScaffoldTest {
                     anchors =
                         listOf(
                             PaneExpansionAnchor.Proportion(0f),
-                            PaneExpansionAnchor.Offset(MockPaneExpansionMiddleAnchor)
+                            PaneExpansionAnchor.Offset.fromStart(MockPaneExpansionMiddleAnchor)
                         )
                 )
             mockDraggingPx = with(LocalDensity.current) { 200.dp.toPx() }
@@ -340,7 +340,7 @@ class ThreePaneScaffoldTest {
         rule.runOnIdle {
             scope.launch {
                 mockPaneExpansionState.animateTo(
-                    PaneExpansionAnchor.Offset(MockPaneExpansionMiddleAnchor)
+                    PaneExpansionAnchor.Offset.fromStart(MockPaneExpansionMiddleAnchor)
                 )
             }
         }
@@ -368,7 +368,7 @@ class ThreePaneScaffoldTest {
         rule.runOnIdle {
             scope.launch {
                 mockPaneExpansionState.animateTo(
-                    PaneExpansionAnchor.Offset(MockPaneExpansionMiddleAnchor),
+                    PaneExpansionAnchor.Offset.fromStart(MockPaneExpansionMiddleAnchor),
                     200F
                 )
             }
@@ -394,7 +394,7 @@ class ThreePaneScaffoldTest {
         rule.runOnIdle {
             scope.launch {
                 assertFailsWith<IllegalArgumentException> {
-                    mockPaneExpansionState.animateTo(PaneExpansionAnchor.Offset(10.dp))
+                    mockPaneExpansionState.animateTo(PaneExpansionAnchor.Offset.fromStart(10.dp))
                 }
             }
         }
@@ -411,7 +411,7 @@ private val MockPaneExpansionMiddleAnchor = 400.dp
 private val MockPaneExpansionAnchors =
     listOf(
         PaneExpansionAnchor.Proportion(0f),
-        PaneExpansionAnchor.Offset(MockPaneExpansionMiddleAnchor),
+        PaneExpansionAnchor.Offset.fromStart(MockPaneExpansionMiddleAnchor),
         PaneExpansionAnchor.Proportion(1f),
     )
 
