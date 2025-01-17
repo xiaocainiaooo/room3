@@ -245,6 +245,9 @@ internal interface Owner : PositionCalculator {
      */
     fun requestFocus(): Boolean
 
+    /** Ask the system to request autofill values to this owner. */
+    fun requestAutofill(node: LayoutNode)
+
     /**
      * Iterates through all LayoutNodes that have requested layout and measures and lays them out.
      * If [sendPointerUpdate] is `true` then a simulated PointerEvent may be sent to update pointer
