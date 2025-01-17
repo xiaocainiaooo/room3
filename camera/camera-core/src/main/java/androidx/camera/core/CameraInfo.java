@@ -429,10 +429,9 @@ public interface CameraInfo {
     /**
      * Returns the maximum torch strength level.
      *
-     * @return The maximum strength level. If the device doesn't support configuring torch
-     * strength, returns {@code 1}.
+     * @return The maximum strength level, or {code 1} if the device doesn't have a flash unit or
+     * doesn't support configuring torch strength.
      */
-    @RestrictTo(Scope.LIBRARY_GROUP)
     @IntRange(from = 1)
     default int getMaxTorchStrengthLevel() {
         return 1;
@@ -444,7 +443,6 @@ public interface CameraInfo {
      * <p>The value of the {@link LiveData} will be the default torch strength level of this
      * device if {@link CameraControl#setTorchStrengthLevelAsync(int)} hasn't been called.
      */
-    @RestrictTo(Scope.LIBRARY_GROUP)
     default @NonNull LiveData<Integer> getTorchStrengthLevel() {
         return new MutableLiveData<>(1);
     }
