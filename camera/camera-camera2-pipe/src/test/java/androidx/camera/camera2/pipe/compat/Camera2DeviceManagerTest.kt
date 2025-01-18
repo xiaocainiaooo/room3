@@ -315,7 +315,7 @@ internal class PruningCamera2DeviceManagerImplTest {
             val virtualCamera1 =
                 deviceManager.open(cameraId0, listOf(cameraId1), fakeGraphListener1, false) { true }
             assertNotNull(virtualCamera1)
-            // Advance time by just a bit to allow coroutines to finish but not closing the camera.
+            // Advance time by just a bit to allow coroutines to finish.
             advanceTimeBy(100)
 
             assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
@@ -331,6 +331,42 @@ internal class PruningCamera2DeviceManagerImplTest {
                 deviceManager.open(cameraId1, listOf(cameraId0), fakeGraphListener2, false) { true }
             assertNotNull(virtualCamera2)
             advanceTimeBy(100)
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 2)
+            val androidCameraState2 = fakeRetryingCameraStateOpener.androidCameraStates.last()
+            androidCameraState2.onOpened(fakeCameraDevice1)
+            advanceUntilIdle()
+
+            virtualCameraState1 = virtualCamera1.value
+            assertIs<CameraStateOpen>(virtualCameraState1)
+            val virtualCameraState2 = virtualCamera2.value
+            assertIs<CameraStateOpen>(virtualCameraState2)
+        }
+
+    @Test
+    fun pendingCamerasShouldBeHeldWhenOpeningConcurrentCameras() =
+        testScope.runTest {
+            val virtualCamera1 =
+                deviceManager.open(cameraId0, listOf(cameraId1), fakeGraphListener1, false) { true }
+            assertNotNull(virtualCamera1)
+            // Advance until idle. This is the only but notable difference between this and the
+            // prior test. Note that here because the request is still pending, the active camera
+            // should not be closed.
+            advanceUntilIdle()
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+            val androidCameraState1 = fakeRetryingCameraStateOpener.androidCameraStates.first()
+            androidCameraState1.onOpened(fakeCameraDevice0)
+            advanceUntilIdle()
+
+            // Since camera 1 is not yet opened, the virtual camera should not be connected yet.
+            var virtualCameraState1 = virtualCamera1.value
+            assertIsNot<CameraStateOpen>(virtualCameraState1)
+
+            val virtualCamera2 =
+                deviceManager.open(cameraId1, listOf(cameraId0), fakeGraphListener2, false) { true }
+            assertNotNull(virtualCamera2)
+            advanceUntilIdle()
 
             assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 2)
             val androidCameraState2 = fakeRetryingCameraStateOpener.androidCameraStates.last()
@@ -395,7 +431,7 @@ internal class PruningCamera2DeviceManagerImplTest {
             val virtualCamera1 =
                 deviceManager.open(cameraId0, listOf(cameraId1), fakeGraphListener1, false) { true }
             assertNotNull(virtualCamera1)
-            // Advance time by just a bit to allow coroutines to finish but not closing the camera.
+            // Advance time by just a bit to allow coroutines to finish.
             advanceTimeBy(100)
 
             assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
