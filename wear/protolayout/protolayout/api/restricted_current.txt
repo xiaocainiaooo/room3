@@ -1527,6 +1527,10 @@ package androidx.wear.protolayout.modifiers {
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=400) public static androidx.wear.protolayout.modifiers.LayoutModifier clipTopRight(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float x, optional @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float y);
   }
 
+  public final class BorderKt {
+    method public static androidx.wear.protolayout.modifiers.LayoutModifier border(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float width, androidx.wear.protolayout.types.LayoutColor color);
+  }
+
   public final class ClickableKt {
     method public static androidx.wear.protolayout.ModifiersBuilders.Clickable clickable();
     method public static androidx.wear.protolayout.ModifiersBuilders.Clickable clickable(optional androidx.wear.protolayout.ActionBuilders.Action action);
@@ -1557,6 +1561,10 @@ package androidx.wear.protolayout.modifiers {
     method public static androidx.wear.protolayout.ModifiersBuilders.Modifiers toProtoLayoutModifiers(androidx.wear.protolayout.modifiers.LayoutModifier);
   }
 
+  public final class OpacityKt {
+    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=400) public static androidx.wear.protolayout.modifiers.LayoutModifier opacity(androidx.wear.protolayout.modifiers.LayoutModifier, @FloatRange(from=0.0, to=1.0) float staticValue, optional androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat? dynamicValue);
+  }
+
   public final class PaddingKt {
     method public static androidx.wear.protolayout.modifiers.LayoutModifier padding(androidx.wear.protolayout.modifiers.LayoutModifier, androidx.wear.protolayout.ModifiersBuilders.Padding padding);
     method public static androidx.wear.protolayout.modifiers.LayoutModifier padding(androidx.wear.protolayout.modifiers.LayoutModifier, @Dimension(unit=androidx.annotation.Dimension.Companion.DP) float all);
@@ -1570,6 +1578,10 @@ package androidx.wear.protolayout.modifiers {
   public final class SemanticsKt {
     method public static androidx.wear.protolayout.modifiers.LayoutModifier contentDescription(androidx.wear.protolayout.modifiers.LayoutModifier, String staticValue, optional @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) androidx.wear.protolayout.expression.DynamicBuilders.DynamicString? dynamicValue);
     method public static androidx.wear.protolayout.modifiers.LayoutModifier semanticsRole(androidx.wear.protolayout.modifiers.LayoutModifier, int semanticsRole);
+  }
+
+  public final class VisibilityKt {
+    method @SuppressCompatibility @androidx.wear.protolayout.expression.ProtoLayoutExperimental @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=300) public static androidx.wear.protolayout.modifiers.LayoutModifier visibility(androidx.wear.protolayout.modifiers.LayoutModifier, boolean staticVisibility, optional androidx.wear.protolayout.expression.DynamicBuilders.DynamicBool? dynamicVisibility);
   }
 
 }
