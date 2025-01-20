@@ -103,7 +103,7 @@ private val TEST_METADATA =
         id = "uid",
         clientRecordId = "clientId",
         clientRecordVersion = 10,
-        device = Device(manufacturer = "manufacturer"),
+        device = Device(type = Device.Companion.TYPE_PHONE, manufacturer = "manufacturer"),
         lastModifiedTime = END_TIME,
         dataOrigin = DataOrigin(packageName = "appId")
     )
