@@ -299,7 +299,15 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     switchContentFragment(ResizeFragment(), menuItem.title)
                 }
-            R.id.item_scroll -> switchContentFragment(ScrollFragment(), menuItem.title)
+            R.id.item_scroll ->
+                if (useCompose) {
+                    switchContentFragment(
+                        ScrollComposeFragment(),
+                        "${menuItem.title} ${getString(R.string.compose)}"
+                    )
+                } else {
+                    switchContentFragment(ScrollFragment(), menuItem.title)
+                }
             R.id.item_pooling_container ->
                 switchContentFragment(PoolingContainerFragment(), menuItem.title)
             R.id.item_fullscreen ->
