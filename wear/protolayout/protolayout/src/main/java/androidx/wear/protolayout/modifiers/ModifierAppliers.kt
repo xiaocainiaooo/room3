@@ -16,15 +16,23 @@
 
 package androidx.wear.protolayout.modifiers
 
+import android.annotation.SuppressLint
+import androidx.annotation.OptIn
 import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ModifiersBuilders.Background
+import androidx.wear.protolayout.ModifiersBuilders.Border
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.ModifiersBuilders.Corner
 import androidx.wear.protolayout.ModifiersBuilders.ElementMetadata
 import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.ModifiersBuilders.Semantics
+import androidx.wear.protolayout.TypeBuilders.BoolProp
+import androidx.wear.protolayout.TypeBuilders.FloatProp
+import androidx.wear.protolayout.expression.ProtoLayoutExperimental
 
 /** Creates a [ModifiersBuilders.Modifiers] from a [LayoutModifier]. */
+@SuppressLint("ProtoLayoutMinSchema")
+@OptIn(ProtoLayoutExperimental::class)
 fun LayoutModifier.toProtoLayoutModifiers(): ModifiersBuilders.Modifiers {
     var semantics: Semantics.Builder? = null
     var background: Background.Builder? = null
@@ -32,6 +40,9 @@ fun LayoutModifier.toProtoLayoutModifiers(): ModifiersBuilders.Modifiers {
     var clickable: Clickable.Builder? = null
     var padding: Padding.Builder? = null
     var metadata: ElementMetadata.Builder? = null
+    var border: Border.Builder? = null
+    var visible: BoolProp.Builder? = null
+    var opacity: FloatProp.Builder? = null
 
     this.foldIn(Unit) { _, e ->
         when (e) {
@@ -41,6 +52,9 @@ fun LayoutModifier.toProtoLayoutModifiers(): ModifiersBuilders.Modifiers {
             is BaseClickableElement -> clickable = e.foldIn(clickable)
             is BasePaddingElement -> padding = e.foldIn(padding)
             is BaseMetadataElement -> metadata = e.foldIn(metadata)
+            is BaseBorderElement -> border = e.foldIn(border)
+            is BaseVisibilityElement -> visible = e.foldIn(visible)
+            is BaseOpacityElement -> opacity = e.foldIn(opacity)
         }
     }
 
@@ -53,6 +67,9 @@ fun LayoutModifier.toProtoLayoutModifiers(): ModifiersBuilders.Modifiers {
             clickable?.let { setClickable(it.build()) }
             padding?.let { setPadding(it.build()) }
             metadata?.let { setMetadata(it.build()) }
+            border?.let { setBorder(it.build()) }
+            visible?.let { setVisible(it.build()) }
+            opacity?.let { setOpacity(it.build()) }
         }
         .build()
 }
