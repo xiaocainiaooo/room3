@@ -49,7 +49,7 @@ package androidx.camera.core {
     method @FloatRange(from=0, fromInclusive=false) public default float getIntrinsicZoomRatio();
     method public default int getLensFacing();
     method public default androidx.lifecycle.LiveData<java.lang.Integer!> getLowLightBoostState();
-    method @IntRange(from=1) public default int getMaxTorchStrengthLevel();
+    method @IntRange(from=0) public default int getMaxTorchStrengthLevel();
     method public default java.util.Set<androidx.camera.core.CameraInfo!> getPhysicalCameraInfos();
     method public int getSensorRotationDegrees();
     method public int getSensorRotationDegrees(int);
@@ -64,6 +64,7 @@ package androidx.camera.core {
     method @SuppressCompatibility @androidx.camera.core.ExperimentalZeroShutterLag public default boolean isZslSupported();
     method public static boolean mustPlayShutterSound();
     method public default java.util.Set<androidx.camera.core.DynamicRange!> querySupportedDynamicRanges(java.util.Set<androidx.camera.core.DynamicRange!>);
+    field public static final int TORCH_STRENGTH_LEVEL_UNSUPPORTED = 0; // 0x0
   }
 
   public final class CameraInfoUnavailableException extends java.lang.Exception {

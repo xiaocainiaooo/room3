@@ -50,6 +50,12 @@ import java.util.Set;
 public interface CameraInfo {
 
     /**
+     * The torch strength level when the device doesn't have a flash unit or doesn't support
+     * adjusting torch strength.
+     */
+    int TORCH_STRENGTH_LEVEL_UNSUPPORTED = 0;
+
+    /**
      * An unknown intrinsic zoom ratio. Usually to indicate the camera is unable to provide
      * necessary information to resolve its intrinsic zoom ratio.
      *
@@ -429,12 +435,12 @@ public interface CameraInfo {
     /**
      * Returns the maximum torch strength level.
      *
-     * @return The maximum strength level, or {code 1} if the device doesn't have a flash unit or
-     * doesn't support configuring torch strength.
+     * @return The maximum strength level, or {@link #TORCH_STRENGTH_LEVEL_UNSUPPORTED} if the
+     * device doesn't have a flash unit or doesn't support configuring torch strength.
      */
-    @IntRange(from = 1)
+    @IntRange(from = 0)
     default int getMaxTorchStrengthLevel() {
-        return 1;
+        return TORCH_STRENGTH_LEVEL_UNSUPPORTED;
     }
 
     /**
@@ -442,9 +448,12 @@ public interface CameraInfo {
      *
      * <p>The value of the {@link LiveData} will be the default torch strength level of this
      * device if {@link CameraControl#setTorchStrengthLevelAsync(int)} hasn't been called.
+     *
+     * <p>The value of the {@link LiveData} will be {@link #TORCH_STRENGTH_LEVEL_UNSUPPORTED} if
+     * the device doesn't have a flash unit or doesn't support configuring torch strength.
      */
     default @NonNull LiveData<Integer> getTorchStrengthLevel() {
-        return new MutableLiveData<>(1);
+        return new MutableLiveData<>(TORCH_STRENGTH_LEVEL_UNSUPPORTED);
     }
 
     @StringDef(open = true, value = {IMPLEMENTATION_TYPE_UNKNOWN,

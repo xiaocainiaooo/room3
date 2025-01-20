@@ -719,9 +719,11 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
     }
 
     @Override
-    @IntRange(from = 1)
+    @IntRange(from = 0)
     public int getMaxTorchStrengthLevel() {
-        return mCameraCharacteristicsCompat.getMaxTorchStrengthLevel();
+        return mCameraCharacteristicsCompat.isTorchStrengthLevelSupported()
+                ? mCameraCharacteristicsCompat.getMaxTorchStrengthLevel()
+                : TORCH_STRENGTH_LEVEL_UNSUPPORTED;
     }
 
     @Override
@@ -730,7 +732,9 @@ public final class Camera2CameraInfoImpl implements CameraInfoInternal {
             if (mCamera2CameraControlImpl == null) {
                 if (mRedirectTorchStrengthLiveData == null) {
                     mRedirectTorchStrengthLiveData = new RedirectableLiveData<>(
-                            mCameraCharacteristicsCompat.getDefaultTorchStrengthLevel());
+                            mCameraCharacteristicsCompat.isTorchStrengthLevelSupported()
+                                    ? mCameraCharacteristicsCompat.getDefaultTorchStrengthLevel()
+                                    : TORCH_STRENGTH_LEVEL_UNSUPPORTED);
                 }
                 return mRedirectTorchStrengthLiveData;
             }

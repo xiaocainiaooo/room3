@@ -516,6 +516,10 @@ public class Camera2CameraControlImpl implements CameraControlInternal {
             return Futures.immediateFailedFuture(
                     new OperationCanceledException("Camera is not active."));
         }
+        if (!mCameraCharacteristics.isTorchStrengthLevelSupported()) {
+            return Futures.immediateFailedFuture(new UnsupportedOperationException(
+                    "The device doesn't support configuring torch strength level."));
+        }
         if (torchStrengthLevel < 1
                 || torchStrengthLevel > mCameraCharacteristics.getMaxTorchStrengthLevel()) {
             return Futures.immediateFailedFuture(new IllegalArgumentException(
