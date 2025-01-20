@@ -17,31 +17,21 @@
 package androidx.appfunctions
 
 import android.os.Bundle
-import androidx.appfunctions.AppFunctionException.Companion.ERROR_CATEGORY_APP
-import androidx.core.util.Preconditions
 
 /**
  * Thrown when an error is caused by the app providing the function.
  *
  * <p>For example, the app crashed when the system is executing the request.
- *
- * <p>Reports errors of the category [ERROR_CATEGORY_APP].
  */
 public abstract class AppFunctionAppException
 internal constructor(errorCode: Int, errorMessage: String? = null, extras: Bundle) :
-    AppFunctionException(errorCode, errorMessage, extras) {
-    init {
-        Preconditions.checkArgument(errorCategory == ERROR_CATEGORY_APP)
-    }
-}
+    AppFunctionException(errorCode, errorMessage, extras)
 
 /**
  * Thrown when an unknown error occurred while processing the call in the AppFunctionService.
  *
  * <p>This error is thrown when the service is connected in the remote application but an unexpected
  * error is thrown from the bound application.
- *
- * <p>This error is in the [ERROR_CATEGORY_APP] category.
  */
 public class AppFunctionAppUnknownException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
@@ -59,8 +49,6 @@ internal constructor(errorMessage: String? = null, extras: Bundle) :
  *
  * <p> This is different from [AppFunctionDeniedException] in that the required permission is
  * missing from the target app, as opposed to the caller.
- *
- * <p>This error is in the [ERROR_CATEGORY_APP] category.
  */
 public class AppFunctionPermissionRequiredException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
@@ -74,8 +62,6 @@ internal constructor(errorMessage: String? = null, extras: Bundle) :
  *
  * <p>For example, a clock app might support updating timer properties such as label but may not
  * allow updating the timer's duration once the timer has already started.
- *
- * <p>This error is in the [ERROR_CATEGORY_APP] category.
  */
 public class AppFunctionNotSupportedException
 internal constructor(errorMessage: String? = null, extras: Bundle) :
