@@ -43,9 +43,35 @@ object IntrospectionHelper {
     }
 
     // Classes
-    val APP_FUNCTION_CONTEXT_CLASS = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionContext")
     val APP_FUNCTION_INVENTORY_CLASS =
         ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "AppFunctionInventory")
     val APP_FUNCTION_METADATA_CLASS =
         ClassName(APP_FUNCTIONS_METADATA_PACKAGE_NAME, "AppFunctionMetadata")
+    val CONFIGURABLE_APP_FUNCTION_FACTORY_CLASS =
+        ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "ConfigurableAppFunctionFactory")
+    val APP_FUNCTION_FUNCTION_NOT_FOUND_EXCEPTION_CLASS =
+        ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionFunctionNotFoundException")
+
+    object AppFunctionFactoryClass {
+        object CreateEnclosingClassMethod {
+            const val METHOD_NAME = "createEnclosingClass"
+        }
+    }
+
+    object AppFunctionContextClass {
+        val CLASS_NAME = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionContext")
+        const val CONTEXT_PROPERTY_NAME = "context"
+    }
+
+    object AppFunctionInvokerClass {
+        val CLASS_NAME = ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "AppFunctionInvoker")
+        const val SUPPORTED_FUNCTION_IDS_PROPERTY_NAME = "supportedFunctionIds"
+
+        object UnsafeInvokeMethod {
+            const val METHOD_NAME = "unsafeInvoke"
+            const val APPLICATION_CONTEXT_PARAM_NAME = "appFunctionContext"
+            const val FUNCTION_ID_PARAM_NAME = "functionIdentifier"
+            const val PARAMETERS_PARAM_NAME = "parameters"
+        }
+    }
 }

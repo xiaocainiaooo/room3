@@ -46,7 +46,6 @@ package androidx.appfunctions
  *     * `FloatArray`
  *     * `DoubleArray`
  *     * `BooleanArray`
- *     * `ByteArray`
  *     * `List<String>`
  *     * Another class annotated with `@AppFunctionSerializable` (enabling nested structures) or a
  *       list of a class annotated with `@AppFunctionSerializable`

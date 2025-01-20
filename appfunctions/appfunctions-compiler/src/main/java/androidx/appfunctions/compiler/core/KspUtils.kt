@@ -17,16 +17,26 @@
 package androidx.appfunctions.compiler.core
 
 import com.google.devtools.ksp.symbol.KSAnnotation
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSName
+import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.KSTypeReference
+import com.google.devtools.ksp.symbol.Variance
+import com.google.devtools.ksp.symbol.Variance.CONTRAVARIANT
+import com.google.devtools.ksp.symbol.Variance.COVARIANT
+import com.google.devtools.ksp.symbol.Variance.INVARIANT
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.LIST
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.STAR
+import com.squareup.kotlinpoet.TypeName
+import com.squareup.kotlinpoet.WildcardTypeName
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
 /**
- * Resolves the type reference to the parameterized type if it is a list. Otherwise, it returns the
- * type reference as is.
+ * Resolves the type reference to the parameterized type if it is a list.
  *
  * @return the resolved type reference
  * @throws ProcessingException If unable to resolve the type.
@@ -91,4 +101,41 @@ fun <T : Any> KSAnnotation.requirePropertyValueOfType(
         this.arguments.singleOrNull { it.name?.asString() == propertyName }?.value
             ?: throw ProcessingException("Unable to find property with name: $propertyName", this)
     return expectedType.cast(propertyValue)
+}
+
+// TODO: Import KotlinPoet KSP to replace these KSPUtils.
+fun KSTypeReference.toTypeName(): TypeName {
+    val args = element?.typeArguments ?: emptyList()
+    return resolve().toTypeName(args)
+}
+
+private fun KSType.toTypeName(arguments: List<KSTypeArgument> = emptyList()): TypeName {
+    val type =
+        when (declaration) {
+            is KSClassDeclaration -> {
+                val typeClassName =
+                    ClassName(declaration.packageName.asString(), declaration.simpleName.asString())
+                typeClassName.withTypeArguments(arguments.map { it.toTypeName() })
+            }
+            else -> throw ProcessingException("Unable to resolve TypeName", null)
+        }
+    return type.copy(nullable = isMarkedNullable)
+}
+
+private fun KSTypeArgument.toTypeName(): TypeName {
+    val type = this.type ?: return STAR
+    return when (variance) {
+        COVARIANT -> WildcardTypeName.producerOf(type.toTypeName())
+        CONTRAVARIANT -> WildcardTypeName.consumerOf(type.toTypeName())
+        Variance.STAR -> STAR
+        INVARIANT -> type.toTypeName()
+    }
+}
+
+private fun ClassName.withTypeArguments(arguments: List<TypeName>): TypeName {
+    return if (arguments.isEmpty()) {
+        this
+    } else {
+        this.parameterizedBy(arguments)
+    }
 }
