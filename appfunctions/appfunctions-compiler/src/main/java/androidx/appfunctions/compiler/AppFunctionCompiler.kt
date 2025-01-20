@@ -20,6 +20,7 @@ import androidx.appfunctions.compiler.core.ProcessingException
 import androidx.appfunctions.compiler.core.logException
 import androidx.appfunctions.compiler.processors.AppFunctionIdProcessor
 import androidx.appfunctions.compiler.processors.AppFunctionInventoryProcessor
+import androidx.appfunctions.compiler.processors.AppFunctionLegacyIndexXmlProcessor
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
@@ -53,8 +54,11 @@ class AppFunctionCompiler(
         override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
             val idProcessor = AppFunctionIdProcessor(environment.codeGenerator)
             val inventoryProcessor = AppFunctionInventoryProcessor(environment.codeGenerator)
+            // TODO: Add compiler option to disable legacy xml generator.
+            val legacyIndexXmlProcessor =
+                AppFunctionLegacyIndexXmlProcessor(environment.codeGenerator)
             return AppFunctionCompiler(
-                listOf(idProcessor, inventoryProcessor),
+                listOf(idProcessor, inventoryProcessor, legacyIndexXmlProcessor),
                 environment.logger,
             )
         }

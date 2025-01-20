@@ -20,6 +20,7 @@ import androidx.appfunctions.compiler.core.IntrospectionHelper.APP_FUNCTION_CONT
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionAnnotation
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 
 /** The helper class to resolve AppFunction related symbols. */
@@ -113,5 +114,8 @@ class AppFunctionSymbolResolver(private val resolver: Resolver) {
             val methodName = functionDeclaration.simpleName.asString()
             return "${packageName}.${className}#${methodName}"
         }
+
+        /** Returns the file containing the class declaration and app functions. */
+        fun getSourceFile(): KSFile? = classDeclaration.containingFile
     }
 }
