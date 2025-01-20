@@ -18,6 +18,8 @@
 
 package androidx.savedstate
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.annotation.Sampled
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
@@ -96,7 +98,6 @@ fun decodeWithExplicitSerializer() {
     val uuid = decodeFromSavedState(UUIDSerializer(), uuidSavedState)
 }
 
-@Suppress("SERIALIZER_TYPE_INCOMPATIBLE") // The lint warning does not show up for external users.
 @Sampled
 fun savedStateSerializer() {
     @Serializable
@@ -125,20 +126,36 @@ fun charSequenceSerializer() {
     )
 }
 
+private class MyJavaSerializable : java.io.Serializable
+
+private class MyJavaSerializableSerializer : JavaSerializableSerializer<MyJavaSerializable>()
+
 @Sampled
 fun serializableSerializer() {
     @Serializable
     data class MyModel(
-        @Serializable(with = JavaSerializableSerializer::class)
-        val serializable: java.io.Serializable
+        @Serializable(with = MyJavaSerializableSerializer::class)
+        val serializable: MyJavaSerializable
     )
 }
+
+private class MyParcelable : Parcelable {
+    override fun describeContents(): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        TODO("Not yet implemented")
+    }
+}
+
+private class MyParcelableSerializer : ParcelableSerializer<MyParcelable>()
 
 @Sampled
 fun parcelableSerializer() {
     @Serializable
     data class MyModel(
-        @Serializable(with = ParcelableSerializer::class) val parcelable: android.os.Parcelable
+        @Serializable(with = MyParcelableSerializer::class) val parcelable: MyParcelable
     )
 }
 
@@ -172,13 +189,11 @@ fun parcelableArraySerializer() {
 fun charSequenceListSerializer() {
     @Serializable
     class MyModel(
-        @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
         @Serializable(with = CharSequenceListSerializer::class)
         val charSequenceList: List<CharSequence>
     )
 }
 
-@Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
 @Sampled
 fun parcelableListSerializer() {
     @Serializable
