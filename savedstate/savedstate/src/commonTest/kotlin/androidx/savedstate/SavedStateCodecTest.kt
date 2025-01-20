@@ -401,15 +401,19 @@ internal class SavedStateCodecTest : RobolectricTest() {
 
     @Test
     fun sealedClasses() {
-        Node.Add(Node.Operand(3), Node.Operand(5)).encodeDecode {
+        // Should use base type for encoding/decoding.
+        Node.Add(Node.Operand(3), Node.Operand(5)).encodeDecode<Node> {
             assertThat(size()).isEqualTo(2)
-            getSavedState("lhs").read {
-                assertThat(size()).isEqualTo(1)
-                assertThat(getInt("value")).isEqualTo(3)
-            }
-            getSavedState("rhs").read {
-                assertThat(size()).isEqualTo(1)
-                assertThat(getInt("value")).isEqualTo(5)
+            assertThat(getString("type")).isEqualTo("androidx.savedstate.Node.Add")
+            getSavedState("value").read {
+                getSavedState("lhs").read {
+                    assertThat(size()).isEqualTo(1)
+                    assertThat(getInt("value")).isEqualTo(3)
+                }
+                getSavedState("rhs").read {
+                    assertThat(size()).isEqualTo(1)
+                    assertThat(getInt("value")).isEqualTo(5)
+                }
             }
         }
     }
@@ -425,11 +429,23 @@ internal class SavedStateCodecTest : RobolectricTest() {
         }
 
         // Nullable with default value.
-        @Serializable data class B(val s: String? = "foo")
-        B().encodeDecode()
-        B(s = "bar").encodeDecode {
+        @Serializable data class B(val s: String? = "foo", val i: Int)
+        B(i = 3).encodeDecode {
             assertThat(size()).isEqualTo(1)
+            assertThat(getInt("i")).isEqualTo(3)
+        }
+        B(s = null, i = 3).encodeDecode {
+            assertThat(size()).isEqualTo(2)
+            assertThat(isNull("s")).isTrue()
+        }
+        B(s = "bar", i = 3).encodeDecode {
+            assertThat(size()).isEqualTo(2)
             assertThat(getString("s")).isEqualTo("bar")
+        }
+        // The value of `s` is the same as its default value so it's omitted from encoding.
+        B(s = "foo", i = 3).encodeDecode {
+            assertThat(size()).isEqualTo(1)
+            assertThat(getInt("i")).isEqualTo(3)
         }
 
         // Nullable without default value
@@ -449,6 +465,22 @@ internal class SavedStateCodecTest : RobolectricTest() {
             assertThat(size()).isEqualTo(2)
             assertThat(getInt("i")).isEqualTo(5)
             assertThat(getString("s")).isEqualTo("foo")
+        }
+
+        // Nullable with null as default value.
+        @Serializable data class E(val s: String? = null)
+        // Even though we encode `null`s in general as we don't encode default values
+        // nothing is encoded.
+        E().encodeDecode()
+
+        // Nullable in parent
+        G(i = 3).encodeDecode<F> {
+            assertThat(size()).isEqualTo(2)
+            assertThat(getString("type")).isEqualTo("androidx.savedstate.G")
+            getSavedState("value").read {
+                assertThat(size()).isEqualTo(1)
+                assertThat(getInt("i")).isEqualTo(3)
+            }
         }
     }
 
@@ -568,6 +600,7 @@ private typealias MyTypeAliasToInt = Int
 
 private typealias MyNestedTypeAlias = MyTypeAliasToInt
 
+@Serializable
 private sealed class Node {
     @Serializable data class Add(val lhs: Operand, val rhs: Operand) : Node()
 
@@ -610,3 +643,10 @@ private object MyColorIntArraySerializer : KSerializer<MyColor> {
         return MyColor(array[0], array[1], array[2])
     }
 }
+
+@Serializable
+private sealed class F {
+    val s: String? = null
+}
+
+@Serializable private data class G(val i: Int) : F()
