@@ -215,6 +215,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private var awaitingFirstLayout: Boolean = true
     private var scrollPositionToRestore: PointF? = null
     private var zoomToRestore: Float? = null
+    @VisibleForTesting internal var isInitialZoomDone: Boolean = false
     /**
      * The width of the PdfView before the last layout change (e.g., before rotation). Used to
      * preserve the zoom level when the device is rotated.
@@ -521,6 +522,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         val superState = super.onSaveInstanceState()
         val state = PdfViewSavedState(superState)
         state.zoom = zoom
+        state.isInitialZoomDone = isInitialZoomDone
         state.viewWidth = width
         state.contentCenterX = toContentX(viewportWidth.toFloat() / 2f)
         state.contentCenterY = toContentY(viewportHeight.toFloat() / 2f)
@@ -605,7 +607,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
     }
 
-    private fun getDefaultZoom(): Float {
+    @VisibleForTesting
+    internal fun getDefaultZoom(): Float {
         if (contentWidth == 0 || viewportWidth == 0) return DEFAULT_INIT_ZOOM
         val widthZoom = viewportWidth.toFloat() / contentWidth
         return MathUtils.clamp(widthZoom, minZoom, maxZoom)
@@ -649,6 +652,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             scrollPositionToRestore = positionToRestore
             zoomToRestore = localStateToRestore.zoom
             oldWidth = localStateToRestore.viewWidth
+            isInitialZoomDone = localStateToRestore.isInitialZoomDone
         } else {
             scrollToRestoredPosition(positionToRestore, localStateToRestore.zoom)
         }
@@ -927,7 +931,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         // centering if it's needed. It doesn't override any restored state because we're scrolling
         // to the current scroll position.
         if (pageNum == 0) {
-            this.zoom = getDefaultZoom()
+            if (!isInitialZoomDone) {
+                this.zoom = getDefaultZoom()
+                isInitialZoomDone = true
+            }
             scrollTo(scrollX, scrollY)
         }
 
