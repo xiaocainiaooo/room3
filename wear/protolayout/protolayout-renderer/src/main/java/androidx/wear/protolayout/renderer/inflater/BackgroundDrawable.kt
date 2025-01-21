@@ -21,7 +21,7 @@ import android.graphics.Paint
 import android.graphics.drawable.GradientDrawable
 
 /**
- * This class overrides [GradientDrawable] for drawing circular shapes.
+ * This class overrides [GradientDrawable] for drawing circular shapes and gradient color.
  *
  * For circular shapes:
  * * The default behavior is that for circles, a circle is drawn first with anti-aliasing applied,
@@ -31,11 +31,13 @@ import android.graphics.drawable.GradientDrawable
  *   the view to the circular outline.
  * * Note that the fix is only applied for circular shapes with no stroke (border).
  */
-public class BackgroundDrawable : GradientDrawable() {
+internal class BackgroundDrawable : GradientDrawable() {
     private val customPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var isStrokeUsed = false
     private var cornerRadiiUsed = false
     private var fillColor: Int? = null
+
+    var linearGradientHelper: LinearGradientHelper? = null
 
     override fun setCornerRadii(radii: FloatArray?) {
         cornerRadiiUsed = true
@@ -57,17 +59,18 @@ public class BackgroundDrawable : GradientDrawable() {
         val height = bounds.height()
 
         val isCircle = width == height && cornerRadius >= width * 0.5f && !cornerRadiiUsed
-        if (isStrokeUsed || !isCircle) {
+        if (linearGradientHelper == null && (isStrokeUsed || !isCircle)) {
             // If the shape is not a circle or stroke is used, then use the default implementation
             // of draw();
             super.draw(canvas)
             return
         }
 
-        if (fillColor != null) {
+        if (fillColor != null || linearGradientHelper != null) {
             customPaint.apply {
                 reset()
                 style = Paint.Style.FILL
+                linearGradientHelper?.let { setShader(it.shader) }
                 if (shader == null) {
                     fillColor?.let { color = it }
                 }
