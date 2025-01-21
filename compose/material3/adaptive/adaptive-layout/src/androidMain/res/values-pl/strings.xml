@@ -20,4 +20,8 @@
     <string name="m3_adaptive_default_pane_expansion_drag_handle_content_description" msgid="9058489142432490820">"Uchwyt do przeciągania panelu"</string>
     <string name="m3_adaptive_default_pane_expansion_drag_handle_action_description" msgid="9031621431415014327">"Zmień podział panelu na %s"</string>
     <string name="m3_adaptive_default_pane_expansion_proportion_anchor_description" msgid="1205294531112795522">"%d procent"</string>
+    <!-- no translation found for m3_adaptive_default_pane_expansion_start_offset_anchor_description (5056616348537665604) -->
+    <skip />
+    <!-- no translation found for m3_adaptive_default_pane_expansion_end_offset_anchor_description (6412636251656811002) -->
+    <skip />
 </resources>
