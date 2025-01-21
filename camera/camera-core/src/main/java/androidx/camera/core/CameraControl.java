@@ -245,6 +245,10 @@ public interface CameraControl {
      * {@link ListenableFuture} will fail with an {@link IllegalArgumentException} and it won't
      * modify the torch strength.
      *
+     * <p>If the device doesn't have a flash unit or doesn't support configuring torch strength
+     * level, the returned {@link ListenableFuture} will fail with an
+     * {@link UnsupportedOperationException}.
+     *
      * @param torchStrengthLevel The desired torch strength level.
      * @return a {@link ListenableFuture} that is completed when the torch strength has been
      * applied.
