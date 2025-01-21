@@ -64,8 +64,6 @@ import androidx.camera.testing.impl.video.Recording
 import androidx.camera.testing.impl.video.RecordingSession
 import androidx.camera.video.VideoRecordEvent.Finalize.ERROR_SOURCE_INACTIVE
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.filters.LargeTest
-import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import com.google.common.truth.Truth.assertThat
@@ -81,17 +79,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-@LargeTest
-@RunWith(Parameterized::class)
-@SdkSuppress(minSdkVersion = 21)
-class VideoRecordingTestBase(
+abstract class VideoRecordingTestBase(
     private val implName: String,
     private var cameraSelector: CameraSelector,
     private val cameraConfig: CameraXConfig,
-    private val forceEnableStreamSharing: Boolean,
 ) {
 
     @get:Rule
@@ -118,7 +111,6 @@ class VideoRecordingTestBase(
 
     companion object {
         private const val VIDEO_TIMEOUT_SEC = 10L
-        private const val TAG = "VideoRecordingTest"
 
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
@@ -128,41 +120,28 @@ class VideoRecordingTestBase(
                     "back+" + Camera2Config::class.simpleName,
                     CameraSelector.DEFAULT_BACK_CAMERA,
                     Camera2Config.defaultConfig(),
-                    /*forceEnableStreamSharing=*/ false,
                 ),
                 arrayOf(
                     "front+" + Camera2Config::class.simpleName,
                     CameraSelector.DEFAULT_FRONT_CAMERA,
                     Camera2Config.defaultConfig(),
-                    /*forceEnableStreamSharing=*/ false,
-                ),
-                arrayOf(
-                    "back+" + Camera2Config::class.simpleName + "+streamSharing",
-                    CameraSelector.DEFAULT_BACK_CAMERA,
-                    Camera2Config.defaultConfig(),
-                    /*forceEnableStreamSharing=*/ true,
                 ),
                 arrayOf(
                     "back+" + CameraPipeConfig::class.simpleName,
                     CameraSelector.DEFAULT_BACK_CAMERA,
                     CameraPipeConfig.defaultConfig(),
-                    /*forceEnableStreamSharing=*/ false,
                 ),
                 arrayOf(
                     "front+" + CameraPipeConfig::class.simpleName,
                     CameraSelector.DEFAULT_FRONT_CAMERA,
                     CameraPipeConfig.defaultConfig(),
-                    /*forceEnableStreamSharing=*/ false,
-                ),
-                arrayOf(
-                    "back+" + CameraPipeConfig::class.simpleName + "+streamSharing",
-                    CameraSelector.DEFAULT_BACK_CAMERA,
-                    CameraPipeConfig.defaultConfig(),
-                    /*forceEnableStreamSharing=*/ true,
                 ),
             )
         }
     }
+
+    protected abstract val testTag: String
+    protected abstract val enableStreamSharing: Boolean
 
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context: Context = ApplicationProvider.getApplicationContext()
@@ -216,7 +195,7 @@ class VideoRecordingTestBase(
         cameraProvider =
             ProcessCameraProviderWrapper(
                 ProcessCameraProvider.getInstance(context).get(),
-                forceEnableStreamSharing
+                enableStreamSharing
             )
         lifecycleOwner = FakeLifecycleOwner()
         lifecycleOwner.startAndResume()
@@ -327,6 +306,10 @@ class VideoRecordingTestBase(
 
     @Test
     fun getCorrectResolution_when_setCropRect() {
+        // In stream sharing (VirtualCameraAdapter), children's ViewPortCropRect is ignored and
+        // override to the parent size, the cropRect is also rotated. Skip the test.
+        assumeFalse(enableStreamSharing)
+
         assumeSuccessfulSurfaceProcessing()
         assumeExtraCroppingQuirk()
 
@@ -343,11 +326,6 @@ class VideoRecordingTestBase(
 
         checkAndBindUseCases(preview, videoCapture)
         val calculatedCropRect = videoCapture.cropRect!!
-
-        // TODO(b/264936115): In stream sharing (VirtualCameraAdapter), children's ViewPortCropRect
-        //  is ignored and override to the parent size, the cropRect is also rotated. Skip the test
-        //  for now.
-        assumeTrue(!isStreamSharingEnabled(videoCapture))
 
         // Act.
         val result = recordingSession.createRecording(recorder = recorder).recordAndVerify()
@@ -393,7 +371,7 @@ class VideoRecordingTestBase(
     }
 
     @Test
-    fun stopRecordingWhenLifecycleStops() {
+    fun stopRecording_when_lifecycleStops() {
         assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
 
         // Arrange.
@@ -488,40 +466,6 @@ class VideoRecordingTestBase(
         )
         // Verifies recording after triggering onError event to the new active error listener
         recordingSession.createRecording().recordAndVerify()
-    }
-
-    /**
-     * Triggers the onError to the error listener in the session config
-     *
-     * If the test starts recording immediately after `onError` is called. There could be a timing
-     * issue which causes the recording to be stopped. In that case, input the VideoEncoderSession's
-     * readyToReleaseFuture. This function will wait for the ready-to-release future to be
-     * completed. This can make sure that the following recording operation won't be interrupted
-     * when the previous DeferrableSurface is closed.
-     */
-    private fun triggerOnErrorAndWaitForReady(
-        sessionConfig: SessionConfig,
-        readyFuture: ListenableFuture<*>? = null
-    ) {
-        instrumentation.runOnMainSync {
-            sessionConfig.errorListener!!.onError(
-                sessionConfig,
-                SessionConfig.SessionError.SESSION_ERROR_UNKNOWN
-            )
-        }
-
-        // If the test starts recording immediately after `onError` is called. There could be a
-        // timing issue which causes the recording to be stopped.
-        // On the main thread: trigger OnError
-        //    -> resetPipeline
-        //    -> DeferrableSurface is closed
-        //    -> SurfaceRequest is complete
-        // On the test thread: start recording
-        // On the Recorder mSequentialExecutor:
-        //    The listener of readyToReleaseFuture executes due to SurfaceRequest is complete
-        //    -> Recorder.requestReset()
-        //    -> recording is stopped unexpectedly.
-        readyFuture?.get(VIDEO_TIMEOUT_SEC, TimeUnit.SECONDS)
     }
 
     @Test
@@ -680,6 +624,7 @@ class VideoRecordingTestBase(
     @Test
     fun updateVideoUsage_whenRecordingStartedPausedResumedStopped(): Unit = runBlocking {
         checkAndBindUseCases(videoCapture, preview)
+
         // Act 1 - isRecording is true after start.
         val recording = recordingSession.createRecording().startAndVerify()
         camera.cameraControl.verifyIfInVideoUsage(
@@ -710,33 +655,32 @@ class VideoRecordingTestBase(
     }
 
     @Test
-    fun updateVideoUsage_whenUnboundBeforeCompletingAndNewVidStartedAfterRebind(): Unit =
-        runBlocking {
-            assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
+    fun updateVideoUsage_whenUnboundBeforeCompletingAndStartNewAfterRebind(): Unit = runBlocking {
+        assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
 
-            checkAndBindUseCases(preview, videoCapture)
-            val recording1 = recordingSession.createRecording().startAndVerify()
+        checkAndBindUseCases(preview, videoCapture)
+        val recording1 = recordingSession.createRecording().startAndVerify()
 
-            // Act 1 - unbind before recording completes and check if isRecording is false.
-            instrumentation.runOnMainSync { cameraProvider.unbind(videoCapture) }
+        // Act 1 - unbind before recording completes and check if isRecording is false.
+        instrumentation.runOnMainSync { cameraProvider.unbind(videoCapture) }
 
-            camera.cameraControl.verifyIfInVideoUsage(
-                false,
-                "Video stopped but camera still in video usage"
-            )
+        camera.cameraControl.verifyIfInVideoUsage(
+            false,
+            "Video stopped but camera still in video usage"
+        )
 
-            // Cleanup.
-            recording1.verifyFinalize(error = ERROR_SOURCE_INACTIVE)
+        // Cleanup.
+        recording1.verifyFinalize(error = ERROR_SOURCE_INACTIVE)
 
-            // Act 2 - rebind and start new recording, check if isRecording is true now.
-            checkAndBindUseCases(preview, videoCapture)
+        // Act 2 - rebind and start new recording, check if isRecording is true now.
+        checkAndBindUseCases(preview, videoCapture)
 
-            recordingSession.createRecording().startAndVerify()
-            camera.cameraControl.verifyIfInVideoUsage(
-                true,
-                "Video started but camera still not in video usage"
-            )
-        }
+        recordingSession.createRecording().startAndVerify()
+        camera.cameraControl.verifyIfInVideoUsage(
+            true,
+            "Video started but camera still not in video usage"
+        )
+    }
 
     @Test
     fun updateVideoUsage_whenLifecycleStoppedBeforeCompletingRecording(): Unit = runBlocking {
@@ -764,14 +708,23 @@ class VideoRecordingTestBase(
 
     private fun isUseCasesCombinationSupported(
         vararg useCases: UseCase,
-        useOppositeCamera: Boolean = false,
-    ) = getCamera(useOppositeCamera).isUseCasesCombinationSupported(*useCases)
+        withStreamSharing: Boolean,
+        useOppositeCamera: Boolean = false
+    ) = getCamera(useOppositeCamera).isUseCasesCombinationSupported(withStreamSharing, *useCases)
 
+    /** Checks use case combination with considering StreamSharing and then binds to lifecycle. */
     private fun checkAndBindUseCases(
         vararg useCases: UseCase,
+        withStreamSharing: Boolean = enableStreamSharing,
         useOppositeCamera: Boolean = false,
     ) {
-        assumeTrue(isUseCasesCombinationSupported(*useCases, useOppositeCamera = useOppositeCamera))
+        assumeTrue(
+            isUseCasesCombinationSupported(
+                *useCases,
+                withStreamSharing = withStreamSharing,
+                useOppositeCamera = useOppositeCamera
+            )
+        )
 
         instrumentation.runOnMainSync {
             cameraProvider.bindToLifecycle(
@@ -812,8 +765,7 @@ class VideoRecordingTestBase(
 
             // Checks the rotation from video file's metadata is matched with the relative rotation.
             assertWithMessage(
-                    TAG +
-                        ", rotation test failure: " +
+                    "Rotation test failure: " +
                         "videoRotation: $videoRotation" +
                         ", expectedRotation: $expectedRotation"
                 )
@@ -828,8 +780,7 @@ class VideoRecordingTestBase(
             val aspectRatio = it.getRotatedAspectRatio()
 
             assertWithMessage(
-                    TAG +
-                        ", verifyVideoAspectRatio failure:" +
+                    "VerifyVideoAspectRatio failure:" +
                         ", videoAspectRatio: $aspectRatio" +
                         ", expectedAspectRatio: $expectedAspectRatio"
                 )
@@ -858,5 +809,39 @@ class VideoRecordingTestBase(
                 isFalse()
             }
         }
+    }
+
+    /**
+     * Triggers the onError to the error listener in the session config
+     *
+     * If the test starts recording immediately after `onError` is called. There could be a timing
+     * issue which causes the recording to be stopped. In that case, input the VideoEncoderSession's
+     * readyToReleaseFuture. This function will wait for the ready-to-release future to be
+     * completed. This can make sure that the following recording operation won't be interrupted
+     * when the previous DeferrableSurface is closed.
+     */
+    private fun triggerOnErrorAndWaitForReady(
+        sessionConfig: SessionConfig,
+        readyFuture: ListenableFuture<*>? = null
+    ) {
+        instrumentation.runOnMainSync {
+            sessionConfig.errorListener!!.onError(
+                sessionConfig,
+                SessionConfig.SessionError.SESSION_ERROR_UNKNOWN
+            )
+        }
+
+        // If the test starts recording immediately after `onError` is called. There could be a
+        // timing issue which causes the recording to be stopped.
+        // On the main thread: trigger OnError
+        //    -> resetPipeline
+        //    -> DeferrableSurface is closed
+        //    -> SurfaceRequest is complete
+        // On the test thread: start recording
+        // On the Recorder mSequentialExecutor:
+        //    The listener of readyToReleaseFuture executes due to SurfaceRequest is complete
+        //    -> Recorder.requestReset()
+        //    -> recording is stopped unexpectedly.
+        readyFuture?.get(VIDEO_TIMEOUT_SEC, TimeUnit.SECONDS)
     }
 }
