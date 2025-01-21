@@ -32,10 +32,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.edgeSwipeToDismiss
+import androidx.wear.compose.foundation.pager.rememberPagerState
 import androidx.wear.compose.foundation.rememberSwipeToDismissBoxState
 import androidx.wear.compose.material.CompactChip
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
+import androidx.wear.compose.material3.AppScaffold
+import androidx.wear.compose.material3.HorizontalPagerScaffold
+import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
@@ -70,6 +74,11 @@ class MainActivity : ComponentActivity() {
                             CompactChip(
                                 onClick = { navController.navigate(EDGE_SWIPE_SCREEN) },
                                 label = { Text("Screen with edge swipe") },
+                            )
+                            Spacer(modifier = Modifier.fillMaxWidth().height(4.dp))
+                            CompactChip(
+                                onClick = { navController.navigate(PAGER_SCAFFOLD_SCREEN) },
+                                label = { Text("Screen with PagerScaffold") },
                             )
                         }
                     }
@@ -127,6 +136,22 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
+                    composable(PAGER_SCAFFOLD_SCREEN) {
+                        AppScaffold {
+                            val pagerState = rememberPagerState(pageCount = { 10 })
+
+                            HorizontalPagerScaffold(pagerState = pagerState) { page ->
+                                ScreenScaffold {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text("Page $page")
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -137,3 +162,4 @@ private const val START = "start"
 private const val SCREEN2 = "screen2"
 private const val SCREEN3 = "screen3"
 private const val EDGE_SWIPE_SCREEN = "edge_swipe_screen"
+private const val PAGER_SCAFFOLD_SCREEN = "pager_scaffold_screen"
