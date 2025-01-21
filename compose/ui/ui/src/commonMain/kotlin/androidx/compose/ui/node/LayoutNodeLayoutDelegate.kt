@@ -368,6 +368,10 @@ internal class LayoutNodeLayoutDelegate(
         measurePassDelegate.childDelegatesDirty = true
         lookaheadPassDelegate?.let { it.childDelegatesDirty = true }
     }
+
+    fun clearLookaheadDelegate() {
+        lookaheadPassDelegate = null
+    }
 }
 
 /**
