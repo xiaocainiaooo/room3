@@ -126,8 +126,7 @@ public fun MaterialScope.titleCard(
                                 typography = style.titleTypography,
                                 color = colors.titleColor,
                                 maxLines = 2,
-                                multilineAlignment =
-                                    horizontalAlignment.horizontalAlignToTextAlign()
+                                alignment = horizontalAlignment.horizontalAlignToTextAlign()
                             )
                     )
                     .title(),
@@ -138,8 +137,7 @@ public fun MaterialScope.titleCard(
                                 TextElementStyle(
                                     typography = style.contentTypography,
                                     color = colors.contentColor,
-                                    multilineAlignment =
-                                        horizontalAlignment.horizontalAlignToTextAlign()
+                                    alignment = horizontalAlignment.horizontalAlignToTextAlign()
                                 )
                         )
                         .it()
@@ -151,8 +149,7 @@ public fun MaterialScope.titleCard(
                                 TextElementStyle(
                                     typography = style.timeTypography,
                                     color = colors.timeColor,
-                                    multilineAlignment =
-                                        horizontalAlignment.horizontalAlignToTextAlign()
+                                    alignment = horizontalAlignment.horizontalAlignToTextAlign()
                                 )
                         )
                         .it()
@@ -248,7 +245,7 @@ public fun MaterialScope.appCard(
                             TextElementStyle(
                                 typography = style.titleTypography,
                                 color = colors.titleColor,
-                                multilineAlignment = TEXT_ALIGN_START
+                                alignment = TEXT_ALIGN_START
                             )
                     )
                     .title(),
@@ -259,7 +256,7 @@ public fun MaterialScope.appCard(
                                 TextElementStyle(
                                     typography = style.contentTypography,
                                     color = colors.contentColor,
-                                    multilineAlignment = TEXT_ALIGN_START
+                                    alignment = TEXT_ALIGN_START
                                 )
                         )
                         .it()
@@ -271,7 +268,7 @@ public fun MaterialScope.appCard(
                                 TextElementStyle(
                                     typography = style.timeTypography,
                                     color = colors.timeColor,
-                                    multilineAlignment = TEXT_ALIGN_END
+                                    alignment = TEXT_ALIGN_END
                                 )
                         )
                         .it()
@@ -283,7 +280,7 @@ public fun MaterialScope.appCard(
                                 TextElementStyle(
                                     typography = style.labelTypography,
                                     color = colors.labelColor,
-                                    multilineAlignment = TEXT_ALIGN_START
+                                    alignment = TEXT_ALIGN_START
                                 )
                         )
                         .it()
@@ -600,8 +597,7 @@ public fun MaterialScope.graphicDataCard(
                             TextElementStyle(
                                 typography = style.titleTypography,
                                 color = colors.titleColor,
-                                multilineAlignment =
-                                    HORIZONTAL_ALIGN_START.horizontalAlignToTextAlign()
+                                alignment = HORIZONTAL_ALIGN_START.horizontalAlignToTextAlign()
                             )
                     )
                     .title(),
@@ -612,8 +608,7 @@ public fun MaterialScope.graphicDataCard(
                                 TextElementStyle(
                                     typography = style.contentTypography,
                                     color = colors.contentColor,
-                                    multilineAlignment =
-                                        HORIZONTAL_ALIGN_START.horizontalAlignToTextAlign()
+                                    alignment = HORIZONTAL_ALIGN_START.horizontalAlignToTextAlign()
                                 )
                         )
                         .it()

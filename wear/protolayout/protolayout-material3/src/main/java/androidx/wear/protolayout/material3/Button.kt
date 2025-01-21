@@ -263,8 +263,7 @@ public fun MaterialScope.button(
                                 TextElementStyle(
                                     typography = style.labelTypography,
                                     color = colors.labelColor,
-                                    multilineAlignment =
-                                        horizontalAlignment.horizontalAlignToTextAlign()
+                                    alignment = horizontalAlignment.horizontalAlignToTextAlign()
                                 )
                         )
                         .labelContent(),
@@ -275,8 +274,7 @@ public fun MaterialScope.button(
                                     TextElementStyle(
                                         typography = style.secondaryLabelTypography,
                                         color = colors.secondaryLabelColor,
-                                        multilineAlignment =
-                                            horizontalAlignment.horizontalAlignToTextAlign()
+                                        alignment = horizontalAlignment.horizontalAlignToTextAlign()
                                     )
                             )
                             .secondaryLabelContent()
@@ -369,8 +367,7 @@ public fun MaterialScope.avatarButton(
                                 TextElementStyle(
                                     typography = style.labelTypography,
                                     color = colors.labelColor,
-                                    multilineAlignment =
-                                        HORIZONTAL_ALIGN_START.horizontalAlignToTextAlign()
+                                    alignment = HORIZONTAL_ALIGN_START.horizontalAlignToTextAlign()
                                 )
                         )
                         .labelContent(),
@@ -381,7 +378,7 @@ public fun MaterialScope.avatarButton(
                                     TextElementStyle(
                                         typography = style.secondaryLabelTypography,
                                         color = colors.secondaryLabelColor,
-                                        multilineAlignment =
+                                        alignment =
                                             HORIZONTAL_ALIGN_START.horizontalAlignToTextAlign()
                                     )
                             )
@@ -527,7 +524,7 @@ public fun MaterialScope.compactButton(
                                             TextElementStyle(
                                                 typography = COMPACT_BUTTON_LABEL_TYPOGRAPHY,
                                                 color = colors.labelColor,
-                                                multilineAlignment =
+                                                alignment =
                                                     horizontalAlignment.horizontalAlignToTextAlign()
                                             )
                                     )
