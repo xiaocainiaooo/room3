@@ -458,6 +458,7 @@ public final class Recorder implements VideoOutput {
     @NonNull Uri mOutputUri = Uri.EMPTY;
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
     long mRecordingBytes = 0L;
+    long mRecordingAudioBytes = 0L;
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
     long mRecordingDurationNs = 0L;
     @VisibleForTesting
@@ -1047,7 +1048,7 @@ public final class Recorder implements VideoOutput {
                         RecordingStats.of(/*duration=*/0L,
                                 /*bytes=*/0L,
                                 AudioStats.of(AudioStats.AUDIO_STATE_DISABLED, mAudioErrorCause,
-                                        AUDIO_AMPLITUDE_NONE)),
+                                        AUDIO_AMPLITUDE_NONE, /*audioBytes=*/0L)),
                         OutputResults.of(Uri.EMPTY),
                         error,
                         cause));
@@ -2163,6 +2164,7 @@ public final class Recorder implements VideoOutput {
         }
 
         mRecordingBytes = newRecordingBytes;
+        mRecordingAudioBytes += encodedData.size();
         mPreviousRecordingAudioDataTimeUs = currentPresentationTimeUs;
     }
 
@@ -2432,8 +2434,13 @@ public final class Recorder implements VideoOutput {
                         e);
                 if (errorToSend == ERROR_NONE) {
                     long availableBytes = checkNotNull(mOutputStorage).getAvailableBytes();
-                    errorToSend = availableBytes < mRequiredFreeStorageBytes
-                            ? ERROR_INSUFFICIENT_STORAGE : ERROR_UNKNOWN;
+                    if (availableBytes < mRequiredFreeStorageBytes) {
+                        errorToSend = ERROR_INSUFFICIENT_STORAGE;
+                    } else if (mRecordingAudioBytes == 0L) {
+                        errorToSend = ERROR_NO_VALID_DATA;
+                    } else {
+                        errorToSend = ERROR_UNKNOWN;
+                    }
                 }
             }
             mMediaMuxer = null;
@@ -2467,6 +2474,7 @@ public final class Recorder implements VideoOutput {
         mEncodingFutures.clear();
         mOutputUri = Uri.EMPTY;
         mRecordingBytes = 0L;
+        mRecordingAudioBytes = 0L;
         mRecordingDurationNs = 0L;
         mFirstRecordingVideoDataTimeUs = Long.MAX_VALUE;
         mFirstRecordingAudioDataTimeUs = Long.MAX_VALUE;
@@ -2790,7 +2798,7 @@ public final class Recorder implements VideoOutput {
     @NonNull RecordingStats getInProgressRecordingStats() {
         return RecordingStats.of(mRecordingDurationNs, mRecordingBytes,
                 AudioStats.of(internalAudioStateToAudioStatsState(mAudioState), mAudioErrorCause,
-                        mAudioAmplitude));
+                        mAudioAmplitude, mRecordingAudioBytes));
     }
 
     @SuppressWarnings("WeakerAccess") /* synthetic accessor */
