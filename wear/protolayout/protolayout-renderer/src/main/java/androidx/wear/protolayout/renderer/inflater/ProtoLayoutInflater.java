@@ -26,6 +26,7 @@ import static androidx.core.util.Preconditions.checkNotNull;
 import static androidx.wear.protolayout.renderer.common.ProtoLayoutDiffer.FIRST_CHILD_INDEX;
 import static androidx.wear.protolayout.renderer.common.ProtoLayoutDiffer.ROOT_NODE_ID;
 import static androidx.wear.protolayout.renderer.common.ProtoLayoutDiffer.getParentNodePosId;
+import static androidx.wear.protolayout.renderer.inflater.PropHelpers.handleProp;
 
 import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
 import static com.google.common.util.concurrent.Futures.immediateFuture;
@@ -105,7 +106,6 @@ import androidx.wear.protolayout.proto.AlignmentProto.HorizontalAlignment;
 import androidx.wear.protolayout.proto.AlignmentProto.TextAlignment;
 import androidx.wear.protolayout.proto.AlignmentProto.VerticalAlignment;
 import androidx.wear.protolayout.proto.AlignmentProto.VerticalAlignmentProp;
-import androidx.wear.protolayout.proto.ColorProto.ColorProp;
 import androidx.wear.protolayout.proto.DimensionProto.AngularDimension;
 import androidx.wear.protolayout.proto.DimensionProto.ArcLineLength;
 import androidx.wear.protolayout.proto.DimensionProto.ContainerDimension;
@@ -2829,6 +2829,7 @@ public final class ProtoLayoutInflater {
 
         handleProp(
                 text.getText(),
+                mUiContext.getResources().getConfiguration().getLocales().get(0),
                 t -> {
                     // Underlines are applied using a Spannable here, rather than setting paint bits
                     // (or
@@ -4238,152 +4239,6 @@ public final class ProtoLayoutInflater {
     }
 
     /**
-     * Either yield the constant value stored in stringProp, or register for updates if it is
-     * dynamic property.
-     *
-     * <p>If both are set, this routine will yield the constant value if and only if this renderer
-     * has a dynamic pipeline (i.e. {code mDataPipeline} is non-null), otherwise it will only
-     * subscribe for dynamic updates. If the dynamic pipeline ever yields an invalid value (via
-     * {@code onStateInvalid}), then stringProp's static valid will be used instead.
-     */
-    private void handleProp(
-            StringProp stringProp,
-            Consumer<String> consumer,
-            String posId,
-            Optional<PipelineMaker> pipelineMaker) {
-        if (stringProp.hasDynamicValue() && pipelineMaker.isPresent()) {
-            try {
-                pipelineMaker
-                        .get()
-                        .addPipelineFor(
-                                stringProp.getDynamicValue(),
-                                stringProp.getValue(),
-                                mUiContext.getResources().getConfiguration().getLocales().get(0),
-                                posId,
-                                consumer);
-            } catch (RuntimeException ex) {
-                Log.e(TAG, "Error building pipeline", ex);
-                consumer.accept(stringProp.getValue());
-            }
-        } else {
-            consumer.accept(stringProp.getValue());
-        }
-    }
-
-    private void handleProp(
-            DegreesProp degreesProp,
-            Consumer<Float> consumer,
-            String posId,
-            Optional<PipelineMaker> pipelineMaker) {
-        if (degreesProp.hasDynamicValue() && pipelineMaker.isPresent()) {
-            try {
-                pipelineMaker
-                        .get()
-                        .addPipelineFor(degreesProp, degreesProp.getValue(), posId, consumer);
-            } catch (RuntimeException ex) {
-                Log.e(TAG, "Error building pipeline", ex);
-                consumer.accept(degreesProp.getValue());
-            }
-        } else {
-            consumer.accept(degreesProp.getValue());
-        }
-    }
-
-    private void handleProp(
-            DpProp dpProp,
-            Consumer<Float> consumer,
-            String posId,
-            Optional<PipelineMaker> pipelineMaker) {
-        handleProp(dpProp, consumer, consumer, posId, pipelineMaker);
-    }
-
-    private void handleProp(
-            DpProp dpProp,
-            Consumer<Float> staticValueConsumer,
-            Consumer<Float> dynamicValueConsumer,
-            String posId,
-            Optional<PipelineMaker> pipelineMaker) {
-        if (dpProp.hasDynamicValue() && pipelineMaker.isPresent()) {
-            try {
-                pipelineMaker
-                        .get()
-                        .addPipelineFor(dpProp, dpProp.getValue(), posId, dynamicValueConsumer);
-            } catch (RuntimeException ex) {
-                Log.e(TAG, "Error building pipeline", ex);
-                staticValueConsumer.accept(dpProp.getValue());
-            }
-        } else {
-            staticValueConsumer.accept(dpProp.getValue());
-        }
-    }
-
-    private void handleProp(
-            ColorProp colorProp,
-            Consumer<Integer> consumer,
-            String posId,
-            Optional<PipelineMaker> pipelineMaker) {
-        if (colorProp.hasDynamicValue() && pipelineMaker.isPresent()) {
-            try {
-                pipelineMaker.get().addPipelineFor(colorProp, colorProp.getArgb(), posId, consumer);
-            } catch (RuntimeException ex) {
-                Log.e(TAG, "Error building pipeline", ex);
-                consumer.accept(colorProp.getArgb());
-            }
-        } else {
-            consumer.accept(colorProp.getArgb());
-        }
-    }
-
-    private void handleProp(
-            BoolProp boolProp,
-            Consumer<Boolean> consumer,
-            String posId,
-            Optional<PipelineMaker> pipelineMaker) {
-        if (boolProp.hasDynamicValue() && pipelineMaker.isPresent()) {
-            try {
-                pipelineMaker.get().addPipelineFor(boolProp, boolProp.getValue(), posId, consumer);
-            } catch (RuntimeException ex) {
-                Log.e(TAG, "Error building pipeline", ex);
-                consumer.accept(boolProp.getValue());
-            }
-        } else {
-            consumer.accept(boolProp.getValue());
-        }
-    }
-
-    private void handleProp(
-            FloatProp floatProp,
-            Consumer<Float> consumer,
-            String posId,
-            Optional<PipelineMaker> pipelineMaker) {
-        handleProp(floatProp, consumer, consumer, posId, pipelineMaker);
-    }
-
-    private void handleProp(
-            FloatProp floatProp,
-            Consumer<Float> staticValueConsumer,
-            Consumer<Float> dynamicValueconsumer,
-            String posId,
-            Optional<PipelineMaker> pipelineMaker) {
-        if (floatProp.hasDynamicValue() && pipelineMaker.isPresent()) {
-            try {
-                pipelineMaker
-                        .get()
-                        .addPipelineFor(
-                                floatProp.getDynamicValue(),
-                                floatProp.getValue(),
-                                posId,
-                                dynamicValueconsumer);
-            } catch (RuntimeException ex) {
-                Log.e(TAG, "Error building pipeline", ex);
-                staticValueConsumer.accept(floatProp.getValue());
-            }
-        } else {
-            staticValueConsumer.accept(floatProp.getValue());
-        }
-    }
-
-    /**
      * Resolves the value for layout to be used in a Size Wrapper for elements containing dynamic
      * values. Returns null if no size wrapper is needed.
      */
@@ -4959,6 +4814,7 @@ public final class ProtoLayoutInflater {
         if (semantics.hasContentDescription()) {
             handleProp(
                     semantics.getContentDescription(),
+                    mUiContext.getResources().getConfiguration().getLocales().get(0),
                     view::setContentDescription,
                     posId,
                     pipelineMaker);
@@ -4970,6 +4826,7 @@ public final class ProtoLayoutInflater {
         if (semantics.hasStateDescription()) {
             handleProp(
                     semantics.getStateDescription(),
+                    mUiContext.getResources().getConfiguration().getLocales().get(0),
                     (state) -> ViewCompat.setStateDescription(view, state),
                     posId,
                     pipelineMaker);
