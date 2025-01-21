@@ -2427,24 +2427,26 @@ public class CameraXActivity extends AppCompatActivity {
             if (mCamera == null) {
                 return;
             }
-            // Show the low-light boost state to the toggle button text for easy observation.
-            mCamera.getCameraInfo().getLowLightBoostState().observe(
-                    this,
-                    state -> {
-                        int resId;
-                        switch (state) {
-                            case LowLightBoostState.INACTIVE:
-                                resId = R.string.toggle_low_light_boost_inactive;
-                                break;
-                            case LowLightBoostState.ACTIVE:
-                                resId = R.string.toggle_low_light_boost_active;
-                                break;
-                            default:
-                                resId = R.string.toggle_low_light_boost_off;
+            if (!mCamera.getCameraInfo().getLowLightBoostState().hasObservers()) {
+                // Show the low-light boost state to the toggle button text for easy observation.
+                mCamera.getCameraInfo().getLowLightBoostState().observe(
+                        this,
+                        state -> {
+                            int resId;
+                            switch (state) {
+                                case LowLightBoostState.INACTIVE:
+                                    resId = R.string.toggle_low_light_boost_inactive;
+                                    break;
+                                case LowLightBoostState.ACTIVE:
+                                    resId = R.string.toggle_low_light_boost_active;
+                                    break;
+                                default:
+                                    resId = R.string.toggle_low_light_boost_off;
+                            }
+                            mLowLightBoostToggle.setText(resId);
                         }
-                        mLowLightBoostToggle.setText(resId);
-                    }
-            );
+                );
+            }
             mCamera.getCameraControl().enableLowLightBoostAsync(mIsLowLightBoostOn);
         });
     }
