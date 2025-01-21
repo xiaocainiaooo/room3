@@ -17,6 +17,7 @@
 package androidx.health.connect.client.impl.platform.aggregate
 
 import android.annotation.SuppressLint
+import android.health.connect.datatypes.Metadata.RECORDING_METHOD_MANUAL_ENTRY
 import androidx.health.connect.client.aggregate.AggregationResult
 import androidx.health.connect.client.aggregate.AggregationResultGroupedByDuration
 import androidx.health.connect.client.records.NutritionRecord
@@ -56,7 +57,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = Instant.ofEpochMilli(1000),
                 startZoneOffset = ZoneOffset.UTC,
                 endZoneOffset = ZoneOffset.UTC,
-                metadata = Metadata(dataOrigin = DataOrigin("some.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("some.package")
+                    ),
                 transFat = 5.grams
             )
         )
@@ -95,7 +100,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = filterEndTime.plus(Duration.ofHours(1)),
                 startZoneOffset = ZoneOffset.UTC,
                 endZoneOffset = ZoneOffset.UTC,
-                metadata = Metadata(dataOrigin = DataOrigin("some.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("some.package")
+                    ),
                 transFat = 20.grams
             )
         )
@@ -149,7 +158,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = Instant.ofEpochMilli(99),
                 startZoneOffset = ZoneOffset.UTC,
                 endZoneOffset = ZoneOffset.UTC,
-                metadata = Metadata(dataOrigin = DataOrigin("out.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("out.package")
+                    ),
                 transFat = 10.grams
             )
         )
@@ -161,7 +174,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = filterStartTime.plus(Duration.ofMinutes(1)).plusMillis(100),
                 startZoneOffset = ZoneOffset.UTC,
                 endZoneOffset = ZoneOffset.UTC,
-                metadata = Metadata(dataOrigin = DataOrigin("bucket_1.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("bucket_1.package")
+                    ),
                 transFat = 10.grams
             )
         )
@@ -173,7 +190,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = filterStartTime.plus(Duration.ofMinutes(2)).plusMillis(100),
                 startZoneOffset = ZoneOffset.UTC,
                 endZoneOffset = ZoneOffset.UTC,
-                metadata = Metadata(dataOrigin = DataOrigin("bucket_2.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("bucket_2.package")
+                    ),
                 transFat = 100.grams
             )
         )
@@ -185,7 +206,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = filterStartTime.plus(Duration.ofMinutes(2)).plusSeconds(30),
                 startZoneOffset = ZoneOffset.UTC,
                 endZoneOffset = ZoneOffset.UTC,
-                metadata = Metadata(dataOrigin = DataOrigin("buckets_1_2.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("buckets_1_2.package")
+                    ),
                 transFat = 1.kilograms
             )
         )
@@ -197,7 +222,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = filterStartTime.plus(Duration.ofMinutes(5)).plusSeconds(45),
                 startZoneOffset = ZoneOffset.UTC,
                 endZoneOffset = ZoneOffset.UTC,
-                metadata = Metadata(dataOrigin = DataOrigin("bucket_4.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("bucket_4.package")
+                    ),
                 transFat = 10.kilograms
             )
         )
@@ -263,7 +292,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = Instant.ofEpochMilli(2000),
                 startZoneOffset = ZoneOffset.ofHours(2),
                 endZoneOffset = ZoneOffset.ofHours(3),
-                metadata = Metadata(dataOrigin = DataOrigin("some.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("some.package")
+                    ),
                 transFat = 10.grams
             )
         )
@@ -274,7 +307,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = Instant.ofEpochMilli(3000),
                 startZoneOffset = ZoneOffset.ofHours(1),
                 endZoneOffset = ZoneOffset.ofHours(6),
-                metadata = Metadata(dataOrigin = DataOrigin("some.other.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("some.other.package")
+                    ),
                 transFat = 20.grams
             )
         )
@@ -285,7 +322,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = Instant.ofEpochMilli(2001),
                 startZoneOffset = ZoneOffset.UTC,
                 endZoneOffset = ZoneOffset.UTC,
-                metadata = Metadata(dataOrigin = DataOrigin("yet.some.other.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("yet.some.other.package")
+                    ),
                 transFat = 30.grams
             )
         )
@@ -327,7 +368,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = Instant.ofEpochMilli(2000),
                 startZoneOffset = ZoneOffset.ofHours(2),
                 endZoneOffset = ZoneOffset.ofHours(3),
-                metadata = Metadata(dataOrigin = DataOrigin("some.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("some.package")
+                    ),
                 samples = emptyList()
             )
         )
@@ -338,7 +383,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = Instant.ofEpochMilli(3000),
                 startZoneOffset = ZoneOffset.ofHours(1),
                 endZoneOffset = ZoneOffset.ofHours(6),
-                metadata = Metadata(dataOrigin = DataOrigin("some.other.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("some.other.package")
+                    ),
                 samples =
                     listOf(
                         SpeedRecord.Sample(Instant.ofEpochMilli(100), 20.kilometersPerHour),
@@ -353,7 +402,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = Instant.ofEpochMilli(2001),
                 startZoneOffset = ZoneOffset.UTC,
                 endZoneOffset = ZoneOffset.UTC,
-                metadata = Metadata(dataOrigin = DataOrigin("yet.some.other.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("yet.some.other.package")
+                    ),
                 samples =
                     listOf(SpeedRecord.Sample(Instant.ofEpochMilli(156), 34.kilometersPerHour))
             )
@@ -403,7 +456,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = Instant.ofEpochMilli(1000),
                 startZoneOffset = ZoneOffset.UTC,
                 endZoneOffset = ZoneOffset.UTC,
-                metadata = Metadata(dataOrigin = DataOrigin("some.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("some.package")
+                    ),
                 transFat = 5.grams
             )
         )
@@ -427,7 +484,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = Instant.ofEpochMilli(1000),
                 startZoneOffset = ZoneOffset.UTC,
                 endZoneOffset = ZoneOffset.UTC,
-                metadata = Metadata(dataOrigin = DataOrigin("some.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("some.package")
+                    ),
             )
         )
 
@@ -450,7 +511,11 @@ class ResultGroupByDurationAggregatorTest {
                 endTime = Instant.ofEpochMilli(1000).plus(Duration.ofMinutes(10)),
                 startZoneOffset = ZoneOffset.UTC,
                 endZoneOffset = ZoneOffset.UTC,
-                metadata = Metadata(dataOrigin = DataOrigin("some.package")),
+                metadata =
+                    Metadata(
+                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
+                        dataOrigin = DataOrigin("some.package")
+                    ),
                 transFat = 5.grams
             )
         )

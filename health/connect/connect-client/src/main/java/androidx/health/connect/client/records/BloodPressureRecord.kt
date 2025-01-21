@@ -34,6 +34,7 @@ import java.time.ZoneOffset
 public class BloodPressureRecord(
     override val time: Instant,
     override val zoneOffset: ZoneOffset?,
+    override val metadata: Metadata,
     /**
      * Systolic blood pressure measurement, in [Pressure] unit. Required field. Valid range: 20-200
      * mmHg.
@@ -59,7 +60,6 @@ public class BloodPressureRecord(
      */
     @property:MeasurementLocations
     public val measurementLocation: Int = MEASUREMENT_LOCATION_UNKNOWN,
-    override val metadata: Metadata = Metadata.EMPTY,
 ) : InstantaneousRecord {
 
     /*
