@@ -139,13 +139,6 @@ public object IconToggleButtonDefaults {
         @Composable get() = MaterialTheme.shapes.medium
 
     /**
-     * Recommended pressed shape corner fraction for [variantAnimatedShapes]. This fraction will be
-     * applied to checked and unchecked shapes to generate the checkedPressed and uncheckedPressed
-     * shapes.
-     */
-    public val PressedShapeCornerSizeFraction: Float = 0.66f
-
-    /**
      * The recommended size of an icon when used inside an icon toggle button with size
      * [SmallButtonSize]. Use [iconSizeFor] to easily determine the icon size.
      */
@@ -244,25 +237,19 @@ public object IconToggleButtonDefaults {
      * @sample androidx.wear.compose.material3.samples.IconToggleButtonVariantSample
      * @param uncheckedShape the unchecked shape.
      * @param checkedShape the checked shape.
-     * @param pressedShapeCornerSizeFraction The fraction to apply to the uncheckedShape and
-     *   checkedShape corner sizes, when the button is pressed. For example, the button shape
-     *   animates from uncheckedShape to a new [CornerBasedShape] with corner size =
-     *   uncheckedShape's corner size * pressedCornerShapeFraction. By default, the button corners
-     *   are reduced in size when pressed, so that the button becomes more square.
      */
     @Composable
     public fun variantAnimatedShapes(
         uncheckedShape: CornerBasedShape = shape,
-        checkedShape: CornerBasedShape = this.checkedShape,
-        pressedShapeCornerSizeFraction: Float = PressedShapeCornerSizeFraction,
+        checkedShape: CornerBasedShape = this.checkedShape
     ): IconToggleButtonShapes =
         IconToggleButtonShapes(
             unchecked = uncheckedShape,
             checked = checkedShape,
             uncheckedPressed =
-                uncheckedShape.fractionalRoundedCornerShape(pressedShapeCornerSizeFraction),
+                uncheckedShape.fractionalRoundedCornerShape(PressedShapeCornerSizeFraction),
             checkedPressed =
-                checkedShape.fractionalRoundedCornerShape(pressedShapeCornerSizeFraction)
+                checkedShape.fractionalRoundedCornerShape(PressedShapeCornerSizeFraction)
         )
 
     /**
@@ -360,6 +347,13 @@ public object IconToggleButtonDefaults {
                     )
                     .also { defaultIconToggleButtonColorsCached = it }
         }
+
+    /**
+     * Recommended pressed shape corner fraction for [variantAnimatedShapes]. This fraction will be
+     * applied to checked and unchecked shapes to generate the checkedPressed and uncheckedPressed
+     * shapes.
+     */
+    private const val PressedShapeCornerSizeFraction: Float = 0.66f
 }
 
 /**
