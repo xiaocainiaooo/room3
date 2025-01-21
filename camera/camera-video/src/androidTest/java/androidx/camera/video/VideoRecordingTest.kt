@@ -365,13 +365,13 @@ class VideoRecordingTest(
     fun getResolutionInfo_shouldMatchRecordedVideoResolution() {
         // Arrange.
         checkAndBindUseCases(preview, videoCapture)
+        val resolutionInfo = videoCapture.resolutionInfo!!
 
         // Act.
         val result = recordingSession.createRecording().recordAndVerify()
 
         // Assert: the resolution of the video file should match the resolution calculated by
         // rotating the cropRect specified in the ResolutionInfo.
-        val resolutionInfo = videoCapture.resolutionInfo!!
         val expectedResolution =
             rotateSize(rectToSize(resolutionInfo.cropRect), resolutionInfo.rotationDegrees)
         verifyVideoResolution(context, result.file, expectedResolution)
