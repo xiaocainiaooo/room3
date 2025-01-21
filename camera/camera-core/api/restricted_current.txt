@@ -259,15 +259,15 @@ package androidx.camera.core {
   }
 
   public final class FlashState {
-    property public static final int FLASH_STATE_FIRED;
-    property public static final int FLASH_STATE_READY;
-    property public static final int FLASH_STATE_UNAVAILABLE;
-    property public static final int FLASH_STATE_UNKNOWN;
-    field public static final int FLASH_STATE_FIRED = 1; // 0x1
-    field public static final int FLASH_STATE_READY = 3; // 0x3
-    field public static final int FLASH_STATE_UNAVAILABLE = 2; // 0x2
-    field public static final int FLASH_STATE_UNKNOWN = 0; // 0x0
+    property public static final int FIRED;
+    property public static final int NOT_FIRED;
+    property public static final int UNAVAILABLE;
+    property public static final int UNKNOWN;
+    field public static final int FIRED = 1; // 0x1
     field public static final androidx.camera.core.FlashState INSTANCE;
+    field public static final int NOT_FIRED = 3; // 0x3
+    field public static final int UNAVAILABLE = 2; // 0x2
+    field public static final int UNKNOWN = 0; // 0x0
   }
 
   public final class FocusMeteringAction {
