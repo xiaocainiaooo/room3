@@ -61,7 +61,7 @@ import org.junit.runners.Parameterized
 @LargeTest
 @RunWith(Parameterized::class)
 @SdkSuppress(minSdkVersion = 21)
-class PersistentRecordingTest(
+class PersistentRecordingTestBase(
     private val implName: String,
     private var cameraSelector: CameraSelector,
     private val cameraConfig: CameraXConfig,
