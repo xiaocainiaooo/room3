@@ -46,9 +46,9 @@ class AppFunctionCompilerTest {
     fun testSimpleFunction_genAppFunctionIds_success() {
         val report = compilationTestHelper.compileAll(sourceFileNames = listOf("SimpleFunction.KT"))
 
-        compilationTestHelper.assertSuccessWithContent(
+        compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
-            expectGeneratedFileName = "SimpleFunctionIds.kt",
+            expectGeneratedSourceFileName = "SimpleFunctionIds.kt",
             goldenFileName = "SimpleFunctionIds.KT"
         )
     }
@@ -85,10 +85,25 @@ class AppFunctionCompilerTest {
     fun testSimpleFunction_genAppFunctionInventoryImpl_success() {
         val report = compilationTestHelper.compileAll(sourceFileNames = listOf("SimpleFunction.KT"))
 
-        compilationTestHelper.assertSuccessWithContent(
+        compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
-            expectGeneratedFileName = "SimpleFunction_AppFunctionInventory_Impl.kt",
+            expectGeneratedSourceFileName = "SimpleFunction_AppFunctionInventory_Impl.kt",
             goldenFileName = "$%s".format("SimpleFunction_AppFunctionInventory_Impl.KT")
+        )
+    }
+
+    // TODO: Add more tests for legacy index processor.
+    @Test
+    fun testSampleNoParamImp_genLegacyIndexXmlFile_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("FakeNoArgImpl.KT", "FakeSchemas.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions.xml",
+            goldenFileName = "fakeNoArgImpl_app_function.xml"
         )
     }
 }

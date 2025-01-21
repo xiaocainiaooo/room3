@@ -28,6 +28,14 @@ object IntrospectionHelper {
     // Annotation classes
     object AppFunctionAnnotation {
         val CLASS_NAME = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunction")
+        const val PROPERTY_IS_ENABLED = "isEnabled"
+    }
+
+    object AppFunctionSchemaDefinitionAnnotation {
+        val CLASS_NAME = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionSchemaDefinition")
+        const val PROPERTY_CATEGORY = "category"
+        const val PROPERTY_NAME = "name"
+        const val PROPERTY_VERSION = "version"
     }
 
     // Classes
