@@ -156,8 +156,10 @@ package androidx.wear.compose.material3 {
   public final class ButtonGroupDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.layout.PaddingValues fullWidthPaddings();
     method public float getExpansionWidth();
+    method public float getMinWidth();
     method public float getSpacing();
     property public final float ExpansionWidth;
+    property public final float MinWidth;
     property public final float Spacing;
     field public static final androidx.wear.compose.material3.ButtonGroupDefaults INSTANCE;
   }
@@ -167,7 +169,7 @@ package androidx.wear.compose.material3 {
   }
 
   public interface ButtonGroupScope {
-    method public androidx.compose.ui.Modifier enlargeOnPress(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource);
+    method public androidx.compose.ui.Modifier animateWidth(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.InteractionSource interactionSource);
     method public androidx.compose.ui.Modifier minWidth(androidx.compose.ui.Modifier, optional float minWidth);
     method public androidx.compose.ui.Modifier weight(androidx.compose.ui.Modifier, @FloatRange(from=0.0, fromInclusive=false) float weight);
   }
