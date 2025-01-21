@@ -65,7 +65,7 @@ import androidx.compose.material3.samples.DeterminateContainedLoadingIndicatorSa
 import androidx.compose.material3.samples.DeterminateLoadingIndicatorSample
 import androidx.compose.material3.samples.DismissibleModalWideNavigationRailSample
 import androidx.compose.material3.samples.DismissibleNavigationDrawerSample
-import androidx.compose.material3.samples.DockedSearchBarSample
+import androidx.compose.material3.samples.DockedSearchBarScaffoldSample
 import androidx.compose.material3.samples.EditableExposedDropdownMenuSample
 import androidx.compose.material3.samples.ElevatedAssistChipSample
 import androidx.compose.material3.samples.ElevatedButtonSample
@@ -106,6 +106,7 @@ import androidx.compose.material3.samples.FilterChipSample
 import androidx.compose.material3.samples.FilterChipWithLeadingIconSample
 import androidx.compose.material3.samples.FloatingActionButtonMenuSample
 import androidx.compose.material3.samples.FloatingActionButtonSample
+import androidx.compose.material3.samples.FullScreenSearchBarScaffoldSample
 import androidx.compose.material3.samples.HorizontalFloatingToolbarAsScaffoldFabSample
 import androidx.compose.material3.samples.HorizontalFloatingToolbarWithFabSample
 import androidx.compose.material3.samples.HorizontalMultiBrowseCarouselSample
@@ -192,7 +193,6 @@ import androidx.compose.material3.samples.ScrollableVerticalFloatingToolbarSampl
 import androidx.compose.material3.samples.ScrollingFancyIndicatorContainerTabs
 import androidx.compose.material3.samples.ScrollingPrimaryTextTabs
 import androidx.compose.material3.samples.ScrollingSecondaryTextTabs
-import androidx.compose.material3.samples.SearchBarSample
 import androidx.compose.material3.samples.SecondaryIconTabs
 import androidx.compose.material3.samples.SecondaryTextTabs
 import androidx.compose.material3.samples.SegmentedButtonMultiSelectSample
@@ -204,6 +204,7 @@ import androidx.compose.material3.samples.SimpleBottomSheetScaffoldSample
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBarWithSubtitle
 import androidx.compose.material3.samples.SimpleOutlinedTextFieldSample
+import androidx.compose.material3.samples.SimpleSearchBarSample
 import androidx.compose.material3.samples.SimpleTextFieldSample
 import androidx.compose.material3.samples.SimpleTopAppBar
 import androidx.compose.material3.samples.SimpleTopAppBarWithSubtitle
@@ -1622,18 +1623,25 @@ private const val SearchBarExampleSourceUrl = "$SampleSourceUrl/SearchBarSamples
 val SearchBarExamples =
     listOf(
         Example(
-            name = "SearchBarSample",
+            name = "SimpleSearchBarSample",
             description = SearchBarExampleDescription,
             sourceUrl = SearchBarExampleSourceUrl
         ) {
-            SearchBarSample()
+            SimpleSearchBarSample()
         },
         Example(
-            name = "DockedSearchBarSample",
+            name = "FullScreenSearchBarScaffoldSample",
             description = SearchBarExampleDescription,
             sourceUrl = SearchBarExampleSourceUrl
         ) {
-            DockedSearchBarSample()
+            FullScreenSearchBarScaffoldSample()
+        },
+        Example(
+            name = "DockedSearchBarScaffoldSample",
+            description = SearchBarExampleDescription,
+            sourceUrl = SearchBarExampleSourceUrl
+        ) {
+            DockedSearchBarScaffoldSample()
         }
     )
 
