@@ -230,6 +230,18 @@ internal actual value class Strings constructor(val value: Int) {
         actual inline val TimePickerMinuteTextField
             get() = Strings(MaterialR.string.m3c_time_picker_minute_text_field)
 
+        actual inline val TimePickerDialogTitle
+            get() = Strings(MaterialR.string.m3c_time_picker_dialog_title)
+
+        actual inline val TimeInputDialogTitle
+            get() = Strings(MaterialR.string.m3c_time_input_dialog_title)
+
+        actual inline val TimePickerToggleKeyboard
+            get() = Strings(MaterialR.string.m3c_time_picker_toggle_keyboard)
+
+        actual inline val TimePickerToggleTouch
+            get() = Strings(MaterialR.string.m3c_time_picker_toggle_touch)
+
         actual inline val TooltipPaneDescription
             get() = Strings(MaterialR.string.m3c_tooltip_pane_description)
 

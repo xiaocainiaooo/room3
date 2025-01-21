@@ -95,6 +95,10 @@ internal actual value class Strings constructor(val value: Int) {
         actual val TimePickerMinuteTextField: Strings = implementedInJetBrainsFork()
         actual val TooltipPaneDescription: Strings = implementedInJetBrainsFork()
         actual val ExposedDropdownMenu: Strings = implementedInJetBrainsFork()
+        actual val TimePickerDialogTitle: Strings = implementedInJetBrainsFork()
+        actual val TimeInputDialogTitle: Strings = implementedInJetBrainsFork()
+        actual val TimePickerToggleKeyboard: Strings = implementedInJetBrainsFork()
+        actual val TimePickerToggleTouch: Strings = implementedInJetBrainsFork()
         actual val ToggleDropdownMenu: Strings = implementedInJetBrainsFork()
         actual val WideNavigationRailPaneTitle: Strings = implementedInJetBrainsFork()
     }
