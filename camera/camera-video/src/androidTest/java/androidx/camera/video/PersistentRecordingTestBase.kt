@@ -35,14 +35,12 @@ import androidx.camera.testing.impl.AndroidUtil.skipVideoRecordingTestIfNotSuppo
 import androidx.camera.testing.impl.CameraPipeConfigTestRule
 import androidx.camera.testing.impl.CameraTaskTrackingExecutor
 import androidx.camera.testing.impl.CameraUtil
-import androidx.camera.testing.impl.InternalTestConvenience.ignoreTestForCameraPipe
+import androidx.camera.testing.impl.LabTestRule
 import androidx.camera.testing.impl.SurfaceTextureProvider
 import androidx.camera.testing.impl.fakes.FakeLifecycleOwner
 import androidx.camera.testing.impl.video.AudioChecker
 import androidx.camera.testing.impl.video.RecordingSession
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.filters.LargeTest
-import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import com.google.common.truth.Truth.assertWithMessage
@@ -55,17 +53,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-@LargeTest
-@RunWith(Parameterized::class)
-@SdkSuppress(minSdkVersion = 21)
-class PersistentRecordingTestBase(
+abstract class PersistentRecordingTestBase(
     private val implName: String,
     private var cameraSelector: CameraSelector,
-    private val cameraConfig: CameraXConfig,
-    private val forceEnableStreamSharing: Boolean,
+    private val cameraConfig: CameraXConfig
 ) {
 
     @get:Rule
@@ -88,6 +81,8 @@ class PersistentRecordingTestBase(
     val permissionRule: GrantPermissionRule =
         GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO)
 
+    @get:Rule val labTestRule = LabTestRule()
+
     companion object {
 
         @JvmStatic
@@ -98,41 +93,28 @@ class PersistentRecordingTestBase(
                     "back+" + Camera2Config::class.simpleName,
                     CameraSelector.DEFAULT_BACK_CAMERA,
                     Camera2Config.defaultConfig(),
-                    /*forceEnableStreamSharing=*/ false,
                 ),
                 arrayOf(
                     "front+" + Camera2Config::class.simpleName,
                     CameraSelector.DEFAULT_FRONT_CAMERA,
                     Camera2Config.defaultConfig(),
-                    /*forceEnableStreamSharing=*/ false,
-                ),
-                arrayOf(
-                    "back+" + Camera2Config::class.simpleName + "+streamSharing",
-                    CameraSelector.DEFAULT_BACK_CAMERA,
-                    Camera2Config.defaultConfig(),
-                    /*forceEnableStreamSharing=*/ true,
                 ),
                 arrayOf(
                     "back+" + CameraPipeConfig::class.simpleName,
                     CameraSelector.DEFAULT_BACK_CAMERA,
                     CameraPipeConfig.defaultConfig(),
-                    /*forceEnableStreamSharing=*/ false,
                 ),
                 arrayOf(
                     "front+" + CameraPipeConfig::class.simpleName,
                     CameraSelector.DEFAULT_FRONT_CAMERA,
                     CameraPipeConfig.defaultConfig(),
-                    /*forceEnableStreamSharing=*/ false,
-                ),
-                arrayOf(
-                    "back+" + CameraPipeConfig::class.simpleName + "+streamSharing",
-                    CameraSelector.DEFAULT_BACK_CAMERA,
-                    CameraPipeConfig.defaultConfig(),
-                    /*forceEnableStreamSharing=*/ true,
                 ),
             )
         }
     }
+
+    protected abstract val testTag: String
+    protected abstract val enableStreamSharing: Boolean
 
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context: Context = ApplicationProvider.getApplicationContext()
@@ -184,7 +166,7 @@ class PersistentRecordingTestBase(
         cameraProvider =
             ProcessCameraProviderWrapper(
                 ProcessCameraProvider.getInstance(context).get(),
-                forceEnableStreamSharing
+                enableStreamSharing
             )
         lifecycleOwner = FakeLifecycleOwner()
         lifecycleOwner.startAndResume()
@@ -226,26 +208,13 @@ class PersistentRecordingTestBase(
         }
     }
 
+    // TODO(b/340406044): Remove LabTestOnly when issue is resolved.
+    @LabTestRule.LabTestOnly
     @Test
     fun persistentRecording_canContinueRecordingAfterRebind() {
         assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
 
-        // TODO(b/340406044): Enable the test for stream sharing use case.
-        assumeFalse(
-            "The test is temporarily ignored when stream sharing is enabled.",
-            forceEnableStreamSharing
-        )
-
         checkAndBindUseCases(preview, videoCapture)
-
-        // TODO(b/340406044): Enable the test for stream sharing use case.
-        // Bypass stream sharing if it's enforced on the device. Like quirks in
-        // androidx.camera.core.internal.compat.workaround.StreamSharingForceEnabler.
-        assumeFalse(
-            "The test is temporarily ignored when the video capture requires transformation.",
-            isStreamSharingEnabled(videoCapture)
-        )
-
         val recording =
             recordingSession.createRecording(asPersistentRecording = true).startAndVerify()
 
@@ -258,26 +227,13 @@ class PersistentRecordingTestBase(
         recording.stopAndVerify()
     }
 
+    // TODO(b/340406044): Remove LabTestOnly when issue is resolved.
+    @LabTestRule.LabTestOnly
     @Test
     fun persistentRecording_canContinueRecordingPausedAfterRebind() {
         assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
 
-        // TODO(b/340406044): Enable the test for stream sharing use case.
-        assumeFalse(
-            "The test is temporarily ignored when stream sharing is enabled.",
-            forceEnableStreamSharing
-        )
-
         checkAndBindUseCases(preview, videoCapture)
-
-        // TODO(b/340406044): Enable the test for stream sharing use case.
-        // Bypass stream sharing if it's enforced on the device. Like quirks in
-        // androidx.camera.core.internal.compat.workaround.StreamSharingForceEnabler.
-        assumeFalse(
-            "The test is temporarily ignored when the video capture requires transformation.",
-            isStreamSharingEnabled(videoCapture)
-        )
-
         val recording =
             recordingSession
                 .createRecording(asPersistentRecording = true)
@@ -290,32 +246,13 @@ class PersistentRecordingTestBase(
         recording.resumeAndVerify().stopAndVerify()
     }
 
+    // TODO(b/353113961): Remove LabTestOnly when issue is resolved.
+    @LabTestRule.LabTestOnly
     @Test
     fun persistentRecording_canStopAfterUnbind() {
         assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
 
-        // TODO(b/353113961): Enable the test for camera pipe implementation.
-        implName.ignoreTestForCameraPipe(
-            "The test is temporarily ignored for camera pipe implementation.",
-            true
-        )
-
-        // TODO(b/340406044): Enable the test for stream sharing use case.
-        assumeFalse(
-            "The test is temporarily ignored when stream sharing is enabled.",
-            forceEnableStreamSharing
-        )
-
         checkAndBindUseCases(preview, videoCapture)
-
-        // TODO(b/340406044): Enable the test for stream sharing use case.
-        // Bypass stream sharing if it's enforced on the device. Like quirks in
-        // androidx.camera.core.internal.compat.workaround.StreamSharingForceEnabler.
-        assumeFalse(
-            "The test is temporarily ignored when the video capture requires transformation.",
-            isStreamSharingEnabled(videoCapture)
-        )
-
         val recording =
             recordingSession.createRecording(asPersistentRecording = true).startAndVerify()
 
@@ -324,13 +261,10 @@ class PersistentRecordingTestBase(
         recording.stopAndVerify()
     }
 
+    // TODO(b/340406044): Remove LabTestOnly when issue is resolved.
+    @LabTestRule.LabTestOnly
     @Test
     fun updateVideoUsage_whenUseCaseUnboundAndReboundForPersistentRecording(): Unit = runBlocking {
-        assumeFalse(
-            "TODO: b/340406044 - Temporarily ignored when stream sharing is enabled.",
-            forceEnableStreamSharing
-        )
-
         checkAndBindUseCases(preview, videoCapture)
         val recording =
             recordingSession.createRecording(asPersistentRecording = true).startAndVerify()
@@ -357,14 +291,11 @@ class PersistentRecordingTestBase(
         recording.stopAndVerify()
     }
 
+    // TODO(b/340406044): Remove LabTestOnly when issue is resolved.
+    @LabTestRule.LabTestOnly
     @Test
     fun updateVideoUsage_whenUseCaseBoundToNewCameraForPersistentRecording(): Unit = runBlocking {
         assumeStopCodecAfterSurfaceRemovalCrashMediaServerQuirk()
-
-        assumeFalse(
-            "TODO: b/340406044 - Temporarily ignored when stream sharing is enabled.",
-            forceEnableStreamSharing
-        )
 
         checkAndBindUseCases(preview, videoCapture)
         val recording =
@@ -400,14 +331,23 @@ class PersistentRecordingTestBase(
 
     private fun isUseCasesCombinationSupported(
         vararg useCases: UseCase,
+        withStreamSharing: Boolean,
         useOppositeCamera: Boolean = false,
-    ) = getCamera(useOppositeCamera).isUseCasesCombinationSupported(*useCases)
+    ) = getCamera(useOppositeCamera).isUseCasesCombinationSupported(withStreamSharing, *useCases)
 
+    /** Checks use case combination with considering StreamSharing and then binds to lifecycle. */
     private fun checkAndBindUseCases(
         vararg useCases: UseCase,
+        withStreamSharing: Boolean = enableStreamSharing,
         useOppositeCamera: Boolean = false,
     ) {
-        assumeTrue(isUseCasesCombinationSupported(*useCases, useOppositeCamera = useOppositeCamera))
+        assumeTrue(
+            isUseCasesCombinationSupported(
+                *useCases,
+                withStreamSharing = withStreamSharing,
+                useOppositeCamera = useOppositeCamera
+            )
+        )
 
         instrumentation.runOnMainSync {
             cameraProvider.bindToLifecycle(
