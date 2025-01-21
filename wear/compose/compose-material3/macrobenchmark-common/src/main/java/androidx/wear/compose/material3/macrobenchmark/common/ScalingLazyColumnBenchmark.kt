@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,25 +25,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
+import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.lazy.scrollTransform
 import kotlinx.coroutines.launch
 
-val TransformingLazyColumnBenchmark =
+val ScalingLazyColumnBenchmark =
     object : MacrobenchmarkScreen {
         override val content: @Composable (BoxScope.() -> Unit)
             get() = {
-                val state = rememberTransformingLazyColumnState()
+                val state = rememberScalingLazyListState()
                 val coroutineScope = rememberCoroutineScope()
                 AppScaffold {
                     ScreenScaffold(
@@ -57,9 +57,10 @@ val TransformingLazyColumnBenchmark =
                             }
                         }
                     ) { contentPadding ->
-                        TransformingLazyColumn(
-                            state = state,
+                        ScalingLazyColumn(
+                            horizontalAlignment = Alignment.CenterHorizontally,
                             contentPadding = contentPadding,
+                            state = state,
                             modifier =
                                 Modifier.background(MaterialTheme.colorScheme.background)
                                     .semantics { contentDescription = CONTENT_DESCRIPTION }
@@ -69,16 +70,7 @@ val TransformingLazyColumnBenchmark =
                                     "Item $it",
                                     color = MaterialTheme.colorScheme.onSurface,
                                     style = MaterialTheme.typography.bodyLarge,
-                                    modifier =
-                                        Modifier.fillMaxWidth()
-                                            // Apply Material 3 Motion transformations.
-                                            .scrollTransform(
-                                                this,
-                                                backgroundColor =
-                                                    MaterialTheme.colorScheme.surfaceContainer,
-                                                shape = MaterialTheme.shapes.small
-                                            )
-                                            .padding(10.dp)
+                                    modifier = Modifier.fillMaxWidth().padding(10.dp)
                                 )
                             }
                         }
@@ -90,6 +82,7 @@ val TransformingLazyColumnBenchmark =
             get() = {
                 repeat(20) {
                     val endY = device.displayHeight * 9 / 10 // scroll down
+
                     device.swipe(
                         device.displayWidth / 2,
                         device.displayHeight / 2,
