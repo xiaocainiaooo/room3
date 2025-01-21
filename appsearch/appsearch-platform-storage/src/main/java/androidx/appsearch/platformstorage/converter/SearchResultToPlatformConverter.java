@@ -20,8 +20,10 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 
 import androidx.annotation.DoNotInline;
+import androidx.annotation.OptIn;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RestrictTo;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.GenericDocument;
 import androidx.appsearch.app.SearchResult;
 import androidx.appsearch.platformstorage.util.AppSearchVersionUtil;
@@ -30,6 +32,7 @@ import androidx.core.util.Preconditions;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Translates between Platform and Jetpack versions of {@link SearchResult}.
@@ -41,6 +44,7 @@ public class SearchResultToPlatformConverter {
     private SearchResultToPlatformConverter() {}
 
     /** Translates from Platform to Jetpack versions of {@link SearchResult}. */
+    @OptIn(markerClass = ExperimentalAppSearchApi.class)
     public static @NonNull SearchResult toJetpackSearchResult(
             android.app.appsearch.@NonNull SearchResult platformResult) {
         Preconditions.checkNotNull(platformResult);
@@ -68,8 +72,14 @@ public class SearchResultToPlatformConverter {
             for (int i = 0; i < informationalRankingSignals.size(); i++) {
                 builder.addInformationalRankingSignal(informationalRankingSignals.get(i));
             }
+
+            // TODO(b/371610934): Ensure the parent type map is set for older devices receiving
+            //  mainline updates. AppSearch will relocate parent type information from
+            //  GenericDocument to SearchResult in new versions. Omitting this step will result
+            //  in missing parent data and incorrect polymorphic deserialization behavior for
+            //  GenericDocument.
+            builder.setParentTypeMap(ApiHelperForB.getParentTypeMap(platformResult));
         }
-        // TODO(b/371610934): Set parentTypeMap once it is available in platform.
         return builder.build();
     }
 
@@ -128,15 +138,21 @@ public class SearchResultToPlatformConverter {
     }
 
     @RequiresApi(36)
-    @SuppressLint("NewApi") // getInformationalRankingSignals() incorrectly flagged as 34-ext16
     private static class ApiHelperForB {
         private ApiHelperForB() {
         }
 
         @DoNotInline
+        @SuppressLint("NewApi") // getInformationalRankingSignals() incorrectly flagged as 34-ext16
         static List<Double> getInformationalRankingSignals(
                 android.app.appsearch.@NonNull SearchResult result) {
             return result.getInformationalRankingSignals();
+        }
+
+        @DoNotInline
+        static Map<String, List<String>> getParentTypeMap(
+                android.app.appsearch.@NonNull SearchResult result) {
+            return result.getParentTypeMap();
         }
     }
 }

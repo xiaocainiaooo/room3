@@ -111,6 +111,8 @@ final class FeaturesImpl implements Features {
             case Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG:
                 // fall through
             case Features.SEARCH_SPEC_ADD_INFORMATIONAL_RANKING_EXPRESSIONS:
+                // fall through
+            case Features.SEARCH_RESULT_PARENT_TYPES:
                 return AppSearchVersionUtil.isAtLeastB();
 
             // Pending Android B Features
@@ -129,9 +131,6 @@ final class FeaturesImpl implements Features {
             case Features.SCHEMA_SCORABLE_PROPERTY_CONFIG:
                 // TODO(b/357105837) : Update when feature is ready in service-appsearch.
                 // fall through
-            case Features.SEARCH_RESULT_PARENT_TYPES:
-                // TODO(b/371610934) : Update when feature is ready in service-appsearch.
-                return false;
 
             // Beyond Android B Features
             case Features.SCHEMA_SET_DESCRIPTION:
