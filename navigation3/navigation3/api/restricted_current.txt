@@ -55,11 +55,11 @@ package androidx.navigation3 {
     method @androidx.compose.runtime.Composable public static <T> void NavDisplay(java.util.List<? extends T> backstack, optional androidx.compose.ui.Modifier modifier, optional java.util.List<? extends androidx.navigation3.NavLocalProvider> localProviders, optional androidx.compose.ui.Alignment contentAlignment, optional androidx.compose.animation.SizeTransform? sizeTransform, optional androidx.compose.animation.EnterTransition enterTransition, optional androidx.compose.animation.ExitTransition exitTransition, optional kotlin.jvm.functions.Function0<kotlin.Unit> onBack, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavEntry<? extends T>> entryProvider);
   }
 
-  public final class NavEntry<T> {
+  public class NavEntry<T> {
     ctor public NavEntry(T key, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
-    method public kotlin.jvm.functions.Function1<T,kotlin.Unit> getContent();
-    method public java.util.Map<java.lang.String,java.lang.Object> getFeatureMap();
-    method public T getKey();
+    method public final kotlin.jvm.functions.Function1<T,kotlin.Unit> getContent();
+    method public final java.util.Map<java.lang.String,java.lang.Object> getFeatureMap();
+    method public final T getKey();
     property public final kotlin.jvm.functions.Function1<T,kotlin.Unit> content;
     property public final java.util.Map<java.lang.String,java.lang.Object> featureMap;
     property public final T key;
