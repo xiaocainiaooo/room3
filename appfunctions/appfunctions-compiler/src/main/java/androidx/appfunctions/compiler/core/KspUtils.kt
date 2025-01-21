@@ -16,8 +16,12 @@
 
 package androidx.appfunctions.compiler.core
 
+import com.google.devtools.ksp.symbol.KSAnnotation
+import com.google.devtools.ksp.symbol.KSName
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.squareup.kotlinpoet.ClassName
+import kotlin.reflect.KClass
+import kotlin.reflect.cast
 
 /**
  * Checks if the type reference is of the given type.
@@ -27,12 +31,45 @@ import com.squareup.kotlinpoet.ClassName
  * @throws ProcessingException If unable to resolve the type.
  */
 fun KSTypeReference.isOfType(type: ClassName): Boolean {
-    val ksType = this.resolve()
     val typeName =
-        ksType.declaration.qualifiedName
+        resolveTypeName()
             ?: throw ProcessingException(
                 "Unable to resolve the type to check if it is of type [${type}]",
                 this
             )
     return typeName.asString() == type.canonicalName
+}
+
+/**
+ * Finds and returns an annotation of [annotationClass] type.
+ *
+ * @param annotationClass the annotation class to find
+ */
+fun Sequence<KSAnnotation>.findAnnotation(annotationClass: ClassName): KSAnnotation? =
+    this.singleOrNull() {
+        val shortName = it.shortName.getShortName()
+        if (shortName != annotationClass.simpleName) {
+            false
+        } else {
+            val typeName =
+                it.annotationType.resolveTypeName()
+                    ?: throw ProcessingException(
+                        "Unable to resolve type for [$shortName]",
+                        it.annotationType
+                    )
+            typeName.asString() == annotationClass.canonicalName
+        }
+    }
+
+private fun KSTypeReference.resolveTypeName(): KSName? = resolve().declaration.qualifiedName
+
+/** Returns the value of the annotation property if found. */
+fun <T : Any> KSAnnotation.requirePropertyValueOfType(
+    propertyName: String,
+    expectedType: KClass<T>,
+): T {
+    val propertyValue =
+        this.arguments.singleOrNull { it.name?.asString() == propertyName }?.value
+            ?: throw ProcessingException("Unable to find property with name: $propertyName", this)
+    return expectedType.cast(propertyValue)
 }
