@@ -46,7 +46,7 @@ import kotlinx.coroutines.withContext
  * created from, then such table is considered 'invalidated' and the [Flow] will emit a new value.
  */
 expect class InvalidationTracker
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX) // used in generated code
 constructor(
     database: RoomDatabase,
     shadowTablesMap: Map<String, String>,

@@ -203,20 +203,29 @@ package androidx.room {
   public abstract class RoomDatabase {
     ctor public RoomDatabase();
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void assertNotMainThread();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public void assertNotSuspendingTransaction();
     method @Deprecated public void beginTransaction();
     method @WorkerThread public abstract void clearAllTables();
     method public void close();
     method public androidx.sqlite.db.SupportSQLiteStatement compileStatement(String sql);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public java.util.List<androidx.room.migration.Migration> createAutoMigrations(java.util.Map<kotlin.reflect.KClass<? extends androidx.room.migration.AutoMigrationSpec>,? extends androidx.room.migration.AutoMigrationSpec> autoMigrationSpecs);
     method protected abstract androidx.room.InvalidationTracker createInvalidationTracker();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) protected androidx.room.RoomOpenDelegateMarker createOpenDelegate();
     method @Deprecated protected androidx.sqlite.db.SupportSQLiteOpenHelper createOpenHelper(androidx.room.DatabaseConfiguration config);
     method @Deprecated public void endTransaction();
+    method @Deprecated @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) @kotlin.jvm.JvmSuppressWildcards public java.util.List<androidx.room.migration.Migration> getAutoMigrations(java.util.Map<java.lang.Class<? extends androidx.room.migration.AutoMigrationSpec>,androidx.room.migration.AutoMigrationSpec> autoMigrationSpecs);
     method public androidx.room.InvalidationTracker getInvalidationTracker();
     method @Deprecated @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) protected java.util.List<androidx.room.RoomDatabase.Callback>? getMCallbacks();
     method @Deprecated @kotlin.jvm.Volatile protected androidx.sqlite.db.SupportSQLiteDatabase? getMDatabase();
     method public androidx.sqlite.db.SupportSQLiteOpenHelper getOpenHelper();
     method public java.util.concurrent.Executor getQueryExecutor();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public java.util.Set<kotlin.reflect.KClass<? extends androidx.room.migration.AutoMigrationSpec>> getRequiredAutoMigrationSpecClasses();
+    method @Deprecated @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public java.util.Set<java.lang.Class<? extends androidx.room.migration.AutoMigrationSpec>> getRequiredAutoMigrationSpecs();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) protected java.util.Map<kotlin.reflect.KClass<? extends java.lang.Object?>,java.util.List<kotlin.reflect.KClass<? extends java.lang.Object?>>> getRequiredTypeConverterClasses();
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) protected java.util.Map<java.lang.Class<? extends java.lang.Object?>,java.util.List<java.lang.Class<? extends java.lang.Object?>>> getRequiredTypeConverters();
     method public java.util.concurrent.Executor getTransactionExecutor();
     method @Deprecated public <T> T? getTypeConverter(Class<T> klass);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final <T> T getTypeConverter(kotlin.reflect.KClass<T> klass);
     method public boolean inTransaction();
     method @CallSuper public void init(androidx.room.DatabaseConfiguration configuration);
     method @Deprecated protected void internalInitInvalidationTracker(androidx.sqlite.db.SupportSQLiteDatabase db);
@@ -324,6 +333,31 @@ package androidx.room {
     method public static suspend <R> Object? useReaderConnection(androidx.room.RoomDatabase, kotlin.jvm.functions.Function2<? super androidx.room.Transactor,? super kotlin.coroutines.Continuation<? super R>,? extends java.lang.Object?> block, kotlin.coroutines.Continuation<? super R>);
     method public static suspend <R> Object? useWriterConnection(androidx.room.RoomDatabase, kotlin.jvm.functions.Function2<? super androidx.room.Transactor,? super kotlin.coroutines.Continuation<? super R>,? extends java.lang.Object?> block, kotlin.coroutines.Continuation<? super R>);
     method public static suspend <R> Object? withTransaction(androidx.room.RoomDatabase, kotlin.jvm.functions.Function1<? super kotlin.coroutines.Continuation<? super R>,? extends java.lang.Object?> block, kotlin.coroutines.Continuation<? super R>);
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public abstract class RoomOpenDelegate implements androidx.room.RoomOpenDelegateMarker {
+    ctor public RoomOpenDelegate(int version, String identityHash, String legacyIdentityHash);
+    method public abstract void createAllTables(androidx.sqlite.SQLiteConnection connection);
+    method public abstract void dropAllTables(androidx.sqlite.SQLiteConnection connection);
+    method public final String getIdentityHash();
+    method public final String getLegacyIdentityHash();
+    method public final int getVersion();
+    method public abstract void onCreate(androidx.sqlite.SQLiteConnection connection);
+    method public abstract void onOpen(androidx.sqlite.SQLiteConnection connection);
+    method public abstract void onPostMigrate(androidx.sqlite.SQLiteConnection connection);
+    method public abstract void onPreMigrate(androidx.sqlite.SQLiteConnection connection);
+    method public abstract androidx.room.RoomOpenDelegate.ValidationResult onValidateSchema(androidx.sqlite.SQLiteConnection connection);
+    property public final String identityHash;
+    property public final String legacyIdentityHash;
+    property public final int version;
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static final class RoomOpenDelegate.ValidationResult {
+    ctor public RoomOpenDelegate.ValidationResult(boolean isValid, String? expectedFoundMsg);
+    property public final String? expectedFoundMsg;
+    property public final boolean isValid;
+    field public final String? expectedFoundMsg;
+    field public final boolean isValid;
   }
 
   public interface RoomOpenDelegateMarker {
