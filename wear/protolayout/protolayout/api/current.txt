@@ -1564,17 +1564,17 @@ package androidx.wear.protolayout.modifiers {
   }
 
   public interface LayoutModifier {
-    method public <R> R foldIn(R initial, kotlin.jvm.functions.Function2<? super R,? super androidx.wear.protolayout.modifiers.LayoutModifier.Element,? extends R> operation);
+    method public <R> R foldRight(R initial, kotlin.jvm.functions.Function2<? super R,? super androidx.wear.protolayout.modifiers.LayoutModifier.Element,? extends R> operation);
     method public default infix androidx.wear.protolayout.modifiers.LayoutModifier then(androidx.wear.protolayout.modifiers.LayoutModifier other);
     field public static final androidx.wear.protolayout.modifiers.LayoutModifier.Companion Companion;
   }
 
   public static final class LayoutModifier.Companion implements androidx.wear.protolayout.modifiers.LayoutModifier {
-    method public <R> R foldIn(R initial, kotlin.jvm.functions.Function2<? super R,? super androidx.wear.protolayout.modifiers.LayoutModifier.Element,? extends R> operation);
+    method public <R> R foldRight(R initial, kotlin.jvm.functions.Function2<? super R,? super androidx.wear.protolayout.modifiers.LayoutModifier.Element,? extends R> operation);
   }
 
   public static interface LayoutModifier.Element extends androidx.wear.protolayout.modifiers.LayoutModifier {
-    method public default <R> R foldIn(R initial, kotlin.jvm.functions.Function2<? super R,? super androidx.wear.protolayout.modifiers.LayoutModifier.Element,? extends R> operation);
+    method public default <R> R foldRight(R initial, kotlin.jvm.functions.Function2<? super R,? super androidx.wear.protolayout.modifiers.LayoutModifier.Element,? extends R> operation);
   }
 
   public final class ModifierAppliersKt {
