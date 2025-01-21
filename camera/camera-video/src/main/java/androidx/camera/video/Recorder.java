@@ -2666,23 +2666,25 @@ public final class Recorder implements VideoOutput {
         @VideoRecordError int error = ERROR_NONE;
         Throwable errorCause = null;
         synchronized (mLock) {
+            Logger.d(TAG, "tryServicePendingRecording on state: " + mState);
             switch (mState) {
                 case PENDING_PAUSED:
                     startRecordingPaused = true;
                     // Fall-through
                 case PENDING_RECORDING:
-                    if (mActiveRecordingRecord != null || mNeedsResetBeforeNextStart) {
-                        // Active recording is still finalizing or the Recorder is expected to be
-                        // reset. Pending recording will be serviced in onRecordingFinalized() or
-                        // in onReset().
-                        break;
-                    }
                     if (mSourceState == SourceState.INACTIVE) {
                         pendingRecordingToFinalize = mPendingRecordingRecord;
                         mPendingRecordingRecord = null;
                         restoreNonPendingState(); // Equivalent to setState(mNonPendingState)
                         error = ERROR_SOURCE_INACTIVE;
                         errorCause = PENDING_RECORDING_ERROR_CAUSE_SOURCE_INACTIVE;
+                    } else if (mActiveRecordingRecord != null || mNeedsResetBeforeNextStart) {
+                        Logger.w(TAG, "PendingRecording is not handled"
+                                + ", active recording = " + mActiveRecordingRecord
+                                + ", need reset flag = " + mNeedsResetBeforeNextStart);
+                        // Active recording is still finalizing or the Recorder is expected to be
+                        // reset. Pending recording will be serviced in onRecordingFinalized() or
+                        // in onReset().
                     } else if (mVideoEncoder != null) {
                         // If there's no VideoEncoder, it may need to wait for the new
                         // VideoEncoder to be configured.
