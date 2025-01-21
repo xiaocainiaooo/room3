@@ -21,6 +21,7 @@ import androidx.room.compiler.codegen.XClassName
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.asClassName
 import androidx.room.compiler.processing.util.Source
+import androidx.room.compiler.processing.util.getDeclaredField
 import androidx.room.compiler.processing.util.runProcessorTest
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.JavaFile
@@ -307,6 +308,72 @@ class XProcessingEnvTest {
                 if (invocation.isKsp) {
                     assertThat(it.asTypeName().kotlin.toString()).isEqualTo("kotlin.Int")
                 }
+            }
+        }
+    }
+
+    @Test
+    fun testInteropTypesByNameFirst() {
+        runProcessorTest(
+            sources =
+                listOf(
+                    Source.kotlin(
+                        "test.Subject.kt",
+                        """
+                        package test
+                        class Subject {
+                            val javaString: java.lang.String = TODO()
+                            val kotlinString: String = TODO()
+                        }
+                        """
+                            .trimIndent()
+                    )
+                )
+        ) { invocation ->
+            val processingEnv = invocation.processingEnv
+            assertThat(processingEnv.requireTypeElement("java.lang.String").asClassName())
+                .isEqualTo(XTypeName.STRING)
+            if (invocation.isKsp) {
+                assertThat(processingEnv.requireTypeElement("kotlin.String").asClassName())
+                    .isEqualTo(XTypeName.STRING)
+            }
+            val subject = processingEnv.requireTypeElement("test.Subject")
+            assertThat(subject.getDeclaredField("javaString").type.typeElement!!.asClassName())
+                .isEqualTo(XClassName.get("java.lang", "String"))
+            assertThat(subject.getDeclaredField("kotlinString").type.typeElement!!.asClassName())
+                .isEqualTo(XTypeName.STRING)
+        }
+    }
+
+    @Test
+    fun testInteropTypesByDeclarationFirst() {
+        runProcessorTest(
+            sources =
+                listOf(
+                    Source.kotlin(
+                        "test.Subject.kt",
+                        """
+                        package test
+                        class Subject {
+                            val javaString: java.lang.String = TODO()
+                            val kotlinString: String = TODO()
+                        }
+                        """
+                            .trimIndent()
+                    )
+                )
+        ) { invocation ->
+            val processingEnv = invocation.processingEnv
+            val subject = processingEnv.requireTypeElement("test.Subject")
+            assertThat(subject.getDeclaredField("javaString").type.typeElement!!.asClassName())
+                .isEqualTo(XClassName.get("java.lang", "String"))
+            assertThat(subject.getDeclaredField("kotlinString").type.typeElement!!.asClassName())
+                .isEqualTo(XTypeName.STRING)
+            assertThat(processingEnv.requireTypeElement("java.lang.String").asClassName())
+                .isEqualTo(XTypeName.STRING)
+            if (invocation.isKsp) {
+                assertThat(processingEnv.requireTypeElement("kotlin.String").asClassName())
+                    .isEqualTo(XTypeName.STRING)
             }
         }
     }
