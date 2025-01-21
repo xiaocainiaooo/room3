@@ -103,10 +103,10 @@ final class TorchControl {
         mExecutor = executor;
 
         mHasFlashUnit = FlashAvailabilityChecker.isFlashAvailable(cameraCharacteristics::get);
-        mIsTorchStrengthSupported =
-                mHasFlashUnit && Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM
-                        && cameraCharacteristics.getMaxTorchStrengthLevel() > 1;
-        mDefaultTorchStrength = cameraCharacteristics.getDefaultTorchStrengthLevel();
+        mIsTorchStrengthSupported = cameraCharacteristics.isTorchStrengthLevelSupported();
+        mDefaultTorchStrength = mHasFlashUnit && mIsTorchStrengthSupported
+                ? cameraCharacteristics.getDefaultTorchStrengthLevel()
+                : Camera2CameraInfoImpl.TORCH_STRENGTH_LEVEL_UNSUPPORTED;
         mTargetTorchStrength = mDefaultTorchStrength;
         mTorchState = new MutableLiveData<>(DEFAULT_TORCH_STATE);
         mTorchStrength = new MutableLiveData<>(mDefaultTorchStrength);

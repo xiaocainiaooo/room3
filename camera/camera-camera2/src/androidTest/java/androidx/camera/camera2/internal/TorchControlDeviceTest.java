@@ -23,6 +23,7 @@ import android.os.Build;
 
 import androidx.camera.camera2.Camera2Config;
 import androidx.camera.camera2.internal.util.TestUtil;
+import androidx.camera.core.CameraInfo;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.CameraXConfig;
 import androidx.camera.core.ImageAnalysis;
@@ -88,7 +89,8 @@ public class TorchControlDeviceTest {
         mCamera = CameraUtil.createCameraAndAttachUseCase(context, cameraSelector, imageAnalysis);
         mCameraControl = TestUtil.getCamera2CameraControlImpl(mCamera.getCameraControl());
         mTorchControl = mCameraControl.getTorchControl();
-        mIsTorchStrengthSupported = mCamera.getCameraInfo().getMaxTorchStrengthLevel() > 1;
+        mIsTorchStrengthSupported = mCamera.getCameraInfo().getMaxTorchStrengthLevel()
+                != CameraInfo.TORCH_STRENGTH_LEVEL_UNSUPPORTED;
     }
 
     @After
@@ -118,7 +120,7 @@ public class TorchControlDeviceTest {
 
     @Test(timeout = 5000L)
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM)
-    public void setTorchStrengthLevel_futureCompleteWhenTorchIsOnLevel()
+    public void setTorchStrengthLevel_futureCompleteWhenTorchIsOn()
             throws ExecutionException, InterruptedException {
         assumeTrue(mIsTorchStrengthSupported);
 
@@ -132,7 +134,7 @@ public class TorchControlDeviceTest {
 
     @Test(timeout = 5000L)
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.VANILLA_ICE_CREAM)
-    public void setTorchStrengthLevel_futureCompleteWhenTorchIsOffLevel()
+    public void setTorchStrengthLevel_futureCompleteWhenTorchIsOff()
             throws ExecutionException, InterruptedException {
         assumeTrue(mIsTorchStrengthSupported);
 

@@ -916,6 +916,30 @@ public class Camera2CameraInfoImplTest {
         assertThat(cameraInfo.getMaxTorchStrengthLevel()).isEqualTo(CAMERA0_MAX_TORCH_STRENGTH);
     }
 
+    @Config(minSdk = Build.VERSION_CODES.VANILLA_ICE_CREAM)
+    @Test
+    public void apiVersionMet_canReturnMaxTorchStrengthUnsupported()
+            throws CameraAccessExceptionCompat {
+        init(/* hasAvailableCapabilities = */ true);
+
+        final CameraInfo cameraInfo = new Camera2CameraInfoImpl(CAMERA1_ID, mCameraManagerCompat);
+
+        assertThat(cameraInfo.getMaxTorchStrengthLevel()).isEqualTo(
+                CameraInfo.TORCH_STRENGTH_LEVEL_UNSUPPORTED);
+    }
+
+    @Config(minSdk = Build.VERSION_CODES.VANILLA_ICE_CREAM)
+    @Test
+    public void apiVersionMet_canReturnTorchStrengthUnsupported()
+            throws CameraAccessExceptionCompat {
+        init(/* hasAvailableCapabilities = */ true);
+
+        final CameraInfo cameraInfo = new Camera2CameraInfoImpl(CAMERA1_ID, mCameraManagerCompat);
+
+        assertThat(cameraInfo.getTorchStrengthLevel().getValue()).isEqualTo(
+                CameraInfo.TORCH_STRENGTH_LEVEL_UNSUPPORTED);
+    }
+
     @Config(minSdk = 33)
     @Test
     public void apiVersionMet_canReturnSupportedDynamicRanges_fromFullySpecified()
@@ -944,13 +968,14 @@ public class Camera2CameraInfoImplTest {
 
     @Config(maxSdk = Build.VERSION_CODES.VANILLA_ICE_CREAM - 1)
     @Test
-    public void apiVersionNotMet_returnMaxTorchStrengthOne()
+    public void apiVersionNotMet_returnMaxTorchStrengthUnsupported()
             throws CameraAccessExceptionCompat {
         init(/* hasAvailableCapabilities = */ true);
 
         final CameraInfo cameraInfo = new Camera2CameraInfoImpl(CAMERA0_ID, mCameraManagerCompat);
 
-        assertThat(cameraInfo.getMaxTorchStrengthLevel()).isEqualTo(1);
+        assertThat(cameraInfo.getMaxTorchStrengthLevel()).isEqualTo(
+                CameraInfo.TORCH_STRENGTH_LEVEL_UNSUPPORTED);
     }
 
     @Config(maxSdk = 32)
