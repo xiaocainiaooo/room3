@@ -120,6 +120,8 @@ constructor(
         }
     }
 
+    private var isLowLightBoostDisabledByUseCaseSessionConfig = false
+
     /**
      * Turn the Low Light Boost on or off.
      *
@@ -137,6 +139,16 @@ constructor(
         if (!isLowLightBoostSupported) {
             return signal.createFailureResult(
                 IllegalStateException("Low Light Boost is not supported!")
+            )
+        }
+
+        if (isLowLightBoostDisabledByUseCaseSessionConfig) {
+            _lowLightBoostState.setLiveDataValue(LowLightBoostState.OFF)
+            return signal.createFailureResult(
+                IllegalStateException(
+                    "Low Light Boost is disabled" +
+                        " when expected frame rate range exceeds 30 or HDR 10-bit is on."
+                )
             )
         }
 
@@ -184,6 +196,13 @@ constructor(
 
         return signal
     }
+
+    public fun setLowLightBoostDisabledByUseCaseSessionConfig(disabled: Boolean) {
+        isLowLightBoostDisabledByUseCaseSessionConfig = disabled
+    }
+
+    public fun isLowLightBoostDisabledByUseCaseSessionConfig(): Boolean =
+        isLowLightBoostDisabledByUseCaseSessionConfig
 
     private fun stopRunningTaskInternal() {
         _updateSignal?.createFailureResult(

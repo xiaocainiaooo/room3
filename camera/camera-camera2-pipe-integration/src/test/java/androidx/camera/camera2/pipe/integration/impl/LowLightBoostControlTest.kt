@@ -334,6 +334,17 @@ class LowLightBoostControlTest {
         Truth.assertThat(deferred2.awaitWithTimeout()).isNotNull()
     }
 
+    @Test
+    fun enableLowLightBoost_whenDisabledByUseCaseSessionConfig(): Unit = runBlocking {
+        activateLowLightBoost()
+        val deferred =
+            lowLightBoostControl
+                .also { it.setLowLightBoostDisabledByUseCaseSessionConfig(true) }
+                .setLowLightBoostAsync(true)
+
+        assertThrows<IllegalStateException> { deferred.await() }
+    }
+
     private suspend fun <T> Deferred<T>.awaitWithTimeout(
         timeMillis: Long = TimeUnit.SECONDS.toMillis(5)
     ) = withTimeout(timeMillis) { await() }
