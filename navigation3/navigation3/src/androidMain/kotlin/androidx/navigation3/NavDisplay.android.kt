@@ -29,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.Dialog
 import androidx.navigation3.NavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
 import androidx.navigation3.NavDisplay.ENTER_TRANSITION_KEY
 import androidx.navigation3.NavDisplay.EXIT_TRANSITION_KEY
@@ -54,18 +53,10 @@ public object NavDisplay {
         if (enter == null || exit == null) emptyMap()
         else mapOf(POP_ENTER_TRANSITION_KEY to enter, POP_EXIT_TRANSITION_KEY to exit)
 
-    /**
-     * Function to be called on the [NavEntry.featureMap] to notify the [NavDisplay] that the
-     * content should be displayed inside of a [Dialog]
-     */
-    public fun isDialog(boolean: Boolean): Map<String, Any> =
-        if (!boolean) emptyMap() else mapOf(DIALOG_KEY to true)
-
     internal const val ENTER_TRANSITION_KEY = "enterTransition"
     internal const val EXIT_TRANSITION_KEY = "exitTransition"
     internal const val POP_ENTER_TRANSITION_KEY = "popEnterTransition"
     internal const val POP_EXIT_TRANSITION_KEY = "popExitTransition"
-    internal const val DIALOG_KEY = "dialog"
     internal const val DEFAULT_TRANSITION_DURATION_MILLISECOND = 700
 }
 
@@ -73,26 +64,23 @@ public object NavDisplay {
  * Display for Composable content that displays a single pane of content at a time, but can move
  * that content in and out with customized transitions.
  *
- * The NavDisplay displays the content associated with the last key on the back stack in most
- * circumstances. If that content wants to be displayed as a dialog, as communicated by adding
- * [NavDisplay.isDialog] to a [NavEntry.featureMap], then the last key's content is a dialog and the
- * second to last key is a displayed in the background.
+ * The NavDisplay displays the content associated with the last key on the back stack.
  *
  * @param backstack the collection of keys that represents the state that needs to be handled
  * @param localProviders list of [NavLocalProvider] to add information to the provided entriess
  * @param modifier the modifier to be applied to the layout.
  * @param contentAlignment The [Alignment] of the [AnimatedContent]
  * @param enterTransition Default [EnterTransition] when navigating to [NavEntry]s. Can be
- *   overridden individually for each [NavEntry] by passing in the record's transitions through
+ *   overridden individually for each [NavEntry] by passing in the entry's transitions through
  *   [NavEntry.featureMap].
  * @param exitTransition Default [ExitTransition] when navigating to [NavEntry]s. Can be overridden
- *   individually for each [NavEntry] by passing in the record's transitions through
+ *   individually for each [NavEntry] by passing in the entry's transitions through
  *   [NavEntry.featureMap].
  * @param popEnterTransition Default [EnterTransition] when popping [NavEntry]s. Can be overridden
- *   individually for each [NavEntry] by passing in the record's transitions through
+ *   individually for each [NavEntry] by passing in the entry's transitions through
  *   [NavEntry.featureMap].
  * @param popExitTransition Default [ExitTransition] when popping [NavEntry]s. Can be overridden
- *   individually for each [NavEntry] by passing in the record's transitions through
+ *   individually for each [NavEntry] by passing in the entry's transitions through
  *   [NavEntry.featureMap].
  * @param onBack a callback for handling system back presses
  * @param entryProvider lambda used to construct each possible [NavEntry]
@@ -147,40 +135,24 @@ public fun <T : Any> NavDisplay(
     // the backstack (targetState) is updated.
     val newStack = backstack.toList()
     val entry = entryProvider.invoke(newStack.last())
-    val isDialog = entry.featureMap[NavDisplay.DIALOG_KEY] == true
 
-    // if there is a dialog, we should create a transition with the next to last entry instead.
-    val transition =
-        if (isDialog) {
-            if (newStack.size > 1) {
-                val previousKey = backstack[backstack.size - 2]
-                val previousEntry = entryProvider.invoke(previousKey)
-                updateTransition(targetState = previousEntry, label = previousKey.toString())
-            } else {
-                null
-            }
-        } else {
-            updateTransition(targetState = newStack, label = newStack.toString())
-        }
-
-    val isPop = isPop(transition?.currentState as List<T>, newStack)
-
-    // Incoming record defines transitions, otherwise it uses default transitions from NavDisplay
+    val transition = updateTransition(targetState = newStack, label = newStack.toString())
+    val isPop = isPop(transition.currentState, newStack)
+    // Incoming entry defines transitions, otherwise it uses default transitions from
+    // NavDisplay
     val finalEnterTransition =
         if (isPop) {
             entry.featureMap[POP_ENTER_TRANSITION_KEY] as? EnterTransition ?: popEnterTransition
         } else {
             entry.featureMap[ENTER_TRANSITION_KEY] as? EnterTransition ?: enterTransition
         }
-
     val finalExitTransition =
         if (isPop) {
             entry.featureMap[POP_EXIT_TRANSITION_KEY] as? ExitTransition ?: popExitTransition
         } else {
             entry.featureMap[EXIT_TRANSITION_KEY] as? ExitTransition ?: exitTransition
         }
-
-    transition?.AnimatedContent(
+    transition.AnimatedContent(
         modifier = modifier,
         transitionSpec = {
             ContentTransform(
@@ -190,18 +162,13 @@ public fun <T : Any> NavDisplay(
             )
         },
         contentAlignment = contentAlignment,
-        contentKey = { (it as List<T>).lastOrNull() }
+        contentKey = { it.lastOrNull() }
     ) { innerStack ->
         // innerStack is not modified but List is still considered unstable in the world of
         // compose - compose doesn't know for sure the key is the stable so it recomposes
         // the content, unless we remember the key
-        val record =
-            remember((innerStack as List<T>).last()) { entryProvider.invoke(innerStack.last()) }
+        val record = remember(innerStack.last()) { entryProvider.invoke(innerStack.last()) }
         wrapperManager.ContentForEntry(record)
-    }
-
-    if (isDialog) {
-        Dialog(onBack) { wrapperManager.ContentForEntry(entry) }
     }
 }
 
