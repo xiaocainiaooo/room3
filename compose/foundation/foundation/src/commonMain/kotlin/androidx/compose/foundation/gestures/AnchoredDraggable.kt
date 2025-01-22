@@ -1650,7 +1650,7 @@ private class DefaultDraggableAnchors<T>(
     }
 }
 
-internal expect inline fun assertOnJvm(statement: Boolean, message: () -> String): Unit
+internal expect inline fun assertOnJvm(statement: Boolean, message: () -> String)
 
 internal val AnchoredDraggableMinFlingVelocity = 125.dp
 

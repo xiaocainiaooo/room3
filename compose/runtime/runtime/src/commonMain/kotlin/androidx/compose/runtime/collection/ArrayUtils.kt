@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-@file:Suppress("RedundantVisibilityModifier")
+package androidx.compose.runtime.collection
 
-package dalvik.annotation.optimization
-
-@Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.CONSTRUCTOR, AnnotationTarget.FUNCTION)
-public annotation class NeverInline
+/**
+ * Equivalent of Array.copyInto() with an implementation designed to avoid unnecessary null checks
+ * and exception throws on Android after inlining.
+ */
+internal expect fun <T> Array<out T>.fastCopyInto(
+    destination: Array<T>,
+    destinationOffset: Int,
+    startIndex: Int,
+    endIndex: Int
+): Array<T>
