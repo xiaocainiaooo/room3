@@ -92,6 +92,21 @@ class AppFunctionCompilerTest {
         )
     }
 
+    @Test
+    fun testAllPrimitiveInputFunctions_genAppFunctionInventoryImpl_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("AllPrimitiveInputFunctions.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName =
+                "AllPrimitiveInputFunctions_AppFunctionInventory_Impl.kt",
+            goldenFileName = "$%s".format("AllPrimitiveInputFunctions_AppFunctionInventory_Impl.KT")
+        )
+    }
+
     // TODO: Add more tests for legacy index processor.
     @Test
     fun testSampleNoParamImp_genLegacyIndexXmlFile_success() {
