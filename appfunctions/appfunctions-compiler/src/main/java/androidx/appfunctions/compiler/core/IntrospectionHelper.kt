@@ -38,6 +38,10 @@ object IntrospectionHelper {
         const val PROPERTY_VERSION = "version"
     }
 
+    object AppFunctionSerializableAnnotation {
+        val CLASS_NAME = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionSerializable")
+    }
+
     // Classes
     val APP_FUNCTION_CONTEXT_CLASS = ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionContext")
     val APP_FUNCTION_INVENTORY_CLASS =
