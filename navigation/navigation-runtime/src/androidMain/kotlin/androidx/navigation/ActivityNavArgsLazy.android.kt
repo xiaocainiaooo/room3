@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@file:JvmName("ActivityNavArgsLazyKt")
+@file:JvmMultifileClass
+
 package androidx.navigation
 
 import android.app.Activity
