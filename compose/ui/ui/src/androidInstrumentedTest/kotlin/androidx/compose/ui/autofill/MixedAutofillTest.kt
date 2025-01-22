@@ -65,9 +65,8 @@ class MixedAutofillTest {
     @get:Rule val rule = createComposeRule()
     private val height = 200.dp
     private val width = 200.dp
-
-    @OptIn(ExperimentalComposeUiApi::class)
-    private val previousFlagValue = ComposeUiFlags.isSemanticAutofillEnabled
+    private val previousFlagValue =
+        @OptIn(ExperimentalComposeUiApi::class) ComposeUiFlags.isSemanticAutofillEnabled
 
     @Before
     fun enableAutofill() {
@@ -124,13 +123,14 @@ class MixedAutofillTest {
     fun populateViewStructure_new_old_sameLayoutNode() {
         // Arrange.
         lateinit var view: View
-        lateinit var autofillTree: AutofillTree
+        lateinit var autofillTree: @Suppress("DEPRECATION") AutofillTree
         val viewStructure: ViewStructure = FakeViewStructure()
-        lateinit var autofillNode: AutofillNode
+        lateinit var autofillNode: @Suppress("DEPRECATION") AutofillNode
         rule.setContent {
             view = LocalView.current
-            autofillTree = LocalAutofillTree.current
+            autofillTree = @Suppress("DEPRECATION") LocalAutofillTree.current
             autofillNode = remember {
+                @Suppress("DEPRECATION")
                 AutofillNode(
                     onFill = {},
                     autofillTypes = listOf(AutofillType.Password),
@@ -203,13 +203,14 @@ class MixedAutofillTest {
     fun populateViewStructure_new_old_differentLayoutNodes() {
         // Arrange.
         lateinit var view: View
-        lateinit var autofillTree: AutofillTree
+        lateinit var autofillTree: @Suppress("DEPRECATION") AutofillTree
         val viewStructure: ViewStructure = FakeViewStructure()
-        lateinit var autofillNode: AutofillNode
+        lateinit var autofillNode: @Suppress("DEPRECATION") AutofillNode
         rule.setContent {
             view = LocalView.current
-            autofillTree = LocalAutofillTree.current
+            autofillTree = @Suppress("DEPRECATION") LocalAutofillTree.current
             autofillNode = remember {
+                @Suppress("DEPRECATION")
                 AutofillNode(
                     onFill = {},
                     autofillTypes = listOf(AutofillType.Password),
@@ -288,14 +289,15 @@ class MixedAutofillTest {
     fun autofill_new_old_sameLayoutNode() {
         // Arrange.
         lateinit var view: View
-        lateinit var autofillTree: AutofillTree
-        lateinit var autofillNode: AutofillNode
+        lateinit var autofillTree: @Suppress("DEPRECATION") AutofillTree
+        lateinit var autofillNode: @Suppress("DEPRECATION") AutofillNode
         lateinit var autoFilledValueNewApi: String
         lateinit var autoFilledValueOldApi: String
         rule.setContent {
             view = LocalView.current
-            autofillTree = LocalAutofillTree.current
+            autofillTree = @Suppress("DEPRECATION") LocalAutofillTree.current
             autofillNode = remember {
+                @Suppress("DEPRECATION")
                 AutofillNode(
                     onFill = { autoFilledValueOldApi = it },
                     autofillTypes = listOf(AutofillType.Password),
@@ -343,14 +345,15 @@ class MixedAutofillTest {
     fun autofill_new_old_differentLayoutNodes() {
         // Arrange.
         lateinit var view: View
-        lateinit var autofillTree: AutofillTree
-        lateinit var autofillNode: AutofillNode
+        lateinit var autofillTree: @Suppress("DEPRECATION") AutofillTree
+        lateinit var autofillNode: @Suppress("DEPRECATION") AutofillNode
         lateinit var autoFilledValueNewApi: String
         lateinit var autoFilledValueOldApi: String
         rule.setContent {
             view = LocalView.current
-            autofillTree = LocalAutofillTree.current
+            autofillTree = @Suppress("DEPRECATION") LocalAutofillTree.current
             autofillNode = remember {
+                @Suppress("DEPRECATION")
                 AutofillNode(
                     onFill = { autoFilledValueOldApi = it },
                     autofillTypes = listOf(AutofillType.Password),
