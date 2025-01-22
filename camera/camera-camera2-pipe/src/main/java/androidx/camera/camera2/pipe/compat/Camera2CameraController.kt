@@ -215,6 +215,7 @@ constructor(
                 cameraSurfaceManager,
                 timeSource,
                 graphConfig.flags,
+                threads.blockingDispatcher,
                 threads.backgroundDispatcher,
                 scope
             )
