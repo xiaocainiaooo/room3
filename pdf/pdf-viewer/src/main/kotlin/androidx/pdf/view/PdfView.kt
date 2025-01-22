@@ -40,6 +40,7 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import androidx.annotation.CallSuper
+import androidx.annotation.MainThread
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import androidx.core.graphics.toRectF
@@ -105,9 +106,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         set(value) {
             checkMainThread()
             value?.let {
-                val reset = field != null && field?.uri != value.uri
+                if (field == value) return
                 field = it
-                if (reset) reset()
+                reset()
                 onDocumentSet()
             }
         }
@@ -232,6 +233,22 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     /** Whether we are in a fling movement. This is used to detect the end of that movement */
     private var isFling = false
 
+    /**
+     * Returns true if neither zoom nor scroll are actively changing. Does not account for
+     * externally-driven changes in position (e.g. a animating scrollY or zoom)
+     */
+    private val positionIsStable: Boolean
+        get() {
+            val zoomIsChanging = gestureTracker.matches(GestureTracker.Gesture.ZOOM)
+            val scrollIsChanging =
+                gestureTracker.matches(
+                    GestureTracker.Gesture.DRAG,
+                    GestureTracker.Gesture.DRAG_X,
+                    GestureTracker.Gesture.DRAG_Y
+                ) || isFling
+            return !zoomIsChanging && !scrollIsChanging
+        }
+
     // To avoid allocations during drawing
     private val visibleAreaRect = Rect()
 
@@ -251,9 +268,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     @VisibleForTesting
     internal var isTouchExplorationEnabled: Boolean =
         Accessibility.get().isTouchExplorationEnabled(context)
-        set(value) {
-            field = value
-        }
 
     private var selectionStateManager: SelectionStateManager? = null
     private val selectionRenderer = SelectionRenderer(context)
@@ -515,7 +529,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         super.onDetachedFromWindow()
         stopCollectingData()
         awaitingFirstLayout = true
-        pageManager?.onDetached()
+        pageManager?.cleanup()
     }
 
     override fun onSaveInstanceState(): Parcelable? {
@@ -555,11 +569,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             postInvalidateOnAnimation()
         } else if (isFling) {
             isFling = false
-            // Once the fling has ended, prompt the page manager to start fetching data for pages
-            // that we don't fetch during a fling
-            pageManager?.maybeUpdatePageState(visiblePages, zoom, isFling)
             // We hide the action mode during a fling, so reveal it when the fling is over
             updateSelectionActionModeVisibility()
+            // Once the fling has ended, prompt the page manager to start fetching data for pages
+            // that we don't fetch during a fling
+            maybeUpdatePageVisibility()
         }
     }
 
@@ -675,6 +689,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
      * Launches a tree of coroutines to collect data from helper classes while we're attached to a
      * visible window
      */
+    @MainThread
     private fun startCollectingData() {
         val mainScope =
             CoroutineScope(HandlerCompat.createAsync(handler.looper).asCoroutineDispatcher())
@@ -688,7 +703,17 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
                     launch {
                         manager.dimensions.collect { onPageDimensionsReceived(it.first, it.second) }
                     }
-                    launch { manager.visiblePages.collect { onVisiblePagesChanged() } }
+                    launch { manager.visiblePages.collect { maybeUpdatePageVisibility() } }
+                }
+            // Don't let two copies of this run concurrently
+            val visiblePagesToJoin = visiblePagesCollector?.apply { cancel() }
+            visiblePagesCollector =
+                mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                    manager.visiblePages.collect {
+                        // Prevent 2 copies from running concurrently
+                        visiblePagesToJoin?.join()
+                        maybeUpdatePageVisibility()
+                    }
                 }
         }
         pageManager?.let { manager ->
@@ -825,13 +850,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         onViewportChanged()
         // Don't fetch new Bitmaps while the user is actively zooming, to avoid jank and rendering
         // churn
-        if (!gestureTracker.matches(GestureTracker.Gesture.ZOOM)) {
-            pageManager?.maybeUpdatePageState(visiblePages, zoom, isFling)
-        }
+        if (positionIsStable) maybeUpdatePageVisibility()
     }
 
     private fun onViewportChanged() {
         pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
+        if (positionIsStable) maybeUpdatePageVisibility()
         accessibilityPageHelper?.invalidateRoot()
         updateSelectionActionModeVisibility()
     }
@@ -890,18 +914,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         return RectF(viewport).intersects(leftEdge, topEdge, rightEdge, bottomEdge)
     }
 
-    /**
-     * Invoked by gesture handlers to let this view know that its position has stabilized, i.e. it's
-     * not actively changing due to user input
-     */
-    internal fun onStableZoom() {
-        pageManager?.maybeUpdatePageState(visiblePages, zoom, isFling)
-    }
-
     private fun reset() {
         // Stop any in progress fling when we open a new document
         scroller.forceFinished(true)
         scrollTo(0, 0)
+        pageManager?.cleanup()
         zoom = DEFAULT_INIT_ZOOM
         pageManager = null
         pageLayoutManager = null
@@ -909,20 +926,22 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         stopCollectingData()
     }
 
-    /** React to a change in visible pages (load new pages and clean up old ones) */
-    private fun onVisiblePagesChanged() {
-        pageManager?.maybeUpdatePageState(visiblePages, zoom, isFling)
+    private fun maybeUpdatePageVisibility() {
+        val visiblePageAreas =
+            pageLayoutManager?.getVisiblePageAreas(visiblePages, getVisibleAreaInContentCoords())
+                ?: return
+        pageManager?.updatePageVisibilities(visiblePageAreas, zoom, positionIsStable)
     }
 
     /** React to a page's dimensions being made available */
     private fun onPageDimensionsReceived(pageNum: Int, size: Point) {
-        pageManager?.onPageSizeReceived(
-            pageNum,
-            size,
-            visiblePages.contains(pageNum),
-            zoom,
-            isFling
-        )
+        val pageLocation =
+            if (visiblePages.contains(pageNum)) {
+                pageLayoutManager?.getPageLocation(pageNum, getVisibleAreaInContentCoords())
+            } else {
+                null
+            }
+        pageManager?.addPage(pageNum, size, zoom, isFling, pageLocation)
         // Learning the dimensions of a page can change our understanding of the content that's in
         // the viewport
         pageLayoutManager?.onViewportChanged(scrollY, height, zoom)
@@ -1182,7 +1201,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         }
 
         override fun onGestureEnd(gesture: GestureTracker.Gesture?) {
-            if (gesture == GestureTracker.Gesture.ZOOM) onStableZoom()
+            // Update page visibility after scroll / zoom gestures end, because we avoid fetching
+            // certain data while those gestures are in progress
+            if (gesture in ZOOM_OR_SCROLL_GESTURES) maybeUpdatePageVisibility()
             totalX = 0f
             totalY = 0f
             straightenCurrentVerticalScroll = true
@@ -1389,6 +1410,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         private const val MIN_SCROLL_TO_SWITCH_DP = 30
 
         private const val DEFAULT_PAGE_PREFETCH_RADIUS: Int = 2
+
+        private val ZOOM_OR_SCROLL_GESTURES =
+            setOf(
+                GestureTracker.Gesture.ZOOM,
+                GestureTracker.Gesture.DRAG,
+                GestureTracker.Gesture.DRAG_X,
+                GestureTracker.Gesture.DRAG_Y
+            )
 
         private fun checkMainThread() {
             check(Looper.myLooper() == Looper.getMainLooper()) {
