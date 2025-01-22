@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,7 @@
 
 package androidx.navigation
 
-import android.view.View
-
-/**
- * Find a [NavController] associated with a [View].
- *
- * Calling this on a View not within a [NavHost] will result in an [IllegalStateException]
- */
-public fun View.findNavController(): NavController = Navigation.findNavController(this)
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.FUNCTION)
+@RequiresOptIn(level = RequiresOptIn.Level.WARNING)
+public annotation class NavDeepLinkSaveStateControl
