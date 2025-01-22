@@ -19,7 +19,6 @@ package androidx.wear.compose.material3
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -49,7 +48,6 @@ import kotlinx.coroutines.launch
  * This is a copy of RoundButton from materialcore, with additional onLongClick callback and usage
  * of combinedClickable.
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun RoundButton(
     onClick: () -> Unit,

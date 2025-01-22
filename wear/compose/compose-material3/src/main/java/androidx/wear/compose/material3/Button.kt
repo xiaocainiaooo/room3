@@ -17,7 +17,6 @@
 package androidx.wear.compose.material3
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -1835,7 +1834,6 @@ private fun Modifier.compactButtonModifier(): Modifier =
  * Button with label. This allows to use the token values for individual buttons instead of relying
  * on common values.
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ButtonImpl(
     onClick: () -> Unit,
