@@ -21,6 +21,8 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavLocalProvider
@@ -38,6 +40,7 @@ class ProfileViewModel : ViewModel() {
 @Composable
 fun BaseNav() {
     val backStack = rememberMutableStateListOf(Profile)
+    val showDialog = remember { mutableStateOf(false) }
     NavDisplay(
         backstack = backStack,
         localProviders = listOf(SavedStateNavLocalProvider, ViewModelStoreNavLocalProvider),
@@ -55,8 +58,8 @@ fun BaseNav() {
                 ) {
                     Scrollable({ backStack.add(it) }) { backStack.removeLast() }
                 }
-                entry<Dialog>(featureMap = NavDisplay.isDialog(true)) {
-                    DialogContent { backStack.removeLast() }
+                entry<DialogBase> {
+                    DialogBase(onClick = { showDialog.value = true }) { backStack.removeLast() }
                 }
                 entry<Dashboard>(
                     NavDisplay.transition(slideInHorizontally { it }, slideOutHorizontally { it })
@@ -66,4 +69,7 @@ fun BaseNav() {
                 }
             }
     )
+    if (showDialog.value) {
+        DialogContent(onDismissRequest = { showDialog.value = false })
+    }
 }
