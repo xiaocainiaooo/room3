@@ -50,10 +50,8 @@ package androidx.lifecycle {
 package androidx.lifecycle.serialization {
 
   public final class SavedStateHandleDelegatesKt {
-    method public static inline <reified T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.lifecycle.SavedStateHandle, String key, kotlin.jvm.functions.Function0<? extends T> init);
-    method public static <T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.lifecycle.SavedStateHandle, String key, kotlinx.serialization.KSerializer<T> serializer, kotlin.jvm.functions.Function0<? extends T> init);
-    method public static inline <reified T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.lifecycle.SavedStateHandle, kotlin.jvm.functions.Function0<? extends T> init);
-    method public static <T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.lifecycle.SavedStateHandle, kotlinx.serialization.KSerializer<T> serializer, kotlin.jvm.functions.Function0<? extends T> init);
+    method public static inline <reified T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.lifecycle.SavedStateHandle, optional String? key, kotlin.jvm.functions.Function0<? extends T> init);
+    method public static <T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.lifecycle.SavedStateHandle, kotlinx.serialization.KSerializer<T> serializer, optional String? key, kotlin.jvm.functions.Function0<? extends T> init);
   }
 
 }
