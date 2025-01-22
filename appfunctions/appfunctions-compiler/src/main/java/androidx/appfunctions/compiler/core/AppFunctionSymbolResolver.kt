@@ -22,6 +22,9 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSTypeReference
+import com.google.devtools.ksp.symbol.KSValueParameter
+import com.squareup.kotlinpoet.LIST
 
 /** The helper class to resolve AppFunction related symbols. */
 class AppFunctionSymbolResolver(private val resolver: Resolver) {
@@ -100,7 +103,30 @@ class AppFunctionSymbolResolver(private val resolver: Resolver) {
         }
 
         private fun validateParameterTypes() {
-            // TODO: Validate that the parameter type used by the app functions are supported
+            for (appFunctionDeclaration in appFunctionDeclarations) {
+                for ((paramIndex, ksValueParameter) in
+                    appFunctionDeclaration.parameters.withIndex()) {
+                    if (paramIndex == 0) {
+                        // Skip the first parameter which is always the `AppFunctionContext`.
+                        continue
+                    }
+
+                    if (!ksValueParameter.validateAppFunctionParameterType()) {
+                        throw ProcessingException(
+                            "App function parameters must be one of the following " +
+                                "primitive types or a list of these types:\n${
+                                SUPPORTED_RAW_PRIMITIVE_TYPES.joinToString(
+                                    ",\n"
+                                )
+                            }, but found ${
+                                    ksValueParameter.resolveTypeReference().ensureQualifiedTypeName()
+                                        .asString()
+                            }",
+                            ksValueParameter
+                        )
+                    }
+                }
+            }
         }
 
         /**
@@ -117,5 +143,54 @@ class AppFunctionSymbolResolver(private val resolver: Resolver) {
 
         /** Returns the file containing the class declaration and app functions. */
         fun getSourceFile(): KSFile? = classDeclaration.containingFile
+
+        private fun KSValueParameter.validateAppFunctionParameterType(): Boolean {
+            // Todo(b/391342300): Allow AppFunctionSerializable type too.
+            if (type.isOfType(LIST)) {
+                val typeReferenceArgument = type.resolveListParameterizedType()
+                // List types only support raw primitive types
+                return SUPPORTED_RAW_PRIMITIVE_TYPES.contains(
+                    typeReferenceArgument.ensureQualifiedTypeName().asString()
+                )
+            }
+            return SUPPORTED_RAW_PRIMITIVE_TYPES.contains(
+                type.ensureQualifiedTypeName().asString()
+            ) || SUPPORTED_ARRAY_PRIMITIVE_TYPES.contains(type.ensureQualifiedTypeName().asString())
+        }
+
+        /**
+         * Resolves the type reference of a parameter.
+         *
+         * If the parameter type is a list, it will resolve the type reference of the list element.
+         */
+        private fun KSValueParameter.resolveTypeReference(): KSTypeReference {
+            return if (type.isOfType(LIST)) {
+                type.resolveListParameterizedType()
+            } else {
+                type
+            }
+        }
+
+        private companion object {
+            val SUPPORTED_RAW_PRIMITIVE_TYPES: Set<String> =
+                setOf(
+                    Int::class.qualifiedName!!,
+                    Long::class.qualifiedName!!,
+                    Float::class.qualifiedName!!,
+                    Double::class.qualifiedName!!,
+                    Boolean::class.qualifiedName!!,
+                    String::class.qualifiedName!!,
+                )
+
+            val SUPPORTED_ARRAY_PRIMITIVE_TYPES: Set<String> =
+                setOf(
+                    IntArray::class.qualifiedName!!,
+                    LongArray::class.qualifiedName!!,
+                    FloatArray::class.qualifiedName!!,
+                    DoubleArray::class.qualifiedName!!,
+                    BooleanArray::class.qualifiedName!!,
+                    ByteArray::class.qualifiedName!!,
+                )
+        }
     }
 }

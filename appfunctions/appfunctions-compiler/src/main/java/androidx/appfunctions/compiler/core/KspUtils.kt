@@ -20,8 +20,27 @@ import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSName
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.LIST
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
+
+/**
+ * Resolves the type reference to the parameterized type if it is a list. Otherwise, it returns the
+ * type reference as is.
+ *
+ * @return the resolved type reference
+ * @throws ProcessingException If unable to resolve the type.
+ */
+fun KSTypeReference.resolveListParameterizedType(): KSTypeReference {
+    if (!isOfType(LIST)) {
+        throw ProcessingException(
+            "Unable to resolve list parameterized type for non list type",
+            this
+        )
+    }
+    return resolve().arguments.firstOrNull()?.type
+        ?: throw ProcessingException("Unable to resolve the parameterized type for the list", this)
+}
 
 /**
  * Checks if the type reference is of the given type.
@@ -31,12 +50,7 @@ import kotlin.reflect.cast
  * @throws ProcessingException If unable to resolve the type.
  */
 fun KSTypeReference.isOfType(type: ClassName): Boolean {
-    val typeName =
-        resolveTypeName()
-            ?: throw ProcessingException(
-                "Unable to resolve the type to check if it is of type [${type}]",
-                this
-            )
+    val typeName = ensureQualifiedTypeName()
     return typeName.asString() == type.canonicalName
 }
 
@@ -46,22 +60,27 @@ fun KSTypeReference.isOfType(type: ClassName): Boolean {
  * @param annotationClass the annotation class to find
  */
 fun Sequence<KSAnnotation>.findAnnotation(annotationClass: ClassName): KSAnnotation? =
-    this.singleOrNull() {
+    this.singleOrNull {
         val shortName = it.shortName.getShortName()
         if (shortName != annotationClass.simpleName) {
             false
         } else {
-            val typeName =
-                it.annotationType.resolveTypeName()
-                    ?: throw ProcessingException(
-                        "Unable to resolve type for [$shortName]",
-                        it.annotationType
-                    )
+            val typeName = it.annotationType.ensureQualifiedTypeName()
             typeName.asString() == annotationClass.canonicalName
         }
     }
 
-private fun KSTypeReference.resolveTypeName(): KSName? = resolve().declaration.qualifiedName
+/**
+ * Resolves the type reference to its qualified name.
+ *
+ * @return the qualified name of the type reference
+ */
+fun KSTypeReference.ensureQualifiedTypeName(): KSName =
+    resolve().declaration.qualifiedName
+        ?: throw ProcessingException(
+            "Unable to resolve the qualified type name for this reference",
+            this
+        )
 
 /** Returns the value of the annotation property if found. */
 fun <T : Any> KSAnnotation.requirePropertyValueOfType(
