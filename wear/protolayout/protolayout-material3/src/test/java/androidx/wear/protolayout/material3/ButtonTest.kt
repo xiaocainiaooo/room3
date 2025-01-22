@@ -83,6 +83,15 @@ class ButtonTest {
     }
 
     @Test
+    fun avatarButton_size_default() {
+        LayoutElementAssertionsProvider(DEFAULT_AVATAR_BUTTON)
+            .onRoot()
+            .assert(hasWidth(expand()))
+            .assert(hasHeight(wrapWithMinTapTargetDimension()))
+            .assert(hasTag(ButtonDefaults.METADATA_TAG_BUTTON))
+    }
+
+    @Test
     fun compactButton_size_default() {
         LayoutElementAssertionsProvider(DEFAULT_COMPACT_BUTTON)
             .onRoot()
@@ -161,6 +170,27 @@ class ButtonTest {
     @Test
     fun pillButton_hasIcon_asIcon() {
         LayoutElementAssertionsProvider(DEFAULT_BUTTON).onElement(hasImage(ICON_ID)).assertExists()
+    }
+
+    @Test
+    fun avatarButton_hasLabel_asText() {
+        LayoutElementAssertionsProvider(DEFAULT_AVATAR_BUTTON)
+            .onElement(hasText(TEXT))
+            .assertExists()
+    }
+
+    @Test
+    fun avatarButton_hasSecondaryLabel_asText() {
+        LayoutElementAssertionsProvider(DEFAULT_AVATAR_BUTTON)
+            .onElement(hasText(TEXT2))
+            .assertExists()
+    }
+
+    @Test
+    fun avatarButton_hasAvatar_asImage() {
+        LayoutElementAssertionsProvider(DEFAULT_AVATAR_BUTTON)
+            .onElement(hasImage(IMAGE_ID))
+            .assertExists()
     }
 
     @Test
@@ -292,6 +322,17 @@ class ButtonTest {
                     labelContent = { text(TEXT.layoutString) },
                     secondaryLabelContent = { text(TEXT2.layoutString) },
                     iconContent = { icon(ICON_ID) }
+                )
+            }
+
+        private val DEFAULT_AVATAR_BUTTON =
+            materialScope(CONTEXT, DEVICE_CONFIGURATION) {
+                avatarButton(
+                    onClick = CLICKABLE,
+                    modifier = LayoutModifier.contentDescription(CONTENT_DESCRIPTION),
+                    labelContent = { text(TEXT.layoutString) },
+                    secondaryLabelContent = { text(TEXT2.layoutString) },
+                    avatarContent = { icon(IMAGE_ID) }
                 )
             }
 

@@ -38,6 +38,8 @@ import androidx.wear.protolayout.material3.DataCardStyle.Companion.defaultCompac
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.defaultDataCardStyle
 import androidx.wear.protolayout.material3.GraphicDataCardDefaults.buildContentForGraphicDataCard
 import androidx.wear.protolayout.material3.GraphicDataCardStyle.Companion.defaultGraphicDataCardStyle
+import androidx.wear.protolayout.material3.PredefinedPrimaryLayoutMargins.maxPrimaryLayoutMargins
+import androidx.wear.protolayout.material3.PredefinedPrimaryLayoutMargins.minPrimaryLayoutMargins
 import androidx.wear.protolayout.material3.TitleCardDefaults.buildContentForTitleCard
 import androidx.wear.protolayout.material3.TitleCardStyle.Companion.defaultTitleCardStyle
 import androidx.wear.protolayout.modifiers.LayoutModifier
@@ -63,7 +65,11 @@ import androidx.wear.protolayout.modifiers.padding
  *   expected to be a short piece of text. Uses [CardColors.timeColor] color by default.
  * @param height The height of this card. It's highly recommended to set this to [expand] or
  *   [weight].
- * @param shape Defines the card's shape, in other words the corner radius for this card.
+ * @param shape Defines the card's shape, in other words the corner radius for this card. If
+ *   changing these to radius smaller than [Shapes.medium], it is important to adjusts the margins
+ *   of [primaryLayout] used to accommodate for more space, for example by using
+ *   [maxPrimaryLayoutMargins]. Or, if the [shape] is set to [Shapes.full], using
+ *   [minPrimaryLayoutMargins] can be considered.
  * @param colors The colors to be used for a background and inner content of this card. If the
  *   background image is also specified, the image will be laid out on top of the background color.
  *   In case of the fully opaque background image, then the background color will not be shown.
@@ -87,7 +93,6 @@ import androidx.wear.protolayout.modifiers.padding
  * @sample androidx.wear.protolayout.material3.samples.titleCardSample
  */
 // TODO: b/346958146 - link Card visuals in DAC
-// TODO: b/373578620 - Add how corners affects margins in the layout.
 public fun MaterialScope.titleCard(
     onClick: Clickable,
     title: (MaterialScope.() -> LayoutElement),
@@ -186,7 +191,11 @@ public fun MaterialScope.titleCard(
  * @param height The height of this card. It's highly recommended to leave this with default value
  *   as `wrap` if there's only 1 card on the screen. If there are two cards, it is highly
  *   recommended to set this to [expand] and use the smaller styles.
- * @param shape Defines the card's shape, in other words the corner radius for this card.
+ * @param shape Defines the card's shape, in other words the corner radius for this card. If
+ *   changing these to radius smaller than [Shapes.medium], it is important to adjusts the margins
+ *   of [primaryLayout] used to accommodate for more space, for example by using
+ *   [maxPrimaryLayoutMargins]. Or, if the [shape] is set to [Shapes.full], using
+ *   [minPrimaryLayoutMargins] can be considered.
  * @param colors The colors to be used for a background and inner content of this card. If the
  *   background image is also specified, the image will be laid out on top of the background color.
  *   In case of the fully opaque background image, then the background color will not be shown.
@@ -207,7 +216,6 @@ public fun MaterialScope.titleCard(
  * @sample androidx.wear.protolayout.material3.samples.appCardSample
  */
 // TODO: b/346958146 - link Card visuals in DAC
-// TODO: b/373578620 - Add how corners affects margins in the layout.
 public fun MaterialScope.appCard(
     onClick: Clickable,
     title: (MaterialScope.() -> LayoutElement),
@@ -313,7 +321,11 @@ public fun MaterialScope.appCard(
  *   for the most optimal experience across different screen sizes.
  * @param height The height of this card. It's highly recommended to set this to [expand] for the
  *   most optimal experience across different screen sizes.
- * @param shape Defines the card's shape, in other words the corner radius for this card.
+ * @param shape Defines the card's shape, in other words the corner radius for this card. If
+ *   changing these to radius smaller than [Shapes.medium], it is important to adjusts the margins
+ *   of [primaryLayout] used to accommodate for more space, for example by using
+ *   [maxPrimaryLayoutMargins]. Or, if the [shape] is set to [Shapes.full], using
+ *   [minPrimaryLayoutMargins] can be considered.
  * @param colors The colors to be used for a background and inner content of this card. If the
  *   background image is also specified, the image will be laid out on top of the background color.
  *   In case of the fully opaque background image, then the background color will not be shown.
@@ -339,7 +351,6 @@ public fun MaterialScope.appCard(
  * @sample androidx.wear.protolayout.material3.samples.dataCardSample
  */
 // TODO: b/346958146 - link Card visuals in DAC
-// TODO: b/373578620 - Add how corners affects margins in the layout.
 public fun MaterialScope.textDataCard(
     onClick: Clickable,
     title: (MaterialScope.() -> LayoutElement),
@@ -426,7 +437,11 @@ public fun MaterialScope.textDataCard(
  *   for the most optimal experience across different screen sizes.
  * @param height The height of this card. It's highly recommended to set this to [expand] for the
  *   most optimal experience across different screen sizes.
- * @param shape Defines the card's shape, in other words the corner radius for this card.
+ * @param shape Defines the card's shape, in other words the corner radius for this card. If
+ *   changing these to radius smaller than [Shapes.medium], it is important to adjusts the margins
+ *   of [primaryLayout] used to accommodate for more space, for example by using
+ *   [maxPrimaryLayoutMargins]. Or, if the [shape] is set to [Shapes.full], using
+ *   [minPrimaryLayoutMargins] can be considered.
  * @param colors The colors to be used for a background and inner content of this card. If the
  *   background image is also specified, the image will be laid out on top of the background color.
  *   In case of the fully opaque background image, then the background color will not be shown.
@@ -454,7 +469,6 @@ public fun MaterialScope.textDataCard(
  * @sample androidx.wear.protolayout.material3.samples.dataCardSample
  */
 // TODO: b/346958146 - link Card visuals in DAC
-// TODO: b/373578620 - Add how corners affects margins in the layout.
 public fun MaterialScope.iconDataCard(
     onClick: Clickable,
     title: (MaterialScope.() -> LayoutElement),
@@ -532,7 +546,11 @@ public fun MaterialScope.iconDataCard(
  * @param graphic A slot for displaying graphic data, such as progress indicator.
  * @param height The width of this card. It's highly recommended to set this to [expand] for the
  *   most optimal experience across different screen sizes.
- * @param shape Defines the card's shape, in other words the corner radius for this card.
+ * @param shape Defines the card's shape, in other words the corner radius for this card. If
+ *   changing these to radius smaller than [Shapes.medium], it is important to adjusts the margins
+ *   of [primaryLayout] used to accommodate for more space, for example by using
+ *   [maxPrimaryLayoutMargins]. Or, if the [shape] is set to [Shapes.full], using
+ *   [minPrimaryLayoutMargins] can be considered.
  * @param colors The colors to be used for a background and inner content of this card. Specified
  *   colors can be [CardDefaults.filledCardColors] for high emphasis card,
  *   [CardDefaults.filledVariantCardColors] for high/medium emphasis card,
@@ -552,7 +570,6 @@ public fun MaterialScope.iconDataCard(
  * @sample androidx.wear.protolayout.material3.samples.graphicDataCardSample
  */
 // TODO: b/346958146 - link Card visuals in DAC
-// TODO: b/373578620 - Add how corners affects margins in the layout.
 public fun MaterialScope.graphicDataCard(
     onClick: Clickable,
     // TODO: b/368272767 - Potentially add helper for CPI and icon and link in KDocs.
@@ -627,7 +644,11 @@ public fun MaterialScope.graphicDataCard(
  * @param modifier Modifiers to set to this element. It's highly recommended to set a content
  *   description using [contentDescription]. If [LayoutModifier.background] modifier is used and the
  *   the background image is also specified, the image will be laid out on top of this color. In
- *   case of the fully opaque background image, then the background color will not be shown.
+ *   case of the fully opaque background image, then the background color will not be shown. If
+ *   [LayoutModifier.clip] modifier is used to change the shape of the card to radius smaller than
+ *   [Shapes.medium], it is important to adjusts the margins of [primaryLayout] used to accommodate
+ *   for more space, for example by using [maxPrimaryLayoutMargins]. Or, if changing to
+ *   [Shapes.full], using [minPrimaryLayoutMargins] can be considered.
  * @param backgroundContent The background object to be used behind the content in the card. It is
  *   recommended to use the default styling that is automatically provided by only calling
  *   [backgroundImage] with the content. It can be combined with the specified
@@ -641,7 +662,6 @@ public fun MaterialScope.graphicDataCard(
  * @sample androidx.wear.protolayout.material3.samples.cardSample
  */
 // TODO: b/346958146 - link Card visuals in DAC
-// TODO: b/373578620 - Add how corners affects margins in the layout.
 public fun MaterialScope.card(
     onClick: Clickable,
     modifier: LayoutModifier = LayoutModifier,
