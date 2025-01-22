@@ -38,7 +38,6 @@ package androidx.appfunctions {
   }
 
   public abstract class AppFunctionException extends java.lang.Exception {
-    ctor public AppFunctionException(int errorCode, optional String? errorMessage);
     method public final String? getErrorMessage();
     property public final String? errorMessage;
     field public static final androidx.appfunctions.AppFunctionException.Companion Companion;
@@ -81,9 +80,9 @@ package androidx.appfunctions {
   }
 
   public final class AppFunctionUnknownException extends androidx.appfunctions.AppFunctionException {
-    ctor public AppFunctionUnknownException(int unknownErrorCode, optional String? errorMessage);
-    method public int getUnknownErrorCode();
-    property public final int unknownErrorCode;
+    ctor public AppFunctionUnknownException(int errorCode, optional String? errorMessage);
+    method public int getErrorCode();
+    property public final int errorCode;
   }
 
 }
