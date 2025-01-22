@@ -210,6 +210,7 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_SET_S
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_SET_TEXT
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_IME_ENTER
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.FOCUS_INPUT
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_CHARACTER
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.RangeInfoCompat.RANGE_TYPE_FLOAT
 import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
@@ -2578,6 +2579,48 @@ class AndroidAccessibilityTest {
         // Assert.
         rule.onNodeWithTag(tag).assert(expectValue(Focused, false))
         assertThat(actionPerformed).isTrue()
+    }
+
+    @Test
+    fun testFindFocus_noInputFocus() {
+        // Arrange.
+        setContent {
+            Row {
+                // No focused item.
+                Box(Modifier.size(10.dp).focusable())
+                Box(Modifier.size(10.dp).focusable())
+            }
+        }
+
+        // Act.
+        val focusedNode = rule.runOnUiThread { provider.findFocus(FOCUS_INPUT) }
+
+        // Assert.
+        assertThat(focusedNode).isNull()
+    }
+
+    @Test
+    fun testFindFocus_hasInputFocus() {
+        // Arrange.
+        val focusRequester = FocusRequester()
+        setContent {
+            Row {
+                // Initially focused item.
+                Box(Modifier.size(10.dp).focusable())
+                Box(Modifier.testTag(tag).focusRequester(focusRequester).focusable()) {
+                    BasicText("focusable")
+                }
+            }
+        }
+        rule.runOnIdle { focusRequester.requestFocus() }
+        val virtualViewId = rule.onNodeWithTag(tag).assert(expectValue(Focused, true)).semanticsId
+        val expectedNode = provider.createAccessibilityNodeInfo(virtualViewId)
+
+        // Act.
+        val actualNode = rule.runOnUiThread { provider.findFocus(FOCUS_INPUT) }
+
+        // Assert.
+        assertThat(actualNode).isEqualTo(expectedNode)
     }
 
     @Test
