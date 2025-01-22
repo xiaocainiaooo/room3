@@ -18,7 +18,7 @@ package androidx.camera.core {
     method public com.google.common.util.concurrent.ListenableFuture<java.lang.Void!> enableTorch(boolean);
     method public com.google.common.util.concurrent.ListenableFuture<java.lang.Integer!> setExposureCompensationIndex(int);
     method public com.google.common.util.concurrent.ListenableFuture<java.lang.Void!> setLinearZoom(@FloatRange(from=0.0f, to=1.0f) float);
-    method public default com.google.common.util.concurrent.ListenableFuture<java.lang.Void!> setTorchStrengthLevelAsync(@IntRange(from=1) int);
+    method public default com.google.common.util.concurrent.ListenableFuture<java.lang.Void!> setTorchStrengthLevel(@IntRange(from=1) int);
     method public com.google.common.util.concurrent.ListenableFuture<java.lang.Void!> setZoomRatio(float);
     method public com.google.common.util.concurrent.ListenableFuture<androidx.camera.core.FocusMeteringResult!> startFocusAndMetering(androidx.camera.core.FocusMeteringAction);
   }
