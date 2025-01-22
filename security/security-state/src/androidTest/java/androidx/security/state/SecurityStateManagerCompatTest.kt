@@ -32,14 +32,14 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class SecurityStateManagerTest {
+class SecurityStateManagerCompatTest {
 
     private val context = ApplicationProvider.getApplicationContext<Context>()
-    private lateinit var securityStateManager: SecurityStateManager
+    private lateinit var securityStateManagerCompat: SecurityStateManagerCompat
 
     @Before
     fun setup() {
-        securityStateManager = SecurityStateManager(context)
+        securityStateManagerCompat = SecurityStateManagerCompat(context)
     }
 
     /** Returns `true` if [date] is in the format "YYYY-MM-DD". */
@@ -85,7 +85,7 @@ class SecurityStateManagerTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun testGetGlobalSecurityState_sdkAbove29() {
-        val bundle = securityStateManager.getGlobalSecurityState()
+        val bundle = securityStateManagerCompat.getGlobalSecurityState()
         assertTrue(matchesDateFormat(bundle.getString("system_spl")!!))
         assertTrue(matchesKernelFormat(bundle.getString("kernel_version")!!))
         assertTrue(containsModuleMetadataPackage(bundle))
@@ -95,7 +95,7 @@ class SecurityStateManagerTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O, maxSdkVersion = Build.VERSION_CODES.P)
     @Test
     fun testGetGlobalSecurityState_sdkAbove25Below29_doesNotContainModuleMetadata() {
-        val bundle = securityStateManager.getGlobalSecurityState()
+        val bundle = securityStateManagerCompat.getGlobalSecurityState()
         assertTrue(matchesDateFormat(bundle.getString("system_spl")!!))
         assertTrue(matchesKernelFormat(bundle.getString("kernel_version")!!))
         assertTrue(containsWebViewPackage(bundle))
@@ -105,7 +105,7 @@ class SecurityStateManagerTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M, maxSdkVersion = Build.VERSION_CODES.N_MR1)
     @Test
     fun testGetGlobalSecurityState_sdkAbove22Below26_doesNotContainModuleMetadataOrWebView() {
-        val bundle = securityStateManager.getGlobalSecurityState()
+        val bundle = securityStateManagerCompat.getGlobalSecurityState()
         assertTrue(matchesDateFormat(bundle.getString("system_spl")!!))
         assertTrue(matchesKernelFormat(bundle.getString("kernel_version")!!))
         assertFalse(containsModuleMetadataPackage(bundle))
@@ -118,7 +118,7 @@ class SecurityStateManagerTest {
     )
     @Test
     fun testGetGlobalSecurityState_sdkBelow23_containsOnlyKernel() {
-        val bundle = securityStateManager.getGlobalSecurityState()
+        val bundle = securityStateManagerCompat.getGlobalSecurityState()
         assertTrue(matchesKernelFormat(bundle.getString("kernel_version")!!))
         assertFalse(bundle.containsKey("system_spl"))
         assertFalse(bundle.containsKey("vendor_spl"))
@@ -130,7 +130,7 @@ class SecurityStateManagerTest {
     @Test
     fun testGetGlobalSecurityState_whenVendorIsEnabled_containsVendorSpl() {
         SecurityPatchState.Companion.USE_VENDOR_SPL = true
-        val bundle = securityStateManager.getGlobalSecurityState()
+        val bundle = securityStateManagerCompat.getGlobalSecurityState()
         assertTrue(bundle.containsKey("vendor_spl"))
     }
 
@@ -138,7 +138,7 @@ class SecurityStateManagerTest {
     @Test
     fun testGetGlobalSecurityState_whenVendorIsDisabled_doesNotContainVendorSpl() {
         SecurityPatchState.Companion.USE_VENDOR_SPL = false
-        val bundle = securityStateManager.getGlobalSecurityState()
+        val bundle = securityStateManagerCompat.getGlobalSecurityState()
         assertFalse(bundle.containsKey("vendor_spl"))
     }
 
@@ -149,7 +149,7 @@ class SecurityStateManagerTest {
             return // Skip this test on non-Google devices.
         }
         val bundle =
-            securityStateManager.getGlobalSecurityState("com.google.android.modulemetadata")
+            securityStateManagerCompat.getGlobalSecurityState("com.google.android.modulemetadata")
         DateBasedSecurityPatchLevel.fromString(
             bundle.getString("com.google.android.modulemetadata")!!
         )

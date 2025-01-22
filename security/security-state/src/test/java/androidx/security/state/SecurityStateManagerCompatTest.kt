@@ -34,15 +34,15 @@ import org.mockito.kotlin.mock
 import org.robolectric.annotation.Config
 
 @RunWith(JUnit4::class)
-class SecurityStateManagerTest {
+class SecurityStateManagerCompatTest {
 
     private val packageManager: PackageManager = mock<PackageManager>()
     private val context: Context = mock<Context>() { on { packageManager } doReturn packageManager }
-    private lateinit var securityStateManager: SecurityStateManager
+    private lateinit var securityStateManagerCompat: SecurityStateManagerCompat
 
     @Before
     fun setUp() {
-        securityStateManager = SecurityStateManager(context)
+        securityStateManagerCompat = SecurityStateManagerCompat(context)
     }
 
     @Config(minSdk = Build.VERSION_CODES.Q)
@@ -56,7 +56,7 @@ class SecurityStateManagerTest {
             .thenReturn(PackageInfo().apply { versionName = "" })
 
         val result =
-            securityStateManager.getGlobalSecurityState("com.google.android.modulemetadata")
+            securityStateManagerCompat.getGlobalSecurityState("com.google.android.modulemetadata")
         assertEquals(
             expectedBundle.getString("com.google.android.modulemetadata"),
             result.getString("com.google.android.modulemetadata")
@@ -68,7 +68,7 @@ class SecurityStateManagerTest {
         Mockito.`when`(packageManager.getPackageInfo(Mockito.anyString(), Mockito.eq(0)))
             .thenThrow(PackageManager.NameNotFoundException())
 
-        val result = securityStateManager.getPackageVersion("non.existent.package")
+        val result = securityStateManagerCompat.getPackageVersion("non.existent.package")
         assertTrue(result.isEmpty())
     }
 
@@ -77,25 +77,25 @@ class SecurityStateManagerTest {
         // This method would normally require reading from the file system,
         // but we can mock this by pretending the expected output of the file read is known.
         val originalKernelVersionMethod =
-            securityStateManager::class.java.getDeclaredMethod("getKernelVersion")
+            securityStateManagerCompat::class.java.getDeclaredMethod("getKernelVersion")
         originalKernelVersionMethod.isAccessible = true
-        val kernelVersion = originalKernelVersionMethod.invoke(securityStateManager) as String
+        val kernelVersion = originalKernelVersionMethod.invoke(securityStateManagerCompat) as String
         assertNotNull(kernelVersion)
     }
 
     @Test
     fun testGetVendorSpl() {
         val originalVendorSplMethod =
-            securityStateManager::class.java.getDeclaredMethod("getVendorSpl")
+            securityStateManagerCompat::class.java.getDeclaredMethod("getVendorSpl")
         originalVendorSplMethod.isAccessible = true
-        val vendorSpl = originalVendorSplMethod.invoke(securityStateManager) as String
+        val vendorSpl = originalVendorSplMethod.invoke(securityStateManagerCompat) as String
         assertNotNull(vendorSpl)
     }
 
     @Config(minSdk = Build.VERSION_CODES.LOLLIPOP)
     @Test
     fun testGetSecurityPatchLevelSafe_API_Level_Below_M() {
-        val result = securityStateManager.getSecurityPatchLevelSafe()
+        val result = securityStateManagerCompat.getSecurityPatchLevelSafe()
         assertEquals("", result)
     }
 }
