@@ -40,7 +40,7 @@ import java.util.regex.Pattern
  * security-related information, which is crucial for maintaining the security integrity of the
  * device.
  */
-public open class SecurityStateManager(private val context: Context) {
+public open class SecurityStateManagerCompat(private val context: Context) {
 
     public companion object {
         private const val TAG = "SecurityStateManager"
@@ -76,26 +76,24 @@ public open class SecurityStateManager(private val context: Context) {
      * and module information into a Bundle. This method can optionally use Google's module metadata
      * providers to enhance the data returned.
      *
-     * @param moduleMetadataProvider Specifies package name for system modules metadata.
+     * @param moduleMetadataProviderPackageName Specifies package name for system modules metadata.
      * @return A Bundle containing keys and values representing the security state of the system,
      *   vendor, and kernel.
      */
-    @SuppressLint("NewApi") // Lint does not detect version check below.
-    public open fun getGlobalSecurityState(moduleMetadataProvider: String? = null): Bundle {
-        if (getAndroidSdkInt() >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+    public open fun getGlobalSecurityState(
+        moduleMetadataProviderPackageName: String = ANDROID_MODULE_METADATA_PROVIDER
+    ): Bundle {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             return getGlobalSecurityStateFromService()
         }
         return Bundle().apply {
-            if (getAndroidSdkInt() >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 putString(KEY_SYSTEM_SPL, Build.VERSION.SECURITY_PATCH)
                 if (USE_VENDOR_SPL) {
                     putString(KEY_VENDOR_SPL, getVendorSpl())
                 }
             }
-            if (getAndroidSdkInt() >= Build.VERSION_CODES.Q) {
-                val moduleMetadataProviderPackageName =
-                    moduleMetadataProvider ?: ANDROID_MODULE_METADATA_PROVIDER
-
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 if (moduleMetadataProviderPackageName.isNotEmpty()) {
                     putString(
                         moduleMetadataProviderPackageName,
@@ -107,7 +105,9 @@ public open class SecurityStateManager(private val context: Context) {
             if (kernelVersion.isNotEmpty()) {
                 putString(KEY_KERNEL_VERSION, kernelVersion)
             }
-            addWebViewPackages(this)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                addWebViewPackages(this)
+            }
         }
     }
 
@@ -159,9 +159,6 @@ public open class SecurityStateManager(private val context: Context) {
      */
     @RequiresApi(26)
     private fun addWebViewPackages(bundle: Bundle) {
-        if (getAndroidSdkInt() < Build.VERSION_CODES.O) {
-            return
-        }
         val packageName = getCurrentWebViewPackageName()
         if (packageName.isNotEmpty()) {
             bundle.putString(packageName, getPackageVersion(packageName))
@@ -187,15 +184,6 @@ public open class SecurityStateManager(private val context: Context) {
     }
 
     /**
-     * Retrieves the SDK version of the current Android system.
-     *
-     * @return the SDK version as an integer.
-     */
-    internal open fun getAndroidSdkInt(): Int {
-        return Build.VERSION.SDK_INT
-    }
-
-    /**
      * Safely retrieves the current security patch level of the device's operating system. This
      * method ensures compatibility by checking the Android version before attempting to access APIs
      * that are not available on older versions.
@@ -203,9 +191,8 @@ public open class SecurityStateManager(private val context: Context) {
      * @return A string representing the current security patch level, or empty string if it cannot
      *   be retrieved.
      */
-    @SuppressLint("NewApi") // Lint does not detect version check below.
     internal fun getSecurityPatchLevelSafe(): String {
-        return if (getAndroidSdkInt() >= Build.VERSION_CODES.M) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Build.VERSION.SECURITY_PATCH
         } else {
             ""
