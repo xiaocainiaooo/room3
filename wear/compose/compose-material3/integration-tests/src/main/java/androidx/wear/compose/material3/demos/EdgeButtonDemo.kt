@@ -16,6 +16,7 @@
 
 package androidx.wear.compose.material3.demos
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -306,11 +308,12 @@ fun EdgeButtonConfigurableDemo() {
                     enabled = colors[selectedColor].first != "Disabled"
                 ) {
                     if (selectedType == 0) {
+                        val iconSize = EdgeButtonDefaults.iconSizeFor(sizes[selectedSize].second)
                         CheckIcon(
                             modifier =
-                                Modifier.size(
-                                    EdgeButtonDefaults.iconSizeFor(sizes[selectedSize].second)
-                                )
+                                Modifier.size(iconSize * 2 / 3)
+                                    .wrapContentSize(unbounded = true)
+                                    .size(iconSize)
                         )
                     } else {
                         Text("Ok")
