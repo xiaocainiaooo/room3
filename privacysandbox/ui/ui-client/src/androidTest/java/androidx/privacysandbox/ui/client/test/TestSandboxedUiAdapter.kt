@@ -103,6 +103,13 @@ class TestSandboxedUiAdapter(private val signalOptions: Set<String> = setOf("opt
             .isFalse()
     }
 
+    internal fun assertSessionClosed() {
+        Truth.assertThat(
+                sessionClosedLatch.await(SandboxedSdkViewTest.TIMEOUT, TimeUnit.MILLISECONDS)
+            )
+            .isTrue()
+    }
+
     inner class TestSession(context: Context, override val signalOptions: Set<String>) :
         SandboxedUiAdapter.Session {
         var zOrderChangedLatch: CountDownLatch = CountDownLatch(1)
