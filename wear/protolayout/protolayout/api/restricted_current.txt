@@ -1436,11 +1436,11 @@ package androidx.wear.protolayout {
   public final class TriggerBuilders {
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TriggerBuilders.Trigger createOnConditionMetTrigger(androidx.wear.protolayout.expression.DynamicBuilders.DynamicBool);
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TriggerBuilders.Trigger createOnLoadTrigger();
-    method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TriggerBuilders.Trigger createOnVisibleOnceTrigger();
+    method @SuppressCompatibility @androidx.wear.protolayout.expression.ProtoLayoutExperimental @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TriggerBuilders.Trigger createOnVisibleOnceTrigger();
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TriggerBuilders.Trigger createOnVisibleTrigger();
   }
 
-  @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static final class TriggerBuilders.OnVisibleOnceTrigger implements androidx.wear.protolayout.TriggerBuilders.Trigger {
+  @SuppressCompatibility @androidx.wear.protolayout.expression.ProtoLayoutExperimental @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static final class TriggerBuilders.OnVisibleOnceTrigger implements androidx.wear.protolayout.TriggerBuilders.Trigger {
   }
 
   public static final class TriggerBuilders.OnVisibleOnceTrigger.Builder {
