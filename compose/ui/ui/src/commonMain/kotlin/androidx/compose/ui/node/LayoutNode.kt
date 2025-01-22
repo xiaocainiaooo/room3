@@ -118,6 +118,12 @@ internal class LayoutNode(
                 if (newRoot != null) {
                     layoutDelegate.ensureLookaheadDelegateCreated()
                     forEachCoordinatorIncludingInner { it.ensureLookaheadDelegateCreated() }
+                } else {
+                    // When lookahead root is set to null, clear the lookahead pass delegate.
+                    // This can happen when lookaheadScope is removed in one of the parents, or
+                    // more likely when movableContent moves from a parent in a LookaheadScope to
+                    // a parent not in a LookaheadScope.
+                    layoutDelegate.clearLookaheadDelegate()
                 }
                 invalidateMeasurements()
             }
