@@ -57,6 +57,11 @@ package androidx.benchmark {
 
   @SuppressCompatibility @androidx.benchmark.ExperimentalBenchmarkConfigApi public final class MicrobenchmarkConfig {
     ctor public MicrobenchmarkConfig();
+    ctor public MicrobenchmarkConfig(optional java.util.List<? extends androidx.benchmark.MetricCapture> metrics);
+    ctor public MicrobenchmarkConfig(optional java.util.List<? extends androidx.benchmark.MetricCapture> metrics, optional boolean traceAppTagEnabled);
+    ctor public MicrobenchmarkConfig(optional java.util.List<? extends androidx.benchmark.MetricCapture> metrics, optional boolean traceAppTagEnabled, optional boolean perfettoSdkTracingEnabled);
+    ctor public MicrobenchmarkConfig(optional java.util.List<? extends androidx.benchmark.MetricCapture> metrics, optional boolean traceAppTagEnabled, optional boolean perfettoSdkTracingEnabled, optional androidx.benchmark.ProfilerConfig? profiler);
+    ctor public MicrobenchmarkConfig(optional java.util.List<? extends androidx.benchmark.MetricCapture> metrics, optional boolean traceAppTagEnabled, optional boolean perfettoSdkTracingEnabled, optional androidx.benchmark.ProfilerConfig? profiler, optional Integer? warmupCount);
     ctor public MicrobenchmarkConfig(optional java.util.List<? extends androidx.benchmark.MetricCapture> metrics, optional boolean traceAppTagEnabled, optional boolean perfettoSdkTracingEnabled, optional androidx.benchmark.ProfilerConfig? profiler, optional Integer? warmupCount, optional Integer? measurementCount);
     method public Integer? getMeasurementCount();
     method public java.util.List<androidx.benchmark.MetricCapture> getMetrics();
