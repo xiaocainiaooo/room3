@@ -309,7 +309,14 @@ class MainActivity : AppCompatActivity() {
                     switchContentFragment(ScrollFragment(), menuItem.title)
                 }
             R.id.item_pooling_container ->
-                switchContentFragment(PoolingContainerFragment(), menuItem.title)
+                if (useCompose) {
+                    switchContentFragment(
+                        LazyListFragment(),
+                        "${menuItem.title} ${getString(R.string.compose)}"
+                    )
+                } else {
+                    switchContentFragment(PoolingContainerFragment(), menuItem.title)
+                }
             R.id.item_fullscreen ->
                 if (useCompose) {
                     switchContentFragment(

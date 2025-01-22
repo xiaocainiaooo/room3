@@ -88,6 +88,7 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
     private var eventListener: SandboxedSdkViewEventListener? = null
     private val frameCommitCallback = Runnable { eventListener?.onUiDisplayed() }
     internal var signalMeasurer: SandboxedSdkViewSignalMeasurer? = null
+    internal var isInComposeNode = false
 
     /**
      * Sets an event listener to the [SandboxedSdkView] and starts reporting the new events. To
@@ -306,7 +307,7 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
         signalMeasurer?.maybeSendSignals()
     }
 
-    private fun closeClient() {
+    internal fun closeClient() {
         client?.close()
         client = null
         sessionConstants = null
@@ -344,16 +345,16 @@ class SandboxedSdkView @JvmOverloads constructor(context: Context, attrs: Attrib
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         addCallbacksOnWindowAttachment()
-        if (client == null || viewContainingPoolingContainerListener == null) {
-            if (this.isWithinPoolingContainer) {
-                attachPoolingContainerListener()
-            }
+        if (viewContainingPoolingContainerListener == null && this.isWithinPoolingContainer) {
+            attachPoolingContainerListener()
+        }
+        if (client == null) {
             CompatImpl.deriveInputTokenAndOpenSession(context, this)
         }
     }
 
     override fun onDetachedFromWindow() {
-        if (!this.isWithinPoolingContainer) {
+        if (!this.isInComposeNode && !this.isWithinPoolingContainer) {
             closeClient()
         }
         removeCallbacksOnWindowDetachment()
