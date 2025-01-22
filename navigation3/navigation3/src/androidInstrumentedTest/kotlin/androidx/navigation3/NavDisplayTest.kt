@@ -18,6 +18,7 @@ package androidx.navigation3
 
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
@@ -28,6 +29,8 @@ import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.window.Dialog
 import androidx.kruth.assertThat
 import androidx.savedstate.SavedStateRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -78,20 +81,28 @@ class NavDisplayTest {
     fun testDialog() {
         lateinit var backstack: MutableList<Any>
         composeTestRule.setContent {
+            var showDialog = remember { mutableStateOf(false) }
             backstack = remember { mutableStateListOf(first) }
             NavDisplay(backstack = backstack) {
                 when (it) {
-                    first -> NavEntry(first) { Text(first) }
-                    second -> NavEntry(second, NavDisplay.isDialog(true)) { Text(second) }
+                    first ->
+                        NavEntry(first) {
+                            Button(onClick = { showDialog.value = true }) { Text(first) }
+                        }
                     else -> error("Invalid key passed")
                 }
+            }
+            if (showDialog.value) {
+                Dialog(onDismissRequest = {}) { Text(second) }
             }
         }
 
         assertThat(composeTestRule.onNodeWithText(first).isDisplayed()).isTrue()
 
-        composeTestRule.runOnIdle { backstack.add(second) }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText(first).performClick()
 
+        composeTestRule.waitForIdle()
         // Both first and second should be showing if we are on a dialog.
         assertThat(composeTestRule.onNodeWithText(first).isDisplayed()).isTrue()
         assertThat(composeTestRule.onNodeWithText(second).isDisplayed()).isTrue()
