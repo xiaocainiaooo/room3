@@ -111,12 +111,8 @@ androidXMultiplatform {
     }
 }
 
-
 android {
     compileSdk = 35
-    lintOptions {
-        disable("InvalidPackage")
-    }
     namespace = "androidx.compose.ui.test.junit4"
 }
 
