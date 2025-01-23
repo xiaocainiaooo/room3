@@ -16,8 +16,6 @@
 
 package androidx.build.lint.replacewith
 
-import androidx.build.lint.ReplaceWithDetector
-import com.android.tools.lint.checks.infrastructure.TestLintTask
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -204,28 +202,21 @@ src/MethodWithNoImportsOrPackage.java:39: Information: Replacement available [Re
         val expectedFixDiffs =
             """
 Fix for src/MethodWithNoImportsOrPackage.java line 35: Replace with `newMethod(null)`:
-@@ -35 +35
+@@ -1 +1
++ import androidx.annotation.Deprecated;
+@@ -35 +36
 -         oldMethodSingleImport(null);
 +         newMethod(null);
-@@ -42 +42
-+ import androidx.annotation.Deprecated;
 Fix for src/MethodWithNoImportsOrPackage.java line 39: Replace with `newMethod(null)`:
-@@ -39 +39
--         oldMethodMultiImport(null);
-+         newMethod(null);
-@@ -42 +42
+@@ -1 +1
 + import androidx.annotation.Deprecated;
 + import androidx.annotation.NonNull;
+@@ -39 +41
+-         oldMethodMultiImport(null);
++         newMethod(null);
         """
                 .trimIndent()
 
-        // Move to check(*input) when b/391690668 is fixed and verifyFixedFileSyntax is removed.
-        TestLintTask.lint()
-            .files(ANDROIDX_REPLACE_WITH_KT, ANDROIDX_ANY_THREAD_KT, *input)
-            .issues(ReplaceWithDetector.ISSUE)
-            .verifyFixedFileSyntax(false)
-            .run()
-            .expect(expected)
-            .expectFixDiffs(expectedFixDiffs)
+        check(*input).expect(expected).expectFixDiffs(expectedFixDiffs)
     }
 }

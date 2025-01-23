@@ -237,11 +237,12 @@ class ReplaceWithDetector : Detector(), SourceCodeScanner {
 
         // Append after any existing imports, after the package declaration, or at the beginning of
         // the file if there are no imports and no package declaration.
-        val appendLocation =
-            (lastImport ?: packageElem)?.let { context.getLocation(it) }
+        val location =
+            (lastImport ?: packageElem)
+                ?.let { context.getLocation(it).end }
+                ?.let { Location.create(context.file, it, it) }
                 ?: Location.create(context.file, context.getContents(), 0, 0)
-        val replaceBuilder = replace().range(appendLocation).end().with(importsText)
-        return replaceBuilder.autoFix()
+        return replace().range(location).with(importsText).autoFix()
     }
 
     companion object {
