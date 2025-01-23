@@ -35,6 +35,9 @@ import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.C
 import androidx.privacysandbox.ui.integration.sdkproviderutils.SdkApiConstants.Companion.MediationOption
 import androidx.privacysandbox.ui.integration.testsdkprovider.ISdkApi
 import androidx.privacysandbox.ui.integration.testsdkprovider.ISdkApiFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -113,7 +116,7 @@ abstract class BaseFragment : Fragment() {
         drawViewabilityLayer: Boolean,
         waitInsideOnDraw: Boolean = false
     ) {
-        runBlocking {
+        CoroutineScope(Dispatchers.Main).launch {
             val sdkBundle =
                 sdkApi.loadBannerAd(adType, mediationOption, waitInsideOnDraw, drawViewabilityLayer)
             sandboxedSdkView.setAdapter(SandboxedUiAdapterFactory.createFromCoreLibInfo(sdkBundle))
