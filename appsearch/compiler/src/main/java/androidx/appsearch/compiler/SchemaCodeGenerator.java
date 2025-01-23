@@ -239,7 +239,8 @@ class SchemaCodeGenerator {
                 break;
             case DOUBLE_PROPERTY: // fall-through
             case BOOLEAN_PROPERTY: // fall-through
-            case BYTES_PROPERTY:
+            case BYTES_PROPERTY: // fall-through
+            case BLOB_HANDLE_PROPERTY:
                 break;
             default:
                 throw new IllegalStateException("Unhandled annotation: " + annotation);
