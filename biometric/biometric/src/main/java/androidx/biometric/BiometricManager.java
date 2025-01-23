@@ -678,6 +678,11 @@ public class BiometricManager {
     private Boolean mIsIdentityCheckAvailable = null;
 
     /**
+     * Whether the identity check is active in the device.
+     */
+    private Boolean mIsIdentityCheckActive = null;
+
+    /**
      * Creates a {@link BiometricManager} instance from the given context.
      *
      * @param context The application or activity context.
@@ -782,6 +787,33 @@ public class BiometricManager {
             }
         }
         return mIsIdentityCheckAvailable;
+    }
+
+    /**
+     * Checks if identity Check is currently active.
+     * <p>
+     * Returns true if this device has this feature enabled, and it's considered in a high-risk
+     * environment that requires extra security measures for accessing sensitive data.
+     */
+    @SuppressLint("WrongConstant")
+    boolean isIdentityCheckActive() {
+        if (mIsIdentityCheckActive != null) {
+            return mIsIdentityCheckActive;
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM
+                || mBiometricManager == null) {
+            mIsIdentityCheckActive = false;
+        } else {
+            try {
+                mIsIdentityCheckActive = Api30Impl.canAuthenticate(mBiometricManager,
+                        Authenticators.IDENTITY_CHECK)
+                        != BiometricManager.BIOMETRIC_ERROR_IDENTITY_CHECK_NOT_ACTIVE;
+            } catch (SecurityException e) {
+                mIsIdentityCheckActive = false;
+            }
+        }
+        return mIsIdentityCheckActive;
     }
 
     /**
