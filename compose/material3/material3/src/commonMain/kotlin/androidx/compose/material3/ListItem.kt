@@ -733,7 +733,7 @@ private value class ListItemType private constructor(private val lines: Int) :
         internal operator fun invoke(
             hasOverline: Boolean,
             hasSupporting: Boolean,
-            isSupportingMultiline: Boolean
+            isSupportingMultiline: Boolean,
         ): ListItemType {
             return when {
                 (hasOverline && hasSupporting) || isSupportingMultiline -> ThreeLine
