@@ -74,6 +74,12 @@ package androidx.benchmark {
     property public final Integer? warmupCount;
   }
 
+  public class MicrobenchmarkScope {
+    method public final void pauseMeasurement();
+    method public final void resumeMeasurement();
+    method public final inline <T> T runWithMeasurementDisabled(kotlin.jvm.functions.Function0<? extends T> block);
+  }
+
   @SuppressCompatibility @androidx.benchmark.ExperimentalBenchmarkConfigApi public abstract sealed class ProfilerConfig {
   }
 

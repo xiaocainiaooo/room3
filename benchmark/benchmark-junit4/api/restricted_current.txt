@@ -16,12 +16,9 @@ package androidx.benchmark.junit4 {
     field @kotlin.PublishedApi internal androidx.benchmark.TestDefinition? testDefinition;
   }
 
-  public final class BenchmarkRule.Scope {
+  public final class BenchmarkRule.Scope extends androidx.benchmark.MicrobenchmarkScope {
     method @kotlin.PublishedApi internal androidx.benchmark.BenchmarkState getOuterState();
-    method public final void pauseMeasurement();
-    method public final void resumeMeasurement();
-    method public final <T> T! runWithMeasurementDisabled(kotlin.jvm.functions.Function0<? extends T!>);
-    method public inline <T> T runWithTimingDisabled(kotlin.jvm.functions.Function0<? extends T> block);
+    method @Deprecated public inline <T> T runWithTimingDisabled(kotlin.jvm.functions.Function0<? extends T> block);
   }
 
   public final class BenchmarkRuleKt {

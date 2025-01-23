@@ -39,12 +39,12 @@ class PerfettoOverheadBenchmark {
     @Test fun empty() = benchmarkRule.measureRepeated {}
 
     /**
-     * The trace section within runWithTimingDisabled, even though not measured, can impact the
+     * The trace section within runWithMeasurementDisabled, even though not measured, can impact the
      * results of a small benchmark significantly.
      */
     @Test
-    fun runWithTimingDisabled() =
-        benchmarkRule.measureRepeated { runWithTimingDisabled { /* nothing */ } }
+    fun runWithMeasurementDisabled() =
+        benchmarkRule.measureRepeated { runWithMeasurementDisabled { /* nothing */ } }
 
     /**
      * Trace section adds ~5us (depending on many factors) in this ideal case, but will be
