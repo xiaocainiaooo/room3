@@ -149,13 +149,6 @@ public object TextToggleButtonDefaults {
         @Composable get() = MaterialTheme.shapes.medium
 
     /**
-     * Recommended pressed shape corner size fraction for [variantAnimatedShapes]. This fraction
-     * will be applied to checked and unchecked shapes to generate the checkedPressed and
-     * uncheckedPressed shapes.
-     */
-    public val PressedShapeCornerSizeFraction: Float = 0.66f
-
-    /**
      * The default size applied for text toggle buttons. It is recommended to apply this size using
      * [Modifier.touchTargetAwareSize].
      */
@@ -225,25 +218,19 @@ public object TextToggleButtonDefaults {
      * @sample androidx.wear.compose.material3.samples.TextToggleButtonVariantSample
      * @param uncheckedShape the unchecked shape.
      * @param checkedShape the checked shape.
-     * @param pressedShapeCornerSizeFraction The fraction to apply to the uncheckedShape and
-     *   checkedShape corner sizes, when the button is pressed. For example, the button shape
-     *   animates from uncheckedShape to a new [CornerBasedShape] with corner size =
-     *   uncheckedShape's corner size * pressedCornerShapeFraction. By default, the button corners
-     *   are reduced in size when pressed, so that the button becomes more square.
      */
     @Composable
     public fun variantAnimatedShapes(
         uncheckedShape: CornerBasedShape = shape,
-        checkedShape: CornerBasedShape = this.checkedShape,
-        pressedShapeCornerSizeFraction: Float = PressedShapeCornerSizeFraction,
+        checkedShape: CornerBasedShape = this.checkedShape
     ): TextToggleButtonShapes =
         TextToggleButtonShapes(
             unchecked = uncheckedShape,
             checked = checkedShape,
             uncheckedPressed =
-                uncheckedShape.fractionalRoundedCornerShape(pressedShapeCornerSizeFraction),
+                uncheckedShape.fractionalRoundedCornerShape(PressedShapeCornerSizeFraction),
             checkedPressed =
-                checkedShape.fractionalRoundedCornerShape(pressedShapeCornerSizeFraction)
+                checkedShape.fractionalRoundedCornerShape(PressedShapeCornerSizeFraction)
         )
 
     /**
@@ -339,6 +326,13 @@ public object TextToggleButtonDefaults {
                     )
                     .also { defaultTextToggleButtonColorsCached = it }
         }
+
+    /**
+     * Recommended pressed shape corner size fraction for [variantAnimatedShapes]. This fraction
+     * will be applied to checked and unchecked shapes to generate the checkedPressed and
+     * uncheckedPressed shapes.
+     */
+    private const val PressedShapeCornerSizeFraction: Float = 0.66f
 }
 
 /**
