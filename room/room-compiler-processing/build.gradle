@@ -23,7 +23,7 @@
  */
 
 import androidx.build.KotlinTarget
-import androidx.build.LibraryType
+import androidx.build.SoftwareType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -73,7 +73,7 @@ tasks.withType(Test).configureEach { test ->
 
 androidx {
     name = "Room XProcessor"
-    type = LibraryType.ANNOTATION_PROCESSOR_UTILS
+    type = SoftwareType.ANNOTATION_PROCESSOR_UTILS
     inceptionYear = "2020"
     description = "Processing Environment Abstraction for AndroidX Room"
     kotlinTarget = KotlinTarget.KOTLIN_1_9

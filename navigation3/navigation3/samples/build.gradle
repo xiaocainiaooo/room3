@@ -23,7 +23,7 @@
  */
 
 import androidx.build.KotlinTarget
-import androidx.build.LibraryType
+import androidx.build.SoftwareType
 
 plugins {
     id("AndroidXPlugin")
@@ -56,7 +56,7 @@ dependencies {
 
 androidx {
     name = "Navigation3 Samples"
-    type = LibraryType.SAMPLES
+    type = SoftwareType.SAMPLES
     inceptionYear = "2024"
     description = "Contains the sample code for Navigation"
     kotlinTarget = KotlinTarget.KOTLIN_2_0

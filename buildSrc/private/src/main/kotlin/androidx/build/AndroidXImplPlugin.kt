@@ -508,7 +508,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                     val defaultTargetVersionForNonAndroidTargets =
                         project.provider {
                             getDefaultTargetJavaVersion(
-                                    libraryType = androidXExtension.type,
+                                    softwareType = androidXExtension.type,
                                     projectName = project.name,
                                     targetName = name
                                 )
@@ -1074,9 +1074,9 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
         afterEvaluate {
             val mavenGroup = androidXExtension.mavenGroup
             val isProbablyPublished =
-                androidXExtension.type == LibraryType.PUBLISHED_LIBRARY ||
+                androidXExtension.type == SoftwareType.PUBLISHED_LIBRARY ||
                     androidXExtension.type ==
-                        LibraryType.PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS
+                        SoftwareType.PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS
             if (mavenGroup != null && isProbablyPublished && androidXExtension.shouldPublish()) {
                 validateProjectMavenGroup(mavenGroup.group)
                 validateProjectMavenName(androidXExtension.name.get(), mavenGroup.group)
@@ -1393,7 +1393,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                 if (!parsed.shouldRelease()) {
                     continue
                 }
-                if (parsed.libraryType == LibraryType.SAMPLES) {
+                if (parsed.softwareType == SoftwareType.SAMPLES) {
                     // a SAMPLES project knows how to publish, but we don't intend to actually
                     // publish it
                     continue
@@ -1475,7 +1475,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
 }
 
 internal fun getDefaultTargetJavaVersion(
-    libraryType: LibraryType,
+    softwareType: SoftwareType,
     projectName: String? = null,
     targetName: String? = null
 ): JavaVersion {
@@ -1484,7 +1484,7 @@ internal fun getDefaultTargetJavaVersion(
         projectName != null && projectName.contains("room-compiler-processing") -> VERSION_11
         projectName != null && projectName.contains("desktop") -> VERSION_11
         targetName != null && (targetName == "desktop" || targetName == "jvmStubs") -> VERSION_11
-        libraryType.compilationTarget == CompilationTarget.HOST -> VERSION_17
+        softwareType.compilationTarget == CompilationTarget.HOST -> VERSION_17
         else -> VERSION_1_8
     }
 }
@@ -1651,8 +1651,8 @@ fun Project.validateProjectParser(androidXExtension: AndroidXExtension) {
     project.gradle.taskGraph.whenReady {
         val parsed = project.parse()
         val errorPrefix = "ProjectParser error parsing ${project.path}."
-        check(androidXExtension.type == parsed.libraryType) {
-            "$errorPrefix Incorrectly computed libraryType = ${parsed.libraryType} " +
+        check(androidXExtension.type == parsed.softwareType) {
+            "$errorPrefix Incorrectly computed libraryType = ${parsed.softwareType} " +
                 "instead of ${androidXExtension.type}"
         }
         check(androidXExtension.shouldPublish() == parsed.shouldPublish()) {

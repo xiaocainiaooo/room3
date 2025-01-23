@@ -24,7 +24,7 @@
 
 import androidx.build.ApkCopyHelperKt
 import androidx.build.KotlinTarget
-import androidx.build.LibraryType
+import androidx.build.SoftwareType
 
 plugins {
     id("AndroidXPlugin")
@@ -45,7 +45,7 @@ android {
 
 androidx {
     name = "ARCore Whitebox"
-    type = LibraryType.TEST_APPLICATION
+    type = SoftwareType.TEST_APPLICATION
     inceptionYear = "2024"
     description = "Test app that exercises the ARCore APIs."
     kotlinTarget = KotlinTarget.KOTLIN_1_9

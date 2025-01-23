@@ -23,7 +23,7 @@
  */
 
 import androidx.build.KotlinTarget
-import androidx.build.LibraryType
+import androidx.build.SoftwareType
 import androidx.build.AndroidXConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -97,7 +97,7 @@ dependencies {
 
 androidx {
     name = "Benchmark - Macrobenchmark"
-    type = LibraryType.PUBLISHED_LIBRARY
+    type = SoftwareType.PUBLISHED_LIBRARY
     inceptionYear = "2020"
     description = "Android Benchmark - Macrobenchmark"
     legacyDisableKotlinStrictApiMode = true

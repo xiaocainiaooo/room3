@@ -23,7 +23,7 @@
  */
 
 import androidx.build.KotlinTarget
-import androidx.build.LibraryType
+import androidx.build.SoftwareType
 import androidx.build.PlatformIdentifier
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
@@ -182,7 +182,7 @@ dependencies {
 
 androidx {
     name = "collections"
-    type = LibraryType.PUBLISHED_LIBRARY
+    type = SoftwareType.PUBLISHED_LIBRARY
     inceptionYear = "2018"
     description = "Standalone efficient collections."
     metalavaK2UastEnabled = false

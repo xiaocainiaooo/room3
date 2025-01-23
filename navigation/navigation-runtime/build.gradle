@@ -23,7 +23,7 @@
  */
 
 import androidx.build.KotlinTarget
-import androidx.build.LibraryType
+import androidx.build.SoftwareType
 import androidx.build.PlatformIdentifier
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
@@ -159,7 +159,7 @@ android {
 
 androidx {
     name = "Navigation Runtime"
-    type = LibraryType.PUBLISHED_LIBRARY
+    type = SoftwareType.PUBLISHED_LIBRARY
     inceptionYear = "2017"
     description = "Android Navigation-Runtime"
     kotlinTarget = KotlinTarget.KOTLIN_1_9

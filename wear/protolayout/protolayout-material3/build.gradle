@@ -21,7 +21,7 @@
  * Please use that script when creating a new project, rather than copying an existing project and
  * modifying its settings.
  */
-import androidx.build.LibraryType
+import androidx.build.SoftwareType
 
 plugins {
     id("AndroidXPlugin")
@@ -76,7 +76,7 @@ android {
 
 androidx {
     name = "androidx.wear.protolayout:protolayout-material3"
-    type = LibraryType.PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS
+    type = SoftwareType.PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS
     samples(project(":wear:protolayout:protolayout-material3-samples"))
     inceptionYear = "2024"
     description = "Material3 components library for ProtoLayout."

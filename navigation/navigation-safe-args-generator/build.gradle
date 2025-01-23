@@ -22,7 +22,7 @@
  * modifying its settings.
  */
 import androidx.build.KotlinTarget
-import androidx.build.LibraryType
+import androidx.build.SoftwareType
 import androidx.build.SdkHelperKt
 
 plugins {
@@ -68,7 +68,7 @@ tasks.withType(Test).configureEach {
 
 androidx {
     name = "Navigation TypeSafe Arguments Generator"
-    type = LibraryType.OTHER_CODE_PROCESSOR
+    type = SoftwareType.OTHER_CODE_PROCESSOR
     inceptionYear = "2017"
     description = "Android Navigation TypeSafe Arguments Generator"
     kotlinTarget = KotlinTarget.KOTLIN_1_9

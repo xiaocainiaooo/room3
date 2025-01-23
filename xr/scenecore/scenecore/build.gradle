@@ -23,7 +23,7 @@
  */
 
 import androidx.build.AndroidXConfig
-import androidx.build.LibraryType
+import androidx.build.SoftwareType
 import androidx.build.KotlinTarget
 
 
@@ -96,7 +96,7 @@ android {
 
 androidx {
     name = "XR SceneCore"
-    type = LibraryType.PUBLISHED_LIBRARY
+    type = SoftwareType.PUBLISHED_LIBRARY
     inceptionYear = "2024"
     description = "Scene building libraries for the androidx.xr namespace."
 
