@@ -27,7 +27,6 @@ import androidx.wear.protolayout.LayoutElementBuilders.VerticalAlignment
 import androidx.wear.protolayout.ModifiersBuilders.Clickable
 import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
-import androidx.wear.protolayout.expression.VersionBuilders.VersionInfo
 import androidx.wear.protolayout.material3.ButtonDefaults.filledButtonColors
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.BOTTOM_MARGIN_DP
 import androidx.wear.protolayout.material3.EdgeButtonDefaults.CONTAINER_HEIGHT_DP
@@ -49,6 +48,7 @@ import androidx.wear.protolayout.material3.EdgeButtonStyle.Companion.ICON
 import androidx.wear.protolayout.material3.EdgeButtonStyle.Companion.ICON_FALLBACK
 import androidx.wear.protolayout.material3.EdgeButtonStyle.Companion.TEXT
 import androidx.wear.protolayout.material3.EdgeButtonStyle.Companion.TEXT_FALLBACK
+import androidx.wear.protolayout.material3.Versions.hasAsymmetricalCornersSupport
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.background
 import androidx.wear.protolayout.modifiers.clickable
@@ -384,9 +384,3 @@ internal object EdgeButtonFallbackDefaults {
 
 internal fun LayoutElement.isSlotEdgeButton(): Boolean =
     this is Box && METADATA_TAG == this.modifiers?.metadata?.toTagName()
-
-/**
- * Checks whether the renderer has support for asymmetrical corners, which is added in version
- * 1.303.
- */
-private fun VersionInfo.hasAsymmetricalCornersSupport() = major > 1 || (major == 1 && minor >= 303)

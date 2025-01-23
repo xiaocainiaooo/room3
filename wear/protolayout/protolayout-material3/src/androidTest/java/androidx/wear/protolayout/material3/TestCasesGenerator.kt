@@ -141,6 +141,47 @@ object TestCasesGenerator {
                     margins = MIN_PRIMARY_LAYOUT_MARGIN
                 )
             }
+        testCases["primarylayout_graphcard_avatarbutton_fallback_golden$goldenSuffix"] =
+            materialScope(
+                ApplicationProvider.getApplicationContext(),
+                deviceParameters.copy(VersionInfo.Builder().setMajor(1).setMinor(100).build()),
+                allowDynamicTheme = false
+            ) {
+                primaryLayout(
+                    mainSlot = {
+                        Column.Builder()
+                            .setWidth(expand())
+                            .setHeight(expand())
+                            .addContent(
+                                graphicDataCard(
+                                    onClick = clickable,
+                                    modifier =
+                                        LayoutModifier.contentDescription("Graphic Data Card"),
+                                    height = expand(),
+                                    horizontalAlignment =
+                                        LayoutElementBuilders.HORIZONTAL_ALIGN_START,
+                                    title = {
+                                        text(
+                                            "1234".layoutString,
+                                        )
+                                    },
+                                    graphic = { circularProgressIndicator(staticProgress = 0.5F) }
+                                )
+                            )
+                            .addContent(DEFAULT_SPACER_BETWEEN_BUTTON_GROUPS)
+                            .addContent(
+                                avatarButton(
+                                    onClick = clickable,
+                                    labelContent = { text("Primary label".layoutString) },
+                                    avatarContent = { avatarImage(IMAGE_ID) },
+                                    height = expand()
+                                )
+                            )
+                            .build()
+                    },
+                    margins = MIN_PRIMARY_LAYOUT_MARGIN
+                )
+            }
         testCases["primarylayout_edgebuttonfilledvariant_iconoverride_golden$NORMAL_SCALE_SUFFIX"] =
             materialScope(
                 ApplicationProvider.getApplicationContext(),
