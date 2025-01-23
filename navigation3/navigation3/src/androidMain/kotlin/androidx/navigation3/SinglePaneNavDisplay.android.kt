@@ -87,7 +87,7 @@ public object NavDisplay {
  * @sample androidx.navigation3.samples.CustomBasicDisplay
  */
 @Composable
-public fun <T : Any> NavDisplay(
+public fun <T : Any> SinglePaneNavDisplay(
     backstack: List<T>,
     modifier: Modifier = Modifier,
     localProviders: List<NavLocalProvider> = emptyList(),
