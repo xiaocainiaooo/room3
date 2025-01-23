@@ -36,7 +36,7 @@ public class SaveableStateNavLocalProvider : NavLocalProvider {
     private var backstackSize = 0
 
     @Composable
-    override fun ProvideToBackStack(backStack: List<Any>) {
+    override fun ProvideToBackStack(backStack: List<Any>, content: @Composable () -> Unit) {
         DisposableEffect(key1 = backStack) {
             refCount.clear()
             onDispose {}
@@ -64,6 +64,7 @@ public class SaveableStateNavLocalProvider : NavLocalProvider {
                 }
             }
         }
+        content.invoke()
     }
 
     @Composable

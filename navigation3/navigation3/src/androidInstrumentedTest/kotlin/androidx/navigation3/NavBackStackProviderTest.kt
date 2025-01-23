@@ -27,18 +27,22 @@ import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class NavWrapperManagerTest {
+class NavBackStackProviderTest {
     @get:Rule val composeTestRule = createComposeRule()
 
     @Test
     fun callWrapperFunctions() {
         var calledWrapBackStack = false
         var calledWrapContent = false
-        val wrapper =
+        val provider =
             object : NavLocalProvider {
                 @Composable
-                override fun ProvideToBackStack(backStack: List<Any>) {
+                override fun ProvideToBackStack(
+                    backStack: List<Any>,
+                    content: @Composable () -> Unit
+                ) {
                     calledWrapBackStack = true
+                    content.invoke()
                 }
 
                 @Composable
@@ -47,11 +51,14 @@ class NavWrapperManagerTest {
                 }
             }
 
-        val manager = NavWrapperManager(listOf(wrapper))
-
         composeTestRule.setContent {
-            manager.PrepareBackStack(listOf("something"))
-            manager.ContentForEntry(NavEntry("myKey") {})
+            NavBackStackProvider(
+                backStack = listOf("something"),
+                localProviders = listOf(provider),
+                entryProvider = { NavEntry("something") {} }
+            ) { records ->
+                records.last().content.invoke("something")
+            }
         }
 
         assertThat(calledWrapBackStack).isTrue()
@@ -62,11 +69,15 @@ class NavWrapperManagerTest {
     fun callWrapperFunctionsOnce() {
         var calledWrapBackStackCount = 0
         var calledWrapContentCount = 0
-        val wrapper =
+        val provider =
             object : NavLocalProvider {
                 @Composable
-                override fun ProvideToBackStack(backStack: List<Any>) {
+                override fun ProvideToBackStack(
+                    backStack: List<Any>,
+                    content: @Composable () -> Unit
+                ) {
                     calledWrapBackStackCount++
+                    content.invoke()
                 }
 
                 @Composable
@@ -75,11 +86,14 @@ class NavWrapperManagerTest {
                 }
             }
 
-        val manager = NavWrapperManager(listOf(wrapper, wrapper))
-
         composeTestRule.setContent {
-            manager.PrepareBackStack(listOf("something"))
-            manager.ContentForEntry(NavEntry("myKey") {})
+            NavBackStackProvider(
+                backStack = listOf("something"),
+                localProviders = listOf(provider, provider),
+                entryProvider = { NavEntry("something") {} }
+            ) { records ->
+                records.last().content.invoke("something")
+            }
         }
 
         assertThat(calledWrapBackStackCount).isEqualTo(1)
