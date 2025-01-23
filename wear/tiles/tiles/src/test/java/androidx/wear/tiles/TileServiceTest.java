@@ -39,6 +39,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
 
+import androidx.concurrent.futures.ResolvableFuture;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.wear.protolayout.ResourceBuilders.Resources;
@@ -995,8 +996,10 @@ public class TileServiceTest {
         }
 
         @Override
-        protected void onRecentInteractionEvents(@NonNull List<TileInteractionEvent> events) {
+        protected @NonNull ListenableFuture<Void> onRecentInteractionEventsAsync(
+                @NonNull List<TileInteractionEvent> events) {
             mLastEventBatch = events;
+            return createImmediateFuture();
         }
 
         @Override
@@ -1023,6 +1026,12 @@ public class TileServiceTest {
                     new Resources.Builder().setVersion(requestParams.getVersion()).build();
 
             return Futures.immediateFuture(resources);
+        }
+
+        private static ListenableFuture<Void> createImmediateFuture() {
+            ResolvableFuture<Void> future = ResolvableFuture.create();
+            future.set(null);
+            return future;
         }
     }
 
