@@ -47,7 +47,7 @@ class AnimatedTest {
 
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first) }
-            NavDisplay(backstack) {
+            SinglePaneNavDisplay(backstack) {
                 when (it) {
                     first -> NavEntry(first) { Text(first) }
                     second -> NavEntry(second) { Text(second) }
@@ -90,7 +90,7 @@ class AnimatedTest {
 
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first) }
-            NavDisplay(backstack) {
+            SinglePaneNavDisplay(backstack) {
                 when (it) {
                     first ->
                         NavEntry(
@@ -145,7 +145,7 @@ class AnimatedTest {
         val testDuration = DEFAULT_TRANSITION_DURATION_MILLISECOND / 5
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first, second) }
-            NavDisplay(backstack) {
+            SinglePaneNavDisplay(backstack) {
                 when (it) {
                     first ->
                         NavEntry(
@@ -193,7 +193,7 @@ class AnimatedTest {
         val testDuration = DEFAULT_TRANSITION_DURATION_MILLISECOND / 5
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first, second, third) }
-            NavDisplay(backstack) {
+            SinglePaneNavDisplay(backstack) {
                 when (it) {
                     first ->
                         NavEntry(
@@ -251,7 +251,7 @@ class AnimatedTest {
         val testDuration = DEFAULT_TRANSITION_DURATION_MILLISECOND / 5
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first, second) }
-            NavDisplay(backstack) {
+            SinglePaneNavDisplay(backstack) {
                 when (it) {
                     first ->
                         NavEntry(
@@ -308,7 +308,7 @@ class AnimatedTest {
         val testDuration = DEFAULT_TRANSITION_DURATION_MILLISECOND / 5
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first, second, third) }
-            NavDisplay(backstack) {
+            SinglePaneNavDisplay(backstack) {
                 when (it) {
                     first ->
                         NavEntry(
@@ -362,7 +362,7 @@ class AnimatedTest {
         val testDuration = DEFAULT_TRANSITION_DURATION_MILLISECOND / 5
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first, third) }
-            NavDisplay(backstack) {
+            SinglePaneNavDisplay(backstack) {
                 when (it) {
                     first ->
                         NavEntry(
@@ -416,7 +416,7 @@ class AnimatedTest {
         val testDuration = DEFAULT_TRANSITION_DURATION_MILLISECOND / 5
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first, second, third, fourth) }
-            NavDisplay(backstack) {
+            SinglePaneNavDisplay(backstack) {
                 when (it) {
                     first ->
                         NavEntry(
@@ -479,7 +479,7 @@ class AnimatedTest {
         val testDuration = DEFAULT_TRANSITION_DURATION_MILLISECOND / 5
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first, second, third) }
-            NavDisplay(backstack) {
+            SinglePaneNavDisplay(backstack) {
                 when (it) {
                     first ->
                         NavEntry(
@@ -542,7 +542,7 @@ class AnimatedTest {
         val testDuration = DEFAULT_TRANSITION_DURATION_MILLISECOND / 5
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first, third, fourth) }
-            NavDisplay(backstack) {
+            SinglePaneNavDisplay(backstack) {
                 when (it) {
                     first ->
                         NavEntry(
@@ -605,7 +605,7 @@ class AnimatedTest {
         val testDuration = DEFAULT_TRANSITION_DURATION_MILLISECOND / 5
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first, third) }
-            NavDisplay(backstack) {
+            SinglePaneNavDisplay(backstack) {
                 when (it) {
                     first ->
                         NavEntry(
@@ -668,7 +668,7 @@ class AnimatedTest {
         val testDuration = DEFAULT_TRANSITION_DURATION_MILLISECOND / 5
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first, second) }
-            NavDisplay(backstack) {
+            SinglePaneNavDisplay(backstack) {
                 when (it) {
                     first ->
                         NavEntry(
@@ -717,7 +717,7 @@ class AnimatedTest {
         val testDuration = DEFAULT_TRANSITION_DURATION_MILLISECOND / 5
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first, second, third) }
-            NavDisplay(backstack) {
+            SinglePaneNavDisplay(backstack) {
                 when (it) {
                     first ->
                         NavEntry(

@@ -34,6 +34,7 @@ import androidx.navigation3.NavDisplay
 import androidx.navigation3.NavEntry
 import androidx.navigation3.NavLocalProvider
 import androidx.navigation3.SavedStateNavLocalProvider
+import androidx.navigation3.SinglePaneNavDisplay
 import androidx.navigation3.entry
 import androidx.navigation3.entryProvider
 
@@ -46,7 +47,7 @@ class ProfileViewModel : ViewModel() {
 fun BaseNav() {
     val backStack = rememberMutableStateListOf(Profile)
     val showDialog = remember { mutableStateOf(false) }
-    NavDisplay(
+    SinglePaneNavDisplay(
         backstack = backStack,
         localProviders = listOf(SavedStateNavLocalProvider, ViewModelStoreNavLocalProvider),
         onBack = { backStack.removeLast() },
