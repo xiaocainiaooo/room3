@@ -134,6 +134,36 @@ class AppFunctionCompilerTest {
     }
 
     @Test
+    fun testBadInputFunctions_genAppFunctionInventoryImpl_hasCompileError() {
+        val reportListPrimitiveArrayInputFunction =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("ListPrimitiveArrayInputFunction.KT")
+            )
+        val reportArrayNonPrimitiveInputFunction =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("ArrayNonPrimitiveInputFunction.KT")
+            )
+        val reportAnyTypedInputFunction =
+            compilationTestHelper.compileAll(sourceFileNames = listOf("AnyTypedInputFunction.KT"))
+
+        compilationTestHelper.assertErrorWithMessage(
+            reportListPrimitiveArrayInputFunction,
+            "App function parameters must be one of the following primitive types or a list " +
+                "of these types"
+        )
+        compilationTestHelper.assertErrorWithMessage(
+            reportArrayNonPrimitiveInputFunction,
+            "App function parameters must be one of the following primitive types or a list " +
+                "of these types"
+        )
+        compilationTestHelper.assertErrorWithMessage(
+            reportAnyTypedInputFunction,
+            "App function parameters must be one of the following primitive types or a list " +
+                "of these types"
+        )
+    }
+
+    @Test
     fun testFakeNoArgImpl_genLegacyIndexXmlFile_success() {
         val report =
             compilationTestHelper.compileAll(
