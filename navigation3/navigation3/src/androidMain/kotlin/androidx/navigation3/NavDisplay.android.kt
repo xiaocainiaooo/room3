@@ -126,10 +126,7 @@ public fun <T : Any> NavDisplay(
     require(backstack.isNotEmpty()) { "NavDisplay backstack cannot be empty" }
 
     BackHandler(backstack.size > 1, onBack)
-    @Suppress("UNCHECKED_CAST")
-    NavBackStackProvider(backstack, localProviders, entryProvider as (T) -> NavEntry<T>) { entries
-        ->
-
+    NavBackStackProvider(backstack, localProviders, entryProvider) { entries ->
         // Make a copy shallow copy so that transition.currentState and transition.targetState are
         // different backstack instances. This ensures currentState reflects the old backstack when
         // the backstack (targetState) is updated.
