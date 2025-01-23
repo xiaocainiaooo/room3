@@ -43,13 +43,15 @@ import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class NavDisplayTest {
+class SinglePaneNavDisplayTest {
     @get:Rule val composeTestRule = createComposeRule()
 
     @Test
     fun testContentShown() {
         composeTestRule.setContent {
-            NavDisplay(backstack = mutableStateListOf(first)) { NavEntry(first) { Text(first) } }
+            SinglePaneNavDisplay(backstack = mutableStateListOf(first)) {
+                NavEntry(first) { Text(first) }
+            }
         }
 
         assertThat(composeTestRule.onNodeWithText(first).isDisplayed()).isTrue()
@@ -60,7 +62,7 @@ class NavDisplayTest {
         lateinit var backstack: MutableList<Any>
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first) }
-            NavDisplay(backstack = backstack) {
+            SinglePaneNavDisplay(backstack = backstack) {
                 when (it) {
                     first -> NavEntry(first) { Text(first) }
                     second -> NavEntry(second) { Text(second) }
@@ -83,7 +85,7 @@ class NavDisplayTest {
         composeTestRule.setContent {
             var showDialog = remember { mutableStateOf(false) }
             backstack = remember { mutableStateListOf(first) }
-            NavDisplay(backstack = backstack) {
+            SinglePaneNavDisplay(backstack = backstack) {
                 when (it) {
                     first ->
                         NavEntry(first) {
@@ -115,7 +117,7 @@ class NavDisplayTest {
         composeTestRule.setContent {
             onBackDispatcher = LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
             backstack = remember { mutableStateListOf(first) }
-            NavDisplay(backstack = backstack) {
+            SinglePaneNavDisplay(backstack = backstack) {
                 when (it) {
                     first -> NavEntry(first) { Text(first) }
                     second -> NavEntry(second) { Text(second) }
@@ -142,7 +144,7 @@ class NavDisplayTest {
         lateinit var backstack: MutableList<Any>
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first) }
-            NavDisplay(backstack = backstack) {
+            SinglePaneNavDisplay(backstack = backstack) {
                 when (it) {
                     first -> NavEntry(first) { numberOnScreen1 = rememberSaveable { increment++ } }
                     second -> NavEntry(second) {}
@@ -174,7 +176,10 @@ class NavDisplayTest {
         composeTestRule.setContent {
             mainRegistry = LocalSavedStateRegistryOwner.current.savedStateRegistry
             backstack = remember { mutableStateListOf(first) }
-            NavDisplay(backstack = backstack, localProviders = listOf(SavedStateNavLocalProvider)) {
+            SinglePaneNavDisplay(
+                backstack = backstack,
+                localProviders = listOf(SavedStateNavLocalProvider)
+            ) {
                 when (it) {
                     first ->
                         NavEntry(first) {
@@ -213,7 +218,7 @@ class NavDisplayTest {
             backStack2 = remember { mutableStateListOf(second) }
             backStack3 = remember { mutableStateListOf(third) }
             state = remember { mutableStateOf(1) }
-            NavDisplay(
+            SinglePaneNavDisplay(
                 backstack =
                     when (state.value) {
                         1 -> backStack1
@@ -254,7 +259,7 @@ class NavDisplayTest {
             assertFailsWith<IllegalArgumentException> {
                 composeTestRule.setContent {
                     backstack = remember { mutableStateListOf() }
-                    NavDisplay(backstack = backstack) { NavEntry(first) {} }
+                    SinglePaneNavDisplay(backstack = backstack) { NavEntry(first) {} }
                 }
             }
         assertThat(fail.message).isEqualTo("NavDisplay backstack cannot be empty")
@@ -265,7 +270,7 @@ class NavDisplayTest {
         lateinit var backstack: MutableList<Any>
         composeTestRule.setContent {
             backstack = remember { mutableStateListOf(first) }
-            NavDisplay(backstack = backstack) {
+            SinglePaneNavDisplay(backstack = backstack) {
                 when (it) {
                     first -> NavEntry(first) { Text(first) }
                     second -> NavEntry(second) { Text(second) }
