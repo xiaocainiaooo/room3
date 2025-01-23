@@ -194,10 +194,8 @@ package androidx.savedstate.serialization {
   }
 
   public final class SavedStateRegistryOwnerDelegatesKt {
-    method public static inline <reified T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, String key, kotlin.jvm.functions.Function0<? extends T> init);
-    method public static <T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, String key, kotlinx.serialization.KSerializer<T> serializer, kotlin.jvm.functions.Function0<? extends T> init);
-    method public static inline <reified T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, kotlin.jvm.functions.Function0<? extends T> init);
-    method public static <T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, kotlinx.serialization.KSerializer<T> serializer, kotlin.jvm.functions.Function0<? extends T> init);
+    method public static inline <reified T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, optional String? key, kotlin.jvm.functions.Function0<? extends T> init);
+    method public static <T> kotlin.properties.ReadWriteProperty<java.lang.Object?,T> saved(androidx.savedstate.SavedStateRegistryOwner, kotlinx.serialization.KSerializer<T> serializer, optional String? key, kotlin.jvm.functions.Function0<? extends T> init);
   }
 
 }
