@@ -17,7 +17,6 @@
 package androidx.wear.protolayout.material3
 
 import android.content.Context
-import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
 import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
 import androidx.wear.protolayout.DimensionBuilders.ImageDimension
@@ -157,7 +156,7 @@ internal class TextElementStyle(
     val underline: Boolean = false,
     val scalable: Boolean = TypographyFontSelection.getFontScalability(typography),
     val maxLines: Int = 1,
-    @TextAlignment val multilineAlignment: Int = TEXT_ALIGN_CENTER,
+    @TextAlignment val alignment: Int = TEXT_ALIGN_CENTER,
     @TextOverflow val overflow: Int = TEXT_OVERFLOW_ELLIPSIZE,
 )
 
