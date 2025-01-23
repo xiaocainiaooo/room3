@@ -807,7 +807,7 @@ public class BiometricFragment extends Fragment {
      */
     void onMoreOptionsButtonPressed() {
         sendErrorAndDismiss(BiometricPrompt.ERROR_CONTENT_VIEW_MORE_OPTIONS_BUTTON,
-                "More options button in the content view is clicked.");
+                getString(R.string.content_view_more_options_button_clicked));
         cancelAuthentication(BiometricFragment.CANCELED_FROM_MORE_OPTIONS_BUTTON);
     }
 
@@ -919,14 +919,17 @@ public class BiometricFragment extends Fragment {
      */
     @SuppressWarnings("WeakerAccess") /* synthetic access */
     void sendErrorAndDismiss(int errorCode, @NonNull CharSequence errorString) {
-        showErrorDialogsForIdentityCheck(errorCode);
+        if (showErrorDialogsForIdentityCheck(errorCode)) {
+            // The error code will be changed to a dialog-specific error code and sent to the
+            // client through the showErrorDialogsForIdentityCheck() callback.
+            return;
+        }
 
         sendErrorToClient(errorCode, errorString);
-
         dismiss();
     }
 
-    private void showErrorDialogsForIdentityCheck(int errorCode) {
+    private boolean showErrorDialogsForIdentityCheck(int errorCode) {
         // TODO(b/375693808): Add a build check in the future
         // Show error dialogs for lockout errors (with identity check enabled only for now)
         final Context context = getContext();
@@ -948,17 +951,29 @@ public class BiometricFragment extends Fragment {
                 case BiometricPrompt.ERROR_NO_BIOMETRICS:
                 case BiometricPrompt.ERROR_HW_NOT_PRESENT:
                 case BiometricPrompt.ERROR_SECURITY_UPDATE_REQUIRED:
-                    IdentityCheckErrorDialog.createDialog(context, false /*isLockoutError*/);
-                    break;
+                    IdentityCheckErrorDialog.createDialog(context, false /*isLockoutError*/, () -> {
+                        sendErrorToClient(
+                                BiometricPrompt.ERROR_BIOMETRIC_HARDWARE_ERROR_DIALOG_DISMISSED,
+                                getString(R.string.biometric_hardware_error_dialog_dismissed));
+                        dismiss();
+                    });
+                    return true;
 
                 case BiometricPrompt.ERROR_LOCKOUT:
                 case BiometricPrompt.ERROR_LOCKOUT_PERMANENT:
-                    IdentityCheckErrorDialog.createDialog(context, true /*isLockoutError*/);
-                    break;
+                    IdentityCheckErrorDialog.createDialog(context, true /*isLockoutError*/, () -> {
+                        sendErrorToClient(
+                                BiometricPrompt.ERROR_LOCK_OUT_ERROR_DIALOG_DISMISSED,
+                                getString(R.string.lockout_error_dialog_dismissed));
+                        dismiss();
+
+                    });
+                    return true;
                 default:
                     // do nothing
             }
         }
+        return false;
     }
 
 
