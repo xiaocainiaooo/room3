@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("UNCHECKED_CAST")
+
 package androidx.navigation3
 
 import androidx.compose.runtime.Composable
@@ -35,10 +37,13 @@ import kotlin.collections.plus
 public fun <T : Any> NavBackStackProvider(
     backStack: List<T>,
     localProviders: List<NavLocalProvider>,
-    entryProvider: (key: T) -> NavEntry<T>,
+    entryProvider: (key: T) -> NavEntry<out T>,
     content: @Composable (List<NavEntry<T>>) -> Unit
 ) {
     val finalProviders = (listOf(SaveableStateNavLocalProvider()) + localProviders).distinct()
+    // Kotlin does not know these things are compatible so we need this explicit cast
+    // to ensure our lambda below takes the correct type
+    entryProvider as (T) -> NavEntry<T>
 
     // Generates a list of entries that are wrapped with the given providers
     val entries =

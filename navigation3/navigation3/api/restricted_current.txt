@@ -46,7 +46,7 @@ package androidx.navigation3 {
   }
 
   public final class NavBackStackProviderKt {
-    method @androidx.compose.runtime.Composable public static <T> void NavBackStackProvider(java.util.List<? extends T> backStack, java.util.List<? extends androidx.navigation3.NavLocalProvider> localProviders, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavEntry<T>> entryProvider, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.navigation3.NavEntry<T>>,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static <T> void NavBackStackProvider(java.util.List<? extends T> backStack, java.util.List<? extends androidx.navigation3.NavLocalProvider> localProviders, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavEntry<? extends T>> entryProvider, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.navigation3.NavEntry<T>>,kotlin.Unit> content);
   }
 
   public final class NavDisplay {
