@@ -39,6 +39,8 @@ import kotlin.collections.contains
  *   allowed, useful for test libraries.
  * - [targetsKotlinConsumersOnly]: When `true`, the library is intended for Kotlin consumers only,
  *   allowing for more Kotlin-centric API design.
+ * - [isForTesting]: When `true`, the library is intended to serve as a testing artifact only, not
+ *   meant for usage in production.
  *
  * [LibraryType] includes a variety of predefined configurations commonly used in Android libraries:
  * - Conventional published libraries ([PUBLISHED_LIBRARY], [PUBLISHED_PROTO_LIBRARY], etc.)
@@ -68,7 +70,8 @@ sealed class LibraryType(
     val checkApi: RunApiTasks = RunApiTasks.No("Unknown Library Type"),
     val compilationTarget: CompilationTarget = CompilationTarget.DEVICE,
     val allowCallingVisibleForTestsApis: Boolean = false,
-    val targetsKotlinConsumersOnly: Boolean = false
+    val targetsKotlinConsumersOnly: Boolean = false,
+    val isForTesting: Boolean = false,
 ) {
     class ConfigurableLibrary(
         name: String,
@@ -76,7 +79,8 @@ sealed class LibraryType(
         checkApi: RunApiTasks = RunApiTasks.No("Unknown Library Type"),
         compilationTarget: CompilationTarget = CompilationTarget.DEVICE,
         allowCallingVisibleForTestsApis: Boolean = false,
-        targetsKotlinConsumersOnly: Boolean = false
+        targetsKotlinConsumersOnly: Boolean = false,
+        isForTesting: Boolean = true
     ) :
         LibraryType(
             name,
@@ -84,7 +88,8 @@ sealed class LibraryType(
             checkApi,
             compilationTarget,
             allowCallingVisibleForTestsApis,
-            targetsKotlinConsumersOnly
+            targetsKotlinConsumersOnly,
+            isForTesting,
         )
 
     companion object {
@@ -177,7 +182,8 @@ sealed class LibraryType(
                 name = "PUBLISHED_TEST_LIBRARY",
                 publish = Publish.SNAPSHOT_AND_RELEASE,
                 checkApi = RunApiTasks.Yes(),
-                allowCallingVisibleForTestsApis = true
+                allowCallingVisibleForTestsApis = true,
+                isForTesting = true,
             )
 
         @JvmStatic
@@ -187,7 +193,8 @@ sealed class LibraryType(
                 publish = Publish.SNAPSHOT_AND_RELEASE,
                 checkApi = RunApiTasks.Yes(),
                 allowCallingVisibleForTestsApis = true,
-                targetsKotlinConsumersOnly = true
+                targetsKotlinConsumersOnly = true,
+                isForTesting = true,
             )
 
         // Snapshot-only libraries
@@ -257,7 +264,8 @@ sealed class LibraryType(
             ConfigurableLibrary(
                 name = "INTERNAL_HOST_TEST_LIBRARY",
                 checkApi = RunApiTasks.No("Internal Library"),
-                compilationTarget = CompilationTarget.HOST
+                compilationTarget = CompilationTarget.HOST,
+                isForTesting = true,
             )
 
         @JvmStatic
@@ -280,7 +288,8 @@ sealed class LibraryType(
             ConfigurableLibrary(
                 name = "INTERNAL_TEST_LIBRARY",
                 checkApi = RunApiTasks.No("Internal Library"),
-                allowCallingVisibleForTestsApis = true
+                allowCallingVisibleForTestsApis = true,
+                isForTesting = true,
             )
 
         // Misc libraries

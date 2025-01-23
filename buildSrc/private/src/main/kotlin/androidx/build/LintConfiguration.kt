@@ -215,6 +215,13 @@ private fun Project.configureLint(lint: Lint, isLibrary: Boolean) {
             fatal.add("VisibleForTests")
         }
 
+        if (extension.type.isForTesting) {
+            // Disable this check as we do allow usage of junit as a dependency
+            disable.add("InvalidPackage")
+        } else {
+            fatal.add("InvalidPackage")
+        }
+
         // Disable a check that's only relevant for apps that ship to Play Store. (b/299278101)
         disable.add("ExpiredTargetSdkVersion")
 
