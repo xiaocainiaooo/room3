@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,20 @@ package androidx.navigation3
 import androidx.compose.runtime.Composable
 
 /**
- * Entry maintains and stores the key and the content represented by that key. Entries should be
- * created as part of a [NavDisplay.entryProvider](reference/androidx/navigation/NavDisplay).
+ * Class that wraps a [NavEntry] within another [NavEntry].
  *
- * @param key key for this entry
- * @param featureMap map of the available features from a display
- * @param content content for this entry to be displayed when this entry is active
+ * This provides a nesting mechanism for [NavEntry]s that allows properly nested content.
+ *
+ * @param navEntry the [NavEntry] to wrap
  */
-public open class NavEntry<T : Any>(
-    public open val key: T,
-    public open val featureMap: Map<String, Any> = emptyMap(),
-    public open val content: @Composable (T) -> Unit
-)
+public open class NavEntryWrapper<T : Any>(public val navEntry: NavEntry<T>) :
+    NavEntry<T>(navEntry.key, navEntry.featureMap, navEntry.content) {
+    override val key: T
+        get() = navEntry.key
+
+    override val featureMap: Map<String, Any>
+        get() = navEntry.featureMap
+
+    override val content: @Composable (T) -> Unit
+        get() = navEntry.content
+}
