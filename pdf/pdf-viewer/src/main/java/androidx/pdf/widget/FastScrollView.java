@@ -267,6 +267,10 @@ public class FastScrollView extends FrameLayout implements PaginationModelObserv
      * Shows the scrubber (drag handle and page indicator) elements.
      */
     public void showScrubber() {
+        if (mPaginationModel != null && mPaginationModel.getNumPages() <= 1) {
+            hideScrubber();
+            return;
+        }
         if (!mIsScrubberVisible) return;
         mDragHandle.setAlpha(1);
         mPageIndicator.show();
