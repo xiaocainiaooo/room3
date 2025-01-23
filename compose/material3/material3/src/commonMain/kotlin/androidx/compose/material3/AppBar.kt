@@ -960,14 +960,14 @@ fun LargeFlexibleTopAppBar(
  * when working in conjunction with scrolling content looks like:
  *
  * @sample androidx.compose.material3.samples.CustomTwoRowsTopAppBar
- * @param title a labmda for providing a title to be displayed in the top app bar in collapsed and
+ * @param title a lambda for providing a title to be displayed in the top app bar in collapsed and
  *   expanded states. By default a small-app-bar [TextStyle] is applied to the Composition, and you
  *   may override it by wrapping your provided component with a composition local. Note that unlike
  *   the large or medium top app bars, the `TwoRowsTopAppBar` does not append bottom padding to the
  *   expanded title Composable by default. Padding should be applied directly to the provided
  *   expanded title, or to the [subtitle] that appears below it.
  * @param modifier the [Modifier] to be applied to this top app bar
- * @param subtitle a labmda for providing an optional subtitle to be displayed in the top app bar in
+ * @param subtitle a lambda for providing an optional subtitle to be displayed in the top app bar in
  *   collapsed and expanded states.
  * @param navigationIcon the navigation icon displayed at the start of the top app bar. This should
  *   typically be an [IconButton] or [IconToggleButton].
@@ -988,8 +988,8 @@ fun LargeFlexibleTopAppBar(
  *   applied by this top app bar to set up its height and colors. A scroll behavior is designed to
  *   work in conjunction with a scrolled content to change the top app bar appearance as the content
  *   scrolls. See [TopAppBarScrollBehavior.nestedScrollConnection].
- * @throws IllegalArgumentException if the provided [expandedHeight] is smaller to the
- *   [collapsedHeight]
+ * @throws IllegalArgumentException if the [height] lambda returns a smaller value when `expanded`
+ *   is true than when it is false.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalMaterial3ExpressiveApi
