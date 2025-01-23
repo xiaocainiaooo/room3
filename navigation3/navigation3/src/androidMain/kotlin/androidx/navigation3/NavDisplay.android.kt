@@ -26,7 +26,6 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation3.NavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
@@ -126,49 +125,48 @@ public fun <T : Any> NavDisplay(
 ) {
     require(backstack.isNotEmpty()) { "NavDisplay backstack cannot be empty" }
 
-    val wrapperManager: NavWrapperManager = rememberNavWrapperManager(localProviders)
     BackHandler(backstack.size > 1, onBack)
-    wrapperManager.PrepareBackStack(backStack = backstack)
+    @Suppress("UNCHECKED_CAST")
+    NavBackStackProvider(backstack, localProviders, entryProvider as (T) -> NavEntry<T>) { entries
+        ->
 
-    // Make a copy shallow copy so that transition.currentState and transition.targetState are
-    // different backstack instances. This ensures currentState reflects the old backstack when
-    // the backstack (targetState) is updated.
-    val newStack = backstack.toList()
-    val entry = entryProvider.invoke(newStack.last())
+        // Make a copy shallow copy so that transition.currentState and transition.targetState are
+        // different backstack instances. This ensures currentState reflects the old backstack when
+        // the backstack (targetState) is updated.
+        val newStack = backstack.toList()
+        val entry = entries.last()
 
-    val transition = updateTransition(targetState = newStack, label = newStack.toString())
-    val isPop = isPop(transition.currentState, newStack)
-    // Incoming entry defines transitions, otherwise it uses default transitions from
-    // NavDisplay
-    val finalEnterTransition =
-        if (isPop) {
-            entry.featureMap[POP_ENTER_TRANSITION_KEY] as? EnterTransition ?: popEnterTransition
-        } else {
-            entry.featureMap[ENTER_TRANSITION_KEY] as? EnterTransition ?: enterTransition
+        val transition = updateTransition(targetState = newStack, label = newStack.toString())
+        val isPop = isPop(transition.currentState, newStack)
+        // Incoming entry defines transitions, otherwise it uses default transitions from
+        // NavDisplay
+        val finalEnterTransition =
+            if (isPop) {
+                entry.featureMap[POP_ENTER_TRANSITION_KEY] as? EnterTransition ?: popEnterTransition
+            } else {
+                entry.featureMap[ENTER_TRANSITION_KEY] as? EnterTransition ?: enterTransition
+            }
+        val finalExitTransition =
+            if (isPop) {
+                entry.featureMap[POP_EXIT_TRANSITION_KEY] as? ExitTransition ?: popExitTransition
+            } else {
+                entry.featureMap[EXIT_TRANSITION_KEY] as? ExitTransition ?: exitTransition
+            }
+        transition.AnimatedContent(
+            modifier = modifier,
+            transitionSpec = {
+                ContentTransform(
+                    targetContentEnter = finalEnterTransition,
+                    initialContentExit = finalExitTransition,
+                    sizeTransform = sizeTransform
+                )
+            },
+            contentAlignment = contentAlignment,
+            contentKey = { it.last() }
+        ) { innerStack ->
+            val lastKey = innerStack.last()
+            entries.findLast { entry -> entry.key == lastKey }?.content?.invoke(lastKey)
         }
-    val finalExitTransition =
-        if (isPop) {
-            entry.featureMap[POP_EXIT_TRANSITION_KEY] as? ExitTransition ?: popExitTransition
-        } else {
-            entry.featureMap[EXIT_TRANSITION_KEY] as? ExitTransition ?: exitTransition
-        }
-    transition.AnimatedContent(
-        modifier = modifier,
-        transitionSpec = {
-            ContentTransform(
-                targetContentEnter = finalEnterTransition,
-                initialContentExit = finalExitTransition,
-                sizeTransform = sizeTransform
-            )
-        },
-        contentAlignment = contentAlignment,
-        contentKey = { it.lastOrNull() }
-    ) { innerStack ->
-        // innerStack is not modified but List is still considered unstable in the world of
-        // compose - compose doesn't know for sure the key is the stable so it recomposes
-        // the content, unless we remember the key
-        val record = remember(innerStack.last()) { entryProvider.invoke(innerStack.last()) }
-        wrapperManager.ContentForEntry(record)
     }
 }
 

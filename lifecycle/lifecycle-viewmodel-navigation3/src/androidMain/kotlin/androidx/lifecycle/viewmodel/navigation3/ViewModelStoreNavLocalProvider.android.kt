@@ -50,10 +50,11 @@ import androidx.savedstate.compose.LocalSavedStateRegistryOwner
 public object ViewModelStoreNavLocalProvider : NavLocalProvider {
 
     @Composable
-    override fun ProvideToBackStack(backStack: List<Any>) {
+    override fun ProvideToBackStack(backStack: List<Any>, content: @Composable () -> Unit) {
         val entryViewModelStoreProvider = viewModel { EntryViewModel() }
         entryViewModelStoreProvider.ownerInBackStack.clear()
         entryViewModelStoreProvider.ownerInBackStack.addAll(backStack)
+        content.invoke()
     }
 
     @Composable
@@ -88,36 +89,36 @@ public object ViewModelStoreNavLocalProvider : NavLocalProvider {
         }
 
         val savedStateRegistryOwner = LocalSavedStateRegistryOwner.current
-        CompositionLocalProvider(
-            LocalViewModelStoreOwner provides
-                object :
-                    ViewModelStoreOwner,
-                    SavedStateRegistryOwner by savedStateRegistryOwner,
-                    HasDefaultViewModelProviderFactory {
-                    override val viewModelStore: ViewModelStore
-                        get() = viewModelStore
+        val childViewModelOwner = remember {
+            object :
+                ViewModelStoreOwner,
+                SavedStateRegistryOwner by savedStateRegistryOwner,
+                HasDefaultViewModelProviderFactory {
+                override val viewModelStore: ViewModelStore
+                    get() = viewModelStore
 
-                    override val defaultViewModelProviderFactory: ViewModelProvider.Factory
-                        get() = SavedStateViewModelFactory(null, savedStateRegistryOwner)
+                override val defaultViewModelProviderFactory: ViewModelProvider.Factory
+                    get() = SavedStateViewModelFactory(null, savedStateRegistryOwner)
 
-                    override val defaultViewModelCreationExtras: CreationExtras
-                        get() =
-                            MutableCreationExtras().also {
-                                it[SAVED_STATE_REGISTRY_OWNER_KEY] = savedStateRegistryOwner
-                                it[VIEW_MODEL_STORE_OWNER_KEY] = this
-                            }
-
-                    init {
-                        require(this.lifecycle.currentState == Lifecycle.State.INITIALIZED) {
-                            "The Lifecycle state is already beyond INITIALIZED. The " +
-                                "ViewModelStoreNavLocalProvider requires adding the " +
-                                "SavedStateNavLocalProvider to ensure support for " +
-                                "SavedStateHandles."
+                override val defaultViewModelCreationExtras: CreationExtras
+                    get() =
+                        MutableCreationExtras().also {
+                            it[SAVED_STATE_REGISTRY_OWNER_KEY] = savedStateRegistryOwner
+                            it[VIEW_MODEL_STORE_OWNER_KEY] = this
                         }
-                        enableSavedStateHandles()
+
+                init {
+                    require(this.lifecycle.currentState == Lifecycle.State.INITIALIZED) {
+                        "The Lifecycle state is already beyond INITIALIZED. The " +
+                            "ViewModelStoreNavLocalProvider requires adding the " +
+                            "SavedStateNavLocalProvider to ensure support for " +
+                            "SavedStateHandles."
                     }
+                    enableSavedStateHandles()
                 }
-        ) {
+            }
+        }
+        CompositionLocalProvider(LocalViewModelStoreOwner provides childViewModelOwner) {
             entry.content.invoke(key)
         }
     }
