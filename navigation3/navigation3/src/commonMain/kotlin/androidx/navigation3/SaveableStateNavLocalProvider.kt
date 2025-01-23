@@ -18,10 +18,13 @@ package androidx.navigation3
 
 import androidx.collection.MutableObjectIntMap
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.runtime.staticCompositionLocalOf
 
 /**
  * Wraps the content of a [NavEntry] with a [SaveableStateHolder.SaveableStateProvider] to ensure
@@ -31,28 +34,26 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
  * non-optional feature.
  */
 public class SaveableStateNavLocalProvider : NavLocalProvider {
-    private var savedStateHolder: SaveableStateHolder? = null
-    private val refCount: MutableObjectIntMap<Any> = MutableObjectIntMap()
-    private var backstackSize = 0
 
     @Composable
     override fun ProvideToBackStack(backStack: List<Any>, content: @Composable () -> Unit) {
+        val localInfo = remember { SaveableStateNavLocalInfo() }
         DisposableEffect(key1 = backStack) {
-            refCount.clear()
+            localInfo.refCount.clear()
             onDispose {}
         }
 
-        savedStateHolder = rememberSaveableStateHolder()
-        backstackSize = backStack.size
+        localInfo.savedStateHolder = rememberSaveableStateHolder()
+        localInfo.backstackSize = backStack.size
         backStack.forEach { key ->
             DisposableEffect(key1 = key) {
-                refCount[key] = refCount.getOrDefault(key, 0).plus(1)
+                localInfo.refCount[key] = localInfo.refCount.getOrDefault(key, 0).plus(1)
                 onDispose {
-                    if (refCount[key] == 0) {
-                        savedStateHolder!!.removeState(key)
+                    if (localInfo.refCount[key] == 0) {
+                        localInfo.savedStateHolder!!.removeState(key)
                     } else {
-                        refCount[key] =
-                            refCount
+                        localInfo.refCount[key] =
+                            localInfo.refCount
                                 .getOrElse(key) {
                                     error(
                                         "Attempting to incorrectly dispose of backstack state in " +
@@ -64,25 +65,29 @@ public class SaveableStateNavLocalProvider : NavLocalProvider {
                 }
             }
         }
-        content.invoke()
+
+        CompositionLocalProvider(LocalSaveableStateNavLocalInfo provides localInfo) {
+            content.invoke()
+        }
     }
 
     @Composable
     public override fun <T : Any> ProvideToEntry(entry: NavEntry<T>) {
+        val localInfo = LocalSaveableStateNavLocalInfo.current
         val key = entry.key
         DisposableEffect(key1 = key) {
-            refCount[key] = refCount.getOrDefault(key, 0).plus(1)
+            localInfo.refCount[key] = localInfo.refCount.getOrDefault(key, 0).plus(1)
             onDispose {
                 // We need to check to make sure that the refcount has been cleared here because
                 // when we are using animations, if the entire back stack is changed, we will
                 // execute the onDispose above that clears all of the counts before we finish the
                 // transition and run this onDispose so our count will already be gone and we
                 // should just remove the state.
-                if (!refCount.contains(key) || refCount[key] == 0) {
-                    savedStateHolder?.removeState(key)
+                if (!localInfo.refCount.contains(key) || localInfo.refCount[key] == 0) {
+                    localInfo.savedStateHolder?.removeState(key)
                 } else {
-                    refCount[key] =
-                        refCount
+                    localInfo.refCount[key] =
+                        localInfo.refCount
                             .getOrElse(key) {
                                 error(
                                     "Attempting to incorrectly dispose of state associated with " +
@@ -94,7 +99,21 @@ public class SaveableStateNavLocalProvider : NavLocalProvider {
             }
         }
 
-        val id: Int = rememberSaveable(key) { key.hashCode() + backstackSize }
-        savedStateHolder?.SaveableStateProvider(id) { entry.content.invoke(key) }
+        val id: Int = rememberSaveable(key) { key.hashCode() + localInfo.backstackSize }
+        localInfo.savedStateHolder?.SaveableStateProvider(id) { entry.content.invoke(key) }
     }
+}
+
+internal val LocalSaveableStateNavLocalInfo =
+    staticCompositionLocalOf<SaveableStateNavLocalInfo> {
+        error(
+            "CompositionLocal LocalSaveableStateNavLocalInfo not present. You must call " +
+                "ProvideToBackStack before calling ProvideToEntry."
+        )
+    }
+
+internal class SaveableStateNavLocalInfo {
+    internal var savedStateHolder: SaveableStateHolder? = null
+    internal val refCount: MutableObjectIntMap<Any> = MutableObjectIntMap()
+    internal var backstackSize = 0
 }
