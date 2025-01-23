@@ -133,9 +133,8 @@ class AppFunctionCompilerTest {
         )
     }
 
-    // TODO: Add more tests for legacy index processor.
     @Test
-    fun testSampleNoParamImp_genLegacyIndexXmlFile_success() {
+    fun testFakeNoArgImpl_genLegacyIndexXmlFile_success() {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("FakeNoArgImpl.KT", "FakeSchemas.KT")
@@ -145,6 +144,45 @@ class AppFunctionCompilerTest {
             report = report,
             expectGeneratedResourceFileName = "app_functions.xml",
             goldenFileName = "fakeNoArgImpl_app_function.xml"
+        )
+    }
+
+    @Test
+    fun testFakeNoArgImp_isEnabledTrue_genLegacyIndexXmlFile_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("FakeNoArgImpl_IsEnabled_True.KT", "FakeSchemas.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions.xml",
+            goldenFileName = "fakeNoArgImpl_isEnabled_true_app_function.xml"
+        )
+    }
+
+    @Test
+    fun testFakeNoArgImp_isEnabledFalse_genLegacyIndexXmlFile_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("FakeNoArgImpl_IsEnabled_False.KT", "FakeSchemas.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions.xml",
+            goldenFileName = "fakeNoArgImpl_isEnabled_false_app_function.xml"
+        )
+    }
+
+    @Test
+    fun testSimpleFunction_noOverride_hasCompileError() {
+        val report = compilationTestHelper.compileAll(sourceFileNames = listOf("SimpleFunction.KT"))
+
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions.xml",
+            goldenFileName = "simpleFunction_noSchema_app_function.xml"
         )
     }
 }
