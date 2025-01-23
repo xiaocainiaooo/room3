@@ -222,8 +222,10 @@ private fun extractProfile(packageName: String): String {
     val expected = "Profile saved to '/data/misc/profman/$packageName-primary.prof.txt'"
 
     // Output of profman was empty in previous version and can be `expected` on newer versions.
-    check(stdout.isBlank() || stdout == expected) {
-        "Expected `pm dump-profiles` stdout to be either black or `$expected` but was $stdout"
+    // Note that it sometimes starts with e.g. :
+    // `Waiting for app processes to flush profiles...\nApp processes flushed profiles in 0ms`
+    check(stdout.isBlank() || stdout.endsWith(expected)) {
+        "Expected `pm dump-profiles` stdout to be either blank or end with `$expected` but was $stdout"
     }
 
     if (UserInfo.isAdditionalUser) {
