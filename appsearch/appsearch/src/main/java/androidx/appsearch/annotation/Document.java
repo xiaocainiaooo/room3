@@ -588,6 +588,34 @@ public @interface Document {
     }
 
     /**
+     * Configures an {@link androidx.appsearch.app.AppSearchBlobHandle} field of a class as a
+     * property known to AppSearch.
+     */
+    @Documented
+    @Retention(RetentionPolicy.CLASS)
+    @Target({ElementType.FIELD, ElementType.METHOD})
+    @ExperimentalAppSearchApi
+    @interface BlobHandleProperty {
+        /**
+         * The name of this property. This string is used to query against this property.
+         *
+         * <p>If not specified, the name of the field in the code will be used instead.
+         */
+        String name() default "";
+
+        /**
+         * Configures whether this property must be specified for the document to be valid.
+         *
+         * <p>This attribute does not apply to properties of a repeated type (e.g. a list).
+         *
+         * <p>Please make sure you understand the consequences of required fields on
+         * {@link androidx.appsearch.app.AppSearchSession#setSchemaAsync schema migration} before
+         * setting this attribute to {@code true}.
+         */
+        boolean required() default false;
+    }
+
+    /**
      * Marks a static method or a builder class directly as a builder producer. A builder class
      * should contain a "build()" method to construct the AppSearch document object and setter
      * methods to set field values.
