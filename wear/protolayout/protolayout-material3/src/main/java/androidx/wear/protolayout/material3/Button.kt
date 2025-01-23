@@ -112,7 +112,11 @@ public fun MaterialScope.iconButton(
         content = {
             withStyle(
                     defaultIconStyle =
-                        IconStyle(size = dp(style.iconSize), tintColor = colors.iconColor)
+                        IconStyle(
+                            width = dp(style.iconSize),
+                            height = dp(style.iconSize),
+                            tintColor = colors.iconColor
+                        )
                 )
                 .iconContent()
         }
@@ -284,7 +288,8 @@ public fun MaterialScope.button(
                         withStyle(
                                 defaultIconStyle =
                                     IconStyle(
-                                        size = dp(style.iconSize),
+                                        width = dp(style.iconSize),
+                                        height = dp(style.iconSize),
                                         tintColor = colors.iconColor
                                     )
                             )
@@ -532,15 +537,19 @@ public fun MaterialScope.compactButton(
                             },
                         icon =
                             iconContent?.let {
+                                val iconSize =
+                                    dp(
+                                        if (labelContent == null) {
+                                            COMPACT_BUTTON_ICON_SIZE_LARGE_DP
+                                        } else {
+                                            COMPACT_BUTTON_ICON_SIZE_SMALL_DP
+                                        }
+                                    )
                                 withStyle(
                                         defaultIconStyle =
                                             IconStyle(
-                                                size =
-                                                    dp(
-                                                        if (labelContent == null)
-                                                            COMPACT_BUTTON_ICON_SIZE_LARGE_DP
-                                                        else COMPACT_BUTTON_ICON_SIZE_SMALL_DP
-                                                    ),
+                                                width = iconSize,
+                                                height = iconSize,
                                                 tintColor = colors.iconColor
                                             )
                                     )

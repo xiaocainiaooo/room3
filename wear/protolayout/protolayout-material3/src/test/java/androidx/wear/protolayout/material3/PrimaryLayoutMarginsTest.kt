@@ -71,7 +71,8 @@ class PrimaryLayoutMarginsTest {
                 defaultIconStyle = IconStyle(),
                 defaultBackgroundImageStyle = BackgroundImageStyle(),
                 defaultAvatarImageStyle = AvatarImageStyle(),
-                layoutSlotsPresence = LayoutSlotsPresence()
+                layoutSlotsPresence = LayoutSlotsPresence(),
+                defaultProgressIndicatorStyle = ProgressIndicatorStyle()
             )
     }
 }

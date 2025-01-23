@@ -38,6 +38,7 @@ import androidx.wear.protolayout.material3.DataCardDefaults.buildContentForDataC
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.defaultCompactDataCardStyle
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.defaultDataCardStyle
 import androidx.wear.protolayout.material3.GraphicDataCardDefaults.buildContentForGraphicDataCard
+import androidx.wear.protolayout.material3.GraphicDataCardDefaults.constructGraphic
 import androidx.wear.protolayout.material3.GraphicDataCardStyle.Companion.defaultGraphicDataCardStyle
 import androidx.wear.protolayout.material3.PredefinedPrimaryLayoutMargins.maxPrimaryLayoutMargins
 import androidx.wear.protolayout.material3.PredefinedPrimaryLayoutMargins.minPrimaryLayoutMargins
@@ -518,7 +519,8 @@ public fun MaterialScope.iconDataCard(
                     withStyle(
                             defaultIconStyle =
                                 IconStyle(
-                                    size = style.iconSize.toDp(),
+                                    width = style.iconSize.toDp(),
+                                    height = style.iconSize.toDp(),
                                     tintColor = colors.secondaryIconColor
                                 )
                         )
@@ -529,7 +531,6 @@ public fun MaterialScope.iconDataCard(
         )
     }
 
-// TODO: b/368272767 - Link directly to progress indicator when available and mention icon in it.
 /**
  * Opinionated ProtoLayout Material3 graphic data card that offers a slot for graphic data such as
  * progress indicator and up to 2 vertically stacked slots, usually for textual description.
@@ -542,8 +543,13 @@ public fun MaterialScope.iconDataCard(
  *   description using [contentDescription].
  * @param content The optional body content of the card. Uses [CardColors.contentColor] color by
  *   default.
- * @param graphic A slot for displaying graphic data, such as progress indicator.
- * @param height The height of this card. It's highly recommended to set this to [expand] for the
+ * @param graphic A slot for displaying graphic data, such as [circularProgressIndicator] or
+ *   [segmentedCircularProgressIndicator]. A progress indicator will have its default color matching
+ *   to the card when the card has one of the predefined colors in CardDefaults. A helper
+ *   [constructGraphic] is also provided to construct a graphic content with a progress indicator
+ *   and an icon, where the icon will be placed in the center with proportional size and color
+ *   matching to the progress indicator.
+ * @param height The width of this card. It's highly recommended to set this to [expand] for the
  *   most optimal experience across different screen sizes.
  * @param shape Defines the card's shape, in other words the corner radius for this card. If
  *   changing these to radius smaller than [Shapes.medium], it is important to adjusts the margins
@@ -571,7 +577,6 @@ public fun MaterialScope.iconDataCard(
 // TODO: b/346958146 - link Card visuals in DAC
 public fun MaterialScope.graphicDataCard(
     onClick: Clickable,
-    // TODO: b/368272767 - Potentially add helper for CPI and icon and link in KDocs.
     graphic: (MaterialScope.() -> LayoutElement),
     title: (MaterialScope.() -> LayoutElement),
     modifier: LayoutModifier = LayoutModifier,
@@ -613,8 +618,16 @@ public fun MaterialScope.graphicDataCard(
                         )
                         .it()
                 },
-            // TODO: b/368272767 - Rethink if we need separate style for graphic.
-            graphic = graphic(),
+            graphic =
+                withStyle(
+                        defaultProgressIndicatorStyle =
+                            ProgressIndicatorStyle(color = colors.graphicProgressIndicatorColors),
+                        defaultIconStyle =
+                            IconStyle(
+                                tintColor = colors.graphicIconColor ?: defaultIconStyle.tintColor
+                            )
+                    )
+                    .graphic(),
             style = style,
             height = height,
             // Only support start and end align.

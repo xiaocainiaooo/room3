@@ -47,10 +47,7 @@ import androidx.wear.protolayout.types.argb
 // TODO: b/352308384 - Add helper to read the exported Json or XML file from the Material Theme
 //    Builder tool.
 // TODO: b/350927030 - Customization setters of shape and typography, which are not fully
-// TODO: b/352308384 - Add helper to read the exported Json or XML file from the Material Theme
-//    Builder tool.
-// TODO: b/350927030 - Customization setters of shape and typography, which are not fully
-// customizable.
+//   customizable.
 // TODO: b/369116159 - Add samples on usage.
 @MaterialScopeMarker
 public open class MaterialScope
@@ -72,7 +69,8 @@ internal constructor(
     internal val defaultIconStyle: IconStyle,
     internal val defaultBackgroundImageStyle: BackgroundImageStyle,
     internal val defaultAvatarImageStyle: AvatarImageStyle,
-    internal val layoutSlotsPresence: LayoutSlotsPresence
+    internal val layoutSlotsPresence: LayoutSlotsPresence,
+    internal val defaultProgressIndicatorStyle: ProgressIndicatorStyle
 ) {
     /** Color Scheme used within this scope and its components. */
     public val colorScheme: ColorScheme = theme.colorScheme
@@ -85,7 +83,8 @@ internal constructor(
         defaultIconStyle: IconStyle = this.defaultIconStyle,
         defaultBackgroundImageStyle: BackgroundImageStyle = this.defaultBackgroundImageStyle,
         defaultAvatarImageStyle: AvatarImageStyle = this.defaultAvatarImageStyle,
-        layoutSlotsPresence: LayoutSlotsPresence = this.layoutSlotsPresence
+        layoutSlotsPresence: LayoutSlotsPresence = this.layoutSlotsPresence,
+        defaultProgressIndicatorStyle: ProgressIndicatorStyle = this.defaultProgressIndicatorStyle
     ): MaterialScope =
         MaterialScope(
             context = context,
@@ -96,7 +95,8 @@ internal constructor(
             defaultIconStyle = defaultIconStyle,
             defaultBackgroundImageStyle = defaultBackgroundImageStyle,
             defaultAvatarImageStyle = defaultAvatarImageStyle,
-            layoutSlotsPresence = layoutSlotsPresence
+            layoutSlotsPresence = layoutSlotsPresence,
+            defaultProgressIndicatorStyle = defaultProgressIndicatorStyle
         )
 }
 
@@ -143,7 +143,8 @@ public fun materialScope(
             defaultIconStyle = IconStyle(),
             defaultBackgroundImageStyle = BackgroundImageStyle(),
             defaultAvatarImageStyle = AvatarImageStyle(),
-            layoutSlotsPresence = LayoutSlotsPresence()
+            layoutSlotsPresence = LayoutSlotsPresence(),
+            defaultProgressIndicatorStyle = ProgressIndicatorStyle()
         )
         .layout()
 
@@ -161,8 +162,9 @@ internal class TextElementStyle(
 )
 
 internal class IconStyle(
-    val size: ImageDimension = 24.toDp(),
-    val tintColor: LayoutColor = ColorTokens.PRIMARY.argb,
+    val width: ImageDimension = 24.toDp(),
+    val height: ImageDimension = 24.toDp(),
+    val tintColor: LayoutColor = ColorTokens.PRIMARY.argb
 )
 
 internal class BackgroundImageStyle(
@@ -188,4 +190,8 @@ internal class LayoutSlotsPresence(
     val isTitleSlotPresent: Boolean = false,
     val isBottomSlotEdgeButton: Boolean = false,
     val isBottomSlotPresent: Boolean = isBottomSlotEdgeButton
+)
+
+internal class ProgressIndicatorStyle(
+    val color: ProgressIndicatorColors? = null,
 )
