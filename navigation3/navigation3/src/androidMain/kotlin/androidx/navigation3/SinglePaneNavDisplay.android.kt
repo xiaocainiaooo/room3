@@ -16,16 +16,25 @@
 package androidx.navigation3
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.PredictiveBackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.SeekableTransitionState
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation3.NavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
@@ -33,6 +42,8 @@ import androidx.navigation3.NavDisplay.ENTER_TRANSITION_KEY
 import androidx.navigation3.NavDisplay.EXIT_TRANSITION_KEY
 import androidx.navigation3.NavDisplay.POP_ENTER_TRANSITION_KEY
 import androidx.navigation3.NavDisplay.POP_EXIT_TRANSITION_KEY
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 /** Object that indicates the features that can be handled by the [NavDisplay] */
 public object NavDisplay {
@@ -134,7 +145,30 @@ public fun <T : Any> SinglePaneNavDisplay(
         val newStack = backstack.toList()
         val entry = entries.last()
 
-        val transition = updateTransition(targetState = newStack, label = newStack.toString())
+        var progress by remember { mutableFloatStateOf(0f) }
+        var inPredictiveBack by remember { mutableStateOf(false) }
+        PredictiveBackHandler(backstack.size > 1) { backEvent ->
+            progress = 0f
+            try {
+                backEvent.collect { value ->
+                    inPredictiveBack = true
+                    progress = value.progress
+                }
+                inPredictiveBack = false
+                onBack()
+            } catch (e: CancellationException) {
+                inPredictiveBack = false
+            }
+        }
+
+        val transitionState = remember {
+            // The state returned here cannot be nullable cause it produces the input of the
+            // transitionSpec passed into the AnimatedContent and that must match the non-nullable
+            // scope exposed by the transitions on the NavHost and composable APIs.
+            SeekableTransitionState(newStack)
+        }
+
+        val transition = rememberTransition(transitionState, label = entry.key.toString())
         val isPop = isPop(transition.currentState, newStack)
         // Incoming entry defines transitions, otherwise it uses default transitions from
         // NavDisplay
@@ -150,6 +184,43 @@ public fun <T : Any> SinglePaneNavDisplay(
             } else {
                 entry.featureMap[EXIT_TRANSITION_KEY] as? ExitTransition ?: exitTransition
             }
+
+        if (inPredictiveBack) {
+            LaunchedEffect(progress) {
+                transitionState.seekTo(progress, newStack.subList(0, newStack.size - 1))
+            }
+        } else {
+            LaunchedEffect(newStack) {
+                // This ensures we don't animate after the back gesture is cancelled and we
+                // are already on the current state
+                if (transitionState.currentState != newStack) {
+                    transitionState.animateTo(newStack)
+                } else {
+                    // convert from nanoseconds to milliseconds
+                    val totalDuration = transition.totalDurationNanos / 1000000
+                    // When the predictive back gesture is cancelled, we need to manually animate
+                    // the SeekableTransitionState from where it left off, to zero and then
+                    // snapTo the final position.
+                    animate(
+                        transitionState.fraction,
+                        0f,
+                        animationSpec = tween((transitionState.fraction * totalDuration).toInt())
+                    ) { value, _ ->
+                        this@LaunchedEffect.launch {
+                            if (value > 0) {
+                                // Seek the original transition back to the currentState
+                                transitionState.seekTo(value)
+                            }
+                            if (value == 0f) {
+                                // Once we animate to the start, we need to snap to the right state.
+                                transitionState.snapTo(newStack)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         transition.AnimatedContent(
             modifier = modifier,
             transitionSpec = {
