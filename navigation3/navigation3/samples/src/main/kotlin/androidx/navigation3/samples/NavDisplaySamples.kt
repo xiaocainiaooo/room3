@@ -16,18 +16,23 @@
 
 package androidx.navigation3.samples
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.Sampled
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavLocalProvider
+import androidx.navigation3.NavBackStackProvider
 import androidx.navigation3.NavDisplay
 import androidx.navigation3.NavEntry
+import androidx.navigation3.NavLocalProvider
 import androidx.navigation3.SavedStateNavLocalProvider
 import androidx.navigation3.entry
 import androidx.navigation3.entryProvider
@@ -71,5 +76,21 @@ fun BaseNav() {
     )
     if (showDialog.value) {
         DialogContent(onDismissRequest = { showDialog.value = false })
+    }
+}
+
+@Sampled
+@Composable
+fun <T : Any> CustomBasicDisplay(
+    backstack: List<T>,
+    modifier: Modifier = Modifier,
+    localProviders: List<NavLocalProvider> = emptyList(),
+    onBack: () -> Unit = { if (backstack is MutableList) backstack.removeAt(backstack.size - 1) },
+    entryProvider: (key: T) -> NavEntry<out T>
+) {
+    BackHandler(backstack.size > 1, onBack)
+    NavBackStackProvider(backstack, localProviders, entryProvider) { entries ->
+        val entry = entries.last()
+        Box(modifier = modifier) { entry.content.invoke(entry.key) }
     }
 }

@@ -84,6 +84,7 @@ public object NavDisplay {
  * @param onBack a callback for handling system back presses
  * @param entryProvider lambda used to construct each possible [NavEntry]
  * @sample androidx.navigation3.samples.BaseNav
+ * @sample androidx.navigation3.samples.CustomBasicDisplay
  */
 @Composable
 public fun <T : Any> NavDisplay(
