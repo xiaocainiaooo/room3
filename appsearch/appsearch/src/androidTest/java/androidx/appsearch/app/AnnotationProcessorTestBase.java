@@ -2882,6 +2882,9 @@ public abstract class AnnotationProcessorTestBase {
         @Document.EmbeddingProperty(indexingType = 1)
         EmbeddingVector mTitleEmbedding;
 
+        @Document.EmbeddingProperty(indexingType = 1, quantizationType = 1)
+        EmbeddingVector mTitleQuantizedEmbedding;
+
         @Document.EmbeddingProperty(indexingType = 1)
         Collection<EmbeddingVector> mReceiverEmbeddings;
 
@@ -2893,10 +2896,13 @@ public abstract class AnnotationProcessorTestBase {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             EmailWithEmbedding email = (EmailWithEmbedding) o;
-            return Objects.equals(mNamespace, email.mNamespace) && Objects.equals(mId,
-                    email.mId) && Objects.equals(mSender, email.mSender)
+            return Objects.equals(mNamespace, email.mNamespace)
+                    && Objects.equals(mId, email.mId)
+                    && Objects.equals(mCreationTimestampMillis, email.mCreationTimestampMillis)
+                    && Objects.equals(mSender, email.mSender)
                     && Objects.equals(mSenderEmbedding, email.mSenderEmbedding)
                     && Objects.equals(mTitleEmbedding, email.mTitleEmbedding)
+                    && Objects.equals(mTitleQuantizedEmbedding, email.mTitleQuantizedEmbedding)
                     && Objects.equals(mReceiverEmbeddings, email.mReceiverEmbeddings)
                     && Arrays.equals(mBodyEmbeddings, email.mBodyEmbeddings);
         }
@@ -2910,6 +2916,8 @@ public abstract class AnnotationProcessorTestBase {
                     new EmbeddingVector(new float[]{0.1f, 0.2f, 0.3f, 0.4f}, "model3");
             EmbeddingVector embedding4 =
                     new EmbeddingVector(new float[]{-0.1f, -0.2f, -0.3f, -0.4f}, "model3");
+            EmbeddingVector embedding5 =
+                    new EmbeddingVector(new float[]{1, 2}, "model4");
             EmailWithEmbedding email = new EmailWithEmbedding();
             email.mNamespace = "namespace";
             email.mId = "id";
@@ -2919,6 +2927,7 @@ public abstract class AnnotationProcessorTestBase {
             email.mTitleEmbedding = embedding2;
             email.mReceiverEmbeddings = Collections.singletonList(embedding3);
             email.mBodyEmbeddings = new EmbeddingVector[]{embedding3, embedding4};
+            email.mTitleQuantizedEmbedding = embedding5;
             return email;
         }
     }
@@ -3009,6 +3018,70 @@ public abstract class AnnotationProcessorTestBase {
         results = retrieveAllSearchResults(searchResults);
         assertThat(results).hasSize(1);
         assertThat(results.get(0).getRankingSignal()).isEqualTo(3);
+        // Convert GenericDocument to EmailWithEmbedding and check values.
+        outputDocument = results.get(0).getDocument(EmailWithEmbedding.class);
+        assertThat(outputDocument).isEqualTo(email);
+    }
+
+    @Test
+    public void testEmbeddingQuantization() throws Exception {
+        assumeTrue(mSession.getFeatures().isFeatureSupported(
+                Features.SCHEMA_EMBEDDING_PROPERTY_CONFIG));
+        assumeTrue(mSession.getFeatures().isFeatureSupported(
+                Features.SCHEMA_EMBEDDING_QUANTIZATION));
+
+        mSession.setSchemaAsync(new SetSchemaRequest.Builder()
+                .addDocumentClasses(EmailWithEmbedding.class)
+                .build()).get();
+
+        // Create and add a document
+        EmailWithEmbedding email = new EmailWithEmbedding();
+        email.mNamespace = "namespace";
+        email.mId = "id";
+        email.mCreationTimestampMillis = 1000;
+        EmbeddingVector embedding = new EmbeddingVector(new float[]{0, 1.45f, 255}, "my_model");
+        email.mTitleEmbedding = embedding;
+        email.mTitleQuantizedEmbedding = embedding;
+        checkIsBatchResultSuccess(mSession.putAsync(
+                new PutDocumentsRequest.Builder()
+                        .addDocuments(email)
+                        .build()));
+
+        EmbeddingVector queryEmbedding = new EmbeddingVector(new float[]{1, 1, 1}, "my_model");
+        // titleEmbedding is unquantized, so it should have an embedding score
+        // 0 + 1.45 + 255 = 256.45.
+        SearchResults searchResults = mSession.search(
+                "titleEmbedding:semanticSearch(getEmbeddingParameter(0), -1000, 1000)",
+                new SearchSpec.Builder()
+                        .setDefaultEmbeddingSearchMetricType(
+                                SearchSpec.EMBEDDING_SEARCH_METRIC_TYPE_DOT_PRODUCT)
+                        .addEmbeddingParameters(queryEmbedding)
+                        .setRankingStrategy(
+                                "sum(this.matchedSemanticScores(getEmbeddingParameter(0)))")
+                        .setListFilterQueryLanguageEnabled(true)
+                        .build());
+        List<SearchResult> results = retrieveAllSearchResults(searchResults);
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0).getRankingSignal()).isWithin(0.0001).of(256.45);
+        // Convert GenericDocument to EmailWithEmbedding and check values.
+        EmailWithEmbedding outputDocument = results.get(0).getDocument(EmailWithEmbedding.class);
+        assertThat(outputDocument).isEqualTo(email);
+
+        // titleQuantizedEmbedding is quantized, so it should have an embedding score
+        // 0 + 1 + 255 = 256.
+        searchResults = mSession.search(
+                "titleQuantizedEmbedding:semanticSearch(getEmbeddingParameter(0), -1000, 1000)",
+                new SearchSpec.Builder()
+                        .setDefaultEmbeddingSearchMetricType(
+                                SearchSpec.EMBEDDING_SEARCH_METRIC_TYPE_DOT_PRODUCT)
+                        .addEmbeddingParameters(queryEmbedding)
+                        .setRankingStrategy(
+                                "sum(this.matchedSemanticScores(getEmbeddingParameter(0)))")
+                        .setListFilterQueryLanguageEnabled(true)
+                        .build());
+        results = retrieveAllSearchResults(searchResults);
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0).getRankingSignal()).isWithin(0.0001).of(256);
         // Convert GenericDocument to EmailWithEmbedding and check values.
         outputDocument = results.get(0).getDocument(EmailWithEmbedding.class);
         assertThat(outputDocument).isEqualTo(email);

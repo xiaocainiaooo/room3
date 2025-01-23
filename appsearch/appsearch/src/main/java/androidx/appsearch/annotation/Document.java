@@ -18,6 +18,7 @@ package androidx.appsearch.annotation;
 
 import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.EmbeddingVector;
+import androidx.appsearch.app.ExperimentalAppSearchApi;
 import androidx.appsearch.app.LongSerializer;
 import androidx.appsearch.app.StringSerializer;
 
@@ -562,6 +563,17 @@ public @interface Document {
          */
         @AppSearchSchema.EmbeddingPropertyConfig.IndexingType int indexingType()
                 default AppSearchSchema.EmbeddingPropertyConfig.INDEXING_TYPE_NONE;
+
+        /**
+         * Configures whether the embedding vectors in this property should be quantized.
+         *
+         * <p>If not specified, defaults to
+         * {@link AppSearchSchema.EmbeddingPropertyConfig#QUANTIZATION_TYPE_NONE} (contents in
+         * this property will not be quantized.).
+         */
+        @ExperimentalAppSearchApi
+        @AppSearchSchema.EmbeddingPropertyConfig.QuantizationType int quantizationType()
+                default AppSearchSchema.EmbeddingPropertyConfig.QUANTIZATION_TYPE_NONE;
 
         /**
          * Configures whether this property must be specified for the document to be valid.

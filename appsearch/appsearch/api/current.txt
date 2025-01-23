@@ -38,6 +38,7 @@ package androidx.appsearch.annotation {
   @java.lang.annotation.Documented @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.CLASS) @java.lang.annotation.Target({java.lang.annotation.ElementType.FIELD, java.lang.annotation.ElementType.METHOD}) public static @interface Document.EmbeddingProperty {
     method public abstract int indexingType() default androidx.appsearch.app.AppSearchSchema.EmbeddingPropertyConfig.INDEXING_TYPE_NONE;
     method public abstract String name() default "";
+    method @SuppressCompatibility @androidx.appsearch.app.ExperimentalAppSearchApi public abstract int quantizationType() default androidx.appsearch.app.AppSearchSchema.EmbeddingPropertyConfig.QUANTIZATION_TYPE_NONE;
     method public abstract boolean required() default false;
   }
 
