@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@file:JvmName("NavHostKt")
+@file:JvmMultifileClass
+
 package androidx.navigation.compose
 
 import android.annotation.SuppressLint

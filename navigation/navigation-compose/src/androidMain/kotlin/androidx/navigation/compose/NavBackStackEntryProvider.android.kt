@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@file:JvmName("NavBackStackEntryProviderKt")
+@file:JvmMultifileClass
+
 package androidx.navigation.compose
 
 import androidx.compose.runtime.Composable

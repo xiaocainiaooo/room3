@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@file:JvmName("NavHostControllerKt")
+@file:JvmMultifileClass
+
 package androidx.navigation.compose
 
 import android.content.Context

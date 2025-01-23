@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+@file:JvmName("NavGraphBuilderKt")
+@file:JvmMultifileClass
+
 package androidx.navigation.compose
 
 import androidx.compose.animation.AnimatedContentScope
