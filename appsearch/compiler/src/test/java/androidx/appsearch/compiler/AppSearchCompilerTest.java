@@ -3525,6 +3525,32 @@ public class AppSearchCompilerTest {
     }
 
     @Test
+    public void testQuantizedEmbeddingFields() throws Exception {
+        Compilation compilation = compile(
+                "import java.util.*;\n"
+                        + "import androidx.appsearch.app.EmbeddingVector;\n"
+                        + "@Document\n"
+                        + "public class Gift {\n"
+                        + "  @Document.Namespace String namespace;\n"
+                        + "  @Document.Id String id;\n"
+                        + "  @Document.StringProperty String name;\n"
+                        + "  @EmbeddingProperty(indexingType=1)"
+                        + "  EmbeddingVector defaultUnquantized;\n"
+                        + "  @EmbeddingProperty(indexingType=1, quantizationType=0)"
+                        + "  EmbeddingVector unquantized;\n"
+                        + "  @EmbeddingProperty(indexingType=1, quantizationType=1)"
+                        + "  EmbeddingVector quantized;\n"
+                        + "}\n");
+
+        assertThat(compilation).succeededWithoutWarnings();
+        checkResultContains("Gift.java",
+                "AppSearchSchema.EmbeddingPropertyConfig.QUANTIZATION_TYPE_NONE");
+        checkResultContains("Gift.java",
+                "AppSearchSchema.EmbeddingPropertyConfig.QUANTIZATION_TYPE_8_BIT");
+        checkEqualsGolden("Gift.java");
+    }
+
+    @Test
     public void testKotlinNullability() throws Exception {
         compileKotlin("""
                 @Document
