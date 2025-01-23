@@ -16,14 +16,15 @@
 
 package androidx.appfunctions.compiler.core
 
-import androidx.appfunctions.compiler.core.IntrospectionHelper.APP_FUNCTION_CONTEXT_CLASS
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionAnnotation
+import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionContextClass
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.KSValueParameter
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.LIST
 
 /** The helper class to resolve AppFunction related symbols. */
@@ -88,14 +89,14 @@ class AppFunctionSymbolResolver(private val resolver: Resolver) {
                 if (firstParam == null) {
                     throw ProcessingException(
                         "The first parameter of an app function must be " +
-                            "$APP_FUNCTION_CONTEXT_CLASS",
+                            "${AppFunctionContextClass.CLASS_NAME}",
                         appFunctionDeclaration
                     )
                 }
-                if (!firstParam.type.isOfType(APP_FUNCTION_CONTEXT_CLASS)) {
+                if (!firstParam.type.isOfType(AppFunctionContextClass.CLASS_NAME)) {
                     throw ProcessingException(
                         "The first parameter of an app function must be " +
-                            "$APP_FUNCTION_CONTEXT_CLASS",
+                            "${AppFunctionContextClass.CLASS_NAME}",
                         firstParam
                     )
                 }
@@ -139,6 +140,14 @@ class AppFunctionSymbolResolver(private val resolver: Resolver) {
             val className = classDeclaration.simpleName.asString()
             val methodName = functionDeclaration.simpleName.asString()
             return "${packageName}.${className}#${methodName}"
+        }
+
+        /** Gets the [classDeclaration]'s [ClassName]. */
+        fun getEnclosingClassName(): ClassName {
+            return ClassName(
+                classDeclaration.packageName.asString(),
+                classDeclaration.simpleName.asString()
+            )
         }
 
         /** Returns the file containing the class declaration and app functions. */
@@ -189,7 +198,6 @@ class AppFunctionSymbolResolver(private val resolver: Resolver) {
                     FloatArray::class.qualifiedName!!,
                     DoubleArray::class.qualifiedName!!,
                     BooleanArray::class.qualifiedName!!,
-                    ByteArray::class.qualifiedName!!,
                 )
         }
     }

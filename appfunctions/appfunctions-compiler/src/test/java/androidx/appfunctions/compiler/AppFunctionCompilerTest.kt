@@ -87,8 +87,8 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
-            expectGeneratedSourceFileName = "SimpleFunction_AppFunctionInventory_Impl.kt",
-            goldenFileName = "$%s".format("SimpleFunction_AppFunctionInventory_Impl.KT")
+            expectGeneratedSourceFileName = "${'$'}SimpleFunction_AppFunctionInventory_Impl.kt",
+            goldenFileName = "${'$'}SimpleFunction_AppFunctionInventory_Impl.KT"
         )
     }
 
@@ -102,8 +102,34 @@ class AppFunctionCompilerTest {
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
             expectGeneratedSourceFileName =
-                "AllPrimitiveInputFunctions_AppFunctionInventory_Impl.kt",
-            goldenFileName = "$%s".format("AllPrimitiveInputFunctions_AppFunctionInventory_Impl.KT")
+                "${'$'}AllPrimitiveInputFunctions_AppFunctionInventory_Impl.kt",
+            goldenFileName = "${'$'}AllPrimitiveInputFunctions_AppFunctionInventory_Impl.KT"
+        )
+    }
+
+    @Test
+    fun testSimpleFunction_genAppFunctionInvokerImpl_success() {
+        val report = compilationTestHelper.compileAll(sourceFileNames = listOf("SimpleFunction.KT"))
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "${'$'}SimpleFunction_AppFunctionInvoker.kt",
+            goldenFileName = "${'$'}SimpleFunction_AppFunctionInvoker.KT",
+        )
+    }
+
+    @Test
+    fun testAllPrimitiveInputFunctions_genAppFunctionInvokerImpl_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("AllPrimitiveInputFunctions.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName =
+                "${'$'}AllPrimitiveInputFunctions_AppFunctionInvoker.kt",
+            goldenFileName = "${'$'}AllPrimitiveInputFunctions_AppFunctionInvoker.KT",
         )
     }
 

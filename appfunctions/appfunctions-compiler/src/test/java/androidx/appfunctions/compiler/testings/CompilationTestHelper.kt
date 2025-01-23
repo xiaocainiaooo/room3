@@ -31,6 +31,8 @@ import javax.tools.Diagnostic
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.pathString
 import kotlin.io.path.writeText
 
 /** A helper to test compilation. */
@@ -88,14 +90,6 @@ class CompilationTestHelper(
                 )
             )
 
-        // Clear previous output files
-        outputDir.toFile().apply {
-            if (exists()) {
-                deleteRecursively()
-            }
-            mkdirs()
-        }
-
         return CompilationReport.create(result, outputDir)
     }
 
@@ -108,20 +102,34 @@ class CompilationTestHelper(
         expectGeneratedSourceFileName: String,
         goldenFileName: String,
     ) {
-        assertCompilationSuccess(report)
-
-        val goldenFile = getGoldenFile(goldenFileName)
         val generatedSourceFile =
-            report.generatedSourceFiles.single { sourceFile ->
+            report.generatedSourceFiles.firstOrNull { sourceFile ->
                 sourceFile.source.relativePath.contains(expectGeneratedSourceFileName)
             }
+        check(generatedSourceFile != null) { "Unable to find [$expectGeneratedSourceFileName]" }
+        Truth.assertWithMessage(
+                """
+                    Compile failed with error:
+                    ${report.printDiagnostics(Diagnostic.Kind.ERROR)}
+
+                    Generated content:
+                    ${generatedSourceFile.source.contents}
+                """
+                    .trimIndent()
+            )
+            .that(report.isSuccess)
+            .isTrue()
+
+        val goldenFile = getGoldenFile(goldenFileName)
+        val generatedFilePath = generatedSourceFile.sourceFilePath.pathString.sanitizeFilePath()
+        val goldenFilePath = goldenFile.absolutePath.sanitizeFilePath()
         Truth.assertWithMessage(
                 """
               Content of generated file [${generatedSourceFile.source.relativePath}] does not match
               the content of golden file [${goldenFile.path}].
 
               To update the golden file,
-              run `cp ${generatedSourceFile.sourceFilePath} ${goldenFile.absolutePath}`
+              run `cp $generatedFilePath ${goldenFilePath}`
             """
                     .trimIndent()
             )
@@ -138,28 +146,6 @@ class CompilationTestHelper(
         expectGeneratedResourceFileName: String,
         goldenFileName: String,
     ) {
-        assertCompilationSuccess(report)
-
-        val goldenFile = getGoldenFile(goldenFileName)
-        val generatedResourceFile =
-            report.generatedResourceFiles.single { resourceFile ->
-                resourceFile.resource.relativePath.contains(expectGeneratedResourceFileName)
-            }
-        Truth.assertWithMessage(
-                """
-              Content of generated file [${generatedResourceFile.resource.relativePath}] does not match
-              the content of golden file [${goldenFile.path}].
-
-              To update the golden file,
-              run `cp ${generatedResourceFile.resourceFilePath} ${goldenFile.absolutePath}`
-            """
-                    .trimIndent()
-            )
-            .that(generatedResourceFile.resource.getContents())
-            .isEqualTo(goldenFile.readText())
-    }
-
-    private fun assertCompilationSuccess(report: CompilationReport) {
         Truth.assertWithMessage(
                 """
                     Compile failed with error:
@@ -169,6 +155,26 @@ class CompilationTestHelper(
             )
             .that(report.isSuccess)
             .isTrue()
+
+        val goldenFile = getGoldenFile(goldenFileName)
+        val generatedResourceFile =
+            report.generatedResourceFiles.single { resourceFile ->
+                resourceFile.resource.relativePath.contains(expectGeneratedResourceFileName)
+            }
+        val generatedFilePath = generatedResourceFile.resourceFilePath.pathString.sanitizeFilePath()
+        val goldenFilePath = goldenFile.absolutePath.sanitizeFilePath()
+        Truth.assertWithMessage(
+                """
+              Content of generated file [${generatedResourceFile.resource.relativePath}] does not match
+              the content of golden file [${goldenFile.path}].
+
+              To update the golden file,
+              run `cp $generatedFilePath ${goldenFilePath}`
+            """
+                    .trimIndent()
+            )
+            .that(generatedResourceFile.resource.getContents())
+            .isEqualTo(goldenFile.readText())
     }
 
     fun assertErrorWithMessage(report: CompilationReport, expectedErrorMessage: String) {
@@ -223,6 +229,10 @@ class CompilationTestHelper(
             .also { file -> check(file.exists()) { "Golden file [${file.path}] does not exist" } }
     }
 
+    private fun String.sanitizeFilePath(): String {
+        return this.replace("$", "\\$")
+    }
+
     /** The compilation report. */
     data class CompilationReport(
         /** Indicates whether the compilation succeed or not. */
@@ -270,6 +280,7 @@ class CompilationTestHelper(
                 val filePath =
                     outputDir.resolve(source.relativePath).apply {
                         parent?.createDirectories()
+                        deleteIfExists()
                         createFile()
                         writeText(source.contents)
                     }
@@ -285,6 +296,7 @@ class CompilationTestHelper(
                 val filePath =
                     outputDir.resolve(resource.relativePath).apply {
                         parent?.createDirectories()
+                        deleteIfExists()
                         createFile()
                         writeText(resource.getContents())
                     }
@@ -292,7 +304,9 @@ class CompilationTestHelper(
             }
         }
     }
-}
 
-private fun Resource.getContents(): String =
-    openInputStream().bufferedReader().use { it.readText() }
+    companion object {
+        private fun Resource.getContents(): String =
+            openInputStream().bufferedReader().use { it.readText() }
+    }
+}
