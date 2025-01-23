@@ -702,8 +702,16 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
             finalizeDsl {
                 // Propagate the compileSdk value into minCompileSdk. Must be done after the DSL in
                 // build.gradle files (that sets compileSdk in the first place) is evaluated.
+
                 kotlinMultiplatformAndroidTarget.aarMetadata.minCompileSdk =
                     kotlinMultiplatformAndroidTarget.compileSdk
+
+                kotlinMultiplatformAndroidTarget.optimization.consumerKeepRules.apply {
+                    if (files.isEmpty()) {
+                        file(project.blankProguardRules())
+                        publish = true
+                    }
+                }
             }
         }
         project.disableStrictVersionConstraints()
@@ -729,7 +737,6 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                 taskProvider.configure { task -> task.dependsOn(it.compileTaskProvider) }
             }
         }
-
         project.afterEvaluate {
             project.addToBuildOnServer("assembleAndroidMain")
             project.addToBuildOnServer("lint")
@@ -920,12 +927,8 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                 it.buildTypes.configureEach { buildType ->
                     if (buildType.name == buildTypeForTests && !project.hasBenchmarkPlugin())
                         (buildType as TestBuildType).isDebuggable = true
-                    val blankProguardRules =
-                        project
-                            .getSupportRootFolder()
-                            .resolve("buildSrc/blank-proguard-rules/proguard-rules.pro")
                     if (buildType.consumerProguardFiles.isEmpty()) {
-                        buildType.consumerProguardFiles.add(blankProguardRules)
+                        buildType.consumerProguardFiles.add(project.blankProguardRules())
                     }
                 }
             }
@@ -1744,6 +1747,9 @@ private fun Project.enforceBanOnVersionRanges() {
         }
     }
 }
+
+private fun Project.blankProguardRules(): File =
+    project.getSupportRootFolder().resolve("buildSrc/blank-proguard-rules/proguard-rules.pro")
 
 internal fun Project.hasAndroidMultiplatformPlugin(): Boolean =
     extensions.findByType(AndroidXMultiplatformExtension::class.java)?.hasAndroidMultiplatform()
