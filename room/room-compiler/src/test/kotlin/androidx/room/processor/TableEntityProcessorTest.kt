@@ -23,9 +23,9 @@ import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.XTypeName.Companion.PRIMITIVE_LONG
 import androidx.room.compiler.processing.util.Source
 import androidx.room.compiler.processing.util.compileFiles
+import androidx.room.compiler.processing.util.runProcessorTest
 import androidx.room.parser.SQLTypeAffinity
 import androidx.room.processor.ProcessorErrors.RELATION_IN_ENTITY
-import androidx.room.runProcessorTestWithK1
 import androidx.room.testing.context
 import androidx.room.vo.CallType
 import androidx.room.vo.DataClass
@@ -339,12 +339,12 @@ class TableEntityProcessorTest : BaseEntityParserTest() {
             """
                 @PrimaryKey
                 private int id;
-                public void setId(int id) {}
-                public int getId(){ return id; }
                 public int id(){ return id; }
+                public int getId(){ return id; }
+                public void setId(int id) {}
                 """
         ) { _, invocation ->
-            invocation.assertCompilationResult { hasErrorContaining("getId, id") }
+            invocation.assertCompilationResult { hasErrorContaining("id, getId") }
         }
     }
 
@@ -399,12 +399,12 @@ class TableEntityProcessorTest : BaseEntityParserTest() {
             """
                 @PrimaryKey
                 private int id;
-                public void setId(int id) {}
-                public void id(int id) {}
                 public int getId(){ return id; }
+                public void id(int id) {}
+                public void setId(int id) {}
                 """
         ) { _, invocation ->
-            invocation.assertCompilationResult { hasErrorContaining("setId, id") }
+            invocation.assertCompilationResult { hasErrorContaining("id, setId") }
         }
     }
 
@@ -2633,7 +2633,7 @@ class TableEntityProcessorTest : BaseEntityParserTest() {
             """
                     .trimIndent()
             )
-        runProcessorTestWithK1(sources = listOf(src)) { invocation ->
+        runProcessorTest(sources = listOf(src)) { invocation ->
             val parser =
                 TableEntityProcessor(
                     invocation.context,
