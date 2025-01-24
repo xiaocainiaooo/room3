@@ -37,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -167,10 +166,8 @@ public object TimeTextDefaults {
         color: Color = MaterialTheme.colorScheme.onBackground,
         fontSize: TextUnit = TextUnit.Unspecified,
     ): CurvedTextStyle =
-        CurvedTextStyle(
-            MaterialTheme.typography.arcMedium +
-                TextStyle(color = color, background = background, fontSize = fontSize)
-        )
+        MaterialTheme.typography.arcMedium +
+            CurvedTextStyle(color = color, background = background, fontSize = fontSize)
 
     /**
      * Creates a default implementation of [TimeSource] and remembers it. Once the system time

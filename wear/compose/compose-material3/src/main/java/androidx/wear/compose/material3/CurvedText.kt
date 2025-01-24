@@ -118,7 +118,7 @@ public fun CurvedScope.curvedText(
         angularDirection = angularDirection,
         overflow = overflow
     ) {
-        val baseStyle = style ?: CurvedTextStyle(MaterialTheme.typography.arcMedium)
+        val baseStyle = style ?: MaterialTheme.typography.arcMedium
         val textColor =
             color.takeOrElse { baseStyle.color.takeOrElse { LocalContentColor.current } }
         baseStyle.merge(
