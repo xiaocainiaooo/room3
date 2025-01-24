@@ -18,6 +18,8 @@ package androidx.navigation3.samples
 
 import androidx.activity.compose.BackHandler
 import androidx.annotation.Sampled
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
@@ -85,6 +87,30 @@ fun BaseNav() {
     )
     if (showDialog.value) {
         DialogContent(onDismissRequest = { showDialog.value = false })
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Sampled
+@Composable
+fun <T : Any> NavSharedElementSample() {
+    val backStack = rememberMutableStateListOf(CatList)
+    SharedTransitionLayout {
+        SinglePaneNavDisplay(
+            backstack = backStack,
+            onBack = { backStack.removeLast() },
+            entryProvider =
+                entryProvider {
+                    entry<CatList> {
+                        CatList(this@SharedTransitionLayout) { cat ->
+                            backStack.add(CatDetail(cat))
+                        }
+                    }
+                    entry<CatDetail> { args ->
+                        CatDetail(args.cat, this@SharedTransitionLayout) { backStack.removeLast() }
+                    }
+                }
+        )
     }
 }
 
