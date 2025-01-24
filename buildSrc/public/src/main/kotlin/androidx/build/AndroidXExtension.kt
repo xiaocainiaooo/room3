@@ -338,6 +338,7 @@ abstract class AndroidXExtension(
     val additionalDeviceTestTags: MutableList<String> by lazy {
         val tags =
             when {
+                project.path.startsWith(":compose:") -> mutableListOf("compose")
                 project.path.startsWith(":privacysandbox:ads:") ->
                     mutableListOf("privacysandbox", "privacysandbox_ads")
                 project.path.startsWith(":privacysandbox:") -> mutableListOf("privacysandbox")
