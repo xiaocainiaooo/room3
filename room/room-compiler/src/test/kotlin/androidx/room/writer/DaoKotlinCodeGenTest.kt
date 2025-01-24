@@ -1603,6 +1603,9 @@ class DaoKotlinCodeGenTest : BaseDaoKotlinCodeGenTest() {
                 @Query("SELECT * FROM Artist JOIN Song ON Artist.artistId = Song.artistKey")
                 fun getArtistWithSongs(): Map<Artist, List<Song>>
 
+                @Query("SELECT * FROM Artist JOIN Song ON Artist.artistId = Song.artistKey")
+                fun getArtistWithMutableSongs(): Map<Artist, MutableList<Song>>
+
                 @Suppress("DEPRECATION") // For @MapInfo
                 @MapInfo(valueColumn = "songCount")
                 @Query(
