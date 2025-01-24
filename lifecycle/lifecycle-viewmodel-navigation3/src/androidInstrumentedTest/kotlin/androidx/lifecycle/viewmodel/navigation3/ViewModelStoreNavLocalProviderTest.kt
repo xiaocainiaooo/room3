@@ -58,12 +58,16 @@ class ViewModelStoreNavLocalProviderTest {
                 viewModel2.myArg = entry2Arg
             }
         composeTestRule.setContent {
-            savedStateWrapper.ProvideToEntry(
-                NavEntry(entry1.key) { viewModelWrapper.ProvideToEntry(entry1) }
-            )
-            savedStateWrapper.ProvideToEntry(
-                NavEntry(entry2.key) { viewModelWrapper.ProvideToEntry(entry2) }
-            )
+            savedStateWrapper.ProvideToBackStack(backStack = listOf(entry1, entry2)) {
+                viewModelWrapper.ProvideToBackStack(backStack = listOf(entry1, entry2)) {
+                    savedStateWrapper.ProvideToEntry(
+                        NavEntry(entry1.key) { viewModelWrapper.ProvideToEntry(entry1) }
+                    )
+                    savedStateWrapper.ProvideToEntry(
+                        NavEntry(entry2.key) { viewModelWrapper.ProvideToEntry(entry2) }
+                    )
+                }
+            }
         }
 
         composeTestRule.runOnIdle {
@@ -87,7 +91,11 @@ class ViewModelStoreNavLocalProviderTest {
                 viewModel1.myArg = entry1Arg
             }
         try {
-            composeTestRule.setContent { viewModelWrapper.ProvideToEntry(entry1) }
+            composeTestRule.setContent {
+                viewModelWrapper.ProvideToBackStack(backStack = listOf(entry1)) {
+                    viewModelWrapper.ProvideToEntry(entry1)
+                }
+            }
         } catch (e: Exception) {
             assertThat(e)
                 .hasMessageThat()
