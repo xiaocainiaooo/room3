@@ -142,7 +142,7 @@ abstract class AndroidXImplPlugin
 @Inject
 constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Project> {
     @get:Inject abstract val registry: BuildEventsListenerRegistry
-    @Suppress("UnstableApiUsage") @get:Inject abstract val buildFeatures: BuildFeatures
+    @get:Inject abstract val buildFeatures: BuildFeatures
 
     override fun apply(project: Project) {
         if (project.isRoot)
@@ -706,12 +706,9 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                 kotlinMultiplatformAndroidTarget.aarMetadata.minCompileSdk =
                     kotlinMultiplatformAndroidTarget.compileSdk
 
-                kotlinMultiplatformAndroidTarget.optimization.consumerKeepRules.apply {
-                    if (files.isEmpty()) {
-                        file(project.blankProguardRules())
-                        publish = true
-                    }
-                }
+                project.setUpBlankProguardFileForKmpAarIfNeeded(
+                    kotlinMultiplatformAndroidTarget.optimization.consumerKeepRules
+                )
             }
         }
         project.disableStrictVersionConstraints()
@@ -927,9 +924,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                 it.buildTypes.configureEach { buildType ->
                     if (buildType.name == buildTypeForTests && !project.hasBenchmarkPlugin())
                         (buildType as TestBuildType).isDebuggable = true
-                    if (buildType.consumerProguardFiles.isEmpty()) {
-                        buildType.consumerProguardFiles.add(project.blankProguardRules())
-                    }
+                    project.setUpBlankProguardFileForAarIfNeeded(buildType)
                 }
             }
             beforeVariants(selector().withBuildType("debug")) { variant -> variant.enable = false }
@@ -1034,6 +1029,7 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
             }
         }
 
+        project.setUpBlankProguardFileForJarIfNeeded(javaExtension)
         project.configureJavaCompilationWarnings(androidXExtension)
 
         project.hideJavadocTask()
@@ -1747,9 +1743,6 @@ private fun Project.enforceBanOnVersionRanges() {
         }
     }
 }
-
-private fun Project.blankProguardRules(): File =
-    project.getSupportRootFolder().resolve("buildSrc/blank-proguard-rules/proguard-rules.pro")
 
 internal fun Project.hasAndroidMultiplatformPlugin(): Boolean =
     extensions.findByType(AndroidXMultiplatformExtension::class.java)?.hasAndroidMultiplatform()
