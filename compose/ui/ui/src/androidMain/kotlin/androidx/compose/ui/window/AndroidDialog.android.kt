@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -195,9 +196,9 @@ actual fun Dialog(
                 }
         }
 
-    DisposableEffect(dialog) {
-        dialog.show()
+    LaunchedEffect(Unit) { dialog.show() }
 
+    DisposableEffect(dialog) {
         onDispose {
             dialog.dismiss()
             dialog.disposeComposition()
