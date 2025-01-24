@@ -25,6 +25,8 @@ import androidx.compose.runtime.compositionLocalOf
  *
  * This does not have a default value since the AnimatedContentScope is provided at runtime by
  * AnimatedContent.
+ *
+ * @sample androidx.navigation3.samples.NavSharedElementSample
  */
 public val LocalNavAnimatedContentScope: ProvidableCompositionLocal<AnimatedContentScope> =
     compositionLocalOf<AnimatedContentScope> {
