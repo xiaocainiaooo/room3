@@ -21,9 +21,8 @@ import androidx.appfunctions.compiler.core.AnnotatedAppFunctions
 import androidx.appfunctions.compiler.core.AppFunctionSymbolResolver
 import androidx.appfunctions.compiler.core.IntrospectionHelper.APP_FUNCTION_FUNCTION_NOT_FOUND_EXCEPTION_CLASS
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionContextClass
-import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionFactoryClass
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionInvokerClass
-import androidx.appfunctions.compiler.core.IntrospectionHelper.CONFIGURABLE_APP_FUNCTION_FACTORY_CLASS
+import androidx.appfunctions.compiler.core.IntrospectionHelper.ConfigurableAppFunctionFactoryClass
 import androidx.appfunctions.compiler.core.toTypeName
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
@@ -233,11 +232,12 @@ class AppFunctionInvokerProcessor(private val codeGenerator: CodeGenerator) : Sy
         val formatStringMap =
             mapOf<String, Any>(
                 "function_id" to annotatedAppFunctions.getAppFunctionIdentifier(appFunction),
-                "factory_class" to CONFIGURABLE_APP_FUNCTION_FACTORY_CLASS,
+                "factory_class" to ConfigurableAppFunctionFactoryClass.CLASS_NAME,
                 "enclosing_class" to annotatedAppFunctions.getEnclosingClassName(),
                 "context_param" to contextSpec.name,
                 "context_property" to AppFunctionContextClass.CONTEXT_PROPERTY_NAME,
-                "create_method" to AppFunctionFactoryClass.CreateEnclosingClassMethod.METHOD_NAME,
+                "create_method" to
+                    ConfigurableAppFunctionFactoryClass.CreateEnclosingClassMethod.METHOD_NAME,
                 "function_name" to appFunction.simpleName.asString(),
                 "parameters" to functionParameterStatement
             )
