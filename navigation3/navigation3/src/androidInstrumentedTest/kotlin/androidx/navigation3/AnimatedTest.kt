@@ -16,21 +16,30 @@
 
 package androidx.navigation3
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.SharedTransitionScope.SharedContentState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.kruth.assertThat
 import androidx.navigation3.SinglePaneNavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import org.junit.Rule
 import org.junit.runner.RunWith
 
@@ -765,6 +774,71 @@ class AnimatedTest {
         composeTestRule.onNodeWithText(first).assertDoesNotExist()
         composeTestRule.onNodeWithText(third).assertDoesNotExist()
         composeTestRule.onNodeWithText(second).assertIsDisplayed()
+    }
+
+    @OptIn(ExperimentalSharedTransitionApi::class)
+    @Test
+    fun testSharedElement() {
+        lateinit var backstack: MutableList<Any>
+        var transitionScope: SharedTransitionScope? = null
+        val sharedStates = mutableSetOf<SharedContentState>()
+        val sharedContentStateKey = 1
+        val sharedText = "shared text"
+        composeTestRule.setContent {
+            backstack = remember { mutableStateListOf(first) }
+            SharedTransitionLayout {
+                SinglePaneNavDisplay(backstack = backstack) {
+                    transitionScope = this
+                    when (it) {
+                        first ->
+                            NavEntry(first) {
+                                Text(
+                                    sharedText,
+                                    Modifier.sharedElement(
+                                        rememberSharedContentState(sharedContentStateKey).also {
+                                            sharedStates.add(it)
+                                        },
+                                        animatedVisibilityScope =
+                                            LocalNavAnimatedContentScope.current
+                                    )
+                                )
+                            }
+                        second ->
+                            NavEntry(second) {
+                                Text(
+                                    sharedText,
+                                    Modifier.sharedElement(
+                                        rememberSharedContentState(sharedContentStateKey).also {
+                                            sharedStates.add(it)
+                                        },
+                                        animatedVisibilityScope =
+                                            LocalNavAnimatedContentScope.current
+                                    )
+                                )
+                            }
+                        else -> error("Invalid key passed")
+                    }
+                }
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(sharedText).assertIsDisplayed()
+        sharedStates.forEach { state -> assertFalse(state.isMatchFound) }
+
+        sharedStates.clear()
+
+        composeTestRule.mainClock.autoAdvance = false
+        composeTestRule.runOnIdle { backstack.add(second) }
+
+        composeTestRule.mainClock.advanceTimeBy(
+            (DEFAULT_TRANSITION_DURATION_MILLISECOND / 4).toLong()
+        )
+
+        composeTestRule.onAllNodesWithText(sharedText).assertCountEquals(2)
+        assertTrue(transitionScope?.isTransitionActive == true)
+        sharedStates.forEach { state -> assertTrue(state.isMatchFound) }
     }
 }
 

@@ -29,6 +29,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -234,7 +235,12 @@ public fun <T : Any> SinglePaneNavDisplay(
             contentKey = { it.last() }
         ) { innerStack ->
             val lastKey = innerStack.last()
-            entries.findLast { entry -> entry.key == lastKey }?.content?.invoke(lastKey)
+            val lastEntry = entries.findLast { entry -> entry.key == lastKey }
+            lastEntry?.let { entry ->
+                CompositionLocalProvider(LocalNavAnimatedContentScope provides this) {
+                    entry.content.invoke(lastKey)
+                }
+            }
         }
     }
 }
