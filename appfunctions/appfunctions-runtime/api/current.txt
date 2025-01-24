@@ -7,23 +7,19 @@ package androidx.appfunctions {
   }
 
   public final class AppFunctionConfiguration {
-    method public java.util.Map<java.lang.Class<? extends java.lang.Object?>,androidx.appfunctions.AppFunctionFactory<? extends java.lang.Object?>> getFactories();
-    property public final java.util.Map<java.lang.Class<? extends java.lang.Object?>,androidx.appfunctions.AppFunctionFactory<? extends java.lang.Object?>> factories;
+    method public java.util.Map<java.lang.Class<? extends java.lang.Object?>,kotlin.jvm.functions.Function0<java.lang.Object>> getEnclosingClassFactories();
+    property public final java.util.Map<java.lang.Class<? extends java.lang.Object?>,kotlin.jvm.functions.Function0<java.lang.Object>> enclosingClassFactories;
   }
 
   public static final class AppFunctionConfiguration.Builder {
     ctor public AppFunctionConfiguration.Builder();
-    method public <T> androidx.appfunctions.AppFunctionConfiguration.Builder addFactory(Class<T> enclosingClass, androidx.appfunctions.AppFunctionFactory<T> factory);
+    method public <T> androidx.appfunctions.AppFunctionConfiguration.Builder addEnclosingClassFactory(Class<T> enclosingClass, kotlin.jvm.functions.Function0<? extends T> factory);
     method public androidx.appfunctions.AppFunctionConfiguration build();
   }
 
   public static interface AppFunctionConfiguration.Provider {
     method public androidx.appfunctions.AppFunctionConfiguration getAppFunctionConfiguration();
     property public abstract androidx.appfunctions.AppFunctionConfiguration appFunctionConfiguration;
-  }
-
-  public interface AppFunctionFactory<T> {
-    method public T createEnclosingClass(Class<T> enclosingClass);
   }
 
 }

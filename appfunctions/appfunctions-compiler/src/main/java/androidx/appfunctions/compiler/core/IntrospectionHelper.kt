@@ -47,12 +47,13 @@ object IntrospectionHelper {
         ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "AppFunctionInventory")
     val APP_FUNCTION_METADATA_CLASS =
         ClassName(APP_FUNCTIONS_METADATA_PACKAGE_NAME, "AppFunctionMetadata")
-    val CONFIGURABLE_APP_FUNCTION_FACTORY_CLASS =
-        ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "ConfigurableAppFunctionFactory")
     val APP_FUNCTION_FUNCTION_NOT_FOUND_EXCEPTION_CLASS =
         ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionFunctionNotFoundException")
 
-    object AppFunctionFactoryClass {
+    object ConfigurableAppFunctionFactoryClass {
+        val CLASS_NAME =
+            ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "ConfigurableAppFunctionFactory")
+
         object CreateEnclosingClassMethod {
             const val METHOD_NAME = "createEnclosingClass"
         }
