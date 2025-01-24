@@ -119,4 +119,5 @@ androidx {
     samples(project(":navigation3:navigation3:navigation3-samples"))
     doNotDocumentReason = "Not published to maven"
     kotlinTarget = KotlinTarget.KOTLIN_1_9
+    addGoldenImageAssets()
 }
