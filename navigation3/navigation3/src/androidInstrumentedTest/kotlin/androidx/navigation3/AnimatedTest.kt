@@ -27,7 +27,7 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.kruth.assertThat
-import androidx.navigation3.NavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
+import androidx.navigation3.SinglePaneNavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import kotlin.test.Test
@@ -102,7 +102,7 @@ class AnimatedTest {
                         NavEntry(
                             second,
                             featureMap =
-                                NavDisplay.transition(
+                                SinglePaneNavDisplay.transition(
                                     enter = fadeIn(tween(customDuration)),
                                     exit = fadeOut(tween(customDuration))
                                 )
@@ -151,7 +151,7 @@ class AnimatedTest {
                         NavEntry(
                             first,
                             featureMap =
-                                NavDisplay.popTransition(
+                                SinglePaneNavDisplay.popTransition(
                                     enter = fadeIn(tween(testDuration)),
                                     exit = fadeOut(tween(testDuration))
                                 )
@@ -199,7 +199,7 @@ class AnimatedTest {
                         NavEntry(
                             first,
                             featureMap =
-                                NavDisplay.popTransition(
+                                SinglePaneNavDisplay.popTransition(
                                     enter = fadeIn(tween(testDuration)),
                                     exit = fadeOut(tween(testDuration))
                                 )
@@ -269,7 +269,7 @@ class AnimatedTest {
                         NavEntry(
                             third,
                             featureMap =
-                                NavDisplay.transition(
+                                SinglePaneNavDisplay.transition(
                                     enter = fadeIn(tween(testDuration)),
                                     exit = fadeOut(tween(testDuration))
                                 )
@@ -326,7 +326,7 @@ class AnimatedTest {
                         NavEntry(
                             third,
                             featureMap =
-                                NavDisplay.transition(
+                                SinglePaneNavDisplay.transition(
                                     enter = fadeIn(tween(testDuration)),
                                     exit = fadeOut(tween(testDuration))
                                 )
@@ -380,7 +380,7 @@ class AnimatedTest {
                         NavEntry(
                             third,
                             featureMap =
-                                NavDisplay.transition(
+                                SinglePaneNavDisplay.transition(
                                     enter = fadeIn(tween(testDuration)),
                                     exit = fadeOut(tween(testDuration))
                                 )
@@ -433,7 +433,7 @@ class AnimatedTest {
                     third ->
                         NavEntry(
                             third,
-                            NavDisplay.transition(
+                            SinglePaneNavDisplay.transition(
                                 enter = fadeIn(tween(testDuration)),
                                 exit = fadeOut(tween(testDuration))
                             )
@@ -503,7 +503,7 @@ class AnimatedTest {
                         NavEntry(
                             fourth,
                             featureMap =
-                                NavDisplay.transition(
+                                SinglePaneNavDisplay.transition(
                                     enter = fadeIn(tween(testDuration)),
                                     exit = fadeOut(tween(testDuration))
                                 )
@@ -560,7 +560,7 @@ class AnimatedTest {
                         NavEntry(
                             third,
                             featureMap =
-                                NavDisplay.transition(
+                                SinglePaneNavDisplay.transition(
                                     enter = fadeIn(tween(testDuration)),
                                     exit = fadeOut(tween(testDuration))
                                 )
@@ -628,7 +628,7 @@ class AnimatedTest {
                     fourth ->
                         NavEntry(
                             fourth,
-                            NavDisplay.transition(
+                            SinglePaneNavDisplay.transition(
                                 enter = fadeIn(tween(testDuration)),
                                 exit = fadeOut(tween(testDuration))
                             )
@@ -679,7 +679,7 @@ class AnimatedTest {
                     second ->
                         NavEntry(
                             second,
-                            NavDisplay.transition(
+                            SinglePaneNavDisplay.transition(
                                 enter = fadeIn(tween(testDuration)),
                                 exit = fadeOut(tween(testDuration))
                             )
@@ -729,7 +729,7 @@ class AnimatedTest {
                         NavEntry(
                             second,
                             featureMap =
-                                NavDisplay.transition(
+                                SinglePaneNavDisplay.transition(
                                     enter = fadeIn(tween(testDuration)),
                                     exit = fadeOut(tween(testDuration))
                                 )
