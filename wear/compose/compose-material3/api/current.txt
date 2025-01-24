@@ -797,18 +797,24 @@ package androidx.wear.compose.material3 {
   }
 
   public final class OpenOnPhoneDialogDefaults {
+    method @androidx.compose.runtime.Composable public void Icon(optional androidx.compose.ui.Modifier modifier, optional String contentDescription);
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.OpenOnPhoneDialogColors colors();
     method @androidx.compose.runtime.Composable public androidx.wear.compose.material3.OpenOnPhoneDialogColors colors(optional long iconColor, optional long iconContainerColor, optional long progressIndicatorColor, optional long progressTrackColor, optional long textColor);
-    method @androidx.compose.runtime.Composable public kotlin.jvm.functions.Function1<androidx.wear.compose.foundation.CurvedScope,kotlin.Unit> curvedText(optional String text, optional androidx.wear.compose.foundation.CurvedTextStyle style);
-    method public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.BoxScope,kotlin.Unit> getOpenOnPhoneIcon();
+    method @androidx.compose.runtime.Composable public androidx.wear.compose.foundation.CurvedTextStyle getCurvedTextStyle();
+    method @androidx.compose.runtime.Composable public String getIconContentDescription();
+    method @androidx.compose.runtime.Composable public String getText();
     property public static final long DurationMillis;
-    property public final kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.BoxScope,kotlin.Unit> OpenOnPhoneIcon;
+    property @androidx.compose.runtime.Composable public final androidx.wear.compose.foundation.CurvedTextStyle curvedTextStyle;
+    property @androidx.compose.runtime.Composable public final String iconContentDescription;
+    property @androidx.compose.runtime.Composable public final String text;
     field public static final long DurationMillis = 4000L; // 0xfa0L
     field public static final androidx.wear.compose.material3.OpenOnPhoneDialogDefaults INSTANCE;
   }
 
   public final class OpenOnPhoneDialogKt {
-    method @androidx.compose.runtime.Composable public static void OpenOnPhoneDialog(boolean show, kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.CurvedScope,kotlin.Unit>? curvedText, optional androidx.wear.compose.material3.OpenOnPhoneDialogColors colors, optional androidx.compose.ui.window.DialogProperties properties, optional long durationMillis, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.BoxScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void OpenOnPhoneDialog(boolean visible, kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.CurvedScope,kotlin.Unit>? curvedText, optional androidx.compose.ui.Modifier modifier, optional androidx.wear.compose.material3.OpenOnPhoneDialogColors colors, optional androidx.compose.ui.window.DialogProperties properties, optional long durationMillis, optional kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void OpenOnPhoneDialogContent(kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.CurvedScope,kotlin.Unit>? curvedText, long durationMillis, optional androidx.compose.ui.Modifier modifier, optional androidx.wear.compose.material3.OpenOnPhoneDialogColors colors, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method public static void openOnPhoneCurvedText(androidx.wear.compose.foundation.CurvedScope, String text, androidx.wear.compose.foundation.CurvedTextStyle style);
   }
 
   public final class PageIndicatorDefaults {
