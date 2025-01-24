@@ -32,6 +32,7 @@ plugins {
 }
 
 dependencies {
+    api(libs.jspecify)
     api(libs.kotlinStdlibJdk8)
     api(libs.javapoet)
     api(libs.kotlinPoet)
