@@ -196,10 +196,10 @@ public class WebViewProviderAdapter {
 
     /**
      * Adapter method for
-     * {@link WebViewCompat#prerenderUrl(WebView, String, CancellationSignal, Executor,
+     * {@link WebViewCompat#prerenderUrlAsync(WebView, String, CancellationSignal, Executor,
      * PrerenderOperationCallback)}.
      */
-    public void prerenderUrl(
+    public void prerenderUrlAsync(
             @NonNull String url,
             @Nullable CancellationSignal cancellationSignal,
             @NonNull Executor callbackExecutor,
@@ -225,7 +225,7 @@ public class WebViewProviderAdapter {
      * {@link WebViewCompat#prerenderUrl(WebView, String, CancellationSignal, Executor,
      * SpeculativeLoadingParameters, PrerenderOperationCallback)}.
      */
-    public void prerenderUrl(
+    public void prerenderUrlAsync(
             @NonNull String url,
             @Nullable CancellationSignal cancellationSignal,
             @NonNull Executor callbackExecutor,
