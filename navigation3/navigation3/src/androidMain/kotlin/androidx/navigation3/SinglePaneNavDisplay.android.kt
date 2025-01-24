@@ -37,27 +37,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation3.NavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
-import androidx.navigation3.NavDisplay.ENTER_TRANSITION_KEY
-import androidx.navigation3.NavDisplay.EXIT_TRANSITION_KEY
-import androidx.navigation3.NavDisplay.POP_ENTER_TRANSITION_KEY
-import androidx.navigation3.NavDisplay.POP_EXIT_TRANSITION_KEY
+import androidx.navigation3.SinglePaneNavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
+import androidx.navigation3.SinglePaneNavDisplay.ENTER_TRANSITION_KEY
+import androidx.navigation3.SinglePaneNavDisplay.EXIT_TRANSITION_KEY
+import androidx.navigation3.SinglePaneNavDisplay.POP_ENTER_TRANSITION_KEY
+import androidx.navigation3.SinglePaneNavDisplay.POP_EXIT_TRANSITION_KEY
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
-/** Object that indicates the features that can be handled by the [NavDisplay] */
-public object NavDisplay {
+/** Object that indicates the features that can be handled by the [SinglePaneNavDisplay] */
+public object SinglePaneNavDisplay {
     /**
-     * Function to be called on the [NavEntry.featureMap] to notify the [NavDisplay] that the
-     * content should be animated using the provided transitions.
+     * Function to be called on the [NavEntry.featureMap] to notify the [SinglePaneNavDisplay] that
+     * the content should be animated using the provided transitions.
      */
     public fun transition(enter: EnterTransition?, exit: ExitTransition?): Map<String, Any> =
         if (enter == null || exit == null) emptyMap()
         else mapOf(ENTER_TRANSITION_KEY to enter, EXIT_TRANSITION_KEY to exit)
 
     /**
-     * Function to be called on the [NavEntry.featureMap] to notify the [NavDisplay] that, when
-     * popping from backstack, the content should be animated using the provided transitions.
+     * Function to be called on the [NavEntry.featureMap] to notify the [SinglePaneNavDisplay] that,
+     * when popping from backstack, the content should be animated using the provided transitions.
      */
     public fun popTransition(enter: EnterTransition?, exit: ExitTransition?): Map<String, Any> =
         if (enter == null || exit == null) emptyMap()

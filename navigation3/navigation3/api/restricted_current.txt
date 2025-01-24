@@ -49,12 +49,6 @@ package androidx.navigation3 {
     method @androidx.compose.runtime.Composable public static <T> void NavBackStackProvider(java.util.List<? extends T> backStack, java.util.List<? extends androidx.navigation3.NavLocalProvider> localProviders, kotlin.jvm.functions.Function1<? super T,? extends androidx.navigation3.NavEntry<? extends T>> entryProvider, kotlin.jvm.functions.Function1<? super java.util.List<? extends androidx.navigation3.NavEntry<T>>,kotlin.Unit> content);
   }
 
-  public final class NavDisplay {
-    method public java.util.Map<java.lang.String,java.lang.Object> popTransition(androidx.compose.animation.EnterTransition? enter, androidx.compose.animation.ExitTransition? exit);
-    method public java.util.Map<java.lang.String,java.lang.Object> transition(androidx.compose.animation.EnterTransition? enter, androidx.compose.animation.ExitTransition? exit);
-    field public static final androidx.navigation3.NavDisplay INSTANCE;
-  }
-
   public class NavEntry<T> {
     ctor public NavEntry(T key, optional java.util.Map<java.lang.String,?> featureMap, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
     method public kotlin.jvm.functions.Function1<T,kotlin.Unit> getContent();
@@ -87,6 +81,12 @@ package androidx.navigation3 {
   public final class SavedStateNavLocalProvider implements androidx.navigation3.NavLocalProvider {
     method @androidx.compose.runtime.Composable public <T> void ProvideToEntry(androidx.navigation3.NavEntry<T> entry);
     field public static final androidx.navigation3.SavedStateNavLocalProvider INSTANCE;
+  }
+
+  public final class SinglePaneNavDisplay {
+    method public java.util.Map<java.lang.String,java.lang.Object> popTransition(androidx.compose.animation.EnterTransition? enter, androidx.compose.animation.ExitTransition? exit);
+    method public java.util.Map<java.lang.String,java.lang.Object> transition(androidx.compose.animation.EnterTransition? enter, androidx.compose.animation.ExitTransition? exit);
+    field public static final androidx.navigation3.SinglePaneNavDisplay INSTANCE;
   }
 
   public final class SinglePaneNavDisplay_androidKt {

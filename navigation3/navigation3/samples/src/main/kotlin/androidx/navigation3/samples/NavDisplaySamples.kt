@@ -30,7 +30,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavLocalProvider
 import androidx.navigation3.NavBackStackProvider
-import androidx.navigation3.NavDisplay
 import androidx.navigation3.NavEntry
 import androidx.navigation3.NavLocalProvider
 import androidx.navigation3.SavedStateNavLocalProvider
@@ -54,13 +53,19 @@ fun BaseNav() {
         entryProvider =
             entryProvider({ NavEntry(Unit) { Text(text = "Invalid Key") } }) {
                 entry<Profile>(
-                    NavDisplay.transition(slideInHorizontally { it }, slideOutHorizontally { it })
+                    SinglePaneNavDisplay.transition(
+                        slideInHorizontally { it },
+                        slideOutHorizontally { it }
+                    )
                 ) {
                     val viewModel = viewModel<ProfileViewModel>()
                     Profile(viewModel, { backStack.add(it) }) { backStack.removeLast() }
                 }
                 entry<Scrollable>(
-                    NavDisplay.transition(slideInHorizontally { it }, slideOutHorizontally { it })
+                    SinglePaneNavDisplay.transition(
+                        slideInHorizontally { it },
+                        slideOutHorizontally { it }
+                    )
                 ) {
                     Scrollable({ backStack.add(it) }) { backStack.removeLast() }
                 }
@@ -68,7 +73,10 @@ fun BaseNav() {
                     DialogBase(onClick = { showDialog.value = true }) { backStack.removeLast() }
                 }
                 entry<Dashboard>(
-                    NavDisplay.transition(slideInHorizontally { it }, slideOutHorizontally { it })
+                    SinglePaneNavDisplay.transition(
+                        slideInHorizontally { it },
+                        slideOutHorizontally { it }
+                    )
                 ) { dashboardArgs ->
                     val userId = dashboardArgs.userId
                     Dashboard(userId, onBack = { backStack.removeLast() })
