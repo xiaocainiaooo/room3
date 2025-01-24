@@ -169,7 +169,11 @@ constructor(
     ) {
         Log.debug { "$this#closeCameraDevice($cameraDevice)" }
         var cameraDeviceClosed = false
-        Threading.runBlockingCheckedOrNull(threads.backgroundDispatcher, CAMERA_CLOSE_TIMEOUT_MS) {
+        Threading.runBlockingCheckedOrNull(
+            threads.blockingDispatcher,
+            threads.backgroundDispatcher,
+            CAMERA_CLOSE_TIMEOUT_MS,
+        ) {
             cameraDevice.closeWithTrace()
             cameraDeviceClosed = true
         }
