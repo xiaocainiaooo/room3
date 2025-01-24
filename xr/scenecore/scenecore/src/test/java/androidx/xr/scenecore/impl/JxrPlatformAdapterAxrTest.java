@@ -49,6 +49,7 @@ import androidx.xr.extensions.environment.PassthroughVisibilityState;
 import androidx.xr.extensions.node.Mat4f;
 import androidx.xr.extensions.node.ReformOptions;
 import androidx.xr.extensions.node.Vec3;
+import androidx.xr.runtime.math.Matrix4;
 import androidx.xr.runtime.math.Pose;
 import androidx.xr.runtime.math.Quaternion;
 import androidx.xr.runtime.math.Vector3;
@@ -784,17 +785,24 @@ public final class JxrPlatformAdapterAxrTest {
     }
 
     @Test
-    public void getPoseInActivitySpace_withActivitySpaceParent_returnsScaledPose()
+    public void getPoseInActivitySpace_withScaledActivitySpaceParent_returnsPose()
             throws Exception {
         Pose pose = new Pose(new Vector3(1f, 2f, 3f), new Quaternion(1f, 2f, 3f, 4f));
 
         // Set the parent as the activity space so these entities' activitySpacePose should match
         // their
-        // local pose relative to their parent.
+        // local pose relative to their parent regardless of the activity space
+        // scale/position/rotation.
         PanelEntityImpl panelEntity = (PanelEntityImpl) createPanelEntity(pose);
         GltfEntityImpl gltfEntity = (GltfEntityImpl) createGltfEntity(pose);
         AndroidXrEntity contentlessEntity = (AndroidXrEntity) createContentlessEntity(pose);
         ActivitySpace activitySpace = mRealityCoreRuntime.getActivitySpace();
+        ((ActivitySpaceImpl) activitySpace)
+                .setOpenXrReferenceSpacePose(
+                        Matrix4.fromTrs(
+                                new Vector3(5f, 6f, 7f),
+                                Quaternion.fromEulerAngles(22f, 33f, 44f),
+                                new Vector3(2f, 2f, 2f)));
         panelEntity.setParent(activitySpace);
         gltfEntity.setParent(activitySpace);
         contentlessEntity.setParent(activitySpace);
@@ -814,7 +822,13 @@ public final class JxrPlatformAdapterAxrTest {
         GltfEntityImpl child2 = (GltfEntityImpl) createGltfEntity(localPose);
         GltfEntityImpl child3 = (GltfEntityImpl) createGltfEntity(localPose);
         ActivitySpace activitySpace = mRealityCoreRuntime.getActivitySpace();
-        assertVector3(activitySpace.getScale(), new Vector3(1f, 1f, 1f));
+        ((ActivitySpaceImpl) activitySpace)
+                .setOpenXrReferenceSpacePose(
+                        Matrix4.fromTrs(
+                                new Vector3(5f, 6f, 7f),
+                                Quaternion.fromEulerAngles(22f, 33, 44),
+                                new Vector3(2f, 2f, 2f)));
+        assertVector3(activitySpace.getScale(), new Vector3(2f, 2f, 2f));
 
         // Set a non-unit local scale to each child.
         child1.setParent(activitySpace);
@@ -1163,6 +1177,20 @@ public final class JxrPlatformAdapterAxrTest {
                                 .map(FakeNode::getAlpha)
                                 .collect(Collectors.toList()))
                 .containsAtLeast(0.5f, 0.5f, 0.5f);
+    }
+
+    @Test
+    public void transformPoseTo_withScaleAndNoOffset_returnsPose() throws Exception {
+        PanelEntityImpl sourceEntity = (PanelEntityImpl) createPanelEntity();
+        GltfEntityImpl destinationEntity = (GltfEntityImpl) createGltfEntity();
+        sourceEntity.setPose(new Pose(new Vector3(0f, 0f, 1f), Quaternion.Identity));
+        sourceEntity.setScale(new Vector3(2f, 2f, 2f));
+        destinationEntity.setPose(new Pose(new Vector3(1f, 0f, 0f), Quaternion.Identity));
+        destinationEntity.setScale(new Vector3(3f, 3f, 3f));
+
+        assertPose(
+                sourceEntity.transformPoseTo(Pose.Identity, destinationEntity),
+                new Pose(new Vector3(-1 / 3f, 0f, 1 / 3f), Quaternion.Identity));
     }
 
     @Test

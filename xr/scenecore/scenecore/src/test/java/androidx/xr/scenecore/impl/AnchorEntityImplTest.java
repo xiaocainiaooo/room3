@@ -822,7 +822,9 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     public void getPoseInActivitySpace_whenAtSamePose_returnsIdentityPose() {
         AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
         Pose pose = new Pose(new Vector3(1, 1, 1), new Quaternion(0, 1, 0, 1).toNormalized());
-        mActivitySpace.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
+        mActivitySpace.setOpenXrReferenceSpacePose(
+                Matrix4.fromTrs(
+                        pose.getTranslation(), pose.getRotation(), new Vector3(2f, 2f, 2f)));
         anchorEntity.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
 
         assertPose(anchorEntity.getPoseInActivitySpace(), new Pose());
@@ -836,6 +838,26 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
         anchorEntity.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
 
         assertPose(anchorEntity.getPoseInActivitySpace(), pose);
+    }
+
+    @Test
+    public void getPoseInActivitySpace_withScaledAndRotatedActivitySpace_returnsDifferencePose() {
+        AnchorEntityImpl anchorEntity = createAndInitAnchorEntity();
+        Quaternion activitySpaceQuaternion = Quaternion.fromEulerAngles(new Vector3(0f, 0f, 90f));
+        Pose pose = new Pose(new Vector3(1, 1, 1), Quaternion.Identity);
+        anchorEntity.setOpenXrReferenceSpacePose(Matrix4.fromPose(pose));
+        mActivitySpace.setOpenXrReferenceSpacePose(
+                Matrix4.fromTrs(
+                        new Vector3(2f, 3f, 4f),
+                        activitySpaceQuaternion,
+                        /* scale= */ new Vector3(2f, 2f, 2f)));
+        // A 90 degree rotation around the z axis is a clockwise rotation of the XY plane.
+        Pose expectedPose =
+                new Pose(
+                        new Vector3(-1.0f, 0.5f, -1.5f),
+                        Quaternion.fromEulerAngles(new Vector3(0f, 0f, -90f)));
+
+        assertPose(anchorEntity.getPoseInActivitySpace(), expectedPose);
     }
 
     @Test

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.xr.compose.platform
+package androidx.xr.runtime.internal
 
-import androidx.compose.runtime.ProvidableCompositionLocal
-import androidx.compose.runtime.compositionLocalOf
-import androidx.xr.scenecore.PanelEntity
+import androidx.annotation.RestrictTo
 
-/**
- * A CompositionLocal that holds the current [PanelEntity] acting as the parent panel for any
- * containing composed UI.
- */
-internal val LocalPanelEntity: ProvidableCompositionLocal<PanelEntity?> =
-    compositionLocalOf<PanelEntity?> { null }
+/** Custom class for exceptions related to [Anchor] APIs. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
+sealed public class AnchorException(message: String) : Exception(message)
+
+/** Anchor resource limit was reached when attempting to create an anchor. */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
+public class AnchorResourcesExhaustedException :
+    AnchorException("Unable to create anchor. Anchor resources exhausted.")

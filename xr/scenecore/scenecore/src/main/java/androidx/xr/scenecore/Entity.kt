@@ -21,6 +21,7 @@ package androidx.xr.scenecore
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.Surface
@@ -486,7 +487,7 @@ public sealed class BaseEntity<out RtEntityType : RtEntity>(
 public class ContentlessEntity
 private constructor(rtEntity: RtEntity, entityManager: EntityManager) :
     BaseEntity<RtEntity>(rtEntity, entityManager) {
-    internal companion object {
+    public companion object {
         /** Factory method to create ContentlessEntity entities. */
         internal fun create(
             adapter: JxrPlatformAdapter,
@@ -498,6 +499,20 @@ private constructor(rtEntity: RtEntity, entityManager: EntityManager) :
                 adapter.createEntity(pose, name, adapter.activitySpaceRootImpl),
                 entityManager,
             )
+
+        /**
+         * Public factory function for creating a content-less entity. This entity is used as a
+         * connection point for attaching children entities and managing them (i.e. setPose()) as a
+         * group.
+         *
+         * @param session Session to create the ContentlessEntity in.
+         * @param name Name of the entity.
+         * @param pose Initial pose of the entity.
+         */
+        @JvmOverloads
+        @JvmStatic
+        public fun create(session: Session, name: String, pose: Pose = Pose.Identity): Entity =
+            ContentlessEntity.create(session.platformAdapter, session.entityManager, name, pose)
     }
 }
 
@@ -586,7 +601,7 @@ private constructor(rtEntity: JxrPlatformAdapter.GltfEntity, entityManager: Enti
         public const val STOPPED: Int = 1
     }
 
-    internal companion object {
+    public companion object {
         /**
          * Factory method for GltfModelEntity.
          *
@@ -604,6 +619,27 @@ private constructor(rtEntity: JxrPlatformAdapter.GltfEntity, entityManager: Enti
                 adapter.createGltfEntity(pose, model.model, adapter.activitySpaceRootImpl),
                 entityManager,
             )
+
+        /**
+         * Public factory function for a [GltfModelEntity].
+         *
+         * This method must be called from the main thread.
+         * https://developer.android.com/guide/components/processes-and-threads
+         *
+         * @param session Session to create the [GltfModel] in.
+         * @param model The [GltfModel] this Entity is referencing.
+         * @param pose The initial pose of the entity.
+         * @return a GltfModelEntity instance
+         */
+        @MainThread
+        @JvmStatic
+        @JvmOverloads
+        public fun create(
+            session: Session,
+            model: GltfModel,
+            pose: Pose = Pose.Identity,
+        ): GltfModelEntity =
+            GltfModelEntity.create(session.platformAdapter, session.entityManager, model, pose)
     }
 
     /** Returns the current animation state of this glTF entity. */
@@ -772,7 +808,7 @@ internal constructor(
     public val isMainPanelEntity: Boolean = false,
 ) : BasePanelEntity<JxrPlatformAdapter.PanelEntity>(rtEntity, entityManager) {
 
-    internal companion object {
+    public companion object {
         /**
          * Factory method for PanelEntity.
          *
@@ -809,6 +845,39 @@ internal constructor(
                     adapter.activitySpaceRootImpl,
                 ),
                 entityManager,
+            )
+
+        // TODO(b/352629832): Update surfaceDimensionsPx to be a PixelDimensions
+        /**
+         * Public factory function for a spatialized PanelEntity.
+         *
+         * @param session Session to create the PanelEntity in.
+         * @param view View to embed in this panel entity.
+         * @param surfaceDimensionsPx Dimensions for the underlying surface for the given view.
+         * @param dimensions Dimensions for the panel in meters.
+         * @param name Name of the panel.
+         * @param pose Pose of this entity relative to its parent, default value is Identity.
+         * @return a PanelEntity instance.
+         */
+        @JvmOverloads
+        @JvmStatic
+        public fun create(
+            session: Session,
+            view: View,
+            surfaceDimensionsPx: Dimensions,
+            dimensions: Dimensions,
+            name: String,
+            pose: Pose = Pose.Identity,
+        ): PanelEntity =
+            PanelEntity.create(
+                session.platformAdapter,
+                session.entityManager,
+                view,
+                surfaceDimensionsPx,
+                dimensions,
+                name,
+                session.activity,
+                pose,
             )
 
         /** Returns the PanelEntity backed by the main window for the Activity. */
@@ -858,7 +927,7 @@ private constructor(
         rtActivityPanelEntity.moveActivity(activity)
     }
 
-    internal companion object {
+    public companion object {
         /**
          * Factory method for ActivityPanelEntity.
          *
@@ -885,6 +954,33 @@ private constructor(
                     adapter.activitySpaceRootImpl,
                 ),
                 entityManager,
+            )
+
+        // TODO(b/352629832): Update windowBoundsPx to be a PixelDimensions
+        /**
+         * Public factory function for a spatial ActivityPanelEntity.
+         *
+         * @param session Session to create the ActivityPanelEntity in.
+         * @param windowBoundsPx Bounds for the panel window in pixels.
+         * @param name Name of the panel.
+         * @param pose Pose of this entity relative to its parent, default value is Identity.
+         * @return an ActivityPanelEntity instance.
+         */
+        @JvmOverloads
+        @JvmStatic
+        public fun create(
+            session: Session,
+            windowBoundsPx: Rect,
+            name: String,
+            pose: Pose = Pose.Identity,
+        ): ActivityPanelEntity =
+            ActivityPanelEntity.create(
+                session.platformAdapter,
+                session.entityManager,
+                PixelDimensions(windowBoundsPx.width(), windowBoundsPx.height()),
+                name,
+                session.activity,
+                pose,
             )
     }
 }
@@ -1004,7 +1100,7 @@ private constructor(rtEntity: JxrPlatformAdapter.AnchorEntity, entityManager: En
         return Anchor.loadFromNativePointer(session, rtEntity.nativePointer())
     }
 
-    internal companion object {
+    public companion object {
         private const val TAG = "AnchorEntity"
 
         /**
@@ -1103,6 +1199,54 @@ private constructor(rtEntity: JxrPlatformAdapter.AnchorEntity, entityManager: En
                 }
             }
             return anchorEntity
+        }
+
+        /**
+         * Public factory function for an AnchorEntity which searches for a location to create an
+         * Anchor among the tracked planes available to the perception system.
+         *
+         * Note that this function will fail if the application has not been granted the
+         * "android.permission.SCENE_UNDERSTANDING" permission. Consider using PermissionHelper to
+         * help request permission from the User.
+         *
+         * @param session Session to create the AnchorEntity in.
+         * @param bounds Bounds for this AnchorEntity.
+         * @param planeType Orientation of plane to which this Anchor should attach.
+         * @param planeSemantic Semantics of the plane to which this Anchor should attach.
+         * @param timeout The amount of time as a [Duration] to search for the a suitable plane to
+         *   attach to. If a plane is not found within the timeout, the returned AnchorEntity state
+         *   will be set to AnchorEntity.State.TIMEDOUT. It may take longer than the timeout period
+         *   before the anchor state is updated. If the timeout duration is zero it will search for
+         *   the anchor indefinitely.
+         */
+        @JvmStatic
+        @JvmOverloads
+        public fun create(
+            session: Session,
+            bounds: Dimensions,
+            planeType: @PlaneTypeValue Int,
+            planeSemantic: @PlaneSemanticValue Int,
+            timeout: Duration = Duration.ZERO,
+        ): AnchorEntity {
+            return AnchorEntity.create(
+                session.platformAdapter,
+                session.entityManager,
+                bounds,
+                planeType,
+                planeSemantic,
+                timeout,
+            )
+        }
+
+        /**
+         * Public factory function for an AnchorEntity which uses an Anchor from ARCore for XR.
+         *
+         * @param session Session to create the AnchorEntity in.
+         * @param anchor The PerceptionAnchor to use for this AnchorEntity.
+         */
+        @JvmStatic
+        public fun create(session: Session, anchor: Anchor): AnchorEntity {
+            return AnchorEntity.create(session.platformAdapter, session.entityManager, anchor)
         }
     }
 
