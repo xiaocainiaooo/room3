@@ -16,33 +16,35 @@
 
 package androidx.build
 
-import androidx.build.LibraryType.Companion.BENCHMARK
-import androidx.build.LibraryType.Companion.SAMPLES
-import androidx.build.LibraryType.Companion.TEST_APPLICATION
-import androidx.build.LibraryType.Companion.UNSET
+import androidx.build.SoftwareType.Companion.BENCHMARK
+import androidx.build.SoftwareType.Companion.SAMPLES
+import androidx.build.SoftwareType.Companion.TEST_APPLICATION
+import androidx.build.SoftwareType.Companion.UNSET
 import kotlin.collections.contains
 
 /**
- * Represents the purpose and configuration of a library, including how it is published, whether it
- * enforces API compatibility checks, and which environment it targets. By using [LibraryType],
- * developers can select from predefined library configurations or create their own through
- * [ConfigurableLibrary]. This reduces complexity by capturing a library's behavior and rationale in
- * one place, rather than requiring manual configuration of multiple independent properties.
+ * Represents the purpose and configuration of a software project, including how it is published,
+ * whether it enforces API compatibility checks, and which environment it targets. By using
+ * [SoftwareType], developers can select from predefined library configurations or create their own
+ * through [ConfigurableSoftwareType]. This reduces complexity by capturing a library's behavior and
+ * rationale in one place, rather than requiring manual configuration of multiple independent
+ * properties.
  *
- * The key properties controlled by [LibraryType] are:
- * - [publish]: Defines how (or if) the library is published to external repositories (e.g.,
+ * The key properties controlled by [SoftwareType] are:
+ * - [publish]: Defines how (or if) the software is published to external repositories (e.g.,
  *   GMaven).
  * - [checkApi]: Determines whether API compatibility tasks are run, which enforce semantic
  *   versioning and API stability.
- * - [compilationTarget]: Specifies whether the library runs on a host machine or an Android device.
+ * - [compilationTarget]: Specifies whether the software runs on a host machine or an Android
+ *   device.
  * - [allowCallingVisibleForTestsApis]: Indicates whether calling `@VisibleForTesting` APIs is
  *   allowed, useful for test libraries.
- * - [targetsKotlinConsumersOnly]: When `true`, the library is intended for Kotlin consumers only,
+ * - [targetsKotlinConsumersOnly]: When `true`, the software is intended for Kotlin consumers only,
  *   allowing for more Kotlin-centric API design.
  * - [isForTesting]: When `true`, the library is intended to serve as a testing artifact only, not
  *   meant for usage in production.
  *
- * [LibraryType] includes a variety of predefined configurations commonly used in Android libraries:
+ * [SoftwareType] includes a variety of predefined configurations commonly used in Android projects:
  * - Conventional published libraries ([PUBLISHED_LIBRARY], [PUBLISHED_PROTO_LIBRARY], etc.)
  * - Internal libraries not published externally ([INTERNAL_TEST_LIBRARY],
  *   [INTERNAL_HOST_TEST_LIBRARY])
@@ -59,30 +61,30 @@ import kotlin.collections.contains
  *   ([INTERNAL_LIBRARY_WITH_API_TASKS], [SNAPSHOT_ONLY_LIBRARY_WITH_API_TASKS])
  * - [UNSET]: a default or transitional state indicating the library's type isn't fully determined
  *
- * Although predefined library types cover many common scenarios, you can create new
- * [ConfigurableLibrary] instances if your project requires a unique combination of publish
+ * Although predefined software types cover many common scenarios, you can create new
+ * [ConfigurableSoftwareType] instances if your project requires a unique combination of publish
  * settings, API checking, and compilation targeting. In doing so, you ensure the project's
  * configuration is concise, clear, and consistently applied.
  */
-sealed class LibraryType(
+sealed class SoftwareType(
     val name: String,
     val publish: Publish = Publish.NONE,
-    val checkApi: RunApiTasks = RunApiTasks.No("Unknown Library Type"),
+    val checkApi: RunApiTasks = RunApiTasks.No("Unknown Software Type"),
     val compilationTarget: CompilationTarget = CompilationTarget.DEVICE,
     val allowCallingVisibleForTestsApis: Boolean = false,
     val targetsKotlinConsumersOnly: Boolean = false,
     val isForTesting: Boolean = false,
 ) {
-    class ConfigurableLibrary(
+    class ConfigurableSoftwareType(
         name: String,
         publish: Publish = Publish.NONE,
-        checkApi: RunApiTasks = RunApiTasks.No("Unknown Library Type"),
+        checkApi: RunApiTasks = RunApiTasks.No("Unknown Software Type"),
         compilationTarget: CompilationTarget = CompilationTarget.DEVICE,
         allowCallingVisibleForTestsApis: Boolean = false,
         targetsKotlinConsumersOnly: Boolean = false,
         isForTesting: Boolean = true
     ) :
-        LibraryType(
+        SoftwareType(
             name,
             publish,
             checkApi,
@@ -96,7 +98,7 @@ sealed class LibraryType(
         // Host-only tooling libraries
         @JvmStatic
         val ANNOTATION_PROCESSOR =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "ANNOTATION_PROCESSOR",
                 publish = Publish.SNAPSHOT_AND_RELEASE,
                 checkApi = RunApiTasks.No("Annotation Processor"),
@@ -105,7 +107,7 @@ sealed class LibraryType(
 
         @JvmStatic
         val ANNOTATION_PROCESSOR_UTILS =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "ANNOTATION_PROCESSOR_UTILS",
                 publish = Publish.SNAPSHOT_AND_RELEASE,
                 checkApi = RunApiTasks.No("Annotation Processor Helper Library"),
@@ -114,7 +116,7 @@ sealed class LibraryType(
 
         @JvmStatic
         val GRADLE_PLUGIN =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "GRADLE_PLUGIN",
                 publish = Publish.SNAPSHOT_AND_RELEASE,
                 checkApi = RunApiTasks.No("Gradle Plugin (Host-only)"),
@@ -123,7 +125,7 @@ sealed class LibraryType(
 
         @JvmStatic
         val OTHER_CODE_PROCESSOR =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "OTHER_CODE_PROCESSOR",
                 publish = Publish.SNAPSHOT_AND_RELEASE,
                 checkApi = RunApiTasks.No("Code Processor (Host-only)"),
@@ -133,7 +135,7 @@ sealed class LibraryType(
         // Lint libraries
         @JvmStatic
         val LINT =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "LINT",
                 checkApi = RunApiTasks.No("Lint Library"),
                 compilationTarget = CompilationTarget.HOST
@@ -141,7 +143,7 @@ sealed class LibraryType(
 
         @JvmStatic
         val STANDALONE_PUBLISHED_LINT =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "STANDALONE_PUBLISHED_LINT",
                 publish = Publish.SNAPSHOT_AND_RELEASE,
                 checkApi = RunApiTasks.No("Lint Library"),
@@ -151,7 +153,7 @@ sealed class LibraryType(
         // Published libraries
         @JvmStatic
         val PUBLISHED_LIBRARY =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "PUBLISHED_LIBRARY",
                 publish = Publish.SNAPSHOT_AND_RELEASE,
                 checkApi = RunApiTasks.Yes()
@@ -159,7 +161,7 @@ sealed class LibraryType(
 
         @JvmStatic
         val PUBLISHED_PROTO_LIBRARY =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "PUBLISHED_PROTO_LIBRARY",
                 publish = Publish.SNAPSHOT_AND_RELEASE,
                 checkApi =
@@ -168,7 +170,7 @@ sealed class LibraryType(
 
         @JvmStatic
         val PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "PUBLISHED_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS",
                 publish = Publish.SNAPSHOT_AND_RELEASE,
                 checkApi = RunApiTasks.Yes(),
@@ -178,7 +180,7 @@ sealed class LibraryType(
         // Published test libraries
         @JvmStatic
         val PUBLISHED_TEST_LIBRARY =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "PUBLISHED_TEST_LIBRARY",
                 publish = Publish.SNAPSHOT_AND_RELEASE,
                 checkApi = RunApiTasks.Yes(),
@@ -188,7 +190,7 @@ sealed class LibraryType(
 
         @JvmStatic
         val PUBLISHED_KOTLIN_ONLY_TEST_LIBRARY =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "PUBLISHED_KOTLIN_ONLY_TEST_LIBRARY",
                 publish = Publish.SNAPSHOT_AND_RELEASE,
                 checkApi = RunApiTasks.Yes(),
@@ -200,7 +202,7 @@ sealed class LibraryType(
         // Snapshot-only libraries
         @JvmStatic
         val SNAPSHOT_ONLY_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "SNAPSHOT_ONLY_LIBRARY_ONLY_USED_BY_KOTLIN_CONSUMERS",
                 publish = Publish.SNAPSHOT_ONLY,
                 checkApi = RunApiTasks.Yes(),
@@ -209,7 +211,7 @@ sealed class LibraryType(
 
         @JvmStatic
         val SNAPSHOT_ONLY_TEST_LIBRARY_WITH_API_TASKS =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "SNAPSHOT_ONLY_TEST_LIBRARY_WITH_API_TASKS",
                 publish = Publish.SNAPSHOT_ONLY,
                 checkApi = RunApiTasks.Yes(),
@@ -218,7 +220,7 @@ sealed class LibraryType(
 
         @JvmStatic
         val SNAPSHOT_ONLY_LIBRARY_WITH_API_TASKS =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "SNAPSHOT_ONLY_LIBRARY_WITH_API_TASKS",
                 publish = Publish.SNAPSHOT_ONLY,
                 checkApi = RunApiTasks.Yes("Snapshot-only library that runs API tasks")
@@ -226,7 +228,7 @@ sealed class LibraryType(
 
         @JvmStatic
         val SNAPSHOT_ONLY_LIBRARY =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "SNAPSHOT_ONLY_LIBRARY",
                 publish = Publish.SNAPSHOT_ONLY,
                 checkApi = RunApiTasks.No("Snapshot-only library that does not run API tasks")
@@ -235,7 +237,7 @@ sealed class LibraryType(
         // Samples library
         @JvmStatic
         val SAMPLES =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "SAMPLES",
                 publish = Publish.SNAPSHOT_AND_RELEASE,
                 checkApi = RunApiTasks.No("Sample Library")
@@ -244,7 +246,7 @@ sealed class LibraryType(
         // IDE libraries
         @JvmStatic
         val IDE_PLUGIN =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "IDE_PLUGIN",
                 checkApi = RunApiTasks.No("IDE Plugin (consumed only by Android Studio)"),
                 compilationTarget = CompilationTarget.DEVICE
@@ -253,7 +255,7 @@ sealed class LibraryType(
         // Internal libraries
         @JvmStatic
         val INTERNAL_GRADLE_PLUGIN =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "INTERNAL_GRADLE_PLUGIN",
                 checkApi = RunApiTasks.No("Internal Gradle Plugin"),
                 compilationTarget = CompilationTarget.HOST
@@ -261,7 +263,7 @@ sealed class LibraryType(
 
         @JvmStatic
         val INTERNAL_HOST_TEST_LIBRARY =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "INTERNAL_HOST_TEST_LIBRARY",
                 checkApi = RunApiTasks.No("Internal Library"),
                 compilationTarget = CompilationTarget.HOST,
@@ -270,14 +272,14 @@ sealed class LibraryType(
 
         @JvmStatic
         val INTERNAL_LIBRARY_WITH_API_TASKS =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "INTERNAL_LIBRARY_WITH_API_TASKS",
                 checkApi = RunApiTasks.Yes("Always run API tasks even if not published")
             )
 
         @JvmStatic
         val INTERNAL_OTHER_CODE_PROCESSOR =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "INTERNAL_OTHER_CODE_PROCESSOR",
                 checkApi = RunApiTasks.No("Code Processor (Host-only)"),
                 compilationTarget = CompilationTarget.HOST
@@ -285,7 +287,7 @@ sealed class LibraryType(
 
         @JvmStatic
         val INTERNAL_TEST_LIBRARY =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "INTERNAL_TEST_LIBRARY",
                 checkApi = RunApiTasks.No("Internal Library"),
                 allowCallingVisibleForTestsApis = true,
@@ -295,7 +297,7 @@ sealed class LibraryType(
         // Misc libraries
         @JvmStatic
         val BENCHMARK =
-            ConfigurableLibrary(
+            ConfigurableSoftwareType(
                 name = "BENCHMARK",
                 checkApi = RunApiTasks.No("Benchmark Library"),
                 allowCallingVisibleForTestsApis = true
@@ -303,11 +305,14 @@ sealed class LibraryType(
 
         @JvmStatic
         val TEST_APPLICATION =
-            ConfigurableLibrary(name = "TEST_APPLICATION", checkApi = RunApiTasks.No("Test App"))
+            ConfigurableSoftwareType(
+                name = "TEST_APPLICATION",
+                checkApi = RunApiTasks.No("Test App")
+            )
 
-        val UNSET = ConfigurableLibrary(name = "UNSET")
+        val UNSET = ConfigurableSoftwareType(name = "UNSET")
 
-        private val allTypes: Map<String, LibraryType> by lazy {
+        private val allTypes: Map<String, SoftwareType> by lazy {
             listOf(
                     PUBLISHED_LIBRARY,
                     PUBLISHED_PROTO_LIBRARY,
@@ -338,13 +343,13 @@ sealed class LibraryType(
                 .associateBy { it.name }
         }
 
-        fun valueOf(name: String): LibraryType {
-            return requireNotNull(allTypes[name]) { "LibraryType with name $name not found" }
+        fun valueOf(name: String): SoftwareType {
+            return requireNotNull(allTypes[name]) { "SoftwareType with name $name not found" }
         }
     }
 }
 
-fun LibraryType.requiresDependencyVerification(): Boolean =
+fun SoftwareType.requiresDependencyVerification(): Boolean =
     this !in listOf(BENCHMARK, SAMPLES, TEST_APPLICATION, UNSET)
 
 enum class CompilationTarget {
@@ -378,4 +383,5 @@ sealed class RunApiTasks {
     data class No(val reason: String) : RunApiTasks()
 }
 
-fun LibraryType.isLint() = this == LibraryType.LINT || this == LibraryType.STANDALONE_PUBLISHED_LINT
+fun SoftwareType.isLint() =
+    this == SoftwareType.LINT || this == SoftwareType.STANDALONE_PUBLISHED_LINT

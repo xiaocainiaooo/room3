@@ -16,7 +16,7 @@
 
 import androidx.build.AndroidXConfig
 import androidx.build.KotlinTarget
-import androidx.build.LibraryType
+import androidx.build.SoftwareType
 import androidx.build.PlatformIdentifier
 import androidx.build.ProjectLayoutType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -134,7 +134,7 @@ wire {
 
 androidx {
     name = "Benchmark TraceProcessor"
-    type = LibraryType.PUBLISHED_LIBRARY
+    type = SoftwareType.PUBLISHED_LIBRARY
     inceptionYear = "2024"
     description = "AndroidX Benchmark TraceProcessor"
     metalavaK2UastEnabled = false
