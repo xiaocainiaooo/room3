@@ -324,11 +324,12 @@ package androidx.wear.compose.material3 {
 
   @androidx.compose.runtime.Immutable @androidx.compose.runtime.Stable public final class ColorScheme {
     ctor public ColorScheme();
-    ctor public ColorScheme(optional long primary, optional long primaryDim, optional long primaryContainer, optional long onPrimary, optional long onPrimaryContainer, optional long secondary, optional long secondaryDim, optional long secondaryContainer, optional long onSecondary, optional long onSecondaryContainer, optional long tertiary, optional long tertiaryDim, optional long tertiaryContainer, optional long onTertiary, optional long onTertiaryContainer, optional long surfaceContainerLow, optional long surfaceContainer, optional long surfaceContainerHigh, optional long onSurface, optional long onSurfaceVariant, optional long outline, optional long outlineVariant, optional long background, optional long onBackground, optional long error, optional long onError, optional long errorContainer, optional long onErrorContainer);
-    method public androidx.wear.compose.material3.ColorScheme copy(optional long primary, optional long primaryDim, optional long primaryContainer, optional long onPrimary, optional long onPrimaryContainer, optional long secondary, optional long secondaryDim, optional long secondaryContainer, optional long onSecondary, optional long onSecondaryContainer, optional long tertiary, optional long tertiaryDim, optional long tertiaryContainer, optional long onTertiary, optional long onTertiaryContainer, optional long surfaceContainerLow, optional long surfaceContainer, optional long surfaceContainerHigh, optional long onSurface, optional long onSurfaceVariant, optional long outline, optional long outlineVariant, optional long background, optional long onBackground, optional long error, optional long onError, optional long errorContainer, optional long onErrorContainer);
+    ctor public ColorScheme(optional long primary, optional long primaryDim, optional long primaryContainer, optional long onPrimary, optional long onPrimaryContainer, optional long secondary, optional long secondaryDim, optional long secondaryContainer, optional long onSecondary, optional long onSecondaryContainer, optional long tertiary, optional long tertiaryDim, optional long tertiaryContainer, optional long onTertiary, optional long onTertiaryContainer, optional long surfaceContainerLow, optional long surfaceContainer, optional long surfaceContainerHigh, optional long onSurface, optional long onSurfaceVariant, optional long outline, optional long outlineVariant, optional long background, optional long onBackground, optional long error, optional long errorDim, optional long errorContainer, optional long onError, optional long onErrorContainer);
+    method public androidx.wear.compose.material3.ColorScheme copy(optional long primary, optional long primaryDim, optional long primaryContainer, optional long onPrimary, optional long onPrimaryContainer, optional long secondary, optional long secondaryDim, optional long secondaryContainer, optional long onSecondary, optional long onSecondaryContainer, optional long tertiary, optional long tertiaryDim, optional long tertiaryContainer, optional long onTertiary, optional long onTertiaryContainer, optional long surfaceContainerLow, optional long surfaceContainer, optional long surfaceContainerHigh, optional long onSurface, optional long onSurfaceVariant, optional long outline, optional long outlineVariant, optional long background, optional long onBackground, optional long error, optional long errorDim, optional long errorContainer, optional long onError, optional long onErrorContainer);
     method public long getBackground();
     method public long getError();
     method public long getErrorContainer();
+    method public long getErrorDim();
     method public long getOnBackground();
     method public long getOnError();
     method public long getOnErrorContainer();
@@ -357,6 +358,7 @@ package androidx.wear.compose.material3 {
     property public final long background;
     property public final long error;
     property public final long errorContainer;
+    property public final long errorDim;
     property public final long onBackground;
     property public final long onError;
     property public final long onErrorContainer;

@@ -717,9 +717,8 @@ public object ConfirmationDialogDefaults {
         get() {
             return defaultFailureConfirmationColorsCached
                 ?: ConfirmationDialogColors(
-                        iconColor = fromToken(ColorSchemeKeyTokens.ErrorContainer),
-                        iconContainerColor =
-                            fromToken(ColorSchemeKeyTokens.OnErrorContainer).copy(.8f),
+                        iconColor = fromToken(ColorSchemeKeyTokens.ErrorDim),
+                        iconContainerColor = fromToken(ColorSchemeKeyTokens.OnError).copy(.8f),
                         textColor = fromToken(ColorSchemeKeyTokens.OnBackground)
                     )
                     .also { defaultFailureConfirmationColorsCached = it }
