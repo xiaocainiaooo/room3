@@ -31,11 +31,15 @@ plugins {
 }
 
 androidx.configureAarAsJarForConfiguration("testImplementation")
+androidx.configureAarAsJarForConfiguration("implementation")
 
 dependencies {
     api(libs.kotlinStdlib)
     implementation(libs.kspApi)
     implementation(libs.kotlinPoet)
+
+    // Added for reusing AppFunctionMetadata classes.
+    implementationAarAsJar(project(":appfunctions:appfunctions-common"))
 
     testImplementationAarAsJar(project(":appfunctions:appfunctions-common"))
     testImplementationAarAsJar(project(":appfunctions:appfunctions-runtime"))
