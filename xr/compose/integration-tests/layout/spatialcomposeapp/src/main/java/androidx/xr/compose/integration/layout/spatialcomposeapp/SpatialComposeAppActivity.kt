@@ -90,9 +90,9 @@ import androidx.xr.runtime.math.Quaternion
 import androidx.xr.runtime.math.Vector3
 import androidx.xr.scenecore.GltfModel
 import androidx.xr.scenecore.Session
+import java.time.Clock
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.time.TimeSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
@@ -305,18 +305,14 @@ class SpatialComposeAppActivity : ComponentActivity() {
 
                 lifecycleScope.launch {
                     val pi = 3.14159F
-                    @OptIn(kotlin.time.ExperimentalTime::class)
-                    val timeSource = TimeSource.Monotonic
-                    @OptIn(kotlin.time.ExperimentalTime::class) val startTime = timeSource.markNow()
+                    val timeSource = Clock.systemUTC()
+                    val startTime = timeSource.millis()
                     val rotateTimeMs = 10000F
 
                     while (true) {
                         delay(16L)
-                        @OptIn(kotlin.time.ExperimentalTime::class)
-                        val angle =
-                            (2 * pi) * ((timeSource.markNow() - startTime).inWholeMilliseconds) /
-                                rotateTimeMs
-
+                        val elapsedMs = timeSource.millis() - startTime
+                        val angle = (2 * pi) * (elapsedMs / rotateTimeMs)
                         val normalized = Vector3(1.0f, 1.0f, 1.0f).toNormalized()
 
                         val qX = normalized.x * sin(angle / 2)
