@@ -23,7 +23,10 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -33,7 +36,15 @@ import org.junit.rules.TemporaryFolder
 import org.junit.rules.Timeout
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DataStoreFactoryTest {
+abstract class BaseDataStoreFactoryTest {
+    abstract fun <T> createDataStore(
+        serializer: Serializer<T>,
+        corruptionHandler: ReplaceFileCorruptionHandler<T>? = null,
+        migrations: List<DataMigration<T>> = listOf(),
+        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+        produceFile: () -> File
+    ): DataStore<T>
+
     @get:Rule val timeout = Timeout(10, TimeUnit.SECONDS)
 
     @get:Rule val tmp = TemporaryFolder()
@@ -50,9 +61,7 @@ class DataStoreFactoryTest {
     @Test
     fun testNewInstance() = runTest {
         val store =
-            DataStoreFactory.create(serializer = TestingSerializer(), scope = dataStoreScope) {
-                testFile
-            }
+            createDataStore(serializer = TestingSerializer(), scope = dataStoreScope) { testFile }
 
         val expectedByte = 123.toByte()
 
@@ -65,7 +74,7 @@ class DataStoreFactoryTest {
         val valueToReplace = 123.toByte()
 
         val store =
-            DataStoreFactory.create(
+            createDataStore(
                 serializer =
                     TestingSerializer(
                         TestingSerializerConfig(failReadWithCorruptionException = true)
@@ -101,7 +110,7 @@ class DataStoreFactoryTest {
             }
 
         val store =
-            DataStoreFactory.create(
+            createDataStore(
                 serializer = TestingSerializer(),
                 migrations = listOf(migratePlus2, migrateMinus1),
                 scope = dataStoreScope
