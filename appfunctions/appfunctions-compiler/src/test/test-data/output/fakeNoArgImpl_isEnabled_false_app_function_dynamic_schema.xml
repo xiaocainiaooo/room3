@@ -9,6 +9,10 @@
         <enabledByDefault>false</enabledByDefault>
         <isRestrictToTrustedCaller>false</isRestrictToTrustedCaller>
         <response>
+            <dataType>
+                <id>unused</id>
+                <type>0</type>
+            </dataType>
             <id>unused</id>
             <isNullable>false</isNullable>
         </response>

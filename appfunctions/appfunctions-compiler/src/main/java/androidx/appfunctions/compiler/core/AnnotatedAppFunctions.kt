@@ -20,7 +20,9 @@ import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionAnnota
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionContextClass
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSchemaDefinitionAnnotation
 import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
+import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
+import androidx.appfunctions.metadata.AppFunctionParameterMetadata
 import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import com.google.devtools.ksp.symbol.KSClassDeclaration
@@ -129,9 +131,9 @@ data class AnnotatedAppFunctions(
             val schemaMetadata =
                 if (appFunctionAnnotationProperties.schemaName != null) {
                     AppFunctionSchemaMetadata(
-                        requireNotNull(appFunctionAnnotationProperties.schemaCategory),
-                        requireNotNull(appFunctionAnnotationProperties.schemaName),
-                        requireNotNull(appFunctionAnnotationProperties.schemaVersion)
+                        checkNotNull(appFunctionAnnotationProperties.schemaCategory),
+                        checkNotNull(appFunctionAnnotationProperties.schemaName),
+                        checkNotNull(appFunctionAnnotationProperties.schemaVersion)
                     )
                 } else {
                     null
@@ -143,14 +145,46 @@ data class AnnotatedAppFunctions(
                 isRestrictToTrustedCaller = false,
                 displayNameRes = 0,
                 schema = schemaMetadata,
-                // TODO: Properly construct the values below.
-                parameters = emptyList(),
+                // TODO: Handle non-primitive and collections.
+                parameters = fnDeclaration.buildMetadataForParameters(),
                 response =
                     AppFunctionResponseMetadata(
-                        isNullable = fnDeclaration.returnType?.resolve()?.isMarkedNullable == true
+                        isNullable = fnDeclaration.returnType?.resolve()?.isMarkedNullable == true,
+                        dataType =
+                            AppFunctionDataTypeMetadata(
+                                type =
+                                    checkNotNull(fnDeclaration.returnType?.toAppFunctionDataType())
+                            )
                     ),
                 components = AppFunctionComponentsMetadata(dataTypes = emptyList())
             )
+        }
+
+    private fun KSFunctionDeclaration.buildMetadataForParameters():
+        List<AppFunctionParameterMetadata> =
+        parameters
+            .filter { !it.type.isOfType(AppFunctionContextClass.CLASS_NAME) }
+            .map {
+                AppFunctionParameterMetadata(
+                    name = checkNotNull(it.name?.asString()),
+                    // TODO: Correctly populate isRequired.
+                    isRequired = !it.hasDefault,
+                    dataType = AppFunctionDataTypeMetadata(type = it.type.toAppFunctionDataType())
+                )
+            }
+
+    private fun KSTypeReference.toAppFunctionDataType(): Int =
+        when (this.resolve().declaration.qualifiedName?.asString()) {
+            "kotlin.String" -> AppFunctionDataTypeMetadata.STRING
+            "kotlin.Int" -> AppFunctionDataTypeMetadata.INT
+            "kotlin.Long" -> AppFunctionDataTypeMetadata.LONG
+            "kotlin.Float" -> AppFunctionDataTypeMetadata.FLOAT
+            "kotlin.Double" -> AppFunctionDataTypeMetadata.DOUBLE
+            "kotlin.Boolean" -> AppFunctionDataTypeMetadata.BOOLEAN
+            "kotlin.Byte" -> AppFunctionDataTypeMetadata.BYTES
+            "kotlin.Unit" -> AppFunctionDataTypeMetadata.UNIT
+            // TODO: Support converting other types.
+            else -> AppFunctionDataTypeMetadata.OBJECT
         }
 
     private fun computeAppFunctionAnnotationProperties(
