@@ -896,16 +896,16 @@ internal object ThreePaneScaffoldDefaults {
 @Composable
 private fun PredictiveBackScaleEffect(
     scaffoldState: ThreePaneScaffoldState,
-    animatable: Animatable<Float, AnimationVector1D>,
+    scaleAnimatable: Animatable<Float, AnimationVector1D>,
 ) {
     LaunchedEffect(scaffoldState) {
         snapshotFlow { scaffoldState.progressFraction }
             .collect { value ->
                 if (scaffoldState.isPredictiveBackInProgress) {
                     val scale = convertStateProgressToPredictiveBackScale(value)
-                    animatable.snapTo(scale)
+                    scaleAnimatable.snapTo(scale)
                 } else {
-                    animatable.animateTo(1f)
+                    scaleAnimatable.animateTo(1f)
                 }
             }
     }
