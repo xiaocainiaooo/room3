@@ -23,6 +23,23 @@ interface FakeAllPrimitiveParams {
     )
 }
 
+@AppFunctionSchemaDefinition(
+    name = "allNullablePrimitiveParamsWithDefault",
+    version = 1,
+    category = FAKE_CATEGORY
+)
+interface FakeAllNullablePrimitiveParamsWithDefault {
+    fun allNullablePrimitiveParamsWithDefault(
+        appFunctionContext: AppFunctionContext,
+        arg1: Int? = null,
+        arg2: Long? = null,
+        arg3: Float? = null,
+        arg4: Double? = null,
+        arg5: String? = null,
+        arg6: Boolean? = null,
+    )
+}
+
 @AppFunctionSchemaDefinition(name = "allPrimitiveReturns", version = 1, category = FAKE_CATEGORY)
 interface FakeAllPrimitiveReturns {
     fun unitReturn(
