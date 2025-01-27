@@ -63,4 +63,8 @@ function buildAndroidx() {
 }
 
 buildAndroidx
+
+# stop Gradle daemon to clean up after ourselves
+./gradlew --stop
+
 echo "Completing $0 at $(date)"
