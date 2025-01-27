@@ -28,6 +28,7 @@ import androidx.room.compiler.codegen.compat.XConverters.applyToJavaPoet
 import androidx.room.compiler.codegen.compat.XConverters.toString
 import androidx.room.compiler.processing.util.Source
 import androidx.room.compiler.processing.util.XTestInvocation
+import androidx.room.compiler.processing.util.runProcessorTest
 import androidx.room.ext.CommonTypeNames
 import androidx.room.ext.CommonTypeNames.MUTABLE_LIST
 import androidx.room.ext.CommonTypeNames.STRING
@@ -36,7 +37,6 @@ import androidx.room.processor.ProcessorErrors.TYPE_CONVERTER_EMPTY_CLASS
 import androidx.room.processor.ProcessorErrors.TYPE_CONVERTER_MISSING_NOARG_CONSTRUCTOR
 import androidx.room.processor.ProcessorErrors.TYPE_CONVERTER_MUST_BE_PUBLIC
 import androidx.room.processor.ProcessorErrors.TYPE_CONVERTER_UNBOUND_GENERIC
-import androidx.room.runProcessorTestWithK1
 import androidx.room.testing.context
 import androidx.room.vo.CustomTypeConverter
 import com.squareup.javapoet.TypeVariableName
@@ -256,7 +256,7 @@ class CustomConverterProcessorTest {
                         .build()
                         .toString(CodeLanguage.JAVA)
             )
-        runProcessorTestWithK1(sources = listOf(baseConverter, extendingClass)) { invocation ->
+        runProcessorTest(sources = listOf(baseConverter, extendingClass)) { invocation ->
             val element =
                 invocation.processingEnv.requireTypeElement(extendingClassName.canonicalName)
             val converter =
@@ -339,7 +339,7 @@ class CustomConverterProcessorTest {
                 public class Container {}
                 """
             )
-        runProcessorTestWithK1(listOf(source)) { invocation ->
+        runProcessorTest(listOf(source)) { invocation ->
             val result =
                 CustomConverterProcessor.findConverters(
                     invocation.context,
@@ -399,7 +399,7 @@ class CustomConverterProcessorTest {
         vararg sources: Source,
         handler: (CustomTypeConverter?, XTestInvocation) -> Unit
     ) {
-        runProcessorTestWithK1(sources = sources.toList() + CONTAINER) { invocation ->
+        runProcessorTest(sources = sources.toList() + CONTAINER) { invocation ->
             val processed =
                 CustomConverterProcessor.findConverters(
                     invocation.context,

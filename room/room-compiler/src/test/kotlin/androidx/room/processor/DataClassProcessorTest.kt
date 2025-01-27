@@ -23,6 +23,7 @@ import androidx.room.compiler.codegen.XClassName
 import androidx.room.compiler.processing.XFieldElement
 import androidx.room.compiler.processing.util.Source
 import androidx.room.compiler.processing.util.XTestInvocation
+import androidx.room.compiler.processing.util.runProcessorTest
 import androidx.room.ext.CommonTypeNames
 import androidx.room.parser.SQLTypeAffinity
 import androidx.room.processor.ProcessorErrors.CANNOT_FIND_GETTER_FOR_FIELD
@@ -33,7 +34,6 @@ import androidx.room.processor.ProcessorErrors.relationCannotFindEntityField
 import androidx.room.processor.ProcessorErrors.relationCannotFindJunctionEntityField
 import androidx.room.processor.ProcessorErrors.relationCannotFindJunctionParentField
 import androidx.room.processor.ProcessorErrors.relationCannotFindParentEntityField
-import androidx.room.runProcessorTestWithK1
 import androidx.room.testing.context
 import androidx.room.vo.CallType
 import androidx.room.vo.Constructor
@@ -85,7 +85,7 @@ class DataClassProcessorTest {
                 public void setBaseField(String baseField){ }
             }
         """
-        runProcessorTestWithK1(
+        runProcessorTest(
             sources =
                 listOf(
                     Source.java(
@@ -1063,7 +1063,7 @@ class DataClassProcessorTest {
             $FOOTER
             """
             )
-        runProcessorTestWithK1(sources = listOf(dataClass)) { invocation ->
+        runProcessorTest(sources = listOf(dataClass)) { invocation ->
             val element = invocation.processingEnv.requireTypeElement(MY_DATA_CLASS)
             val dataClass1 =
                 DataClassProcessor.createFor(
@@ -1723,7 +1723,7 @@ class DataClassProcessorTest {
                 "foo.bar.TestData.WithJvmOverloads"
             )
             .forEach {
-                runProcessorTestWithK1(sources = listOf(TEST_DATA)) { invocation ->
+                runProcessorTest(sources = listOf(TEST_DATA)) { invocation ->
                     DataClassProcessor.createFor(
                             context = invocation.context,
                             element = invocation.processingEnv.requireTypeElement(it),
@@ -1738,7 +1738,7 @@ class DataClassProcessorTest {
 
     @Test
     fun dataClass_withJvmOverloads_primaryConstructor() {
-        runProcessorTestWithK1(sources = listOf(TEST_DATA)) { invocation ->
+        runProcessorTest(sources = listOf(TEST_DATA)) { invocation ->
             DataClassProcessor.createFor(
                     context = invocation.context,
                     element =
@@ -1768,7 +1768,7 @@ class DataClassProcessorTest {
             }
             """
             )
-        runProcessorTestWithK1(sources = listOf(source)) { invocation ->
+        runProcessorTest(sources = listOf(source)) { invocation ->
             val dataClass =
                 DataClassProcessor.createFor(
                         context = invocation.context,
@@ -1784,7 +1784,7 @@ class DataClassProcessorTest {
 
     @Test
     fun ignoredColumns_noConstructor() {
-        runProcessorTestWithK1(
+        runProcessorTest(
             listOf(
                 Source.java(
                     MY_DATA_CLASS.canonicalName,
@@ -1823,7 +1823,7 @@ class DataClassProcessorTest {
 
     @Test
     fun ignoredColumns_noSetterGetter() {
-        runProcessorTestWithK1(
+        runProcessorTest(
             listOf(
                 Source.java(
                     MY_DATA_CLASS.canonicalName,
@@ -1860,7 +1860,7 @@ class DataClassProcessorTest {
 
     @Test
     fun ignoredColumns_columnInfo() {
-        runProcessorTestWithK1(
+        runProcessorTest(
             listOf(
                 Source.java(
                     MY_DATA_CLASS.canonicalName,
@@ -1892,7 +1892,7 @@ class DataClassProcessorTest {
 
     @Test
     fun ignoredColumns_missing() {
-        runProcessorTestWithK1(
+        runProcessorTest(
             listOf(
                 Source.java(
                     MY_DATA_CLASS.canonicalName,
@@ -1926,7 +1926,7 @@ class DataClassProcessorTest {
 
     @Test
     fun noSetter_scopeBindStmt() {
-        runProcessorTestWithK1(
+        runProcessorTest(
             listOf(
                 Source.java(
                     MY_DATA_CLASS.canonicalName,
@@ -1955,7 +1955,7 @@ class DataClassProcessorTest {
 
     @Test
     fun noSetter_scopeTwoWay() {
-        runProcessorTestWithK1(
+        runProcessorTest(
             listOf(
                 Source.java(
                     MY_DATA_CLASS.canonicalName,
@@ -1987,7 +1987,7 @@ class DataClassProcessorTest {
 
     @Test
     fun noSetter_scopeReadFromCursor() {
-        runProcessorTestWithK1(
+        runProcessorTest(
             listOf(
                 Source.java(
                     MY_DATA_CLASS.canonicalName,
@@ -2019,7 +2019,7 @@ class DataClassProcessorTest {
 
     @Test
     fun noGetter_scopeBindStmt() {
-        runProcessorTestWithK1(
+        runProcessorTest(
             listOf(
                 Source.java(
                     MY_DATA_CLASS.canonicalName,
@@ -2051,7 +2051,7 @@ class DataClassProcessorTest {
 
     @Test
     fun noGetter_scopeTwoWay() {
-        runProcessorTestWithK1(
+        runProcessorTest(
             listOf(
                 Source.java(
                     MY_DATA_CLASS.canonicalName,
@@ -2083,7 +2083,7 @@ class DataClassProcessorTest {
 
     @Test
     fun noGetter_scopeReadCursor() {
-        runProcessorTestWithK1(
+        runProcessorTest(
             listOf(
                 Source.java(
                     MY_DATA_CLASS.canonicalName,
@@ -2112,7 +2112,7 @@ class DataClassProcessorTest {
 
     @Test
     fun setterStartsWithIs() {
-        runProcessorTestWithK1(
+        runProcessorTest(
             listOf(
                 Source.kotlin(
                     "Book.kt",
@@ -2141,7 +2141,7 @@ class DataClassProcessorTest {
                 .isEqualTo(
                     FieldGetter(
                         fieldName = "isbn",
-                        jvmName = "getIsbn",
+                        jvmName = if (invocation.isKsp2) "isbn" else "getIsbn",
                         type = stringType,
                         callType = CallType.SYNTHETIC_METHOD
                     )
@@ -2160,7 +2160,7 @@ class DataClassProcessorTest {
                 .isEqualTo(
                     FieldGetter(
                         fieldName = "isbn2",
-                        jvmName = "getIsbn2",
+                        jvmName = if (invocation.isKsp2) "isbn2" else "getIsbn2",
                         type = stringType.makeNullable(),
                         callType = CallType.SYNTHETIC_METHOD
                     )
@@ -2169,7 +2169,7 @@ class DataClassProcessorTest {
                 .isEqualTo(
                     FieldSetter(
                         fieldName = "isbn2",
-                        jvmName = "setIsbn2",
+                        jvmName = if (invocation.isKsp2) "setbn2" else "setIsbn2",
                         type = stringType.makeNullable(),
                         callType = CallType.SYNTHETIC_METHOD
                     )
@@ -2180,7 +2180,7 @@ class DataClassProcessorTest {
     @Test
     fun embedded_nullability() {
         listOf("foo.bar.TestData.SomeEmbeddedVals").forEach {
-            runProcessorTestWithK1(sources = listOf(TEST_DATA)) { invocation ->
+            runProcessorTest(sources = listOf(TEST_DATA)) { invocation ->
                 val result =
                     DataClassProcessor.createFor(
                             context = invocation.context,
@@ -2228,7 +2228,7 @@ class DataClassProcessorTest {
     ) {
         val dataClassSource = Source.java(MY_DATA_CLASS.canonicalName, code)
         val all = sources.toList() + dataClassSource
-        runProcessorTestWithK1(sources = all, classpath = classpath) { invocation ->
+        runProcessorTest(sources = all, classpath = classpath) { invocation ->
             handler.invoke(
                 DataClassProcessor.createFor(
                         context = invocation.context,

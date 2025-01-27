@@ -27,6 +27,7 @@ import androidx.room.compiler.processing.XType
 import androidx.room.compiler.processing.XTypeElement
 import androidx.room.compiler.processing.util.Source
 import androidx.room.compiler.processing.util.XTestInvocation
+import androidx.room.compiler.processing.util.runProcessorTest
 import androidx.room.ext.CommonTypeNames
 import androidx.room.ext.CommonTypeNames.LIST
 import androidx.room.ext.CommonTypeNames.MUTABLE_LIST
@@ -45,7 +46,6 @@ import androidx.room.processor.ProcessorErrors.DO_NOT_USE_GENERIC_IMMUTABLE_MULT
 import androidx.room.processor.ProcessorErrors.MAP_INFO_MUST_HAVE_AT_LEAST_ONE_COLUMN_PROVIDED
 import androidx.room.processor.ProcessorErrors.cannotFindQueryResultAdapter
 import androidx.room.processor.ProcessorErrors.mayNeedMapColumn
-import androidx.room.runProcessorTestWithK1
 import androidx.room.solver.query.result.DataClassRowAdapter
 import androidx.room.solver.query.result.DataSourceFactoryQueryResultBinder
 import androidx.room.solver.query.result.ListQueryResultAdapter
@@ -1243,7 +1243,7 @@ class QueryFunctionProcessorTest(private val enableVerification: Boolean) {
             )
         val allOptions =
             mapOf(Context.BooleanProcessorOptions.GENERATE_KOTLIN.argName to "false") + options
-        runProcessorTestWithK1(
+        runProcessorTest(
             sources = additionalSources + commonSources + inputSource,
             options = allOptions
         ) { invocation ->
@@ -1313,7 +1313,7 @@ class QueryFunctionProcessorTest(private val enableVerification: Boolean) {
                 COMMON.RX2_EMPTY_RESULT_SET_EXCEPTION
             )
 
-        runProcessorTestWithK1(
+        runProcessorTest(
             sources = additionalSources + commonSources + inputSource,
             options = options
         ) { invocation ->

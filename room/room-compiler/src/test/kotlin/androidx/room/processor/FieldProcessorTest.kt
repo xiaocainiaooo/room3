@@ -27,7 +27,6 @@ import androidx.room.compiler.processing.util.runProcessorTest
 import androidx.room.ext.CommonTypeNames
 import androidx.room.parser.Collate
 import androidx.room.parser.SQLTypeAffinity
-import androidx.room.runProcessorTestWithK1
 import androidx.room.solver.types.ColumnTypeAdapter
 import androidx.room.testing.context
 import androidx.room.vo.Field
@@ -711,7 +710,7 @@ class FieldProcessorTest {
                 ),
                 ARRAY_CONVERTER
             )
-        runProcessorTestWithK1(sources = sources) { invocation ->
+        runProcessorTest(sources = sources) { invocation ->
             val (owner, fieldElement) =
                 invocation.roundEnv
                     .getElementsAnnotatedWith(Entity::class.qualifiedName!!)
