@@ -129,7 +129,8 @@ class CompilationTestHelper(
               the content of golden file [${goldenFile.path}].
 
               To update the golden file,
-              run `cp $generatedFilePath ${goldenFilePath}`
+              run:
+               cp $generatedFilePath ${goldenFilePath}
             """
                     .trimIndent()
             )
@@ -169,7 +170,8 @@ class CompilationTestHelper(
               the content of golden file [${goldenFile.path}].
 
               To update the golden file,
-              run `cp $generatedFilePath ${goldenFilePath}`
+              run:
+               cp $generatedFilePath ${goldenFilePath}
             """
                     .trimIndent()
             )

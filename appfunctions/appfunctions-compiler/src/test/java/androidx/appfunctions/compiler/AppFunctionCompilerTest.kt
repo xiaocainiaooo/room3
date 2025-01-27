@@ -206,13 +206,72 @@ class AppFunctionCompilerTest {
     }
 
     @Test
-    fun testSimpleFunction_noOverride_hasCompileError() {
-        val report = compilationTestHelper.compileAll(sourceFileNames = listOf("SimpleFunction.KT"))
+    fun testFakeNoArg_freeForm_genLegacyIndexXmlFile_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("FakeNoArg_FreeForm_Function.KT")
+            )
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
             expectGeneratedResourceFileName = "app_functions.xml",
-            goldenFileName = "simpleFunction_noSchema_app_function.xml"
+            goldenFileName = "fakeNoArg_freeForm_function_app_function.xml"
+        )
+    }
+
+    @Test
+    fun testFakeNoArgImpl_genIndexXmlFile_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("FakeNoArgImpl.KT", "FakeSchemas.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            goldenFileName = "fakeNoArgImpl_app_function_dynamic_schema.xml"
+        )
+    }
+
+    @Test
+    fun testFakeNoArgImp_isEnabledTrue_genIndexXmlFile_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("FakeNoArgImpl_IsEnabled_True.KT", "FakeSchemas.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            goldenFileName = "fakeNoArgImpl_isEnabled_true_app_function_dynamic_schema.xml"
+        )
+    }
+
+    @Test
+    fun testFakeNoArgImp_isEnabledFalse_genIndexXmlFile_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("FakeNoArgImpl_IsEnabled_False.KT", "FakeSchemas.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            goldenFileName = "fakeNoArgImpl_isEnabled_false_app_function_dynamic_schema.xml"
+        )
+    }
+
+    @Test
+    fun testFakeNoArg_freeForm_genIndexXmlFile_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("FakeNoArg_FreeForm_Function.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions.xml",
+            goldenFileName = "fakeNoArg_freeForm_function_app_function_dynamic_schema.xml"
         )
     }
 }
