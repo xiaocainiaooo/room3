@@ -125,7 +125,15 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // TODO(b/337793172): Replace with a default fragment
-                switchContentFragment(ResizeFragment(), "Resize CUJ")
+                val extras = intent.extras
+                if (extras != null) {
+                    val fragmentOptions = FragmentOptions.createFromIntentExtras(extras)
+                    val fragment = fragmentOptions.getFragment()
+                    fragment.handleOptionsFromIntent(fragmentOptions)
+                    switchContentFragment(fragment, "Automated CUJ")
+                } else {
+                    switchContentFragment(ResizeFragment(), "Resize CUJ")
+                }
 
                 setWindowsInsetsListener()
                 initializeOptionsButton()
