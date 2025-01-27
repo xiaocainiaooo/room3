@@ -40,6 +40,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.pdf.view.PdfView
+import androidx.pdf.view.Selection
 import androidx.pdf.view.ToolBoxView
 import androidx.pdf.view.search.PdfSearchView
 import androidx.pdf.viewer.PdfPasswordDialog
@@ -49,6 +50,7 @@ import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.DocumentError
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.DocumentLoaded
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.Loading
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.PasswordRequested
+import androidx.pdf.viewer.fragment.model.SearchViewUiState
 import androidx.pdf.viewer.fragment.search.PdfSearchViewManager
 import androidx.pdf.viewer.fragment.util.getCenter
 import androidx.pdf.viewer.fragment.view.PdfViewManager
@@ -207,6 +209,8 @@ public open class PdfViewerFragmentV2 : Fragment() {
             )
         pdfSearchViewManager = PdfSearchViewManager(pdfSearchView)
 
+        setupPdfViewListeners()
+
         onPdfSearchViewCreated(pdfSearchView)
 
         collectFlowOnLifecycleScope { collectFragmentUiScreenState() }
@@ -236,6 +240,23 @@ public open class PdfViewerFragmentV2 : Fragment() {
                 )
             )
         }
+    }
+
+    private fun setupPdfViewListeners() {
+        /**
+         * Closes any active search session if the user selects anything in the PdfView. This
+         * improves the user experience by allowing the focus to shift to the intended content.
+         */
+        pdfView.addOnSelectionChangedListener(
+            object : PdfView.OnSelectionChangedListener {
+                override fun onSelectionChanged(
+                    previousSelection: Selection?,
+                    newSelection: Selection?
+                ) {
+                    newSelection?.let { isTextSearchActive = false }
+                }
+            }
+        )
     }
 
     private fun setupSearchViewListeners(pdfSearchView: PdfSearchView) {
@@ -274,6 +295,9 @@ public open class PdfViewerFragmentV2 : Fragment() {
         searchStateCollector = collectFlowOnLifecycleScope {
             documentViewModel.searchViewUiState.collect { uiState ->
                 pdfSearchViewManager.setState(uiState)
+
+                /** Clear selection when we start a search session. */
+                if (uiState !is SearchViewUiState.Closed) pdfView.clearSelection()
             }
         }
 
