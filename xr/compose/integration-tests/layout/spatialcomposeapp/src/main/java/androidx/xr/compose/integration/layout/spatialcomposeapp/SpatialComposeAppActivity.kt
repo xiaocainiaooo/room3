@@ -306,7 +306,7 @@ class SpatialComposeAppActivity : ComponentActivity() {
         var arrows by remember { mutableStateOf<GltfModel?>(null) }
         val gltfEntity = arrows?.let { remember { GltfModelEntity.create(session, it) } }
 
-        LaunchedEffect(Unit) { arrows = GltfModel.create(session, "xyzArrows.glb").await() }
+        LaunchedEffect(Unit) { arrows = GltfModel.create(session, "models/xyzArrows.glb").await() }
 
         if (gltfEntity != null) {
             Volume(modifier) {

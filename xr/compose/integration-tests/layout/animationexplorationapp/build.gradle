@@ -29,7 +29,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":xr:compose:integration-tests:common"))
     implementation(project(":xr:compose:compose"))
 
     implementation("androidx.activity:activity-compose:1.10.0-beta01")

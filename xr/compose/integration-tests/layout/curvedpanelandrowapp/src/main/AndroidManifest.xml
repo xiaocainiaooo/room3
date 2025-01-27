@@ -19,12 +19,12 @@
   <uses-permission android:name="android.permission.SCENE_UNDERSTANDING"/>
 
   <application
-      android:label="Compose XR Animation Exploration App">
+      android:label="Compose XR Curved Panel And Row App">
     <property
         android:name="android.window.PROPERTY_XR_ACTIVITY_START_MODE"
         android:value="XR_ACTIVITY_START_MODE_FULL_SPACE_MANAGED" />
     <activity
-        android:name=".AnimationExplorationApp"
+        android:name=".CurvedPanelAndRowApp"
         android:configChanges="screenSize|smallestScreenSize|orientation|screenLayout"
         android:exported="true">
       <intent-filter>
