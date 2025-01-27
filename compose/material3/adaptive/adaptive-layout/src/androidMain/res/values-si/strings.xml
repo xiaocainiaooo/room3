@@ -20,8 +20,6 @@
     <string name="m3_adaptive_default_pane_expansion_drag_handle_content_description" msgid="9058489142432490820">"පැනල ප්‍රසාරණ ඇදීම් හැඬලය"</string>
     <string name="m3_adaptive_default_pane_expansion_drag_handle_action_description" msgid="9031621431415014327">"කවුළු බෙදීම %s ලෙස වෙනස් කරන්න"</string>
     <string name="m3_adaptive_default_pane_expansion_proportion_anchor_description" msgid="1205294531112795522">"සියයට %d"</string>
-    <!-- no translation found for m3_adaptive_default_pane_expansion_start_offset_anchor_description (5056616348537665604) -->
-    <skip />
-    <!-- no translation found for m3_adaptive_default_pane_expansion_end_offset_anchor_description (6412636251656811002) -->
-    <skip />
+    <string name="m3_adaptive_default_pane_expansion_start_offset_anchor_description" msgid="5056616348537665604">"ආරම්භයේ සිට %d DPs"</string>
+    <string name="m3_adaptive_default_pane_expansion_end_offset_anchor_description" msgid="6412636251656811002">"අවසානයේ සිට %d DPs"</string>
 </resources>
