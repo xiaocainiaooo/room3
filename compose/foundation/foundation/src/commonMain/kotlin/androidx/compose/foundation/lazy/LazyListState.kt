@@ -123,7 +123,7 @@ class LazyListState
 constructor(
     firstVisibleItemIndex: Int = 0,
     firstVisibleItemScrollOffset: Int = 0,
-    private val prefetchStrategy: LazyListPrefetchStrategy = LazyListPrefetchStrategy(),
+    internal val prefetchStrategy: LazyListPrefetchStrategy = LazyListPrefetchStrategy(),
 ) : ScrollableState {
 
     /**
