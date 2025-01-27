@@ -231,7 +231,7 @@ class EntityTest {
         whenever(mockPlatformAdapter.getMainPanelEntity()).thenReturn(mockPanelEntityImpl)
         session = Session.create(activity, mockPlatformAdapter)
         activitySpace = ActivitySpace.create(mockPlatformAdapter, entityManager)
-        gltfModel = session.createGltfResourceAsync("test.glb").get()
+        gltfModel = GltfModel.create(session, "test.glb").get()
         gltfModelEntity = GltfModelEntity.create(mockPlatformAdapter, entityManager, gltfModel)
         panelEntity =
             PanelEntity.create(
@@ -781,13 +781,13 @@ class EntityTest {
 
     @Test
     fun contentlessEntity_isCreated() {
-        val entity = session.createEntity("test")
+        val entity = ContentlessEntity.create(session, "test")
         assertThat(entity).isNotNull()
     }
 
     @Test
     fun contentlessEntity_canSetPose() {
-        val entity = session.createEntity("test")
+        val entity = ContentlessEntity.create(session, "test")
         val setPose = Pose.Identity
         entity.setPose(setPose)
 
@@ -804,7 +804,7 @@ class EntityTest {
     fun contentlessEntity_canGetPose() {
         whenever(mockContentlessEntity.pose).thenReturn(Pose())
 
-        val entity = session.createEntity("test")
+        val entity = ContentlessEntity.create(session, "test")
         val pose = Pose.Identity
 
         assertThat(entity.getPose()).isEqualTo(pose)
@@ -815,7 +815,7 @@ class EntityTest {
     fun contentlessEntity_canGetActivitySpacePose() {
         whenever(mockContentlessEntity.activitySpacePose).thenReturn(Pose())
 
-        val entity = session.createEntity("test")
+        val entity = ContentlessEntity.create(session, "test")
         val pose = Pose.Identity
 
         assertThat(entity.getActivitySpacePose()).isEqualTo(pose)

@@ -88,7 +88,7 @@ import java.util.concurrent.Executor;
 public class FakeXrExtensions implements XrExtensions {
     private static final String NOT_IMPLEMENTED_IN_FAKE =
             "This function is not implemented yet in FakeXrExtensions.  Please add an"
-                    + " implementation if support is desired for testing.";
+                + " implementation if support is desired for testing.";
 
     @NonNull public final List<FakeNode> createdNodes = new ArrayList<>();
 

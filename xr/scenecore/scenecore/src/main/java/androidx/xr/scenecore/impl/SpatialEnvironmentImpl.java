@@ -390,8 +390,10 @@ final class SpatialEnvironmentImpl implements SpatialEnvironment {
             try (NodeTransaction transaction = mXrExtensions.createNodeTransaction()) {
                 transaction.setParent(prevGeometrySubspaceSplitEngine.subspaceNode, null).apply();
             }
+            // Destroying the subspace will also destroy the underlying Impress node for the
+            // Environment
+            // geometry.
             mSplitEngineSubspaceManager.deleteSubspace(prevGeometrySubspaceSplitEngine.subspaceId);
-            mImpressApi.destroyImpressNode(prevGeometrySubspaceImpressNode);
 
             prevGeometrySubspaceSplitEngine = null;
             prevGeometrySubspaceImpressNode = -1;

@@ -54,11 +54,20 @@ class AnchorTest {
     @Before
     fun setUp() {
         xrResourcesManager = XrResourcesManager()
+        FakeRuntimeAnchor.anchorsCreated = 0
     }
 
     @After
     fun tearDown() {
         xrResourcesManager.clear()
+    }
+
+    @Test
+    fun create_anchorLimitReached_returnsAnchorResourcesExhausted() = createTestSessionAndRunTest {
+        repeat(FakeRuntimeAnchor.ANCHOR_RESOURCE_LIMIT) { Anchor.create(session, Pose()) }
+
+        assertThat(Anchor.create(session, Pose()))
+            .isInstanceOf(AnchorCreateResourcesExhausted::class.java)
     }
 
     @Test
@@ -164,6 +173,27 @@ class AnchorTest {
 
             assertThat(Anchor.load(session, uuid!!)).isInstanceOf(AnchorCreateSuccess::class.java)
         }
+    }
+
+    @Test
+    fun load_anchorLimitReached_returnsAnchorResourcesExhausted() = createTestSessionAndRunTest {
+        runTest {
+            val anchor = (Anchor.create(session, Pose()) as AnchorCreateSuccess).anchor
+            var uuid: UUID? = null
+            val persistJob = launch { uuid = anchor.persist() }
+            val updateJob = launch { anchor.update() }
+            updateJob.join()
+            persistJob.join()
+            repeat(FakeRuntimeAnchor.ANCHOR_RESOURCE_LIMIT - 1) { Anchor.load(session, uuid!!) }
+
+            assertThat(Anchor.load(session, uuid!!))
+                .isInstanceOf(AnchorCreateResourcesExhausted::class.java)
+        }
+    }
+
+    @Test
+    fun loadFromNativePointer_returnsAnchorCreateSuccess() = createTestSessionAndRunTest {
+        assertThat(Anchor.loadFromNativePointer(session, 123L)).isNotNull()
     }
 
     @Test

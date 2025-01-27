@@ -85,8 +85,8 @@ final class StereoSurfaceEntitySplitEngineImpl extends AndroidXrEntity
     public void dispose() {
         // TODO(b/377906324): - Punt this logic to the UI thread, so that applications can destroy
         // StereoSurface entities from any thread.
+        // The subspace impress node will be destroyed when the subspace is deleted.
         mSplitEngineSubspaceManager.deleteSubspace(mSubspace.subspaceId);
-        mImpressApi.destroyImpressNode(mSubspaceImpressNode);
         super.dispose();
     }
 

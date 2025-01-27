@@ -155,9 +155,10 @@ public abstract class SystemSpaceEntityImplTest {
         FakeNode node = (FakeNode) systemSpaceEntity.getNode();
         Mat4f mat4f =
                 new Mat4f( // --                Column major, right handed 4x4 Transformation Matrix
-                        // with
-                        new float[] { // --         translation of (4, 8, 12) and rotation 90 (@)
-                            // around Z axis
+                           // with
+                        new float
+                                [] { // --         translation of (4, 8, 12) and rotation 90 (@)
+                                     // around Z axis
                             0f, 1f, 0f, 0f, // --     cos(@),   sin(@), 0,  0
                             -1f, 0f, 0f, 0f, // --    -sin(@),  cos(@), 0,  0
                             0f, 0f, 1f, 0f, // --     0,        0,      1,  0
@@ -290,9 +291,10 @@ public abstract class SystemSpaceEntityImplTest {
         SystemSpaceEntityImpl systemSpaceEntity = getSystemSpaceEntityImpl();
         Matrix4 matrix =
                 new Matrix4( // --               Column major, right handed 4x4 Transformation
-                        // Matrix with
-                        new float[] { // --         translation of (4, 8, 12) and rotation 90 (@)
-                            // around Z axis
+                             // Matrix with
+                        new float
+                                [] { // --         translation of (4, 8, 12) and rotation 90 (@)
+                                     // around Z axis
                             0f, 1f, 0f, 0f, // --     cos(@),   sin(@), 0,  0
                             -1f, 0f, 0f, 0f, // --    -sin(@),  cos(@), 0,  0
                             0f, 0f, 1f, 0f, // --     0,        0,      1,  0
@@ -312,9 +314,9 @@ public abstract class SystemSpaceEntityImplTest {
         SystemSpaceEntityImpl systemSpaceEntity = getSystemSpaceEntityImpl();
         Matrix4 matrix =
                 new Matrix4( // --               Column major, right handed 4x4 Transformation
-                        // Matrix with
+                             // Matrix with
                         new float // --             translation of (4, 8, 12) and rotation 90 (@)
-                                // around Z axis,
+                                  // around Z axis,
                                 [] { // --              and scale of 3.3.
                             0f, 3.3f, 0f, 0f, // --     cos(@),   sin(@), 0,  0
                             -3.3f, 0f, 0f, 0f, // --    -sin(@),  cos(@), 0,  0

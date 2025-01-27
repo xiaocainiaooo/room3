@@ -30,6 +30,7 @@ import androidx.xr.runtime.math.Quaternion
 import androidx.xr.runtime.math.Ray
 import androidx.xr.runtime.math.Vector3
 import androidx.xr.scenecore.GltfModel
+import androidx.xr.scenecore.GltfModelEntity
 import androidx.xr.scenecore.InputEvent
 import androidx.xr.scenecore.InteractableComponent
 import androidx.xr.scenecore.Session as JxrCoreSession
@@ -59,7 +60,7 @@ internal class AnchorRenderer(
             SupervisorJob(
                 coroutineScope.launch() {
                     gltfAnchorModel =
-                        renderSession.createGltfResourceAsync("models/xyzArrows.glb").await()
+                        GltfModel.create(renderSession, "models/xyzArrows.glb").await()
                     planeRenderer.renderedPlanes.collect { attachInteractableComponents(it) }
                 }
             )
@@ -114,7 +115,12 @@ internal class AnchorRenderer(
                                                 renderedAnchors.add(
                                                     createAnchorModel(anchorResult.anchor)
                                                 )
-                                            is AnchorCreateResourcesExhausted -> {}
+                                            is AnchorCreateResourcesExhausted -> {
+                                                Log.e(
+                                                    activity::class.simpleName,
+                                                    "Failed to create anchor: anchor resources exhausted.",
+                                                )
+                                            }
                                         }
                                     } catch (e: IllegalStateException) {
                                         Log.e(
@@ -131,7 +137,7 @@ internal class AnchorRenderer(
     }
 
     private fun createAnchorModel(anchor: Anchor): AnchorModel {
-        val entity = renderSession.createGltfEntity(gltfAnchorModel, Pose())
+        val entity = GltfModelEntity.create(renderSession, gltfAnchorModel, Pose())
         entity.setScale(.1f)
         val renderJob =
             coroutineScope.launch(updateJob) {

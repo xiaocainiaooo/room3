@@ -82,4 +82,8 @@ internal class MovableNode(
     public var enabled: Boolean,
     public var stickyPose: Boolean,
     public var onPoseChange: (Pose) -> Boolean,
-) : SubspaceModifier.Node()
+) : SubspaceModifier.Node(), CoreEntityNode {
+    override fun modifyCoreEntity(coreEntity: CoreEntity) {
+        coreEntity.movable?.updateState(this)
+    }
+}

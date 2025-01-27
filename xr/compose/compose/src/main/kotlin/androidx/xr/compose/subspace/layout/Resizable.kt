@@ -107,4 +107,8 @@ internal class ResizableNode(
     internal var maximumSize: DpVolumeSize,
     internal var maintainAspectRatio: Boolean,
     internal var onSizeChange: (IntVolumeSize) -> Boolean,
-) : SubspaceModifier.Node()
+) : SubspaceModifier.Node(), CoreEntityNode {
+    override fun modifyCoreEntity(coreEntity: CoreEntity) {
+        coreEntity.resizable?.updateState(this)
+    }
+}

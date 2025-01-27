@@ -46,14 +46,14 @@ package androidx.xr.compose.testing {
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class SubspaceSemanticsMatcher {
-    ctor public SubspaceSemanticsMatcher(String description, kotlin.jvm.functions.Function1<? super androidx.xr.compose.subspace.node.SubspaceSemanticsNode,java.lang.Boolean> matcher);
+    ctor public SubspaceSemanticsMatcher(String description, kotlin.jvm.functions.Function1<? super androidx.xr.compose.subspace.node.SubspaceSemanticsInfo,java.lang.Boolean> matcher);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class SubspaceSemanticsNodeInteraction {
     ctor public SubspaceSemanticsNodeInteraction(androidx.xr.compose.testing.SubspaceTestContext testContext, androidx.xr.compose.testing.SubspaceSemanticsMatcher matcher);
     method public void assertDoesNotExist();
     method @com.google.errorprone.annotations.CanIgnoreReturnValue public androidx.xr.compose.testing.SubspaceSemanticsNodeInteraction assertExists(optional String? errorMessageOnFail);
-    method public androidx.xr.compose.subspace.node.SubspaceSemanticsNode fetchSemanticsNode(optional String? errorMessageOnFail);
+    method public androidx.xr.compose.subspace.node.SubspaceSemanticsInfo fetchSemanticsNode(optional String? errorMessageOnFail);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class SubspaceSemanticsNodeInteractionCollection {
