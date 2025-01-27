@@ -16,7 +16,6 @@
 
 package androidx.xr.compose.spatial
 
-import android.view.View
 import androidx.annotation.RestrictTo
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -24,29 +23,30 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.ComposableOpenTarget
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.UiComposable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.xr.compose.platform.LocalCoreEntity
 import androidx.xr.compose.platform.LocalDialogManager
-import androidx.xr.compose.platform.LocalPanelEntity
 import androidx.xr.compose.platform.LocalSession
 import androidx.xr.compose.platform.LocalSpatialCapabilities
+import androidx.xr.compose.platform.coreMainPanelEntity
 import androidx.xr.compose.spatial.EdgeOffset.Companion.outer
 import androidx.xr.compose.subspace.layout.SpatialRoundedCornerShape
 import androidx.xr.compose.subspace.layout.SpatialShape
@@ -115,6 +115,7 @@ public class OrbiterSettings(
  * ```
  */
 @Composable
+@ComposableOpenTarget(index = -1)
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun Orbiter(
     position: OrbiterEdge.Horizontal,
@@ -122,7 +123,7 @@ public fun Orbiter(
     alignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     settings: OrbiterSettings = OrbiterDefaults.orbiterSettings,
     shape: SpatialShape = OrbiterDefaults.shape,
-    content: @Composable () -> Unit,
+    content: @Composable @UiComposable () -> Unit,
 ) {
     Orbiter(
         OrbiterData(
@@ -158,6 +159,7 @@ public fun Orbiter(
  * ```
  */
 @Composable
+@ComposableOpenTarget(index = -1)
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun Orbiter(
     position: OrbiterEdge.Horizontal,
@@ -165,7 +167,7 @@ public fun Orbiter(
     alignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     settings: OrbiterSettings = OrbiterDefaults.orbiterSettings,
     shape: SpatialShape = OrbiterDefaults.shape,
-    content: @Composable () -> Unit,
+    content: @Composable @UiComposable () -> Unit,
 ) {
     Orbiter(
         OrbiterData(
@@ -198,6 +200,7 @@ public fun Orbiter(
  * ```
  */
 @Composable
+@ComposableOpenTarget(index = -1)
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun Orbiter(
     position: OrbiterEdge.Vertical,
@@ -205,7 +208,7 @@ public fun Orbiter(
     alignment: Alignment.Vertical = Alignment.CenterVertically,
     settings: OrbiterSettings = OrbiterDefaults.orbiterSettings,
     shape: SpatialShape = OrbiterDefaults.shape,
-    content: @Composable () -> Unit,
+    content: @Composable @UiComposable () -> Unit,
 ) {
     Orbiter(
         OrbiterData(
@@ -241,6 +244,7 @@ public fun Orbiter(
  * ```
  */
 @Composable
+@ComposableOpenTarget(index = -1)
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public fun Orbiter(
     position: OrbiterEdge.Vertical,
@@ -248,7 +252,7 @@ public fun Orbiter(
     alignment: Alignment.Vertical = Alignment.CenterVertically,
     settings: OrbiterSettings = OrbiterDefaults.orbiterSettings,
     shape: SpatialShape = OrbiterDefaults.shape,
-    content: @Composable () -> Unit,
+    content: @Composable @UiComposable () -> Unit,
 ) {
     Orbiter(
         OrbiterData(
@@ -273,27 +277,28 @@ private fun Orbiter(data: OrbiterData) {
 
 @Composable
 internal fun PositionedOrbiter(data: OrbiterData) {
-    val view = LocalView.current
     val session = checkNotNull(LocalSession.current) { "session must be initialized" }
-    val panelEntity = LocalPanelEntity.current ?: session.mainPanelEntity
-    var panelSize by remember { mutableStateOf(panelEntity.getPixelDimensions()) }
+    val entity = LocalCoreEntity.current ?: session.coreMainPanelEntity
     var contentSize: IntSize? by remember { mutableStateOf(null) }
     val dialogManager = LocalDialogManager.current
     val density = LocalDensity.current
-
-    DisposableEffect(view) {
-        val listener =
-            View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-                panelSize = panelEntity.getPixelDimensions()
-            }
-        view.addOnLayoutChangeListener(listener)
-        onDispose { view.removeOnLayoutChangeListener(listener) }
-    }
+    val panelSize = entity.size
 
     ElevatedPanel(
-        spatialElevationLevel = SpatialElevationLevel.Level1,
         contentSize = contentSize ?: IntSize.Zero,
-        contentOffset = contentSize?.let { data.calculateOffset(panelSize, it, density) },
+        pose =
+            contentSize?.let {
+                rememberCalculatePose(
+                    data.calculateOffset(
+                        panelSize.run { PixelDimensions(width, height) },
+                        it,
+                        density
+                    ),
+                    panelSize.run { IntSize(width, height) },
+                    it,
+                    SpatialElevationLevel.Level1.level,
+                )
+            },
         shape = data.shape,
     ) {
         Box(

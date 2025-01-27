@@ -68,6 +68,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
     private Anchor mAnchor;
     private UUID mUuid = null;
     private PersistStateChangeListener mPersistStateChangeListener;
+    private final OpenXrActivityPoseHelper mOpenXrActivityPoseHelper;
 
     private static class AnchorCreationData {
 
@@ -235,7 +236,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
             Log.e(
                     TAG,
                     "ActivitySpace is not an instance of ActivitySpaceImpl.Anchor is in Error"
-                            + " state.");
+                        + " state.");
             mState = State.ERROR;
             mActivitySpace = null;
         }
@@ -246,9 +247,17 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
             Log.e(
                     TAG,
                     "ActivitySpaceRoot is not an instance of AndroidXrEntity. Anchor is in Error"
-                            + " state.");
+                        + " state.");
             mState = State.ERROR;
             mActivitySpaceRoot = null;
+        }
+
+        if (mActivitySpace != null && mActivitySpaceRoot != null) {
+            mOpenXrActivityPoseHelper =
+                    new OpenXrActivityPoseHelper(
+                            (ActivitySpaceImpl) activitySpace, (AndroidXrEntity) activitySpaceRoot);
+        } else {
+            mOpenXrActivityPoseHelper = null;
         }
 
         // Return early if the state is already in an error state.
@@ -507,7 +516,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
                 Log.i(
                         TAG,
                         "Anchor is disposed before becoming persisted, stop checking its persist"
-                                + " state.");
+                            + " state.");
                 return;
             }
             if (mAnchor.getPersistState() == Anchor.PersistState.PERSISTED) {
@@ -561,11 +570,10 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
         throw new UnsupportedOperationException("Cannot set 'scale' on an AnchorEntity.");
     }
 
-    // TODO: b/360168321 Use the OpenXrPosableHelper when retrieving the pose in activity space.
     @Override
     public Pose getPoseInActivitySpace() {
         synchronized (this) {
-            if (mActivitySpace == null) {
+            if (mActivitySpace == null || mOpenXrActivityPoseHelper == null) {
                 throw new IllegalStateException(
                         "Cannot get pose in Activity Space with a null Activity Space.");
             }
@@ -574,49 +582,28 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
                 Log.w(
                         TAG,
                         "Cannot retrieve pose in underlying space. Ensure that the anchor is"
-                                + " anchored before calling this method. Returning identity pose.");
+                            + " anchored before calling this method. Returning identity pose.");
                 return new Pose();
             }
 
-            // ActivitySpace and the anchor have unit scale and the anchor has no direct parent so
-            // we can
-            // just compose the two poses without scaling.
-            final Pose openXrToAnchor = this.getPoseInOpenXrReferenceSpace();
-            final Pose openXrToActivitySpace = mActivitySpace.getPoseInOpenXrReferenceSpace();
-            if (openXrToActivitySpace == null || openXrToAnchor == null) {
-                Log.e(
-                        TAG,
-                        "Cannot retrieve pose in underlying space despite anchor being anchored."
-                                + " Returning identity pose.");
-                return new Pose();
-            }
-
-            final Pose activitySpaceToOpenXr = openXrToActivitySpace.getInverse();
-            return activitySpaceToOpenXr.compose(openXrToAnchor);
+            return mOpenXrActivityPoseHelper.getPoseInActivitySpace(
+                    getPoseInOpenXrReferenceSpace());
         }
     }
 
     // TODO: b/360168321 Use the OpenXrPosableHelper when retrieving the pose in world space.
     @Override
     public Pose getActivitySpacePose() {
-        if (mActivitySpaceRoot == null) {
+        if (mOpenXrActivityPoseHelper == null) {
             throw new IllegalStateException(
-                    "Cannot get pose in World Space Pose with a null World Space Entity.");
+                    "Cannot get pose in Activity Space. Anchor initialized in Error state.");
         }
-
-        // ActivitySpace and the anchor have unit scale and the anchor has no direct parent so we
-        // can
-        // just
-        // compose the two poses without scaling.
-        final Pose activitySpaceToAnchor = this.getPoseInActivitySpace();
-        final Pose worldSpaceToActivitySpace =
-                mActivitySpaceRoot.getPoseInActivitySpace().getInverse();
-        return worldSpaceToActivitySpace.compose(activitySpaceToAnchor);
+        return mOpenXrActivityPoseHelper.getActivitySpacePose(getPoseInOpenXrReferenceSpace());
     }
 
     @Override
     public Vector3 getActivitySpaceScale() {
-        return getWorldSpaceScale().div(mActivitySpace.getWorldSpaceScale());
+        return mOpenXrActivityPoseHelper.getActivitySpaceScale(getWorldSpaceScale());
     }
 
     @Override

@@ -48,7 +48,7 @@ package androidx.xr.arcore {
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class HitResult {
-    method public androidx.xr.arcore.Anchor createAnchor();
+    method public androidx.xr.arcore.AnchorCreateResult createAnchor();
     method public float getDistance();
     method public androidx.xr.runtime.math.Pose getHitPose();
     method public androidx.xr.arcore.Trackable<androidx.xr.arcore.Trackable.State> getTrackable();
@@ -73,7 +73,7 @@ package androidx.xr.arcore {
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class Plane implements androidx.xr.arcore.Trackable<androidx.xr.arcore.Plane.State> {
-    method public androidx.xr.arcore.Anchor createAnchor(androidx.xr.runtime.math.Pose pose);
+    method public androidx.xr.arcore.AnchorCreateResult createAnchor(androidx.xr.runtime.math.Pose pose);
     method public kotlinx.coroutines.flow.StateFlow<androidx.xr.arcore.Plane.State> getState();
     method public androidx.xr.arcore.Plane.Type getType();
     method public static kotlinx.coroutines.flow.StateFlow<java.util.Collection<androidx.xr.arcore.Plane>> subscribe(androidx.xr.runtime.Session session);
@@ -134,7 +134,7 @@ package androidx.xr.arcore {
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface Trackable<State> {
-    method public androidx.xr.arcore.Anchor createAnchor(androidx.xr.runtime.math.Pose pose);
+    method public androidx.xr.arcore.AnchorCreateResult createAnchor(androidx.xr.runtime.math.Pose pose);
     method public kotlinx.coroutines.flow.StateFlow<androidx.xr.arcore.Trackable.State> getState();
     property public abstract kotlinx.coroutines.flow.StateFlow<androidx.xr.arcore.Trackable.State> state;
   }

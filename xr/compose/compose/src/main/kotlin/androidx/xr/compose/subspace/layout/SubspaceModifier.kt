@@ -86,6 +86,36 @@ public interface SubspaceModifier {
                 null
             }
         }
+
+        /**
+         * Indicates that the node is attached to a [SubspaceLayout] which is part of the UI tree.
+         * This will get set to true right before [onAttach] is called, and set to false right after
+         * [onDetach] is called.
+         *
+         * @see onAttach
+         * @see onDetach
+         */
+        public var isAttached: Boolean = false
+            private set
+
+        internal open fun markAsAttached() {
+            check(!isAttached) { "Cannot attach node that is already attached!" }
+            isAttached = true
+        }
+
+        internal open fun markAsDetached() {
+            check(isAttached) { "Cannot detach node that is not attached!" }
+            isAttached = false
+        }
+
+        /** Called when the node is attached to a [SubspaceLayout] which is part of the UI tree. */
+        public open fun onAttach() {}
+
+        /**
+         * Called when the node is not attached to a [SubspaceLayout] anymore. Note that the node
+         * can be reattached again.
+         */
+        public open fun onDetach() {}
     }
 
     /**

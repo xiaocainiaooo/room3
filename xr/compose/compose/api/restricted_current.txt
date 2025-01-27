@@ -18,7 +18,7 @@ package androidx.xr.compose.platform {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class SceneManager implements java.lang.AutoCloseable {
     method public void close();
-    method public java.util.List<androidx.xr.compose.subspace.node.SubspaceSemanticsNode> getAllRootSubspaceSemanticsNodes();
+    method public java.util.List<androidx.xr.compose.subspace.node.SubspaceSemanticsInfo> getAllRootSubspaceSemanticsNodes();
     method public int getSceneCount();
     method public void start();
     method public void stop();
@@ -169,10 +169,10 @@ package androidx.xr.compose.spatial {
   }
 
   public final class OrbiterKt {
-    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) @androidx.compose.runtime.Composable public static void Orbiter(int position, androidx.xr.compose.spatial.EdgeOffset offset, optional androidx.compose.ui.Alignment.Horizontal alignment, optional androidx.xr.compose.spatial.OrbiterSettings settings, optional androidx.xr.compose.subspace.layout.SpatialShape shape, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) @androidx.compose.runtime.Composable public static void Orbiter(int position, androidx.xr.compose.spatial.EdgeOffset offset, optional androidx.compose.ui.Alignment.Vertical alignment, optional androidx.xr.compose.spatial.OrbiterSettings settings, optional androidx.xr.compose.subspace.layout.SpatialShape shape, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) @androidx.compose.runtime.Composable public static void Orbiter(int position, optional float offset, optional androidx.compose.ui.Alignment.Horizontal alignment, optional androidx.xr.compose.spatial.OrbiterSettings settings, optional androidx.xr.compose.subspace.layout.SpatialShape shape, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) @androidx.compose.runtime.Composable public static void Orbiter(int position, optional float offset, optional androidx.compose.ui.Alignment.Vertical alignment, optional androidx.xr.compose.spatial.OrbiterSettings settings, optional androidx.xr.compose.subspace.layout.SpatialShape shape, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableOpenTarget(index=0xffffffff) public static void Orbiter(int position, androidx.xr.compose.spatial.EdgeOffset offset, optional androidx.compose.ui.Alignment.Horizontal alignment, optional androidx.xr.compose.spatial.OrbiterSettings settings, optional androidx.xr.compose.subspace.layout.SpatialShape shape, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableOpenTarget(index=0xffffffff) public static void Orbiter(int position, androidx.xr.compose.spatial.EdgeOffset offset, optional androidx.compose.ui.Alignment.Vertical alignment, optional androidx.xr.compose.spatial.OrbiterSettings settings, optional androidx.xr.compose.subspace.layout.SpatialShape shape, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableOpenTarget(index=0xffffffff) public static void Orbiter(int position, optional float offset, optional androidx.compose.ui.Alignment.Horizontal alignment, optional androidx.xr.compose.spatial.OrbiterSettings settings, optional androidx.xr.compose.subspace.layout.SpatialShape shape, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableOpenTarget(index=0xffffffff) public static void Orbiter(int position, optional float offset, optional androidx.compose.ui.Alignment.Vertical alignment, optional androidx.xr.compose.spatial.OrbiterSettings settings, optional androidx.xr.compose.subspace.layout.SpatialShape shape, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) @kotlin.jvm.JvmInline public final value class OrbiterOffsetType {
@@ -621,6 +621,10 @@ package androidx.xr.compose.subspace.layout {
 
   public abstract static class SubspaceModifier.Node {
     ctor public SubspaceModifier.Node();
+    method public final boolean isAttached();
+    method public void onAttach();
+    method public void onDetach();
+    property public final boolean isAttached;
   }
 
   public final class SubspaceModifierKt {
@@ -646,8 +650,16 @@ package androidx.xr.compose.subspace.layout {
 
 package androidx.xr.compose.subspace.node {
 
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface LayoutCoordinatesAwareModifierNode {
+    method public void onLayoutCoordinates(androidx.xr.compose.subspace.layout.SubspaceLayoutCoordinates coordinates);
+  }
+
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface SubspaceLayoutModifierNode {
     method public androidx.xr.compose.subspace.layout.MeasureResult measure(androidx.xr.compose.subspace.layout.MeasureScope, androidx.xr.compose.subspace.layout.Measurable measurable, androidx.xr.compose.unit.VolumeConstraints constraints);
+  }
+
+  public final class SubspaceLayoutModifierNodeKt {
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static void requestRelayout(androidx.xr.compose.subspace.node.SubspaceLayoutModifierNode);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public abstract class SubspaceModifierElement<N extends androidx.xr.compose.subspace.layout.SubspaceModifier.Node> implements androidx.xr.compose.subspace.layout.SubspaceModifier {
@@ -658,35 +670,33 @@ package androidx.xr.compose.subspace.node {
     method public abstract void update(N node);
   }
 
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface SubspaceSemanticsModifierNode {
-    method public void applySemantics(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface SubspaceSemanticsInfo {
+    method public default java.util.List<androidx.xr.scenecore.Component>? getComponents();
+    method public androidx.compose.ui.semantics.SemanticsConfiguration getConfig();
+    method public androidx.xr.runtime.math.Pose getPose();
+    method public androidx.xr.runtime.math.Pose getPoseInRoot();
+    method public default float getScale();
+    method public java.util.List<androidx.xr.compose.subspace.node.SubspaceSemanticsInfo> getSemanticsChildren();
+    method public androidx.xr.scenecore.Entity? getSemanticsEntity();
+    method public int getSemanticsId();
+    method public androidx.xr.compose.subspace.node.SubspaceSemanticsInfo? getSemanticsParent();
+    method public androidx.xr.compose.unit.IntVolumeSize getSize();
+    method public default boolean isRoot();
+    property public default java.util.List<androidx.xr.scenecore.Component>? components;
+    property public abstract androidx.compose.ui.semantics.SemanticsConfiguration config;
+    property public default boolean isRoot;
+    property public abstract androidx.xr.runtime.math.Pose pose;
+    property public abstract androidx.xr.runtime.math.Pose poseInRoot;
+    property public default float scale;
+    property public abstract java.util.List<androidx.xr.compose.subspace.node.SubspaceSemanticsInfo> semanticsChildren;
+    property public abstract androidx.xr.scenecore.Entity? semanticsEntity;
+    property public abstract int semanticsId;
+    property public abstract androidx.xr.compose.subspace.node.SubspaceSemanticsInfo? semanticsParent;
+    property public abstract androidx.xr.compose.unit.IntVolumeSize size;
   }
 
-  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class SubspaceSemanticsNode {
-    method public java.util.List<androidx.xr.compose.subspace.node.SubspaceSemanticsNode> getChildren();
-    method public java.util.List<androidx.xr.scenecore.Component>? getComponents();
-    method public androidx.compose.ui.semantics.SemanticsConfiguration getConfig();
-    method public int getId();
-    method public androidx.xr.compose.subspace.node.SubspaceSemanticsNode? getParent();
-    method public androidx.xr.runtime.math.Vector3 getPosition();
-    method public androidx.xr.runtime.math.Vector3 getPositionInRoot();
-    method public androidx.xr.runtime.math.Quaternion getRotation();
-    method public androidx.xr.runtime.math.Quaternion getRotationInRoot();
-    method public float getScale();
-    method public androidx.xr.compose.unit.IntVolumeSize getSize();
-    method public boolean isRoot();
-    property public final java.util.List<androidx.xr.compose.subspace.node.SubspaceSemanticsNode> children;
-    property public final java.util.List<androidx.xr.scenecore.Component>? components;
-    property public final androidx.compose.ui.semantics.SemanticsConfiguration config;
-    property public final int id;
-    property public final boolean isRoot;
-    property public final androidx.xr.compose.subspace.node.SubspaceSemanticsNode? parent;
-    property public final androidx.xr.runtime.math.Vector3 position;
-    property public final androidx.xr.runtime.math.Vector3 positionInRoot;
-    property public final androidx.xr.runtime.math.Quaternion rotation;
-    property public final androidx.xr.runtime.math.Quaternion rotationInRoot;
-    property public final float scale;
-    property public final androidx.xr.compose.unit.IntVolumeSize size;
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface SubspaceSemanticsModifierNode {
+    method public void applySemantics(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
   }
 
 }

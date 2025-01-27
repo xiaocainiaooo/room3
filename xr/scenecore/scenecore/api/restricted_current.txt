@@ -549,9 +549,17 @@ package androidx.xr.extensions.subspace {
 package androidx.xr.scenecore {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class ActivityPanelEntity extends androidx.xr.scenecore.PanelEntity {
+    method public static androidx.xr.scenecore.ActivityPanelEntity create(androidx.xr.scenecore.Session session, android.graphics.Rect windowBoundsPx, String name);
+    method public static androidx.xr.scenecore.ActivityPanelEntity create(androidx.xr.scenecore.Session session, android.graphics.Rect windowBoundsPx, String name, optional androidx.xr.runtime.math.Pose pose);
     method public void launchActivity(android.content.Intent intent);
     method public void launchActivity(android.content.Intent intent, optional android.os.Bundle? bundle);
     method public void moveActivity(android.app.Activity activity);
+    field public static final androidx.xr.scenecore.ActivityPanelEntity.Companion Companion;
+  }
+
+  public static final class ActivityPanelEntity.Companion {
+    method public androidx.xr.scenecore.ActivityPanelEntity create(androidx.xr.scenecore.Session session, android.graphics.Rect windowBoundsPx, String name);
+    method public androidx.xr.scenecore.ActivityPanelEntity create(androidx.xr.scenecore.Session session, android.graphics.Rect windowBoundsPx, String name, optional androidx.xr.runtime.math.Pose pose);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public interface ActivityPose {
@@ -571,6 +579,9 @@ package androidx.xr.scenecore {
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class AnchorEntity extends androidx.xr.scenecore.BaseEntity<androidx.xr.scenecore.JxrPlatformAdapter.AnchorEntity> {
+    method public static androidx.xr.scenecore.AnchorEntity create(androidx.xr.scenecore.Session session, androidx.xr.arcore.Anchor anchor);
+    method public static androidx.xr.scenecore.AnchorEntity create(androidx.xr.scenecore.Session session, androidx.xr.scenecore.Dimensions bounds, int planeType, int planeSemantic);
+    method public static androidx.xr.scenecore.AnchorEntity create(androidx.xr.scenecore.Session session, androidx.xr.scenecore.Dimensions bounds, int planeType, int planeSemantic, optional java.time.Duration timeout);
     method public androidx.xr.arcore.Anchor getAnchor(androidx.xr.runtime.Session session);
     method public androidx.xr.scenecore.AnchorEntity.PersistState getPersistState();
     method public int getState();
@@ -578,6 +589,13 @@ package androidx.xr.scenecore {
     method public void setOnSpaceUpdatedListener(androidx.xr.scenecore.OnSpaceUpdatedListener? listener);
     method public void setOnSpaceUpdatedListener(androidx.xr.scenecore.OnSpaceUpdatedListener? listener, optional java.util.concurrent.Executor? executor);
     method public void setOnStateChangedListener(androidx.xr.scenecore.OnStateChangedListener? onStateChangedListener);
+    field public static final androidx.xr.scenecore.AnchorEntity.Companion Companion;
+  }
+
+  public static final class AnchorEntity.Companion {
+    method public androidx.xr.scenecore.AnchorEntity create(androidx.xr.scenecore.Session session, androidx.xr.arcore.Anchor anchor);
+    method public androidx.xr.scenecore.AnchorEntity create(androidx.xr.scenecore.Session session, androidx.xr.scenecore.Dimensions bounds, int planeType, int planeSemantic);
+    method public androidx.xr.scenecore.AnchorEntity create(androidx.xr.scenecore.Session session, androidx.xr.scenecore.Dimensions bounds, int planeType, int planeSemantic, optional java.time.Duration timeout);
   }
 
   public enum AnchorEntity.PersistState {
@@ -669,6 +687,14 @@ package androidx.xr.scenecore {
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class ContentlessEntity extends androidx.xr.scenecore.BaseEntity<androidx.xr.scenecore.JxrPlatformAdapter.Entity> {
+    method public static androidx.xr.scenecore.Entity create(androidx.xr.scenecore.Session session, String name);
+    method public static androidx.xr.scenecore.Entity create(androidx.xr.scenecore.Session session, String name, optional androidx.xr.runtime.math.Pose pose);
+    field public static final androidx.xr.scenecore.ContentlessEntity.Companion Companion;
+  }
+
+  public static final class ContentlessEntity.Companion {
+    method public androidx.xr.scenecore.Entity create(androidx.xr.scenecore.Session session, String name);
+    method public androidx.xr.scenecore.Entity create(androidx.xr.scenecore.Session session, String name, optional androidx.xr.runtime.math.Pose pose);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class Dimensions {
@@ -712,8 +738,14 @@ package androidx.xr.scenecore {
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class ExrImage implements androidx.xr.scenecore.Image {
+    method public static androidx.xr.scenecore.ExrImage create(androidx.xr.scenecore.Session session, String name);
     method public androidx.xr.scenecore.JxrPlatformAdapter.ExrImageResource getImage();
     property public final androidx.xr.scenecore.JxrPlatformAdapter.ExrImageResource image;
+    field public static final androidx.xr.scenecore.ExrImage.Companion Companion;
+  }
+
+  public static final class ExrImage.Companion {
+    method public androidx.xr.scenecore.ExrImage create(androidx.xr.scenecore.Session session, String name);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class Fov {
@@ -734,15 +766,24 @@ package androidx.xr.scenecore {
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class GltfModel implements androidx.xr.scenecore.Model {
+    method @MainThread public static com.google.common.util.concurrent.ListenableFuture<androidx.xr.scenecore.GltfModel> create(androidx.xr.scenecore.Session session, String name);
     method public androidx.xr.scenecore.JxrPlatformAdapter.GltfModelResource getModel();
     property public final androidx.xr.scenecore.JxrPlatformAdapter.GltfModelResource model;
+    field public static final androidx.xr.scenecore.GltfModel.Companion Companion;
+  }
+
+  public static final class GltfModel.Companion {
+    method @MainThread public com.google.common.util.concurrent.ListenableFuture<androidx.xr.scenecore.GltfModel> create(androidx.xr.scenecore.Session session, String name);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class GltfModelEntity extends androidx.xr.scenecore.BaseEntity<androidx.xr.scenecore.JxrPlatformAdapter.GltfEntity> {
+    method @MainThread public static androidx.xr.scenecore.GltfModelEntity create(androidx.xr.scenecore.Session session, androidx.xr.scenecore.GltfModel model);
+    method @MainThread public static androidx.xr.scenecore.GltfModelEntity create(androidx.xr.scenecore.Session session, androidx.xr.scenecore.GltfModel model, optional androidx.xr.runtime.math.Pose pose);
     method public int getAnimationState();
     method @MainThread public void startAnimation(boolean loop);
     method @MainThread public void startAnimation(boolean loop, optional String? animationName);
     method @MainThread public void stopAnimation();
+    field public static final androidx.xr.scenecore.GltfModelEntity.Companion Companion;
   }
 
   public static final class GltfModelEntity.AnimationState {
@@ -751,6 +792,11 @@ package androidx.xr.scenecore {
     field public static final androidx.xr.scenecore.GltfModelEntity.AnimationState INSTANCE;
     field public static final int PLAYING = 0; // 0x0
     field public static final int STOPPED = 1; // 0x1
+  }
+
+  public static final class GltfModelEntity.Companion {
+    method @MainThread public androidx.xr.scenecore.GltfModelEntity create(androidx.xr.scenecore.Session session, androidx.xr.scenecore.GltfModel model);
+    method @MainThread public androidx.xr.scenecore.GltfModelEntity create(androidx.xr.scenecore.Session session, androidx.xr.scenecore.GltfModel model, optional androidx.xr.runtime.math.Pose pose);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class Head extends androidx.xr.scenecore.BaseActivityPose<androidx.xr.scenecore.JxrPlatformAdapter.HeadActivityPose> {
@@ -1298,8 +1344,16 @@ package androidx.xr.scenecore {
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public class PanelEntity extends androidx.xr.scenecore.BasePanelEntity<androidx.xr.scenecore.JxrPlatformAdapter.PanelEntity> {
+    method public static final androidx.xr.scenecore.PanelEntity create(androidx.xr.scenecore.Session session, android.view.View view, androidx.xr.scenecore.Dimensions surfaceDimensionsPx, androidx.xr.scenecore.Dimensions dimensions, String name);
+    method public static final androidx.xr.scenecore.PanelEntity create(androidx.xr.scenecore.Session session, android.view.View view, androidx.xr.scenecore.Dimensions surfaceDimensionsPx, androidx.xr.scenecore.Dimensions dimensions, String name, optional androidx.xr.runtime.math.Pose pose);
     method public final boolean isMainPanelEntity();
     property public final boolean isMainPanelEntity;
+    field public static final androidx.xr.scenecore.PanelEntity.Companion Companion;
+  }
+
+  public static final class PanelEntity.Companion {
+    method public androidx.xr.scenecore.PanelEntity create(androidx.xr.scenecore.Session session, android.view.View view, androidx.xr.scenecore.Dimensions surfaceDimensionsPx, androidx.xr.scenecore.Dimensions dimensions, String name);
+    method public androidx.xr.scenecore.PanelEntity create(androidx.xr.scenecore.Session session, android.view.View view, androidx.xr.scenecore.Dimensions surfaceDimensionsPx, androidx.xr.scenecore.Dimensions dimensions, String name, optional androidx.xr.runtime.math.Pose pose);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class PerceptionSpace extends androidx.xr.scenecore.BaseActivityPose<androidx.xr.scenecore.JxrPlatformAdapter.PerceptionSpaceActivityPose> {
@@ -1427,25 +1481,8 @@ package androidx.xr.scenecore {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class Session {
     ctor public Session(android.app.Activity activity, androidx.xr.scenecore.JxrPlatformAdapter platformAdapter, androidx.xr.scenecore.SpatialEnvironment spatialEnvironment);
-    method public void addSpatialCapabilitiesChangedListener(java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
-    method public void addSpatialCapabilitiesChangedListener(java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
-    method @Deprecated public boolean canEmbedActivityPanel(android.app.Activity activity);
     method public static androidx.xr.scenecore.Session create(android.app.Activity activity);
     method public static androidx.xr.scenecore.Session create(android.app.Activity activity, optional androidx.xr.scenecore.JxrPlatformAdapter? platformAdapter);
-    method public androidx.xr.scenecore.ActivityPanelEntity createActivityPanelEntity(android.graphics.Rect windowBoundsPx, String name);
-    method public androidx.xr.scenecore.ActivityPanelEntity createActivityPanelEntity(android.graphics.Rect windowBoundsPx, String name, optional androidx.xr.runtime.math.Pose pose);
-    method public androidx.xr.scenecore.AnchorEntity createAnchorEntity(androidx.xr.arcore.Anchor anchor);
-    method public androidx.xr.scenecore.AnchorEntity createAnchorEntity(androidx.xr.scenecore.Dimensions bounds, int planeType, int planeSemantic);
-    method public androidx.xr.scenecore.AnchorEntity createAnchorEntity(androidx.xr.scenecore.Dimensions bounds, int planeType, int planeSemantic, optional java.time.Duration timeout);
-    method public androidx.xr.scenecore.Entity createEntity(String name);
-    method public androidx.xr.scenecore.Entity createEntity(String name, optional androidx.xr.runtime.math.Pose pose);
-    method public androidx.xr.scenecore.ExrImage createExrImageResource(String name);
-    method @MainThread public androidx.xr.scenecore.GltfModelEntity createGltfEntity(androidx.xr.scenecore.GltfModel model);
-    method @MainThread public androidx.xr.scenecore.GltfModelEntity createGltfEntity(androidx.xr.scenecore.GltfModel model, optional androidx.xr.runtime.math.Pose pose);
-    method @MainThread public com.google.common.util.concurrent.ListenableFuture<androidx.xr.scenecore.GltfModel> createGltfResourceAsync(String name);
-    method public androidx.xr.scenecore.PanelEntity createPanelEntity(android.view.View view, androidx.xr.scenecore.Dimensions surfaceDimensionsPx, androidx.xr.scenecore.Dimensions dimensions, String name);
-    method public androidx.xr.scenecore.PanelEntity createPanelEntity(android.view.View view, androidx.xr.scenecore.Dimensions surfaceDimensionsPx, androidx.xr.scenecore.Dimensions dimensions, String name, optional androidx.xr.runtime.math.Pose pose);
-    method public androidx.xr.scenecore.AnchorEntity createPersistedAnchorEntity(java.util.UUID uuid);
     method public android.app.Activity getActivity();
     method public androidx.xr.scenecore.ActivitySpace getActivitySpace();
     method public androidx.xr.scenecore.Entity getActivitySpaceRoot();
@@ -1453,15 +1490,11 @@ package androidx.xr.scenecore {
     method public androidx.xr.scenecore.PanelEntity getMainPanelEntity();
     method public androidx.xr.scenecore.PerceptionSpace getPerceptionSpace();
     method public androidx.xr.scenecore.JxrPlatformAdapter getPlatformAdapter();
-    method public androidx.xr.scenecore.SpatialCapabilities getSpatialCapabilities();
     method public androidx.xr.scenecore.SpatialEnvironment getSpatialEnvironment();
     method public androidx.xr.scenecore.SpatialUser getSpatialUser();
-    method @Deprecated public boolean hasSpatialCapability(int capability);
-    method public void removeSpatialCapabilitiesChangedListener(java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
     method public android.os.Bundle setFullSpaceMode(android.os.Bundle bundle);
     method public android.os.Bundle setFullSpaceModeWithEnvironmentInherited(android.os.Bundle bundle);
     method public void setPreferredAspectRatio(android.app.Activity activity, float preferredRatio);
-    method public boolean unpersistAnchor(java.util.UUID uuid);
     property public final android.app.Activity activity;
     property public final androidx.xr.scenecore.ActivitySpace activitySpace;
     property public final androidx.xr.scenecore.Entity activitySpaceRoot;
@@ -1476,6 +1509,13 @@ package androidx.xr.scenecore {
   public static final class Session.Companion {
     method public androidx.xr.scenecore.Session create(android.app.Activity activity);
     method public androidx.xr.scenecore.Session create(android.app.Activity activity, optional androidx.xr.scenecore.JxrPlatformAdapter? platformAdapter);
+  }
+
+  public final class SessionExt {
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static void addSpatialCapabilitiesChangedListener(androidx.xr.scenecore.Session, java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static void addSpatialCapabilitiesChangedListener(androidx.xr.scenecore.Session, java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static androidx.xr.scenecore.SpatialCapabilities getSpatialCapabilities(androidx.xr.scenecore.Session);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static void removeSpatialCapabilitiesChangedListener(androidx.xr.scenecore.Session, java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class SoundFieldAttributes {
