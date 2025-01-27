@@ -568,7 +568,7 @@ data class RelationCollector(
             relation.field.type.let { fieldType ->
                 if (fieldType.typeArguments.isNotEmpty()) {
                     val rawType = fieldType.rawType
-                    val setType = context.processingEnv.requireType(CommonTypeNames.SET)
+                    val setType = context.processingEnv.requireType(CommonTypeNames.MUTABLE_SET)
                     val paramTypeName =
                         if (setType.rawType.isAssignableFrom(rawType)) {
                             when (context.codeLanguage) {

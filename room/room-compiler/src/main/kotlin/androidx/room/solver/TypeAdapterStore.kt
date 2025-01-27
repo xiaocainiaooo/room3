@@ -811,9 +811,10 @@ private constructor(
             context.processingEnv.requireType(CommonTypeNames.COLLECTION).rawType
         if (collectionTypeRaw.isAssignableFrom(mapValueTypeArg.rawType)) {
             // The Map's value type argument is assignable to a Collection, we need to make
-            // sure it is either a list or a set.
-            val listTypeRaw = context.processingEnv.requireType(CommonTypeNames.LIST).rawType
-            val setTypeRaw = context.processingEnv.requireType(CommonTypeNames.SET).rawType
+            // sure it is either a List or a Set.
+            val listTypeRaw =
+                context.processingEnv.requireType(CommonTypeNames.MUTABLE_LIST).rawType
+            val setTypeRaw = context.processingEnv.requireType(CommonTypeNames.MUTABLE_SET).rawType
             val collectionValueType =
                 when {
                     mapValueTypeArg.rawType.isAssignableFrom(listTypeRaw) ->
