@@ -176,6 +176,12 @@ internal actual value class Strings constructor(val value: Int) {
         actual inline val DateRangeInputInvalidRangeInput
             get() = Strings(MaterialR.string.m3c_date_range_input_invalid_range_input)
 
+        actual inline val FloatingToolbarCollapse
+            get() = Strings(MaterialR.string.m3c_floating_toolbar_collapse)
+
+        actual inline val FloatingToolbarExpand
+            get() = Strings(MaterialR.string.m3c_floating_toolbar_expand)
+
         actual inline val BottomSheetPaneTitle
             get() = Strings(MaterialR.string.m3c_bottom_sheet_pane_title)
 
