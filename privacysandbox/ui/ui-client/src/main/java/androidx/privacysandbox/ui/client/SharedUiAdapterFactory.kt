@@ -19,6 +19,7 @@ package androidx.privacysandbox.ui.client
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.core.IRemoteSharedUiSessionClient
@@ -28,6 +29,9 @@ import androidx.privacysandbox.ui.core.RemoteCallManager.addBinderDeathListener
 import androidx.privacysandbox.ui.core.RemoteCallManager.closeRemoteSession
 import androidx.privacysandbox.ui.core.RemoteCallManager.tryToCallRemoteObject
 import androidx.privacysandbox.ui.core.SharedUiAdapter
+import java.lang.reflect.InvocationHandler
+import java.lang.reflect.Method
+import java.lang.reflect.Proxy
 import java.util.concurrent.Executor
 
 /**
@@ -36,11 +40,12 @@ import java.util.concurrent.Executor
  */
 @SuppressLint("NullAnnotationGroup")
 @ExperimentalFeatures.SharedUiPresentationApi
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 object SharedUiAdapterFactory {
 
+    private const val TAG = "PrivacySandboxUiLib"
     // Bundle key is a binary compatibility requirement
     private const val SHARED_UI_ADAPTER_BINDER = "sharedUiAdapterBinder"
+    private const val TEST_ONLY_USE_REMOTE_ADAPTER = "testOnlyUseRemoteAdapter"
 
     /**
      * Creates a [SharedUiAdapter] from a supplied [coreLibInfo] that acts as a proxy between the
@@ -59,7 +64,105 @@ object SharedUiAdapterFactory {
             }
         val adapterInterface = ISharedUiAdapter.Stub.asInterface(uiAdapterBinder)
 
-        return RemoteAdapter(adapterInterface)
+        val forceUseRemoteAdapter = coreLibInfo.getBoolean(TEST_ONLY_USE_REMOTE_ADAPTER)
+        val isLocalBinder = uiAdapterBinder.queryLocalInterface(ISharedUiAdapter.DESCRIPTOR) != null
+        val useLocalAdapter = !forceUseRemoteAdapter && isLocalBinder
+        Log.d(TAG, "useLocalAdapter=$useLocalAdapter")
+
+        return if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && !useLocalAdapter
+        ) {
+            RemoteAdapter(adapterInterface)
+        } else {
+            LocalAdapter(adapterInterface)
+        }
+    }
+
+    /**
+     * [LocalAdapter] communicates with a provider living on same process as the client but on a
+     * different class loader.
+     */
+    @SuppressLint("BanUncheckedReflection") // using reflection on library classes
+    private class LocalAdapter(adapterInterface: ISharedUiAdapter) : SharedUiAdapter {
+        private val uiProviderBinder = adapterInterface.asBinder()
+
+        private val targetSharedSessionClientClass =
+            Class.forName(
+                SharedUiAdapter.SessionClient::class.java.name,
+                /* initialize = */ false,
+                uiProviderBinder.javaClass.classLoader
+            )
+
+        // The adapterInterface provided must have a openSession method on its class.
+        // Since the object itself has been instantiated on a different classloader, we
+        // need reflection to get hold of it.
+        private val openSessionMethod: Method =
+            Class.forName(
+                    SharedUiAdapter::class.java.name,
+                    /* initialize = */ false,
+                    uiProviderBinder.javaClass.classLoader
+                )
+                .getMethod("openSession", Executor::class.java, targetSharedSessionClientClass)
+
+        override fun openSession(clientExecutor: Executor, client: SharedUiAdapter.SessionClient) {
+            try {
+                val sessionClientProxy =
+                    Proxy.newProxyInstance(
+                        uiProviderBinder.javaClass.classLoader,
+                        arrayOf(targetSharedSessionClientClass),
+                        SessionClientProxyHandler(client)
+                    )
+                openSessionMethod.invoke(uiProviderBinder, clientExecutor, sessionClientProxy)
+            } catch (exception: Throwable) {
+                client.onSessionError(exception)
+            }
+        }
+
+        private class SessionClientProxyHandler(
+            private val origClient: SharedUiAdapter.SessionClient
+        ) : InvocationHandler {
+            override fun invoke(proxy: Any, method: Method, args: Array<Any>?): Any {
+                return when (method.name) {
+                    "onSessionOpened" -> {
+                        // We have to forward the call to original client, but it won't
+                        // recognize Session class on targetClassLoader. We need proxy for it
+                        // on local ClassLoader.
+                        args!! // This method will always have an argument, so safe to !!
+                        origClient.onSessionOpened(SessionProxy(args[0]))
+                    }
+                    "onSessionError" -> {
+                        args!! // This method will always have an argument, so safe to !!
+                        val throwable = args[0] as Throwable
+                        origClient.onSessionError(throwable)
+                    }
+                    "toString" -> origClient.toString()
+                    "equals" -> proxy === args?.get(0)
+                    "hashCode" -> hashCode()
+                    else -> {
+                        throw UnsupportedOperationException(
+                            "Unexpected method call object:$proxy, method: $method, args: $args"
+                        )
+                    }
+                }
+            }
+        }
+
+        /** Create [SharedUiAdapter.Session] that proxies to [origSession] */
+        private class SessionProxy(private val origSession: Any) : SharedUiAdapter.Session {
+            private val targetClass =
+                Class.forName(
+                        SharedUiAdapter.Session::class.java.name,
+                        /* initialize = */ false,
+                        origSession.javaClass.classLoader
+                    )
+                    .also { it.cast(origSession) }
+
+            private val closeMethod = targetClass.getMethod("close")
+
+            override fun close() {
+                closeMethod.invoke(origSession)
+            }
+        }
     }
 
     /**
