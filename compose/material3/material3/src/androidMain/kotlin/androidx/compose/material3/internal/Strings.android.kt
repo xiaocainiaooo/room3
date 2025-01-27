@@ -249,3 +249,6 @@ internal actual value class Strings constructor(val value: Int) {
             get() = Strings(MaterialR.string.m3c_wide_navigation_rail_pane_title)
     }
 }
+
+internal actual fun formatString(string: String, vararg formatArgs: Any?): String =
+    string.format(*formatArgs)
