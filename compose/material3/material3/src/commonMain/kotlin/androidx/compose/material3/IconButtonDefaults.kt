@@ -887,6 +887,20 @@ object IconButtonDefaults {
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalMaterial3ExpressiveApi
     @ExperimentalMaterial3ExpressiveApi
+    /** Default selected shape for any extra small icon button. */
+    val xSmallSelectedRoundShape: Shape
+        @Composable get() = XSmallIconButtonTokens.SelectedContainerShapeRound.value
+
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    /** Default selected shape for any extra small, square icon button. */
+    val xSmallSelectedSquareShape: Shape
+        @Composable get() = XSmallIconButtonTokens.SelectedContainerShapeSquare.value
+
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
     /** Default shape for any small icon button. */
     val smallRoundShape: Shape
         @Composable get() = SmallIconButtonTokens.ContainerShapeRound.value
@@ -894,7 +908,7 @@ object IconButtonDefaults {
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalMaterial3ExpressiveApi
     @ExperimentalMaterial3ExpressiveApi
-    /** Default shape for any small icon button. */
+    /** Default square shape for any small icon button. */
     val smallSquareShape: Shape
         @Composable get() = SmallIconButtonTokens.ContainerShapeSquare.value
 
@@ -904,6 +918,20 @@ object IconButtonDefaults {
     /** Default pressed shape for any small icon button. */
     val smallPressedShape: Shape
         @Composable get() = SmallIconButtonTokens.PressedContainerShape.value
+
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    /** Default selected shape for any small icon button. */
+    val smallSelectedRoundShape: Shape
+        @Composable get() = SmallIconButtonTokens.SelectedContainerShapeRound.value
+
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    /** Default selected shape for any small, square icon button. */
+    val SmallSelectedSquareShape: Shape
+        @Composable get() = SmallIconButtonTokens.SelectedContainerShapeSquare.value
 
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalMaterial3ExpressiveApi
@@ -929,6 +957,20 @@ object IconButtonDefaults {
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalMaterial3ExpressiveApi
     @ExperimentalMaterial3ExpressiveApi
+    /** Default selected shape for any medium icon button. */
+    val mediumSelectedRoundShape: Shape
+        @Composable get() = MediumIconButtonTokens.SelectedContainerShapeRound.value
+
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    /** Default selected shape for any medium, square icon button. */
+    val mediumSelectedSquareShape: Shape
+        @Composable get() = MediumIconButtonTokens.SelectedContainerShapeSquare.value
+
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
     /** Default shape for any large icon button. */
     val largeRoundShape: Shape
         @Composable get() = LargeIconButtonTokens.ContainerShapeRound.value
@@ -946,6 +988,20 @@ object IconButtonDefaults {
     /** Default pressed shape for any large icon button. */
     val largePressedShape: Shape
         @Composable get() = LargeIconButtonTokens.PressedContainerShape.value
+
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    /** Default selected shape for any large icon button. */
+    val largeSelectedRoundShape: Shape
+        @Composable get() = LargeIconButtonTokens.SelectedContainerShapeRound.value
+
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    /** Default selected shape for any large, square icon button. */
+    val largeSelectedSquareShape: Shape
+        @Composable get() = LargeIconButtonTokens.SelectedContainerShapeSquare.value
 
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalMaterial3ExpressiveApi
@@ -968,20 +1024,100 @@ object IconButtonDefaults {
     val xLargePressedShape: Shape
         @Composable get() = XLargeIconButtonTokens.PressedContainerShape.value
 
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    /** Default selected shape for any extra large icon button. */
+    val xLargeSelectedRoundShape: Shape
+        @Composable get() = XSmallIconButtonTokens.SelectedContainerShapeRound.value
+
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalMaterial3ExpressiveApi
+    @ExperimentalMaterial3ExpressiveApi
+    /** Default selected shape for any extra large, square icon button. */
+    val xLargeSelectedSquareShape: Shape
+        @Composable get() = XLargeIconButtonTokens.SelectedContainerShapeSquare.value
+
     /**
-     * Creates a [ButtonShapes] that correspond to the shapes in the default, pressed, and checked
-     * states. Toggle button will morph between these shapes as long as the shapes are all
+     * Creates a [IconButtonShapes] that correspond to the shapes in the default or pressed states.
+     * Icon button will morph between these shapes as long as the shapes are all
      * [CornerBasedShape]s.
      *
      * @param shape the unchecked shape for [ButtonShapes]
      * @param pressedShape the unchecked shape for [ButtonShapes]
-     * @param checkedShape the unchecked shape for [ButtonShapes]
      */
     @ExperimentalMaterial3ExpressiveApi
     @Composable
-    fun shapes(shape: Shape, pressedShape: Shape, checkedShape: Shape): IconButtonShapes =
-        remember(shape, pressedShape, checkedShape) {
-            IconButtonShapes(shape, pressedShape, checkedShape)
+    fun shapes(shape: Shape? = null, pressedShape: Shape? = null): IconButtonShapes =
+        MaterialTheme.shapes.defaultIconButtonShapes.copy(
+            shape = shape,
+            pressedShape = pressedShape,
+        )
+
+    /**
+     * Creates a [IconButtonShapes] that correspond to a default [IconButton] in the active and
+     * pressed states. [IconButton] will morph between these shapes as long as the shapes are all
+     * [CornerBasedShape]s.
+     */
+    @ExperimentalMaterial3ExpressiveApi
+    @Composable
+    fun shapes(): IconButtonShapes = MaterialTheme.shapes.defaultIconButtonShapes
+
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    internal val Shapes.defaultIconButtonShapes: IconButtonShapes
+        @Composable
+        get() {
+            return defaultIconButtonShapesCached
+                ?: IconButtonShapes(
+                        shape = smallRoundShape,
+                        pressedShape = smallPressedShape,
+                    )
+                    .also { defaultIconButtonShapesCached = it }
+        }
+
+    /**
+     * Creates a [IconToggleButtonShapes] that correspond to the shapes in the default, pressed, and
+     * checked states. Icon button will morph between these shapes as long as the shapes are all
+     * [CornerBasedShape]s.
+     *
+     * @param shape the active shape for [IconToggleButtonShapes]
+     * @param pressedShape the pressed shape for [IconToggleButtonShapes]
+     * @param checkedShape the checked shape for [IconToggleButtonShapes]
+     */
+    @ExperimentalMaterial3ExpressiveApi
+    @Composable
+    fun toggleableShapes(
+        shape: Shape? = null,
+        pressedShape: Shape? = null,
+        checkedShape: Shape? = null
+    ): IconToggleButtonShapes =
+        MaterialTheme.shapes.defaultIconToggleButtonShapes.copy(
+            shape = shape,
+            pressedShape = pressedShape,
+            checkedShape = checkedShape
+        )
+
+    /**
+     * Creates a [ButtonShapes] that correspond to a default [IconToggleButton] in the active,
+     * pressed and selected states. [IconToggleButton] will morph between these shapes as long as
+     * the shapes are all [CornerBasedShape]s.
+     */
+    @ExperimentalMaterial3ExpressiveApi
+    @Composable
+    fun toggleableShapes(): IconToggleButtonShapes =
+        MaterialTheme.shapes.defaultIconToggleButtonShapes
+
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    internal val Shapes.defaultIconToggleButtonShapes: IconToggleButtonShapes
+        @Composable
+        get() {
+            return defaultIconToggleButtonShapesCached
+                ?: IconToggleButtonShapes(
+                        shape = smallRoundShape,
+                        pressedShape = smallPressedShape,
+                        checkedShape = smallSelectedRoundShape
+                    )
+                    .also { defaultIconToggleButtonShapesCached = it }
         }
 
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
