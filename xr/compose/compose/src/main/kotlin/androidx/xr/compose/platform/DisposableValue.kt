@@ -53,7 +53,5 @@ internal class DisposableValue<out T>(public val value: T, private val disposeBl
     override fun onRemembered() {}
 }
 
-internal operator fun <T> DisposableValue<T>.getValue(
-    thisObj: Any?,
-    property: KProperty<*>,
-): T = value
+internal operator fun <T> DisposableValue<T>.getValue(thisObj: Any?, property: KProperty<*>): T =
+    value
