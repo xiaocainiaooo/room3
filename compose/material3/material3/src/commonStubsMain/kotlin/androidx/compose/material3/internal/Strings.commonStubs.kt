@@ -104,3 +104,6 @@ internal actual value class Strings constructor(val value: Int) {
 @ReadOnlyComposable
 internal actual fun getString(string: Strings, vararg formatArgs: Any): String =
     implementedInJetBrainsFork()
+
+internal actual fun formatString(string: String, vararg formatArgs: Any?): String =
+    implementedInJetBrainsFork()
