@@ -286,8 +286,12 @@ public class InProgressStroke {
     public fun resetUpdatedRegion(): Unit = nativeResetUpdatedRegion(nativePointer)
 
     /**
-     * Returns the number of outlines for the specified brush coat. Calls to functions that accept
-     * an outlineIndex must treat the result of this function as an upper bound.
+     * Returns the number of outlines for the specified brush coat.
+     *
+     * Calls to functions that accept an outlineIndex must treat the result of this function as an
+     * upper bound. Coats with discontinuous geometry will always have multiple outlines, but even
+     * continuous geometry may be drawn with multiple overlapping outlines when this improves
+     * rendering quality or performance.
      *
      * @param coatIndex Must be between 0 (inclusive) and the result of [getBrushCoatCount]
      *   (exclusive).
