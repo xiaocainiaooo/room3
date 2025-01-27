@@ -19,6 +19,7 @@ package androidx.appfunctions.compiler
 import androidx.appfunctions.compiler.core.ProcessingException
 import androidx.appfunctions.compiler.core.logException
 import androidx.appfunctions.compiler.processors.AppFunctionIdProcessor
+import androidx.appfunctions.compiler.processors.AppFunctionIndexXmlProcessor
 import androidx.appfunctions.compiler.processors.AppFunctionInventoryProcessor
 import androidx.appfunctions.compiler.processors.AppFunctionInvokerProcessor
 import androidx.appfunctions.compiler.processors.AppFunctionLegacyIndexXmlProcessor
@@ -56,11 +57,20 @@ class AppFunctionCompiler(
             val idProcessor = AppFunctionIdProcessor(environment.codeGenerator)
             val inventoryProcessor = AppFunctionInventoryProcessor(environment.codeGenerator)
             val invokerProcessor = AppFunctionInvokerProcessor(environment.codeGenerator)
+            // We generate both XML formats supported by old and new AppSearch indexer respectively
+            // as it can't be guaranteed that the device will have the latest version of AppSearch.
             // TODO: Add compiler option to disable legacy xml generator.
             val legacyIndexXmlProcessor =
                 AppFunctionLegacyIndexXmlProcessor(environment.codeGenerator)
+            val indexXmlProcessor = AppFunctionIndexXmlProcessor(environment.codeGenerator)
             return AppFunctionCompiler(
-                listOf(idProcessor, inventoryProcessor, invokerProcessor, legacyIndexXmlProcessor),
+                listOf(
+                    idProcessor,
+                    inventoryProcessor,
+                    invokerProcessor,
+                    legacyIndexXmlProcessor,
+                    indexXmlProcessor
+                ),
                 environment.logger,
             )
         }

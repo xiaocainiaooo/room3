@@ -37,6 +37,9 @@ dependencies {
     api(libs.kotlinStdlib)
     implementation(libs.kspApi)
     implementation(libs.kotlinPoet)
+    implementation(libs.kotlinReflect, {
+        exclude group: "org.jetbrains.kotlin", module: "kotlin-stdlib"
+    })
 
     // Added for reusing AppFunctionMetadata classes.
     implementationAarAsJar(project(":appfunctions:appfunctions-common"))
