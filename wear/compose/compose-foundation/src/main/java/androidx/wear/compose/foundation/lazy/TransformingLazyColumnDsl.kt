@@ -40,15 +40,17 @@ import androidx.wear.compose.foundation.lazy.layout.LazyLayoutAnimationSpecsNode
 public sealed interface TransformingLazyColumnItemScope {
     /**
      * Scroll progress of the item before height transformation is applied using
-     * [Modifier.transformedHeight]. Is null for the item that is off screen.
+     * [Modifier.transformedHeight]. Is [TransformingLazyColumnItemScrollProgress.Unspecified] for
+     * the item that is off screen.
      */
-    public val DrawScope.scrollProgress: TransformingLazyColumnItemScrollProgress?
+    public val DrawScope.scrollProgress: TransformingLazyColumnItemScrollProgress
 
     /**
      * Scroll progress of the item before height transformation is applied using
-     * [Modifier.transformedHeight]. Is null for the item that is off screen.
+     * [Modifier.transformedHeight]. Is [TransformingLazyColumnItemScrollProgress.Unspecified] for
+     * the item that is off screen.
      */
-    public val GraphicsLayerScope.scrollProgress: TransformingLazyColumnItemScrollProgress?
+    public val GraphicsLayerScope.scrollProgress: TransformingLazyColumnItemScrollProgress
 
     /**
      * Applies the new height of the item depending on its scroll progress and measured height.
@@ -209,13 +211,15 @@ internal class TransformingLazyColumnItemScopeImpl(
     val reduceMotionEnabled: Boolean
 ) : TransformingLazyColumnItemScope {
 
-    private val _scrollProgress: TransformingLazyColumnItemScrollProgress?
-        get() = state.layoutInfo.visibleItems.fastFirstOrNull { it.index == index }?.scrollProgress
+    private val _scrollProgress: TransformingLazyColumnItemScrollProgress
+        get() =
+            state.layoutInfo.visibleItems.fastFirstOrNull { it.index == index }?.scrollProgress
+                ?: TransformingLazyColumnItemScrollProgress.Unspecified
 
-    override val DrawScope.scrollProgress: TransformingLazyColumnItemScrollProgress?
+    override val DrawScope.scrollProgress: TransformingLazyColumnItemScrollProgress
         get() = _scrollProgress
 
-    override val GraphicsLayerScope.scrollProgress: TransformingLazyColumnItemScrollProgress?
+    override val GraphicsLayerScope.scrollProgress: TransformingLazyColumnItemScrollProgress
         get() = _scrollProgress
 
     override fun Modifier.transformedHeight(

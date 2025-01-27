@@ -530,17 +530,25 @@ package androidx.wear.compose.foundation.lazy {
   @androidx.wear.compose.foundation.lazy.TransformingLazyColumnScopeMarker public sealed interface TransformingLazyColumnItemScope {
     method @androidx.compose.runtime.Composable public default void TransformExclusion(kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScope,kotlin.Unit> content);
     method public androidx.compose.ui.Modifier animateItem(androidx.compose.ui.Modifier, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float>? fadeInSpec, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset>? placementSpec, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float>? fadeOutSpec);
-    method public androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress? getScrollProgress(androidx.compose.ui.graphics.drawscope.DrawScope);
-    method public androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress? getScrollProgress(androidx.compose.ui.graphics.GraphicsLayerScope);
+    method public long getScrollProgress(androidx.compose.ui.graphics.drawscope.DrawScope);
+    method public long getScrollProgress(androidx.compose.ui.graphics.GraphicsLayerScope);
     method public androidx.compose.ui.Modifier transformedHeight(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function2<? super java.lang.Integer,? super androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress,java.lang.Integer> heightProvider);
-    property public androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress? scrollProgress;
-    property public androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress? scrollProgress;
+    property public long scrollProgress;
+    property public long scrollProgress;
   }
 
   @kotlin.jvm.JvmInline public final value class TransformingLazyColumnItemScrollProgress {
     ctor public TransformingLazyColumnItemScrollProgress(float topOffsetFraction, float bottomOffsetFraction);
     property public final float bottomOffsetFraction;
+    property public final boolean isSpecified;
+    property public final boolean isUnspecified;
     property public final float topOffsetFraction;
+    field public static final androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScrollProgress.Companion Companion;
+  }
+
+  public static final class TransformingLazyColumnItemScrollProgress.Companion {
+    method public long getUnspecified();
+    property public final long Unspecified;
   }
 
   public final class TransformingLazyColumnKt {
