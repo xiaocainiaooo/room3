@@ -270,8 +270,36 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithResourceContent(
             report = report,
-            expectGeneratedResourceFileName = "app_functions.xml",
+            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
             goldenFileName = "fakeNoArg_freeForm_function_app_function_dynamic_schema.xml"
+        )
+    }
+
+    @Test
+    fun testFakeAllPrimitiveParams_genIndexXmlFile_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("FakeAllPrimitiveParamsImpl.KT", "FakeSchemas.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            goldenFileName = "fakeAllPrimitiveParams_app_function_dynamic_schema.xml"
+        )
+    }
+
+    @Test
+    fun testFakeAllPrimitiveReturns_genIndexXmlFile_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("FakeAllPrimitiveReturnsImpl.KT", "FakeSchemas.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            goldenFileName = "fakeAllPrimitiveReturns_app_function_dynamic_schema.xml"
         )
     }
 }

@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <appfunctions>
     <appfunction>
-        <function_id>com.testdata.FakeNoArg#noArg</function_id>
-        <enabled_by_default>true</enabled_by_default>
+        <components>
+            <id>unused</id>
+        </components>
+        <displayNameRes>0</displayNameRes>
+        <id>com.testdata.FakeNoArg#noArg</id>
+        <enabledByDefault>true</enabledByDefault>
+        <isRestrictToTrustedCaller>false</isRestrictToTrustedCaller>
+        <response>
+            <dataType>
+                <id>unused</id>
+                <type>0</type>
+            </dataType>
+            <id>unused</id>
+            <isNullable>false</isNullable>
+        </response>
+        <functionId>com.testdata.FakeNoArg#noArg</functionId>
     </appfunction>
 </appfunctions>
