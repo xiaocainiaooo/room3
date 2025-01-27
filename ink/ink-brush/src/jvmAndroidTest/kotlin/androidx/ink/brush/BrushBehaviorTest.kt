@@ -71,6 +71,7 @@ class BrushBehaviorTest {
                 BrushBehavior.Source.INPUT_ACCELERATION_Y_IN_CENTIMETERS_PER_SECOND_SQUARED,
                 BrushBehavior.Source.INPUT_ACCELERATION_FORWARD_IN_CENTIMETERS_PER_SECOND_SQUARED,
                 BrushBehavior.Source.INPUT_ACCELERATION_LATERAL_IN_CENTIMETERS_PER_SECOND_SQUARED,
+                BrushBehavior.Source.DISTANCE_REMAINING_AS_FRACTION_OF_STROKE_LENGTH,
             )
         assertThat(list.toSet()).hasSize(list.size)
     }
@@ -224,6 +225,8 @@ class BrushBehaviorTest {
             .isEqualTo(
                 "BrushBehavior.Source.INPUT_ACCELERATION_LATERAL_IN_CENTIMETERS_PER_SECOND_SQUARED"
             )
+        assertThat(BrushBehavior.Source.DISTANCE_REMAINING_AS_FRACTION_OF_STROKE_LENGTH.toString())
+            .isEqualTo("BrushBehavior.Source.DISTANCE_REMAINING_AS_FRACTION_OF_STROKE_LENGTH")
     }
 
     @Test
@@ -584,6 +587,65 @@ class BrushBehaviorTest {
         val node3 = BrushBehavior.ConstantNode(2f)
         assertThat(node1.hashCode()).isEqualTo(node2.hashCode())
         assertThat(node1.hashCode()).isNotEqualTo(node3.hashCode())
+    }
+
+    @Test
+    fun noiseNodeConstructor_throwsForNonFiniteBasePeriod() {
+        assertFailsWith<IllegalArgumentException> {
+            BrushBehavior.NoiseNode(
+                12345,
+                BrushBehavior.DampingSource.TIME_IN_SECONDS,
+                Float.POSITIVE_INFINITY,
+            )
+        }
+        assertFailsWith<IllegalArgumentException> {
+            BrushBehavior.NoiseNode(12345, BrushBehavior.DampingSource.TIME_IN_SECONDS, Float.NaN)
+        }
+    }
+
+    @Test
+    fun noiseNodeConstructor_throwsForNegativeBasePeriod() {
+        assertFailsWith<IllegalArgumentException> {
+            BrushBehavior.NoiseNode(12345, BrushBehavior.DampingSource.TIME_IN_SECONDS, -1f)
+        }
+    }
+
+    @Test
+    fun noiseNodeToString() {
+        val node = BrushBehavior.NoiseNode(12345, BrushBehavior.DampingSource.TIME_IN_SECONDS, 1f)
+        assertThat(node.toString()).isEqualTo("NoiseNode(12345, TIME_IN_SECONDS, 1.0)")
+    }
+
+    @Test
+    fun noiseNodeEquals_checksEqualityOfValues() {
+        val node = BrushBehavior.NoiseNode(12345, BrushBehavior.DampingSource.TIME_IN_SECONDS, 1f)
+        assertThat(node)
+            .isEqualTo(
+                BrushBehavior.NoiseNode(12345, BrushBehavior.DampingSource.TIME_IN_SECONDS, 1f)
+            )
+        assertThat(node)
+            .isNotEqualTo(
+                BrushBehavior.NoiseNode(12346, BrushBehavior.DampingSource.TIME_IN_SECONDS, 1f)
+            )
+        assertThat(node)
+            .isNotEqualTo(
+                BrushBehavior.NoiseNode(
+                    12345,
+                    BrushBehavior.DampingSource.DISTANCE_IN_CENTIMETERS,
+                    1f
+                )
+            )
+        assertThat(node)
+            .isNotEqualTo(
+                BrushBehavior.NoiseNode(12345, BrushBehavior.DampingSource.TIME_IN_SECONDS, 2f)
+            )
+    }
+
+    @Test
+    fun noiseNodeHashCode_withIdenticalValues_match() {
+        val node1 = BrushBehavior.NoiseNode(12345, BrushBehavior.DampingSource.TIME_IN_SECONDS, 1f)
+        val node2 = BrushBehavior.NoiseNode(12345, BrushBehavior.DampingSource.TIME_IN_SECONDS, 1f)
+        assertThat(node1.hashCode()).isEqualTo(node2.hashCode())
     }
 
     @Test

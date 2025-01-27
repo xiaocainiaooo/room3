@@ -67,7 +67,7 @@ internal class InProgressStrokesManager(
     /** The callback for reporting latency data to the client. */
     private val latencyDataCallback: LatencyDataCallback = LatencyDataCallback {},
     /** For getting timestamps for latency measurement. Injectable for testing only. */
-    private inline val getNanoTime: () -> Long = System::nanoTime,
+    private val getNanoTime: () -> Long = System::nanoTime,
     /** For getting instances of [InProgressStroke]. Injectable for testing only. */
     inProgressStrokePool: InProgressStrokePool = InProgressStrokePool.create(),
     /**

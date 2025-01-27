@@ -336,6 +336,8 @@ public class BrushBehavior(
                     "INPUT_ACCELERATION_FORWARD_IN_CENTIMETERS_PER_SECOND_SQUARED"
                 INPUT_ACCELERATION_LATERAL_IN_CENTIMETERS_PER_SECOND_SQUARED ->
                     "INPUT_ACCELERATION_LATERAL_IN_CENTIMETERS_PER_SECOND_SQUARED"
+                DISTANCE_REMAINING_AS_FRACTION_OF_STROKE_LENGTH ->
+                    "DISTANCE_REMAINING_AS_FRACTION_OF_STROKE_LENGTH"
                 else -> "INVALID"
             }
 
@@ -577,6 +579,13 @@ public class BrushBehavior(
             @JvmField
             public val INPUT_ACCELERATION_LATERAL_IN_CENTIMETERS_PER_SECOND_SQUARED: Source =
                 Source(36)
+            /**
+             * The distance left to be traveled from a given input to the current last input of the
+             * stroke, as a fraction of the current total length of the stroke. This value changes
+             * for each input as the stroke is drawn.
+             */
+            @JvmField
+            public val DISTANCE_REMAINING_AS_FRACTION_OF_STROKE_LENGTH: Source = Source(37)
             private const val PREFIX = "BrushBehavior.Source."
         }
     }
@@ -1009,6 +1018,50 @@ public class BrushBehavior(
         /** Appends a native `BrushBehavior::ConstantNode` to a native brush behavior struct. */
         @UsedByNative
         private external fun nativeAppendConstantNode(nativeBehaviorPointer: Long, value: Float)
+    }
+
+    /** A [ValueNode] that produces a smooth random function. */
+    public class NoiseNode
+    constructor(
+        public val seed: Int,
+        public val varyOver: DampingSource,
+        public val basePeriod: Float,
+    ) : ValueNode(emptyList()) {
+        init {
+            require(basePeriod.isFinite() && basePeriod > 0.0f) {
+                "basePeriod must be finite and positive, was $basePeriod"
+            }
+        }
+
+        override fun appendToNativeBrushBehavior(nativeBehaviorPointer: Long) {
+            nativeAppendNoiseNode(nativeBehaviorPointer, seed, varyOver.value, basePeriod)
+        }
+
+        override fun toString(): String =
+            "NoiseNode($seed, ${varyOver.toSimpleString()}, $basePeriod)"
+
+        override fun equals(other: Any?): Boolean {
+            if (other == null || other !is NoiseNode) return false
+            return seed == other.seed &&
+                varyOver == other.varyOver &&
+                basePeriod == other.basePeriod
+        }
+
+        override fun hashCode(): Int {
+            var result = seed.hashCode()
+            result = 31 * result + varyOver.hashCode()
+            result = 31 * result + basePeriod.hashCode()
+            return result
+        }
+
+        /** Appends a native `BrushBehavior::NoiseNode` to a native brush behavior struct. */
+        @UsedByNative
+        private external fun nativeAppendNoiseNode(
+            nativeBehaviorPointer: Long,
+            seed: Int,
+            varyOver: Int,
+            basePeriod: Float,
+        )
     }
 
     /**
