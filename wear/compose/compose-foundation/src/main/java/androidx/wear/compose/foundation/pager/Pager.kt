@@ -27,7 +27,6 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerDefaults as ComposePagerDefaults
@@ -40,16 +39,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.findRootCoordinates
+import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.horizontalScrollAxisRange
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.CustomTouchSlopProvider
+import androidx.wear.compose.foundation.GestureInclusion
 import androidx.wear.compose.foundation.HierarchicalFocusCoordinator
 import androidx.wear.compose.foundation.rememberActiveFocusRequester
 import androidx.wear.compose.foundation.rotary.RotaryScrollableBehavior
@@ -58,9 +60,9 @@ import androidx.wear.compose.foundation.rotary.rotaryScrollable
 import kotlinx.coroutines.coroutineScope
 
 /**
- * A full-screen horizontally scrolling Pager optimized for Wear OS devices. This component wraps
- * the standard Compose Foundation [HorizontalPager] and provides Wear-specific enhancements to
- * improve performance, usability, and adherence to Wear OS design guidelines.
+ * A horizontally scrolling Pager optimized for Wear OS devices. This component wraps the standard
+ * Compose Foundation [HorizontalPager] and provides Wear-specific enhancements to improve
+ * performance, usability, and adherence to Wear OS design guidelines.
  *
  * Please refer to the samples to learn how to use this API.
  *
@@ -80,17 +82,17 @@ import kotlinx.coroutines.coroutineScope
  * @param userScrollEnabled whether the scrolling via the user gestures or accessibility actions is
  *   allowed. You can still scroll programmatically using [PagerState.scroll] even when it is
  *   disabled.
+ * @param gestureInclusion When userScrollEnabled=true, this function provides more fine-grained
+ *   control so that touch gestures can be excluded when they start in a certain region. An instance
+ *   of [GestureInclusion] can be passed in here which will determine via
+ *   [GestureInclusion.allowGesture] whether the gesture should proceed or not. By default,
+ *   [gestureInclusion] allows gestures everywhere except a zone on the left edge of the first page,
+ *   which is used for swipe-to-dismiss (see [PagerDefaults.disableLeftEdgeOnFirstPage]).
  * @param reverseLayout reverse the direction of scrolling and layout.
  * @param key a stable and unique key representing the item. When you specify the key the scroll
  *   position will be maintained based on the key, which means if you add/remove items before the
  *   current visible item the item with the given key will be kept as the first visible one. If null
  *   is passed the position in the list will represent the key.
- * @param swipeToDismissEdgeZoneFraction A float which controls the size of the screen edge area
- *   used for the Wear system's swipe to dismiss gesture. This value, between 0 and 1, represents
- *   the fraction of the screen width that will be sensitive to the gesture. For example, 0.25 means
- *   the leftmost 25% of the screen will trigger the gesture. Even when RTL mode is enabled, this
- *   parameter only ever applies to the left edge of the screen. Setting this to 0 will disable the
- *   gesture.
  * @param rotaryScrollableBehavior Parameter for changing rotary behavior. By default rotary support
  *   is disabled for [HorizontalPager]. It can be enabled by passing
  *   [RotaryScrollableDefaults.snapBehavior] with pagerState parameter.
@@ -105,25 +107,17 @@ public fun HorizontalPager(
     beyondViewportPageCount: Int = PagerDefaults.BeyondViewportPageCount,
     flingBehavior: TargetedFlingBehavior = PagerDefaults.snapFlingBehavior(state = state),
     userScrollEnabled: Boolean = true,
+    gestureInclusion: GestureInclusion = PagerDefaults.disableLeftEdgeOnFirstPage(state),
     reverseLayout: Boolean = false,
     key: ((index: Int) -> Any)? = null,
-    @FloatRange(from = 0.0, to = 1.0)
-    swipeToDismissEdgeZoneFraction: Float = PagerDefaults.SwipeToDismissEdgeZoneFraction,
     rotaryScrollableBehavior: RotaryScrollableBehavior? = null,
     content: @Composable PagerScope.(page: Int) -> Unit
 ) {
-    val swipeToDismissEnabled = swipeToDismissEdgeZoneFraction != 0f
     var allowPaging by remember { mutableStateOf(true) }
-    val screenWidth =
-        with(LocalDensity.current) { LocalConfiguration.current.screenWidthDp.dp.toPx() }
-    val edgeBoundary = screenWidth * swipeToDismissEdgeZoneFraction.coerceIn(0f, 1f)
+    var pagerCoordinates: LayoutCoordinates? by remember { mutableStateOf(null) }
 
     val originalTouchSlop = LocalViewConfiguration.current.touchSlop
-    CustomTouchSlopProvider(
-        newTouchSlop =
-            if (swipeToDismissEnabled) originalTouchSlop * CustomTouchSlopMultiplier
-            else originalTouchSlop
-    ) {
+    CustomTouchSlopProvider(newTouchSlop = originalTouchSlop * CustomTouchSlopMultiplier) {
         val rotaryModifier =
             if (rotaryScrollableBehavior != null && userScrollEnabled)
                 Modifier.rotaryScrollable(
@@ -137,14 +131,23 @@ public fun HorizontalPager(
             state = state,
             modifier =
                 modifier
-                    .fillMaxSize()
-                    .pointerInput(screenWidth, swipeToDismissEnabled) {
+                    .onPlaced { layoutCoordinates -> pagerCoordinates = layoutCoordinates }
+                    .pointerInput(pagerCoordinates, gestureInclusion, userScrollEnabled) {
                         coroutineScope {
                             awaitEachGesture {
+                                if (!userScrollEnabled || pagerCoordinates == null) {
+                                    allowPaging = false
+                                    return@awaitEachGesture
+                                }
+
                                 allowPaging = true
                                 val firstDown = awaitFirstDown(false, PointerEventPass.Initial)
-                                val xPosition = firstDown.position.x
-                                allowPaging = !swipeToDismissEnabled || xPosition > edgeBoundary
+
+                                allowPaging =
+                                    gestureInclusion.allowGesture(
+                                        firstDown.position,
+                                        pagerCoordinates!!
+                                    )
                             }
                         }
                     }
@@ -185,8 +188,8 @@ public fun HorizontalPager(
 }
 
 /**
- * A full-screen vertically scrolling Pager optimized for Wear OS devices. This component wraps the
- * standard Compose Foundation [VerticalPager] and provides Wear-specific enhancements to improve
+ * A vertically scrolling Pager optimized for Wear OS devices. This component wraps the standard
+ * Compose Foundation [VerticalPager] and provides Wear-specific enhancements to improve
  * performance, usability, and adherence to Wear OS design guidelines.
  *
  * [VerticalPager] supports rotary input by default. Rotary input allows users to scroll through the
@@ -247,7 +250,7 @@ public fun VerticalPager(
 
     VerticalPager(
         state = state,
-        modifier = modifier.fillMaxSize().then(rotaryModifier),
+        modifier = modifier.then(rotaryModifier),
         contentPadding = contentPadding,
         pageSize = PageSize.Fill,
         beyondViewportPageCount = beyondViewportPageCount,
@@ -268,6 +271,36 @@ public fun VerticalPager(
 
 /** Contains the default values used by [Pager]. These are optimised for Wear. */
 public object PagerDefaults {
+    /**
+     * The default behaviour for when [HorizontalPager] should consume gestures. In this
+     * implementation of [gestureInclusion], scroll events that originate in the left edge of the
+     * first page of the Pager (as determined by [LeftEdgeZoneFraction]) will be ignored. This
+     * allows swipe-to-dismiss handlers (if present) to handle the gesture in this region.
+     *
+     * @param pagerState The state of the [HorizontalPager]. Used to determine the current page.
+     * @param edgeZoneFraction The fraction of the screen width from the left edge where gestures
+     *   should be ignored on the first page. Defaults to [LeftEdgeZoneFraction].
+     */
+    public fun disableLeftEdgeOnFirstPage(
+        pagerState: PagerState,
+        edgeZoneFraction: Float = LeftEdgeZoneFraction
+    ): GestureInclusion {
+        return object : GestureInclusion {
+            override fun allowGesture(
+                offset: Offset,
+                layoutCoordinates: LayoutCoordinates
+            ): Boolean {
+                return if (pagerState.currentPage == 0) {
+                    val screenOffset = layoutCoordinates.localToScreen(offset)
+                    val screenWidth = layoutCoordinates.findRootCoordinates().size.width
+                    return screenOffset.x > screenWidth * edgeZoneFraction
+                } else {
+                    true
+                }
+            }
+        }
+    }
+
     /**
      * Default fling behavior for pagers on Wear, snaps at most one page at a time.
      *
@@ -325,10 +358,12 @@ public object PagerDefaults {
         spring(Spring.DampingRatioNoBouncy, MediumHighStiffness)
 
     /**
-     * The default value of swipeToDismissEdgeZoneFraction used to configure the size of the edge
-     * zone in a [HorizontalPager].
+     * The default value used to configure the size of the left edge zone in a [HorizontalPager].
+     * The left edge zone in this case refers to the leftmost edge of the screen, in this region in
+     * a [Pager] it is common to disable scrolling in order for swipe-to-dismiss handlers to take
+     * over.
      */
-    public val SwipeToDismissEdgeZoneFraction: Float = 0.15f
+    public val LeftEdgeZoneFraction: Float = 0.15f
 
     /**
      * The default value of beyondViewportPageCount used to specify the number of pages to compose
