@@ -66,16 +66,16 @@ androidXMultiplatform {
             }
         }
 
-        commonJvmMain {
+        jvmAndroidMain {
             dependsOn(commonMain)
         }
 
         androidMain {
-            dependsOn(commonJvmMain)
+            dependsOn(jvmAndroidMain)
         }
 
         jvmMain {
-            dependsOn(commonJvmMain)
+            dependsOn(jvmAndroidMain)
         }
 
         commonTest {
@@ -90,7 +90,7 @@ androidXMultiplatform {
             }
         }
 
-        commonJvmTest {
+        jvmAndroidTest {
             dependsOn(commonTest)
             dependencies {
                 implementation(libs.junit)
@@ -104,18 +104,18 @@ androidXMultiplatform {
         }
 
         jvmTest {
-            dependsOn(commonJvmTest)
+            dependsOn(jvmAndroidTest)
         }
 
         androidUnitTest {
-            dependsOn(commonJvmTest)
+            dependsOn(jvmAndroidTest)
             dependencies {
                 implementation(libs.protobufLite)
             }
         }
 
         androidInstrumentedTest {
-            dependsOn(commonJvmTest)
+            dependsOn(jvmAndroidTest)
             dependencies {
                 implementation(libs.truth)
                 implementation(project(":internal-testutils-truth"))
