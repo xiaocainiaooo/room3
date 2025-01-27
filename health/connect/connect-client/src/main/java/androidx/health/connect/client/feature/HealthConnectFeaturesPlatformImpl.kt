@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@file:RequiresApi(api = 34)
+@file:RequiresApi(api = Build.VERSION_CODES.R)
 
 package androidx.health.connect.client.feature
 

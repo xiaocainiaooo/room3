@@ -18,7 +18,8 @@ package androidx.health.connect.client.records
 import android.annotation.SuppressLint
 import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectFeatures
-import androidx.health.connect.client.impl.platform.records.toPlatformFhirVersion
+import androidx.health.connect.client.feature.withPhrFeatureCheck
+import androidx.health.connect.client.impl.platform.records.PlatformFhirVersion
 
 /**
  * Represents the FHIR version. This is designed according to
@@ -28,10 +29,24 @@ import androidx.health.connect.client.impl.platform.records.toPlatformFhirVersio
  *
  * The versions R4 (4.0.1) and R4B (4.3.0) are supported in Health Connect. Use
  * [isSupportedFhirVersion] to check whether a FHIR version is supported.
+ *
+ * This feature is dependent on the version of HealthConnect installed on the device. To check if
+ * it's available call [HealthConnectFeatures.getFeatureStatus] and pass
+ * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
  */
 // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class FhirVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<FhirVersion> {
+    @SuppressLint("NewApi") // already checked with a feature availability check
+    private val platformFhirVersion: Any =
+        withPhrFeatureCheck(FhirVersion::class) {
+            PlatformFhirVersion.parseFhirVersion("$major.$minor.$patch")
+        }
+
+    @SuppressLint("NewApi") // already checked with a feature availability check
+    internal fun toPlatformFhirVersion(): PlatformFhirVersion =
+        withPhrFeatureCheck(FhirVersion::class) { platformFhirVersion as PlatformFhirVersion }
+
     override fun compareTo(other: FhirVersion): Int {
         if (major != other.major) {
             return if (major > other.major) 1 else -1
@@ -63,13 +78,8 @@ class FhirVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<F
         return result
     }
 
-    /** Returns the string representation of the FHIR version. */
-    fun toFhirVersionString(): String {
-        return "$major.$minor.$patch"
-    }
-
     override fun toString(): String {
-        return "${this.javaClass.simpleName}: ${toFhirVersionString()}"
+        return "${this::class.java.simpleName}{$major.$minor.$patch}"
     }
 
     /**

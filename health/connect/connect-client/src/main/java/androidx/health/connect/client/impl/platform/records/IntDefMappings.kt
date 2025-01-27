@@ -27,6 +27,20 @@ import androidx.health.connect.client.records.BodyTemperatureMeasurementLocation
 import androidx.health.connect.client.records.CervicalMucusRecord
 import androidx.health.connect.client.records.ExerciseSegment
 import androidx.health.connect.client.records.ExerciseSessionRecord
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_ALLERGY_INTOLERANCE
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_CONDITION
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_ENCOUNTER
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_IMMUNIZATION
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_LOCATION
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_MEDICATION
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_MEDICATION_REQUEST
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_MEDICATION_STATEMENT
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_OBSERVATION
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_ORGANIZATION
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_PATIENT
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_PRACTITIONER
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_PRACTITIONER_ROLE
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_PROCEDURE
 import androidx.health.connect.client.records.MealType
 import androidx.health.connect.client.records.MenstruationFlowRecord
 import androidx.health.connect.client.records.OvulationTestRecord
@@ -539,6 +553,28 @@ internal val SDK_TO_PLATFORM_RECORDING_METHOD: Map<Int, Int> =
         Metadata.RECORDING_METHOD_MANUAL_ENTRY to PlatformMetadata.RECORDING_METHOD_MANUAL_ENTRY
     )
 
+internal val SDK_TO_PLATFORM_FHIR_RESOURCE_TYPE: Map<Int, Int> =
+    mapOf(
+        FHIR_RESOURCE_TYPE_IMMUNIZATION to PlatformFhirResource.FHIR_RESOURCE_TYPE_IMMUNIZATION,
+        FHIR_RESOURCE_TYPE_ALLERGY_INTOLERANCE to
+            PlatformFhirResource.FHIR_RESOURCE_TYPE_ALLERGY_INTOLERANCE,
+        FHIR_RESOURCE_TYPE_OBSERVATION to PlatformFhirResource.FHIR_RESOURCE_TYPE_OBSERVATION,
+        FHIR_RESOURCE_TYPE_CONDITION to PlatformFhirResource.FHIR_RESOURCE_TYPE_CONDITION,
+        FHIR_RESOURCE_TYPE_PROCEDURE to PlatformFhirResource.FHIR_RESOURCE_TYPE_PROCEDURE,
+        FHIR_RESOURCE_TYPE_MEDICATION to PlatformFhirResource.FHIR_RESOURCE_TYPE_MEDICATION,
+        FHIR_RESOURCE_TYPE_MEDICATION_REQUEST to
+            PlatformFhirResource.FHIR_RESOURCE_TYPE_MEDICATION_REQUEST,
+        FHIR_RESOURCE_TYPE_MEDICATION_STATEMENT to
+            PlatformFhirResource.FHIR_RESOURCE_TYPE_MEDICATION_STATEMENT,
+        FHIR_RESOURCE_TYPE_PATIENT to PlatformFhirResource.FHIR_RESOURCE_TYPE_PATIENT,
+        FHIR_RESOURCE_TYPE_PRACTITIONER to PlatformFhirResource.FHIR_RESOURCE_TYPE_PRACTITIONER,
+        FHIR_RESOURCE_TYPE_PRACTITIONER_ROLE to
+            PlatformFhirResource.FHIR_RESOURCE_TYPE_PRACTITIONER_ROLE,
+        FHIR_RESOURCE_TYPE_ENCOUNTER to PlatformFhirResource.FHIR_RESOURCE_TYPE_ENCOUNTER,
+        FHIR_RESOURCE_TYPE_LOCATION to PlatformFhirResource.FHIR_RESOURCE_TYPE_LOCATION,
+        FHIR_RESOURCE_TYPE_ORGANIZATION to PlatformFhirResource.FHIR_RESOURCE_TYPE_ORGANIZATION
+    )
+
 internal fun Int.toPlatformExerciseCategory(): Int {
     return SDK_TO_PLATFORM_BLOOD_GLUCOSE_SPECIMEN_SOURCE[this]
         ?: PlatformPlannedExerciseStep.EXERCISE_CATEGORY_UNKNOWN
@@ -626,6 +662,12 @@ internal fun Int.toPlatformSleepStageType(): Int {
 
 internal fun Int.toPlatformRecordingMethod(): Int {
     return SDK_TO_PLATFORM_RECORDING_METHOD[this] ?: PlatformMetadata.RECORDING_METHOD_UNKNOWN
+}
+
+internal fun Int.toPlatformFhirResourceType(): Int {
+    // PHR does not support FHIR UNKNOWN type, see ag/29700288
+    return SDK_TO_PLATFORM_FHIR_RESOURCE_TYPE[this]
+        ?: throw IllegalArgumentException("Invalid FHIR resource type.")
 }
 
 internal fun Int.toSdkBloodPressureBodyPosition(): Int {
