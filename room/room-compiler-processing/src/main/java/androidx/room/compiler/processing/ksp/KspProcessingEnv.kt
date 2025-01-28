@@ -177,7 +177,7 @@ internal class KspProcessingEnv(
             } catch (ex: NumberFormatException) {
                 null
             }
-        return if (jvmTarget != null && jvmTarget > 9) {
+        return if (jvmTarget != null && jvmTarget >= 9) {
             findTypeElement("javax.annotation.processing.Generated")
         } else {
             findTypeElement("javax.annotation.Generated")
