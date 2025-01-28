@@ -19,6 +19,7 @@ package androidx.wear.protolayout.material3
 import android.content.Context
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
+import androidx.wear.protolayout.DeviceParametersBuilders
 
 // TODO: b/373336064 - Move this to protolayout-material3-testing
 internal fun enableDynamicTheme() {
@@ -28,3 +29,9 @@ internal fun enableDynamicTheme() {
         /* dynamic theming is enabled */ 1
     )
 }
+
+internal val DEVICE_PARAMETERS =
+    DeviceParametersBuilders.DeviceParameters.Builder()
+        .setScreenWidthDp(192)
+        .setScreenHeightDp(192)
+        .build()
