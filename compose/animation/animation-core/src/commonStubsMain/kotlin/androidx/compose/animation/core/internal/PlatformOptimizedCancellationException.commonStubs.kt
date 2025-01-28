@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.material3.common
+package androidx.compose.animation.core.internal
 
-@Suppress("NOTHING_TO_INLINE")
-internal actual inline fun identifyHashCode(value: Any): Int = implementedInJetBrainsFork()
+import kotlinx.coroutines.CancellationException
+
+internal actual abstract class PlatformOptimizedCancellationException
+actual constructor(message: String?) : CancellationException(message)

@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.compose.material3.common
+package androidx.compose.ui.internal
 
-@Suppress("NOTHING_TO_INLINE")
-internal actual inline fun identifyHashCode(value: Any): Int = System.identityHashCode(value)
+import kotlinx.coroutines.CancellationException
+
+/**
+ * Represents a platform-optimized cancellation exception. This allows us to configure exceptions
+ * separately on JVM and other platforms.
+ */
+internal expect abstract class PlatformOptimizedCancellationException(message: String? = null) :
+    CancellationException

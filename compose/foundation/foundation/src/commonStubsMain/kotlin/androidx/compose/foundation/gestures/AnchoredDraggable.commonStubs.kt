@@ -17,14 +17,6 @@
 package androidx.compose.foundation.gestures
 
 import androidx.compose.foundation.implementedInJetBrainsFork
-import kotlinx.coroutines.CancellationException
-
-internal actual class AnchoredDragFinishedSignal actual constructor() :
-    CancellationException("Anchored drag finished") {
-    init {
-        implementedInJetBrainsFork()
-    }
-}
 
 internal actual inline fun assertOnJvm(statement: Boolean, message: () -> String): Unit =
     implementedInJetBrainsFork()
