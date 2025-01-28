@@ -115,7 +115,7 @@ object SandboxedUiAdapterFactory {
 
         private val targetSessionConstantsClass =
             Class.forName(
-                SessionConstants::class.java.name,
+                "androidx.privacysandbox.ui.core.SessionConstants",
                 /* initialize = */ false,
                 uiProviderBinder.javaClass.classLoader
             )
