@@ -366,14 +366,11 @@ internal class MicrobenchmarkPhase(
                             warmupPhase(
                                 warmupManager = warmupManager,
                                 // Collect the instructions metric to ensure that behavior and
-                                // timing aren't
-                                // significantly skewed between warmup and timing phases. For
-                                // example, if
-                                // only timing phase has a complex impl of pause/resume, then
-                                // behavior
-                                // changes drastically, and the warmupManager will estimate a far
-                                // faster
-                                // impl of `measureRepeated { runWithTimingDisabled }`
+                                // timing aren't significantly skewed between warmup and timing
+                                // phases. For example, if only timing phase has a complex impl of
+                                // pause/resume, then behavior changes drastically, and the
+                                // warmupManager will estimate a far faster impl of
+                                // `measureRepeated { runWithMeasurementDisabled }`
                                 collectCpuEventInstructions =
                                     metrics.any {
                                         it is CpuEventCounterCapture && it.names.isNotEmpty()
