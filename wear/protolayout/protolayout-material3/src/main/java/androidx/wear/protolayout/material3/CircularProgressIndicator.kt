@@ -30,7 +30,6 @@ import androidx.wear.protolayout.DimensionBuilders.degrees
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.Arc
-import androidx.wear.protolayout.LayoutElementBuilders.ArcLine
 import androidx.wear.protolayout.LayoutElementBuilders.ArcSpacer
 import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.DashedArcLine
@@ -39,7 +38,6 @@ import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicColor
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat
-import androidx.wear.protolayout.expression.VersionBuilders.VersionInfo
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.CPI_DEFAULT_DP_SIZE
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.INDICATOR_STROKE_WIDTH_INCREMENT_PX
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.LARGE_STROKE_WIDTH
@@ -47,6 +45,7 @@ import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.MET
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.TRIVIAL_ARC_OFFSET
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.calculateRecommendedGapSize
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.filledProgressIndicatorColors
+import androidx.wear.protolayout.material3.Versions.hasDashedArcLineSupport
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.modifiers.padding
@@ -386,12 +385,6 @@ private fun verifySize(size: ContainerDimension) {
         throw IllegalArgumentException("CircularProgressIndicator could not have size as wrap")
     }
 }
-
-/**
- * For renderer with version lower than 1.403, there is no [DashedArcLine] support. In this case,
- * the progress indicator will fallback to use [ArcLine]
- */
-private fun VersionInfo.hasDashedArcLineSupport() = major > 1 || (major == 1 && minor >= 403)
 
 /*
  * Check the endAngle is valid with the provided startAngle, and adjust the sweep angle to be 360

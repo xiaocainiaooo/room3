@@ -21,7 +21,6 @@ import androidx.annotation.Dimension.Companion.DP
 import androidx.annotation.FloatRange
 import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
 import androidx.wear.protolayout.DimensionBuilders.expand
-import androidx.wear.protolayout.DimensionBuilders.weight
 import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.Column
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_END
@@ -45,7 +44,7 @@ internal object GraphicDataCardDefaults {
      * * graph content, 40% of the horizontal space
      * * remaining is a Column with title and content
      */
-    internal fun buildContentForGraphicDataCard(
+    internal fun MaterialScope.buildContentForGraphicDataCard(
         title: LayoutElement,
         content: LayoutElement?,
         graphic: LayoutElement,
@@ -66,9 +65,10 @@ internal object GraphicDataCardDefaults {
 
         // Side padding - start
         // Smaller padding should be applied to the graph side, and larger to the labels side.
+
         horizontalElementBuilder.addContent(
             verticalSpacer(
-                weight(
+                deviceConfiguration.weightForSpacer(
                     style.sidePaddingWeight +
                         GRAPH_SIDE_PADDING_WEIGHT_OFFSET *
                             (if (horizontalAlignment == HORIZONTAL_ALIGN_START) -1 else 1)
@@ -79,7 +79,7 @@ internal object GraphicDataCardDefaults {
         // Wrap graphic in expandable box with weights
         val wrapGraphic =
             Box.Builder()
-                .setWidth(weight(GRAPHIC_SPACE_PERCENTAGE))
+                .setWidth(deviceConfiguration.weightForContainer(GRAPHIC_SPACE_PERCENTAGE))
                 .setHeight(height)
                 .addContent(graphic)
                 .build()
@@ -96,7 +96,9 @@ internal object GraphicDataCardDefaults {
         horizontalElementBuilder.addContent(
             Box.Builder()
                 .setHorizontalAlignment(HORIZONTAL_ALIGN_START)
-                .setWidth(weight(100 - style.sidePaddingWeight * 2 - GRAPHIC_SPACE_PERCENTAGE))
+                .setWidth(
+                    weightAsExpand(100 - style.sidePaddingWeight * 2 - GRAPHIC_SPACE_PERCENTAGE)
+                )
                 .addContent(verticalElementBuilder.build())
                 .build()
         )
@@ -110,7 +112,7 @@ internal object GraphicDataCardDefaults {
         // Smaller padding should be applied to the graph side, and larger to the labels side.
         horizontalElementBuilder.addContent(
             verticalSpacer(
-                weight(
+                deviceConfiguration.weightForSpacer(
                     style.sidePaddingWeight +
                         GRAPH_SIDE_PADDING_WEIGHT_OFFSET *
                             (if (horizontalAlignment == HORIZONTAL_ALIGN_START) 1 else -1)
