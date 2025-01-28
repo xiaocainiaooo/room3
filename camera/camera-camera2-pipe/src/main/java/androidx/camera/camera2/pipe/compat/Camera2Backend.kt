@@ -75,6 +75,7 @@ constructor(
     }
 
     override fun shutdownAsync(): Deferred<Unit> {
+        camera2DeviceCache.shutdown()
         return camera2DeviceManager.closeAll()
     }
 
