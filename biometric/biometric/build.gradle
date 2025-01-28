@@ -55,6 +55,7 @@ dependencies {
     testImplementation(libs.mockitoCore4)
     testImplementation(libs.robolectric)
     testImplementation(libs.truth)
+    testImplementation("androidx.fragment:fragment-testing:1.4.1")
 
     androidTestImplementation(libs.testCore)
     androidTestImplementation(libs.testExtJunit)
