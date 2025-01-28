@@ -15,22 +15,15 @@
  */
 package androidx.navigation
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStore
-import androidx.lifecycle.get
 
-private val FACTORY: ViewModelProvider.Factory =
-    object : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return NavControllerViewModel() as T
-        }
+public actual open class NavHostController : NavController() {
+    public actual final override fun setLifecycleOwner(owner: LifecycleOwner) {
+        implementedInJetBrainsFork()
     }
 
-internal fun NavControllerViewModel.Companion.getInstance(
-    viewModelStore: ViewModelStore
-): NavControllerViewModel {
-    val viewModelProvider = ViewModelProvider(viewModelStore, FACTORY)
-    return viewModelProvider.get()
+    public actual final override fun setViewModelStore(viewModelStore: ViewModelStore) {
+        implementedInJetBrainsFork()
+    }
 }
