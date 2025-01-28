@@ -24,6 +24,8 @@ import androidx.health.connect.client.HealthConnectFeatures.Companion.FEATURE_PE
 import androidx.health.connect.client.HealthConnectFeatures.Companion.FEATURE_STATUS_AVAILABLE
 import kotlin.reflect.KClass
 
+internal const val FEATURE_CONSTANT_NAME_PHR = "FEATURE_PERSONAL_HEALTH_RECORD"
+
 @OptIn(ExperimentalFeatureAvailabilityApi::class)
 internal fun isPersonalHealthRecordFeatureAvailableInPlatform(): Boolean {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -61,6 +63,6 @@ internal fun <T> withPhrFeatureCheck(apiName: String, block: () -> T): T {
     if (isPersonalHealthRecordFeatureAvailableInPlatform()) {
         return block()
     } else {
-        throw createExceptionDueToFeatureUnavailable("FEATURE_PERSONAL_HEALTH_RECORD", apiName)
+        throw createExceptionDueToFeatureUnavailable(FEATURE_CONSTANT_NAME_PHR, apiName)
     }
 }
