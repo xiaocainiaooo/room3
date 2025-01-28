@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 
-package androidx.compose.animation.core
+package androidx.compose.material.internal
 
-import kotlinx.coroutines.CancellationException
-
-internal actual class MutationInterruptedException : CancellationException("") {
-    init {
-        implementedInJetBrainsFork()
-    }
-}
+internal actual fun identityHashCode(instance: Any?): Int = System.identityHashCode(instance)

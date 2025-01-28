@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.material.internal
 
 import kotlinx.coroutines.CancellationException
 
 private val EmptyStackTraceElements = emptyArray<StackTraceElement>()
 
-/**
- * Used in place of the standard Job cancellation pathway to avoid reflective javaClass.simpleName
- * lookups to build the exception message and stack trace collection. Remove if these are changed in
- * kotlinx.coroutines.
- */
-internal actual class ModifierNodeDetachedCancellationException :
-    CancellationException("The Modifier.Node was detached") {
+internal actual abstract class PlatformOptimizedCancellationException
+actual constructor(message: String?) : CancellationException(message) {
+
     override fun fillInStackTrace(): Throwable {
         // Avoid null.clone() on Android <= 6.0 when accessing stackTrace
         stackTrace = EmptyStackTraceElements

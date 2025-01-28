@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.compose.material
+package androidx.compose.material.internal
 
 import kotlinx.coroutines.CancellationException
 
-internal actual class AnchoredDragFinishedSignal : CancellationException("Anchored drag finished") {
-    init {
-        implementedInJetBrainsFork()
-    }
-}
+/**
+ * Represents a platform-optimized cancellation exception. This allows us to configure exceptions
+ * separately on JVM and other platforms.
+ */
+internal expect abstract class PlatformOptimizedCancellationException(message: String? = null) :
+    CancellationException

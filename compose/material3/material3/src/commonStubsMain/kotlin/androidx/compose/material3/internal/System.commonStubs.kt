@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.gestures
+package androidx.compose.material3.internal
 
-import kotlinx.coroutines.CancellationException
+import androidx.compose.material3.implementedInJetBrainsFork
 
-private val EmptyStackTraceElements = emptyArray<StackTraceElement>()
-
-internal actual class FlingCancellationException actual constructor() :
-    CancellationException("The fling animation was cancelled") {
-    override fun fillInStackTrace(): Throwable {
-        stackTrace = EmptyStackTraceElements
-        return this
-    }
-}
+internal actual fun identityHashCode(instance: Any?): Int = implementedInJetBrainsFork()
