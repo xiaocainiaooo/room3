@@ -937,6 +937,7 @@ package androidx.compose.foundation.lazy {
 
   @androidx.compose.runtime.Stable public final class LazyListState implements androidx.compose.foundation.gestures.ScrollableState {
     ctor @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi public LazyListState();
+    ctor @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi public LazyListState(androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow cacheWindow, optional int firstVisibleItemIndex, optional int firstVisibleItemScrollOffset);
     ctor public LazyListState(optional int firstVisibleItemIndex, optional int firstVisibleItemScrollOffset);
     ctor @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi public LazyListState(optional int firstVisibleItemIndex, optional int firstVisibleItemScrollOffset, optional androidx.compose.foundation.lazy.LazyListPrefetchStrategy prefetchStrategy);
     method public suspend Object? animateScrollToItem(@IntRange(from=0L) int index, optional int scrollOffset, kotlin.coroutines.Continuation<? super kotlin.Unit>);
@@ -967,6 +968,7 @@ package androidx.compose.foundation.lazy {
   }
 
   public final class LazyListStateKt {
+    method @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static androidx.compose.foundation.lazy.LazyListState rememberLazyListState(androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow cacheWindow, optional int initialFirstVisibleItemIndex, optional int initialFirstVisibleItemScrollOffset);
     method @androidx.compose.runtime.Composable public static androidx.compose.foundation.lazy.LazyListState rememberLazyListState(optional int initialFirstVisibleItemIndex, optional int initialFirstVisibleItemScrollOffset);
     method @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static androidx.compose.foundation.lazy.LazyListState rememberLazyListState(optional int initialFirstVisibleItemIndex, optional int initialFirstVisibleItemScrollOffset, optional androidx.compose.foundation.lazy.LazyListPrefetchStrategy prefetchStrategy);
   }
@@ -1164,6 +1166,16 @@ package androidx.compose.foundation.lazy.layout {
     property public int size;
     property public int startIndex;
     property public T value;
+  }
+
+  @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public interface LazyLayoutCacheWindow {
+    method public default int calculateAheadWindow(androidx.compose.ui.unit.Density, int viewport);
+    method public default int calculateBehindWindow(androidx.compose.ui.unit.Density, int viewport);
+  }
+
+  public final class LazyLayoutCacheWindowKt {
+    method @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow LazyLayoutCacheWindow(optional float ahead, optional float behind);
+    method @SuppressCompatibility @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow LazyLayoutCacheWindow(optional float aheadFraction, optional float behindFraction);
   }
 
   public abstract class LazyLayoutIntervalContent<Interval extends androidx.compose.foundation.lazy.layout.LazyLayoutIntervalContent.Interval> {

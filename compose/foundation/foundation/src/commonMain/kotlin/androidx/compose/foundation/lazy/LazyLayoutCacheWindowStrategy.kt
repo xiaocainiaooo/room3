@@ -24,8 +24,6 @@ import androidx.compose.foundation.gestures.snapping.singleAxisViewportSize
 import androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchHandle
 import androidx.compose.foundation.lazy.layout.NestedPrefetchScope
-import androidx.compose.foundation.lazy.layout.PrefetchScheduler
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.traceValue
 import kotlin.math.absoluteValue
@@ -36,11 +34,9 @@ import kotlin.math.sign
  * This is a transition class based on [LazyListPrefetchStrategy] where we will perform a window
  * based prefetching for items in the direction of the scroll movement (ahead).
  */
-@ExperimentalFoundationApi
+@OptIn(ExperimentalFoundationApi::class)
 internal class CacheWindowListPrefetchStrategy(
-    private val prefetchCacheWindow: LazyLayoutCacheWindow,
-    private val density: Density,
-    override val prefetchScheduler: PrefetchScheduler? = null
+    private val cacheWindow: LazyLayoutCacheWindow,
 ) : LazyListPrefetchStrategy {
 
     /** Handles for prefetched items in the current forward window. */
@@ -53,6 +49,8 @@ internal class CacheWindowListPrefetchStrategy(
      */
     private val windowCache = mutableIntIntMapOf()
     private var previousPassDelta = 0f
+
+    private var nestedPrefetchItemCount: Int = 2
 
     /**
      * Indices for the start and end of the cache window. The items between
@@ -116,7 +114,7 @@ internal class CacheWindowListPrefetchStrategy(
     }
 
     override fun NestedPrefetchScope.onNestedPrefetch(firstVisibleItemIndex: Int) {
-        // no-op for now
+        repeat(nestedPrefetchItemCount) { schedulePrecomposition(firstVisibleItemIndex + it) }
     }
 
     fun hasValidBounds() =
@@ -146,10 +144,11 @@ internal class CacheWindowListPrefetchStrategy(
                 // extra space is always positive in this context
                 val mainAxisExtraSpaceEnd =
                     (lastItemOverflowOffset - viewportEndOffset).absoluteValue
+                val density = (layoutInfo as? LazyListMeasureResult)?.density
                 val prefetchForwardWindow =
-                    with(prefetchCacheWindow) { density.calculateAheadWindow(viewport) }
+                    with(cacheWindow) { density?.calculateAheadWindow(viewport) ?: 0 }
                 val keepAroundWindow =
-                    with(prefetchCacheWindow) { density.calculateBehindWindow(viewport) }
+                    with(cacheWindow) { density?.calculateBehindWindow(viewport) ?: 0 }
 
                 // save latest item count
                 itemsCount = totalItemsCount
