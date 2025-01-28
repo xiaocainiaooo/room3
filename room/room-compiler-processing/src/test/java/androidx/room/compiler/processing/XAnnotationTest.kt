@@ -18,6 +18,7 @@ package androidx.room.compiler.processing
 
 import androidx.kruth.assertThat
 import androidx.kruth.assertWithMessage
+import androidx.room.compiler.codegen.XClassName
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.asClassName
 import androidx.room.compiler.processing.compat.XConverters.toJavac
@@ -42,6 +43,7 @@ import androidx.room.compiler.processing.util.getDeclaredMethodByJvmName
 import androidx.room.compiler.processing.util.getField
 import androidx.room.compiler.processing.util.getMethodByJvmName
 import androidx.room.compiler.processing.util.getParameter
+import androidx.room.compiler.processing.util.runKspTest
 import androidx.room.compiler.processing.util.runProcessorTest
 import androidx.room.compiler.processing.util.runProcessorTestWithoutKsp
 import com.squareup.kotlinpoet.javapoet.JAnnotationSpec
@@ -494,6 +496,34 @@ class XAnnotationTest(private val preCompiled: Boolean) {
                 assertThat(boxArray[0].getAsString("value")).isEqualTo("other list 1")
                 assertThat(boxArray[1].getAsString("value")).isEqualTo("other list 2")
             }
+        }
+    }
+
+    @Test
+    fun errorTypeReference_kotlin() {
+        val mySource =
+            Source.kotlin(
+                "Subject.kt",
+                """
+            import kotlin.reflect.KClass
+
+            @Target(AnnotationTarget.CLASS)
+            annotation class TheAnnotation(vararg val value: KClass<*>)
+
+            @TheAnnotation(value = [GeneratedType::class, String::class])
+            class Subject
+            """
+                    .trimIndent()
+            )
+        runKspTest(sources = listOf(mySource)) { invocation ->
+            val element = invocation.processingEnv.requireTypeElement("Subject")
+            val annotation = element.requireAnnotation(XClassName.get("", "TheAnnotation"))
+
+            assertThat(element.validate()).isFalse()
+            assertThat(annotation.annotationValues.single().asTypeList().map { it.asTypeName() })
+                .containsExactly(XClassName.get("", "GeneratedType"), String::class.asClassName())
+
+            invocation.assertCompilationResult { hasError("Unresolved reference 'GeneratedType'.") }
         }
     }
 
