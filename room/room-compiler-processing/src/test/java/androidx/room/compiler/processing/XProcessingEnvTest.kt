@@ -17,6 +17,7 @@
 package androidx.room.compiler.processing
 
 import androidx.kruth.assertThat
+import androidx.kruth.assertWithMessage
 import androidx.room.compiler.codegen.XClassName
 import androidx.room.compiler.codegen.XTypeName
 import androidx.room.compiler.codegen.asClassName
@@ -161,26 +162,24 @@ class XProcessingEnvTest {
 
     @Test
     fun findGeneratedAnnotation() {
-        runProcessorTest(
-            sources = emptyList(),
-            classpath = emptyList(),
-            javacArguments = listOf("-target", "1.8", "-source", "1.8"),
-            kotlincArguments = listOf("-jvm-target=1.8")
-        ) { invocation ->
-            val generatedAnnotation = invocation.processingEnv.findGeneratedAnnotation()
-            assertThat(generatedAnnotation?.qualifiedName).isEqualTo("javax.annotation.Generated")
+
+        fun validateGeneratedAnnotation(jvmTarget: String, fqn: String) {
+            runProcessorTest(
+                sources = emptyList(),
+                classpath = emptyList(),
+                javacArguments = listOf("-target", jvmTarget, "-source", jvmTarget),
+                kotlincArguments = listOf("-jvm-target=$jvmTarget")
+            ) { invocation ->
+                val generatedAnnotation = invocation.processingEnv.findGeneratedAnnotation()
+                assertWithMessage("On jvmTarget=$jvmTarget")
+                    .that(generatedAnnotation?.qualifiedName)
+                    .isEqualTo(fqn)
+            }
         }
 
-        runProcessorTest(
-            sources = emptyList(),
-            classpath = emptyList(),
-            javacArguments = listOf("-target", "11", "-source", "11"),
-            kotlincArguments = listOf("-jvm-target=11")
-        ) { invocation ->
-            val generatedAnnotation = invocation.processingEnv.findGeneratedAnnotation()
-            assertThat(generatedAnnotation?.qualifiedName)
-                .isEqualTo("javax.annotation.processing.Generated")
-        }
+        validateGeneratedAnnotation("1.8", "javax.annotation.Generated")
+        validateGeneratedAnnotation("9", "javax.annotation.processing.Generated")
+        validateGeneratedAnnotation("11", "javax.annotation.processing.Generated")
     }
 
     @Test
