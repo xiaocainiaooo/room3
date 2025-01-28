@@ -302,4 +302,20 @@ class AppFunctionCompilerTest {
             goldenFileName = "fakeAllPrimitiveReturns_app_function_dynamic_schema.xml"
         )
     }
+
+    @Test
+    fun testFakeAllNullablePrimitiveParamsWithDefault_genIndexXmlFile_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames =
+                    listOf("FakeAllNullablePrimitiveParamsWithDefaultImpl.KT", "FakeSchemas.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithResourceContent(
+            report = report,
+            expectGeneratedResourceFileName = "app_functions_dynamic_schema.xml",
+            goldenFileName =
+                "fakeAllNullablePrimitiveParamsWithDefault_app_function_dynamic_schema.xml"
+        )
+    }
 }

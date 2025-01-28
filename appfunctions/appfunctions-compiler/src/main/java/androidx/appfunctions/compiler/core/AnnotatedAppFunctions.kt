@@ -167,8 +167,7 @@ data class AnnotatedAppFunctions(
             .map {
                 AppFunctionParameterMetadata(
                     name = checkNotNull(it.name?.asString()),
-                    // TODO: Correctly populate isRequired.
-                    isRequired = !it.hasDefault,
+                    isRequired = !it.type.resolve().isMarkedNullable,
                     dataType = AppFunctionDataTypeMetadata(type = it.type.toAppFunctionDataType())
                 )
             }
