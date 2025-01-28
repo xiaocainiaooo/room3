@@ -73,7 +73,7 @@ import androidx.wear.compose.material3.tokens.ColorTokens
  * @property background The background color that appears behind other content.
  * @property onBackground Color used for text and icons displayed on top of the background color.
  * @property error Color that indicates remove, delete, close or dismiss actions, such as Swipe to
- *   Reveal. Added as a container alternative that is slightly less alarming and urgent than the
+ *   Reveal. Added as a slightly less alarming and urgent alternative to errorContainer than the
  *   error dim color.
  * @property errorDim Indicates high priority errors or emergency actions, such as safety alerts,
  *   failed dialog overlays or stop buttons.
