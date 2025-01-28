@@ -25,6 +25,7 @@ import androidx.privacysandbox.ui.core.ExperimentalFeatures
 import androidx.privacysandbox.ui.core.IRemoteSharedUiSessionClient
 import androidx.privacysandbox.ui.core.IRemoteSharedUiSessionController
 import androidx.privacysandbox.ui.core.ISharedUiAdapter
+import androidx.privacysandbox.ui.core.RemoteCallManager.tryToCallRemoteObject
 import androidx.privacysandbox.ui.core.SharedUiAdapter
 import java.util.concurrent.Executor
 
@@ -55,13 +56,19 @@ private class BinderSharedUiAdapterDelegate(private val adapter: SharedUiAdapter
     }
 
     // TODO(b/365614954): try to improve method's performance.
-    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun openRemoteSession(remoteSessionClient: IRemoteSharedUiSessionClient) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            tryToCallRemoteObject(remoteSessionClient) {
+                onRemoteSessionError("openRemoteSession() requires API34+")
+            }
+            return
+        }
+
         try {
             val sessionClient = SessionClientProxy(remoteSessionClient)
             openSession(Runnable::run, sessionClient)
         } catch (exception: Throwable) {
-            remoteSessionClient.onRemoteSessionError(exception.message)
+            tryToCallRemoteObject(remoteSessionClient) { onRemoteSessionError(exception.message) }
         }
     }
 
