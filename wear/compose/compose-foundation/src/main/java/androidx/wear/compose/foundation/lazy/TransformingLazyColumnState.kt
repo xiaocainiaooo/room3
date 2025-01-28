@@ -24,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -127,7 +126,7 @@ public class TransformingLazyColumnState() : ScrollableState {
         private set
 
     internal var nearestRange: IntRange by
-        mutableStateOf(IntRange.EMPTY, structuralEqualityPolicy())
+        mutableStateOf(calculateNearestItemsRange(0), structuralEqualityPolicy())
         private set
 
     internal var lastMeasuredAnchorItemHeight: Int = Int.MIN_VALUE
