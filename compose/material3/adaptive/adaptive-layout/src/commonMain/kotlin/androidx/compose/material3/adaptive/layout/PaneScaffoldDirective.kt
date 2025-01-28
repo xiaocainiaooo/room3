@@ -29,6 +29,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlin.jvm.JvmInline
 
 /**
  * Calculates the recommended [PaneScaffoldDirective] from a given [WindowAdaptiveInfo]. Use this
@@ -253,7 +254,7 @@ class PaneScaffoldDirective(
 
 /** Policies that indicate how hinges are supposed to be addressed in an adaptive layout. */
 @Immutable
-@kotlin.jvm.JvmInline
+@JvmInline
 value class HingePolicy private constructor(private val value: Int) {
     override fun toString(): String {
         return "HingePolicy." +
