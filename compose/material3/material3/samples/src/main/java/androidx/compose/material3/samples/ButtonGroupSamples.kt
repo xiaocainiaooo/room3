@@ -52,7 +52,7 @@ import androidx.compose.ui.util.fastForEachIndexed
 @Sampled
 @Composable
 fun ButtonGroupSample() {
-    ButtonGroup {
+    ButtonGroup(modifier = Modifier.padding(horizontal = 8.dp)) {
         val options = listOf("A", "B", "C", "D")
         val checked = remember { mutableStateListOf(false, false, false, false) }
         val modifiers =
