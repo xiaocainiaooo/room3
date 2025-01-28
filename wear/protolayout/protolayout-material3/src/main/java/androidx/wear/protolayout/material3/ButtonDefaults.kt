@@ -23,7 +23,6 @@ import androidx.annotation.FloatRange
 import androidx.wear.protolayout.DimensionBuilders
 import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
 import androidx.wear.protolayout.DimensionBuilders.expand
-import androidx.wear.protolayout.DimensionBuilders.weight
 import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.Column
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_END
@@ -96,13 +95,13 @@ public object ButtonDefaults {
      *
      * [horizontalAlignment] defines side that avatar is.
      */
-    internal fun buildContentForAvatarButton(
+    internal fun MaterialScope.buildContentForAvatarButton(
         avatar: LayoutElement,
         label: LayoutElement,
         secondaryLabel: LayoutElement?,
         @HorizontalAlignment horizontalAlignment: Int,
         style: AvatarButtonStyle,
-        height: ContainerDimension,
+        height: ContainerDimension
     ): LayoutElement {
         val verticalElementBuilder: Column.Builder =
             Column.Builder().setWidth(expand()).setHorizontalAlignment(HORIZONTAL_ALIGN_START)
@@ -118,7 +117,7 @@ public object ButtonDefaults {
         // Side padding - start
         horizontalElementBuilder.addContent(
             verticalSpacer(
-                weight(
+                deviceConfiguration.weightForSpacer(
                     if (horizontalAlignment == HORIZONTAL_ALIGN_START) style.avatarPaddingWeight
                     else style.labelsPaddingWeight
                 )
@@ -128,7 +127,7 @@ public object ButtonDefaults {
         // Wrap avatar in expandable box with weights
         val wrapAvatar =
             Box.Builder()
-                .setWidth(weight(style.avatarSizeWeight))
+                .setWidth(deviceConfiguration.weightForContainer(style.avatarSizeWeight))
                 .setHeight(height)
                 .addContent(avatar)
                 .build()
@@ -144,7 +143,7 @@ public object ButtonDefaults {
                 .setHorizontalAlignment(HORIZONTAL_ALIGN_START)
                 // Remaining % from 100% is for labels
                 .setWidth(
-                    weight(
+                    weightAsExpand(
                         100 -
                             style.avatarPaddingWeight -
                             style.labelsPaddingWeight -
@@ -163,7 +162,7 @@ public object ButtonDefaults {
         // Side padding - end
         horizontalElementBuilder.addContent(
             verticalSpacer(
-                weight(
+                deviceConfiguration.weightForSpacer(
                     if (horizontalAlignment == HORIZONTAL_ALIGN_START) style.labelsPaddingWeight
                     else style.avatarPaddingWeight
                 )

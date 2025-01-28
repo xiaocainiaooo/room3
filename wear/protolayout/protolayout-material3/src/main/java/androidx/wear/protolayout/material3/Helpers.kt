@@ -22,11 +22,13 @@ import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
 import androidx.annotation.Dimension.Companion.SP
 import androidx.annotation.FloatRange
+import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
 import androidx.wear.protolayout.DimensionBuilders
 import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
 import androidx.wear.protolayout.DimensionBuilders.DpProp
 import androidx.wear.protolayout.DimensionBuilders.WrappedDimensionProp
 import androidx.wear.protolayout.DimensionBuilders.expand
+import androidx.wear.protolayout.DimensionBuilders.weight
 import androidx.wear.protolayout.DimensionBuilders.wrap
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.Box
@@ -45,6 +47,7 @@ import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.ModifiersBuilders.SEMANTICS_ROLE_BUTTON
 import androidx.wear.protolayout.material3.PrimaryLayoutDefaults.percentageHeightToDp
 import androidx.wear.protolayout.material3.PrimaryLayoutDefaults.percentageWidthToDp
+import androidx.wear.protolayout.material3.Versions.hasExpandWithWeightSupport
 import androidx.wear.protolayout.materialcore.fontscaling.FontScaleConverterFactory
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.clickable
@@ -102,7 +105,7 @@ internal fun verticalSpacer(@Dimension(unit = DP) widthDp: Int): Spacer =
     Spacer.Builder().setWidth(widthDp.toDp()).setHeight(expand()).build()
 
 /** Builds a vertical Spacer, with height set to expand and width set to the given value. */
-internal fun verticalSpacer(width: DimensionBuilders.ExpandedDimensionProp): Spacer =
+internal fun verticalSpacer(width: DimensionBuilders.SpacerDimension): Spacer =
     Spacer.Builder().setWidth(width).setHeight(expand()).build()
 
 /**
@@ -238,3 +241,46 @@ internal fun MaterialScope.percentagePadding(
     @FloatRange(from = 0.0, to = 1.0) start: Float,
     @FloatRange(from = 0.0, to = 1.0) end: Float
 ): Padding = padding(start = percentageWidthToDp(start), end = percentageWidthToDp(end))
+
+/**
+ * Returns [DimensionBuilders.ExpandedDimensionProp] with [weight] set to the given [weightValue]
+ * represented as percentage up to 100%, when the renderer's schema version supports it. Otherwise,
+ * returns [DpProp] with a value as [weightValue] percentage of the screen width.
+ */
+internal fun DeviceParameters.weightForSpacer(
+    @FloatRange(from = 0.0, to = 100.0) weightValue: Float
+): DimensionBuilders.SpacerDimension =
+    if (rendererSchemaVersion.hasExpandWithWeightSupport()) {
+        weight(weightValue)
+    } else {
+        (screenWidthDp * weightValue / 100f).dp
+    }
+
+/**
+ * Returns [DimensionBuilders.ExpandedDimensionProp] with [weight] set to the given [weightValue]
+ * represented as percentage up to 100%, when the renderer's schema version supports it. Otherwise,
+ * returns [DimensionBuilders.ExpandedDimensionProp] with no weight, that will occupy remaining
+ * space.
+ */
+internal fun MaterialScope.weightAsExpand(
+    @FloatRange(from = 0.0, to = 100.0) weightValue: Float
+): DimensionBuilders.ExpandedDimensionProp =
+    if (deviceConfiguration.rendererSchemaVersion.hasExpandWithWeightSupport()) {
+        weight(weightValue)
+    } else {
+        expand()
+    }
+
+/**
+ * Returns [DimensionBuilders.ExpandedDimensionProp] with [weight] set to the given [weightValue]
+ * represented as percentage up to 100%, when the renderer's schema version supports it. Otherwise,
+ * returns [DpProp] with a value as [weightValue] percentage of the screen width.
+ */
+internal fun DeviceParameters.weightForContainer(
+    @FloatRange(from = 0.0, to = 100.0) weightValue: Float
+): DimensionBuilders.ContainerDimension =
+    if (rendererSchemaVersion.hasExpandWithWeightSupport()) {
+        weight(weightValue)
+    } else {
+        (screenWidthDp * weightValue / 100f).dp
+    }

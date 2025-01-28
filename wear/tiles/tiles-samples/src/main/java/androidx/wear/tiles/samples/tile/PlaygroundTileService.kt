@@ -129,7 +129,7 @@ private fun tileLayout(
 ): LayoutElementBuilders.LayoutElement =
     materialScope(context = context, deviceConfiguration = requestParams.deviceConfiguration) {
         primaryLayout(
-            mainSlot = { oneSlotButtons() },
+            mainSlot = { graphicDataCardSample() },
             margins = MAX_PRIMARY_LAYOUT_MARGIN,
             bottomSlot = {
                 textEdgeButton(

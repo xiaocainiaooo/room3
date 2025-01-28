@@ -17,10 +17,13 @@
 package androidx.wear.protolayout.material3
 
 import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
+import androidx.wear.protolayout.LayoutElementBuilders.TEXT_OVERFLOW_ELLIPSIZE
+import androidx.wear.protolayout.LayoutElementBuilders.TEXT_OVERFLOW_ELLIPSIZE_END
 import androidx.wear.protolayout.LayoutElementBuilders.TextAlignment
 import androidx.wear.protolayout.LayoutElementBuilders.TextOverflow
 import androidx.wear.protolayout.layout.basicText
 import androidx.wear.protolayout.material3.Typography.TypographyToken
+import androidx.wear.protolayout.material3.Versions.hasTextOverflowEllipsizeSupport
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.LayoutString
@@ -48,6 +51,7 @@ import androidx.wear.protolayout.types.LayoutString
  * @sample androidx.wear.protolayout.material3.samples.helloWorldTextDefault
  * @sample androidx.wear.protolayout.material3.samples.helloWorldTextDynamicCustom
  */
+@Suppress("DEPRECATION") // Intentionally using deprecated fallback for old renderer
 public fun MaterialScope.text(
     text: LayoutString,
     @TypographyToken typography: Int = defaultTextElementStyle.typography,
@@ -70,6 +74,15 @@ public fun MaterialScope.text(
                 .build(),
         maxLines = maxLines,
         alignment = alignment,
-        overflow = overflow,
+        overflow =
+            if (overflow == TEXT_OVERFLOW_ELLIPSIZE) {
+                if (deviceConfiguration.rendererSchemaVersion.hasTextOverflowEllipsizeSupport()) {
+                    overflow
+                } else {
+                    TEXT_OVERFLOW_ELLIPSIZE_END
+                }
+            } else {
+                overflow
+            },
         modifier = modifiers
     )
