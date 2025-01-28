@@ -1117,11 +1117,13 @@ internal class SlotReader(
         runtimeCheck(emptyCount == 0) { "Cannot reposition while in an empty region" }
         currentGroup = index
         val parent = if (index < groupsSize) groups.parentAnchor(index) else -1
-        this.parent = parent
-        if (parent < 0) this.currentEnd = groupsSize
-        else this.currentEnd = parent + groups.groupSize(parent)
-        this.currentSlot = 0
-        this.currentSlotEnd = 0
+        if (parent != this.parent) {
+            this.parent = parent
+            if (parent < 0) this.currentEnd = groupsSize
+            else this.currentEnd = parent + groups.groupSize(parent)
+            this.currentSlot = 0
+            this.currentSlotEnd = 0
+        }
     }
 
     /** Restore the parent to a parent of the current group. */
