@@ -27,6 +27,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -194,9 +195,13 @@ internal fun ThreePaneScaffold(
                 scaffoldStateTransition = currentTransition
             }
 
+    val stateHolder = rememberSaveableStateHolder()
+
     LookaheadScope {
         val scaffoldScope =
-            remember(currentTransition, this) { ThreePaneScaffoldScopeImpl(transitionScope, this) }
+            remember(currentTransition, this) {
+                ThreePaneScaffoldScopeImpl(transitionScope, this, stateHolder)
+            }
         with(LocalThreePaneScaffoldOverride.current) {
             ThreePaneScaffoldOverrideContext(
                     modifier = modifier,

@@ -20,6 +20,7 @@ import androidx.annotation.FloatRange
 import androidx.compose.animation.core.Transition
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.layout.Measurable
@@ -139,7 +140,11 @@ sealed interface PaneScaffoldPaneScope<Role> {
     val paneMotion: PaneMotion
 }
 
-internal abstract class PaneScaffoldScopeImpl : PaneScaffoldScope {
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+internal abstract class PaneScaffoldScopeImpl(
+    // TODO(conradchen): Add it to PaneScaffoldScope API in 1.2
+    val saveableStateHolder: SaveableStateHolder
+) : PaneScaffoldScope {
     override fun Modifier.preferredWidth(width: Dp): Modifier {
         require(width == Dp.Unspecified || width > 0.dp) { "invalid width" }
         return this.then(PreferredWidthElement(width))
