@@ -18,7 +18,6 @@ package androidx.wear.protolayout.material3
 
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.wear.protolayout.material3.MaterialScopeTest.Companion.DEVICE_PARAMETERS
 import androidx.wear.protolayout.material3.PrimaryLayoutMargins.Companion.customizedPrimaryLayoutMargin
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test

@@ -19,7 +19,6 @@ import android.graphics.Color
 import android.os.Build.VERSION_CODES
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.wear.protolayout.DeviceParametersBuilders
 import androidx.wear.protolayout.material3.tokens.ColorTokens
 import androidx.wear.protolayout.types.argb
 import com.google.common.truth.Truth.assertThat
@@ -140,13 +139,5 @@ class MaterialScopeTest {
         // Not overridden
         assertThat(materialScope.theme.colorScheme.primary.staticArgb)
             .isEqualTo(ColorTokens.PRIMARY)
-    }
-
-    companion object {
-        internal val DEVICE_PARAMETERS =
-            DeviceParametersBuilders.DeviceParameters.Builder()
-                .setScreenWidthDp(192)
-                .setScreenHeightDp(192)
-                .build()
     }
 }
