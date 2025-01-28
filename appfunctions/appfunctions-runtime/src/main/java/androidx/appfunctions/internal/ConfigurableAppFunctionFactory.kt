@@ -24,12 +24,12 @@ import androidx.appfunctions.internal.Constants.APP_FUNCTIONS_TAG
 import java.lang.reflect.InvocationTargetException
 
 /**
- * An factory that will incorporate [AppFunctionConfiguration] from [context] to create AppFunction
+ * A factory that will incorporate [AppFunctionConfiguration] from [context] to create AppFunction
  * enclosing classes.
  *
  * If the application context from [context] overrides [AppFunctionConfiguration.Provider], the
- * customize factory method will be used to instantiate the enclosing class. Otherwise, it will use
- * reflection to create the instance assuming the enclosing class has no argument constructor.
+ * customized factory method will be used to instantiate the enclosing class. Otherwise, it will use
+ * reflection to create the instance assuming the enclosing class has a no argument constructor.
  *
  * [createEnclosingClass] will throw [AppFunctionInstantiationException] if unable to instantiate
  * the enclosing class.

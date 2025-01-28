@@ -25,7 +25,7 @@ package androidx.appfunctions
  *
  * The enclosing class of the function would be instantiated whenever an AppFunction within the
  * class is called. If the enclosing class requires constructor parameters or custom instantiation,
- * adds a custom factory in [AppFunctionConfiguration.Builder.addEnclosingClassFactory]. This allows
+ * add a custom factory in [AppFunctionConfiguration.Builder.addEnclosingClassFactory]. This allows
  * you to inject dependencies or handle more complex object creation scenarios.
  *
  * When a function is annotated with `@AppFunction`, the compiler will automatically:

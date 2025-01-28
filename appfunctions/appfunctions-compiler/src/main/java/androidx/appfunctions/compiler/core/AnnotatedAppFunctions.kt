@@ -43,7 +43,7 @@ data class AnnotatedAppFunctions(
      */
     val classDeclaration: KSClassDeclaration,
     /**
-     * The list of [com.google.devtools.ksp.symbol.KSFunctionDeclaration] that annotated as app
+     * The list of [com.google.devtools.ksp.symbol.KSFunctionDeclaration] that are annotated as app
      * function.
      */
     val appFunctionDeclarations: List<KSFunctionDeclaration>

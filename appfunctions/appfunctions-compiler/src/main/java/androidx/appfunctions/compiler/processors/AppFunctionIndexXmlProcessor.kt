@@ -38,7 +38,7 @@ import org.w3c.dom.Element
  * AppSearch indexer to index.
  *
  * The generator would write an XML file as `/assets/app_functions_dynamic_schema.xml`. The file
- * would be packaged into the APK's asset when assembled. So that the AppSearch indexer can look up
+ * would be packaged into the APK's asset when assembled, so that the AppSearch indexer can look up
  * the asset and inject metadata into platform AppSearch database accordingly.
  */
 class AppFunctionIndexXmlProcessor(
