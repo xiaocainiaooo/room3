@@ -168,7 +168,6 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
                     "MissingBuildMethod",
                     "SetterReturnsThis",
                     "OverlappingConstants",
-                    "IllegalStateException",
                     "ListenerLast",
                     "ExecutorRegistration",
                     "StreamFiles",
