@@ -1924,8 +1924,7 @@ package androidx.health.connect.client.records.metadata {
   }
 
   public final class Device {
-    ctor public Device();
-    ctor public Device(optional String? manufacturer, optional String? model, optional int type);
+    ctor public Device(int type, optional String? manufacturer, optional String? model);
     method public String? getManufacturer();
     method public String? getModel();
     method public int getType();
