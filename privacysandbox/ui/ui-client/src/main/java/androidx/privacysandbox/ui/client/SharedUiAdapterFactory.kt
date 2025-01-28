@@ -88,7 +88,7 @@ object SharedUiAdapterFactory {
 
         private val targetSharedSessionClientClass =
             Class.forName(
-                SharedUiAdapter.SessionClient::class.java.name,
+                "androidx.privacysandbox.ui.core.SharedUiAdapter\$SessionClient",
                 /* initialize = */ false,
                 uiProviderBinder.javaClass.classLoader
             )
@@ -98,7 +98,7 @@ object SharedUiAdapterFactory {
         // need reflection to get hold of it.
         private val openSessionMethod: Method =
             Class.forName(
-                    SharedUiAdapter::class.java.name,
+                    "androidx.privacysandbox.ui.core.SharedUiAdapter",
                     /* initialize = */ false,
                     uiProviderBinder.javaClass.classLoader
                 )
@@ -151,7 +151,7 @@ object SharedUiAdapterFactory {
         private class SessionProxy(private val origSession: Any) : SharedUiAdapter.Session {
             private val targetClass =
                 Class.forName(
-                        SharedUiAdapter.Session::class.java.name,
+                        "androidx.privacysandbox.ui.core.SharedUiAdapter\$Session",
                         /* initialize = */ false,
                         origSession.javaClass.classLoader
                     )
