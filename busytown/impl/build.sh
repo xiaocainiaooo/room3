@@ -129,7 +129,4 @@ if [ -d "$CONFIGURATION_CACHE_REPORTS" ]; then
     cp -r "$CONFIGURATION_CACHE_REPORTS" "$CONFIGURATION_CACHE_REPORTS_EXPORTED"
 fi
 
-# stop Gradle daemon to clean up after ourselves
-./gradlew --stop
-
 exit "$BUILD_STATUS"
