@@ -6,6 +6,7 @@
  * modifying its settings.
  */
 import androidx.build.SoftwareType
+import androidx.stableaidl.StableAidlBuildTypeDslExtension
 
 plugins {
     id("AndroidXPlugin")
@@ -80,7 +81,7 @@ android {
     }
     buildTypes.configureEach {
         consumerProguardFiles("proguard-rules.pro")
-        stableAidl {
+        extensions.configure<StableAidlBuildTypeDslExtension> {
             version = 1
         }
     }
