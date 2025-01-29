@@ -59,7 +59,9 @@ internal interface WindowBackend {
      *
      * @throws UnsupportedOperationException if the Window SDK version is less than 6.
      */
-    @RequiresWindowSdkExtension(version = 6) val supportedPostures: List<SupportedPosture>
+    @RequiresWindowSdkExtension(version = 6)
+    @get:RequiresWindowSdkExtension(version = 6)
+    val supportedPostures: List<SupportedPosture>
 
     /**
      * Returns the current [WindowLayoutInfo] for the given [Context].
