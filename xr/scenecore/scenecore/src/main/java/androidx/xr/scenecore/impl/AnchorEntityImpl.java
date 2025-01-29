@@ -236,7 +236,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
             Log.e(
                     TAG,
                     "ActivitySpace is not an instance of ActivitySpaceImpl.Anchor is in Error"
-                        + " state.");
+                            + " state.");
             mState = State.ERROR;
             mActivitySpace = null;
         }
@@ -247,7 +247,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
             Log.e(
                     TAG,
                     "ActivitySpaceRoot is not an instance of AndroidXrEntity. Anchor is in Error"
-                        + " state.");
+                            + " state.");
             mState = State.ERROR;
             mActivitySpaceRoot = null;
         }
@@ -516,7 +516,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
                 Log.i(
                         TAG,
                         "Anchor is disposed before becoming persisted, stop checking its persist"
-                            + " state.");
+                                + " state.");
                 return;
             }
             if (mAnchor.getPersistState() == Anchor.PersistState.PERSISTED) {
@@ -582,7 +582,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
                 Log.w(
                         TAG,
                         "Cannot retrieve pose in underlying space. Ensure that the anchor is"
-                            + " anchored before calling this method. Returning identity pose.");
+                                + " anchored before calling this method. Returning identity pose.");
                 return new Pose();
             }
 
