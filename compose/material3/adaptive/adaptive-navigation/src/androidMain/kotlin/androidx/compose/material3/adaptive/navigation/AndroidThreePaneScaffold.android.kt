@@ -31,6 +31,9 @@ import androidx.compose.ui.Modifier
  * A version of [ListDetailPaneScaffold] that supports navigation and predictive back handling out
  * of the box, controlled by [ThreePaneScaffoldNavigator].
  *
+ * Example usage, including integration with the Compose Navigation library:
+ *
+ * @sample androidx.compose.material3.adaptive.samples.NavigableListDetailPaneScaffoldSample
  * @param navigator The navigator instance to navigate through the scaffold.
  * @param listPane the list pane of the scaffold, which is supposed to hold a list of item summaries
  *   that can be selected from, for example, the inbox mail list of a mail app. See
