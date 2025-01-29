@@ -574,21 +574,13 @@ public class HealthPermission internal constructor() {
             )
 
         /**
-         * Exposes all write and read permissions.
+         * Exposes all PHR write and read permissions.
          *
          * @return A list of permissions as Strings
          */
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
         @JvmField
-        public val ALL_PERMISSIONS: List<String> = buildList {
-            addAll(
-                RECORD_TYPE_TO_PERMISSION.flatMap {
-                    listOf(WRITE_PERMISSION_PREFIX + it.value, READ_PERMISSION_PREFIX + it.value)
-                }
-            )
-            add(PERMISSION_WRITE_EXERCISE_ROUTE)
-            add(PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND)
-            add(PERMISSION_READ_HEALTH_DATA_HISTORY)
+        public val ALL_PERSONAL_HEALTH_RECORD_PERMISSIONS: List<String> = buildList {
             add(PERMISSION_WRITE_MEDICAL_DATA)
             add(PERMISSION_READ_MEDICAL_DATA_ALLERGIES_INTOLERANCES)
             add(PERMISSION_READ_MEDICAL_DATA_CONDITIONS)
@@ -602,6 +594,25 @@ public class HealthPermission internal constructor() {
             add(PERMISSION_READ_MEDICAL_DATA_VACCINES)
             add(PERMISSION_READ_MEDICAL_DATA_VISITS)
             add(PERMISSION_READ_MEDICAL_DATA_VITAL_SIGNS)
+        }
+
+        /**
+         * Exposes all write and read permissions.
+         *
+         * @return A list of permissions as Strings
+         */
+        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+        @JvmField
+        public val ALL_PERMISSIONS: List<String> = buildList {
+            addAll(
+                RECORD_TYPE_TO_PERMISSION.flatMap {
+                    listOf(WRITE_PERMISSION_PREFIX + it.value, READ_PERMISSION_PREFIX + it.value)
+                }
+            )
+            addAll(ALL_PERSONAL_HEALTH_RECORD_PERMISSIONS)
+            add(PERMISSION_WRITE_EXERCISE_ROUTE)
+            add(PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND)
+            add(PERMISSION_READ_HEALTH_DATA_HISTORY)
         }
     }
 }

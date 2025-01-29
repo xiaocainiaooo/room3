@@ -66,3 +66,15 @@ internal fun <T> withPhrFeatureCheck(apiName: String, block: () -> T): T {
         throw createExceptionDueToFeatureUnavailable(FEATURE_CONSTANT_NAME_PHR, apiName)
     }
 }
+
+/**
+ * Similar to [with], this method executes `block` if PHR feature is available, otherwise throwing
+ * an [UnsupportedOperationException] pointing to `apiName`.
+ */
+internal suspend fun <T> withPhrFeatureCheckSuspend(apiName: String, block: suspend () -> T): T {
+    if (isPersonalHealthRecordFeatureAvailableInPlatform()) {
+        return block()
+    } else {
+        throw createExceptionDueToFeatureUnavailable(FEATURE_CONSTANT_NAME_PHR, apiName)
+    }
+}

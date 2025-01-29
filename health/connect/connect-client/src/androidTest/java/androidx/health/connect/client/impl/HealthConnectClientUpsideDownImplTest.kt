@@ -25,7 +25,11 @@ import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
 import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
+import androidx.health.connect.client.feature.isPersonalHealthRecordFeatureAvailableInPlatform
 import androidx.health.connect.client.impl.platform.aggregate.AGGREGATE_METRICS_ADDED_IN_SDK_EXT_10
+import androidx.health.connect.client.impl.platform.phr.VaccinesMedicalResourceFactory.CompleteStatus.COMPLETE
+import androidx.health.connect.client.impl.platform.phr.VaccinesMedicalResourceFactory.CompleteStatus.INCOMPLETE
+import androidx.health.connect.client.impl.platform.phr.VaccinesMedicalResourceFactory.createVaccinesUpsertMedicalResourceRequest
 import androidx.health.connect.client.impl.platform.records.SDK_TO_PLATFORM_RECORD_CLASS
 import androidx.health.connect.client.impl.platform.records.SDK_TO_PLATFORM_RECORD_CLASS_EXT_13
 import androidx.health.connect.client.permission.HealthPermission
@@ -99,6 +103,10 @@ class HealthConnectClientUpsideDownImplTest {
                     permissions.add(HealthPermission.getReadPermission(recordType))
                     permissions.add(HealthPermission.getWritePermission(recordType))
                 }
+            }
+
+            if (isPersonalHealthRecordFeatureAvailableInPlatform()) {
+                permissions.addAll(HealthPermission.ALL_PERSONAL_HEALTH_RECORD_PERMISSIONS)
             }
 
             return permissions.toTypedArray()
@@ -892,8 +900,83 @@ class HealthConnectClientUpsideDownImplTest {
 
     @Test
     fun getGrantedPermissions() = runTest {
+        assumeTrue(
+            "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
+            isPersonalHealthRecordFeatureAvailableInPlatform()
+        )
         assertThat(healthConnectClient.permissionController.getGrantedPermissions())
             .containsExactlyElementsIn(getAllRecordPermissions())
+    }
+
+    @Ignore(
+        "TODO(b/382680786): Remove Ignore and call createMedicalDataSource once it has been added"
+    )
+    @Test
+    fun upsertMedicalResources_newMedicalResource_expectInserted() = runTest {
+        assumeTrue(
+            "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
+            isPersonalHealthRecordFeatureAvailableInPlatform()
+        )
+        val requests =
+            listOf(
+                createVaccinesUpsertMedicalResourceRequest(
+                    dataSourceId =
+                        "" // TODO(b/382680786): Remove Ignore and call createMedicalDataSource once
+                    // it has been added
+                )
+            )
+
+        val response = healthConnectClient.upsertMedicalResources(requests)
+
+        assertThat(response).hasSize(1)
+        assertThat(response[0].fhirResource.data).isEqualTo(requests[0].data)
+
+        // TODO(b/382680786): read the medical resource back and assert once the read API has become
+        // available.
+    }
+
+    @Ignore(
+        "TODO(b/382680786): Remove Ignore and call createMedicalDataSource once it has been added"
+    )
+    @Test
+    fun upsertMedicalResources_sameMedicalResourceId_expectUpdated() = runTest {
+        assumeTrue(
+            "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
+            isPersonalHealthRecordFeatureAvailableInPlatform()
+        )
+        val insertRequests =
+            listOf(
+                createVaccinesUpsertMedicalResourceRequest(
+                    dataSourceId =
+                        "", // TODO(b/382680786): Remove Ignore and call createMedicalDataSource
+                    // once it has been added
+                    completeStatus = COMPLETE
+                )
+            )
+
+        val insertResponse = healthConnectClient.upsertMedicalResources(insertRequests)
+
+        assertThat(insertResponse).hasSize(1)
+        assertThat(insertResponse[0].fhirResource.data).isEqualTo(insertRequests[0].data)
+
+        val updateRequests =
+            listOf(
+                createVaccinesUpsertMedicalResourceRequest(
+                    dataSourceId =
+                        "", // TODO(b/382680786): Remove Ignore and call createMedicalDataSource
+                    // once it has been added
+                    completeStatus = INCOMPLETE
+                )
+            )
+
+        val updateResponse = healthConnectClient.upsertMedicalResources(updateRequests)
+        assertThat(updateResponse).hasSize(1)
+        assertThat(updateResponse[0].fhirResource.data).isEqualTo(updateRequests[0].data)
+
+        assertThat(insertResponse[0].id).isEqualTo(updateResponse[0].id)
+
+        // TODO(b/382680487): read the medical resource back and assert once the read API has become
+        // available.
     }
 
     private fun <A, E> assertEquals(vararg assertions: Pair<A, E>) {

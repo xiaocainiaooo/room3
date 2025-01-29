@@ -46,6 +46,8 @@ import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseRouteResult
 import androidx.health.connect.client.records.ExerciseSegment
 import androidx.health.connect.client.records.ExerciseSessionRecord
+import androidx.health.connect.client.records.FhirResource
+import androidx.health.connect.client.records.FhirVersion
 import androidx.health.connect.client.records.FloorsClimbedRecord
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.HeartRateVariabilityRmssdRecord
@@ -53,6 +55,7 @@ import androidx.health.connect.client.records.HeightRecord
 import androidx.health.connect.client.records.HydrationRecord
 import androidx.health.connect.client.records.IntermenstrualBleedingRecord
 import androidx.health.connect.client.records.LeanBodyMassRecord
+import androidx.health.connect.client.records.MedicalResource
 import androidx.health.connect.client.records.MedicalResourceId
 import androidx.health.connect.client.records.MenstruationFlowRecord
 import androidx.health.connect.client.records.MenstruationPeriodRecord
@@ -1314,3 +1317,20 @@ internal fun PlatformExerciseSegment.toSdkExerciseSegment() =
 @SuppressLint("NewApi") // Guarded by sdk extension check
 internal fun PlatformMedicalResourceId.toSdkMedicalResourceId() =
     MedicalResourceId(dataSourceId, fhirResourceType.toSdkFhirResourceType(), fhirResourceId)
+
+@SuppressLint("NewApi") // Guarded by sdk extension check
+internal fun PlatformFhirVersion.toSdkFhirVersion() = FhirVersion(major, minor, patch)
+
+@SuppressLint("NewApi") // Guarded by sdk extension check
+internal fun PlatformFhirResource.toSdkFhirResource() =
+    FhirResource(type.toSdkFhirResourceType(), id, data)
+
+@SuppressLint("NewApi") // Guarded by sdk extension check
+internal fun PlatformMedicalResource.toSdkMedicalResource() =
+    MedicalResource(
+        type.toSdkMedicalResourceType(),
+        id.toSdkMedicalResourceId(),
+        dataSourceId,
+        fhirVersion.toSdkFhirVersion(),
+        fhirResource.toSdkFhirResource()
+    )
