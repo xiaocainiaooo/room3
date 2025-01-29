@@ -310,6 +310,53 @@ internal class PruningCamera2DeviceManagerImplTest {
         }
 
     @Test
+    fun canPrewarmCamera() =
+        testScope.runTest {
+            // Test to make sure the camera prewarmed is reused in a later regular open request.
+            deviceManager.prewarm(cameraId0)
+            advanceUntilIdle()
+
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+            val androidCameraState = fakeRetryingCameraStateOpener.androidCameraStates.first()
+            androidCameraState.onOpened(fakeCameraDevice0)
+
+            // Advance time by a little bit to keep the prewarmed camera still open.
+            advanceTimeBy(100)
+
+            val virtualCamera =
+                deviceManager.open(cameraId0, emptyList(), fakeGraphListener1, false) { true }
+            assertNotNull(virtualCamera)
+            advanceUntilIdle()
+
+            // Verify we get an opened camera and that we didn't open the camera twice.
+            assertIs<CameraStateOpen>(virtualCamera.value)
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+        }
+
+    @Test
+    fun prewarmDoesNotDisconnectPriorRequestOpen() =
+        testScope.runTest {
+            // Test to make sure that cameras are not disconnected by a later prewarm request.
+            val virtualCamera =
+                deviceManager.open(cameraId0, emptyList(), fakeGraphListener1, false) { true }
+            assertNotNull(virtualCamera)
+            deviceManager.prewarm(cameraId0)
+            advanceUntilIdle()
+
+            // The prewarm request should not disconnect the virtual camera.
+            assertIsNot<CameraStateClosed>(virtualCamera.value)
+
+            // Now provide an opened camera.
+            assertEquals(fakeRetryingCameraStateOpener.androidCameraStates.size, 1)
+            val androidCameraState = fakeRetryingCameraStateOpener.androidCameraStates.first()
+            androidCameraState.onOpened(fakeCameraDevice0)
+            advanceUntilIdle()
+
+            // Verify the camera is opened successfully.
+            assertIs<CameraStateOpen>(virtualCamera.value)
+        }
+
+    @Test
     fun allCamerasShouldBeOpenedBeforeConnectingWhenOpeningConcurrentCameras() =
         testScope.runTest {
             val virtualCamera1 =
@@ -586,6 +633,56 @@ internal class PruningCamera2DeviceManagerImplTest {
         }
 
     @Test
+    fun PrewarmShouldNotPruneRegularRequestOpens() =
+        testScope.runTest {
+            val fakeRequestOpen1 = createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener1)
+            val fakeRequestOpen2 =
+                createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener2, isPrewarm = true)
+
+            val requestList =
+                mutableListOf<CameraRequest>(
+                    fakeRequestOpen1,
+                    fakeRequestOpen2,
+                )
+            deviceManager.prune(requestList)
+            // The latter RequestOpen is a prewarm, and should thus not prune the former RequestOpen
+            assertEquals(requestList.size, 2)
+            assertEquals(requestList[0], fakeRequestOpen1)
+            assertEquals(requestList[1], fakeRequestOpen2)
+        }
+
+    @Test
+    fun PrewarmShouldBePrunedByAnyRequestOpen() =
+        testScope.runTest {
+            val fakeRequestOpen1 =
+                createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener1, isPrewarm = true)
+            val fakeRequestOpen2 = createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener2)
+            val fakeRequestOpen3 =
+                createFakeRequestOpen(cameraId0, emptyList(), fakeGraphListener3, isPrewarm = true)
+
+            var requestList =
+                mutableListOf<CameraRequest>(
+                    fakeRequestOpen1,
+                    fakeRequestOpen2,
+                )
+            deviceManager.prune(requestList)
+            // If we have a prewarm request with the same camera that hasn't be processed, it should
+            // be pruned.
+            assertEquals(requestList.size, 1)
+            assertEquals(requestList.first(), fakeRequestOpen2)
+
+            requestList =
+                mutableListOf<CameraRequest>(
+                    fakeRequestOpen1,
+                    fakeRequestOpen3,
+                )
+            deviceManager.prune(requestList)
+            // If we have consecutive prewarm requests for the same camera, the former can be pruned
+            assertEquals(requestList.size, 1)
+            assertEquals(requestList.first(), fakeRequestOpen3)
+        }
+
+    @Test
     fun deferredStillCompletesForPrunedRequests() =
         testScope.runTest {
             val requestCloseById1 = RequestCloseById(cameraId0)
@@ -639,9 +736,10 @@ internal class PruningCamera2DeviceManagerImplTest {
         cameraId: CameraId,
         sharedCameraIds: List<CameraId>,
         graphListener: GraphListener,
+        isPrewarm: Boolean = false,
     ): RequestOpen {
         val virtualCamera = VirtualCameraState(cameraId, graphListener, fakeThreads.globalScope)
-        return RequestOpen(virtualCamera, sharedCameraIds, graphListener, false, { true })
+        return RequestOpen(virtualCamera, sharedCameraIds, graphListener, isPrewarm, { true })
     }
 
     private fun createFakeRequestClose(
