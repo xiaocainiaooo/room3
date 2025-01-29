@@ -1019,7 +1019,6 @@ package androidx.wear.compose.material3 {
   }
 
   public final class ScreenScaffoldDefaults {
-    method @Deprecated public androidx.compose.foundation.layout.PaddingValues contentPaddingWithEdgeButton(float edgeButtonSize, optional float start, optional float top, optional float end, optional float extraBottom);
     method @androidx.compose.runtime.Composable public androidx.compose.foundation.layout.PaddingValues getContentPadding();
     method public float getEdgeButtonMinSpacing();
     method public float getEdgeButtonSpacing();
