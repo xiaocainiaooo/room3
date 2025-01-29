@@ -36,6 +36,7 @@ import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -264,7 +265,8 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
             UnconfinedTestDispatcher(effectContext[TestCoroutineScheduler])
     private val testCoroutineScope = TestScope(testCoroutineDispatcher)
     private lateinit var recomposerCoroutineScope: CoroutineScope
-    private val coroutineExceptionHandler = UncaughtExceptionHandler()
+    private val coroutineExceptionHandler =
+        UncaughtExceptionHandler(effectContext[CoroutineExceptionHandler])
 
     private val frameClock: TestMonotonicFrameClock
     private val recomposerContinuationInterceptor: ApplyingContinuationInterceptor

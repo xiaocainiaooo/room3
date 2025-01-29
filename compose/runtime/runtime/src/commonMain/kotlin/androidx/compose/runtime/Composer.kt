@@ -61,6 +61,7 @@ import androidx.compose.runtime.tooling.traceForGroup
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 
@@ -1477,8 +1478,8 @@ internal class ComposerImpl(
     internal val errorContext: CompositionErrorContextImpl? = CompositionErrorContextImpl(this)
         get() = if (sourceMarkersEnabled) field else null
 
-    override val applyCoroutineContext: CoroutineContext
-        @TestOnly get() = parentContext.effectCoroutineContext
+    override val applyCoroutineContext: CoroutineContext =
+        parentContext.effectCoroutineContext + (errorContext ?: EmptyCoroutineContext)
 
     /**
      * Inserts a "Replaceable Group" starting marker in the slot table at the current execution
@@ -3644,7 +3645,7 @@ internal class ComposerImpl(
         if (!sourceMarkersEnabled) return emptyList()
 
         return slotTable
-            .findLocation { it === value }
+            .findLocation { it === value || (it as? RememberObserverHolder)?.wrapped === value }
             ?.let { (groupIndex, dataIndex) ->
                 sourceTraceForGroup(groupIndex, dataIndex) + parentCompositionTrace()
             } ?: emptyList()

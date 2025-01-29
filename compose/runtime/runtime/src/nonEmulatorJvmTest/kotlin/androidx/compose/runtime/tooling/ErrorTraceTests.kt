@@ -46,120 +46,102 @@ class ErrorTraceTests {
     }
 
     @Test
-    fun setContent() = exceptionTest {
-        assertTrace(listOf("<lambda>(ErrorTraceTests.kt:<unknown line>)")) {
+    fun setContent() =
+        exceptionTest("<lambda>(ErrorTraceTests.kt:<unknown line>)") {
             compose { throwTestException() }
         }
-    }
 
     @Test
-    fun recompose() = exceptionTest {
-        var state by mutableStateOf(false)
-        compose {
-            if (state) {
-                throwTestException()
-            }
-        }
-
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-            )
+    fun recompose() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
         ) {
+            var state by mutableStateOf(false)
+            compose {
+                if (state) {
+                    throwTestException()
+                }
+            }
+
             state = true
             advance()
         }
-    }
 
     @Test
-    fun setContentLinear() = exceptionTest {
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-                "<lambda>(ErrorTraceComposables.kt:77)",
-                "ReusableComposeNode(Composables.kt:<line number>)",
-                "Linear(ErrorTraceComposables.kt:73)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            ),
+    fun setContentLinear() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
+            "<lambda>(ErrorTraceComposables.kt:77)",
+            "ReusableComposeNode(Composables.kt:<line number>)",
+            "Linear(ErrorTraceComposables.kt:73)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
         ) {
             compose { Linear { throwTestException() } }
         }
-    }
 
     @Test
-    fun recomposeLinear() = exceptionTest {
-        var state by mutableStateOf(false)
-        compose {
-            Linear {
-                if (state) {
-                    throwTestException()
+    fun recomposeLinear() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
+            "<lambda>(ErrorTraceComposables.kt:77)",
+            "ReusableComposeNode(Composables.kt:<line number>)",
+            "Linear(ErrorTraceComposables.kt:73)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
+        ) {
+            var state by mutableStateOf(false)
+            compose {
+                Linear {
+                    if (state) {
+                        throwTestException()
+                    }
                 }
             }
-        }
 
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-                "<lambda>(ErrorTraceComposables.kt:77)",
-                "ReusableComposeNode(Composables.kt:<line number>)",
-                "Linear(ErrorTraceComposables.kt:73)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            ),
-        ) {
             state = true
             advance()
         }
-    }
 
     @Test
-    fun setContentInlineLinear() = exceptionTest {
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-                "<lambda>(ErrorTraceComposables.kt:87)",
-                "ReusableComposeNode(Composables.kt:<line number>)",
-                "InlineLinear(ErrorTraceComposables.kt:83)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            ),
+    fun setContentInlineLinear() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
+            "<lambda>(ErrorTraceComposables.kt:87)",
+            "ReusableComposeNode(Composables.kt:<line number>)",
+            "InlineLinear(ErrorTraceComposables.kt:83)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
         ) {
             compose { InlineLinear { throwTestException() } }
         }
-    }
 
     @Test
-    fun recomposeInlineLinear() = exceptionTest {
-        var state by mutableStateOf(false)
+    fun recomposeInlineLinear() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
+            "<lambda>(ErrorTraceComposables.kt:87)",
+            "ReusableComposeNode(Composables.kt:<line number>)",
+            "InlineLinear(ErrorTraceComposables.kt:83)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
+        ) {
+            var state by mutableStateOf(false)
 
-        compose {
-            InlineLinear {
-                if (state) {
-                    throwTestException()
+            compose {
+                InlineLinear {
+                    if (state) {
+                        throwTestException()
+                    }
                 }
             }
-        }
 
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-                "<lambda>(ErrorTraceComposables.kt:87)",
-                "ReusableComposeNode(Composables.kt:<line number>)",
-                "InlineLinear(ErrorTraceComposables.kt:83)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
-        ) {
             state = true
             advance()
         }
-    }
 
     @Test
-    fun setContentAfterTextInLoopInlineWrapper() = exceptionTest {
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-                "InlineWrapper(ErrorTraceComposables.kt:57)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            ),
+    fun setContentAfterTextInLoopInlineWrapper() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
+            "InlineWrapper(ErrorTraceComposables.kt:57)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
         ) {
             compose {
                 InlineWrapper {
@@ -172,43 +154,37 @@ class ErrorTraceTests {
                 }
             }
         }
-    }
 
     @Test
-    fun recomposeAfterTextInLoopInlineWrapper() = exceptionTest {
-        var state by mutableStateOf(false)
+    fun recomposeAfterTextInLoopInlineWrapper() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
+            "InlineWrapper(ErrorTraceComposables.kt:57)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
+        ) {
+            var state by mutableStateOf(false)
 
-        compose {
-            InlineWrapper {
-                repeat(5) { it ->
-                    Text("test")
-                    if (it > 3 && state) {
-                        throwTestException()
+            compose {
+                InlineWrapper {
+                    repeat(5) { it ->
+                        Text("test")
+                        if (it > 3 && state) {
+                            throwTestException()
+                        }
                     }
                 }
             }
-        }
 
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-                "InlineWrapper(ErrorTraceComposables.kt:57)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
-        ) {
             state = true
             advance()
         }
-    }
 
     @Test
-    fun setContentAfterTextInLoop() = exceptionTest {
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-                "Repeated(ErrorTraceComposables.kt:94)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            ),
+    fun setContentAfterTextInLoop() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
+            "Repeated(ErrorTraceComposables.kt:94)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
         ) {
             compose {
                 Repeated(List(10) { it }) {
@@ -217,390 +193,286 @@ class ErrorTraceTests {
                 }
             }
         }
-    }
 
     @Test
-    fun recomposeAfterTextInLoop() = exceptionTest {
-        var state by mutableStateOf(false)
+    fun recomposeAfterTextInLoop() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
+            "Repeated(ErrorTraceComposables.kt:94)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
+        ) {
+            var state by mutableStateOf(false)
 
-        compose {
-            Repeated(List(10) { it }) {
-                Text("test")
-                if (state) {
-                    throwTestException()
+            compose {
+                Repeated(List(10) { it }) {
+                    Text("test")
+                    if (state) {
+                        throwTestException()
+                    }
                 }
             }
-        }
 
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-                "Repeated(ErrorTraceComposables.kt:94)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
-        ) {
             state = true
             advance()
         }
-    }
 
     @Test
-    fun setContentSubcomposition() = exceptionTest {
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-                "<lambda>(ErrorTraceComposables.kt:66)",
-                "Subcompose(ErrorTraceComposables.kt:62)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
+    fun setContentSubcomposition() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
+            "<lambda>(ErrorTraceComposables.kt:66)",
+            "Subcompose(ErrorTraceComposables.kt:62)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
         ) {
             compose { Subcompose { throwTestException() } }
         }
-    }
 
     @Test
-    fun recomposeSubcomposition() = exceptionTest {
-        var state by mutableStateOf(false)
+    fun recomposeSubcomposition() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
+            "<lambda>(ErrorTraceComposables.kt:66)",
+            "Subcompose(ErrorTraceComposables.kt:62)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
+        ) {
+            var state by mutableStateOf(false)
 
-        compose {
-            Subcompose {
-                if (state) {
-                    throwTestException()
+            compose {
+                Subcompose {
+                    if (state) {
+                        throwTestException()
+                    }
                 }
             }
-        }
 
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-                "<lambda>(ErrorTraceComposables.kt:66)",
-                "Subcompose(ErrorTraceComposables.kt:62)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
-        ) {
             state = true
             advance()
         }
-    }
 
     @Test
-    fun setContentDefaults() = exceptionTest {
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-                "ComposableWithDefaults(ErrorTraceComposables.kt:109)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
+    fun setContentDefaults() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
+            "ComposableWithDefaults(ErrorTraceComposables.kt:109)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
         ) {
             compose { ComposableWithDefaults { throwTestException() } }
         }
-    }
 
     @Test
-    fun recomposeDefaults() = exceptionTest {
-        var state by mutableStateOf(false)
+    fun recomposeDefaults() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
+            "ComposableWithDefaults(ErrorTraceComposables.kt:109)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
+        ) {
+            var state by mutableStateOf(false)
 
-        compose {
-            ComposableWithDefaults {
-                if (state) {
-                    throwTestException()
+            compose {
+                ComposableWithDefaults {
+                    if (state) {
+                        throwTestException()
+                    }
                 }
             }
-        }
 
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-                "ComposableWithDefaults(ErrorTraceComposables.kt:109)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
-        ) {
             state = true
             advance()
         }
-    }
 
     @Test
-    fun setContentRemember() = exceptionTest {
-        assertTrace(
-            listOf(
-                "remember(ErrorTraceTests.kt:<unknown line>)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
+    fun setContentRemember() =
+        exceptionTest(
+            "remember(ErrorTraceTests.kt:<unknown line>)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
         ) {
             compose { remember { throwTestException() } }
         }
-    }
 
     @Test
-    fun setContentRememberObserver() = exceptionTest {
-        assertTrace(
-            listOf(
-                "remember(Effects.kt:<unknown line>)",
-                "DisposableEffect(Effects.kt:<line number>)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
+    fun setContentRememberObserver() =
+        exceptionTest(
+            "remember(Effects.kt:<unknown line>)",
+            "DisposableEffect(Effects.kt:<line number>)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
         ) {
             compose { DisposableEffect(Unit) { throwTestException() } }
         }
-    }
 
     @Test
-    fun recomposeRememberObserver() = exceptionTest {
-        var state by mutableStateOf(false)
-        compose {
-            DisposableEffect(state) {
-                if (state) {
-                    throwTestException()
+    fun recomposeRememberObserver() =
+        exceptionTest(
+            "remember(Effects.kt:<unknown line>)",
+            "DisposableEffect(Effects.kt:<line number>)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
+        ) {
+            var state by mutableStateOf(false)
+            compose {
+                DisposableEffect(state) {
+                    if (state) {
+                        throwTestException()
+                    }
+                    onDispose {}
                 }
-                onDispose {}
             }
-        }
 
-        assertTrace(
-            listOf(
-                "remember(Effects.kt:<unknown line>)",
-                "DisposableEffect(Effects.kt:<line number>)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
-        ) {
             state = true
             advance()
         }
-    }
 
     @Test
-    fun nodeReuse() = exceptionTest {
-        var state by mutableStateOf(false)
-        compose { ReusableContent(state) { NodeWithCallbacks(onReuse = { throwTestException() }) } }
-
-        assertTrace(
-            listOf(
-                // missing ReusableComposeNode because writer is not set directly to the node group
-                "NodeWithCallbacks(ErrorTraceComposables.kt:<unknown line>)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)",
-                "ReusableContent(Composables.kt:<line number>)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
+    fun nodeReuse() =
+        exceptionTest(
+            // missing ReusableComposeNode because writer is not set directly to the node group
+            "NodeWithCallbacks(ErrorTraceComposables.kt:<unknown line>)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)",
+            "ReusableContent(Composables.kt:<line number>)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
         ) {
+            var state by mutableStateOf(false)
+            compose {
+                ReusableContent(state) { NodeWithCallbacks(onReuse = { throwTestException() }) }
+            }
+
             state = true
             advance()
         }
-    }
 
     @Test
-    fun nodeDeactivate() = exceptionTest {
-        var active by mutableStateOf(true)
-        compose {
-            ReusableContentHost(active) {
-                NodeWithCallbacks(onDeactivate = { throwTestException() })
-            }
-        }
-
-        assertTrace(
-            listOf(
-                "ReusableComposeNode(Composables.kt:<unknown line>)",
-                "NodeWithCallbacks(ErrorTraceComposables.kt:121)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)",
-                "ReusableContentHost(Composables.kt:<line number>)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
+    fun nodeDeactivate() =
+        exceptionTest(
+            "ReusableComposeNode(Composables.kt:<unknown line>)",
+            "NodeWithCallbacks(ErrorTraceComposables.kt:121)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)",
+            "ReusableContentHost(Composables.kt:<line number>)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
         ) {
+            var active by mutableStateOf(true)
+            compose {
+                ReusableContentHost(active) {
+                    NodeWithCallbacks(onDeactivate = { throwTestException() })
+                }
+            }
+
             active = false
             advance()
         }
-    }
 
     @Test
-    fun setContentNodeAttach() = exceptionTest {
-        assertTrace(
-            listOf(
-                "ReusableComposeNode(Composables.kt:<unknown line>)",
-                "NodeWithCallbacks(ErrorTraceComposables.kt:121)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)",
-                "InlineWrapper(ErrorTraceComposables.kt:57)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
+    fun setContentNodeAttach() =
+        exceptionTest(
+            "ReusableComposeNode(Composables.kt:<unknown line>)",
+            "NodeWithCallbacks(ErrorTraceComposables.kt:121)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)",
+            "InlineWrapper(ErrorTraceComposables.kt:57)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
         ) {
             compose { InlineWrapper { NodeWithCallbacks(onAttach = { throwTestException() }) } }
         }
-    }
 
     @Test
-    fun recomposeNodeAttach() = exceptionTest {
-        var state by mutableStateOf(false)
-        compose {
-            Wrapper {
-                if (state) {
-                    NodeWithCallbacks(onAttach = { throwTestException() })
+    fun recomposeNodeAttach() =
+        exceptionTest(
+            "ReusableComposeNode(Composables.kt:<unknown line>)",
+            "NodeWithCallbacks(ErrorTraceComposables.kt:121)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)",
+            "Wrapper(ErrorTraceComposables.kt:149)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
+        ) {
+            var state by mutableStateOf(false)
+            compose {
+                Wrapper {
+                    if (state) {
+                        NodeWithCallbacks(onAttach = { throwTestException() })
+                    }
                 }
             }
-        }
 
-        assertTrace(
-            listOf(
-                "ReusableComposeNode(Composables.kt:<unknown line>)",
-                "NodeWithCallbacks(ErrorTraceComposables.kt:121)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)",
-                "Wrapper(ErrorTraceComposables.kt:149)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
-        ) {
             state = true
             advance()
         }
-    }
 
     @Test
-    fun recomposeNodeAttachInlineWrapper() = exceptionTest {
-        var state by mutableStateOf(false)
-        compose {
-            InlineWrapper {
-                if (state) {
-                    NodeWithCallbacks(onAttach = { throwTestException() })
+    fun recomposeNodeAttachInlineWrapper() =
+        exceptionTest(
+            "ReusableComposeNode(Composables.kt:<unknown line>)",
+            "NodeWithCallbacks(ErrorTraceComposables.kt:121)",
+            // (b/380272059): groupless source information is missing here after recomposition
+            //                "<lambda>(ErrorTraceTests.kt:<line number>)",
+            //                "InlineWrapper(ErrorTraceComposables.kt:148)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
+        ) {
+            var state by mutableStateOf(false)
+            compose {
+                InlineWrapper {
+                    if (state) {
+                        NodeWithCallbacks(onAttach = { throwTestException() })
+                    }
                 }
             }
-        }
 
-        assertTrace(
-            listOf(
-                "ReusableComposeNode(Composables.kt:<unknown line>)",
-                "NodeWithCallbacks(ErrorTraceComposables.kt:121)",
-                // (b/380272059): groupless source information is missing here after recomposition
-                //                "<lambda>(ErrorTraceTests.kt:<line number>)",
-                //                "InlineWrapper(ErrorTraceComposables.kt:148)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
-        ) {
             state = true
             advance()
         }
-    }
 
     @Test
-    fun emptySourceInformation() = exceptionTest {
-        val list = listOf(1, 2, 3)
-        var content: (@Composable () -> Unit)? = null
-        // some gymnastics to ensure that Kotlin generates a null check
-        if (3 in list) {
-            content = { throwTestException() }
-        }
-
-        assertTrace(
-            listOf(
-                "<lambda>(ErrorTraceTests.kt:<unknown line>)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)",
-                "InlineWrapper(ErrorTraceComposables.kt:57)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
+    fun emptySourceInformation() =
+        exceptionTest(
+            "<lambda>(ErrorTraceTests.kt:<unknown line>)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)",
+            "InlineWrapper(ErrorTraceComposables.kt:57)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
         ) {
+            val list = listOf(1, 2, 3)
+            var content: (@Composable () -> Unit)? = null
+            // some gymnastics to ensure that Kotlin generates a null check
+            if (3 in list) {
+                content = { throwTestException() }
+            }
+
             compose { InlineWrapper { list.fastForEach { key(it) { content?.invoke() } } } }
         }
-    }
 
     @Test
-    fun setContentNodeUpdate() = exceptionTest {
-        assertTrace(
-            listOf(
-                "ReusableComposeNode(Composables.kt:<unknown line>)",
-                "NodeWithCallbacks(ErrorTraceComposables.kt:121)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)",
-                "Wrapper(ErrorTraceComposables.kt:149)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
+    fun setContentNodeUpdate() =
+        exceptionTest(
+            "ReusableComposeNode(Composables.kt:<unknown line>)",
+            "NodeWithCallbacks(ErrorTraceComposables.kt:121)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)",
+            "Wrapper(ErrorTraceComposables.kt:149)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
         ) {
             compose { Wrapper { NodeWithCallbacks(onUpdate = { throwTestException() }) } }
         }
-    }
 
     @Test
-    fun recomposeUpdate() = exceptionTest {
-        var state by mutableStateOf(false)
-        compose {
-            Wrapper {
-                if (state) {
-                    NodeWithCallbacks(
-                        onUpdate =
-                            if (state) {
-                                { throwTestException() }
-                            } else {
-                                {}
-                            }
-                    )
+    fun recomposeUpdate() =
+        exceptionTest(
+            "ReusableComposeNode(Composables.kt:<unknown line>)",
+            "NodeWithCallbacks(ErrorTraceComposables.kt:121)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)",
+            "Wrapper(ErrorTraceComposables.kt:149)",
+            "<lambda>(ErrorTraceTests.kt:<line number>)"
+        ) {
+            var state by mutableStateOf(false)
+            compose {
+                Wrapper {
+                    if (state) {
+                        NodeWithCallbacks(
+                            onUpdate =
+                                if (state) {
+                                    { throwTestException() }
+                                } else {
+                                    {}
+                                }
+                        )
+                    }
                 }
             }
-        }
 
-        assertTrace(
-            listOf(
-                "ReusableComposeNode(Composables.kt:<unknown line>)",
-                "NodeWithCallbacks(ErrorTraceComposables.kt:121)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)",
-                "Wrapper(ErrorTraceComposables.kt:149)",
-                "<lambda>(ErrorTraceTests.kt:<line number>)"
-            )
-        ) {
             state = true
             advance()
         }
-    }
-}
-
-private class ExceptionTestScope(
-    private val externalExceptions: List<Throwable>,
-    private val scope: CompositionTestScope
-) : CompositionTestScope by scope {
-    fun assertTrace(expected: List<String>, block: () -> Unit) {
-        var exception: TestComposeException? = null
-        try {
-            block()
-        } catch (e: TestComposeException) {
-            exception = e
-        } finally {
-            try {
-                scope.composition?.dispose()
-            } catch (e: Throwable) {
-                // swallow
-            } finally {
-                scope.composition = null
-            }
-        }
-        exception =
-            exception
-                ?: externalExceptions.firstOrNull { it is TestComposeException }
-                    as? TestComposeException
-                ?: error("Composition exception was not caught or not thrown")
-
-        val composeTrace =
-            exception.suppressedExceptions.firstOrNull { it is DiagnosticComposeException }
-        if (composeTrace == null) {
-            throw exception
-        }
-        val message = composeTrace.message.orEmpty()
-        val frameString =
-            message
-                .substringAfter("Composition stack when thrown:\n")
-                .lines()
-                .filter { it.isNotEmpty() }
-                .map {
-                    val trace = it.removePrefix("\tat ")
-                    // Only keep the lines in the test file
-                    if (trace.contains(TestFile)) {
-                        trace
-                    } else {
-                        val line = trace.substringAfter(':').substringBefore(')')
-                        if (line == "<unknown line>" || DebugKeepLineNumbers) {
-                            trace
-                        } else {
-                            trace.replace(line, "<line number>")
-                        }
-                    }
-                }
-                .joinToString(",\n") { "\"$it\"" }
-
-        val expectedString = expected.joinToString(",\n") { "\"$it\"" }
-        assertEquals(expectedString, frameString)
-    }
 }
 
 private fun throwTestException(): Nothing = throw TestComposeException()
@@ -610,18 +482,46 @@ private class TestComposeException : Exception("Test exception")
 private const val TestFile = "ErrorTraceComposables.kt"
 private const val DebugKeepLineNumbers = false
 
-private fun exceptionTest(block: ExceptionTestScope.() -> Unit) {
-    val recomposeExceptions = mutableListOf<Exception>()
-    compositionTest(
-        recomposeInvoker = {
-            try {
-                it()
-            } catch (e: TestComposeException) {
-                recomposeExceptions += e
-            }
-        }
-    ) {
-        val scope = ExceptionTestScope(recomposeExceptions, this)
-        with(scope) { block() }
+private fun exceptionTest(vararg trace: String, block: suspend CompositionTestScope.() -> Unit) {
+    assertTrace(trace.toList()) { compositionTest(block) }
+}
+
+private fun assertTrace(expected: List<String>, block: () -> Unit) {
+    var exception: TestComposeException? = null
+    try {
+        block()
+    } catch (e: TestComposeException) {
+        exception = e
     }
+    exception = exception ?: error("Composition exception was not caught or not thrown")
+
+    val composeTrace =
+        exception.suppressedExceptions.firstOrNull { it is DiagnosticComposeException }
+    if (composeTrace == null) {
+        throw exception
+    }
+    val message = composeTrace.message.orEmpty()
+    val frameString =
+        message
+            .substringAfter("Composition stack when thrown:\n")
+            .lines()
+            .filter { it.isNotEmpty() }
+            .map {
+                val trace = it.removePrefix("\tat ")
+                // Only keep the lines in the test file
+                if (trace.contains(TestFile)) {
+                    trace
+                } else {
+                    val line = trace.substringAfter(':').substringBefore(')')
+                    if (line == "<unknown line>" || DebugKeepLineNumbers) {
+                        trace
+                    } else {
+                        trace.replace(line, "<line number>")
+                    }
+                }
+            }
+            .joinToString(",\n") { "\"$it\"" }
+
+    val expectedString = expected.joinToString(",\n") { "\"$it\"" }
+    assertEquals(expectedString, frameString)
 }
