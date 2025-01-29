@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,33 +21,44 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 
 /**
  * A [PopupPositionProvider] which places the context menu fully within the window, aligning a
  * corner of the popup menu with the cursor. For each x/y dimension it will:
- * * In cases where the popup length is too small for the window length, it aligns the start edges
+ * * In cases where the window length is too small for the popup length, it aligns the start edges
  *   of the popup and the window.
  * * In cases where there is enough length between the click position and the end of the window for
- *   entire popup length, it will align the start edge of the popup with the [localPosition].
+ *   entire popup length, it will align the start edge of the popup with the [anchorPosition].
  * * In cases where there is not enough length between the click position and the end of the window
  *   for entire popup length, but there is between the click position and the start of the window,
- *   it will align the end edge of the popup with the [localPosition].
+ *   it will align the end edge of the popup with the [anchorPosition].
  * * In the final case: the window length is wide enough for the popup, but there isn't enough
- *   length on either side of click position to fit an edge of the popup with the click position. It
- *   will align the end edges of the popup and window.
+ *   length on either side of the [anchorPosition] to fit an edge of the popup with the resulting
+ *   position. It will align the end edges of the popup and window.
  *
- * @param localPosition The [IntOffset] to align to. This should be in the same coordinates that the
- *   `Popup` is anchored to.
+ * @param anchorPosition The [IntOffset] to align to. This should be in the same coordinates that
+ *   the [Popup] is anchored to. In the case of a right-click context menu, this would be the
+ *   position of the right-click.
+ * @param onPositionCalculated A snapshot-aware callback that is invoked after the position is
+ *   calculated. It provides the [anchorPosition] in its first parameter and the bounds of the
+ *   resulting popup in its second parameter. Changes to state read during this lambda will result
+ *   in the popup re-calculating its position. This callback is useful for situations where you need
+ *   to vary your popup based on the resulting position of the popup.
  */
+// TODO(b/332764757) Consider making public.
 internal class ContextMenuPopupPositionProvider(
-    private val localPosition: IntOffset,
+    private val anchorPosition: IntOffset,
+    private val onPositionCalculated: ((position: IntOffset, menuBounds: IntRect) -> Unit)? = null,
 ) : PopupPositionProvider {
     // TODO(b/256233441) anchorBounds should be positioned within the window that
     //  windowSize is derived from. However, it seems that windowSize's
     //  bounds do not include the top decoration, while the window anchorBounds
     //  is derived from does include the top decoration. This causes the
     //  resulting calculation to be off when approaching the bottom of the screen.
+
+    // Note: This is snapshot aware.
     override fun calculatePosition(
         anchorBounds: IntRect,
         windowSize: IntSize,
@@ -55,20 +66,21 @@ internal class ContextMenuPopupPositionProvider(
         popupContentSize: IntSize
     ): IntOffset =
         IntOffset(
-            x =
-                alignPopupAxis(
-                    position = anchorBounds.left + localPosition.x,
-                    popupLength = popupContentSize.width,
-                    windowLength = windowSize.width,
-                    closeAffinity = layoutDirection == LayoutDirection.Ltr
-                ),
-            y =
-                alignPopupAxis(
-                    position = anchorBounds.top + localPosition.y,
-                    popupLength = popupContentSize.height,
-                    windowLength = windowSize.height,
-                )
-        )
+                x =
+                    alignPopupAxis(
+                        position = anchorBounds.left + anchorPosition.x,
+                        popupLength = popupContentSize.width,
+                        windowLength = windowSize.width,
+                        closeAffinity = layoutDirection == LayoutDirection.Ltr
+                    ),
+                y =
+                    alignPopupAxis(
+                        position = anchorBounds.top + anchorPosition.y,
+                        popupLength = popupContentSize.height,
+                        windowLength = windowSize.height,
+                    )
+            )
+            .also { onPositionCalculated?.invoke(anchorPosition, IntRect(it, popupContentSize)) }
 }
 
 /**
