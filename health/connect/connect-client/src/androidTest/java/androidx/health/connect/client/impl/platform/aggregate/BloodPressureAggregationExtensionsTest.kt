@@ -18,6 +18,7 @@ package androidx.health.connect.client.impl.platform.aggregate
 
 import android.annotation.TargetApi
 import android.content.Context
+import android.health.connect.datatypes.Metadata.RECORDING_METHOD_MANUAL_ENTRY
 import android.os.Build
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.aggregate.AggregationResult
@@ -28,6 +29,7 @@ import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BloodPressureRecord
 import androidx.health.connect.client.records.NutritionRecord
 import androidx.health.connect.client.records.metadata.DataOrigin
+import androidx.health.connect.client.records.metadata.Metadata
 import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
@@ -129,30 +131,35 @@ class BloodPressureAggregationExtensionsTest {
                 BloodPressureRecord(
                     time = START_TIME,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 105.millimetersOfMercury,
                     diastolic = 60.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 2.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 90.millimetersOfMercury,
                     diastolic = 70.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 4.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 120.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 6.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 110.millimetersOfMercury,
                     diastolic = 65.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 8.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 100.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 )
@@ -180,12 +187,14 @@ class BloodPressureAggregationExtensionsTest {
                 BloodPressureRecord(
                     time = START_TIME + 4.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 120.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 8.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 100.millimetersOfMercury,
                     diastolic = 60.millimetersOfMercury
                 )
@@ -226,12 +235,14 @@ class BloodPressureAggregationExtensionsTest {
                 BloodPressureRecord(
                     time = START_TIME + 4.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 120.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 8.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 100.millimetersOfMercury,
                     diastolic = 60.millimetersOfMercury
                 )
@@ -272,30 +283,35 @@ class BloodPressureAggregationExtensionsTest {
                 BloodPressureRecord(
                     time = START_TIME,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 105.millimetersOfMercury,
                     diastolic = 60.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 2.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 90.millimetersOfMercury,
                     diastolic = 70.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 4.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 120.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 6.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 110.millimetersOfMercury,
                     diastolic = 65.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 8.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 100.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 )
@@ -326,30 +342,35 @@ class BloodPressureAggregationExtensionsTest {
                 BloodPressureRecord(
                     time = START_TIME,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 105.millimetersOfMercury,
                     diastolic = 60.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 2.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 90.millimetersOfMercury,
                     diastolic = 70.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 4.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 120.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 6.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 110.millimetersOfMercury,
                     diastolic = 65.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 8.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 100.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 )
@@ -380,12 +401,14 @@ class BloodPressureAggregationExtensionsTest {
                 BloodPressureRecord(
                     time = START_TIME,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 110.millimetersOfMercury,
                     diastolic = 65.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 2.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 100.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 )
@@ -416,30 +439,35 @@ class BloodPressureAggregationExtensionsTest {
                 BloodPressureRecord(
                     time = START_TIME,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 105.millimetersOfMercury,
                     diastolic = 60.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 2.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 100.millimetersOfMercury,
                     diastolic = 70.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 4.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 120.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 6.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 110.millimetersOfMercury,
                     diastolic = 65.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 8.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 100.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 )
@@ -479,6 +507,7 @@ class BloodPressureAggregationExtensionsTest {
                 BloodPressureRecord(
                     time = START_TIME,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 110.millimetersOfMercury,
                     diastolic = 65.millimetersOfMercury
                 ),
@@ -506,6 +535,7 @@ class BloodPressureAggregationExtensionsTest {
                 BloodPressureRecord(
                     time = START_TIME,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 110.millimetersOfMercury,
                     diastolic = 65.millimetersOfMercury
                 ),
@@ -532,6 +562,7 @@ class BloodPressureAggregationExtensionsTest {
                 BloodPressureRecord(
                     time = START_TIME,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 110.millimetersOfMercury,
                     diastolic = 65.millimetersOfMercury
                 ),
@@ -558,18 +589,21 @@ class BloodPressureAggregationExtensionsTest {
                 BloodPressureRecord(
                     time = START_TIME + 4.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 120.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 8.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 100.millimetersOfMercury,
                     diastolic = 60.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 1.days + 10.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 100.millimetersOfMercury,
                     diastolic = 70.millimetersOfMercury
                 )
@@ -644,18 +678,21 @@ class BloodPressureAggregationExtensionsTest {
                 BloodPressureRecord(
                     time = START_TIME + 4.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 120.millimetersOfMercury,
                     diastolic = 80.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 8.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 100.millimetersOfMercury,
                     diastolic = 60.millimetersOfMercury
                 ),
                 BloodPressureRecord(
                     time = START_TIME + 1.hours + 10.minutes,
                     zoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     systolic = 100.millimetersOfMercury,
                     diastolic = 70.millimetersOfMercury
                 )

@@ -18,6 +18,7 @@ package androidx.health.connect.client.impl.platform.aggregate
 
 import android.annotation.TargetApi
 import android.content.Context
+import android.health.connect.datatypes.Metadata.RECORDING_METHOD_MANUAL_ENTRY
 import android.os.Build
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.aggregate.AggregationResult
@@ -27,6 +28,7 @@ import androidx.health.connect.client.impl.platform.toLocalTimeWithDefaultZoneFa
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.NutritionRecord
 import androidx.health.connect.client.records.metadata.DataOrigin
+import androidx.health.connect.client.records.metadata.Metadata
 import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
@@ -97,35 +99,40 @@ class NutritionAggregationExtensionsTest {
                     endTime = START_TIME + 1.minutes,
                     transFat = Mass.grams(0.3),
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME + 2.minutes,
                     endTime = START_TIME + 3.minutes,
                     transFat = null,
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME + 4.minutes,
                     endTime = START_TIME + 5.minutes,
                     transFat = Mass.grams(0.4),
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME + 6.minutes,
                     endTime = START_TIME + 7.minutes,
                     transFat = Mass.grams(0.5),
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME + 8.minutes,
                     endTime = START_TIME + 9.minutes,
                     transFat = Mass.grams(0.5),
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 )
             )
         )
@@ -148,28 +155,32 @@ class NutritionAggregationExtensionsTest {
                     endTime = START_TIME + 1.minutes,
                     transFat = .3.grams,
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME + 1.days + 2.minutes,
                     endTime = START_TIME + 1.days + 3.minutes,
                     transFat = null,
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME + 3.days + 4.minutes,
                     endTime = START_TIME + 3.days + 5.minutes,
                     transFat = .4.grams,
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME + 3.days + 6.minutes,
                     endTime = START_TIME + 3.days + 7.minutes,
                     transFat = .5.grams,
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 )
             )
         )
@@ -220,6 +231,7 @@ class NutritionAggregationExtensionsTest {
                 NutritionRecord(
                     startTime = START_TIME,
                     endTime = START_TIME + 1.minutes,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     transFat = .3.grams,
                     startZoneOffset = ZoneOffset.UTC,
                     endZoneOffset = ZoneOffset.UTC
@@ -227,6 +239,7 @@ class NutritionAggregationExtensionsTest {
                 NutritionRecord(
                     startTime = START_TIME + 1.hours + 2.minutes,
                     endTime = START_TIME + 1.hours + 3.minutes,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     transFat = null,
                     startZoneOffset = ZoneOffset.UTC,
                     endZoneOffset = ZoneOffset.UTC
@@ -234,6 +247,7 @@ class NutritionAggregationExtensionsTest {
                 NutritionRecord(
                     startTime = START_TIME + 3.hours + 4.minutes,
                     endTime = START_TIME + 3.hours + 5.minutes,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     transFat = .4.grams,
                     startZoneOffset = ZoneOffset.UTC,
                     endZoneOffset = ZoneOffset.UTC
@@ -241,6 +255,7 @@ class NutritionAggregationExtensionsTest {
                 NutritionRecord(
                     startTime = START_TIME + 3.hours + 6.minutes,
                     endTime = START_TIME + 3.hours + 7.minutes,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     transFat = .5.grams,
                     startZoneOffset = ZoneOffset.UTC,
                     endZoneOffset = ZoneOffset.UTC
@@ -293,35 +308,40 @@ class NutritionAggregationExtensionsTest {
                     endTime = START_TIME + 1.minutes,
                     transFat = Mass.grams(0.3),
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME + 2.minutes,
                     endTime = START_TIME + 3.minutes,
                     transFat = null,
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME + 4.minutes,
                     endTime = START_TIME + 5.minutes,
                     transFat = Mass.grams(0.4),
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME + 6.minutes,
                     endTime = START_TIME + 7.minutes,
                     transFat = Mass.grams(0.5),
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME + 8.minutes,
                     endTime = START_TIME + 9.minutes,
                     transFat = Mass.grams(0.5),
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 )
             )
         )
@@ -353,14 +373,16 @@ class NutritionAggregationExtensionsTest {
                         endTime = START_TIME + 1.minutes,
                         transFat = Mass.grams(0.3),
                         startZoneOffset = ZoneOffset.UTC,
-                        endZoneOffset = ZoneOffset.UTC
+                        endZoneOffset = ZoneOffset.UTC,
+                        metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     ),
                     NutritionRecord(
                         startTime = START_TIME + 2.minutes,
                         endTime = START_TIME + 3.minutes,
                         transFat = Mass.grams(0.4),
                         startZoneOffset = ZoneOffset.UTC,
-                        endZoneOffset = ZoneOffset.UTC
+                        endZoneOffset = ZoneOffset.UTC,
+                        metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     )
                 )
             )
@@ -388,14 +410,16 @@ class NutritionAggregationExtensionsTest {
                         endTime = START_TIME + 1.minutes,
                         transFat = Mass.grams(0.3),
                         startZoneOffset = ZoneOffset.UTC,
-                        endZoneOffset = ZoneOffset.UTC
+                        endZoneOffset = ZoneOffset.UTC,
+                        metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     ),
                     NutritionRecord(
                         startTime = START_TIME + 2.minutes,
                         endTime = START_TIME + 3.minutes,
                         transFat = Mass.grams(0.4),
                         startZoneOffset = ZoneOffset.UTC,
-                        endZoneOffset = ZoneOffset.UTC
+                        endZoneOffset = ZoneOffset.UTC,
+                        metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     )
                 )
             )
@@ -425,7 +449,8 @@ class NutritionAggregationExtensionsTest {
                         endTime = START_TIME + 1.minutes,
                         transFat = Mass.grams(0.5),
                         startZoneOffset = ZoneOffset.UTC,
-                        endZoneOffset = ZoneOffset.UTC
+                        endZoneOffset = ZoneOffset.UTC,
+                        metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     ),
                 )
             )
@@ -454,35 +479,40 @@ class NutritionAggregationExtensionsTest {
                     endTime = START_TIME + 1.minutes,
                     transFat = Mass.grams(0.3),
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME + 2.minutes,
                     endTime = START_TIME + 3.minutes,
                     transFat = null,
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME - 2.hours + 4.minutes,
                     endTime = START_TIME + 5.minutes,
                     transFat = Mass.grams(0.4),
                     startZoneOffset = ZoneOffset.ofHours(2),
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME + 3.hours + 6.minutes,
                     endTime = START_TIME + 3.hours + 7.minutes,
                     transFat = Mass.grams(0.5),
                     startZoneOffset = ZoneOffset.ofHours(-3),
-                    endZoneOffset = ZoneOffset.ofHours(-3)
+                    endZoneOffset = ZoneOffset.ofHours(-3),
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
                 NutritionRecord(
                     startTime = START_TIME - 4.hours + 8.minutes,
                     endTime = START_TIME - 4.hours + 9.minutes,
                     transFat = Mass.grams(0.5),
                     startZoneOffset = ZoneOffset.ofHours(4),
-                    endZoneOffset = ZoneOffset.ofHours(4)
+                    endZoneOffset = ZoneOffset.ofHours(4),
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 )
             )
         )
@@ -514,7 +544,8 @@ class NutritionAggregationExtensionsTest {
                         endTime = START_TIME + 1.minutes,
                         transFat = Mass.grams(0.5),
                         startZoneOffset = ZoneOffset.UTC,
-                        endZoneOffset = ZoneOffset.UTC
+                        endZoneOffset = ZoneOffset.UTC,
+                        metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                     ),
                 )
             )
@@ -553,7 +584,8 @@ class NutritionAggregationExtensionsTest {
                     endTime = START_TIME + 1.minutes,
                     transFat = Mass.grams(0.5),
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
             )
         )
@@ -580,7 +612,8 @@ class NutritionAggregationExtensionsTest {
                     endTime = START_TIME + 1.minutes,
                     transFat = Mass.grams(0.5),
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
             )
         )
@@ -607,7 +640,8 @@ class NutritionAggregationExtensionsTest {
                     endTime = START_TIME + 60.minutes,
                     transFat = Mass.grams(0.5),
                     startZoneOffset = ZoneOffset.ofHours(-2),
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 )
             )
         )
@@ -637,7 +671,8 @@ class NutritionAggregationExtensionsTest {
                     endTime = START_TIME + 1.minutes,
                     transFat = Mass.grams(0.5),
                     startZoneOffset = ZoneOffset.UTC,
-                    endZoneOffset = ZoneOffset.UTC
+                    endZoneOffset = ZoneOffset.UTC,
+                    metadata = Metadata(recordingMethod = RECORDING_METHOD_MANUAL_ENTRY),
                 ),
             )
         )
