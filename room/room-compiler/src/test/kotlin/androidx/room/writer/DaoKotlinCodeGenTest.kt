@@ -2622,6 +2622,9 @@ class DaoKotlinCodeGenTest : BaseDaoKotlinCodeGenTest() {
               @Query("SELECT * FROM MyEntity")
               fun getEntity(): MyEntity
 
+              @Query("SELECT uuidData FROM MyEntity")
+              fun getValueClass(): UUIDValueClass
+
               @Insert
               fun addEntity(item: MyEntity)
             }
