@@ -19,6 +19,8 @@ import androidx.compose.runtime.ComposeNodeLifecycleCallback
 import androidx.compose.runtime.CompositionLocalMap
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
+import androidx.compose.runtime.tooling.CompositionErrorContext
+import androidx.compose.runtime.tooling.LocalCompositionErrorContext
 import androidx.compose.ui.ComposeUiFlags
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
@@ -789,6 +791,12 @@ internal class LayoutNode(
             }
         }
 
+    private val traceContext: CompositionErrorContext?
+        get() = compositionLocalMap[LocalCompositionErrorContext]
+
+    fun rethrowWithCompositionTrace(e: Throwable): Nothing =
+        throw e.also { traceContext?.apply { e.attachComposeStackTrace(this@LayoutNode) } }
+
     private fun onDensityOrLayoutDirectionChanged() {
         // TODO(b/242120396): it seems like we need to update some densities in the node
         // coordinators here
@@ -1011,7 +1019,7 @@ internal class LayoutNode(
     }
 
     internal fun draw(canvas: Canvas, graphicsLayer: GraphicsLayer?) =
-        outerCoordinator.draw(canvas, graphicsLayer)
+        withCompositionTrace(this) { outerCoordinator.draw(canvas, graphicsLayer) }
 
     /**
      * Carries out a hit test on the [PointerInputModifier]s associated with this [LayoutNode] and
@@ -1497,6 +1505,13 @@ internal class LayoutNode(
         NotUsed,
     }
 }
+
+internal inline fun <T> withCompositionTrace(layoutNode: LayoutNode, block: () -> T): T =
+    try {
+        block()
+    } catch (e: Throwable) {
+        layoutNode.rethrowWithCompositionTrace(e)
+    }
 
 /** Returns [LayoutNode.owner] or throws if it is null. */
 internal fun LayoutNode.requireOwner(): Owner {

@@ -303,7 +303,7 @@ internal class RememberEventDispatcher(
         try {
             block()
         } catch (e: Throwable) {
-            throw e.also { traceContext?.attachTraceForValue(it, instance) }
+            throw e.also { traceContext?.apply { e.attachComposeStackTrace(instance) } }
         }
 }
 

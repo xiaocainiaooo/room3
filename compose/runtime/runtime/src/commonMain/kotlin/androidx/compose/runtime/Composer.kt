@@ -51,6 +51,7 @@ import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.CompositionErrorContextImpl
 import androidx.compose.runtime.tooling.CompositionGroup
 import androidx.compose.runtime.tooling.CompositionInstance
+import androidx.compose.runtime.tooling.LocalCompositionErrorContext
 import androidx.compose.runtime.tooling.LocalInspectionTables
 import androidx.compose.runtime.tooling.attachComposeTrace
 import androidx.compose.runtime.tooling.buildTrace
@@ -1416,8 +1417,7 @@ internal class ComposerImpl(
     private var nodeExpected = false
     private val invalidations: MutableList<Invalidation> = mutableListOf()
     private val entersStack = IntStack()
-    private var parentProvider: PersistentCompositionLocalMap =
-        persistentCompositionLocalHashMapOf()
+    private var rootProvider: PersistentCompositionLocalMap = persistentCompositionLocalHashMapOf()
     private var providerUpdates: MutableIntObjectMap<PersistentCompositionLocalMap>? = null
     private var providersInvalid = false
     private val providersInvalidStack = IntStack()
@@ -1667,7 +1667,7 @@ internal class ComposerImpl(
 
         // parent reference management
         parentContext.startComposing()
-        parentProvider = parentContext.getCompositionLocalScope()
+        val parentProvider = parentContext.getCompositionLocalScope()
         providersInvalidStack.push(providersInvalid.asInt())
         providersInvalid = changed(parentProvider)
         providerCache = null
@@ -1682,10 +1682,22 @@ internal class ComposerImpl(
             sourceMarkersEnabled = parentContext.collectingSourceInformation
         }
 
-        parentProvider.read(LocalInspectionTables)?.let {
+        rootProvider =
+            if (sourceMarkersEnabled) {
+                @Suppress("UNCHECKED_CAST") // ProvidableCompositionLocal to CompositionLocal
+                parentProvider.putValue(
+                    LocalCompositionErrorContext as CompositionLocal<Any?>,
+                    StaticValueHolder(errorContext)
+                )
+            } else {
+                parentProvider
+            }
+
+        rootProvider.read(LocalInspectionTables)?.let {
             it.add(compositionData)
             parentContext.recordInspectionTable(it)
         }
+
         startGroup(parentContext.compoundHashKey)
     }
 
@@ -2278,8 +2290,8 @@ internal class ComposerImpl(
                 current = reader.parent(current)
             }
         }
-        providerCache = parentProvider
-        return parentProvider
+        providerCache = rootProvider
+        return rootProvider
     }
 
     /**

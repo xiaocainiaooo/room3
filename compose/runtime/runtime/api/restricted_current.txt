@@ -1223,6 +1223,15 @@ package androidx.compose.runtime.tooling {
     method public static androidx.compose.runtime.tooling.CompositionInstance? findCompositionInstance(androidx.compose.runtime.tooling.CompositionData);
   }
 
+  public sealed interface CompositionErrorContext {
+    method public boolean attachComposeStackTrace(Throwable, Object composeNode);
+  }
+
+  public final class CompositionErrorContextKt {
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.runtime.tooling.CompositionErrorContext?> getLocalCompositionErrorContext();
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.runtime.tooling.CompositionErrorContext?> LocalCompositionErrorContext;
+  }
+
   @kotlin.jvm.JvmDefaultWithCompatibility public interface CompositionGroup extends androidx.compose.runtime.tooling.CompositionData {
     method public Iterable<java.lang.Object?> getData();
     method public default int getGroupSize();

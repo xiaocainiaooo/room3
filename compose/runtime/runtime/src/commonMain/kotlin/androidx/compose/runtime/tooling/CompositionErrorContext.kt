@@ -18,16 +18,49 @@ package androidx.compose.runtime.tooling
 
 import androidx.compose.runtime.ComposerImpl
 import androidx.compose.runtime.changelist.OperationErrorContext
+import androidx.compose.runtime.staticCompositionLocalOf
 
-internal interface CompositionErrorContext {
-    fun attachTraceForValue(throwable: Throwable, value: Any)
+/**
+ * Used to attach a compose stack trace to a throwable based on a location of compose node in
+ * composition. This context is expected to be used by custom node implementations to attach
+ * diagnostic compose stack traces to exceptions in passes that are not handled by the Compose
+ * runtime (example: measure / layout / draw in Compose UI).
+ *
+ * Compose runtime automatically appends information about exceptions that happen in composition and
+ * effects.
+ */
+val LocalCompositionErrorContext = staticCompositionLocalOf<CompositionErrorContext?> { null }
+
+/**
+ * Provides a way to attach a compose stack trace to a throwable based on a location of compose node
+ * in composition. This context is expected to be used by custom node implementations to attach
+ * diagnostic compose stack traces to exceptions in passes that are not handled by the Compose
+ * runtime (example: measure / layout / draw in Compose UI).
+ *
+ * Compose runtime automatically appends information about exceptions that happen in composition and
+ * effects.
+ */
+sealed interface CompositionErrorContext {
+    /**
+     * Attaches a Compose stack trace to a throwable as a suppressed [DiagnosticComposeException].
+     * Has no effect if:
+     * - Throwable already contains a suppressed [DiagnosticComposeException]
+     * - [composeNode] is not found in composition
+     * - composition contains no source information (e.g. in minified builds)
+     *
+     * @param composeNode closest node to where exception was originally thrown
+     * @return true if the exception was attached, false otherwise
+     * @receiver throwable to attach a compose stack trace to
+     */
+    fun Throwable.attachComposeStackTrace(composeNode: Any): Boolean
 }
 
 internal class CompositionErrorContextImpl(private val composer: ComposerImpl) :
     CompositionErrorContext, OperationErrorContext {
-    override fun attachTraceForValue(throwable: Throwable, value: Any) {
-        throwable.attachComposeTrace { composer.compositionTraceForValue(value) }
-    }
+    override fun Throwable.attachComposeStackTrace(composeNode: Any): Boolean =
+        tryAttachComposeTrace {
+            composer.compositionTraceForValue(composeNode)
+        }
 
     override fun buildStackTrace(currentOffset: Int?): List<ComposeTraceFrame> =
         composer.parentCompositionTrace()
