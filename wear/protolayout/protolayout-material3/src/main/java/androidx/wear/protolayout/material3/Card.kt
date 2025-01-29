@@ -543,7 +543,7 @@ public fun MaterialScope.iconDataCard(
  * @param content The optional body content of the card. Uses [CardColors.contentColor] color by
  *   default.
  * @param graphic A slot for displaying graphic data, such as progress indicator.
- * @param height The width of this card. It's highly recommended to set this to [expand] for the
+ * @param height The height of this card. It's highly recommended to set this to [expand] for the
  *   most optimal experience across different screen sizes.
  * @param shape Defines the card's shape, in other words the corner radius for this card. If
  *   changing these to radius smaller than [Shapes.medium], it is important to adjusts the margins
