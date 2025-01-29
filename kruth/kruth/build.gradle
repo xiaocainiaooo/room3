@@ -108,7 +108,7 @@ androidXMultiplatform {
             dependsOn(nonJvmTest)
             dependencies {
                 // https://youtrack.jetbrains.com/issue/KT-71032
-                implementation("org.jetbrains.kotlin:kotlin-test:2.1.0")
+                implementation(libs.kotlinTestForWasmTests)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
             }

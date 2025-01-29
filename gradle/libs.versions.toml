@@ -50,7 +50,7 @@ javaxInject = "1"
 jcodec = "0.2.5"
 kotlin18 = "1.8.22"
 kotlin19 = "1.9.24"
-kotlin = "2.1.0"
+kotlin = "2.1.10"
 kotlinBenchmark = "0.4.11"
 kotlinGradlePluginAnnotations = "1.9.24"
 kotlinGradlePluginApi = "1.9.24"
@@ -59,7 +59,7 @@ kotlinCoroutines = "1.7.3"
 kotlinNativeUtils = "1.9.24"
 kotlinSerialization = "1.6.3"
 kotlinToolingCore = "1.9.24"
-ksp = "2.1.0-1.0.29"
+ksp = "2.1.10-1.0.29"
 ktfmt = "0.50"
 # Version format is: 1.KOTLIN_MAJOR_VERSION.0.KTFMT_VERSION
 # When updated, the id and checksum in StudioTask needs to be updated too
@@ -228,6 +228,7 @@ kotlinStdlibCommon = { module = "org.jetbrains.kotlin:kotlin-stdlib-common" }
 kotlinStdlibJdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8" }
 kotlinStdlibJs = { module = "org.jetbrains.kotlin:kotlin-stdlib-js" }
 kotlinTest = { module = "org.jetbrains.kotlin:kotlin-test" }
+kotlinTestForWasmTests = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinTestAnnotationsCommon = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common" }
 kotlinTestCommon = { module = "org.jetbrains.kotlin:kotlin-test-common" }
 kotlinTestJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit" }
