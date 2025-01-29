@@ -117,9 +117,13 @@ public fun MaterialScope.circularProgressIndicator(
         deviceConfiguration.rendererSchemaVersion.hasDashedArcLineSupport()
     // With the fallback implementation, expandable size is not supported, fallback to dp size.
     val containerSize =
-        if (hasDashedArcLineSupport || size is DpProp) size else CPI_DEFAULT_DP_SIZE.dp
+        if (hasDashedArcLineSupport || size is DpProp) {
+            size
+        } else {
+            CPI_DEFAULT_DP_SIZE.dp
+        }
     val boxBuilder =
-        if (hasDashedArcLineSupport)
+        if (hasDashedArcLineSupport) {
             singleSegmentImpl(
                 startAngleDegrees = startAngleDegrees,
                 endAngleDegrees = checkAndAdjustEndAngle(startAngleDegrees, endAngleDegrees),
@@ -129,7 +133,7 @@ public fun MaterialScope.circularProgressIndicator(
                 gapSize = gapSize,
                 colors = colors
             )
-        else
+        } else {
             circularProgressIndicatorFallbackImpl(
                 // Without DashedArcLine support, container size fell back to dp size.
                 arcContainerSize = (containerSize as DpProp).value,
@@ -141,6 +145,7 @@ public fun MaterialScope.circularProgressIndicator(
                 gapSize = gapSize,
                 colors = colors
             )
+        }
 
     return boxBuilder
         .setModifiers(modifiers)
@@ -215,9 +220,13 @@ public fun MaterialScope.segmentedCircularProgressIndicator(
         deviceConfiguration.rendererSchemaVersion.hasDashedArcLineSupport()
     // Without using DashedArcLine, expandable size is not supported, fallback to dp size.
     val containerSize =
-        if (hasDashedArcLineSupport || size is DpProp) size else CPI_DEFAULT_DP_SIZE.dp
+        if (hasDashedArcLineSupport || size is DpProp) {
+            size
+        } else {
+            CPI_DEFAULT_DP_SIZE.dp
+        }
     val boxBuilder =
-        if (hasDashedArcLineSupport)
+        if (hasDashedArcLineSupport) {
             multipleSegmentsImpl(
                 segmentCount = segmentCount,
                 startAngleDegrees = startAngleDegrees,
@@ -228,7 +237,7 @@ public fun MaterialScope.segmentedCircularProgressIndicator(
                 gapSize = gapSize,
                 colors = colors
             )
-        else
+        } else {
             circularProgressIndicatorFallbackImpl(
                 // Without DashedArcLine support, container size fell back to dp size.
                 arcContainerSize = (containerSize as DpProp).value,
@@ -240,6 +249,7 @@ public fun MaterialScope.segmentedCircularProgressIndicator(
                 gapSize = gapSize,
                 colors = colors
             )
+        }
 
     return boxBuilder
         .setModifiers(modifiers)
@@ -437,8 +447,11 @@ internal fun trackColor(
     colors: ProgressIndicatorColors
 ): ColorProp =
     ColorProp.Builder(
-            if (staticProgress > 1) colors.trackOverflowColor.prop.argb
-            else colors.trackColor.prop.argb
+            if (staticProgress > 1) {
+                colors.trackOverflowColor.prop.argb
+            } else {
+                colors.trackColor.prop.argb
+            }
         )
         .apply {
             dynamicProgress?.let {

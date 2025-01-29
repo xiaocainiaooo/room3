@@ -118,8 +118,11 @@ public object ButtonDefaults {
         horizontalElementBuilder.addContent(
             verticalSpacer(
                 deviceConfiguration.weightForSpacer(
-                    if (horizontalAlignment == HORIZONTAL_ALIGN_START) style.avatarPaddingWeight
-                    else style.labelsPaddingWeight
+                    if (horizontalAlignment == HORIZONTAL_ALIGN_START) {
+                        style.avatarPaddingWeight
+                    } else {
+                        style.labelsPaddingWeight
+                    }
                 )
             )
         )
@@ -163,8 +166,11 @@ public object ButtonDefaults {
         horizontalElementBuilder.addContent(
             verticalSpacer(
                 deviceConfiguration.weightForSpacer(
-                    if (horizontalAlignment == HORIZONTAL_ALIGN_START) style.labelsPaddingWeight
-                    else style.avatarPaddingWeight
+                    if (horizontalAlignment == HORIZONTAL_ALIGN_START) {
+                        style.labelsPaddingWeight
+                    } else {
+                        style.avatarPaddingWeight
+                    }
                 )
             )
         )

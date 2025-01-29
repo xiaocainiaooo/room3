@@ -20,6 +20,7 @@ import android.content.Context
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.wear.protolayout.DeviceParametersBuilders
+import androidx.wear.protolayout.modifiers.clickable
 
 // TODO: b/373336064 - Move this to protolayout-material3-testing
 internal fun enableDynamicTheme() {
@@ -35,3 +36,5 @@ internal val DEVICE_PARAMETERS =
         .setScreenWidthDp(192)
         .setScreenHeightDp(192)
         .build()
+
+internal val CLICKABLE = clickable(id = "id")
