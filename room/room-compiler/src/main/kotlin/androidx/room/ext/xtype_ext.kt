@@ -17,6 +17,7 @@
 package androidx.room.ext
 
 import androidx.room.compiler.codegen.XTypeName
+import androidx.room.compiler.processing.XNullability
 import androidx.room.compiler.processing.XType
 import androidx.room.compiler.processing.isArray
 import androidx.room.compiler.processing.isByte
@@ -108,4 +109,16 @@ fun XType.isList(): Boolean = isTypeOf(List::class)
 /** Returns true if this is a [List] or [Set]. */
 fun XType.isCollection(): Boolean {
     return isTypeOf(List::class) || isTypeOf(Set::class)
+}
+
+/**
+ * Returns true if this is assignable from [other] considering unknown nullability as nullable.
+ *
+ * Different from [XType.isAssignableFrom] where a type of unknown nullability can be assigned to a
+ * same non-null type.
+ */
+fun XType.isAssignableFromWithNullability(other: XType): Boolean {
+    val to = if (this.nullability == XNullability.UNKNOWN) this.makeNullable() else this
+    val from = if (other.nullability == XNullability.UNKNOWN) other.makeNullable() else other
+    return to.isAssignableFrom(from)
 }
