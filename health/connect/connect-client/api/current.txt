@@ -195,7 +195,7 @@ package androidx.health.connect.client.permission {
 package androidx.health.connect.client.records {
 
   public final class ActiveCaloriesBurnedRecord implements androidx.health.connect.client.records.Record {
-    ctor public ActiveCaloriesBurnedRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.units.Energy energy, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public ActiveCaloriesBurnedRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.units.Energy energy, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
     method public androidx.health.connect.client.units.Energy getEnergy();
@@ -217,7 +217,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class BasalBodyTemperatureRecord implements androidx.health.connect.client.records.Record {
-    ctor public BasalBodyTemperatureRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Temperature temperature, optional int measurementLocation, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public BasalBodyTemperatureRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, androidx.health.connect.client.units.Temperature temperature, optional int measurementLocation);
     method public int getMeasurementLocation();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public androidx.health.connect.client.units.Temperature getTemperature();
@@ -231,7 +231,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class BasalMetabolicRateRecord implements androidx.health.connect.client.records.Record {
-    ctor public BasalMetabolicRateRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Power basalMetabolicRate, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public BasalMetabolicRateRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Power basalMetabolicRate, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public androidx.health.connect.client.units.Power getBasalMetabolicRate();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public java.time.Instant getTime();
@@ -249,7 +249,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class BloodGlucoseRecord implements androidx.health.connect.client.records.Record {
-    ctor public BloodGlucoseRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.BloodGlucose level, optional int specimenSource, optional int mealType, optional int relationToMeal, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public BloodGlucoseRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, androidx.health.connect.client.units.BloodGlucose level, optional int specimenSource, optional int mealType, optional int relationToMeal);
     method public androidx.health.connect.client.units.BloodGlucose getLevel();
     method public int getMealType();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
@@ -295,7 +295,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class BloodPressureRecord implements androidx.health.connect.client.records.Record {
-    ctor public BloodPressureRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Pressure systolic, androidx.health.connect.client.units.Pressure diastolic, optional int bodyPosition, optional int measurementLocation, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public BloodPressureRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, androidx.health.connect.client.units.Pressure systolic, androidx.health.connect.client.units.Pressure diastolic, optional int bodyPosition, optional int measurementLocation);
     method public int getBodyPosition();
     method public androidx.health.connect.client.units.Pressure getDiastolic();
     method public int getMeasurementLocation();
@@ -349,7 +349,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class BodyFatRecord implements androidx.health.connect.client.records.Record {
-    ctor public BodyFatRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Percentage percentage, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public BodyFatRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Percentage percentage, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public androidx.health.connect.client.units.Percentage getPercentage();
     method public java.time.Instant getTime();
@@ -387,7 +387,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class BodyTemperatureRecord implements androidx.health.connect.client.records.Record {
-    ctor public BodyTemperatureRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Temperature temperature, optional int measurementLocation, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public BodyTemperatureRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, androidx.health.connect.client.units.Temperature temperature, optional int measurementLocation);
     method public int getMeasurementLocation();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public androidx.health.connect.client.units.Temperature getTemperature();
@@ -401,7 +401,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class BodyWaterMassRecord implements androidx.health.connect.client.records.Record {
-    ctor public BodyWaterMassRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Mass mass, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public BodyWaterMassRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Mass mass, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public androidx.health.connect.client.units.Mass getMass();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public java.time.Instant getTime();
@@ -413,7 +413,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class BoneMassRecord implements androidx.health.connect.client.records.Record {
-    ctor public BoneMassRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Mass mass, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public BoneMassRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Mass mass, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public androidx.health.connect.client.units.Mass getMass();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public java.time.Instant getTime();
@@ -425,7 +425,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class CervicalMucusRecord implements androidx.health.connect.client.records.Record {
-    ctor public CervicalMucusRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, optional int appearance, optional int sensation, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public CervicalMucusRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, optional int appearance, optional int sensation);
     method public int getAppearance();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public int getSensation();
@@ -465,7 +465,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class CyclingPedalingCadenceRecord implements androidx.health.connect.client.records.Record {
-    ctor public CyclingPedalingCadenceRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.CyclingPedalingCadenceRecord.Sample> samples, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public CyclingPedalingCadenceRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.CyclingPedalingCadenceRecord.Sample> samples, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
@@ -499,7 +499,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class DistanceRecord implements androidx.health.connect.client.records.Record {
-    ctor public DistanceRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.units.Length distance, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public DistanceRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.units.Length distance, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public androidx.health.connect.client.units.Length getDistance();
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
@@ -521,7 +521,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class ElevationGainedRecord implements androidx.health.connect.client.records.Record {
-    ctor public ElevationGainedRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.units.Length elevation, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public ElevationGainedRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.units.Length elevation, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public androidx.health.connect.client.units.Length getElevation();
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
@@ -858,14 +858,13 @@ package androidx.health.connect.client.records {
   }
 
   public final class ExerciseSessionRecord implements androidx.health.connect.client.records.Record {
-    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, int exerciseType);
-    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, int exerciseType, optional String? title);
-    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, int exerciseType, optional String? title, optional String? notes);
-    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, int exerciseType, optional String? title, optional String? notes, optional androidx.health.connect.client.records.metadata.Metadata metadata);
-    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, int exerciseType, optional String? title, optional String? notes, optional androidx.health.connect.client.records.metadata.Metadata metadata, optional java.util.List<androidx.health.connect.client.records.ExerciseSegment> segments);
-    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, int exerciseType, optional String? title, optional String? notes, optional androidx.health.connect.client.records.metadata.Metadata metadata, optional java.util.List<androidx.health.connect.client.records.ExerciseSegment> segments, optional java.util.List<androidx.health.connect.client.records.ExerciseLap> laps);
-    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, int exerciseType, optional String? title, optional String? notes, optional androidx.health.connect.client.records.metadata.Metadata metadata, optional java.util.List<androidx.health.connect.client.records.ExerciseSegment> segments, optional java.util.List<androidx.health.connect.client.records.ExerciseLap> laps, optional androidx.health.connect.client.records.ExerciseRoute? exerciseRoute);
-    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, int exerciseType, optional String? title, optional String? notes, optional androidx.health.connect.client.records.metadata.Metadata metadata, optional java.util.List<androidx.health.connect.client.records.ExerciseSegment> segments, optional java.util.List<androidx.health.connect.client.records.ExerciseLap> laps, optional androidx.health.connect.client.records.ExerciseRoute? exerciseRoute, optional String? plannedExerciseSessionId);
+    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, int exerciseType);
+    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, int exerciseType, optional String? title);
+    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, int exerciseType, optional String? title, optional String? notes);
+    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, int exerciseType, optional String? title, optional String? notes, optional java.util.List<androidx.health.connect.client.records.ExerciseSegment> segments);
+    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, int exerciseType, optional String? title, optional String? notes, optional java.util.List<androidx.health.connect.client.records.ExerciseSegment> segments, optional java.util.List<androidx.health.connect.client.records.ExerciseLap> laps);
+    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, int exerciseType, optional String? title, optional String? notes, optional java.util.List<androidx.health.connect.client.records.ExerciseSegment> segments, optional java.util.List<androidx.health.connect.client.records.ExerciseLap> laps, optional androidx.health.connect.client.records.ExerciseRoute? exerciseRoute);
+    ctor public ExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, int exerciseType, optional String? title, optional String? notes, optional java.util.List<androidx.health.connect.client.records.ExerciseSegment> segments, optional java.util.List<androidx.health.connect.client.records.ExerciseLap> laps, optional androidx.health.connect.client.records.ExerciseRoute? exerciseRoute, optional String? plannedExerciseSessionId);
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
     method public androidx.health.connect.client.records.ExerciseRouteResult getExerciseRouteResult();
@@ -1021,7 +1020,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class FloorsClimbedRecord implements androidx.health.connect.client.records.Record {
-    ctor public FloorsClimbedRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, double floors, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public FloorsClimbedRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, double floors, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
     method public double getFloors();
@@ -1043,7 +1042,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class HeartRateRecord implements androidx.health.connect.client.records.Record {
-    ctor public HeartRateRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.HeartRateRecord.Sample> samples, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public HeartRateRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.HeartRateRecord.Sample> samples, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
@@ -1079,7 +1078,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class HeartRateVariabilityRmssdRecord implements androidx.health.connect.client.records.Record {
-    ctor public HeartRateVariabilityRmssdRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, double heartRateVariabilityMillis, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public HeartRateVariabilityRmssdRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, double heartRateVariabilityMillis, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public double getHeartRateVariabilityMillis();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public java.time.Instant getTime();
@@ -1091,7 +1090,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class HeightRecord implements androidx.health.connect.client.records.Record {
-    ctor public HeightRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Length height, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public HeightRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Length height, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public androidx.health.connect.client.units.Length getHeight();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public java.time.Instant getTime();
@@ -1113,7 +1112,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class HydrationRecord implements androidx.health.connect.client.records.Record {
-    ctor public HydrationRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.units.Volume volume, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public HydrationRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.units.Volume volume, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
@@ -1135,7 +1134,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class IntermenstrualBleedingRecord implements androidx.health.connect.client.records.Record {
-    ctor public IntermenstrualBleedingRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public IntermenstrualBleedingRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public java.time.Instant getTime();
     method public java.time.ZoneOffset? getZoneOffset();
@@ -1145,7 +1144,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class LeanBodyMassRecord implements androidx.health.connect.client.records.Record {
-    ctor public LeanBodyMassRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Mass mass, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public LeanBodyMassRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Mass mass, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public androidx.health.connect.client.units.Mass getMass();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public java.time.Instant getTime();
@@ -1171,7 +1170,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class MenstruationFlowRecord implements androidx.health.connect.client.records.Record {
-    ctor public MenstruationFlowRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, optional int flow, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public MenstruationFlowRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, optional int flow);
     method public int getFlow();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public java.time.Instant getTime();
@@ -1195,7 +1194,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class MenstruationPeriodRecord implements androidx.health.connect.client.records.Record {
-    ctor public MenstruationPeriodRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public MenstruationPeriodRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
@@ -1209,7 +1208,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class NutritionRecord implements androidx.health.connect.client.records.Record {
-    ctor public NutritionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, optional androidx.health.connect.client.units.Mass? biotin, optional androidx.health.connect.client.units.Mass? caffeine, optional androidx.health.connect.client.units.Mass? calcium, optional androidx.health.connect.client.units.Energy? energy, optional androidx.health.connect.client.units.Energy? energyFromFat, optional androidx.health.connect.client.units.Mass? chloride, optional androidx.health.connect.client.units.Mass? cholesterol, optional androidx.health.connect.client.units.Mass? chromium, optional androidx.health.connect.client.units.Mass? copper, optional androidx.health.connect.client.units.Mass? dietaryFiber, optional androidx.health.connect.client.units.Mass? folate, optional androidx.health.connect.client.units.Mass? folicAcid, optional androidx.health.connect.client.units.Mass? iodine, optional androidx.health.connect.client.units.Mass? iron, optional androidx.health.connect.client.units.Mass? magnesium, optional androidx.health.connect.client.units.Mass? manganese, optional androidx.health.connect.client.units.Mass? molybdenum, optional androidx.health.connect.client.units.Mass? monounsaturatedFat, optional androidx.health.connect.client.units.Mass? niacin, optional androidx.health.connect.client.units.Mass? pantothenicAcid, optional androidx.health.connect.client.units.Mass? phosphorus, optional androidx.health.connect.client.units.Mass? polyunsaturatedFat, optional androidx.health.connect.client.units.Mass? potassium, optional androidx.health.connect.client.units.Mass? protein, optional androidx.health.connect.client.units.Mass? riboflavin, optional androidx.health.connect.client.units.Mass? saturatedFat, optional androidx.health.connect.client.units.Mass? selenium, optional androidx.health.connect.client.units.Mass? sodium, optional androidx.health.connect.client.units.Mass? sugar, optional androidx.health.connect.client.units.Mass? thiamin, optional androidx.health.connect.client.units.Mass? totalCarbohydrate, optional androidx.health.connect.client.units.Mass? totalFat, optional androidx.health.connect.client.units.Mass? transFat, optional androidx.health.connect.client.units.Mass? unsaturatedFat, optional androidx.health.connect.client.units.Mass? vitaminA, optional androidx.health.connect.client.units.Mass? vitaminB12, optional androidx.health.connect.client.units.Mass? vitaminB6, optional androidx.health.connect.client.units.Mass? vitaminC, optional androidx.health.connect.client.units.Mass? vitaminD, optional androidx.health.connect.client.units.Mass? vitaminE, optional androidx.health.connect.client.units.Mass? vitaminK, optional androidx.health.connect.client.units.Mass? zinc, optional String? name, optional int mealType, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public NutritionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, optional androidx.health.connect.client.units.Mass? biotin, optional androidx.health.connect.client.units.Mass? caffeine, optional androidx.health.connect.client.units.Mass? calcium, optional androidx.health.connect.client.units.Energy? energy, optional androidx.health.connect.client.units.Energy? energyFromFat, optional androidx.health.connect.client.units.Mass? chloride, optional androidx.health.connect.client.units.Mass? cholesterol, optional androidx.health.connect.client.units.Mass? chromium, optional androidx.health.connect.client.units.Mass? copper, optional androidx.health.connect.client.units.Mass? dietaryFiber, optional androidx.health.connect.client.units.Mass? folate, optional androidx.health.connect.client.units.Mass? folicAcid, optional androidx.health.connect.client.units.Mass? iodine, optional androidx.health.connect.client.units.Mass? iron, optional androidx.health.connect.client.units.Mass? magnesium, optional androidx.health.connect.client.units.Mass? manganese, optional androidx.health.connect.client.units.Mass? molybdenum, optional androidx.health.connect.client.units.Mass? monounsaturatedFat, optional androidx.health.connect.client.units.Mass? niacin, optional androidx.health.connect.client.units.Mass? pantothenicAcid, optional androidx.health.connect.client.units.Mass? phosphorus, optional androidx.health.connect.client.units.Mass? polyunsaturatedFat, optional androidx.health.connect.client.units.Mass? potassium, optional androidx.health.connect.client.units.Mass? protein, optional androidx.health.connect.client.units.Mass? riboflavin, optional androidx.health.connect.client.units.Mass? saturatedFat, optional androidx.health.connect.client.units.Mass? selenium, optional androidx.health.connect.client.units.Mass? sodium, optional androidx.health.connect.client.units.Mass? sugar, optional androidx.health.connect.client.units.Mass? thiamin, optional androidx.health.connect.client.units.Mass? totalCarbohydrate, optional androidx.health.connect.client.units.Mass? totalFat, optional androidx.health.connect.client.units.Mass? transFat, optional androidx.health.connect.client.units.Mass? unsaturatedFat, optional androidx.health.connect.client.units.Mass? vitaminA, optional androidx.health.connect.client.units.Mass? vitaminB12, optional androidx.health.connect.client.units.Mass? vitaminB6, optional androidx.health.connect.client.units.Mass? vitaminC, optional androidx.health.connect.client.units.Mass? vitaminD, optional androidx.health.connect.client.units.Mass? vitaminE, optional androidx.health.connect.client.units.Mass? vitaminK, optional androidx.health.connect.client.units.Mass? zinc, optional String? name, optional int mealType);
     method public androidx.health.connect.client.units.Mass? getBiotin();
     method public androidx.health.connect.client.units.Mass? getCaffeine();
     method public androidx.health.connect.client.units.Mass? getCalcium();
@@ -1399,7 +1398,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class OvulationTestRecord implements androidx.health.connect.client.records.Record {
-    ctor public OvulationTestRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, int result, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public OvulationTestRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, int result, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public int getResult();
     method public java.time.Instant getTime();
@@ -1423,7 +1422,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class OxygenSaturationRecord implements androidx.health.connect.client.records.Record {
-    ctor public OxygenSaturationRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Percentage percentage, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public OxygenSaturationRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Percentage percentage, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public androidx.health.connect.client.units.Percentage getPercentage();
     method public java.time.Instant getTime();
@@ -1445,14 +1444,12 @@ package androidx.health.connect.client.records {
   }
 
   public final class PlannedExerciseSessionRecord implements androidx.health.connect.client.records.Record {
-    ctor public PlannedExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType);
-    ctor public PlannedExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType, optional String? title);
-    ctor public PlannedExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType, optional String? title, optional String? notes);
-    ctor public PlannedExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType, optional String? title, optional String? notes, optional androidx.health.connect.client.records.metadata.Metadata metadata);
-    ctor public PlannedExerciseSessionRecord(java.time.LocalDate startDate, java.time.Duration duration, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType);
-    ctor public PlannedExerciseSessionRecord(java.time.LocalDate startDate, java.time.Duration duration, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType, optional String? title);
-    ctor public PlannedExerciseSessionRecord(java.time.LocalDate startDate, java.time.Duration duration, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType, optional String? title, optional String? notes);
-    ctor public PlannedExerciseSessionRecord(java.time.LocalDate startDate, java.time.Duration duration, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType, optional String? title, optional String? notes, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public PlannedExerciseSessionRecord(androidx.health.connect.client.records.metadata.Metadata metadata, java.time.LocalDate startDate, java.time.Duration duration, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType);
+    ctor public PlannedExerciseSessionRecord(androidx.health.connect.client.records.metadata.Metadata metadata, java.time.LocalDate startDate, java.time.Duration duration, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType, optional String? title);
+    ctor public PlannedExerciseSessionRecord(androidx.health.connect.client.records.metadata.Metadata metadata, java.time.LocalDate startDate, java.time.Duration duration, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType, optional String? title, optional String? notes);
+    ctor public PlannedExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType);
+    ctor public PlannedExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType, optional String? title);
+    ctor public PlannedExerciseSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> blocks, int exerciseType, optional String? title, optional String? notes);
     method public java.util.List<androidx.health.connect.client.records.PlannedExerciseBlock> getBlocks();
     method public String? getCompletedExerciseSessionId();
     method public java.time.Instant getEndTime();
@@ -1512,7 +1509,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class PowerRecord implements androidx.health.connect.client.records.Record {
-    ctor public PowerRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.PowerRecord.Sample> samples, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public PowerRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.PowerRecord.Sample> samples, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
@@ -1551,7 +1548,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class RespiratoryRateRecord implements androidx.health.connect.client.records.Record {
-    ctor public RespiratoryRateRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, double rate, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public RespiratoryRateRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, double rate, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public double getRate();
     method public java.time.Instant getTime();
@@ -1563,7 +1560,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class RestingHeartRateRecord implements androidx.health.connect.client.records.Record {
-    ctor public RestingHeartRateRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, long beatsPerMinute, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public RestingHeartRateRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, long beatsPerMinute, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public long getBeatsPerMinute();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public java.time.Instant getTime();
@@ -1585,7 +1582,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class SexualActivityRecord implements androidx.health.connect.client.records.Record {
-    ctor public SexualActivityRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, optional int protectionUsed, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public SexualActivityRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, optional int protectionUsed);
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public int getProtectionUsed();
     method public java.time.Instant getTime();
@@ -1607,7 +1604,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class SkinTemperatureRecord implements androidx.health.connect.client.records.Record {
-    ctor public SkinTemperatureRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.SkinTemperatureRecord.Delta> deltas, optional androidx.health.connect.client.units.Temperature? baseline, optional int measurementLocation, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public SkinTemperatureRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, java.util.List<androidx.health.connect.client.records.SkinTemperatureRecord.Delta> deltas, optional androidx.health.connect.client.units.Temperature? baseline, optional int measurementLocation);
     method public androidx.health.connect.client.units.Temperature? getBaseline();
     method public java.util.List<androidx.health.connect.client.records.SkinTemperatureRecord.Delta> getDeltas();
     method public java.time.Instant getEndTime();
@@ -1653,7 +1650,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class SleepSessionRecord implements androidx.health.connect.client.records.Record {
-    ctor public SleepSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, optional String? title, optional String? notes, optional java.util.List<androidx.health.connect.client.records.SleepSessionRecord.Stage> stages, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public SleepSessionRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, optional String? title, optional String? notes, optional java.util.List<androidx.health.connect.client.records.SleepSessionRecord.Stage> stages);
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
@@ -1705,7 +1702,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class SpeedRecord implements androidx.health.connect.client.records.Record {
-    ctor public SpeedRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.SpeedRecord.Sample> samples, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public SpeedRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.SpeedRecord.Sample> samples, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
@@ -1739,7 +1736,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class StepsCadenceRecord implements androidx.health.connect.client.records.Record {
-    ctor public StepsCadenceRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.StepsCadenceRecord.Sample> samples, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public StepsCadenceRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, java.util.List<androidx.health.connect.client.records.StepsCadenceRecord.Sample> samples, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
@@ -1773,7 +1770,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class StepsRecord implements androidx.health.connect.client.records.Record {
-    ctor public StepsRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, @IntRange(from=1L, to=1000000L) long count, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public StepsRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, @IntRange(from=1L, to=1000000L) long count, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public long getCount();
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
@@ -1795,7 +1792,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class TotalCaloriesBurnedRecord implements androidx.health.connect.client.records.Record {
-    ctor public TotalCaloriesBurnedRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.units.Energy energy, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public TotalCaloriesBurnedRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, androidx.health.connect.client.units.Energy energy, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
     method public androidx.health.connect.client.units.Energy getEnergy();
@@ -1817,7 +1814,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class Vo2MaxRecord implements androidx.health.connect.client.records.Record {
-    ctor public Vo2MaxRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, double vo2MillilitersPerMinuteKilogram, optional int measurementMethod, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public Vo2MaxRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.records.metadata.Metadata metadata, double vo2MillilitersPerMinuteKilogram, optional int measurementMethod);
     method public int getMeasurementMethod();
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public java.time.Instant getTime();
@@ -1847,7 +1844,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class WeightRecord implements androidx.health.connect.client.records.Record {
-    ctor public WeightRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Mass weight, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public WeightRecord(java.time.Instant time, java.time.ZoneOffset? zoneOffset, androidx.health.connect.client.units.Mass weight, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public androidx.health.connect.client.records.metadata.Metadata getMetadata();
     method public java.time.Instant getTime();
     method public androidx.health.connect.client.units.Mass getWeight();
@@ -1869,7 +1866,7 @@ package androidx.health.connect.client.records {
   }
 
   public final class WheelchairPushesRecord implements androidx.health.connect.client.records.Record {
-    ctor public WheelchairPushesRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, long count, optional androidx.health.connect.client.records.metadata.Metadata metadata);
+    ctor public WheelchairPushesRecord(java.time.Instant startTime, java.time.ZoneOffset? startZoneOffset, java.time.Instant endTime, java.time.ZoneOffset? endZoneOffset, long count, androidx.health.connect.client.records.metadata.Metadata metadata);
     method public long getCount();
     method public java.time.Instant getEndTime();
     method public java.time.ZoneOffset? getEndZoneOffset();
@@ -1933,8 +1930,7 @@ package androidx.health.connect.client.records.metadata {
   }
 
   public final class Metadata {
-    ctor public Metadata();
-    ctor public Metadata(optional String id, optional androidx.health.connect.client.records.metadata.DataOrigin dataOrigin, optional java.time.Instant lastModifiedTime, optional String? clientRecordId, optional long clientRecordVersion, optional androidx.health.connect.client.records.metadata.Device? device, optional int recordingMethod);
+    ctor public Metadata(int recordingMethod, optional String id, optional androidx.health.connect.client.records.metadata.DataOrigin dataOrigin, optional java.time.Instant lastModifiedTime, optional String? clientRecordId, optional long clientRecordVersion, optional androidx.health.connect.client.records.metadata.Device? device);
     method public String? getClientRecordId();
     method public long getClientRecordVersion();
     method public androidx.health.connect.client.records.metadata.DataOrigin getDataOrigin();
