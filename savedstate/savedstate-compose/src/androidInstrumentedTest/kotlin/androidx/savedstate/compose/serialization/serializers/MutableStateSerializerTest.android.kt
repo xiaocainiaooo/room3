@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package androidx.lifecycle.viewmodel.compose.serialization.serializers
+package androidx.savedstate.compose.serialization.serializers
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.kruth.assertThat
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
-import com.google.common.truth.Truth.assertThat
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.serializer
