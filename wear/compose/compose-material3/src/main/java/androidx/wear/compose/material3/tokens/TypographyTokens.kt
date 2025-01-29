@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-// VERSION: v0_108
-// GENERATED CODE - DO NOT MODIFY BY HAND
+// VERSION: v0_108 + manual changes
 package androidx.wear.compose.material3.tokens
 
 import androidx.compose.ui.text.font.DeviceFontFamilyName
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.toFontFamily
+import androidx.wear.compose.foundation.CurvedTextStyle
 import androidx.wear.compose.material3.DefaultTextStyle
 
+/**
+ * ********************************************************
+ * Modified by hand, don't override!!!
+ * *********************************************************
+ */
 internal object TypographyTokens {
+    internal val DefaultCurvedTextStyle = CurvedTextStyle(DefaultTextStyle)
     val ArcLarge =
-        DefaultTextStyle.copy(
+        DefaultCurvedTextStyle.copy(
             fontFamily =
                 Font(
                         DeviceFontFamilyName(TypeScaleTokens.ArcLargeFont.name),
@@ -36,11 +42,13 @@ internal object TypographyTokens {
                     .toFontFamily(),
             fontWeight = FontWeight(TypeScaleTokens.ArcLargeWeight.toInt()),
             fontSize = TypeScaleTokens.ArcLargeSize,
-            lineHeight = TypeScaleTokens.ArcLargeLineHeight,
+            // TODO: http://b/392091195
+            // lineHeight = TypeScaleTokens.ArcLargeLineHeight,
             letterSpacing = TypeScaleTokens.ArcLargeTrackingTop,
+            letterSpacingCounterClockwise = TypeScaleTokens.ArcLargeTrackingBottom,
         )
     val ArcMedium =
-        DefaultTextStyle.copy(
+        DefaultCurvedTextStyle.copy(
             fontFamily =
                 Font(
                         DeviceFontFamilyName(TypeScaleTokens.ArcMediumFont.name),
@@ -51,11 +59,13 @@ internal object TypographyTokens {
                     .toFontFamily(),
             fontWeight = FontWeight(TypeScaleTokens.ArcMediumWeight.toInt()),
             fontSize = TypeScaleTokens.ArcMediumSize,
-            lineHeight = TypeScaleTokens.ArcMediumLineHeight,
+            // TODO: http://b/392091195
+            // lineHeight = TypeScaleTokens.ArcMediumLineHeight,
             letterSpacing = TypeScaleTokens.ArcMediumTrackingTop,
+            letterSpacingCounterClockwise = TypeScaleTokens.ArcMediumTrackingBottom,
         )
     val ArcSmall =
-        DefaultTextStyle.copy(
+        DefaultCurvedTextStyle.copy(
             fontFamily =
                 Font(
                         DeviceFontFamilyName(TypeScaleTokens.ArcSmallFont.name),
@@ -65,8 +75,10 @@ internal object TypographyTokens {
                     .toFontFamily(),
             fontWeight = FontWeight(TypeScaleTokens.ArcSmallWeight.toInt()),
             fontSize = TypeScaleTokens.ArcSmallSize,
-            lineHeight = TypeScaleTokens.ArcSmallLineHeight,
+            // TODO: http://b/392091195
+            // lineHeight = TypeScaleTokens.ArcSmallLineHeight,
             letterSpacing = TypeScaleTokens.ArcSmallTrackingTop,
+            letterSpacingCounterClockwise = TypeScaleTokens.ArcSmallTrackingBottom,
         )
     val BodyExtraSmall =
         DefaultTextStyle.copy(
