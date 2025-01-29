@@ -537,7 +537,7 @@ value class CompositingStrategy internal constructor(@Suppress("unused") private
 fun Modifier.toolingGraphicsLayer() =
     if (isDebugInspectorInfoEnabled) this.then(Modifier.graphicsLayer()) else this
 
-private data class BlockGraphicsLayerElement(val block: GraphicsLayerScope.() -> Unit) :
+private class BlockGraphicsLayerElement(val block: GraphicsLayerScope.() -> Unit) :
     ModifierNodeElement<BlockGraphicsLayerModifier>() {
     override fun create() = BlockGraphicsLayerModifier(block)
 
@@ -549,6 +549,19 @@ private data class BlockGraphicsLayerElement(val block: GraphicsLayerScope.() ->
     override fun InspectorInfo.inspectableProperties() {
         name = "graphicsLayer"
         properties["block"] = block
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is BlockGraphicsLayerElement) return false
+
+        if (block !== other.block) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return block.hashCode()
     }
 }
 
