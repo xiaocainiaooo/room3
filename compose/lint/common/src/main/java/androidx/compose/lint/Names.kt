@@ -87,6 +87,7 @@ object Names {
 
         object Node {
             val PackageName = Package(Ui.PackageName, "node")
+            val ModifierNodeElement = Name(PackageName, "ModifierNodeElement")
             val CurrentValueOf = Name(PackageName, "currentValueOf")
         }
     }

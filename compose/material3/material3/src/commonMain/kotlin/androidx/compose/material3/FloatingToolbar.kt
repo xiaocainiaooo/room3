@@ -1000,7 +1000,7 @@ object FloatingToolbarDefaults {
                 collapseScrollThreshold = collapseScrollDistanceThreshold
             )
 
-    internal data class VerticalNestedScrollExpansionElement(
+    internal class VerticalNestedScrollExpansionElement(
         val expanded: Boolean,
         val onExpand: () -> Unit,
         val onCollapse: () -> Unit,
@@ -1037,6 +1037,30 @@ object FloatingToolbarDefaults {
             properties["reverseLayout"] = reverseLayout
             properties["onExpand"] = onExpand
             properties["onCollapse"] = onCollapse
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is VerticalNestedScrollExpansionElement) return false
+
+            if (expanded != other.expanded) return false
+            if (reverseLayout != other.reverseLayout) return false
+            if (onExpand !== other.onExpand) return false
+            if (onCollapse !== other.onCollapse) return false
+            if (expandScrollThreshold != other.expandScrollThreshold) return false
+            if (collapseScrollThreshold != other.collapseScrollThreshold) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = expanded.hashCode()
+            result = 31 * result + reverseLayout.hashCode()
+            result = 31 * result + onExpand.hashCode()
+            result = 31 * result + onCollapse.hashCode()
+            result = 31 * result + expandScrollThreshold.hashCode()
+            result = 31 * result + collapseScrollThreshold.hashCode()
+            return result
         }
     }
 
