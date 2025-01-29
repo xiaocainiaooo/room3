@@ -62,31 +62,29 @@ private val RECORDS_TO_AGGREGATE_METRICS_INFO_MAP =
             )
     )
 
-internal suspend fun <T : SeriesRecord<*>> HealthConnectClient.aggregateSeriesRecord(
-    recordType: KClass<T>,
+internal suspend inline fun <reified T : SeriesRecord<*>> HealthConnectClient.aggregateSeries(
     aggregateRequest: AggregateRequest
 ): AggregationResult {
     val timeRange = createTimeRange(aggregateRequest.timeRangeFilter)
     return aggregate(
         ReadRecordsRequest(
-            recordType,
+            T::class,
             aggregateRequest.timeRangeFilter.withBufferedStart(),
             aggregateRequest.dataOriginFilter
         ),
         ResultAggregator(
             timeRange,
-            SeriesAggregationProcessor(recordType, aggregateRequest.metrics, timeRange)
+            SeriesAggregationProcessor(T::class, aggregateRequest.metrics, timeRange)
         )
     )
 }
 
-internal suspend fun <T : SeriesRecord<*>> HealthConnectClient.aggregateSeriesRecord(
-    recordType: KClass<T>,
+internal suspend inline fun <reified T : SeriesRecord<*>> HealthConnectClient.aggregateSeries(
     aggregateRequest: AggregateGroupByPeriodRequest
 ): List<AggregationResultGroupedByPeriod> {
     return aggregate(
         ReadRecordsRequest(
-            recordType,
+            T::class,
             aggregateRequest.timeRangeFilter.withBufferedStart(),
             aggregateRequest.dataOriginFilter
         ),
@@ -94,18 +92,17 @@ internal suspend fun <T : SeriesRecord<*>> HealthConnectClient.aggregateSeriesRe
             createLocalTimeRange(aggregateRequest.timeRangeFilter),
             aggregateRequest.timeRangeSlicer
         ) {
-            SeriesAggregationProcessor(recordType, aggregateRequest.metrics, it)
+            SeriesAggregationProcessor(T::class, aggregateRequest.metrics, it)
         }
     )
 }
 
-internal suspend fun <T : SeriesRecord<*>> HealthConnectClient.aggregateSeriesRecord(
-    recordType: KClass<T>,
+internal suspend inline fun <reified T : SeriesRecord<*>> HealthConnectClient.aggregateSeries(
     aggregateRequest: AggregateGroupByDurationRequest
 ): List<AggregationResultGroupedByDurationWithMinTime> {
     return aggregate(
         ReadRecordsRequest(
-            recordType,
+            T::class,
             aggregateRequest.timeRangeFilter.withBufferedStart(),
             aggregateRequest.dataOriginFilter
         ),
@@ -113,7 +110,7 @@ internal suspend fun <T : SeriesRecord<*>> HealthConnectClient.aggregateSeriesRe
             createInstantTimeRange(aggregateRequest.timeRangeFilter),
             aggregateRequest.timeRangeSlicer
         ) {
-            SeriesAggregationProcessor(recordType, aggregateRequest.metrics, it)
+            SeriesAggregationProcessor(T::class, aggregateRequest.metrics, it)
         }
     )
 }

@@ -834,8 +834,7 @@ class SeriesRecordAggregationExtensionsTest {
     fun aggregateSeriesRecord_invalidMetrics_throws() = runTest {
         assertThrows(IllegalStateException::class.java) {
             runBlocking {
-                healthConnectClient.aggregateSeriesRecord(
-                    StepsCadenceRecord::class,
+                healthConnectClient.aggregateSeries<StepsCadenceRecord>(
                     AggregateRequest(
                         setOf(
                             SpeedRecord.SPEED_AVG,
@@ -854,8 +853,7 @@ class SeriesRecordAggregationExtensionsTest {
     fun aggregateSeriesRecord_invalidSeriesRecord_throws() = runTest {
         assertThrows(IllegalArgumentException::class.java) {
             runBlocking {
-                healthConnectClient.aggregateSeriesRecord(
-                    recordType = HeartRateRecord::class,
+                healthConnectClient.aggregateSeries<HeartRateRecord>(
                     AggregateRequest(
                         setOf(
                             HeartRateRecord.BPM_AVG,
