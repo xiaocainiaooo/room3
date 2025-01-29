@@ -16,7 +16,7 @@
 
 @file:OptIn(InternalSerializationApi::class, ExperimentalTypeInference::class)
 
-package androidx.lifecycle.viewmodel.compose.serialization.serializers
+package androidx.savedstate.compose.serialization.serializers
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
