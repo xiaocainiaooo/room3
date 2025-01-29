@@ -558,6 +558,69 @@ class DaoKotlinCodeGenTest : BaseDaoKotlinCodeGenTest() {
     }
 
     @Test
+    fun dataClassRowAdapter_customTypeConverter_java() {
+        val src =
+            Source.kotlin(
+                "MyDao.kt",
+                """
+            import androidx.room.*
+
+            @Dao
+            interface MyDao {
+              @Query("SELECT * FROM MyEntity")
+              fun getEntity(): MyEntity
+              
+              @Insert
+              fun addEntity(item: MyEntity)
+            }
+
+            @Entity
+            @TypeConverters(FooConverter::class)
+            data class MyEntity(
+                @PrimaryKey
+                val pk: Foo,
+                val data: Bar
+            )
+
+            data class Foo(val num: Long)
+            data class Bar(val data: String)
+            """
+                    .trimIndent()
+            )
+        val converterSrc =
+            Source.java(
+                "FooConverter",
+                """
+            import androidx.room.TypeConverter;
+
+            public class FooConverter {
+                @TypeConverter
+                public static Foo fromLong(Long num) {
+                    return new Foo(num);
+                }
+                @TypeConverter
+                public static Long toLong(Foo foo) {
+                    return foo.getNum();
+                }
+                @TypeConverter
+                public static Bar fromString(String data) {
+                    return new Bar(data);
+                }
+                @TypeConverter
+                public static String toString(Bar bar) {
+                    return bar.getData();
+                }
+            }
+            """
+                    .trimIndent()
+            )
+        runTest(
+            sources = listOf(src, converterSrc, databaseSrc),
+            expectedFilePath = getTestGoldenPath(testName.methodName)
+        )
+    }
+
+    @Test
     fun dataClassRowAdapter_customTypeConverter_provided() {
         val src =
             Source.kotlin(
