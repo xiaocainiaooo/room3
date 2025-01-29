@@ -75,10 +75,17 @@ internal constructor(
                 appendLine()
             }
             if (generatedSources.isEmpty()) {
-                appendLine("Generated files: NONE")
+                appendLine("Generated source files: NONE")
             } else {
-                appendLine("Generated files:")
+                appendLine("Generated source files:")
                 generatedSources.forEach { appendLine(it.relativePath) }
+            }
+            appendLine()
+            if (generatedResources.isEmpty()) {
+                appendLine("Generated resource files: NONE")
+            } else {
+                appendLine("Generated resource files:")
+                generatedResources.forEach { appendLine(it.relativePath) }
             }
             appendLine()
             appendLine("RAW OUTPUT:")
