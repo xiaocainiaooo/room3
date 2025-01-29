@@ -20,6 +20,7 @@ import androidx.room.BuiltInTypeConverters
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import androidx.room.compiler.codegen.asClassName
 import androidx.room.compiler.processing.XElement
 import androidx.room.compiler.processing.XMethodElement
 import androidx.room.compiler.processing.XType
@@ -49,7 +50,7 @@ class CustomConverterProcessor(val context: Context, val element: XTypeElement) 
                 context.reportMissingTypeReference(element.toString())
                 return ProcessResult.EMPTY
             }
-            val annotation = element.requireAnnotation(TypeConverters::class)
+            val annotation = element.requireAnnotation(TypeConverters::class.asClassName())
             val classes = annotation.getAsTypeList("value").mapTo(LinkedHashSet()) { it }
             val typeElementToWrappers =
                 classes
@@ -77,13 +78,17 @@ class CustomConverterProcessor(val context: Context, val element: XTypeElement) 
                 typeElementToWrappers.values.flatMap { wrappers -> wrappers.map { it.custom } }
             )
             val builtInStates =
-                annotation.getAsAnnotationBox<BuiltInTypeConverters>("builtInTypeConverters").let {
+                annotation["builtInTypeConverters"]?.asAnnotation()?.let { builtInAnnotation ->
+                    fun getState(name: String) =
+                        builtInAnnotation[name]?.asEnum()?.name?.let {
+                            BuiltInTypeConverters.State.valueOf(it)
+                        } ?: BuiltInTypeConverters.State.INHERITED
                     BuiltInConverterFlags(
-                        enums = it.value.enums,
-                        uuid = it.value.uuid,
-                        byteBuffer = it.value.byteBuffer
+                        enums = getState("enums"),
+                        uuid = getState("uuid"),
+                        byteBuffer = getState("byteBuffer"),
                     )
-                }
+                } ?: BuiltInConverterFlags.DEFAULT
             return ProcessResult(
                 typeElementToWrappers = typeElementToWrappers,
                 builtInConverterFlags = builtInStates
