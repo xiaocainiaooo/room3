@@ -500,7 +500,7 @@ class XAnnotationTest(private val preCompiled: Boolean) {
     }
 
     @Test
-    fun errorTypeReference_kotlin() {
+    fun typeReferenceError_kotlin() {
         val mySource =
             Source.kotlin(
                 "Subject.kt",
@@ -511,19 +511,31 @@ class XAnnotationTest(private val preCompiled: Boolean) {
             annotation class TheAnnotation(vararg val value: KClass<*>)
 
             @TheAnnotation(value = [GeneratedType::class, String::class])
-            class Subject
+            class SubjectOne
+
+            @TheAnnotation(GeneratedType::class, String::class)
+            class SubjectTwo
             """
                     .trimIndent()
             )
         runKspTest(sources = listOf(mySource)) { invocation ->
-            val element = invocation.processingEnv.requireTypeElement("Subject")
-            val annotation = element.requireAnnotation(XClassName.get("", "TheAnnotation"))
+            listOf("SubjectOne", "SubjectTwo").forEach {
+                val element = invocation.processingEnv.requireTypeElement(it)
+                val annotation = element.requireAnnotation(XClassName.get("", "TheAnnotation"))
 
-            assertThat(element.validate()).isFalse()
-            assertThat(annotation.annotationValues.single().asTypeList().map { it.asTypeName() })
-                .containsExactly(XClassName.get("", "GeneratedType"), String::class.asClassName())
+                assertThat(element.validate()).isFalse()
+                assertThat(
+                        annotation.annotationValues.single().asTypeList().map { it.asTypeName() }
+                    )
+                    .containsExactly(
+                        XClassName.get("", "GeneratedType"),
+                        String::class.asClassName()
+                    )
 
-            invocation.assertCompilationResult { hasError("Unresolved reference 'GeneratedType'.") }
+                invocation.assertCompilationResult {
+                    hasError("Unresolved reference 'GeneratedType'.")
+                }
+            }
         }
     }
 
