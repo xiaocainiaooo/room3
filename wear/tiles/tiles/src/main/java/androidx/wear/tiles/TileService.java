@@ -621,12 +621,13 @@ public abstract class TileService extends Service {
                                 tileService.markTileAsActiveLegacy(evt.getTileId());
 
                                 tileService.onTileEnterEvent(evt);
-                                sendRecentInteractionEvents(
+                                sendRecentInteractionEventsInternal(
                                         List.of(
                                                 new TileInteractionEvent.Builder(
                                                                 evt.getTileId(),
                                                                 TileInteractionEvent.ENTER)
-                                                        .build()));
+                                                        .build()),
+                                        /* callback= */ null);
                             } catch (InvalidProtocolBufferException ex) {
                                 Log.e(TAG, "Error deserializing TileEnterEvent payload.", ex);
                             }
@@ -657,12 +658,13 @@ public abstract class TileService extends Service {
                                 tileService.markTileAsActiveLegacy(evt.getTileId());
 
                                 tileService.onTileLeaveEvent(evt);
-                                sendRecentInteractionEvents(
+                                sendRecentInteractionEventsInternal(
                                         List.of(
                                                 new TileInteractionEvent.Builder(
                                                                 evt.getTileId(),
                                                                 TileInteractionEvent.LEAVE)
-                                                        .build()));
+                                                        .build()),
+                                        /* callback= */ null);
                             } catch (InvalidProtocolBufferException ex) {
                                 Log.e(TAG, "Error deserializing TileLeaveEvent payload.", ex);
                             }
@@ -672,6 +674,13 @@ public abstract class TileService extends Service {
 
         @Override
         public void processRecentInteractionEvents(List<TileInteractionEventData> data) {
+            onRecentInteractionEvents(data, /* callback= */ null);
+        }
+
+        @Override
+        @SuppressWarnings("JdkCollectors")
+        public void onRecentInteractionEvents(
+                List<TileInteractionEventData> data, InteractionEventsCallback callback) {
             mHandler.post(
                     () -> {
                         TileService tileService = mServiceRef.get();
@@ -694,21 +703,26 @@ public abstract class TileService extends Service {
                                         .filter(Optional::isPresent)
                                         .map(Optional::get)
                                         .collect(Collectors.toList());
-                        sendRecentInteractionEvents(events);
+                        sendRecentInteractionEventsInternal(events, callback);
                     });
         }
 
-        private void sendRecentInteractionEvents(@NonNull List<TileInteractionEvent> events) {
+        private void sendRecentInteractionEventsInternal(
+                @NonNull List<TileInteractionEvent> events,
+                @Nullable InteractionEventsCallback callback) {
             TileService tileService = mServiceRef.get();
             ListenableFuture<Void> future = tileService.onRecentInteractionEventsAsync(events);
             future.addListener(
                     () -> {
                         try {
                             future.get();
-                            // TODO: b/391327948: Call on callback when available.
+                            if (callback != null) {
+                                callback.finish();
+                            }
                         } catch (ExecutionException
                                 | InterruptedException
-                                | CancellationException ex) {
+                                | CancellationException
+                                | RemoteException ex) {
                             Log.e(TAG, "onRecentInteractionEventsAsync Future failed", ex);
                         }
                     },
