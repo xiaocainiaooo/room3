@@ -30,6 +30,8 @@ import java.time.ZoneOffset
 /**
  * Captures the blood pressure of a user. Each record represents a single instantaneous blood
  * pressure reading.
+ *
+ * @throws IllegalArgumentException if one of the values is outside the valid range.
  */
 public class BloodPressureRecord(
     override val time: Instant,
