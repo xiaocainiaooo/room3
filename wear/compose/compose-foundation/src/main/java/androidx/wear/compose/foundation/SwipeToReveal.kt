@@ -28,6 +28,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -51,13 +53,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.findRootCoordinates
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
@@ -478,6 +484,11 @@ public fun rememberRevealState(
  *   recommend triggering the action when it is clicked.
  * @param undoAction The optional undo action that will be applied to the component once the the
  *   [RevealState.currentValue] becomes [RevealValue.RightRevealed].
+ * @param gestureInclusion Provides fine-grained control so that touch gestures can be excluded when
+ *   they start in a certain region. An instance of [GestureInclusion] can be passed in here which
+ *   will determine via [GestureInclusion.allowGesture] whether the gesture should proceed or not.
+ *   By default, [gestureInclusion] allows gestures everywhere except a zone on the left edge, which
+ *   is used for swipe-to-dismiss (see [SwipeToRevealDefaults.ignoreLeftEdge]).
  * @param content The content that will be initially displayed over the other actions provided.
  */
 @Composable
@@ -488,12 +499,15 @@ public fun SwipeToReveal(
     state: RevealState = rememberRevealState(),
     secondaryAction: (@Composable () -> Unit)? = null,
     undoAction: (@Composable () -> Unit)? = null,
+    gestureInclusion: GestureInclusion = SwipeToRevealDefaults.ignoreLeftEdge(),
     content: @Composable () -> Unit
 ) {
     // A no-op NestedScrollConnection which does not consume scroll/fling events
     val noOpNestedScrollConnection = remember { object : NestedScrollConnection {} }
 
     var globalPosition by remember { mutableStateOf<LayoutCoordinates?>(null) }
+
+    var allowSwipe by remember { mutableStateOf(true) }
 
     CustomTouchSlopProvider(
         newTouchSlop = LocalViewConfiguration.current.touchSlop * CustomTouchSlopMultiplier
@@ -504,11 +518,21 @@ public fun SwipeToReveal(
                     .onGloballyPositioned { layoutCoordinates ->
                         globalPosition = layoutCoordinates
                     }
+                    .pointerInput(globalPosition) {
+                        awaitEachGesture {
+                            allowSwipe = true
+                            val firstDown = awaitFirstDown(false, PointerEventPass.Initial)
+                            globalPosition?.let {
+                                allowSwipe = gestureInclusion.allowGesture(firstDown.position, it)
+                            }
+                        }
+                    }
                     .swipeableV2(
                         state = state.swipeableState,
                         orientation = Orientation.Horizontal,
                         enabled =
-                            state.currentValue != RevealValue.LeftRevealed &&
+                            allowSwipe &&
+                                state.currentValue != RevealValue.LeftRevealed &&
                                 state.currentValue != RevealValue.RightRevealed,
                     )
                     .swipeAnchors(
@@ -754,6 +778,46 @@ public object SwipeToRevealDefaults {
     public val PositionalThreshold: (totalDistance: Float) -> Float = { totalDistance: Float ->
         totalDistance * 0.5f
     }
+
+    /**
+     * The default value used to configure the size of the left edge zone in a [SwipeToReveal]. The
+     * left edge zone in this case refers to the leftmost edge of the screen, in this region it is
+     * common to disable scrolling in order for swipe-to-dismiss handlers to take over.
+     */
+    public val LeftEdgeZoneFraction: Float = 0.15f
+
+    /**
+     * The default behaviour for when [SwipeToReveal] should consume gestures. In this
+     * implementation of [GestureInclusion], swipe events that originate in the left edge of the
+     * screen (as determined by [LeftEdgeZoneFraction]) will be ignored. This allows
+     * swipe-to-dismiss handlers (if present) to handle the gesture in this region.
+     *
+     * @param edgeZoneFraction The fraction of the screen width from the left edge where gestures
+     *   should be ignored. Defaults to [LeftEdgeZoneFraction].
+     */
+    public fun ignoreLeftEdge(edgeZoneFraction: Float = LeftEdgeZoneFraction): GestureInclusion =
+        object : GestureInclusion {
+            override fun allowGesture(
+                offset: Offset,
+                layoutCoordinates: LayoutCoordinates
+            ): Boolean {
+                val screenOffset = layoutCoordinates.localToScreen(offset)
+                val screenWidth = layoutCoordinates.findRootCoordinates().size.width
+                return screenOffset.x > screenWidth * edgeZoneFraction
+            }
+        }
+
+    /**
+     * A behaviour for [SwipeToReveal] to consume all gestures. In this implementation of
+     * [GestureInclusion], no swipe events will be ignored.
+     */
+    public fun allowAllGestures(): GestureInclusion =
+        object : GestureInclusion {
+            override fun allowGesture(
+                offset: Offset,
+                layoutCoordinates: LayoutCoordinates
+            ): Boolean = true
+        }
 }
 
 @Composable
