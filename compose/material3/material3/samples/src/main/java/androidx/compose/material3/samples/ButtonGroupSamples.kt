@@ -20,6 +20,7 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -52,7 +53,7 @@ import androidx.compose.ui.util.fastForEachIndexed
 @Sampled
 @Composable
 fun ButtonGroupSample() {
-    ButtonGroup {
+    ButtonGroup(modifier = Modifier.padding(horizontal = 8.dp)) {
         val options = listOf("A", "B", "C", "D")
         val checked = remember { mutableStateListOf(false, false, false, false) }
         val modifiers =
