@@ -152,5 +152,5 @@ androidx {
 }
 
 android {
-    namespace "androidx.sqlite.db.framework"
+    namespace = "androidx.sqlite.db.framework"
 }
