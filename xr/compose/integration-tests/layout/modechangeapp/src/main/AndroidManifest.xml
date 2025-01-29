@@ -16,15 +16,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-  <uses-permission android:name="android.permission.SCENE_UNDERSTANDING"/>
+  <uses-permission android:name="android.permission.SCENE_UNDERSTANDING" />
 
   <application
-      android:label="Compose XR Animation Exploration App">
+      android:label="Compose XR ModeChangeApp">
     <property
         android:name="android.window.PROPERTY_XR_ACTIVITY_START_MODE"
         android:value="XR_ACTIVITY_START_MODE_FULL_SPACE_MANAGED" />
     <activity
-        android:name=".AnimationExplorationApp"
+        android:name=".ModeChangeApp"
         android:configChanges="screenSize|smallestScreenSize|orientation|screenLayout"
         android:exported="true">
       <intent-filter>
