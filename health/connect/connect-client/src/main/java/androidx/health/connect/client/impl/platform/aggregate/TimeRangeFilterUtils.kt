@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,22 +21,6 @@ import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.time.temporal.Temporal
-
-internal sealed interface TimeRange<T : Temporal> {
-    val startTime: T
-    val endTime: T
-}
-
-internal data class InstantTimeRange(
-    override val startTime: Instant,
-    override val endTime: Instant
-) : TimeRange<Instant>
-
-internal data class LocalTimeRange(
-    override val startTime: LocalDateTime,
-    override val endTime: LocalDateTime
-) : TimeRange<LocalDateTime>
 
 internal fun createTimeRange(timeRangeFilter: TimeRangeFilter): TimeRange<*> {
     if (timeRangeFilter.isBasedOnLocalTime()) {
@@ -65,3 +49,15 @@ internal fun createLocalTimeRange(timeRangeFilter: TimeRangeFilter): LocalTimeRa
             ?: LocalDateTime.ofInstant(Instant.now().plus(Duration.ofDays(1)), ZoneOffset.MAX)
     return LocalTimeRange(startTime, endTime)
 }
+
+internal fun TimeRangeFilter.withBufferedStart(): TimeRangeFilter {
+    return TimeRangeFilter(
+        startTime = startTime?.minus(RECORD_START_TIME_BUFFER),
+        endTime = endTime,
+        localStartTime = localStartTime?.minus(RECORD_START_TIME_BUFFER),
+        localEndTime = localEndTime
+    )
+}
+
+// Max buffer to account for overlapping records that have startTime < timeRangeFilter.startTime
+private val RECORD_START_TIME_BUFFER: Duration = Duration.ofDays(1)

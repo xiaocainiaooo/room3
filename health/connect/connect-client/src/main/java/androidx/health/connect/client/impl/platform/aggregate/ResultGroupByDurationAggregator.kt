@@ -64,7 +64,7 @@ internal class ResultGroupedByDurationAggregator<T : Record>(
 
         val lastBucketStartTime =
             when (record) {
-                is InstantaneousRecord -> getBucketStartTime(record.time)
+                is InstantaneousRecord -> bucketStartTime
                 is IntervalRecord -> getBucketStartTime(record.endTime)
                 else -> error("Unsupported value for aggregation: $record")
             }
