@@ -187,7 +187,7 @@ fun Modifier.pullToRefresh(
         )
 
 @OptIn(ExperimentalMaterial3Api::class)
-internal data class PullToRefreshElement(
+internal class PullToRefreshElement(
     val isRefreshing: Boolean,
     val onRefresh: () -> Unit,
     val enabled: Boolean,
@@ -221,6 +221,28 @@ internal data class PullToRefreshElement(
         properties["enabled"] = enabled
         properties["state"] = state
         properties["threshold"] = threshold
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is PullToRefreshElement) return false
+
+        if (isRefreshing != other.isRefreshing) return false
+        if (enabled != other.enabled) return false
+        if (onRefresh !== other.onRefresh) return false
+        if (state != other.state) return false
+        if (threshold != other.threshold) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = isRefreshing.hashCode()
+        result = 31 * result + enabled.hashCode()
+        result = 31 * result + onRefresh.hashCode()
+        result = 31 * result + state.hashCode()
+        result = 31 * result + threshold.hashCode()
+        return result
     }
 }
 
