@@ -89,7 +89,7 @@ androidXMultiplatform {
 }
 
 android {
-    namespace "androidx.room.testing"
+    namespace = "androidx.room.testing"
 }
 
 androidx {

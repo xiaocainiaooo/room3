@@ -68,7 +68,7 @@ abstract class BundleTestSdkDexTask extends DefaultTask {
 }
 
 def bundleTestSdkDexTaskProvider = tasks.register("bundleTestSdkDexTask", BundleTestSdkDexTask) {
-    description("Bundle DEX from the androidTestBundleDex configuration into assets folder")
+    description = "Bundle DEX from the androidTestBundleDex configuration into assets folder"
 
     def configuration = configurations.getByName("androidTestBundleDex")
     testSdkApkFolders.from(configuration.incoming.artifactView {}.files)
