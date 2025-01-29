@@ -32,10 +32,13 @@ import kotlin.test.Test
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 
 internal class SavedStateRegistryOwnerDelegatesTest : RobolectricTest() {
@@ -273,6 +276,53 @@ internal class SavedStateRegistryOwnerDelegatesTest : RobolectricTest() {
             }
         property = 2
         assertThat(property).isEqualTo(2)
+    }
+
+    @Test
+    fun saved_customConfig_performSave() {
+        data class User(val name: String)
+        class UserSerializer : KSerializer<User> {
+            override val descriptor: SerialDescriptor =
+                PrimitiveSerialDescriptor("User", PrimitiveKind.STRING)
+
+            override fun serialize(encoder: Encoder, value: User) {
+                encoder.encodeString(value.name)
+            }
+
+            override fun deserialize(decoder: Decoder): User {
+                return User(decoder.decodeString())
+            }
+        }
+
+        val config = SavedStateConfig {
+            serializersModule = SerializersModule { contextual(User::class, UserSerializer()) }
+        }
+        val owner =
+            FakeSavedStateRegistryOwner().apply {
+                savedStateRegistryController.performAttach()
+                savedStateRegistryController.performRestore(savedState = null)
+                lifecycleRegistry.currentState = State.CREATED
+            }
+        val original = User("foo")
+        var property: User by owner.saved(config = config) { original }
+        @Suppress("UNUSED_VARIABLE") // We have to access the property to trigger saving later.
+        val temp = property
+
+        val actualState = savedState()
+        owner.savedStateRegistryController.performSave(actualState)
+        // Simulate configuration change.
+        val newOwner =
+            FakeSavedStateRegistryOwner().apply {
+                savedStateRegistryController.performAttach()
+                savedStateRegistryController.performRestore(savedState = actualState)
+                lifecycleRegistry.currentState = State.CREATED
+            }
+        var newProperty: User by
+            newOwner.saved(config = config, key = "property") {
+                error("Unexpected initializer call")
+            }
+
+        assertThat(newProperty).isEqualTo(original)
     }
 
     @Test
