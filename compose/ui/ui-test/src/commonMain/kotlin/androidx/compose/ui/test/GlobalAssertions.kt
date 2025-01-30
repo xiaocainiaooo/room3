@@ -34,6 +34,7 @@ import kotlin.jvm.JvmName
  *   assertion with [removeGlobalAssertion].
  * @param assertion A function to be executed.
  */
+@ExperimentalTestApi
 @Deprecated(
     message =
         "This API has been removed and its intended usage to run accessibility checks can now be done via `ComposeUiTest.enableAccessibilityChecks()` and `ComposeTestRule.enableAccessibilityChecks()`",
@@ -47,6 +48,7 @@ fun addGlobalAssertion(name: String, assertion: (SemanticsNodeInteraction) -> Un
  *
  * @param name An identifier that was previously used in a call to [addGlobalAssertion].
  */
+@ExperimentalTestApi
 @Deprecated(
     message =
         "This API has been removed and its intended usage to run accessibility checks can now be done via `ComposeUiTest.disableAccessibilityChecks()` and `ComposeTestRule.disableAccessibilityChecks()`",
@@ -61,6 +63,7 @@ fun removeGlobalAssertion(name: String) {}
  *
  * @return the [SemanticsNodeInteraction] that is the receiver of this method
  */
+@ExperimentalTestApi
 @Deprecated(
     message =
         "This API has been removed and its intended usage to run accessibility checks can now be done via `SemanticsNodeInteraction.tryPerformAccessibilityChecks()`",
@@ -82,6 +85,7 @@ fun SemanticsNodeInteraction.invokeGlobalAssertions(): SemanticsNodeInteraction 
  *
  * @return the [SemanticsNodeInteractionCollection] that is the receiver of this method
  */
+@ExperimentalTestApi
 @Deprecated(
     message =
         "This API has been removed and its intended usage to run accessibility checks can now be done via `SemanticsNodeInteraction.tryPerformAccessibilityChecks()`",
