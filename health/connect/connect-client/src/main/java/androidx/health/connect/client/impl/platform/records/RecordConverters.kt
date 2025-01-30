@@ -53,6 +53,7 @@ import androidx.health.connect.client.records.HeightRecord
 import androidx.health.connect.client.records.HydrationRecord
 import androidx.health.connect.client.records.IntermenstrualBleedingRecord
 import androidx.health.connect.client.records.LeanBodyMassRecord
+import androidx.health.connect.client.records.MedicalResourceId
 import androidx.health.connect.client.records.MenstruationFlowRecord
 import androidx.health.connect.client.records.MenstruationPeriodRecord
 import androidx.health.connect.client.records.NutritionRecord
@@ -1309,3 +1310,7 @@ internal fun PlatformExerciseLap.toSdkExerciseLap() =
 
 internal fun PlatformExerciseSegment.toSdkExerciseSegment() =
     ExerciseSegment(startTime, endTime, segmentType.toSdkExerciseSegmentType(), repetitionsCount)
+
+@SuppressLint("NewApi") // Guarded by sdk extension check
+internal fun PlatformMedicalResourceId.toSdkMedicalResourceId() =
+    MedicalResourceId(dataSourceId, fhirResourceType.toSdkFhirResourceType(), fhirResourceId)

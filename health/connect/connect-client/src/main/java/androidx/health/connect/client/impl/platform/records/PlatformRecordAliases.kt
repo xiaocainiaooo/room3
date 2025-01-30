@@ -450,3 +450,5 @@ internal typealias PlatformMedicalDataSource = android.health.connect.datatypes.
 
 internal typealias PlatformMedicalDataSourceBuilder =
     android.health.connect.datatypes.MedicalDataSource.Builder
+
+internal typealias PlatformMedicalResourceId = android.health.connect.MedicalResourceId

@@ -575,6 +575,9 @@ internal val SDK_TO_PLATFORM_FHIR_RESOURCE_TYPE: Map<Int, Int> =
         FHIR_RESOURCE_TYPE_ORGANIZATION to PlatformFhirResource.FHIR_RESOURCE_TYPE_ORGANIZATION
     )
 
+internal val PLATFORM_TO_SDK_FHIR_RESOURCE_TYPE: Map<Int, Int> =
+    SDK_TO_PLATFORM_FHIR_RESOURCE_TYPE.reversed()
+
 internal fun Int.toPlatformExerciseCategory(): Int {
     return SDK_TO_PLATFORM_BLOOD_GLUCOSE_SPECIMEN_SOURCE[this]
         ?: PlatformPlannedExerciseStep.EXERCISE_CATEGORY_UNKNOWN
@@ -667,7 +670,7 @@ internal fun Int.toPlatformRecordingMethod(): Int {
 internal fun Int.toPlatformFhirResourceType(): Int {
     // PHR does not support FHIR UNKNOWN type, see ag/29700288
     return SDK_TO_PLATFORM_FHIR_RESOURCE_TYPE[this]
-        ?: throw IllegalArgumentException("Invalid FHIR resource type.")
+        ?: throw IllegalArgumentException("SDK => Platform: Invalid FHIR resource type.")
 }
 
 internal fun Int.toSdkBloodPressureBodyPosition(): Int {
@@ -753,4 +756,9 @@ internal fun Int.toSdkRecordingMethod(): Int {
 
 private fun Map<Int, Int>.reversed(): Map<Int, Int> {
     return entries.associate { (k, v) -> v to k }
+}
+
+internal fun Int.toSdkFhirResourceType(): Int {
+    return PLATFORM_TO_SDK_FHIR_RESOURCE_TYPE[this]
+        ?: throw IllegalArgumentException("Platform => SDK: Invalid FHIR resource type.")
 }

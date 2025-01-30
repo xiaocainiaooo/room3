@@ -32,7 +32,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class FhirVersionTest {
-
     @Before
     fun setup() {
         Assume.assumeTrue(
@@ -86,12 +85,20 @@ class FhirVersionTest {
     }
 
     @Test
+    fun validFhirVersion_not_equals() {
+        val fhirVersion1 = FhirVersion(major = 1, minor = 2, patch = 3)
+        val fhirVersion2 = FhirVersion(major = 1, minor = 2, patch = 5)
+
+        assertThat(fhirVersion1).isNotEqualTo(fhirVersion2)
+    }
+
+    @Test
     fun toString_expectCorrectString() {
         val fhirVersion = FhirVersion(major = 1, minor = 2, patch = 3)
 
         val fhirVersionString = fhirVersion.toString()
 
-        assertThat(fhirVersionString).isEqualTo("FhirVersion{1.2.3}")
+        assertThat(fhirVersionString).isEqualTo("FhirVersion(1.2.3)")
     }
 
     @Test
@@ -114,14 +121,11 @@ class FhirVersionTest {
     @SuppressLint("NewApi") // checked with feature availability check
     @Test
     fun toPlatformFhirVersion_expectCorrectConversion() {
-        val fhirVersion = FhirVersion(major = 1, minor = 2, patch = 3)
+        val sdk = FhirVersion(major = 1, minor = 2, patch = 3)
 
-        val platformFhirVersion = fhirVersion.toPlatformFhirVersion()
-
-        assertThat(platformFhirVersion).isEqualTo(PlatformFhirVersion.parseFhirVersion("1.2.3"))
+        assertThat(sdk.platformFhirVersion).isEqualTo(PlatformFhirVersion.parseFhirVersion("1.2.3"))
     }
 
-    @OptIn(ExperimentalFeatureAvailabilityApi::class)
     @Test
     fun isSupportedVersion_notSupportedVersion_expectFalse() {
         val fhirVersion = FhirVersion(major = 1, minor = 2, patch = 3)
@@ -129,7 +133,6 @@ class FhirVersionTest {
         assertThat(fhirVersion.isSupportedFhirVersion()).isFalse()
     }
 
-    @OptIn(ExperimentalFeatureAvailabilityApi::class)
     @Test
     fun isSupportedVersion_supportedVersion_expectTrue() {
         val fhirVersion = FhirVersion(major = 4, minor = 0, patch = 1)

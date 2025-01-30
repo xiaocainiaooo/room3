@@ -38,14 +38,10 @@ import androidx.health.connect.client.impl.platform.records.PlatformFhirVersion
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class FhirVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<FhirVersion> {
     @SuppressLint("NewApi") // already checked with a feature availability check
-    private val platformFhirVersion: Any =
+    internal val platformFhirVersion: PlatformFhirVersion =
         withPhrFeatureCheck(FhirVersion::class) {
             PlatformFhirVersion.parseFhirVersion("$major.$minor.$patch")
         }
-
-    @SuppressLint("NewApi") // already checked with a feature availability check
-    internal fun toPlatformFhirVersion(): PlatformFhirVersion =
-        withPhrFeatureCheck(FhirVersion::class) { platformFhirVersion as PlatformFhirVersion }
 
     override fun compareTo(other: FhirVersion): Int {
         if (major != other.major) {
@@ -79,7 +75,7 @@ class FhirVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<F
     }
 
     override fun toString(): String {
-        return "${this::class.java.simpleName}{$major.$minor.$patch}"
+        return "${this::class.java.simpleName}($major.$minor.$patch)"
     }
 
     /**
@@ -90,9 +86,10 @@ class FhirVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<F
      * [HealthConnectFeatures.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
      */
     @SuppressLint("NewApi") // checked by `getFeatureStatus()`
-    fun isSupportedFhirVersion(): Boolean {
-        return toPlatformFhirVersion().isSupportedFhirVersion
-    }
+    fun isSupportedFhirVersion(): Boolean =
+        withPhrFeatureCheck(FhirVersion::class, "isSupportedFhirVersion") {
+            platformFhirVersion.isSupportedFhirVersion
+        }
 
     companion object {
         private val VERSION_REGEX = Regex("(\\d+)\\.(\\d+)\\.(\\d+)")

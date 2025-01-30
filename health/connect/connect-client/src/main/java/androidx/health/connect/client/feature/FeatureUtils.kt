@@ -43,16 +43,15 @@ internal fun createExceptionDueToFeatureUnavailable(featureConstantName: String,
  * Similar to [with], this method executes `block` if PHR feature is available, otherwise throwing
  * an [UnsupportedOperationException] pointing to `apiName`.
  */
-internal fun <T> withPhrFeatureCheck(kClass: KClass<*>, block: () -> T): T {
-    if (isPersonalHealthRecordFeatureAvailableInPlatform()) {
-        return block()
-    } else {
-        throw createExceptionDueToFeatureUnavailable(
-            "FEATURE_PERSONAL_HEALTH_RECORD",
-            kClass.java.simpleName
-        )
-    }
-}
+internal fun <T> withPhrFeatureCheck(kClass: KClass<*>, block: () -> T): T =
+    withPhrFeatureCheck("${kClass.simpleName}", block)
+
+/**
+ * Similar to [with], this method executes `block` if PHR feature is available, otherwise throwing
+ * an [UnsupportedOperationException] pointing to `apiName`.
+ */
+internal fun <T> withPhrFeatureCheck(kClass: KClass<*>, methodName: String, block: () -> T): T =
+    withPhrFeatureCheck("${kClass.simpleName}#$methodName", block)
 
 /**
  * Similar to [with], this method executes `block` if PHR feature is available, otherwise throwing
