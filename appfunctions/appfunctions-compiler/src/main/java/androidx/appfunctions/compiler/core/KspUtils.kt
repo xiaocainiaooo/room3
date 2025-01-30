@@ -35,6 +35,57 @@ import com.squareup.kotlinpoet.WildcardTypeName
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
+internal val SUPPORTED_TYPES =
+    setOf(
+        Int::class.qualifiedName!!,
+        Long::class.qualifiedName!!,
+        Float::class.qualifiedName!!,
+        Double::class.qualifiedName!!,
+        Boolean::class.qualifiedName!!,
+        String::class.qualifiedName!!,
+        IntArray::class.qualifiedName!!,
+        LongArray::class.qualifiedName!!,
+        FloatArray::class.qualifiedName!!,
+        DoubleArray::class.qualifiedName!!,
+        BooleanArray::class.qualifiedName!!,
+        "kotlin.collections.List<kotlin.String>"
+    )
+
+/**
+ * Returns true if the parameter has a type that is supported by @AppFunction
+ * and @AppFunctionSerializable.
+ */
+internal fun KSTypeReference.isSupportedType(): Boolean {
+    // Todo(b/392587953): Allow AppFunctionSerializable types.
+    return SUPPORTED_TYPES.contains(getTypeNameAsString())
+}
+
+internal fun KSTypeReference.getTypeNameAsString(): String {
+    if (isOfType(LIST)) {
+        return getListTypeNameAsString()
+    }
+    return ensureQualifiedTypeName().asString()
+}
+
+private fun KSTypeReference.getListTypeNameAsString(): String {
+    if (!isOfType(LIST)) {
+        throw ProcessingException(
+            "Unable to resolve list parameterized type for non list type",
+            this
+        )
+    }
+    val parametrizedType =
+        resolve().arguments.firstOrNull()?.type
+            ?: throw ProcessingException(
+                "Unable to resolve the parameterized type for the list",
+                this
+            )
+    return this.ensureQualifiedTypeName().asString() +
+        "<" +
+        parametrizedType.ensureQualifiedTypeName().asString() +
+        ">"
+}
+
 /**
  * Resolves the type reference to the parameterized type if it is a list.
  *

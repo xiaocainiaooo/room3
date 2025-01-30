@@ -82,11 +82,11 @@ data class AnnotatedAppFunctions(
                     continue
                 }
 
-                if (!ksValueParameter.validateAppFunctionParameterType()) {
+                if (!ksValueParameter.type.isSupportedType()) {
                     throw ProcessingException(
                         "App function parameters must be one of the following " +
                             "primitive types or a list of these types:\n${
-                                SUPPORTED_RAW_PRIMITIVE_TYPES.joinToString(
+                                SUPPORTED_TYPES.joinToString(
                                     ",\n"
                                 )
                             }, but found ${
@@ -247,19 +247,6 @@ data class AnnotatedAppFunctions(
         return findRootAppFunctionSchemaInterface(superClassFunction)
     }
 
-    private fun KSValueParameter.validateAppFunctionParameterType(): Boolean {
-        // Todo(b/391342300): Allow AppFunctionSerializable type too.
-        if (type.isOfType(LIST)) {
-            val typeReferenceArgument = type.resolveListParameterizedType()
-            // List types only support raw primitive types
-            return SUPPORTED_RAW_PRIMITIVE_TYPES.contains(
-                typeReferenceArgument.ensureQualifiedTypeName().asString()
-            )
-        }
-        return SUPPORTED_RAW_PRIMITIVE_TYPES.contains(type.ensureQualifiedTypeName().asString()) ||
-            SUPPORTED_ARRAY_PRIMITIVE_TYPES.contains(type.ensureQualifiedTypeName().asString())
-    }
-
     /**
      * Resolves the type reference of a parameter.
      *
@@ -279,25 +266,4 @@ data class AnnotatedAppFunctions(
         val schemaVersion: Long?,
         val schemaCategory: String?
     )
-
-    private companion object {
-        val SUPPORTED_RAW_PRIMITIVE_TYPES: Set<String> =
-            setOf(
-                Int::class.qualifiedName!!,
-                Long::class.qualifiedName!!,
-                Float::class.qualifiedName!!,
-                Double::class.qualifiedName!!,
-                Boolean::class.qualifiedName!!,
-                String::class.qualifiedName!!,
-            )
-
-        val SUPPORTED_ARRAY_PRIMITIVE_TYPES: Set<String> =
-            setOf(
-                IntArray::class.qualifiedName!!,
-                LongArray::class.qualifiedName!!,
-                FloatArray::class.qualifiedName!!,
-                DoubleArray::class.qualifiedName!!,
-                BooleanArray::class.qualifiedName!!,
-            )
-    }
 }
