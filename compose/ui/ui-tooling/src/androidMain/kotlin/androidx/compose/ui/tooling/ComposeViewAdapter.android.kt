@@ -90,7 +90,8 @@ internal data class ViewInfo(
     val bounds: IntRect,
     val location: SourceLocation?,
     val children: List<ViewInfo>,
-    val layoutInfo: Any?
+    val layoutInfo: Any?,
+    val name: String?
 ) {
     fun hasBounds(): Boolean = bounds.bottom != 0 && bounds.right != 0
 
@@ -244,7 +245,8 @@ internal class ComposeViewAdapter : FrameLayout {
             box,
             location,
             childrenViewInfo,
-            layoutInfo
+            layoutInfo,
+            name
         )
     }
 
