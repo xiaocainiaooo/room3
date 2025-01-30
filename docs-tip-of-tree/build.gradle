@@ -330,6 +330,7 @@ dependencies {
     docs(project(":test:uiautomator:uiautomator"))
     // androidx.textclassifier is not hosted in androidx
     kmpDocs(project(":tracing:tracing"))
+    kmpDocs(project(":tracing:tracing-driver"))
     docs(project(":tracing:tracing-ktx"))
     docs(project(":tracing:tracing-perfetto"))
     docs(project(":tracing:tracing-perfetto-handshake"))
