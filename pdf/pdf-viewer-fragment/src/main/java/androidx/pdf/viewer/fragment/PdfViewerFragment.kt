@@ -104,7 +104,19 @@ import kotlinx.coroutines.launch
  * @see documentUri
  */
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 13)
-public open class PdfViewerFragment : Fragment() {
+public open class PdfViewerFragment constructor() : Fragment() {
+
+    /**
+     * Protected constructor for instantiating a [PdfViewerFragment] with the specified styling
+     * options.
+     *
+     * @param pdfStylingOptions The styling options to be applied to the PDF viewer.
+     */
+    protected constructor(pdfStylingOptions: PdfStylingOptions) : this() {
+        val args =
+            Bundle().also { it.putInt(KEY_PDF_VIEW_STYLE, pdfStylingOptions.containerStyleResId) }
+        arguments = args
+    }
 
     // ViewModel to manage PdfLoader state
     private val viewModel: PdfLoaderViewModel by viewModels()
@@ -1041,7 +1053,7 @@ public open class PdfViewerFragment : Fragment() {
         fastScrollView?.visibility = View.VISIBLE
     }
 
-    private companion object {
+    public companion object {
         /** Key for saving page layout reach in bundles. */
         private const val KEY_LAYOUT_REACH: String = "plr"
         private const val KEY_DATA: String = "data"
@@ -1056,5 +1068,24 @@ public open class PdfViewerFragment : Fragment() {
         private const val EXTRA_PDF_FILE_NAME = "androidx.pdf.viewer.fragment.extra.PDF_FILE_NAME"
         private const val EXTRA_STARTING_PAGE: String =
             "androidx.pdf.viewer.fragment.extra.STARTING_PAGE"
+        private const val KEY_PDF_VIEW_STYLE = "keyPdfViewStyle"
+
+        /**
+         * Creates a new instance of [PdfViewerFragment] with the specified styling options.
+         *
+         * @param pdfStylingOptions The styling options to be applied.
+         * @return A new instance of [PdfViewerFragment] with the provided styling options.
+         */
+        @JvmStatic
+        public fun newInstance(pdfStylingOptions: PdfStylingOptions): PdfViewerFragment {
+            val fragment = PdfViewerFragment()
+            val args =
+                Bundle().also {
+                    it.putInt(KEY_PDF_VIEW_STYLE, pdfStylingOptions.containerStyleResId)
+                }
+
+            fragment.arguments = args
+            return fragment
+        }
     }
 }
