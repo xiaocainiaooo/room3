@@ -33,5 +33,10 @@ package androidx.privacysandbox.ui.client.view {
     method public void onUiError(Throwable error);
   }
 
+  @SuppressCompatibility @androidx.privacysandbox.ui.core.ExperimentalFeatures.SharedUiPresentationApi public final class SharedUiContainer extends android.view.ViewGroup {
+    ctor public SharedUiContainer(android.content.Context context);
+    ctor public SharedUiContainer(android.content.Context context, optional android.util.AttributeSet? attrs);
+  }
+
 }
 
