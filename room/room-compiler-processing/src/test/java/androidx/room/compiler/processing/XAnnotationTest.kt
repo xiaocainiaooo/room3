@@ -319,8 +319,7 @@ class XAnnotationTest(private val preCompiled: Boolean) {
                 .isEqualTo(TestSuppressWarnings::class.qualifiedName)
             assertThat(annotation.type.typeElement)
                 .isEqualTo(invocation.processingEnv.requireTypeElement(TestSuppressWarnings::class))
-            assertThat(annotation.asAnnotationBox<TestSuppressWarnings>().value.value)
-                .isEqualTo(arrayOf("a", "b"))
+            assertThat(annotation.getAsStringList("value")).containsExactly("a", "b")
         }
     }
 
@@ -1081,11 +1080,11 @@ class XAnnotationTest(private val preCompiled: Boolean) {
             val subject = invocation.processingEnv.requireTypeElement("Subject")
             val annotation = subject.getAnnotation(OtherAnnotation::class)
             assertThat(annotation).isNotNull()
-            assertThat(annotation?.value?.value).isEqualTo("x")
+            assertThat(annotation?.getAsString("value")).isEqualTo("x")
 
             val annotation2 = subject.getAnnotation(OtherAnnotationTypeAlias::class)
             assertThat(annotation2).isNotNull()
-            assertThat(annotation2?.value?.value).isEqualTo("x")
+            assertThat(annotation2?.getAsString("value")).isEqualTo("x")
         }
     }
 
