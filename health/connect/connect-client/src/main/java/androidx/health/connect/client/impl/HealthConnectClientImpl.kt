@@ -48,6 +48,7 @@ import androidx.health.connect.client.impl.converters.response.toChangesResponse
 import androidx.health.connect.client.impl.converters.response.toReadRecordsResponse
 import androidx.health.connect.client.permission.HealthPermission.Companion.ALL_PERMISSIONS
 import androidx.health.connect.client.records.MedicalResource
+import androidx.health.connect.client.records.MedicalResourceId
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
@@ -276,6 +277,12 @@ internal constructor(
             "HealthConnectClient#upsertMedicalResources()"
         )
     }
+
+    override suspend fun readMedicalResources(ids: List<MedicalResourceId>): List<MedicalResource> =
+        throw createExceptionDueToFeatureUnavailable(
+            FEATURE_CONSTANT_NAME_PHR,
+            "HealthConnectClient#readMedicalResources(ids: List<MedicalResourceId>)"
+        )
 
     /**
      * Wraps any thrown [RemoteException] with a new instance, such that stack traces indicate which

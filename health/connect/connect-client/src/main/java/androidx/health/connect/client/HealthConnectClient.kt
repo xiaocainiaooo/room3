@@ -25,6 +25,11 @@ import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
 import androidx.annotation.RestrictTo
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.health.connect.client.HealthConnectClient.Companion.SDK_AVAILABLE
+import androidx.health.connect.client.HealthConnectClient.Companion.SDK_UNAVAILABLE
+import androidx.health.connect.client.HealthConnectClient.Companion.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED
+import androidx.health.connect.client.HealthConnectClient.Companion.getOrCreate
+import androidx.health.connect.client.HealthConnectClient.Companion.getSdkStatus
 import androidx.health.connect.client.aggregate.AggregateMetric
 import androidx.health.connect.client.aggregate.AggregationResult
 import androidx.health.connect.client.aggregate.AggregationResultGroupedByDuration
@@ -359,6 +364,47 @@ interface HealthConnectClient {
         throw createExceptionDueToFeatureUnavailable(
             FEATURE_CONSTANT_NAME_PHR,
             "HealthConnectClient#upsetMedicalResources()"
+        )
+
+    /**
+     * Retrieves a collection of [MedicalResource]s given a list of [MedicalResourceId]s.
+     *
+     * The number and order of medical resources returned by this API is not guaranteed, depending
+     * on a number of factors:
+     * * If an empty list of IDs is provided, an empty list will be returned.
+     * * If any ID does not exist, no medical resource will be returned for that ID.
+     * * Only permitted [MedicalResource]s are returned. Specifically:
+     *     * A caller without any read medical permissions such as
+     *       [PERMISSION_READ_MEDICAL_DATA_VACCINES], or the write medical permission
+     *       [PERMISSION_WRITE_MEDICAL_DATA] is not permitted to read any [MedicalResource],
+     *       including ones that it created.
+     *     * A caller with the write permission is permitted to read its own [MedicalResource]s of
+     *       any type regardless whether it's in foreground or background.
+     *     * A caller with only a read permission, when in background, is only permitted to read its
+     *       own [MedicalResource]s of the corresponding type. For example, if a caller only holds
+     *       [PERMISSION_READ_MEDICAL_DATA_VACCINES], then when in background it is only permitted
+     *       to read its own [MedicalResource]s with
+     *       [MedicalResource.MEDICAL_RESOURCE_TYPE_VACCINES]. However, when it is in foreground or
+     *       if it holds [PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND], it is permitted to read all
+     *       vaccines [MedicalResource]s, including ones that were written by other apps.
+     *
+     * Each returned [MedicalResource] s not guaranteed to meet all requirements of the <a
+     * href="https://hl7.org/fhir/resourcelist.html">Fast Healthcare Interoperability Resources
+     * (FHIR) spec</a>. If required, clients should perform their own validations.
+     *
+     * This feature is dependent on the version of HealthConnect installed on the device. To check
+     * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
+     * [HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     *
+     * @throws IllegalArgumentException if the size of [ids] is too large or any ID is deemed as
+     *   invalid.
+     */
+    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    suspend fun readMedicalResources(ids: List<MedicalResourceId>): List<MedicalResource> =
+        throw createExceptionDueToFeatureUnavailable(
+            FEATURE_CONSTANT_NAME_PHR,
+            "HealthConnectClient#readMedicalResources(ids: List<MedicalResourceId>)"
         )
 
     companion object {

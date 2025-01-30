@@ -32,6 +32,7 @@ import androidx.health.connect.client.impl.converters.datatype.RECORDS_TYPE_NAME
 import androidx.health.connect.client.impl.converters.records.toProto
 import androidx.health.connect.client.impl.converters.records.toRecord
 import androidx.health.connect.client.records.MedicalResource
+import androidx.health.connect.client.records.MedicalResourceId
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
@@ -438,6 +439,12 @@ public class FakeHealthConnectClient(
         requests: List<UpsertMedicalResourceRequest>
     ): List<MedicalResource> {
         TODO("b/382680786 Not yet implemented")
+    }
+
+    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    override suspend fun readMedicalResources(ids: List<MedicalResourceId>): List<MedicalResource> {
+        TODO("b/382680487 Not yet implemented")
     }
 
     private fun String.toRecordId(packageName: String): String {
