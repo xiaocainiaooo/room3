@@ -87,9 +87,9 @@ import kotlinx.coroutines.launch
  * @param onDismissRequest A lambda function to be called when the dialog is dismissed - either by
  *   swiping right or when the [durationMillis] has passed.
  * @param curvedText A slot for displaying curved text content which will be shown along the bottom
- *   edge of the dialog. We recommend using [openOnPhoneCurvedText] for this parameter, which will
- *   give the default sweep angle and padding, and [OpenOnPhoneDialogDefaults.curvedTextStyle] as
- *   the style.
+ *   edge of the dialog. We recommend using [openOnPhoneDialogCurvedText] for this parameter, which
+ *   will give the default sweep angle and padding, and [OpenOnPhoneDialogDefaults.curvedTextStyle]
+ *   as the style.
  * @param modifier Modifier to be applied to the dialog content.
  * @param colors [OpenOnPhoneDialogColors] that will be used to resolve the colors used for this
  *   [OpenOnPhoneDialog].
@@ -151,9 +151,9 @@ public fun OpenOnPhoneDialog(
  *
  * @sample androidx.wear.compose.material3.samples.OpenOnPhoneDialogSample
  * @param curvedText A slot for displaying curved text content which will be shown along the bottom
- *   edge of the dialog. We recommend using [openOnPhoneCurvedText] for this parameter, which will
- *   give the default sweep angle and padding, and [OpenOnPhoneDialogDefaults.curvedTextStyle] as
- *   the style.
+ *   edge of the dialog. We recommend using [openOnPhoneDialogCurvedText] for this parameter, which
+ *   will give the default sweep angle and padding, and [OpenOnPhoneDialogDefaults.curvedTextStyle]
+ *   as the style.
  * @param durationMillis The duration in milliseconds for which the progress indicator inside of
  *   this content is animated. This value should be previously adjusted by the accessibility manager
  *   according to the content displayed. See [OpenOnPhoneDialog] implementation for more details.
@@ -264,7 +264,7 @@ public fun OpenOnPhoneDialogContent(
  * @param style The style to apply to the text. It is recommended to use
  *   [OpenOnPhoneDialogDefaults.curvedTextStyle] for curved text in [OpenOnPhoneDialog].
  */
-public fun CurvedScope.openOnPhoneCurvedText(
+public fun CurvedScope.openOnPhoneDialogCurvedText(
     text: String,
     style: CurvedTextStyle,
 ): Unit =

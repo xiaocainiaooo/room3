@@ -30,7 +30,7 @@ import androidx.wear.compose.material3.FilledTonalButton
 import androidx.wear.compose.material3.OpenOnPhoneDialog
 import androidx.wear.compose.material3.OpenOnPhoneDialogDefaults
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.openOnPhoneCurvedText
+import androidx.wear.compose.material3.openOnPhoneDialogCurvedText
 
 @Sampled
 @Composable
@@ -50,6 +50,6 @@ fun OpenOnPhoneDialogSample() {
     OpenOnPhoneDialog(
         visible = showConfirmation,
         onDismissRequest = { showConfirmation = false },
-        curvedText = { openOnPhoneCurvedText(text = text, style = style) }
+        curvedText = { openOnPhoneDialogCurvedText(text = text, style = style) }
     )
 }

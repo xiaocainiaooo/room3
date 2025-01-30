@@ -81,7 +81,7 @@ class OpenOnPhoneDialogScreenshotTest {
                     visible = true,
                     modifier = Modifier.size(screenSize.size.dp).testTag(TEST_TAG),
                     onDismissRequest = {},
-                    curvedText = { openOnPhoneCurvedText(text = text, style = style) }
+                    curvedText = { openOnPhoneDialogCurvedText(text = text, style = style) }
                 )
             }
         }
