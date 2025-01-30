@@ -23,6 +23,7 @@ import androidx.appfunctions.compiler.processors.AppFunctionIndexXmlProcessor
 import androidx.appfunctions.compiler.processors.AppFunctionInventoryProcessor
 import androidx.appfunctions.compiler.processors.AppFunctionInvokerProcessor
 import androidx.appfunctions.compiler.processors.AppFunctionLegacyIndexXmlProcessor
+import androidx.appfunctions.compiler.processors.AppFunctionSerializableProcessor
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
@@ -63,13 +64,15 @@ class AppFunctionCompiler(
             val legacyIndexXmlProcessor =
                 AppFunctionLegacyIndexXmlProcessor(environment.codeGenerator)
             val indexXmlProcessor = AppFunctionIndexXmlProcessor(environment.codeGenerator)
+            val entityProcessor = AppFunctionSerializableProcessor(environment.codeGenerator)
             return AppFunctionCompiler(
                 listOf(
                     idProcessor,
                     inventoryProcessor,
                     invokerProcessor,
                     legacyIndexXmlProcessor,
-                    indexXmlProcessor
+                    indexXmlProcessor,
+                    entityProcessor
                 ),
                 environment.logger,
             )
