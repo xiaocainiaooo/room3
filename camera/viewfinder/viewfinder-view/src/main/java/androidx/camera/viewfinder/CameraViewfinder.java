@@ -16,9 +16,6 @@
 
 package androidx.camera.viewfinder;
 
-import static androidx.camera.viewfinder.core.ViewfinderSurfaceRequest.MIRROR_MODE_HORIZONTAL;
-import static androidx.camera.viewfinder.internal.utils.TransformUtils.createTransformInfo;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -35,25 +32,33 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import androidx.annotation.AnyThread;
 import androidx.annotation.ColorRes;
 import androidx.annotation.UiThread;
 import androidx.annotation.VisibleForTesting;
 import androidx.camera.viewfinder.core.ImplementationMode;
 import androidx.camera.viewfinder.core.ScaleType;
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest;
+import androidx.camera.viewfinder.core.ViewfinderSurfaceSession;
+import androidx.camera.viewfinder.core.impl.RefCounted;
+import androidx.camera.viewfinder.core.impl.ViewfinderSurfaceSessionImpl;
+import androidx.camera.viewfinder.internal.futures.Futures;
 import androidx.camera.viewfinder.internal.quirk.DeviceQuirks;
 import androidx.camera.viewfinder.internal.quirk.SurfaceViewNotCroppedByParentQuirk;
 import androidx.camera.viewfinder.internal.quirk.SurfaceViewStretchedQuirk;
 import androidx.camera.viewfinder.internal.utils.Logger;
-import androidx.camera.viewfinder.internal.utils.Threads;
+import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import kotlin.Unit;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
+import java.util.concurrent.CancellationException;
 
 /**
  * Base viewfinder widget that can display the camera feed for Camera2.
@@ -78,17 +83,24 @@ public final class CameraViewfinder extends FrameLayout {
     private final @NonNull DisplayRotationListener mDisplayRotationListener =
             new DisplayRotationListener();
 
-    private final @NonNull Looper mRequiredLooper = Looper.myLooper();
+    private final @NonNull Looper mRequiredLooper = Objects.requireNonNull(Looper.myLooper());
 
-    @NonNull ImplementationMode mImplementationMode;
+    /**
+     * Holds the implementation mode set through the {@code app:implementationMode} attr or the
+     * {@link #DEFAULT_IMPL_MODE} if that is not set.
+     *
+     * <p>The applied implementation mode, which is stored in {@code mCurrentImplementationMode},
+     * will use the implementation mode set through the {@link ViewfinderSurfaceRequest}, or will
+     * default to {@code mDefaultImplementationMode} if the surface request does not specify an
+     * implementation mode.
+     */
+    @NonNull ImplementationMode mDefaultImplementationMode;
+    @NonNull ImplementationMode mCurrentImplementationMode;
 
     // Synthetic access
     @SuppressWarnings("WeakerAccess")
     @Nullable ViewfinderImplementation mImplementation;
 
-    // Synthetic access
-    @SuppressWarnings("WeakerAccess")
-    @Nullable ViewfinderSurfaceRequest mCurrentSurfaceRequest;
 
     private final OnLayoutChangeListener mOnLayoutChangeListener =
             (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
@@ -98,52 +110,6 @@ public final class CameraViewfinder extends FrameLayout {
                     redrawViewfinder();
                 }
             };
-
-    // Synthetic access
-    @SuppressWarnings("WeakerAccess")
-    final ViewfinderSurfaceProvider mSurfaceProvider = new ViewfinderSurfaceProvider() {
-
-        @Override
-        @AnyThread
-        public void onSurfaceRequested(
-                @NonNull ViewfinderSurfaceRequest surfaceRequest
-        ) {
-            if (!Threads.isMainThread()) {
-                // In short term, throwing exception to guarantee onSurfaceRequest is
-                //  called on main thread. In long term, user should be able to specify an
-                //  executor to run this function.
-                throw new IllegalStateException("onSurfaceRequested must be called on the main  "
-                        + "thread");
-            }
-            Logger.d(TAG, "Surface requested by Viewfinder.");
-
-            if (surfaceRequest.getImplementationMode() != null) {
-                mImplementationMode = surfaceRequest.getImplementationMode();
-            }
-
-            mImplementation = shouldUseTextureView(mImplementationMode)
-                    ? new TextureViewImplementation(
-                            CameraViewfinder.this, mViewfinderTransformation)
-                    : new SurfaceViewImplementation(
-                            CameraViewfinder.this, mViewfinderTransformation);
-
-            mImplementation.onSurfaceRequested(surfaceRequest);
-
-            Display display = getDisplay();
-            if (display != null) {
-                mViewfinderTransformation.setTransformationInfo(
-                        createTransformInfo(surfaceRequest.getResolution(),
-                                display,
-                                surfaceRequest.getOutputMirrorMode()
-                                        == MIRROR_MODE_HORIZONTAL,
-                                surfaceRequest.getSourceOrientation()),
-                        surfaceRequest.getResolution(),
-                        surfaceRequest.getOutputMirrorMode()
-                                == MIRROR_MODE_HORIZONTAL);
-                redrawViewfinder();
-            }
-        }
-    };
 
     @UiThread
     public CameraViewfinder(@NonNull Context context) {
@@ -182,8 +148,9 @@ public final class CameraViewfinder extends FrameLayout {
             int implementationModeId =
                     attributes.getInteger(R.styleable.Viewfinder_implementationMode,
                             DEFAULT_IMPL_MODE.getId());
-            mImplementationMode = ImplementationMode.fromId(
+            mDefaultImplementationMode = ImplementationMode.fromId(
                     implementationModeId);
+            mCurrentImplementationMode = mDefaultImplementationMode;
         } finally {
             attributes.recycle();
         }
@@ -216,7 +183,7 @@ public final class CameraViewfinder extends FrameLayout {
     @UiThread
     public @NonNull ImplementationMode getSurfaceImplementationMode() {
         checkUiThread();
-        return mImplementationMode;
+        return mCurrentImplementationMode;
     }
 
     /**
@@ -229,7 +196,7 @@ public final class CameraViewfinder extends FrameLayout {
      *
      * <p> This method should be called after {@link CameraViewfinder} is inflated and can be
      * called before or after
-     * {@link CameraViewfinder#requestSurfaceAsync(ViewfinderSurfaceRequest)}. The
+     * {@link CameraViewfinder#requestSurfaceSessionAsync(ViewfinderSurfaceRequest)}. The
      * {@link ScaleType} to set will be effective immediately after the method is called.
      *
      * @param scaleType The {@link ScaleType} to apply to the viewfinder.
@@ -291,30 +258,59 @@ public final class CameraViewfinder extends FrameLayout {
      * @param surfaceRequest The {@link ViewfinderSurfaceRequest}
      *                       to get a surface.
      * @return The requested surface.
-     *
      * @see ViewfinderSurfaceRequest
      */
     @UiThread
-    public @NonNull ListenableFuture<Surface> requestSurfaceAsync(
+    public @NonNull ListenableFuture<ViewfinderSurfaceSession> requestSurfaceSessionAsync(
             @NonNull ViewfinderSurfaceRequest surfaceRequest) {
         checkUiThread();
 
-        if (mCurrentSurfaceRequest != null
-                && surfaceRequest.equals(mCurrentSurfaceRequest)) {
-            return mCurrentSurfaceRequest.getSurfaceAsync();
+        if (surfaceRequest.getImplementationMode() != null) {
+            mCurrentImplementationMode = surfaceRequest.getImplementationMode();
+        } else {
+            mCurrentImplementationMode = mDefaultImplementationMode;
         }
 
-        if (mCurrentSurfaceRequest != null) {
-            mCurrentSurfaceRequest.markSurfaceSafeToRelease();
+        ViewfinderImplementation viewfinderImplementation =
+                shouldUseTextureView(mCurrentImplementationMode)
+                ? new TextureViewImplementation(
+                CameraViewfinder.this, mViewfinderTransformation)
+                : new SurfaceViewImplementation(
+                        CameraViewfinder.this, mViewfinderTransformation);
+
+        if (mImplementation != null && mImplementation != viewfinderImplementation) {
+            mImplementation.onImplementationReplaced();
+        }
+        mImplementation = viewfinderImplementation;
+        ListenableFuture<RefCounted<Surface>> surfaceFuture = CallbackToFutureAdapter.getFuture(
+                (surfaceResponse) -> {
+                    viewfinderImplementation.onSurfaceRequested(surfaceRequest,
+                            surfaceResponse);
+                    return "requestSurfaceSessionAsync(" + surfaceRequest + ")";
+                }
+        );
+
+        Logger.d(TAG, "Surface requested by Viewfinder.");
+
+
+        Display display = getDisplay();
+        if (display != null) {
+            // TODO(b/390259589): Apply TransformationInfo
+            redrawViewfinder();
         }
 
-        ListenableFuture<Surface> surfaceListenableFuture =
-                surfaceRequest.getSurfaceAsync();
-        mCurrentSurfaceRequest = surfaceRequest;
-
-        provideSurfaceIfReady();
-
-        return surfaceListenableFuture;
+        return Futures.transform(surfaceFuture, (refCountedSurface) -> {
+            Surface surface = Objects.requireNonNull(refCountedSurface).acquire();
+            if (surface != null) {
+                return new ViewfinderSurfaceSessionImpl(
+                        surface, surfaceRequest, () -> {
+                            Objects.requireNonNull(refCountedSurface).release();
+                    return Unit.INSTANCE;
+                });
+            } else {
+                throw new CancellationException();
+            }
+        }, Runnable::run);
     }
 
     /**
@@ -343,26 +339,13 @@ public final class CameraViewfinder extends FrameLayout {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         addOnLayoutChangeListener(mOnLayoutChangeListener);
-        if (mImplementation != null) {
-            mImplementation.onAttachedToWindow();
-        }
         startListeningToDisplayChange();
-
-        // TODO: need to handle incomplete surface request if request is received before view
-        //  attached to window.
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         removeOnLayoutChangeListener(mOnLayoutChangeListener);
-        if (mImplementation != null) {
-            mImplementation.onDetachedFromWindow();
-        }
-        if (mCurrentSurfaceRequest != null) {
-            mCurrentSurfaceRequest.markSurfaceSafeToRelease();
-            mCurrentSurfaceRequest = null;
-        }
         stopListeningToDisplayChange();
     }
 
@@ -398,26 +381,15 @@ public final class CameraViewfinder extends FrameLayout {
         }
     }
 
-    private boolean provideSurfaceIfReady() {
-        final ViewfinderSurfaceRequest surfaceRequest =
-                mCurrentSurfaceRequest;
-        final ViewfinderSurfaceProvider surfaceProvider = mSurfaceProvider;
-        if (surfaceProvider != null && surfaceRequest != null) {
-            surfaceProvider.onSurfaceRequested(surfaceRequest);
-            return true;
-        }
-        return false;
-    }
-
     /**
      * Checks if the current thread is the same UI thread on which the class was constructed.
      *
-     * @see <a href = go/android-api-guidelines/concurrency#uithread></a>
+     * @see <a href="http://go/android-api-guidelines/concurrency#uithread">API Guidelines</a>
      */
     private void checkUiThread() {
         // Ignore mRequiredLooper == null because this can be called from the super
         // class constructor before the class's own constructor has run.
-        if (mRequiredLooper != null && Looper.myLooper() != mRequiredLooper) {
+        if (Looper.myLooper() != mRequiredLooper) {
             Throwable throwable = new Throwable(
                     "A method was called on thread '" + Thread.currentThread().getName()
                             + "'. All methods must be called on the same thread. (Expected Looper "
@@ -473,17 +445,7 @@ public final class CameraViewfinder extends FrameLayout {
         public void onDisplayChanged(int displayId) {
             Display display = getDisplay();
             if (display != null && display.getDisplayId() == displayId) {
-                ViewfinderSurfaceRequest surfaceRequest =
-                        mCurrentSurfaceRequest;
-                if (surfaceRequest != null) {
-                    mViewfinderTransformation.updateTransformInfo(
-                            createTransformInfo(surfaceRequest.getResolution(),
-                                    display,
-                                    surfaceRequest.getOutputMirrorMode()
-                                            == MIRROR_MODE_HORIZONTAL,
-                                    surfaceRequest.getSourceOrientation()));
-                    redrawViewfinder();
-                }
+                redrawViewfinder();
             }
         }
     }

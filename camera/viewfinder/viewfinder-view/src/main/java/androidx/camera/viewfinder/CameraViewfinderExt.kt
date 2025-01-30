@@ -16,16 +16,16 @@
 
 package androidx.camera.viewfinder
 
-import android.view.Surface
 import androidx.camera.viewfinder.core.ViewfinderSurfaceRequest
+import androidx.camera.viewfinder.core.ViewfinderSurfaceSession
 import androidx.concurrent.futures.await
 
 /**
- * Provides a suspending function of [CameraViewfinder.requestSurfaceAsync] to request a [Surface]
- * by sending a [ViewfinderSurfaceRequest].
+ * Provides a suspending function of [CameraViewfinder.requestSurfaceSessionAsync] to request a
+ * [ViewfinderSurfaceSession] by sending a [ViewfinderSurfaceRequest].
  */
 object CameraViewfinderExt {
-    suspend fun CameraViewfinder.requestSurface(
+    suspend fun CameraViewfinder.requestSurfaceSession(
         viewfinderSurfaceRequest: ViewfinderSurfaceRequest
-    ): Surface = requestSurfaceAsync(viewfinderSurfaceRequest).await()
+    ): ViewfinderSurfaceSession = requestSurfaceSessionAsync(viewfinderSurfaceRequest).await()
 }
