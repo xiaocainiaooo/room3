@@ -58,6 +58,9 @@ android {
         AndroidXConfig.getPrebuiltsRoot(project),
         "androidx/ink/android")
   }
+  defaultConfig {
+    consumerProguardFiles('used_by_native.pgcfg', 'external_referenced_by_native.pgcfg')
+  }
 }
 
 androidx {
