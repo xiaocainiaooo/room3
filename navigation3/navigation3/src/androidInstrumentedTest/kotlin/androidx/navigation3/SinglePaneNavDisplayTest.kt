@@ -168,6 +168,77 @@ class SinglePaneNavDisplayTest {
     }
 
     @Test
+    fun testStateIsRemovedOnPop() {
+        lateinit var numberOnScreen1: MutableState<Int>
+        lateinit var numberOnScreen2: MutableState<Int>
+        lateinit var backstack: MutableList<Any>
+        composeTestRule.setContent {
+            backstack = remember { mutableStateListOf(first) }
+            SinglePaneNavDisplay(backstack = backstack) {
+                when (it) {
+                    first ->
+                        NavEntry(first) {
+                            numberOnScreen1 = rememberSaveable { mutableStateOf(0) }
+                            Text("numberOnScreen1: ${numberOnScreen1.value}")
+                        }
+                    second ->
+                        NavEntry(second) {
+                            numberOnScreen2 = rememberSaveable { mutableStateOf(0) }
+                            Text("numberOnScreen2: ${numberOnScreen2.value}")
+                        }
+                    else -> error("Invalid key passed")
+                }
+            }
+        }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("Initial number should be 0").that(numberOnScreen1.value).isEqualTo(0)
+            numberOnScreen1.value++
+            numberOnScreen1.value++
+        }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("The number should be 2").that(numberOnScreen1.value).isEqualTo(2)
+        }
+
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 2").isDisplayed()).isTrue()
+
+        composeTestRule.runOnIdle { backstack.add(second) }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("Initial number should be 0").that(numberOnScreen2.value).isEqualTo(0)
+            numberOnScreen2.value++
+            numberOnScreen2.value++
+            numberOnScreen2.value++
+            numberOnScreen2.value++
+        }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("The number should be 4").that(numberOnScreen2.value).isEqualTo(4)
+        }
+
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen2: 4").isDisplayed()).isTrue()
+
+        composeTestRule.runOnIdle { backstack.removeAt(backstack.size - 1) }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("The number should be restored")
+                .that(numberOnScreen1.value)
+                .isEqualTo(2)
+        }
+
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 2").isDisplayed()).isTrue()
+
+        composeTestRule.runOnIdle { backstack.add(second) }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("Initial number should be 0").that(numberOnScreen2.value).isEqualTo(0)
+        }
+
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen2: 0").isDisplayed()).isTrue()
+    }
+
+    @Test
     fun testIndividualSavedStateRegistries() {
         lateinit var mainRegistry: SavedStateRegistry
         lateinit var registry1: SavedStateRegistry
