@@ -115,23 +115,27 @@ public class Metadata(
         const val RECORDING_METHOD_UNKNOWN = 0
 
         /**
-         * For actively recorded data by the user.
+         * For data actively recorded by the user.
          *
          * For e.g. An exercise session actively recorded by the user using a phone or a watch
          * device.
+         *
+         * [device] must be specified when using this recording method.
          */
         const val RECORDING_METHOD_ACTIVELY_RECORDED = 1
 
         /**
-         * For passively recorded data by the app. Or data recorded by a device without knowing
-         * whether or not user initiated the recording.
+         * For data recorded passively by a device without user explicitly initiating the recording,
+         * or whenever it cannot be determined.
          *
          * For e.g. Steps data recorded by a watch or phone without the user starting a session.
+         *
+         * [device] must be specified when using this recording method.
          */
         const val RECORDING_METHOD_AUTOMATICALLY_RECORDED = 2
 
         /**
-         * For manually entered data by the user.
+         * For data manually entered by the user.
          *
          * For e.g. Nutrition or weight data entered by the user.
          */
