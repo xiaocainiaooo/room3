@@ -72,12 +72,7 @@ val TransformingLazyColumnBenchmark =
                                     modifier =
                                         Modifier.fillMaxWidth()
                                             // Apply Material 3 Motion transformations.
-                                            .scrollTransform(
-                                                this,
-                                                backgroundColor =
-                                                    MaterialTheme.colorScheme.surfaceContainer,
-                                                shape = MaterialTheme.shapes.small
-                                            )
+                                            .scrollTransform(this)
                                             .padding(10.dp)
                                 )
                             }
@@ -88,15 +83,11 @@ val TransformingLazyColumnBenchmark =
 
         override val exercise: MacrobenchmarkScope.() -> Unit
             get() = {
+                val swipeStartY = device.displayHeight * 9 / 10 // scroll up
+                val swipeEndY = device.displayHeight / 2
+                val midX = device.displayWidth / 2
                 repeat(20) {
-                    val endY = device.displayHeight * 9 / 10 // scroll down
-                    device.swipe(
-                        device.displayWidth / 2,
-                        device.displayHeight / 2,
-                        device.displayWidth / 2,
-                        endY,
-                        10
-                    )
+                    device.swipe(midX, swipeStartY, midX, swipeEndY, 5)
                     device.waitForIdle()
                     SystemClock.sleep(500)
                 }
