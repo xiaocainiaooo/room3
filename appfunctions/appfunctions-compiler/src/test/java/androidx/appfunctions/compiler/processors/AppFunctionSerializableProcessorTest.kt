@@ -18,7 +18,6 @@ package androidx.appfunctions.compiler.processors
 
 import androidx.appfunctions.compiler.AppFunctionCompiler
 import androidx.appfunctions.compiler.testings.CompilationTestHelper
-import com.google.common.truth.Truth.assertThat
 import java.io.File
 import org.junit.Before
 import org.junit.Test
@@ -37,17 +36,24 @@ class AppFunctionSerializableProcessorTest {
             )
     }
 
+    // TODO(b/392587953): break down test by parameter types (e.g. EntityWithPrimitive,
+    //  EntityWithNullablePrimitive) when all types are supported.
     @Test
-    fun testResolveAppFunctionSerializables_validProperties_success() {
+    fun testProcessor_validProperties_success() {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("EntityWithValidProperties.KT")
             )
-        assertThat(report.isSuccess).isTrue()
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName = "EntityWithValidPropertiesFactory.kt",
+            goldenFileName = "\$EntityWithValidPropertiesFactory.KT"
+        )
     }
 
     @Test
-    fun testResolveAppFunctionSerializables_nonPropertyParameter_fails() {
+    fun testProcessor_nonPropertyParameter_fails() {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("EntityWithNonPropertyParameter.KT")
@@ -59,7 +65,7 @@ class AppFunctionSerializableProcessorTest {
     }
 
     @Test
-    fun testResolveAppFunctionSerializables_invalidPropertyType_fails() {
+    fun testProcessor_invalidPropertyType_fails() {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("EntityWithInvalidParameterType.KT")
@@ -75,7 +81,7 @@ class AppFunctionSerializableProcessorTest {
     }
 
     @Test
-    fun testResolveAppFunctionSerializables_invalidPropertyListType_fails() {
+    fun testProcessor_invalidPropertyListType_fails() {
         val report =
             compilationTestHelper.compileAll(
                 sourceFileNames = listOf("EntityWithInvalidListParameterType.KT")

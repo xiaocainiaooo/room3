@@ -75,4 +75,18 @@ object IntrospectionHelper {
             const val PARAMETERS_PARAM_NAME = "parameters"
         }
     }
+
+    object AppFunctionSerializableFactoryClass {
+        val CLASS_NAME =
+            ClassName(APP_FUNCTIONS_INTERNAL_PACKAGE_NAME, "AppFunctionSerializableFactory")
+
+        object FromAppFunctionDataMethod {
+            const val METHOD_NAME = "fromAppFunctionData"
+            const val APP_FUNCTION_DATA_PARAM_NAME = "appFunctionData"
+        }
+
+        object ToAppFunctionDataMethod {
+            const val METHOD_NAME = "toAppFunctionData"
+        }
+    }
 }
