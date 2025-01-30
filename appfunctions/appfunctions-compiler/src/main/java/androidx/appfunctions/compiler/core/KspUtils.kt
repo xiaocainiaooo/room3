@@ -56,8 +56,7 @@ internal val SUPPORTED_TYPES =
  * and @AppFunctionSerializable.
  */
 internal fun KSTypeReference.isSupportedType(): Boolean {
-    // Todo(b/392587953): Allow AppFunctionSerializable types.
-    return SUPPORTED_TYPES.contains(getTypeNameAsString())
+    return SUPPORTED_TYPES.contains(getTypeNameAsString()) || isAppFunctionSerializableType(this)
 }
 
 internal fun KSTypeReference.getTypeNameAsString(): String {
@@ -189,4 +188,16 @@ private fun ClassName.withTypeArguments(arguments: List<TypeName>): TypeName {
     } else {
         this.parameterizedBy(arguments)
     }
+}
+
+private fun isAppFunctionSerializableType(typeReferenceArgument: KSTypeReference): Boolean {
+    var typeToCheck = typeReferenceArgument
+    if (typeReferenceArgument.isOfType(LIST)) {
+        typeToCheck = typeReferenceArgument.resolveListParameterizedType()
+    }
+    return typeToCheck
+        .resolve()
+        .declaration
+        .annotations
+        .findAnnotation(IntrospectionHelper.AppFunctionSerializableAnnotation.CLASS_NAME) != null
 }
