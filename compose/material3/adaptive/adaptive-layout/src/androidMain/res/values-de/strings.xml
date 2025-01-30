@@ -20,6 +20,6 @@
     <string name="m3_adaptive_default_pane_expansion_drag_handle_content_description" msgid="9058489142432490820">"Ziehpunkt zum Maximieren des Bereichs"</string>
     <string name="m3_adaptive_default_pane_expansion_drag_handle_action_description" msgid="9031621431415014327">"„Fenster teilen“ in %s ändern"</string>
     <string name="m3_adaptive_default_pane_expansion_proportion_anchor_description" msgid="1205294531112795522">"%d Prozent"</string>
-    <string name="m3_adaptive_default_pane_expansion_start_offset_anchor_description" msgid="5056616348537665604">"%d DPs vom Start"</string>
+    <string name="m3_adaptive_default_pane_expansion_start_offset_anchor_description" msgid="5056616348537665604">"%d DPs vom Anfang"</string>
     <string name="m3_adaptive_default_pane_expansion_end_offset_anchor_description" msgid="6412636251656811002">"%d DPs vom Ende"</string>
 </resources>
