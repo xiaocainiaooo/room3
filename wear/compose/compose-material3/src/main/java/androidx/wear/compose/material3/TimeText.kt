@@ -86,6 +86,7 @@ import java.util.Locale
  * @param modifier The modifier to be applied to the component.
  * @param curvedModifier The [CurvedModifier] used to restrict the arc in which [TimeText] is drawn.
  * @param maxSweepAngle The default maximum sweep angle in degrees.
+ * @param backgroundColor The background color of the arc drawn behind the [TimeText].
  * @param timeSource [TimeSource] which retrieves the current time and formats it.
  * @param contentPadding The spacing values between the container and the content.
  * @param content The content of the [TimeText] - displays the current time by default. This lambda
@@ -98,12 +99,12 @@ public fun TimeText(
     modifier: Modifier = Modifier,
     curvedModifier: CurvedModifier = CurvedModifier,
     maxSweepAngle: Float = TimeTextDefaults.MaxSweepAngle,
+    backgroundColor: Color = TimeTextDefaults.backgroundColor(),
     timeSource: TimeSource = TimeTextDefaults.rememberTimeSource(timeFormat()),
     contentPadding: PaddingValues = TimeTextDefaults.ContentPadding,
     content: CurvedScope.(String) -> Unit = { time -> timeTextCurvedText(time) }
 ) {
     val currentTime = timeSource.currentTime()
-    val backgroundColor = CurvedTextDefaults.backgroundColor()
 
     CurvedLayout(modifier = modifier) {
         curvedRow(
@@ -188,6 +189,12 @@ public object TimeTextDefaults {
     @Composable
     public fun rememberTimeSource(timeFormat: String): TimeSource =
         remember(timeFormat) { DefaultTimeSource(timeFormat) }
+
+    /**
+     * The recommended background color to use when displaying curved text so it is visible on top
+     * of other content.
+     */
+    @Composable public fun backgroundColor(): Color = CurvedTextDefaults.backgroundColor()
 }
 
 /**
