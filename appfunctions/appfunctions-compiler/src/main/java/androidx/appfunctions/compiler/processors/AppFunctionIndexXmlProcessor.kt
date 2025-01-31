@@ -106,7 +106,7 @@ class AppFunctionIndexXmlProcessor(
             .createNewFile(
                 Dependencies(
                     aggregating = true,
-                    *appFunctionsByClass.mapNotNull { it.getSourceFile() }.toTypedArray()
+                    *appFunctionsByClass.flatMap { it.getSourceFiles() }.toTypedArray()
                 ),
                 XML_PACKAGE_NAME,
                 XML_FILE_NAME,
