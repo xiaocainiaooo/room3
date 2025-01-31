@@ -111,7 +111,7 @@ public class JvmTraceSink(
     }
 
     override fun close() {
-        makeDrainRequest()
+        flush()
         bufferedSink.close()
     }
 }
