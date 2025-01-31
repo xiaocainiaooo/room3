@@ -49,9 +49,7 @@ package androidx.tracing.driver {
     ctor public ProcessTrack(androidx.tracing.driver.TraceContext context, int id, String name, optional boolean hasPreamble);
     method public androidx.tracing.driver.CounterTrack CounterTrack(String name);
     method public androidx.tracing.driver.ThreadTrack ThreadTrack(int id, String name);
-    method public androidx.tracing.driver.TraceContext getContext();
     method public androidx.tracing.driver.PooledTracePacket? preamblePacket();
-    property public androidx.tracing.driver.TraceContext context;
   }
 
   public class ThreadTrack extends androidx.tracing.driver.EventTrack {

@@ -43,7 +43,6 @@ internal constructor(
     ) : this(sequenceId, sink, isEnabled, isDebug = false)
 
     internal val lock = Lock()
-    internal val pool = ProtoPool(isDebug = isDebug)
     internal val processes = mutableIntObjectMapOf<ProcessTrack>()
 
     /** @return A [ProcessTrack] using the unique process [id] using the provided [TraceContext]. */
@@ -74,6 +73,25 @@ internal constructor(
     override fun close() {
         flush()
         sink.close()
+    }
+
+    // Debug only
+    internal fun poolableCount(): Long {
+        if (!isDebug) {
+            return 0L
+        }
+        var count = 0L
+        processes.forEachValue { processTrack ->
+            count += processTrack.pool.poolableCount()
+            processTrack.threads.forEachValue { threadTrack ->
+                count += threadTrack.pool.poolableCount()
+            }
+
+            processTrack.counters.forEachValue { counterTrack ->
+                count += counterTrack.pool.poolableCount()
+            }
+        }
+        return count
     }
 }
 

@@ -35,7 +35,7 @@ class RecyclingTest {
             thread.trace("section") {}
         }
         assertTrue(context.isDebug)
-        assertEquals(0, context.pool.poolableCount())
+        assertEquals(0, context.poolableCount())
     }
 
     @Test
@@ -46,6 +46,6 @@ class RecyclingTest {
             thread.traceFlow("section") {}
         }
         assertTrue(context.isDebug)
-        assertEquals(0, context.pool.poolableCount())
+        assertEquals(0, context.poolableCount())
     }
 }

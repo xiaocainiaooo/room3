@@ -21,7 +21,7 @@ import androidx.collection.mutableScatterMapOf
 /** Represents a track for a process in a perfetto trace. */
 public open class ProcessTrack(
     /** The tracing context. */
-    override val context: TraceContext,
+    context: TraceContext,
     /** The process id */
     internal val id: Int,
     /** The name of the process. */
@@ -33,9 +33,9 @@ public open class ProcessTrack(
     internal val counters = mutableScatterMapOf<String, CounterTrack>()
 
     override fun preamblePacket(): PooledTracePacket? {
-        val packet = context.pool.obtainTracePacket()
-        val track = context.pool.obtainTrackDescriptor()
-        val process = context.pool.obtainProcessDescriptor()
+        val packet = pool.obtainTracePacket()
+        val track = pool.obtainTrackDescriptor()
+        val process = pool.obtainProcessDescriptor()
         packet.trackPoolableForOwnership(track)
         packet.trackPoolableForOwnership(process)
         // Populate process details
@@ -78,16 +78,19 @@ public open class ProcessTrack(
 private const val EMPTY_PROCESS_ID = -1
 private const val EMPTY_PROCESS_NAME = "Empty Process"
 
-internal class EmptyProcessTrack(override val context: EmptyTraceContext) :
+internal class EmptyProcessTrack(context: EmptyTraceContext) :
     ProcessTrack(
         context = context,
         id = EMPTY_PROCESS_ID,
         name = EMPTY_PROCESS_NAME,
         hasPreamble = false
     ) {
+
+    private val emptyContext: EmptyTraceContext = context
+
     override fun preamblePacket(): PooledTracePacket? = null
 
-    override fun ThreadTrack(id: Int, name: String): ThreadTrack = this.context.thread
+    override fun ThreadTrack(id: Int, name: String): ThreadTrack = emptyContext.thread
 
-    override fun CounterTrack(name: String): CounterTrack = this.context.counter
+    override fun CounterTrack(name: String): CounterTrack = emptyContext.counter
 }
