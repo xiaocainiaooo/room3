@@ -154,6 +154,9 @@ package androidx.compose.ui.geometry {
     method public static inline boolean isUnspecified(long);
     method @androidx.compose.runtime.Stable public static long lerp(long start, long stop, float fraction);
     method public static inline long takeOrElse(long, kotlin.jvm.functions.Function0<androidx.compose.ui.geometry.Offset> block);
+    property @androidx.compose.runtime.Stable public final inline boolean isFinite;
+    property @androidx.compose.runtime.Stable public final inline boolean isSpecified;
+    property @androidx.compose.runtime.Stable public final inline boolean isUnspecified;
   }
 
   @androidx.compose.runtime.Immutable public final class Rect {
@@ -288,6 +291,17 @@ package androidx.compose.ui.geometry {
     method public static boolean isSimple(androidx.compose.ui.geometry.RoundRect);
     method public static androidx.compose.ui.geometry.RoundRect lerp(androidx.compose.ui.geometry.RoundRect start, androidx.compose.ui.geometry.RoundRect stop, float fraction);
     method public static androidx.compose.ui.geometry.RoundRect translate(androidx.compose.ui.geometry.RoundRect, long offset);
+    property public final androidx.compose.ui.geometry.Rect boundingRect;
+    property public final long center;
+    property public final boolean isCircle;
+    property public final boolean isEllipse;
+    property public final boolean isEmpty;
+    property public final boolean isFinite;
+    property public final boolean isRect;
+    property public final boolean isSimple;
+    property public final float maxDimension;
+    property public final float minDimension;
+    property public final androidx.compose.ui.geometry.Rect safeInnerRect;
   }
 
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class Size {
@@ -325,6 +339,9 @@ package androidx.compose.ui.geometry {
     method @androidx.compose.runtime.Stable public static inline operator long times(float, long size);
     method @androidx.compose.runtime.Stable public static inline operator long times(int, long size);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Rect toRect(long);
+    property @androidx.compose.runtime.Stable public final long center;
+    property @androidx.compose.runtime.Stable public final inline boolean isSpecified;
+    property @androidx.compose.runtime.Stable public final inline boolean isUnspecified;
   }
 
 }

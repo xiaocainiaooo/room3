@@ -76,6 +76,7 @@ package androidx.compose.animation {
 
   public final class ColorVectorConverterKt {
     method public static kotlin.jvm.functions.Function1<androidx.compose.ui.graphics.colorspace.ColorSpace,androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D>> getVectorConverter(androidx.compose.ui.graphics.Color.Companion);
+    property public final kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.colorspace.ColorSpace,? extends androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D>> VectorConverter;
   }
 
   public final class ContentTransform {

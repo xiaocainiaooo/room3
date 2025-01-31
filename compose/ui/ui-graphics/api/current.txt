@@ -8,6 +8,7 @@ package androidx.compose.ui.graphics {
   public final class AndroidCanvas_androidKt {
     method public static androidx.compose.ui.graphics.Canvas Canvas(android.graphics.Canvas c);
     method public static android.graphics.Canvas getNativeCanvas(androidx.compose.ui.graphics.Canvas);
+    property public final android.graphics.Canvas nativeCanvas;
   }
 
   public final class AndroidColorFilter_androidKt {
@@ -395,6 +396,8 @@ package androidx.compose.ui.graphics {
     method @androidx.compose.runtime.Stable public static float luminance(long);
     method public static inline long takeOrElse(long, kotlin.jvm.functions.Function0<androidx.compose.ui.graphics.Color> block);
     method @ColorInt @androidx.compose.runtime.Stable public static int toArgb(long);
+    property @androidx.compose.runtime.Stable public final inline boolean isSpecified;
+    property @androidx.compose.runtime.Stable public final inline boolean isUnspecified;
   }
 
   @kotlin.jvm.JvmInline public final value class ColorMatrix {
@@ -803,6 +806,11 @@ package androidx.compose.ui.graphics {
     method @Deprecated public static int getReverseDifference(androidx.compose.ui.graphics.PathOperation.Companion);
     method @Deprecated public static int getUnion(androidx.compose.ui.graphics.PathOperation.Companion);
     method @Deprecated public static int getXor(androidx.compose.ui.graphics.PathOperation.Companion);
+    property @Deprecated public final int difference;
+    property @Deprecated public final int intersect;
+    property @Deprecated public final int reverseDifference;
+    property @Deprecated public final int union;
+    property @Deprecated public final int xor;
   }
 
   public final class PathSegment {

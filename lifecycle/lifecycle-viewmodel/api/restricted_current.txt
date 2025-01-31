@@ -8,6 +8,7 @@ package androidx.lifecycle {
 
   public final class AndroidViewModel_androidKt {
     method public static inline android.app.Application getApplication(androidx.lifecycle.AndroidViewModel);
+    property public final inline android.app.Application application;
   }
 
   public interface HasDefaultViewModelProviderFactory {
@@ -32,6 +33,7 @@ package androidx.lifecycle {
 
   public final class ViewModelKt {
     method public static kotlinx.coroutines.CoroutineScope getViewModelScope(androidx.lifecycle.ViewModel);
+    property public final kotlinx.coroutines.CoroutineScope viewModelScope;
   }
 
   public final class ViewModelLazy<VM extends androidx.lifecycle.ViewModel> implements kotlin.Lazy<VM> {

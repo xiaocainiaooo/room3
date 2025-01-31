@@ -1626,6 +1626,8 @@ package androidx.wear.protolayout.types {
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.types.LayoutColor createLayoutColor(androidx.wear.protolayout.expression.DynamicBuilders.DynamicColor, @ColorInt long staticArgb);
     method public static androidx.wear.protolayout.types.LayoutColor createLayoutColor(int);
     method public static androidx.wear.protolayout.types.LayoutColor createLayoutColor(long);
+    property public final androidx.wear.protolayout.types.LayoutColor argb;
+    property public final androidx.wear.protolayout.types.LayoutColor argb;
   }
 
   public final class LayoutString {
@@ -1645,6 +1647,7 @@ package androidx.wear.protolayout.types {
     method public static androidx.wear.protolayout.types.LayoutString createLayoutString(String);
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint stringLayoutConstraint(String longestPattern);
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public static androidx.wear.protolayout.TypeBuilders.StringLayoutConstraint stringLayoutConstraint(String longestPattern, optional int alignment);
+    property public final androidx.wear.protolayout.types.LayoutString layoutString;
   }
 
 }
