@@ -72,6 +72,8 @@ internal expect value class Strings constructor(val value: Int) {
         val DateRangePickerDayInRange: Strings
         val DateRangeInputTitle: Strings
         val DateRangeInputInvalidRangeInput: Strings
+        val FloatingToolbarCollapse: Strings
+        val FloatingToolbarExpand: Strings
         val BottomSheetPaneTitle: Strings
         val BottomSheetDragHandleDescription: Strings
         val BottomSheetPartialExpandDescription: Strings

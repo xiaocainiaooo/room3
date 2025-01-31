@@ -75,6 +75,8 @@ internal actual value class Strings constructor(val value: Int) {
         actual val DateRangePickerDayInRange: Strings = implementedInJetBrainsFork()
         actual val DateRangeInputTitle: Strings = implementedInJetBrainsFork()
         actual val DateRangeInputInvalidRangeInput: Strings = implementedInJetBrainsFork()
+        actual val FloatingToolbarCollapse: Strings = implementedInJetBrainsFork()
+        actual val FloatingToolbarExpand: Strings = implementedInJetBrainsFork()
         actual val BottomSheetPaneTitle: Strings = implementedInJetBrainsFork()
         actual val BottomSheetDragHandleDescription: Strings = implementedInJetBrainsFork()
         actual val BottomSheetPartialExpandDescription: Strings = implementedInJetBrainsFork()
