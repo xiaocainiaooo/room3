@@ -3230,6 +3230,241 @@ class AndroidPointerInputTest {
     }
 
     /*
+     * Tests how the input system handles TOUCH events going into a pointer input modifier node
+     * when its parent's pointer input modifier is dynamically removed DURING an event stream, that
+     * is, before the event stream ends.
+     *
+     * After any pointer input modifier node is removed, any existing event stream is cancelled,
+     * and any follow up events from that stream are ignored. Any new event streams, will trigger
+     * the appropriate nodes in the new tree.
+     *
+     * They key used is Unit.
+     *
+     * Specific events:
+     *  1. UI Element (parent and child location): PRESS (touch)
+     *  2. UI Element (parent and child location): MULTIPLE MOVE (touch)
+     *  3. Dynamically remove parent pointer input modifier (between input event streams)
+     *  4. System sends generated RELEASE to parent and child (this is not a user sent release)
+     *  -- Events send in old input stream (Note: A new input stream starts with PRESS). ---
+     *  5. UI Element (child only location [parent gone]): MULTIPLE MOVE (touch) - doesn't trigger
+     *  6. UI Element (modifier 1 and 2): RELEASE (touch) - doesn't trigger
+     *
+     * TODO: If support added for dynamic modifier DURING event streams, modify test
+     */
+    @Test
+    fun pointerInputEvents_removeParentInputModifierDuringStream_noFurtherEventsTriggerForStream() {
+        // --> Arrange
+        var parentBoxLayoutCoordinates: LayoutCoordinates? = null
+        var childBoxLayoutCoordinates: LayoutCoordinates? = null
+
+        val setUpFinishedLatch = CountDownLatch(2)
+
+        var enableDynamicPointerInput by mutableStateOf(true)
+
+        // Events for the Parent Box with dynamic pointer input modifier
+        var parentBoxDynamicPointerInputScopeExecutionCount by mutableStateOf(0)
+        var parentBoxDynamicModifierPress by mutableStateOf(0)
+        var parentBoxDynamicModifierMove by mutableStateOf(0)
+        var parentBoxDynamicModifierRelease by mutableStateOf(0)
+
+        // Events for the child Box
+        var childBoxPointerInputScopeExecutionCount by mutableStateOf(0)
+        var childBoxModifierPress by mutableStateOf(0)
+        var childBoxModifierMove by mutableStateOf(0)
+        var childBoxModifierRelease by mutableStateOf(0)
+
+        // All other events that should never be triggered in this test
+        var eventsThatShouldNotTrigger by mutableStateOf(false)
+
+        var pointerEvent: PointerEvent? by mutableStateOf(null)
+
+        // Pointer Input Modifier that is toggled on/off based on passed value.
+        fun Modifier.dynamicallyToggledPointerInput(
+            enable: Boolean,
+            pointerEventLambda: (pointerEvent: PointerEvent) -> Unit
+        ) =
+            if (enable) {
+                pointerInput(Unit) {
+                    ++parentBoxDynamicPointerInputScopeExecutionCount
+
+                    // Reset pointer events when lambda is ran the first time
+                    parentBoxDynamicModifierPress = 0
+                    parentBoxDynamicModifierMove = 0
+                    parentBoxDynamicModifierRelease = 0
+
+                    awaitPointerEventScope {
+                        while (true) {
+                            pointerEventLambda(awaitPointerEvent())
+                        }
+                    }
+                }
+            } else this
+
+        // Setup UI
+        rule.runOnUiThread {
+            container.setContent {
+                // Parent Box
+                Box(
+                    Modifier.background(Color.Green)
+                        .size(400.dp)
+                        .onGloballyPositioned {
+                            parentBoxLayoutCoordinates = it
+                            setUpFinishedLatch.countDown()
+                        }
+                        .dynamicallyToggledPointerInput(enableDynamicPointerInput) {
+                            when (it.type) {
+                                PointerEventType.Press -> {
+                                    ++parentBoxDynamicModifierPress
+                                }
+                                PointerEventType.Move -> {
+                                    ++parentBoxDynamicModifierMove
+                                }
+                                PointerEventType.Release -> {
+                                    ++parentBoxDynamicModifierRelease
+                                }
+                                else -> {
+                                    eventsThatShouldNotTrigger = true
+                                }
+                            }
+                        }
+                ) {
+                    // Child box
+                    Box(
+                        Modifier.background(Color.Red)
+                            .size(200.dp)
+                            .onGloballyPositioned {
+                                childBoxLayoutCoordinates = it
+                                setUpFinishedLatch.countDown()
+                            }
+                            .pointerInput(Unit) {
+                                ++childBoxPointerInputScopeExecutionCount
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        pointerEvent = awaitPointerEvent()
+                                        when (pointerEvent!!.type) {
+                                            PointerEventType.Press -> {
+                                                ++childBoxModifierPress
+                                            }
+                                            PointerEventType.Move -> {
+                                                ++childBoxModifierMove
+                                            }
+                                            PointerEventType.Release -> {
+                                                ++childBoxModifierRelease
+                                            }
+                                            else -> {
+                                                eventsThatShouldNotTrigger = true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                    ) {}
+                }
+            }
+        }
+        // Ensure Arrange (setup) step is finished
+        assertTrue(setUpFinishedLatch.await(2, TimeUnit.SECONDS))
+
+        // --> Act + Assert (interwoven)
+        // DOWN (Starts Event Stream)
+        dispatchTouchEvent(ACTION_DOWN, parentBoxLayoutCoordinates!!)
+        rule.runOnUiThread {
+            assertThat(childBoxPointerInputScopeExecutionCount).isEqualTo(1)
+            assertThat(parentBoxDynamicPointerInputScopeExecutionCount).isEqualTo(1)
+
+            assertThat(parentBoxDynamicModifierPress).isEqualTo(1)
+            assertThat(parentBoxDynamicModifierMove).isEqualTo(0)
+            assertThat(parentBoxDynamicModifierRelease).isEqualTo(0)
+
+            assertThat(childBoxModifierPress).isEqualTo(1)
+            assertThat(childBoxModifierMove).isEqualTo(0)
+            assertThat(childBoxModifierRelease).isEqualTo(0)
+
+            assertThat(pointerEvent).isNotNull()
+            assertThat(eventsThatShouldNotTrigger).isFalse()
+        }
+
+        val moveAmount = 2f
+        var moveYLocation = 0f
+        var moveCount = 0
+
+        (0..4).forEach { _ ->
+            moveYLocation += moveAmount
+            moveCount++
+
+            dispatchTouchEvent(ACTION_MOVE, parentBoxLayoutCoordinates!!, Offset(0f, moveYLocation))
+            rule.runOnUiThread {
+                assertThat(childBoxPointerInputScopeExecutionCount).isEqualTo(1)
+                assertThat(parentBoxDynamicPointerInputScopeExecutionCount).isEqualTo(1)
+
+                assertThat(parentBoxDynamicModifierPress).isEqualTo(1)
+                assertThat(parentBoxDynamicModifierMove).isEqualTo(moveCount)
+                assertThat(parentBoxDynamicModifierRelease).isEqualTo(0)
+
+                assertThat(childBoxModifierPress).isEqualTo(1)
+                assertThat(childBoxModifierMove).isEqualTo(moveCount)
+                assertThat(childBoxModifierRelease).isEqualTo(0)
+
+                assertThat(pointerEvent).isNotNull()
+                assertThat(eventsThatShouldNotTrigger).isFalse()
+            }
+        }
+
+        // Remove top pointer modifier node
+        enableDynamicPointerInput = false
+        rule.waitForFutureFrame(2)
+
+        // A generated Release was sent, but now all events moving forward do not trigger the
+        // event listeners, since this is still the cancelled event stream.
+        // (If we wanted to start a new event stream, we'd dispatch an ACTION_DOWN or hover enter).
+
+        moveYLocation = 0f
+        val oldMoveCount = moveCount
+
+        (0..4).forEach { _ ->
+            moveYLocation += moveAmount
+            moveCount++
+
+            dispatchTouchEvent(ACTION_MOVE, childBoxLayoutCoordinates!!, Offset(0f, moveYLocation))
+            rule.runOnUiThread {
+                assertThat(childBoxPointerInputScopeExecutionCount).isEqualTo(1)
+                assertThat(parentBoxDynamicPointerInputScopeExecutionCount).isEqualTo(1)
+
+                assertThat(parentBoxDynamicModifierPress).isEqualTo(1)
+                assertThat(parentBoxDynamicModifierMove).isEqualTo(oldMoveCount)
+                assertThat(parentBoxDynamicModifierRelease).isEqualTo(1)
+
+                assertThat(childBoxModifierPress).isEqualTo(1)
+                assertThat(childBoxModifierMove).isEqualTo(oldMoveCount)
+                assertThat(childBoxModifierRelease).isEqualTo(1)
+
+                assertThat(pointerEvent).isNotNull()
+                assertThat(eventsThatShouldNotTrigger).isFalse()
+            }
+        }
+
+        dispatchTouchEvent(
+            ACTION_UP,
+            childBoxLayoutCoordinates!!,
+        )
+        rule.runOnUiThread {
+            assertThat(childBoxPointerInputScopeExecutionCount).isEqualTo(1)
+            assertThat(parentBoxDynamicPointerInputScopeExecutionCount).isEqualTo(1)
+
+            assertThat(parentBoxDynamicModifierPress).isEqualTo(1)
+            assertThat(parentBoxDynamicModifierMove).isEqualTo(oldMoveCount)
+            assertThat(parentBoxDynamicModifierRelease).isEqualTo(1)
+
+            assertThat(childBoxModifierPress).isEqualTo(1)
+            assertThat(childBoxModifierMove).isEqualTo(oldMoveCount)
+            assertThat(childBoxModifierRelease).isEqualTo(1)
+
+            assertThat(pointerEvent).isNotNull()
+            assertThat(eventsThatShouldNotTrigger).isFalse()
+        }
+    }
+
+    /*
      * Tests TOUCH events are triggered correctly when dynamically adding a pointer input
      * modifier BELOW an existing pointer input modifier.
      *
