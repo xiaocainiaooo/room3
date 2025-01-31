@@ -29,8 +29,10 @@ import androidx.health.connect.client.aggregate.AggregationResult
 import androidx.health.connect.client.aggregate.AggregationResultGroupedByDuration
 import androidx.health.connect.client.aggregate.AggregationResultGroupedByPeriod
 import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
+import androidx.health.connect.client.feature.FEATURE_CONSTANT_NAME_PHR
 import androidx.health.connect.client.feature.HealthConnectFeaturesApkImpl
 import androidx.health.connect.client.feature.HealthConnectFeaturesUnavailableImpl
+import androidx.health.connect.client.feature.createExceptionDueToFeatureUnavailable
 import androidx.health.connect.client.impl.converters.aggregate.retrieveAggregateDataRow
 import androidx.health.connect.client.impl.converters.aggregate.toAggregateDataRowGroupByDuration
 import androidx.health.connect.client.impl.converters.aggregate.toAggregateDataRowGroupByPeriod
@@ -268,7 +270,11 @@ internal constructor(
     override suspend fun upsertMedicalResources(
         requests: List<UpsertMedicalResourceRequest>
     ): List<MedicalResource> {
-        TODO("b/382680786 Not yet implemented")
+        // This impl should never be called if a client use feature availability checks on PHR APIs.
+        throw createExceptionDueToFeatureUnavailable(
+            FEATURE_CONSTANT_NAME_PHR,
+            "HealthConnectClient#upsertMedicalResources()"
+        )
     }
 
     /**

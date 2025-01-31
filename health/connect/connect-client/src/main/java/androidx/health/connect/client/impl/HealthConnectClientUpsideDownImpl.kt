@@ -16,6 +16,7 @@
 
 package androidx.health.connect.client.impl
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageInfo.REQUESTED_PERMISSION_GRANTED
 import android.content.pm.PackageManager.GET_PERMISSIONS
@@ -29,6 +30,7 @@ import android.os.Build
 import android.os.RemoteException
 import android.os.ext.SdkExtensions
 import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
 import androidx.annotation.VisibleForTesting
 import androidx.core.os.asOutcomeReceiver
 import androidx.health.connect.client.ExperimentalDeduplicationApi
@@ -43,11 +45,13 @@ import androidx.health.connect.client.changes.DeletionChange
 import androidx.health.connect.client.changes.UpsertionChange
 import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
 import androidx.health.connect.client.feature.HealthConnectFeaturesPlatformImpl
+import androidx.health.connect.client.feature.withPhrFeatureCheckSuspend
 import androidx.health.connect.client.impl.platform.aggregate.AGGREGATE_METRICS_ADDED_IN_SDK_EXT_10
 import androidx.health.connect.client.impl.platform.aggregate.aggregateFallback
 import androidx.health.connect.client.impl.platform.aggregate.isPlatformSupportedMetric
 import androidx.health.connect.client.impl.platform.records.toPlatformRecord
 import androidx.health.connect.client.impl.platform.records.toPlatformRecordClass
+import androidx.health.connect.client.impl.platform.records.toSdkMedicalResource
 import androidx.health.connect.client.impl.platform.records.toSdkRecord
 import androidx.health.connect.client.impl.platform.request.toPlatformLocalTimeRangeFilter
 import androidx.health.connect.client.impl.platform.request.toPlatformRequest
@@ -385,11 +389,23 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
         }
     }
 
+    @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
+    @SuppressLint("NewApi") // already checked with a feature availability check
     override suspend fun upsertMedicalResources(
         requests: List<UpsertMedicalResourceRequest>
-    ): List<MedicalResource> {
-        TODO("b/382680786 Not yet implemented")
-    }
+    ): List<MedicalResource> =
+        withPhrFeatureCheckSuspend("HealthConnectClient#upsertMedicalResources()") {
+            wrapPlatformException {
+                    suspendCancellableCoroutine { continuation ->
+                        healthConnectManager.upsertMedicalResources(
+                            requests.map { it.platformUpsertMedicalResourceRequest },
+                            executor,
+                            continuation.asOutcomeReceiver()
+                        )
+                    }
+                }
+                .map { it.toSdkMedicalResource() }
+        }
 
     private suspend fun <T> wrapPlatformException(function: suspend () -> T): T {
         return try {
