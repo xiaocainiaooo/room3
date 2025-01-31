@@ -29,10 +29,8 @@ import androidx.health.connect.client.aggregate.AggregationResult
 import androidx.health.connect.client.aggregate.AggregationResultGroupedByDuration
 import androidx.health.connect.client.aggregate.AggregationResultGroupedByPeriod
 import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
-import androidx.health.connect.client.feature.FEATURE_CONSTANT_NAME_PHR
 import androidx.health.connect.client.feature.HealthConnectFeaturesApkImpl
 import androidx.health.connect.client.feature.HealthConnectFeaturesUnavailableImpl
-import androidx.health.connect.client.feature.createExceptionDueToFeatureUnavailable
 import androidx.health.connect.client.impl.converters.aggregate.retrieveAggregateDataRow
 import androidx.health.connect.client.impl.converters.aggregate.toAggregateDataRowGroupByDuration
 import androidx.health.connect.client.impl.converters.aggregate.toAggregateDataRowGroupByPeriod
@@ -47,8 +45,6 @@ import androidx.health.connect.client.impl.converters.request.toReadDataRequestP
 import androidx.health.connect.client.impl.converters.response.toChangesResponse
 import androidx.health.connect.client.impl.converters.response.toReadRecordsResponse
 import androidx.health.connect.client.permission.HealthPermission.Companion.ALL_PERMISSIONS
-import androidx.health.connect.client.records.MedicalResource
-import androidx.health.connect.client.records.MedicalResourceId
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
@@ -56,7 +52,6 @@ import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.request.ReadRecordsRequest.Companion.DEDUPLICATION_STRATEGY_DISABLED
-import androidx.health.connect.client.request.UpsertMedicalResourceRequest
 import androidx.health.connect.client.response.ChangesResponse
 import androidx.health.connect.client.response.InsertRecordsResponse
 import androidx.health.connect.client.response.ReadRecordResponse
@@ -267,22 +262,6 @@ internal constructor(
         )
         return result
     }
-
-    override suspend fun upsertMedicalResources(
-        requests: List<UpsertMedicalResourceRequest>
-    ): List<MedicalResource> {
-        // This impl should never be called if a client use feature availability checks on PHR APIs.
-        throw createExceptionDueToFeatureUnavailable(
-            FEATURE_CONSTANT_NAME_PHR,
-            "HealthConnectClient#upsertMedicalResources()"
-        )
-    }
-
-    override suspend fun readMedicalResources(ids: List<MedicalResourceId>): List<MedicalResource> =
-        throw createExceptionDueToFeatureUnavailable(
-            FEATURE_CONSTANT_NAME_PHR,
-            "HealthConnectClient#readMedicalResources(ids: List<MedicalResourceId>)"
-        )
 
     /**
      * Wraps any thrown [RemoteException] with a new instance, such that stack traces indicate which

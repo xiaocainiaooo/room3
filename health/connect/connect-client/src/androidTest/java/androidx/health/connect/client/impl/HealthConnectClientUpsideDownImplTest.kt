@@ -35,7 +35,9 @@ import androidx.health.connect.client.impl.platform.records.SDK_TO_PLATFORM_RECO
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.readRecord
 import androidx.health.connect.client.records.BloodPressureRecord
+import androidx.health.connect.client.records.FhirResource.Companion.FHIR_RESOURCE_TYPE_IMMUNIZATION
 import androidx.health.connect.client.records.HeartRateRecord
+import androidx.health.connect.client.records.MedicalResourceId
 import androidx.health.connect.client.records.NutritionRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.WeightRecord
@@ -909,74 +911,101 @@ class HealthConnectClientUpsideDownImplTest {
     }
 
     @Ignore(
-        "TODO(b/382680786): Remove Ignore and call createMedicalDataSource once it has been added"
+        "TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added"
     )
     @Test
-    fun upsertMedicalResources_newMedicalResource_expectInserted() = runTest {
+    fun upsertNewMedicalResourcesThenRead_expectCorrectResponse() = runTest {
         assumeTrue(
             "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
             isPersonalHealthRecordFeatureAvailableInPlatform()
         )
+        // TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added
+        val dataSourceId = ""
+        val fhirResourceId = "immunization-101"
         val requests =
             listOf(
                 createVaccinesUpsertMedicalResourceRequest(
-                    dataSourceId =
-                        "" // TODO(b/382680786): Remove Ignore and call createMedicalDataSource once
-                    // it has been added
+                    dataSourceId = dataSourceId,
+                    fhirResourceId = fhirResourceId
                 )
             )
 
-        val response = healthConnectClient.upsertMedicalResources(requests)
+        // insert a new MedicalResource
+        val upsertResponse = healthConnectClient.upsertMedicalResources(requests)
 
-        assertThat(response).hasSize(1)
-        assertThat(response[0].fhirResource.data).isEqualTo(requests[0].data)
+        assertThat(upsertResponse).hasSize(1)
+        assertThat(upsertResponse[0].fhirResource.data).isEqualTo(requests[0].data)
 
-        // TODO(b/382680786): read the medical resource back and assert once the read API has become
-        // available.
+        // read back the MedicalResource
+        val medicalResources =
+            healthConnectClient.readMedicalResources(
+                listOf(
+                    MedicalResourceId(
+                        dataSourceId = dataSourceId,
+                        fhirResourceType = FHIR_RESOURCE_TYPE_IMMUNIZATION,
+                        fhirResourceId = fhirResourceId
+                    )
+                )
+            )
+
+        assertThat(medicalResources).isEqualTo(upsertResponse)
     }
 
     @Ignore(
-        "TODO(b/382680786): Remove Ignore and call createMedicalDataSource once it has been added"
+        "TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added"
     )
     @Test
-    fun upsertMedicalResources_sameMedicalResourceId_expectUpdated() = runTest {
+    fun upsertExistingMedicalResourcesThenRead_expectCorrectResponse() = runTest {
         assumeTrue(
             "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
             isPersonalHealthRecordFeatureAvailableInPlatform()
         )
+        // TODO: b/382680485 - Remove Ignore and call createMedicalDataSource once it has been added
+        val dataSourceId = ""
+        val fhirResourceId = "immunization-101"
         val insertRequests =
             listOf(
                 createVaccinesUpsertMedicalResourceRequest(
-                    dataSourceId =
-                        "", // TODO(b/382680786): Remove Ignore and call createMedicalDataSource
-                    // once it has been added
+                    dataSourceId = dataSourceId,
+                    fhirResourceId = fhirResourceId,
                     completeStatus = COMPLETE
                 )
             )
 
+        // insert a new MedicalResource
         val insertResponse = healthConnectClient.upsertMedicalResources(insertRequests)
 
         assertThat(insertResponse).hasSize(1)
         assertThat(insertResponse[0].fhirResource.data).isEqualTo(insertRequests[0].data)
 
+        // update the inserted MedicalResource
         val updateRequests =
             listOf(
                 createVaccinesUpsertMedicalResourceRequest(
-                    dataSourceId =
-                        "", // TODO(b/382680786): Remove Ignore and call createMedicalDataSource
-                    // once it has been added
-                    completeStatus = INCOMPLETE
+                    dataSourceId = dataSourceId,
+                    fhirResourceId = fhirResourceId,
+                    completeStatus = INCOMPLETE // change this from COMPLETE => INCOMPLETE
                 )
             )
 
         val updateResponse = healthConnectClient.upsertMedicalResources(updateRequests)
         assertThat(updateResponse).hasSize(1)
         assertThat(updateResponse[0].fhirResource.data).isEqualTo(updateRequests[0].data)
-
         assertThat(insertResponse[0].id).isEqualTo(updateResponse[0].id)
 
-        // TODO(b/382680487): read the medical resource back and assert once the read API has become
-        // available.
+        // read back the MedicalResource
+        val medicalResources =
+            healthConnectClient.readMedicalResources(
+                listOf(
+                    MedicalResourceId(
+                        dataSourceId = dataSourceId,
+                        fhirResourceType = FHIR_RESOURCE_TYPE_IMMUNIZATION,
+                        fhirResourceId = fhirResourceId
+                    )
+                )
+            )
+
+        assertThat(medicalResources).isEqualTo(updateResponse)
     }
 
     private fun <A, E> assertEquals(vararg assertions: Pair<A, E>) {

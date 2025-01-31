@@ -39,7 +39,7 @@ import androidx.health.connect.client.impl.platform.records.PlatformFhirVersion
 class FhirVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<FhirVersion> {
     @SuppressLint("NewApi") // already checked with a feature availability check
     internal val platformFhirVersion: PlatformFhirVersion =
-        withPhrFeatureCheck(FhirVersion::class) {
+        withPhrFeatureCheck(this::class) {
             PlatformFhirVersion.parseFhirVersion("$major.$minor.$patch")
         }
 
@@ -87,7 +87,7 @@ class FhirVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<F
      */
     @SuppressLint("NewApi") // checked by `getFeatureStatus()`
     fun isSupportedFhirVersion(): Boolean =
-        withPhrFeatureCheck(FhirVersion::class, "isSupportedFhirVersion") {
+        withPhrFeatureCheck(this::class, "isSupportedFhirVersion") {
             platformFhirVersion.isSupportedFhirVersion
         }
 
