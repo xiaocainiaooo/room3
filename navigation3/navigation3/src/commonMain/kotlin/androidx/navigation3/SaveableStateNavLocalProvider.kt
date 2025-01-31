@@ -45,9 +45,13 @@ public class SaveableStateNavLocalProvider : NavLocalProvider {
 
         localInfo.savedStateHolder = rememberSaveableStateHolder()
         backStack.forEach { key ->
+            // We update here as part of composition to ensure the value is available to
+            // ProvideToEntry
+            localInfo.refCount[key] = backStack.count { it == key }
             DisposableEffect(key1 = key) {
-                // Add 1 to the refCount for each key that was see in the backstack.
-                localInfo.refCount[key] = localInfo.refCount.getOrDefault(key, 0).plus(1)
+                // We update here at the end of composition in case the backstack changed and
+                // everything was cleared.
+                localInfo.refCount[key] = backStack.count { it == key }
                 onDispose {
                     // If the backStack count is less than the refCount for the key, remove the
                     // state since that means we removed a key from the backstack, and set the
@@ -76,11 +80,8 @@ public class SaveableStateNavLocalProvider : NavLocalProvider {
     public override fun <T : Any> ProvideToEntry(entry: NavEntry<T>) {
         val localInfo = LocalSaveableStateNavLocalInfo.current
         val key = entry.key
-        // We default this to 1 since this is the first time we have seen this key and it has not
-        // been added to the map yet since that happens as part of the ProvideToBackStack's
-        // DisposableEffect.
-        val refCount = localInfo.refCount.getOrDefault(key, 1)
-        val id: Int = rememberSaveable(key) { getIdForKey(key, refCount) }
+        val refCount = localInfo.refCount[key]
+        val id: Int = rememberSaveable(key, refCount) { getIdForKey(key, refCount) }
         localInfo.savedStateHolder?.SaveableStateProvider(id) { entry.content.invoke(key) }
     }
 }
