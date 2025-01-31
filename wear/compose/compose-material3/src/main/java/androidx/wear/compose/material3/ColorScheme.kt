@@ -270,6 +270,9 @@ public class ColorScheme(
     // Level Indicator
     internal var defaultLevelIndicatorColorsCached: LevelIndicatorColors? = null
 
+    // Scroll Indicator
+    internal var defaultScrollIndicatorColorsCached: ScrollIndicatorColors? = null
+
     // Confirmation
     internal var defaultConfirmationColorsCached: ConfirmationDialogColors? = null
     internal var defaultSuccessConfirmationColorsCached: ConfirmationDialogColors? = null
