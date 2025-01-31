@@ -29,13 +29,13 @@ import kotlinx.coroutines.test.runTest
 class TestSink : TraceSink() {
     internal val packets = mutableListOf<PooledTracePacket>()
 
-    override fun emit(packetArray: PooledTracePacketArray) {
-        for (packet in packetArray.pooledTracePacketArray) {
+    override fun emit(pooledPacketArray: PooledTracePacketArray) {
+        for (packet in pooledPacketArray.pooledTracePacketArray) {
             if (packet != null) {
                 packets += packet
             }
         }
-        packetArray.recycle()
+        pooledPacketArray.recycle()
     }
 
     override fun flush() {

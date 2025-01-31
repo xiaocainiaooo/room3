@@ -6,7 +6,7 @@ package androidx.tracing.driver {
     ctor public AndroidTraceSink(android.content.Context context, java.io.File traceFile);
     ctor public AndroidTraceSink(android.content.Context context, okio.BufferedSink bufferedSink, optional kotlin.coroutines.CoroutineContext coroutineContext);
     method public void close();
-    method public void emit(androidx.tracing.driver.PooledTracePacketArray packetArray);
+    method public void emit(androidx.tracing.driver.PooledTracePacketArray pooledPacketArray);
     method public void flush();
   }
 

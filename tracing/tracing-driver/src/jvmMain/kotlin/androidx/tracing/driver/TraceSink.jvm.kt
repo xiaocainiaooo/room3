@@ -25,7 +25,6 @@ import java.util.Locale
 import java.util.TimeZone
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.createCoroutineUnintercepted
 import kotlin.coroutines.resume
@@ -75,8 +74,8 @@ public class JvmTraceSink(
         makeDrainRequest()
     }
 
-    override fun emit(packetArray: PooledTracePacketArray) {
-        queue.addFirst(packetArray)
+    override fun emit(pooledPacketArray: PooledTracePacketArray) {
+        queue.addFirst(pooledPacketArray)
         makeDrainRequest()
     }
 
