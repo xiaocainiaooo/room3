@@ -49,18 +49,17 @@ public class SaveableStateNavLocalProvider : NavLocalProvider {
             DisposableEffect(key1 = key) {
                 localInfo.refCount[key] = localInfo.refCount.getOrDefault(key, 0).plus(1)
                 onDispose {
+                    localInfo.refCount[key] =
+                        localInfo.refCount
+                            .getOrElse(key) {
+                                error(
+                                    "Attempting to incorrectly dispose of backstack state in " +
+                                        "SaveableStateNavLocalProvider"
+                                )
+                            }
+                            .minus(1)
                     if (localInfo.refCount[key] == 0) {
                         localInfo.savedStateHolder!!.removeState(key)
-                    } else {
-                        localInfo.refCount[key] =
-                            localInfo.refCount
-                                .getOrElse(key) {
-                                    error(
-                                        "Attempting to incorrectly dispose of backstack state in " +
-                                            "SaveableStateNavLocalProvider"
-                                    )
-                                }
-                                .minus(1)
                     }
                 }
             }
@@ -83,7 +82,7 @@ public class SaveableStateNavLocalProvider : NavLocalProvider {
                 // execute the onDispose above that clears all of the counts before we finish the
                 // transition and run this onDispose so our count will already be gone and we
                 // should just remove the state.
-                if (!localInfo.refCount.contains(key) || localInfo.refCount[key] == 0) {
+                if (!localInfo.refCount.contains(key)) {
                     localInfo.savedStateHolder?.removeState(key)
                 } else {
                     localInfo.refCount[key] =
@@ -96,11 +95,13 @@ public class SaveableStateNavLocalProvider : NavLocalProvider {
                             }
                             .minus(1)
                 }
+                if (localInfo.refCount[key] == 0) {
+                    localInfo.savedStateHolder!!.removeState(key)
+                }
             }
         }
 
-        val id: Int = rememberSaveable(key) { key.hashCode() + localInfo.backstackSize }
-        localInfo.savedStateHolder?.SaveableStateProvider(id) { entry.content.invoke(key) }
+        localInfo.savedStateHolder?.SaveableStateProvider(key) { entry.content.invoke(key) }
     }
 }
 
