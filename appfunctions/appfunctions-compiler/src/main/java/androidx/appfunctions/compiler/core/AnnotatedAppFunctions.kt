@@ -114,8 +114,43 @@ data class AnnotatedAppFunctions(
         return "${packageName}.${className}#${methodName}"
     }
 
-    /** Returns the file containing the class declaration and app functions. */
-    fun getSourceFile(): KSFile? = classDeclaration.containingFile
+    /**
+     * Returns the set of files that need to be processed to obtain the complete information about
+     * the app functions defined in this class.
+     *
+     * This includes the class file containing the function declarations, the class file containing
+     * the schema definitions, and the class files containing the AppFunctionSerializable classes
+     * used in the function parameters.
+     */
+    fun getSourceFiles(): Set<KSFile> {
+        val sourceFileSet: MutableSet<KSFile> = mutableSetOf()
+
+        // Add the class file containing the function declarations
+        classDeclaration.containingFile?.let { sourceFileSet.add(it) }
+
+        for (functionDeclaration in appFunctionDeclarations) {
+            // Add the class file containing the schema definitions
+            val rootAppFunctionSchemaInterface =
+                findRootAppFunctionSchemaInterface(functionDeclaration)
+            rootAppFunctionSchemaInterface?.containingFile?.let { sourceFileSet.add(it) }
+
+            // Traverse each functions parameter to obtain the relevant AppFunctionSerializable
+            // class files
+            for (ksValueParameter in functionDeclaration.parameters) {
+                if (isAppFunctionSerializableType(ksValueParameter.type)) {
+                    val appFunctionSerializableClassDeclaration =
+                        ksValueParameter.type.resolve().declaration as KSClassDeclaration
+                    val annotatedSerializable =
+                        AnnotatedAppFunctionSerializable(appFunctionSerializableClassDeclaration)
+                    sourceFileSet.addAll(annotatedSerializable.getSourceFiles())
+                }
+            }
+        }
+
+        // Todo(b/391342300): Consider return value source file in case of returning an
+        // AppFunctionSerializable
+        return sourceFileSet
+    }
 
     /** Gets the [classDeclaration]'s [ClassName]. */
     fun getEnclosingClassName(): ClassName {
