@@ -134,6 +134,21 @@ class AppFunctionCompilerTest {
     }
 
     @Test
+    fun testSerializableInputFunctions_genAppFunctionInventoryImpl_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("SerializableInputFunctions.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName =
+                "${'$'}SerializableInputFunctions_AppFunctionInventory_Impl.kt",
+            goldenFileName = "${'$'}SerializableInputFunctions_AppFunctionInventory_Impl.KT",
+        )
+    }
+
+    @Test
     fun testBadInputFunctions_genAppFunctionInventoryImpl_hasCompileError() {
         val reportListPrimitiveArrayInputFunction =
             compilationTestHelper.compileAll(
@@ -148,18 +163,18 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertErrorWithMessage(
             reportListPrimitiveArrayInputFunction,
-            "App function parameters must be one of the following primitive types or a list " +
-                "of these types"
+            "App function parameters must be a supported type, or a type annotated as" +
+                " @AppFunctionSerializable. See list of supported types"
         )
         compilationTestHelper.assertErrorWithMessage(
             reportArrayNonPrimitiveInputFunction,
-            "App function parameters must be one of the following primitive types or a list " +
-                "of these types"
+            "App function parameters must be a supported type, or a type annotated as" +
+                " @AppFunctionSerializable. See list of supported types"
         )
         compilationTestHelper.assertErrorWithMessage(
             reportAnyTypedInputFunction,
-            "App function parameters must be one of the following primitive types or a list " +
-                "of these types"
+            "App function parameters must be a supported type, or a type annotated as" +
+                " @AppFunctionSerializable. See list of supported types"
         )
     }
 

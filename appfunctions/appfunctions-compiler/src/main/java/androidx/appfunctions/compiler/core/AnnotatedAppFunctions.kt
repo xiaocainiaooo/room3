@@ -84,12 +84,14 @@ data class AnnotatedAppFunctions(
 
                 if (!ksValueParameter.type.isSupportedType()) {
                     throw ProcessingException(
-                        "App function parameters must be one of the following " +
-                            "primitive types or a list of these types:\n${
+                        "App function parameters must be a supported type, or a type " +
+                            "annotated as @AppFunctionSerializable. See list of supported types:\n" +
+                            "${
                                 SUPPORTED_TYPES.joinToString(
                                     ",\n"
                                 )
-                            }, but found ${
+                            }\n" +
+                            "but found ${
                                 ksValueParameter.resolveTypeReference().ensureQualifiedTypeName()
                                     .asString()
                             }",
