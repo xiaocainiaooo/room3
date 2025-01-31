@@ -16,8 +16,6 @@
 
 package androidx.compose.material3.samples
 
-import android.content.Context
-import android.view.accessibility.AccessibilityManager
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -64,7 +62,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
@@ -74,11 +71,6 @@ import androidx.compose.ui.unit.dp
 @Sampled
 @Composable
 fun ExpandableHorizontalFloatingToolbarSample() {
-    val context = LocalContext.current
-    val isTouchExplorationEnabled = remember {
-        val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        am.isEnabled && am.isTouchExplorationEnabled
-    }
     val listState = rememberLazyListState()
     var currentItem = 0
     val expanded by remember {
@@ -107,7 +99,7 @@ fun ExpandableHorizontalFloatingToolbarSample() {
                 }
                 HorizontalFloatingToolbar(
                     modifier = Modifier.align(Alignment.BottomCenter).offset(y = -ScreenOffset),
-                    expanded = expanded || isTouchExplorationEnabled,
+                    expanded = expanded,
                     leadingContent = { leadingContent() },
                     trailingContent = { trailingContent() },
                     content = {
@@ -129,11 +121,6 @@ fun ExpandableHorizontalFloatingToolbarSample() {
 @Sampled
 @Composable
 fun ScrollableHorizontalFloatingToolbarSample() {
-    val context = LocalContext.current
-    val isTouchExplorationEnabled = remember {
-        val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        am.isEnabled && am.isTouchExplorationEnabled
-    }
     val listState = rememberLazyListState()
     val exitAlwaysScrollBehavior =
         FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
@@ -168,8 +155,7 @@ fun ScrollableHorizontalFloatingToolbarSample() {
                             Icon(Icons.Filled.Add, contentDescription = "Localized description")
                         }
                     },
-                    scrollBehavior =
-                        if (!isTouchExplorationEnabled) exitAlwaysScrollBehavior else null,
+                    scrollBehavior = exitAlwaysScrollBehavior
                 )
             }
         }
@@ -181,11 +167,6 @@ fun ScrollableHorizontalFloatingToolbarSample() {
 @Sampled
 @Composable
 fun ExpandableVerticalFloatingToolbarSample() {
-    val context = LocalContext.current
-    val isTouchExplorationEnabled = remember {
-        val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        am.isEnabled && am.isTouchExplorationEnabled
-    }
     val listState = rememberLazyListState()
     var currentItem = 0
     val expanded by remember {
@@ -214,7 +195,7 @@ fun ExpandableVerticalFloatingToolbarSample() {
                 }
                 VerticalFloatingToolbar(
                     modifier = Modifier.align(Alignment.CenterEnd).offset(x = -ScreenOffset),
-                    expanded = expanded || isTouchExplorationEnabled,
+                    expanded = expanded,
                     leadingContent = { leadingContent() },
                     trailingContent = { trailingContent() },
                     content = {
@@ -236,11 +217,6 @@ fun ExpandableVerticalFloatingToolbarSample() {
 @Sampled
 @Composable
 fun ScrollableVerticalFloatingToolbarSample() {
-    val context = LocalContext.current
-    val isTouchExplorationEnabled = remember {
-        val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        am.isEnabled && am.isTouchExplorationEnabled
-    }
     val listState = rememberLazyListState()
     val exitAlwaysScrollBehavior =
         FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = End)
@@ -275,8 +251,7 @@ fun ScrollableVerticalFloatingToolbarSample() {
                             Icon(Icons.Filled.Add, contentDescription = "Localized description")
                         }
                     },
-                    scrollBehavior =
-                        if (!isTouchExplorationEnabled) exitAlwaysScrollBehavior else null,
+                    scrollBehavior = exitAlwaysScrollBehavior
                 )
             }
         }
@@ -288,12 +263,6 @@ fun ScrollableVerticalFloatingToolbarSample() {
 @Sampled
 @Composable
 fun HorizontalFloatingToolbarWithFabSample() {
-    val context = LocalContext.current
-    val isTouchExplorationEnabled = remember {
-        val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        am.isEnabled && am.isTouchExplorationEnabled
-    }
-
     var expanded by rememberSaveable { mutableStateOf(true) }
     val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
     Scaffold { innerPadding ->
@@ -302,18 +271,11 @@ fun HorizontalFloatingToolbarWithFabSample() {
                 Modifier.fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     // Apply a floatingToolbarVerticalNestedScroll Modifier to the Column to toggle
-                    // the expanded state of the HorizontalFloatingToolbar. We don't intercept
-                    // scrolls if the touch exploration is enabled (i.e. Talkback).
-                    .then(
-                        if (!isTouchExplorationEnabled) {
-                            Modifier.floatingToolbarVerticalNestedScroll(
-                                expanded = expanded,
-                                onExpand = { expanded = true },
-                                onCollapse = { expanded = false }
-                            )
-                        } else {
-                            Modifier
-                        }
+                    // the expanded state of the HorizontalFloatingToolbar.
+                    .floatingToolbarVerticalNestedScroll(
+                        expanded = expanded,
+                        onExpand = { expanded = true },
+                        onCollapse = { expanded = false }
                     )
                     .verticalScroll(rememberScrollState())
             ) {
@@ -357,11 +319,6 @@ fun HorizontalFloatingToolbarWithFabSample() {
 @Sampled
 @Composable
 fun CenteredHorizontalFloatingToolbarWithFabSample() {
-    val context = LocalContext.current
-    val isTouchExplorationEnabled = remember {
-        val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        am.isEnabled && am.isTouchExplorationEnabled
-    }
     val exitAlwaysScrollBehavior =
         FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
     val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
@@ -388,7 +345,7 @@ fun CenteredHorizontalFloatingToolbarWithFabSample() {
                 },
                 modifier = Modifier.align(Alignment.BottomCenter).offset(y = -ScreenOffset),
                 colors = vibrantColors,
-                scrollBehavior = if (!isTouchExplorationEnabled) exitAlwaysScrollBehavior else null,
+                scrollBehavior = exitAlwaysScrollBehavior,
                 content = {
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(Icons.Filled.Person, contentDescription = "Localized description")
@@ -413,11 +370,7 @@ fun CenteredHorizontalFloatingToolbarWithFabSample() {
 @Sampled
 @Composable
 fun VerticalFloatingToolbarWithFabSample() {
-    val context = LocalContext.current
-    val isTouchExplorationEnabled = remember {
-        val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        am.isEnabled && am.isTouchExplorationEnabled
-    }
+
     var expanded by rememberSaveable { mutableStateOf(true) }
     val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
     Scaffold { innerPadding ->
@@ -426,18 +379,13 @@ fun VerticalFloatingToolbarWithFabSample() {
                 Modifier.fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     // Apply a floatingToolbarVerticalNestedScroll Modifier to the Column to toggle
-                    // the expanded state of the VerticalFloatingToolbar. We don't intercept scrolls
-                    // if the touch exploration is enabled (i.e. Talkback).
+                    // the expanded state of the VerticalFloatingToolbar.
                     .then(
-                        if (!isTouchExplorationEnabled) {
-                            Modifier.floatingToolbarVerticalNestedScroll(
-                                expanded = expanded,
-                                onExpand = { expanded = true },
-                                onCollapse = { expanded = false }
-                            )
-                        } else {
-                            Modifier
-                        }
+                        Modifier.floatingToolbarVerticalNestedScroll(
+                            expanded = expanded,
+                            onExpand = { expanded = true },
+                            onCollapse = { expanded = false }
+                        )
                     )
                     .verticalScroll(rememberScrollState())
             ) {
@@ -481,11 +429,6 @@ fun VerticalFloatingToolbarWithFabSample() {
 @Sampled
 @Composable
 fun CenteredVerticalFloatingToolbarWithFabSample() {
-    val context = LocalContext.current
-    val isTouchExplorationEnabled = remember {
-        val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        am.isEnabled && am.isTouchExplorationEnabled
-    }
     val exitAlwaysScrollBehavior =
         FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = End)
     val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
@@ -512,7 +455,7 @@ fun CenteredVerticalFloatingToolbarWithFabSample() {
                 },
                 modifier = Modifier.align(Alignment.CenterEnd).offset(x = -ScreenOffset),
                 colors = vibrantColors,
-                scrollBehavior = if (!isTouchExplorationEnabled) exitAlwaysScrollBehavior else null,
+                scrollBehavior = exitAlwaysScrollBehavior,
                 content = {
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(Icons.Filled.Person, contentDescription = "Localized description")
@@ -537,12 +480,6 @@ fun CenteredVerticalFloatingToolbarWithFabSample() {
 @Sampled
 @Composable
 fun HorizontalFloatingToolbarAsScaffoldFabSample() {
-    val context = LocalContext.current
-    val isTouchExplorationEnabled = remember {
-        val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        am.isEnabled && am.isTouchExplorationEnabled
-    }
-
     var expanded by rememberSaveable { mutableStateOf(true) }
     val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
     Scaffold(
@@ -584,18 +521,13 @@ fun HorizontalFloatingToolbarAsScaffoldFabSample() {
                 Modifier.fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     // Apply a floatingToolbarVerticalNestedScroll Modifier to the Column to toggle
-                    // the expanded state of the HorizontalFloatingToolbar. We don't intercept
-                    // scrolls if the touch exploration is enabled (i.e. Talkback).
+                    // the expanded state of the HorizontalFloatingToolbar.
                     .then(
-                        if (!isTouchExplorationEnabled) {
-                            Modifier.floatingToolbarVerticalNestedScroll(
-                                expanded = expanded,
-                                onExpand = { expanded = true },
-                                onCollapse = { expanded = false }
-                            )
-                        } else {
-                            Modifier
-                        }
+                        Modifier.floatingToolbarVerticalNestedScroll(
+                            expanded = expanded,
+                            onExpand = { expanded = true },
+                            onCollapse = { expanded = false }
+                        )
                     )
                     .verticalScroll(rememberScrollState())
             ) {

@@ -40,6 +40,8 @@ import androidx.compose.material3.FloatingToolbarDefaults.ScreenOffset
 import androidx.compose.material3.FloatingToolbarDefaults.floatingToolbarVerticalNestedScroll
 import androidx.compose.material3.FloatingToolbarExitDirection.Companion.Bottom
 import androidx.compose.material3.FloatingToolbarExitDirection.Companion.End
+import androidx.compose.material3.internal.Strings
+import androidx.compose.material3.internal.getString
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +56,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
@@ -776,8 +779,6 @@ class FloatingToolbarTest {
         rule.onNodeWithTag(FloatingToolbarTestTag).assertHeightIsEqualTo(componentHeight)
     }
 
-    private val mainLayoutTag = "mainLayout"
-
     @Test
     fun floatingToolbarVerticalNestedScroll_verticalSwipesUpdateValue() {
         var expanded = true
@@ -792,9 +793,9 @@ class FloatingToolbarTest {
         assertThat(expanded).isEqualTo(true)
 
         // Toggle the value by scrolling up and down.
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
         rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeDown(top, centerY) }
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput { swipeDown(top, centerY) }
         rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
     }
 
@@ -813,9 +814,9 @@ class FloatingToolbarTest {
         assertThat(expanded).isEqualTo(true)
 
         // Toggle the value by scrolling down and up in this reverse layout..
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeDown(top, centerY) }
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput { swipeDown(top, centerY) }
         rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
         rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
     }
 
@@ -835,9 +836,9 @@ class FloatingToolbarTest {
         assertThat(expanded).isEqualTo(true)
 
         // Scrolling up or down should not change the value.
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
         rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeDown(top, centerY) }
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput { swipeDown(top, centerY) }
         rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
     }
 
@@ -855,10 +856,10 @@ class FloatingToolbarTest {
         assertThat(expanded).isEqualTo(false)
 
         // Simulate a scroll up and ensure that the value is still false.
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput { swipeUp(bottom, centerY) }
         rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
         // Simulate a scroll down to toggle the value to true.
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeDown(top, centerY) }
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput { swipeDown(top, centerY) }
         rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
     }
 
@@ -882,14 +883,14 @@ class FloatingToolbarTest {
         assertThat(expanded).isEqualTo(true)
 
         // Simulate a short scroll below the threshold and ensure that the value is still true.
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput {
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput {
             swipeUp(bottom, bottom - thresholdPx / 4f)
         }
         rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
 
         // Simulate an additional scroll to cross the threshold and ensure that the value is now
         // false.
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput {
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput {
             swipeUp(bottom, bottom - thresholdPx * 2)
         }
         rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
@@ -913,14 +914,14 @@ class FloatingToolbarTest {
         assertThat(expanded).isEqualTo(true)
 
         // Simulate a short scroll below the threshold and ensure that the value is still true.
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput {
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput {
             swipeUp(bottom, bottom - thresholdPx / 4f)
         }
         rule.runOnIdle { assertThat(expanded).isEqualTo(true) }
 
         // Simulate an additional scroll to cross the threshold and ensure that the value is now
         // false.
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput {
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput {
             swipeUp(bottom, bottom - thresholdPx)
         }
         rule.runOnIdle { assertThat(expanded).isEqualTo(false) }
@@ -931,7 +932,7 @@ class FloatingToolbarTest {
         rule.setMaterialContent(lightColorScheme()) {
             val scrollBehavior =
                 FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = End)
-            Scaffold(modifier = Modifier.nestedScroll(scrollBehavior).testTag(mainLayoutTag)) {
+            Scaffold(modifier = Modifier.nestedScroll(scrollBehavior).testTag(MainLayoutTag)) {
                 innerPadding ->
                 Box(Modifier.padding(innerPadding)) {
                     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
@@ -954,7 +955,7 @@ class FloatingToolbarTest {
         rule.onNodeWithTag(FloatingToolbarContentLastItemTestTag).assertIsDisplayed()
 
         // Swipe the content up to collapse the FloatingToolbar.
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, bottom - 1000) }
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput { swipeUp(bottom, bottom - 1000) }
         rule.waitForIdle()
         // Check that the FAB and a sample from the toolbar content are not displayed.
         rule.onNodeWithTag(FloatingActionButtonTestTag).assertIsNotDisplayed()
@@ -966,7 +967,7 @@ class FloatingToolbarTest {
         rule.setMaterialContent(lightColorScheme()) {
             val scrollBehavior =
                 FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = End)
-            Scaffold(modifier = Modifier.nestedScroll(scrollBehavior).testTag(mainLayoutTag)) {
+            Scaffold(modifier = Modifier.nestedScroll(scrollBehavior).testTag(MainLayoutTag)) {
                 innerPadding ->
                 Box(Modifier.padding(innerPadding)) {
                     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
@@ -989,11 +990,107 @@ class FloatingToolbarTest {
         rule.onNodeWithTag(FloatingToolbarContentLastItemTestTag).assertIsDisplayed()
 
         // Swipe the content up to collapse the FloatingToolbar.
-        rule.onNodeWithTag(mainLayoutTag).performTouchInput { swipeUp(bottom, bottom - 1000) }
+        rule.onNodeWithTag(MainLayoutTag).performTouchInput { swipeUp(bottom, bottom - 1000) }
         rule.waitForIdle()
         // Check that the FAB and a sample from the toolbar content are not displayed.
         rule.onNodeWithTag(FloatingActionButtonTestTag).assertIsNotDisplayed()
         rule.onNodeWithTag(FloatingToolbarContentLastItemTestTag).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun horizontalFloatingToolbar_withFab_expanded_semantics() {
+        lateinit var actionLabel: String
+        rule.setMaterialContent(lightColorScheme()) {
+            actionLabel = getString(Strings.FloatingToolbarCollapse)
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = true,
+                floatingActionButton = { ToolbarFab() },
+            ) {
+                ToolbarContent()
+            }
+        }
+
+        val action =
+            rule
+                .onNodeWithTag(FloatingActionButtonTestTag)
+                .fetchSemanticsNode()
+                .config[SemanticsActions.CustomActions]
+
+        assertThat(action).hasSize(1)
+        assertThat(action[0].label).isEqualTo(actionLabel)
+    }
+
+    @Test
+    fun horizontalFloatingToolbar_withFab_collapsed_semantics() {
+        lateinit var actionLabel: String
+        rule.setMaterialContent(lightColorScheme()) {
+            actionLabel = getString(Strings.FloatingToolbarExpand)
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = false,
+                floatingActionButton = { ToolbarFab() },
+            ) {
+                ToolbarContent()
+            }
+        }
+
+        val action =
+            rule
+                .onNodeWithTag(FloatingActionButtonTestTag)
+                .fetchSemanticsNode()
+                .config[SemanticsActions.CustomActions]
+
+        assertThat(action).hasSize(1)
+        assertThat(action[0].label).isEqualTo(actionLabel)
+    }
+
+    @Test
+    fun verticalFloatingToolbar_withFab_expanded_semantics() {
+        lateinit var actionLabel: String
+        rule.setMaterialContent(lightColorScheme()) {
+            actionLabel = getString(Strings.FloatingToolbarCollapse)
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = true,
+                floatingActionButton = { ToolbarFab() },
+            ) {
+                ToolbarContent()
+            }
+        }
+
+        val action =
+            rule
+                .onNodeWithTag(FloatingActionButtonTestTag)
+                .fetchSemanticsNode()
+                .config[SemanticsActions.CustomActions]
+
+        assertThat(action).hasSize(1)
+        assertThat(action[0].label).isEqualTo(actionLabel)
+    }
+
+    @Test
+    fun verticalFloatingToolbar_withFab_collapsed_semantics() {
+        lateinit var actionLabel: String
+        rule.setMaterialContent(lightColorScheme()) {
+            actionLabel = getString(Strings.FloatingToolbarExpand)
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = false,
+                floatingActionButton = { ToolbarFab() },
+            ) {
+                ToolbarContent()
+            }
+        }
+
+        val action =
+            rule
+                .onNodeWithTag(FloatingActionButtonTestTag)
+                .fetchSemanticsNode()
+                .config[SemanticsActions.CustomActions]
+
+        assertThat(action).hasSize(1)
+        assertThat(action[0].label).isEqualTo(actionLabel)
     }
 
     @Composable
@@ -1020,7 +1117,7 @@ class FloatingToolbarTest {
         ) {
             Box(modifier = Modifier.fillMaxWidth().height(80.dp))
             LazyColumn(
-                modifier = Modifier.fillMaxWidth().testTag(mainLayoutTag).weight(1f),
+                modifier = Modifier.fillMaxWidth().testTag(MainLayoutTag).weight(1f),
                 reverseLayout = reverseLayout
             ) {
                 items(100) {
@@ -1064,6 +1161,7 @@ class FloatingToolbarTest {
     }
 
     private val MinTouchTarget = 48.dp
+    private val MainLayoutTag = "mainLayout"
     private val FloatingToolbarTestTag = "floatingToolbar"
     private val FloatingActionButtonTestTag = "floatingActionButton"
     private val FloatingToolbarContentLastItemTestTag = "floatingToolbarContentLastItem"
