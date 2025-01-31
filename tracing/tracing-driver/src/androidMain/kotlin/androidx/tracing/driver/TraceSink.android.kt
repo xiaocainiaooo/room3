@@ -87,8 +87,8 @@ public class AndroidTraceSink(
         makeDrainRequest()
     }
 
-    override fun emit(packetArray: PooledTracePacketArray) {
-        queue.addFirst(packetArray)
+    override fun emit(pooledPacketArray: PooledTracePacketArray) {
+        queue.addFirst(pooledPacketArray)
         makeDrainRequest()
     }
 
