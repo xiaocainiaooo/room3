@@ -80,6 +80,7 @@ internal abstract class GenerateApiTask @Inject constructor(workerExecutor: Work
 
         val levelsArgs =
             getGenerateApiLevelsArgs(
+                projectApiDirectory.asFile,
                 getPastApiFiles(),
                 currentVersion.get(),
                 apiLocation.get().apiLevelsFile
