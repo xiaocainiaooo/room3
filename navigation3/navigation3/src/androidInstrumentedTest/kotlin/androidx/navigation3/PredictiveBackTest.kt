@@ -16,75 +16,86 @@
 
 package androidx.navigation3
 
-import android.os.Build
 import android.window.BackEvent
 import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.annotation.RequiresApi
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.testutils.assertAgainstGolden
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.test.captureToImage
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onParent
-import androidx.compose.ui.unit.dp
+import androidx.kruth.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.filters.SdkSuppress
-import androidx.test.screenshot.AndroidXScreenshotTestRule
-import kotlin.test.Test
+import com.google.common.truth.Truth.assertWithMessage
 import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class PredictiveBackScreenshotTest {
+class PredictiveBackTest {
     @get:Rule val composeTestRule = createComposeRule()
 
-    @get:Rule val screenshotRule = AndroidXScreenshotTestRule("navigation3/navigation3")
-
-    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     @Test
-    fun testNavDisplayPredictiveBackAnimations() {
-        lateinit var backstack: MutableList<Any>
+    fun testStateIsRestoredOnPredictiveBack() {
+        lateinit var numberOnScreen1: MutableState<Int>
+        lateinit var numberOnScreen2: MutableState<Int>
         lateinit var backPressedDispatcher: OnBackPressedDispatcher
+        lateinit var backstack: MutableList<Any>
         composeTestRule.setContent {
-            backstack = remember { mutableStateListOf(first) }
             backPressedDispatcher =
                 LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
-            SinglePaneNavDisplay(
-                backstack = backstack,
-                enterTransition = slideInHorizontally { it / 2 },
-                exitTransition = slideOutHorizontally { -it / 2 },
-                popEnterTransition = slideInHorizontally { -it / 2 },
-                popExitTransition = slideOutHorizontally { it / 2 }
-            ) {
+            backstack = remember { mutableStateListOf(first) }
+            SinglePaneNavDisplay(backstack = backstack) {
                 when (it) {
-                    first -> NavEntry(first) { Text(first) }
+                    first ->
+                        NavEntry(first) {
+                            numberOnScreen1 = rememberSaveable { mutableStateOf(0) }
+                            Text("numberOnScreen1: ${numberOnScreen1.value}")
+                        }
                     second ->
                         NavEntry(second) {
-                            Box(Modifier.fillMaxSize().background(Color.Blue)) {
-                                Text(second, Modifier.size(50.dp))
-                            }
+                            numberOnScreen2 = rememberSaveable { mutableStateOf(0) }
+                            Text("numberOnScreen2: ${numberOnScreen2.value}")
                         }
                     else -> error("Invalid key passed")
                 }
             }
         }
 
+        composeTestRule.runOnIdle {
+            assertWithMessage("Initial number should be 0").that(numberOnScreen1.value).isEqualTo(0)
+            numberOnScreen1.value++
+            numberOnScreen1.value++
+        }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("The number should be 2").that(numberOnScreen1.value).isEqualTo(2)
+        }
+
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 2").isDisplayed()).isTrue()
+
         composeTestRule.runOnIdle { backstack.add(second) }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("Initial number should be 0").that(numberOnScreen2.value).isEqualTo(0)
+            numberOnScreen2.value++
+            numberOnScreen2.value++
+            numberOnScreen2.value++
+            numberOnScreen2.value++
+        }
+
+        composeTestRule.runOnIdle {
+            assertWithMessage("The number should be 4").that(numberOnScreen2.value).isEqualTo(4)
+        }
+
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen2: 4").isDisplayed()).isTrue()
 
         composeTestRule.runOnIdle {
             backPressedDispatcher.dispatchOnBackStarted(
@@ -97,19 +108,15 @@ class PredictiveBackScreenshotTest {
 
         composeTestRule.waitForIdle()
 
+        composeTestRule.runOnIdle { backPressedDispatcher.onBackPressed() }
+
         composeTestRule.runOnIdle {
-            backPressedDispatcher.dispatchOnBackProgressed(
-                BackEventCompat(0.1F, 0.1F, 0.5F, BackEvent.EDGE_LEFT)
-            )
+            assertWithMessage("The number should be restored")
+                .that(numberOnScreen1.value)
+                .isEqualTo(2)
         }
 
-        composeTestRule.waitForIdle()
-
-        composeTestRule
-            .onNodeWithText(second)
-            .onParent()
-            .captureToImage()
-            .assertAgainstGolden(screenshotRule, "testNavDisplayPredictiveBackAnimations")
+        assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 2").isDisplayed()).isTrue()
     }
 }
 
