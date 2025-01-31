@@ -809,7 +809,7 @@ public class BiometricFragment extends Fragment {
      * pressed on the prompt content.
      */
     void onMoreOptionsButtonPressed() {
-        sendErrorAndDismiss(BiometricPrompt.ERROR_MORE_OPTIONS_BUTTON,
+        sendErrorAndDismiss(BiometricPrompt.ERROR_CONTENT_VIEW_MORE_OPTIONS_BUTTON,
                 "More options button in the content view is clicked.");
         cancelAuthentication(BiometricFragment.CANCELED_FROM_MORE_OPTIONS_BUTTON);
     }
