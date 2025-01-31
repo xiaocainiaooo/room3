@@ -1200,6 +1200,7 @@ package androidx.compose.ui.hapticfeedback {
     method public int getContextClick();
     method public int getGestureEnd();
     method public int getGestureThresholdActivate();
+    method public int getKeyboardTap();
     method public int getLongPress();
     method public int getReject();
     method public int getSegmentFrequentTick();
@@ -1213,6 +1214,7 @@ package androidx.compose.ui.hapticfeedback {
     property public final int ContextClick;
     property public final int GestureEnd;
     property public final int GestureThresholdActivate;
+    property public final int KeyboardTap;
     property public final int LongPress;
     property public final int Reject;
     property public final int SegmentFrequentTick;
