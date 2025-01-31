@@ -305,8 +305,8 @@ private fun MaterialScope.graphicDataCardSampleWithFallbackProgressIndicator(con
                     segmentCount = 6,
                     startAngleDegrees = 200F,
                     endAngleDegrees = 520F,
-                    dynamicProgress = DynamicFloat.animate(0.0F, 1.0F, recommendedAnimationSpec),
-                    size = dp(75F)
+                    dynamicProgress = DynamicFloat.animate(0.0F, 1.5F, recommendedAnimationSpec),
+                    size = dp(55F)
                 )
             }
         }

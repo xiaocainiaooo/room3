@@ -45,6 +45,7 @@ import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.MET
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.TRIVIAL_ARC_OFFSET
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.calculateRecommendedGapSize
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.filledProgressIndicatorColors
+import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.recommendedAnimationSpec
 import androidx.wear.protolayout.material3.Versions.hasDashedArcLineSupport
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.contentDescription
@@ -60,7 +61,10 @@ import kotlin.math.min
  * Note that, the proper implementation of this component requires a ProtoLayout renderer with
  * version equal to or above 1.403. When the renderer is lower than 1.403, this component will
  * automatically fallback to an implementation with reduced features, without support for expandable
- * size, overflow, and start/end transition.
+ * size, and start/end transition.
+ *
+ * This component consumes 3 animation quotas when [dynamicProgress] is specified with animation by
+ * the caller. It is highly recommend to use the [recommendedAnimationSpec] to animate the progress.
  *
  * @param staticProgress The static progress of this progress indicator where 0 represent no
  *   progress and 1 represents completion. Progress above 1 is also allowed. If [dynamicProgress] is
@@ -153,7 +157,10 @@ public fun MaterialScope.circularProgressIndicator(
  * Note that, the proper implementation of this component requires a ProtoLayout renderer with
  * version equal to or above 1.403. When the renderer is lower than 1.403, this component will
  * automatically fallback to an implementation with reduced features, without support for multiple
- * segments, expandable size, overflow, and start/end transition.
+ * segments, expandable size, and start/end transition.
+ *
+ * This component consumes 2 animation quotas when [dynamicProgress] is specified with animation by
+ * the caller. It is highly recommend to use the [recommendedAnimationSpec] to animate the progress.
  *
  * @param segmentCount Number of equal segments that the progress indicator should be divided into.
  *   Has to be a number greater than or equal to 1.
@@ -424,7 +431,7 @@ private fun trackInDegrees(sweepAngle: Float, progressInDegrees: DegreesProp): D
         }
         .build()
 
-private fun trackColor(
+internal fun trackColor(
     staticProgress: Float,
     dynamicProgress: DynamicFloat?,
     colors: ProgressIndicatorColors
