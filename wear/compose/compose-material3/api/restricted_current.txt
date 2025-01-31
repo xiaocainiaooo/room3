@@ -816,7 +816,7 @@ package androidx.wear.compose.material3 {
   public final class OpenOnPhoneDialogKt {
     method @androidx.compose.runtime.Composable public static void OpenOnPhoneDialog(boolean visible, kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.CurvedScope,kotlin.Unit>? curvedText, optional androidx.compose.ui.Modifier modifier, optional androidx.wear.compose.material3.OpenOnPhoneDialogColors colors, optional androidx.compose.ui.window.DialogProperties properties, optional long durationMillis, optional kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static void OpenOnPhoneDialogContent(kotlin.jvm.functions.Function1<? super androidx.wear.compose.foundation.CurvedScope,kotlin.Unit>? curvedText, long durationMillis, optional androidx.compose.ui.Modifier modifier, optional androidx.wear.compose.material3.OpenOnPhoneDialogColors colors, kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method public static void openOnPhoneCurvedText(androidx.wear.compose.foundation.CurvedScope, String text, androidx.wear.compose.foundation.CurvedTextStyle style);
+    method public static void openOnPhoneDialogCurvedText(androidx.wear.compose.foundation.CurvedScope, String text, androidx.wear.compose.foundation.CurvedTextStyle style);
   }
 
   public final class PageIndicatorDefaults {

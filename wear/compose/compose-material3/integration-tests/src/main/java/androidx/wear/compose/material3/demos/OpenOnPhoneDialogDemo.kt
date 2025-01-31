@@ -31,7 +31,7 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.OpenOnPhoneDialog
 import androidx.wear.compose.material3.OpenOnPhoneDialogDefaults
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.openOnPhoneCurvedText
+import androidx.wear.compose.material3.openOnPhoneDialogCurvedText
 import androidx.wear.compose.material3.samples.OpenOnPhoneDialogSample
 
 val OpenOnPhoneDialogDemos =
@@ -57,7 +57,7 @@ fun OpenOnPhoneDialogWithCustomText() {
     OpenOnPhoneDialog(
         visible = visible,
         onDismissRequest = { visible = false },
-        curvedText = { openOnPhoneCurvedText(text = "Custom text", style = curvedTextStyle) }
+        curvedText = { openOnPhoneDialogCurvedText(text = "Custom text", style = curvedTextStyle) }
     )
 }
 
@@ -85,6 +85,8 @@ fun OpenOnPhoneDialogWithCustomColors() {
                 progressTrackColor = MaterialTheme.colorScheme.onTertiary,
                 textColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
-        curvedText = { openOnPhoneCurvedText(text = "Custom colors", style = curvedTextStyle) }
+        curvedText = {
+            openOnPhoneDialogCurvedText(text = "Custom colors", style = curvedTextStyle)
+        }
     )
 }

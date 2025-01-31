@@ -35,7 +35,7 @@ import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.OpenOnPhoneDialog
 import androidx.wear.compose.material3.OpenOnPhoneDialogDefaults
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.openOnPhoneCurvedText
+import androidx.wear.compose.material3.openOnPhoneDialogCurvedText
 
 object OpenOnPhoneDialogBenchmark : MacrobenchmarkScreen {
     override val content: @Composable (BoxScope.() -> Unit)
@@ -59,7 +59,7 @@ object OpenOnPhoneDialogBenchmark : MacrobenchmarkScreen {
                 visible = showDialog.value,
                 onDismissRequest = { showDialog.value = false },
                 durationMillis = 2000,
-                curvedText = { openOnPhoneCurvedText(text = text, style = style) }
+                curvedText = { openOnPhoneDialogCurvedText(text = text, style = style) }
             )
         }
 
