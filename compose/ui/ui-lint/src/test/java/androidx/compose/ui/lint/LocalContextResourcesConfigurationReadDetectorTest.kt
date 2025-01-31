@@ -27,13 +27,16 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-/** Test for [LocalContextConfigurationReadDetector]. */
+/** Test for [LocalContextResourcesConfigurationReadDetector]. */
 @RunWith(JUnit4::class)
-class LocalContextConfigurationReadDetectorTest : LintDetectorTest() {
-    override fun getDetector(): Detector = LocalContextConfigurationReadDetector()
+class LocalContextResourcesConfigurationReadDetectorTest : LintDetectorTest() {
+    override fun getDetector(): Detector = LocalContextResourcesConfigurationReadDetector()
 
     override fun getIssues(): MutableList<Issue> =
-        mutableListOf(LocalContextConfigurationReadDetector.LocalContextConfigurationRead)
+        mutableListOf(
+            LocalContextResourcesConfigurationReadDetector.LocalContextConfigurationRead,
+            LocalContextResourcesConfigurationReadDetector.LocalContextResourcesRead
+        )
 
     val LocalContextStub =
         bytecodeStub(
@@ -86,6 +89,8 @@ class LocalContextConfigurationReadDetectorTest : LintDetectorTest() {
 
                 @Composable
                 fun Test() {
+                    LocalContext.current.resources
+                    LocalContext.current.getResources()
                     LocalContext.current.resources.configuration
                     LocalContext.current.getResources().getConfiguration()
                 }
@@ -101,25 +106,37 @@ class LocalContextConfigurationReadDetectorTest : LintDetectorTest() {
             .run()
             .expect(
                 """
-src/test/test.kt:9: Error: Reading Configuration using LocalContext.current.resources.configuration [LocalContextConfigurationRead]
+src/test/test.kt:11: Error: Reading Configuration using LocalContext.current.resources.configuration [LocalContextConfigurationRead]
                     LocalContext.current.resources.configuration
                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/test/test.kt:10: Error: Reading Configuration using LocalContext.current.resources.configuration [LocalContextConfigurationRead]
+src/test/test.kt:12: Error: Reading Configuration using LocalContext.current.resources.configuration [LocalContextConfigurationRead]
                     LocalContext.current.getResources().getConfiguration()
                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-2 errors, 0 warnings
+src/test/test.kt:9: Warning: Reading Resources using LocalContext.current.resources [LocalContextResourcesRead]
+                    LocalContext.current.resources
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/test/test.kt:10: Warning: Reading Resources using LocalContext.current.resources [LocalContextResourcesRead]
+                    LocalContext.current.getResources()
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2 errors, 2 warnings
             """
             )
             .expectFixDiffs(
                 """
-Autofix for src/test/test.kt line 9: Replace with LocalConfiguration.current:
+Autofix for src/test/test.kt line 11: Replace with LocalConfiguration.current:
 @@ -5 +5
 -                 import androidx.compose.ui.platform.LocalContext
 +                 import androidx.compose.ui.platform.LocalConfiguration
 + import androidx.compose.ui.platform.LocalContext
-@@ -9 +10
+@@ -11 +12
 -                     LocalContext.current.resources.configuration
 +                     LocalConfiguration.current
+Autofix for src/test/test.kt line 9: Replace with LocalResources.current:
+@@ -6 +6
++ import androidx.compose.ui.platform.LocalResources
+@@ -9 +10
+-                     LocalContext.current.resources
++                     LocalResources.current
                 """
             )
     }
@@ -153,6 +170,12 @@ Autofix for src/test/test.kt line 9: Replace with LocalConfiguration.current:
                     val res = context.resources
                     res.configuration
                 }
+
+                @Composable
+                fun Test3() {
+                    val context = LocalContext.current
+                    val res = context.resources
+                }
             """
                 ),
                 LocalContextStub,
@@ -174,7 +197,10 @@ src/test/test.kt:16: Error: Reading Configuration using LocalContext.current.res
 src/test/test.kt:23: Error: Reading Configuration using LocalContext.current.resources.configuration [LocalContextConfigurationRead]
                     res.configuration
                     ~~~~~~~~~~~~~~~~~
-3 errors, 0 warnings
+src/test/test.kt:29: Warning: Reading Resources using LocalContext.current.resources [LocalContextResourcesRead]
+                    val res = context.resources
+                              ~~~~~~~~~~~~~~~~~
+3 errors, 1 warnings
             """
             )
     }
