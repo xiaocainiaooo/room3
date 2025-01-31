@@ -24,7 +24,7 @@ package androidx.appfunctions
  * type (directly or as a nested entity) in an AppFunction, the shape of the entity defined within
  * its primary constructor will be exposed to the caller as an
  * [androidx.appfunctions.metadata.AppFunctionMetadataDocument]. This information allows the caller
- * to construct the structure input to call an AppFunction or understand what properties are
+ * to construct the structured input to call an AppFunction or understand what properties are
  * provided in the structured output.
  *
  * **Constraints for Classes Annotated with `@AppFunctionSerializable`:**
