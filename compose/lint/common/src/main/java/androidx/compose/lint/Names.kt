@@ -71,6 +71,7 @@ object Names {
         object Platform {
             val PackageName = Package(Ui.PackageName, "platform")
             val LocalConfiguration = Name(PackageName, "LocalConfiguration")
+            val LocalResources = Name(PackageName, "LocalResources")
         }
 
         object Pointer {
