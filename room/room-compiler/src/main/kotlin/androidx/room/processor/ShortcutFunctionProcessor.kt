@@ -15,7 +15,7 @@
  */
 package androidx.room.processor
 
-import androidx.room.compiler.processing.XAnnotationBox
+import androidx.room.compiler.processing.XAnnotation
 import androidx.room.compiler.processing.XMethodElement
 import androidx.room.compiler.processing.XType
 import androidx.room.compiler.processing.XTypeElement
@@ -37,7 +37,7 @@ class ShortcutFunctionProcessor(
     private val delegate =
         FunctionProcessorDelegate.createFor(context, containing, executableElement)
 
-    fun <T : Annotation> extractAnnotation(klass: KClass<T>, errorMsg: String): XAnnotationBox<T>? {
+    fun <T : Annotation> extractAnnotation(klass: KClass<T>, errorMsg: String): XAnnotation? {
         val annotation = executableElement.getAnnotation(klass)
         context.checker.check(annotation != null, executableElement, errorMsg)
         return annotation

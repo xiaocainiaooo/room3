@@ -16,6 +16,7 @@
 
 package androidx.room.processor
 
+import androidx.room.compiler.codegen.asClassName
 import androidx.room.compiler.processing.XType
 import androidx.room.compiler.processing.XTypeElement
 import androidx.room.ext.isNotNone
@@ -54,21 +55,36 @@ internal constructor(
     }
 
     private fun doProcess(): Entity {
+        if (!element.validate()) {
+            context.reportMissingTypeReference(element.qualifiedName)
+            return Entity(
+                element = element,
+                tableName = element.name,
+                type = element.type,
+                fields = emptyList(),
+                embeddedFields = emptyList(),
+                indices = emptyList(),
+                primaryKey = PrimaryKey.MISSING,
+                foreignKeys = emptyList(),
+                constructor = null,
+                shadowTableName = null
+            )
+        }
         context.checker.hasAnnotation(
             element,
             androidx.room.Entity::class,
             ProcessorErrors.ENTITY_MUST_BE_ANNOTATED_WITH_ENTITY
         )
-        val annotationBox = element.getAnnotation(androidx.room.Entity::class)
+        val annotation = element.getAnnotation(androidx.room.Entity::class)
         val tableName: String
         val entityIndices: List<IndexInput>
         val foreignKeyInputs: List<ForeignKeyInput>
         val inheritSuperIndices: Boolean
-        if (annotationBox != null) {
-            tableName = extractTableName(element, annotationBox.value)
-            entityIndices = extractIndices(annotationBox, tableName)
-            inheritSuperIndices = annotationBox.value.inheritSuperIndices
-            foreignKeyInputs = extractForeignKeys(annotationBox)
+        if (annotation != null) {
+            tableName = extractTableName(element, annotation)
+            entityIndices = extractIndices(annotation, tableName)
+            inheritSuperIndices = annotation["inheritSuperIndices"]?.asBoolean() == true
+            foreignKeyInputs = extractForeignKeys(annotation)
         } else {
             tableName = element.name
             foreignKeyInputs = emptyList()
@@ -257,7 +273,7 @@ internal constructor(
                     )
                     return@map null
                 }
-                val tableName = extractTableName(parentElement, parentAnnotation.value)
+                val tableName = extractTableName(parentElement, parentAnnotation)
                 val fields =
                     it.childColumns.mapNotNull { columnName ->
                         val field = dataClass.findFieldByColumnName(columnName)
@@ -350,30 +366,31 @@ internal constructor(
     /** Check fields for @PrimaryKey. */
     private fun collectPrimaryKeysFromPrimaryKeyAnnotations(fields: List<Field>): List<PrimaryKey> {
         return fields.mapNotNull { field ->
-            field.element.getAnnotation(androidx.room.PrimaryKey::class)?.let {
-                if (field.parent != null) {
-                    // the field in the entity that contains this error.
-                    val grandParentField = field.parent.mRootParent.field.element
-                    // bound for entity.
-                    context
-                        .fork(grandParentField)
-                        .logger
-                        .w(
-                            Warning.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED,
-                            grandParentField,
-                            ProcessorErrors.embeddedPrimaryKeyIsDropped(
-                                element.qualifiedName,
-                                field.name
-                            )
+            val primaryKeyAnnotation =
+                field.element.getAnnotation(androidx.room.PrimaryKey::class)
+                    ?: return@mapNotNull null
+            if (field.parent != null) {
+                // the field in the entity that contains this error.
+                val grandParentField = field.parent.mRootParent.field.element
+                // bound for entity.
+                context
+                    .fork(grandParentField)
+                    .logger
+                    .w(
+                        Warning.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED,
+                        grandParentField,
+                        ProcessorErrors.embeddedPrimaryKeyIsDropped(
+                            element.qualifiedName,
+                            field.name
                         )
-                    null
-                } else {
-                    PrimaryKey(
-                        declaredIn = field.element.enclosingElement,
-                        fields = Fields(field),
-                        autoGenerateId = it.value.autoGenerate
                     )
-                }
+                null
+            } else {
+                PrimaryKey(
+                    declaredIn = field.element.enclosingElement,
+                    fields = Fields(field),
+                    autoGenerateId = primaryKeyAnnotation["autoGenerate"]?.asBoolean() == true
+                )
             }
         }
     }
@@ -385,7 +402,7 @@ internal constructor(
     ): List<PrimaryKey> {
         val myPkeys =
             typeElement.getAnnotation(androidx.room.Entity::class)?.let {
-                val primaryKeyColumns = it.value.primaryKeys
+                val primaryKeyColumns = it["primaryKeys"]?.asStringList() ?: emptyList()
                 if (primaryKeyColumns.isEmpty()) {
                     emptyList()
                 } else {
@@ -431,15 +448,16 @@ internal constructor(
     ): List<PrimaryKey> {
         return embeddedFields.mapNotNull { embeddedField ->
             embeddedField.field.element.getAnnotation(androidx.room.PrimaryKey::class)?.let {
+                val autoGenerate = it["autoGenerate"]?.asBoolean() == true
                 context.checker.check(
-                    !it.value.autoGenerate || embeddedField.dataClass.fields.size == 1,
+                    !autoGenerate || embeddedField.dataClass.fields.size == 1,
                     embeddedField.field.element,
                     ProcessorErrors.AUTO_INCREMENT_EMBEDDED_HAS_MULTIPLE_FIELDS
                 )
                 PrimaryKey(
                     declaredIn = embeddedField.field.element.enclosingElement,
                     fields = embeddedField.dataClass.fields,
-                    autoGenerateId = it.value.autoGenerate
+                    autoGenerateId = autoGenerate
                 )
             }
         }

@@ -38,18 +38,24 @@ class FieldProcessor(
 
     fun process(): Field {
         val member = element.asMemberOf(containing)
-        val columnInfo = element.getAnnotation(ColumnInfo::class)?.value
-        val name = element.name
+        val columnInfoAnnotation = element.getAnnotation(ColumnInfo::class)
+        val elementName = element.name
+        val annotationColumnName = columnInfoAnnotation?.get("name")?.asString()
         val rawCName =
-            if (columnInfo != null && columnInfo.name != ColumnInfo.INHERIT_FIELD_NAME) {
-                columnInfo.name
+            if (
+                annotationColumnName != null &&
+                    annotationColumnName != ColumnInfo.INHERIT_FIELD_NAME
+            ) {
+                annotationColumnName
             } else {
-                name
+                elementName
             }
         val columnName = (fieldParent?.prefix ?: "") + rawCName
         val affinity =
             try {
-                SQLTypeAffinity.fromAnnotationValue(columnInfo?.typeAffinity)
+                val affinityInt =
+                    columnInfoAnnotation?.get("typeAffinity")?.asInt() ?: ColumnInfo.UNDEFINED
+                SQLTypeAffinity.fromAnnotationValue(affinityInt)
             } catch (ex: NumberFormatException) {
                 null
             }
@@ -69,19 +75,23 @@ class FieldProcessor(
             )
         val adapterAffinity = adapter?.typeAffinity ?: affinity
         val nonNull = Field.calcNonNull(member, fieldParent)
-
+        val collateInt = columnInfoAnnotation?.get("collate")?.asInt() ?: ColumnInfo.UNSPECIFIED
         val field =
             Field(
-                name = name,
+                name = elementName,
                 type = member,
                 element = element,
                 columnName = columnName,
                 affinity = affinity,
-                collate = Collate.fromAnnotationValue(columnInfo?.collate),
+                collate = Collate.fromAnnotationValue(collateInt),
                 defaultValue =
-                    extractDefaultValue(columnInfo?.defaultValue, adapterAffinity, nonNull),
+                    extractDefaultValue(
+                        columnInfoAnnotation?.get("defaultValue")?.asString(),
+                        adapterAffinity,
+                        nonNull
+                    ),
                 parent = fieldParent,
-                indexed = columnInfo?.index ?: false,
+                indexed = columnInfoAnnotation?.get("index")?.asBoolean() == true,
                 nonNull = nonNull
             )
 
