@@ -1029,7 +1029,7 @@ object IconButtonDefaults {
     @ExperimentalMaterial3ExpressiveApi
     /** Default selected shape for any extra large icon button. */
     val xLargeSelectedRoundShape: Shape
-        @Composable get() = XSmallIconButtonTokens.SelectedContainerShapeRound.value
+        @Composable get() = XLargeIconButtonTokens.SelectedContainerShapeRound.value
 
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalMaterial3ExpressiveApi
