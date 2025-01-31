@@ -6,6 +6,7 @@
  * modifying its settings.
  */
 import androidx.build.SoftwareType
+import androidx.stableaidl.StableAidlBuildTypeDslExtension
 
 plugins {
     id("AndroidXPlugin")
@@ -55,12 +56,8 @@ dependencies {
     // delegation is handled manually inside androidx.core.util.mockito.CustomMockMaker.
     androidTestImplementation(libs.dexmakerMockito)
     androidTestImplementation(libs.dexmakerMockitoInline)
-    androidTestImplementation("androidx.appcompat:appcompat:1.1.0") {
-        exclude group: "androidx.core", module: "core"
-    }
-    androidTestImplementation(project(":internal-testutils-runtime"), {
-        exclude group: "androidx.core", module: "core"
-    })
+    androidTestImplementation("androidx.appcompat:appcompat:1.1.0")
+    androidTestImplementation(project(":internal-testutils-runtime"))
     androidTestImplementation(project(":internal-testutils-lifecycle"))
     androidTestImplementation(project(":internal-testutils-fonts"))
     androidTestImplementation(project(":internal-testutils-mockito"))
@@ -78,24 +75,22 @@ android {
     buildFeatures {
         aidl = true
     }
-    testOptions.unitTests.includeAndroidResources = true
-    aaptOptions {
-        noCompress = "ttf"
+    testOptions.unitTests.isIncludeAndroidResources = true
+    androidResources {
+        noCompress += "ttf"
     }
     buildTypes.configureEach {
         consumerProguardFiles("proguard-rules.pro")
-
-        stableAidl {
+        extensions.configure<StableAidlBuildTypeDslExtension> {
             version = 1
         }
     }
-
-    packagingOptions {
-        // Drop the file from external dependencies, preferring the local file inside androidTest
-        pickFirsts = [
-                "mockito-extensions/org.mockito.plugins.MockMaker",
-                "mockito-extensions/org.mockito.plugins.StackTraceCleanerProvider"
-        ]
+    packaging {
+        resources {
+            // Drop the file from external dependencies, preferring the local file in androidTest
+            pickFirsts += "mockito-extensions/org.mockito.plugins.MockMaker"
+            pickFirsts += "mockito-extensions/org.mockito.plugins.StackTraceCleanerProvider"
+        }
     }
     namespace = "androidx.core"
 }
@@ -103,7 +98,7 @@ android {
 androidx {
     name = "Core"
     type = SoftwareType.PUBLISHED_LIBRARY
-    mavenVersion = LibraryVersions.CORE
+    mavenVersion = LibraryVersions["CORE"]
     inceptionYear = "2015"
     description = "Provides backward-compatible implementations of Android platform APIs and " +
             "features."
