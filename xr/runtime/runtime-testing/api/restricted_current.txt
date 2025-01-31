@@ -100,6 +100,17 @@ package androidx.xr.runtime.testing {
     method public androidx.xr.runtime.testing.FakeRuntime createRuntime(android.app.Activity activity);
   }
 
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class FakeRuntimeHand implements androidx.xr.runtime.internal.Hand {
+    ctor public FakeRuntimeHand();
+    ctor public FakeRuntimeHand(optional boolean isActive, optional java.util.Map<androidx.xr.runtime.internal.HandJointType,androidx.xr.runtime.math.Pose> handJoints);
+    method public java.util.Map<androidx.xr.runtime.internal.HandJointType,androidx.xr.runtime.math.Pose> getHandJoints();
+    method public boolean isActive();
+    method public void setActive(boolean);
+    method public void setHandJoints(java.util.Map<androidx.xr.runtime.internal.HandJointType,androidx.xr.runtime.math.Pose>);
+    property public java.util.Map<androidx.xr.runtime.internal.HandJointType,androidx.xr.runtime.math.Pose> handJoints;
+    property public boolean isActive;
+  }
+
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class FakeRuntimePlane implements androidx.xr.runtime.testing.AnchorHolder androidx.xr.runtime.internal.Plane {
     ctor public FakeRuntimePlane();
     ctor public FakeRuntimePlane(optional androidx.xr.runtime.internal.Plane.Type type, optional androidx.xr.runtime.internal.Plane.Label label, optional androidx.xr.runtime.internal.TrackingState trackingState, optional androidx.xr.runtime.math.Pose centerPose, optional androidx.xr.runtime.math.Vector2 extents, optional java.util.List<androidx.xr.runtime.math.Vector2> vertices, optional androidx.xr.runtime.internal.Plane? subsumedBy, optional java.util.Collection<androidx.xr.runtime.internal.Anchor> anchors);

@@ -422,6 +422,7 @@ public sealed class BaseEntity<out RtEntityType : RtEntity>(
         return rtEntity.worldSpaceScale.x
     }
 
+    // TODO: b/356874139 - remove this method
     override fun setSize(dimensions: Dimensions) {
         rtEntity.setSize(dimensions.toRtDimensions())
         this.dimensions = dimensions
@@ -680,13 +681,65 @@ private constructor(rtEntity: JxrPlatformAdapter.GltfEntity, entityManager: Enti
     }
 }
 
-/** StereoSurfaceEntity is a concrete implementation of Entity that hosts a StereoSurface Panel. */
+/**
+ * StereoSurfaceEntity is a concrete implementation of Entity that hosts a StereoSurface Canvas. The
+ * entity creates and owns an Android Surface into which the application can render stereo image
+ * content. This Surface is then texture mapped to the canvas, and if a stereoscopic StereoMode is
+ * specified, then the User will see left and right eye content mapped to the appropriate display.
+ *
+ * Note that it is not currently possible to synchronize CanvasShape and StereoMode changes with
+ * application rendering or video decoding. Applications are advised to carefully hide this entity
+ * around transitions to manage glitchiness.
+ *
+ * @property canvasShape The [CanvasShape] which describes the mesh to which the Surface is mapped.
+ * @property stereoMode The [StereoMode] which describes how parts of the surface are displayed to
+ *   the user's eyes.
+ * @property dimensions The dimensions of the canvas in the local spatial coordinate system of the
+ *   entity.
+ */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)
 public class StereoSurfaceEntity
 private constructor(
     rtEntity: JxrPlatformAdapter.StereoSurfaceEntity,
     entityManager: EntityManager,
+    canvasShape: CanvasShape,
 ) : BaseEntity<JxrPlatformAdapter.StereoSurfaceEntity>(rtEntity, entityManager) {
+
+    /** Represents the shape of the StereoSurface Canvas that backs a StereoSurfaceEntity. */
+    public abstract class CanvasShape private constructor() {
+        public open val dimensions: Dimensions = Dimensions(0.0f, 0.0f, 0.0f)
+
+        // A Quad-shaped canvas. Width and height are represented in the local spatial coordinate
+        // system of the entity. (0,0,0) is the center of the canvas.
+        public class Quad(public val width: Float, public val height: Float) : CanvasShape() {
+            override val dimensions: Dimensions
+                get() = Dimensions(width, height, 0.0f)
+        }
+
+        // An inwards-facing sphere-shaped canvas, centered at (0,0,0) in the local coordinate
+        // space.
+        // This is intended to be used by setting the entity's pose to the user's head pose.
+        // Radius is represented in the local spatial coordinate system of the entity.
+        // The center of the Surface will be mapped to (0, 0, -radius) in the local coordinate
+        // space,
+        // and UV's are applied from positive X to negative X in an equirectangular projection.
+        public class Vr360Sphere(public val radius: Float) : CanvasShape() {
+            override val dimensions: Dimensions
+                get() = Dimensions(radius * 2, radius * 2, radius * 2)
+        }
+
+        // An inwards-facing hemisphere-shaped canvas, where (0,0,0) is the center of the base of
+        // the
+        // hemisphere. Radius is represented in the local spatial coordinate system of the entity.
+        // This is intended to be used by setting the entity's pose to the user's head pose.
+        // The center of the Surface will be mapped to (0, 0, -radius) in the local coordinate
+        // space,
+        // and UV's are applied from positive X to negative X in an equirectangular projection.
+        public class Vr180Hemisphere(public val radius: Float) : CanvasShape() {
+            override val dimensions: Dimensions
+                get() = Dimensions(radius * 2, radius * 2, radius)
+        }
+    }
 
     /**
      * Specifies how the surface content will be routed for stereo viewing. Applications must render
@@ -725,26 +778,44 @@ private constructor(
          * @param adapter JxrPlatformAdapter to use.
          * @param entityManager A SceneCore EntityManager
          * @param stereoMode An [Int] which defines how surface subregions map to eyes
-         * @param dimensions A [Dimensions] which specifies the size of the canvas relative to
-         *   parent
          * @param pose Pose for this StereoSurface entity, relative to its parent.
+         * @param canvasShape The [CanvasShape] which describes the spatialized shape of the canvas.
          */
         internal fun create(
             adapter: JxrPlatformAdapter,
             entityManager: EntityManager,
             stereoMode: Int = StereoMode.SIDE_BY_SIDE,
-            dimensions: Dimensions = Dimensions(1.0f, 1.0f, 1.0f),
             pose: Pose = Pose.Identity,
-        ): StereoSurfaceEntity =
-            StereoSurfaceEntity(
+            canvasShape: CanvasShape = CanvasShape.Quad(1.0f, 1.0f),
+        ): StereoSurfaceEntity {
+            val rtCanvasShape =
+                when (canvasShape) {
+                    is CanvasShape.Quad ->
+                        JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape.Quad(
+                            canvasShape.width,
+                            canvasShape.height,
+                        )
+                    is CanvasShape.Vr360Sphere ->
+                        JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape.Vr360Sphere(
+                            canvasShape.radius
+                        )
+                    is CanvasShape.Vr180Hemisphere ->
+                        JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape.Vr180Hemisphere(
+                            canvasShape.radius
+                        )
+                    else -> throw IllegalArgumentException("Unsupported canvas shape: $canvasShape")
+                }
+            return StereoSurfaceEntity(
                 adapter.createStereoSurfaceEntity(
                     getRtStereoMode(stereoMode),
-                    dimensions.toRtDimensions(),
+                    rtCanvasShape,
                     pose,
                     adapter.activitySpaceRootImpl,
                 ),
                 entityManager,
+                canvasShape,
             )
+        }
 
         /**
          * Public factory function for a StereoSurfaceEntity.
@@ -754,8 +825,8 @@ private constructor(
          *
          * @param session Session to create the StereoSurfaceEntity in.
          * @param stereoMode Stereo mode for the surface.
-         * @param dimensions Dimensions for the surface.
          * @param pose Pose of this entity relative to its parent, default value is Identity.
+         * @param canvasShape The [CanvasShape] which describes the spatialized shape of the canvas.
          * @return a StereoSurfaceEntity instance
          */
         @MainThread
@@ -763,27 +834,62 @@ private constructor(
         public fun create(
             session: Session,
             stereoMode: Int = StereoSurfaceEntity.StereoMode.SIDE_BY_SIDE,
-            dimensions: Dimensions = Dimensions(1.0f, 1.0f, 1.0f),
             pose: Pose = Pose.Identity,
+            canvasShape: CanvasShape = CanvasShape.Quad(1.0f, 1.0f),
         ): StereoSurfaceEntity =
             StereoSurfaceEntity.create(
                 session.platformAdapter,
                 session.entityManager,
                 stereoMode,
-                dimensions,
                 pose,
+                canvasShape,
             )
     }
 
     /**
-     * Changes the width and height of the "spatial canvas" which the surface is mapped to. (0,0,0)
-     * for this Entity is the canvas's center. (In unscaled ActivitySpace, this is 1 unit per meter)
-     * Width and height <= 0 are unsupported (Depth is ignored).
+     * Controls how the surface content will be routed for stereo viewing. Applications must render
+     * into the surface in accordance with what is specified here in order for the compositor to
+     * correctly produce a stereoscopic view to the user.
+     *
+     * Values must be one of the values from [StereoMode].
      */
-    public var dimensions: Dimensions
-        get() = rtEntity.dimensions.toDimensions()
+    public var stereoMode: Int
+        get() = rtEntity.stereoMode
+        @MainThread
         set(value) {
-            rtEntity.dimensions = value.toRtDimensions()
+            rtEntity.stereoMode = getRtStereoMode(value)
+        }
+
+    /**
+     * Returns the dimensions of the Entity.
+     *
+     * This is the size of the canvas in the local spatial coordinate system of the entity. Updating
+     * the canvas
+     */
+    public val dimensions: Dimensions
+        get() = rtEntity.dimensions.toDimensions()
+
+    /** Allows for updating the canvas shape for the Entity after creation. */
+    public var canvasShape: CanvasShape = canvasShape
+        @MainThread
+        set(value) {
+            val rtCanvasShape =
+                when (value) {
+                    is CanvasShape.Quad ->
+                        JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape.Quad(
+                            value.width,
+                            value.height
+                        )
+                    is CanvasShape.Vr360Sphere ->
+                        JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape.Vr360Sphere(value.radius)
+                    is CanvasShape.Vr180Hemisphere ->
+                        JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape.Vr180Hemisphere(
+                            value.radius
+                        )
+                    else -> throw IllegalArgumentException("Unsupported canvas shape: $value")
+                }
+            rtEntity.setCanvasShape(rtCanvasShape)
+            field = value
         }
 
     /**
@@ -1033,6 +1139,11 @@ private constructor(rtEntity: JxrPlatformAdapter.AnchorEntity, entityManager: En
          * without the possibility of recovery.
          */
         public const val ERROR: Int = 3
+        /**
+         * The PERMISSIONS_NOT_GRANTED state means that the user has not granted the necessary
+         * permissions i.e. SCENE_UNDERSTANDING to create this AnchorEntity.
+         */
+        public const val PERMISSIONS_NOT_GRANTED: Int = 4
     }
 
     /** Specifies the current persist state of the Anchor. */
@@ -1052,6 +1163,9 @@ private constructor(rtEntity: JxrPlatformAdapter.AnchorEntity, entityManager: En
     @Suppress("ExecutorRegistration")
     public fun setOnStateChangedListener(onStateChangedListener: OnStateChangedListener?) {
         this.onStateChangedListener = onStateChangedListener
+        if (state.get() == State.PERMISSIONS_NOT_GRANTED) {
+            onStateChangedListener?.onStateChanged(State.PERMISSIONS_NOT_GRANTED)
+        }
     }
 
     /** Updates the current state. */
@@ -1165,6 +1279,8 @@ private constructor(rtEntity: JxrPlatformAdapter.AnchorEntity, entityManager: En
                         anchorEntity.setState(State.TIMEDOUT)
                     JxrPlatformAdapter.AnchorEntity.State.ERROR ->
                         anchorEntity.setState(State.ERROR)
+                    JxrPlatformAdapter.AnchorEntity.State.PERMISSIONS_NOT_GRANTED ->
+                        anchorEntity.setState(State.PERMISSIONS_NOT_GRANTED)
                 }
             }
             return anchorEntity
@@ -1196,6 +1312,8 @@ private constructor(rtEntity: JxrPlatformAdapter.AnchorEntity, entityManager: En
                         anchorEntity.setState(State.TIMEDOUT)
                     JxrPlatformAdapter.AnchorEntity.State.ERROR ->
                         anchorEntity.setState(State.ERROR)
+                    JxrPlatformAdapter.AnchorEntity.State.PERMISSIONS_NOT_GRANTED ->
+                        anchorEntity.setState(State.PERMISSIONS_NOT_GRANTED)
                 }
             }
             return anchorEntity
@@ -1260,6 +1378,8 @@ private constructor(rtEntity: JxrPlatformAdapter.AnchorEntity, entityManager: En
             JxrPlatformAdapter.AnchorEntity.State.ANCHORED -> State.ANCHORED
             JxrPlatformAdapter.AnchorEntity.State.TIMED_OUT -> State.TIMEDOUT
             JxrPlatformAdapter.AnchorEntity.State.ERROR -> State.ERROR
+            JxrPlatformAdapter.AnchorEntity.State.PERMISSIONS_NOT_GRANTED ->
+                State.PERMISSIONS_NOT_GRANTED
         }
 
     /**

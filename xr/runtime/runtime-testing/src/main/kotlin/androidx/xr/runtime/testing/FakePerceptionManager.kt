@@ -33,8 +33,8 @@ public class FakePerceptionManager : PerceptionManager, AnchorHolder {
     public val anchors: MutableList<Anchor> = mutableListOf<Anchor>()
     override val trackables: MutableList<Trackable> = mutableListOf<Trackable>()
 
-    override val leftHand: Hand? = null
-    override val rightHand: Hand? = null
+    override val leftHand: Hand? = FakeRuntimeHand()
+    override val rightHand: Hand? = FakeRuntimeHand()
 
     private val hitResults = mutableListOf<HitResult>()
     private val anchorUuids = mutableListOf<UUID>()

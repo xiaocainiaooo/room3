@@ -32,9 +32,11 @@ import static org.mockito.Mockito.when;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import android.app.Activity;
 import android.os.IBinder;
 import android.os.SystemClock;
 
+import androidx.test.rule.GrantPermissionRule;
 import androidx.xr.extensions.node.Node;
 import androidx.xr.runtime.internal.Anchor.PersistenceState;
 import androidx.xr.runtime.internal.TrackingState;
@@ -62,10 +64,13 @@ import androidx.xr.scenecore.testing.FakeXrExtensions.FakeNode;
 import com.google.common.collect.ImmutableList;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.android.controller.ActivityController;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -154,8 +159,15 @@ public final class AnchorEntityImplTest extends SystemSpaceEntityImplTest {
     private long mCurrentTimeMillis = 1000000000L;
     private ActivitySpaceImpl mActivitySpace;
 
+    @Rule
+    public GrantPermissionRule mGrantPermissionRule =
+            GrantPermissionRule.grant("android.permission.SCENE_UNDERSTANDING");
+
     @Before
     public void doBeforeEachTest() {
+        ActivityController<Activity> activityController = Robolectric.buildActivity(Activity.class);
+        Activity activity = activityController.create().start().get();
+        when(mPerceptionLibrary.getActivity()).thenReturn(activity);
         Node taskNode = mFakeExtensions.createNode();
         mActivitySpace =
                 new ActivitySpaceImpl(

@@ -53,6 +53,7 @@ class EntityTest {
     private val mockAnchorEntityImpl = mock<JxrPlatformAdapter.AnchorEntity>()
     private val mockActivityPanelEntity = mock<JxrPlatformAdapter.ActivityPanelEntity>()
     private val mockContentlessEntity = mock<JxrPlatformAdapter.Entity>()
+    private val mockStereoSurfaceEntity = mock<JxrPlatformAdapter.StereoSurfaceEntity>()
     private val entityManager = EntityManager()
     private lateinit var session: Session
     private lateinit var activitySpace: ActivitySpace
@@ -62,6 +63,7 @@ class EntityTest {
     private lateinit var anchorEntity: AnchorEntity
     private lateinit var activityPanelEntity: ActivityPanelEntity
     private lateinit var contentlessEntity: Entity
+    private lateinit var stereoSurfaceEntity: StereoSurfaceEntity
 
     interface FakeComponent : Component
 
@@ -228,6 +230,8 @@ class EntityTest {
             .thenReturn(mockActivityPanelEntity)
         whenever(mockPlatformAdapter.createEntity(any(), any(), any()))
             .thenReturn(mockContentlessEntity)
+        whenever(mockPlatformAdapter.createStereoSurfaceEntity(any(), any(), any(), any()))
+            .thenReturn(mockStereoSurfaceEntity)
         whenever(mockPlatformAdapter.getMainPanelEntity()).thenReturn(mockPanelEntityImpl)
         session = Session.create(activity, mockPlatformAdapter)
         activitySpace = ActivitySpace.create(mockPlatformAdapter, entityManager)
@@ -261,6 +265,14 @@ class EntityTest {
                 activity,
             )
         contentlessEntity = ContentlessEntity.create(mockPlatformAdapter, entityManager, "test")
+        stereoSurfaceEntity =
+            StereoSurfaceEntity.create(
+                mockPlatformAdapter,
+                entityManager,
+                StereoSurfaceEntity.StereoMode.SIDE_BY_SIDE,
+                Pose.Identity,
+                StereoSurfaceEntity.CanvasShape.Quad(1.0f, 1.0f),
+            )
     }
 
     @Test
@@ -1138,6 +1150,20 @@ class EntityTest {
         verify(component3).onAttach(panelEntity)
         assertThat(panelEntity.getComponentsOfType(FakeComponent::class.java))
             .containsExactly(component2, component3)
+    }
+
+    @Test
+    fun StereoSurfaceEntity_redirectsCallsToRtEntity() {
+        stereoSurfaceEntity.stereoMode = StereoSurfaceEntity.StereoMode.TOP_BOTTOM
+        verify(mockStereoSurfaceEntity).setStereoMode(StereoSurfaceEntity.StereoMode.TOP_BOTTOM)
+
+        @Suppress("UNUSED_VARIABLE") var unusedMode = stereoSurfaceEntity.stereoMode
+        verify(mockStereoSurfaceEntity).getStereoMode()
+
+        stereoSurfaceEntity.canvasShape = StereoSurfaceEntity.CanvasShape.Vr360Sphere(1.0f)
+        verify(mockStereoSurfaceEntity).setCanvasShape(any())
+
+        // no equivalent test for getter - that just returns the Kotlin object for now.
     }
 
     @Test

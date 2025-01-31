@@ -88,7 +88,7 @@ import java.util.concurrent.Executor;
 public class FakeXrExtensions implements XrExtensions {
     private static final String NOT_IMPLEMENTED_IN_FAKE =
             "This function is not implemented yet in FakeXrExtensions.  Please add an"
-                + " implementation if support is desired for testing.";
+                    + " implementation if support is desired for testing.";
 
     @NonNull public final List<FakeNode> createdNodes = new ArrayList<>();
 
@@ -845,6 +845,10 @@ public class FakeXrExtensions implements XrExtensions {
             return mWOrientation;
         }
 
+        public float getCornerRadius() {
+            return mCornerRadius;
+        }
+
         public boolean isVisible() {
             return mIsVisible;
         }
@@ -1131,7 +1135,7 @@ public class FakeXrExtensions implements XrExtensions {
             implements androidx.xr.extensions.asset.EnvironmentToken {
         String mUrl;
 
-        private FakeEnvironmentToken(@NonNull String url) {
+        public FakeEnvironmentToken(@NonNull String url) {
             this.mUrl = url;
         }
 

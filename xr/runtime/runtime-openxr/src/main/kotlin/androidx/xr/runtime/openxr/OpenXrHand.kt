@@ -28,8 +28,8 @@ public class OpenXrHand internal constructor(private val isLeftHand: Boolean) : 
     override var isActive: Boolean = false
         private set
 
-    private val _handJoints: MutableMap<HandJointType, Pose> = mutableMapOf<HandJointType, Pose>()
-    override val handJoints: Map<HandJointType, Pose> = _handJoints
+    override var handJoints: Map<HandJointType, Pose> = emptyMap()
+        private set
 
     override fun update(xrTime: Long) {
         val handState: HandState =
@@ -37,8 +37,7 @@ public class OpenXrHand internal constructor(private val isLeftHand: Boolean) : 
                 ?: throw IllegalStateException("Could not locate hand joints for hand.")
 
         isActive = handState.isActive
-        _handJoints.clear()
-        _handJoints.putAll(HandJointType.values().zip(handState.handJoints).toMap())
+        handJoints = HandJointType.values().zip(handState.handJoints).toMap()
     }
 
     private external fun nativeLocateHandJoints(isLeftHand: Boolean, timestampNs: Long): HandState?

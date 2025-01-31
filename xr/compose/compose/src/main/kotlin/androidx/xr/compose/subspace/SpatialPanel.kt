@@ -32,10 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.UiComposable
 import androidx.compose.ui.graphics.Color as UiColor
@@ -107,17 +104,21 @@ public fun SpatialPanel(
     shape: SpatialShape = SpatialPanelDefaults.shape,
     content: @Composable @UiComposable () -> Unit,
 ) {
-    var panelEntity by remember { mutableStateOf<CorePanelEntity?>(null) }
+    val composeView = rememberComposeView()
 
     SpatialPanel(
         modifier = modifier,
         name = name,
-        view =
-            rememberComposeView {
-                CompositionLocalProvider(LocalCoreEntity provides panelEntity, content = content)
-            },
+        view = composeView,
         shape = shape,
-        onCorePanelEntityCreated = { panelEntity = it },
+        onCorePanelEntityCreated = { corePanelEntity ->
+            composeView.setContent {
+                CompositionLocalProvider(
+                    LocalCoreEntity provides corePanelEntity,
+                    content = content
+                )
+            }
+        },
     )
 }
 
@@ -192,7 +193,9 @@ public fun SpatialPanel(
         LayoutPanelEntity(activityPanelEntity, name, shape, modifier)
 
         if (dialogManager.isSpatialDialogActive.value) {
-            val scrimView = rememberComposeView {
+            val scrimView = rememberComposeView()
+
+            scrimView.setContent {
                 Box(
                     modifier =
                         Modifier.fillMaxSize()

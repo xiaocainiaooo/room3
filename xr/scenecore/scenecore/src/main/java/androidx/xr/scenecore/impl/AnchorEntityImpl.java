@@ -18,11 +18,13 @@ package androidx.xr.scenecore.impl;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import android.content.pm.PackageManager;
 import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.xr.extensions.XrExtensions;
 import androidx.xr.extensions.node.Node;
 import androidx.xr.extensions.node.NodeTransaction;
@@ -59,6 +61,8 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
     public static final Duration PERSIST_STATE_CHECK_DELAY = Duration.ofMillis(500);
     public static final String ANCHOR_NODE_NAME = "AnchorNode";
     private static final String TAG = "AnchorEntityImpl";
+    private static final String SCENE_UNDERSTANDING_PERMISSION =
+            "android.permission.SCENE_UNDERSTANDING";
     private final ActivitySpaceImpl mActivitySpace;
     private final AndroidXrEntity mActivitySpaceRoot;
     private final PerceptionLibrary mPerceptionLibrary;
@@ -236,7 +240,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
             Log.e(
                     TAG,
                     "ActivitySpace is not an instance of ActivitySpaceImpl.Anchor is in Error"
-                        + " state.");
+                            + " state.");
             mState = State.ERROR;
             mActivitySpace = null;
         }
@@ -247,7 +251,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
             Log.e(
                     TAG,
                     "ActivitySpaceRoot is not an instance of AndroidXrEntity. Anchor is in Error"
-                        + " state.");
+                            + " state.");
             mState = State.ERROR;
             mActivitySpaceRoot = null;
         }
@@ -260,8 +264,18 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
             mOpenXrActivityPoseHelper = null;
         }
 
+        if (ContextCompat.checkSelfPermission(
+                        perceptionLibrary.getActivity(), SCENE_UNDERSTANDING_PERMISSION)
+                == PackageManager.PERMISSION_DENIED) {
+            Log.e(
+                    TAG,
+                    "Scene understanding permission is not granted. Anchor is in"
+                            + " PERMISSIONS_NOT_GRANTED state.");
+            mState = State.PERMISSIONS_NOT_GRANTED;
+        }
+
         // Return early if the state is already in an error state.
-        if (mState == State.ERROR) {
+        if (mState == State.ERROR || mState == State.PERMISSIONS_NOT_GRANTED) {
             return;
         }
 
@@ -480,6 +494,9 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
     @Override
     public void setOnStateChangedListener(OnStateChangedListener onStateChangedListener) {
         mOnStateChangedListener = onStateChangedListener;
+        if (mState == State.PERMISSIONS_NOT_GRANTED) {
+            onStateChangedListener.onStateChanged(State.PERMISSIONS_NOT_GRANTED);
+        }
     }
 
     @Override
@@ -516,7 +533,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
                 Log.i(
                         TAG,
                         "Anchor is disposed before becoming persisted, stop checking its persist"
-                            + " state.");
+                                + " state.");
                 return;
             }
             if (mAnchor.getPersistState() == Anchor.PersistState.PERSISTED) {
@@ -582,7 +599,7 @@ class AnchorEntityImpl extends SystemSpaceEntityImpl implements AnchorEntity {
                 Log.w(
                         TAG,
                         "Cannot retrieve pose in underlying space. Ensure that the anchor is"
-                            + " anchored before calling this method. Returning identity pose.");
+                                + " anchored before calling this method. Returning identity pose.");
                 return new Pose();
             }
 

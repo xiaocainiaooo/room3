@@ -84,7 +84,6 @@ class MovablePanelApp : ComponentActivity() {
                         ),
                     label = "transition",
                 )
-
         rememberInfiniteTransition("movingValue")
             .animateFloat(
                 initialValue = 0f,
@@ -92,7 +91,7 @@ class MovablePanelApp : ComponentActivity() {
                 animationSpec =
                     infiniteRepeatable(
                         tween(30000, easing = LinearEasing),
-                        repeatMode = RepeatMode.Reverse,
+                        repeatMode = RepeatMode.Reverse
                     ),
                 label = "moving",
             )
@@ -163,12 +162,12 @@ class MovablePanelApp : ComponentActivity() {
                                 .width(panelWidth)
                                 .height(200.dp)
                                 .rotate(rotateValueMovable)
-                                .movable { pose ->
+                                .movable { poseChangeEvent ->
                                     with(density) {
-                                        xValueMovable = pose.translation.x.toDp()
-                                        yValueMovable = pose.translation.y.toDp()
-                                        zValueMovable = pose.translation.z.toDp()
-                                        rotateValueMovable = pose.rotation
+                                        xValueMovable = poseChangeEvent.pose.translation.x.toDp()
+                                        yValueMovable = poseChangeEvent.pose.translation.y.toDp()
+                                        zValueMovable = poseChangeEvent.pose.translation.z.toDp()
+                                        rotateValueMovable = poseChangeEvent.pose.rotation
                                         true // This true is to indicate that the callback will
                                         // handle the moving of the
                                     } // panel.
