@@ -75,7 +75,7 @@ class FhirVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<F
     }
 
     override fun toString(): String {
-        return "${this::class.java.simpleName}($major.$minor.$patch)"
+        return "${this::class.java.simpleName}@${Integer.toHexString(System.identityHashCode(this))}($major.$minor.$patch)"
     }
 
     /**

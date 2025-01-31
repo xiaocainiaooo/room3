@@ -53,7 +53,7 @@ internal fun <T : Comparable<T>> T.requireInRange(min: T, max: T, name: String) 
     requireNotMore(max, name)
 }
 
-internal fun toString(obj: Any, fieldMap: Map<String, Any>): String {
+internal fun toString(obj: Any, fieldMap: Map<String, Any?>): String {
     val content =
         fieldMap.entries.joinToString(separator = ", ", prefix = "(", postfix = ")") {
             "${it.key}=${it.value}"

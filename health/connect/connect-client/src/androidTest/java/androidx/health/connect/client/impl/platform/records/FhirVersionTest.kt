@@ -22,6 +22,7 @@ import androidx.health.connect.client.feature.isPersonalHealthRecordFeatureAvail
 import androidx.health.connect.client.records.FhirVersion
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import com.google.common.testing.EqualsTester
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertThrows
 import org.junit.Assume
@@ -78,18 +79,13 @@ class FhirVersionTest {
 
     @Test
     fun validFhirVersion_equals() {
-        val fhirVersion1 = FhirVersion(major = 1, minor = 2, patch = 3)
-        val fhirVersion2 = FhirVersion(major = 1, minor = 2, patch = 3)
-
-        assertThat(fhirVersion1).isEqualTo(fhirVersion2)
-    }
-
-    @Test
-    fun validFhirVersion_not_equals() {
-        val fhirVersion1 = FhirVersion(major = 1, minor = 2, patch = 3)
-        val fhirVersion2 = FhirVersion(major = 1, minor = 2, patch = 5)
-
-        assertThat(fhirVersion1).isNotEqualTo(fhirVersion2)
+        EqualsTester()
+            .addEqualityGroup(
+                FhirVersion(major = 1, minor = 2, patch = 3),
+                FhirVersion(major = 1, minor = 2, patch = 3)
+            )
+            .addEqualityGroup(FhirVersion(major = 1, minor = 2, patch = 5))
+            .testEquals()
     }
 
     @Test
@@ -98,7 +94,7 @@ class FhirVersionTest {
 
         val fhirVersionString = fhirVersion.toString()
 
-        assertThat(fhirVersionString).isEqualTo("FhirVersion(1.2.3)")
+        assertThat(fhirVersionString).contains("(1.2.3)")
     }
 
     @Test
