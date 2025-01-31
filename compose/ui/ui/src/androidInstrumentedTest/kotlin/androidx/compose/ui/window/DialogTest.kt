@@ -22,9 +22,11 @@ import android.view.KeyEvent
 import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_UP
 import android.view.View
+import android.view.Window
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -51,11 +53,13 @@ import androidx.compose.ui.geometry.lerp
 import androidx.compose.ui.gesture.MotionEvent
 import androidx.compose.ui.gesture.PointerProperties
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.PointerCoords
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionOnScreen
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
@@ -74,8 +78,10 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import com.google.common.truth.Truth.assertThat
@@ -769,6 +775,47 @@ class DialogTest {
             }
             val window = provider.window
             assertThat(window.attributes.gravity).isEqualTo(Gravity.CENTER)
+        }
+    }
+
+    @Test
+    @SdkSuppress(maxSdkVersion = 34)
+    fun dialogThemeCanBeOverridden() {
+        lateinit var window: Window
+        rule.setContent {
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = { context ->
+                    ComposeView(
+                            ContextThemeWrapper(
+                                context,
+                                androidx.compose.ui.tests.R.style.CustomDialogTheme
+                            )
+                        )
+                        .apply {
+                            setContent {
+                                Dialog(
+                                    onDismissRequest = {},
+                                    properties =
+                                        DialogProperties(
+                                            decorFitsSystemWindows = false,
+                                            usePlatformDefaultWidth = false
+                                        )
+                                ) {
+                                    var parent = LocalView.current
+                                    while (parent !is DialogWindowProvider) {
+                                        parent = parent.parent as View
+                                    }
+                                    window = (parent as DialogWindowProvider).window
+                                    Box(Modifier.fillMaxSize().background(Color.Blue))
+                                }
+                            }
+                        }
+                }
+            )
+        }
+        rule.runOnIdle {
+            @Suppress("DEPRECATION") assertThat(window.statusBarColor).isEqualTo(Color.Red.toArgb())
         }
     }
 
