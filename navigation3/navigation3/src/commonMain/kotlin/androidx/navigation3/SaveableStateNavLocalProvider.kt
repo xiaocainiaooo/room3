@@ -44,22 +44,24 @@ public class SaveableStateNavLocalProvider : NavLocalProvider {
         }
 
         localInfo.savedStateHolder = rememberSaveableStateHolder()
-        localInfo.backstackSize = backStack.size
         backStack.forEach { key ->
             DisposableEffect(key1 = key) {
+                // Add 1 to the refCount for each key that was see in the backstack.
                 localInfo.refCount[key] = localInfo.refCount.getOrDefault(key, 0).plus(1)
                 onDispose {
-                    localInfo.refCount[key] =
-                        localInfo.refCount
-                            .getOrElse(key) {
-                                error(
-                                    "Attempting to incorrectly dispose of backstack state in " +
-                                        "SaveableStateNavLocalProvider"
-                                )
-                            }
-                            .minus(1)
+                    // If the backStack count is less than the refCount for the key, remove the
+                    // state since that means we removed a key from the backstack, and set the
+                    // refCount to the backstack count.
+                    val backstackCount = backStack.count { it == key }
+                    if (backstackCount < localInfo.refCount[key]) {
+                        localInfo.savedStateHolder!!.removeState(
+                            getIdForKey(key, localInfo.refCount[key])
+                        )
+                        localInfo.refCount[key] = backstackCount
+                    }
+                    // If the refCount is 0, remove the key from the refCount.
                     if (localInfo.refCount[key] == 0) {
-                        localInfo.savedStateHolder!!.removeState(key)
+                        localInfo.refCount.remove(key)
                     }
                 }
             }
@@ -74,34 +76,12 @@ public class SaveableStateNavLocalProvider : NavLocalProvider {
     public override fun <T : Any> ProvideToEntry(entry: NavEntry<T>) {
         val localInfo = LocalSaveableStateNavLocalInfo.current
         val key = entry.key
-        DisposableEffect(key1 = key) {
-            localInfo.refCount[key] = localInfo.refCount.getOrDefault(key, 0).plus(1)
-            onDispose {
-                // We need to check to make sure that the refcount has been cleared here because
-                // when we are using animations, if the entire back stack is changed, we will
-                // execute the onDispose above that clears all of the counts before we finish the
-                // transition and run this onDispose so our count will already be gone and we
-                // should just remove the state.
-                if (!localInfo.refCount.contains(key)) {
-                    localInfo.savedStateHolder?.removeState(key)
-                } else {
-                    localInfo.refCount[key] =
-                        localInfo.refCount
-                            .getOrElse(key) {
-                                error(
-                                    "Attempting to incorrectly dispose of state associated with " +
-                                        "key $key in SaveableStateNavLocalProvider"
-                                )
-                            }
-                            .minus(1)
-                }
-                if (localInfo.refCount[key] == 0) {
-                    localInfo.savedStateHolder!!.removeState(key)
-                }
-            }
-        }
-
-        localInfo.savedStateHolder?.SaveableStateProvider(key) { entry.content.invoke(key) }
+        // We default this to 1 since this is the first time we have seen this key and it has not
+        // been added to the map yet since that happens as part of the ProvideToBackStack's
+        // DisposableEffect.
+        val refCount = localInfo.refCount.getOrDefault(key, 1)
+        val id: Int = rememberSaveable(key) { getIdForKey(key, refCount) }
+        localInfo.savedStateHolder?.SaveableStateProvider(id) { entry.content.invoke(key) }
     }
 }
 
@@ -116,5 +96,6 @@ internal val LocalSaveableStateNavLocalInfo =
 internal class SaveableStateNavLocalInfo {
     internal var savedStateHolder: SaveableStateHolder? = null
     internal val refCount: MutableObjectIntMap<Any> = MutableObjectIntMap()
-    internal var backstackSize = 0
 }
+
+internal fun getIdForKey(key: Any, count: Int): Int = 31 * key.hashCode() + count
