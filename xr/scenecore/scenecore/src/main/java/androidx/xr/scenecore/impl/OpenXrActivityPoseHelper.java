@@ -57,7 +57,7 @@ final class OpenXrActivityPoseHelper {
             Log.e(
                     TAG,
                     "Cannot retrieve pose in underlying space for the ActivityPose. Returning"
-                        + " identity pose.");
+                            + " identity pose.");
             return new Pose();
         }
 

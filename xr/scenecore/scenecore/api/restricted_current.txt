@@ -607,11 +607,13 @@ package androidx.xr.scenecore {
   public static final class AnchorEntity.State {
     property public static final int ANCHORED;
     property public static final int ERROR;
+    property public static final int PERMISSIONS_NOT_GRANTED;
     property public static final int TIMEDOUT;
     property public static final int UNANCHORED;
     field public static final int ANCHORED = 0; // 0x0
     field public static final int ERROR = 3; // 0x3
     field public static final androidx.xr.scenecore.AnchorEntity.State INSTANCE;
+    field public static final int PERMISSIONS_NOT_GRANTED = 4; // 0x4
     field public static final int TIMEDOUT = 2; // 0x2
     field public static final int UNANCHORED = 1; // 0x1
   }
@@ -901,7 +903,7 @@ package androidx.xr.scenecore {
     method public androidx.xr.scenecore.JxrPlatformAdapter.AnchorEntity createPersistedAnchorEntity(java.util.UUID, java.time.Duration);
     method public androidx.xr.scenecore.JxrPlatformAdapter.PointerCaptureComponent createPointerCaptureComponent(java.util.concurrent.Executor, androidx.xr.scenecore.JxrPlatformAdapter.PointerCaptureComponent.StateListener, androidx.xr.scenecore.JxrPlatformAdapter.InputEventListener);
     method public androidx.xr.scenecore.JxrPlatformAdapter.ResizableComponent createResizableComponent(androidx.xr.scenecore.JxrPlatformAdapter.Dimensions, androidx.xr.scenecore.JxrPlatformAdapter.Dimensions);
-    method public androidx.xr.scenecore.JxrPlatformAdapter.StereoSurfaceEntity createStereoSurfaceEntity(int, androidx.xr.scenecore.JxrPlatformAdapter.Dimensions, androidx.xr.runtime.math.Pose, androidx.xr.scenecore.JxrPlatformAdapter.Entity);
+    method public androidx.xr.scenecore.JxrPlatformAdapter.StereoSurfaceEntity createStereoSurfaceEntity(int, androidx.xr.scenecore.JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape, androidx.xr.runtime.math.Pose, androidx.xr.scenecore.JxrPlatformAdapter.Entity);
     method public void dispose();
     method public androidx.xr.scenecore.JxrPlatformAdapter.ActivitySpace getActivitySpace();
     method public androidx.xr.scenecore.JxrPlatformAdapter.Entity getActivitySpaceRootImpl();
@@ -976,6 +978,7 @@ package androidx.xr.scenecore {
   public enum JxrPlatformAdapter.AnchorEntity.State {
     enum_constant public static final androidx.xr.scenecore.JxrPlatformAdapter.AnchorEntity.State ANCHORED;
     enum_constant public static final androidx.xr.scenecore.JxrPlatformAdapter.AnchorEntity.State ERROR;
+    enum_constant public static final androidx.xr.scenecore.JxrPlatformAdapter.AnchorEntity.State PERMISSIONS_NOT_GRANTED;
     enum_constant public static final androidx.xr.scenecore.JxrPlatformAdapter.AnchorEntity.State TIMED_OUT;
     enum_constant public static final androidx.xr.scenecore.JxrPlatformAdapter.AnchorEntity.State UNANCHORED;
   }
@@ -1285,8 +1288,31 @@ package androidx.xr.scenecore {
     method public androidx.xr.scenecore.JxrPlatformAdapter.Dimensions getDimensions();
     method public int getStereoMode();
     method public android.view.Surface getSurface();
-    method public void setDimensions(androidx.xr.scenecore.JxrPlatformAdapter.Dimensions);
+    method public void setCanvasShape(androidx.xr.scenecore.JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape);
     method public void setStereoMode(int);
+  }
+
+  public static interface JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape {
+    method public androidx.xr.scenecore.JxrPlatformAdapter.Dimensions getDimensions();
+  }
+
+  public static final class JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape.Quad implements androidx.xr.scenecore.JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape {
+    ctor public JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape.Quad(float, float);
+    method public androidx.xr.scenecore.JxrPlatformAdapter.Dimensions getDimensions();
+    field public final float height;
+    field public final float width;
+  }
+
+  public static final class JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape.Vr180Hemisphere implements androidx.xr.scenecore.JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape {
+    ctor public JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape.Vr180Hemisphere(float);
+    method public androidx.xr.scenecore.JxrPlatformAdapter.Dimensions getDimensions();
+    field public final float radius;
+  }
+
+  public static final class JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape.Vr360Sphere implements androidx.xr.scenecore.JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape {
+    ctor public JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape.Vr360Sphere(float);
+    method public androidx.xr.scenecore.JxrPlatformAdapter.Dimensions getDimensions();
+    field public final float radius;
   }
 
   public static interface JxrPlatformAdapter.SystemSpaceEntity extends androidx.xr.scenecore.JxrPlatformAdapter.Entity {
@@ -1486,15 +1512,11 @@ package androidx.xr.scenecore {
     method public android.app.Activity getActivity();
     method public androidx.xr.scenecore.ActivitySpace getActivitySpace();
     method public androidx.xr.scenecore.Entity getActivitySpaceRoot();
-    method public <T extends androidx.xr.scenecore.Entity> java.util.List<T> getEntitiesOfType(Class<? extends T> type);
     method public androidx.xr.scenecore.PanelEntity getMainPanelEntity();
     method public androidx.xr.scenecore.PerceptionSpace getPerceptionSpace();
     method public androidx.xr.scenecore.JxrPlatformAdapter getPlatformAdapter();
     method public androidx.xr.scenecore.SpatialEnvironment getSpatialEnvironment();
     method public androidx.xr.scenecore.SpatialUser getSpatialUser();
-    method public android.os.Bundle setFullSpaceMode(android.os.Bundle bundle);
-    method public android.os.Bundle setFullSpaceModeWithEnvironmentInherited(android.os.Bundle bundle);
-    method public void setPreferredAspectRatio(android.app.Activity activity, float preferredRatio);
     property public final android.app.Activity activity;
     property public final androidx.xr.scenecore.ActivitySpace activitySpace;
     property public final androidx.xr.scenecore.Entity activitySpaceRoot;
@@ -1514,8 +1536,12 @@ package androidx.xr.scenecore {
   public final class SessionExt {
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static void addSpatialCapabilitiesChangedListener(androidx.xr.scenecore.Session, java.util.concurrent.Executor callbackExecutor, java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static void addSpatialCapabilitiesChangedListener(androidx.xr.scenecore.Session, java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static <T extends androidx.xr.scenecore.Entity> java.util.List<T> getEntitiesOfType(androidx.xr.scenecore.Session, Class<? extends T> type);
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static androidx.xr.scenecore.SpatialCapabilities getSpatialCapabilities(androidx.xr.scenecore.Session);
     method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static void removeSpatialCapabilitiesChangedListener(androidx.xr.scenecore.Session, java.util.function.Consumer<androidx.xr.scenecore.SpatialCapabilities> listener);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static android.os.Bundle setFullSpaceMode(androidx.xr.scenecore.Session, android.os.Bundle bundle);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static android.os.Bundle setFullSpaceModeWithEnvironmentInherited(androidx.xr.scenecore.Session, android.os.Bundle bundle);
+    method @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public static void setPreferredAspectRatio(androidx.xr.scenecore.Session, android.app.Activity activity, float preferredRatio);
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class SoundFieldAttributes {
@@ -1698,18 +1724,51 @@ package androidx.xr.scenecore {
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class StereoSurfaceEntity extends androidx.xr.scenecore.BaseEntity<androidx.xr.scenecore.JxrPlatformAdapter.StereoSurfaceEntity> {
+    method public androidx.xr.scenecore.StereoSurfaceEntity.CanvasShape getCanvasShape();
     method public androidx.xr.scenecore.Dimensions getDimensions();
+    method public int getStereoMode();
     method @MainThread public android.view.Surface getSurface();
-    method public void setDimensions(androidx.xr.scenecore.Dimensions);
+    method @MainThread public void setCanvasShape(androidx.xr.scenecore.StereoSurfaceEntity.CanvasShape);
+    method @MainThread public void setStereoMode(int);
+    property public final androidx.xr.scenecore.StereoSurfaceEntity.CanvasShape canvasShape;
     property public final androidx.xr.scenecore.Dimensions dimensions;
+    property public final int stereoMode;
     field public static final androidx.xr.scenecore.StereoSurfaceEntity.Companion Companion;
+  }
+
+  public abstract static class StereoSurfaceEntity.CanvasShape {
+    method public androidx.xr.scenecore.Dimensions getDimensions();
+    property public androidx.xr.scenecore.Dimensions dimensions;
+  }
+
+  public static final class StereoSurfaceEntity.CanvasShape.Quad extends androidx.xr.scenecore.StereoSurfaceEntity.CanvasShape {
+    ctor public StereoSurfaceEntity.CanvasShape.Quad(float width, float height);
+    method public float getHeight();
+    method public float getWidth();
+    property public androidx.xr.scenecore.Dimensions dimensions;
+    property public final float height;
+    property public final float width;
+  }
+
+  public static final class StereoSurfaceEntity.CanvasShape.Vr180Hemisphere extends androidx.xr.scenecore.StereoSurfaceEntity.CanvasShape {
+    ctor public StereoSurfaceEntity.CanvasShape.Vr180Hemisphere(float radius);
+    method public float getRadius();
+    property public androidx.xr.scenecore.Dimensions dimensions;
+    property public final float radius;
+  }
+
+  public static final class StereoSurfaceEntity.CanvasShape.Vr360Sphere extends androidx.xr.scenecore.StereoSurfaceEntity.CanvasShape {
+    ctor public StereoSurfaceEntity.CanvasShape.Vr360Sphere(float radius);
+    method public float getRadius();
+    property public androidx.xr.scenecore.Dimensions dimensions;
+    property public final float radius;
   }
 
   public static final class StereoSurfaceEntity.Companion {
     method @MainThread public androidx.xr.scenecore.StereoSurfaceEntity create(androidx.xr.scenecore.Session session);
     method @MainThread public androidx.xr.scenecore.StereoSurfaceEntity create(androidx.xr.scenecore.Session session, optional int stereoMode);
-    method @MainThread public androidx.xr.scenecore.StereoSurfaceEntity create(androidx.xr.scenecore.Session session, optional int stereoMode, optional androidx.xr.scenecore.Dimensions dimensions);
-    method @MainThread public androidx.xr.scenecore.StereoSurfaceEntity create(androidx.xr.scenecore.Session session, optional int stereoMode, optional androidx.xr.scenecore.Dimensions dimensions, optional androidx.xr.runtime.math.Pose pose);
+    method @MainThread public androidx.xr.scenecore.StereoSurfaceEntity create(androidx.xr.scenecore.Session session, optional int stereoMode, optional androidx.xr.runtime.math.Pose pose);
+    method @MainThread public androidx.xr.scenecore.StereoSurfaceEntity create(androidx.xr.scenecore.Session session, optional int stereoMode, optional androidx.xr.runtime.math.Pose pose, optional androidx.xr.scenecore.StereoSurfaceEntity.CanvasShape canvasShape);
   }
 
   public static final class StereoSurfaceEntity.StereoMode {
@@ -1784,7 +1843,7 @@ package androidx.xr.scenecore.impl {
     method public androidx.xr.scenecore.JxrPlatformAdapter.AnchorEntity createPersistedAnchorEntity(java.util.UUID, java.time.Duration);
     method public androidx.xr.scenecore.JxrPlatformAdapter.PointerCaptureComponent createPointerCaptureComponent(java.util.concurrent.Executor, androidx.xr.scenecore.JxrPlatformAdapter.PointerCaptureComponent.StateListener, androidx.xr.scenecore.JxrPlatformAdapter.InputEventListener);
     method public androidx.xr.scenecore.JxrPlatformAdapter.ResizableComponent createResizableComponent(androidx.xr.scenecore.JxrPlatformAdapter.Dimensions, androidx.xr.scenecore.JxrPlatformAdapter.Dimensions);
-    method public androidx.xr.scenecore.JxrPlatformAdapter.StereoSurfaceEntity createStereoSurfaceEntity(int, androidx.xr.scenecore.JxrPlatformAdapter.Dimensions, androidx.xr.runtime.math.Pose, androidx.xr.scenecore.JxrPlatformAdapter.Entity);
+    method public androidx.xr.scenecore.JxrPlatformAdapter.StereoSurfaceEntity createStereoSurfaceEntity(int, androidx.xr.scenecore.JxrPlatformAdapter.StereoSurfaceEntity.CanvasShape, androidx.xr.runtime.math.Pose, androidx.xr.scenecore.JxrPlatformAdapter.Entity);
     method public void dispose();
     method public androidx.xr.scenecore.JxrPlatformAdapter.ActivitySpace getActivitySpace();
     method public androidx.xr.scenecore.JxrPlatformAdapter.Entity getActivitySpaceRootImpl();
@@ -1853,6 +1912,7 @@ package androidx.xr.scenecore.impl.perception {
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public class PerceptionLibrary {
     ctor public PerceptionLibrary();
+    method public android.app.Activity getActivity();
     method public androidx.xr.scenecore.impl.perception.Session? getSession();
     method public com.google.common.util.concurrent.ListenableFuture<androidx.xr.scenecore.impl.perception.Session!>? initSession(android.app.Activity, int, java.util.concurrent.ExecutorService);
     method protected static void loadLibraryAsync(String);

@@ -156,9 +156,18 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
      * Entity. This does not affect layout and other content will be laid out according to the
      * original scale of the entity.
      */
-    public var scale: Float
-        get() = entity.getScale()
-        set(value) = entity.setScale(value)
+    public var scale: Float = 1.0F
+        set(value) {
+            field = value
+            entity.setScale(value * scaleFromMovement)
+        }
+
+    /**
+     * The scale of this entity when it is moved. This value is only used to be multiplied by the
+     * scale of the entity, to preserve the original scale of the entity and determine the final
+     * scale of the entity.
+     */
+    var scaleFromMovement: Float = 1.0F
 
     /**
      * Sets the opacity of this entity (and its children) to a value between [0..1]. An alpha value
@@ -192,7 +201,6 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
          *   'enabled' bit in the Node.
          */
         public var isEnabled: Boolean = true
-
         /** Pose based on user adjustments from MoveEvents from SceneCore. */
         public var userPose: Pose? = null
             set(value) {
@@ -270,7 +278,11 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
                             currentPose: Pose,
                             currentScale: Float,
                         ) {
-                            updatePoseOnMove(currentPose)
+                            updatePoseOnMove(
+                                currentPose,
+                                currentScale,
+                                entity.getSize().toIntVolumeSize(DEFAULT_DENSITY),
+                            )
                         }
 
                         override fun onMoveEnd(
@@ -280,7 +292,11 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
                             finalScale: Float,
                             updatedParent: Entity?,
                         ) {
-                            updatePoseOnMove(finalPose)
+                            updatePoseOnMove(
+                                finalPose,
+                                finalScale,
+                                entity.getSize().toIntVolumeSize(DEFAULT_DENSITY),
+                            )
                             initialOffset = Pose.Identity
                         }
                     },
@@ -310,7 +326,8 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
         }
 
         /** Called every time there is a MoveEvent in SceneCore, if this CoreEntity is movable. */
-        private fun updatePoseOnMove(pose: Pose) {
+        private fun updatePoseOnMove(pose: Pose, scaleWithDistance: Float, size: IntVolumeSize) {
+
             if (movableNode?.enabled == false) {
                 return
             }
@@ -325,11 +342,16 @@ internal sealed class CoreEntity(public val entity: Entity) : SubspaceLayoutCoor
                     corePose.translation - initialOffset.translation,
                     initialOffset.rotation.inverse * corePose.rotation,
                 )
-            if (node.onPoseChange(corePose)) {
+
+            if (node.onPoseChange(PoseChangeEvent(corePose, scaleWithDistance, size))) {
                 // We're done, the user app will handle the event.
                 return
             }
             userPose = coreDeltaPose
+            if (movableNode?.scaleWithDistance!!) {
+                scaleFromMovement = scaleWithDistance
+                entity.setScale(scale * scaleFromMovement)
+            }
         }
 
         /** Flag to enforce single logging of Entity Component update error. */

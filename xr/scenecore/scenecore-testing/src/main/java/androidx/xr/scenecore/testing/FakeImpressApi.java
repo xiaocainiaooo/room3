@@ -16,6 +16,7 @@
 
 package androidx.xr.scenecore.testing;
 
+import android.graphics.SurfaceTexture;
 import android.view.Surface;
 
 import androidx.annotation.NonNull;
@@ -48,6 +49,35 @@ public class FakeImpressApi implements ImpressApi {
         public ResolvableFuture<Void> fireOnDone;
     }
 
+    /** Test bookkeeping data for a Android Surface */
+    public static class TestSurface extends Surface {
+        public int id;
+
+        public TestSurface(int id) {
+            super(new SurfaceTexture(id));
+        }
+    }
+
+    /** Test bookkeeping data for a StereoSurfaceEntity */
+    public static class StereoSurfaceEntityData {
+        /** Enum representing the different canvas shapes that can be created. */
+        public enum CanvasShape {
+            QUAD,
+            VR_360_SPHERE,
+            VR_180_HEMISPHERE
+        }
+
+        public int impressNode;
+        @Nullable public Surface surface;
+        @StereoMode public int stereoMode;
+
+        // This is a union of the CanvasShape parameters
+        public float width;
+        public float height;
+        public float radius;
+        @Nullable public CanvasShape canvasShape;
+    }
+
     // Map of model tokens to the list of impress nodes that are instances of that model.
     private final Map<Long, List<Integer>> mGltfModels = new HashMap<>();
     // Map of impress nodes to their parent impress nodes.
@@ -58,6 +88,9 @@ public class FakeImpressApi implements ImpressApi {
 
     // Map of impress nodes and animations that are currently playing (looping)
     final Map<Integer, AnimationInProgress> mImpressLoopAnimatedNodes = new HashMap<>();
+
+    // Map of impress entity nodes to their associated StereoSurfaceEntityData
+    public final Map<Integer, StereoSurfaceEntityData> mStereoSurfaceEntities = new HashMap<>();
 
     private int mNextModelId = 1;
     private int mNextNodeId = 1;
@@ -172,6 +205,10 @@ public class FakeImpressApi implements ImpressApi {
             }
         }
         mImpressNodes.remove(impressNode);
+
+        if (mStereoSurfaceEntities.containsKey(impressNode)) {
+            mStereoSurfaceEntities.remove(impressNode);
+        }
     }
 
     @Override
@@ -194,6 +231,11 @@ public class FakeImpressApi implements ImpressApi {
         return mImpressNodes.containsKey(impressNode) && mImpressNodes.get(impressNode) != null;
     }
 
+    /** Returns the parent impress node for the given impress node. */
+    public int getImpressNodeParent(int impressNode) {
+        return mImpressNodes.get(impressNode);
+    }
+
     /** Returns the number of impress nodes that are currently animating. */
     public int impressNodeAnimatingSize() {
         return mImpressAnimatedNodes.size();
@@ -205,24 +247,79 @@ public class FakeImpressApi implements ImpressApi {
     }
 
     @Override
-    public int createStereoSurface(@StereoMode int mode) {
-        return mNextNodeId++;
+    public int createStereoSurface(@StereoMode int stereoMode) {
+        StereoSurfaceEntityData data = new StereoSurfaceEntityData();
+        data.impressNode = createImpressNode();
+        data.surface = new TestSurface(data.impressNode);
+        data.stereoMode = stereoMode;
+        data.canvasShape = null;
+        mStereoSurfaceEntities.put(data.impressNode, data);
+        return data.impressNode;
+    }
+
+    /**
+     * This method sets the canvas shape of a StereoSurfaceEntity using its Impress ID.
+     *
+     * @param impressNode The Impress node which hosts the StereoSurfaceEntity to be updated.
+     * @param width The width in local spatial units to set the quad to.
+     * @param height The height in local spatial units to set the quad to.
+     */
+    @Override
+    public void setStereoSurfaceEntityCanvasShapeQuad(int impressNode, float width, float height) {
+        if (!mStereoSurfaceEntities.containsKey(impressNode)) {
+            throw new IllegalArgumentException("Couldn't find stereo surface entity!");
+        }
+        StereoSurfaceEntityData data = mStereoSurfaceEntities.get(impressNode);
+        data.canvasShape = StereoSurfaceEntityData.CanvasShape.QUAD;
+        data.width = width;
+        data.height = height;
+    }
+
+    /**
+     * This method sets the canvas shape of a StereoSurfaceEntity using its Impress ID.
+     *
+     * @param impressNode The Impress node which hosts the StereoSurfaceEntity to be updated.
+     * @param radius The radius in local spatial units to set the sphere to.
+     */
+    @Override
+    public void setStereoSurfaceEntityCanvasShapeSphere(int impressNode, float radius) {
+        if (!mStereoSurfaceEntities.containsKey(impressNode)) {
+            throw new IllegalArgumentException("Couldn't find stereo surface entity!");
+        }
+        StereoSurfaceEntityData data = mStereoSurfaceEntities.get(impressNode);
+        data.canvasShape = StereoSurfaceEntityData.CanvasShape.VR_360_SPHERE;
+        data.radius = radius;
+    }
+
+    /**
+     * This method sets the canvas shape of a StereoSurfaceEntity using its Impress ID.
+     *
+     * @param impressNode The Impress node which hosts the StereoSurfaceEntity to be updated.
+     * @param radius The radius in local spatial units of the hemisphere.
+     */
+    @Override
+    public void setStereoSurfaceEntityCanvasShapeHemisphere(int impressNode, float radius) {
+        StereoSurfaceEntityData data = mStereoSurfaceEntities.get(impressNode);
+        data.canvasShape = StereoSurfaceEntityData.CanvasShape.VR_180_HEMISPHERE;
+        data.radius = radius;
     }
 
     @Override
     @NonNull
     public Surface getSurfaceFromStereoSurface(int panelImpressNode) {
-        throw new IllegalArgumentException("not implemented");
+        if (!mStereoSurfaceEntities.containsKey(panelImpressNode)) {
+            // TODO: b/387323937 - the Native code currently CHECK fails in this case
+            throw new IllegalArgumentException("Couldn't find stereo surface entity!");
+        }
+        return mStereoSurfaceEntities.get(panelImpressNode).surface;
     }
 
     @Override
     public void setStereoModeForStereoSurface(int panelImpressNode, @StereoMode int mode) {
-        throw new IllegalArgumentException("not implemented");
-    }
-
-    @Override
-    public void setCanvasDimensionsForStereoSurface(
-            int panelImpressNode, float width, float height) {
-        throw new IllegalArgumentException("not implemented");
+        if (!mStereoSurfaceEntities.containsKey(panelImpressNode)) {
+            // TODO: b/387323937 - the Native code currently CHECK fails in this case
+            throw new IllegalArgumentException("Couldn't find stereo surface entity!");
+        }
+        mStereoSurfaceEntities.get(panelImpressNode).stereoMode = mode;
     }
 }
