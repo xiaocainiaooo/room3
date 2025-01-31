@@ -668,18 +668,49 @@ package androidx.constraintlayout.compose {
   @androidx.compose.runtime.Stable public abstract class LayoutReference {
   }
 
-  @kotlin.PublishedApi internal class Measurer implements androidx.constraintlayout.core.widgets.analyzer.BasicMeasure.Measurer androidx.constraintlayout.compose.DesignInfoProvider {
-    ctor public Measurer(androidx.compose.ui.unit.Density density);
+  @Deprecated @kotlin.PublishedApi internal class Measurer implements androidx.constraintlayout.core.widgets.analyzer.BasicMeasure.Measurer androidx.constraintlayout.compose.DesignInfoProvider {
+    ctor @Deprecated public Measurer(androidx.compose.ui.unit.Density density);
+    method @Deprecated public final void addLayoutInformationReceiver(androidx.constraintlayout.compose.LayoutInformationReceiver? layoutReceiver);
+    method @Deprecated protected final void applyRootSize(long constraints);
+    method @Deprecated public void computeLayoutResult();
+    method @Deprecated @androidx.compose.runtime.Composable public final void createDesignElements();
+    method @Deprecated public void didMeasures();
+    method @Deprecated @androidx.compose.runtime.Composable public final void drawDebugBounds(androidx.compose.foundation.layout.BoxScope, float forcedScaleFactor);
+    method @Deprecated public final void drawDebugBounds(androidx.compose.ui.graphics.drawscope.DrawScope, float forcedScaleFactor);
+    method @Deprecated public String getDesignInfo(int startX, int startY, String args);
+    method @Deprecated public final float getForcedScaleFactor();
+    method @Deprecated protected final java.util.Map<androidx.compose.ui.layout.Measurable,androidx.constraintlayout.core.state.WidgetFrame> getFrameCache();
+    method @Deprecated public final int getLayoutCurrentHeight();
+    method @Deprecated public final int getLayoutCurrentWidth();
+    method @Deprecated protected final androidx.constraintlayout.compose.LayoutInformationReceiver? getLayoutInformationReceiver();
+    method @Deprecated protected final java.util.Map<androidx.compose.ui.layout.Measurable,androidx.compose.ui.layout.Placeable> getPlaceables();
+    method @Deprecated protected final androidx.constraintlayout.core.widgets.ConstraintWidgetContainer getRoot();
+    method @Deprecated protected final androidx.constraintlayout.compose.State getState();
+    method @Deprecated public void measure(androidx.constraintlayout.core.widgets.ConstraintWidget constraintWidget, androidx.constraintlayout.core.widgets.analyzer.BasicMeasure.Measure measure);
+    method @Deprecated public final void parseDesignElements(androidx.constraintlayout.compose.ConstraintSet constraintSet);
+    method @Deprecated public final void performLayout(androidx.compose.ui.layout.Placeable.PlacementScope, java.util.List<? extends androidx.compose.ui.layout.Measurable> measurables);
+    method @Deprecated public final long performMeasure(long constraints, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.constraintlayout.compose.ConstraintSet constraintSet, java.util.List<? extends androidx.compose.ui.layout.Measurable> measurables, int optimizationLevel);
+    method @Deprecated public final void setForcedScaleFactor(float);
+    method @Deprecated protected final void setLayoutInformationReceiver(androidx.constraintlayout.compose.LayoutInformationReceiver?);
+    property @Deprecated public final float forcedScaleFactor;
+    property @Deprecated protected final java.util.Map<androidx.compose.ui.layout.Measurable,androidx.constraintlayout.core.state.WidgetFrame> frameCache;
+    property @Deprecated public final int layoutCurrentHeight;
+    property @Deprecated public final int layoutCurrentWidth;
+    property @Deprecated protected final androidx.constraintlayout.compose.LayoutInformationReceiver? layoutInformationReceiver;
+    property @Deprecated protected final java.util.Map<androidx.compose.ui.layout.Measurable,androidx.compose.ui.layout.Placeable> placeables;
+    property @Deprecated protected final androidx.constraintlayout.core.widgets.ConstraintWidgetContainer root;
+    property @Deprecated protected final androidx.constraintlayout.compose.State state;
+  }
+
+  @kotlin.PublishedApi internal class Measurer2 implements androidx.constraintlayout.core.widgets.analyzer.BasicMeasure.Measurer androidx.constraintlayout.compose.DesignInfoProvider {
+    ctor public Measurer2(androidx.compose.ui.unit.Density density);
     method public final void addLayoutInformationReceiver(androidx.constraintlayout.compose.LayoutInformationReceiver? layoutReceiver);
     method protected final void applyRootSize(long constraints);
     method public void computeLayoutResult();
-    method @androidx.compose.runtime.Composable public final void createDesignElements();
     method public void didMeasures();
-    method @androidx.compose.runtime.Composable public final void drawDebugBounds(androidx.compose.foundation.layout.BoxScope, float forcedScaleFactor);
-    method public final void drawDebugBounds(androidx.compose.ui.graphics.drawscope.DrawScope, float forcedScaleFactor);
     method public String getDesignInfo(int startX, int startY, String args);
     method public final float getForcedScaleFactor();
-    method protected final java.util.Map<androidx.compose.ui.layout.Measurable,androidx.constraintlayout.core.state.WidgetFrame> getFrameCache();
+    method protected final java.util.Map<java.lang.String,androidx.constraintlayout.core.state.WidgetFrame> getFrameCache();
     method public final int getLayoutCurrentHeight();
     method public final int getLayoutCurrentWidth();
     method protected final androidx.constraintlayout.compose.LayoutInformationReceiver? getLayoutInformationReceiver();
@@ -687,13 +718,13 @@ package androidx.constraintlayout.compose {
     method protected final androidx.constraintlayout.core.widgets.ConstraintWidgetContainer getRoot();
     method protected final androidx.constraintlayout.compose.State getState();
     method public void measure(androidx.constraintlayout.core.widgets.ConstraintWidget constraintWidget, androidx.constraintlayout.core.widgets.analyzer.BasicMeasure.Measure measure);
-    method public final void parseDesignElements(androidx.constraintlayout.compose.ConstraintSet constraintSet);
-    method public final void performLayout(androidx.compose.ui.layout.Placeable.PlacementScope, java.util.List<? extends androidx.compose.ui.layout.Measurable> measurables);
-    method public final long performMeasure(long constraints, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.constraintlayout.compose.ConstraintSet constraintSet, java.util.List<? extends androidx.compose.ui.layout.Measurable> measurables, int optimizationLevel);
+    method public final void performLayout(androidx.compose.ui.layout.Placeable.PlacementScope, java.util.List<? extends androidx.compose.ui.layout.Measurable> measurables, java.util.Map<androidx.compose.ui.layout.Measurable,androidx.compose.ui.layout.Placeable> placeableMap);
+    method public final long performMeasure(long constraints, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.constraintlayout.compose.ConstraintSet constraintSet, java.util.List<? extends androidx.compose.ui.layout.Measurable> measurables, java.util.Map<androidx.compose.ui.layout.Measurable,androidx.compose.ui.layout.Placeable> placeableMap, int optimizationLevel);
     method public final void setForcedScaleFactor(float);
     method protected final void setLayoutInformationReceiver(androidx.constraintlayout.compose.LayoutInformationReceiver?);
+    method protected final void setPlaceables(java.util.Map<androidx.compose.ui.layout.Measurable,androidx.compose.ui.layout.Placeable>);
     property public final float forcedScaleFactor;
-    property protected final java.util.Map<androidx.compose.ui.layout.Measurable,androidx.constraintlayout.core.state.WidgetFrame> frameCache;
+    property protected final java.util.Map<java.lang.String,androidx.constraintlayout.core.state.WidgetFrame> frameCache;
     property public final int layoutCurrentHeight;
     property public final int layoutCurrentWidth;
     property protected final androidx.constraintlayout.compose.LayoutInformationReceiver? layoutInformationReceiver;
