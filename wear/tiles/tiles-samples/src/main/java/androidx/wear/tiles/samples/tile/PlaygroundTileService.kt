@@ -36,6 +36,7 @@ import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.recommendedAnimationSpec
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.extraLargeDataCardStyle
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.smallCompactDataCardStyle
+import androidx.wear.protolayout.material3.GraphicDataCardDefaults.constructGraphic
 import androidx.wear.protolayout.material3.MaterialScope
 import androidx.wear.protolayout.material3.PrimaryLayoutMargins.Companion.MAX_PRIMARY_LAYOUT_MARGIN
 import androidx.wear.protolayout.material3.TextButtonStyle.Companion.smallTextButtonStyle
@@ -259,11 +260,17 @@ private fun MaterialScope.graphicDataCardSample() =
             )
         },
         graphic = {
-            segmentedCircularProgressIndicator(
-                segmentCount = 6,
-                startAngleDegrees = 200F,
-                endAngleDegrees = 520F,
-                dynamicProgress = DynamicFloat.animate(0.0F, 1.5F, recommendedAnimationSpec),
+            constructGraphic(
+                mainContent = {
+                    segmentedCircularProgressIndicator(
+                        segmentCount = 6,
+                        startAngleDegrees = 200F,
+                        endAngleDegrees = 520F,
+                        dynamicProgress =
+                            DynamicFloat.animate(0.0F, 1.5F, recommendedAnimationSpec),
+                    )
+                },
+                iconContent = { icon(ICON_ID) }
             )
         }
     )

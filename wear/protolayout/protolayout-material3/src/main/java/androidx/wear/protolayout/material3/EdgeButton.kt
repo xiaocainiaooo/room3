@@ -104,7 +104,11 @@ public fun MaterialScope.iconEdgeButton(
     return edgeButton(onClick = onClick, modifier = modifier, colors = colors, style = style) {
         withStyle(
                 defaultIconStyle =
-                    IconStyle(size = style.iconSizeDp.dp, tintColor = colors.iconColor)
+                    IconStyle(
+                        width = style.iconSizeDp.dp,
+                        height = style.iconSizeDp.dp,
+                        tintColor = colors.iconColor
+                    )
             )
             .iconContent()
     }

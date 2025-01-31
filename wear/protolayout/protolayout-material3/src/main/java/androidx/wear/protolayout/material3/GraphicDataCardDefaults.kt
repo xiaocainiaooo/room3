@@ -20,7 +20,12 @@ import androidx.annotation.Dimension
 import androidx.annotation.Dimension.Companion.DP
 import androidx.annotation.FloatRange
 import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
+import androidx.wear.protolayout.DimensionBuilders.DpProp
+import androidx.wear.protolayout.DimensionBuilders.ExpandedDimensionProp
+import androidx.wear.protolayout.DimensionBuilders.ProportionalDimensionProp
+import androidx.wear.protolayout.DimensionBuilders.WrappedDimensionProp
 import androidx.wear.protolayout.DimensionBuilders.expand
+import androidx.wear.protolayout.DimensionBuilders.weight
 import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.Column
 import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_END
@@ -30,12 +35,16 @@ import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.LayoutElementBuilders.Row
 import androidx.wear.protolayout.ModifiersBuilders.Padding
 import androidx.wear.protolayout.material3.Typography.TypographyToken
+import androidx.wear.protolayout.material3.Versions.hasExpandWithWeightSupport
 import androidx.wear.protolayout.modifiers.padding
+import androidx.wear.protolayout.types.dp
 
-internal object GraphicDataCardDefaults {
-    @FloatRange(from = 0.0, to = 100.0) private const val GRAPHIC_SPACE_PERCENTAGE: Float = 40f
+public object GraphicDataCardDefaults {
+    @FloatRange(from = 0.0, to = 100.0) internal const val GRAPHIC_SPACE_PERCENTAGE: Float = 40f
     private const val GRAPH_SIDE_PADDING_WEIGHT_OFFSET = 2f
     private const val DATA_GRAPH_CARD_START_ALIGN_EXTRA_SPACE_DP = 2
+    /** The default ratio of the center icon size to the progress indicator size. */
+    internal const val CENTER_ICON_SIZE_RATIO_IN_GRAPHIC = 0.4F
 
     /**
      * Returns [LayoutElement] describing the inner content for the graph data card.
@@ -121,6 +130,114 @@ internal object GraphicDataCardDefaults {
         )
 
         return horizontalElementBuilder.build()
+    }
+
+    /**
+     * Helper to construct a graphic content with a [mainContent] and an [iconContent] in its
+     * center, that can be passed into the [graphicDataCard].
+     *
+     * It is highly recommended for the [mainContent] to take a [circularProgressIndicator] or
+     * [segmentedCircularProgressIndicator] and keep its default size as [expand] in order to fill
+     * the available space for the best results across different screen sizes. To have contrasting
+     * content colors, when using this constructed graphic inside a [graphicDataCard] with one of
+     * the predefined colors in [CardDefaults], it is also highly recommended to leave its
+     * [ProgressIndicatorColors] to default, which will automatically match to the card colors.
+     *
+     * @param mainContent The main content of the graphic slot. The main content is required to be
+     *   wrapped in a [Box]. This helper is specially designed to supports well with main content as
+     *   [circularProgressIndicator] or [segmentedCircularProgressIndicator] to be placed in the
+     *   graphics slot.
+     * @param iconContent The icon to be placed at the center of the main content. It is highly
+     *   recommended to provide it by calling [icon] with only the resource ID, so that the returned
+     *   layout would take advantage of the default styling functions provided by this helper, with
+     *   equal width and height which are proportional to the [mainContent]'s width , and matching
+     *   color to the card.
+     * @param iconSizeRatio The ratio of the icon size to the [mainContent]'s width.
+     * @throws IllegalArgumentException When the mainContent has size of [WrappedDimensionProp].
+     */
+    public fun MaterialScope.constructGraphic(
+        mainContent: (MaterialScope.() -> LayoutElement),
+        iconContent: (MaterialScope.() -> LayoutElement),
+        iconSizeRatio: Float = CENTER_ICON_SIZE_RATIO_IN_GRAPHIC
+    ): LayoutElement {
+        // Recreate the ColorProp to avoid null fingerprint.
+        val contentMain = mainContent()
+        require(contentMain is Box) {
+            "The main content passed to constructGraphic helper requires to be wrapped in a box."
+        }
+        val size: ContainerDimension =
+            when (val width = contentMain.width) {
+                is DpProp -> width.value.dp
+                is ExpandedDimensionProp ->
+                    width.layoutWeight?.let { weightAsExpand(it.value) } ?: expand()
+                is WrappedDimensionProp -> {
+                    throw IllegalArgumentException("main content with wrap size is not supported.")
+                }
+                else -> {
+                    throw IllegalArgumentException("Unknown dimension type of ContainerDimension.")
+                }
+            }
+
+        val centeredIcon: LayoutElement =
+            if (
+                size is ExpandedDimensionProp &&
+                    deviceConfiguration.rendererSchemaVersion.hasExpandWithWeightSupport()
+            ) {
+                // The total weight of the row is 1.
+                val spacer = verticalSpacer(weight(0.5f - iconSizeRatio / 2f))
+                Row.Builder()
+                    .setWidth(expand())
+                    .setHeight(expand())
+                    .addContent(spacer)
+                    .addContent(
+                        Box.Builder()
+                            .setWidth(weight(iconSizeRatio))
+                            .setHeight(expand())
+                            .addContent(
+                                withStyle(
+                                        defaultIconStyle =
+                                            IconStyle(
+                                                width = expand(),
+                                                height =
+                                                    ProportionalDimensionProp.Builder()
+                                                        .setAspectRatioHeight(1)
+                                                        .setAspectRatioWidth(1)
+                                                        .build(),
+                                                tintColor = defaultIconStyle.tintColor
+                                            )
+                                    )
+                                    .iconContent()
+                            )
+                            .build()
+                    )
+                    .addContent(spacer)
+                    .build()
+            } else {
+                val iconSize =
+                    (iconSizeRatio *
+                            (if (size is DpProp) {
+                                size.value
+                            } else {
+                                deviceConfiguration.screenWidthDp * GRAPHIC_SPACE_PERCENTAGE
+                            }))
+                        .dp
+                withStyle(
+                        defaultIconStyle =
+                            IconStyle(
+                                width = iconSize,
+                                height = iconSize,
+                                tintColor = defaultIconStyle.tintColor
+                            )
+                    )
+                    .iconContent()
+            }
+
+        return Box.Builder()
+            .setWidth(size)
+            .setHeight(size)
+            .addContent(contentMain)
+            .addContent(centeredIcon)
+            .build()
     }
 }
 
