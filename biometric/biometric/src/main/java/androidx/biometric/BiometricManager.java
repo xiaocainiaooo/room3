@@ -26,6 +26,7 @@ import android.util.Log;
 import androidx.annotation.IntDef;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
+import androidx.annotation.RestrictTo;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
 
@@ -93,6 +94,15 @@ public class BiometricManager {
      * addressed the issue.
      */
     public static final int BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED = 15;
+
+    /**
+     * Identity Check is currently not active. Restrict to library for now.
+     *
+     * This device either doesn't have this feature enabled, or it's not considered in a
+     * high-risk environment that requires extra security measures for accessing sensitive data.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    public static final int BIOMETRIC_ERROR_IDENTITY_CHECK_NOT_ACTIVE = 20;
 
     /**
      * A status code that may be returned when checking for biometric authentication.
