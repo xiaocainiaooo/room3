@@ -124,7 +124,7 @@ public class AndroidTraceSink(
     }
 
     override fun close() {
-        makeDrainRequest()
+        flush()
         bufferedSink.close()
     }
 }
