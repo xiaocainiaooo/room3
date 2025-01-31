@@ -565,7 +565,7 @@ internal class CompositionImpl(
     internal val observerHolder = CompositionObserverHolder()
 
     /** The [Composer] to use to create and update the tree managed by this composition. */
-    private val composer: ComposerImpl =
+    internal val composer: ComposerImpl =
         ComposerImpl(
                 applier = applier,
                 parentContext = parent,

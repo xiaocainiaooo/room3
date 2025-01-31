@@ -36,11 +36,14 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 
 @OptIn(InternalComposeApi::class, ExperimentalCoroutinesApi::class)
-fun compositionTest(block: suspend CompositionTestScope.() -> Unit) = runTest {
+fun compositionTest(
+    recomposeInvoker: suspend (block: suspend () -> Unit) -> Unit = { it() },
+    block: suspend CompositionTestScope.() -> Unit,
+) = runTest {
     withContext(TestMonotonicFrameClock(this)) {
         // Start the recomposer
         val recomposer = Recomposer(coroutineContext)
-        launch { recomposer.runRecomposeAndApplyChanges() }
+        launch { recomposeInvoker { recomposer.runRecomposeAndApplyChanges() } }
         testScheduler.runCurrent()
 
         // Create a test scope for the test using the test scope passed in by runTest
