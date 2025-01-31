@@ -25,6 +25,7 @@ import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -59,6 +60,7 @@ class AppFunctionInventoryProcessor(
         val inventoryClassBuilder = TypeSpec.classBuilder(inventoryClassName)
         inventoryClassBuilder.addSuperinterface(IntrospectionHelper.APP_FUNCTION_INVENTORY_CLASS)
         inventoryClassBuilder.addAnnotation(AppFunctionCompiler.GENERATED_ANNOTATION)
+        inventoryClassBuilder.addKdoc(buildSourceFilesKdoc(appFunctionClass))
         inventoryClassBuilder.addProperty(buildFunctionIdToMetadataMapProperty())
 
         val fileSpec =
@@ -67,10 +69,7 @@ class AppFunctionInventoryProcessor(
                 .build()
         codeGenerator
             .createNewFile(
-                Dependencies(
-                    aggregating = false,
-                    checkNotNull(appFunctionClass.classDeclaration.containingFile)
-                ),
+                Dependencies(aggregating = true, *appFunctionClass.getSourceFiles().toTypedArray()),
                 originalPackageName,
                 inventoryClassName
             )
@@ -92,6 +91,16 @@ class AppFunctionInventoryProcessor(
             // TODO: Actually build map properties
             .initializer(buildCodeBlock { addStatement("mapOf()") })
             .build()
+    }
+
+    // TODO: Remove doc once done with impl
+    private fun buildSourceFilesKdoc(appFunctionClass: AnnotatedAppFunctions): CodeBlock {
+        return buildCodeBlock {
+            addStatement("Source Files:")
+            for (file in appFunctionClass.getSourceFiles()) {
+                addStatement(file.fileName)
+            }
+        }
     }
 
     private fun getAppFunctionInventoryClassName(functionClassName: String): String {

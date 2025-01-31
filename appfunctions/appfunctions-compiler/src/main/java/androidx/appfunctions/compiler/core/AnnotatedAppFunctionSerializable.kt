@@ -18,13 +18,17 @@ package androidx.appfunctions.compiler.core
 
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.SUPPORTED_TYPES
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.getTypeNameAsString
+import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.isAppFunctionSerializableType
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.isSupportedType
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSFile
+import com.google.devtools.ksp.symbol.KSValueParameter
+import com.squareup.kotlinpoet.ClassName
 
 /** Represents a class annotated with [androidx.appfunctions.AppFunctionSerializable]. */
-data class AnnotatedAppFunctionSerializable(val classDeclaration: KSClassDeclaration) {
+data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KSClassDeclaration) {
     fun validate(): AnnotatedAppFunctionSerializable {
-        val parameters = classDeclaration.primaryConstructor?.parameters
+        val parameters = appFunctionSerializableClass.primaryConstructor?.parameters
         if (parameters == null) {
             // No parameters to validate.
             return this
@@ -49,5 +53,57 @@ data class AnnotatedAppFunctionSerializable(val classDeclaration: KSClassDeclara
             }
         }
         return this
+    }
+
+    /**
+     * Returns the set of source files that contain the definition of the
+     * [appFunctionSerializableClass] and all the @AppFunctionSerializable classes that it contains.
+     */
+    fun getSourceFiles(): Set<KSFile> {
+        val sourceFileSet: MutableSet<KSFile> = mutableSetOf()
+        val visitedSerializableSet: MutableSet<ClassName> = mutableSetOf()
+
+        // Add the file containing the AppFunctionSerializable class definition immediately it's
+        // seen
+        appFunctionSerializableClass.containingFile?.let { sourceFileSet.add(it) }
+        visitedSerializableSet.add(appFunctionSerializableClass.getClassName())
+        traverseSerializableClassSourceFiles(
+            appFunctionSerializableClass,
+            sourceFileSet,
+            visitedSerializableSet
+        )
+        return sourceFileSet
+    }
+
+    private fun traverseSerializableClassSourceFiles(
+        serializableClassDefinition: KSClassDeclaration,
+        sourceFileSet: MutableSet<KSFile>,
+        visitedSerializableSet: MutableSet<ClassName>
+    ) {
+        val parameters: List<KSValueParameter> =
+            serializableClassDefinition.primaryConstructor?.parameters ?: emptyList()
+        for (ksValueParameter in parameters) {
+            if (isAppFunctionSerializableType(ksValueParameter.type)) {
+                val appFunctionSerializableDefinition =
+                    ksValueParameter.type.resolve().declaration as KSClassDeclaration
+                // Skip serializable that have been seen before
+                if (
+                    visitedSerializableSet.contains(
+                        appFunctionSerializableDefinition.getClassName()
+                    )
+                ) {
+                    continue
+                }
+                // Process newly found serializable
+                sourceFileSet.addAll(
+                    AnnotatedAppFunctionSerializable(appFunctionSerializableDefinition)
+                        .getSourceFiles()
+                )
+            }
+        }
+    }
+
+    private fun KSClassDeclaration.getClassName(): ClassName {
+        return ClassName(packageName.asString(), simpleName.asString())
     }
 }

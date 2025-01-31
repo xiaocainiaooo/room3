@@ -8,9 +8,10 @@ import kotlin.collections.Map
 
 /**
  * Source Files:
- * SimpleFunction.....kt
+ * RecursiveSerializableInputFunctions.....kt
  */
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
-public class `$SimpleFunction_AppFunctionInventory_Impl` : AppFunctionInventory {
+public class `$RecursiveSerializableInputFunctions_AppFunctionInventory_Impl` : AppFunctionInventory
+    {
   override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf()
 }
