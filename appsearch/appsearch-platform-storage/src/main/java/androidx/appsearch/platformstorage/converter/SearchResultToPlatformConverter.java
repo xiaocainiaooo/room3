@@ -18,6 +18,7 @@ package androidx.appsearch.platformstorage.converter;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.DoNotInline;
 import androidx.annotation.OptIn;
@@ -41,6 +42,8 @@ import java.util.Map;
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @RequiresApi(Build.VERSION_CODES.S)
 public class SearchResultToPlatformConverter {
+    private static final String TAG = "AppSearchSearchResPlatC";
+
     private SearchResultToPlatformConverter() {}
 
     /** Translates from Platform to Jetpack versions of {@link SearchResult}. */
@@ -73,12 +76,19 @@ public class SearchResultToPlatformConverter {
                 builder.addInformationalRankingSignal(informationalRankingSignals.get(i));
             }
 
-            // TODO(b/371610934): Ensure the parent type map is set for older devices receiving
-            //  mainline updates. AppSearch will relocate parent type information from
-            //  GenericDocument to SearchResult in new versions. Omitting this step will result
-            //  in missing parent data and incorrect polymorphic deserialization behavior for
-            //  GenericDocument.
-            builder.setParentTypeMap(ApiHelperForB.getParentTypeMap(platformResult));
+            try {
+                // TODO(b/371610934): Ensure the parent type map is set for older devices receiving
+                //  mainline updates. AppSearch will relocate parent type information from
+                //  GenericDocument to SearchResult in new versions. Omitting this step will result
+                //  in missing parent data and incorrect polymorphic deserialization behavior for
+                //  GenericDocument.
+                builder.setParentTypeMap(ApiHelperForB.getParentTypeMap(platformResult));
+            } catch (NoSuchMethodError e) {
+                // Catch NoSuchMethodError thrown by older pre-release Android B devices that may
+                // not have the getParentTypeMap method. This is a temporary workaround until all
+                // B devices have the method available.
+                Log.e(TAG, "Failed to set parent type map.", e);
+            }
         }
         return builder.build();
     }
