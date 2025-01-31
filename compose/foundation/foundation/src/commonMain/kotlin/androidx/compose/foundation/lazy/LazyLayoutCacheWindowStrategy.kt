@@ -21,6 +21,7 @@ import androidx.collection.mutableIntObjectMapOf
 import androidx.collection.mutableIntSetOf
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.snapping.singleAxisViewportSize
+import androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchHandle
 import androidx.compose.foundation.lazy.layout.NestedPrefetchScope
 import androidx.compose.foundation.lazy.layout.PrefetchScheduler
@@ -35,10 +36,8 @@ import kotlin.math.sign
  * based prefetching for items in the direction of the scroll movement (ahead).
  */
 @ExperimentalFoundationApi
-internal class PrefetchWindowStrategy(
-    // TODO(levima) will replace this with the Prefetch Window API.
-    private val aheadWindow: Density.(Int) -> Int,
-    private val keepAroundWindow: Density.(Int) -> Int,
+internal class CacheWindowListPrefetchStrategy(
+    private val prefetchCacheWindow: LazyLayoutCacheWindow,
     private val density: Density,
     override val prefetchScheduler: PrefetchScheduler? = null
 ) : LazyListPrefetchStrategy {
@@ -62,8 +61,11 @@ internal class PrefetchWindowStrategy(
      * 3) Scheduled for prefetching.
      * 4) Not scheduled yet.
      */
-    private var prefetchWindowStartIndex = Int.MAX_VALUE
-    private var prefetchWindowEndIndex = Int.MIN_VALUE
+    internal var prefetchWindowStartIndex = Int.MAX_VALUE
+        private set
+
+    internal var prefetchWindowEndIndex = Int.MIN_VALUE
+        private set
 
     /**
      * Keeps track of the "extra" space used. Extra space starts by being the amount of space
@@ -107,6 +109,9 @@ internal class PrefetchWindowStrategy(
         // no-op for now
     }
 
+    fun hasValidBounds() =
+        prefetchWindowStartIndex != Int.MAX_VALUE && prefetchWindowEndIndex != Int.MIN_VALUE
+
     private fun LazyListPrefetchScope.updateCacheWindow(
         delta: Float,
         layoutInfo: LazyListLayoutInfo
@@ -131,8 +136,10 @@ internal class PrefetchWindowStrategy(
                 // extra space is always positive in this context
                 val mainAxisExtraSpaceEnd =
                     (lastItemOverflowOffset - viewportEndOffset).absoluteValue
-                val prefetchForwardWindow = aheadWindow.invoke(density, viewport)
-                val keepAroundWindow = keepAroundWindow.invoke(density, viewport)
+                val prefetchForwardWindow =
+                    with(prefetchCacheWindow) { density.calculateAheadWindow(viewport) }
+                val keepAroundWindow =
+                    with(prefetchCacheWindow) { density.calculateBehindWindow(viewport) }
 
                 // save latest item count
                 itemsCount = totalItemsCount
