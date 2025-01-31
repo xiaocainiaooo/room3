@@ -49,6 +49,7 @@ import androidx.xr.compose.testing.setSubspaceContent
 import androidx.xr.compose.unit.Meter.Companion.meters
 import androidx.xr.scenecore.BasePanelEntity
 import androidx.xr.scenecore.PanelEntity
+import androidx.xr.scenecore.getEntitiesOfType
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows

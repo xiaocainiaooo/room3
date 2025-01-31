@@ -53,11 +53,12 @@ class ModeChangeApp : ComponentActivity() {
         setContent { PanelContent("Unknown mode", "Text not shown", false) {} }
 
         SessionCallbackProvider.default.get(Session.create(this)).also {
-            it.onFullSpaceMode { fullSpaceModeContent() }
+            @Suppress("UNUSED_VARIABLE") val unused = it.onFullSpaceMode { fullSpaceModeContent() }
         }
 
         SessionCallbackProvider.default.get(Session.create(this)).also {
-            it.onHomeSpaceMode { homeSpaceModeContent() }
+            @Suppress("UNUSED_VARIABLE")
+            val unused = it.onHomeSpaceMode { _ -> homeSpaceModeContent() }
         }
     }
 

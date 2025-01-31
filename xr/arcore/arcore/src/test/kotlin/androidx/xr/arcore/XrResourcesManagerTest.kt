@@ -19,6 +19,7 @@ package androidx.xr.arcore
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.xr.runtime.math.Pose
 import androidx.xr.runtime.testing.FakeRuntimeAnchor
+import androidx.xr.runtime.testing.FakeRuntimeHand
 import androidx.xr.runtime.testing.FakeRuntimePlane
 import com.google.common.truth.Truth.assertThat
 import org.junit.After
@@ -39,6 +40,25 @@ class XrResourcesManagerTest {
     @After
     fun tearDown() {
         underTest.clear()
+    }
+
+    @Test
+    fun initiateHands_setsAvailableHands() {
+        val runtimeHand = FakeRuntimeHand()
+        val runtimeHand2 = FakeRuntimeHand()
+
+        underTest.initiateHands(runtimeHand, runtimeHand2)
+
+        assertThat(underTest.leftHand!!.runtimeHand).isEqualTo(runtimeHand)
+        assertThat(underTest.rightHand!!.runtimeHand).isEqualTo(runtimeHand2)
+    }
+
+    @Test
+    fun initiateHands_setsWithNull() {
+        underTest.initiateHands(leftRuntimeHand = null, rightRuntimeHand = null)
+
+        assertThat(underTest.leftHand).isNull()
+        assertThat(underTest.rightHand).isNull()
     }
 
     @Test

@@ -47,6 +47,28 @@ package androidx.xr.arcore {
     property public final androidx.xr.arcore.Anchor anchor;
   }
 
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class Hand {
+    method public kotlinx.coroutines.flow.StateFlow<androidx.xr.arcore.Hand.State> getState();
+    method public static androidx.xr.arcore.Hand? left(androidx.xr.runtime.Session session);
+    method public static androidx.xr.arcore.Hand? right(androidx.xr.runtime.Session session);
+    method public suspend Object? update(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public final kotlinx.coroutines.flow.StateFlow<androidx.xr.arcore.Hand.State> state;
+    field public static final androidx.xr.arcore.Hand.Companion Companion;
+  }
+
+  public static final class Hand.Companion {
+    method public androidx.xr.arcore.Hand? left(androidx.xr.runtime.Session session);
+    method public androidx.xr.arcore.Hand? right(androidx.xr.runtime.Session session);
+  }
+
+  public static final class Hand.State {
+    ctor public Hand.State(boolean isActive, java.util.Map<androidx.xr.runtime.internal.HandJointType,androidx.xr.runtime.math.Pose> handJoints);
+    method public java.util.Map<androidx.xr.runtime.internal.HandJointType,androidx.xr.runtime.math.Pose> getHandJoints();
+    method public boolean isActive();
+    property public final java.util.Map<androidx.xr.runtime.internal.HandJointType,androidx.xr.runtime.math.Pose> handJoints;
+    property public final boolean isActive;
+  }
+
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class HitResult {
     method public androidx.xr.arcore.AnchorCreateResult createAnchor();
     method public float getDistance();
@@ -62,8 +84,12 @@ package androidx.xr.arcore {
   }
 
   @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) public final class PerceptionState {
+    method public androidx.xr.arcore.Hand? getLeftHand();
+    method public androidx.xr.arcore.Hand? getRightHand();
     method public kotlin.time.ComparableTimeMark getTimeMark();
     method public java.util.Collection<androidx.xr.arcore.Trackable<androidx.xr.arcore.Trackable.State>> getTrackables();
+    property public final androidx.xr.arcore.Hand? leftHand;
+    property public final androidx.xr.arcore.Hand? rightHand;
     property public final kotlin.time.ComparableTimeMark timeMark;
     property public final java.util.Collection<androidx.xr.arcore.Trackable<androidx.xr.arcore.Trackable.State>> trackables;
   }

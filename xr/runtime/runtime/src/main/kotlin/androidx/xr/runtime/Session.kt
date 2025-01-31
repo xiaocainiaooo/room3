@@ -31,7 +31,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
@@ -96,8 +95,9 @@ internal constructor(
             return SessionCreateSuccess(session)
         }
 
+        // TODO(b/392919087): Move the Hand Tracking permission to another place.
         internal val SESSION_PERMISSIONS: List<String> =
-            listOf("android.permission.SCENE_UNDERSTANDING")
+            listOf("android.permission.SCENE_UNDERSTANDING", "android.permission.HAND_TRACKING")
     }
 
     /** The state of the runtime. */

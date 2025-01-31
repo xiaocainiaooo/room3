@@ -23,8 +23,7 @@ import androidx.xr.compose.subspace.node.SubspaceSemanticsInfo
 /**
  * Manager for all [SpatialComposeScene]s that are created when the [SceneManager] is running.
  *
- * This is used by the testing framework to keep track of all scene compositions that were created
- * for the purpose of finding the semantic roots.
+ * Enables finding all semantic roots in a spatial scene graph.
  */
 @Suppress("NotCloseable")
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP_PREFIX)

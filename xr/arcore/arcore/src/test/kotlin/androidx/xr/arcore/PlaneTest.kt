@@ -57,7 +57,11 @@ class PlaneTest {
     private lateinit var session: Session
 
     @get:Rule
-    val grantPermissionRule = GrantPermissionRule.grant("android.permission.SCENE_UNDERSTANDING")
+    val grantPermissionRule =
+        GrantPermissionRule.grant(
+            "android.permission.SCENE_UNDERSTANDING",
+            "android.permission.HAND_TRACKING",
+        )
 
     @Before
     fun setUp() {
