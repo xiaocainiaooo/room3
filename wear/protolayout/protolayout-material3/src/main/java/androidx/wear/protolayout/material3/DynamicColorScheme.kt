@@ -20,6 +20,7 @@ import android.content.Context
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.ColorRes
+import androidx.annotation.FloatRange
 import androidx.annotation.VisibleForTesting
 import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.argb
@@ -76,8 +77,13 @@ public fun dynamicColorScheme(
             background = getLayoutColor(context, R.color.system_background_dark),
             onBackground = getLayoutColor(context, R.color.system_on_background_dark),
             error = getLayoutColor(context, R.color.system_error_dark),
-            onError = getLayoutColor(context, R.color.system_on_error_dark),
             errorContainer = getLayoutColor(context, R.color.system_error_container_dark),
+            errorDim =
+                context.resources
+                    .getColor(R.color.system_error_container_dark, context.theme)
+                    .setLuminance(68f)
+                    .argb,
+            onError = getLayoutColor(context, R.color.system_on_error_dark),
             onErrorContainer = getLayoutColor(context, R.color.system_on_error_container_dark),
         )
     } else {
@@ -105,3 +111,25 @@ internal const val DYNAMIC_THEMING_SETTING_NAME: String = "dynamic_color_theme_e
 /** Retrieves the [LayoutColor] from the dynamic system theme with the given color token name. */
 private fun getLayoutColor(context: Context, @ColorRes id: Int): LayoutColor =
     context.resources.getColor(id, context.theme).argb
+
+/**
+ * Forked from `androidx.compose.material3.DynamicTonalPaletteKt.setLuminance`.
+ *
+ * Set the luminance(tone) of this color. Chroma may decrease because chroma has a different maximum
+ * for any given hue and luminance.
+ *
+ * Returns ARGB value.
+ *
+ * @param newLuminance 0 <= newLuminance <= 100; invalid values are corrected.
+ */
+@VisibleForTesting
+internal fun Int.setLuminance(@FloatRange(from = 0.0, to = 100.0) newLuminance: Float): Int {
+    if ((newLuminance < 0.0001) || (newLuminance > 99.9999)) {
+        return CamUtils.argbFromLstar(newLuminance.toDouble())
+    }
+
+    val baseCam: Cam = Cam.fromInt(this)
+    val baseColor = Cam.getInt(baseCam.hue, baseCam.chroma, newLuminance)
+
+    return baseColor
+}
