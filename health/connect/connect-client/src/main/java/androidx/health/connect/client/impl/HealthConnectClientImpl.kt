@@ -45,6 +45,7 @@ import androidx.health.connect.client.impl.converters.request.toReadDataRequestP
 import androidx.health.connect.client.impl.converters.response.toChangesResponse
 import androidx.health.connect.client.impl.converters.response.toReadRecordsResponse
 import androidx.health.connect.client.permission.HealthPermission.Companion.ALL_PERMISSIONS
+import androidx.health.connect.client.records.MedicalResource
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
@@ -52,6 +53,7 @@ import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.request.ReadRecordsRequest.Companion.DEDUPLICATION_STRATEGY_DISABLED
+import androidx.health.connect.client.request.UpsertMedicalResourceRequest
 import androidx.health.connect.client.response.ChangesResponse
 import androidx.health.connect.client.response.InsertRecordsResponse
 import androidx.health.connect.client.response.ReadRecordResponse
@@ -261,6 +263,12 @@ internal constructor(
             "Retrieved ${result.size} period aggregation buckets."
         )
         return result
+    }
+
+    override suspend fun upsertMedicalResources(
+        requests: List<UpsertMedicalResourceRequest>
+    ): List<MedicalResource> {
+        TODO("b/382680786 Not yet implemented")
     }
 
     /**

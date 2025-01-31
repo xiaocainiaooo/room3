@@ -56,6 +56,7 @@ import androidx.health.connect.client.impl.platform.response.toKtResponse
 import androidx.health.connect.client.impl.platform.response.toSdkResponse
 import androidx.health.connect.client.impl.platform.toKtException
 import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_PREFIX
+import androidx.health.connect.client.records.MedicalResource
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
@@ -63,6 +64,7 @@ import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.request.ReadRecordsRequest.Companion.DEDUPLICATION_STRATEGY_DISABLED
+import androidx.health.connect.client.request.UpsertMedicalResourceRequest
 import androidx.health.connect.client.response.ChangesResponse
 import androidx.health.connect.client.response.InsertRecordsResponse
 import androidx.health.connect.client.response.ReadRecordResponse
@@ -381,6 +383,12 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
         if (allHealthPermissions.isNotEmpty()) {
             revokePermissionsFunction(allHealthPermissions)
         }
+    }
+
+    override suspend fun upsertMedicalResources(
+        requests: List<UpsertMedicalResourceRequest>
+    ): List<MedicalResource> {
+        TODO("b/382680786 Not yet implemented")
     }
 
     private suspend fun <T> wrapPlatformException(function: suspend () -> T): T {

@@ -16,6 +16,7 @@
 
 package androidx.health.connect.client.testing
 
+import androidx.annotation.RestrictTo
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.PermissionController
@@ -30,12 +31,14 @@ import androidx.health.connect.client.feature.HealthConnectFeaturesUnavailableIm
 import androidx.health.connect.client.impl.converters.datatype.RECORDS_TYPE_NAME_MAP
 import androidx.health.connect.client.impl.converters.records.toProto
 import androidx.health.connect.client.impl.converters.records.toRecord
+import androidx.health.connect.client.records.MedicalResource
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
+import androidx.health.connect.client.request.UpsertMedicalResourceRequest
 import androidx.health.connect.client.response.ChangesResponse
 import androidx.health.connect.client.response.InsertRecordsResponse
 import androidx.health.connect.client.response.ReadRecordResponse
@@ -427,6 +430,14 @@ public class FakeHealthConnectClient(
             changesTokenExpired = tokenInfo.expired,
             nextChangesToken = nextChangesToken
         )
+    }
+
+    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    override suspend fun upsertMedicalResources(
+        requests: List<UpsertMedicalResourceRequest>
+    ): List<MedicalResource> {
+        TODO("b/382680786 Not yet implemented")
     }
 
     private fun String.toRecordId(packageName: String): String {

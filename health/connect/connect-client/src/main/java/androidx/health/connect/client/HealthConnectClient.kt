@@ -30,9 +30,14 @@ import androidx.health.connect.client.aggregate.AggregationResult
 import androidx.health.connect.client.aggregate.AggregationResultGroupedByDuration
 import androidx.health.connect.client.aggregate.AggregationResultGroupedByPeriod
 import androidx.health.connect.client.feature.ExperimentalFeatureAvailabilityApi
+import androidx.health.connect.client.feature.FEATURE_CONSTANT_NAME_PHR
 import androidx.health.connect.client.feature.HealthConnectFeaturesUnavailableImpl
+import androidx.health.connect.client.feature.createExceptionDueToFeatureUnavailable
 import androidx.health.connect.client.impl.HealthConnectClientImpl
 import androidx.health.connect.client.impl.HealthConnectClientUpsideDownImpl
+import androidx.health.connect.client.records.FhirResource
+import androidx.health.connect.client.records.MedicalResource
+import androidx.health.connect.client.records.MedicalResourceId
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.metadata.DataOrigin
 import androidx.health.connect.client.request.AggregateGroupByDurationRequest
@@ -40,6 +45,7 @@ import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
+import androidx.health.connect.client.request.UpsertMedicalResourceRequest
 import androidx.health.connect.client.response.ChangesResponse
 import androidx.health.connect.client.response.InsertRecordsResponse
 import androidx.health.connect.client.response.ReadRecordResponse
@@ -302,6 +308,58 @@ interface HealthConnectClient {
      * @see getChangesToken
      */
     suspend fun getChanges(changesToken: String): ChangesResponse
+
+    /**
+     * Inserts or updates a list of [MedicalResource]s using [UpsertMedicalResourceRequest]s.
+     *
+     * From [UpsertMedicalResourceRequest.dataSourceId] and [UpsertMedicalResourceRequest.data] in
+     * each request, a unique [MedicalResourceId] will be constructed. If there is already a
+     * [MedicalResource] with that ID in Health Connect, then it will be updated, otherwise a new
+     * [MedicalResource] will be inserted and returned.
+     *
+     * For each [UpsertMedicalResourceRequest], one [MedicalResource] will be returned, regardless
+     * whether it's updated or inserted. The order of the [MedicalResource]s in the returned list
+     * will be the same as their corresponding [UpsertMedicalResourceRequest]s in the input list.
+     *
+     * Medical data is represented using the
+     * [Fast Healthcare Interoperability Resources (FHIR)]("https://hl7.org/fhir/") standard. The
+     * FHIR resource provided in [UpsertMedicalResourceRequest.data] is expected to be valid for the
+     * specified [FHIR version][UpsertMedicalResourceRequest.fhirVersion] according to the
+     * [FHIR spec](https://hl7.org/fhir/resourcelist.html).
+     *
+     * Each [UpsertMedicalResourceRequest] also has to meet the following requirements:
+     * * [UpsertMedicalResourceRequest.data] must contain an "id" field and a "resourceType" field.
+     *   The "resource type" must be one of the items in the accepted list of resource types in
+     *   [FhirResource].
+     * * The FHIR resource does not contain any "contained" resources.
+     * * [FHIR version][UpsertMedicalResourceRequest.fhirVersion] of each request must match
+     *   [MedicalDataSource.fhirVersion] of [UpsertMedicalResourceRequest.dataSourceId]'s
+     *   corresponding [MedicalDataSource].
+     *
+     * Structural validation checks such as resource structure, field types and presence of required
+     * fields will be performed, however these checks may not cover all FHIR spec requirements and
+     * may change in future versions.
+     *
+     * If any request is failed to be processed for any reason, none of the requests will be
+     * inserted or updated.
+     *
+     * This feature is dependent on the version of HealthConnect installed on the device. To check
+     * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
+     * [HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     *
+     * @param requests List of upsert requests.
+     * @throws IllegalArgumentException if any request is failed to be processed for any reason such
+     *   as invalid [UpsertMedicalResourceRequest.dataSourceId]
+     */
+    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    suspend fun upsertMedicalResources(
+        requests: List<UpsertMedicalResourceRequest>
+    ): List<MedicalResource> =
+        throw createExceptionDueToFeatureUnavailable(
+            FEATURE_CONSTANT_NAME_PHR,
+            "HealthConnectClient#upsetMedicalResources()"
+        )
 
     companion object {
         @RestrictTo(RestrictTo.Scope.LIBRARY)
