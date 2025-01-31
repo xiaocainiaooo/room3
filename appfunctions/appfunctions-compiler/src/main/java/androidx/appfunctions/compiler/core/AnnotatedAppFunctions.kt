@@ -23,6 +23,7 @@ import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionMetadata
 import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
 import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionResponseMetadata
 import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
@@ -177,7 +178,7 @@ data class AnnotatedAppFunctions(
                 isEnabledByDefault = appFunctionAnnotationProperties.isEnabledByDefault,
                 schema = appFunctionAnnotationProperties.toAppFunctionSchemaMetadata(),
                 parameters = parameterObjectTypeMetadata,
-                response = responseObjectTypeMetadata
+                response = AppFunctionResponseMetadata(valueType = responseObjectTypeMetadata)
             )
         }
 
@@ -226,7 +227,8 @@ data class AnnotatedAppFunctions(
         return AppFunctionObjectTypeMetadata(
             properties = properties,
             required = requiredProperties,
-            isNullable = false
+            isNullable = false,
+            qualifiedName = null,
         )
     }
 

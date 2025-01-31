@@ -59,7 +59,7 @@ constructor(
     /** The parameters of the AppFunction. Parameters are stored as properties in the object. */
     public val parameters: AppFunctionObjectTypeMetadata,
     /** The response of the AppFunction. */
-    public val response: AppFunctionDataTypeMetadata,
+    public val response: AppFunctionResponseMetadata,
     /** Reusable components that could be shared within the function specification. */
     public val components: AppFunctionComponentsMetadata = AppFunctionComponentsMetadata(),
 ) {
@@ -105,12 +105,7 @@ constructor(
                     null
                 },
             parameters = parameters.toAppFunctionDataTypeMetadataDocument(),
-            response =
-                // TODO: Handle non-primitive and collections.
-                AppFunctionDataTypeMetadataDocument(
-                    type = (response as AppFunctionPrimitiveTypeMetadata).type,
-                    isNullable = response.isNullable,
-                ),
+            response = response.toAppFunctionResponseMetadataDocument(),
             components = components.toAppFunctionComponentsMetadataDocument()
         )
     }
@@ -135,7 +130,7 @@ public data class AppFunctionMetadataDocument(
     /** The parameters of the AppFunction. Parameters are stored as properties in the object. */
     @Document.DocumentProperty public val parameters: AppFunctionDataTypeMetadataDocument,
     /** The response of the AppFunction. */
-    @Document.DocumentProperty public val response: AppFunctionDataTypeMetadataDocument,
+    @Document.DocumentProperty public val response: AppFunctionResponseMetadataDocument,
     /** The reusable components for the AppFunction. */
     @Document.DocumentProperty public val components: AppFunctionComponentsMetadataDocument,
 )

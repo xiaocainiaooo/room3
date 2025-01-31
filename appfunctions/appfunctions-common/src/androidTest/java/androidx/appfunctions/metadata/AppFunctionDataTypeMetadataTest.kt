@@ -26,13 +26,37 @@ import org.junit.Test
 class AppFunctionDataTypeMetadataTest {
 
     @Test
+    fun appFunctionArrayTypeMetadata_equalsAndHashCode() {
+        val properties2 = mapOf("prop2" to AppFunctionPrimitiveTypeMetadata(TYPE_STRING, true))
+
+        val arrayType1a =
+            AppFunctionArrayTypeMetadata(AppFunctionPrimitiveTypeMetadata(TYPE_INT, true), false)
+        val arrayType1b =
+            AppFunctionArrayTypeMetadata(AppFunctionPrimitiveTypeMetadata(TYPE_INT, true), false)
+        val arrayType2 =
+            AppFunctionArrayTypeMetadata(
+                AppFunctionObjectTypeMetadata(properties2, emptyList(), "qualifiedName", false),
+                false
+            )
+
+        assertThat(arrayType1a).isEqualTo(arrayType1b)
+        assertThat(arrayType1a.hashCode()).isEqualTo(arrayType1b.hashCode())
+
+        assertThat(arrayType1a).isNotEqualTo(arrayType2)
+        assertThat(arrayType1a.hashCode()).isNotEqualTo(arrayType2.hashCode())
+    }
+
+    @Test
     fun appFunctionObjectTypeMetadata_equalsAndHashCode() {
         val properties1 = mapOf("prop1" to AppFunctionPrimitiveTypeMetadata(TYPE_INT, false))
         val properties2 = mapOf("prop2" to AppFunctionPrimitiveTypeMetadata(TYPE_STRING, true))
 
-        val objectType1a = AppFunctionObjectTypeMetadata(properties1, listOf("prop1"), false)
-        val objectType1b = AppFunctionObjectTypeMetadata(properties1, listOf("prop1"), false)
-        val objectType2 = AppFunctionObjectTypeMetadata(properties2, listOf("prop2"), true)
+        val objectType1a =
+            AppFunctionObjectTypeMetadata(properties1, listOf("prop1"), "qualifiedName", false)
+        val objectType1b =
+            AppFunctionObjectTypeMetadata(properties1, listOf("prop1"), "qualifiedName", false)
+        val objectType2 =
+            AppFunctionObjectTypeMetadata(properties2, listOf("prop2"), "qualifiedName", true)
 
         assertThat(objectType1a).isEqualTo(objectType1b)
         assertThat(objectType1a.hashCode()).isEqualTo(objectType1b.hashCode())
@@ -51,9 +75,10 @@ class AppFunctionDataTypeMetadataTest {
                 "prop2" to primitiveTypeLong,
             )
         val isNullable = false
+        val qualifiedName = "qualifiedName"
         val requiredProperties = listOf("prop1", "prop2")
         val appFunctionObjectTypeMetadata =
-            AppFunctionObjectTypeMetadata(properties, requiredProperties, isNullable)
+            AppFunctionObjectTypeMetadata(properties, requiredProperties, qualifiedName, isNullable)
         val expectedPrimitiveDocumentProperties1 =
             AppFunctionPropertyMetadataDocument(
                 name = "prop1",
@@ -72,7 +97,9 @@ class AppFunctionDataTypeMetadataTest {
                         expectedPrimitiveDocumentProperties1,
                         expectedPrimitiveDocumentProperties2,
                     ),
-                required = requiredProperties
+                required = requiredProperties,
+                objectQualifiedName = "qualifiedName",
+                isNullable = false,
             )
 
         val convertedDocument =

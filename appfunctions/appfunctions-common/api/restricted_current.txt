@@ -156,7 +156,7 @@ package androidx.appfunctions {
 package androidx.appfunctions.metadata {
 
   public final class AppFunctionArrayTypeMetadata extends androidx.appfunctions.metadata.AppFunctionDataTypeMetadata {
-    ctor public AppFunctionArrayTypeMetadata(androidx.appfunctions.metadata.AppFunctionDataTypeMetadata itemType);
+    ctor public AppFunctionArrayTypeMetadata(androidx.appfunctions.metadata.AppFunctionDataTypeMetadata itemType, boolean isNullable);
     method public androidx.appfunctions.metadata.AppFunctionDataTypeMetadata getItemType();
     property public androidx.appfunctions.metadata.AppFunctionDataTypeMetadata itemType;
   }
@@ -178,7 +178,6 @@ package androidx.appfunctions.metadata {
     field public static final int TYPE_FLOAT = 5; // 0x5
     field public static final int TYPE_INT = 7; // 0x7
     field public static final int TYPE_LONG = 6; // 0x6
-    field public static final int TYPE_PENDING_INTENT = 9; // 0x9
     field public static final int TYPE_STRING = 8; // 0x8
     field public static final int TYPE_UNIT = 0; // 0x0
   }
@@ -190,33 +189,34 @@ package androidx.appfunctions.metadata {
     property public static int TYPE_FLOAT;
     property public static int TYPE_INT;
     property public static int TYPE_LONG;
-    property public static int TYPE_PENDING_INTENT;
     property public static int TYPE_STRING;
     property public static int TYPE_UNIT;
   }
 
   public final class AppFunctionMetadata {
-    ctor public AppFunctionMetadata(String id, boolean isEnabledByDefault, androidx.appfunctions.metadata.AppFunctionSchemaMetadata? schema, androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata parameters, androidx.appfunctions.metadata.AppFunctionDataTypeMetadata response);
-    ctor public AppFunctionMetadata(String id, boolean isEnabledByDefault, androidx.appfunctions.metadata.AppFunctionSchemaMetadata? schema, androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata parameters, androidx.appfunctions.metadata.AppFunctionDataTypeMetadata response, optional androidx.appfunctions.metadata.AppFunctionComponentsMetadata components);
+    ctor public AppFunctionMetadata(String id, boolean isEnabledByDefault, androidx.appfunctions.metadata.AppFunctionSchemaMetadata? schema, androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata parameters, androidx.appfunctions.metadata.AppFunctionResponseMetadata response);
+    ctor public AppFunctionMetadata(String id, boolean isEnabledByDefault, androidx.appfunctions.metadata.AppFunctionSchemaMetadata? schema, androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata parameters, androidx.appfunctions.metadata.AppFunctionResponseMetadata response, optional androidx.appfunctions.metadata.AppFunctionComponentsMetadata components);
     method public androidx.appfunctions.metadata.AppFunctionComponentsMetadata getComponents();
     method public String getId();
     method public androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata getParameters();
-    method public androidx.appfunctions.metadata.AppFunctionDataTypeMetadata getResponse();
+    method public androidx.appfunctions.metadata.AppFunctionResponseMetadata getResponse();
     method public androidx.appfunctions.metadata.AppFunctionSchemaMetadata? getSchema();
     method public boolean isEnabledByDefault();
     property public androidx.appfunctions.metadata.AppFunctionComponentsMetadata components;
     property public String id;
     property public boolean isEnabledByDefault;
     property public androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata parameters;
-    property public androidx.appfunctions.metadata.AppFunctionDataTypeMetadata response;
+    property public androidx.appfunctions.metadata.AppFunctionResponseMetadata response;
     property public androidx.appfunctions.metadata.AppFunctionSchemaMetadata? schema;
   }
 
   public final class AppFunctionObjectTypeMetadata extends androidx.appfunctions.metadata.AppFunctionDataTypeMetadata {
-    ctor public AppFunctionObjectTypeMetadata(java.util.Map<java.lang.String,? extends androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> properties, java.util.List<java.lang.String> required, boolean isNullable);
+    ctor public AppFunctionObjectTypeMetadata(java.util.Map<java.lang.String,? extends androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> properties, java.util.List<java.lang.String> required, String? qualifiedName, boolean isNullable);
     method public java.util.Map<java.lang.String,androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> getProperties();
+    method public String? getQualifiedName();
     method public java.util.List<java.lang.String> getRequired();
     property public java.util.Map<java.lang.String,androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> properties;
+    property public String? qualifiedName;
     property public java.util.List<java.lang.String> required;
   }
 
@@ -230,6 +230,12 @@ package androidx.appfunctions.metadata {
     ctor public AppFunctionReferenceTypeMetadata(String referenceDataType, boolean isNullable);
     method public String getReferenceDataType();
     property public String referenceDataType;
+  }
+
+  public final class AppFunctionResponseMetadata {
+    ctor public AppFunctionResponseMetadata(androidx.appfunctions.metadata.AppFunctionDataTypeMetadata valueType);
+    method public androidx.appfunctions.metadata.AppFunctionDataTypeMetadata getValueType();
+    property public androidx.appfunctions.metadata.AppFunctionDataTypeMetadata valueType;
   }
 
   public final class AppFunctionSchemaMetadata {

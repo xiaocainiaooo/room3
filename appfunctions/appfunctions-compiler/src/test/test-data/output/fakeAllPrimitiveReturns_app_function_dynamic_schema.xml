@@ -13,8 +13,11 @@
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>0</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>0</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -37,8 +40,11 @@
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>7</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>7</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -61,8 +67,11 @@
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>6</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>6</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -85,8 +94,11 @@
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>5</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>5</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -109,8 +121,11 @@
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>4</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>4</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -133,8 +148,11 @@
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>8</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>8</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -157,8 +175,11 @@
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>1</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>false</isNullable>
+                <type>1</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -181,8 +202,11 @@
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>true</isNullable>
-            <type>7</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>true</isNullable>
+                <type>7</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -205,8 +229,11 @@
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>true</isNullable>
-            <type>6</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>true</isNullable>
+                <type>6</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -229,8 +256,11 @@
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>true</isNullable>
-            <type>5</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>true</isNullable>
+                <type>5</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -253,8 +283,11 @@
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>true</isNullable>
-            <type>4</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>true</isNullable>
+                <type>4</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -277,8 +310,11 @@
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>true</isNullable>
-            <type>8</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>true</isNullable>
+                <type>8</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>
@@ -301,8 +337,11 @@
         </parameters>
         <response>
             <id>unused</id>
-            <isNullable>true</isNullable>
-            <type>1</type>
+            <valueType>
+                <id>unused</id>
+                <isNullable>true</isNullable>
+                <type>1</type>
+            </valueType>
         </response>
         <schema>
             <id>unused</id>

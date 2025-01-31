@@ -31,9 +31,13 @@ class AppFunctionMetadataTest {
             AppFunctionObjectTypeMetadata(
                 properties = emptyMap(),
                 required = emptyList(),
+                qualifiedName = "qualifiedName",
                 isNullable = false
             )
-        val response = AppFunctionPrimitiveTypeMetadata(type = TYPE_STRING, isNullable = false)
+        val response =
+            AppFunctionResponseMetadata(
+                valueType = AppFunctionPrimitiveTypeMetadata(type = TYPE_STRING, isNullable = false)
+            )
 
         val metadata1 =
             AppFunctionMetadata(
@@ -81,8 +85,12 @@ class AppFunctionMetadataTest {
             )
         val isNullable = false
         val requiredProperties = listOf("prop1", "prop2")
-        val parameters = AppFunctionObjectTypeMetadata(properties, requiredProperties, isNullable)
-        val response = AppFunctionPrimitiveTypeMetadata(type = TYPE_STRING, isNullable = false)
+        val parameters =
+            AppFunctionObjectTypeMetadata(properties, requiredProperties, null, isNullable)
+        val response =
+            AppFunctionResponseMetadata(
+                valueType = AppFunctionPrimitiveTypeMetadata(type = TYPE_STRING, isNullable = false)
+            )
         val primitiveType1 = AppFunctionPrimitiveTypeMetadata(TYPE_INT, false)
         val primitiveType2 = AppFunctionPrimitiveTypeMetadata(TYPE_STRING, true)
         val components = AppFunctionComponentsMetadata(listOf(primitiveType1, primitiveType2))
@@ -95,18 +103,18 @@ class AppFunctionMetadataTest {
                 response = response,
                 components = components
             )
+
+        val actualAppFunctionMetadataDocument = appFunctionMetadata.toAppFunctionMetadataDocument()
+
         val expectedAppFunctionMetadataDocument =
             AppFunctionMetadataDocument(
                 id = id,
                 isEnabledByDefault = isEnabledByDefault,
                 schema = schemaMetadata.toAppFunctionSchemaMetadataDocument(),
                 parameters = parameters.toAppFunctionDataTypeMetadataDocument(),
-                response = response.toAppFunctionDataTypeMetadataDocument(),
+                response = response.toAppFunctionResponseMetadataDocument(),
                 components = components.toAppFunctionComponentsMetadataDocument()
             )
-
-        val actualAppFunctionMetadataDocument = appFunctionMetadata.toAppFunctionMetadataDocument()
-
         assertThat(actualAppFunctionMetadataDocument).isEqualTo(expectedAppFunctionMetadataDocument)
     }
 }
