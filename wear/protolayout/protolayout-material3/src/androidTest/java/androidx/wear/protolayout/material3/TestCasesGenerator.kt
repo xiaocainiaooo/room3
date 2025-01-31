@@ -36,6 +36,7 @@ import androidx.wear.protolayout.material3.CardDefaults.filledVariantCardColors
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.filledTonalProgressIndicatorColors
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults.filledVariantProgressIndicatorColors
 import androidx.wear.protolayout.material3.DataCardStyle.Companion.smallCompactDataCardStyle
+import androidx.wear.protolayout.material3.GraphicDataCardDefaults.constructGraphic
 import androidx.wear.protolayout.material3.IconButtonStyle.Companion.largeIconButtonStyle
 import androidx.wear.protolayout.material3.MaterialGoldenTest.Companion.pxToDp
 import androidx.wear.protolayout.material3.PrimaryLayoutMargins.Companion.MAX_PRIMARY_LAYOUT_MARGIN
@@ -135,7 +136,14 @@ object TestCasesGenerator {
                                     "steps".layoutString,
                                 )
                             },
-                            graphic = { circularProgressIndicator(staticProgress = 0.5F) }
+                            graphic = {
+                                constructGraphic(
+                                    mainContent = {
+                                        circularProgressIndicator(staticProgress = 0.5F)
+                                    },
+                                    iconContent = { icon(ICON_ID) }
+                                )
+                            }
                         )
                     },
                     margins = MIN_PRIMARY_LAYOUT_MARGIN

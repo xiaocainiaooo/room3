@@ -56,7 +56,8 @@ class MaterialScopeTest {
                 defaultIconStyle = IconStyle(),
                 defaultBackgroundImageStyle = BackgroundImageStyle(),
                 defaultAvatarImageStyle = AvatarImageStyle(),
-                layoutSlotsPresence = LayoutSlotsPresence()
+                layoutSlotsPresence = LayoutSlotsPresence(),
+                defaultProgressIndicatorStyle = ProgressIndicatorStyle()
             )
 
         assertThat(scopeWithDefaultTheme.deviceConfiguration).isEqualTo(DEVICE_PARAMETERS)
@@ -89,7 +90,8 @@ class MaterialScopeTest {
                 defaultIconStyle = IconStyle(),
                 defaultBackgroundImageStyle = BackgroundImageStyle(),
                 defaultAvatarImageStyle = AvatarImageStyle(),
-                layoutSlotsPresence = LayoutSlotsPresence()
+                layoutSlotsPresence = LayoutSlotsPresence(),
+                defaultProgressIndicatorStyle = ProgressIndicatorStyle()
             )
 
         assertThat(materialScope.deviceConfiguration).isEqualTo(DEVICE_PARAMETERS)
@@ -126,7 +128,8 @@ class MaterialScopeTest {
                 defaultIconStyle = IconStyle(),
                 defaultBackgroundImageStyle = BackgroundImageStyle(),
                 defaultAvatarImageStyle = AvatarImageStyle(),
-                layoutSlotsPresence = LayoutSlotsPresence()
+                layoutSlotsPresence = LayoutSlotsPresence(),
+                defaultProgressIndicatorStyle = ProgressIndicatorStyle()
             )
 
         assertThat(isDynamicColorSchemeEnabled(materialScope.context)).isFalse()

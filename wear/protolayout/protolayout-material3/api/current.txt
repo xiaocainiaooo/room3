@@ -76,9 +76,11 @@ package androidx.wear.protolayout.material3 {
   }
 
   public final class CardColors {
-    ctor public CardColors(androidx.wear.protolayout.types.LayoutColor backgroundColor, androidx.wear.protolayout.types.LayoutColor titleColor, androidx.wear.protolayout.types.LayoutColor contentColor, optional androidx.wear.protolayout.types.LayoutColor timeColor, optional androidx.wear.protolayout.types.LayoutColor labelColor, optional androidx.wear.protolayout.types.LayoutColor secondaryIconColor, optional androidx.wear.protolayout.types.LayoutColor secondaryTextColor);
+    ctor public CardColors(androidx.wear.protolayout.types.LayoutColor backgroundColor, androidx.wear.protolayout.types.LayoutColor titleColor, androidx.wear.protolayout.types.LayoutColor contentColor, optional androidx.wear.protolayout.types.LayoutColor timeColor, optional androidx.wear.protolayout.types.LayoutColor labelColor, optional androidx.wear.protolayout.types.LayoutColor secondaryIconColor, optional androidx.wear.protolayout.types.LayoutColor secondaryTextColor, optional androidx.wear.protolayout.material3.ProgressIndicatorColors? graphicProgressIndicatorColors, optional androidx.wear.protolayout.types.LayoutColor? graphicIconColor);
     method public androidx.wear.protolayout.types.LayoutColor getBackgroundColor();
     method public androidx.wear.protolayout.types.LayoutColor getContentColor();
+    method public androidx.wear.protolayout.types.LayoutColor? getGraphicIconColor();
+    method public androidx.wear.protolayout.material3.ProgressIndicatorColors? getGraphicProgressIndicatorColors();
     method public androidx.wear.protolayout.types.LayoutColor getLabelColor();
     method public androidx.wear.protolayout.types.LayoutColor getSecondaryIconColor();
     method public androidx.wear.protolayout.types.LayoutColor getSecondaryTextColor();
@@ -86,6 +88,8 @@ package androidx.wear.protolayout.material3 {
     method public androidx.wear.protolayout.types.LayoutColor getTitleColor();
     property public final androidx.wear.protolayout.types.LayoutColor backgroundColor;
     property public final androidx.wear.protolayout.types.LayoutColor contentColor;
+    property public final androidx.wear.protolayout.types.LayoutColor? graphicIconColor;
+    property public final androidx.wear.protolayout.material3.ProgressIndicatorColors? graphicProgressIndicatorColors;
     property public final androidx.wear.protolayout.types.LayoutColor labelColor;
     property public final androidx.wear.protolayout.types.LayoutColor secondaryIconColor;
     property public final androidx.wear.protolayout.types.LayoutColor secondaryTextColor;
@@ -216,6 +220,11 @@ package androidx.wear.protolayout.material3 {
     method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement textEdgeButton(androidx.wear.protolayout.material3.MaterialScope, androidx.wear.protolayout.ModifiersBuilders.Clickable onClick, optional androidx.wear.protolayout.modifiers.LayoutModifier modifier, optional androidx.wear.protolayout.material3.ButtonColors colors, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> labelContent);
   }
 
+  public final class GraphicDataCardDefaults {
+    method public androidx.wear.protolayout.LayoutElementBuilders.LayoutElement constructGraphic(androidx.wear.protolayout.material3.MaterialScope, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> mainContent, kotlin.jvm.functions.Function1<? super androidx.wear.protolayout.material3.MaterialScope,? extends androidx.wear.protolayout.LayoutElementBuilders.LayoutElement> iconContent, optional float iconSizeRatio);
+    field public static final androidx.wear.protolayout.material3.GraphicDataCardDefaults INSTANCE;
+  }
+
   public final class GraphicDataCardStyle {
     field public static final androidx.wear.protolayout.material3.GraphicDataCardStyle.Companion Companion;
   }
@@ -235,7 +244,7 @@ package androidx.wear.protolayout.material3 {
   }
 
   public final class IconKt {
-    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement icon(androidx.wear.protolayout.material3.MaterialScope, String protoLayoutResourceId, optional androidx.wear.protolayout.DimensionBuilders.ImageDimension size, optional androidx.wear.protolayout.types.LayoutColor tintColor);
+    method public static androidx.wear.protolayout.LayoutElementBuilders.LayoutElement icon(androidx.wear.protolayout.material3.MaterialScope, String protoLayoutResourceId, optional androidx.wear.protolayout.DimensionBuilders.ImageDimension width, optional androidx.wear.protolayout.DimensionBuilders.ImageDimension height, optional androidx.wear.protolayout.types.LayoutColor tintColor);
   }
 
   public final class ImageKt {

@@ -101,7 +101,8 @@ public fun MaterialScope.circularProgressIndicator(
     endAngleDegrees: Float = startAngleDegrees + 360F,
     @Dimension(DP) strokeWidth: Float = LARGE_STROKE_WIDTH,
     @Dimension(DP) gapSize: Float = calculateRecommendedGapSize(strokeWidth),
-    colors: ProgressIndicatorColors = filledProgressIndicatorColors(),
+    colors: ProgressIndicatorColors =
+        defaultProgressIndicatorStyle.color ?: filledProgressIndicatorColors(),
     size: ContainerDimension = expand(),
 ): LayoutElement {
     // CircularProgressIndicator could not have size as wrap
