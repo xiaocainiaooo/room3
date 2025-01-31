@@ -160,8 +160,11 @@ private constructor(
                 }
 
         val ignoredColumns =
-            element.getAnnotation(androidx.room.Entity::class)?.value?.ignoredColumns?.toSet()
-                ?: emptySet()
+            element
+                .getAnnotation(androidx.room.Entity::class)
+                ?.get("ignoredColumns")
+                ?.asStringList()
+                ?.toSet() ?: emptySet()
         val fieldBindingErrors = mutableMapOf<Field, String>()
         val unfilteredMyFields =
             allFields[null]?.map {
@@ -434,7 +437,8 @@ private constructor(
             return null
         }
 
-        val fieldPrefix = variableElement.getAnnotation(Embedded::class)?.value?.prefix ?: ""
+        val embeddedAnnotation = variableElement.getAnnotation(Embedded::class)
+        val fieldPrefix = embeddedAnnotation?.get("prefix")?.asString() ?: ""
         val inheritedPrefix = parent?.prefix ?: ""
         val embeddedField =
             Field(
@@ -467,15 +471,16 @@ private constructor(
         container: XType,
         relationElement: XFieldElement
     ): androidx.room.vo.Relation? {
-        val annotation = relationElement.getAnnotation(Relation::class)!!
+        val annotation = relationElement.requireAnnotation(Relation::class)
 
-        val parentField = myFields.firstOrNull { it.columnName == annotation.value.parentColumn }
+        val parentColumnName = annotation.getAsString("parentColumn")
+        val parentField = myFields.firstOrNull { it.columnName == parentColumnName }
         if (parentField == null) {
             context.logger.e(
                 relationElement,
                 ProcessorErrors.relationCannotFindParentEntityField(
                     entityName = element.qualifiedName,
-                    columnName = annotation.value.parentColumn,
+                    columnName = parentColumnName,
                     availableColumns = myFields.map { it.columnName }
                 )
             )
@@ -498,7 +503,7 @@ private constructor(
             return null
         }
 
-        val entityClassInput = annotation.getAsType("entity")
+        val entityClassInput = annotation["entity"]?.asType()
 
         // do we need to decide on the entity?
         val inferEntity = (entityClassInput == null || entityClassInput.isTypeOf(Any::class))
@@ -506,7 +511,7 @@ private constructor(
             if (inferEntity) {
                 typeElement
             } else {
-                entityClassInput!!.typeElement
+                entityClassInput.typeElement
             }
         if (entityElement == null) {
             // this should not happen as we check for declared above but for compile time
@@ -525,13 +530,14 @@ private constructor(
         val entity = EntityOrViewProcessor(context, entityElement, referenceStack).process()
 
         // now find the field in the entity.
-        val entityField = entity.findFieldByColumnName(annotation.value.entityColumn)
+        val entityColumnName = annotation.getAsString("entityColumn")
+        val entityField = entity.findFieldByColumnName(entityColumnName)
         if (entityField == null) {
             context.logger.e(
                 relationElement,
                 ProcessorErrors.relationCannotFindEntityField(
                     entityName = entity.typeName.toString(context.codeLanguage),
-                    columnName = annotation.value.entityColumn,
+                    columnName = entityColumnName,
                     availableColumns = entity.columnNames
                 )
             )
@@ -539,8 +545,8 @@ private constructor(
         }
 
         // do we have a join entity?
-        val junctionAnnotation = annotation.getAsAnnotationBox<Junction>("associateBy")
-        val junctionClassInput = junctionAnnotation.getAsType("value")
+        val junctionAnnotation = annotation["associateBy"]?.asAnnotation()
+        val junctionClassInput = junctionAnnotation?.getAsType("value")
         val junctionElement: XTypeElement? =
             if (junctionClassInput != null && !junctionClassInput.isTypeOf(Any::class)) {
                 junctionClassInput.typeElement.also {
@@ -552,8 +558,9 @@ private constructor(
                 null
             }
         val junction =
-            junctionElement?.let {
-                val entityOrView = EntityOrViewProcessor(context, it, referenceStack).process()
+            if (junctionAnnotation != null && junctionElement != null) {
+                val entityOrView =
+                    EntityOrViewProcessor(context, junctionElement, referenceStack).process()
 
                 fun findAndValidateJunctionColumn(
                     columnName: String,
@@ -585,9 +592,10 @@ private constructor(
                     return field
                 }
 
+                val junctionParentColumnName = junctionAnnotation["parentColumn"]?.asString() ?: ""
                 val junctionParentColumn =
-                    if (junctionAnnotation.value.parentColumn.isNotEmpty()) {
-                        junctionAnnotation.value.parentColumn
+                    if (junctionParentColumnName.isNotEmpty()) {
+                        junctionParentColumnName
                     } else {
                         parentField.columnName
                     }
@@ -607,9 +615,10 @@ private constructor(
                         }
                     )
 
+                val junctionEntityColumnName = junctionAnnotation["entityColumn"]?.asString() ?: ""
                 val junctionEntityColumn =
-                    if (junctionAnnotation.value.entityColumn.isNotEmpty()) {
-                        junctionAnnotation.value.entityColumn
+                    if (junctionEntityColumnName.isNotEmpty()) {
+                        junctionEntityColumnName
                     } else {
                         entityField.columnName
                     }
@@ -638,6 +647,8 @@ private constructor(
                     parentField = junctionParentField,
                     entityField = junctionEntityField
                 )
+            } else {
+                null
             }
 
         val field =
@@ -649,14 +660,15 @@ private constructor(
                 parent = parent
             )
 
+        val projectionNames = annotation["projection"]?.asStringList() ?: emptyList()
         val projection =
-            if (annotation.value.projection.isEmpty()) {
+            if (projectionNames.isEmpty()) {
                 // we need to infer the projection from inputs.
                 createRelationshipProjection(inferEntity, asType, entity, entityField, typeElement)
             } else {
                 // make sure projection makes sense
-                validateRelationshipProjection(annotation.value.projection, entity, relationElement)
-                annotation.value.projection.asList()
+                validateRelationshipProjection(projectionNames, entity, relationElement)
+                projectionNames
             }
         // if types don't match, row adapter prints a warning
         return androidx.room.vo.Relation(
@@ -671,7 +683,7 @@ private constructor(
     }
 
     private fun validateRelationshipProjection(
-        projectionInput: Array<String>,
+        projectionInput: List<String>,
         entity: EntityOrView,
         relationElement: XVariableElement
     ) {

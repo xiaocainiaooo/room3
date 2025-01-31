@@ -18,6 +18,7 @@ package androidx.room.vo
 
 import androidx.room.compiler.codegen.XClassName
 import androidx.room.compiler.codegen.XTypeName
+import androidx.room.compiler.codegen.asClassName
 import androidx.room.compiler.processing.XType
 import androidx.room.compiler.processing.XTypeElement
 import androidx.room.processor.DatabaseViewProcessor
@@ -44,11 +45,11 @@ open class DataClass(
     fun accessedTableNames(): List<String> {
         val entityAnnotation = element.getAnnotation(androidx.room.Entity::class)
         return if (entityAnnotation != null) {
-            listOf(EntityProcessor.extractTableName(element, entityAnnotation.value))
+            listOf(EntityProcessor.extractTableName(element, entityAnnotation))
         } else {
             val viewAnnotation = element.getAnnotation(androidx.room.DatabaseView::class)
             if (viewAnnotation != null) {
-                listOf(DatabaseViewProcessor.extractViewName(element, viewAnnotation.value))
+                listOf(DatabaseViewProcessor.extractViewName(element, viewAnnotation))
             } else {
                 emptyList()
             } +

@@ -20,7 +20,9 @@ import androidx.room.Fts3
 import androidx.room.Fts4
 import androidx.room.FtsOptions.MatchInfo
 import androidx.room.FtsOptions.Order
-import androidx.room.compiler.processing.XAnnotationBox
+import androidx.room.FtsOptions.TOKENIZER_SIMPLE
+import androidx.room.compiler.codegen.asClassName
+import androidx.room.compiler.processing.XAnnotation
 import androidx.room.compiler.processing.XType
 import androidx.room.compiler.processing.XTypeElement
 import androidx.room.parser.FtsVersion
@@ -52,6 +54,31 @@ internal constructor(
     }
 
     private fun doProcess(): FtsEntity {
+        if (!element.validate()) {
+            context.reportMissingTypeReference(element.qualifiedName)
+            return FtsEntity(
+                element = element,
+                tableName = element.name,
+                type = element.type,
+                fields = emptyList(),
+                embeddedFields = emptyList(),
+                primaryKey = PrimaryKey.MISSING,
+                constructor = null,
+                shadowTableName = null,
+                ftsVersion = FtsVersion.FTS3,
+                ftsOptions =
+                    FtsOptions(
+                        tokenizer = TOKENIZER_SIMPLE,
+                        tokenizerArgs = emptyList(),
+                        contentEntity = null,
+                        languageIdColumnName = "",
+                        matchInfo = MatchInfo.FTS3,
+                        notIndexedColumns = emptyList(),
+                        prefixSizes = emptyList(),
+                        preferredOrder = Order.ASC
+                    )
+            )
+        }
         context.checker.hasAnnotation(
             element,
             androidx.room.Entity::class,
@@ -60,7 +87,7 @@ internal constructor(
         val entityAnnotation = element.getAnnotation(androidx.room.Entity::class)
         val tableName: String
         if (entityAnnotation != null) {
-            tableName = extractTableName(element, entityAnnotation.value)
+            tableName = extractTableName(element, entityAnnotation)
             context.checker.check(
                 extractIndices(entityAnnotation, tableName).isEmpty(),
                 element,
@@ -89,9 +116,9 @@ internal constructor(
 
         val (ftsVersion, ftsOptions) =
             if (element.hasAnnotation(androidx.room.Fts3::class)) {
-                FtsVersion.FTS3 to getFts3Options(element.getAnnotation(Fts3::class)!!)
+                FtsVersion.FTS3 to getFts3Options(element.requireAnnotation(Fts3::class))
             } else {
-                FtsVersion.FTS4 to getFts4Options(element.getAnnotation(Fts4::class)!!)
+                FtsVersion.FTS4 to getFts4Options(element.requireAnnotation(Fts4::class))
             }
 
         val shadowTableName =
@@ -141,10 +168,10 @@ internal constructor(
         return entity
     }
 
-    private fun getFts3Options(annotation: XAnnotationBox<Fts3>) =
+    private fun getFts3Options(annotation: XAnnotation) =
         FtsOptions(
-            tokenizer = annotation.value.tokenizer,
-            tokenizerArgs = annotation.value.tokenizerArgs.asList(),
+            tokenizer = annotation["tokenizer"]?.asString() ?: TOKENIZER_SIMPLE,
+            tokenizerArgs = annotation["tokenizerArgs"]?.asStringList() ?: emptyList(),
             contentEntity = null,
             languageIdColumnName = "",
             matchInfo = MatchInfo.FTS4,
@@ -153,17 +180,20 @@ internal constructor(
             preferredOrder = Order.ASC
         )
 
-    private fun getFts4Options(annotation: XAnnotationBox<Fts4>): FtsOptions {
-        val contentEntity: Entity? = getContentEntity(annotation.getAsType("contentEntity"))
+    private fun getFts4Options(annotation: XAnnotation): FtsOptions {
+        val contentEntity: Entity? = getContentEntity(annotation["contentEntity"]?.asType())
         return FtsOptions(
-            tokenizer = annotation.value.tokenizer,
-            tokenizerArgs = annotation.value.tokenizerArgs.asList(),
+            tokenizer = annotation["tokenizer"]?.asString() ?: TOKENIZER_SIMPLE,
+            tokenizerArgs = annotation["tokenizerArgs"]?.asStringList() ?: emptyList(),
             contentEntity = contentEntity,
-            languageIdColumnName = annotation.value.languageId,
-            matchInfo = annotation.value.matchInfo,
-            notIndexedColumns = annotation.value.notIndexed.asList(),
-            prefixSizes = annotation.value.prefix.asList(),
-            preferredOrder = annotation.value.order
+            languageIdColumnName = annotation["languageId"]?.asString() ?: "",
+            matchInfo =
+                annotation["matchInfo"]?.asEnum()?.let { MatchInfo.valueOf(it.name) }
+                    ?: MatchInfo.FTS4,
+            notIndexedColumns = annotation["notIndexed"]?.asStringList() ?: emptyList(),
+            prefixSizes = annotation["prefix"]?.asIntList() ?: emptyList(),
+            preferredOrder =
+                annotation["order"]?.asEnum()?.let { Order.valueOf(it.name) } ?: Order.ASC,
         )
     }
 
@@ -195,11 +225,11 @@ internal constructor(
     }
 
     private fun findAndValidatePrimaryKey(
-        entityAnnotation: XAnnotationBox<androidx.room.Entity>?,
+        entityAnnotation: XAnnotation?,
         fields: List<Field>
     ): PrimaryKey {
         val keysFromEntityAnnotation =
-            entityAnnotation?.value?.primaryKeys?.mapNotNull { pkColumnName ->
+            entityAnnotation?.get("primaryKeys")?.asStringList()?.mapNotNull { pkColumnName ->
                 val field = fields.firstOrNull { it.columnName == pkColumnName }
                 context.checker.check(
                     field != null,

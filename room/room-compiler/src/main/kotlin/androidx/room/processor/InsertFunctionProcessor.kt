@@ -37,7 +37,7 @@ class InsertFunctionProcessor(
         val annotation =
             delegate.extractAnnotation(Insert::class, ProcessorErrors.MISSING_INSERT_ANNOTATION)
 
-        val onConflict = annotation?.value?.onConflict ?: OnConflictProcessor.INVALID_ON_CONFLICT
+        val onConflict = annotation?.get("onConflict")?.asInt() ?: OnConflictStrategy.ABORT
         context.checker.check(
             onConflict in OnConflictStrategy.NONE..OnConflictStrategy.IGNORE,
             executableElement,
@@ -53,7 +53,7 @@ class InsertFunctionProcessor(
 
         val (entities, params) =
             delegate.extractParams(
-                targetEntityType = annotation?.getAsType("entity"),
+                targetEntityType = annotation?.get("entity")?.asType(),
                 missingParamError = ProcessorErrors.INSERT_DOES_NOT_HAVE_ANY_PARAMETERS_TO_INSERT,
                 onValidatePartialEntity = { entity, pojo ->
                     val missingPrimaryKeys =

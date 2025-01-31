@@ -44,7 +44,7 @@ class UpsertFunctionProcessor(
 
         val (entities, params) =
             delegate.extractParams(
-                targetEntityType = annotation?.getAsType("entity"),
+                targetEntityType = annotation?.get("entity")?.asType(),
                 missingParamError = ProcessorErrors.UPSERT_DOES_NOT_HAVE_ANY_PARAMETERS_TO_UPSERT,
                 onValidatePartialEntity = { entity, pojo ->
                     val missingPrimaryKeys =
