@@ -188,9 +188,6 @@ actual fun Dialog(
             DialogWrapper(onDismissRequest, properties, view, layoutDirection, density, dialogId)
                 .apply {
                     setContent(composition) {
-                        // TODO(b/159900354): draw a scrim and add margins around the Compose
-                        // Dialog, and
-                        //  consume clicks so they can't pass through to the underlying UI
                         DialogLayout(Modifier.semantics { dialog() }, currentContent)
                     }
                 }
@@ -537,8 +534,6 @@ private class DialogWrapper(
                 LayoutDirection.Rtl -> android.util.LayoutDirection.RTL
             }
     }
-
-    // TODO(b/159900354): Make the Android Dialog full screen and the scrim fully transparent
 
     fun setContent(parentComposition: CompositionContext, children: @Composable () -> Unit) {
         dialogLayout.setContent(parentComposition, children)
