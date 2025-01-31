@@ -69,7 +69,9 @@ class AppFunctionIndexXmlProcessor(
         appFunctionsByClass: List<AnnotatedAppFunctions>,
     ) {
         val appFunctionMetadataList =
-            appFunctionsByClass.flatMap { it.createAppFunctionMetadataInstances() }
+            appFunctionsByClass.flatMap {
+                it.createAppFunctionMetadataList().map { it.toAppFunctionMetadataDocument() }
+            }
 
         val xmlDocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
         val xmlDocument = xmlDocumentBuilder.newDocument().apply { xmlStandalone = true }

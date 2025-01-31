@@ -64,7 +64,9 @@ class AppFunctionLegacyIndexXmlProcessor(
             return
         }
         val appFunctionMetadataList =
-            appFunctionsByClass.flatMap { it.createAppFunctionMetadataInstances() }
+            appFunctionsByClass.flatMap {
+                it.createAppFunctionMetadataList().map { it.toAppFunctionMetadataDocument() }
+            }
         writeXmlFile(appFunctionMetadataList, appFunctionsByClass)
     }
 

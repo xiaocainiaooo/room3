@@ -60,6 +60,21 @@ public class AppFunctionSchemaMetadata(
     override fun toString(): String {
         return "AppFunctionSchemaMetadata(category='$category', name='$name', version=$version)"
     }
+
+    /**
+     * Converts this [AppFunctionSchemaMetadata] to an [AppFunctionSchemaMetadataDocument].
+     *
+     * This is used to persist the schema metadata to storage.
+     */
+    // TODO: Add test for converter
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public fun toAppFunctionSchemaMetadataDocument(): AppFunctionSchemaMetadataDocument {
+        return AppFunctionSchemaMetadataDocument(
+            schemaName = name,
+            schemaCategory = category,
+            schemaVersion = version
+        )
+    }
 }
 
 /** Represents the persistent storage format of [AppFunctionSchemaMetadata]. */

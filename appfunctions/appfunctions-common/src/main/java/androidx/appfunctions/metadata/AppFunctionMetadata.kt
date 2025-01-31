@@ -85,6 +85,35 @@ constructor(
     override fun toString(): String {
         return "AppFunctionMetadata(isEnabledByDefault=$isEnabledByDefault, schema=$schema, parameters=$parameters, response=$response, components=$components)"
     }
+
+    /**
+     * Converts the [AppFunctionMetadata] to an [AppFunctionMetadataDocument].
+     *
+     * This method is used to persist the [AppFunctionMetadata] in a database.
+     */
+    // TODO: Add test for converter
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public fun toAppFunctionMetadataDocument(): AppFunctionMetadataDocument {
+        return AppFunctionMetadataDocument(
+            id = id,
+            isEnabledByDefault = isEnabledByDefault,
+            schema =
+                if (schema != null) {
+                    val functionSchemaMetadata = checkNotNull(schema)
+                    functionSchemaMetadata.toAppFunctionSchemaMetadataDocument()
+                } else {
+                    null
+                },
+            parameters = parameters.toAppFunctionDataTypeMetadataDocument(),
+            response =
+                // TODO: Handle non-primitive and collections.
+                AppFunctionDataTypeMetadataDocument(
+                    type = (response as AppFunctionPrimitiveTypeMetadata).type,
+                    isNullable = response.isNullable,
+                ),
+            components = components.toAppFunctionComponentsMetadataDocument()
+        )
+    }
 }
 
 /** Represents the persistent storage format of [AppFunctionMetadata]. */
