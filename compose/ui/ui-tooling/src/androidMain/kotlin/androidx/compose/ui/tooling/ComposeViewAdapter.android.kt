@@ -38,7 +38,6 @@ import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
@@ -158,20 +157,6 @@ internal class ComposeViewAdapter : FrameLayout {
      * initialized.
      */
     private var previewComposition: @Composable () -> Unit = {}
-
-    // Note: the constant emptyContent below instead of a literal {} works around
-    // https://youtrack.jetbrains.com/issue/KT-17467, which causes the compiler to emit classes
-    // named `content` and `Content` (from the Content method's composable update scope)
-    // which causes compilation problems on case-insensitive filesystems.
-    @Suppress("RemoveExplicitTypeArguments")
-    private val content = mutableStateOf<@Composable () -> Unit>(emptyContent)
-
-    /**
-     * When true, the composition will be immediately invalidated after being drawn. This will force
-     * it to be recomposed on the next render. This is useful for live literals so the whole
-     * composition happens again on the next render.
-     */
-    private var forceCompositionInvalidation = false
 
     /**
      * When true, the adapter will try to look objects that support the call [DESIGN_INFO_METHOD]
@@ -359,18 +344,8 @@ internal class ComposeViewAdapter : FrameLayout {
         }
     }
 
-    private fun invalidateComposition() {
-        // Invalidate the full composition by setting it to empty and back to the actual value
-        content.value = {}
-        content.value = previewComposition
-        // Invalidate the state of the view so it gets redrawn
-        invalidate()
-    }
-
     override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
-
-        if (forceCompositionInvalidation) invalidateComposition()
 
         onDraw()
         if (!debugPaintBounds) {
@@ -429,8 +404,6 @@ internal class ComposeViewAdapter : FrameLayout {
      * @param debugViewInfos if true, it will generate the [ViewInfo] structures and will log it.
      * @param animationClockStartTime if positive, [clock] will be defined and will control the
      *   animations defined in the context of the `@Composable` being previewed.
-     * @param forceCompositionInvalidation if true, the composition will be invalidated on every
-     *   draw, forcing it to recompose on next render.
      * @param lookForDesignInfoProviders if true, it will try to populate [designInfoList].
      * @param designInfoProvidersArgument String to use as an argument when populating
      *   [designInfoList].
@@ -448,7 +421,6 @@ internal class ComposeViewAdapter : FrameLayout {
         debugPaintBounds: Boolean = false,
         debugViewInfos: Boolean = false,
         animationClockStartTime: Long = -1,
-        forceCompositionInvalidation: Boolean = false,
         lookForDesignInfoProviders: Boolean = false,
         designInfoProvidersArgument: String? = null,
         onCommit: () -> Unit = {},
@@ -457,7 +429,6 @@ internal class ComposeViewAdapter : FrameLayout {
         this.debugPaintBounds = debugPaintBounds
         this.debugViewInfos = debugViewInfos
         this.composableName = methodName
-        this.forceCompositionInvalidation = forceCompositionInvalidation
         this.lookForDesignInfoProviders = lookForDesignInfoProviders
         this.designInfoProvidersArgument = designInfoProvidersArgument ?: ""
         this.onDraw = onDraw
@@ -566,9 +537,6 @@ internal class ComposeViewAdapter : FrameLayout {
                 -1L
             }
 
-        val forceCompositionInvalidation =
-            attrs.getAttributeBooleanValue(TOOLS_NS_URI, "forceCompositionInvalidation", false)
-
         init(
             className = className,
             methodName = methodName,
@@ -579,7 +547,6 @@ internal class ComposeViewAdapter : FrameLayout {
             debugViewInfos =
                 attrs.getAttributeBooleanValue(TOOLS_NS_URI, "printViewInfos", debugViewInfos),
             animationClockStartTime = animationClockStartTime,
-            forceCompositionInvalidation = forceCompositionInvalidation,
             lookForDesignInfoProviders =
                 attrs.getAttributeBooleanValue(
                     TOOLS_NS_URI,
