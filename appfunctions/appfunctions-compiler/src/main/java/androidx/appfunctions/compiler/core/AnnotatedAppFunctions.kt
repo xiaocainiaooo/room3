@@ -82,7 +82,7 @@ data class AnnotatedAppFunctions(
                     continue
                 }
 
-                if (!ksValueParameter.type.isSupportedType()) {
+                if (!isSupportedType(ksValueParameter.type)) {
                     throw ProcessingException(
                         "App function parameters must be a supported type, or a type " +
                             "annotated as @AppFunctionSerializable. See list of supported types:\n" +
@@ -272,4 +272,82 @@ data class AnnotatedAppFunctions(
         val schemaVersion: Long?,
         val schemaCategory: String?
     )
+
+    companion object {
+        /**
+         * Checks if the type reference is a supported type.
+         *
+         * A supported type is a primitive type, a type annotated as @AppFunctionSerializable, or a
+         * list of a supported type.
+         */
+        fun isSupportedType(typeReferenceArgument: KSTypeReference): Boolean {
+            return SUPPORTED_TYPES.contains(typeReferenceArgument.getTypeNameAsString()) ||
+                isAppFunctionSerializableType(typeReferenceArgument)
+        }
+
+        /**
+         * Checks if the type reference is annotated as @AppFunctionSerializable.
+         *
+         * If the type reference is a list, it will resolve the type reference of the list element.
+         */
+        fun isAppFunctionSerializableType(typeReferenceArgument: KSTypeReference): Boolean {
+            var typeToCheck = typeReferenceArgument
+            if (typeReferenceArgument.isOfType(LIST)) {
+                typeToCheck = typeReferenceArgument.resolveListParameterizedType()
+            }
+            return typeToCheck
+                .resolve()
+                .declaration
+                .annotations
+                .findAnnotation(IntrospectionHelper.AppFunctionSerializableAnnotation.CLASS_NAME) !=
+                null
+        }
+
+        /**
+         * Gets the type name of the type reference as a string.
+         *
+         * If the type reference is a list, it will resolve the type reference of the list element.
+         */
+        fun KSTypeReference.getTypeNameAsString(): String {
+            if (isOfType(LIST)) {
+                return getListTypeNameAsString()
+            }
+            return ensureQualifiedTypeName().asString()
+        }
+
+        private fun KSTypeReference.getListTypeNameAsString(): String {
+            if (!isOfType(LIST)) {
+                throw ProcessingException(
+                    "Unable to resolve list parameterized type for non list type",
+                    this
+                )
+            }
+            val parametrizedType =
+                resolve().arguments.firstOrNull()?.type
+                    ?: throw ProcessingException(
+                        "Unable to resolve the parameterized type for the list",
+                        this
+                    )
+            return this.ensureQualifiedTypeName().asString() +
+                "<" +
+                parametrizedType.ensureQualifiedTypeName().asString() +
+                ">"
+        }
+
+        internal val SUPPORTED_TYPES =
+            setOf(
+                Int::class.qualifiedName!!,
+                Long::class.qualifiedName!!,
+                Float::class.qualifiedName!!,
+                Double::class.qualifiedName!!,
+                Boolean::class.qualifiedName!!,
+                String::class.qualifiedName!!,
+                IntArray::class.qualifiedName!!,
+                LongArray::class.qualifiedName!!,
+                FloatArray::class.qualifiedName!!,
+                DoubleArray::class.qualifiedName!!,
+                BooleanArray::class.qualifiedName!!,
+                "kotlin.collections.List<kotlin.String>"
+            )
+    }
 }
