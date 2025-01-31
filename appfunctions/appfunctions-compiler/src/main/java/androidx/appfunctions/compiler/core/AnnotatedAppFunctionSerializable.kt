@@ -16,6 +16,9 @@
 
 package androidx.appfunctions.compiler.core
 
+import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.SUPPORTED_TYPES
+import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.getTypeNameAsString
+import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.isSupportedType
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 
 /** Represents a class annotated with [androidx.appfunctions.AppFunctionSerializable]. */
@@ -35,7 +38,7 @@ data class AnnotatedAppFunctionSerializable(val classDeclaration: KSClassDeclara
                 )
             }
 
-            if (!ksValueParameter.type.isSupportedType()) {
+            if (!isSupportedType(ksValueParameter.type)) {
                 throw ProcessingException(
                     "AppFunctionSerializable properties must be one of the following types:\n" +
                         SUPPORTED_TYPES.joinToString(",") +
