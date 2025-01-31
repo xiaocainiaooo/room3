@@ -59,5 +59,5 @@ public final class ColorTokens {
     @ColorInt public static final int TERTIARY_CONTAINER = PaletteTokens.TERTIARY30;
     @ColorInt public static final int TERTIARY_DIM = PaletteTokens.TERTIARY80;
 
-  private ColorTokens() {}
+    private ColorTokens() {}
 }
