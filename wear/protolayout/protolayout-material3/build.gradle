@@ -40,6 +40,7 @@ dependencies {
     lintPublish(project(":wear:protolayout:protolayout-lint"))
     compileOnly(project(":annotation:annotation-sampled"))
     implementation("androidx.annotation:annotation-experimental:1.4.1")
+    implementation("androidx.core:core:1.15.0")
 
     testImplementation(libs.junit)
     testImplementation(libs.mockitoCore4)
