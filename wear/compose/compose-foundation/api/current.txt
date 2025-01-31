@@ -579,8 +579,9 @@ package androidx.wear.compose.foundation.lazy {
   @kotlin.DslMarker public @interface TransformingLazyColumnScopeMarker {
   }
 
-  public final class TransformingLazyColumnState implements androidx.compose.foundation.gestures.ScrollableState {
+  @androidx.compose.runtime.Stable public final class TransformingLazyColumnState implements androidx.compose.foundation.gestures.ScrollableState {
     ctor public TransformingLazyColumnState();
+    ctor public TransformingLazyColumnState(optional int initialAnchorItemIndex, optional int initialAnchorItemScrollOffset);
     method public suspend Object? animateScrollToItem(@IntRange(from=0L) int index, optional int scrollOffset, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public float dispatchRawDelta(float delta);
     method public int getAnchorItemIndex();
@@ -599,7 +600,7 @@ package androidx.wear.compose.foundation.lazy {
   }
 
   public final class TransformingLazyColumnStateKt {
-    method @androidx.compose.runtime.Composable public static androidx.wear.compose.foundation.lazy.TransformingLazyColumnState rememberTransformingLazyColumnState();
+    method @androidx.compose.runtime.Composable public static androidx.wear.compose.foundation.lazy.TransformingLazyColumnState rememberTransformingLazyColumnState(optional int initialAnchorItemIndex, optional int initialAnchorItemScrollOffset);
   }
 
   public sealed interface TransformingLazyColumnVisibleItemInfo {
