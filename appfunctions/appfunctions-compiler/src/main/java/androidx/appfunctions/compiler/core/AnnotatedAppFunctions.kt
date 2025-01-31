@@ -19,12 +19,12 @@ package androidx.appfunctions.compiler.core
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionAnnotation
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionContextClass
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSchemaDefinitionAnnotation
-import androidx.appfunctions.metadata.AppFunctionComponentsMetadata
+import androidx.appfunctions.metadata.AppFunctionComponentsMetadataDocument
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
-import androidx.appfunctions.metadata.AppFunctionMetadata
-import androidx.appfunctions.metadata.AppFunctionParameterMetadata
-import androidx.appfunctions.metadata.AppFunctionResponseMetadata
-import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
+import androidx.appfunctions.metadata.AppFunctionDataTypeMetadataDocument
+import androidx.appfunctions.metadata.AppFunctionMetadataDocument
+import androidx.appfunctions.metadata.AppFunctionPropertyMetadataDocument
+import androidx.appfunctions.metadata.AppFunctionSchemaMetadataDocument
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
@@ -123,67 +123,71 @@ data class AnnotatedAppFunctions(
         )
     }
 
-    /** Creates [AppFunctionMetadata] instances for each of [appFunctionDeclarations]. */
-    fun createAppFunctionMetadataInstances(): List<AppFunctionMetadata> =
+    /** Creates [AppFunctionMetadataDocument] instances for each of [appFunctionDeclarations]. */
+    fun createAppFunctionMetadataInstances(): List<AppFunctionMetadataDocument> =
         this.appFunctionDeclarations.map { fnDeclaration ->
             val appFunctionAnnotationProperties =
                 computeAppFunctionAnnotationProperties(fnDeclaration)
             val schemaMetadata =
                 if (appFunctionAnnotationProperties.schemaName != null) {
-                    AppFunctionSchemaMetadata(
-                        checkNotNull(appFunctionAnnotationProperties.schemaCategory),
-                        checkNotNull(appFunctionAnnotationProperties.schemaName),
-                        checkNotNull(appFunctionAnnotationProperties.schemaVersion)
+                    AppFunctionSchemaMetadataDocument(
+                        schemaCategory =
+                            checkNotNull(appFunctionAnnotationProperties.schemaCategory),
+                        schemaName = checkNotNull(appFunctionAnnotationProperties.schemaName),
+                        schemaVersion = checkNotNull(appFunctionAnnotationProperties.schemaVersion)
                     )
                 } else {
                     null
                 }
-            AppFunctionMetadata(
+            AppFunctionMetadataDocument(
                 id = this.getAppFunctionIdentifier(fnDeclaration),
                 isEnabledByDefault = appFunctionAnnotationProperties.isEnabledByDefault,
-                // TODO: Remove these when AppFunctionMetadata is finalized.
-                isRestrictToTrustedCaller = false,
-                displayNameRes = 0,
                 schema = schemaMetadata,
                 // TODO: Handle non-primitive and collections.
                 parameters = fnDeclaration.buildMetadataForParameters(),
                 response =
-                    AppFunctionResponseMetadata(
+                    AppFunctionDataTypeMetadataDocument(
+                        type = checkNotNull(fnDeclaration.returnType?.toAppFunctionDataType()),
                         isNullable = fnDeclaration.returnType?.resolve()?.isMarkedNullable == true,
-                        dataType =
-                            AppFunctionDataTypeMetadata(
-                                type =
-                                    checkNotNull(fnDeclaration.returnType?.toAppFunctionDataType())
-                            )
                     ),
-                components = AppFunctionComponentsMetadata(dataTypes = emptyList())
+                components = AppFunctionComponentsMetadataDocument(dataTypes = emptyList())
             )
         }
 
     private fun KSFunctionDeclaration.buildMetadataForParameters():
-        List<AppFunctionParameterMetadata> =
-        parameters
-            .filter { !it.type.isOfType(AppFunctionContextClass.CLASS_NAME) }
-            .map {
-                AppFunctionParameterMetadata(
-                    name = checkNotNull(it.name?.asString()),
-                    isRequired = !it.type.resolve().isMarkedNullable,
-                    dataType = AppFunctionDataTypeMetadata(type = it.type.toAppFunctionDataType())
-                )
-            }
+        AppFunctionDataTypeMetadataDocument {
+        // TODO: Consider building the non-document classes first and only converting them to
+        //  documents just before serializing them into XML.
+        val properties =
+            parameters
+                .filter { !it.type.isOfType(AppFunctionContextClass.CLASS_NAME) }
+                .map {
+                    AppFunctionPropertyMetadataDocument(
+                        name = checkNotNull(it.name?.asString()),
+                        dataTypeMetadata =
+                            AppFunctionDataTypeMetadataDocument(
+                                type = it.type.toAppFunctionDataType(),
+                            )
+                    )
+                }
+        return AppFunctionDataTypeMetadataDocument(
+            type = AppFunctionDataTypeMetadata.TYPE_OBJECT,
+            properties = properties
+        )
+    }
 
     private fun KSTypeReference.toAppFunctionDataType(): Int =
         when (this.resolve().declaration.qualifiedName?.asString()) {
-            "kotlin.String" -> AppFunctionDataTypeMetadata.STRING
-            "kotlin.Int" -> AppFunctionDataTypeMetadata.INT
-            "kotlin.Long" -> AppFunctionDataTypeMetadata.LONG
-            "kotlin.Float" -> AppFunctionDataTypeMetadata.FLOAT
-            "kotlin.Double" -> AppFunctionDataTypeMetadata.DOUBLE
-            "kotlin.Boolean" -> AppFunctionDataTypeMetadata.BOOLEAN
-            "kotlin.Byte" -> AppFunctionDataTypeMetadata.BYTES
-            "kotlin.Unit" -> AppFunctionDataTypeMetadata.UNIT
+            "kotlin.String" -> AppFunctionDataTypeMetadata.TYPE_STRING
+            "kotlin.Int" -> AppFunctionDataTypeMetadata.TYPE_INT
+            "kotlin.Long" -> AppFunctionDataTypeMetadata.TYPE_LONG
+            "kotlin.Float" -> AppFunctionDataTypeMetadata.TYPE_FLOAT
+            "kotlin.Double" -> AppFunctionDataTypeMetadata.TYPE_DOUBLE
+            "kotlin.Boolean" -> AppFunctionDataTypeMetadata.TYPE_BOOLEAN
+            "kotlin.Byte" -> AppFunctionDataTypeMetadata.TYPE_BYTES
+            "kotlin.Unit" -> AppFunctionDataTypeMetadata.TYPE_UNIT
             // TODO: Support converting other types.
-            else -> AppFunctionDataTypeMetadata.OBJECT
+            else -> AppFunctionDataTypeMetadata.TYPE_OBJECT
         }
 
     private fun computeAppFunctionAnnotationProperties(

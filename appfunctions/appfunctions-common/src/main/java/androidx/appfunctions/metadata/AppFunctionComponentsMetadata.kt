@@ -20,41 +20,41 @@ import androidx.annotation.RestrictTo
 import androidx.appsearch.annotation.Document
 import java.util.Objects
 
-// TODO: Make it public once API surface is finalize
-/** Represent the reusable components for a function specification */
-@Document
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+/** Represent the reusable components in a function specification. */
 public class AppFunctionComponentsMetadata
-internal constructor(
-    @Document.Namespace public val namespace: String,
-    @Document.Id public val id: String,
-    /** The list of common [AppFunctionDataTypeMetadata] that can be used to call an AppFunction. */
-    @Document.DocumentProperty public val dataTypes: List<AppFunctionDataTypeMetadata>,
-) {
+@JvmOverloads
+constructor(
     /**
-     * @param dataTypes The list of common [AppFunctionDataTypeMetadata] that can be used for
-     *   function calling.
+     * The list of data types that can be reused across the schema. For example, a Person type can
+     * be defined here and referenced in multiple places. See {@link
+     * AppFunctionReferenceTypeMetadata#referenceDataType}.
      */
-    public constructor(
-        dataTypes: List<AppFunctionDataTypeMetadata>
-    ) : this(APP_FUNCTION_NAMESPACE, APP_FUNCTION_ID_EMPTY, dataTypes)
-
+    public val dataTypes: List<AppFunctionDataTypeMetadata> = emptyList(),
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is AppFunctionComponentsMetadata) return false
+        if (javaClass != other?.javaClass) return false
 
-        return this.namespace == other.namespace &&
-            this.id == other.id &&
-            this.dataTypes == other.dataTypes
+        other as AppFunctionComponentsMetadata
+
+        return dataTypes == other.dataTypes
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(namespace, id, dataTypes)
+        return Objects.hashCode(dataTypes)
     }
 
     override fun toString(): String {
-        return "AppFunctionComponentsMetadata(namespace=$namespace, " +
-            "id=$id, " +
-            "dataTypes=$dataTypes)"
+        return "AppFunctionComponentsMetadata(dataTypes=$dataTypes)"
     }
 }
+
+/** Represents the persistent storage format of [AppFunctionComponentsMetadata]. */
+@Document
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+public data class AppFunctionComponentsMetadataDocument(
+    @Document.Namespace public val namespace: String = APP_FUNCTION_NAMESPACE,
+    @Document.Id public val id: String = APP_FUNCTION_ID_EMPTY,
+    /** The list of data types that ban be reusable across the schema. */
+    @Document.DocumentProperty public val dataTypes: List<AppFunctionDataTypeMetadata>,
+)
