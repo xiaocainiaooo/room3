@@ -250,6 +250,10 @@ package androidx.constraintlayout.compose {
     method public static androidx.constraintlayout.compose.Dimension getAtLeastWrapContent(androidx.constraintlayout.compose.Dimension.MinCoercible);
     method public static androidx.constraintlayout.compose.Dimension.MinCoercible getAtMostWrapContent(androidx.constraintlayout.compose.Dimension.Coercible);
     method public static androidx.constraintlayout.compose.Dimension getAtMostWrapContent(androidx.constraintlayout.compose.Dimension.MaxCoercible);
+    property public final androidx.constraintlayout.compose.Dimension.MaxCoercible atLeastWrapContent;
+    property public final androidx.constraintlayout.compose.Dimension atLeastWrapContent;
+    property public final androidx.constraintlayout.compose.Dimension.MinCoercible atMostWrapContent;
+    property public final androidx.constraintlayout.compose.Dimension atMostWrapContent;
   }
 
   @androidx.compose.foundation.layout.LayoutScopeMarker public final class ConstraintLayoutScope extends androidx.constraintlayout.compose.ConstraintLayoutBaseScope {
@@ -284,6 +288,8 @@ package androidx.constraintlayout.compose {
     method public static Object? getConstraintLayoutId(androidx.compose.ui.layout.Measurable);
     method public static Object? getConstraintLayoutTag(androidx.compose.ui.layout.Measurable);
     method public static androidx.compose.ui.Modifier layoutId(androidx.compose.ui.Modifier, String layoutId, optional String? tag);
+    property public final Object? constraintLayoutId;
+    property public final Object? constraintLayoutTag;
   }
 
   public interface ConstraintLayoutTagParentData {

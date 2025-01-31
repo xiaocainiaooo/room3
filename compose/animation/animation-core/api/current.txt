@@ -161,6 +161,7 @@ package androidx.compose.animation.core {
     method public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.animation.core.AnimationState<T,V> copy(androidx.compose.animation.core.AnimationState<T,V>, optional T value, optional V? velocityVector, optional long lastFrameTimeNanos, optional long finishedTimeNanos, optional boolean isRunning);
     method public static <T, V extends androidx.compose.animation.core.AnimationVector> V createZeroVectorFrom(androidx.compose.animation.core.TwoWayConverter<T,V>, T value);
     method public static boolean isFinished(androidx.compose.animation.core.AnimationState<? extends java.lang.Object?,? extends java.lang.Object?>);
+    property public final boolean isFinished;
   }
 
   public abstract sealed class AnimationVector {
@@ -758,6 +759,15 @@ package androidx.compose.animation.core {
     method public static androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntSize,androidx.compose.animation.core.AnimationVector2D> getVectorConverter(androidx.compose.ui.unit.IntSize.Companion);
     method public static androidx.compose.animation.core.TwoWayConverter<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> getVectorConverter(kotlin.jvm.internal.FloatCompanionObject);
     method public static androidx.compose.animation.core.TwoWayConverter<java.lang.Integer,androidx.compose.animation.core.AnimationVector1D> getVectorConverter(kotlin.jvm.internal.IntCompanionObject);
+    property public final androidx.compose.animation.core.TwoWayConverter<java.lang.Float,androidx.compose.animation.core.AnimationVector1D> VectorConverter;
+    property public final androidx.compose.animation.core.TwoWayConverter<java.lang.Integer,androidx.compose.animation.core.AnimationVector1D> VectorConverter;
+    property public final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Rect,androidx.compose.animation.core.AnimationVector4D> VectorConverter;
+    property public final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> VectorConverter;
+    property public final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.DpOffset,androidx.compose.animation.core.AnimationVector2D> VectorConverter;
+    property public final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Size,androidx.compose.animation.core.AnimationVector2D> VectorConverter;
+    property public final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.geometry.Offset,androidx.compose.animation.core.AnimationVector2D> VectorConverter;
+    property public final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntOffset,androidx.compose.animation.core.AnimationVector2D> VectorConverter;
+    property public final androidx.compose.animation.core.TwoWayConverter<androidx.compose.ui.unit.IntSize,androidx.compose.animation.core.AnimationVector2D> VectorConverter;
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface VectorizedAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> {
@@ -867,6 +877,14 @@ package androidx.compose.animation.core {
     method public static long getVisibilityThreshold(androidx.compose.ui.unit.IntOffset.Companion);
     method public static long getVisibilityThreshold(androidx.compose.ui.unit.IntSize.Companion);
     method public static int getVisibilityThreshold(kotlin.jvm.internal.IntCompanionObject);
+    property public final long VisibilityThreshold;
+    property public final long VisibilityThreshold;
+    property public final int VisibilityThreshold;
+    property public final float VisibilityThreshold;
+    property public final long VisibilityThreshold;
+    property public final long VisibilityThreshold;
+    property public final long VisibilityThreshold;
+    property public final androidx.compose.ui.geometry.Rect VisibilityThreshold;
   }
 
 }

@@ -119,6 +119,20 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static inline operator long times(float, long size);
     method @androidx.compose.runtime.Stable public static inline operator float times(int, float other);
     method @androidx.compose.runtime.Stable public static inline operator long times(int, long size);
+    property @androidx.compose.runtime.Stable public final long center;
+    property @androidx.compose.runtime.Stable public final inline float dp;
+    property @androidx.compose.runtime.Stable public final inline float dp;
+    property @androidx.compose.runtime.Stable public final inline float dp;
+    property @androidx.compose.runtime.Stable public final inline float height;
+    property @androidx.compose.runtime.Stable public final inline boolean isFinite;
+    property @androidx.compose.runtime.Stable public final inline boolean isSpecified;
+    property @androidx.compose.runtime.Stable public final inline boolean isSpecified;
+    property @androidx.compose.runtime.Stable public final inline boolean isSpecified;
+    property @androidx.compose.runtime.Stable public final inline boolean isUnspecified;
+    property @androidx.compose.runtime.Stable public final inline boolean isUnspecified;
+    property @androidx.compose.runtime.Stable public final inline boolean isUnspecified;
+    property @androidx.compose.runtime.Stable public final inline long size;
+    property @androidx.compose.runtime.Stable public final inline float width;
   }
 
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class DpOffset {
@@ -324,6 +338,7 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect toIntRect(long);
     method @androidx.compose.runtime.Stable public static long toIntSize(long);
     method @androidx.compose.runtime.Stable public static long toSize(long);
+    property @androidx.compose.runtime.Stable public final long center;
   }
 
   public enum LayoutDirection {
@@ -367,6 +382,14 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static inline operator long times(double, long other);
     method @androidx.compose.runtime.Stable public static inline operator long times(float, long other);
     method @androidx.compose.runtime.Stable public static inline operator long times(int, long other);
+    property @androidx.compose.runtime.Stable public final long em;
+    property @androidx.compose.runtime.Stable public final long em;
+    property @androidx.compose.runtime.Stable public final long em;
+    property @androidx.compose.runtime.Stable public final inline boolean isSpecified;
+    property @androidx.compose.runtime.Stable public final inline boolean isUnspecified;
+    property @androidx.compose.runtime.Stable public final long sp;
+    property @androidx.compose.runtime.Stable public final long sp;
+    property @androidx.compose.runtime.Stable public final long sp;
   }
 
   @kotlin.jvm.JvmInline public final value class TextUnitType {

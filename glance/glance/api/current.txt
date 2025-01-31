@@ -255,6 +255,7 @@ package androidx.glance.color {
 
   public final class DayNightColorProvidersKt {
     method public static androidx.glance.unit.ColorProvider ColorProvider(long day, long night);
+    property public final boolean isNightMode;
   }
 
 }
@@ -424,6 +425,8 @@ package androidx.glance.semantics {
     method public static String getTestTag(androidx.glance.semantics.SemanticsPropertyReceiver);
     method public static void setContentDescription(androidx.glance.semantics.SemanticsPropertyReceiver, String);
     method public static void setTestTag(androidx.glance.semantics.SemanticsPropertyReceiver, String);
+    property public final String contentDescription;
+    property public final String testTag;
   }
 
   public final class SemanticsPropertyKey<T> {

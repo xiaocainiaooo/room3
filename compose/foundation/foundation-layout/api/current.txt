@@ -449,7 +449,34 @@ package androidx.compose.foundation.layout {
     method @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static boolean isTappableElementVisible(androidx.compose.foundation.layout.WindowInsets.Companion);
     method public static void setConsumeWindowInsets(androidx.compose.ui.platform.AbstractComposeView, boolean);
     method public void setConsumeWindowInsets(boolean);
+    property @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi public final boolean areNavigationBarsVisible;
+    property @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi public final boolean areStatusBarsVisible;
+    property @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi public final boolean areSystemBarsVisible;
+    property public final androidx.compose.foundation.layout.WindowInsets captionBar;
+    property @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi public final androidx.compose.foundation.layout.WindowInsets captionBarIgnoringVisibility;
+    property public final boolean consumeWindowInsets;
     property @Deprecated public boolean consumeWindowInsets;
+    property public final androidx.compose.foundation.layout.WindowInsets displayCutout;
+    property public final androidx.compose.foundation.layout.WindowInsets ime;
+    property @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi public final androidx.compose.foundation.layout.WindowInsets imeAnimationSource;
+    property @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi public final androidx.compose.foundation.layout.WindowInsets imeAnimationTarget;
+    property @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi public final boolean isCaptionBarVisible;
+    property @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi public final boolean isImeVisible;
+    property @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi public final boolean isTappableElementVisible;
+    property public final androidx.compose.foundation.layout.WindowInsets mandatorySystemGestures;
+    property public final androidx.compose.foundation.layout.WindowInsets navigationBars;
+    property @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi public final androidx.compose.foundation.layout.WindowInsets navigationBarsIgnoringVisibility;
+    property public final androidx.compose.foundation.layout.WindowInsets safeContent;
+    property public final androidx.compose.foundation.layout.WindowInsets safeDrawing;
+    property public final androidx.compose.foundation.layout.WindowInsets safeGestures;
+    property public final androidx.compose.foundation.layout.WindowInsets statusBars;
+    property @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi public final androidx.compose.foundation.layout.WindowInsets statusBarsIgnoringVisibility;
+    property public final androidx.compose.foundation.layout.WindowInsets systemBars;
+    property @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi public final androidx.compose.foundation.layout.WindowInsets systemBarsIgnoringVisibility;
+    property public final androidx.compose.foundation.layout.WindowInsets systemGestures;
+    property public final androidx.compose.foundation.layout.WindowInsets tappableElement;
+    property @SuppressCompatibility @androidx.compose.foundation.layout.ExperimentalLayoutApi public final androidx.compose.foundation.layout.WindowInsets tappableElementIgnoringVisibility;
+    property public final androidx.compose.foundation.layout.WindowInsets waterfall;
   }
 
 }

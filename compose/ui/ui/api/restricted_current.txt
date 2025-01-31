@@ -310,6 +310,7 @@ package androidx.compose.ui.autofill {
   public final class ContentDataType_androidKt {
     method public static androidx.compose.ui.autofill.ContentDataType ContentDataType(int dataType);
     method public static int getDataType(androidx.compose.ui.autofill.ContentDataType);
+    property public final int dataType;
   }
 
   public sealed interface ContentType {
@@ -1861,6 +1862,13 @@ package androidx.compose.ui.input.key {
     method public static boolean isCtrlPressed(android.view.KeyEvent);
     method public static boolean isMetaPressed(android.view.KeyEvent);
     method public static boolean isShiftPressed(android.view.KeyEvent);
+    property public final boolean isAltPressed;
+    property public final boolean isCtrlPressed;
+    property public final boolean isMetaPressed;
+    property public final boolean isShiftPressed;
+    property public final long key;
+    property public final int type;
+    property public final int utf16CodePoint;
   }
 
   public final class KeyInputModifierKt {
@@ -1876,6 +1884,7 @@ package androidx.compose.ui.input.key {
   public final class Key_androidKt {
     method public static long Key(int nativeKeyCode);
     method public static int getNativeKeyCode(long);
+    property public final int nativeKeyCode;
   }
 
   public interface SoftKeyboardInterceptionModifierNode extends androidx.compose.ui.node.DelegatableNode {
@@ -2062,6 +2071,22 @@ package androidx.compose.ui.input.pointer {
     method public static boolean isShiftPressed(int);
     method public static boolean isSymPressed(int);
     method public static boolean isTertiaryPressed(int);
+    property public final boolean areAnyPressed;
+    property public final boolean isAltGraphPressed;
+    property public final boolean isAltPressed;
+    property public final boolean isBackPressed;
+    property public final boolean isCapsLockOn;
+    property public final boolean isCtrlPressed;
+    property public final boolean isForwardPressed;
+    property public final boolean isFunctionPressed;
+    property public final boolean isMetaPressed;
+    property public final boolean isNumLockOn;
+    property public final boolean isPrimaryPressed;
+    property public final boolean isScrollLockOn;
+    property public final boolean isSecondaryPressed;
+    property public final boolean isShiftPressed;
+    property public final boolean isSymPressed;
+    property public final boolean isTertiaryPressed;
   }
 
   @androidx.compose.runtime.Stable public interface PointerIcon {
@@ -2457,6 +2482,7 @@ package androidx.compose.ui.layout {
   public final class LayoutIdKt {
     method public static Object? getLayoutId(androidx.compose.ui.layout.Measurable);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier layoutId(androidx.compose.ui.Modifier, Object layoutId);
+    property public final Object? layoutId;
   }
 
   public interface LayoutIdParentData {
@@ -2492,6 +2518,7 @@ package androidx.compose.ui.layout {
 
   public final class LayoutInfo_androidKt {
     method public static android.view.View? getView(androidx.compose.ui.layout.LayoutInfo);
+    property public final android.view.View? view;
   }
 
   public final class LayoutKt {
@@ -2737,6 +2764,8 @@ package androidx.compose.ui.layout {
     method public static inline long takeOrElse(long, kotlin.jvm.functions.Function0<androidx.compose.ui.layout.ScaleFactor> block);
     method @androidx.compose.runtime.Stable public static operator long times(long, long scaleFactor);
     method @androidx.compose.runtime.Stable public static operator long times(long, long size);
+    property @androidx.compose.runtime.Stable public final inline boolean isSpecified;
+    property @androidx.compose.runtime.Stable public final inline boolean isUnspecified;
   }
 
   public final class SubcomposeLayoutKt {
@@ -3564,6 +3593,7 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.CompositionContext? findViewTreeCompositionContext(android.view.View);
     method public static androidx.compose.runtime.CompositionContext? getCompositionContext(android.view.View);
     method public static void setCompositionContext(android.view.View, androidx.compose.runtime.CompositionContext?);
+    property public final androidx.compose.runtime.CompositionContext? compositionContext;
   }
 
 }
@@ -4050,6 +4080,7 @@ package androidx.compose.ui.semantics {
     property public final androidx.compose.ui.semantics.CollectionInfo collectionInfo;
     property public final androidx.compose.ui.semantics.CollectionItemInfo collectionItemInfo;
     property public final androidx.compose.ui.autofill.ContentDataType contentDataType;
+    property public final String contentDescription;
     property public final androidx.compose.ui.autofill.ContentType contentType;
     property public final java.util.List<? extends androidx.compose.ui.semantics.CustomAccessibilityAction> customActions;
     property public final androidx.compose.ui.text.AnnotatedString editableText;
@@ -4068,6 +4099,7 @@ package androidx.compose.ui.semantics {
     property public final boolean selected;
     property public final String stateDescription;
     property public final String testTag;
+    property public final androidx.compose.ui.text.AnnotatedString text;
     property public final long textSelectionRange;
     property public final androidx.compose.ui.text.AnnotatedString textSubstitution;
     property public final androidx.compose.ui.state.ToggleableState toggleableState;

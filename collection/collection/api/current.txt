@@ -1229,6 +1229,7 @@ package androidx.collection {
     method @Deprecated public static <T> boolean remove(androidx.collection.LongSparseArray<T>, long key, T value);
     method public static inline operator <T> void set(androidx.collection.LongSparseArray<T>, long key, T value);
     method public static <T> java.util.Iterator<T> valueIterator(androidx.collection.LongSparseArray<T>);
+    property public final inline int size;
   }
 
   public class LruCache<K, V> {
@@ -2388,6 +2389,7 @@ package androidx.collection {
     method @Deprecated public static <T> boolean remove(androidx.collection.SparseArrayCompat<T>, int key, T value);
     method public static inline operator <T> void set(androidx.collection.SparseArrayCompat<T>, int key, T value);
     method public static <T> java.util.Iterator<T> valueIterator(androidx.collection.SparseArrayCompat<T>);
+    property public final inline int size;
   }
 
 }

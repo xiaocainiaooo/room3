@@ -267,6 +267,23 @@ package androidx.compose.ui.test {
     method @Deprecated @SuppressCompatibility @androidx.compose.ui.test.ExperimentalTestApi public static void swipeUp(androidx.compose.ui.test.GestureScope, optional float startY, optional float endY, optional long durationMillis);
     method @Deprecated public static void swipeWithVelocity(androidx.compose.ui.test.GestureScope, long start, long end, float endVelocity, optional long durationMillis);
     method @Deprecated public static void up(androidx.compose.ui.test.GestureScope, optional int pointerId);
+    property @Deprecated public final inline float bottom;
+    property @Deprecated public final long bottomCenter;
+    property @Deprecated public final long bottomLeft;
+    property @Deprecated public final long bottomRight;
+    property @Deprecated public final long center;
+    property @Deprecated public final long centerLeft;
+    property @Deprecated public final long centerRight;
+    property @Deprecated public final inline float centerX;
+    property @Deprecated public final inline float centerY;
+    property @Deprecated public final inline int height;
+    property @Deprecated public final inline float left;
+    property @Deprecated public final inline float right;
+    property @Deprecated public final inline float top;
+    property @Deprecated public final long topCenter;
+    property @Deprecated public final long topLeft;
+    property @Deprecated public final long topRight;
+    property @Deprecated public final inline int width;
   }
 
   public final class GlobalAssertions {
@@ -353,6 +370,11 @@ package androidx.compose.ui.test {
     method public static void withKeyToggled(androidx.compose.ui.test.KeyInjectionScope, long key, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
     method public static void withKeysDown(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
     method public static void withKeysToggled(androidx.compose.ui.test.KeyInjectionScope, java.util.List<androidx.compose.ui.input.key.Key> keys, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.KeyInjectionScope,kotlin.Unit> block);
+    property public final boolean isAltDown;
+    property public final boolean isCtrlDown;
+    property public final boolean isFnDown;
+    property public final boolean isMetaDown;
+    property public final boolean isShiftDown;
   }
 
   public final class KeyInputHelpersKt {
@@ -540,6 +562,7 @@ package androidx.compose.ui.test {
 
   public final class TestMonotonicFrameClock_jvmKt {
     method @SuppressCompatibility @androidx.compose.ui.test.ExperimentalTestApi public static long getFrameDelayMillis(androidx.compose.ui.test.TestMonotonicFrameClock);
+    property @SuppressCompatibility @androidx.compose.ui.test.ExperimentalTestApi public final long frameDelayMillis;
   }
 
   public final class TextActionsKt {
