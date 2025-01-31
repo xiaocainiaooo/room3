@@ -102,7 +102,7 @@ public object SinglePaneNavDisplay {
 public fun <T : Any> SinglePaneNavDisplay(
     backstack: List<T>,
     modifier: Modifier = Modifier,
-    localProviders: List<NavLocalProvider> = emptyList(),
+    localProviders: List<NavLocalProvider> = listOf(SaveableStateNavLocalProvider()),
     contentAlignment: Alignment = Alignment.TopStart,
     sizeTransform: SizeTransform? = null,
     enterTransition: EnterTransition =
@@ -139,7 +139,7 @@ public fun <T : Any> SinglePaneNavDisplay(
     require(backstack.isNotEmpty()) { "NavDisplay backstack cannot be empty" }
 
     BackHandler(backstack.size > 1, onBack)
-    NavBackStackProvider(backstack, localProviders, entryProvider) { entries ->
+    NavBackStackProvider(backstack, entryProvider, localProviders) { entries ->
         // Make a copy shallow copy so that transition.currentState and transition.targetState are
         // different backstack instances. This ensures currentState reflects the old backstack when
         // the backstack (targetState) is updated.

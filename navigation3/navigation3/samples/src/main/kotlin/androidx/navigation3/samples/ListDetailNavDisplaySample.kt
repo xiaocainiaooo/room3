@@ -51,7 +51,7 @@ fun <T : Any> ListDetailNavDisplay(
 ) {
     val isSinglePaneLayout = (windowWidthSizeClass == WindowWidthSizeClass.Compact)
     BackHandler(isSinglePaneLayout && backstack.size > 1, onBack)
-    NavBackStackProvider(backstack, localProviders, entryProvider) { entries ->
+    NavBackStackProvider(backstack, entryProvider, localProviders) { entries ->
         val lastEntry = entries.last()
         if (isSinglePaneLayout) {
             Box(modifier = modifier) { lastEntry.content.invoke(lastEntry.key) }

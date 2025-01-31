@@ -124,7 +124,7 @@ fun <T : Any> CustomBasicDisplay(
     entryProvider: (key: T) -> NavEntry<out T>
 ) {
     BackHandler(backstack.size > 1, onBack)
-    NavBackStackProvider(backstack, localProviders, entryProvider) { entries ->
+    NavBackStackProvider(backstack, entryProvider, localProviders) { entries ->
         val entry = entries.last()
         Box(modifier = modifier) { entry.content.invoke(entry.key) }
     }
