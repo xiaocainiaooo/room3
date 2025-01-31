@@ -18,7 +18,7 @@ package androidx.appfunctions.compiler.processors
 
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctions
 import androidx.appfunctions.compiler.core.AppFunctionSymbolResolver
-import androidx.appfunctions.metadata.AppFunctionMetadata
+import androidx.appfunctions.metadata.AppFunctionMetadataDocument
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
@@ -69,7 +69,7 @@ class AppFunctionLegacyIndexXmlProcessor(
     }
 
     private fun writeXmlFile(
-        appFunctionMetadataList: List<AppFunctionMetadata>,
+        appFunctionMetadataList: List<AppFunctionMetadataDocument>,
         appFunctionsByClass: List<AnnotatedAppFunctions>,
     ) {
         val xmlDocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
@@ -106,7 +106,7 @@ class AppFunctionLegacyIndexXmlProcessor(
     }
 
     private fun Document.createAppFunctionElement(
-        appFunctionMetadata: AppFunctionMetadata
+        appFunctionMetadata: AppFunctionMetadataDocument
     ): Element =
         createElement(XmlElement.APP_FUNCTION_ITEM_TAG).apply {
             appendChild(
