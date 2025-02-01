@@ -43,10 +43,6 @@ android {
                 "CODE-COVERAGE,DEBUGGABLE,EMULATOR,LOW-BATTERY,UNLOCKED"
     }
     sourceSets {
-        main.assets.srcDirs += new File(
-                AndroidXConfig.getPrebuiltsRoot(project),
-                "androidx/traceprocessor/trace_processor_shell"
-        )
         androidTest.assets.srcDirs += new File(
                 AndroidXConfig.getPrebuiltsRoot(project),
                 "androidx/traceprocessor/testdata"

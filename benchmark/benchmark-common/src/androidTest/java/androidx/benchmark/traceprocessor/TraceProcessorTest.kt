@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,11 @@ package androidx.benchmark.traceprocessor
 
 import androidx.benchmark.Outputs
 import androidx.benchmark.Shell
-import androidx.benchmark.macro.ShellServerLifecycleManager
-import androidx.benchmark.macro.createTempFileFromAsset
-import androidx.benchmark.macro.runServer
-import androidx.benchmark.macro.runSingleSessionServer
 import androidx.benchmark.perfetto.PerfettoHelper.Companion.isAbiSupported
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import java.io.File
 import java.net.ConnectException
@@ -41,10 +38,12 @@ import org.junit.Assume.assumeFalse
 import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import perfetto.protos.QueryResult
 import perfetto.protos.TraceMetrics
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+@SdkSuppress(minSdkVersion = 23)
 class TraceProcessorTest {
     @Test
     fun shellPath() {
@@ -212,7 +211,7 @@ class TraceProcessorTest {
         TraceProcessor.runSingleSessionServer(traceFile.absolutePath) {
             val query = "SELECT name,ts,dur FROM slice WHERE name LIKE \"activityStart\""
             val bytes = rawQuery(query)
-            val queryResult = perfetto.protos.QueryResult.ADAPTER.decode(bytes)
+            val queryResult = QueryResult.ADAPTER.decode(bytes)
             assertNull(queryResult.error, "no error expected")
             assertEquals(
                 expected =
@@ -401,4 +400,15 @@ class TraceProcessorTest {
         } catch (e: ConnectException) {
             false
         }
+}
+
+@Suppress("SameParameterValue")
+internal fun createTempFileFromAsset(prefix: String, suffix: String): File {
+    val file = File.createTempFile(prefix, suffix, Outputs.dirUsableByAppAndShell)
+    InstrumentationRegistry.getInstrumentation()
+        .context
+        .assets
+        .open(prefix + suffix)
+        .copyTo(file.outputStream())
+    return file
 }
