@@ -31,9 +31,9 @@ public open class CounterTrack(
         parent = parent
     ) {
     override fun preamblePacket(): PooledTracePacket? {
-        val packet = context.pool.obtainTracePacket()
-        val track = context.pool.obtainTrackDescriptor()
-        val counter = context.pool.obtainCounterDescriptor()
+        val packet = pool.obtainTracePacket()
+        val track = pool.obtainTrackDescriptor()
+        val counter = pool.obtainCounterDescriptor()
         packet.trackPoolableForOwnership(track)
         packet.trackPoolableForOwnership(counter)
         track.trackDescriptor.uuid = uuid

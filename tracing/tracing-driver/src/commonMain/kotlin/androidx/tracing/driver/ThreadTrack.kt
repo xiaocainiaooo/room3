@@ -33,9 +33,9 @@ public open class ThreadTrack(
         parent = process
     ) {
     override fun preamblePacket(): PooledTracePacket? {
-        val packet = context.pool.obtainTracePacket()
-        val track = context.pool.obtainTrackDescriptor()
-        val thread = context.pool.obtainThreadDescriptor()
+        val packet = pool.obtainTracePacket()
+        val track = pool.obtainTrackDescriptor()
+        val thread = pool.obtainThreadDescriptor()
         packet.trackPoolableForOwnership(track)
         packet.trackPoolableForOwnership(thread)
         // Populate thread details

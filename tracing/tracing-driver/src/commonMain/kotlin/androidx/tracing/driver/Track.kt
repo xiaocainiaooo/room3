@@ -36,6 +36,9 @@ public abstract class Track(
      */
     private val preamble: AtomicBoolean = AtomicBoolean(false)
     private val flushRequested = AtomicBoolean(false)
+    // Every poolable that is obtained from the pool, keeps track of its owner.
+    // The underlying poolable, if eventually recycled by the Sink after an emit() is complete.
+    internal val pool: ProtoPool = ProtoPool(isDebug = context.isDebug)
     private val queue: ArrayDeque<PooledTracePacket> = ArrayDeque(TRACE_PACKET_BUFFER_SIZE * 2)
 
     /** @return The [PooledTracePacket] which is a preamble packet for the [Track]. */
@@ -68,7 +71,7 @@ public abstract class Track(
 
     private fun transferPooledPacketArray() {
         do {
-            val pooledPacketArray = context.pool.obtainTracePacketArray()
+            val pooledPacketArray = pool.obtainTracePacketArray()
             var i = 0
             while (queue.isNotEmpty() && i < pooledPacketArray.pooledTracePacketArray.size) {
                 val pooledTracePacket = queue.removeFirstOrNull()

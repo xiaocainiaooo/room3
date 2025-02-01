@@ -23,8 +23,8 @@ internal fun <T : EventTrack> T.trackBeginPacket(
     name: String,
     flowIds: List<Long> = emptyList()
 ): PooledTracePacket {
-    val packet = context.pool.obtainTracePacket()
-    val event = context.pool.obtainTrackEvent()
+    val packet = pool.obtainTracePacket()
+    val event = pool.obtainTrackEvent()
     packet.trackPoolableForOwnership(event)
     event.trackEvent.type = MutableTrackEvent.Type.TYPE_SLICE_BEGIN
     event.trackEvent.track_uuid = uuid
@@ -42,8 +42,8 @@ internal fun <T : EventTrack> T.trackBeginPacket(
 
 /** A [PooledTracePacket] that represents an end point of a trace span. */
 internal fun <T : EventTrack> T.trackEndPacket(name: String): PooledTracePacket {
-    val packet = context.pool.obtainTracePacket()
-    val event = context.pool.obtainTrackEvent()
+    val packet = pool.obtainTracePacket()
+    val event = pool.obtainTrackEvent()
     packet.trackPoolableForOwnership(event)
     event.trackEvent.type = MutableTrackEvent.Type.TYPE_SLICE_END
     event.trackEvent.track_uuid = uuid
@@ -55,8 +55,8 @@ internal fun <T : EventTrack> T.trackEndPacket(name: String): PooledTracePacket 
 }
 
 internal fun <T : EventTrack> T.instantPacket(): PooledTracePacket {
-    val packet = context.pool.obtainTracePacket()
-    val event = context.pool.obtainTrackEvent()
+    val packet = pool.obtainTracePacket()
+    val event = pool.obtainTrackEvent()
     packet.trackPoolableForOwnership(event)
     event.trackEvent.type = MutableTrackEvent.Type.TYPE_INSTANT
     event.trackEvent.track_uuid = uuid
@@ -67,8 +67,8 @@ internal fun <T : EventTrack> T.instantPacket(): PooledTracePacket {
 }
 
 internal fun CounterTrack.longCounterPacket(value: Long): PooledTracePacket {
-    val packet = context.pool.obtainTracePacket()
-    val event = context.pool.obtainTrackEvent()
+    val packet = pool.obtainTracePacket()
+    val event = pool.obtainTrackEvent()
     packet.trackPoolableForOwnership(event)
     event.trackEvent.type = MutableTrackEvent.Type.TYPE_COUNTER
     event.trackEvent.track_uuid = uuid
@@ -80,8 +80,8 @@ internal fun CounterTrack.longCounterPacket(value: Long): PooledTracePacket {
 }
 
 internal fun CounterTrack.doubleCounterPacket(value: Double): PooledTracePacket {
-    val packet = context.pool.obtainTracePacket()
-    val event = context.pool.obtainTrackEvent()
+    val packet = pool.obtainTracePacket()
+    val event = pool.obtainTrackEvent()
     packet.trackPoolableForOwnership(event)
     event.trackEvent.type = MutableTrackEvent.Type.TYPE_COUNTER
     event.trackEvent.track_uuid = uuid

@@ -24,12 +24,12 @@ import perfetto.protos.MutableTrackDescriptor
 import perfetto.protos.MutableTrackEvent
 
 // This is 4 * the total number of outstanding requests that can be emitted by a track.
-private const val TRACK_EVENT_POOL_SIZE = 4096
-private const val TRACE_PACKET_POOL_SIZE = 4096
+private const val TRACK_EVENT_POOL_SIZE = 2048
+private const val TRACE_PACKET_POOL_SIZE = 2048
 private const val TRACK_DESCRIPTOR_POOL_SIZE = 256
-private const val PROCESS_DESCRIPTOR_POOL_SIZE = 4
-private const val THREAD_DESCRIPTOR_POOL_SIZE = 8
-private const val COUNTER_DESCRIPTOR_POOL_SIZE = 8
+private const val PROCESS_DESCRIPTOR_POOL_SIZE = 2
+private const val THREAD_DESCRIPTOR_POOL_SIZE = 4
+private const val COUNTER_DESCRIPTOR_POOL_SIZE = 4
 // The size of the array
 // This would mean that each pool can queue up to 32 * 32 trace packets
 internal const val TRACE_PACKET_BUFFER_SIZE = 32
