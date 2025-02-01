@@ -141,7 +141,9 @@
             <trusting group="com.fasterxml.jackson"/>
             <trusting group="com.fasterxml.jackson.core"/>
             <trusting group="com.fasterxml.jackson.dataformat"/>
+            <trusting group="com.fasterxml.jackson.module"/>
             <trusting group="com.fasterxml.woodstox"/>
+            <trusting group="org.codehaus.woodstox"/>
          </trusted-key>
          <trusted-key id="29BEA2A645F2D6CED7FB12E02B172E3E156466E8">
             <trusting group="org.apache.maven"/>
