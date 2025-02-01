@@ -426,6 +426,10 @@ constructor(
         } else {
             if (!request.isPrewarm) {
                 realCamera.connectTo(request.virtualCamera, realCameraToken)
+            } else {
+                // Since prewarm requests don't connect to VirtualCameras, make sure to release our
+                // acquired token here to allow the camera to be closed if unused after a while.
+                realCameraToken.release()
             }
         }
     }
