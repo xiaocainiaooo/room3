@@ -61,6 +61,7 @@ import androidx.health.connect.client.impl.platform.response.toSdkResponse
 import androidx.health.connect.client.impl.platform.toKtException
 import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_PREFIX
 import androidx.health.connect.client.records.MedicalResource
+import androidx.health.connect.client.records.MedicalResourceId
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.request.AggregateGroupByDurationRequest
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
@@ -406,6 +407,10 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                 }
                 .map { it.toSdkMedicalResource() }
         }
+
+    override suspend fun readMedicalResources(ids: List<MedicalResourceId>): List<MedicalResource> {
+        TODO("b/382680487 Not yet implemented")
+    }
 
     private suspend fun <T> wrapPlatformException(function: suspend () -> T): T {
         return try {
