@@ -47,6 +47,17 @@ constructor(
     override fun toString(): String {
         return "AppFunctionComponentsMetadata(dataTypes=$dataTypes)"
     }
+
+    /**
+     * Converts the [AppFunctionComponentsMetadata] to a [AppFunctionComponentsMetadataDocument].
+     *
+     * @return the [AppFunctionComponentsMetadataDocument] representation of the metadata.
+     */
+    // TODO: Add test for converter
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public fun toAppFunctionComponentsMetadataDocument(): AppFunctionComponentsMetadataDocument {
+        return AppFunctionComponentsMetadataDocument(dataTypes = dataTypes)
+    }
 }
 
 /** Represents the persistent storage format of [AppFunctionComponentsMetadata]. */
