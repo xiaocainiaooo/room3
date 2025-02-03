@@ -182,7 +182,7 @@ public class AppFunctionObjectTypeMetadata(
     public fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
         val properties =
             properties.map { (name, dataTypeMetadata) ->
-                AppFunctionPropertyMetadataDocument(
+                AppFunctionNamedDataTypeMetadataDocument(
                     name = checkNotNull(name),
                     dataTypeMetadata =
                         (dataTypeMetadata as AppFunctionPrimitiveTypeMetadata)
@@ -263,16 +263,16 @@ public class AppFunctionPrimitiveTypeMetadata(
     }
 }
 
-/** Represents the persistent storage format of the schema of a property and its name. */
+/** Represents the persistent storage format of the schema of a data type and its name. */
 @Document
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-public data class AppFunctionPropertyMetadataDocument(
+public data class AppFunctionNamedDataTypeMetadataDocument(
     @Document.Namespace public val namespace: String = APP_FUNCTION_NAMESPACE,
     /** The id of the data type. */
     @Document.Id public val id: String = APP_FUNCTION_ID_EMPTY,
-    /** The name of the property. */
+    /** The name of the data type. */
     @Document.StringProperty public val name: String,
-    /** The schema of the property type. */
+    /** The data type metadata. */
     @Document.DocumentProperty public val dataTypeMetadata: AppFunctionDataTypeMetadataDocument,
 )
 
@@ -296,7 +296,7 @@ public data class AppFunctionDataTypeMetadataDocument(
      * properties.
      */
     @Document.DocumentProperty
-    public val properties: List<AppFunctionPropertyMetadataDocument> = emptyList(),
+    public val properties: List<AppFunctionNamedDataTypeMetadataDocument> = emptyList(),
     /**
      * If the [type] is [AppFunctionDataTypeMetadata.TYPE_OBJECT], this specified the object's
      * required properties' names.

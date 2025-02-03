@@ -80,12 +80,12 @@ class AppFunctionDataTypeMetadataTest {
         val appFunctionObjectTypeMetadata =
             AppFunctionObjectTypeMetadata(properties, requiredProperties, qualifiedName, isNullable)
         val expectedPrimitiveDocumentProperties1 =
-            AppFunctionPropertyMetadataDocument(
+            AppFunctionNamedDataTypeMetadataDocument(
                 name = "prop1",
                 dataTypeMetadata = AppFunctionDataTypeMetadataDocument(type = TYPE_INT)
             )
         val expectedPrimitiveDocumentProperties2 =
-            AppFunctionPropertyMetadataDocument(
+            AppFunctionNamedDataTypeMetadataDocument(
                 name = "prop2",
                 dataTypeMetadata = AppFunctionDataTypeMetadataDocument(type = TYPE_LONG)
             )

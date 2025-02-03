@@ -163,9 +163,9 @@ package androidx.appfunctions.metadata {
 
   public final class AppFunctionComponentsMetadata {
     ctor public AppFunctionComponentsMetadata();
-    ctor public AppFunctionComponentsMetadata(optional java.util.List<? extends androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> dataTypes);
-    method public java.util.List<androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> getDataTypes();
-    property public java.util.List<androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> dataTypes;
+    ctor public AppFunctionComponentsMetadata(optional java.util.Map<java.lang.String,? extends androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> dataTypes);
+    method public java.util.Map<java.lang.String,androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> getDataTypes();
+    property public java.util.Map<java.lang.String,androidx.appfunctions.metadata.AppFunctionDataTypeMetadata> dataTypes;
   }
 
   public abstract class AppFunctionDataTypeMetadata {

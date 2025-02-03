@@ -28,10 +28,11 @@ class AppFunctionComponentsMetadataTest {
         val dataType2 =
             AppFunctionPrimitiveTypeMetadata(AppFunctionDataTypeMetadata.TYPE_STRING, true)
 
-        val components1 = AppFunctionComponentsMetadata(listOf(dataType1))
-        val components2 = AppFunctionComponentsMetadata(listOf(dataType1))
-        val components3 = AppFunctionComponentsMetadata(listOf(dataType2))
-        val components4 = AppFunctionComponentsMetadata(listOf(dataType1, dataType2))
+        val components1 = AppFunctionComponentsMetadata(mapOf("dataType1" to dataType1))
+        val components2 = AppFunctionComponentsMetadata(mapOf("dataType1" to dataType1))
+        val components3 = AppFunctionComponentsMetadata(mapOf("dataType2" to dataType2))
+        val components4 =
+            AppFunctionComponentsMetadata(mapOf("dataType1" to dataType1, "dataType2" to dataType2))
 
         assertThat(components1).isEqualTo(components2)
         assertThat(components1.hashCode()).isEqualTo(components2.hashCode())
@@ -49,12 +50,30 @@ class AppFunctionComponentsMetadataTest {
             AppFunctionPrimitiveTypeMetadata(AppFunctionDataTypeMetadata.TYPE_INT, false)
         val primitiveType2 =
             AppFunctionPrimitiveTypeMetadata(AppFunctionDataTypeMetadata.TYPE_STRING, true)
-        val components = AppFunctionComponentsMetadata(listOf(primitiveType1, primitiveType2))
+        val components =
+            AppFunctionComponentsMetadata(
+                mapOf("dataType1" to primitiveType1, "dataType2" to primitiveType2)
+            )
 
         val appFunctionComponentsMetadataDocument =
             components.toAppFunctionComponentsMetadataDocument()
 
         assertThat(appFunctionComponentsMetadataDocument.dataTypes)
-            .containsExactly(primitiveType1, primitiveType2)
+            .containsExactly(
+                AppFunctionNamedDataTypeMetadataDocument(
+                    name = "dataType1",
+                    dataTypeMetadata =
+                        AppFunctionDataTypeMetadataDocument(
+                            type = AppFunctionDataTypeMetadata.TYPE_INT
+                        )
+                ),
+                AppFunctionNamedDataTypeMetadataDocument(
+                    name = "dataType2",
+                    dataTypeMetadata =
+                        AppFunctionDataTypeMetadataDocument(
+                            type = AppFunctionDataTypeMetadata.TYPE_STRING
+                        )
+                ),
+            )
     }
 }

@@ -93,7 +93,13 @@ class AppFunctionMetadataTest {
             )
         val primitiveType1 = AppFunctionPrimitiveTypeMetadata(TYPE_INT, false)
         val primitiveType2 = AppFunctionPrimitiveTypeMetadata(TYPE_STRING, true)
-        val components = AppFunctionComponentsMetadata(listOf(primitiveType1, primitiveType2))
+        val components =
+            AppFunctionComponentsMetadata(
+                mapOf(
+                    "dataType1" to primitiveType1,
+                    "dataType2" to primitiveType2,
+                )
+            )
         val appFunctionMetadata =
             AppFunctionMetadata(
                 id = id,
