@@ -92,7 +92,7 @@ import java.time.format.DateTimeFormatter
  *
  * @sample androidx.wear.compose.material3.samples.DatePickerYearMonthDaySample
  *
- * Example of a [DatePicker] with a minDate:
+ * Example of a [DatePicker] with a minValidDate:
  *
  * @sample androidx.wear.compose.material3.samples.DatePickerFutureOnlySample
  * @param initialDate The initial value to be displayed in the DatePicker.
@@ -553,10 +553,10 @@ public object DatePickerDefaults {
     /**
      * Creates a [DatePickerColors] for a [DatePicker].
      *
-     * @param activePickerContentColor The content color of the currently active picker section.
-     * @param inactivePickerContentColor The content color of an inactive picker section.
+     * @param activePickerContentColor The content color of the currently active picker.
+     * @param inactivePickerContentColor The content color of an inactive picker.
      * @param invalidPickerContentColor The content color of invalid picker options. Picker options
-     *   can be invalid when minDate or maxDate are specified for the [DatePicker].
+     *   can be invalid when minValidDate or maxValidDate are specified for the [DatePicker].
      * @param pickerLabelColor The color of the picker label.
      * @param nextButtonContentColor The content color of the next button.
      * @param nextButtonContainerColor The container color of the next button.
@@ -613,11 +613,11 @@ public object DatePickerDefaults {
 /**
  * Colors for [DatePicker].
  *
- * @param activePickerContentColor The content color of the currently active picker section, that
- *   is, the section currently being changed, such as the day, month or year.
- * @param inactivePickerContentColor The content color of an inactive picker section.
+ * @param activePickerContentColor The content color of the currently active picker, that is, the
+ *   picker currently being changed, such as the day, month or year.
+ * @param inactivePickerContentColor The content color of an inactive picker.
  * @param invalidPickerContentColor The content color of invalid picker options. Picker options can
- *   be invalid when minDate or maxDate are specified for the [DatePicker].
+ *   be invalid when minValidDate or maxValidDate are specified for the [DatePicker].
  * @param pickerLabelColor The color of the picker label.
  * @param nextButtonContentColor The content color of the next button.
  * @param nextButtonContainerColor The container color of the next button.
@@ -638,9 +638,9 @@ public class DatePickerColors(
     /**
      * Returns a copy of this DatePickerColors, optionally overriding some of the values.
      *
-     * @param activePickerContentColor The content color of the currently active picker section,
-     *   that is, the section currently being changed, such as the day, month or year.
-     * @param inactivePickerContentColor The content color of an inactive picker section.
+     * @param activePickerContentColor The content color of the currently active picker, that is,
+     *   the picker currently being changed, such as the day, month or year.
+     * @param inactivePickerContentColor The content color of an inactive picker.
      * @param invalidPickerContentColor The content color of invalid picker options.
      * @param pickerLabelColor The color of the picker label.
      * @param nextButtonContentColor The content color of the next button.
