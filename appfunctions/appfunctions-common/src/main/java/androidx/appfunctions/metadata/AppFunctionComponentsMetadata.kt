@@ -53,7 +53,6 @@ constructor(
      *
      * @return the [AppFunctionComponentsMetadataDocument] representation of the metadata.
      */
-    // TODO: Add test for converter
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public fun toAppFunctionComponentsMetadataDocument(): AppFunctionComponentsMetadataDocument {
         return AppFunctionComponentsMetadataDocument(dataTypes = dataTypes)
