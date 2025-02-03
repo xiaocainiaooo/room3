@@ -38,6 +38,7 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewGroup.getChildMeasureSpec
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
+import android.view.animation.Interpolator
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.IntDef
@@ -1378,6 +1379,45 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         return false
     }
 
+    /**
+     * Open the detail view if it is currently slideable. If first layout has already completed this
+     * will animate.
+     *
+     * @param duration the duration of the animation.
+     * @param interpolator the interpolator used for the animation.
+     * @return true if the pane was slideable and is now open/in the process of opening
+     * @see openPane
+     */
+    fun openPane(duration: Int, interpolator: Interpolator): Boolean {
+        if (!isSlideable) {
+            preservedOpenState = true
+        }
+        if (awaitingFirstLayout || smoothSlideTo(0f, duration, interpolator)) {
+            preservedOpenState = true
+            return true
+        }
+        return false
+    }
+
+    /**
+     * Close the detail view if it is currently slideable. If first layout has already completed
+     * this will animate.
+     *
+     * @param duration the duration of the animation.
+     * @param interpolator the interpolator used for the animation.
+     * @return true if the pane was slideable and is now closed/in the process of closing
+     */
+    fun closePane(duration: Int, interpolator: Interpolator): Boolean {
+        if (!isSlideable) {
+            preservedOpenState = false
+        }
+        if (awaitingFirstLayout || smoothSlideTo(1f, duration, interpolator)) {
+            preservedOpenState = false
+            return true
+        }
+        return false
+    }
+
     @Deprecated(
         "Renamed to {@link #openPane()} - this method is going away soon!",
         ReplaceWith("openPane()")
@@ -1540,23 +1580,61 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             return false
         }
         val slideableView = slideableView ?: return false
-        val isLayoutRtl = isLayoutRtl
-        val lp = slideableView.spLayoutParams
-        val x: Int =
-            if (isLayoutRtl) {
-                val startBound = paddingRight + lp.rightMargin
-                val childWidth = slideableView.width
-                (width - (startBound + slideOffset * slideRange + childWidth)).toInt()
-            } else {
-                val startBound = paddingLeft + lp.leftMargin
-                (startBound + slideOffset * slideRange).toInt()
-            }
+        val x = computeScrollOffset(slideableView, slideOffset)
         if (overlappingPaneHandler.smoothSlideViewTo(slideableView, x, slideableView.top)) {
             setAllChildrenVisible()
             postInvalidateOnAnimation()
             return true
         }
         return false
+    }
+
+    /**
+     * Smoothly animate mDraggingPane to the target X position within its range.
+     *
+     * @param slideOffset position to animate to
+     * @param duration the duration of the animation
+     * @param interpolator the interpolator used for animation
+     */
+    private fun smoothSlideTo(
+        slideOffset: Float,
+        duration: Int,
+        interpolator: Interpolator
+    ): Boolean {
+        if (!isSlideable) {
+            // Nothing to do.
+            return false
+        }
+        val slideableView = slideableView ?: return false
+        val x = computeScrollOffset(slideableView, slideOffset)
+
+        if (
+            overlappingPaneHandler.smoothSlideViewTo(
+                slideableView,
+                x,
+                slideableView.top,
+                duration,
+                interpolator
+            )
+        ) {
+            setAllChildrenVisible()
+            postInvalidateOnAnimation()
+            return true
+        }
+        return false
+    }
+
+    private fun computeScrollOffset(slideableView: View, slideOffset: Float): Int {
+        val isLayoutRtl = isLayoutRtl
+        val lp = slideableView.spLayoutParams
+        return if (isLayoutRtl) {
+            val startBound = paddingRight + lp.rightMargin
+            val childWidth = slideableView.width
+            (width - (startBound + slideOffset * slideRange + childWidth)).toInt()
+        } else {
+            val startBound = paddingLeft + lp.leftMargin
+            (startBound + slideOffset * slideRange).toInt()
+        }
     }
 
     override fun computeScroll() {
@@ -2318,6 +2396,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
 
         fun smoothSlideViewTo(view: View, left: Int, top: Int): Boolean =
             dragHelper.smoothSlideViewTo(view, left, top)
+
+        fun smoothSlideViewTo(
+            view: View,
+            left: Int,
+            top: Int,
+            duration: Int,
+            interpolator: Interpolator
+        ): Boolean = dragHelper.smoothSlideViewTo(view, left, top, duration, interpolator)
 
         fun setPanelSlideListener(listener: PanelSlideListener?) {
             // The logic in this method emulates what we had before support for multiple
