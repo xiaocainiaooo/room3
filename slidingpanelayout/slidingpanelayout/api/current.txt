@@ -11,6 +11,7 @@ package androidx.slidingpanelayout.widget {
     method @Deprecated public boolean canSlide();
     method public void close();
     method public boolean closePane();
+    method public final boolean closePane(int duration, android.view.animation.Interpolator interpolator);
     method @Deprecated @ColorInt public int getCoveredFadeColor();
     method public final int getLockMode();
     method @Px public final int getPaneSpacing();
@@ -27,6 +28,7 @@ package androidx.slidingpanelayout.widget {
     method public final boolean isUserResizingEnabled();
     method public void open();
     method public boolean openPane();
+    method public final boolean openPane(int duration, android.view.animation.Interpolator interpolator);
     method public void removePanelSlideListener(androidx.slidingpanelayout.widget.SlidingPaneLayout.PanelSlideListener listener);
     method public void removeSlideableStateListener(androidx.slidingpanelayout.widget.SlidingPaneLayout.SlideableStateListener listener);
     method public final void setChildClippingToResizeDividerEnabled(boolean);
