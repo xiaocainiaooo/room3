@@ -188,7 +188,11 @@ internal abstract class ComposeTraceBuilder {
 
 private val EmptyIntArray = IntArray(0)
 
-private fun parseSourceInfo(data: String): ParsedSourceInformation {
+private fun parseSourceInfo(data: String): ParsedSourceInformation? {
+    if (data.isEmpty()) {
+        return null
+    }
+
     var i = 0
     var functionName: String? = null
     var isCall = false
@@ -254,18 +258,23 @@ private fun parseSourceInfo(data: String): ParsedSourceInformation {
     )
 }
 
-internal fun SlotWriter.currentTrace(): List<ComposeTraceFrame> {
+internal fun SlotWriter.buildTrace(
+    child: Any? = null,
+    group: Int = currentGroup,
+    parent: Int? = null
+): List<ComposeTraceFrame> {
     val writer = this
     if (!writer.closed && writer.size != 0) {
         val traceBuilder = WriterTraceBuilder(writer)
-        var currentGroup = writer.currentGroup
+        var currentGroup = group
         // sometimes in composition the parent is not completed, so we have to use writer.parent
         // whenever it is reasonably set.
-        var parentGroup = if (writer.parent < 0) writer.parent(currentGroup) else writer.parent
-        var childAnchor: Any? = writer.groupSlotIndex(currentGroup)
+        var parentGroup =
+            parent ?: if (writer.parent < 0) writer.parent(currentGroup) else writer.parent
+        var childData: Any? = child ?: writer.groupSlotIndex(currentGroup)
         while (currentGroup >= 0) {
-            traceBuilder.processEdge(writer.sourceInformationOf(currentGroup), childAnchor)
-            childAnchor = writer.anchor(currentGroup)
+            traceBuilder.processEdge(writer.sourceInformationOf(currentGroup), childData)
+            childData = writer.anchor(currentGroup)
             currentGroup = parentGroup
 
             if (currentGroup >= 0) {
@@ -277,7 +286,7 @@ internal fun SlotWriter.currentTrace(): List<ComposeTraceFrame> {
     return emptyList()
 }
 
-internal fun SlotReader.currentTrace(): List<ComposeTraceFrame> {
+internal fun SlotReader.buildTrace(): List<ComposeTraceFrame> {
     val reader = this
     if (!reader.closed && reader.size != 0) {
         val traceBuilder = ReaderTraceBuilder(reader)

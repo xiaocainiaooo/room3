@@ -27,7 +27,10 @@ internal expect class DiagnosticComposeException(
     trace: List<ComposeTraceFrame>,
 ) : RuntimeException
 
-internal class ComposeTraceFrame(val sourceInfo: ParsedSourceInformation, val groupOffset: Int?)
+internal data class ComposeTraceFrame(
+    val sourceInfo: ParsedSourceInformation,
+    val groupOffset: Int?
+)
 
 internal class ParsedSourceInformation(
     val isCall: Boolean,
@@ -38,12 +41,14 @@ internal class ParsedSourceInformation(
     val dataString: String
 )
 
-internal fun Throwable.attachComposeTrace(trace: () -> List<ComposeTraceFrame>): Throwable = apply {
+internal fun Throwable.tryAttachComposeTrace(trace: () -> List<ComposeTraceFrame>): Boolean {
+    var result = false
     if (suppressedExceptions.none { it is DiagnosticComposeException }) {
         val traceException =
             try {
                 val frames = trace()
-                if (frames.isNotEmpty()) DiagnosticComposeException(frames) else null
+                result = frames.isNotEmpty()
+                if (result) DiagnosticComposeException(frames) else null
             } catch (e: Throwable) {
                 // Attach the exception thrown while collecting trace.
                 // Usually this means that the slot table is malformed.
@@ -53,6 +58,11 @@ internal fun Throwable.attachComposeTrace(trace: () -> List<ComposeTraceFrame>):
             addSuppressed(traceException)
         }
     }
+    return result
+}
+
+internal fun Throwable.attachComposeTrace(trace: () -> List<ComposeTraceFrame>): Throwable = apply {
+    tryAttachComposeTrace(trace)
 }
 
 internal fun StringBuilder.appendStackTrace(trace: List<ComposeTraceFrame>) {
