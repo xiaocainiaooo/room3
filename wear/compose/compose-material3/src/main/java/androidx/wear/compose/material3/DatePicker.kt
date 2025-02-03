@@ -479,7 +479,8 @@ public fun DatePicker(
                     if (selectedIndex?.let { it >= 2 } == true) {
                         datePickerState.isSelectedDayValid
                     } else {
-                        true
+                        // Disable the 'next' button under TalkBack until a Picker is selected.
+                        selectedIndex != null
                     },
             ) {
                 // If none is selected (selectedIndex == null) we show 'next' instead of 'confirm'.
