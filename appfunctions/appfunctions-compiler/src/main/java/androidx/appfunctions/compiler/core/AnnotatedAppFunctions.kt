@@ -372,6 +372,7 @@ data class AnnotatedAppFunctions(
          *
          * If the type reference is a list, it will resolve the type reference of the list element.
          */
+        // TODO(b/392587953): Use toTypeName instead and remove redundant util functions
         fun KSTypeReference.getTypeNameAsString(): String {
             if (isOfType(LIST)) {
                 return getListTypeNameAsString()
@@ -398,20 +399,23 @@ data class AnnotatedAppFunctions(
                 ">"
         }
 
+        internal val SUPPORTED_ARRAY_TYPES =
+            listOf(
+                IntArray::class.qualifiedName!!,
+                LongArray::class.qualifiedName!!,
+                FloatArray::class.qualifiedName!!,
+                DoubleArray::class.qualifiedName!!,
+                BooleanArray::class.qualifiedName!!
+            )
+
         internal val SUPPORTED_TYPES =
-            setOf(
+            listOf(
                 Int::class.qualifiedName!!,
                 Long::class.qualifiedName!!,
                 Float::class.qualifiedName!!,
                 Double::class.qualifiedName!!,
                 Boolean::class.qualifiedName!!,
                 String::class.qualifiedName!!,
-                IntArray::class.qualifiedName!!,
-                LongArray::class.qualifiedName!!,
-                FloatArray::class.qualifiedName!!,
-                DoubleArray::class.qualifiedName!!,
-                BooleanArray::class.qualifiedName!!,
-                "kotlin.collections.List<kotlin.String>"
-            )
+            ) + SUPPORTED_ARRAY_TYPES + listOf("kotlin.collections.List<kotlin.String>")
     }
 }

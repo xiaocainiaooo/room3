@@ -20,21 +20,47 @@ import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.SUPPO
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.getTypeNameAsString
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.isAppFunctionSerializableType
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.isSupportedType
+import com.google.devtools.ksp.getVisibility
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSValueParameter
+import com.google.devtools.ksp.symbol.Visibility
 import com.squareup.kotlinpoet.ClassName
 
 /** Represents a class annotated with [androidx.appfunctions.AppFunctionSerializable]. */
+
+/** Represents a class annotated with [androidx.appfunctions.AppFunctionSerializable]. */
 data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KSClassDeclaration) {
+    // TODO(b/392587953): throw an error if a property has the same name as one of the factory
+    //  method parameters
+    /**
+     * Validates that the class annotated with AppFunctionSerializable follows app function's spec.
+     *
+     * The annotated class must adhere to the following requirements:
+     * 1. **Primary Constructor:** The class must have a public primary constructor.
+     * 2. **Property Parameters:** Only properties (declared with `val`) can be passed as parameters
+     *    to the primary constructor.
+     * 3. **Supported Types:** All properties must be of one of the [SUPPORTED_TYPES].
+     *
+     * @throws ProcessingException if the class does not adhere to the requirements
+     */
     fun validate(): AnnotatedAppFunctionSerializable {
-        val parameters = appFunctionSerializableClass.primaryConstructor?.parameters
-        if (parameters == null) {
-            // No parameters to validate.
-            return this
+        val primaryConstructor = appFunctionSerializableClass.primaryConstructor
+        if (primaryConstructor == null || primaryConstructor.parameters.isEmpty()) {
+            throw ProcessingException(
+                "Classes annotated with AppFunctionSerializable must have a primary constructor with one or more properties.",
+                appFunctionSerializableClass
+            )
         }
 
-        for (ksValueParameter in parameters) {
+        if (primaryConstructor.getVisibility() != Visibility.PUBLIC) {
+            throw ProcessingException(
+                "The primary constructor of @AppFunctionSerializable must be public.",
+                appFunctionSerializableClass
+            )
+        }
+
+        for (ksValueParameter in primaryConstructor.parameters) {
             if (!ksValueParameter.isVal) {
                 throw ProcessingException(
                     "All parameters in @AppFunctionSerializable primary constructor must have getters",
@@ -66,7 +92,7 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
         // Add the file containing the AppFunctionSerializable class definition immediately it's
         // seen
         appFunctionSerializableClass.containingFile?.let { sourceFileSet.add(it) }
-        visitedSerializableSet.add(appFunctionSerializableClass.getClassName())
+        visitedSerializableSet.add(originalClassName)
         traverseSerializableClassSourceFiles(
             appFunctionSerializableClass,
             sourceFileSet,
@@ -87,11 +113,7 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
                 val appFunctionSerializableDefinition =
                     ksValueParameter.type.resolve().declaration as KSClassDeclaration
                 // Skip serializable that have been seen before
-                if (
-                    visitedSerializableSet.contains(
-                        appFunctionSerializableDefinition.getClassName()
-                    )
-                ) {
+                if (visitedSerializableSet.contains(originalClassName)) {
                     continue
                 }
                 // Process newly found serializable
@@ -103,7 +125,10 @@ data class AnnotatedAppFunctionSerializable(val appFunctionSerializableClass: KS
         }
     }
 
-    private fun KSClassDeclaration.getClassName(): ClassName {
-        return ClassName(packageName.asString(), simpleName.asString())
+    val originalClassName: ClassName by lazy {
+        ClassName(
+            appFunctionSerializableClass.packageName.asString(),
+            appFunctionSerializableClass.simpleName.asString()
+        )
     }
 }
