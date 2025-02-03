@@ -47,12 +47,12 @@ class PredictiveBackTest {
         lateinit var numberOnScreen1: MutableState<Int>
         lateinit var numberOnScreen2: MutableState<Int>
         lateinit var backPressedDispatcher: OnBackPressedDispatcher
-        lateinit var backstack: MutableList<Any>
+        lateinit var backStack: MutableList<Any>
         composeTestRule.setContent {
             backPressedDispatcher =
                 LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
-            backstack = remember { mutableStateListOf(first) }
-            SinglePaneNavDisplay(backstack = backstack) {
+            backStack = remember { mutableStateListOf(first) }
+            SinglePaneNavDisplay(backStack = backStack) {
                 when (it) {
                     first ->
                         NavEntry(first) {
@@ -81,7 +81,7 @@ class PredictiveBackTest {
 
         assertThat(composeTestRule.onNodeWithText("numberOnScreen1: 2").isDisplayed()).isTrue()
 
-        composeTestRule.runOnIdle { backstack.add(second) }
+        composeTestRule.runOnIdle { backStack.add(second) }
 
         composeTestRule.runOnIdle {
             assertWithMessage("Initial number should be 0").that(numberOnScreen2.value).isEqualTo(0)
