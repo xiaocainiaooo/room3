@@ -518,11 +518,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             view.viewTreeOwners?.lifecycleOwner?.lifecycle?.currentState ==
                 Lifecycle.State.DESTROYED
         ) {
-            return null
+            return emptyNodeInfoOrNull()
         }
-        val info: AccessibilityNodeInfoCompat = AccessibilityNodeInfoCompat.obtain()
-        val semanticsNodeWithAdjustedBounds = currentSemanticsNodes[virtualViewId] ?: return null
+        val semanticsNodeWithAdjustedBounds =
+            currentSemanticsNodes[virtualViewId] ?: return emptyNodeInfoOrNull()
         val semanticsNode: SemanticsNode = semanticsNodeWithAdjustedBounds.semanticsNode
+        val info: AccessibilityNodeInfoCompat = AccessibilityNodeInfoCompat.obtain()
         if (virtualViewId == AccessibilityNodeProviderCompat.HOST_VIEW_ID) {
             info.setParent(view.getParentForAccessibility() as? View)
         } else {
@@ -542,6 +543,24 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         populateAccessibilityNodeInfoProperties(virtualViewId, info, semanticsNode)
 
         return info
+    }
+
+    /**
+     * There are cases when [createNodeInfo] is called when the view is already destroyed or if the
+     * semantics node is removed from composition. In this case we return null.
+     *
+     * But looks like this is causing crash in Assistant. This happens because 1) Assistant falls
+     * back to using ANIs until we implement b/393515913 and 2) there's no null check in platform's
+     * code until API 35. As a workaround we will return non-null empty ANI for such use cases to
+     * avoid the crash.
+     *
+     * This change should be reverted when b/393515913 is fixed.
+     */
+    private fun emptyNodeInfoOrNull(): AccessibilityNodeInfoCompat? {
+        // Accessibility Manager is not enabled if this code is used by Assistant
+        return if (!accessibilityManager.isEnabled) {
+            AccessibilityNodeInfoCompat.obtain()
+        } else null
     }
 
     private fun boundsInScreen(node: SemanticsNodeWithAdjustedBounds): android.graphics.Rect {
