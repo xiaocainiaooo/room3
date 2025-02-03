@@ -16,7 +16,10 @@
 
 package androidx.biometric;
 
+import static android.Manifest.permission.SET_BIOMETRIC_DIALOG_ADVANCED;
+
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.res.Resources;
@@ -153,6 +156,15 @@ public class BiometricManager {
          * {@link #BIOMETRIC_WEAK}.
          */
         int DEVICE_CREDENTIAL = 1 << 15;
+
+        /**
+         * The bit is used to request for Identity Check.
+         * TODO(b/375693808): Once framework identity check authenticator constant is public,
+         * update the doc here.
+         */
+        @RequiresPermission(SET_BIOMETRIC_DIALOG_ADVANCED)
+        @RestrictTo(RestrictTo.Scope.LIBRARY)
+        int IDENTITY_CHECK = 1 << 16;
     }
 
     /**
@@ -661,6 +673,11 @@ public class BiometricManager {
             mFingerprintManager;
 
     /**
+     * Whether the identity check is available in this platform version.
+     */
+    private Boolean mIsIdentityCheckAvailable = null;
+
+    /**
      * Creates a {@link BiometricManager} instance from the given context.
      *
      * @param context The application or activity context.
@@ -719,8 +736,18 @@ public class BiometricManager {
      * authenticator. Otherwise, returns {@link #BIOMETRIC_STATUS_UNKNOWN} or an error code
      * indicating why the user can't authenticate.
      */
+    @SuppressLint("WrongConstant") // For the internal BIOMETRIC_ERROR_IDENTITY_CHECK_NOT_ACTIVE
     @AuthenticationStatus
     public int canAuthenticate(@AuthenticatorTypes int authenticators) {
+        if (!isIdentityCheckAvailable()) {
+            if (authenticators == Authenticators.IDENTITY_CHECK) {
+                return BIOMETRIC_ERROR_IDENTITY_CHECK_NOT_ACTIVE;
+            } else if ((authenticators & Authenticators.IDENTITY_CHECK)
+                    == Authenticators.IDENTITY_CHECK) {
+                authenticators &= ~Authenticators.IDENTITY_CHECK;
+            }
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (mBiometricManager == null) {
                 Log.e(TAG, "Failure in canAuthenticate(). BiometricManager was null.");
@@ -729,6 +756,32 @@ public class BiometricManager {
             return Api30Impl.canAuthenticate(mBiometricManager, authenticators);
         }
         return canAuthenticateCompat(authenticators);
+    }
+
+    /**
+     * Checks if the identity check is available in this platform version.
+     * <p>
+     * TODO(b/375693808): Once framework identity check authenticator constant is public, check
+     * it directly, instead of via canAuthenticate().
+     */
+    @SuppressLint("WrongConstant")
+    boolean isIdentityCheckAvailable() {
+        if (mIsIdentityCheckAvailable != null) {
+            return mIsIdentityCheckAvailable;
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM
+                || mBiometricManager == null) {
+            mIsIdentityCheckAvailable = false;
+        } else {
+            try {
+                Api30Impl.canAuthenticate(mBiometricManager, Authenticators.IDENTITY_CHECK);
+                mIsIdentityCheckAvailable = true;
+            } catch (SecurityException e) {
+                mIsIdentityCheckAvailable = false;
+            }
+        }
+        return mIsIdentityCheckAvailable;
     }
 
     /**

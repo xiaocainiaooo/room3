@@ -1191,9 +1191,11 @@ public class BiometricPrompt {
             throw new IllegalArgumentException("CryptoObject cannot be null.");
         }
 
-        // Ensure that all allowed authenticators support crypto auth.
+        // Ensure that all allowed authenticators support crypto auth. |isIdentityCheckAvailable|
+        // is not important for this check.
         @BiometricManager.AuthenticatorTypes final int authenticators =
-                AuthenticatorUtils.getConsolidatedAuthenticators(info, crypto);
+                AuthenticatorUtils.getConsolidatedAuthenticators(info, crypto,
+                        false /*isIdentityCheckAvailable*/);
         if (AuthenticatorUtils.isWeakBiometricAllowed(authenticators)) {
             throw new IllegalArgumentException("Crypto-based authentication is not supported for "
                     + "Class 2 (Weak) biometrics.");
