@@ -42,4 +42,19 @@ class AppFunctionComponentsMetadataTest {
         assertThat(components1).isNotEqualTo(components4)
         assertThat(components1.hashCode()).isNotEqualTo(components4.hashCode())
     }
+
+    @Test
+    fun toAppFunctionComponentsMetadataDocument_returnsCorrectDocument() {
+        val primitiveType1 =
+            AppFunctionPrimitiveTypeMetadata(AppFunctionDataTypeMetadata.TYPE_INT, false)
+        val primitiveType2 =
+            AppFunctionPrimitiveTypeMetadata(AppFunctionDataTypeMetadata.TYPE_STRING, true)
+        val components = AppFunctionComponentsMetadata(listOf(primitiveType1, primitiveType2))
+
+        val appFunctionComponentsMetadataDocument =
+            components.toAppFunctionComponentsMetadataDocument()
+
+        assertThat(appFunctionComponentsMetadataDocument.dataTypes)
+            .containsExactly(primitiveType1, primitiveType2)
+    }
 }

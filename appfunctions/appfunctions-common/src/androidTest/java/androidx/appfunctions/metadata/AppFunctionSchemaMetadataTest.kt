@@ -58,4 +58,20 @@ class AppFunctionSchemaMetadataTest {
         assertThat(schema1).isNotEqualTo(schema5)
         assertThat(schema1.hashCode()).isNotEqualTo(schema5.hashCode())
     }
+
+    @Test
+    fun appFunctionSchemaMetadata_toAppFunctionSchemaMetadataDocument_returnsCorrectDocument() {
+        val schemaMetadata =
+            AppFunctionSchemaMetadata(category = "testCategory", name = "testName", version = 1L)
+        val expectedSchemaMetadataDocument =
+            AppFunctionSchemaMetadataDocument(
+                schemaCategory = schemaMetadata.category,
+                schemaVersion = schemaMetadata.version,
+                schemaName = schemaMetadata.name
+            )
+
+        val schemaMetadataDocument = schemaMetadata.toAppFunctionSchemaMetadataDocument()
+
+        assertThat(schemaMetadataDocument).isEqualTo(expectedSchemaMetadataDocument)
+    }
 }

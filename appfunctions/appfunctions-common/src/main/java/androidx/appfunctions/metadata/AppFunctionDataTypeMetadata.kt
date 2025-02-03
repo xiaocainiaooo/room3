@@ -161,7 +161,6 @@ public class AppFunctionObjectTypeMetadata(
 
     /** Converts this [AppFunctionObjectTypeMetadata] to a [AppFunctionDataTypeMetadataDocument]. */
     // TODO: Handle non-primitive and collections.
-    // TODO: Add test for converter
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
         val properties =
@@ -176,6 +175,7 @@ public class AppFunctionObjectTypeMetadata(
         return AppFunctionDataTypeMetadataDocument(
             type = TYPE_OBJECT,
             properties = properties,
+            required = required
         )
     }
 }
@@ -236,7 +236,6 @@ public class AppFunctionPrimitiveTypeMetadata(
     /**
      * Converts this [AppFunctionPrimitiveTypeMetadata] to a [AppFunctionDataTypeMetadataDocument].
      */
-    // TODO: Add test for converter
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
         return AppFunctionDataTypeMetadataDocument(type = type)
