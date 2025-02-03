@@ -16,6 +16,7 @@
 
 package androidx.appfunctions.compiler.processors
 
+import androidx.annotation.VisibleForTesting
 import androidx.appfunctions.AppFunctionData
 import androidx.appfunctions.compiler.AppFunctionCompiler
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctionSerializable
@@ -26,11 +27,15 @@ import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerial
 import androidx.appfunctions.compiler.core.ProcessingException
 import androidx.appfunctions.compiler.core.ensureQualifiedTypeName
 import androidx.appfunctions.compiler.core.isOfType
+import androidx.appfunctions.compiler.core.logException
 import androidx.appfunctions.compiler.core.resolveListParameterizedType
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
+import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
+import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
+import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSTypeReference
@@ -83,11 +88,16 @@ import com.squareup.kotlinpoet.buildCodeBlock
  */
 class AppFunctionSerializableProcessor(
     private val codeGenerator: CodeGenerator,
+    private val logger: KSPLogger,
 ) : SymbolProcessor {
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        val entityClasses = resolveAppFunctionSerializables(resolver)
-        for (entity in entityClasses) {
-            buildAppFunctionSerializableFactoryClass(entity)
+        try {
+            val entityClasses = resolveAppFunctionSerializables(resolver)
+            for (entity in entityClasses) {
+                buildAppFunctionSerializableFactoryClass(entity)
+            }
+        } catch (e: ProcessingException) {
+            logger.logException(e)
         }
         return emptyList()
     }
@@ -267,5 +277,12 @@ class AppFunctionSerializableProcessor(
 
     private fun KSClassDeclaration.getProperties(): List<KSValueParameter> {
         return checkNotNull(primaryConstructor).parameters
+    }
+
+    @VisibleForTesting
+    class Provider : SymbolProcessorProvider {
+        override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
+            return AppFunctionSerializableProcessor(environment.codeGenerator, environment.logger)
+        }
     }
 }

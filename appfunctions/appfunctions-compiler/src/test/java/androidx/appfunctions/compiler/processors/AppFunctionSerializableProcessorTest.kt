@@ -16,7 +16,6 @@
 
 package androidx.appfunctions.compiler.processors
 
-import androidx.appfunctions.compiler.AppFunctionCompiler
 import androidx.appfunctions.compiler.testings.CompilationTestHelper
 import java.io.File
 import org.junit.Before
@@ -30,9 +29,9 @@ class AppFunctionSerializableProcessorTest {
     fun setup() {
         compilationTestHelper =
             CompilationTestHelper(
-                testFileSrcDir = File("src/test/test-data/entities"),
+                testFileSrcDir = File("src/test/test-data/input"),
                 goldenFileSrcDir = File("src/test/test-data/output"), // unused
-                symbolProcessorProviders = listOf(AppFunctionCompiler.Provider())
+                symbolProcessorProviders = listOf(AppFunctionSerializableProcessor.Provider())
             )
     }
 
