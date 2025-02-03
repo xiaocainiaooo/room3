@@ -91,7 +91,6 @@ constructor(
      *
      * This method is used to persist the [AppFunctionMetadata] in a database.
      */
-    // TODO: Add test for converter
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public fun toAppFunctionMetadataDocument(): AppFunctionMetadataDocument {
         return AppFunctionMetadataDocument(

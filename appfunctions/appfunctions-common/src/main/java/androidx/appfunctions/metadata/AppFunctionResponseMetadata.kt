@@ -47,12 +47,7 @@ public class AppFunctionResponseMetadata(
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public fun toAppFunctionResponseMetadataDocument(): AppFunctionResponseMetadataDocument {
         return AppFunctionResponseMetadataDocument(
-            // TODO: Handle non-primitive and collections.
-            valueType =
-                AppFunctionDataTypeMetadataDocument(
-                    type = (valueType as AppFunctionPrimitiveTypeMetadata).type,
-                    isNullable = valueType.isNullable,
-                ),
+            valueType = valueType.toAppFunctionDataTypeMetadataDocument()
         )
     }
 }

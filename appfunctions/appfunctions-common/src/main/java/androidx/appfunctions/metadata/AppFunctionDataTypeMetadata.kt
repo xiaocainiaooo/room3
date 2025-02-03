@@ -54,6 +54,10 @@ internal constructor(
     /** Whether the data type is nullable. */
     public val isNullable: Boolean,
 ) {
+    /** Converts this [AppFunctionDataTypeMetadata] to an [AppFunctionDataTypeMetadataDocument]. */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public abstract fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument
+
     public companion object {
         /** Void type. */
         public const val TYPE_UNIT: Int = 0
@@ -124,9 +128,19 @@ public class AppFunctionArrayTypeMetadata(
 
     override fun toString(): String {
         return "AppFunctionArrayTypeMetadataDocument(" +
-            "itemType=$itemType," +
-            "isNullable=$isNullable," +
+            "itemType=$itemType, " +
+            "isNullable=$isNullable" +
             ")"
+    }
+
+    /** Converts this [AppFunctionArrayTypeMetadata] to an [AppFunctionDataTypeMetadataDocument]. */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    override fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
+        return AppFunctionDataTypeMetadataDocument(
+            itemType = itemType.toAppFunctionDataTypeMetadataDocument(),
+            type = TYPE_ARRAY,
+            isNullable = isNullable,
+        )
     }
 }
 
@@ -169,24 +183,23 @@ public class AppFunctionObjectTypeMetadata(
 
     override fun toString(): String {
         return "AppFunctionObjectTypeMetadata(" +
-            "properties=$properties," +
-            "required=$required," +
-            "qualifiedName=$qualifiedName," +
-            "isNullable=$isNullable," +
+            "properties=$properties, " +
+            "required=$required, " +
+            "qualifiedName=$qualifiedName, " +
+            "isNullable=$isNullable" +
             ")"
     }
 
-    /** Converts this [AppFunctionObjectTypeMetadata] to a [AppFunctionDataTypeMetadataDocument]. */
-    // TODO: Handle non-primitive and collections.
+    /**
+     * Converts this [AppFunctionObjectTypeMetadata] to an [AppFunctionDataTypeMetadataDocument].
+     */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
+    override fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
         val properties =
-            properties.map { (name, dataTypeMetadata) ->
+            properties.map { (name, dataType) ->
                 AppFunctionNamedDataTypeMetadataDocument(
                     name = checkNotNull(name),
-                    dataTypeMetadata =
-                        (dataTypeMetadata as AppFunctionPrimitiveTypeMetadata)
-                            .toAppFunctionDataTypeMetadataDocument()
+                    dataTypeMetadata = dataType.toAppFunctionDataTypeMetadataDocument()
                 )
             }
         return AppFunctionDataTypeMetadataDocument(
@@ -194,6 +207,7 @@ public class AppFunctionObjectTypeMetadata(
             properties = properties,
             required = required,
             objectQualifiedName = qualifiedName,
+            isNullable = isNullable,
         )
     }
 }
@@ -224,9 +238,18 @@ public class AppFunctionReferenceTypeMetadata(
 
     override fun toString(): String {
         return "AppFunctionReferenceTypeMetadata(" +
-            "referenceDataType=$referenceDataType," +
-            "isNullable=$isNullable," +
+            "referenceDataType=$referenceDataType, " +
+            "isNullable=$isNullable" +
             ")"
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    override fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
+        return AppFunctionDataTypeMetadataDocument(
+            type = TYPE_OBJECT,
+            dataTypeReference = referenceDataType,
+            isNullable = isNullable,
+        )
     }
 }
 
@@ -251,15 +274,15 @@ public class AppFunctionPrimitiveTypeMetadata(
     }
 
     override fun toString(): String {
-        return "AppFunctionPrimitiveTypeMetadata(" + "type=$type," + "isNullable=$isNullable," + ")"
+        return "AppFunctionPrimitiveTypeMetadata(type=$type, isNullable=$isNullable)"
     }
 
     /**
-     * Converts this [AppFunctionPrimitiveTypeMetadata] to a [AppFunctionDataTypeMetadataDocument].
+     * Converts this [AppFunctionPrimitiveTypeMetadata] to an [AppFunctionDataTypeMetadataDocument].
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    public fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
-        return AppFunctionDataTypeMetadataDocument(type = type)
+    override fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
+        return AppFunctionDataTypeMetadataDocument(type = type, isNullable = isNullable)
     }
 }
 

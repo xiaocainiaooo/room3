@@ -64,14 +64,16 @@ class AppFunctionComponentsMetadataTest {
                     name = "dataType1",
                     dataTypeMetadata =
                         AppFunctionDataTypeMetadataDocument(
-                            type = AppFunctionDataTypeMetadata.TYPE_INT
+                            type = AppFunctionDataTypeMetadata.TYPE_INT,
+                            isNullable = false,
                         )
                 ),
                 AppFunctionNamedDataTypeMetadataDocument(
                     name = "dataType2",
                     dataTypeMetadata =
                         AppFunctionDataTypeMetadataDocument(
-                            type = AppFunctionDataTypeMetadata.TYPE_STRING
+                            type = AppFunctionDataTypeMetadata.TYPE_STRING,
+                            isNullable = true,
                         )
                 ),
             )

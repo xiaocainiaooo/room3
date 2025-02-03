@@ -65,10 +65,7 @@ constructor(
                 dataTypes.map { (name, dataType) ->
                     AppFunctionNamedDataTypeMetadataDocument(
                         name = name,
-                        dataTypeMetadata =
-                            AppFunctionDataTypeMetadataDocument(
-                                type = (dataType as AppFunctionPrimitiveTypeMetadata).type,
-                            )
+                        dataTypeMetadata = dataType.toAppFunctionDataTypeMetadataDocument()
                     )
                 }
         )
