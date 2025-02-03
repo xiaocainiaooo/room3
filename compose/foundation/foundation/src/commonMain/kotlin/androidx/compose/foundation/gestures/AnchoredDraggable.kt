@@ -1656,12 +1656,13 @@ internal val AnchoredDraggableMinFlingVelocity = 125.dp
 
 private const val ConfigurationMovedToModifier =
     "This constructor of " +
-        "AnchoredDraggableState has been deprecated. Please pass thresholds and animation specs to " +
-        "anchoredDraggableFlingBehavior(..) instead, which can be passed to Modifier.anchoredDraggable."
+        "AnchoredDraggableState has been deprecated. Please pass thresholds and animation specs" +
+        " to AnchoredDraggableDefaults.flingBehavior(..) instead, which can be passed to" +
+        " Modifier.anchoredDraggable."
 private const val SettleWithVelocityDeprecated =
-    "settle does not accept a velocity anymore. " +
-        "Please use FlingBehavior#performFling instead. See AnchoredDraggableSamples.kt for example " +
-        "usages."
+    "settle does not accept a velocity anymore." +
+        " Please use FlingBehavior#performFling instead. See AnchoredDraggableSample.kt for" +
+        " example usages."
 private const val StartDragImmediatelyDeprecated =
     "startDragImmediately has been removed " +
         "without replacement. Modifier.anchoredDraggable sets startDragImmediately to true by " +
