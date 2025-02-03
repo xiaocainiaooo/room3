@@ -11,6 +11,6 @@ import kotlin.collections.Map
  * AllPrimitiveInputFunctions.....kt
  */
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
-public class `$AllPrimitiveInputFunctions_AppFunctionInventory_Impl` : AppFunctionInventory {
+public class `$AllPrimitiveInputFunctions_AppFunctionInventory` : AppFunctionInventory {
   override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf()
 }

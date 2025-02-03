@@ -11,6 +11,6 @@ import kotlin.collections.Map
  * SimpleFunction.....kt
  */
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
-public class `$SimpleFunction_AppFunctionInventory_Impl` : AppFunctionInventory {
+public class `$SimpleFunction_AppFunctionInventory` : AppFunctionInventory {
   override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf()
 }
