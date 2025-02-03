@@ -30,6 +30,7 @@ import androidx.health.connect.client.HealthConnectClient.Companion.SDK_UNAVAILA
 import androidx.health.connect.client.HealthConnectClient.Companion.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED
 import androidx.health.connect.client.HealthConnectClient.Companion.getOrCreate
 import androidx.health.connect.client.HealthConnectClient.Companion.getSdkStatus
+import androidx.health.connect.client.HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD
 import androidx.health.connect.client.aggregate.AggregateMetric
 import androidx.health.connect.client.aggregate.AggregationResult
 import androidx.health.connect.client.aggregate.AggregationResultGroupedByDuration
@@ -40,6 +41,7 @@ import androidx.health.connect.client.feature.HealthConnectFeaturesUnavailableIm
 import androidx.health.connect.client.feature.createExceptionDueToFeatureUnavailable
 import androidx.health.connect.client.impl.HealthConnectClientImpl
 import androidx.health.connect.client.impl.HealthConnectClientUpsideDownImpl
+import androidx.health.connect.client.permission.HealthPermission.Companion.PERMISSION_WRITE_MEDICAL_DATA
 import androidx.health.connect.client.records.FhirResource
 import androidx.health.connect.client.records.MedicalResource
 import androidx.health.connect.client.records.MedicalResourceId
@@ -326,6 +328,12 @@ interface HealthConnectClient {
      * whether it's updated or inserted. The order of the [MedicalResource]s in the returned list
      * will be the same as their corresponding [UpsertMedicalResourceRequest]s in the input list.
      *
+     * Regarding permissions:
+     * * Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API, otherwise a
+     *   [SecurityException] will be thrown.
+     * * With [PERMISSION_WRITE_MEDICAL_DATA] granted, caller is permitted to call this API in
+     *   either foreground or background.
+     *
      * Medical data is represented using the
      * [Fast Healthcare Interoperability Resources (FHIR)]("https://hl7.org/fhir/") standard. The
      * FHIR resource provided in [UpsertMedicalResourceRequest.data] is expected to be valid for the
@@ -350,11 +358,12 @@ interface HealthConnectClient {
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-     * [HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
      *
      * @param requests List of upsert requests.
      * @throws IllegalArgumentException if any request is failed to be processed for any reason such
      *   as invalid [UpsertMedicalResourceRequest.dataSourceId]
+     * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
      */
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -394,7 +403,7 @@ interface HealthConnectClient {
      *
      * This feature is dependent on the version of HealthConnect installed on the device. To check
      * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
-     * [HealthConnectFeatures.Companion.FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
      *
      * @throws IllegalArgumentException if the size of [ids] is too large or any ID is deemed as
      *   invalid.
@@ -402,6 +411,35 @@ interface HealthConnectClient {
     // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     suspend fun readMedicalResources(ids: List<MedicalResourceId>): List<MedicalResource> =
+        throw createExceptionDueToFeatureUnavailable(
+            FEATURE_CONSTANT_NAME_PHR,
+            "HealthConnectClient#readMedicalResources(ids: List<MedicalResourceId>)"
+        )
+
+    /**
+     * Deletes a list of [MedicalResource]s by the provided list of [MedicalResourceId]s.
+     * * If any ID in [ids] is invalid, the API will throw an [IllegalArgumentException], and
+     *   nothing will be deleted.
+     * * If any ID in [ids] does not exist, that ID will be ignored, while deletion on other IDs
+     *   will be performed.
+     *
+     * Regarding permissions:
+     * * Only apps with the system permission can delete data written by apps other than themselves.
+     * * Caller must hold [PERMISSION_WRITE_MEDICAL_DATA] in order to call this API, even then, it
+     *   can only delete its own data. If any of the items in [ids] belongs to another app, they
+     *   will be ignored.
+     * * Deletes are permitted in the foreground or background.
+     *
+     * This feature is dependent on the version of HealthConnect installed on the device. To check
+     * if it's available call [HealthConnectFeatures.getFeatureStatus] and pass
+     * [FEATURE_PERSONAL_HEALTH_RECORD] as an argument.
+     *
+     * @param ids The ids to delete.
+     * @throws SecurityException if caller does not hold [PERMISSION_WRITE_MEDICAL_DATA].
+     */
+    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    suspend fun deleteMedicalResources(ids: List<MedicalResourceId>): Unit =
         throw createExceptionDueToFeatureUnavailable(
             FEATURE_CONSTANT_NAME_PHR,
             "HealthConnectClient#readMedicalResources(ids: List<MedicalResourceId>)"

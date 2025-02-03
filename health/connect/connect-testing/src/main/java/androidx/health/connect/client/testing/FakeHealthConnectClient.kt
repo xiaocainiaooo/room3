@@ -435,6 +435,12 @@ public class FakeHealthConnectClient(
         TODO("b/382680487 Not yet implemented")
     }
 
+    // TODO(b/382278995): remove @RestrictTo to unhide PHR APIs
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    override suspend fun deleteMedicalResources(ids: List<MedicalResourceId>) {
+        TODO("b/382681580 Not yet implemented")
+    }
+
     private fun String.toRecordId(packageName: String): String {
         return "$packageName:$this"
     }

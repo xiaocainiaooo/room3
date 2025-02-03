@@ -30,13 +30,13 @@ import androidx.health.connect.client.records.MedicalResource.Companion.MEDICAL_
  * A class to hold medical resource data.
  *
  * Unlike FHIR resource which is represented in Health Connect with [FhirResource],
- * [MedicalResource] is a Health Connect specific concept. A [MedicalResource] contains more than
+ * `MedicalResource` is a Health Connect specific concept. A `MedicalResource` contains more than
  * just a [FhirResource], notably, it also contains:
- * * A [dataSourceId] representing ID of a [MedicalDataSource] where data of this [MedicalResource]
+ * * A [dataSourceId] representing ID of a [MedicalDataSource] where data of this `MedicalResource`
  *   come from.
  * * A [MedicalResourceType] indicating how HealthConnect categorizes the [FhirResource]. Each
  *   [MedicalResourceType] is tied to a read permission. For example, a client can only read
- *   [MedicalResource]s with [MEDICAL_RESOURCE_TYPE_VACCINES] if it holds
+ *   `MedicalResource`s with [MEDICAL_RESOURCE_TYPE_VACCINES] if it holds
  *   [PERMISSION_READ_MEDICAL_DATA_VACCINES].
  *
  * The data representation follows the
@@ -52,13 +52,13 @@ class MedicalResource(
     /**
      * Returns the medical resource type, assigned by Health Connect at insertion time.
      *
-     * For a list of supported types, see the [MedicalResource] type constants, such as
+     * For a list of supported types, see the `MedicalResource` type constants, such as
      * [MEDICAL_RESOURCE_TYPE_VACCINES]. Clients should be aware that this list is non exhaustive
      * and may increase in future releases when additional types will need to be handled.
      */
     @MedicalResourceType val type: Int,
 
-    /** A [MedicalResourceId] to represent a unique ID of this [MedicalResource]. */
+    /** A [MedicalResourceId] to represent a unique ID of this `MedicalResource`. */
     val id: MedicalResourceId,
 
     /** Represents ID of a medical data source where the data comes from. */
@@ -67,7 +67,7 @@ class MedicalResource(
     /** FHIR version of [fhirResource]. */
     val fhirVersion: FhirVersion,
 
-    /** Returns the [FhirResource] that this [MedicalResource] represents. */
+    /** Returns the [FhirResource] that this `MedicalResource` represents. */
     val fhirResource: FhirResource,
 ) {
     @SuppressLint("NewApi") // already checked with a feature availability check
