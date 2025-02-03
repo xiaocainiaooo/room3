@@ -61,8 +61,18 @@ package androidx.wear.protolayout.expression {
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=200) public androidx.wear.protolayout.expression.AnimationParameterBuilders.Repeatable.Builder setReverseRepeatOverride(androidx.wear.protolayout.expression.AnimationParameterBuilders.AnimationParameters);
   }
 
-  public final class AppDataKey<T extends androidx.wear.protolayout.expression.DynamicBuilders.DynamicType> extends androidx.wear.protolayout.expression.DynamicDataKey<T!> {
-    ctor public AppDataKey(String);
+  public final class AppDataKey<T extends androidx.wear.protolayout.expression.DynamicBuilders.DynamicType> extends androidx.wear.protolayout.expression.DynamicDataKey<T> {
+    ctor public AppDataKey(String key);
+  }
+
+  public final class AppDataKeyUtil {
+    method public static androidx.wear.protolayout.expression.AppDataKey<androidx.wear.protolayout.expression.DynamicBuilders.DynamicBool> boolAppDataKey(String key);
+    method public static androidx.wear.protolayout.expression.AppDataKey<androidx.wear.protolayout.expression.DynamicBuilders.DynamicColor> colorAppDataKey(String key);
+    method public static androidx.wear.protolayout.expression.AppDataKey<androidx.wear.protolayout.expression.DynamicBuilders.DynamicDuration> durationAppDataKey(String key);
+    method public static androidx.wear.protolayout.expression.AppDataKey<androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat> floatAppDataKey(String key);
+    method public static androidx.wear.protolayout.expression.AppDataKey<androidx.wear.protolayout.expression.DynamicBuilders.DynamicInstant> instantAppDataKey(String key);
+    method public static androidx.wear.protolayout.expression.AppDataKey<androidx.wear.protolayout.expression.DynamicBuilders.DynamicInt32> intAppDataKey(String key);
+    method public static androidx.wear.protolayout.expression.AppDataKey<androidx.wear.protolayout.expression.DynamicBuilders.DynamicString> stringAppDataKey(String key);
   }
 
   public class ConditionScopes {
@@ -329,8 +339,10 @@ package androidx.wear.protolayout.expression {
   }
 
   public abstract class DynamicDataKey<T extends androidx.wear.protolayout.expression.DynamicBuilders.DynamicType> {
-    method public String getKey();
-    method public String getNamespace();
+    method public final String getKey();
+    method public final String getNamespace();
+    property public final String key;
+    property public final String namespace;
   }
 
   @SuppressCompatibility @RequiresOptIn(level=androidx.annotation.RequiresOptIn.Level.ERROR) @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.CLASS) @java.lang.annotation.Target({java.lang.annotation.ElementType.METHOD, java.lang.annotation.ElementType.TYPE, java.lang.annotation.ElementType.FIELD}) public @interface ExperimentalProtoLayoutExtensionApi {
