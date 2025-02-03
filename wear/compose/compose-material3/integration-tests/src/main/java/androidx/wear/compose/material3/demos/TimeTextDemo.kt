@@ -39,7 +39,6 @@ import androidx.wear.compose.integration.demos.common.ComposableDemo
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.Icon
-import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.OutlinedButton
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TimeText
@@ -168,10 +167,6 @@ fun TimeTextOnScreenWhiteBackground() {
 @Composable
 fun TimeTextBackgroundOverride() {
     Box(Modifier.fillMaxSize().background(Color.DarkGray)) {
-        MaterialTheme(
-            colorScheme = MaterialTheme.colorScheme.copy(background = Color.Transparent)
-        ) {
-            TimeText { time -> curvedText(time) }
-        }
+        TimeText(backgroundColor = Color.Transparent) { time -> curvedText(time) }
     }
 }
