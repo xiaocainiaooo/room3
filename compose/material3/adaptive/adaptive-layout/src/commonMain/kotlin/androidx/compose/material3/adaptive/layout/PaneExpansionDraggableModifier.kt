@@ -27,6 +27,7 @@ import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 
@@ -41,7 +42,17 @@ import androidx.compose.ui.unit.Dp
 @ExperimentalMaterial3AdaptiveApi
 @Composable
 fun PaneExpansionState.defaultDragHandleSemantics(): SemanticsPropertyReceiver.() -> Unit {
-    val description = getString(Strings.defaultPaneExpansionDragHandleContentDescription)
+    val contentDesc = getString(Strings.defaultPaneExpansionDragHandleContentDescription)
+    val currentAnchor = currentAnchor
+    val stateDesc =
+        if (currentAnchor != null) {
+            getString(
+                Strings.defaultPaneExpansionDragHandleStateDescription,
+                currentAnchor.description
+            )
+        } else {
+            null
+        }
     val nextAnchor = nextAnchor
     val actionLabel =
         if (nextAnchor != null) {
@@ -53,7 +64,10 @@ fun PaneExpansionState.defaultDragHandleSemantics(): SemanticsPropertyReceiver.(
             null
         }
     return semantics@{
-        contentDescription = description
+        contentDescription = contentDesc
+        if (stateDesc != null) {
+            stateDescription = stateDesc
+        }
         if (nextAnchor == null) {
             // TODO(conrachen): handle this case
             return@semantics
