@@ -158,6 +158,26 @@ public class AppFunctionObjectTypeMetadata(
     override fun toString(): String {
         return "AppFunctionObjectTypeMetadata(properties=$properties, required=$required) ${super.toString()}"
     }
+
+    /** Converts this [AppFunctionObjectTypeMetadata] to a [AppFunctionDataTypeMetadataDocument]. */
+    // TODO: Handle non-primitive and collections.
+    // TODO: Add test for converter
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
+        val properties =
+            properties.map { (name, dataTypeMetadata) ->
+                AppFunctionPropertyMetadataDocument(
+                    name = checkNotNull(name),
+                    dataTypeMetadata =
+                        (dataTypeMetadata as AppFunctionPrimitiveTypeMetadata)
+                            .toAppFunctionDataTypeMetadataDocument()
+                )
+            }
+        return AppFunctionDataTypeMetadataDocument(
+            type = TYPE_OBJECT,
+            properties = properties,
+        )
+    }
 }
 
 /**
@@ -211,6 +231,15 @@ public class AppFunctionPrimitiveTypeMetadata(
 
     override fun toString(): String {
         return "AppFunctionPrimitiveTypeMetadata(isNullable=$isNullable) ${super.toString()}"
+    }
+
+    /**
+     * Converts this [AppFunctionPrimitiveTypeMetadata] to a [AppFunctionDataTypeMetadataDocument].
+     */
+    // TODO: Add test for converter
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public fun toAppFunctionDataTypeMetadataDocument(): AppFunctionDataTypeMetadataDocument {
+        return AppFunctionDataTypeMetadataDocument(type = type)
     }
 }
 

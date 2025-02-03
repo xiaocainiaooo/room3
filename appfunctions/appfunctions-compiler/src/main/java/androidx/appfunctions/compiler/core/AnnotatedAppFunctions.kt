@@ -19,12 +19,11 @@ package androidx.appfunctions.compiler.core
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionAnnotation
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionContextClass
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSchemaDefinitionAnnotation
-import androidx.appfunctions.metadata.AppFunctionComponentsMetadataDocument
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata
-import androidx.appfunctions.metadata.AppFunctionDataTypeMetadataDocument
-import androidx.appfunctions.metadata.AppFunctionMetadataDocument
-import androidx.appfunctions.metadata.AppFunctionPropertyMetadataDocument
-import androidx.appfunctions.metadata.AppFunctionSchemaMetadataDocument
+import androidx.appfunctions.metadata.AppFunctionMetadata
+import androidx.appfunctions.metadata.AppFunctionObjectTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionPrimitiveTypeMetadata
+import androidx.appfunctions.metadata.AppFunctionSchemaMetadata
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
@@ -160,56 +159,73 @@ data class AnnotatedAppFunctions(
         )
     }
 
-    /** Creates [AppFunctionMetadataDocument] instances for each of [appFunctionDeclarations]. */
-    fun createAppFunctionMetadataInstances(): List<AppFunctionMetadataDocument> =
-        this.appFunctionDeclarations.map { fnDeclaration ->
+    /**
+     * Creates a list of [AppFunctionMetadata] instances for each of the app functions defined in
+     * this class.
+     */
+    fun createAppFunctionMetadataList(): List<AppFunctionMetadata> =
+        appFunctionDeclarations.map { functionDeclaration ->
             val appFunctionAnnotationProperties =
-                computeAppFunctionAnnotationProperties(fnDeclaration)
-            val schemaMetadata =
-                if (appFunctionAnnotationProperties.schemaName != null) {
-                    AppFunctionSchemaMetadataDocument(
-                        schemaCategory =
-                            checkNotNull(appFunctionAnnotationProperties.schemaCategory),
-                        schemaName = checkNotNull(appFunctionAnnotationProperties.schemaName),
-                        schemaVersion = checkNotNull(appFunctionAnnotationProperties.schemaVersion)
-                    )
-                } else {
-                    null
-                }
-            AppFunctionMetadataDocument(
-                id = this.getAppFunctionIdentifier(fnDeclaration),
+                computeAppFunctionAnnotationProperties(functionDeclaration)
+            val parameterObjectTypeMetadata = functionDeclaration.buildParameterObjectTypeMetadata()
+            val responseObjectTypeMetadata =
+                checkNotNull(functionDeclaration.returnType).buildResponseObjectTypeMetadata()
+
+            AppFunctionMetadata(
+                id = getAppFunctionIdentifier(functionDeclaration),
                 isEnabledByDefault = appFunctionAnnotationProperties.isEnabledByDefault,
-                schema = schemaMetadata,
-                // TODO: Handle non-primitive and collections.
-                parameters = fnDeclaration.buildMetadataForParameters(),
-                response =
-                    AppFunctionDataTypeMetadataDocument(
-                        type = checkNotNull(fnDeclaration.returnType?.toAppFunctionDataType()),
-                        isNullable = fnDeclaration.returnType?.resolve()?.isMarkedNullable == true,
-                    ),
-                components = AppFunctionComponentsMetadataDocument(dataTypes = emptyList())
+                schema = appFunctionAnnotationProperties.toAppFunctionSchemaMetadata(),
+                parameters = parameterObjectTypeMetadata,
+                response = responseObjectTypeMetadata
             )
         }
 
-    private fun KSFunctionDeclaration.buildMetadataForParameters():
-        AppFunctionDataTypeMetadataDocument {
-        // TODO: Consider building the non-document classes first and only converting them to
-        //  documents just before serializing them into XML.
-        val properties =
-            parameters
-                .filter { !it.type.isOfType(AppFunctionContextClass.CLASS_NAME) }
-                .map {
-                    AppFunctionPropertyMetadataDocument(
-                        name = checkNotNull(it.name?.asString()),
-                        dataTypeMetadata =
-                            AppFunctionDataTypeMetadataDocument(
-                                type = it.type.toAppFunctionDataType(),
-                            )
-                    )
-                }
-        return AppFunctionDataTypeMetadataDocument(
-            type = AppFunctionDataTypeMetadata.TYPE_OBJECT,
-            properties = properties
+    /**
+     * Builds an [AppFunctionDataTypeMetadata] instance for the return type of an app function.
+     *
+     * Currently, only primitive return types are supported.
+     */
+    private fun KSTypeReference.buildResponseObjectTypeMetadata(): AppFunctionDataTypeMetadata {
+        // TODO: Support beyond primitive return types
+        return AppFunctionPrimitiveTypeMetadata(
+            type = checkNotNull(toAppFunctionDataType()),
+            isNullable = resolve().isMarkedNullable == true
+        )
+    }
+
+    /**
+     * Builds an [AppFunctionObjectTypeMetadata] instance for the parameters of an app function.
+     *
+     * Currently, only primitive parameters are supported.
+     */
+    private fun KSFunctionDeclaration.buildParameterObjectTypeMetadata():
+        AppFunctionObjectTypeMetadata {
+        val properties: MutableMap<String, AppFunctionDataTypeMetadata> = mutableMapOf()
+        val requiredProperties: MutableList<String> = mutableListOf()
+        for (ksValueParameter in parameters) {
+            if (ksValueParameter.type.isOfType(AppFunctionContextClass.CLASS_NAME)) {
+                // Skip the first parameter which is always the `AppFunctionContext`.
+                continue
+            }
+
+            // TODO: Support serializable and collections
+            val isPropertyNullable = ksValueParameter.type.resolve().isMarkedNullable
+            val propertyName = checkNotNull(ksValueParameter.name).asString()
+            val propertyMetadata =
+                AppFunctionPrimitiveTypeMetadata(
+                    type = ksValueParameter.type.toAppFunctionDataType(),
+                    isNullable = isPropertyNullable
+                )
+            properties[propertyName] = propertyMetadata
+
+            if (!isPropertyNullable) {
+                requiredProperties.add(propertyName)
+            }
+        }
+        return AppFunctionObjectTypeMetadata(
+            properties = properties,
+            required = requiredProperties,
+            isNullable = false
         )
     }
 
@@ -298,6 +314,19 @@ data class AnnotatedAppFunctions(
             type.resolveListParameterizedType()
         } else {
             type
+        }
+    }
+
+    private fun AppFunctionAnnotationProperties.toAppFunctionSchemaMetadata():
+        AppFunctionSchemaMetadata? {
+        return if (this.schemaName != null) {
+            AppFunctionSchemaMetadata(
+                category = checkNotNull(this.schemaCategory),
+                name = this.schemaName,
+                version = checkNotNull(this.schemaVersion)
+            )
+        } else {
+            null
         }
     }
 
