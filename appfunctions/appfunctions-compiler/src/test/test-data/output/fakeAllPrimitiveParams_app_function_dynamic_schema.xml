@@ -63,6 +63,12 @@
                 <id>unused</id>
                 <name>arg6</name>
             </properties>
+            <required>arg1</required>
+            <required>arg2</required>
+            <required>arg3</required>
+            <required>arg4</required>
+            <required>arg5</required>
+            <required>arg6</required>
             <type>3</type>
         </parameters>
         <response>

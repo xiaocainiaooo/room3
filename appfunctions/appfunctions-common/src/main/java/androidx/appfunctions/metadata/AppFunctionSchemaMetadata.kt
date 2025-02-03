@@ -66,7 +66,6 @@ public class AppFunctionSchemaMetadata(
      *
      * This is used to persist the schema metadata to storage.
      */
-    // TODO: Add test for converter
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public fun toAppFunctionSchemaMetadataDocument(): AppFunctionSchemaMetadataDocument {
         return AppFunctionSchemaMetadataDocument(

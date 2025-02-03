@@ -17,6 +17,8 @@
 package androidx.appfunctions.metadata
 
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_INT
+import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_LONG
+import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_OBJECT
 import androidx.appfunctions.metadata.AppFunctionDataTypeMetadata.Companion.TYPE_STRING
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
@@ -37,6 +39,46 @@ class AppFunctionDataTypeMetadataTest {
 
         assertThat(objectType1a).isNotEqualTo(objectType2)
         assertThat(objectType1a.hashCode()).isNotEqualTo(objectType2.hashCode())
+    }
+
+    @Test
+    fun appFunctionObjectTypeMetadata_toAppFunctionDataTypeMetadataDocument_returnsCorrectDocument() {
+        val primitiveTypeInt = AppFunctionPrimitiveTypeMetadata(TYPE_INT, true)
+        val primitiveTypeLong = AppFunctionPrimitiveTypeMetadata(TYPE_LONG, true)
+        val properties =
+            mapOf(
+                "prop1" to primitiveTypeInt,
+                "prop2" to primitiveTypeLong,
+            )
+        val isNullable = false
+        val requiredProperties = listOf("prop1", "prop2")
+        val appFunctionObjectTypeMetadata =
+            AppFunctionObjectTypeMetadata(properties, requiredProperties, isNullable)
+        val expectedPrimitiveDocumentProperties1 =
+            AppFunctionPropertyMetadataDocument(
+                name = "prop1",
+                dataTypeMetadata = AppFunctionDataTypeMetadataDocument(type = TYPE_INT)
+            )
+        val expectedPrimitiveDocumentProperties2 =
+            AppFunctionPropertyMetadataDocument(
+                name = "prop2",
+                dataTypeMetadata = AppFunctionDataTypeMetadataDocument(type = TYPE_LONG)
+            )
+        val expectedAppFunctionDataTypeMetadataDocument =
+            AppFunctionDataTypeMetadataDocument(
+                type = TYPE_OBJECT,
+                properties =
+                    listOf(
+                        expectedPrimitiveDocumentProperties1,
+                        expectedPrimitiveDocumentProperties2,
+                    ),
+                required = requiredProperties
+            )
+
+        val convertedDocument =
+            appFunctionObjectTypeMetadata.toAppFunctionDataTypeMetadataDocument()
+
+        assertThat(convertedDocument).isEqualTo(expectedAppFunctionDataTypeMetadataDocument)
     }
 
     @Test
@@ -63,5 +105,16 @@ class AppFunctionDataTypeMetadataTest {
 
         assertThat(primitive1a).isNotEqualTo(primitive2)
         assertThat(primitive1a.hashCode()).isNotEqualTo(primitive2.hashCode())
+    }
+
+    @Test
+    fun appFunctionPrimitiveTypeMetadata_toAppFunctionDataTypeMetadataDocument_returnsCorrectDocument() {
+        val primitiveTypeInt = AppFunctionPrimitiveTypeMetadata(TYPE_INT, true)
+        val primitiveTypeLong = AppFunctionPrimitiveTypeMetadata(TYPE_LONG, true)
+
+        assertThat(primitiveTypeInt.toAppFunctionDataTypeMetadataDocument())
+            .isEqualTo(AppFunctionDataTypeMetadataDocument(type = TYPE_INT))
+        assertThat(primitiveTypeLong.toAppFunctionDataTypeMetadataDocument())
+            .isEqualTo(AppFunctionDataTypeMetadataDocument(type = TYPE_LONG))
     }
 }
