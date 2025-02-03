@@ -49,7 +49,7 @@ fun BaseNav() {
     val backStack = rememberMutableStateListOf(Profile)
     val showDialog = remember { mutableStateOf(false) }
     SinglePaneNavDisplay(
-        backstack = backStack,
+        backStack = backStack,
         localProviders = listOf(SavedStateNavLocalProvider, ViewModelStoreNavLocalProvider),
         onBack = { backStack.removeLast() },
         entryProvider =
@@ -97,7 +97,7 @@ fun <T : Any> NavSharedElementSample() {
     val backStack = rememberMutableStateListOf(CatList)
     SharedTransitionLayout {
         SinglePaneNavDisplay(
-            backstack = backStack,
+            backStack = backStack,
             onBack = { backStack.removeLast() },
             entryProvider =
                 entryProvider {

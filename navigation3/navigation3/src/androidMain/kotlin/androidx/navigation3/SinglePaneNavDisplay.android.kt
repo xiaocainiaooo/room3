@@ -77,7 +77,7 @@ public object SinglePaneNavDisplay {
  *
  * The NavDisplay displays the content associated with the last key on the back stack.
  *
- * @param backstack the collection of keys that represents the state that needs to be handled
+ * @param backStack the collection of keys that represents the state that needs to be handled
  * @param localProviders list of [NavLocalProvider] to add information to the provided entriess
  * @param modifier the modifier to be applied to the layout.
  * @param contentAlignment The [Alignment] of the [AnimatedContent]
@@ -100,7 +100,7 @@ public object SinglePaneNavDisplay {
  */
 @Composable
 public fun <T : Any> SinglePaneNavDisplay(
-    backstack: List<T>,
+    backStack: List<T>,
     modifier: Modifier = Modifier,
     localProviders: List<NavLocalProvider> = listOf(SaveableStateNavLocalProvider()),
     contentAlignment: Alignment = Alignment.TopStart,
@@ -133,22 +133,22 @@ public fun <T : Any> SinglePaneNavDisplay(
                     DEFAULT_TRANSITION_DURATION_MILLISECOND,
                 )
         ),
-    onBack: () -> Unit = { if (backstack is MutableList) backstack.removeAt(backstack.size - 1) },
+    onBack: () -> Unit = { if (backStack is MutableList) backStack.removeAt(backStack.size - 1) },
     entryProvider: (key: T) -> NavEntry<out T>
 ) {
-    require(backstack.isNotEmpty()) { "NavDisplay backstack cannot be empty" }
+    require(backStack.isNotEmpty()) { "NavDisplay backstack cannot be empty" }
 
-    BackHandler(backstack.size > 1, onBack)
-    NavBackStackProvider(backstack, entryProvider, localProviders) { entries ->
+    BackHandler(backStack.size > 1, onBack)
+    NavBackStackProvider(backStack, entryProvider, localProviders) { entries ->
         // Make a copy shallow copy so that transition.currentState and transition.targetState are
         // different backstack instances. This ensures currentState reflects the old backstack when
         // the backstack (targetState) is updated.
-        val newStack = backstack.toList()
+        val newStack = backStack.toList()
         val entry = entries.last()
 
         var progress by remember { mutableFloatStateOf(0f) }
         var inPredictiveBack by remember { mutableStateOf(false) }
-        PredictiveBackHandler(backstack.size > 1) { backEvent ->
+        PredictiveBackHandler(backStack.size > 1) { backEvent ->
             progress = 0f
             try {
                 backEvent.collect { value ->

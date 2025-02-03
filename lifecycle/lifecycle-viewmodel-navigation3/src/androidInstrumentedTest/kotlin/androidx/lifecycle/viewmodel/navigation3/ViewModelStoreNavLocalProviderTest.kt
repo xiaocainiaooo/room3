@@ -114,7 +114,7 @@ class ViewModelStoreNavLocalProviderTest {
         composeTestRule.setContent {
             backStack = remember { mutableStateListOf("Home") }
             SinglePaneNavDisplay(
-                backstack = backStack,
+                backStack = backStack,
                 localProviders = listOf(SavedStateNavLocalProvider, ViewModelStoreNavLocalProvider),
                 onBack = { backStack.removeAt(backStack.lastIndex) },
             ) { key ->
@@ -164,7 +164,7 @@ class ViewModelStoreNavLocalProviderTest {
         composeTestRule.setContent {
             backStack = remember { mutableStateListOf("Home") }
             SinglePaneNavDisplay(
-                backstack = backStack,
+                backStack = backStack,
                 localProviders = listOf(SavedStateNavLocalProvider, ViewModelStoreNavLocalProvider),
                 onBack = { backStack.removeAt(backStack.lastIndex) },
             ) { key ->

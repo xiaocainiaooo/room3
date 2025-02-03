@@ -58,14 +58,14 @@ class SinglePaneNavDisplayScreenshotTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     @Test
     fun testNavDisplayPredictiveBackAnimations() {
-        lateinit var backstack: MutableList<Any>
+        lateinit var backStack: MutableList<Any>
         lateinit var backPressedDispatcher: OnBackPressedDispatcher
         composeTestRule.setContent {
-            backstack = remember { mutableStateListOf(first) }
+            backStack = remember { mutableStateListOf(first) }
             backPressedDispatcher =
                 LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
             SinglePaneNavDisplay(
-                backstack = backstack,
+                backStack = backStack,
                 enterTransition = slideInHorizontally { it / 2 },
                 exitTransition = slideOutHorizontally { -it / 2 },
                 popEnterTransition = slideInHorizontally { -it / 2 },
@@ -84,7 +84,7 @@ class SinglePaneNavDisplayScreenshotTest {
             }
         }
 
-        composeTestRule.runOnIdle { backstack.add(second) }
+        composeTestRule.runOnIdle { backStack.add(second) }
 
         composeTestRule.runOnIdle {
             backPressedDispatcher.dispatchOnBackStarted(
