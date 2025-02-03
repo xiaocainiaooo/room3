@@ -87,8 +87,8 @@ class AppFunctionCompilerTest {
 
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
-            expectGeneratedSourceFileName = "${'$'}SimpleFunction_AppFunctionInventory_Impl.kt",
-            goldenFileName = "${'$'}SimpleFunction_AppFunctionInventory_Impl.KT"
+            expectGeneratedSourceFileName = "${'$'}SimpleFunction_AppFunctionInventory.kt",
+            goldenFileName = "${'$'}SimpleFunction_AppFunctionInventory.KT"
         )
     }
 
@@ -102,8 +102,8 @@ class AppFunctionCompilerTest {
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
             expectGeneratedSourceFileName =
-                "${'$'}AllPrimitiveInputFunctions_AppFunctionInventory_Impl.kt",
-            goldenFileName = "${'$'}AllPrimitiveInputFunctions_AppFunctionInventory_Impl.KT"
+                "${'$'}AllPrimitiveInputFunctions_AppFunctionInventory.kt",
+            goldenFileName = "${'$'}AllPrimitiveInputFunctions_AppFunctionInventory.KT"
         )
     }
 
@@ -143,8 +143,8 @@ class AppFunctionCompilerTest {
         compilationTestHelper.assertSuccessWithSourceContent(
             report = report,
             expectGeneratedSourceFileName =
-                "${'$'}SerializableInputFunctions_AppFunctionInventory_Impl.kt",
-            goldenFileName = "${'$'}SerializableInputFunctions_AppFunctionInventory_Impl.KT",
+                "${'$'}SerializableInputFunctions_AppFunctionInventory.kt",
+            goldenFileName = "${'$'}SerializableInputFunctions_AppFunctionInventory.KT",
         )
     }
 
@@ -160,9 +160,9 @@ class AppFunctionCompilerTest {
     //        compilationTestHelper.assertSuccessWithSourceContent(
     //            report = report,
     //            expectGeneratedSourceFileName =
-    //                "${'$'}RecursiveSerializableInputFunctions_AppFunctionInventory_Impl.kt",
+    //                "${'$'}RecursiveSerializableInputFunctions_AppFunctionInventory.kt",
     //            goldenFileName =
-    //                "${'$'}RecursiveSerializableInputFunctions_AppFunctionInventory_Impl.KT",
+    //                "${'$'}RecursiveSerializableInputFunctions_AppFunctionInventory.KT",
     //        )
     //    }
 

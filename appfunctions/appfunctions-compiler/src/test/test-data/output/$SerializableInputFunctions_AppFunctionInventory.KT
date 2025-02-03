@@ -11,6 +11,6 @@ import kotlin.collections.Map
  * SerializableInputFunctions.....kt
  */
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
-public class `$SerializableInputFunctions_AppFunctionInventory_Impl` : AppFunctionInventory {
+public class `$SerializableInputFunctions_AppFunctionInventory` : AppFunctionInventory {
   override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf()
 }

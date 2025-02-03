@@ -104,6 +104,6 @@ class AppFunctionInventoryProcessor(
     }
 
     private fun getAppFunctionInventoryClassName(functionClassName: String): String {
-        return "$%s_AppFunctionInventory_Impl".format(functionClassName)
+        return "$%s_AppFunctionInventory".format(functionClassName)
     }
 }
