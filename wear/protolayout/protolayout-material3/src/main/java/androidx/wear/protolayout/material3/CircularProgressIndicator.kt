@@ -34,7 +34,6 @@ import androidx.wear.protolayout.LayoutElementBuilders.ArcSpacer
 import androidx.wear.protolayout.LayoutElementBuilders.Box
 import androidx.wear.protolayout.LayoutElementBuilders.DashedArcLine
 import androidx.wear.protolayout.LayoutElementBuilders.DashedLinePattern
-import androidx.wear.protolayout.LayoutElementBuilders.LayoutElement
 import androidx.wear.protolayout.ModifiersBuilders.Modifiers
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicColor
 import androidx.wear.protolayout.expression.DynamicBuilders.DynamicFloat
@@ -108,7 +107,7 @@ public fun MaterialScope.circularProgressIndicator(
     colors: ProgressIndicatorColors =
         defaultProgressIndicatorStyle.color ?: filledProgressIndicatorColors(),
     size: ContainerDimension = expand(),
-): LayoutElement {
+): Box {
     // CircularProgressIndicator could not have size as wrap
     verifySize(size)
 
@@ -206,7 +205,7 @@ public fun MaterialScope.segmentedCircularProgressIndicator(
     @Dimension(DP) gapSize: Float = calculateRecommendedGapSize(strokeWidth),
     colors: ProgressIndicatorColors = filledProgressIndicatorColors(),
     size: ContainerDimension = expand(),
-): LayoutElement {
+): Box {
     // CircularProgressIndicator could not have size as wrap
     verifySize(size)
 
