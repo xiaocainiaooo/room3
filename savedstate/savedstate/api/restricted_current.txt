@@ -76,18 +76,18 @@ package androidx.savedstate {
     method public inline boolean isNull(String key);
     method public inline int size();
     method public java.util.Map<java.lang.String,java.lang.Object?> toMap();
-    property @kotlin.PublishedApi internal final android.os.Bundle source;
+    property @kotlin.PublishedApi internal android.os.Bundle source;
   }
 
   public final class SavedStateReaderKt {
     method @kotlin.PublishedApi internal static inline Void keyNotFoundError(String key);
     method @kotlin.PublishedApi internal static inline Void valueNotFoundError(String key);
-    property @kotlin.PublishedApi internal static final boolean DEFAULT_BOOLEAN;
-    property @kotlin.PublishedApi internal static final char DEFAULT_CHAR;
-    property @kotlin.PublishedApi internal static final double DEFAULT_DOUBLE;
-    property @kotlin.PublishedApi internal static final float DEFAULT_FLOAT;
-    property @kotlin.PublishedApi internal static final int DEFAULT_INT;
-    property @kotlin.PublishedApi internal static final long DEFAULT_LONG;
+    property @kotlin.PublishedApi internal static boolean DEFAULT_BOOLEAN;
+    property @kotlin.PublishedApi internal static char DEFAULT_CHAR;
+    property @kotlin.PublishedApi internal static double DEFAULT_DOUBLE;
+    property @kotlin.PublishedApi internal static float DEFAULT_FLOAT;
+    property @kotlin.PublishedApi internal static int DEFAULT_INT;
+    property @kotlin.PublishedApi internal static long DEFAULT_LONG;
     field @kotlin.PublishedApi internal static final boolean DEFAULT_BOOLEAN = false;
     field @kotlin.PublishedApi internal static final char DEFAULT_CHAR = 0; // 0x0000 '\u0000'
     field @kotlin.PublishedApi internal static final double DEFAULT_DOUBLE = 0.0;
@@ -103,7 +103,7 @@ package androidx.savedstate {
     method @MainThread public void registerSavedStateProvider(String key, androidx.savedstate.SavedStateRegistry.SavedStateProvider provider);
     method @MainThread public void runOnNextRecreation(Class<? extends androidx.savedstate.SavedStateRegistry.AutoRecreated> clazz);
     method @MainThread public void unregisterSavedStateProvider(String key);
-    property @MainThread public final boolean isRestored;
+    property @MainThread public boolean isRestored;
   }
 
   public static interface SavedStateRegistry.AutoRecreated {
@@ -120,7 +120,7 @@ package androidx.savedstate {
     method @MainThread public void performAttach();
     method @MainThread public void performRestore(android.os.Bundle? savedState);
     method @MainThread public void performSave(android.os.Bundle outBundle);
-    property public final androidx.savedstate.SavedStateRegistry savedStateRegistry;
+    property public androidx.savedstate.SavedStateRegistry savedStateRegistry;
     field public static final androidx.savedstate.SavedStateRegistryController.Companion Companion;
   }
 
@@ -169,7 +169,7 @@ package androidx.savedstate {
     method public inline void putStringArray(String key, String[] value);
     method public inline void putStringList(String key, java.util.List<java.lang.String> value);
     method public inline void remove(String key);
-    property @kotlin.PublishedApi internal final android.os.Bundle source;
+    property @kotlin.PublishedApi internal android.os.Bundle source;
   }
 
   public final class SavedStateWriterKt {
@@ -191,7 +191,7 @@ package androidx.savedstate.serialization {
 
   public final class SavedStateConfig {
     method public kotlinx.serialization.modules.SerializersModule getSerializersModule();
-    property public final kotlinx.serialization.modules.SerializersModule serializersModule;
+    property public kotlinx.serialization.modules.SerializersModule serializersModule;
     field public static final androidx.savedstate.serialization.SavedStateConfig.Companion Companion;
     field public static final androidx.savedstate.serialization.SavedStateConfig DEFAULT;
   }
@@ -199,11 +199,11 @@ package androidx.savedstate.serialization {
   public static final class SavedStateConfig.Builder {
     method public kotlinx.serialization.modules.SerializersModule getSerializersModule();
     method public void setSerializersModule(kotlinx.serialization.modules.SerializersModule);
-    property public final kotlinx.serialization.modules.SerializersModule serializersModule;
+    property public kotlinx.serialization.modules.SerializersModule serializersModule;
   }
 
   public static final class SavedStateConfig.Companion {
-    property public final androidx.savedstate.serialization.SavedStateConfig DEFAULT;
+    property public androidx.savedstate.serialization.SavedStateConfig DEFAULT;
   }
 
   public final class SavedStateConfigKt {

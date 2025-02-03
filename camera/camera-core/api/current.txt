@@ -259,10 +259,10 @@ package androidx.camera.core {
   }
 
   public final class FlashState {
-    property public static final int FIRED;
-    property public static final int NOT_FIRED;
-    property public static final int UNAVAILABLE;
-    property public static final int UNKNOWN;
+    property public static int FIRED;
+    property public static int NOT_FIRED;
+    property public static int UNAVAILABLE;
+    property public static int UNKNOWN;
     field public static final int FIRED = 1; // 0x1
     field public static final androidx.camera.core.FlashState INSTANCE;
     field public static final int NOT_FIRED = 3; // 0x3

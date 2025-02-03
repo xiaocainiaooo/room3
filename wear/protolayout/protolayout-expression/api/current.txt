@@ -376,8 +376,8 @@ package androidx.wear.protolayout.expression {
     method public kotlin.Pair<androidx.wear.protolayout.expression.DynamicDataKey<T>,androidx.wear.protolayout.expression.DynamicDataBuilders.DynamicDataValue<T>> asPair();
     method public androidx.wear.protolayout.expression.DynamicDataKey<T> getKey();
     method public androidx.wear.protolayout.expression.DynamicDataBuilders.DynamicDataValue<T> getValue();
-    property public final androidx.wear.protolayout.expression.DynamicDataKey<T> key;
-    property public final androidx.wear.protolayout.expression.DynamicDataBuilders.DynamicDataValue<T> value;
+    property public androidx.wear.protolayout.expression.DynamicDataKey<T> key;
+    property public androidx.wear.protolayout.expression.DynamicDataBuilders.DynamicDataValue<T> value;
   }
 
   public final class DynamicDataPairUtil {
@@ -488,7 +488,7 @@ package androidx.wear.protolayout.expression.util {
     method @androidx.wear.protolayout.expression.RequiresSchemaVersion(major=1, minor=300) public androidx.wear.protolayout.expression.DynamicBuilders.DynamicString format(optional androidx.wear.protolayout.expression.DynamicBuilders.DynamicInstant instant);
     method public java.time.ZoneId getTimeZone();
     method public void setTimeZone(java.time.ZoneId);
-    property public final java.time.ZoneId timeZone;
+    property public java.time.ZoneId timeZone;
   }
 
   public final class DynamicFormatter {
