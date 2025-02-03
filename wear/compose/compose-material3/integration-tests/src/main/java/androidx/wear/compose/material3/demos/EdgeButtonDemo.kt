@@ -51,6 +51,7 @@ import androidx.wear.compose.material3.Card
 import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.EdgeButtonDefaults
 import androidx.wear.compose.material3.EdgeButtonSize
+import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.RadioButton
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
@@ -221,7 +222,13 @@ fun EdgeButtonMultiDemo() {
             Column(modifier = Modifier.weight(1f)) {
                 Row { Spacer(modifier = Modifier.height(10.dp)) }
                 Row {
-                    Text("Sizes", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                    ListHeader {
+                        Text(
+                            "Sizes",
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -237,7 +244,13 @@ fun EdgeButtonMultiDemo() {
                     }
                 }
                 Row {
-                    Text("Colors", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                    ListHeader {
+                        Text(
+                            "Colors",
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
