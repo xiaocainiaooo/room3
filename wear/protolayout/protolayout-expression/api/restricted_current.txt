@@ -322,6 +322,7 @@ package androidx.wear.protolayout.expression {
     method public default boolean hasInstantValue();
     method public default boolean hasIntValue();
     method public default boolean hasStringValue();
+    method public default boolean hasValueOfType(Class<? extends java.lang.Object!>);
     method public default byte[] toDynamicDataValueByteArray();
     method public default int toDynamicDataValueByteArray(byte[]);
     method public default int toDynamicDataValueByteArray(byte[], int, int);
