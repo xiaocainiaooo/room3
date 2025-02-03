@@ -21,7 +21,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -52,6 +54,10 @@ import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.Loading
 import androidx.pdf.viewer.fragment.model.PdfFragmentUiState.PasswordRequested
 import androidx.pdf.viewer.fragment.model.SearchViewUiState
 import androidx.pdf.viewer.fragment.search.PdfSearchViewManager
+import androidx.pdf.viewer.fragment.toolbox.ToolboxGestureEventProcessor
+import androidx.pdf.viewer.fragment.toolbox.ToolboxGestureEventProcessor.MotionEventType.ScrollTo
+import androidx.pdf.viewer.fragment.toolbox.ToolboxGestureEventProcessor.MotionEventType.SingleTap
+import androidx.pdf.viewer.fragment.toolbox.ToolboxGestureEventProcessor.ToolboxGestureDelegate
 import androidx.pdf.viewer.fragment.util.getCenter
 import androidx.pdf.viewer.fragment.view.PdfViewManager
 import kotlinx.coroutines.Job
@@ -91,6 +97,8 @@ public open class PdfViewerFragmentV2 : Fragment() {
         get() = documentViewModel.isTextSearchActiveFromState
         set(value) {
             documentViewModel.updateSearchState(value)
+            // hiding the toolbox when search is active and showing when search is closes
+            isToolboxVisible = !value
         }
 
     /**
@@ -103,7 +111,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
     public var isToolboxVisible: Boolean
         get() = documentViewModel.isToolboxVisibleFromState
         set(value) {
-            documentViewModel.updateToolboxState(value)
+            documentViewModel.updateToolboxState(isToolboxActive = value)
         }
 
     /**
@@ -159,6 +167,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
 
     private var searchStateCollector: Job? = null
     private var highlightStateCollector: Job? = null
+    private var toolboxStateCollector: Job? = null
 
     // Provides visible pages in viewport both end inclusive.
     private val PdfView.visiblePages: IntRange
@@ -182,6 +191,20 @@ public open class PdfViewerFragmentV2 : Fragment() {
             }
         }
 
+    private var toolboxGestureEventProcessor: ToolboxGestureEventProcessor =
+        ToolboxGestureEventProcessor(
+            toolboxGestureDelegate =
+                object : ToolboxGestureDelegate {
+                    override fun onSingleTap() {
+                        documentViewModel.updateToolboxState(isToolboxActive = !isToolboxVisible)
+                    }
+
+                    override fun onScroll(position: Int) {
+                        documentViewModel.updateToolboxState(isToolboxActive = (position <= 0))
+                    }
+                }
+        )
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -200,6 +223,26 @@ public open class PdfViewerFragmentV2 : Fragment() {
             pdfSearchView = findViewById(R.id.pdfSearchView)
             toolboxView = findViewById(R.id.toolBoxView)
         }
+        val gestureDetector =
+            GestureDetector(
+                activity,
+                object : GestureDetector.SimpleOnGestureListener() {
+                    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                        toolboxGestureEventProcessor.processEvent(SingleTap)
+                        // we should not consume this event as the events are required in PdfView
+                        return false
+                    }
+                }
+            )
+
+        pdfView.setOnTouchListener { _, event ->
+            // we should not consume this event as the events are required in PdfView
+            gestureDetector.onTouchEvent(event)
+        }
+        pdfView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
+            toolboxGestureEventProcessor.processEvent(ScrollTo(scrollY))
+        }
+
         pdfViewManager =
             PdfViewManager(
                 pdfView = pdfView,
@@ -214,7 +257,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
         onPdfSearchViewCreated(pdfSearchView)
 
         collectFlowOnLifecycleScope { collectFragmentUiScreenState() }
-
+        toolboxView.hide()
         toolboxView.setOnCurrentPageRequested { pdfView.visiblePages.getCenter() }
     }
 
@@ -309,6 +352,12 @@ public open class PdfViewerFragmentV2 : Fragment() {
                 }
             }
         }
+
+        toolboxStateCollector = collectFlowOnLifecycleScope {
+            documentViewModel.toolboxViewUiState.collect { showToolbox ->
+                if (showToolbox) toolboxView.show() else toolboxView.hide()
+            }
+        }
     }
 
     private fun cancelViewStateCollection() {
@@ -316,6 +365,8 @@ public open class PdfViewerFragmentV2 : Fragment() {
         searchStateCollector = null
         highlightStateCollector?.cancel()
         highlightStateCollector = null
+        toolboxStateCollector?.cancel()
+        toolboxStateCollector = null
     }
 
     private fun getPasswordDialog(): PdfPasswordDialog {
@@ -379,7 +430,6 @@ public open class PdfViewerFragmentV2 : Fragment() {
             pdfView = GONE,
             loadingView = VISIBLE,
             errorView = GONE,
-            toolboxView = GONE
         )
         // Cancel view state collection upon new document load.
         // These state should only be relevant if document is loaded successfully.
@@ -388,7 +438,7 @@ public open class PdfViewerFragmentV2 : Fragment() {
 
     private fun handlePasswordRequested(uiState: PasswordRequested) {
         requestPassword(uiState.passwordFailed)
-        setViewVisibility(pdfView = GONE, loadingView = GONE, errorView = GONE, toolboxView = GONE)
+        setViewVisibility(pdfView = GONE, loadingView = GONE, errorView = GONE)
         // Utilize retry param to show incorrect password on PasswordDialog
     }
 
@@ -401,7 +451,6 @@ public open class PdfViewerFragmentV2 : Fragment() {
             pdfView = VISIBLE,
             loadingView = GONE,
             errorView = GONE,
-            toolboxView = VISIBLE
         )
         // Start collection of view states like search, toolbox, etc. once document is loaded.
         collectViewStates()
@@ -414,7 +463,6 @@ public open class PdfViewerFragmentV2 : Fragment() {
             pdfView = GONE,
             loadingView = GONE,
             errorView = VISIBLE,
-            toolboxView = GONE
         )
     }
 
@@ -422,12 +470,10 @@ public open class PdfViewerFragmentV2 : Fragment() {
         pdfView: Int,
         loadingView: Int,
         errorView: Int,
-        toolboxView: Int
     ) {
         this.pdfView.visibility = pdfView
         this.loadingView.visibility = loadingView
         this.errorView.visibility = errorView
-        this.toolboxView.visibility = toolboxView
     }
 
     private fun collectFlowOnLifecycleScope(block: suspend () -> Unit): Job {
