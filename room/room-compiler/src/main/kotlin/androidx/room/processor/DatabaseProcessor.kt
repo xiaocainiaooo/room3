@@ -41,7 +41,7 @@ import androidx.room.vo.Entity
 import androidx.room.vo.FtsEntity
 import androidx.room.vo.Warning
 import androidx.room.vo.columnNames
-import androidx.room.vo.findFieldByColumnName
+import androidx.room.vo.findPropertyByColumnName
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.nio.file.Path
@@ -93,7 +93,7 @@ class DatabaseProcessor(baseContext: Context, val element: XTypeElement) {
                 .getAllMethods()
                 .filter { it.isAbstract() }
                 .filterNot {
-                    // remove methods that belong to room
+                    // remove functions that belong to room
                     it.enclosingElement.asClassName() == RoomTypeNames.ROOM_DB
                 }
                 .mapNotNull { executable ->
@@ -254,7 +254,7 @@ class DatabaseProcessor(baseContext: Context, val element: XTypeElement) {
                 }
                 val parentFields =
                     foreignKey.parentColumns.mapNotNull { columnName ->
-                        val parentField = parent.findFieldByColumnName(columnName)
+                        val parentField = parent.findPropertyByColumnName(columnName)
                         if (parentField == null) {
                             context.logger.e(
                                 entity.element,
@@ -278,7 +278,7 @@ class DatabaseProcessor(baseContext: Context, val element: XTypeElement) {
                             parentEntity = parent.element.qualifiedName,
                             childEntity = entity.element.qualifiedName,
                             parentColumns = foreignKey.parentColumns,
-                            childColumns = foreignKey.childFields.map { it.columnName }
+                            childColumns = foreignKey.childProperties.map { it.columnName }
                         )
                     )
                     return@foreignKeyLoop
@@ -352,14 +352,14 @@ class DatabaseProcessor(baseContext: Context, val element: XTypeElement) {
                 }
             }
         daoFunctions.forEach { daoFunction ->
-            daoFunction.dao.mDeleteOrUpdateShortcutFunctions.forEach { method ->
-                method.entities.forEach {
-                    check(method.element, daoFunction.dao, it.value.entityTypeName)
+            daoFunction.dao.mDeleteOrUpdateShortcutFunctions.forEach { function ->
+                function.entities.forEach {
+                    check(function.element, daoFunction.dao, it.value.entityTypeName)
                 }
             }
-            daoFunction.dao.mInsertOrUpsertShortcutFunctions.forEach { method ->
-                method.entities.forEach {
-                    check(method.element, daoFunction.dao, it.value.entityTypeName)
+            daoFunction.dao.mInsertOrUpsertShortcutFunctions.forEach { function ->
+                function.entities.forEach {
+                    check(function.element, daoFunction.dao, it.value.entityTypeName)
                 }
             }
         }

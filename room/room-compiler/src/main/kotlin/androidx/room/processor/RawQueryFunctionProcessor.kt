@@ -131,7 +131,7 @@ class RawQueryFunctionProcessor(
                         DataClassProcessor.createFor(
                                 context = context,
                                 element = it,
-                                bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
+                                bindingScope = PropertyProcessor.BindingScope.READ_FROM_STMT,
                                 parent = null
                             )
                             .process()

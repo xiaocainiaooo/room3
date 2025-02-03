@@ -27,27 +27,27 @@ import androidx.room.solver.CodeGenScope
 import androidx.room.vo.CallType
 import androidx.room.vo.Constructor
 import androidx.room.vo.DataClass
-import androidx.room.vo.EmbeddedField
-import androidx.room.vo.Field
-import androidx.room.vo.FieldWithIndex
+import androidx.room.vo.EmbeddedProperty
+import androidx.room.vo.Property
+import androidx.room.vo.PropertyWithIndex
 import androidx.room.vo.RelationCollector
 import java.util.Locale
 
-/** Handles writing a field into statement or reading it from statement. */
-class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
-    val field = fieldWithIndex.field
-    val indexVar = fieldWithIndex.indexVar
-    val alwaysExists = fieldWithIndex.alwaysExists
+/** Handles writing a property into statement or reading it from statement. */
+class PropertyReadWriteWriter(propertyWithIndex: PropertyWithIndex) {
+    val property = propertyWithIndex.property
+    val indexVar = propertyWithIndex.indexVar
+    val alwaysExists = propertyWithIndex.alwaysExists
 
     companion object {
         /*
          * Get all parents including the ones which have grand children in this list but does not
          * have any direct children in the list.
          */
-        fun getAllParents(fields: List<Field>): Set<EmbeddedField> {
-            val allParents = mutableSetOf<EmbeddedField>()
-            fun addAllParents(field: Field) {
-                var parent = field.parent
+        fun getAllParents(properties: List<Property>): Set<EmbeddedProperty> {
+            val allParents = mutableSetOf<EmbeddedProperty>()
+            fun addAllParents(property: Property) {
+                var parent = property.parent
                 while (parent != null) {
                     if (allParents.add(parent)) {
                         parent = parent.parent
@@ -56,35 +56,36 @@ class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
                     }
                 }
             }
-            fields.forEach(::addAllParents)
+            properties.forEach(::addAllParents)
             return allParents
         }
 
         /**
-         * Convert the fields with indices into a Node tree so that we can recursively process them.
-         * This work is done here instead of parsing because the result may include arbitrary
-         * fields.
+         * Convert the properties with indices into a Node tree so that we can recursively process
+         * them. This work is done here instead of parsing because the result may include arbitrary
+         * properties.
          */
         private fun createNodeTree(
             rootVar: String,
-            fieldsWithIndices: List<FieldWithIndex>,
+            propertiesWithIndices: List<PropertyWithIndex>,
             scope: CodeGenScope
         ): Node {
-            val allParents = getAllParents(fieldsWithIndices.map { it.field })
+            val allParents = getAllParents(propertiesWithIndices.map { it.property })
             val rootNode = Node(rootVar, null)
-            rootNode.directFields = fieldsWithIndices.filter { it.field.parent == null }
+            rootNode.directProperties = propertiesWithIndices.filter { it.property.parent == null }
             val parentNodes =
                 allParents.associateWith {
                     Node(
-                        varName = scope.getTmpVar("_tmp${it.field.name.capitalize(Locale.US)}"),
-                        fieldParent = it
+                        varName = scope.getTmpVar("_tmp${it.property.name.capitalize(Locale.US)}"),
+                        propertyParent = it
                     )
                 }
             parentNodes.values.forEach { node ->
-                val fieldParent = node.fieldParent!!
-                val grandParent = fieldParent.parent
+                val propertyParent = node.propertyParent!!
+                val grandParent = propertyParent.parent
                 val grandParentNode = grandParent?.let { parentNodes[it] } ?: rootNode
-                node.directFields = fieldsWithIndices.filter { it.field.parent == fieldParent }
+                node.directProperties =
+                    propertiesWithIndices.filter { it.property.parent == propertyParent }
                 node.parentNode = grandParentNode
                 grandParentNode.subNodes.add(node)
             }
@@ -94,13 +95,13 @@ class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
         fun bindToStatement(
             ownerVar: String,
             stmtParamVar: String,
-            fieldsWithIndices: List<FieldWithIndex>,
+            propertiesWithIndices: List<PropertyWithIndex>,
             scope: CodeGenScope
         ) {
             fun visitNode(node: Node) {
                 fun bindWithDescendants() {
-                    node.directFields.forEach {
-                        FieldReadWriteWriter(it)
+                    node.directProperties.forEach {
+                        PropertyReadWriteWriter(it)
                             .bindToStatement(
                                 ownerVar = node.varName,
                                 stmtParamVar = stmtParamVar,
@@ -110,22 +111,22 @@ class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
                     node.subNodes.forEach(::visitNode)
                 }
 
-                val fieldParent = node.fieldParent
-                if (fieldParent != null) {
-                    fieldParent.getter.writeGet(
+                val propertyParent = node.propertyParent
+                if (propertyParent != null) {
+                    propertyParent.getter.writeGet(
                         ownerVar = node.parentNode!!.varName,
                         outVar = node.varName,
                         builder = scope.builder
                     )
                     scope.builder.apply {
-                        if (fieldParent.nonNull) {
+                        if (propertyParent.nonNull) {
                             bindWithDescendants()
                         } else {
                             beginControlFlow("if (%L != null)", node.varName).apply {
                                 bindWithDescendants()
                             }
                             nextControlFlow("else").apply {
-                                node.allFields().forEach {
+                                node.allProperties().forEach {
                                     addStatement("%L.bindNull(%L)", stmtParamVar, it.indexVar)
                                 }
                             }
@@ -136,7 +137,7 @@ class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
                     bindWithDescendants()
                 }
             }
-            visitNode(createNodeTree(ownerVar, fieldsWithIndices, scope))
+            visitNode(createNodeTree(ownerVar, propertiesWithIndices, scope))
         }
 
         /**
@@ -147,9 +148,9 @@ class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
             outVar: String,
             constructor: Constructor?,
             typeName: XTypeName,
-            localVariableNames: Map<String, FieldWithIndex>,
+            localVariableNames: Map<String, PropertyWithIndex>,
             localEmbeddeds: List<Node>,
-            localRelations: Map<String, Field>,
+            localRelations: Map<String, Property>,
             scope: CodeGenScope
         ) {
             if (constructor == null) {
@@ -162,15 +163,17 @@ class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
             val variableNames =
                 constructor.params.map { param ->
                     when (param) {
-                        is Constructor.Param.FieldParam ->
+                        is Constructor.Param.PropertyParam ->
                             localVariableNames.entries
-                                .firstOrNull { it.value.field === param.field }
+                                .firstOrNull { it.value.property === param.property }
                                 ?.key
                         is Constructor.Param.EmbeddedParam ->
-                            localEmbeddeds.firstOrNull { it.fieldParent == param.embedded }?.varName
+                            localEmbeddeds
+                                .firstOrNull { it.propertyParent == param.embedded }
+                                ?.varName
                         is Constructor.Param.RelationParam ->
                             localRelations.entries
-                                .firstOrNull { it.value === param.relation.field }
+                                .firstOrNull { it.value === param.relation.property }
                                 ?.key
                     }
                 }
@@ -183,48 +186,48 @@ class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
             outVar: String,
             outDataClass: DataClass,
             stmtVar: String,
-            fieldsWithIndices: List<FieldWithIndex>,
+            propertiesWithIndices: List<PropertyWithIndex>,
             scope: CodeGenScope,
             relationCollectors: List<RelationCollector>
         ) {
             fun visitNode(node: Node) {
-                val fieldParent = node.fieldParent
+                val propertyParent = node.propertyParent
                 fun readNode() {
-                    // read constructor parameters into local fields
-                    val constructorFields =
-                        node.directFields
-                            .filter { it.field.setter.callType == CallType.CONSTRUCTOR }
+                    // read constructor parameters into local properties
+                    val constructorProperties =
+                        node.directProperties
+                            .filter { it.property.setter.callType == CallType.CONSTRUCTOR }
                             .associateBy { fwi ->
-                                FieldReadWriteWriter(fwi)
+                                PropertyReadWriteWriter(fwi)
                                     .readIntoTmpVar(
                                         stmtVar,
-                                        fwi.field.setter.type.asTypeName(),
+                                        fwi.property.setter.type.asTypeName(),
                                         scope
                                     )
                             }
-                    // read decomposed fields (e.g. embedded)
+                    // read decomposed properties (e.g. embedded)
                     node.subNodes.forEach(::visitNode)
-                    // read relationship fields
-                    val relationFields =
+                    // read relationship properties
+                    val relationProperties =
                         relationCollectors
-                            .filter { (relation) -> relation.field.parent === fieldParent }
+                            .filter { (relation) -> relation.property.parent === propertyParent }
                             .associate {
                                 it.writeReadCollectionIntoTmpVar(
                                     stmtVarName = stmtVar,
-                                    fieldsWithIndices = fieldsWithIndices,
+                                    propertiesWithIndices = propertiesWithIndices,
                                     scope = scope
                                 )
                             }
 
                     // construct the object
-                    if (fieldParent != null) {
+                    if (propertyParent != null) {
                         construct(
                             outVar = node.varName,
-                            constructor = fieldParent.dataClass.constructor,
-                            typeName = fieldParent.field.typeName,
+                            constructor = propertyParent.dataClass.constructor,
+                            typeName = propertyParent.property.typeName,
                             localEmbeddeds = node.subNodes,
-                            localRelations = relationFields,
-                            localVariableNames = constructorFields,
+                            localRelations = relationProperties,
+                            localVariableNames = constructorProperties,
                             scope = scope
                         )
                     } else {
@@ -233,26 +236,26 @@ class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
                             constructor = outDataClass.constructor,
                             typeName = outDataClass.typeName,
                             localEmbeddeds = node.subNodes,
-                            localRelations = relationFields,
-                            localVariableNames = constructorFields,
+                            localRelations = relationProperties,
+                            localVariableNames = constructorProperties,
                             scope = scope
                         )
                     }
-                    // ready any field that was not part of the constructor
-                    node.directFields
-                        .filterNot { it.field.setter.callType == CallType.CONSTRUCTOR }
+                    // ready any property that was not part of the constructor
+                    node.directProperties
+                        .filterNot { it.property.setter.callType == CallType.CONSTRUCTOR }
                         .forEach { fwi ->
-                            FieldReadWriteWriter(fwi)
+                            PropertyReadWriteWriter(fwi)
                                 .readFromStatement(
                                     ownerVar = node.varName,
                                     stmtVar = stmtVar,
                                     scope = scope
                                 )
                         }
-                    // assign sub nodes to fields if they were not part of the constructor.
+                    // assign sub nodes to properties if they were not part of the constructor.
                     node.subNodes
                         .mapNotNull {
-                            val setter = it.fieldParent?.setter
+                            val setter = it.propertyParent?.setter
                             if (setter != null && setter.callType != CallType.CONSTRUCTOR) {
                                 Pair(it.varName, setter)
                             } else {
@@ -266,28 +269,30 @@ class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
                                 builder = scope.builder
                             )
                         }
-                    // assign relation fields that were not part of the constructor
-                    relationFields
-                        .filterNot { (_, field) -> field.setter.callType == CallType.CONSTRUCTOR }
-                        .forEach { (varName, field) ->
-                            field.setter.writeSet(
+                    // assign relation properties that were not part of the constructor
+                    relationProperties
+                        .filterNot { (_, property) ->
+                            property.setter.callType == CallType.CONSTRUCTOR
+                        }
+                        .forEach { (varName, property) ->
+                            property.setter.writeSet(
                                 ownerVar = node.varName,
                                 inVar = varName,
                                 builder = scope.builder
                             )
                         }
                 }
-                if (fieldParent == null) {
+                if (propertyParent == null) {
                     // root element
                     // always declared by the caller so we don't declare this
                     readNode()
                 } else {
                     // always declare, we'll set below
-                    scope.builder.addLocalVariable(node.varName, fieldParent.field.typeName)
-                    if (fieldParent.nonNull) {
+                    scope.builder.addLocalVariable(node.varName, propertyParent.property.typeName)
+                    if (propertyParent.nonNull) {
                         readNode()
                     } else {
-                        val myDescendants = node.allFields()
+                        val myDescendants = node.allProperties()
                         val allNullCheck =
                             myDescendants.joinToString(" && ") {
                                 if (it.alwaysExists) {
@@ -306,31 +311,31 @@ class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
                     }
                 }
             }
-            visitNode(createNodeTree(outVar, fieldsWithIndices, scope))
+            visitNode(createNodeTree(outVar, propertiesWithIndices, scope))
         }
     }
 
     /**
-     * @param ownerVar The entity / pojo variable that owns this field. It must own this field! (not
-     *   the container pojo)
+     * @param ownerVar The entity / pojo variable that owns this property. It must own this
+     *   property! (not the container pojo)
      * @param stmtParamVar The statement variable
      * @param scope The code generation scope
      */
     private fun bindToStatement(ownerVar: String, stmtParamVar: String, scope: CodeGenScope) {
-        val binder = field.statementBinder ?: return
-        field.getter.writeGetToStatement(ownerVar, stmtParamVar, indexVar, binder, scope)
+        val binder = property.statementBinder ?: return
+        property.getter.writeGetToStatement(ownerVar, stmtParamVar, indexVar, binder, scope)
     }
 
     /**
-     * @param ownerVar The entity / pojo variable that owns this field. It must own this field (not
-     *   the container pojo)
+     * @param ownerVar The entity / pojo variable that owns this property. It must own this property
+     *   (not the container pojo)
      * @param stmtVar The statement variable
      * @param scope The code generation scope
      */
     private fun readFromStatement(ownerVar: String, stmtVar: String, scope: CodeGenScope) {
         fun doRead() {
-            val reader = field.statementValueReader ?: return
-            field.setter.writeSetFromStatement(ownerVar, stmtVar, indexVar, reader, scope)
+            val reader = property.statementValueReader ?: return
+            property.setter.writeSetFromStatement(ownerVar, stmtVar, indexVar, reader, scope)
         }
         if (alwaysExists) {
             doRead()
@@ -344,11 +349,16 @@ class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
 
     /** Reads the value into a temporary local variable. */
     fun readIntoTmpVar(stmtVar: String, typeName: XTypeName, scope: CodeGenScope): String {
-        val tmpField = scope.getTmpVar("_tmp${field.name.capitalize(Locale.US)}")
+        val tmpProperty = scope.getTmpVar("_tmp${property.name.capitalize(Locale.US)}")
         scope.builder.apply {
-            addLocalVariable(tmpField, typeName)
+            addLocalVariable(tmpProperty, typeName)
             if (alwaysExists) {
-                field.statementValueReader?.readFromStatement(tmpField, stmtVar, indexVar, scope)
+                property.statementValueReader?.readFromStatement(
+                    tmpProperty,
+                    stmtVar,
+                    indexVar,
+                    scope
+                )
             } else {
                 beginControlFlow("if (%L == -1)", indexVar).applyTo { language ->
                     val defaultValue = typeName.defaultValue()
@@ -359,16 +369,16 @@ class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
                     ) {
                         addStatement(
                             "error(%S)",
-                            "Missing value for a NON-NULL column '${field.columnName}', " +
+                            "Missing value for a NON-NULL column '${property.columnName}', " +
                                 "found NULL value instead."
                         )
                     } else {
-                        addStatement("%L = %L", tmpField, defaultValue)
+                        addStatement("%L = %L", tmpProperty, defaultValue)
                     }
                 }
                 nextControlFlow("else").apply {
-                    field.statementValueReader?.readFromStatement(
-                        tmpField,
+                    property.statementValueReader?.readFromStatement(
+                        tmpProperty,
                         stmtVar,
                         indexVar,
                         scope
@@ -377,25 +387,25 @@ class FieldReadWriteWriter(fieldWithIndex: FieldWithIndex) {
                 endControlFlow()
             }
         }
-        return tmpField
+        return tmpProperty
     }
 
-    /** On demand node which is created based on the fields that were passed into this class. */
+    /** On demand node which is created based on the properties that were passed into this class. */
     private class Node(
         // root for me
         val varName: String,
-        // set if I'm a FieldParent
-        val fieldParent: EmbeddedField?
+        // set if I'm a PropertyParent
+        val propertyParent: EmbeddedProperty?
     ) {
         // whom do i belong
         var parentNode: Node? = null
-        // these fields are my direct fields
-        lateinit var directFields: List<FieldWithIndex>
+        // these properties are my direct properties
+        lateinit var directProperties: List<PropertyWithIndex>
         // these nodes are under me
         val subNodes = mutableListOf<Node>()
 
-        fun allFields(): List<FieldWithIndex> {
-            return directFields + subNodes.flatMap { it.allFields() }
+        fun allProperties(): List<PropertyWithIndex> {
+            return directProperties + subNodes.flatMap { it.allProperties() }
         }
     }
 }

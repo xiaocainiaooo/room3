@@ -28,15 +28,15 @@ import androidx.room.processor.EntityProcessor
 open class DataClass(
     val element: XTypeElement,
     val type: XType,
-    fields: List<Field>,
-    val embeddedFields: List<EmbeddedField>,
+    properties: List<Property>,
+    val embeddedProperties: List<EmbeddedProperty>,
     val relations: List<Relation>,
     val constructor: Constructor? = null
-) : HasFields {
+) : HasProperties {
     val className: XClassName by lazy { element.asClassName() }
     val typeName: XTypeName by lazy { type.asTypeName() }
 
-    override val fields = Fields(fields)
+    override val properties = Properties(properties)
 
     /**
      * All table or view names that are somehow accessed by this data class. Might be via Embedded
@@ -53,7 +53,7 @@ open class DataClass(
             } else {
                 emptyList()
             } +
-                embeddedFields.flatMap { it.dataClass.accessedTableNames() } +
+                embeddedProperties.flatMap { it.dataClass.accessedTableNames() } +
                 relations.map { it.entity.tableName }
         }
     }

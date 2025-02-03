@@ -960,7 +960,7 @@ abstract class InsertOrUpsertShortcutFunctionProcessorTest<out T : InsertOrUpser
             additionalSources = listOf(usernameSource)
         ) { _, invocation ->
             invocation.assertCompilationResult {
-                hasErrorContaining(ProcessorErrors.cannotFindAsEntityField("foo.bar.User"))
+                hasErrorContaining(ProcessorErrors.cannotFindAsEntityProperty("foo.bar.User"))
             }
         }
     }

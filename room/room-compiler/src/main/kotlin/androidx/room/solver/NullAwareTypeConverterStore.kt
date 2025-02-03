@@ -290,7 +290,7 @@ class NullAwareTypeConverterStore(
 
     /** Returns all type converters that can receive input type and return into another type. */
     private fun getAllTypeConvertersFrom(input: XType): List<TypeConverter> {
-        // for input, check assignability because it defines whether we can use the method or not.
+        // for input, check assignability because it defines whether we can use the function or not.
         return typeConvertersByFromCache.getOrPut(input) {
             // this cache avoids us many assignability checks.
             typeConverters.mapNotNull { converter ->

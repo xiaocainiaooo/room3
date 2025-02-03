@@ -29,7 +29,7 @@ import androidx.room.parser.Collate
 import androidx.room.parser.SQLTypeAffinity
 import androidx.room.solver.types.ColumnTypeAdapter
 import androidx.room.testing.context
-import androidx.room.vo.Field
+import androidx.room.vo.Property
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
@@ -40,7 +40,7 @@ import org.junit.runners.JUnit4
 import org.mockito.Mockito.mock
 
 @RunWith(JUnit4::class)
-class FieldProcessorTest {
+class PropertyProcessorTest {
     companion object {
         const val ENTITY_PREFIX =
             """
@@ -127,15 +127,15 @@ class FieldProcessorTest {
     @Test
     fun primitives() {
         ALL_PRIMITIVES.forEach { primitive ->
-            val fieldName = primitive.toString(CodeLanguage.JAVA)
-            singleEntity("$fieldName x;") { field, invocation ->
+            val propertyName = primitive.toString(CodeLanguage.JAVA)
+            singleEntity("$propertyName x;") { property, invocation ->
                 assertThat(
-                    field,
+                    property,
                     `is`(
-                        Field(
+                        Property(
                             name = "x",
                             type = primitive.typeMirror(invocation),
-                            element = field.element,
+                            element = property.element,
                             affinity = primitive.affinity()
                         )
                     )
@@ -147,15 +147,15 @@ class FieldProcessorTest {
     @Test
     fun boxed() {
         ALL_BOXED_PRIMITIVES.forEach { boxedPrimitive ->
-            val fieldName = boxedPrimitive.simpleNames.single()
-            singleEntity("@Nullable $fieldName y;") { field, invocation ->
+            val propertyName = boxedPrimitive.simpleNames.single()
+            singleEntity("@Nullable $propertyName y;") { property, invocation ->
                 assertThat(
-                    field,
+                    property,
                     `is`(
-                        Field(
+                        Property(
                             name = "y",
                             type = boxedPrimitive.typeMirror(invocation).makeNullable(),
-                            element = field.element,
+                            element = property.element,
                             affinity = boxedPrimitive.affinity()
                         )
                     )
@@ -172,14 +172,14 @@ class FieldProcessorTest {
             @PrimaryKey
             int x;
             """
-        ) { field, invocation ->
+        ) { property, invocation ->
             assertThat(
-                field,
+                property,
                 `is`(
-                    Field(
+                    Property(
                         name = "x",
                         type = XTypeName.PRIMITIVE_INT.typeMirror(invocation),
-                        element = field.element,
+                        element = property.element,
                         columnName = "foo",
                         affinity = SQLTypeAffinity.INTEGER
                     )
@@ -195,14 +195,14 @@ class FieldProcessorTest {
             @ColumnInfo(name = "foo", index = true)
             int x;
             """
-        ) { field, invocation ->
+        ) { property, invocation ->
             assertThat(
-                field,
+                property,
                 `is`(
-                    Field(
+                    Property(
                         name = "x",
                         type = XTypeName.PRIMITIVE_INT.typeMirror(invocation),
-                        element = field.element,
+                        element = property.element,
                         columnName = "foo",
                         affinity = SQLTypeAffinity.INTEGER,
                         indexed = true
@@ -231,23 +231,23 @@ class FieldProcessorTest {
         singleEntity(
             "@TypeConverters(foo.bar.MyConverter.class)" +
                 "@ColumnInfo(typeAffinity = ColumnInfo.TEXT) @NonNull byte[] arr;"
-        ) { field, invocation ->
+        ) { property, invocation ->
             assertThat(
-                field,
+                property,
                 `is`(
-                    Field(
+                    Property(
                         name = "arr",
                         type =
                             invocation.processingEnv
                                 .getArrayType(XTypeName.PRIMITIVE_BYTE)
                                 .makeNonNullable(),
-                        element = field.element,
+                        element = property.element,
                         affinity = SQLTypeAffinity.TEXT
                     )
                 )
             )
             assertThat(
-                (field.statementValueReader as? ColumnTypeAdapter)?.typeAffinity,
+                (property.statementValueReader as? ColumnTypeAdapter)?.typeAffinity,
                 `is`(SQLTypeAffinity.TEXT)
             )
         }
@@ -259,15 +259,15 @@ class FieldProcessorTest {
             singleEntity(
                 "@TypeConverters(foo.bar.MyConverter.class) @NonNull " +
                     "${primitive.toString(CodeLanguage.JAVA)}[] arr;"
-            ) { field, invocation ->
+            ) { property, invocation ->
                 assertThat(
-                    field,
+                    property,
                     `is`(
-                        Field(
+                        Property(
                             name = "arr",
                             type =
                                 invocation.processingEnv.getArrayType(primitive).makeNonNullable(),
-                            element = field.element,
+                            element = property.element,
                             affinity =
                                 if (primitive == XTypeName.PRIMITIVE_BYTE) {
                                     SQLTypeAffinity.BLOB
@@ -287,12 +287,12 @@ class FieldProcessorTest {
             singleEntity(
                 "@TypeConverters(foo.bar.MyConverter.class) " +
                     "${boxedPrimitive.toString(CodeLanguage.JAVA)}[] arr;"
-            ) { field, invocation ->
+            ) { property, invocation ->
                 val expected =
-                    Field(
+                    Property(
                         name = "arr",
                         type = invocation.processingEnv.getArrayType(boxedPrimitive),
-                        element = field.element,
+                        element = property.element,
                         affinity = SQLTypeAffinity.TEXT,
                         nonNull = false // no annotation
                     )
@@ -301,11 +301,11 @@ class FieldProcessorTest {
                 // (Array<(kotlin.Int..kotlin.Int?)>..Array<out (kotlin.Int..kotlin.Int?)>?)
                 // as a workaround in test,
                 assertThat(
-                    field,
+                    property,
                     `is`(
                         expected.copy(
                             // don't compare type
-                            type = field.type
+                            type = property.type
                         )
                     )
                 )
@@ -317,7 +317,7 @@ class FieldProcessorTest {
                         boxedPrimitive.copy(nullable = true)
                     }
                 assertThat(
-                    field.type.asTypeName(),
+                    property.type.asTypeName(),
                     `is`(XTypeName.getArrayName(elementType).copy(nullable = true))
                 )
             }
@@ -336,14 +336,14 @@ class FieldProcessorTest {
                 static class Extending extends BaseClass<java.lang.Integer> {
                 }
                 """
-        ) { field, invocation ->
+        ) { property, invocation ->
             assertThat(
-                field,
+                property,
                 `is`(
-                    Field(
+                    Property(
                         name = "item",
                         type = XTypeName.PRIMITIVE_INT.box(invocation).makeNonNullable(),
-                        element = field.element,
+                        element = property.element,
                         affinity = SQLTypeAffinity.INTEGER
                     )
                 )
@@ -367,7 +367,7 @@ class FieldProcessorTest {
                     if (invocation.isKsp) {
                         ProcessorErrors.CANNOT_FIND_COLUMN_TYPE_ADAPTER
                     } else {
-                        ProcessorErrors.CANNOT_USE_UNBOUND_GENERICS_IN_ENTITY_FIELDS
+                        ProcessorErrors.CANNOT_USE_UNBOUND_GENERICS_IN_ENTITY_PROPERTIES
                     }
                 )
             }
@@ -377,10 +377,10 @@ class FieldProcessorTest {
     @Test
     fun nameVariations() {
         runProcessorTest {
-            val fieldElement = mock(XFieldElement::class.java)
+            val propertyElement = mock(XFieldElement::class.java)
             assertThat(
-                Field(
-                        fieldElement,
+                Property(
+                        propertyElement,
                         "x",
                         XTypeName.PRIMITIVE_INT.typeMirror(it),
                         SQLTypeAffinity.INTEGER
@@ -389,8 +389,8 @@ class FieldProcessorTest {
                 `is`(arrayListOf("x"))
             )
             assertThat(
-                Field(
-                        fieldElement,
+                Property(
+                        propertyElement,
                         "x",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
                         SQLTypeAffinity.INTEGER
@@ -399,8 +399,8 @@ class FieldProcessorTest {
                 `is`(arrayListOf("x"))
             )
             assertThat(
-                Field(
-                        fieldElement,
+                Property(
+                        propertyElement,
                         "xAll",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
                         SQLTypeAffinity.INTEGER
@@ -416,7 +416,7 @@ class FieldProcessorTest {
         val elm = mock(XFieldElement::class.java)
         runProcessorTest {
             assertThat(
-                Field(
+                Property(
                         elm,
                         "isX",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
@@ -426,12 +426,17 @@ class FieldProcessorTest {
                 `is`(arrayListOf("isX", "x"))
             )
             assertThat(
-                Field(elm, "isX", XTypeName.PRIMITIVE_INT.typeMirror(it), SQLTypeAffinity.INTEGER)
+                Property(
+                        elm,
+                        "isX",
+                        XTypeName.PRIMITIVE_INT.typeMirror(it),
+                        SQLTypeAffinity.INTEGER
+                    )
                     .nameWithVariations,
                 `is`(arrayListOf("isX"))
             )
             assertThat(
-                Field(
+                Property(
                         elm,
                         "is",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
@@ -441,7 +446,7 @@ class FieldProcessorTest {
                 `is`(arrayListOf("is"))
             )
             assertThat(
-                Field(
+                Property(
                         elm,
                         "isAllItems",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
@@ -458,7 +463,7 @@ class FieldProcessorTest {
         val elm = mock(XFieldElement::class.java)
         runProcessorTest {
             assertThat(
-                Field(
+                Property(
                         elm,
                         "hasX",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
@@ -468,12 +473,17 @@ class FieldProcessorTest {
                 `is`(arrayListOf("hasX", "x"))
             )
             assertThat(
-                Field(elm, "hasX", XTypeName.PRIMITIVE_INT.typeMirror(it), SQLTypeAffinity.INTEGER)
+                Property(
+                        elm,
+                        "hasX",
+                        XTypeName.PRIMITIVE_INT.typeMirror(it),
+                        SQLTypeAffinity.INTEGER
+                    )
                     .nameWithVariations,
                 `is`(arrayListOf("hasX"))
             )
             assertThat(
-                Field(
+                Property(
                         elm,
                         "has",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
@@ -483,7 +493,7 @@ class FieldProcessorTest {
                 `is`(arrayListOf("has"))
             )
             assertThat(
-                Field(
+                Property(
                         elm,
                         "hasAllItems",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
@@ -500,7 +510,7 @@ class FieldProcessorTest {
         val elm = mock(XFieldElement::class.java)
         runProcessorTest {
             assertThat(
-                Field(
+                Property(
                         elm,
                         "mall",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
@@ -510,7 +520,7 @@ class FieldProcessorTest {
                 `is`(arrayListOf("mall"))
             )
             assertThat(
-                Field(
+                Property(
                         elm,
                         "mallVars",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
@@ -520,7 +530,7 @@ class FieldProcessorTest {
                 `is`(arrayListOf("mallVars"))
             )
             assertThat(
-                Field(
+                Property(
                         elm,
                         "mAll",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
@@ -530,12 +540,12 @@ class FieldProcessorTest {
                 `is`(arrayListOf("mAll", "all"))
             )
             assertThat(
-                Field(elm, "m", XTypeName.PRIMITIVE_INT.typeMirror(it), SQLTypeAffinity.INTEGER)
+                Property(elm, "m", XTypeName.PRIMITIVE_INT.typeMirror(it), SQLTypeAffinity.INTEGER)
                     .nameWithVariations,
                 `is`(arrayListOf("m"))
             )
             assertThat(
-                Field(
+                Property(
                         elm,
                         "mallItems",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
@@ -545,7 +555,7 @@ class FieldProcessorTest {
                 `is`(arrayListOf("mallItems"))
             )
             assertThat(
-                Field(
+                Property(
                         elm,
                         "mAllItems",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
@@ -562,7 +572,7 @@ class FieldProcessorTest {
         val elm = mock(XFieldElement::class.java)
         runProcessorTest {
             assertThat(
-                Field(
+                Property(
                         elm,
                         "_all",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
@@ -572,12 +582,12 @@ class FieldProcessorTest {
                 `is`(arrayListOf("_all", "all"))
             )
             assertThat(
-                Field(elm, "_", XTypeName.PRIMITIVE_INT.typeMirror(it), SQLTypeAffinity.INTEGER)
+                Property(elm, "_", XTypeName.PRIMITIVE_INT.typeMirror(it), SQLTypeAffinity.INTEGER)
                     .nameWithVariations,
                 `is`(arrayListOf("_"))
             )
             assertThat(
-                Field(
+                Property(
                         elm,
                         "_allItems",
                         XTypeName.PRIMITIVE_BOOLEAN.typeMirror(it),
@@ -599,17 +609,17 @@ class FieldProcessorTest {
             @Nullable
             String code;
             """
-            ) { field, invocation ->
+            ) { property, invocation ->
                 assertThat(
-                    field,
+                    property,
                     `is`(
-                        Field(
+                        Property(
                             name = "code",
                             type =
                                 invocation.context.processingEnv
                                     .requireType(CommonTypeNames.STRING)
                                     .makeNullable(),
-                            element = field.element,
+                            element = property.element,
                             columnName = "code",
                             collate = collate,
                             affinity = SQLTypeAffinity.TEXT
@@ -688,20 +698,23 @@ class FieldProcessorTest {
 
     private fun testDefaultValue(
         defaultValue: String,
-        fieldType: String,
+        propertyType: String,
         body: (String?, XTestInvocation) -> Unit
     ) {
         singleEntity(
             """
                 @ColumnInfo(defaultValue = $defaultValue)
-                $fieldType name;
+                $propertyType name;
             """
-        ) { field, invocation ->
-            body(field.defaultValue, invocation)
+        ) { property, invocation ->
+            body(property.defaultValue, invocation)
         }
     }
 
-    fun singleEntity(vararg input: String, handler: (Field, invocation: XTestInvocation) -> Unit) {
+    fun singleEntity(
+        vararg input: String,
+        handler: (Property, invocation: XTestInvocation) -> Unit
+    ) {
         val sources =
             listOf(
                 Source.java(
@@ -711,7 +724,7 @@ class FieldProcessorTest {
                 ARRAY_CONVERTER
             )
         runProcessorTest(sources = sources) { invocation ->
-            val (owner, fieldElement) =
+            val (owner, propertyElement) =
                 invocation.roundEnv
                     .getElementsAnnotatedWith(Entity::class.qualifiedName!!)
                     .filterIsInstance<XTypeElement>()
@@ -720,14 +733,14 @@ class FieldProcessorTest {
             val entityContext =
                 TableEntityProcessor(baseContext = invocation.context, element = owner).context
             val parser =
-                FieldProcessor(
+                PropertyProcessor(
                     baseContext = entityContext,
                     containing = owner.type,
-                    element = fieldElement!!,
-                    bindingScope = FieldProcessor.BindingScope.TWO_WAY,
-                    fieldParent = null,
-                    onBindingError = { field, errorMsg ->
-                        invocation.context.logger.e(field.element, errorMsg)
+                    element = propertyElement!!,
+                    bindingScope = PropertyProcessor.BindingScope.TWO_WAY,
+                    propertyParent = null,
+                    onBindingError = { property, errorMsg ->
+                        invocation.context.logger.e(property.element, errorMsg)
                     }
                 )
             handler(parser.process(), invocation)

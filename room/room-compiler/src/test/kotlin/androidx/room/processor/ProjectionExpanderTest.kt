@@ -533,7 +533,7 @@ class ProjectionExpanderTest {
                 DataClassProcessor.createFor(
                         invocation.context,
                         entityElement,
-                        bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
+                        bindingScope = PropertyProcessor.BindingScope.READ_FROM_STMT,
                         parent = null
                     )
                     .process()
@@ -625,7 +625,7 @@ class ProjectionExpanderTest {
                 DataClassProcessor.createFor(
                         invocation.context,
                         pojoElement,
-                        bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
+                        bindingScope = PropertyProcessor.BindingScope.READ_FROM_STMT,
                         parent = null
                     )
                     .process()

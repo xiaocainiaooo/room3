@@ -54,7 +54,9 @@ constructor(
     viewTables: Map<String, @JvmSuppressWildcards Set<String>>,
     vararg tableNames: String
 ) {
-    /** Internal method to initialize tracker for a given connection. Invoked by generated code. */
+    /**
+     * Internal function to initialize tracker for a given connection. Invoked by generated code.
+     */
     internal fun internalInit(connection: SQLiteConnection)
 
     /**

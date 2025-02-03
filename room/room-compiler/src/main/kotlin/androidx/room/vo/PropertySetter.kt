@@ -25,8 +25,8 @@ import androidx.room.solver.CodeGenScope
 import androidx.room.solver.types.StatementValueReader
 import java.util.Locale
 
-data class FieldSetter(
-    val fieldName: String,
+data class PropertySetter(
+    val propertyName: String,
     val jvmName: String,
     val type: XType,
     val callType: CallType
@@ -40,14 +40,14 @@ data class FieldSetter(
                 CodeLanguage.JAVA -> {
                     val stmt =
                         when (callType) {
-                            CallType.FIELD -> "%L.%L = %L"
-                            CallType.METHOD,
-                            CallType.SYNTHETIC_METHOD -> "%L.%L(%L)"
+                            CallType.PROPERTY -> "%L.%L = %L"
+                            CallType.FUNCTION,
+                            CallType.SYNTHETIC_FUNCTION -> "%L.%L(%L)"
                             else -> error("Unknown call type: $callType")
                         }
                     addStatement(stmt, ownerVar, jvmName, inVar)
                 }
-                CodeLanguage.KOTLIN -> addStatement("%L.%L = %L", ownerVar, fieldName, inVar)
+                CodeLanguage.KOTLIN -> addStatement("%L.%L = %L", ownerVar, propertyName, inVar)
             }
         }
     }
@@ -62,40 +62,42 @@ data class FieldSetter(
         when (scope.language) {
             CodeLanguage.JAVA ->
                 when (callType) {
-                    CallType.FIELD -> {
-                        val outFieldName = "$ownerVar.$jvmName"
-                        reader.readFromStatement(outFieldName, stmtVar, indexVar, scope)
+                    CallType.PROPERTY -> {
+                        val outPropertyName = "$ownerVar.$jvmName"
+                        reader.readFromStatement(outPropertyName, stmtVar, indexVar, scope)
                     }
-                    CallType.METHOD,
-                    CallType.SYNTHETIC_METHOD -> {
-                        val tmpField = scope.getTmpVar("_tmp${fieldName.capitalize(Locale.US)}")
+                    CallType.FUNCTION,
+                    CallType.SYNTHETIC_FUNCTION -> {
+                        val tmpProperty =
+                            scope.getTmpVar("_tmp${propertyName.capitalize(Locale.US)}")
                         scope.builder.apply {
-                            addLocalVariable(tmpField, type.asTypeName())
-                            reader.readFromStatement(tmpField, stmtVar, indexVar, scope)
-                            addStatement("%L.%L(%L)", ownerVar, jvmName, tmpField)
+                            addLocalVariable(tmpProperty, type.asTypeName())
+                            reader.readFromStatement(tmpProperty, stmtVar, indexVar, scope)
+                            addStatement("%L.%L(%L)", ownerVar, jvmName, tmpProperty)
                         }
                     }
                     CallType.CONSTRUCTOR -> {
-                        // no code, field is set via constructor
+                        // no code, property is set via constructor
                     }
                 }
             CodeLanguage.KOTLIN ->
                 when (callType) {
-                    CallType.FIELD,
-                    CallType.SYNTHETIC_METHOD -> {
-                        val outFieldName = "$ownerVar.$fieldName"
-                        reader.readFromStatement(outFieldName, stmtVar, indexVar, scope)
+                    CallType.PROPERTY,
+                    CallType.SYNTHETIC_FUNCTION -> {
+                        val outPropertyName = "$ownerVar.$propertyName"
+                        reader.readFromStatement(outPropertyName, stmtVar, indexVar, scope)
                     }
-                    CallType.METHOD -> {
-                        val tmpField = scope.getTmpVar("_tmp${fieldName.capitalize(Locale.US)}")
+                    CallType.FUNCTION -> {
+                        val tmpProperty =
+                            scope.getTmpVar("_tmp${propertyName.capitalize(Locale.US)}")
                         scope.builder.apply {
-                            addLocalVariable(tmpField, type.asTypeName())
-                            reader.readFromStatement(tmpField, stmtVar, indexVar, scope)
-                            addStatement("%L.%L(%L)", ownerVar, jvmName, tmpField)
+                            addLocalVariable(tmpProperty, type.asTypeName())
+                            reader.readFromStatement(tmpProperty, stmtVar, indexVar, scope)
+                            addStatement("%L.%L(%L)", ownerVar, jvmName, tmpProperty)
                         }
                     }
                     CallType.CONSTRUCTOR -> {
-                        // no code, field is set via constructor
+                        // no code, property is set via constructor
                     }
                 }
         }

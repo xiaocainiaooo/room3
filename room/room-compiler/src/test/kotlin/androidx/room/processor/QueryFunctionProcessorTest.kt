@@ -53,7 +53,7 @@ import androidx.room.solver.query.result.LiveDataQueryResultBinder
 import androidx.room.solver.query.result.SingleColumnRowAdapter
 import androidx.room.solver.query.result.SingleItemQueryResultAdapter
 import androidx.room.testing.context
-import androidx.room.vo.Field
+import androidx.room.vo.Property
 import androidx.room.vo.QueryFunction
 import androidx.room.vo.ReadQueryFunction
 import androidx.room.vo.Warning
@@ -101,9 +101,9 @@ class QueryFunctionProcessorTest(private val enableVerification: Boolean) {
         @JvmStatic
         fun getParams() = arrayOf(true, false)
 
-        fun createField(name: String, columnName: String? = null): Field {
+        fun createField(name: String, columnName: String? = null): Property {
             val (element, type) = mockElementAndType()
-            return Field(
+            return Property(
                 element = element,
                 name = name,
                 type = type,
@@ -1007,7 +1007,7 @@ class QueryFunctionProcessorTest(private val enableVerification: Boolean) {
         ) { adapter, _, invocation ->
             assertThat(adapter?.mapping?.unusedColumns).containsExactly("name", "lastName")
             assertThat(adapter?.mapping?.unusedFields)
-                .containsExactlyElementsIn(adapter?.dataClass?.fields)
+                .containsExactlyElementsIn(adapter?.dataClass?.properties)
             invocation.assertCompilationResult {
                 hasErrorContaining(
                     cannotFindQueryResultAdapter(
@@ -1015,10 +1015,10 @@ class QueryFunctionProcessorTest(private val enableVerification: Boolean) {
                     )
                 )
                 hasWarningContaining(
-                    ProcessorErrors.queryFieldDataClassMismatch(
+                    ProcessorErrors.queryPropertyDataClassMismatch(
                         dataClassTypeNames = listOf(DATA_CLASS.canonicalName),
                         unusedColumns = listOf("name", "lastName"),
-                        dataClassUnusedFields =
+                        dataClassUnusedProperties =
                             mapOf(
                                 DATA_CLASS.canonicalName to
                                     listOf(createField("nameX"), createField("lastNameX"))
@@ -1067,10 +1067,10 @@ class QueryFunctionProcessorTest(private val enableVerification: Boolean) {
             assertThat(adapter?.mapping?.unusedFields).isEmpty()
             invocation.assertCompilationResult {
                 hasWarningContaining(
-                    ProcessorErrors.queryFieldDataClassMismatch(
+                    ProcessorErrors.queryPropertyDataClassMismatch(
                         dataClassTypeNames = listOf(DATA_CLASS.canonicalName),
                         unusedColumns = listOf("uid"),
-                        dataClassUnusedFields = emptyMap(),
+                        dataClassUnusedProperties = emptyMap(),
                         allColumns = listOf("uid", "name", "lastName"),
                     )
                 )
@@ -1089,15 +1089,17 @@ class QueryFunctionProcessorTest(private val enableVerification: Boolean) {
         ) { adapter, _, invocation ->
             assertThat(adapter?.mapping?.unusedColumns).isEmpty()
             assertThat(adapter?.mapping?.unusedFields)
-                .containsExactlyElementsIn(adapter?.dataClass?.fields?.filter { it.name == "name" })
+                .containsExactlyElementsIn(
+                    adapter?.dataClass?.properties?.filter { it.name == "name" }
+                )
 
             invocation.assertCompilationResult {
                 hasWarningContaining(
-                    ProcessorErrors.queryFieldDataClassMismatch(
+                    ProcessorErrors.queryPropertyDataClassMismatch(
                         dataClassTypeNames = listOf(DATA_CLASS.canonicalName),
                         unusedColumns = emptyList(),
                         allColumns = listOf("lastName"),
-                        dataClassUnusedFields =
+                        dataClassUnusedProperties =
                             mapOf(DATA_CLASS.canonicalName to listOf(createField("name"))),
                     )
                 )
@@ -1117,14 +1119,16 @@ class QueryFunctionProcessorTest(private val enableVerification: Boolean) {
         ) { adapter, _, invocation ->
             assertThat(adapter?.mapping?.unusedColumns).isEmpty()
             assertThat(adapter?.mapping?.unusedFields)
-                .containsExactlyElementsIn(adapter?.dataClass?.fields?.filter { it.name == "name" })
+                .containsExactlyElementsIn(
+                    adapter?.dataClass?.properties?.filter { it.name == "name" }
+                )
 
             invocation.assertCompilationResult {
                 hasWarningContaining(
-                    ProcessorErrors.queryFieldDataClassMismatch(
+                    ProcessorErrors.queryPropertyDataClassMismatch(
                         dataClassTypeNames = listOf(DATA_CLASS.canonicalName),
                         unusedColumns = emptyList(),
-                        dataClassUnusedFields =
+                        dataClassUnusedProperties =
                             mapOf(DATA_CLASS.canonicalName to listOf(createField("name"))),
                         allColumns = listOf("lastName"),
                     )
@@ -1132,7 +1136,7 @@ class QueryFunctionProcessorTest(private val enableVerification: Boolean) {
                 hasErrorContaining(
                     ProcessorErrors.dataClassMissingNonNull(
                         dataClassTypeName = DATA_CLASS.canonicalName,
-                        missingDataClassFields = listOf("name"),
+                        missingDataClassProperties = listOf("name"),
                         allQueryColumns = listOf("lastName")
                     )
                 )
@@ -1152,15 +1156,15 @@ class QueryFunctionProcessorTest(private val enableVerification: Boolean) {
             assertThat(adapter?.mapping?.unusedColumns).containsExactly("uid")
             assertThat(adapter?.mapping?.unusedFields)
                 .containsExactlyElementsIn(
-                    adapter?.dataClass?.fields?.filter { it.name == "lastName" }
+                    adapter?.dataClass?.properties?.filter { it.name == "lastName" }
                 )
             invocation.assertCompilationResult {
                 hasWarningContaining(
-                    ProcessorErrors.queryFieldDataClassMismatch(
+                    ProcessorErrors.queryPropertyDataClassMismatch(
                         dataClassTypeNames = listOf(DATA_CLASS.canonicalName),
                         unusedColumns = listOf("uid"),
                         allColumns = listOf("uid", "name"),
-                        dataClassUnusedFields =
+                        dataClassUnusedProperties =
                             mapOf(DATA_CLASS.canonicalName to listOf(createField("lastName")))
                     )
                 )

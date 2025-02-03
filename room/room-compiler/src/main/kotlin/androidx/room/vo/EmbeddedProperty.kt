@@ -18,16 +18,20 @@ package androidx.room.vo
 
 import androidx.room.compiler.processing.XNullability
 
-/** Used when a field is embedded inside an Entity or data class. */
+/** Used when a property is embedded inside an Entity or data class. */
 // used in cache matching, must stay as a data class or implement equals
-data class EmbeddedField(val field: Field, val prefix: String = "", val parent: EmbeddedField?) {
-    val getter by lazy { field.getter }
-    val setter by lazy { field.setter }
-    val nonNull = field.type.nullability == XNullability.NONNULL
+data class EmbeddedProperty(
+    val property: Property,
+    val prefix: String = "",
+    val parent: EmbeddedProperty?
+) {
+    val getter by lazy { property.getter }
+    val setter by lazy { property.setter }
+    val nonNull = property.type.nullability == XNullability.NONNULL
     lateinit var dataClass: DataClass
-    val mRootParent: EmbeddedField by lazy { parent?.mRootParent ?: this }
+    val mRootParent: EmbeddedProperty by lazy { parent?.mRootParent ?: this }
 
     fun isNonNullRecursively(): Boolean {
-        return field.nonNull && (parent == null || parent.isNonNullRecursively())
+        return property.nonNull && (parent == null || parent.isNonNullRecursively())
     }
 }

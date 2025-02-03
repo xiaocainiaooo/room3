@@ -27,8 +27,8 @@ import androidx.room.solver.CodeGenScope
 import androidx.room.solver.types.StatementValueBinder
 import java.util.Locale
 
-data class FieldGetter(
-    val fieldName: String,
+data class PropertyGetter(
+    val propertyName: String,
     val jvmName: String,
     val type: XType,
     val callType: CallType,
@@ -49,24 +49,25 @@ data class FieldGetter(
         scope: CodeGenScope
     ) {
         val varExpr = getterExpression(ownerVar)
-        // A temporary local val is needed in Kotlin whenever the getter method returns nullable or
-        // the field / property is nullable such that a smart cast can be properly performed. Even
-        // if the field / property are immutable (val), we still use a local val in case the
+        // A temporary local val is needed in Kotlin whenever the getter function returns nullable
+        // or
+        // the property is nullable such that a smart cast can be properly performed. Even
+        // if the property are immutable (val), we still use a local val in case the
         // property is declared in another module, which would make the smart cast impossible.
         if (scope.language == CodeLanguage.KOTLIN && type.nullability != XNullability.NONNULL) {
-            val tmpField = scope.getTmpVar("_tmp${fieldName.capitalize(Locale.US)}")
+            val tmpProperty = scope.getTmpVar("_tmp${propertyName.capitalize(Locale.US)}")
             scope.builder.addLocalVariable(
-                name = tmpField,
+                name = tmpProperty,
                 typeName = type.asTypeName(),
                 assignExpr = varExpr
             )
-            binder.bindToStmt(stmtParamVar, indexVar, tmpField, scope)
+            binder.bindToStmt(stmtParamVar, indexVar, tmpProperty, scope)
         } else {
             binder.bindToStmt(
                 stmtParamVar,
                 indexVar,
-                // This method expects a String, which depends on the language. We should change
-                // the method signature to accept an XCodeBlock instead.
+                // This function expects a String, which depends on the language. We should change
+                // the function signature to accept an XCodeBlock instead.
                 varExpr.toString(scope.language),
                 scope
             )
@@ -77,16 +78,16 @@ data class FieldGetter(
         when (language) {
             CodeLanguage.JAVA ->
                 when (callType) {
-                    CallType.FIELD -> add("%L.%L", ownerVar, jvmName)
-                    CallType.METHOD,
-                    CallType.SYNTHETIC_METHOD -> add("%L.%L()", ownerVar, jvmName)
+                    CallType.PROPERTY -> add("%L.%L", ownerVar, jvmName)
+                    CallType.FUNCTION,
+                    CallType.SYNTHETIC_FUNCTION -> add("%L.%L()", ownerVar, jvmName)
                     CallType.CONSTRUCTOR -> error("Getters should never be of type 'constructor'!")
                 }
             CodeLanguage.KOTLIN ->
                 when (callType) {
-                    CallType.FIELD,
-                    CallType.SYNTHETIC_METHOD -> add("%L.%L", ownerVar, fieldName)
-                    CallType.METHOD -> add("%L.%L()", ownerVar, jvmName)
+                    CallType.PROPERTY,
+                    CallType.SYNTHETIC_FUNCTION -> add("%L.%L", ownerVar, propertyName)
+                    CallType.FUNCTION -> add("%L.%L()", ownerVar, jvmName)
                     CallType.CONSTRUCTOR -> error("Getters should never be of type 'constructor'!")
                 }
         }
