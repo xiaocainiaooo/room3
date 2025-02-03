@@ -426,6 +426,25 @@ class HealthConnectClientUpsideDownImpl : HealthConnectClient, PermissionControl
                 .map { it.toSdkMedicalResource() }
         }
 
+    @RequiresPermission("android.permission.health.WRITE_MEDICAL_DATA")
+    @RequiresExtension(Build.VERSION_CODES.UPSIDE_DOWN_CAKE, 16)
+    override suspend fun deleteMedicalResources(ids: List<MedicalResourceId>) {
+        withPhrFeatureCheckSuspend(
+            HealthConnectClientUpsideDownImpl::class,
+            "deleteMedicalResources(ids: List<MedicalResourceId>)"
+        ) {
+            wrapPlatformException {
+                suspendCancellableCoroutine { continuation ->
+                    healthConnectManager.deleteMedicalResources(
+                        ids.map { it.platformMedicalResourceId },
+                        executor,
+                        continuation.asOutcomeReceiver()
+                    )
+                }
+            }
+        }
+    }
+
     private suspend fun <T> wrapPlatformException(function: suspend () -> T): T {
         return try {
             function()

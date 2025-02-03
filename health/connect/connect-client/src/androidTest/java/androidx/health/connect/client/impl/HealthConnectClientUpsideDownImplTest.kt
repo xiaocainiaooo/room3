@@ -1008,6 +1008,36 @@ class HealthConnectClientUpsideDownImplTest {
         assertThat(medicalResources).isEqualTo(updateResponse)
     }
 
+    @Ignore(
+        "TODO(b/382680485): Remove Ignore and call createMedicalDataSource once it has been added"
+    )
+    @Test
+    fun insertMedicalResourcesThenDelete_expectSuccessfulDeletion() = runTest {
+        assumeTrue(
+            "FEATURE_PERSONAL_HEALTH_RECORD is not available on this device!",
+            isPersonalHealthRecordFeatureAvailableInPlatform()
+        )
+        val dataSourceId =
+            "" // TODO(b/382680485): Remove Ignore and call createMedicalDataSource once it has been
+        // added
+        val fhirResourceId = "immunization-101"
+        val requests =
+            listOf(
+                createVaccinesUpsertMedicalResourceRequest(
+                    dataSourceId = dataSourceId,
+                    fhirResourceId = fhirResourceId
+                )
+            )
+        val insertResponse = healthConnectClient.upsertMedicalResources(requests)
+
+        healthConnectClient.deleteMedicalResources(insertResponse.map { it.id })
+
+        val medicalResources =
+            healthConnectClient.readMedicalResources(insertResponse.map { it.id })
+
+        assertThat(medicalResources).isEmpty()
+    }
+
     private fun <A, E> assertEquals(vararg assertions: Pair<A, E>) {
         assertions.forEach { (actual, expected) -> assertThat(actual).isEqualTo(expected) }
     }
