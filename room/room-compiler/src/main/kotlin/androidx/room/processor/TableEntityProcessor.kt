@@ -16,7 +16,6 @@
 
 package androidx.room.processor
 
-import androidx.room.compiler.codegen.asClassName
 import androidx.room.compiler.processing.XType
 import androidx.room.compiler.processing.XTypeElement
 import androidx.room.ext.isNotNone
@@ -31,16 +30,16 @@ import androidx.room.processor.ProcessorErrors.INVALID_INDEX_ORDERS_SIZE
 import androidx.room.processor.ProcessorErrors.RELATION_IN_ENTITY
 import androidx.room.processor.cache.Cache
 import androidx.room.vo.DataClass
-import androidx.room.vo.EmbeddedField
+import androidx.room.vo.EmbeddedProperty
 import androidx.room.vo.Entity
-import androidx.room.vo.Field
-import androidx.room.vo.Fields
 import androidx.room.vo.ForeignKey
 import androidx.room.vo.Index
 import androidx.room.vo.PrimaryKey
+import androidx.room.vo.Properties
+import androidx.room.vo.Property
 import androidx.room.vo.Warning
 import androidx.room.vo.columnNames
-import androidx.room.vo.findFieldByColumnName
+import androidx.room.vo.findPropertyByColumnName
 
 class TableEntityProcessor
 internal constructor(
@@ -61,8 +60,8 @@ internal constructor(
                 element = element,
                 tableName = element.name,
                 type = element.type,
-                fields = emptyList(),
-                embeddedFields = emptyList(),
+                properties = emptyList(),
+                embeddedProperties = emptyList(),
                 indices = emptyList(),
                 primaryKey = PrimaryKey.MISSING,
                 foreignKeys = emptyList(),
@@ -106,23 +105,23 @@ internal constructor(
             DataClassProcessor.createFor(
                     context = context,
                     element = element,
-                    bindingScope = FieldProcessor.BindingScope.TWO_WAY,
+                    bindingScope = PropertyProcessor.BindingScope.TWO_WAY,
                     parent = null,
                     referenceStack = referenceStack
                 )
                 .process()
         context.checker.check(pojo.relations.isEmpty(), element, RELATION_IN_ENTITY)
 
-        val fieldIndices =
-            pojo.fields
+        val propertyIndices =
+            pojo.properties
                 .filter { it.indexed }
                 .mapNotNull {
                     if (it.parent != null) {
                         it.indexed = false
                         context.logger.w(
-                            Warning.INDEX_FROM_EMBEDDED_FIELD_IS_DROPPED,
+                            Warning.INDEX_FROM_EMBEDDED_PROPERTY_IS_DROPPED,
                             it.element,
-                            ProcessorErrors.droppedEmbeddedFieldIndex(
+                            ProcessorErrors.droppedEmbeddedPropertyIndex(
                                 it.getPath(),
                                 element.qualifiedName
                             )
@@ -131,8 +130,8 @@ internal constructor(
                     } else if (it.element.enclosingElement != element && !inheritSuperIndices) {
                         it.indexed = false
                         context.logger.w(
-                            Warning.INDEX_FROM_PARENT_FIELD_IS_DROPPED,
-                            ProcessorErrors.droppedSuperClassFieldIndex(
+                            Warning.INDEX_FROM_PARENT_PROPERTY_IS_DROPPED,
+                            ProcessorErrors.droppedSuperClassPropertyIndex(
                                 it.columnName,
                                 element.qualifiedName,
                                 it.element.enclosingElement
@@ -151,14 +150,14 @@ internal constructor(
                     }
                 }
         val superIndices = loadSuperIndices(element.superClass, tableName, inheritSuperIndices)
-        val indexInputs = entityIndices + fieldIndices + superIndices
+        val indexInputs = entityIndices + propertyIndices + superIndices
         val indices = validateAndCreateIndices(indexInputs, pojo)
 
-        val primaryKey = findAndValidatePrimaryKey(pojo.fields, pojo.embeddedFields)
-        val affinity = primaryKey.fields.firstOrNull()?.affinity ?: SQLTypeAffinity.TEXT
+        val primaryKey = findAndValidatePrimaryKey(pojo.properties, pojo.embeddedProperties)
+        val affinity = primaryKey.properties.firstOrNull()?.affinity ?: SQLTypeAffinity.TEXT
         context.checker.check(
             !primaryKey.autoGenerateId || affinity == SQLTypeAffinity.INTEGER,
-            primaryKey.fields.firstOrNull()?.element ?: element,
+            primaryKey.properties.firstOrNull()?.element ?: element,
             ProcessorErrors.AUTO_INCREMENTED_PRIMARY_KEY_IS_NOT_INT
         )
 
@@ -170,7 +169,7 @@ internal constructor(
             element,
             ProcessorErrors.INVALID_TABLE_NAME
         )
-        pojo.fields.forEach {
+        pojo.properties.forEach {
             context.checker.check(
                 SqlParser.isValidIdentifier(it.columnName),
                 it.element,
@@ -183,8 +182,8 @@ internal constructor(
                 element = element,
                 tableName = tableName,
                 type = pojo.type,
-                fields = pojo.fields,
-                embeddedFields = pojo.embeddedFields,
+                properties = pojo.properties,
+                embeddedProperties = pojo.embeddedProperties,
                 indices = indices,
                 primaryKey = primaryKey,
                 foreignKeys = entityForeignKeys,
@@ -200,15 +199,15 @@ internal constructor(
         primaryKey: PrimaryKey,
         indices: List<Index>
     ) {
-        fun covers(columnNames: List<String>, fields: List<Field>): Boolean =
-            fields.size >= columnNames.size &&
-                columnNames.withIndex().all { fields[it.index].columnName == it.value }
+        fun covers(columnNames: List<String>, properties: List<Property>): Boolean =
+            properties.size >= columnNames.size &&
+                columnNames.withIndex().all { properties[it.index].columnName == it.value }
 
         entityForeignKeys.forEach { fKey ->
-            val columnNames = fKey.childFields.map { it.columnName }
+            val columnNames = fKey.childProperties.map { it.columnName }
             val exists =
-                covers(columnNames, primaryKey.fields) ||
-                    indices.any { index -> covers(columnNames, index.fields) }
+                covers(columnNames, primaryKey.properties) ||
+                    indices.any { index -> covers(columnNames, index.properties) }
             if (!exists) {
                 if (columnNames.size == 1) {
                     context.logger.w(
@@ -274,10 +273,10 @@ internal constructor(
                     return@map null
                 }
                 val tableName = extractTableName(parentElement, parentAnnotation)
-                val fields =
+                val properties =
                     it.childColumns.mapNotNull { columnName ->
-                        val field = dataClass.findFieldByColumnName(columnName)
-                        if (field == null) {
+                        val property = dataClass.findPropertyByColumnName(columnName)
+                        if (property == null) {
                             context.logger.e(
                                 dataClass.element,
                                 ProcessorErrors.foreignKeyChildColumnDoesNotExist(
@@ -286,14 +285,14 @@ internal constructor(
                                 )
                             )
                         }
-                        field
+                        property
                     }
-                if (fields.size != it.childColumns.size) {
+                if (properties.size != it.childColumns.size) {
                     return@map null
                 }
                 ForeignKey(
                     parentTable = tableName,
-                    childFields = fields,
+                    childProperties = properties,
                     parentColumns = it.parentColumns,
                     onDelete = it.onDelete,
                     onUpdate = it.onUpdate,
@@ -304,13 +303,13 @@ internal constructor(
     }
 
     private fun findAndValidatePrimaryKey(
-        fields: List<Field>,
-        embeddedFields: List<EmbeddedField>
+        properties: List<Property>,
+        embeddedProperties: List<EmbeddedProperty>
     ): PrimaryKey {
         val candidates =
-            collectPrimaryKeysFromEntityAnnotations(element, fields) +
-                collectPrimaryKeysFromPrimaryKeyAnnotations(fields) +
-                collectPrimaryKeysFromEmbeddedFields(embeddedFields)
+            collectPrimaryKeysFromEntityAnnotations(element, properties) +
+                collectPrimaryKeysFromPrimaryKeyAnnotations(properties) +
+                collectPrimaryKeysFromEmbeddedProperties(embeddedProperties)
 
         context.checker.check(candidates.isNotEmpty(), element, ProcessorErrors.MISSING_PRIMARY_KEY)
 
@@ -318,38 +317,39 @@ internal constructor(
         // force the @NonNull annotation. If the key is a single Primary Key, Integer or Long, we
         // don't force the @NonNull annotation since SQLite will automatically generate IDs.
         // 2. If a key is autogenerate, we generate NOT NULL in table spec, but we don't require
-        // @NonNull annotation on the field itself.
-        val verifiedFields = mutableSetOf<Field>() // track verified fields to not over report
+        // @NonNull annotation on the property itself.
+        val verifiedProperties =
+            mutableSetOf<Property>() // track verified properties to not over report
         candidates
             .filterNot { it.autoGenerateId }
             .forEach { candidate ->
-                candidate.fields.forEach { field ->
+                candidate.properties.forEach { property ->
                     if (
-                        candidate.fields.size > 1 ||
-                            (candidate.fields.size == 1 &&
-                                field.affinity != SQLTypeAffinity.INTEGER)
+                        candidate.properties.size > 1 ||
+                            (candidate.properties.size == 1 &&
+                                property.affinity != SQLTypeAffinity.INTEGER)
                     ) {
-                        if (!verifiedFields.contains(field)) {
+                        if (!verifiedProperties.contains(property)) {
                             context.checker.check(
-                                field.nonNull,
-                                field.element,
-                                ProcessorErrors.primaryKeyNull(field.getPath())
+                                property.nonNull,
+                                property.element,
+                                ProcessorErrors.primaryKeyNull(property.getPath())
                             )
-                            verifiedFields.add(field)
+                            verifiedProperties.add(property)
                         }
                         // Validate parents for nullability
-                        var parent = field.parent
+                        var parent = property.parent
                         while (parent != null) {
-                            val parentField = parent.field
-                            if (!verifiedFields.contains(parentField)) {
+                            val parentProperty = parent.property
+                            if (!verifiedProperties.contains(parentProperty)) {
                                 context.checker.check(
-                                    parentField.nonNull,
-                                    parentField.element,
-                                    ProcessorErrors.primaryKeyNull(parentField.getPath())
+                                    parentProperty.nonNull,
+                                    parentProperty.element,
+                                    ProcessorErrors.primaryKeyNull(parentProperty.getPath())
                                 )
-                                verifiedFields.add(parentField)
+                                verifiedProperties.add(parentProperty)
                             }
-                            parent = parentField.parent
+                            parent = parentProperty.parent
                         }
                     }
                 }
@@ -364,14 +364,16 @@ internal constructor(
     }
 
     /** Check fields for @PrimaryKey. */
-    private fun collectPrimaryKeysFromPrimaryKeyAnnotations(fields: List<Field>): List<PrimaryKey> {
+    private fun collectPrimaryKeysFromPrimaryKeyAnnotations(
+        fields: List<Property>
+    ): List<PrimaryKey> {
         return fields.mapNotNull { field ->
             val primaryKeyAnnotation =
                 field.element.getAnnotation(androidx.room.PrimaryKey::class)
                     ?: return@mapNotNull null
             if (field.parent != null) {
                 // the field in the entity that contains this error.
-                val grandParentField = field.parent.mRootParent.field.element
+                val grandParentField = field.parent.mRootParent.property.element
                 // bound for entity.
                 context
                     .fork(grandParentField)
@@ -388,7 +390,7 @@ internal constructor(
             } else {
                 PrimaryKey(
                     declaredIn = field.element.enclosingElement,
-                    fields = Fields(field),
+                    properties = Properties(field),
                     autoGenerateId = primaryKeyAnnotation["autoGenerate"]?.asBoolean() == true
                 )
             }
@@ -398,7 +400,7 @@ internal constructor(
     /** Check classes for @Entity(primaryKeys = ?). */
     private fun collectPrimaryKeysFromEntityAnnotations(
         typeElement: XTypeElement,
-        availableFields: List<Field>
+        availableProperties: List<Property>
     ): List<PrimaryKey> {
         val myPkeys =
             typeElement.getAnnotation(androidx.room.Entity::class)?.let {
@@ -406,24 +408,24 @@ internal constructor(
                 if (primaryKeyColumns.isEmpty()) {
                     emptyList()
                 } else {
-                    val fields =
+                    val properties =
                         primaryKeyColumns.mapNotNull { pKeyColumnName ->
-                            val field =
-                                availableFields.firstOrNull { it.columnName == pKeyColumnName }
+                            val property =
+                                availableProperties.firstOrNull { it.columnName == pKeyColumnName }
                             context.checker.check(
-                                field != null,
+                                property != null,
                                 typeElement,
                                 ProcessorErrors.primaryKeyColumnDoesNotExist(
                                     pKeyColumnName,
-                                    availableFields.map { it.columnName }
+                                    availableProperties.map { it.columnName }
                                 )
                             )
-                            field
+                            property
                         }
                     listOf(
                         PrimaryKey(
                             declaredIn = typeElement,
-                            fields = Fields(fields),
+                            properties = Properties(properties),
                             autoGenerateId = false
                         )
                     )
@@ -433,30 +435,30 @@ internal constructor(
         val mySuper = typeElement.superClass
         val superPKeys =
             if (mySuper != null && mySuper.isNotNone()) {
-                // my super cannot see my fields so remove them.
-                val remainingFields =
-                    availableFields.filterNot { it.element.enclosingElement == typeElement }
-                collectPrimaryKeysFromEntityAnnotations(mySuper.typeElement!!, remainingFields)
+                // my super cannot see my properties so remove them.
+                val remainingProperties =
+                    availableProperties.filterNot { it.element.enclosingElement == typeElement }
+                collectPrimaryKeysFromEntityAnnotations(mySuper.typeElement!!, remainingProperties)
             } else {
                 emptyList()
             }
         return superPKeys + myPkeys
     }
 
-    private fun collectPrimaryKeysFromEmbeddedFields(
-        embeddedFields: List<EmbeddedField>
+    private fun collectPrimaryKeysFromEmbeddedProperties(
+        embeddedProperties: List<EmbeddedProperty>
     ): List<PrimaryKey> {
-        return embeddedFields.mapNotNull { embeddedField ->
-            embeddedField.field.element.getAnnotation(androidx.room.PrimaryKey::class)?.let {
+        return embeddedProperties.mapNotNull { embeddedProperty ->
+            embeddedProperty.property.element.getAnnotation(androidx.room.PrimaryKey::class)?.let {
                 val autoGenerate = it["autoGenerate"]?.asBoolean() == true
                 context.checker.check(
-                    !autoGenerate || embeddedField.dataClass.fields.size == 1,
-                    embeddedField.field.element,
-                    ProcessorErrors.AUTO_INCREMENT_EMBEDDED_HAS_MULTIPLE_FIELDS
+                    !autoGenerate || embeddedProperty.dataClass.properties.size == 1,
+                    embeddedProperty.property.element,
+                    ProcessorErrors.AUTO_INCREMENT_EMBEDDED_HAS_MULTIPLE_PROPERTIES
                 )
                 PrimaryKey(
-                    declaredIn = embeddedField.field.element.enclosingElement,
-                    fields = embeddedField.dataClass.fields,
+                    declaredIn = embeddedProperty.property.element.enclosingElement,
+                    properties = embeddedProperty.dataClass.properties,
                     autoGenerateId = autoGenerate
                 )
             }
@@ -514,18 +516,18 @@ internal constructor(
                     element,
                     INDEX_COLUMNS_CANNOT_BE_EMPTY
                 )
-                val fields =
+                val properties =
                     input.columnNames.mapNotNull { columnName ->
-                        val field = dataClass.findFieldByColumnName(columnName)
+                        val property = dataClass.findPropertyByColumnName(columnName)
                         context.checker.check(
-                            field != null,
+                            property != null,
                             element,
                             ProcessorErrors.indexColumnDoesNotExist(
                                 columnName,
                                 dataClass.columnNames
                             )
                         )
-                        field
+                        property
                     }
                 if (input.orders.isNotEmpty()) {
                     context.checker.check(
@@ -534,13 +536,13 @@ internal constructor(
                         INVALID_INDEX_ORDERS_SIZE
                     )
                 }
-                if (fields.isEmpty()) {
+                if (properties.isEmpty()) {
                     null
                 } else {
                     Index(
                         name = input.name,
                         unique = input.unique,
-                        fields = fields,
+                        properties = Properties(properties),
                         orders = input.orders
                     )
                 }
@@ -552,18 +554,18 @@ internal constructor(
             .filter { it.value.size > 1 }
             .forEach { context.logger.e(element, ProcessorErrors.duplicateIndexInEntity(it.key)) }
 
-        // see if any embedded field is an entity with indices, if so, report a warning
-        dataClass.embeddedFields.forEach { embedded ->
+        // see if any embedded property is an entity with indices, if so, report a warning
+        dataClass.embeddedProperties.forEach { embedded ->
             val embeddedElement = embedded.dataClass.element
             embeddedElement.getAnnotation(androidx.room.Entity::class)?.let {
                 val subIndices = extractIndices(it, "")
                 if (subIndices.isNotEmpty()) {
                     context.logger.w(
                         Warning.INDEX_FROM_EMBEDDED_ENTITY_IS_DROPPED,
-                        embedded.field.element,
+                        embedded.property.element,
                         ProcessorErrors.droppedEmbeddedIndex(
                             entityName = embedded.dataClass.typeName.toString(context.codeLanguage),
-                            fieldPath = embedded.field.getPath(),
+                            propertyPath = embedded.property.getPath(),
                             grandParent = element.qualifiedName
                         )
                     )

@@ -23,7 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.compiler.processing.XMethodElement
 import androidx.room.compiler.processing.XType
 import androidx.room.vo.InsertFunction
-import androidx.room.vo.findFieldByColumnName
+import androidx.room.vo.findPropertyByColumnName
 
 class InsertFunctionProcessor(
     baseContext: Context,
@@ -57,25 +57,25 @@ class InsertFunctionProcessor(
                 missingParamError = ProcessorErrors.INSERT_DOES_NOT_HAVE_ANY_PARAMETERS_TO_INSERT,
                 onValidatePartialEntity = { entity, pojo ->
                     val missingPrimaryKeys =
-                        entity.primaryKey.fields.any {
-                            pojo.findFieldByColumnName(it.columnName) == null
+                        entity.primaryKey.properties.any {
+                            pojo.findPropertyByColumnName(it.columnName) == null
                         }
                     context.checker.check(
                         entity.primaryKey.autoGenerateId || !missingPrimaryKeys,
                         executableElement,
                         ProcessorErrors.missingPrimaryKeysInPartialEntityForInsert(
                             partialEntityName = pojo.typeName.toString(context.codeLanguage),
-                            primaryKeyNames = entity.primaryKey.fields.columnNames
+                            primaryKeyNames = entity.primaryKey.properties.columnNames
                         )
                     )
 
                     // Verify all non null columns without a default value are in the POJO otherwise
                     // the INSERT will fail with a NOT NULL constraint.
                     val missingRequiredFields =
-                        (entity.fields - entity.primaryKey.fields).filter {
+                        (entity.properties - entity.primaryKey.properties).filter {
                             it.nonNull &&
                                 it.defaultValue == null &&
-                                pojo.findFieldByColumnName(it.columnName) == null
+                                pojo.findPropertyByColumnName(it.columnName) == null
                         }
                     context.checker.check(
                         missingRequiredFields.isEmpty(),

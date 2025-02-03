@@ -22,8 +22,8 @@ import androidx.room.compiler.processing.util.XTestInvocation
 import androidx.room.compiler.processing.util.compileFiles
 import androidx.room.compiler.processing.util.runProcessorTest
 import androidx.room.processor.DataClassProcessor
-import androidx.room.processor.FieldProcessor
 import androidx.room.processor.ProcessorErrors
+import androidx.room.processor.PropertyProcessor
 import androidx.room.testing.context
 import androidx.room.vo.DataClass
 import com.google.auto.value.processor.AutoValueProcessor
@@ -83,7 +83,7 @@ class AutoValueDataClassProcessorDelegateTest {
                 """
         ) { dataClass, invocation ->
             assertThat(dataClass.type.asTypeName(), `is`(MY_DATA_CLASS))
-            assertThat(dataClass.fields.size, `is`(1))
+            assertThat(dataClass.properties.size, `is`(1))
             assertThat(dataClass.constructor?.element, `is`(notNullValue()))
             invocation.assertCompilationResult { hasNoWarnings() }
         }
@@ -120,7 +120,7 @@ class AutoValueDataClassProcessorDelegateTest {
             DataClassProcessor.createFor(
                     context = invocation.context,
                     element = invocation.processingEnv.requireTypeElement(MY_DATA_CLASS),
-                    bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
+                    bindingScope = PropertyProcessor.BindingScope.READ_FROM_STMT,
                     parent = null
                 )
                 .process()
@@ -288,7 +288,7 @@ class AutoValueDataClassProcessorDelegateTest {
                 DataClassProcessor.createFor(
                         context = invocation.context,
                         element = invocation.processingEnv.requireTypeElement(MY_DATA_CLASS),
-                        bindingScope = FieldProcessor.BindingScope.READ_FROM_STMT,
+                        bindingScope = PropertyProcessor.BindingScope.READ_FROM_STMT,
                         parent = null
                     )
                     .process(),

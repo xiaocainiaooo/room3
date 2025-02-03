@@ -110,7 +110,7 @@ class CustomConverterProcessor(val context: Context, val element: XTypeElement) 
                             }
                         if (duplicates.isNotEmpty()) {
                             context.logger.e(
-                                converter.method,
+                                converter.function,
                                 ProcessorErrors.duplicateTypeConverters(duplicates)
                             )
                         }
@@ -123,11 +123,12 @@ class CustomConverterProcessor(val context: Context, val element: XTypeElement) 
         if (!element.validate()) {
             context.reportMissingTypeReference(element.qualifiedName)
         }
-        val methods = element.getAllMethods()
-        val converterMethods = methods.filter { it.hasAnnotation(TypeConverter::class) }.toList()
+        val functions = element.getAllMethods()
+        val converterFunctions =
+            functions.filter { it.hasAnnotation(TypeConverter::class) }.toList()
         val isProvidedConverter = element.hasAnnotation(ProvidedTypeConverter::class)
-        context.checker.check(converterMethods.isNotEmpty(), element, TYPE_CONVERTER_EMPTY_CLASS)
-        val allStatic = converterMethods.all { it.isStatic() }
+        context.checker.check(converterFunctions.isNotEmpty(), element, TYPE_CONVERTER_EMPTY_CLASS)
+        val allStatic = converterFunctions.all { it.isStatic() }
         val constructors = element.getConstructors()
         val isKotlinObjectDeclaration = element.isKotlinObject()
         if (!isProvidedConverter) {
@@ -145,38 +146,38 @@ class CustomConverterProcessor(val context: Context, val element: XTypeElement) 
                 TYPE_CONVERTER_MISSING_NOARG_CONSTRUCTOR
             )
         }
-        return converterMethods.mapNotNull {
-            processMethod(
+        return converterFunctions.mapNotNull {
+            processFunction(
                 container = element,
                 isContainerKotlinObject = isKotlinObjectDeclaration,
-                methodElement = it,
+                functionElement = it,
                 isProvidedConverter = isProvidedConverter
             )
         }
     }
 
-    private fun processMethod(
+    private fun processFunction(
         container: XTypeElement,
-        methodElement: XMethodElement,
+        functionElement: XMethodElement,
         isContainerKotlinObject: Boolean,
         isProvidedConverter: Boolean
     ): CustomTypeConverter? {
-        val asMember = methodElement.asMemberOf(container.type)
+        val asMember = functionElement.asMemberOf(container.type)
         val returnType = asMember.returnType
         val invalidReturnType = returnType.isInvalidReturnType()
         context.checker.check(
-            methodElement.isPublic(),
-            methodElement,
+            functionElement.isPublic(),
+            functionElement,
             TYPE_CONVERTER_MUST_BE_PUBLIC
         )
         if (invalidReturnType) {
-            context.logger.e(methodElement, TYPE_CONVERTER_BAD_RETURN_TYPE)
+            context.logger.e(functionElement, TYPE_CONVERTER_BAD_RETURN_TYPE)
             return null
         }
-        context.checker.notUnbound(returnType, methodElement, TYPE_CONVERTER_UNBOUND_GENERIC)
-        val params = methodElement.parameters
+        context.checker.notUnbound(returnType, functionElement, TYPE_CONVERTER_UNBOUND_GENERIC)
+        val params = functionElement.parameters
         if (params.size != 1) {
-            context.logger.e(methodElement, TYPE_CONVERTER_MUST_RECEIVE_1_PARAM)
+            context.logger.e(functionElement, TYPE_CONVERTER_MUST_RECEIVE_1_PARAM)
             return null
         }
         val param = params.map { it.asMemberOf(container.type) }.first()
@@ -184,7 +185,7 @@ class CustomConverterProcessor(val context: Context, val element: XTypeElement) 
         return CustomTypeConverter(
             enclosingClass = container,
             isEnclosingClassKotlinObject = isContainerKotlinObject,
-            method = methodElement,
+            function = functionElement,
             from = param,
             to = returnType,
             isProvidedConverter = isProvidedConverter

@@ -333,8 +333,8 @@ internal constructor(
     /**
      * Asserts that the given source file is generated.
      *
-     * Unlike Java compile testing, which does structural comparison, this method executes a line by
-     * line comparison and is only able to ignore spaces and empty lines.
+     * Unlike Java compile testing, which does structural comparison, this function executes a line
+     * by line comparison and is only able to ignore spaces and empty lines.
      *
      * @see generatedSourceFileWithPath
      */

@@ -59,7 +59,7 @@ class RelationCollectorFunctionWriter(private val collector: RelationCollector) 
         return "RelationCollectorFunctionWriter" +
             "-${collector.mapTypeName}" +
             "-${relation.entity.typeName.toString(CodeLanguage.JAVA)}" +
-            "-${relation.entityField.columnName}" +
+            "-${relation.entityProperty.columnName}" +
             "-${relation.dataClassTypeName}" +
             "-${relation.createLoadAllSql()}"
     }
@@ -125,7 +125,7 @@ class RelationCollectorFunctionWriter(private val collector: RelationCollector) 
                 // clause, this column is the rightmost column in the generated SELECT
                 // clause.
                 val junctionParentColumnIndex = relation.projection.size
-                addStatement("// _junction.%L", relation.junction.parentField.columnName)
+                addStatement("// _junction.%L", relation.junction.parentProperty.columnName)
                 addLocalVal(
                     itemKeyIndexVar,
                     XTypeName.PRIMITIVE_INT,
@@ -139,7 +139,7 @@ class RelationCollectorFunctionWriter(private val collector: RelationCollector) 
                     assignExprFormat = "%M(%L, %S)",
                     RoomTypeNames.STATEMENT_UTIL.packageMember("getColumnIndex"),
                     stmtVar,
-                    relation.entityField.columnName
+                    relation.entityProperty.columnName
                 )
             }
 

@@ -51,12 +51,12 @@ fun XType.isByteBuffer() = asTypeName().equalsIgnoreNullability(CommonTypeNames.
 fun XType.isUUID() = asTypeName().equalsIgnoreNullability(CommonTypeNames.UUID)
 
 /**
- * Checks if the class of the provided type has the equals() and hashCode() methods declared.
+ * Checks if the class of the provided type has the equals() and hashCode() functions declared.
  *
  * Certain Room types and database primitive types are considered to implements equals and hashcode.
  *
- * If they are not found at the current class level, the method recursively moves on to the super
- * class level and continues to look for these declared methods.
+ * If they are not found at the current class level, the function recursively moves on to the super
+ * class level and continues to look for these declared functions.
  */
 fun XType.implementsEqualsAndHashcode(): Boolean {
     if (this.isSupportedMapTypeArg()) return true
