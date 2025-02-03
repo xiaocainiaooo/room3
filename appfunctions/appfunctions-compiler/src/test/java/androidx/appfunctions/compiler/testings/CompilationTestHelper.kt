@@ -32,7 +32,6 @@ import kotlin.io.path.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
 import kotlin.io.path.deleteIfExists
-import kotlin.io.path.pathString
 import kotlin.io.path.writeText
 
 /** A helper to test compilation. */
@@ -94,6 +93,53 @@ class CompilationTestHelper(
     }
 
     /**
+     * Asserts that the compilation succeeds and contains a generated file (either source or
+     * resource) with the given name, whose content matches the golden file.
+     */
+    private fun assertSuccessWithGeneratedContent(
+        report: CompilationReport,
+        expectGeneratedFileName: String,
+        goldenFileName: String,
+        getGeneratedFileContent: () -> String
+    ) {
+        val generatedContent = getGeneratedFileContent()
+        Truth.assertWithMessage(
+                """
+            Compile failed with error:
+            ${report.printDiagnostics(Diagnostic.Kind.ERROR)}
+
+            Generated content:
+            $generatedContent
+            """
+                    .trimIndent()
+            )
+            .that(report.isSuccess)
+            .isTrue()
+
+        val goldenFile = getGoldenFile(goldenFileName)
+
+        val updateGoldenFiles = System.getProperty("update_golden_files")?.toBoolean() == true
+        if (updateGoldenFiles) {
+            println("Updating golden file: ${goldenFile.path}")
+            goldenFile.writeText(generatedContent)
+        } else {
+            Truth.assertWithMessage(
+                    """
+                Content of generated file [$expectGeneratedFileName] does not match
+                the content of golden file [${goldenFile.path}].
+
+                To update the golden file,
+                run:
+                  ./gradlew appfunctions:appfunctions-compiler:test -Dupdate_golden_files=true
+                """
+                        .trimIndent()
+                )
+                .that(generatedContent)
+                .isEqualTo(goldenFile.readText())
+        }
+    }
+
+    /**
      * Asserts that the compilation succeeds and contains [expectGeneratedSourceFileName] in
      * generated sources that is identical to the content of [goldenFileName].
      */
@@ -102,40 +148,14 @@ class CompilationTestHelper(
         expectGeneratedSourceFileName: String,
         goldenFileName: String,
     ) {
-        val generatedSourceFile =
-            report.generatedSourceFiles.firstOrNull { sourceFile ->
-                sourceFile.source.relativePath.contains(expectGeneratedSourceFileName)
-            }
-        check(generatedSourceFile != null) { "Unable to find [$expectGeneratedSourceFileName]" }
-        Truth.assertWithMessage(
-                """
-                    Compile failed with error:
-                    ${report.printDiagnostics(Diagnostic.Kind.ERROR)}
-
-                    Generated content:
-                    ${generatedSourceFile.source.contents}
-                """
-                    .trimIndent()
-            )
-            .that(report.isSuccess)
-            .isTrue()
-
-        val goldenFile = getGoldenFile(goldenFileName)
-        val generatedFilePath = generatedSourceFile.sourceFilePath.pathString.sanitizeFilePath()
-        val goldenFilePath = goldenFile.absolutePath.sanitizeFilePath()
-        Truth.assertWithMessage(
-                """
-              Content of generated file [${generatedSourceFile.source.relativePath}] does not match
-              the content of golden file [${goldenFile.path}].
-
-              To update the golden file,
-              run:
-               cp $generatedFilePath ${goldenFilePath}
-            """
-                    .trimIndent()
-            )
-            .that(generatedSourceFile.source.contents)
-            .isEqualTo(goldenFile.readText())
+        assertSuccessWithGeneratedContent(report, expectGeneratedSourceFileName, goldenFileName) {
+            report.generatedSourceFiles
+                .single { sourceFile ->
+                    sourceFile.source.relativePath.contains(expectGeneratedSourceFileName)
+                }
+                .source
+                .contents
+        }
     }
 
     /**
@@ -147,36 +167,14 @@ class CompilationTestHelper(
         expectGeneratedResourceFileName: String,
         goldenFileName: String,
     ) {
-        Truth.assertWithMessage(
-                """
-                    Compile failed with error:
-                    ${report.printDiagnostics(Diagnostic.Kind.ERROR)}
-                """
-                    .trimIndent()
-            )
-            .that(report.isSuccess)
-            .isTrue()
-
-        val goldenFile = getGoldenFile(goldenFileName)
-        val generatedResourceFile =
-            report.generatedResourceFiles.single { resourceFile ->
-                resourceFile.resource.relativePath.contains(expectGeneratedResourceFileName)
-            }
-        val generatedFilePath = generatedResourceFile.resourceFilePath.pathString.sanitizeFilePath()
-        val goldenFilePath = goldenFile.absolutePath.sanitizeFilePath()
-        Truth.assertWithMessage(
-                """
-              Content of generated file [${generatedResourceFile.resource.relativePath}] does not match
-              the content of golden file [${goldenFile.path}].
-
-              To update the golden file,
-              run:
-               cp $generatedFilePath ${goldenFilePath}
-            """
-                    .trimIndent()
-            )
-            .that(generatedResourceFile.resource.getContents())
-            .isEqualTo(goldenFile.readText())
+        assertSuccessWithGeneratedContent(report, expectGeneratedResourceFileName, goldenFileName) {
+            report.generatedResourceFiles
+                .single { resourceFile ->
+                    resourceFile.resource.relativePath.contains(expectGeneratedResourceFileName)
+                }
+                .resource
+                .getContents()
+        }
     }
 
     fun assertErrorWithMessage(report: CompilationReport, expectedErrorMessage: String) {
