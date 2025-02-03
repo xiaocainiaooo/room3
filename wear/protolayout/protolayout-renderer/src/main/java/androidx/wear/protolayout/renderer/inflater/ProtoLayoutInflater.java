@@ -326,10 +326,12 @@ public final class ProtoLayoutInflater {
 
     @VisibleForTesting static final String WEIGHT_AXIS_TAG = "wght";
     @VisibleForTesting static final String WIDTH_AXIS_TAG = "wdth";
+    @VisibleForTesting static final String ROUNDNESS_AXIS_TAG = "ROND";
     @VisibleForTesting static final String TABULAR_OPTION_TAG = "tnum";
 
     private static final ImmutableSet<String> SUPPORTED_FONT_SETTING_TAGS =
-            ImmutableSet.of(WEIGHT_AXIS_TAG, WIDTH_AXIS_TAG, TABULAR_OPTION_TAG);
+            ImmutableSet.of(
+                    WEIGHT_AXIS_TAG, WIDTH_AXIS_TAG, ROUNDNESS_AXIS_TAG, TABULAR_OPTION_TAG);
 
     /**
      * Listener for clicks on Clickable objects that have an Action to (re)load the contents of a
@@ -356,9 +358,7 @@ public final class ProtoLayoutInflater {
         private final Optional<PipelineMaker> mPipelineMaker;
 
         InflateResult(
-                ViewGroup inflateParent,
-                View firstChild,
-                Optional<PipelineMaker> pipelineMaker) {
+                ViewGroup inflateParent, View firstChild, Optional<PipelineMaker> pipelineMaker) {
             this.inflateParent = inflateParent;
             this.firstChild = firstChild;
             this.mPipelineMaker = pipelineMaker;
@@ -2162,7 +2162,6 @@ public final class ProtoLayoutInflater {
         return view;
     }
 
-
     private static int textAlignToAndroidGravity(TextAlignment alignment) {
         // Vertical center alignment is usually a default and text will be centered vertically.
         // However, we need it explicitly for cases when max lines are adjusted and shrank, so there
@@ -3322,8 +3321,8 @@ public final class ProtoLayoutInflater {
      * @return Returns the drawable if it is successfully set to the image view; otherwise returns
      *     null to indicate the failure of setting drawable.
      */
-    private @Nullable Drawable setImageDrawable(ImageView imageView, Drawable drawable,
-            String protoResId) {
+    private @Nullable Drawable setImageDrawable(
+            ImageView imageView, Drawable drawable, String protoResId) {
         if (drawable != null) {
             mInflaterStatsLogger.logDrawableUsage(drawable);
         }
@@ -3442,8 +3441,8 @@ public final class ProtoLayoutInflater {
                 lineView.setMaxSweepAngleDegrees(sizeForLayout);
             }
             View wrappedView =
-                    applyModifiersToArcLayoutView(lineView, line.getModifiers(), posId,
-                            pipelineMaker);
+                    applyModifiersToArcLayoutView(
+                            lineView, line.getModifiers(), posId, pipelineMaker);
             return addLineViewToParentArc(
                     parentViewWrapper,
                     wrappedView,
@@ -3512,7 +3511,7 @@ public final class ProtoLayoutInflater {
                 angularAlignmentProtoToAngularAlignment(length.getAngularAlignmentForLayout()),
                 /* arcLayoutWeight= */ 0
                 // Zero weight in ArcLayout means the view should not be stretched.
-        );
+                );
     }
 
     private InflatedView addLineViewToParentArc(
@@ -3524,8 +3523,8 @@ public final class ProtoLayoutInflater {
             float arcLayoutWeight) {
         SizedArcContainer sizeWrapper = null;
         SizedArcContainer.LayoutParams sizedLayoutParams =
-                new SizedArcContainer.LayoutParams(LayoutParams.MATCH_PARENT,
-                        LayoutParams.MATCH_PARENT);
+                new SizedArcContainer.LayoutParams(
+                        LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         if (sizeForLayout != null) {
             sizeWrapper = new SizedArcContainer(mUiContext);
             sizeWrapper.setArcDirection(arcLineDirection);
@@ -3541,8 +3540,8 @@ public final class ProtoLayoutInflater {
 
         // A WearDashedArcLineView or WearCurvedLineView must always be the same width/height as its
         // parent, so it can draw the line properly inside of those bounds.
-        ArcLayout.LayoutParams layoutParams = new ArcLayout.LayoutParams(
-                generateDefaultLayoutParams());
+        ArcLayout.LayoutParams layoutParams =
+                new ArcLayout.LayoutParams(generateDefaultLayoutParams());
         layoutParams.width = LayoutParams.MATCH_PARENT;
         layoutParams.height = LayoutParams.MATCH_PARENT;
         layoutParams.setWeight(arcLayoutWeight);
@@ -3622,7 +3621,7 @@ public final class ProtoLayoutInflater {
             int index = FIRST_CHILD_INDEX;
             for (ArcLayoutElement child : arc.getContentsList()) {
                 String childPosId = ProtoLayoutDiffer.createNodePosId(arcPosId, index++);
-                                InflatedView childView =
+                InflatedView childView =
                         inflateArcLayoutElement(
                                 new ParentViewWrapper(arcLayout, layoutParams),
                                 child,
@@ -4017,7 +4016,9 @@ public final class ProtoLayoutInflater {
             case DASHED_LINE:
                 inflatedView =
                         inflateDashedArcLine(
-                                parentViewWrapper, element.getDashedLine(), nodePosId,
+                                parentViewWrapper,
+                                element.getDashedLine(),
+                                nodePosId,
                                 pipelineMaker);
                 break;
 
@@ -4525,7 +4526,7 @@ public final class ProtoLayoutInflater {
             Log.w(TAG, "No previous fingerprint available.");
             return null;
         }
-                LayoutDiff diff =
+        LayoutDiff diff =
                 ProtoLayoutDiffer.getDiff(prevRenderedMetadata.getTreeFingerprint(), targetLayout);
         if (diff == null) {
             Log.w(TAG, "getDiff failed");
@@ -4563,7 +4564,7 @@ public final class ProtoLayoutInflater {
                 }
 
                 // The parent node might also have been updated.
-                                ViewProperties possibleUpdatedParentInfo =
+                ViewProperties possibleUpdatedParentInfo =
                         layoutInfoBuilder.getViewPropertiesFor(parentNodePosId);
                 parentInfo =
                         possibleUpdatedParentInfo != null
