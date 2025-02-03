@@ -21,9 +21,10 @@
  * Please use that script when creating a new project, rather than copying an existing project and
  * modifying its settings.
  */
+
 import androidx.build.KotlinTarget
-import androidx.build.SoftwareType
 import androidx.build.SdkHelperKt
+import androidx.build.SoftwareType
 
 plugins {
     id("AndroidXPlugin")
@@ -57,6 +58,7 @@ def testGeneratedSourcesPath = "${layout.buildDirectory.get().asFile}/testGenera
 tasks.withType(Test).configureEach { test ->
     test.doFirst {
         systemProperty("test_output_dir", testGeneratedSourcesPath)
+        systemProperty("update_golden_files", System.getProperty("update_golden_files") ?: "false")
     }
 }
 
