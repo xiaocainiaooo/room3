@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -57,7 +59,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -68,8 +69,6 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChild
-import androidx.compose.ui.test.onChildAt
-import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
@@ -296,252 +295,330 @@ class FloatingToolbarTest {
 
     @Test
     fun horizontalFloatingToolbar_trailingContent_expanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            HorizontalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingToolbarTestTag),
-                expanded = true,
-                trailingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
+        var iconButtonSize: Dp = IconButtonDefaults.smallContainerSize().width
+        rule
+            .setMaterialContentForSizeAssertions {
+                if (LocalMinimumInteractiveComponentSize.current > iconButtonSize) {
+                    iconButtonSize = LocalMinimumInteractiveComponentSize.current
+                }
+                HorizontalFloatingToolbar(
+                    expanded = true,
+                    trailingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    content = {}
+                )
+            }
+            .assertHeightIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateTopPadding() +
+                    iconButtonSize +
+                    FloatingToolbarDefaults.ContentPadding.calculateBottomPadding()
             )
-        }
-
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(1)
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertExists()
+            .assertWidthIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateStartPadding(LayoutDirection.Ltr) +
+                    iconButtonSize +
+                    FloatingToolbarDefaults.ContentPadding.calculateEndPadding(LayoutDirection.Ltr)
+            )
     }
 
     @Test
     fun horizontalFloatingToolbar_trailingContent_notExpanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            HorizontalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingToolbarTestTag),
-                expanded = false,
-                trailingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
+        rule
+            .setMaterialContentForSizeAssertions {
+                HorizontalFloatingToolbar(
+                    expanded = false,
+                    trailingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    content = {}
+                )
+            }
+            // Expecting a width of the default content padding
+            .assertWidthIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateStartPadding(LayoutDirection.Ltr) +
+                    FloatingToolbarDefaults.ContentPadding.calculateEndPadding(LayoutDirection.Ltr)
             )
-        }
-
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(0)
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertDoesNotExist()
     }
 
     @Test
     fun horizontalFloatingToolbar_leadingContent_expanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            HorizontalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingToolbarTestTag),
-                expanded = true,
-                leadingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
+        var iconButtonSize: Dp = IconButtonDefaults.smallContainerSize().width
+        rule
+            .setMaterialContentForSizeAssertions {
+                if (LocalMinimumInteractiveComponentSize.current > iconButtonSize) {
+                    iconButtonSize = LocalMinimumInteractiveComponentSize.current
+                }
+                HorizontalFloatingToolbar(
+                    expanded = true,
+                    leadingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    content = {}
+                )
+            }
+            .assertHeightIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateTopPadding() +
+                    iconButtonSize +
+                    FloatingToolbarDefaults.ContentPadding.calculateBottomPadding()
             )
-        }
-
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(1)
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertExists()
+            .assertWidthIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateStartPadding(LayoutDirection.Ltr) +
+                    iconButtonSize +
+                    FloatingToolbarDefaults.ContentPadding.calculateEndPadding(LayoutDirection.Ltr)
+            )
     }
 
     @Test
     fun horizontalFloatingToolbar_leadingContent_notExpanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            HorizontalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingToolbarTestTag),
-                expanded = false,
-                leadingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
+        rule
+            .setMaterialContentForSizeAssertions {
+                HorizontalFloatingToolbar(
+                    expanded = false,
+                    leadingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    content = {}
+                )
+            }
+            // Expecting a width of the default content padding
+            .assertWidthIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateStartPadding(LayoutDirection.Ltr) +
+                    FloatingToolbarDefaults.ContentPadding.calculateEndPadding(LayoutDirection.Ltr)
             )
-        }
-
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(0)
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertDoesNotExist()
     }
 
     @Test
     fun horizontalFloatingToolbar_leadingAndTrailingContent_expanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            HorizontalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingToolbarTestTag),
-                expanded = true,
-                leadingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                trailingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
+        var iconButtonSize: Dp = IconButtonDefaults.smallContainerSize().width
+        rule
+            .setMaterialContentForSizeAssertions {
+                if (LocalMinimumInteractiveComponentSize.current > iconButtonSize) {
+                    iconButtonSize = LocalMinimumInteractiveComponentSize.current
+                }
+                HorizontalFloatingToolbar(
+                    expanded = true,
+                    leadingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    trailingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    content = {}
+                )
+            }
+            .assertHeightIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateTopPadding() +
+                    iconButtonSize +
+                    FloatingToolbarDefaults.ContentPadding.calculateBottomPadding()
             )
-        }
-
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(2)
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildAt(0).assertExists()
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildAt(1).assertExists()
+            .assertWidthIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateStartPadding(LayoutDirection.Ltr) +
+                    iconButtonSize +
+                    iconButtonSize +
+                    FloatingToolbarDefaults.ContentPadding.calculateEndPadding(LayoutDirection.Ltr)
+            )
     }
 
     @Test
     fun horizontalFloatingToolbar_leadingAndTrailingContent_notExpanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            HorizontalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingToolbarTestTag),
-                expanded = false,
-                leadingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                trailingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
+        rule
+            .setMaterialContentForSizeAssertions {
+                HorizontalFloatingToolbar(
+                    expanded = false,
+                    leadingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    trailingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    content = {}
+                )
+            }
+            // Expecting a width of the default content padding
+            .assertWidthIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateStartPadding(LayoutDirection.Ltr) +
+                    FloatingToolbarDefaults.ContentPadding.calculateEndPadding(LayoutDirection.Ltr)
             )
-        }
-
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(0)
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertDoesNotExist()
     }
 
     @Test
     fun verticalFloatingToolbar_trailingContent_expanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            VerticalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingToolbarTestTag),
-                expanded = true,
-                trailingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
+        var iconButtonSize: Dp = IconButtonDefaults.smallContainerSize().height
+        rule
+            .setMaterialContentForSizeAssertions {
+                if (LocalMinimumInteractiveComponentSize.current > iconButtonSize) {
+                    iconButtonSize = LocalMinimumInteractiveComponentSize.current
+                }
+                VerticalFloatingToolbar(
+                    expanded = true,
+                    trailingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    content = {}
+                )
+            }
+            .assertHeightIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateTopPadding() +
+                    iconButtonSize +
+                    FloatingToolbarDefaults.ContentPadding.calculateBottomPadding()
             )
-        }
-
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(1)
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertExists()
+            .assertWidthIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateStartPadding(LayoutDirection.Ltr) +
+                    iconButtonSize +
+                    FloatingToolbarDefaults.ContentPadding.calculateEndPadding(LayoutDirection.Ltr)
+            )
     }
 
     @Test
     fun verticalFloatingToolbar_trailingContent_notExpanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            VerticalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingToolbarTestTag),
-                expanded = false,
-                trailingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
+        rule
+            .setMaterialContentForSizeAssertions {
+                VerticalFloatingToolbar(
+                    expanded = false,
+                    trailingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    content = {}
+                )
+            }
+            // Expecting a height of the default content padding
+            .assertHeightIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateTopPadding() +
+                    FloatingToolbarDefaults.ContentPadding.calculateBottomPadding()
             )
-        }
-
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(0)
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertDoesNotExist()
     }
 
     @Test
     fun verticalFloatingToolbar_leadingContent_expanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            VerticalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingToolbarTestTag),
-                expanded = true,
-                leadingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
+        var iconButtonSize: Dp = IconButtonDefaults.smallContainerSize().height
+        rule
+            .setMaterialContentForSizeAssertions {
+                if (LocalMinimumInteractiveComponentSize.current > iconButtonSize) {
+                    iconButtonSize = LocalMinimumInteractiveComponentSize.current
+                }
+                VerticalFloatingToolbar(
+                    expanded = true,
+                    leadingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    content = {}
+                )
+            }
+            .assertHeightIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateTopPadding() +
+                    iconButtonSize +
+                    FloatingToolbarDefaults.ContentPadding.calculateBottomPadding()
             )
-        }
-
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(1)
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertExists()
+            .assertWidthIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateStartPadding(LayoutDirection.Ltr) +
+                    iconButtonSize +
+                    FloatingToolbarDefaults.ContentPadding.calculateEndPadding(LayoutDirection.Ltr)
+            )
     }
 
     @Test
     fun verticalFloatingToolbar_leadingContent_notExpanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            VerticalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingToolbarTestTag),
-                expanded = false,
-                leadingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
+        rule
+            .setMaterialContentForSizeAssertions {
+                VerticalFloatingToolbar(
+                    expanded = false,
+                    leadingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    content = {}
+                )
+            }
+            // Expecting a height of the default content padding
+            .assertHeightIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateTopPadding() +
+                    FloatingToolbarDefaults.ContentPadding.calculateBottomPadding()
             )
-        }
-
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(0)
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertDoesNotExist()
     }
 
     @Test
     fun verticalFloatingToolbar_leadingAndTrailingContent_expanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            VerticalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingToolbarTestTag),
-                expanded = true,
-                leadingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                trailingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
+        var iconButtonSize: Dp = IconButtonDefaults.smallContainerSize().height
+        rule
+            .setMaterialContentForSizeAssertions {
+                if (LocalMinimumInteractiveComponentSize.current > iconButtonSize) {
+                    iconButtonSize = LocalMinimumInteractiveComponentSize.current
+                }
+                VerticalFloatingToolbar(
+                    expanded = true,
+                    leadingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    trailingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    content = {}
+                )
+            }
+            .assertHeightIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateTopPadding() +
+                    iconButtonSize +
+                    iconButtonSize +
+                    FloatingToolbarDefaults.ContentPadding.calculateBottomPadding()
             )
-        }
-
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(2)
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildAt(0).assertExists()
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildAt(1).assertExists()
+            .assertWidthIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateStartPadding(LayoutDirection.Ltr) +
+                    iconButtonSize +
+                    FloatingToolbarDefaults.ContentPadding.calculateEndPadding(LayoutDirection.Ltr)
+            )
     }
 
     @Test
     fun verticalFloatingToolbar_leadingAndTrailingContent_notExpanded() {
-        rule.setMaterialContent(lightColorScheme()) {
-            VerticalFloatingToolbar(
-                modifier = Modifier.testTag(FloatingToolbarTestTag),
-                expanded = false,
-                leadingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                trailingContent = {
-                    IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                    }
-                },
-                content = {}
+        rule
+            .setMaterialContentForSizeAssertions {
+                VerticalFloatingToolbar(
+                    expanded = false,
+                    leadingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    trailingContent = {
+                        IconButton(onClick = { /* doSomething() */ }) {
+                            Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                        }
+                    },
+                    content = {}
+                )
+            }
+            // Expecting a height of the default content padding
+            .assertHeightIsEqualTo(
+                FloatingToolbarDefaults.ContentPadding.calculateTopPadding() +
+                    FloatingToolbarDefaults.ContentPadding.calculateBottomPadding()
             )
-        }
-
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChildren().assertCountEquals(0)
-        rule.onNodeWithTag(FloatingToolbarTestTag).onChild().assertDoesNotExist()
     }
 
     @Test
@@ -998,6 +1075,158 @@ class FloatingToolbarTest {
     }
 
     @Test
+    fun horizontalFloatingToolbar_expanded_semantics() {
+        lateinit var actionLabel: String
+        rule.setMaterialContent(lightColorScheme()) {
+            actionLabel = getString(Strings.FloatingToolbarCollapse)
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = true,
+                leadingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                    }
+                },
+                trailingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                    }
+                }
+            ) {
+                IconButton(
+                    onClick = { /* doSomething() */ },
+                    modifier = Modifier.testTag(FloatingToolbarMainContentTestTag)
+                ) {
+                    Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                }
+            }
+        }
+
+        val action =
+            rule
+                .onNodeWithTag(FloatingToolbarMainContentTestTag)
+                .fetchSemanticsNode()
+                .config[SemanticsActions.CustomActions]
+
+        assertThat(action).hasSize(1)
+        assertThat(action[0].label).isEqualTo(actionLabel)
+    }
+
+    @Test
+    fun horizontalFloatingToolbar_collapsed_semantics() {
+        lateinit var actionLabel: String
+        rule.setMaterialContent(lightColorScheme()) {
+            actionLabel = getString(Strings.FloatingToolbarExpand)
+            HorizontalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = false,
+                leadingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                    }
+                },
+                trailingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                    }
+                }
+            ) {
+                IconButton(
+                    onClick = { /* doSomething() */ },
+                    modifier = Modifier.testTag(FloatingToolbarMainContentTestTag)
+                ) {
+                    Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                }
+            }
+        }
+
+        val action =
+            rule
+                .onNodeWithTag(FloatingToolbarMainContentTestTag)
+                .fetchSemanticsNode()
+                .config[SemanticsActions.CustomActions]
+
+        assertThat(action).hasSize(1)
+        assertThat(action[0].label).isEqualTo(actionLabel)
+    }
+
+    @Test
+    fun verticalFloatingToolbar_expanded_semantics() {
+        lateinit var actionLabel: String
+        rule.setMaterialContent(lightColorScheme()) {
+            actionLabel = getString(Strings.FloatingToolbarCollapse)
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = true,
+                leadingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                    }
+                },
+                trailingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                    }
+                }
+            ) {
+                IconButton(
+                    onClick = { /* doSomething() */ },
+                    modifier = Modifier.testTag(FloatingToolbarMainContentTestTag)
+                ) {
+                    Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                }
+            }
+        }
+
+        val action =
+            rule
+                .onNodeWithTag(FloatingToolbarMainContentTestTag)
+                .fetchSemanticsNode()
+                .config[SemanticsActions.CustomActions]
+
+        assertThat(action).hasSize(1)
+        assertThat(action[0].label).isEqualTo(actionLabel)
+    }
+
+    @Test
+    fun verticalFloatingToolbar_collapsed_semantics() {
+        lateinit var actionLabel: String
+        rule.setMaterialContent(lightColorScheme()) {
+            actionLabel = getString(Strings.FloatingToolbarExpand)
+            VerticalFloatingToolbar(
+                modifier = Modifier.testTag(FloatingToolbarTestTag),
+                expanded = false,
+                leadingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
+                    }
+                },
+                trailingContent = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                    }
+                }
+            ) {
+                IconButton(
+                    onClick = { /* doSomething() */ },
+                    modifier = Modifier.testTag(FloatingToolbarMainContentTestTag)
+                ) {
+                    Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                }
+            }
+        }
+
+        val action =
+            rule
+                .onNodeWithTag(FloatingToolbarMainContentTestTag)
+                .fetchSemanticsNode()
+                .config[SemanticsActions.CustomActions]
+
+        assertThat(action).hasSize(1)
+        assertThat(action[0].label).isEqualTo(actionLabel)
+    }
+
+    @Test
     fun horizontalFloatingToolbar_withFab_expanded_semantics() {
         lateinit var actionLabel: String
         rule.setMaterialContent(lightColorScheme()) {
@@ -1165,4 +1394,5 @@ class FloatingToolbarTest {
     private val FloatingToolbarTestTag = "floatingToolbar"
     private val FloatingActionButtonTestTag = "floatingActionButton"
     private val FloatingToolbarContentLastItemTestTag = "floatingToolbarContentLastItem"
+    private val FloatingToolbarMainContentTestTag = "floatingToolbarMainContentTestTag"
 }
