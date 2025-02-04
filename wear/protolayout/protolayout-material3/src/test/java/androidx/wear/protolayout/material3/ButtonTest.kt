@@ -26,7 +26,6 @@ import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.material3.CompactButtonStyle.COMPACT_BUTTON_HEIGHT_DP
 import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.backgroundColor
-import androidx.wear.protolayout.modifiers.clickable
 import androidx.wear.protolayout.modifiers.contentDescription
 import androidx.wear.protolayout.testing.LayoutElementAssertionsProvider
 import androidx.wear.protolayout.testing.hasClickable
@@ -275,8 +274,6 @@ class ButtonTest {
                 .setScreenWidthDp(192)
                 .setScreenHeightDp(192)
                 .build()
-
-        private val CLICKABLE = clickable(id = "id")
 
         private const val CONTENT_DESCRIPTION = "This is a button"
 

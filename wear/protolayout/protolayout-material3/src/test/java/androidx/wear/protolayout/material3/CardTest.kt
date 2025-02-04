@@ -543,8 +543,6 @@ class CardTest {
                 .setRendererSchemaVersion(VersionInfo.Builder().setMajor(99).setMinor(999).build())
                 .build()
 
-        private val CLICKABLE = clickable(id = "id")
-
         private const val CONTENT_DESCRIPTION = "This is a card"
 
         private const val IMAGE_ID = "image"

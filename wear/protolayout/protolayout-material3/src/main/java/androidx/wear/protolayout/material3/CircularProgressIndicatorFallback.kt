@@ -157,8 +157,11 @@ private fun trackInDegrees(
         sweepAngle = sweepAngle,
         staticRatio = 1F - (staticProgress - floor(staticProgress)),
         dynamicRatio =
-            if (dynamicProgress == null) null
-            else DynamicFloat.constant(1F).minus(dynamicProgress.rem(1F)),
+            if (dynamicProgress == null) {
+                null
+            } else {
+                DynamicFloat.constant(1F).minus(dynamicProgress.rem(1F))
+            },
         lengthAdjustment = lengthAdjustment
     )
 

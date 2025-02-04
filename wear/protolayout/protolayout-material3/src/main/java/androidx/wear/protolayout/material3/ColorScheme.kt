@@ -15,7 +15,6 @@
  */
 package androidx.wear.protolayout.material3
 
-import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.material3.tokens.ColorTokens
 import androidx.wear.protolayout.types.LayoutColor
 import androidx.wear.protolayout.types.argb

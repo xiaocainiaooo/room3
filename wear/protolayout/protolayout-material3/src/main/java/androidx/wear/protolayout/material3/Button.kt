@@ -233,7 +233,6 @@ public fun MaterialScope.textButton(
  * @sample androidx.wear.protolayout.material3.samples.customButtonSample
  */
 // TODO: b/346958146 - Link Button visuals in DAC
-// TODO: b/373578620 - Add how corners affects margins in the layout.
 public fun MaterialScope.button(
     onClick: Clickable,
     labelContent: (MaterialScope.() -> LayoutElement),
@@ -248,8 +247,11 @@ public fun MaterialScope.button(
     style: ButtonStyle = defaultButtonStyle(),
     @HorizontalAlignment
     horizontalAlignment: Int =
-        if (iconContent == null && secondaryLabelContent == null) HORIZONTAL_ALIGN_CENTER
-        else HORIZONTAL_ALIGN_START,
+        if (iconContent == null && secondaryLabelContent == null) {
+            HORIZONTAL_ALIGN_CENTER
+        } else {
+            HORIZONTAL_ALIGN_START
+        },
     contentPadding: Padding = style.innerPadding
 ): LayoutElement =
     buttonContainer(
@@ -405,8 +407,11 @@ public fun MaterialScope.avatarButton(
                         )
                         .avatarContent(),
                 horizontalAlignment =
-                    if (horizontalAlignment == HORIZONTAL_ALIGN_CENTER) HORIZONTAL_ALIGN_START
-                    else horizontalAlignment,
+                    if (horizontalAlignment == HORIZONTAL_ALIGN_CENTER) {
+                        HORIZONTAL_ALIGN_START
+                    } else {
+                        horizontalAlignment
+                    },
                 style = style,
                 height = height
             )
@@ -488,7 +493,6 @@ public fun MaterialScope.imageButton(
  * @sample androidx.wear.protolayout.material3.samples.compactButtonsSample
  */
 // TODO: b/346958146 - Link Button visuals in DAC
-// TODO: b/373578620 - Add how corners affects margins in the layout.
 public fun MaterialScope.compactButton(
     onClick: Clickable,
     modifier: LayoutModifier = LayoutModifier,
@@ -499,8 +503,11 @@ public fun MaterialScope.compactButton(
     colors: ButtonColors = filledButtonColors(),
     @HorizontalAlignment
     horizontalAlignment: Int =
-        if (iconContent != null && labelContent != null) HORIZONTAL_ALIGN_START
-        else HORIZONTAL_ALIGN_CENTER,
+        if (iconContent != null && labelContent != null) {
+            HORIZONTAL_ALIGN_START
+        } else {
+            HORIZONTAL_ALIGN_CENTER
+        },
     contentPadding: Padding =
         Padding.Builder()
             .setStart(COMPACT_BUTTON_DEFAULT_CONTENT_PADDING_DP.toDp())
@@ -599,11 +606,17 @@ internal fun MaterialScope.buttonContainer(
     modifier: LayoutModifier = LayoutModifier,
     content: (MaterialScope.() -> LayoutElement)? = null,
     width: ContainerDimension =
-        if (content == null) IMAGE_BUTTON_DEFAULT_SIZE_DP.toDp()
-        else wrapWithMinTapTargetDimension(),
+        if (content == null) {
+            IMAGE_BUTTON_DEFAULT_SIZE_DP.toDp()
+        } else {
+            wrapWithMinTapTargetDimension()
+        },
     height: ContainerDimension =
-        if (content == null) IMAGE_BUTTON_DEFAULT_SIZE_DP.toDp()
-        else wrapWithMinTapTargetDimension(),
+        if (content == null) {
+            IMAGE_BUTTON_DEFAULT_SIZE_DP.toDp()
+        } else {
+            wrapWithMinTapTargetDimension()
+        },
     backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     contentPadding: Padding = DEFAULT_CONTENT_PADDING
 ): LayoutElement =

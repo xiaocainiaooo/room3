@@ -46,6 +46,7 @@ import androidx.wear.protolayout.material3.tokens.TextStyle
  * ProtoLayout Material3 components use the values provided here to style their looks.
  *
  * @param colorScheme The customized colors for each color role.
+ * @param shapes The shapes values for each shape role.
  */
 internal class MaterialTheme(
     internal val colorScheme: ColorScheme = ColorScheme(),
