@@ -217,6 +217,17 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     private var scrollPositionToRestore: PointF? = null
     private var zoomToRestore: Float? = null
     @VisibleForTesting internal var isInitialZoomDone: Boolean = false
+
+    /**
+     * Flag to indicate if we need to override fast scroll visibility. This is true when the search
+     * is visible
+     */
+    private var shouldOverrideFastScrollVisibility: Boolean = false
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public var isFastScrollerVisible: Boolean = false
+        private set
+
     /**
      * The width of the PdfView before the last layout change (e.g., before rotation). Used to
      * preserve the zoom level when the device is rotated.
@@ -324,6 +335,16 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
             localPageLayoutManager.increaseReach(position.pageNum)
             deferredScrollPosition = position
             deferredScrollPage = null
+        }
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    public fun overrideFastScrollerVisibility(isVisible: Boolean) {
+        shouldOverrideFastScrollVisibility = !isVisible
+        if (isVisible) {
+            maybeShowFastScroller()
+        } else {
+            maybeHideFastScroller()
         }
     }
 
@@ -452,7 +473,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         canvas.restore()
 
         val documentPageCount = pdfDocument?.pageCount ?: 0
-        if (documentPageCount > 1) {
+        if (documentPageCount > 1 && !shouldOverrideFastScrollVisibility) {
             fastScroller?.drawScroller(
                 canvas,
                 scrollY,
@@ -473,7 +494,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     }
 
     private fun maybeShowFastScroller() {
-        fastScroller?.show { postInvalidate() }
+        if (!shouldOverrideFastScrollVisibility) {
+            isFastScrollerVisible = true
+            fastScroller?.show { postInvalidate() }
+        }
+    }
+
+    private fun maybeHideFastScroller() {
+        isFastScrollerVisible = false
+        fastScroller?.hide { postInvalidate() }
     }
 
     private fun maybeDragSelectionHandle(event: MotionEvent?): Boolean {
@@ -496,7 +525,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         super.onScrollChanged(l, t, oldl, oldt)
         // TODO(b/390003204): Prevent showing of the scrubber when the document only been
         //  translated on the x-axis
-        maybeShowFastScroller()
+        if (t != oldt) {
+            maybeShowFastScroller()
+        }
         onViewportChanged()
     }
 
