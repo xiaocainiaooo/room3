@@ -19,7 +19,7 @@ package androidx.appfunctions.compiler.processors
 import androidx.appfunctions.AppFunctionData
 import androidx.appfunctions.compiler.AppFunctionCompiler
 import androidx.appfunctions.compiler.core.AnnotatedAppFunctionSerializable
-import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.SUPPORTED_ARRAY_TYPES
+import androidx.appfunctions.compiler.core.AnnotatedAppFunctions.Companion.SUPPORTED_ARRAY_PRIMITIVE_TYPES
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableAnnotation
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableFactoryClass
 import androidx.appfunctions.compiler.core.IntrospectionHelper.AppFunctionSerializableFactoryClass.FromAppFunctionDataMethod.APP_FUNCTION_DATA_PARAM_NAME
@@ -262,7 +262,7 @@ class AppFunctionSerializableProcessor(
     }
 
     private fun KSTypeReference.isPrimitiveArray(): Boolean {
-        return SUPPORTED_ARRAY_TYPES.contains(ensureQualifiedTypeName().asString())
+        return SUPPORTED_ARRAY_PRIMITIVE_TYPES.contains(ensureQualifiedTypeName().asString())
     }
 
     private fun KSClassDeclaration.getProperties(): List<KSValueParameter> {
