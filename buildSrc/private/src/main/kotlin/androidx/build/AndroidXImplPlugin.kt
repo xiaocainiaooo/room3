@@ -518,9 +518,6 @@ constructor(private val componentFactory: SoftwareComponentFactory) : Plugin<Pro
                         defaultTargetVersionForNonAndroidTargets.map { JvmTarget.fromTarget(it) }
                     compilations.configureEach { compilation ->
                         compilation.compileJavaTaskProvider?.configure { javaCompile ->
-                            println(
-                                "target javac ${defaultTargetVersionForNonAndroidTargets.get()}"
-                            )
                             javaCompile.targetCompatibility =
                                 defaultTargetVersionForNonAndroidTargets.get()
                             javaCompile.sourceCompatibility =
