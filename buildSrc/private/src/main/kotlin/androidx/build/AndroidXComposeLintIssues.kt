@@ -43,5 +43,6 @@ internal val ComposeLintWarningIdsToTreatAsErrors =
         "ReturnFromAwaitPointerEventScope",
         "UseOfNonLambdaOffsetOverload",
         "MultipleAwaitPointerEventScopes",
-        "LocalContextResourcesRead"
+        "LocalContextResourcesRead",
+        "ConfigurationScreenWidthHeight"
     )

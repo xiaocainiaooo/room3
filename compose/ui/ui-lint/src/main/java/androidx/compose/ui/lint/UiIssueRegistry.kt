@@ -33,6 +33,7 @@ class UiIssueRegistry : IssueRegistry() {
                 ComposedModifierDetector.UnnecessaryComposedModifier,
                 LocalContextResourcesConfigurationReadDetector.LocalContextConfigurationRead,
                 LocalContextResourcesConfigurationReadDetector.LocalContextResourcesRead,
+                ConfigurationScreenWidthHeightDetector.ConfigurationScreenWidthHeight,
                 ModifierDeclarationDetector.ModifierFactoryExtensionFunction,
                 ModifierDeclarationDetector.ModifierFactoryReturnType,
                 ModifierDeclarationDetector.ModifierFactoryUnreferencedReceiver,
