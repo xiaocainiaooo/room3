@@ -1,0 +1,36 @@
+{
+  "projectPath": ":benchmark:benchmark-junit4",
+  "dependencyAdvice": [
+    {
+      "coordinates": {
+        "type": "module",
+        "identifier": "androidx.test:monitor",
+        "resolvedVersion": "1.8.0-alpha01"
+      },
+      "toConfiguration": "implementation"
+    },
+    {
+      "coordinates": {
+        "type": "module",
+        "identifier": "androidx.test:runner",
+        "resolvedVersion": "1.5.2"
+      },
+      "fromConfiguration": "implementation",
+      "toConfiguration": "api"
+    },
+    {
+      "coordinates": {
+        "type": "project",
+        "identifier": ":benchmark:benchmark-traceprocessor"
+      },
+      "toConfiguration": "api"
+    },
+    {
+      "coordinates": {
+        "type": "project",
+        "identifier": ":internal-testutils-ktx"
+      },
+      "fromConfiguration": "androidTestImplementation"
+    }
+  ]
+}
