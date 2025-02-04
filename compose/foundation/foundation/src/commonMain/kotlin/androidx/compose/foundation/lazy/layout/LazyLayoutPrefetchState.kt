@@ -70,9 +70,10 @@ class LazyLayoutPrefetchState(
      *
      * @param index item index to prefetch.
      * @param constraints [Constraints] to use for premeasuring.
-     * @param onItemPrefetched This callback is called when the item premeasuring is finished. If
-     *   the request is canceled or no measuring is performed this callback won't be called. Use
-     *   [LazyLayoutPrefetchResultScope.getSize] to get the item's size.
+     * @param onItemPrefetched This callback is called when the item prefetching is finished. This
+     *   means precomposition and premeasuring. If the request is canceled before either phases can
+     *   complete, this callback won't be called. Use [LazyLayoutPrefetchResultScope.getSize] to get
+     *   the item's available size in pixels.
      */
     fun schedulePrefetch(
         index: Int,
@@ -123,7 +124,7 @@ class LazyLayoutPrefetchState(
         /** The amount of placeables composed into this item. */
         val placeablesCount: Int
 
-        /** Retrieves the latest measured size for a given placeable [index]. */
+        /** Retrieves the latest measured size for a given placeable [index] in pixels. */
         fun getSize(index: Int): IntSize
     }
 
