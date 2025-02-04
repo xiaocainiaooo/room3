@@ -86,7 +86,7 @@ public open class PdfView
 constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
     View(context, attrs, defStyle) {
 
-    private val fastScrollVerticalThumbDrawable: Drawable?
+    public val fastScrollVerticalThumbDrawable: Drawable?
     private val fastScrollVerticalTrackDrawable: Drawable?
     private val fastScrollPageIndicatorBackgroundDrawable: Drawable?
 
@@ -182,6 +182,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
         get() {
             return selectionStateManager?.selectionModel?.value?.selection
         }
+
+    @VisibleForTesting
+    public val currentPageIndicatorLabel: String
+        get() = fastScroller?.fastScrollDrawer?.currentPageIndicatorLabel ?: ""
 
     /** Listener interface to receive updates when the [currentSelection] changes */
     public interface OnSelectionChangedListener {

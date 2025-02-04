@@ -16,8 +16,19 @@
 
 package androidx.pdf
 
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.pdf.idlingresource.PdfIdlingResource
+import androidx.pdf.testapp.R
+import androidx.pdf.view.PdfView
 import androidx.pdf.viewer.fragment.PdfViewerFragmentV2
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 /**
  * A subclass fragment from [PdfViewerFragmentV2] to include [androidx.test.espresso.IdlingResource]
@@ -29,15 +40,73 @@ internal class TestPdfViewerFragmentV2 : PdfViewerFragmentV2() {
 
     val pdfLoadingIdlingResource = PdfIdlingResource(PDF_LOAD_RESOURCE_NAME)
 
+    private var hostView: FrameLayout? = null
+    private var search: FloatingActionButton? = null
+
+    var documentLoaded = false
+    var documentError: Throwable? = null
+
+    fun getPdfViewInstance(): PdfView = pdfView
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = super.onCreateView(inflater, container, savedInstanceState) as ConstraintLayout
+
+        // Inflate the custom layout for this fragment
+        hostView = inflater.inflate(R.layout.fragment_host, container, false) as FrameLayout
+        hostView?.let { hostView -> handleInsets(hostView) }
+
+        // Add the default PDF viewer to the custom layout
+        hostView?.addView(view)
+        return hostView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        search = hostView?.findViewById(R.id.host_Search)
+
+        // Show/hide the search button based on initial toolbox visibility
+        if (isToolboxVisible) search?.show() else search?.hide()
+
+        // Set up search button click listener
+        search?.setOnClickListener { isTextSearchActive = true }
+    }
+
+    override fun onRequestImmersiveMode(enterImmersive: Boolean) {
+        super.onRequestImmersiveMode(enterImmersive)
+        if (!enterImmersive) search?.show() else search?.hide()
+    }
+
     override fun onLoadDocumentSuccess() {
+        documentLoaded = true
         pdfLoadingIdlingResource.decrement()
     }
 
     override fun onLoadDocumentError(error: Throwable) {
+        documentError = error
         pdfLoadingIdlingResource.decrement()
     }
 
     companion object {
         private const val PDF_LOAD_RESOURCE_NAME = "PdfLoad"
+
+        fun handleInsets(hostView: View) {
+            ViewCompat.setOnApplyWindowInsetsListener(hostView) { view, insets ->
+                // Get the insets for the system bars (status bar, navigation bar)
+                val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+                // Adjust the padding of the container view to accommodate system windows
+                view.setPadding(
+                    view.paddingLeft,
+                    systemBarsInsets.top,
+                    view.paddingRight,
+                    systemBarsInsets.bottom
+                )
+                insets
+            }
+        }
     }
 }

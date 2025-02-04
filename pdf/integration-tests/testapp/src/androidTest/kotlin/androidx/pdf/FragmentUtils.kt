@@ -18,7 +18,6 @@ package androidx.pdf
 
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.lifecycle.Lifecycle
-import androidx.pdf.idlingresource.PdfIdlingResource
 import androidx.test.platform.app.InstrumentationRegistry
 
 internal object FragmentUtils {
@@ -30,7 +29,7 @@ internal object FragmentUtils {
         filename: String = TEST_DOCUMENT_FILE,
         nextState: Lifecycle.State,
         orientation: Int,
-        pdfLoadingIdlingResource: PdfIdlingResource
+        onDocumentLoading: (() -> Unit)? = null
     ): FragmentScenario<TestPdfViewerFragmentV2> {
         val context = InstrumentationRegistry.getInstrumentation().context
         val inputStream = context.assets.open(filename)
@@ -38,11 +37,13 @@ internal object FragmentUtils {
         scenario.moveToState(nextState)
         scenario.onFragment { it.requireActivity().requestedOrientation = orientation }
 
+        onDocumentLoading?.invoke()
+
         // Load the document in the fragment
         scenario.onFragment { fragment ->
-            fragment.documentUri = TestUtils.saveStream(inputStream, fragment.requireContext())
             // Increment pdf load idling resource to wait for background task to complete.
-            pdfLoadingIdlingResource.increment()
+            fragment.pdfLoadingIdlingResource.increment()
+            fragment.documentUri = TestUtils.saveStream(inputStream, fragment.requireContext())
         }
 
         return scenario
