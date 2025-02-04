@@ -29,6 +29,8 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntRect
 
 /** Interface that allows libraries to override the behavior of [AnimatedPane]. */
@@ -147,6 +149,7 @@ private object DefaultAnimatedPaneOverride : AnimatedPaneOverride {
                             lookaheadScope = this,
                             enabled = animatingBounds
                         )
+                        .semantics { isTraversalGroup = true }
                         .then(if (animatingBounds) Modifier else Modifier.clipToBounds()),
                 enter = enterTransition,
                 exit = exitTransition
