@@ -56,8 +56,8 @@ constructor(
      * implement a particular predefined schema.
      */
     public val schema: AppFunctionSchemaMetadata?,
-    /** The parameters of the AppFunction. Parameters are stored as properties in the object. */
-    public val parameters: AppFunctionObjectTypeMetadata,
+    /** The parameters of the AppFunction. */
+    public val parameters: List<AppFunctionParameterMetadata>,
     /** The response of the AppFunction. */
     public val response: AppFunctionResponseMetadata,
     /** Reusable components that could be shared within the function specification. */
@@ -103,7 +103,7 @@ constructor(
                 } else {
                     null
                 },
-            parameters = parameters.toAppFunctionDataTypeMetadataDocument(),
+            parameters = parameters.map { it.toAppFunctionParameterMetadataDocument() },
             response = response.toAppFunctionResponseMetadataDocument(),
             components = components.toAppFunctionComponentsMetadataDocument()
         )
@@ -126,8 +126,8 @@ public data class AppFunctionMetadataDocument(
     @Document.BooleanProperty public val isEnabledByDefault: Boolean,
     /** The predefined schema of the AppFunction. */
     @Document.DocumentProperty public val schema: AppFunctionSchemaMetadataDocument?,
-    /** The parameters of the AppFunction. Parameters are stored as properties in the object. */
-    @Document.DocumentProperty public val parameters: AppFunctionDataTypeMetadataDocument,
+    /** The parameters of the AppFunction. */
+    @Document.DocumentProperty public val parameters: List<AppFunctionParameterMetadataDocument>,
     /** The response of the AppFunction. */
     @Document.DocumentProperty public val response: AppFunctionResponseMetadataDocument,
     /** The reusable components for the AppFunction. */

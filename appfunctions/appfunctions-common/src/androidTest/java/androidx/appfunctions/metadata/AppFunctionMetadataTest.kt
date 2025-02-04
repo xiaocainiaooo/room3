@@ -27,13 +27,7 @@ class AppFunctionMetadataTest {
     fun appFunctionMetadata_equalsAndHashCode() {
         val schema =
             AppFunctionSchemaMetadata(category = "testCategory", name = "testName", version = 1L)
-        val parameters =
-            AppFunctionObjectTypeMetadata(
-                properties = emptyMap(),
-                required = emptyList(),
-                qualifiedName = "qualifiedName",
-                isNullable = false
-            )
+        val parameters = emptyList<AppFunctionParameterMetadata>()
         val response =
             AppFunctionResponseMetadata(
                 valueType = AppFunctionPrimitiveTypeMetadata(type = TYPE_STRING, isNullable = false)
@@ -78,15 +72,19 @@ class AppFunctionMetadataTest {
             AppFunctionSchemaMetadata(category = "testCategory", name = "testName", version = 1L)
         val primitiveTypeInt = AppFunctionPrimitiveTypeMetadata(TYPE_INT, true)
         val primitiveTypeLong = AppFunctionPrimitiveTypeMetadata(TYPE_LONG, true)
-        val properties =
-            mapOf(
-                "prop1" to primitiveTypeInt,
-                "prop2" to primitiveTypeLong,
-            )
-        val isNullable = false
-        val requiredProperties = listOf("prop1", "prop2")
         val parameters =
-            AppFunctionObjectTypeMetadata(properties, requiredProperties, null, isNullable)
+            listOf<AppFunctionParameterMetadata>(
+                AppFunctionParameterMetadata(
+                    name = "prop1",
+                    isRequired = false,
+                    dataType = primitiveTypeInt
+                ),
+                AppFunctionParameterMetadata(
+                    name = "prop2",
+                    isRequired = true,
+                    dataType = primitiveTypeLong
+                ),
+            )
         val response =
             AppFunctionResponseMetadata(
                 valueType = AppFunctionPrimitiveTypeMetadata(type = TYPE_STRING, isNullable = false)
@@ -117,7 +115,7 @@ class AppFunctionMetadataTest {
                 id = id,
                 isEnabledByDefault = isEnabledByDefault,
                 schema = schemaMetadata.toAppFunctionSchemaMetadataDocument(),
-                parameters = parameters.toAppFunctionDataTypeMetadataDocument(),
+                parameters = parameters.map { it.toAppFunctionParameterMetadataDocument() },
                 response = response.toAppFunctionResponseMetadataDocument(),
                 components = components.toAppFunctionComponentsMetadataDocument()
             )

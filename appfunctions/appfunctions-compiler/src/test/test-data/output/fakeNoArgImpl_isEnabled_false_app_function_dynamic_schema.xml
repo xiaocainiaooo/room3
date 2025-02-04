@@ -6,11 +6,6 @@
         </components>
         <id>com.testdata.FakeNoArgImpl_IsEnabled_False#noArg</id>
         <enabledByDefault>false</enabledByDefault>
-        <parameters>
-            <id>unused</id>
-            <isNullable>false</isNullable>
-            <type>3</type>
-        </parameters>
         <response>
             <id>unused</id>
             <valueType>
