@@ -151,7 +151,11 @@ private object DefaultAnimatedPaneOverride : AnimatedPaneOverride {
                 enter = enterTransition,
                 exit = exitTransition
             ) {
-                AnimatedPaneScope.create(this).content()
+                (scope as ThreePaneScaffoldPaneScopeImpl).saveableStateHolder.SaveableStateProvider(
+                    paneRole.toString()
+                ) {
+                    AnimatedPaneScope.create(this).content()
+                }
             }
         }
     }
