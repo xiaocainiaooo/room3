@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-@file:Suppress("UnstableApiUsage")
-
-package androidx.compose.runtime.lint
+package androidx.lifecycle.runtime.compose.lint
 
 import androidx.compose.lint.Name
 import androidx.compose.lint.Package
@@ -37,30 +35,32 @@ import org.jetbrains.uast.USimpleNameReferenceExpression
 import org.jetbrains.uast.tryResolve
 
 /**
- * [Detector] that checks calls to StateFlow.value to make sure they don't happen inside the body of
- * a composable function / lambda.
+ * [com.android.tools.lint.detector.api.Detector] that checks calls to Lifecycle.currentState to
+ * make sure they don't happen inside the body of a composable function / lambda.
+ *
+ * Based on [androidx.compose.runtime.lint.ComposableStateFlowValueDetector].
  */
-class ComposableStateFlowValueDetector : Detector(), SourceCodeScanner {
+class ComposableLifecycleCurrentStateDetector : Detector(), SourceCodeScanner {
     override fun getApplicableUastTypes() = listOf(USimpleNameReferenceExpression::class.java)
 
     override fun createUastHandler(context: JavaContext) =
         object : UElementHandler() {
             override fun visitSimpleNameReferenceExpression(node: USimpleNameReferenceExpression) {
-                // Look for a call to .value that comes from StateFlow
-                if (node.identifier != "value") return
+                // Look for a call to .currentState that comes from Lifecycle
+                if (node.identifier != "currentState") return
                 val method = node.tryResolve() as? PsiMethod ?: return
-                if (method.containingClass?.inheritsFrom(StateFlowName) == true) {
+                if (method.containingClass?.inheritsFrom(LifecycleName) == true) {
                     if (node.isInvokedWithinComposable()) {
                         context.report(
-                            StateFlowValueCalledInComposition,
+                            LifecycleCurrentStateInComposition,
                             node,
                             context.getNameLocation(node),
-                            "StateFlow.value should not be called within composition",
+                            "Lifecycle.currentState should not be called within composition",
                             fix()
                                 .replace()
-                                .text("value")
-                                .with("collectAsState().value")
-                                .imports("androidx.compose.runtime.collectAsState")
+                                .text("currentState")
+                                .with("currentStateAsState().value")
+                                .imports("androidx.lifecycle.compose.currentStateAsState")
                                 .build()
                         )
                     }
@@ -69,24 +69,24 @@ class ComposableStateFlowValueDetector : Detector(), SourceCodeScanner {
         }
 
     companion object {
-        val StateFlowValueCalledInComposition =
-            Issue.create(
-                "StateFlowValueCalledInComposition",
-                "StateFlow.value should not be called within composition",
-                "Calling StateFlow.value within composition will not observe changes to the " +
-                    "StateFlow, so changes might not be reflected within the composition. Instead " +
-                    "you should use stateFlow.collectAsState() to observe changes to the StateFlow, " +
+        val LifecycleCurrentStateInComposition =
+            Issue.Companion.create(
+                "LifecycleCurrentStateInComposition",
+                "Lifecycle.currentState should not be called within composition",
+                "Calling Lifecycle.currentState within composition will not observe changes to the " +
+                    "Lifecycle, so changes might not be reflected within the composition. Instead " +
+                    "you should use lifecycle.currentStateAsState() to observe changes to the Lifecycle, " +
                     "and recompose when it changes.",
-                Category.CORRECTNESS,
+                Category.Companion.CORRECTNESS,
                 3,
                 Severity.ERROR,
                 Implementation(
-                    ComposableStateFlowValueDetector::class.java,
+                    ComposableLifecycleCurrentStateDetector::class.java,
                     EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
                 )
             )
     }
 }
 
-private val StateFlowPackageName = Package("kotlinx.coroutines.flow")
-private val StateFlowName = Name(StateFlowPackageName, "StateFlow")
+private val LifecyclePackageName = Package("androidx.lifecycle")
+private val LifecycleName = Name(LifecyclePackageName, "Lifecycle")
