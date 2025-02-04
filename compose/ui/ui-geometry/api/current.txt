@@ -248,7 +248,7 @@ package androidx.compose.ui.geometry {
 
   public static final class RoundRect.Companion {
     method public androidx.compose.ui.geometry.RoundRect getZero();
-    property public androidx.compose.ui.geometry.RoundRect Zero;
+    property public static androidx.compose.ui.geometry.RoundRect Zero;
   }
 
   public final class RoundRectKt {

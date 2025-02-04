@@ -241,8 +241,8 @@ package androidx.room {
     method @Deprecated public void setTransactionSuccessful();
     property public androidx.room.InvalidationTracker invalidationTracker;
     property public boolean isOpen;
-    property @Deprecated @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) protected java.util.List<androidx.room.RoomDatabase.Callback>? mCallbacks;
-    property @Deprecated @kotlin.jvm.Volatile protected androidx.sqlite.db.SupportSQLiteDatabase? mDatabase;
+    property @Deprecated @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX) protected final java.util.List<androidx.room.RoomDatabase.Callback>? mCallbacks;
+    property @Deprecated @kotlin.jvm.Volatile protected final androidx.sqlite.db.SupportSQLiteDatabase? mDatabase;
     property public androidx.sqlite.db.SupportSQLiteOpenHelper openHelper;
     property public java.util.concurrent.Executor queryExecutor;
     property public java.util.concurrent.Executor transactionExecutor;
@@ -611,7 +611,7 @@ package androidx.room.util {
     method public static String? joinIntoString(java.util.List<java.lang.Integer>? input);
     method @Deprecated public static StringBuilder newStringBuilder();
     method public static java.util.List<java.lang.Integer>? splitToIntList(String? input);
-    property @Deprecated public String?[] EMPTY_STRING_ARRAY;
+    property @Deprecated public static String?[] EMPTY_STRING_ARRAY;
     field @Deprecated public static final String?[] EMPTY_STRING_ARRAY;
   }
 

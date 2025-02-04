@@ -272,7 +272,7 @@ package androidx.compose.runtime {
 
   public interface CompositionLocalAccessorScope {
     method public <T> T getCurrentValue(androidx.compose.runtime.CompositionLocal<T>);
-    property public T currentValue;
+    property public abstract T currentValue;
   }
 
   @androidx.compose.runtime.Stable public final class CompositionLocalContext {

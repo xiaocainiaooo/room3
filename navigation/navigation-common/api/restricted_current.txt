@@ -262,7 +262,7 @@ package androidx.navigation {
     method public inline <reified T> boolean hasRoute(androidx.navigation.NavDestination);
     method public <T> boolean hasRoute(androidx.navigation.NavDestination, kotlin.reflect.KClass<T> route);
     method protected <C> Class<? extends C?> parseClassFromName(android.content.Context context, String name, Class<? extends C?> expectedClassType);
-    property public kotlin.sequences.Sequence<androidx.navigation.NavDestination> hierarchy;
+    property public static kotlin.sequences.Sequence<androidx.navigation.NavDestination> hierarchy;
   }
 
   @androidx.navigation.NavDestinationDsl public class NavDestinationBuilder<D extends androidx.navigation.NavDestination> {
