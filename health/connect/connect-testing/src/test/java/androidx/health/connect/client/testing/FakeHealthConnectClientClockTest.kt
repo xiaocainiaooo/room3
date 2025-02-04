@@ -16,7 +16,6 @@
 
 package androidx.health.connect.client.testing
 
-import android.health.connect.datatypes.Metadata.RECORDING_METHOD_MANUAL_ENTRY
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeightRecord
 import androidx.health.connect.client.records.metadata.Metadata
@@ -52,11 +51,7 @@ class FakeHealthConnectClientClockTest {
             exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_RUNNING,
             title = "Record1",
             exerciseRoute = null,
-            metadata =
-                Metadata(
-                    recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
-                    clientRecordId = "FakeHealthConnectData1"
-                )
+            metadata = Metadata.manualEntry(clientRecordId = "FakeHealthConnectData1")
         )
 
     private val record2 =
@@ -68,11 +63,7 @@ class FakeHealthConnectClientClockTest {
             exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_RUNNING,
             title = "Record2",
             exerciseRoute = null,
-            metadata =
-                Metadata(
-                    recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
-                    clientRecordId = "FakeHealthConnectData2"
-                )
+            metadata = Metadata.manualEntry(clientRecordId = "FakeHealthConnectData2")
         )
 
     private val fake =
@@ -182,11 +173,7 @@ class FakeHealthConnectClientClockTest {
         val heightRecord =
             HeightRecord(
                 time = fixedInstant.minusSeconds(29),
-                metadata =
-                    Metadata(
-                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
-                        clientRecordId = "HeightRecord#1"
-                    ),
+                metadata = Metadata.manualEntry(clientRecordId = "HeightRecord#1"),
                 height = Length.meters(1.8),
                 zoneOffset = zoneOffset
             )
@@ -225,11 +212,7 @@ class FakeHealthConnectClientClockTest {
         val heightRecord =
             HeightRecord(
                 time = fixedInstant.minusSeconds(29),
-                metadata =
-                    Metadata(
-                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
-                        clientRecordId = "HeightRecord#1"
-                    ),
+                metadata = Metadata.manualEntry(clientRecordId = "HeightRecord#1"),
                 height = Length.meters(1.8),
                 zoneOffset = zoneOffset
             )
@@ -273,11 +256,7 @@ class FakeHealthConnectClientClockTest {
         val heightRecord =
             HeightRecord(
                 time = fixedInstant.minusSeconds(29),
-                metadata =
-                    Metadata(
-                        recordingMethod = RECORDING_METHOD_MANUAL_ENTRY,
-                        clientRecordId = "HeightRecord#1"
-                    ),
+                metadata = Metadata.manualEntry(clientRecordId = "HeightRecord#1"),
                 height = Length.meters(1.8),
                 zoneOffset = zoneOffset
             )

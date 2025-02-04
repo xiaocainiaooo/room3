@@ -27,6 +27,7 @@ import androidx.health.connect.client.records.metadata.Device
 import androidx.health.connect.client.records.metadata.Metadata
 
 internal fun PlatformMetadata.toSdkMetadata(): Metadata {
+    @Suppress("DEPRECATION") // The constructor will become internal
     return Metadata(
         id = id,
         dataOrigin = dataOrigin.toSdkDataOrigin(),
