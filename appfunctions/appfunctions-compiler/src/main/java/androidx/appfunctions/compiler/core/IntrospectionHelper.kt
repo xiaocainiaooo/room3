@@ -49,6 +49,8 @@ object IntrospectionHelper {
         ClassName(APP_FUNCTIONS_METADATA_PACKAGE_NAME, "AppFunctionMetadata")
     val APP_FUNCTION_FUNCTION_NOT_FOUND_EXCEPTION_CLASS =
         ClassName(APP_FUNCTIONS_PACKAGE_NAME, "AppFunctionFunctionNotFoundException")
+    val APP_FUNCTION_SCHEMA_METADATA_CLASS =
+        ClassName(APP_FUNCTIONS_METADATA_PACKAGE_NAME, "AppFunctionSchemaMetadata")
 
     object ConfigurableAppFunctionFactoryClass {
         val CLASS_NAME =
