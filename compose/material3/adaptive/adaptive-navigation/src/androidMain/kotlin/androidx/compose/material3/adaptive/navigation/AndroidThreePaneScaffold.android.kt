@@ -61,7 +61,8 @@ fun <T> NavigableListDetailPaneScaffold(
     detailPane: @Composable ThreePaneScaffoldPaneScope.() -> Unit,
     modifier: Modifier = Modifier,
     extraPane: (@Composable ThreePaneScaffoldPaneScope.() -> Unit)? = null,
-    defaultBackBehavior: BackNavigationBehavior = BackNavigationBehavior.PopUntilContentChange,
+    defaultBackBehavior: BackNavigationBehavior =
+        BackNavigationBehavior.PopUntilScaffoldValueChange,
     paneExpansionDragHandle: (@Composable ThreePaneScaffoldScope.(PaneExpansionState) -> Unit)? =
         null,
     paneExpansionState: PaneExpansionState? = null,
@@ -113,7 +114,8 @@ fun <T> NavigableSupportingPaneScaffold(
     supportingPane: @Composable ThreePaneScaffoldPaneScope.() -> Unit,
     modifier: Modifier = Modifier,
     extraPane: (@Composable ThreePaneScaffoldPaneScope.() -> Unit)? = null,
-    defaultBackBehavior: BackNavigationBehavior = BackNavigationBehavior.PopUntilContentChange,
+    defaultBackBehavior: BackNavigationBehavior =
+        BackNavigationBehavior.PopUntilScaffoldValueChange,
     paneExpansionDragHandle: (@Composable ThreePaneScaffoldScope.(PaneExpansionState) -> Unit)? =
         null,
     paneExpansionState: PaneExpansionState? = null,
