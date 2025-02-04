@@ -148,7 +148,8 @@ internal class FastScrollDrawer(
         visiblePages: Range<Int>
     ) {
         val label = generateLabel(visiblePages)
-        val pageIndicatorWidthPx = (label.length + (2 * pageIndicatorTextOffsetDp)).dpToPx(context)
+        val labelWidth = textPaint.measureText(label).toInt()
+        val pageIndicatorWidthPx = labelWidth + (2 * pageIndicatorTextOffsetDp.dpToPx(context))
 
         val indicatorLeftPx =
             thumbLeftPx - pageIndicatorWidthPx - pageIndicatorRightMarginDp.dpToPx(context)
@@ -163,10 +164,7 @@ internal class FastScrollDrawer(
         )
         pageIndicatorBackground.draw(canvas)
 
-        val xPos =
-            indicatorLeftPx +
-                ((pageIndicatorWidthPx - label.length) / 2) +
-                pageIndicatorTextXOffsetDp
+        val xPos = indicatorLeftPx + (pageIndicatorWidthPx / 2)
         val yPos = indicatorTopPx + pageIndicatorTextYOffsetDp
         canvas.drawText(label, xPos.toFloat(), yPos.toFloat(), textPaint)
     }
