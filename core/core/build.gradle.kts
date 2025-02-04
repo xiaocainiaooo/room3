@@ -48,6 +48,7 @@ dependencies {
     androidTestImplementation(libs.espressoCore)
     androidTestImplementation(libs.mockitoCore)
     androidTestImplementation(libs.testUiautomator)
+    androidTestImplementation(libs.opentest4j)
 
     androidTestImplementation("androidx.lifecycle:lifecycle-runtime-testing:2.6.2")
 
