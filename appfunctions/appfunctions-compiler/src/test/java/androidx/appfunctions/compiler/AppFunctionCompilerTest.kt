@@ -148,6 +148,21 @@ class AppFunctionCompilerTest {
         )
     }
 
+    @Test
+    fun testFakeAllPrimitiveParamsImpl_genAppFunctionInventoryImpl_success() {
+        val report =
+            compilationTestHelper.compileAll(
+                sourceFileNames = listOf("FakeAllPrimitiveParamsImpl.KT", "FakeSchemas.KT")
+            )
+
+        compilationTestHelper.assertSuccessWithSourceContent(
+            report = report,
+            expectGeneratedSourceFileName =
+                "${'$'}FakeAllPrimitiveParamsImpl_AppFunctionInventory.kt",
+            goldenFileName = "${'$'}FakeAllPrimitiveParamsImpl_AppFunctionInventory.KT",
+        )
+    }
+
     // TODO(b/392587953): disabling test temporarily as AppFunctionSerializable types are not
     // supported yet in AppFunctionSerializableFactory.
     //    @Test

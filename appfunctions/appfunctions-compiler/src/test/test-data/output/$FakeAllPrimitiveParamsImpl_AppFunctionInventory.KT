@@ -9,12 +9,14 @@ import kotlin.collections.Map
 
 /**
  * Source Files:
- * SimpleFunction.....kt
+ * FakeAllPrimitiveParamsImpl.....kt
+ * FakeSchemas.....kt
  */
 @Generated("androidx.appfunctions.compiler.AppFunctionCompiler")
-public class `$SimpleFunction_AppFunctionInventory` : AppFunctionInventory {
+public class `$FakeAllPrimitiveParamsImpl_AppFunctionInventory` : AppFunctionInventory {
   override val functionIdToMetadataMap: Map<String, AppFunctionMetadata> = mapOf()
 
-  private val COM_TESTDATA_SIMPLEFUNCTION_SIMPLEFUNCTION_SCHEMA_METADATA: AppFunctionSchemaMetadata?
-      = null
+  private val COM_TESTDATA_FAKEALLPRIMITIVEPARAMSIMPL_ALLPRIMITIVEPARAMS_SCHEMA_METADATA:
+      AppFunctionSchemaMetadata? = AppFunctionSchemaMetadata(category= "fake_schema_category",
+      name="allPrimitiveParams", version=1)
 }
