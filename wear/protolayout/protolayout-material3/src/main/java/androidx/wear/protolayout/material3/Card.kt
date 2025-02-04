@@ -103,7 +103,11 @@ public fun MaterialScope.titleCard(
     time: (MaterialScope.() -> LayoutElement)? = null,
     height: ContainerDimension = wrapWithMinTapTargetDimension(),
     shape: Corner =
-        if (deviceConfiguration.screenWidthDp.isBreakpoint()) shapes.extraLarge else shapes.large,
+        if (deviceConfiguration.screenWidthDp.isBreakpoint()) {
+            shapes.extraLarge
+        } else {
+            shapes.large
+        },
     colors: CardColors = filledCardColors(),
     backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     style: TitleCardStyle = defaultTitleCardStyle(),
@@ -225,7 +229,11 @@ public fun MaterialScope.appCard(
     time: (MaterialScope.() -> LayoutElement)? = null,
     height: ContainerDimension = wrapWithMinTapTargetDimension(),
     shape: Corner =
-        if (deviceConfiguration.screenWidthDp.isBreakpoint()) shapes.extraLarge else shapes.large,
+        if (deviceConfiguration.screenWidthDp.isBreakpoint()) {
+            shapes.extraLarge
+        } else {
+            shapes.large
+        },
     colors: CardColors = filledCardColors(),
     backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     style: AppCardStyle = defaultAppCardStyle(),
@@ -363,7 +371,11 @@ public fun MaterialScope.textDataCard(
     colors: CardColors = filledCardColors(),
     backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     style: DataCardStyle =
-        if (secondaryText == null) defaultCompactDataCardStyle() else defaultDataCardStyle(),
+        if (secondaryText == null) {
+            defaultCompactDataCardStyle()
+        } else {
+            defaultDataCardStyle()
+        },
     contentPadding: Padding = style.innerPadding,
 ): LayoutElement =
     card(
@@ -481,7 +493,11 @@ public fun MaterialScope.iconDataCard(
     colors: CardColors = filledCardColors(),
     backgroundContent: (MaterialScope.() -> LayoutElement)? = null,
     style: DataCardStyle =
-        if (secondaryIcon == null) defaultCompactDataCardStyle() else defaultDataCardStyle(),
+        if (secondaryIcon == null) {
+            defaultCompactDataCardStyle()
+        } else {
+            defaultDataCardStyle()
+        },
     titleContentPlacement: TitleContentPlacementInDataCard = TitleContentPlacementInDataCard.Bottom,
     contentPadding: Padding = style.innerPadding,
 ): LayoutElement =
@@ -635,9 +651,11 @@ public fun MaterialScope.graphicDataCard(
                 if (
                     horizontalAlignment != HORIZONTAL_ALIGN_START &&
                         horizontalAlignment != HORIZONTAL_ALIGN_END
-                )
+                ) {
                     HORIZONTAL_ALIGN_START
-                else horizontalAlignment
+                } else {
+                    horizontalAlignment
+                }
         )
     }
 

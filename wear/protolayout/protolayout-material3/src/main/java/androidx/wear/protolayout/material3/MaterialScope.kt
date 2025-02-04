@@ -48,20 +48,24 @@ import androidx.wear.protolayout.types.argb
 //    Builder tool.
 // TODO: b/350927030 - Customization setters of shape and typography, which are not fully
 //   customizable.
-// TODO: b/369116159 - Add samples on usage.
 @MaterialScopeMarker
 public open class MaterialScope
 /**
  * @param context The Android Context for the Tile service
  * @param deviceConfiguration The device parameters for where the components will be rendered
- * @param allowDynamicTheme If dynamic colors theme should be used on components, meaning that
+ * @param allowDynamicTheme Whether dynamic colors theme should be used on components, meaning that
+ *   the colors following the current system theme
  * @param theme The theme to be used. If not set, default Material theme will be applied
  * @param defaultTextElementStyle The opinionated text style that text component can use as defaults
  * @param defaultIconStyle The opinionated icon style that icon component can use as defaults
+ * @param defaultBackgroundImageStyle The opinionated background image style that background image
+ *   component can use as defaults
+ * @param defaultAvatarImageStyle The opinionated avatar image style that avatar image component can
+ *   use as defaults
+ * @property deviceConfiguration The device parameters for where the components will be rendered
  */
 internal constructor(
     internal val context: Context,
-    /** The device parameters for where the components will be rendered. */
     public val deviceConfiguration: DeviceParameters,
     internal val allowDynamicTheme: Boolean,
     internal val theme: MaterialTheme,
@@ -106,7 +110,7 @@ internal constructor(
  *
  * @param context The Android Context for the Tile service
  * @param deviceConfiguration The device parameters for where the components will be rendered
- * @param allowDynamicTheme If dynamic colors theme should be used on components, meaning that
+ * @param allowDynamicTheme Whether dynamic colors theme should be used on components, meaning that
  *   colors will follow the system theme if enabled on the device. If not set, defaults to using the
  *   system theme
  * @param defaultColorScheme Color Scheme with static colors. The color theme to be used, when
@@ -148,6 +152,7 @@ public fun materialScope(
         )
         .layout()
 
+/** DSL marker used to distinguish between [MaterialScope] and other item scopes. */
 @DslMarker public annotation class MaterialScopeMarker
 
 internal class TextElementStyle(
@@ -170,7 +175,7 @@ internal class IconStyle(
 internal class BackgroundImageStyle(
     val width: ImageDimension = expand(),
     val height: ImageDimension = expand(),
-    val overlayColor: LayoutColor = ColorTokens.BACKGROUND.argb.withOpacity(/* ratio= */ 0.6f),
+    val overlayColor: LayoutColor = ColorTokens.BACKGROUND.argb.withOpacity(ratio = 0.6f),
     val overlayWidth: ContainerDimension = expand(),
     val overlayHeight: ContainerDimension = expand(),
     val shape: Corner = ShapeTokens.CORNER_LARGE,

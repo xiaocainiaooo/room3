@@ -291,9 +291,11 @@ private fun MaterialScope.getHeaderContent(
         headerBuilder
             .addContent(
                 horizontalSpacer(
-                    if (deviceConfiguration.screenHeightDp.isBreakpoint())
+                    if (deviceConfiguration.screenHeightDp.isBreakpoint()) {
                         HEADER_ICON_TITLE_SPACER_HEIGHT_LARGE_DP
-                    else HEADER_ICON_TITLE_SPACER_HEIGHT_SMALL_DP
+                    } else {
+                        HEADER_ICON_TITLE_SPACER_HEIGHT_SMALL_DP
+                    }
                 )
             )
             .addContent(titleSlot)

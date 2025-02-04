@@ -27,6 +27,7 @@ import androidx.wear.protolayout.DimensionBuilders
 import androidx.wear.protolayout.DimensionBuilders.ContainerDimension
 import androidx.wear.protolayout.DimensionBuilders.DpProp
 import androidx.wear.protolayout.DimensionBuilders.WrappedDimensionProp
+import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.DimensionBuilders.weight
 import androidx.wear.protolayout.DimensionBuilders.wrap
@@ -75,6 +76,10 @@ internal fun String.toTagBytes(): ByteArray = toByteArray(StandardCharsets.UTF_8
 /** Returns String representation of tag from Metadata. */
 internal fun ElementMetadata.toTagName(): String = String(tagData, StandardCharsets.UTF_8)
 
+/**
+ * Adds the given [newItem] between each element in this [Iterable], starting after the first and
+ * ending before the last one.
+ */
 internal fun <T> Iterable<T>.addBetween(newItem: T): Sequence<T> = sequence {
     var isFirst = true
     for (element in this@addBetween) {
@@ -88,9 +93,11 @@ internal fun <T> Iterable<T>.addBetween(newItem: T): Sequence<T> = sequence {
 }
 
 @Dimension(unit = SP)
-internal fun Float.dpToSp(fontScale: Float): Float =
-    (if (SDK_INT >= UPSIDE_DOWN_CAKE) FontScaleConverterFactory.forScale(fontScale) else null)
-        ?.convertDpToSp(this) ?: dpToSpLinear(fontScale)
+internal fun Float.dpToSp(fontScale: Float): Float {
+    val converter =
+        if (SDK_INT >= UPSIDE_DOWN_CAKE) FontScaleConverterFactory.forScale(fontScale) else null
+    return converter?.convertDpToSp(this) ?: dpToSpLinear(fontScale)
+}
 
 @Dimension(unit = SP) private fun Float.dpToSpLinear(fontScale: Float): Float = this / fontScale
 
@@ -123,7 +130,7 @@ internal fun wrapWithMinTapTargetDimension(): WrappedDimensionProp =
  */
 internal fun LayoutColor.withOpacity(@FloatRange(from = 0.0, to = 1.0) ratio: Float): LayoutColor {
     // From androidx.core.graphics.ColorUtils
-    require(!(ratio < 0 || ratio > 1)) { "setOpacityForColor ratio must be between 0 and 1." }
+    require(ratio in 0.0..1.0) { "withOpacity ratio must be between 0 and 1." }
     val fullyOpaque = 255
     val alphaMask = 0x00ffffff
     val alpha = (ratio * fullyOpaque).toInt()
@@ -163,7 +170,7 @@ internal fun MaterialScope.componentContainer(
     backgroundContent: (MaterialScope.() -> LayoutElement)?,
     contentPadding: Padding,
     metadataTag: String?,
-    content: (MaterialScope.() -> LayoutElement)?
+    content: (MaterialScope.() -> LayoutElement)?,
 ): LayoutElement {
     val mod =
         LayoutModifier.semanticsRole(SEMANTICS_ROLE_BUTTON) then
@@ -196,7 +203,7 @@ internal fun MaterialScope.componentContainer(
                             overlayWidth = width,
                             overlayHeight = height,
                             shape = protoLayoutModifiers.background?.corner ?: shapes.large,
-                            contentScaleMode = LayoutElementBuilders.CONTENT_SCALE_MODE_FILL_BOUNDS
+                            contentScaleMode = LayoutElementBuilders.CONTENT_SCALE_MODE_FILL_BOUNDS,
                         )
                 )
                 .backgroundContent()
@@ -222,12 +229,12 @@ internal fun MaterialScope.componentContainer(
 internal fun MaterialScope.percentagePadding(
     @FloatRange(from = 0.0, to = 1.0) start: Float,
     @FloatRange(from = 0.0, to = 1.0) end: Float,
-    @FloatRange(from = 0.0, to = 1.0) bottom: Float
+    @FloatRange(from = 0.0, to = 1.0) bottom: Float,
 ): Padding =
     padding(
         start = percentageWidthToDp(start),
         end = percentageWidthToDp(end),
-        bottom = percentageHeightToDp(bottom)
+        bottom = percentageHeightToDp(bottom),
     )
 
 /**
@@ -239,7 +246,7 @@ internal fun MaterialScope.percentagePadding(
  */
 internal fun MaterialScope.percentagePadding(
     @FloatRange(from = 0.0, to = 1.0) start: Float,
-    @FloatRange(from = 0.0, to = 1.0) end: Float
+    @FloatRange(from = 0.0, to = 1.0) end: Float,
 ): Padding = padding(start = percentageWidthToDp(start), end = percentageWidthToDp(end))
 
 /**
@@ -278,7 +285,7 @@ internal fun MaterialScope.weightAsExpand(
  */
 internal fun DeviceParameters.weightForContainer(
     @FloatRange(from = 0.0, to = 100.0) weightValue: Float
-): DimensionBuilders.ContainerDimension =
+): ContainerDimension =
     if (rendererSchemaVersion.hasExpandWithWeightSupport()) {
         weight(weightValue)
     } else {
